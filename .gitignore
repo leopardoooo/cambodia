@@ -24,3 +24,6 @@ release.properties
 .classpath
 .project
 .settings/
+
+# MAC #
+.DS_Store
