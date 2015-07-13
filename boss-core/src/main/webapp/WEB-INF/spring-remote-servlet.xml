@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd"
+	default-autowire="byName" default-lazy-init="false">
+
+	<bean name="/acct"
+		class="org.springframework.remoting.httpinvoker.HttpInvokerServiceExporter"
+		scope="prototype">
+		<property name="service">
+			<bean
+				class="com.ycsoft.business.service.externalImpl.AcctServiceExternal"
+				scope="prototype" />
+		</property>
+		<property name="serviceInterface"
+			value="com.ycsoft.business.service.externalImpl.IAcctServiceExternal" />
+	</bean>
+
+	<bean name="/user"
+		class="org.springframework.remoting.httpinvoker.HttpInvokerServiceExporter"
+		scope="prototype">
+		<property name="service">
+			<bean
+				class="com.ycsoft.business.service.externalImpl.UserServiceExternal"
+				scope="prototype" />
+		</property>
+		<property name="serviceInterface"
+			value="com.ycsoft.business.service.externalImpl.IUserServiceExternal" />
+	</bean>
+	<bean name="/userProd"
+		class="org.springframework.remoting.httpinvoker.HttpInvokerServiceExporter"
+		scope="prototype">
+		<property name="service">
+			<bean
+				class="com.ycsoft.business.service.externalImpl.UserProdServiceExternal"
+				scope="prototype" />
+		</property>
+		<property name="serviceInterface"
+			value="com.ycsoft.business.service.externalImpl.IUserProdServiceExternal" />
+	</bean>
+	<bean name="/valuableCard"
+		class="org.springframework.remoting.httpinvoker.HttpInvokerServiceExporter"
+		scope="prototype">
+		<property name="service">
+			<bean
+				class="com.ycsoft.business.service.externalImpl.ValuableCardServiceExternal"
+				scope="prototype" />
+		</property>
+		<property name="serviceInterface"
+			value="com.ycsoft.business.service.externalImpl.IValuableCardServiceExternal" />
+	</bean>
+	<bean name="/queryCust"
+		class="org.springframework.remoting.httpinvoker.HttpInvokerServiceExporter"
+		scope="prototype">
+		<property name="service">
+			<bean
+				class="com.ycsoft.business.service.externalImpl.QueryCustServiceExternal"
+				scope="prototype" />
+		</property>
+		<property name="serviceInterface"
+			value="com.ycsoft.business.service.externalImpl.IQueryCustServiceExternal" />
+	</bean>
+	<bean name="/queryUser"
+		class="org.springframework.remoting.httpinvoker.HttpInvokerServiceExporter"
+		scope="prototype">
+		<property name="service">
+			<bean
+				class="com.ycsoft.business.service.externalImpl.QueryUserServiceExternal"
+				scope="prototype" />
+		</property>
+		<property name="serviceInterface"
+			value="com.ycsoft.business.service.externalImpl.IQueryUserServiceExternal" />
+	</bean>
+	<bean name="/doneCode"
+		class="org.springframework.remoting.httpinvoker.HttpInvokerServiceExporter"
+		scope="prototype">
+		<property name="service">
+			<bean
+				class="com.ycsoft.business.service.externalImpl.DoneCodeServiceExternal"
+				scope="prototype" />
+		</property>
+		<property name="serviceInterface"
+			value="com.ycsoft.business.service.externalImpl.IDoneCodeServiceExternal" />
+	</bean>
+	<bean name="/pay"
+		class="org.springframework.remoting.httpinvoker.HttpInvokerServiceExporter"
+		scope="prototype">
+		<property name="service">
+			<bean
+				class="com.ycsoft.business.service.externalImpl.PayServiceExternal"
+				scope="prototype" />
+		</property>
+		<property name="serviceInterface"
+			value="com.ycsoft.business.service.externalImpl.IPayServiceExternal" />
+	</bean>
+	<bean name="/cust"
+		class="org.springframework.remoting.httpinvoker.HttpInvokerServiceExporter"
+		scope="prototype">
+		<property name="service">
+			<bean
+				class="com.ycsoft.business.service.externalImpl.CustServiceExternal"
+				scope="prototype" />
+		</property>
+		<property name="serviceInterface"
+			value="com.ycsoft.business.service.externalImpl.ICustServiceExternal" />
+	</bean>
+	<bean name="/task"
+		class="org.springframework.remoting.httpinvoker.HttpInvokerServiceExporter"
+		scope="prototype">
+		<property name="service">
+			<bean
+				class="com.ycsoft.business.service.externalImpl.TaskServiceExternal"
+				scope="prototype" />
+		</property>
+		<property name="serviceInterface"
+			value="com.ycsoft.business.service.externalImpl.ITaskServiceExternal" />
+	</bean>
+</beans>

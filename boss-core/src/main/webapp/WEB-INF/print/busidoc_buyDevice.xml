@@ -1,0 +1,97 @@
+ <?xml version="1.0" encoding="GBK"?>
+<div class="Cl">
+	<tpl if="values.params.device">
+		<div class="print_item">
+			<div class="row">
+				<div class="title_1">业务{point}</div>
+				<div class="title_2">购买设备</div>
+			</div>
+
+			<div class="row" >
+				<div class="title_1">&nbsp;</div>
+				<div class="field" style="width: 50%;">
+					<span>购买方式：{[values.params.device.buy_mode_text]} </span>
+				</div>
+				<div class="field" style="width: 40%;">
+					<span>设备类型：{[values.params.device.device_type_text]} </span>
+				</div>
+			</div>
+
+			<tpl if="values.params.device.device_type=='STB'">
+				<div class="row" >
+					<div class="title_1">&nbsp;</div>
+					<div class="field" style="width: 50%;">
+						<span>型号：{[values.params.device.deviceModel.model_name]}
+						</span>
+					</div>
+					<div class="field" style="width: 40%;">
+						<span>交互类型：{[values.params.device.deviceModel.interactive_type_text]}
+						</span>
+					</div>
+				</div>
+				<div class="row" >
+					<div class="title_1">&nbsp;</div>
+					<div class="field" style="width: 50%;">
+						<span>机顶盒号：{[values.params.device.device_code]} </span>
+					</div>
+					<div class="field" style="width: 40%;">
+						<span>清晰度：{[values.params.device.deviceModel.definition_type_text]}
+						</span>
+					</div>
+				</div>
+
+				<tpl if="values.params.device.pairCard">
+					<div class="title_1">&nbsp;</div>
+					<div class="row" >
+						<div class="field" style="width: 50%;">
+							<span>配对卡型号：{[values.params.device.pairCard.device_model]} </span>
+						</div>
+						<div class="field" style="width: 40%;">
+							<span>卡号：{[values.params.device.pairCard.card_id]} </span>
+						</div>
+					</div>
+				</tpl>
+				<tpl if="values.params.device.pairModem">
+					<div class="title_1">&nbsp;配对猫：</div>
+					<div class="row" >
+						<div class="title_1">&nbsp;
+						</div>
+						<div class="field" style="width: 50%;">
+							<span>型号：{[values.params.device.pairModem.device_model]} </span>
+						</div>
+						<div class="field" style="width: 40%;">
+							<span>MAC：{[values.params.device.pairModem.modem_mac]} </span>
+						</div>
+					</div>
+				</tpl>
+
+			</tpl>
+
+			<tpl if="values.params.device.device_type=='CARD'">
+				<div class="row">
+					<div class="title_1">&nbsp;
+					</div>
+					<div class="field" style="width: 50%;">
+						<span>卡型号：{[values.params.device.device_model]} </span>
+					</div>
+					<div class="field" style="width: 40%;">
+						<span>智能卡号：{[values.params.device.device_code]} </span>
+					</div>
+				</div>
+			</tpl>
+
+			<tpl if="values.params.device.device_type=='MODEM'">
+				<div class="row">
+					<div class="title_1">&nbsp;
+					</div>
+					<div class="field" style="width: 50%;">
+						<span>Modem型号：{[values.params.device.deviceModel.device_model]} </span>
+					</div>
+					<div class="field" style="width: 40%;">
+						<span>Modem Mac：{[values.params.device.device_code]} </span>
+					</div>
+				</div>
+			</tpl>
+		</div>
+	</tpl>
+</div>

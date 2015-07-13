@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="GBK"?>
+<div class="Cl">
+<tpl if="params.user_type == '模拟电视'">
+	<div class="print_item">
+		<div class="row">
+			<div class="title_1">业务{point}</div>
+			<div class="title_2">新装</div>
+		</div>
+		<div class="row">
+			<div class="title_1">&nbsp;</div>
+			<div class="field"> <span>业务类型：模拟电视</span></div>
+		</div>
+
+		<div class="row">
+				<div class="title_1">&nbsp;</div>
+	 			<div class="field"> <span>终端数量：{[values.params.busi_count]}台</span></div>
+				<div class="field"> <span>终端类型：主终端</span></div>
+		</div>
+	</div>
+</tpl>
+<tpl if="params.user_type == '数字电视'">
+	<div class="print_item">
+			<div class="row">
+				<div class="title_1">业务{point}</div>
+				<div class="title_2">新装</div>
+			</div>
+			<div class="row">
+				<div class="title_1">&nbsp;</div>
+				<div class="field"> <span>业务类型：数字电视</span></div>
+			</div>
+			<div class="row">
+				<div class="title_1">&nbsp;</div>
+				<div class="field" style="width: 50%;" ><span>机顶盒号：{values.params.stb_id}</span></div>
+				<div class="field" style="width: 40%;"><span>智能卡号：{values.params.card_id}</span></div>
+			</div>
+			<div class="row">
+				<div class="title_1">&nbsp;</div>
+				<div class="field" style="width: 50%;"> <span>终端类型：{values.params.terminal_type}</span></div>
+			</div>
+			<div class="row">
+				<div class="title_1">&nbsp;</div>
+				<div class="field">&nbsp;</div>
+				<div class="field">&nbsp;</div>
+			</div>
+		
+	</div>
+</tpl>
+<tpl if="params.user_type == '宽带'">
+	<div class="print_item">
+		<div class="row">
+			<div class="title_1">业务{point}</div>
+			<div class="title_2">新装</div>
+		</div>
+		<div class="row" style="padding-left:100px;">
+			<div class="field" style="width:50%;"> <span>业务类型：互联网</span></div>
+			<div class="field" style="width:50%;"> <span>Modem Mac：{values.params.modem_mac}</span></div>
+	  	</div>
+		<div class="row" style="padding-left:100px;">
+			<div class="field" style="width:50%;"> <span>上网帐号：{values.params.login_name}</span></div>
+			<div class="field" style="width:50%;"> <span>密码：{values.params.login_password}</span></div>
+		</div>
+	</div>
+</tpl>
+</div>

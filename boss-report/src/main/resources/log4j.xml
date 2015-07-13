@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="GBK" ?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+<log4j:configuration debug="false"
+	xmlns:log4j="http://jakarta.apache.org/log4j/">
+	<appender name="CON" class="org.apache.log4j.ConsoleAppender">
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d{MM-dd HH\:mm\:ss} [%5p]-[%c\:%L] %3x - %m%n" />
+		</layout>
+	</appender>
+
+	<appender name="SYS" class="org.apache.log4j.RollingFileAppender">
+		<param name="File" value="${catalina.home}/logs/bossreport.log" />
+		<param name="MaxFileSize" value="10MB" />
+		<param name="MaxBackupIndex" value="30" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d{MM-dd HH\:mm\:ss} [%5p]-[%c\:%L] %3x - %m%n" />
+		</layout>
+		<filter class="org.apache.log4j.varia.LevelRangeFilter">
+			<param name="levelMin" value="DEBUG" />
+			<param name="levelMax" value="ERROR" />
+			<param name="AcceptOnMatch" value="true" />
+		</filter>
+	</appender>
+	
+	<logger name="com.opensymphony">
+		<level value="INFO" />
+		<appender-ref ref="SYS" />
+		<appender-ref ref="CON" />
+	</logger>
+	<logger name="org.apache">
+		<level value="INFO" />
+		<appender-ref ref="SYS" />
+		<appender-ref ref="CON" />
+	</logger>
+	<logger name="org.springframework.jdbc.core.JdbcTemplate">
+		<level value="INFO" />
+		<appender-ref ref="SYS" />
+		<appender-ref ref="CON" />
+	</logger>
+	<logger name="org.springframework">
+		<level value="INFO" />
+		<appender-ref ref="SYS" />
+		<appender-ref ref="CON" />
+	</logger>
+	<logger name="com.ycsoft">
+		<level value="DEBUG" />
+		<appender-ref ref="CON" />
+		<appender-ref ref="SYS" />
+	</logger>
+	<!--  
+	<root> 
+		<level value="INFO" />
+		<appender-ref ref="CON" />
+	</root>-->
+</log4j:configuration>

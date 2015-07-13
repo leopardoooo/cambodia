@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="GBK"?>
+<div class="Cl">
+	
+	<div class="print_item">
+		<div class="row">
+			<div class="title_1">业务{point}</div>
+			<div class="title_2" >宽带升级</div>
+		</div>
+		<tpl if="values.params.bandUser">
+			<div class="row" >
+				<div class="field" ><span>网络类型:{values.params.bandUser.net_type}</span></div>
+				<div class="field" ><span>绑定方式:{values.params.bandUser.bind_type}</span></div>
+				<div class="field" style="padding-left:100px;"><span>登录名:{values.params.bandUser.login_name}</span></div>
+				<div class="field"><span>MAC:{values.params.bandUser.modem_mac}</span></div>
+			</div>
+		</tpl>
+		
+		<tpl if="values.params.old_prod">
+			<div class="row">
+				<div class="field" style="width: 50%;" ><span>原产品名称：{values.params.old_prod.prod_name}</span></div>
+				<div class="field" style="width: 40%;" ><span>资费：{values.params.old_prod.tariff_name}</span></div>
+			</div>
+		</tpl>
+		
+		<tpl if="values.params.new_prod">
+			<div class="row">
+				<div class="field" style="width: 50%;" ><span>新产品名称：{values.params.new_prod.prod_name}</span></div>
+				<div class="field" style="width: 40%;" ><span>资费：{values.params.new_prod.tariff_name}</span></div>
+			</div>
+			<div class="row">
+				<div class="title_1">&nbsp;</div>
+				<div class="field" style="width: 90%;" ><span>产品描述：</span></div>
+			</div>
+			<div class="row">
+				<div class="title_1">&nbsp;&nbsp;</div>
+				<div class="field" style="width: 90%;padding-left:60px;" >
+					<span>{values.params.new_prod.prod_desc}</span>
+				</div>
+			</div>
+			<tpl if="values.params.new_prod.prod_descs">
+				<tpl for="values.params.new_prod.prod_descs">
+					<div class="row">
+						<div class="title_1">&nbsp;</div>
+						<div class="field" style="width: 90%;" >
+							<span></span>
+						</div>
+					</div>
+				</tpl>
+			</tpl>
+<div class="row"></div> 
+		</tpl>
+		
+	</div>
+</div>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="GBK"?>
+<div class="Cl">
+	<div class="print_item">
+		<div class="row">
+				<div class="title_1">业务{point}</div>
+				<div class="title_2">促销<!-- 【流水号：{[values.item.done_code]}】 --></div>
+			</div>
+		 <tpl for="params">
+			<tpl if="values.user">
+				<div class="row">
+					<div class="title_1">&nbsp;</div>
+					<div class="field" style="width: 90%;"><span>智能卡号：   {[values.user.card_id]}</span></div>
+				</div>
+			</tpl>
+			
+			<div class="row">
+				<div class="title_1">&nbsp;</div>
+				<div class="field" style="width: 90%;"><span>促销名称：{[values.promotion_name]}</span></div>
+			</div>
+			<div class="row">
+				<div class="title_1">&nbsp;</div>
+				<div class="field" style="width: 90%;" >促销说明：</div>
+			</div>
+			<div class="row">
+				<div class="title_1">&nbsp;</div>
+				<div class="field" style="width: 90%;" >
+					<span>{[values.promotion_desc]}</span>
+				</div>
+			</div>
+			<tpl if="values.promotion_descs">
+				<tpl for="values.promotion_descs">
+					<div class="row">
+						<div class="title_1">&nbsp;</div>
+						<div class="field" style="width: 90%;" >
+							<span></span>
+						</div>
+					</div>
+				</tpl>
+			</tpl>
+			<div class="row"></div>
+		</tpl>
+		
+	</div>
+</div>

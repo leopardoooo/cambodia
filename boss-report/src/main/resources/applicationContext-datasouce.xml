@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+           http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
+           http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+           http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd"
+	default-autowire="byName" default-lazy-init="false">
+	
+
+	<!-- 属性文件读入 -->
+	<bean id="propertyConfigurer"
+		class="com.ycsoft.commons.config.CustomPropertyConfigurer">
+		<property name="locations">
+			<list>
+				<value>classpath*:*.properties</value>
+			</list>
+		</property>
+	</bean>
+
+<!-- 数据源定义,使用Apache DBCP 连接池 -->
+	<bean id="dataSource"
+		class="com.mchange.v2.c3p0.ComboPooledDataSource"
+		destroy-method="close">
+		<property name="driverClass" value="${jdbc.driverClassName}"/>
+		<property name="jdbcUrl" value="${jdbc.url}"/>
+		<property name="user" value="${jdbc.user}"/>
+		<property name="password" value="${jdbc.password}"/>
+		<property name="minPoolSize" value="${jdbc.minPoolSize}"/>
+		<property name="maxPoolSize" value="${jdbc.maxPoolSize}"/>
+		<property name="acquireIncrement" value="${jdbc.acquireIncrement}"/>
+		<!--property name="maxStatements" value="${jdbc.maxStatements}"/-->
+		<!-- property name="maxIdleTime" value="${jdbc.maxIdleTime}"/-->
+		<!-- property name="automaticTestTable" value="${jdbc.automaticTestTable}"/-->
+		<!--property name="idleConnectionTestPeriod" value="${jdbc.idleConnectionTestPeriod}"/-->
+		<!--property name="checkoutTimeout" value="${jdbc.checkoutTimeout}"/-->
+	</bean>
+
+	<!--
+		<bean id="dataSource"
+		class="org.springframework.jndi.JndiObjectFactoryBean"> <property
+		name="jndiName"><value>java:comp/env/jdbc/ds</value></property>
+		</bean>
+	-->
+
+	<!-- 支持 @Transactional 标记 -->
+	<tx:annotation-driven transaction-manager="transactionManager" />
+
+	<!-- 支持 @AspectJ 标记-->
+	<aop:aspectj-autoproxy />
+
+	<!-- 以AspectJ方式 定义 AOP -->
+	<aop:config proxy-target-class="true">
+		<!--
+			<aop:advisor pointcut="execution(*
+			javacommon.base.BaseManager.*(..))" advice-ref="txAdvice"/>
+		-->
+		<aop:advisor pointcut="execution(* com.ycsoft.report.web.action..*.*(..))"
+			advice-ref="txAdvice" />
+	</aop:config>
+
+	<!--
+		基本事务定义,使用transactionManager作事务管理,默认get* find*方法的事务为readonly,其余方法按默认设置.
+	-->
+	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+		<tx:attributes>
+			<tx:method name="save*"   read-only="false" rollback-for="Exception"   propagation="REQUIRED" />
+			<tx:method name="update*" read-only="false" rollback-for="Exception"   propagation="REQUIRED" />
+			<tx:method name="delete*" read-only="false" rollback-for="Exception"   propagation="REQUIRED" />
+			<tx:method name="init*"   read-only="false" rollback-for="Exception"   propagation="REQUIRED" />
+			<tx:method name="*"       read-only="true" />
+		</tx:attributes>
+	</tx:advice>
+
+	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+    
+    <!-- Transaction manager for a single JDBC DataSource -->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+    
+	<bean id="sqlGenerator" class="com.ycsoft.daos.core.generator.OracleGenerator"></bean>
+ 	
+</beans>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="GBK"?>
+<div class="Cl">
+<tpl if="params.user_type == '模拟电视'">
+	<div class="print_item">
+		<div class="row">
+			<div class="title_1">业务{point}</div>
+			<div class="title_2">接线</div>
+		</div>
+		<div class="row">
+			<div class="title_1">&nbsp;</div>
+			<div class="field"> <span>业务类型：模拟电视</span></div>
+		</div>
+		<div class="row">
+			<div class="title_1">&nbsp;</div>
+			<div class="field" style="width: 50%;"> <span>终端数量：{[values.params.user_count]}台</span></div>
+			<div class="field" style="width: 40%;"> <span>终端类型：主终端</span></div>
+		</div>
+		<tpl for="params.prods">
+			<div class="row">
+				<div class="title_1">&nbsp;</div>
+				<div class="field" style="width: 50%;"> <span>产品名称：{prod_name}</span></div>
+				<div class="field" style="width: 40%;"> <span>计费方式：{tariff_name}</span></div>
+			</div>
+		</tpl>
+	</div>
+</tpl>
+</div>

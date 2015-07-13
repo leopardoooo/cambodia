@@ -1,0 +1,162 @@
+*, img, a img, a:hover img {
+	border:0 none;
+	font-family:Arial,sans-serif,Helvetic;
+	font-size:12px;
+	margin:0;
+	padding:0;
+}
+body{
+	margin: 0;
+	padding: 0em;
+	overflow: hidden;
+	background-color:#F8FCFF;
+	background-image:url(./../images/login/input-bg.gif);
+	background-position:0 -620px;
+	background-repeat:repeat-x;
+	text-align:center;
+}
+a, a:link {
+	color:#507EA4;
+	text-decoration:none;
+}
+a:hover {
+	color:#0059d9;
+	text-decoration:none;
+}
+.top{
+	text-align: right;
+	width: 100%;
+}
+#login-info{
+	margin-left:auto;
+	margin-right:auto;
+	margin-top:10px;
+	width:800px;
+}
+#login-info .ml{
+	background-image:url(./../images/login/body-bg.jpg);
+	background-repeat:no-repeat;
+	float:left;
+	height:377px;
+	text-align:left;
+	width:232px;
+}
+#login-info .input{
+	float:left;
+	height:377px;
+	width:310px;
+	background-image:url(./../images/login/input-bg.gif);
+	background-position:0 -116px;
+	background-repeat:repeat-x;
+}
+#login-info .input .logfrom{
+	margin-left: 26px;
+}
+#login-info .mr{
+	background-image:url(./../images/login/body-bg.jpg);
+	background-position:-233px 0;
+	background-repeat:no-repeat;
+	float:left;
+	height:377px;
+	width:232px;
+}
+.foot{
+	background-color:#F6F6F6;
+	border-top:1px solid #EBEBEB;
+	color:#909090;
+	line-height:22px;
+	overflow:hidden;
+	padding:15px 0;
+	text-align:center;
+	width:100%;
+}.foot li {
+	display:inline;
+	padding-right:10px;
+}.foot a{
+	color: #909090;
+}.foot a:hover{
+	color: #666;
+}li{
+	list-style-type:none;
+}
+
+.logo{
+	background-position:left top;
+	background-repeat:no-repeat;
+	height:72px;
+	margin-bottom:25px;
+	margin-top:45px;
+	margin-left:5px;
+	background-image:url(./../images/login/logo.gif);
+}
+.logTab th{
+	color:#666666;
+	font-weight:normal;
+	line-height:14px;
+	text-align:right;
+	width:62px;
+}
+.inner-input-cmp input{
+	border:1px solid #B8B8B8;
+	font-size:14px;
+	height:24px;
+	margin-left: 7px;
+	line-height:20px;
+	padding-bottom:1px;
+	padding-left:2px;
+	padding-top:2px;
+	width:173px;
+}
+.input-focus{
+	background-color: #F8FEBC;
+}
+.input-blur{
+	background-color: #FFFFFF;
+}
+.input-error{
+	background-color: #FB375F;
+}
+.check{
+	margin:0 2px !important;
+	vertical-align:middle !important;
+}
+.Sel_Ver{
+}
+.Sel_Ver label{
+	line-height: 22px;
+	height:22px;
+	color: #909090;
+}
+.logTab tr{
+	height: 32px;
+}
+.message{
+	padding-left: 30px;
+	padding-top: 20px;
+	color: red;
+	height: 58;
+}
+.message li{
+	list-style-type: disc;
+}
+.login-b, .login-b2, .login-b3 {
+	background-image:url(./../images/login/login-btn.gif);
+	background-position:0 0;
+	background-repeat:no-repeat;
+	border:0 none;
+	cursor:pointer !important;
+	display:block;
+	float:left;
+	height:32px;
+	margin-left:3px;
+	margin-top:7px;
+	width:82px;
+}
+.login-b2 {
+	background-image:url(./../images/login/login-btn.gif);
+	background-position:0 -33px;
+}
+.login-b3 {
+	background-image:url(./../images/login/login-btn.gif);
+	background-position:0 -66px;
+}

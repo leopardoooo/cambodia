@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="GBK" ?>
+<div id="header" style="position: relative; height: 360px; ">
+	<div class="Cl"style="height: 23px;position: relative; ">
+		<div style="position: absolute; top: 75px; right: 265px;">NO:{id}</div>
+		<div style="position: absolute; top: 105px; right: 265px; ">第 <span class="currentPage"></span>/<span class="totalPage"></span> 页</div>
+	</div>
+	<div class="Cl">
+		<div class="print_item" style="position: relative;height: 135px;">
+			<div>
+				<div style="position: absolute; top: 80px; left: 125px;"><span>客户名：{[values.custInfo.cust.cust_name]}</span></div>
+			</div>
+			<div>
+				<div style="position: absolute; top: 110px; left: 125px;"><span>客户编号：{[values.custInfo.cust.cust_no]}&nbsp;&nbsp;&nbsp;&nbsp;[{[values.custInfo.cust.cust_type_text]}]</span></div>
+			</div>
+			<div>
+				<div style="position: absolute; top: 140px; left: 125px;"><span>证件类别：{[values.custInfo.linkman.cert_type_text || ""]}</span></div>
+				<div style="position: absolute; top: 140px; left: 450px;"><span>证件号码：{[fm.formatIdOrPhone(values.custInfo.linkman.cert_num || "")]}</span></div>
+			</div>
+			<div>
+				<div style="position: absolute; top: 170px; left: 125px;"><span>座&nbsp;&nbsp;&nbsp;&nbsp;机：{[fm.formatIdOrPhone(values.custInfo.linkman.tel || "")]}</span></div>
+				<div style="position: absolute; top: 170px; left: 450px;"><span>手&nbsp;&nbsp;&nbsp;&nbsp;机：{[fm.formatIdOrPhone(values.custInfo.linkman.mobile || "")]}</span></div>
+			</div>
+			<div>
+			<!-- formatIdOrPhone -->
+				<div style="position: absolute; top: 200px; left: 125px;"><span>代收银行：{[values.custInfo.acctBank.bank_code_text || ""]}</span></div>
+				<div style="position: absolute; top: 200px; left: 450px;"><span>卡&nbsp;&nbsp;&nbsp;&nbsp;号：{[fm.formatIdOrPhone(values.custInfo.acctBank.bank_account || "")]}</span></div>
+			</div>
+			<div>
+				<div style="position: absolute; top: 227px; left: 125px;"><span>装机地址：{[values.custInfo.cust.address || ""]}</span></div>
+			</div>
+			<div style="position: absolute; top: 257px; left: 125px;">
+					受理员：{loginName}
+	 		</div>
+			<div style="position: absolute; top: 257px; left: 350px;">
+					营业厅：{optrDeptName}
+	 		</div>
+	 		
+	 		<div style="position: absolute; top: 257px; left: 575px;">
+	 			<span>
+	 				小区网络类型：{[values.custInfo.cust.add_net_type_text || ""]}
+	 			</span>
+	 		</div>
+	 		
+			<div>
+				<div style="position: absolute; top: 287px; left: 125px;"><span>受理时间：{done_date}</span></div>
+			</div>	 		
+	 		
+		</div>
+	</div>
+
+	<div style="position: absolute; top: 1360px; left: 830px;">
+		
+	</div>
+	
+ </div>   
+ 
+ 
+<div id="content" style=" position: absolute; left: 70px; width:1020px; >
+ 
+	{subItems}	
+	<div class="Cl">
+		<div class="print_item">
+			<tpl if="fees && fees.length &gt; 0">
+				<div class="row" >
+					<div class="title_1">付费信息</div><div class="title_1">&nbsp;</div>
+				</div>
+				<tpl for="fees">
+					<tpl for="list">
+						<div class="row" style="padding-left:60px;">
+							<div class="field" style="width: 30%;"><span>{acctitem_name}</span></div>
+							<tpl if="printitem_id == '10001602' " >
+								<div class="field" style="width: 12%;"><span>数量： {count}</span></div>
+							</tpl>
+							<tpl if="printitem_id != '10001602' " >
+								<div class="field" style="width: 12%;"><span>&nbsp;</span></div>
+							</tpl>
+							<div class="field" style="width: 30%;"><span>折&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;扣： {disct_name}</span></div>
+							<div class="field" style="width: 20%;"><span>金额： {[fm.convertToYuan(values.real_pay)]}元</span>  </div>
+							
+	 					</div>
+	 					
+					</tpl>
+					
+					<div class="row" style="padding-left:60px;">
+ 						<div class="field" ><span>预计到期日： {invalid_date}</span></div>
+ 					</div>
+					
+				</tpl>
+			</tpl>
+			<tpl if="fees.length &gt; 0">
+				<div class="row">
+					<div class="title_1">&nbsp;</div>
+					<div class="field"><span>合计（大写）：{[fm.convertToChinese(values.feeTotal)]}</span></div>
+					<div class="field"><span>合计（小写）：{[fm.convertToYuan(values.feeTotal)]}元 </span></div>
+				</div>
+			</tpl>
+		</div>
+	</div>
+</div>

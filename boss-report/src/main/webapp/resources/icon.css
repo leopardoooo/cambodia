@@ -1,0 +1,24 @@
+.icon-back { background-image: url(./images/icon/back.gif) !important; background-repeat: no-repeat; }
+.icon-excel { background-image: url(./images/icon/excel16.gif) !important; background-repeat: no-repeat; }
+.icon-view-sql { background-image: url(./images/icon/view_sql.gif) !important; background-repeat: no-repeat; }
+.icon-sum { background-image: url(./images/icon/total.gif) !important; background-repeat: no-repeat; }
+.icon-switch { background-image: url(./images/icon/switch.gif) !important; background-repeat: no-repeat; }
+.icon-full { background-image: url(./images/icon/full.gif) !important; background-repeat: no-repeat; }
+.icon-chart { background-image: url(./images/icon/chart.gif) !important; background-repeat: no-repeat; }
+.icon-table { background-image: url(./images/icon/table.gif) !important; background-repeat: no-repeat; }
+.icon-save { background-image: url(./images/icon/saveNew.gif) !important; background-repeat: no-repeat; }
+.icon-toggleTpl { background-image: url(./images/icon/toggleTpl.gif) !important; background-repeat: no-repeat; }
+.icon-data { background-image: url(./images/icon/data.gif) !important; background-repeat: no-repeat; }
+.icon-s-chart { background-image: url(./images/icon/219.gif) !important; background-repeat: no-repeat; }
+
+.icon-add-report { background-image: url(./images/icon/report.gif) !important; background-repeat: no-repeat; }
+.icon-fav { background-image: url(./images/icon/favorites.gif) !important; background-repeat: no-repeat; }
+.icon-search { background-image: url(./images/icon/search.gif) !important; background-repeat: no-repeat; }
+.icon-expand { background-image: url(./images/icon/expand-all.gif) !important; background-repeat: no-repeat; }
+.icon-collapse { background-image: url(./images/icon/collapse-all.gif) !important; background-repeat: no-repeat; }
+.icon-home { background-image: url(./images/icon/home.gif) !important; background-repeat: no-repeat; }
+
+.icon-datasrc-async { background-image: url(./images/icon/home.gif) !important; background-repeat: no-repeat; }
+.icon-datasrc-production { background-image: url(./images/icon/home.gif) !important; background-repeat: no-repeat; }
+.icon-datasrc-archive { background-image: url(./images/icon/home.gif) !important; background-repeat: no-repeat; }
+.icon-datasrc-offline { background-image: url(./images/icon/home.gif) !important; background-repeat: no-repeat; }

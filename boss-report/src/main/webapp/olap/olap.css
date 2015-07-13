@@ -1,0 +1,42 @@
+.olapTitle {
+	FONT-WEIGHT: bold; FONT-SIZE: 15px; PADDING-BOTTOM: 5px; VERTICAL-ALIGN: middle; CURSOR: default; COLOR: #185e91; PADDING-TOP: 5px; FONT-FAMILY: 宋体; TEXT-ALIGN: center
+}
+.olapDimsTitle {
+	FONT-SIZE: 12px; VERTICAL-ALIGN: middle; CURSOR: default; COLOR: black; FONT-FAMILY: 宋体; BACKGROUND-COLOR: #c9c9c9;
+}
+.olapDimsList {
+	FONT-SIZE: 12px; VERTICAL-ALIGN: middle; CURSOR: default; COLOR: #185e91; FONT-FAMILY: 宋体
+}
+.olapGraphTitle {
+	 FONT-SIZE: 12px; VERTICAL-ALIGN: middle; CURSOR: default; COLOR: black; FONT-FAMILY: 宋体; BACKGROUND-COLOR: #c9c9c9;}
+.olapGraphList {
+	FONT-SIZE: 12px; VERTICAL-ALIGN: middle; CURSOR: default; COLOR: #185e91; FONT-FAMILY: 宋体;
+	text-decoration:underline
+}
+.olapExpExcel {
+	FONT-SIZE: 12px; VERTICAL-ALIGN: middle; CURSOR: default; COLOR: #185e91; FONT-FAMILY: 宋体;
+	text-decoration:underline
+}
+.olapGraphList:hover{color:#FF0000}
+
+.olapCorner {
+	BORDER-RIGHT: #dcdcdc 1px solid; BORDER-TOP: white 1px solid; FONT-WEIGHT: bold; FONT-SIZE: 12px; VERTICAL-ALIGN: middle; BORDER-LEFT: white 1px solid; CURSOR: default; COLOR: white; BORDER-BOTTOM: #dcdcdc 1px solid; FONT-FAMILY: 宋体; BACKGROUND-COLOR: #185e91
+}
+.olapColHeader {
+	BORDER-RIGHT: white 1px solid; BORDER-TOP: white 1px solid;  FONT-SIZE: 12px; VERTICAL-ALIGN: middle; BORDER-LEFT: white 1px solid; CURSOR: default; COLOR: #ffffff; BORDER-BOTTOM: white 1px solid; FONT-FAMILY: 宋体; BACKGROUND-COLOR: #185e91; TEXT-ALIGN: center
+}
+.olapRowHeader {
+	BORDER-RIGHT: white 1px solid; BORDER-TOP: white 1px solid;  FONT-SIZE: 12px; VERTICAL-ALIGN: middle; BORDER-LEFT: white 1px solid; CURSOR: default; COLOR: black; BORDER-BOTTOM: white 1px solid; FONT-FAMILY: 宋体; BACKGROUND-COLOR: #ededed; TEXT-ALIGN: left
+}
+.olapContent1 {
+	BORDER-RIGHT: #ffffff 1px solid; BORDER-TOP: #ffffff 1px solid; FONT-SIZE: 12px; VERTICAL-ALIGN: middle; BORDER-LEFT: #ffffff 1px solid; CURSOR: default; COLOR: black; BORDER-BOTTOM: #ffffff 1px solid; FONT-FAMILY: 宋体; BACKGROUND-COLOR: #f8f8f8; TEXT-ALIGN: right
+}
+.olapContent2 {
+	BORDER-RIGHT: #ffffff 1px solid; BORDER-TOP: #ffffff 1px solid; FONT-SIZE: 12px; VERTICAL-ALIGN: middle; BORDER-LEFT: #ffffff 1px solid; CURSOR: default; COLOR: black; BORDER-BOTTOM: #ffffff 1px solid; FONT-FAMILY: 宋体; BACKGROUND-COLOR: #f0f0f0; TEXT-ALIGN: right
+}
+.olapDragTip {
+	BORDER-RIGHT: black 1px solid; PADDING-RIGHT: 10px; BORDER-TOP: black 1px solid; PADDING-LEFT: 10px; FONT-SIZE: 12px; PADDING-BOTTOM: 5px; BORDER-LEFT: black 1px solid; PADDING-TOP: 5px; BORDER-BOTTOM: black 1px solid; FONT-FAMILY: 宋体; BACKGROUND-COLOR: lightblue
+}
+.olapPopupMenu {
+	BORDER-RIGHT: #696969 2px solid; PADDING-RIGHT: 4px; BORDER-TOP: #f8f8f8 2px solid; PADDING-LEFT: 4px; FONT-SIZE: 12px; PADDING-BOTTOM: 4px; BORDER-LEFT: #f8f8f8 2px solid; PADDING-TOP: 4px; BORDER-BOTTOM: #696969 2px solid; FONT-FAMILY: 宋体; BACKGROUND-COLOR: lightgrey
+}

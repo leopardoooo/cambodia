@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="GBK"?>
+<div class="Cl">
+<tpl if="params.user_type == '模拟电视'">
+	<div class="print_item">
+		<div class="row">
+			<div class="title_1">业务{point}</div>
+			<div class="title_2">新装</div>
+		</div>
+		<div class="row">
+			<div class="title_1">&nbsp;</div>
+			<div class="field"> <span>业务类型：模拟电视</span></div>
+		</div>
+		<div class="row">
+				<div class="title_1">&nbsp;</div>
+	 			<div class="field"> <span>终端数量：{[values.params.busi_count]}台</span></div>
+				<div class="field"> <span>终端类型：主终端</span></div>
+		</div>
+	</div>
+</tpl>
+<tpl if="params.user_type == '数字电视'">
+	<div class="print_item">
+			<div class="row">
+				<div class="title_1">业务{point}</div>
+				<div class="title_2">新装</div>
+			</div>
+			<div class="row">
+				<div class="title_1">&nbsp;</div>
+				<div class="field"> <span>业务类型：数字电视</span></div>
+			</div>
+		 	<div class="row">
+				<div class="title_1">&nbsp;</div>
+	 			<div class="field"> <span>终端数量：{[values.params.busi_count]}台</span></div>
+				<div class="field"> <span>终端类型：主终端</span></div>
+			</div>
+			<div class="row">
+				<div class="title_1">&nbsp;</div>
+	 			<div class="field"> <span>购买方式：配备</span></div>
+ 			</div>
+ 	</div>
+</tpl> 
+</div>

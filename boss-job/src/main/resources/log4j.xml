@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="GBK" ?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+<log4j:configuration debug="false"
+	xmlns:log4j="http://jakarta.apache.org/log4j/">
+	<appender name="CON" class="org.apache.log4j.ConsoleAppender">
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d{MM-dd HH\:mm\:ss} [%5p]-[%c\:%L] %3x - %m%n" />
+		</layout>
+	</appender>
+	
+	<!-- 所有日志
+	<appender name="ALLLOG" class="com.ycsoft.commons.log4j.MttangLog4jRollingFileAppender"> 
+		<param name="File" value="./logs/yyyy-MM-dd/boss_job_all.log"/> 
+		<param name="MaxFileSize" value="30MB"/>
+		<param name="MaxBackupIndex" value="10"/>
+		<layout class="org.apache.log4j.PatternLayout"> 
+		  <param  name="ConversionPattern" value="%d{MM-dd HH\:mm\:ss} [%5p]-[%c\:%L] %3x - %m%n"/> 
+		</layout> 
+		<filter class="org.apache.log4j.varia.LevelRangeFilter"> 
+		  	<param name="levelMin" value="DEBUG" />
+			<param name="levelMax" value="ERROR" />
+			<param name="AcceptOnMatch" value="true" />
+		</filter> 
+	</appender>
+	 -->
+	<!-- 所有日志-->
+	<appender name="ALLLOG" class="org.apache.log4j.RollingFileAppender"> 
+		<param name="File" value="./logs/boss_job_all.log"/> 
+		<param name="MaxFileSize" value="30MB"/>
+		<param name="MaxBackupIndex" value="10"/>
+		<layout class="org.apache.log4j.PatternLayout"> 
+		  <param  name="ConversionPattern" value="%d{MM-dd HH\:mm\:ss} [%5p]-[%c\:%L] %3x - %m%n"/> 
+		</layout> 
+		<filter class="org.apache.log4j.varia.LevelRangeFilter"> 
+		  	<param name="levelMin" value="DEBUG" />
+			<param name="levelMax" value="ERROR" />
+			<param name="AcceptOnMatch" value="true" />
+		</filter> 
+	</appender>
+	<!-- 所有错误日志-->
+	<appender name="ERRORLOG" class="org.apache.log4j.RollingFileAppender"> 
+		<param name="File" value="./logs/boss_job_error.log"/> 
+		<param name="MaxFileSize" value="30MB"/>
+		<param name="MaxBackupIndex" value="10"/>
+		<layout class="org.apache.log4j.PatternLayout"> 
+		  <param  name="ConversionPattern" value="%d{MM-dd HH\:mm\:ss} [%5p]-[%c\:%L] %3x - %m%n"/> 
+		</layout> 
+		<filter class="org.apache.log4j.varia.LevelRangeFilter"> 
+		  	<param name="levelMin" value="ERROR" />
+			<param name="levelMax" value="ERROR" />
+			<param name="AcceptOnMatch" value="true" />
+		</filter> 
+	</appender>
+	
+	
+	<root>
+		<level value="INFO" />
+		<!-- 输出的屏幕,linux下启动注释掉，开发时启用 -->
+		<appender-ref ref="CON" />
+		<!-- 输出到总日志文件中 -->
+		<appender-ref ref="ALLLOG" />
+		<appender-ref ref="ERRORLOG" />
+	</root>
+	
+</log4j:configuration>

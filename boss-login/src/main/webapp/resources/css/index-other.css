@@ -1,0 +1,74 @@
+#loading{
+    position:absolute;
+    left	:40%;
+    top		:40%;
+    padding	:2px;
+    z-index	:20001;
+    height	:auto;
+} 
+
+#loading div{
+    color	:#444;
+    font	:bold 13px tahoma,arial,helvetica;
+    padding :10px;
+    margin  :0;
+    height  :auto;
+} 
+#loading div {
+	background:transparent;
+}
+
+#loading .loading-msg {
+    font: normal 10px arial,tahoma,sans-serif;
+}
+
+#header{
+    background:url(./../images/index/bg6.gif) repeat-x;
+/*	border:0 none;
+    padding-left: 10px;
+	padding-top: 10px;
+	float   :left ; 
+*/
+}
+#header .title{
+	font	:normal 26px tahoma, arial, sans-serif;
+	color	:#2b4a8c;
+	padding-top: 8px;
+	margin-left: 150px;
+	width   :80%;
+	font-weight:bolder;
+}
+
+#header .logo{
+	float:left;
+	clear:left;
+	width: 108px;
+	padding:0px;
+	padding-left:8px;
+	padding-top:5px;
+	padding-bottom:0px;
+}
+
+.top-toolbar{
+	border:0 none;
+	border-top:1px solid #d0d0d0;
+	background:transparent;
+} 
+.x-tree-root-icon{
+	background-image:url(./../images/tree/base.gif) !important;
+}
+.x-tree-node-leaf .x-tree-node-icon{
+	background-image:url(./../images/tree/file.gif) !important;
+}
+.x-tree-node-expanded .x-tree-node-icon{
+	background-image:url(./../images/tree/folderopen.gif) ;
+}
+/* 多行表头CSS*/
+td.ux-grid-hd-group-cell {
+    background: url(./../images/grid3-hrow.gif) repeat-x bottom;
+}
+
+.x-tree-node-collapsed .x-tree-node-icon{
+	background-image:url(./../images/tree/folder.gif) ;
+}
+

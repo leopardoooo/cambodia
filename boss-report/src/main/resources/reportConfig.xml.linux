@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<reportConfig>
+    <!--  <config>
+      <name>logConfig</name>
+      <value>/WEB-INF/runqianReportLog.properties</value>
+    </config>-->
+    <config>
+      <name>license</name>
+      <value>/WEB-INF/classes/ServerYV4.0Linux.lic</value>
+    </config>
+    <config>
+      <name>reportFileHome</name>
+      <value>/reportFiles</value>
+    </config>
+   
+    <config>
+      <name>JNDIPrefix</name>
+      <value>java:comp/env</value>
+    </config>
+    <config>
+      <name>dataSource</name>
+      <value></value>
+    </config>
+	<config>
+      <name>jspCharset</name>
+      <value>GBK</value>
+    </config>
+    <!-- 否每次都重新读取报表定义，如设为yes，表示关闭缓存功能，设为no，表示开启缓存功能 -->
+	<config>
+	  <name>alwaysReloadDefine</name>
+      <value>yes</value>
+    </config>
+    <!-- 表示提交给报表的参数在缓存中保存的时间，以分钟为单位。如果不设此参数，缺省值是120分 -->
+    <config>
+      <name>cachedParamsTimeout</name>
+      <value>120</value>
+    </config>
+    <!-- 表示报表缓存的文件夹 -->
+    <config>
+      <name>cachedReportDir</name>
+      <value>boss_report_cache</value>
+    </config>
+    <config>
+      <name>cachedIdPrefix</name>
+      <value>A</value>
+    </config>
+    <config>
+      <name>cachedReportTimeout</name>
+      <value>120</value>
+    </config>
+    <config>
+      <name>maxCellNum</name>
+      <value>100000</value>
+    </config>
+    <config>
+      <name>maxConcurrentForReport</name>
+      <value></value>
+    </config>
+    <config>
+      <name>maxWaitForReport</name>
+      <value>10</value>
+    </config>
+    <config>
+      <name>maxWaitTimeForReport</name>
+      <value>30</value>
+    </config>
+    <config>
+      <name>appUrlPrefix</name>
+      <value></value>
+    </config>
+    <config>
+      <name>errorPage</name>
+      <value>/myError.jsp</value>
+    </config>
+</reportConfig>

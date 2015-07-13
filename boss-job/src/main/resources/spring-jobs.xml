@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd"
+	default-autowire="byName" default-lazy-init="false">
+
+	<!-- 获取任务表的Bean -->
+	<bean id="qrtzJobDetailBuilder" class="com.yaochen.myquartz.config.impl.QrtzJobDetailForDbBuilder">
+		<property name="dataSource" ref="dataSource" />
+		<property name="poolDefaultJobSpringBeans_Split" value="," />
+		<property name="querySQL">
+			<value>select * from t_job_cfg t WHERE t.status='ACTIVE'</value>
+		</property>
+	</bean>
+	
+	<!-- Quartz Scheduler Manager -->
+	<bean class="com.yaochen.myquartz.SchedulerManagerBean" >
+		<property name="autoStartup" value="true" />
+		<property name="startupDelay" value="3" />
+		<property name="qrtzJobDetailBuilder" ref="qrtzJobDetailBuilder" />
+	</bean>
+	
+	
+	<!-- 扣款 -->
+	<bean id="createBankFeedsGoJob" class="com.yaochen.boss.job.CreateBankFeedsJob">
+		<property name="busiComponent" ref="busiComponent" />
+		<property name="ftpBuilder" ref="ftpBuilder" />
+		<property name="jobType" value="GO" />
+	</bean>
+	
+	<!-- 退款 -->
+	<bean id="createBankFeedsRefundJob" class="com.yaochen.boss.job.CreateBankFeedsJob">
+		<property name="busiComponent" ref="busiComponent" />
+		<property name="ftpBuilder" ref="ftpBuilder" />
+		<property name="jobType" value="REFUND" />
+	</bean>
+	
+	<bean id="ftpBuilder" class="com.yaochen.boss.commons.FtpUtilBuilder">
+		<property name="hostname" value="${ftp.hostname}"></property>
+		<property name="port" value="${ftp.port}"></property>
+		<property name="username" value="${ftp.username}"></property>
+		<property name="password" value="${ftp.password}"></property>
+		<property name="localDownloadPath" value="${ftp.localDownloadPath}"></property>
+		<property name="remoteBankPath" value="${ftp.remoteBankPath}"></property>
+		<property name="localTempPath" value="${ftp.localTempPath}"></property>
+		<property name="remoteUploadPath" value="${ftp.remoteUploadPath}"></property>
+		<property name="localHistoryPath" value="${ftp.localHistoryPath}"></property>
+	</bean>
+	
+	<bean id="taskServiceJob" class="com.yaochen.boss.job.TaskServiceJob">
+		<property name="jobComponent" ref="jobComponent" />
+		<property name="wsUrl" value="${callcenter.wsUrl}" />
+	</bean>	
+</beans>

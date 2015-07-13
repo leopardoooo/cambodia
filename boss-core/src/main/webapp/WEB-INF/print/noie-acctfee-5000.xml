@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="GBK" ?>
+<jsteak-applet>
+	<page-setting>
+		<width>900</width>
+		<height>600</height>
+	</page-setting>
+	<items>
+		<item left="50" 	top="90">{[values.date.year || '']}年</item>
+		<item left="95" 	top="90">{[values.date.month || '']}月</item>
+		<item left="115" 	top="90" >{[values.date.day || '']}日</item>
+		<item left="50" 	top="110" >{[values.cust.cust_name ? "客户名称:"+ [values.cust.cust_name] :'']}</item>
+		<item left="270" 	top="110" >{[values.cust.cust_no ? "客户编号:"+[values.cust.cust_no] :'']}</item>
+		<item left="50" 	top="125" >{[values.cust.address ? "客户地址:"+ [values.cust.address] :'']}</item>
+		<tpl for="printItems">
+			<item left="70" top="{[130 + xindex* 15]}" >{printitem_name}</item>
+			<tpl if="card_id">
+				<item left="250" top="{[130 + xindex* 15]}" >{card_id}</item>
+			</tpl>
+			<item left="350" top="{[130+ xindex* 15]}" >{[fm.convertToYuan(values.amount)]}</item>
+		</tpl>
+		<item left="110" top="230" >{[this.chinese(values.total)]}</item>
+		<item left="340" top="230" >{[fm.convertToYuan(values.total)]}</item>
+		<tpl if="values.count">
+			<item left="110" top="245" >办理业务户数:{[values.count]}</item>
+		</tpl>
+		<item left="340" top="245" >{[values.optr.optr_name|| '']}</item>
+
+	</items>
+</jsteak-applet>
+

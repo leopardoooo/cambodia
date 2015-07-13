@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="GBK" ?>
+<printinfo>
+	<defaultsetting>
+		<width>2500</width>
+		<height>933</height>
+		<font>6</font>
+	</defaultsetting>
+	<items>
+		<printitem>
+			<x>250</x><y>100</y><data>{[values.cust.cust_name || '']}</data>
+		</printitem>		
+		<printitem>
+			<x>90</x><y>100</y><data>{[values.cust.cust_no || '']}</data>
+		</printitem>
+		<printitem>
+			<x>670</x><y>100</y><data>{[values.date.year || '']}</data>
+		</printitem>
+		<printitem>
+			<x>780</x><y>100</y><data>{[values.date.month || '']}</data>
+		</printitem>
+		<printitem>
+			<x>850</x><y>100</y><data>{[values.date.day || '']}</data>
+		</printitem>			
+		<tpl for="printItems">
+			<printitem>
+				<x>70</x><y>{[170 + xindex* 35]}</y><data>{printitem_name}</data>
+			</printitem>			
+			<printitem>
+				<x>600</x><y>{[170+ xindex* 35]}</y><data>{[fm.convertToYuan(values.amount)]}</data>
+			</printitem>
+		</tpl> 
+		<printitem>
+			<x>100</x><y>440</y><data>金额合计（大写）{[this.chinese(values.total)]}</data>
+		</printitem>
+		<printitem>
+			<x>650</x><y>440</y><data>（小写）￥{[fm.convertToYuan(values.total)]}</data>
+		</printitem>
+		<printitem>
+			<x>150</x><y>500</y><data>{[values.optr.optr_name|| '']}</data>
+		</printitem>
+	</items>
+</printinfo>

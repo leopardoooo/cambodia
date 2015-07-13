@@ -1,0 +1,384 @@
+.x-window-dlg .icon-download { 
+	background:transparent url(./../images/icon/download.gif) no-repeat top left;
+    height:46px;
+} 
+
+.icon-grid { background-image: url(./../images/icon/grid.jpg) !important; background-repeat: no-repeat; }
+.icon-query { background-image: url(./../images/icon/query.gif) !important; background-repeat: no-repeat; }
+.icon-add-user { background-image: url(./../images/icon/user_add.gif) !important; background-repeat: no-repeat; }
+.icon-delete-user { background-image: url(./../images/icon/user_delete.gif) !important; background-repeat: no-repeat; }
+.icon-edit-user { background-image: url(./../images/icon/user_edit.png) !important; background-repeat: no-repeat; }
+.icon-navigate { background-image: url(./../images/icon/nav1.gif) !important; background-repeat: no-repeat; }
+.icon-bulletin { background-image: url(./../images/icon/bulletin.gif) !important; background-repeat: no-repeat; }
+.icon-cust { background-image: url(./../images/icon/custinfo.gif) !important; background-repeat: no-repeat; }
+.icon-busi { background-image: url(./../images/icon/plugin.gif) !important; background-repeat: no-repeat; }
+.icon-add { background-image: url(./../images/icon/add.gif) !important; background-repeat: no-repeat; }
+.icon-modify { background-image: url(./../images/icon/modify.gif) !important; background-repeat: no-repeat; }
+.icon-del { background-image: url(./../images/icon/delete.gif) !important; background-repeat: no-repeat; }
+.icon-save { background-image: url(./../images/icon/save4.gif) !important; background-repeat: no-repeat; }
+.icon-buy {height:120px!important;width:40px!important; background-image: url(./../images/icon/buy.png) !important; background-repeat: no-repeat;}
+.icon-reset { background-image: url(./../images/icon/reset4.gif) !important; background-repeat: no-repeat; }
+.icon-pay { background-image: url(./../images/icon/pay.gif) !important; background-repeat: no-repeat; }
+.icon-refund { background-image: url(./../images/icon/refund.gif) !important; background-repeat: no-repeat; }
+.icon-hand { background-image: url(./../images/icon/hand.png) !important; background-repeat: no-repeat; }
+.icon-condition { background-image: url(./../images/icon/condition.png) !important; background-repeat: no-repeat; }
+.icon-data { background-image: url(./../images/icon/data.png) !important; background-repeat: no-repeat; }
+.icon-close { background-image: url(./../images/icon/close.png) !important; background-repeat: no-repeat; }
+.icon-confirm { background-image: url(./../images/icon/confirm.png) !important; background-repeat: no-repeat; }
+.icon-cancel { background-image: url(./../images/icon/cancel.png) !important; background-repeat: no-repeat; }
+.icon-refresh { background-image: url(./../images/icon/refresh.png) !important; background-repeat: no-repeat; }
+.icon-excel { background-image: url(./../images/icon/excel.gif) !important; background-repeat: no-repeat; }
+.icon-expand-all{background-image: url(./../images/icon/expand-all.gif) !important;}
+.icon-collapse-all{background-image: url(./../images/icon/collapse-all.gif) !important;}
+.icon-comments_remove{background-image: url(./../images/icon/comments_remove.png) !important;}
+.icon-batch-number{background-image: url(./../images/icon/batch_number.png) !important;}
+/***************************************************************
+ * 工具条的icon2图标
+ * */
+.icon-help {
+	background-image: url(./../images/index/help.gif) !important; 
+	background-repeat: no-repeat;
+}
+.icon-password {
+	background-image: url(./../images/index/optr-password.gif) !important; 
+	background-repeat: no-repeat;
+}
+.icon-exit {
+	background-image: url(./../images/index/exit.gif) !important; 
+	background-repeat: no-repeat;
+}
+.icon-t-sys {
+	background-image: url(./../images/index/sys.gif) !important; 
+	background-repeat: no-repeat;
+}
+.icon-t-county {
+	background-image: url(./../images/index/county.gif) !important; 
+	background-repeat: no-repeat;
+}
+.icon-t-dept {
+	background-image: url(./../images/index/changeDept.png) !important; 
+	background-repeat: no-repeat;
+}
+.icon-busi{
+	background-image: url(./../images/index/icon_busi.png) !important; 
+	background-repeat: no-repeat;
+}
+.icon-manage{
+	background-image: url(./../images/index/icon_manage.png) !important; 
+	background-repeat: no-repeat;
+}
+.icon-depot{
+	background-image: url(./../images/index/icon_depot.png) !important; 
+	background-repeat: no-repeat;
+}
+.icon-project{
+	background-image: url(./../images/index/icon_project.png) !important; 
+	background-repeat: no-repeat;
+}
+.icon-invoice{
+	background-image: url(./../images/index/icon_invoice.png) !important; 
+	background-repeat: no-repeat;
+}
+.icon-report{
+	background-image: url(./../images/index/icon_report.png) !important; 
+	background-repeat: no-repeat;
+}
+.site-tool-bg{
+    background-repeat: repeat-x;
+    background-position: center;
+    background-image: url(./../images/index/nav-bg.png);
+    background-color: #F8F8F8;
+}
+
+.move-to-left {
+    background-image: url(./../images/icon/move_to_left.gif) !important;
+}
+.move-to-right {
+    background-image: url(./../images/icon/move_to_right.gif) !important;
+}
+
+/** 以下是菜单样式 ***/
+.btn-panel {
+	background-color:#E7EEFE;/**E0E9FE*/
+}.btn-panel td { 
+	padding:5px;padding-left:8px;
+}
+.ext-form{
+	padding-top:3px;
+}
+.ext-form td { 
+	padding-top:4px;
+}
+.newCust {
+    background-image: url(./../images/menu2/new_cust.png) !important;
+}
+.changeCust {
+    background-image: url(./../images/menu2/changecust.gif) !important;
+}
+.editCust {
+    background-image: url(./../images/menu2/edit.png) !important;
+}
+.moveCust {
+	background-image: url(./../images/menu2/change_cust.png) !important;
+}
+.changeAddr {
+    background-image: url(./../images/menu2/change_addr.png) !important;
+}
+.warning {
+	background-image: url(./../images/menu2/warning.gif) !important;
+}
+.joinUnit {
+    background-image: url(./../images/menu2/join_unit.png) !important;
+}
+.leaveUnit {
+    background-image: url(./../images/menu2/quit_unit.png) !important;
+}
+.delCust {
+    background-image: url(./../images/menu2/delete.png) !important;
+}
+.changeDevice {
+    background-image: url(./../images/menu2/change_device.png) !important;
+}
+.buyDevice {
+    background-image: url(./../images/menu2/buy_device.png) !important;
+}
+
+.reclaimDevice {
+    background-image: url(./../images/menu2/reclaim_device.png) !important;
+}
+.regLoss {
+    background-image: url(./../images/menu2/reg_loss.gif) !important;
+}
+.cancelLoss {
+    background-image: url(./../images/menu2/cancel_loss.gif) !important;
+}
+.saleDevice {
+    background-image: url(./../images/menu2/saledevice.png) !important;
+}
+.pay {
+	background-image: url(./../images/menu2/pay.png) !important;
+}
+.clearInactive {
+	background-image: url(./../images/menu2/clearInactive.png) !important;
+}
+.editDoneRemark {
+	background-image: url(./../images/menu2/EditDoneRemark.png) !important;
+}
+.ModifyThreshold {
+	background-image: url(./../images/menu2/ModifyThreshold.png) !important;
+}
+.busiBack{
+	background-image: url(./../images/menu2/cancel.png) !important;
+}
+.acctTrans{
+	background-image: url(./../images/menu2/acct_trans.png) !important;
+}
+.adjust{
+	background-image: url(./../images/menu2/adjust.png) !important;
+}
+.merge {
+	background-image: url(./../images/menu2/001_63.gif) !important;
+}
+.refund {
+	background-image: url(./../images/menu2/refund.png) !important;
+}
+.unPay {
+	background-image: url(./../images/menu2/cancel.png) !important;
+}
+.editFee {
+	background-image: url(./../images/menu2/edit_fee.png) !important;
+}
+.newUser {
+	background-image: url(./../images/menu2/new_user.png) !important;
+}
+.editStb {
+	background-image: url(./../images/menu2/editStb.png) !important;
+}
+.turnUser{
+	background-image: url(./../images/menu2/turnuser.gif) !important;
+}
+.changeNonresCust{
+	background-image: url(./../images/menu2/changeNonresCust.png) !important;
+}
+.logoffUser {
+	background-image: url(./../images/menu2/delete.png) !important;
+}
+.atvToDtv {
+	background-image: url(./../images/menu2/atv_to_dtv.png) !important;
+}
+.openDuplex {
+	background-image: url(./../images/menu2/open_sx.png) !important;
+}
+.stopUser {
+	background-image: url(./../images/menu2/stop.png) !important;
+}
+.cancelStopUser {
+	background-image: url(./../images/menu2/stopuser.gif) !important;
+}
+.openUser {
+	background-image: url(./../images/menu2/open.png) !important;
+}
+.editUserLevel {
+	background-image: url(./../images/menu2/edit_user_level.png) !important;
+}
+.tempOpen{
+	background-image: url(./../images/menu2/temp_open.png) !important;
+}
+.orderProd {
+	background-image: url(./../images/menu2/order.png) !important;
+}
+.cancelProd {
+	background-image: url(./../images/menu2/delete.png) !important;
+}
+.editPrice {
+	background-image: url(./../images/menu2/edit_price.png) !important;
+}
+.resendCmd {
+	background-image: url(./../images/menu2/resend.png) !important;
+}
+.refreshCmd {
+	background-image: url(./../images/menu2/refresh_cmd.gif) !important;
+}
+.promotion {
+	background-image: url(./../images/menu2/promotion.png) !important;
+}
+.bankContract {
+	background-image: url(./../images/menu2/bankcontract.gif) !important;
+}
+.cancelContract {
+	background-image: url(./../images/menu2/cancelcontract.gif) !important;
+}
+.print {
+	background-image: url(./../images/menu2/print.png) !important;
+}
+.print_big {
+	background-image: url(./../images/menu2/printer.png) !important;
+}
+.config_big {
+	background-image: url(./../images/menu2/config.png) !important;
+}
+.billing_big {
+	background-image: url(./../images/menu2/billing.png) !important;
+}
+.creditcards_big {
+	background-image: url(./../images/menu2/creditcards.png) !important;
+}
+.gz {
+	background-image: url(./../images/index/gz.png) !important;
+}
+.icon_card {
+	background-image: url(./../images/index/icon_card.gif) !important;
+}
+
+.others {
+	background-image: url(./../images/index/others.png) !important;
+}
+.bulletin {
+	background-image: url(./../images/icon/bulletin.gif) !important;
+}
+.query {
+	background-image: url(./../images/index/query.png) !important;
+}
+.ca_1 {
+	background-image: url(./../images/menu2/ca_1.gif) !important;
+}
+.ca_2 {
+	background-image: url(./../images/menu2/ca_2.gif) !important;
+}
+.ca_3 {
+	background-image: url(./../images/menu2/ca_3.gif) !important;
+}
+.bandClear {
+	background-image: url(./../images/menu2/band_clear.gif) !important;
+}
+.cancelBill {
+	background-image: url(./../images/menu2/cancel.png) !important;
+}
+
+/**面板图标**/
+.cust {
+	background-image: url(./../images/menu2/cust.png) !important;
+}
+.user {
+	background-image: url(./../images/menu2/user.png) !important;
+}
+.acct {
+	background-image: url(./../images/menu2/acct.png) !important;
+}
+.pay_fee {
+	background-image: url(./../images/menu2/pay_fee.png) !important;
+}
+.doc {
+	background-image: url(./../images/menu2/doc.png) !important;
+}
+.done_code {
+	background-image: url(./../images/menu2/done_code.png) !important;
+}
+.toolbtn{
+ 	float:left;width:16;height:16;
+	background-repeat:no-repeat;cursor:pointer;
+}
+.bill {
+	background-image: url(./../images/menu2/bill.gif) !important;
+}
+.editUserStatus{
+	background-image: url(./../images/menu2/editUserStatus.png) !important;
+}
+.userStatus{
+	background-image: url(./../images/menu2/userStatus.png) !important;
+}
+
+/** 以下是下拉框样式 ***/
+.ux-lovcombo-icon {   
+    width:16px;   
+    height:16px;   
+    float:left;   
+    background-position: -1px -1px ! important;   
+    background-repeat:no-repeat ! important;   
+}   
+.ux-lovcombo-icon-checked {   
+    background: transparent url(./../images/icon/checked.gif);   
+}   
+.ux-lovcombo-icon-unchecked {   
+    background: transparent url(./../images/icon/unchecked.gif);   
+}
+
+#content-anchor-tip ul {
+    float: left;
+    width: 200px;
+    list-style-type: disc;
+    margin-left: 15px;
+} 
+
+.ext-ie #content-anchor-tip ul {
+    margin: 0;
+    padding-left: 15px;
+} 
+
+#content-anchor-tip .thumb {
+    float: right;
+} 
+
+#content-anchor-tip .status-icon {
+    position: absolute;
+    top: 4px;
+    right: 50px;
+    padding: 0;
+    line-height: 0;
+} 
+
+#content-anchor-tip a:link, #content-anchor-tip a:visited {
+    color: #339;
+}
+.tip-target {
+            width: 100px;
+            text-align:center;
+            padding: 5px 0;
+            border:1px dotted #99bbe8;
+            background:#dfe8f6;
+            color: #15428b;
+            cursor:default;
+            margin:10px;
+            font:bold 11px tahoma,arial,sans-serif;
+            float:left;
+        }

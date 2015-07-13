@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="GBK" ?> 
+<span style="position:absolute; left: 100px; top: 70px;">{[values.task.create_time || '']}</span>
+<span style="position:absolute; left: 340px; top: 70px;">{[values.task.books_time || '']}</span>
+<span style="position:absolute; left: 150px; top: 105px;">{[values.custInfo.cust.cust_no || '']}</span>
+<span style="position:absolute; left: 340px; top: 105px;">{[values.custInfo.cust.cust_name || '']}</span>
+<span style="position:absolute; left: 150px; top: 140px;">{[values.custInfo.linkman.tel || '']}</span>
+<span style="position:absolute; left: 340px; top: 140px;">{[values.custInfo.linkman.mobile || '']}</span>
+<span style="position:absolute; left: 140px; top: 175px;">{[values.task.install_addr || values.custInfo.cust.address || '']}</span>
+<span style="position:absolute; left: 170px; top: 210px;">{[values.task.task_cust_name || '']}</span>
+<span style="position:absolute; left: 340px; top: 210px;">{[values.task.tel || '']}</span>
+<span style="position:absolute; left: 140px; top: 240px;">
+	<tpl for="task.taskServList">
+		{serv_name}<tpl if="xcount != xindex">,</tpl>
+	</tpl>
+	<tpl if="values.userDto && values.userDto.user_type == 'DTV'">
+		[{[values.userDto.terminal_type_text || '']}]
+	</tpl>
+</span>
+<span style="position:absolute; left: 140px; top: 280px;">{[values.task.task_type_text || '']}</span>
+<span style="position:absolute; left: 100px; top: 315px;">{[values.task.assign_dept_text || '']}</span>
+<span style="position:absolute; left: 220px; top: 315px;">{[values.task.assign_optr_text || '']}</span>
+
+<span style="position:absolute; left: 100px; top: 410px;">
+  <tpl if="values.userDto && values.userDto.user_type == 'BAND'">
+   	 宽带用户名/密码： {[values.userDto.login_name || '']}/{[values.userDto.login_password || '']}
+   </tpl>
+</span>
+<span style="position:absolute; left: 100px; top: 390px;">
+  <tpl if="values.task.bug_cause_text">
+   	  {[values.task.bug_cause_text || '']}
+  </tpl>
+</span>
+<span style="position:absolute; left: 100px; top: 415px;">
+  <tpl if="values.task.remark!='' && values.task.remark!='null' && values.task.remark!=null">
+   	  备注:{[values.task.remark || '']} 
+  </tpl>
+  <tpl if="values.task.remarkList!=null">
+		<tpl for="values.task.remarkList">
+		   	 <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{remark} 
+		</tpl>
+	</tpl>
+</span>
+<span style="position:absolute; left: 100px; top: 440px;">
+  <tpl if="values.task.old_addr!='' && values.task.old_addr!='null' && values.task.old_addr!=null ">
+   	  搬迁原地址:{[values.task.old_addr || '']}
+  </tpl>
+</span>

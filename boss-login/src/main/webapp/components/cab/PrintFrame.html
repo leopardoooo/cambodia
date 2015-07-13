@@ -1,0 +1,55 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<html>
+  <head>
+    <title>Web打印</title>
+    <meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
+    <meta http-equiv="description" content="this is my page">
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <style type= "text/css" media= "print">
+    	#page{display: block;}
+    	#wait{display: none;}
+    </style>
+    <style type="text/css" media="screen">
+    	body{padding: 0px;margin: 0px;overflow: hidden;}
+    	#page{display: none;}
+    	#wait{display: block;width: 100px;padding-top: 10px;padding-left: 10px;}
+    </style>
+  </head>
+  <body>
+  	<object id="factory" viewastext style="display:none"     
+			classid="clsid:1663ed61-23eb-11d2-b92f-008048fdd814"     
+			codebase="./smsx.cab#Version=6,6,440,26"></object> 
+	</body>
+	  	
+  	<div id="wait">正在打印...</div>
+  	<div id="page">
+  	</div>
+  </body>
+  <script type="text/javascript">
+ 	document.getElementById('page').innerHTML = window.opener.App.Print.HTML;
+ 	//document.getElementById('page').innerHTML = window.dialogArguments;
+  	try{
+		setAndPrint("CAB");
+	}catch(e){ 
+		setAndPrint("WEB"); 
+	}
+  	var that = this;
+  	setTimeout(function(){
+  		that.close();
+  	}, 1200);
+  	
+  	function setAndPrint( printMode ){  
+  		if(printMode == "CAB"){
+			factory.printing.header = "";      
+			factory.printing.footer = "";      
+			factory.printing.portrait = 1;  // 1为纵向打,0为横向打 
+			factory.printing.leftMargin = 0;// 左边距      
+			factory.printing.topMargin = 0; // 右边距      
+			factory.printing.Print(false);  // 直接打印，不提示
+		}else{
+			window.print();
+		}
+	}
+  </script>
+</html>

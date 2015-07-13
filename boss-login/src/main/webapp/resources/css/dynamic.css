@@ -1,0 +1,13 @@
+@CHARSET "UTF-8";
+
+.tge-inputfield-popu {
+    width: 80px;
+}
+
+.tge-inputfield-overlapped {
+    width: 80px;
+}
+
+.tge-inputfield-created {
+    width: 120px;
+}

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="GBK"?>
+<div class="Cl">
+<div class="print_item">
+	<div class="row">
+		<div class="title_1">业务{point}</div>
+		<div class="title_2">修改宽带密码<!-- 【流水号：{[values.item.done_code]}】 --></div>
+	</div>
+	<div class="row">
+		<div class="title_1">&nbsp;</div>
+		<div class="field"> <span>上网帐号：{[values.params.login_name]}</span></div>
+	</div>
+	<div class="row">
+		<div class="title_1">&nbsp;</div>
+		<div class="field"> <span>密码：{[values.params.old_password]}</span></div>
+		<div class="field"> <span>更改为：{[values.params.new_password]}</span></div>
+	</div>
+</div>
+</div>

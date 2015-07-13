@@ -1,0 +1,511 @@
+<?xml version="1.0" encoding="GBK" ?> 
+<printinfo>
+	<defaultsetting>
+		<width>2500</width>
+		<height>933</height>
+		<font>10</font>
+	</defaultsetting>
+	<items>
+		<printitem>
+			<x>150</x><y>195</y><data>{[values.optr.dept_name]}</data>
+		</printitem>
+		<printitem>
+			<x>350</x><y>195</y><data>{[values.optr.optr_name]}</data>
+		</printitem>		
+		<printitem>
+			<x>900</x><y>195</y><data>{[values.date.dateStr || '']}</data>
+		</printitem>		
+		<printitem>
+			<x>150</x><y>275</y><data>客户姓名 {[values.cust.cust_name || '']}</data>
+		</printitem>		
+		<printitem>
+			<x>150</x><y>335</y><data>用户类型 {[values.cust.cust_class_text || '']}</data>
+		</printitem>		
+		<printitem>
+			<x>650</x><y>335</y><data>证件号码 {[values.linkman.cert_num || '']}</data>
+		</printitem>				
+		<printitem>
+			<x>150</x><y>365</y><data>固定电话 {[values.linkman.tel || '']}</data>
+		</printitem>
+		<printitem>
+			<x>650</x><y>365</y><data>手机 {[values.linkman.mobile || '']}</data>
+		</printitem>
+		<printitem>
+			<x>150</x><y>395</y><data>装机地址 {[values.cust.address || '']}</data>
+		</printitem>		
+		
+		<tpl for="docItems">
+			<tpl if="busi_code == '1040'">
+				<tpl if="xindex == 1">
+					<printitem>
+						<x>150</x><y>{[455 + xindex* 30]}</y><data>{busi_name}</data>
+					</printitem>
+				</tpl>
+				<tpl for="Ext.decode(info)">
+				
+					<tpl for="data">
+						<printitem>
+							<x>150</x><y>{[495 + xindex* 30]}</y><data>{[values.terminal_type_text || '']}</data>
+						</printitem>
+						<printitem>
+							<x>350</x><y>{[495 + xindex* 30]}</y>
+								<data>
+									{[values.printitem_name || '']}
+									<tpl if="!Ext.isEmpty(values.user_type) && values.user_type != 'DTV'">
+										({[values.user_name || '']})
+									</tpl>
+								</data>
+						</printitem>
+						<printitem>
+							<x>970</x><y>{[495 + xindex* 30]}</y><data>{[fm.convertToYuan(values.fee)]}</data>
+						</printitem>
+					</tpl>
+					<printitem>
+						<x>910</x><y>{[605 + values.count * 30]}</y><data>合计：{[fm.convertToYuan(values.sum_fee)]}</data>
+					</printitem>
+				</tpl>
+			</tpl>
+			
+			<tpl if="busi_code == '1240' || busi_code == '1039'">
+				<tpl if="xindex == 1">
+					<printitem>
+						<x>150</x><y>{[490 + xindex* 30]}</y><data>{busi_name}</data>
+					</printitem>
+				</tpl>
+				<tpl for="Ext.decode(info)">
+					<printitem>
+						<x>150</x><y>{[590 + xindex* 50]}</y><data>{[values.printitem_name || '']}</data>
+					</printitem>
+					<printitem>
+						<x>780</x><y>{[590 + xindex* 50]}</y><data>{[fm.convertToYuan(values.sum_fee)]}</data>
+					</printitem>
+				</tpl>
+			</tpl>
+			
+			<tpl if="busi_code == '1003' || busi_code == '1010' ">
+				<tpl if="xindex == 1">
+					<printitem>
+						<x>150</x><y>{[490 + xindex* 30]}</y><data>{busi_name}</data>
+					</printitem>
+				</tpl>
+				
+				<tpl for="Ext.decode(info)">
+					<tpl if="Ext.isObject(values.cust_name_change)">
+						<printitem>
+							<x>150</x><y>{[590 + xindex* 50]}</y><data>原客户名：{values.cust_name_change.old_value}</data>
+						</printitem>
+						<printitem>
+							<x>150</x><y>{[590 + xindex* 70]}</y><data>新客户名：{values.cust_name_change.new_value}</data>
+						</printitem>
+					</tpl>
+					<tpl if="Ext.isObject(values.address_change)">
+						<printitem>
+							<x>150</x><y>{[590 + xindex* 50]}</y><data>原地址：{values.address_change.old_value}</data>
+						</printitem>
+						<printitem>
+							<x>150</x><y>{[590 + xindex* 70]}</y><data>新地址：{values.address_change.new_value}</data>
+						</printitem>
+					</tpl>
+				</tpl>
+				
+			</tpl>
+			
+			<tpl if="busi_code == '1001'">
+				<tpl if="xindex == 1">
+					<printitem>
+						<x>150</x><y>{[490 + xindex* 30]}</y><data>{busi_name}</data>
+					</printitem>
+					<printitem>
+						<x>150</x><y>{[590 + xindex* 30]}</y><data>{info}</data>
+					</printitem>
+				</tpl>
+			</tpl>
+			
+			<tpl if="busi_code == '1007'">
+				<tpl if="xindex == 1">
+					<printitem>
+						<x>150</x><y>{[490 + xindex* 30]}</y><data>{busi_name}</data>
+					</printitem>
+				</tpl>
+				
+				<tpl for="Ext.decode(info)">
+					<tpl if="values.stb">
+						<printitem>
+							<x>150</x><y>{[590 + xindex* 30]}</y><data>设备编号 {values.stb.device_code}</data>
+						</printitem>
+					</tpl>
+					<tpl if="values.card">
+						<printitem>
+							<x>150</x><y>{[590 + xindex* 30]}</y><data>设备编号 {values.card.device_code}</data>
+						</printitem>
+					</tpl>
+					<tpl if="values.modem">
+						<printitem>
+							<x>150</x><y>{[590 + xindex* 30]}</y><data>设备编号 {values.modem.device_code}</data>
+						</printitem>
+					</tpl>
+				</tpl>
+			</tpl>
+			
+			<tpl if="busi_code == '1231'">
+				<tpl if="xindex == 1">
+					<printitem>
+						<x>150</x><y>{[490 + xindex* 30]}</y><data>{busi_name}</data>
+					</printitem>
+				</tpl>
+				
+				<tpl for="Ext.decode(info)">
+					<tpl if="values.device">
+						<printitem>
+							<x>150</x><y>{[590 + xindex* 30]}</y><data>设备编号 {values.device.device_code}</data>
+						</printitem>
+					</tpl>
+					<tpl if="values.paired_card">
+						<printitem>
+							<x>150</x><y>{[590 + xindex* 30]}</y><data>设备编号 {values.paired_card.device_code}</data>
+						</printitem>
+					</tpl>
+					<tpl if="values.paired_modem">
+						<printitem>
+							<x>150</x><y>{[590 + xindex* 30]}</y><data>猫Mac {values.paired_modem.device_code}</data>
+						</printitem>
+					</tpl>
+				</tpl>
+			</tpl>
+			
+			<tpl if="busi_code == '1008'">
+				<tpl if="xindex == 1">
+					<printitem>
+						<x>150</x><y>{[490 + xindex* 30]}</y><data>{busi_name}</data>
+					</printitem>
+				</tpl>
+				
+				<tpl for="Ext.decode(info)">
+					<tpl if="values.device">
+						<printitem>
+							<x>150</x><y>{[590 + xindex* 30]}</y><data>设备编号： {values.device.device_code}</data>
+						</printitem>
+					</tpl>
+					<tpl if="values.paired_card">
+						<printitem>
+							<x>650</x><y>{[590 + xindex* 30]}</y><data> 配对卡编号：{values.paired_card.device_code}</data>
+						</printitem>
+					</tpl>
+					<tpl if="values.paired_modem">
+						<printitem>
+							<x>1150</x><y>{[590 + xindex* 30]}</y><data>配对MODEM编号： {values.paired_modem.device_code}</data>
+						</printitem>
+					</tpl>
+				</tpl>
+			</tpl>
+			
+			<tpl if="busi_code == '1009'">
+				<tpl if="xindex == 1">
+					<printitem>
+						<x>150</x><y>{[490 + xindex* 30]}</y><data>{busi_name}</data>
+					</printitem>
+				</tpl>
+				
+				<tpl for="Ext.decode(info)">
+					<tpl if="values.oldStb">
+						<tpl if="values.newStb">
+							<printitem>
+								<x>150</x><y>{[520 + xindex* 30]}</y><data>原机顶盒号： {values.oldStb.device_code}</data>
+							</printitem>
+							<printitem>
+								<x>750</x><y>{[520 + xindex* 30]}</y><data>新机顶盒号 ： {values.newStb.device_code}</data>
+							</printitem>
+						</tpl>
+					</tpl>
+					
+					<tpl if="values.oldCard">
+						<tpl if="values.newCard">
+							<printitem>
+								<x>150</x><y>{[550 + xindex* 30]}</y><data>原卡号： {values.oldCard.device_code}</data>
+							</printitem>
+							<printitem>
+								<x>750</x><y>{[550 + xindex* 30]}</y><data>新卡号： {values.newCard.device_code}</data>
+							</printitem>
+						</tpl>
+					</tpl>
+					
+					<tpl if="values.oldModem">
+						<tpl if="values.newModem">
+							<printitem>
+								<x>150</x><y>{[610 + xindex* 30]}</y><data>老Modem号： {values.oldModem.device_code}</data>
+							</printitem>
+							<printitem>
+								<x>750</x><y>{[610 + xindex* 30]}</y><data>新Modem号： {values.newModem.device_code}</data>
+							</printitem>
+						</tpl>
+					</tpl>
+					
+				</tpl>
+			</tpl>
+			
+			<tpl if="busi_code == '1011' || busi_code == '1014'">
+				<tpl if="xindex == 1">
+					<printitem>
+						<x>150</x><y>{[490 + xindex* 30]}</y><data>{busi_name}</data>
+					</printitem>
+				</tpl>
+				
+				<tpl for="Ext.decode(info)">
+					<printitem>
+						<x>150</x><y>{[520 + xindex* 30]}</y><data>
+							设备编号:{values.device.device_code}
+						</data>
+					</printitem>
+				</tpl>
+			</tpl>
+			
+			<tpl if="busi_code == '1013'">
+				<tpl if="xindex == 1">
+					<printitem>
+						<x>150</x><y>{[490 + xindex* 30]}</y><data>{busi_name}</data>
+					</printitem>
+				</tpl>
+				
+				<tpl for="Ext.decode(info)">
+					<tpl if="values.device">
+						<x>150</x><y>{[520 + xindex* 30]}</y><data>
+							设备编号：{values.device.device_code}
+						</data> 
+					</tpl>
+					<tpl if="values.paired_card">
+						<x>650</x><y>{[520 + xindex* 30]}</y><data>
+							配对卡编号：{values.paired_card.device_code}
+						</data>
+					</tpl>
+					<tpl if="values.paired_modem">
+						<x>1150</x><y>{[520 + xindex* 30]}</y><data>
+							配对MODEM编号：{values.paired_modem.device_code}
+						</data>
+					</tpl>
+				</tpl>
+			</tpl>
+			
+			<tpl if="busi_code == '1020'">
+				<tpl if="xindex == 1">
+					<printitem>
+						<x>150</x><y>{[490 + xindex* 30]}</y><data>{busi_name}</data>
+					</printitem>
+				</tpl>
+				
+				<tpl for="Ext.decode(info)">
+					<tpl if="values.user">
+						<printitem>
+							<x>150</x><y>{[520 + xindex* 30]}</y><data>用户类型：{values.user.user_type_text}</data>
+						</printitem>
+					</tpl>
+					<tpl if="values.user.terminal_type_text">
+						<printitem>
+							<x>650</x><y>{[550 + xindex* 30]}</y><data>终端类型：{values.user.terminal_type_text}</data>
+						</printitem>
+					</tpl>
+				</tpl>
+			</tpl>
+			
+			<tpl if="busi_code == '1021'">
+				<tpl if="xindex == 1">
+					<printitem>
+						<x>150</x><y>{[490 + xindex* 30]}</y><data>{busi_name}</data>
+					</printitem>
+				</tpl>
+				
+				<tpl for="Ext.decode(info)">
+					<tpl for="users">
+						<printitem>
+							<x>150</x><y>{[520 + xindex* 30]}</y><data>
+								用户类型：{values.user_type_text} 机顶盒号:{values.stb_id} 智能卡号:{values.card_id}
+							</data>
+						</printitem>
+					</tpl>
+				</tpl>
+			</tpl>
+			
+			<tpl if="busi_code == '1024' || busi_code == '1025'">
+				<tpl if="xindex == 1">
+					<printitem>
+						<x>150</x><y>{[490 + xindex* 30]}</y><data>{busi_name}</data>
+					</printitem>
+				</tpl>
+				
+				<tpl for="Ext.decode(info)">
+					<tpl for="users">
+						<printitem>
+							<x>150</x><y>{[520 + xindex* 50]}</y><data>
+								终端类型：{values.user_type_text}  设备号：
+								<tpl if="values.stb_id"> {values.stb_id} </tpl> <tpl if="values.card_id"> {values.card_id}</tpl> <tpl if="values.modem_mac"> {values.modem_mac} </tpl>
+							</data>
+						</printitem>
+					</tpl>
+				</tpl>
+			</tpl>
+			
+			<tpl if="busi_code == '1027' || busi_code == '1915' ">
+				<tpl if="xindex == 1">
+					<printitem>
+						<x>150</x><y>{[490 + xindex* 30]}</y><data>{busi_name}</data>
+					</printitem>
+				</tpl>
+				
+				<tpl for="Ext.decode(info)">
+					<printitem>
+						<x>150</x><y>{[520 + xindex* 30]}</y>
+						<tpl for="prod_list">
+							<data>{values.prod_name}  </data>
+						</tpl>
+					</printitem>
+				</tpl>
+				
+			</tpl>
+			
+			<tpl if="busi_code == '1028'">
+				<tpl if="xindex == 1">
+					<printitem>
+						<x>150</x><y>{[490 + xindex* 30]}</y><data>{busi_name}</data>
+					</printitem>
+				</tpl>
+				
+				<tpl for="Ext.decode(info)">
+					<printitem>
+						<x>150</x><y>{[550 + xindex* 30]}</y>
+						<data>
+							产品 ：{values.prod.prod_name}  新资费：{values.new_tariff.tariff_name}启用
+						</data>
+					</printitem>
+				</tpl>
+			</tpl>
+			
+			<tpl if="busi_code == '1031'">
+				<tpl if="xindex == 1">
+					<printitem>
+						<x>150</x><y>{[490 + xindex* 30]}</y><data>{busi_name}</data>
+					</printitem>
+				</tpl>
+				
+				<tpl for="Ext.decode(info)">
+					<printitem>
+						<x>150</x><y>{[520 + xindex* 30]}</y><data>
+							网络类型：{values.user.net_type_text}  Modem：{values.user.modem_mac}
+						</data>
+					</printitem>
+				</tpl>
+			</tpl>
+			
+			<tpl if="busi_code == '1064'">
+				<tpl if="xindex == 1">
+					<printitem>
+						<x>150</x><y>{[490 + xindex* 30]}</y><data>{busi_name}</data>
+					</printitem>
+				</tpl>
+				
+				<tpl for="Ext.decode(info)">
+					<printitem>
+						<x>150</x><y>{[520 + xindex* 30]}</y><data>
+							促销主题：{values.promotion.theme_name}  促销名称：{values.promotion.promotion_name} 促销说明：{values.promotion.promotion_desc}
+						</data>
+					</printitem>
+				</tpl>
+			</tpl>
+			
+			<tpl if="busi_code == '1688'">
+				<tpl if="xindex == 1">
+					<printitem>
+						<x>150</x><y>{[490 + xindex* 30]}</y><data>{busi_name}</data>
+					</printitem>
+				</tpl>
+				
+				<tpl for="Ext.decode(info)">
+					<printitem>
+						<x>150</x><y>{[520 + xindex* 30]}</y><data>
+							套餐名：{values.prom_fee.prom_fee_name}  套餐金额：{[fm.convertToYuan(values.prom_fee.prom_fee)]}
+						</data>
+					</printitem>
+					<printitem>
+						<x>150</x><y>{[560 + xindex* 30]}</y><data>
+							用户名
+						</data>
+					</printitem>
+					<printitem>
+						<x>500</x><y>{[560 + xindex* 30]}</y><data>
+							产品名
+						</data>
+					</printitem>
+					<printitem>
+						<x>800</x><y>{[560 + xindex* 30]}</y><data>
+							缴费月数
+						</data>
+					</printitem>
+					
+					<tpl for="details">
+						<printitem>
+							<x>150</x><y>{[590 + xindex* 30]}</y><data>
+								{values.user_name}
+							</data>
+						</printitem>
+						<printitem>
+							<x>500</x><y>{[590 + xindex* 30]}</y><data>
+								{values.prod_name}
+							</data>
+						</printitem>
+						<printitem>
+							<x>800</x><y>{[590 + xindex* 30]}</y><data>
+								{values.months}
+							</data>
+						</printitem>
+					</tpl>
+					
+					<printitem>
+						<x>150</x><y>{[620 + values.details.length * 30]}</y><data>
+							套餐说明：
+						</data>
+					</printitem>
+					<printitem>
+						<x>150</x><y>{[650 + values.details.length * 30]}</y><data>
+							{values.prom_fee.remark}
+						</data>
+					</printitem>
+				</tpl>
+			</tpl>
+			
+			
+			
+			<tpl if="busi_code != '1040' && busi_code != '1240' && busi_code != '1039' && busi_code != '1007' && busi_code != '1003' && busi_code != '1010' && busi_code != '1009' && busi_code != '1011' && busi_code != '1014' && busi_code != '1013' && busi_code != '1008' && busi_code!='1020' && busi_code != '1021' && busi_code !='1024' && busi_code !='1025' && busi_code!='1027' && busi_code != '1915' && busi_code !='1028' && busi_code != '1031' && busi_code !='1231' && busi_code != '1064' && busi_code !='1688' ">
+				<printitem>
+					<x>150</x><y>{[550 + xindex* 50]}</y><data>{busi_name}</data>
+				</printitem>
+				<printitem>
+					<x>370</x><y>{[550 + xindex* 50]}</y><data>{info}</data>
+				</printitem>
+			</tpl>
+			
+		</tpl>
+	</items>
+</printinfo>
+<!-- 
+	客户开户		1001
+	过户			1003
+	购买设备		1007
+	回收设备		1008
+	更换设备		1009
+	移机			1010
+	取消挂失		1011
+	销售			1013
+	挂失			1014
+	用户开户		1020
+	用户销户		1021
+	报停			1024
+	报开			1025
+	退订			1027
+	资费变更		1028
+	模拟转数		1030
+	开通双向		1031
+	缴费			1040
+	促销			1064
+	修改购买方式	1231
+	批量缴费		1240
+	批量退订产品	1915
+	套餐缴费		1688
+ -->

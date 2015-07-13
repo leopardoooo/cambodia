@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="GBK"?>
+<div class="Cl">
+<div class="print_item">
+	
+	<tpl if="params.pay_type == '银行'">
+		<div class="row">
+			<div class="title_1">业务{point}</div>
+			<div class="title_2">支付方式</div>
+		</div>
+		<div class="row">
+			<div class="title_1">&nbsp;</div>
+			<div class="field"> <span>支付方式：银行</span></div>
+			<div class="field"> <span>银行名称：{[values.params.update_pay_type]}</span></div>
+		</div>
+		<div class="row">
+			<div class="title_1">&nbsp;</div>
+			<div class="field" style="width: 90%;"> <span>银行帐号：{[values.params.bank_account]}</span></div>
+		</div>
+		<div class="row">
+			<div class="title_1">&nbsp;</div>
+			<div class="field" style="width: 90%;"> <span>银行户名：{[values.params.account_name]}</span></div>
+		</div>
+		<tpl if="params.proxy_info !='' ">
+			<div class="row">
+				<div class="title_1">&nbsp;</div>
+				<div class="field" style="width: 90%;"> <span>经办人：{[values.params.proxy_info]}</span></div>
+			</div>
+		</tpl>
+		<tpl if="params.cert_num">
+			<tpl if="params.cert_num != '' ">
+				<div class="row">
+					<div class="title_1">&nbsp;</div>
+					<div class="field" style="width: 90%;"> <span>证件号码：{[values.params.cert_num]}</span></div>
+				</div>
+			</tpl>
+		</tpl>
+	</tpl>
+	<tpl if="params.pay_type == '银行修改'">
+		<div class="row">
+			<div class="title_1">业务{point}</div>
+			<div class="title_2">修改支付方式</div>
+		</div>
+		<tpl if="!params.new_update_pay_type">
+			<div class="row">
+				<div class="title_1">&nbsp;</div>
+				<div class="field"> <span>支付方式：银行</span></div>
+				<div class="field"> <span>银行名称：{[values.params.old_update_pay_type]}</span></div>
+			</div>
+		</tpl>
+		<tpl if="params.new_update_pay_type">
+			<div class="row">
+				<div class="title_1">&nbsp;</div>
+				<div class="field"><span>支付方式：银行</span></div>
+			</div>
+		</tpl>
+		<tpl if="params.new_update_pay_type">
+			<div class="row">
+					<div class="title_1">&nbsp;</div>
+					<div class="field" > <span>旧银行名称：{[values.params.old_update_pay_type]}</span></div>
+					<div class="field" > <span>新银行名称：{[values.params.new_update_pay_type]}</span></div>
+				
+			</div>
+		</tpl>
+		<tpl if="params.new_bank_account">
+			<div class="row">
+				<div class="title_1">&nbsp;</div>
+				<div class="field" > <span>旧银行帐号：{[values.params.old_bank_account]}</span></div>
+				<div class="field" > <span>新银行帐号：{[values.params.new_bank_account]}</span></div>
+			</div>
+			
+		</tpl>
+		<tpl if="!params.new_bank_account">
+			<div class="row">
+				<div class="title_1">&nbsp;</div>
+				<div class="field" style="width: 90%;"><span>银行帐号：{[values.params.old_bank_account]}</span></div>
+			</div>
+		</tpl>
+		
+		<div class="row">
+			<tpl if="params.new_account_name">
+				<div class="title_1">&nbsp;</div>
+				<div class="field" > <span>旧银行户名：{[values.params.old_account_name]}</span></div>
+				<div class="field" > <span>新银行户名：{[values.params.new_account_name]}</span></div>
+			</tpl>
+			<tpl if="!params.new_account_name">
+				<div class="title_1">&nbsp;</div>
+				<div class="field" > <span>银行户名：{[values.params.old_account_name]}</span></div>
+			</tpl>
+		</div>
+		<tpl if="params.new_proxy_info">
+			<div class="row">
+				<div class="title_1">&nbsp;</div>
+				<div class="field" > <span>经办人：{[values.params.new_proxy_info]}</span></div>
+			</div>
+		</tpl>
+		<tpl if="!params.new_proxy_info && params.old_proxy_info">
+				<div class="row">
+					<div class="title_1">&nbsp;</div>
+					<div class="field" style="width: 90%;"> <span>经办人：{[values.params.old_proxy_info]}</span></div>
+				</div>
+		</tpl>
+		<tpl if="params.old_cert_num">
+			<tpl if="params.old_cert_num != ''">
+				<div class="row">
+					<div class="title_1">&nbsp;</div>
+					<div class="field" style="width: 90%;"> <span>证件号码：{[values.params.old_cert_num]}</span></div>
+				</div>
+			</tpl>
+		</tpl>
+		
+	</tpl>
+	 
+	<tpl if="params.pay_type == ''">
+		<div class="row">
+			<div class="title_1">业务{point}</div>
+			<div class="title_2">修改支付方式</div>
+		</div>
+		<div class="row">
+			<div class="title_1">&nbsp;</div>
+			<div class="field" > <span>旧支付方式：{[values.params.old_update_pay_type]}</span></div>
+		</div>
+		<div class="row">
+			<div class="title_1">&nbsp;</div>
+			<div class="field" > <span>新支付方式：{[values.params.new_update_pay_type]}</span></div>
+		</div>
+		<tpl if="params.bank_account>
+			<div class="row">
+				<div class="title_1">&nbsp;</div>
+				<div class="field" style="width: 90%;"> <span>银行帐号：{[values.params.bank_account]}</span></div>
+			</div>
+		</tpl>
+		<tpl if="params.account_name>
+			<div class="row">
+				<div class="title_1">&nbsp;</div>
+				<div class="field" style="width: 90%;"> <span>银行户名：{[values.params.account_name]}</span></div>
+			</div>
+		</tpl>
+		<tpl if="params.proxy_info != ''">
+			<div class="row">
+				<div class="title_1">&nbsp;</div>
+				<div class="field" style="width: 90%;"> <span>经办人：{[values.params.proxy_info]}</span></div>
+			</div>
+		</tpl>
+		<tpl if="params.old_cert_num">
+			<tpl if="params.old_cert_num !='' ">
+				<div class="row">
+					<div class="title_1">&nbsp;</div>
+					<div class="field" style="width: 90%;"> <span>证件号码：{[values.params.old_cert_num]}</span></div>
+				</div>
+			</tpl>
+		</tpl>
+	</tpl>
+	
+	
+</div>
+</div>

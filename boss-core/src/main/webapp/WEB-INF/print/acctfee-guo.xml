@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="GBK" ?>
+<printinfo>
+	<defaultsetting>
+		<width>2500</width>
+		<height>933</height>
+		<font>6</font>
+	</defaultsetting>
+	<items>
+		<printitem>
+			<x>600</x><y>180</y><data>机打发票代码：{[values.invoiceCode || '']}</data>
+		</printitem>
+		<printitem>
+			<x>600</x><y>210</y><data>机打发票号码：{[values.invoiceId || '']}</data>
+		</printitem>
+		<printitem>
+			<x>70</x><y>225</y><data>付款方名称：{[values.cust.cust_name || '']}</data>
+		</printitem>		
+		<printitem>
+			<x>70</x><y>260</y><data>付款方代码：{[values.cust.cust_no || '']}</data>
+		</printitem>
+		<printitem>
+			<x>450</x><y>180</y><data>信息传输</data>
+		</printitem>
+		<printitem>
+			<x>90</x><y>180</y><data>{[values.date.datetimeStr || '']}</data>
+		</printitem>
+		<printitem>
+			<x>120</x><y>300</y><data>开票项目</data>
+		</printitem>
+		<printitem>
+			<x>600</x><y>300</y><data>金额</data>
+		</printitem>
+		<tpl for="printItems">
+			<printitem>
+				<x>70</x><y>{[305 + xindex* 35]}</y><data>{printitem_name}</data>
+			</printitem>			
+			<printitem>
+				<x>600</x><y>{[305+ xindex* 35]}</y><data>{[fm.convertToYuan(values.amount)]}</data>
+			</printitem>
+		</tpl> 
+		<printitem>
+			<x>70</x><y>750</y><data>附注 {[values.remark ?  [values.remark] : '']}</data>
+		</printitem>	
+		<printitem>
+			<x>70</x><y>805</y><data>金额合计（大写）{[this.chinese(values.total)]}</data>
+		</printitem>
+		<printitem>
+			<x>700</x><y>805</y><data>（小写）￥{[fm.convertToYuan(values.total)]}</data>
+		</printitem>
+		<printitem>
+			<x>70</x><y>840</y><data>收款人：{[values.optr.optr_name|| '']}</data>
+		</printitem>
+		<printitem>
+			<x>500</x><y>840</y><data>付款方式：{[values.paytype || '']}</data>
+		</printitem>
+	</items>
+</printinfo>

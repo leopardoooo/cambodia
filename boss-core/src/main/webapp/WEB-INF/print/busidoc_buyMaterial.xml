@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="GBK"?>
+<div class="Cl">
+	<div class="print_item">
+		<div class="row">
+			<div class="title_1">业务{point}</div>
+			<div class="title_2">购买配件</div>
+		</div>
+		<div class="row">
+			<div class="title_1">&nbsp;</div>
+			<div class="field" style="width: 50%;"> <span>配件类型：{[values.params.material_type]}</span></div>
+			<div class="field" style="width: 40%;"> <span>配件型号：{[values.params.material_model]}</span></div>
+		</div>
+		<div class="row">
+			<div class="title_1">&nbsp;</div>
+			<div class="field" style="width: 50%;"> <span>购买方式：{[values.params.material_buy_mode]}</span></div>
+			<div class="field" style="width: 40%;"> <span>购买数量：{[values.params.material_count]}</span></div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee 
+	http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+	<!-- 配置SSO 监听器，删除已经失效的Session -->
+	 <listener>
+	 	<listener-class>com.ycsoft.commons.action.SessionListener</listener-class>
+	 </listener>
+	<!-- 
+		Spring 容器参数配置
+		Spring容器初始化监听器配置
+	-->
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>classpath*:applicationContext-*.xml</param-value>
+	</context-param>
+	<listener>
+		<listener-class>
+			org.springframework.web.context.ContextLoaderListener
+		</listener-class>
+	</listener>
+
+	<!-- 报表Servlet过滤器在struts2过滤前配置 -->
+	<filter>
+		<filter-name>report</filter-name>
+		<filter-class>
+			com.ycsoft.report.web.commons.ReportServletFilter
+		</filter-class>
+		<init-param>
+		<param-name>includeServlets</param-name>
+		<param-value>reportServlet</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>report</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	<!-- 
+		Struts2 配置区域
+		Struts2 核心控制器
+	-->
+	<filter>
+		<filter-name>struts2</filter-name>
+		<filter-class>
+			org.apache.struts2.dispatcher.ng.filter.StrutsPrepareAndExecuteFilter
+		</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>struts2</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+
+	<!-- 容器初始化监听器 -->
+	<listener>
+		<listener-class>
+			com.ycsoft.report.web.commons.AppInitListener
+		</listener-class>
+	</listener>
+
+	<!-- 
+		容器配置区域
+		session超时定义,单位为分钟
+	-->
+	<session-config>
+		<session-timeout>60</session-timeout>
+	</session-config>
+	<!-- 快逸报表配置   -->
+	<servlet>
+		<servlet-name>reportServlet</servlet-name>
+		<servlet-class>
+			com.runqian.report4.view.ReportServlet
+		</servlet-class>
+		<init-param>
+			<param-name>configFile</param-name>
+			<param-value>/WEB-INF/classes/reportConfig.xml</param-value>
+		</init-param>
+		<load-on-startup>2</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>reportServlet</servlet-name>
+		<url-pattern>/reportServlet</url-pattern>
+	</servlet-mapping>
+	<jsp-config>
+		<taglib>
+			<taglib-uri>/WEB-INF/runqianReport4.tld</taglib-uri>
+			<taglib-location>
+				/WEB-INF/runqianReport4.tld
+			</taglib-location>
+		</taglib>
+	</jsp-config>
+
+	<resource-ref>
+		<description>DB1 Connection</description>
+		<res-ref-name>boss2010</res-ref-name>
+		<res-type>javax.sql.DataSource</res-type>
+		<res-auth>Container</res-auth>
+	</resource-ref>
+	<resource-ref>
+		<description>DB2 Connection</description>
+		<res-ref-name>system</res-ref-name>
+		<res-type>javax.sql.DataSource</res-type>
+		<res-auth>Container</res-auth>
+	</resource-ref>
+	
+</web-app>

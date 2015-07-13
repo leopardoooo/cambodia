@@ -1,0 +1,49 @@
+html BODY {
+	overflow:auto;
+	padding: 0px; 
+	margin: 0px; 
+	font-size: 13px;
+}
+.x-div-screen-center{
+	position:absolute;
+	top:25%;
+	left:15%;
+	height:40%;
+	width:100%;
+}
+.left-div-img-icon{ 
+	float:left;
+	width:150px;
+	height:100%;
+}
+.msg-div{
+	float:left ;
+}
+.msg-div label{
+	color : #0000a0;;
+	line-height:30px;
+	padding-left:20px;
+	font-weight:bolder;
+}
+.msg-div div{
+	color : #400080;;
+	line-height:25px;
+}
+.msg-div div ul{
+	margin-top:0px;
+	margin-left:10px ;
+}
+.msg-div div ul li span{
+	color:red;
+	font-size:13px ;
+	font-family:"Courier New";	
+	word-wrap:break-word;	
+}
+.x-img-failure{
+	background-image:url("./../images/failure.gif"); 
+	background-repeat:no-repeat;
+}
+.x-img-success{
+	background-image:url("./../images/success.gif");
+	background-repeat:no-repeat;
+}

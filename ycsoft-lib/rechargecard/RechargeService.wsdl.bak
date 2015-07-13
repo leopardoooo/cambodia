@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions targetNamespace="http://www.bjdv.com/RechargeService"
+	xmlns:ns1="http://bean.bjdv.com"
+	xmlns:soapenc12="http://www.w3.org/2003/05/soap-encoding"
+	xmlns:tns="http://www.bjdv.com/RechargeService"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:soap11="http://schemas.xmlsoap.org/soap/envelope/"
+	xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/"
+	xmlns:soapenc11="http://schemas.xmlsoap.org/soap/encoding/"
+	xmlns:soap12="http://www.w3.org/2003/05/soap-envelope">
+	<wsdl:types>
+		<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+			attributeFormDefault="qualified" elementFormDefault="qualified"
+			targetNamespace="http://bean.bjdv.com">
+			<xsd:complexType name="RechargeReq">
+				<xsd:sequence>
+					<xsd:element minOccurs="0" name="icCard"
+						nillable="true" type="xsd:string" />
+					<xsd:element minOccurs="0" name="password"
+						nillable="true" type="xsd:string" />
+					<xsd:element minOccurs="0" name="rechargeCard"
+						nillable="true" type="xsd:string" />
+					<xsd:element minOccurs="0" name="userName"
+						nillable="true" type="xsd:string" />
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="RechargeRes">
+				<xsd:sequence>
+					<xsd:element minOccurs="0" name="banace"
+						nillable="true" type="xsd:string" />
+					<xsd:element minOccurs="0" name="code"
+						type="xsd:int" />
+					<xsd:element minOccurs="0" name="codeMessage"
+						nillable="true" type="xsd:string" />
+				</xsd:sequence>
+			</xsd:complexType>
+		</xsd:schema>
+		<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+			attributeFormDefault="qualified" elementFormDefault="qualified"
+			targetNamespace="http://www.bjdv.com/RechargeService">
+			<xsd:element name="recharge">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element maxOccurs="1" minOccurs="1"
+							name="in0" nillable="true" type="ns1:RechargeReq" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="rechargeResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element maxOccurs="1" minOccurs="1"
+							name="out" nillable="true" type="ns1:RechargeRes" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:schema>
+	</wsdl:types>
+	<wsdl:message name="rechargeResponse">
+		<wsdl:part name="parameters" element="tns:rechargeResponse">
+		</wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="rechargeRequest">
+		<wsdl:part name="parameters" element="tns:recharge"></wsdl:part>
+	</wsdl:message>
+	<wsdl:portType name="RechargeServicePortType">
+		<wsdl:operation name="recharge">
+			<wsdl:input name="rechargeRequest"
+				message="tns:rechargeRequest">
+			</wsdl:input>
+			<wsdl:output name="rechargeResponse"
+				message="tns:rechargeResponse">
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:portType>
+	<wsdl:binding name="RechargeServiceHttpBinding"
+		type="tns:RechargeServicePortType">
+		<wsdlsoap:binding style="document"
+			transport="http://schemas.xmlsoap.org/soap/http" />
+		<wsdl:operation name="recharge">
+			<wsdlsoap:operation soapAction="" />
+			<wsdl:input name="rechargeRequest">
+				<wsdlsoap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output name="rechargeResponse">
+				<wsdlsoap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+	<wsdl:service name="RechargeService">
+		<wsdl:port name="RechargeServiceHttpPort"
+			binding="tns:RechargeServiceHttpBinding">
+			<wsdlsoap:address
+				location="http://127.0.0.1:8088/recharge_interface/services/RechargeService" />
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>

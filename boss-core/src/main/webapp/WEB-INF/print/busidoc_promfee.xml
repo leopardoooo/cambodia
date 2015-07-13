@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="GBK"?>
+<div class="Cl">
+	<div class="print_item">
+		<div class="row">
+			<div class="title_1">业务{point}</div>
+			<div class="title_2">套餐活动</div>
+		</div>
+		<tpl if="params.related_user_list">
+			<div class="row">
+				<div class="field" style="width: 90%;padding-left:60px;" ><span>参与用户</span></div>
+			</div>
+			<tpl for="params.related_user_list">
+				<div class="row" style="padding-left:60px;">
+					<tpl if="values.terminal_type_text">
+						<div class="field" ><span>终端类型：{values.terminal_type_text}</span></div>
+					</tpl>
+					<tpl if="values.stb_id">
+						<div class="field" ><span>机顶盒：{values.stb_id}</span></div>
+					</tpl>
+					<tpl if="values.card_id">
+						<div class="field"  ><span>智能卡：{values.card_id}</span></div>
+					</tpl>
+					<tpl if="values.modem_mac">
+						<div class="field"><span>猫：{values.modem_mac}</span></div>
+					</tpl>
+				</div>
+			</tpl>
+		</tpl>
+		
+		 <tpl if="params.prod_tariff_list">
+			<tpl for="params.prod_tariff_list"> 
+				
+					<div class="row">
+						<div class="field" style="width: 90%;padding-left:60px;" ><span>活动名称：{prod_name}</span></div>
+					</div>
+					
+					<div class="row">
+						<div class="field" style="width: 90%;padding-left:60px;" ><span>活动费用：{tariff_name}元</span></div>
+					</div>
+					
+					
+					<div class="row">
+						<div class="field" style="width: 90%;padding-left:60px;" >
+							<span>活动内容：{values.prod_desc}</span>
+						</div>
+					</div>
+					<tpl if="values.prod_descs">
+						<tpl for="values.prod_descs">
+							<div class="row">
+								<div class="title_1">&nbsp;</div>
+								<div class="field" style="width: 90%;" >
+									<span></span>
+								</div>
+							</div>
+						</tpl>
+					</tpl>
+					<div class="row"></div>
+			</tpl>
+		</tpl>
+		
+	</div>
+</div>

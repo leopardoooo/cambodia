@@ -1,0 +1,145 @@
+/*!
+ * 为导航式首页提供的样式文件
+ */
+html, body, div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, pre, form, fieldset, input, p, blockquote, th, td {margin: 0;padding: 0;}img, body, html {border: 0;}address, caption, cite, code, dfn, em, strong, th, var {font-style: normal;font-weight: normal;}ol, ul {list-style: none;}caption, th {text-align: left;}h1, h2, h3, h4, h5, h6 {font-size: 100%;}q:before, q:after {content: '';}
+body {font-family: arial, verdana, sans-serif;font-size: 12px;overflow: auto;}
+a {text-decoration: none; color: #f50;}a:hover {text-decoration: underline;color: #f50;} 
+#loading {position: absolute;left: 40%;top: 40%;padding: 2px;z-index: 20001;height: auto;} 
+#loading div {color: #444;font: bold 13px tahoma, arial, helvetica;padding: 10px;margin: 0;height: auto;}
+#loading div {background: transparent;} 
+#loading .loading-msg {font: normal 10px arial, tahoma, sans-serif;}
+
+#header {}
+#header .site-nav-search{
+	padding-left: 10px;
+	padding-right: 10px;
+	height: 80px;
+	background: red;
+	background:url(./../images/index/bg6.gif) repeat-x;
+}
+.site-nav-search #search{
+	height:100%;
+	margin:0px;
+	padding-left:154px !important;
+	padding-left:10px;
+	width: 630; 
+}#search .search-tablist{
+	position:absolute;
+	padding-top:1px;
+}
+.search-tablist li{
+	float: left;
+	padding-top:6px;
+	padding-left:15px;
+	padding-right:15px;
+} .search-tablist li a , .search-panel-right li a{
+	color: #153679;  
+} .search-tablist .first {
+	
+} .search-tablist .selected {
+	background-color:red;
+	background-position:right -83px !important;
+	font-size:14px;
+	font-weight:bold; 
+	padding:0px 5px 0 0; 
+	z-index:-2;
+}.search-tablist .selected a{
+	background-position:0 -83px !important;
+	display:block; 
+	line-height:20px;
+	padding:5px 4px 3px 10px;
+	text-align:center;
+}.search-tablist .selected, .search-tablist .selected a  , #search .rc-tp{
+	background:transparent url(./../images/index/search.png) no-repeat scroll 999em 0;
+}
+#search .search-panel{
+	position:absolute;
+	clear: left;
+	top: 53px !important;
+	top: 53px; 
+	width:395 !important;
+	width:408;
+	height: 34px!important;
+	height: 38px;
+	padding-top:3px !important;
+	padding-top:3px;
+	padding-left:3px;
+	border: 1px solid #9eaab6;
+	border-bottom:0;
+	background:url(./../images/index/search-panel.png) ;
+	background-position: left -4px ;
+}
+#search .feepanel{
+	float:right;
+	width:120 !important;
+	width: 120px;
+	font-size: 15px;
+	padding:0px;
+	padding-left:0px;
+	padding-top:10px;
+	padding-bottom:0px;
+}
+#search .feepanel LABEL{
+	font-weight: bold;color: blue
+}
+#search .toolpanel{
+	float:right;
+	width:210 !important;
+	width:210px;
+	height:100px;
+	padding:0px;
+	padding-left:0px;
+	padding-top:12px;
+	padding-bottom:0px;
+	
+}
+#search .toolpanel .top_button{
+	width:32;height:32;margin-left: 16px;cursor:pointer;
+}
+
+.search-panel .search-input-box{
+	background-color: white;
+	border-color:#585856 #585856 #B6B7B9;
+	border-style:solid;
+	border-width:1px 0 1px 1px;
+	height:29px;
+	width: 260;
+	padding:4px;
+}
+.search-panel .search-input-box input{
+	border:0 none;
+	width:243 !important;
+	width:100%;
+	background-color: white;
+	font-family:tahoma,arial,helvetica,sans-serif;
+}.search-panel .search-btn button{
+	border:0 none;
+	color:#FFFFFF;
+	cursor:pointer;
+	font-size:15px;
+	font-weight:bold;
+	height:29px;
+	width:72px;
+	background:url(./../images/index/search-btn.png) right top;
+	background-color:#FB8502;
+}#search .search-panel-right{
+	float:right;
+	padding-top: 38px; 
+	width:29% !important;
+	width:11%;
+} 
+.site-nav-search .logo{
+	float:left;
+	clear:left;
+	width: 108px;
+	padding:0px;
+	padding-left:0px;
+	padding-top:11px;
+	padding-bottom:0px;
+}
+.content {
+	padding:2px;
+	padding-top:1px;
+	padding-bottom:4px;
+}
+

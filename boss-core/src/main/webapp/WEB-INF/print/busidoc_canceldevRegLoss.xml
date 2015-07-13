@@ -1,0 +1,16 @@
+ <?xml version="1.0" encoding="GBK"?>
+<div class="Cl">
+  <div class="print_item">
+    <div class="row">
+      <div class="title_1">业务{point}</div>
+      <div class="title_2">取消设备挂失</div>
+    </div>
+      
+     <div class="row">
+       <div class="title_1">&nbsp;</div>
+       <div class="field" style="width: 50%;"><span>设备类型：{[values.params.device_type]} </span></div>
+       <div class="field" style="width: 40%;"><span>设备号：{[values.params.device_code]} </span></div>
+    </div>
+     
+  </div>
+</div>

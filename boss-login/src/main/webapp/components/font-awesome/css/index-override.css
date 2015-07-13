@@ -1,0 +1,48 @@
+.x-tab-strip span.icon{
+	font-family: '微软雅黑'; 
+}
+.x-tab-strip span.icon:before{
+	font-family: "FontAwesome";
+	font-size: 15px;
+	position: absolute;
+	top: 1px;
+	left: 2px;
+}
+.x-tab-strip .x-tab-with-icon span.x-tab-strip-text{
+	position: relative;
+	padding-left: 23px;
+	line-height: 28px;
+	font-size: 14px;
+}
+.x-btn-text-icon .x-btn-icon-small-left .x-btn-text.icon:before{
+	font-family: "FontAwesome";
+	margin-right: 5px;
+	position: absolute;
+	top: 4px;
+	left: 2px;
+}
+.x-btn-text-icon .x-btn-icon-small-left .x-btn-text.icon{
+	padding-left: 20px;
+	height: 18px;
+	position: relative;
+}
+.x-grid3-locked{
+	border-right: 0px;
+}
+.x-menu-item-icon.icon{
+font-family: "FontAwesome";
+}
+.x-menu-item-icon.icon:before{
+	font-family: "FontAwesome";
+}
+.grid-column-icon{
+	margin: 0 3px;
+	margin-top: 2px;
+	cursor: pointer;
+	color: #000;
+}
+.grid-column-icon .icon:before{font-size: 15px; margin-top: 2px;}
+a.grid-column-icon:hover{
+	color: #000;
+	text-decoration: none;
+}

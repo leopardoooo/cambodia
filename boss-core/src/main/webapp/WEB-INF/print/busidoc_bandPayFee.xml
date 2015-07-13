@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="GBK"?>
+<div class="Cl">
+ 	
+ 	<tpl if="values.params.bandPayList">
+		<div class="print_item">
+			<div class="row">
+				<div class="title_1">业务{point}</div>
+				<div class="title_2">宽带缴费<!-- 【流水号：{[values.item.done_code]}】 --></div>
+			</div>
+			<tpl for="values.params.bandPayList">
+				<div class="row">
+					<div class="title_1">&nbsp;</div>
+					<div class="field" style="width: 50%;" > <span>上网帐号：{login_name}</span></div>
+					<div class="field" style="width: 40%;" > <span>套餐：{tariff_name}</span></div>
+				</div>
+				<div class="row">
+					<div class="title_1">&nbsp;</div>
+					<div class="field" style="width: 90%;" > <span>缴费期限：{old_invalid_date} 至 {invalid_date}</span></div>
+				</div>
+			</tpl>
+		</div>
+ 	</tpl>
+</div>

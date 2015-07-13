@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="GBK" ?>
+<jsteak-applet>
+	<page-setting>
+		<width>900</width>
+		<height>600</height>
+	</page-setting>
+	<items>
+		<tpl if="values.cust && values.cust.busi_name">
+			<item left="170" top="70">{[values.cust.busi_name || '']}</item>
+		</tpl>
+			<item left="270" top="70">{[values.cust.cust_name || '']}</item>
+			<item left="370" top="70">{[values.cust.address || '']}</item>
+			<item left="100" top="110">{[values.cust.cust_class_text || '']}</item>
+		<item left="440" top="240">{[values.date.year || '']}</item>
+		<item left="480" top="240">{[values.date.month || '']}</item>
+		<item left="500" top="240">{[values.date.day || '']}</item>
+		<item left="190" top="240">{[this.chinese(values.total)]}</item>
+		<tpl for="printItems">
+			<item left="130" top="{[120 + xindex* 15]}" >{printitem_name}</item>
+			<item left="480" top="{[120+ xindex* 15]}" >{[fm.convertToYuan(values.amount)]}</item>
+		</tpl>
+		<item left="355" top="240" >{[values.optr.optr_name|| '']}</item>
+	</items>
+</jsteak-applet>

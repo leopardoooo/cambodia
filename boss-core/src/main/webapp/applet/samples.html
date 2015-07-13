@@ -1,0 +1,36 @@
+<html>
+   <head><title>jSteak samples</title>    
+   
+   </head>
+   <body style="padding: 50px;">
+   <h1 id="title">Print Applet Samples</h1><hr />
+   <h3 id="status" style="">正在安装控件...</h3>
+   <p style=" background: #fceb9f; width: 600px;padding: 20px; line-height: 26px; border-radius: 5px;">
+	需要小小的设置一下，请下载<a href="./java.policy">java.policy</a>，<br />
+	打开您浏览器安装JRE时的目录如：C:\Program Files (x86)\Java\jre7 <br />
+	然后切换至\lib\security目录，将目录下的java.policy覆盖即可。   
+   </p>
+      <br />
+   <button onclick="doPrint()" style="border: 1px solid #a10101; background: #a11212;padding: 0px 20px; cursor: pointer; height: 40px; font-size: 15px; color: #fff; font-weight: bold;">再次打印 ？</button>
+
+   <applet id="jsteak" code="com.jsteak.PrintApplet.class" archive="./JSteak.jar" style="position: absolute; left: -100px; top: -100px;" width="1" height="1">
+   </applet>
+   <script type="text/javascript">
+		function jsteakReady(){
+			document.getElementById("status").innerHTML = "安装完成，正在打印...";
+			doPrint();
+		}
+		
+		function doPrint(){
+			var obj = document.getElementById("jsteak");
+			var data = "text=2012年&posX=70&posY=10^text=12月&posX=170&posY=170^text=27日&posX=245&posY=170^text=客户名称:我是大美女&posX=70&posY=220^"+
+					"text=客户编号:0101010101&posX=630&posY=170^text=客户地址:杭州市西湖区文二西路1号元茂大厦&posX=70&posY=260^"+
+					"text=数字电视预存费&posX=70&posY=305^text=01010023201321&posX=470&posY=305^text=120.00&posX=780&posY=305^"+
+					"text=壹佰贰拾圆整&posX=210&posY=520^text=120.00&posX=780&posY=520^text=营业员&posX=780&posY=553";
+					
+			var batchData = data + "|" + data + "|" + data; 
+			//obj.print(data, 900, 600);
+			obj.print(batchData, 900, 600);
+		}
+   </script>
+</html>

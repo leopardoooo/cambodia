@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="GBK"?>
+<div class="Cl">
+
+<tpl if="params.users">
+<div class="print_item">
+	<div class="row">
+		<div class="title_1">业务{point}</div>
+		<div class="title_2">用户销户<!-- 【流水号：{[values.item.done_code]}】 --></div>
+	</div>
+	</div>
+	
+	<tpl for="params.users">
+	<div class="print_item">
+		<div class="row">
+			<div class="title_1">&nbsp;</div>
+			<div class="field" style="width: 95%; padding-left:60px;"><span>终端类型：{values.user.terminal_type_text}</span></div>
+ 		</div>
+ 		<div class="row"></div>
+		<tpl if="values.user_type == '数字电视'">		
+			<div class="row">
+				<div class="title_1">&nbsp;</div>
+				<div class="field" style="width: 40%;"><span>机顶盒号：{[values.user.stb_id]}</span></div>
+				<div class="field" style="width: 50%;"><span>智能卡号：{[values.user.card_id]}</span></div>
+			</div>
+		</tpl>
+		<tpl if="values.user_type == '宽带'">
+			<div class="row">
+				<div class="title_1">&nbsp;</div>
+				<div class="field" style="width: 90%;"><span>终端类型：{values.user.terminal_type_text}</span></div>
+	 		</div>
+			<div class="row">
+				<div class="title_1">&nbsp;</div>
+				<div class="field" style="width: 40%;"><span>上网帐号：{[values.user.login_name]}</span></div>
+				<div class="field" style="width: 50%;"><span>Modem Mac：{[values.user.modem_mac]}</span></div>
+			</div>
+		</tpl>
+		<tpl for="values.prods">
+		
+			<div class="row">
+				<div class="title_1">&nbsp;</div>
+				<div class="field" style="width: 40%;"><span>退订产品：{prod_name}</span></div>
+				<div class="field" style="width: 50%;"><span>计费方式：{tariff_name}</span></div>
+			</div>
+		</tpl>
+		</div> 
+	</tpl>
+</tpl>
+</div>

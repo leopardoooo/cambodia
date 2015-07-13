@@ -1,0 +1,70 @@
+/*!
+ * MyJsp Library 1.0
+ * Copyright(c) 2009-2010 ycsoft
+ * huanghui2004@hotmail.com
+ */
+
+
+
+.x-form-row {
+    height: 25px;
+    width: 100%;
+    white-space: nowrap ;
+} 
+.x-form-row LABEL{
+    float: left;
+    width: 20%;
+    text-align: right;
+	margin-top:3px;
+} 
+.x-form-row DIV {
+    float: left;
+    width: 30%;
+    padding-left: 2px;
+}
+input , textarea{
+	font-family:tahoma,arial,helvetica,sans-serif;
+	font-size-adjust:none;
+	font-stretch:normal;
+	font-style:normal;
+	font-variant:normal;
+	font-weight:normal;
+	line-height:normal;
+	color: #373737;
+	margin:-1px 0;
+	padding:2px 2px 1px 2px;
+    padding-bottom:0;
+	border: 1px solid #B5B8C8;
+	background-repeat: repeat-x;
+	background-image:url(../../images/form/bg_input.gif);
+} 
+select{
+	width:125px;
+	border: 1px solid #B5B8C8;
+}
+input , select{
+	font-size:12px;
+	height : 21px;
+}
+textarea{
+	font-size:12px;
+	padding:3px;
+	margin-bottom:2px;
+}
+.x-form-checkOrRadio{
+	border : none ;
+	background-image : none ;
+}
+.x-form-input-focus{
+	border-color:#7EADD9;
+} 
+.x-form-input-blur{
+	border-color:#c0c0c0;
+} 
+.x-form-input-invalid{
+	background: repeat-x scroll center bottom;
+	background-color: #ffffff;
+	background-image: url(../../images/form/invalid_line.gif);
+	border-color:#CC3300;
+	padding:2px;
+}

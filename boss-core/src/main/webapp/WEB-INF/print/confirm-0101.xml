@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="GBK" ?> 
+<printinfo>
+	<defaultsetting>
+		<width>2500</width>
+		<height>933</height>
+		<font>10</font>
+	</defaultsetting>
+	<items>
+		<printitem>
+			<x>150</x><y>195</y><data>{[values.optr.dept_name]}</data>
+		</printitem>
+		<printitem>
+			<x>350</x><y>195</y><data>{[values.optr.optr_name]}</data>
+		</printitem>		
+		<printitem>
+			<x>900</x><y>195</y><data>{[values.date.dateStr || '']}</data>
+		</printitem>		
+		<printitem>
+			<x>150</x><y>275</y><data>客户姓名 {[values.cust.cust_name || '']}</data>
+		</printitem>		
+		<printitem>
+			<x>150</x><y>335</y><data>用户类型 {[values.cust.cust_class_text || '']}</data>
+		</printitem>		
+		<printitem>
+			<x>650</x><y>335</y><data>证件号码 {[values.linkman.cert_num || '']}</data>
+		</printitem>				
+		<printitem>
+			<x>150</x><y>365</y><data>固定电话 {[values.linkman.tel || '']}</data>
+		</printitem>
+		<printitem>
+			<x>650</x><y>365</y><data>手机 {[values.linkman.mobile || '']}</data>
+		</printitem>
+		<printitem>
+			<x>150</x><y>395</y><data>装机地址 {[values.cust.address || '']}</data>
+		</printitem>		
+		
+		<tpl for="docItems">
+		
+			<tpl if="busi_code == '1040'">
+				<tpl if="xindex == 1">
+					<printitem>
+						<x>150</x><y>{[455 + xindex* 30]}</y><data>{busi_name}</data>
+					</printitem>
+				</tpl>
+				<tpl for="Ext.decode(info)">
+				
+					<tpl for="data">
+						<printitem>
+							<x>150</x><y>{[495 + xindex* 30]}</y><data>{[values.terminal_type_text || '']}</data>
+						</printitem>
+						<printitem>
+							<x>350</x><y>{[495 + xindex* 30]}</y>
+								<data>
+									{[values.printitem_name || '']}
+									<tpl if="!Ext.isEmpty(values.user_type) && values.user_type != 'DTV'">
+										({[values.user_name || '']})
+									</tpl>
+								</data>
+						</printitem>
+						<printitem>
+							<x>970</x><y>{[495 + xindex* 30]}</y><data>{[fm.convertToYuan(values.fee)]}</data>
+						</printitem>
+					</tpl>
+					<printitem>
+						<x>910</x><y>{[605 + values.count * 30]}</y><data>合计：{[fm.convertToYuan(values.sum_fee)]}</data>
+					</printitem>
+				</tpl>
+			</tpl>
+			
+			
+			<tpl if="busi_code == '1240' || busi_code == '1039'">
+				<tpl if="xindex == 1">
+					<printitem>
+						<x>150</x><y>{[490 + xindex* 30]}</y><data>{busi_name}</data>
+					</printitem>
+				</tpl>
+				<tpl for="Ext.decode(info)">
+					<printitem>
+						<x>150</x><y>{[590 + xindex* 50]}</y><data>{[values.printitem_name || '']}</data>
+					</printitem>
+					<printitem>
+						<x>780</x><y>{[590 + xindex* 50]}</y><data>{[fm.convertToYuan(values.sum_fee)]}</data>
+					</printitem>
+				</tpl>
+			</tpl>
+			
+			<tpl if="busi_code != '1040' && busi_code != '1240' && busi_code != '1039'">
+				<printitem>
+					<x>150</x><y>{[550 + xindex* 50]}</y><data>{busi_name}</data>
+				</printitem>
+				<printitem>
+					<x>370</x><y>{[550 + xindex* 50]}</y><data>{info}</data>
+				</printitem>
+			</tpl>
+			
+		</tpl>
+	</items>
+</printinfo>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="GBK"?>
+<div class="Cl">
+<div class="print_item">
+	<div class="row">
+		<div class="title_1">业务{point}</div>
+		<div class="title_2">过户<!-- 【流水号：{[values.item.done_code]}】 --></div>
+	</div>
+	<tpl if="params.changes">
+		<tpl for="params.changes">
+			<tpl if="values.column_name == 'cust_name'">
+				<div class="row">
+					<div class="title_1">&nbsp;</div>
+					<div class="field" style="width: 50%;" ><span>旧客户名称：{values.old_value}</span></div>
+					<div class="field" style="width: 40%;" ><span>新客户名称：{values.new_value}</span></div>
+				</div>
+			</tpl>
+			<tpl if="values.column_name == 'cert_num'">
+				<div class="row">
+					<div class="title_1">&nbsp;</div>
+					<div class="field" style="width: 50%;"><span>旧证件号码：{[fm.formatIdOrPhone(values.old_value || '')]}</span></div>
+	 				<div class="field" style="width: 40%;"><span>新证件号码：{[fm.formatIdOrPhone(values.new_value || '')]}</span></div>
+	 			</div>
+			</tpl>
+			<tpl if="values.column_name == 'cert_type'">
+				<div class="row">
+					<div class="title_1">&nbsp;</div>
+					<div class="field" style="width: 50%;"><span>旧证件类型：{values.old_value_text}</span></div>
+					<div class="field" style="width: 40%;"><span>新证件类型：{values.new_value_text}</span></div>
+				</div>
+			</tpl>
+			<tpl if="values.column_name == 'tel'">
+				<div class="row">
+					<div class="title_1">&nbsp;</div>
+					<div class="field" style="width: 50%;"><span>旧固定电话：{[fm.formatIdOrPhone(values.old_value || '')]}</span></div>
+					<div class="field" style="width: 40%;"><span>新固定电话：{[fm.formatIdOrPhone(values.new_value || '')]}</span></div>
+				</div>
+			</tpl>
+			<tpl if="values.column_name == 'mobile'">
+				<div class="row">
+					<div class="title_1">&nbsp;</div>
+					<div class="field" style="width: 50%;"><span>旧移动电话：{[fm.formatIdOrPhone(values.old_value || '')]}</span></div>
+					<div class="field" style="width: 40%;"><span>新移动电话：{[fm.formatIdOrPhone(values.new_value || '')]}</span></div>
+				</div>
+			</tpl>
+			<tpl if="values.column_name == 'address'">
+				<div class="row">
+					<div class="title_1">&nbsp;</div>
+					<div class="field" style="width: 50%;"><span>原地址：{values.old_value}</span></div>
+					<div class="field" style="width: 40%;"><span>新地址：{values.new_value}</span></div>
+				</div>
+			</tpl>
+		</tpl>
+		
+		
+	</tpl>
+</div>
+</div>

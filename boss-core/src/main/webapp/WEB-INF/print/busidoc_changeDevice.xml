@@ -1,0 +1,54 @@
+ <?xml version="1.0" encoding="GBK"?>
+<div class="Cl">
+  <div class="print_item">
+    <div class="row">
+      <div class="title_1">业务{point}</div>
+      <div class="title_2">设备更换</div>
+    </div>
+    <tpl if="values.params.changeReason!=null">
+    	<div class="row">
+	          <div class="title_1">&nbsp;</div>
+	          <div class="field"> <span>更换原因：{values.params.changeReason} </span></div>
+        </div>
+    </tpl>
+    <tpl if="values.params.oldStb !=null && values.params.newStb!=null">
+    	<div class="row">
+	          <div class="title_1">&nbsp;</div>
+	          <div class="field" style="width: 40%;" > <span>旧机型号：{[values.params.oldStb.deviceModel.device_model]} </span></div>
+	          <div class="field" style="width: 50%;" > <span>新机型号：{[values.params.newStb.deviceModel.device_model]} </span></div>
+        </div>
+         <div class="row">
+	          <div class="title_1">&nbsp;</div>
+	          <div class="field" style="width: 40%;" > <span>旧机顶盒号：{[values.params.oldStb.device_code]} </span></div>
+	          <div class="field" style="width: 50%;" > <span>新机顶盒号：{[values.params.newStb.device_code]} </span></div>
+        </div>
+    </tpl>
+    
+    <tpl if="values.params.oldCard !=null && values.params.newCard!=null">
+    	<div class="row">
+	          <div class="title_1">&nbsp;</div>
+	          <div class="field" style="width: 40%;" > <span>旧卡型号：{[values.params.oldCard.deviceModel.device_model]} </span></div>
+	          <div class="field" style="width: 50%;" > <span>新卡型号：{[values.params.newCard.deviceModel.device_model]} </span></div>
+        </div>
+         <div class="row">
+	          <div class="title_1">&nbsp;</div>
+	          <div class="field" style="width: 40%;" > <span>旧智能卡号：{[values.params.oldCard.device_code]} </span></div>
+	          <div class="field" style="width: 50%;"> <span>新智能卡号：{[values.params.newCard.device_code]} </span></div>
+        </div>
+    </tpl>
+    
+    <tpl if="values.params.oldModem !=null && values.params.newModem!=null">
+    	<div class="row">
+	          <div class="title_1">&nbsp;</div>
+	          <div class="field" style="width: 40%;" > <span>旧猫型号：{[values.params.oldModem.deviceModel.device_model]} </span></div>
+	          <div class="field" style="width: 50%;" > <span>新猫型号：{[values.params.newModem.deviceModel.device_model]} </span></div>
+        </div>
+         <div class="row">
+	          <div class="title_1">&nbsp;</div>
+	          <div class="field" style="width: 40%;" > <span>旧MAC：{[values.params.oldModem.modem_mac]} </span></div>
+	          <div class="field" style="width: 50%;" > <span>新MAC：{[values.params.newModem.modem_mac]} </span></div>
+        </div>
+    </tpl>
+    
+  </div>
+</div>

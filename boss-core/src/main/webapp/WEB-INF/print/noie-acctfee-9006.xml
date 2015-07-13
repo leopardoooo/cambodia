@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="GBK" ?>
+<jsteak-applet>
+	<page-setting>
+		<width>900</width>
+		<height>600</height>
+	</page-setting>
+	<items>
+		<item left="60" top="130">{[values.date.year || '']}年</item>
+		<item left="120" top="90">{[values.date.month || '']}月</item>
+		<item left="140" top="90" >{[values.date.day || '']}日</item>
+		<item left="295" top="90" >{[values.cust.cust_no ? "客户编号:"+[values.cust.cust_no] :'']}</item>
+		<item left="65" top="125" >{[values.cust.cust_name ? "客户名称:"+ [values.cust.cust_name] :'']}</item>
+		<item left="240" top="125" >{[values.cust.address ? "客户地址:"+ [values.cust.address] :'']}</item>
+		<item left="65" top="140" >收费项目:</item>
+		<tpl for="printItems">
+			<item left="75" top="{[145 + xindex* 15]}" >{printitem_name}</item>
+			<tpl if="card_id">
+				<item left="255" top="{[145 + xindex* 15]}" >{card_id}</item>
+			</tpl>
+			<item left="360" top="{[145+ xindex* 15]}" >{[fm.convertToYuan(values.amount)]}</item>
+		</tpl>
+		<item left="65" top="240" >余额:{[fm.convertToYuan(values.balance)]}</item>
+		<item left="120" top="260" >金额(大写):{[this.chinese(values.total)]}</item>
+		<item left="320" top="260" >金额(小写):{[fm.convertToYuan(values.total)]}元</item>
+		<item left="120" top="275" >开票人工号：{[values.optr.login_name|| '']}</item>
+	</items>
+</jsteak-applet>
+

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="GBK"?>
+<div class="Cl">
+<div class="print_item">
+	<div class="row">
+		<div class="title_1">业务{point}</div>
+		<div class="title_2">客户迁移<!-- 【流水号：{[values.item.done_code]}】 --></div>
+	</div>
+	<tpl if="params.changes">
+		<tpl for="params.changes">
+			<tpl if="column_name == 'address'">
+				<div class="row">
+					<div class="title_1">&nbsp;</div>
+					<div class="field" style="width: 80%;"><span>旧地址：{old_value}</span></div>
+				</div>
+				<div class="row">
+					<div class="title_1">&nbsp;</div>
+					<div class="field" style="width: 80%;"><span>新地址：{new_value}</span></div>
+				</div>
+			</tpl>
+		</tpl>
+	</tpl>
+</div>
+</div>

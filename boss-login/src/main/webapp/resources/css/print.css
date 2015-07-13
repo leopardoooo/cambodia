@@ -1,0 +1,41 @@
+body, dl, dt, dd, ul, ol, li, pre, code, form, fieldset, legend, input, textarea, p, blockquote, h1{margin:0;padding:0;}
+body{font-size:21px;font-family:"Arial";background: #ffffff;}
+img{border:none;}
+a{color:#666666;text-decoration:none; cursor:pointer;}
+a:hover{text-decoration:underline;}
+li{list-style-type:none;}
+.Cc{display:block;}
+.Fl{float:left;}
+.Fr{float:right;}
+.Cl{clear:both;}
+.Verdana{font-family:"Verdana";}
+.Font{line-height: 32px; height:25px; width: 100%;}
+.split_2{background:url(./../images/print/split.png) repeat-x;width: 100%;height: 10px;}
+.split_1{background:url(./../images/print/split_1.png) repeat-x;width: 100%;height: 10px;}
+.page_img{width: 100%;height: 40; background: #8f8f8f;}
+.Font_1{width: 33%;text-align: left;padding-left: 3px;}
+.Font_2{text-align: center;width: 33%;}
+.Font_3{text-align: right;width: 33%;padding-right: 3px;}
+.Label_1{width: 14%;text-align: left;padding-top: 3px;}
+.Label_1.padd{padding-top: 5px;}
+.td{width: 43%;}
+.Content{border: none;}
+.Content tr{height: 25px;}
+.td_1{width: 83%; text-align: left;}
+.TextArea{height: 25px; line-height: 23px;}
+.td_5{width: 50%;}
+.foot{margin-top: 30px;}
+
+.page{page-break-before: always; height: 1px;}
+.thead{display:table-header-group;}
+.tfoot{display:table-footer-group;}
+.custSign{padding: 50px 0px 0px 110px;}
+.logo{background:url(./../images/print/logo.jpg) no-repeat; width: 100%; height: 200%;}
+
+.print_item{}
+.print_item>DIV{height: 23px;}
+.print_item .title_1{width: 10%;float: left;text-align: center;}
+.print_item .title_2{width: 200px;float: left;text-align: left;font-weight: bold;}
+.print_item .field{width: 45%; float: left;}
+.field DIV{width:100px; text-align: left;float: left;}
+.field SPAN{float: left;}

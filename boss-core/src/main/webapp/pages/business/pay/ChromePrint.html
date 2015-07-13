@@ -1,0 +1,20 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+  <head>
+    <title>打印预览</title>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <style type="text/css">
+    	HTML, BODY{margin: 0px; padding: 0px;}
+		.abs{clear: both; position: absolute; left: 0px; top: 0px;}
+		.breakPage{page-break-after: always; position: relative; height: 1px;}
+    </style>
+  </head>
+  <body id="body" > 
+  </body>
+  <script type="text/javascript">
+ 	document.getElementById('body').innerHTML = window.opener.__chromeWebPrintData; 
+ 	window.print();
+ 	window.close();
+  </script>
+</html>

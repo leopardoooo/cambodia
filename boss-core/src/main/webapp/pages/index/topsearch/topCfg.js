@@ -1,0 +1,1 @@
+THIS_SYSTEM_VALUE = false;//配置是否提醒操作员打印，测试系统为false,正式系统为true；和top.js一起加载

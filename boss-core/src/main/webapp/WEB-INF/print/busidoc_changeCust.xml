@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="GBK"?>
+<div class="Cl">
+ <div class="print_item">
+ 
+		<div class="row">
+			<div class="title_1">业务{point}</div>
+			<div class="title_2">用户过户<!-- 【流水号：{[values.item.done_code]}】 --></div>
+		</div>
+		
+		<div class="row">
+			<div class="title_1">&nbsp;</div>
+			<div class="field"> <span>旧客户编号：{[values.params.old_cust_no]}</span></div>
+			<div class="field"> <span>新客户编号：{[values.params.new_cust_no]}</span></div>
+		</div>
+		<div class="row">
+			<div class="title_1">&nbsp;</div>
+			<div class="field"> <span>旧客户姓名：{[values.params.old_cust_name]}</span></div>
+			<div class="field"> <span>新客户姓名：{[values.params.new_cust_name]}</span></div>
+		</div>
+		<div class="row">
+			<div class="title_1">&nbsp;</div>
+			<div class="field" style="width: 80%;" > <span>旧客户地址：{[values.params.old_address]}</span></div>
+		</div>
+		<div class="row">
+			<div class="title_1">&nbsp;</div>
+			<div class="field" style="width: 80%;" > <span>新客户地址：{[values.params.new_address]}</span></div>
+		</div>
+		<tpl if="params.user_type=='数字电视'">
+			<div class="row">
+				<div class="title_1">&nbsp;</div>
+				<div class="field"> <span>业务类型：数字电视</span></div>
+			</div>
+			<div class="row">
+				<div class="title_1">&nbsp;</div>
+				<div class="field" style="width: 50%;" > <span>机顶盒号：{[values.params.stb_id]}</span></div>
+				<div class="field" style="width: 40%;" > <span>智能卡号：{[values.params.card_id]}</span></div>
+			</div>
+		</tpl>
+		<tpl if="params.user_type=='宽带'">
+			<div class="row">
+				<div class="title_1">&nbsp;</div>
+				<div class="field"> <span>业务类型：互联网</span></div>
+			</div>
+			<div class="row">
+				<div class="title_1">&nbsp;</div>
+				<div class="field" style="width: 50%;" > <span>Modem Mac：{[values.params.modem_mac]}</span></div>
+	 		</div>
+ 		</tpl>
+		 <tpl for="values.params.prodList">
+		 	<div class="title_1">&nbsp;</div>
+			<div class="field" style="width: 50%;" > <span>产品名称：{prod_name}</span></div>
+			<div class="field" style="width: 40%;" > <span>产品资费：{tariff_name}</span></div>
+		 </tpl>
+	 
+ 
+</div>
+</div>

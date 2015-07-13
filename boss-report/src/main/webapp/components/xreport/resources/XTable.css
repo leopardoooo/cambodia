@@ -1,0 +1,28 @@
+.report_th, .report_td{text-align: center;vertical-align:middle; overflow: hidden; text-overflow: ellipsis;white-space:nowrap;
+height: 25px; border:1px solid #808080; color: #808080; font-size: 12px;}
+.report_th{background:url(./images/grid3-hrow2.gif) repeat-x left top rgb(230, 230, 230); font-weight: bold;}
+.report_td{background-color: #FFF;}
+.BTop{border-top: 0px;}
+
+.x-table .x-toolbar{background-image: none; height: 23px;border-bottom: 0px;font-size: 12px;}
+.x-toolbar td, .x-toolbar span, .x-toolbar input, .x-toolbar div, .x-toolbar select ,.x-toolbar label{font-family: "微软雅黑";}
+
+.x-table{position: relative; height: 100%; width: 100%; overflow: hidden;}
+.x-d-content{position: absolute; top: 0px; bottom: 28px; left: 0px; right: 0px; border-bottom:1px solid #d0d0d0; overflow: hidden;}
+.x-d-content .x-table-header table, .x-d-content .x-table-body table{border-collapse: collapse; table-layout: fixed;}
+.x-d-content .x-table-body{overflow: auto; position: absolute; top: 0px; left: 0px; right: 0px; bottom: 0px;}
+.x-d-content .x-table-header{overflow: hidden;}
+.x-table .x-paging{position: absolute; bottom: 0px; left: 0px; right: 0px;}
+
+.Fl{float: left;}
+.Fr{float: right;}
+
+.x-table .tools{width: 16px; height: 16px; cursor: pointer;}
+.x-table .split{width: 3px;}
+.icon-zoom-in{background: url("./images/zoom-in.gif") no-repeat; }
+.icon-zoom-out{background: url("./images/zoom-out.gif") no-repeat;}
+.icon-filter{background: url("./images/filter.gif") no-repeat;}
+.icon-sort{background: url("./images/sort.gif") no-repeat;}
+
+.report_td a{color: #808080;  text-decoration: underline; font-family: 微软雅黑;}
+.report_td a:hover{text-decoration: none;}

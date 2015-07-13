@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="GBK"?>
+<div class="Cl">
+<div class="print_item">
+	<div class="row">
+		<div class="title_1">业务{point}</div>
+		<div class="title_2">带账移机<!-- 【流水号：{[values.item.done_code]}】 --></div>
+	</div>
+	
+	<div class="row">
+		<div class="title_1">&nbsp;</div>
+		<div class="field" style="width: 45%;"><span>用户类型：{[values.params.user_type]}</span></div>
+		<div class="field" style="width: 45%;"><span>终端类型：{[values.params.terminal_type ]}</span></div>
+	</div>
+	
+	<div class="row">
+		<div class="title_1">&nbsp;</div>
+		<div class="field" ><span>机顶盒号：{[values.params.stb_id]}</span></div>
+	</div>
+	
+	<div class="row">
+		<div class="title_1">&nbsp;</div>
+		<div class="field"><span>智能卡号：{[values.params.card_id]}</span></div>
+	</div>
+	
+	<div class="row">
+		<div class="title_1">&nbsp;</div>
+		<div class="field" ><span>猫MAC ：{[values.params.modem_mac]}</span></div>
+	</div>
+	
+	<div class="row">
+		<div class="title_1">&nbsp;</div>
+		<div class="field" style="width: 45%;"><span>新客户编号：{[values.params.new_cust_no]}</span></div>
+		<div class="field" style="width: 45%;"><span>新客户姓名：{[values.params.new_cust_name]}</span></div>
+	</div>
+	
+	
+</div>
+</div>

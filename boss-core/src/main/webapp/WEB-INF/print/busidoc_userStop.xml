@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="GBK"?>
+<div class="Cl">
+<tpl if="params.users">
+	<div class="print_item">
+		<div class="row">
+			<div class="title_1">业务{point}</div>
+			<div class="title_2">报停</div>
+		</div>
+	</div>
+	<tpl for="params.users">
+		<tpl if="values.user_type == 'DTV'">
+			<div class="print_item">
+				<div class="row">
+					<div class="title_1">&nbsp;</div>
+					<div class="field" style="width: 90%;"><span>终端类型：{[values.terminal_type]}</span></div>
+				</div>
+				<div class="row">
+					<div class="title_1">&nbsp;</div>
+					<div class="field" style="width: 50%;" ><span>机顶盒号：{[values.stb_id]}</span></div>
+					<div class="field" style="width: 40%;" ><span>智能卡号：{[values.card_id]}</span></div>
+				</div>
+				 <div class="row">
+					<div class="title_1">&nbsp;</div>
+		 			<div class="field"  ><span>生效日期：{[values.effective_date]}</span></div>
+				</div>
+				<div class="row"></div>
+			</div>
+		</tpl>
+		<tpl if="values.user_type == 'BAND'">
+			<div class="print_item">
+				<div class="row">
+					<div class="title_1">&nbsp;</div>
+					<div class="field" ><span>业务类型：互联网</span></div>
+				</div>
+				<div class="row">
+					<div class="title_1">&nbsp;</div>
+					<div class="field" style="width: 50%;"><span>上网帐号：{[values.login_name]}</span></div>
+					<div class="field" style="width: 40%;"><span>Modem Mac：{[values.modem_mac]}</span></div>
+				</div>
+				<div class="row">
+					<div class="title_1">&nbsp;</div>
+		 			<div class="field"  ><span>生效日期：{[values.effective_date]}</span></div>
+				</div>
+				<div class="row"></div>
+			</div>
+		</tpl>
+		<tpl if="values.user_type == 'ATV'">
+			<div class="print_item">
+				<div class="row">
+					<div class="title_1">&nbsp;</div>
+					<div class="field" style="width: 90%;"><span>业务类型：模拟电视</span></div>
+					
+				</div>
+				<div class="row">
+					<div class="title_1">&nbsp;</div>
+					<div class="field" style="width: 50%;"><span>报停终端数：{[values.stop_count]} 台</span></div>
+					<div class="field" style="width: 40%;"><span>终端类型：主终端</span></div>
+				</div>
+				<div class="row">
+					<div class="title_1">&nbsp;</div>
+		 			<div class="field" style="width:90%" >
+		 				<div>生效日期：</div>
+		 				<span>{[values.effective_date]}   至   {[Date.parseDate(values.effective_date,"Y-m-d").add(Date.YEAR,1).add(Date.DAY,-1).format("Y-m-d")]}</span>
+		 			</div>
+				</div>
+				<div class="row"></div>
+			</div>
+		</tpl>
+</tpl>
+</tpl>
+</div>

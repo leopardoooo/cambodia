@@ -1,0 +1,221 @@
+@CHARSET "UTF-8";
+
+.x-btn .x-btn-text {
+    font-size: 12px;
+}
+
+.x-tip .x-tip-body {
+    font-size: 12px;
+}
+
+.x-tree-node a, .x-dd-drag-ghost a {
+    -moz-user-select: -moz-none;
+}
+
+.x-treegrid-text {
+    -moz-user-select: -moz-none;
+}
+
+.x-treegrid .x-treegrid-col {
+    font-size: 12px;
+    height: 24px;
+    padding: 3px 0px 0px 0px;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.x-treegrid .x-treegrid-hd-inner {
+    font-size: 12px;
+}
+
+.x-treegrid .x-treegrid-col .x-tree-node-anchor span a {
+    color: #2a5caa;
+}
+
+.x-treegrideditor-inputfield .x-form-field {
+    font: 12px arial, tahoma, helvetica, sans-serif;
+    height: 16px;
+}
+
+.ext-ie .x-treegrideditor-inputfield .x-form-field {
+    height: 16px;
+}
+
+.x-treegrideditor-inputfield .x-form-field-wrap .x-treegrideditor-arrow-trigger {
+    height: 15px;
+    background-image: url(./../images/trigger.gif);
+}
+
+.x-treegrideditor-inputfield .x-form-field-wrap .x-treegrideditor-date-trigger {
+    height: 15px;
+    background-image: url(./../images/date-trigger.gif);
+}
+
+input.x-treegrideditor-node-cb {
+    margin-left: 2px;
+    margin-right: 2px;
+}
+
+.x-treegrideditor-obar {
+    font: 12px arial, tahoma, helvetica, sans-serif;
+    font-weight: bold;
+}
+
+.x-treegrideditor-obar span {
+    padding: 0px 2px;
+    line-height: 18px;
+    margin: 0px 2px;
+}
+
+.x-treegrideditor-obar a {
+    color: #4D4D4D;
+    border-bottom: 0px;
+}
+
+.x-treegrideditor-obar a:link {
+    color: #4D4D4D;
+    border-bottom: 0px;
+}
+
+.x-treegrideditor-obar a:hover {
+    color: #99BBE8;
+    border-bottom: 1px solid #99BBE8;
+}
+
+.x-treegrideditor-obar .x-treegrideditor-obar-add {
+    background: url(./../images/add.png) no-repeat;
+    padding-top: 1px;
+    padding-left: 18px;
+}
+
+.ext-ie .x-treegrideditor-obar .x-treegrideditor-obar-add {
+    padding-top: 3px;
+}
+
+.x-treegrideditor-obar .x-treegrideditor-obar-batchAdd {
+    background: url(./../images/add.png) no-repeat;
+    padding-top: 1px;
+    padding-left: 18px;
+}
+
+.ext-ie .x-treegrideditor-obar .x-treegrideditor-obar-batchAdd {
+    padding-top: 3px;
+}
+
+.x-treegrideditor-obar .x-treegrideditor-obar-add-gray {
+    background: url(./../images/add-gray.png) no-repeat;
+}
+
+.x-treegrideditor-obar .x-treegrideditor-obar-edit {
+    background: url(./../images/edit.png) no-repeat;
+    padding-top: 1px;
+    padding-left: 18px;
+}
+
+.ext-ie .x-treegrideditor-obar .x-treegrideditor-obar-edit {
+    padding-top: 3px;
+}
+
+.x-treegrideditor-obar .x-treegrideditor-obar-edit-gray {
+    background: url(./../images/edit-gray.png) no-repeat;
+}
+
+.x-treegrideditor-obar .x-treegrideditor-obar-remove {
+    background: url(./../images/remove.png) no-repeat;
+    padding-top: 1px;
+    padding-left: 18px;
+}
+
+.ext-ie .x-treegrideditor-obar .x-treegrideditor-obar-remove {
+    padding-top: 3px;
+}
+
+.x-treegrideditor-obar .x-treegrideditor-obar-remove-gray {
+    background: url(./../images/remove-gray.png) no-repeat;
+}
+
+.x-treegrideditor-obar .x-treegrideditor-obar-synch {
+    background: url(./../images/refresh.png) no-repeat;
+    padding-top: 1px;
+    padding-left: 18px;
+}
+
+.ext-ie .x-treegrideditor-obar .x-treegrideditor-obar-synch {
+    padding-top: 3px;
+}
+
+.x-treegrideditor-obar .x-treegrideditor-obar-synch-gray {
+    background: url(./../images/refresh.png) no-repeat;
+}
+
+.x-treegrideditor-obar .x-treegrideditor-obar-copy {
+    background: url(./../images/menu2/editUserStatus.png) no-repeat;
+    padding-top: 1px;
+    padding-left: 18px;
+}
+
+.ext-ie .x-treegrideditor-obar .x-treegrideditor-obar-copy {
+    padding-top: 3px;
+}
+
+.x-treegrideditor-obar .x-treegrideditor-obar-copy-gray {
+    background: url(./../images/menu2/editUserStatus.png) no-repeat;
+}
+
+.x-treegrideditor-obar .x-treegrideditor-obar-statusActive {
+    background: url(./../images/active.gif) no-repeat;
+    padding-top: 1px;
+    padding-left: 18px;
+}
+
+.ext-ie .x-treegrideditor-obar .x-treegrideditor-obar-statusActive {
+    padding-top: 3px;
+}
+
+.x-treegrideditor-obar .x-treegrideditor-obar-statusActive-gray {
+    background: url(./../images/active.gif) no-repeat;
+}
+
+.x-treegrideditor-obar .x-treegrideditor-obar-statusInvalid {
+    background: url(./../images/invalid.png) no-repeat;
+    padding-top: 1px;
+    padding-left: 18px;
+}
+
+.ext-ie .x-treegrideditor-obar .x-treegrideditor-obar-statusInvalid {
+    padding-top: 3px;
+}
+
+.x-treegrideditor-obar .x-treegrideditor-obar-statusInvalid-gray {
+    background: url(./../images/invalid.png) no-repeat;
+}
+
+.x-treegrideditor-obar .x-treegrideditor-obar-yes {
+    background: url(./../images/yes.png) no-repeat;
+    padding-top: 1px;
+    padding-left: 18px;
+    font-weight: normal;
+}
+
+.ext-ie .x-treegrideditor-obar .x-treegrideditor-obar-yes {
+    padding-top: 3px;
+}
+
+.x-treegrideditor-obar .x-treegrideditor-obar-yes-gray {
+    background: url(./../images/yes-gray.png) no-repeat;
+}
+
+.x-treegrideditor-obar .x-treegrideditor-obar-no {
+    background: url(./../images/no.png) no-repeat;
+    padding-top: 1px;
+    padding-left: 18px;
+    font-weight: normal;
+}
+
+.ext-ie .x-treegrideditor-obar .x-treegrideditor-obar-no {
+    padding-top: 3px;
+}
+
+.x-treegrideditor-obar .x-treegrideditor-obar-no-gray {
+    background: url(./../images/no-gray.png) no-repeat;
+}

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd"
+	default-autowire="byName" default-lazy-init="false">
+
+	<!--
+		component-scan自动搜索@Component , @Controller , @Service , @Repository等标注的类
+	-->
+	<context:component-scan base-package="com.ycsoft.business.dao"/> 
+	<context:component-scan base-package="com.ycsoft.business.component" scope-resolver="com.ycsoft.business.commons.support.PrototypeScopeMetadataResolver" />
+	<context:component-scan base-package="com.ycsoft.business.service.impl" scope-resolver="com.ycsoft.business.commons.support.PrototypeScopeMetadataResolver"/>
+	
+	<!-- Service 注入前台参数信息的拦截器 -->
+	<bean id="setterParameterInterceptor" name="setterParameterInterceptor" scope="prototype"  class="com.ycsoft.business.commons.interceptor.SetterParameterInterceptor"/>
+	<bean id="filterBusiCodeInterceptor" name="filterBusiCodeInterceptor" scope="prototype"  class="com.ycsoft.business.commons.interceptor.FilterBusiCodeInterceptor">
+	</bean>
+
+	<bean id="iservices" class="org.springframework.aop.framework.autoproxy.BeanNameAutoProxyCreator">
+		<property name="proxyTargetClass" value="true"/>
+		<property name="beanNames" value="*Service"/>
+		<property name="interceptorNames">
+			<list>
+				<value>setterParameterInterceptor</value>
+				<value>filterBusiCodeInterceptor</value>
+			</list>
+		</property>
+	</bean>
+	
+	<!--
+	<bean class="com.ycsoft.commons.action.InitializingAction">
+	</bean>
+	-->
+	
+	<bean class="com.ycsoft.commons.action.SsoUnit">
+		<property name="ssoIp" value="${sso.ip}"/>
+		<property name="ssoPort" value="${sso.port}"/>
+		<property name="ssoLoginUrl" value="${sso.loginurl}"/>
+	</bean>
+</beans>

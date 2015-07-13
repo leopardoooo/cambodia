@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="GBK" ?>
+<printinfo>
+	<defaultsetting>
+		<width>2500</width>
+		<height>933</height>
+		<font>10</font>
+	</defaultsetting>
+	<items>
+		<printitem>
+			<x>155</x><y>100</y><data>{[values.date.year || '']}</data>
+		</printitem>
+		<printitem>
+			<x>270</x><y>100</y><data>{[values.date.month || '']}</data>
+		</printitem>
+		<printitem>
+			<x>330</x><y>100</y><data>{[values.date.day || '']}</data>
+		</printitem>	
+		<printitem>
+			<x>310</x><y>165</y><data>{[values.cust.cust_name || '']}</data>
+		</printitem>
+		<printitem>
+			<x>850</x><y>165</y><data>{[values.card_id || '']}</data>
+		</printitem>
+		<printitem>
+			<x>310</x><y>225</y><data>{[values.cust.address || '']}</data>
+		</printitem>
+		<printitem>
+			<x>310</x><y>285</y><data>{[this.chinese(values.total)]}</data>
+		</printitem>
+		<printitem>
+			<x>815</x><y>285</y><data>{[fm.convertToYuan(values.total)]}</data>
+		</printitem>
+		<tpl for="printItems">
+			<printitem>
+				<x>185</x><y>{[300 + xindex* 35]}</y><data>{printitem_name}</data>
+			</printitem>
+			<printitem>
+				<x>650</x><y>{[300+ xindex* 35]}</y><data>{[fm.convertToYuan(values.amount)]}</data>
+			</printitem>
+		</tpl> 
+		<printitem>
+			<x>170</x><y>550</y><data>{[values.optr.login_name|| '']}</data>
+		</printitem>
+		<printitem>
+			<x>905</x><y>550</y><data>{[values.optr.dept_name|| '']}</data>
+		</printitem>
+	</items>
+</printinfo>

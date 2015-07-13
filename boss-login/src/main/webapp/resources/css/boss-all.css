@@ -1,0 +1,88 @@
+html BODY {
+	overflow-x:hidden;
+	padding: 0px; 
+	margin: 0px; 
+	font-size: 12px;
+	overflow-y:auto;
+}
+
+/*!
+ * Ext 扩展样式定义。
+ */
+#loading{
+    position:absolute;
+    left:40%;
+    top:40%;
+    padding:2px;
+    z-index:20001;
+    height:auto;
+}
+
+.label{
+	color: #000000;
+	//BACKGROUND: #F9F9F9;
+	text-align:right;
+	font-size:12px;
+}
+.input{
+	color: #4444AA;
+	font-size:13px;
+	BACKGROUND: #F9F9F9;
+}
+.input_bold{
+	color:#4444AA;
+	BACKGROUND: #F9F9F9;
+	font-size:13px;
+	font-weight:bold;
+}
+
+.input_red{
+	color:#ff0000;
+	BACKGROUND: #F9F9F9;
+	font-size:13px;
+	font-weight:bold;
+}
+
+/**  RowExpander.js 的表格行样式 */
+.row-label{
+	width: 22%;
+	display: -moz-inline-box;
+	display: inline-block;
+	text-align: right;
+	line-height: 24px;
+}
+.row-input{
+	width: 28%;
+	display: -moz-inline-box;
+	display: inline-block;
+	text-align: left;
+	line-height: 24px;
+}
+
+/**  一行只显示一列的行样式 */
+.row-simple-label{
+	width: 30%;
+	display: -moz-inline-box;
+	display: inline-block;
+	text-align: right;
+	line-height: 24px;
+}
+.row-simple-input{
+	width: 70%;
+	display: -moz-inline-box;
+	display: inline-block;
+	text-align: left;
+	line-height: 24px;
+}
+/** grid中选定行显示红色*/
+.x-grid-record-red table{   
+    color: #FF0000;   
+}
+.x-grid-record-green table{   
+   background: #A3D1D1;	
+}
+/*gridpanel单元格复制*/
+.x-selectable, .x-selectable * {    
+    -moz-user-select: text! important ;    
+    -khtml-user-select: text! important ;    
+}

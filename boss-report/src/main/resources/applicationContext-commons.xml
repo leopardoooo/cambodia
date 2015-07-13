@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd"
+	default-autowire="byName" default-lazy-init="false">
+
+	<!--
+		component-scan自动搜索@Component , @Controller , @Service , @Repository等标注的类
+		
+	-->
+	<context:component-scan base-package="com.ycsoft.report.dao"/> 
+	<context:component-scan base-package="com.ycsoft.business.dao.system"/> 
+	<context:component-scan base-package="com.ycsoft.report.component"/>
+	
+	<bean id="queryRepDao" class="com.ycsoft.report.dao.config.QueryRepDao">
+		<property name="driverclassname">
+			<value>${jdbc.driverClassName}</value>
+		</property>
+	</bean>
+	<bean id="queryKey"    class="com.ycsoft.report.query.key.Impl.QueryKeyImpl"></bean>
+	<bean id="querySql"    class="com.ycsoft.report.query.sql.QuerySqlImpl"></bean>
+	<bean id="queryManage" class="com.ycsoft.report.query.QueryManageImpl"></bean>
+	
+	<bean id="dimensionManage" class="com.ycsoft.report.query.cube.impl.DimensionManage"></bean>
+	<bean id="cubeManage"      class="com.ycsoft.report.query.cube.impl.CubeManage"></bean>
+	<bean id="cubeDetail"      class="com.ycsoft.report.query.cube.detail.CubeDetailSql"></bean>
+	<bean id="dataControl"     class="com.ycsoft.report.query.datarole.impl.DataControlImpl"></bean>
+	<bean id="repLevelManage"  class="com.ycsoft.report.query.datarole.RepLevelManage"></bean>
+		
+	<bean class="com.ycsoft.commons.action.SsoUnit">
+		<property name="ssoIp" value="${sso.ip}"/>
+		<property name="ssoPort" value="${sso.port}"/>
+		<property name="ssoLoginUrl" value="${sso.loginurl}"/>
+	</bean>
+</beans>

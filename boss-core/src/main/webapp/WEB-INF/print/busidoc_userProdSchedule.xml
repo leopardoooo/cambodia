@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="GBK"?>
+<div class="Cl">
+<div class="print_item">
+	<div class="row">
+		<div class="title_1">业务{point}</div>
+		<div class="title_2">排程退订</div>
+ 	</div>
+		<tpl if="values.params.user_type == '数字电视'">
+				<div class="row">
+					<div class="title_1">&nbsp;</div>
+					<div class="field" style="width: 50%;"> <span>业务类型：数字电视</span></div>
+					<div class="field" style="width: 40%;"> <span>终端类型：{values.params.terminal_type}</span></div>
+				</div>
+				<div class="row">
+					<div class="title_1">&nbsp;</div>
+					<div class="field" style="width: 50%;" > <span>机顶盒号：{values.params.stb_id}</span></div>
+					<div class="field" style="width: 40%;"> <span>智能卡号：{values.params.card_id}</span></div>
+				</div>
+				<div class="row">
+					<div class="title_1">&nbsp;</div>
+					<div class="field" style="width: 50%;"> <span>退订产品：</span></div>
+				</div>
+				<tpl for="values.params.prods">
+					<div class="row">
+							<div class="title_1">&nbsp;</div>
+				 			<div class="field" style="width: 50%;"> <span>产品名称：{prod_name}</span></div>
+				 			<div class="field" style="width: 40%;"> <span>资费名称：{tariff_name}</span></div>
+					</div>
+				</tpl>
+				
+		</tpl>
+		<tpl if="values.params.user_type == '宽带'">
+				<div class="row">
+					<div class="title_1">&nbsp;</div>
+					<div class="field"> <span>业务类型：互联网</span></div>
+				</div>
+				<div class="row">
+					<div class="title_1">&nbsp;</div>
+					<div class="field" style="width: 50%;"> <span>上网帐号：{values.params.login_name}</span></div>
+				</div>
+				<tpl for="values.params.prods">
+					<div class="row">
+							<div class="title_1">&nbsp;</div>
+				 			<div class="field" style="width: 50%;"> <span>产品名称：{values.params.prod_name}</span></div>
+				 			<div class="field" style="width: 40%;"> <span>资费名称：{values.params.tariff_name}</span></div>
+					</div>
+				</tpl>
+		</tpl>
+	<div class="row">
+		<div class="title_1">&nbsp;</div>
+		<div class="field"> <span>生效日期：{[values.params.exec_date]}</span></div>
+	</div> 
+</div>
+</div>

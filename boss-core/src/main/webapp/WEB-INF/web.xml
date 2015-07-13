@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	version="2.4"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+	<!-- 配置SSO 监听器，删除已经失效的Session -->
+	 <listener>
+	 	<listener-class>com.ycsoft.commons.action.SessionListener</listener-class>
+	 </listener>
+	 <!-- 
+		Spring 容器参数配置
+		Spring容器初始化监听器配置
+	 -->
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>classpath*:spring/*.xml</param-value>
+	</context-param>
+	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+	
+	<!-- 
+		Struts2 配置区域
+		Struts2 核心控制器
+	-->
+	<filter>
+		<filter-name>struts2</filter-name>
+		<filter-class>com.ycsoft.commons.action.BossStrutsPrepareAndExecuteFilter</filter-class>
+		<init-param>
+			<param-name>excludeUri</param-name>
+			<param-value>/remoting/</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>struts2</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+	<!-- 配置DispatcherServlet -->
+	<servlet>
+		<servlet-name>spring-remote</servlet-name>
+		<servlet-class>
+			org.springframework.web.servlet.DispatcherServlet
+		</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>spring-remote</servlet-name>
+		<url-pattern>/remoting/*</url-pattern>
+	</servlet-mapping>
+	
+	
+	<!-- 容器初始化监听器 -->
+	<listener>
+		<listener-class>com.ycsoft.web.commons.listeners.AppInitListener</listener-class>
+	</listener>
+	<!-- 
+		容器配置区域
+		session超时定义,单位为分钟
+	 -->
+	<session-config>
+		<session-timeout>60</session-timeout>
+	</session-config>
+
+	<!--Error Page定义 
+	<error-page>
+		<exception-type>org.apache.jasper.JasperException</exception-type>
+		<location>/pages/errors/jspError.jsp</location>
+	</error-page>
+	<error-page>
+		<error-code>403</error-code>
+		<location>/pages/errors/403.jsp</location>
+	</error-page>
+	<error-page>
+		<error-code>404</error-code>
+		<location>/pages/errors/404.jsp</location>
+	</error-page>
+	<error-page>
+		<error-code>500</error-code>
+		<location>/pages/errors/500.jsp</location>
+	</error-page>
+	-->
+</web-app>
+

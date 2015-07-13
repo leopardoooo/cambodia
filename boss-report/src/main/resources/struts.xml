@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+
+<!-- 
+	/**
+	 * 以下采用Struts通配符配置，一般情况下均符合Action的配置要求，
+	 * 因此不要轻易修改文件内容，如果需要添加配置，则查看《尧辰软件BOSS项目J2EE开发指南》
+	 * 内有详细的说明。
+	 */
+ -->
+<struts>
+	<!-- Struts 常量配置  -->
+	<constant name="struts.devMode" value="false" />
+	<constant name="struts.i18n.reload" value="false"/>
+	
+	<constant name="struts.objectFactory" value="spring"/>
+	<constant name="struts.i18n.encoding" value="UTF-8"/>
+	<constant name="struts.enable.DynamicMethodInvocation" value="false" />
+	<constant name="struts.enable.SlashesInActionNames" value="true"/>
+	<constant name="struts.action.extension" value="action,," />
+	
+	<package name="default" namespace="/" extends="struts-default">
+		
+		<!-- 定义返回结果类型 -->
+		<result-types>
+            <result-type name="json" class="org.apache.struts2.json.JSONResult"/>
+        </result-types>
+		
+		<!-- Custom Interceptors Area -->
+		<interceptors>
+			<interceptor name="loginValid" class="com.ycsoft.commons.interceptor.LoginValidInterceptor"/>
+			<interceptor name="json" class="org.apache.struts2.json.JSONInterceptor"/>
+			<interceptor name="report" class="com.ycsoft.report.web.commons.ReportInterceptor"/>
+			<interceptor name="catchException" class="com.ycsoft.report.web.commons.CatchExceptionInterceptor"/>
+			<interceptor-stack name="baseStack">
+				<interceptor-ref name="catchException"/>
+				<interceptor-ref name="loginValid"/>
+				<interceptor-ref name="timer"/>
+				<interceptor-ref name="defaultStack"/>
+				<interceptor-ref name="json"/>
+				<interceptor-ref name="report"/>
+			</interceptor-stack>
+		</interceptors>
+		<default-interceptor-ref name="baseStack" />
+	
+		<!--  当Struts没有找到符合的Action name时，则使用如下定义的resNotFound -->
+		<default-action-ref name="resNotFound" />
+		
+		<!-- Global Result Define -->
+		<global-results>
+			<result name="systemError">/pages/errors/ajaxResponseError.jsp</result>
+		</global-results>
+		
+		<!-- Statement Exception Area-->
+<!-- 		<global-exception-mappings>
+			<exception-mapping result="systemError" exception="java.lang.Exception"/>
+		</global-exception-mappings>
+ -->		
+		
+		<!-- 
+			 Custom Action Area
+		      所有自定义的Action必须在该区域内配置。  
+		-->
+	    <action name="resNotFound">
+	      	<result>/pages/errors/unKnowAorR.jsp</result>
+	    </action>
+	    
+	    <action name="go" class="com.ycsoft.commons.action.StockAction">
+	    	<result name="to">${url}</result>
+	    </action> 
+	    <action name="rego" class="com.ycsoft.commons.action.StockAction" method="rego">
+	    	<result name="to">${url}</result>
+	    	<result name="login" type="redirect">/goLogin.jsp</result>
+	    </action>
+	    <action name="gologin" class="com.ycsoft.commons.action.StockAction" method="gologin">
+	    	<result name="to">/goLogin.jsp</result>
+	    	<result name="json">/goLogin.jsp</result>
+	    </action>	    
+	    <action name="ps" class="com.ycsoft.commons.action.StockAction" method="querySysParam">
+	    	<result  type="json" name="json-records">
+	    		<param name="root">root.records</param>
+	    	</result>
+	    </action> 
+	    
+	    <!-- 
+		 	/* 
+		 	 * 以下Action使用通配符配置，通常情况下新建了一个控制类，不需要在进行配置，
+		 	 * 当以下配置满足不了需求的情况下，
+		 	 * 您可以在上面(Custom Action Area)configuration own action class.
+		 	 *
+		 	 * "*/*!*" 通配符说明:
+		 	 *
+		 	 * {1}：代表中模块名称，前台后台的模块名称必须保持一致。
+		 	 * {2}：控制类的类名前缀(不包含Action)。如TestAction类，应该输入Test
+		 	 * {3}：控制器要执行的方法名称，
+		 	 * 一个合法的URL如：http://localhost:8080/boss2010/system/Area!list.action
+		 	 */
+	     -->
+		<action name="*/*!*" class="com.ycsoft.report.web.action.{1}.{2}Action" method="{3}">
+			<result type="json" name="json-simpleObj">
+				<param name="root">root.simpleObj</param>
+				<param name="ignoreHierarchy">false</param><!-- 不忽略继承关系，返回json字符串包含父类的属性 -->
+			</result>
+			<result type="json" name="json-records">
+				<param name="root">root.records</param>
+			</result>
+			<result type="json" name="json-others">
+				<param name="root">root.others</param>
+			</result>
+			<result type="json" name="json-page">
+				<param name="root">root.page</param>
+			</result>
+			<result type="json" name="json-success">
+				<param name="root">root.success</param>
+			</result>
+			<result type="json" name="json">
+				<param name="root">root</param>
+			</result>
+		</action>
+		<action name="Index!*" class="com.ycsoft.report.web.action.system.IndexAction" method="{1}">
+			<result type="redirect" name="pokerstart">/pages/poker/index.jsp</result>
+			<result type="redirect" name="pokererror">/pages/poker/timeout.jsp</result>
+		</action>
+	</package>
+</struts>

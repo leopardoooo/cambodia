@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="GBK"?>
+<div class="Cl">
+<div class="print_item">
+	<div class="row">
+		<div class="title_1">业务{point}</div>
+		<div class="title_2">{[values.params.schedule_type_text]}</div>
+ 	</div>
+	<tpl for="values.params.user_list">
+		<tpl if="user_type == '模拟电视'">
+				<div class="row">
+					<div class="title_1">&nbsp;</div>
+					<div class="field" style="width: 50%;"> <span>业务类型：模拟电视</span></div>
+ 				</div>
+				<div class="row">
+						<div class="title_1">&nbsp;</div>
+			 			<div class="field" style="width: 50%;"> <span>报停终端数：{busi_count}台</span></div>
+			 			<div class="field" style="width: 40%;"> <span>终端类型：主终端</span></div>
+				</div>
+		</tpl>
+		<tpl if="user_type == '数字电视'">
+				<div class="row">
+					<div class="title_1">&nbsp;</div>
+					<div class="field" style="width: 50%;"> <span>业务类型：数字电视</span></div>
+					<div class="field" style="width: 40%;"> <span>终端类型：{terminal_type}</span></div>
+				</div>
+				<div class="row">
+					<div class="title_1">&nbsp;</div>
+					<div class="field" style="width: 50%;" > <span>机顶盒号：{stb_id}</span></div>
+					<div class="field" style="width: 40%;"> <span>智能卡号：{card_id}</span></div>
+				</div>
+		</tpl>
+		<tpl if="user_type == '宽带'">
+				<div class="row">
+					<div class="title_1">&nbsp;</div>
+					<div class="field"> <span>业务类型：互联网</span></div>
+				</div>
+				<div class="row">
+					<div class="title_1">&nbsp;</div>
+					<div class="field" style="width: 50%;"> <span>上网帐号：{login_name}</span></div>
+				</div>
+		</tpl>
+	</tpl>
+	<div class="row">
+		<div class="title_1">&nbsp;</div>
+		<div class="field"> <span>生效日期：{[values.params.exec_date]}</span></div>
+	</div>
+	<tpl if="values.params.ext_info" >
+		<div class="print_item">
+		<div class="row">
+		<div class="title_1">&nbsp;</div>
+			 <tpl for="values.params.ext_info">
+					 	<tpl if="attribute_id == '451' && attribute_value!=''">
+								<div class="field" style="width: 50%;"> <span>经办人{attribute_value}</span></div>
+						</tpl>
+						
+			 </tpl>
+			  <tpl for="values.params.ext_info">
+						<tpl if="attribute_id == '453' && attribute_value!=''">
+								<div class="field" style="width: 40%;"> <span>联系电话：{attribute_value}</span></div>
+						</tpl>
+			 </tpl>
+		 </div>
+		  <tpl for="values.params.ext_info">
+					<tpl if="attribute_id == '452' && attribute_value!=''">
+						 <div class="row">
+							<div class="title_1">&nbsp;</div>
+							<div class="field"> <span>证件号码：{attribute_value}</span></div>
+						</div>
+					</tpl>
+		 </tpl>
+		</div>
+	</tpl>
+</div>
+</div>

@@ -1,0 +1,32 @@
+ <?xml version="1.0" encoding="GBK"?>
+<div class="Cl">
+  <div class="print_item">
+    <div class="row">
+      <div class="title_1">业务{point}</div>
+      <div class="title_2">设备回收</div>
+    </div>
+    <tpl for="values.params.device_list">
+       <tpl if="device_type=='STB'">
+         <div class="row">
+	          <div class="title_1">&nbsp;</div>
+	          <div class="field" style="width: 50%;"> <span>机顶盒号：{device_code} </span></div>
+	          <tpl if="card_id!=''">
+	           		<div class="field" style="width: 40%;"> <span>智能卡号：{card_id} </span></div>
+	          </tpl>
+        </div>
+      </tpl>
+      <tpl if="device_type=='CARD'">
+         <div class="row">
+	          <div class="title_1">&nbsp;</div>
+	          <div class="field" style="width: 90%;"> <span>智能卡号：{device_code} </span></div>
+        </div>
+      </tpl>
+      <tpl if="device_type=='MODEM'">
+         <div class="row">
+	          <div class="title_1">&nbsp;</div>
+	          <div class="field" style="width: 90%;"> <span>Modem Mac：{device_code} </span></div>
+        </div>
+      </tpl>
+     </tpl>
+  </div>
+</div>

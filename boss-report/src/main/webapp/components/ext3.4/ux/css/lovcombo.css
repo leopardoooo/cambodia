@@ -1,0 +1,14 @@
+/** 以下是下拉框样式 ***/
+.ux-lovcombo-icon {   
+    width:16px;   
+    height:16px;   
+    float:left;   
+    background-position: -1px -1px ! important;   
+    background-repeat:no-repeat ! important;   
+}   
+.ux-lovcombo-icon-checked {   
+    background: transparent url(./../images/checked.gif);   
+}   
+.ux-lovcombo-icon-unchecked {   
+    background: transparent url(./../images/unchecked.gif);   
+}
