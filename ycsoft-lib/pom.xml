@@ -100,31 +100,5 @@
 			<version>3.3</version>
 		</dependency>
 	</dependencies>
-	
-	<build>
-		<plugins>
-			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.3.2</version>
-				<configuration>
-					<source>1.7</source>
-					<target>1.7</target>
-					<encoding>UTF-8</encoding>
-					<includes>
-						<include>src/main/java/**/*.java</include>
-						<include>basebeandao/**/*.java</include>
-						<include>busidao/**/*.java</include>
-						<include>business/**/*.java</include>
-						<include>com.ycsoft.commons/**/*.java</include>
-						<include>com.ycsoft.daos/**/*.java</include>
-						<include>com.ycsoft.beans/**/*.java</include>
-						<include>rechargecard/**/*.java</include>
-						<include>sysmanager/**/*.java</include>
-						<include>zxband/**/*.java</include>
-					</includes>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
 
 </project>

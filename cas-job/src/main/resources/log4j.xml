@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="GBK" ?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+<log4j:configuration debug="false"
+	xmlns:log4j="http://jakarta.apache.org/log4j/">
+	<appender name="CON" class="org.apache.log4j.ConsoleAppender">
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d{MM-dd HH\:mm\:ss} [%5p]-[%c{1}\:%L] %3x - %m%n" />
+		</layout>
+	</appender>
+
+	<appender name="SYS" class="org.apache.log4j.RollingFileAppender">
+		<param name="File" value="./logs/ca.log" />
+		<param name="MaxFileSize" value="30MB" />
+		<param name="MaxBackupIndex" value="30" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d{MM-dd HH\:mm\:ss} [%5p]-[%c\:%L] %3x - %m%n" />
+		</layout>
+		<filter class="org.apache.log4j.varia.LevelRangeFilter">
+			<param name="levelMin" value="DEBUG" />
+			<param name="levelMax" value="ERROR" />
+			<param name="AcceptOnMatch" value="true" />
+		</filter>
+	</appender>
+	<!-- 输出到日志文件 -->
+	<logger name="CASche">
+		<level value="DEBUG" />
+		<appender-ref ref="SYS" />
+	</logger>
+	<!-- 输出到屏幕 -->
+	<logger name="CASche">
+		<level value="DEBUG" />
+		<appender-ref ref="CON" />
+	</logger>
+	
+</log4j:configuration>
