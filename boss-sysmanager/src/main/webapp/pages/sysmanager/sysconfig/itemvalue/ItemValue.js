@@ -223,7 +223,7 @@ ItemDefineWin = Ext.extend(Ext.Window,{
 			}]
 		})
 	},
-	doSave :　function(){
+	doSave :function(){
 		if(this.form.getForm().isValid()){
 			Confirm("确定保存吗?", this ,function(){
 				mb = Show();//显示正在提交
@@ -303,27 +303,27 @@ ItemValueConfig = Ext.extend(ComEditorGrid,{
 			header : '参数值',
 			dataIndex : 'item_value',
 			width:80,
-			editor :　new Ext.form.TextField({
+			editor :new Ext.form.TextField({
 				allowBlank : false
 			})
 		},{
 			header : '参数名称',
 			dataIndex : 'item_name',
 			width:100,
-			editor :　new Ext.form.TextField({
+			editor :new Ext.form.TextField({
 				allowBlank : false
 			})
 		},{
 			header : '显示县市',
 			dataIndex : 'show_county_id',
 			width:250,
-			editor :　this.showCountyComb,
+			editor :this.showCountyComb,
 			renderer:paramComboRender.createDelegate(this.showCountyComb.getStore())
 		},{
 			header : '参数索引',
 			dataIndex : 'item_idx',
 			width:70,
-			editor :　new Ext.form.NumberField({
+			editor :new Ext.form.NumberField({
 				allowBlank : false
 			})
 		}/*,{

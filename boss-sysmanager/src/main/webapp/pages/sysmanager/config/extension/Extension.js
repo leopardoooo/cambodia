@@ -15,11 +15,11 @@ ExtensionGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 	nullableStore : null,//是否允许为空数据
 	inputtypeStore : null,//输入类型数据
 	columnStore : null,//首列字段名数据	
-	paramStore :　null,//下拉框参数数据
+	paramStore :null,//下拉框参数数据
 	cm : null,
 	extensionId : null,
 	custExtGroup : null,
-	userExtGroup :　null,
+	userExtGroup :null,
 	constructor : function(){
 		//分组类型数据
 	 	this.custExtGroup = [
@@ -571,7 +571,7 @@ ExtensionMng = Ext.extend(Ext.Panel,{
 	constructor : function(){
 		this.grid = new ExtensionGrid(); 
 		ExtensionMng.superclass.constructor.call(this,{
-			title :　'扩展属性配置管理',
+			title :'扩展属性配置管理',
 			region : 'center',
 			layout : 'fit',
 			items : [this.grid],

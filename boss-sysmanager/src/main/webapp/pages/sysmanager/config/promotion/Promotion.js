@@ -529,7 +529,7 @@ PromotionGrid = Ext.extend(Ext.grid.GridPanel,{
 			var promotionId = this.getSelectionModel().getSelected().get('promotion_id');
 			
 			Ext.Ajax.request({
-				url :　root + '/system/Promotion!removePromotion.action',
+				url :root + '/system/Promotion!removePromotion.action',
 				params : {
 					promotionId : promotionId	
 				},
@@ -645,7 +645,7 @@ PromotionWin = Ext.extend(Ext.Window,{
 			fieldLabel : '规则名称',
 			allowBlank : false,
 			width : 150,
-			xtype :　'combo',
+			xtype :'combo',
 			store : ruleStore,
 			displayField : 'rule_name',
 			valueField : 'rule_id',
@@ -824,7 +824,7 @@ PromotionWin = Ext.extend(Ext.Window,{
 		        newValues["promCountyIds"] = promCountyId.join(",");
 				
 				Ext.Ajax.request({
-					url :　url,
+					url :url,
 					params : newValues,
 					scope : this,
 					success : function(res,opt){
@@ -853,7 +853,7 @@ PromotionWin = Ext.extend(Ext.Window,{
  */
 ComPromGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 	promotionId : null,
-	totalAcctFee :　null,
+	totalAcctFee :null,
 	totalAcctCount : null,
 	repetitionTimes : null,
 	autoExec : null,
@@ -966,10 +966,10 @@ FeePromotionGrid = Ext.extend(ComPromGrid,{
 		});
 		
 		var feeColumns = [{
-			header :　'费用名称',
+			header :'费用名称',
 			dataIndex : 'fee_name',
 			editor : new Ext.form.ComboBox({
-				store :　this.busiFeeStore,
+				store :this.busiFeeStore,
 				forceSelection:true,
 				selectOnFocus:true,
 				triggerAction:'all',
@@ -1018,7 +1018,7 @@ FeePromotionGrid = Ext.extend(ComPromGrid,{
 	        tbar : [{
 	        	text : '添加',
 	        	scope : this,
-	        	id :　'addFeeProm',
+	        	id :'addFeeProm',
 	        	disabled : true,
 	        	iconCls : 'icon-add',
 	        	handler : this.addRecord
@@ -1268,7 +1268,7 @@ AcctPromotionGrid = Ext.extend(ComPromGrid,{
 			header : '账目名称',
 			dataIndex : 'acctitem_name',
 			editor : new Ext.form.ComboBox({
-				store :　this.acctItemStore,
+				store :this.acctItemStore,
 				forceSelection:true,
 				selectOnFocus:true,
 				triggerAction:'all',
@@ -1281,7 +1281,7 @@ AcctPromotionGrid = Ext.extend(ComPromGrid,{
 			})
 		},{
 			header : '资费名称',
-			id :　'tariff_name',
+			id :'tariff_name',
 			dataIndex : 'tariff_name',
 			editor: new Ext.form.TextField()
 		},{
@@ -1412,7 +1412,7 @@ AcctPromotionGrid = Ext.extend(ComPromGrid,{
 					}
 				});
 				var combo = new Ext.form.ComboBox({
-					store :　this.tariffStore,
+					store :this.tariffStore,
 					forceSelection:true,
 					selectOnFocus:true,
 					triggerAction:'all',
@@ -1525,7 +1525,7 @@ AcctPromotionGrid = Ext.extend(ComPromGrid,{
 		//必须调用父类方法
 		AcctPromotionGrid.superclass.addRecord.call(this,obj);
 	},
-	getTotalFee :　function(){
+	getTotalFee :function(){
 		var total = 0;
 		this.getStore().each(function(rec){
 			if(rec.get('necessary') == 'T'){

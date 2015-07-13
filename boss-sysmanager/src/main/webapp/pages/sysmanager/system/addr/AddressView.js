@@ -658,7 +658,7 @@ AddressWin = Ext.extend(Ext.Window,{
 		
 		
 		AddressWin.superclass.constructor.call(this,{
-			id :　'AddressWin',
+			id :'AddressWin',
 			title : this.title,
 			layout : 'fit',
 			height : 250,

@@ -148,7 +148,7 @@ TemplateTree = Ext.extend(Ext.tree.TreePanel,{
 		Confirm("确定删除吗?", this ,function(){
 			Ext.Ajax.request({
 				scope : this,
-				url :　root + '/config/Template!deleteTemplate.action',
+				url :root + '/config/Template!deleteTemplate.action',
 				params : {
 					templateId : this.getSelectionModel().getSelectedNode().attributes.others.attr
 				},
@@ -194,8 +194,8 @@ TemplateWin = Ext.extend(Ext.Window,{
 		this.templateType = templateType.substring(0,templateType.indexOf('_type'))
 		
 		this.oldTemplateStore = new Ext.data.JsonStore({
-			url :　root + '/config/Template!queryTplsByType.action',
-			fields : ['template_id','template_name']　
+			url :root + '/config/Template!queryTplsByType.action',
+			fields : ['template_id','template_name']
 		})
 		this.oldTemplateStore.load({
 			params : {
@@ -205,9 +205,9 @@ TemplateWin = Ext.extend(Ext.Window,{
 		
 		var items = [
 				{xtype : 'textfield',fieldLabel : '模板名称',id : 'templateName',
-					allowBlank :　false,blankText : '请输入模板名称'
+					allowBlank :false,blankText : '请输入模板名称'
 				},
-				{xtype : 'combo',id :　'copyTemplateId',fieldLabel : '复制模板于',store : this.oldTemplateStore,
+				{xtype : 'combo',id :'copyTemplateId',fieldLabel : '复制模板于',store : this.oldTemplateStore,
 				emptyText : '请选择...',mode: 'local',forceSelection : true,triggerAction : 'all',
 				displayField : 'template_name',valueField : 'template_id',editable : false
 			}];
@@ -270,7 +270,7 @@ TemplateWin = Ext.extend(Ext.Window,{
 				var copyTemplateId = Ext.getCmp('copyTemplateId').getValue();
 				
 				Ext.Ajax.request({
-					url :　root + '/config/Template!createTemplate.action',
+					url :root + '/config/Template!createTemplate.action',
 					params : {
 						templateName : templateName,
 						templateType : this.templateType,
@@ -714,7 +714,7 @@ FeeTemplateWin = Ext.extend(Ext.Window,{
 			App.form.initComboData( this.form.findByType("paramcombo"),this.doInit,this);
 		}else{
 			if(App.getData().optr['optr_id'] != '101676' 
-				&& this.record &&　App.getData().optr['optr_id']!= this.record.get('optr_id')){
+				&& this.record &&App.getData().optr['optr_id']!= this.record.get('optr_id')){
 				this.filterData();
 			}
 		}
@@ -785,7 +785,7 @@ FeeTemplateWin = Ext.extend(Ext.Window,{
 				var models = Ext.decode(res.responseText);
 				this.addDeviceMoel(models);
 				if(App.getData().optr['optr_id'] != '101676' 
-					&& this.record &&　App.getData().optr['optr_id']!= this.record.get('optr_id')){
+					&& this.record &&App.getData().optr['optr_id']!= this.record.get('optr_id')){
 					this.filterData();
 				}
 			}
@@ -1198,7 +1198,7 @@ UpdateCfgTemplateGrid = Ext.extend(ComTemplateGrid,{
 	updCfgStore : null,//信息修改模板数据
 	updCfgFields : null,//信息修改字段数据
 	updFields:null,//过滤的修改字段名
-	busiCodeStore :　null,//业务代码
+	busiCodeStore :null,//业务代码
 	constructor : function(){
 		
 		//信息修改模板数据
