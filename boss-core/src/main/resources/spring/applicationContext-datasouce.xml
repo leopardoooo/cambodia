@@ -17,6 +17,7 @@
 		<property name="locations">
 			<list>
 				<value>classpath*:*.properties</value>
+				<value>classpath*:/config/*.properties</value>
 			</list>
 		</property>
 	</bean>

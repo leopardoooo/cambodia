@@ -55,8 +55,8 @@ public class Environment {
 	 */
 	public static final String BUSIPARAM_INTERCEPT_KEY = "busiParameterInterceptorKey";
 
-	public static final String ROOT_PATH_BOSS_CORE = "/boss_core" ;
-	public static final String ROOT_PATH_BOSS_LOGIN = "/boss_login";
+	public static final String ROOT_PATH_BOSS_CORE = "/boss-core" ;
+	public static final String ROOT_PATH_BOSS_LOGIN = "/boss-login";
 
 	/**
 	 * 登录的URL

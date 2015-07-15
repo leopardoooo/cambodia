@@ -66,7 +66,7 @@ Ext.apply( Login , {
 					this.openUrl( urls['sub_system_url']+"/rego?sub_system_id="+urls['sub_system_id']);
 					msg.update("<li>登录成功</li>");
 					this.isLogin=true;
-					window.close();
+					//window.close();
 				}
 			}
 		});

@@ -5,10 +5,10 @@ Ext.ns("Constant");
 Ext.apply( Constant , {
 	
 	//站点名称
-	ROOT_PATH_CORE: "boss_core",
-	ROOT_PATH_LOGIN: 'boss_login',
-	ROOT_PATH_SYSMANAGER: 'boss_sysmanager',
-	ROOT_PATH_REPORT: 'boss_report',
+	ROOT_PATH_CORE: "boss-core",
+	ROOT_PATH_LOGIN: 'boss-login',
+	ROOT_PATH_SYSMANAGER: 'boss-sysmanager',
+	ROOT_PATH_REPORT: 'boss-report',
 	
 	ROOT_PATH: root,
 	

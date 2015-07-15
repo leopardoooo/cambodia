@@ -10,7 +10,6 @@
 
 	<properties>
 		<myquartz.version>1.0</myquartz.version>
-		<quartz.version>1.8.6</quartz.version>
 	</properties>
 
 	<dependencies>
@@ -18,11 +17,6 @@
 			<groupId>com.yaochen.cambodia</groupId>
 			<artifactId>ycsoft-lib</artifactId>
 			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.quartz-scheduler</groupId>
-			<artifactId>quartz</artifactId>
-			<version>${quartz.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.yaochen</groupId>
