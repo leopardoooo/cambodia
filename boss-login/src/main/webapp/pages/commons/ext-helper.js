@@ -72,13 +72,12 @@ Ext.Ajax.handleFailure= Ext.Ajax.handleFailure.createInterceptor(function(respon
 //	Alert('系统异常  HTTP状态代码 : '+response['status']+' HTTP状态代码文本: '+response['statusText']+
 //		' 是否超时: '+response['isTimeout']+' 是否中断 ：'+response['isAbort']
 //		+' 请求URL：'+url);
-	Alert('网络异常，请点击确定刷新！',function(){
-		if (window.parent){
-			window.parent.location.reload();
-		}else{
-			window.location.reload();
-		}
-		
+	Alert('异常：' + response.responseText,function(){
+//		if (window.parent){
+//			window.parent.location.reload();
+//		}else{
+//			window.location.reload();
+//		}
 	});
 	
 	//Alert('系统异常');
