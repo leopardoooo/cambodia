@@ -43,7 +43,7 @@ BusiPanel = Ext.extend( Ext.Panel , {
 		},{
 			columnWidth : .15,
 			items : [{
-				id:'ywSaveId',
+				id:'ywSaveId1',
 				xtype : 'button',
 				text: '&nbsp;&nbsp;业务保存',
 				scope: this,
@@ -54,102 +54,102 @@ BusiPanel = Ext.extend( Ext.Panel , {
 			}]
 		}];
 		
-		var busiCode = App.getApp().data.currentResource.busicode;
-		if(busiCode == '1001' || busiCode =='1007' ){//客户开户，购买设备
-			var buyDevice = App.getData().busiTask['BuyDevice'];
-			var newUser = App.getData().busiTask['NewUser'];
-			
-			var arr = [];
-			//是否有购买设备和用户开户资源权限
-			if(buyDevice){
-				this.applyButton(buyDevice);
-				arr.push({
-					columnWidth : .15,
-					id:'newCustToDeviceId',
-					items : [buyDevice]
-				});
-			}
-			if(newUser){
-				this.applyButton(newUser);
-				arr.push({
-					columnWidth : .15,
-					id:'newCustToUserId',
-					items : [newUser]
-				});
-			}
-			
-			if(arr.length > 0){
-				buttons.push(arr);
-			}
-			
-		}else if(busiCode == '1020'){//用户开户
-			var orderProd = App.getData().busiTask['OrderProd'];
-			/*
-			var newUser = App.getData().busiTask['NewUser'];
-			this.applyButton(newUser);
-			*/
-			var arr = [];
-			/*arr.push({
-				columnWidth : .15,
-				items : [newUser]
-			});*/
-			
-			if(orderProd){
-				this.applyButton(orderProd);
-				arr.push({
-					columnWidth : .15,
-					items : [orderProd]
-				});
-			}
-			buttons.push(arr);
-		}else if(busiCode == '1015'){//订购产品
-			var orderProd = App.getData().busiTask['OrderProd'];
-			this.applyButton(orderProd);
-			
-			var arr = [];
-			arr.push({
-				columnWidth : .15,
-				items : [orderProd]
-			});
-			
-			var payFees = App.getData().busiTask['PayFees'];
-			if(payFees){
-				this.applyButton(payFees);
-				arr.push({
-					columnWidth : .15,
-					items : [payFees]
-				});
-			}
-			
-			buttons.push(arr);
-		}else if(busiCode == '1688'){//套餐缴费
-			buttons.push([{
-				columnWidth : .15,
-				items : [{
-					id:'doReturnId',
-					xtype : 'button',
-					text: '&nbsp;重置终端信息',
-					scope: this,
-					width: 90,
-					height : 25,
-					iconCls:'icon-reset',
-					handler:  function() {
-						Ext.getCmp('promPayFeeFormId').doReturnData();
-					}
-				}]
-			}])
-		}else if(busiCode == '1025'){//报开
-			var payFees = App.getData().busiTask['PayFees'];
-			var arr = [];
-			if(payFees){
-				this.applyButton(payFees);
-				arr.push({
-					columnWidth : .15,
-					items : [payFees]
-				});
-			}
-			buttons.push(arr);
-		}
+//		var busiCode = App.getApp().data.currentResource.busicode;
+//		if(busiCode == '1001' || busiCode =='1007' ){//客户开户，购买设备
+//			var buyDevice = App.getData().busiTask['BuyDevice'];
+//			var newUser = App.getData().busiTask['NewUser'];
+//			
+//			var arr = [];
+////			//是否有购买设备和用户开户资源权限
+////			if(buyDevice){
+////				this.applyButton(buyDevice);
+////				arr.push({
+////					columnWidth : .15,
+////					id:'newCustToDeviceId',
+////					items : [buyDevice]
+////				});
+////			}
+////			if(newUser){
+////				this.applyButton(newUser);
+////				arr.push({
+////					columnWidth : .15,
+////					id:'newCustToUserId',
+////					items : [newUser]
+////				});
+////			}
+//			
+//			if(arr.length > 0){
+//				buttons.push(arr);
+//			}
+//			
+//		}else if(busiCode == '1020'){//用户开户
+//			var orderProd = App.getData().busiTask['OrderProd'];
+//			/*
+//			var newUser = App.getData().busiTask['NewUser'];
+//			this.applyButton(newUser);
+//			*/
+//			var arr = [];
+//			/*arr.push({
+//				columnWidth : .15,
+//				items : [newUser]
+//			});*/
+//			
+////			if(orderProd){
+////				this.applyButton(orderProd);
+////				arr.push({
+////					columnWidth : .15,
+////					items : [orderProd]
+////				});
+////			}
+//			buttons.push(arr);
+//		}else if(busiCode == '1015'){//订购产品
+//			var orderProd = App.getData().busiTask['OrderProd'];
+//			this.applyButton(orderProd);
+//			
+//			var arr = [];
+//			arr.push({
+//				columnWidth : .15,
+//				items : [orderProd]
+//			});
+//			
+//			var payFees = App.getData().busiTask['PayFees'];
+//			if(payFees){
+//				this.applyButton(payFees);
+//				arr.push({
+//					columnWidth : .15,
+//					items : [payFees]
+//				});
+//			}
+//			
+//			buttons.push(arr);
+//		}else if(busiCode == '1688'){//套餐缴费
+//			buttons.push([{
+//				columnWidth : .15,
+//				items : [{
+//					id:'doReturnId',
+//					xtype : 'button',
+//					text: '&nbsp;重置终端信息',
+//					scope: this,
+//					width: 90,
+//					height : 25,
+//					iconCls:'icon-reset',
+//					handler:  function() {
+//						Ext.getCmp('promPayFeeFormId').doReturnData();
+//					}
+//				}]
+//			}])
+//		}else if(busiCode == '1025'){//报开
+//			var payFees = App.getData().busiTask['PayFees'];
+//			var arr = [];
+//			if(payFees){
+//				this.applyButton(payFees);
+//				arr.push({
+//					columnWidth : .15,
+//					items : [payFees]
+//				});
+//			}
+//			buttons.push(arr);
+//		}
 		
 		if(buttons.length == 2){
 			buttons[0].columnWidth = 0.8;

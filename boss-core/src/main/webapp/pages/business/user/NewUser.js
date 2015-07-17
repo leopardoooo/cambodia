@@ -5,12 +5,6 @@
  */
 NewUserForm = Ext.extend(UserBaseForm , {
 	url : Constant.ROOT_PATH+"/core/x/User!createUser.action",
-	listeners:{
-		scope:this,
-		render:function(){
-			Ext.getCmp('ywSaveId').hide();//用户订购的时候取消显示业务保存和其他动态增加的按钮.只让订购
-		}
-	},
 	doValid : function(){
 		var stbCombo = Ext.getCmp('dtv_stb_id');
 		var cardCombo = Ext.getCmp('dtv_card_id');

@@ -170,7 +170,6 @@ TopToolbar = Ext.extend(Ext.Toolbar , {
 	},
 	refershOptrInfo : function() {
 		var optr = App.getData().optr;
-		console.log(optr);
 		this.insert(0,' 当前操作员 ' + optr['optr_name'] + '('
 						+ optr['county_name'] + '-'
 						+ optr['dept_name'] + ')');
