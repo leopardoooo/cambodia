@@ -258,6 +258,7 @@
 }
 .toolbtn{
  	float:left;width:16;height:16;
+ 	margin: 0 3px;
 	background-repeat:no-repeat;cursor:pointer;
 }
 
