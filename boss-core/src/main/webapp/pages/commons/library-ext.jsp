@@ -25,7 +25,8 @@
 <script type="text/javascript" src="<%=boss_res %>/components/ext3/ext-base.js" ></script>
 <script type="text/javascript" src="<%=boss_res %>/components/ext3/ext-all.js" ></script>
 <script type="text/javascript" src="<%=boss_res %>/components/ext3/ext-lang-zh_CN.js" charset="UTF-8"></script>
-<script type="text/javascript" src="<%=boss_res %>/pages/commons/ux/ext-basex.js" charset="UTF-8"></script>
+<script type="text/javascript" src="<%=boss_res %>/components/jquery/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="<%=boss_res %>/components/jquery/ext-async-adapter.js"></script>
 <script type="text/javascript">
 	var root = '<%=r %>';
 </script>

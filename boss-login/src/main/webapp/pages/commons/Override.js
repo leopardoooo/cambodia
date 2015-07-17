@@ -450,8 +450,7 @@ Ext.util.Format.dateFormat = function(v){
 		return v.format('Y-m-d');
 	}
 	var date = Date.parseDate(v,'Y-m-d h:i:s');
-	return date; //TODO 暂时修改
-	//return date.format('Y-m-d');
+	return date.format('Y-m-d');
 }
 /**
  * 计算当前日期与传入日期的天数

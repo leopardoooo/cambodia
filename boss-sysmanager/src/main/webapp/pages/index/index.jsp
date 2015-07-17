@@ -57,7 +57,9 @@
 	<script type="text/javascript" src="<%=boss_res %>/pages/commons/Constant.js" charset="UTF-8"></script>
 	<script type="text/javascript" src="<%=boss_res %>/pages/commons/Override.js" charset="UTF-8"></script>
 	<script type="text/javascript" src="<%=boss_res %>/pages/commons/ext-helper.js" ></script>
-	<script type="text/javascript" src="<%=boss_res %>/pages/commons/ux/ext-basex.js" charset="UTF-8"></script>
+	<script type="text/javascript" src="<%=boss_res %>/components/jquery/jquery-1.11.3.min.js"></script>
+	<script type="text/javascript" src="<%=boss_res %>/components/jquery/ext-async-adapter.js"></script>
+
 	
 	<script type="text/javascript" src="<%=boss_res %>/pages/commons/Vtypes.js" ></script>
 	<script type="text/javascript" src="<%=boss_res %>/pages/commons/busi-helper.js" ></script>
