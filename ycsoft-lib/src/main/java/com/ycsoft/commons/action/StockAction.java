@@ -2,6 +2,7 @@ package com.ycsoft.commons.action;
 
 import static com.ycsoft.commons.constants.Environment.CONTEXT_PATH;
 import static com.ycsoft.commons.constants.Environment.SSO_TOKEN_PARAM_KEY;
+import static com.ycsoft.commons.constants.Environment.USER_IN_SESSION_LANG;
 import static com.ycsoft.commons.constants.Environment.USER_IN_SESSION_NAME;
 
 import java.util.ArrayList;
@@ -73,6 +74,9 @@ public class StockAction extends BaseAction {
 			//操作员信息放入本地Session,如果是切换营业厅不需要设置信息
 			getSession().setAttribute(USER_IN_SESSION_NAME, jsonOptr);
 			getSession().setAttribute(SSO_TOKEN_PARAM_KEY, ssoSid);
+			// 设置语言至当前session中
+			Object lang = com.alibaba.fastjson.JSON.parseObject(jsonOptr).get("lang");
+			getSession().setAttribute(USER_IN_SESSION_LANG, lang);
 			getSession().setAttribute(CONTEXT_PATH, request.getContextPath());
 		}
 

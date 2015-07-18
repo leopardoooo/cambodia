@@ -1,7 +1,6 @@
 package com.ycsoft.commons.interceptor;
 
 import static com.ycsoft.commons.constants.Environment.CONTEXT_PATH;
-import static com.ycsoft.commons.constants.Environment.LOGIN_PROCESS_METHOD;
 import static com.ycsoft.commons.constants.Environment.SSO_TOKEN_PARAM_KEY;
 import static com.ycsoft.commons.constants.Environment.TOGGLE_SYSTEM_PROCESS_METHOD;
 import static com.ycsoft.commons.constants.Environment.USER_IN_SESSION_NAME;
@@ -16,7 +15,6 @@ import com.opensymphony.xwork2.interceptor.AbstractInterceptor;
 import com.ycsoft.beans.system.SOptr;
 import com.ycsoft.commons.abstracts.BaseAction;
 import com.ycsoft.commons.action.SsoUnit;
-import com.ycsoft.commons.action.StockAction;
 import com.ycsoft.commons.helper.JsonHelper;
 import com.ycsoft.commons.helper.WebHelper;
 import com.ycsoft.commons.pojo.ExceptionData;

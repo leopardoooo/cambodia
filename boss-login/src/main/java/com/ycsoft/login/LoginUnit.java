@@ -69,6 +69,7 @@ public class LoginUnit extends HttpServlet {
 			if(null == loginName || loginName.equals("")){
 				msg.add("用户名不能为空，无法登陆!");
 			}
+			String lang = request.getParameter("lang");
 			SsoDto optr = null;
 			List<SsoDto> ssoList =checkLogin(loginName);
 			if(ssoList.size() == 0){
@@ -115,6 +116,8 @@ public class LoginUnit extends HttpServlet {
 				if (ip == null)
 					ip=request.getRemoteAddr();
 				ouser.setUserIp(ip);
+				//设置语言
+				optr.setLang(lang); 
 				ouser.setOptr(optr);
 				ouser.setLoginTime(new Date());
 				ouser.setBwver(detectionBrowserVersion(request.getHeader("user-agent")));

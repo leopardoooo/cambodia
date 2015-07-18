@@ -34,7 +34,8 @@ Ext.apply( Login , {
 		var loginName= Ext.get( "loginName" ), 
 			pwd= Ext.get( "pwd" ),
 			rmb= Ext.get( "rmbUser"),
-			msg= Ext.get( "msg" );
+			msg= Ext.get( "msg" ),
+			lang = Ext.get("lang");
 		
 		if( Ext.isEmpty(loginName.getValue())){
 			//uid.radioClass(errorCls);
@@ -51,7 +52,8 @@ Ext.apply( Login , {
 		Ext.Ajax.request({
 			params: {
 				loginName: loginName.getValue(),
-				pwd: pwd.getValue()
+				pwd: pwd.getValue(),
+				lang: lang.getValue()
 			},
 			url: "login",
 			scope: this,

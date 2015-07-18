@@ -55,7 +55,7 @@
 								<tr>
 									<th>用户名</th>
 									<td class="inner-input-cmp">
-										<input class="input-blur"  maxlength="20" id="loginName" value=''
+										<input class="input-blur"  maxlength="20" id="loginName" value='lyadmin'
 											   onfocus="this.select();this.className='input-focus';" 
 											   onblur="this.className='input-blur';"/>
 									</td>
@@ -64,12 +64,23 @@
 								<tr>
 									<th>密&nbsp;&nbsp;&nbsp;&nbsp;码</th>
 									<td width="90" class="inner-input-cmp">
-										<input class="input-blur" maxlength="20" id="pwd" type="password"  value=''
+										<input class="input-blur" maxlength="20" id="pwd" type="password"  value='123shyc'
 											   onfocus="this.select();this.className='input-focus';" 
 											   onblur="this.className='input-blur';"/>
 									</td>
 									<td>
 									</td>
+								</tr>
+								<tr>
+									<th>语&nbsp;&nbsp;&nbsp;&nbsp;言</th> 
+									<td width="90" class="inner-input-cmp">
+										<select id="lang" style="margin-left: 7px;">
+											<option value="zh" >简体中文</option>
+											<option value="en" selected>English</option>
+											<option value="kh">柬埔寨语</option>
+										</select>
+									</td>
+									<td></td>
 								</tr>
 								<tr>
 									<th>&nbsp;</th>

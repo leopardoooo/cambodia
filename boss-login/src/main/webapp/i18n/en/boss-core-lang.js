@@ -1,0 +1,6 @@
+/** boss-core */
+BCLangs= {
+	home:{
+		
+	}
+}

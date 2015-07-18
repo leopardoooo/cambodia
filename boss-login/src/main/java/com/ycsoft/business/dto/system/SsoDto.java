@@ -41,6 +41,16 @@ public class SsoDto  {
 	private String sub_system_url ;
 	private String sub_system_host ;
 	private String iconcls ;
+	
+	private String lang;
+
+	public String getLang() {
+		return lang;
+	}
+
+	public void setLang(String lang) {
+		this.lang = lang;
+	}
 
 	/**
 	 * @return the tokenId

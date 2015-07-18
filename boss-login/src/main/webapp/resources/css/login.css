@@ -84,9 +84,9 @@ a:hover {
 	background-position:left top;
 	background-repeat:no-repeat;
 	height:72px;
-	margin-bottom:25px;
+	margin-bottom:5px;
 	margin-top:45px;
-	margin-left:5px;
+	margin-left:23px;
 	background-image:url(./../images/login/logo.gif);
 }
 .logTab th{
@@ -148,8 +148,8 @@ a:hover {
 	display:block;
 	float:left;
 	height:32px;
-	margin-left:3px;
-	margin-top:7px;
+	margin-left:7px;
+	margin-top:2px;
 	width:82px;
 }
 .login-b2 {

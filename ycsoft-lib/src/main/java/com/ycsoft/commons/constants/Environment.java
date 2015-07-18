@@ -16,7 +16,12 @@ public class Environment {
 	/**
 	 * 当操作员登录成功后，在Session缓存，保存用户信息的KEY
 	 */
-	public static final String USER_IN_SESSION_NAME = "boss_user_login_name" ;
+	public static final String USER_IN_SESSION_NAME = "boss_user_login_name";
+	
+	/**
+	 * 语言
+	 */
+	public static final String USER_IN_SESSION_LANG = "boss_user_login_lang";
 
 	/**
 	 * SSO登录的参数KEY
