@@ -23,6 +23,60 @@
 <!-- 	<link rel="stylesheet" href="<%=boss_res %>/resources/css/icon.css" type="text/css" /> -->
 	<link rel="stylesheet" href="<%=boss_res %>/resources/css/icon.css" type="text/css" />
 	<link rel="stylesheet" href="<%=boss_res %>/resources/css/msg-tip.css" type="text/css" />
+  </head>
+  <body style="overflow: hide;">
+  	<div id="loading">
+  	 <div>
+  	  <img src="<%=boss_res %>/resources/images/loading.gif" width="51" height="31" 
+		   style="margin-right:8px;float:left;vertical-align:top;" />
+			 BOSS System <br />
+	  <span class="loading-msg">loading...</span>
+	 </div>
+	</div>
+	<div id="header" style="visibility: hidden;">
+		<div class="site-nav-search">
+			<div class="logo">
+					<img src="<%=boss_res %>/resources/images/index/logo3.gif"/>
+			</div>
+			<div action="?" method="post" name="search" id="search">
+				 <div class="search-panel">
+					<span class="search-input-box"> 
+						<input id='type' type='hidden' name='type'/>
+						<input id="q" type="text"  style="color:#bbbbbb;font-weight:bold"  value=''
+							 onkeydown="if(event.keyCode == 13){App.search.searchCustUnPrint();} "
+							 onblur="searchonblur(this);"
+							 onfocus="searchonfocus(this);" name="q" />
+					</span> 
+					<span class="search-btn">
+						<button id='btnSearch_id' onclick="if (Ext.getDom('q').value!=tiptext)App.search.searchCustUnPrint(false)"></button> 
+					</span>
+					<span class="search-btn" style="margin-left: -9px">
+						<button id='btnSearch_id2' onclick="App.search.searchCustUnPrint(true)"></button> 
+					</span>
+				</div>
+				<ul id="TabList" class="search-tablist">
+					<li  class="first selected"> <a href="#" boss:name="cust" onclick='changeSearchType(true)' id="_search0"></a> </li>
+					<li> <a href="#" boss:name="device_id" onclick='changeSearchType(false)' id="_search1"></a> </li>
+					<li> <a href="#" boss:name="addr_name" onclick='changeSearchType(false)' id="_search2"></a> </li>
+					<li> <a href="#" boss:name="tel" onclick='changeSearchType(false)' id="_search3" ></a> </li>
+					<li> <a href="#" boss:name="mutipleSearch" id="_search4" ></a> </li>
+				</ul>
+
+				<div id='tool' class="toolpanel">
+				</div>
+			</div>
+
+		</div>
+
+	</div>
+		<%--  导入ExtJS库相关文件 --%> 
+	<script type="text/javascript" src="<%=boss_res %>/components/ext3/ext-base.js" ></script>
+	<script type="text/javascript" src="<%=boss_res %>/components/ext3/ext-all.js" ></script>
+	
+	<script type="text/javascript" src="<%=boss_res%>/i18n/<%=lang %>/ext-lang.js"></script>
+	<script type="text/javascript" src="<%=boss_res%>/i18n/<%=lang %>/resouces-lang.js"></script>
+	<script type="text/javascript" src="<%=boss_res%>/i18n/<%=lang %>/boss-core-lang.js"></script>
+	<script type="text/javascript" src="<%=boss_res%>/i18n/langUtils.js"></script>
 	
 <script type="text/javascript">
 	var regourl = '<%=SessionListener.getSsoLoginUrl(request) %>';
@@ -30,13 +84,13 @@
     
     var root = '<%=root %>',token_id ='${param.tokenId }';
     var issearchtip = true;
-    var tiptext='客户名称|受理编号|银行账号|宽带帐号222';
+    var tiptext = langUtils.bc("home.searchTip");
     
-	
 	function searchonblur(athis){
 		if(issearchtip){
 			if (athis.value == ''){
-				athis.value=tiptext;
+				tiptext = langUtils.bc("home.searchTip");
+				athis.value = tiptext;
 				athis.style.color='#bbbbbb';
 			}
 		}
@@ -71,64 +125,17 @@
 		issearchtip=type;
 	}
 	
+	// i18n初始化
+	langUtils.bc("home.searchBtns.[0]", "btnSearch_id");
+	langUtils.bc("home.searchBtns.[1]", "btnSearch_id2");
+	
+	langUtils.bc("home.searchTabs.[0]", "_search0");
+	langUtils.bc("home.searchTabs.[1]", "_search1");
+	langUtils.bc("home.searchTabs.[2]", "_search2");
+	langUtils.bc("home.searchTabs.[3]", "_search3");
+	langUtils.bc("home.searchTabs.[4]", "_search4");
+
     </script>
-  </head>
-  <body style="overflow: hide;">
-  	<div id="loading">
-  	 <div>
-  	  <img src="<%=boss_res %>/resources/images/loading.gif" width="51" height="31" 
-		   style="margin-right:8px;float:left;vertical-align:top;" />
-			 BOSS System <br />
-	  <span class="loading-msg">loading...</span>
-	 </div>
-	</div>
-	<div id="header" style="visibility: hidden;">
-		<div class="site-nav-search">
-			<div class="logo">
-					<img src="<%=boss_res %>/resources/images/index/logo3.gif"/>
-			</div>
-			<div action="?" method="post" name="search" id="search">
-				 <div class="search-panel">
-					<span class="search-input-box"> 
-						<input id='type' type='hidden' name='type'/>
-						<input id="q" type="text"  style="color:#bbbbbb;font-weight:bold"  value=''
-							 onkeydown="if(event.keyCode == 13){App.search.searchCustUnPrint();} "
-							 onblur="searchonblur(this);"
-							 onfocus="searchonfocus(this);" name="q" />
-					</span> 
-					<span class="search-btn">
-						<button id='btnSearch_id' onclick="if (Ext.getDom('q').value!=tiptext)App.search.searchCustUnPrint(false)">搜 索</button> 
-					</span>
-					<span class="search-btn" style="margin-left: -9px">
-						<button id='btnSearch_id2' onclick="App.search.searchCustUnPrint(true)">缴 费</button> 
-					</span>
-				</div>
-				<ul id="TabList" class="search-tablist">
-					<li  class="first selected"> <a href="#" boss:name="cust" onclick='changeSearchType(true)'>名称编号</a> </li>
-					<li> <a href="#" boss:name="device_id" onclick='changeSearchType(false)'>设备编号</a> </li>
-					<li> <a href="#" boss:name="addr_name" onclick='changeSearchType(false)'>安装地址</a> </li>
-					<li> <a href="#" boss:name="tel" onclick='changeSearchType(false)'>电话号码</a> </li>
-					<li> <a href="#" boss:name="mutipleSearch">多条件搜索</a> </li>
-				</ul>
-
-				<div id='tool' class="toolpanel">
-				</div>
-			</div>
-
-		</div>
-
-	</div>
-	
-	<%--  导入ExtJS库相关文件 --%> 
-	<script type="text/javascript" src="<%=boss_res %>/components/ext3/ext-base.js" ></script>
-	<script type="text/javascript" src="<%=boss_res %>/components/ext3/ext-all.js" ></script>
-	<script type="text/javascript" src="<%=boss_res %>/components/ext3/ext-lang-zh_CN.js" ></script>
-	
-	<script type="text/javascript" src="<%=boss_res%>/i18n/<%=lang %>/ext-lang.js"></script>
-	<script type="text/javascript" src="<%=boss_res%>/i18n/<%=lang %>/resouces-lang.js"></script>
-	<script type="text/javascript" src="<%=boss_res%>/i18n/<%=lang %>/boss-core-lang.js"></script>
-	<script type="text/javascript" src="<%=boss_res%>/i18n/langUtils.js"></script>
-	
 	<script type="text/javascript" src="<%=boss_res %>/components/jquery/jquery-1.11.3.min.js"></script>
 	<script type="text/javascript" src="<%=boss_res %>/components/jquery/ext-async-adapter.js"></script>
 	
@@ -221,12 +228,12 @@
   	
   	
   	//web服务器时间
-   	<%-- var serverDate = new Date('<%=nowDate%>');
+   	var serverDate = new Date('<%=nowDate%>');
    	serverDate.setSeconds(serverDate.getSeconds()+2);
 	function nowDate(){
 		return serverDate.clone();
 	}
-	function runDate(){
+	/* function runDate(){
 		serverDate.setSeconds(serverDate.getSeconds()+1);
 		var txt = Ext.getCmp('nowServerDateViewer');
 		var dateStr = serverDate.format('Y-m-d H:i:s');
@@ -240,7 +247,7 @@
 			txt.setText(dateStr);
 		}
 	}
-	setInterval("runDate()",1000);  --%>
+	setInterval("runDate()",1000); */
   	</script>
   </body>
 </html>

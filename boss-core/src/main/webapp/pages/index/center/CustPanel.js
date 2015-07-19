@@ -1,27 +1,27 @@
 var custInfoHTML =
 '<table width="100%" border="0" cellpadding="0" cellspacing="0">' +
 	'<tr height=24>'+
-		'<td class="label" width=20%>客户名称:</td>' +
+		'<td class="label" width=20%>' + langUtils.main("cust.base.name") +':</td>' +
 		'<td class="input_bold" width=30%>&nbsp;{[values.cust.cust_name || ""]}</td>'+
-		'<td class="label" width=20%>受理编号:</td>' +
+		'<td class="label" width=20%>'+ langUtils.main("cust.base.busiId") +':</td>' +
 		'<td class="input_bold" width=30%>&nbsp;{[values.cust.cust_no || ""]}</td>'+
 	'</tr>'+
 	'<tr height=24>'+
-	'<td class="label">开户日期:</td>' +
+	'<td class="label">'+ langUtils.main("cust.base.openDate") +':</td>' +
 		'<td class="input" >&nbsp;{[fm.dateFormat(values.cust.open_time) || ""]}</td>'+
-		'<td class="label">客户地址:</td>' +
+		'<td class="label">'+ langUtils.main("cust.base.addr") +':</td>' +
 		'<td class="input">&nbsp;{[values.cust.address || ""]}</td>'+
 	'</tr>' +
 	'<tr height=24>'+
-		'<td class="label">客户状态:</td>' +
+		'<td class="label">'+ langUtils.main("cust.base.status") +':</td>' +
 		'<td class="input">&nbsp;{[Ext.util.Format.statusShow(values.cust.status_text) || ""]}</td>'+
-		'<td class="label">客户类型:</td>' +
+		'<td class="label">'+ langUtils.main("cust.base.type") +':</td>' +
 		'<td class="input">&nbsp;{[values.cust.cust_type_text || ""]}</td>'+
 	'</tr>' +
 	'<tr height=24>'+
-		'<td class="label">证件类型:</td>' +
+		'<td class="label">'+ langUtils.main("cust.base.certType") +':</td>' +
 		'<td class="input">&nbsp;{[values.linkman.cert_type_text || ""]}</td>'+
-		'<td class="label">证件号码:</td>' +
+		'<td class="label">'+ langUtils.main("cust.base.certNum") +':</td>' +
 		'<td class="input">&nbsp;{[values.linkman.cert_num || ""]}</td>'+
 	'</tr>' +
 	'<tpl if="values.cust.cust_type == \'RESIDENT\'">' +
@@ -39,29 +39,29 @@ var custInfoHTML =
 		'</tr>' + 
 	'</tpl>' +
 	'<tr height=24>'+
-		'<td class="label">联系人:</td>' +
+		'<td class="label">'+ langUtils.main("cust.base.linkMan") +':</td>' +
 		'<td class="input">&nbsp;{[values.linkman.linkman_name || ""]}</td>'+
-		'<td class="label">固定电话:</td>' +
+		'<td class="label">'+ langUtils.main("cust.base.tel") +':</td>' +
 		'<td class="input">&nbsp;{[values.linkman.tel || ""]}</td>'+	
 	'</tr>' +'<tr height=24>'+
-		'<td class="label">出生日期:</td>' +
+		'<td class="label">'+ langUtils.main("cust.base.barthday") +':</td>' +
 		'<td class="input">&nbsp;{[fm.dateFormat(values.linkman.birthday) || ""]}</td>'+
-		'<td class="label">手机:</td>' +
+		'<td class="label">'+ langUtils.main("cust.base.mobile") +':</td>' +
 		'<td class="input">&nbsp;{[values.linkman.mobile || ""]}</td>'+
 	'</tr>'+'<tr height=24>'+
-	'<td class="label">区域小区:</td>' +
+	'<td class="label">'+ langUtils.main("cust.base.areaCateory") +':</td>' +
 		'<td class="input">&nbsp;{[values.cust.addr_id_text || ""]}</td>'+
-		'<td class="label">小区网络类型:</td>' +
+		'<td class="label">'+ langUtils.main("cust.base.houseNetType") +':</td>' +
 		'<td class="input">&nbsp;{[values.cust.add_net_type_text || ""]}</td>'+
 	'</tr>'+'<tr height=24>'+
-	'<td class="label">小区客户经理:</td>' +
+	'<td class="label">'+ langUtils.main("cust.base.houseManager") +':</td>' +
 		'<td class="input">&nbsp;{[values.cust.busi_optr_name || ""]}</td>'+
-		'<td class="label">小区运维人员:</td>' +
+		'<td class="label">'+ langUtils.main("cust.base.houseOptr") +':</td>' +
 		'<td class="input">&nbsp;{[values.cust.serv_optr_name || ""]}</td>'+
 	'</tr>' +
 		'<tr height=24>'+
-		'<td class="label">邮寄地址:</td>' +
-		'<td class="input" colspan="3">&nbsp;{[values.linkman.mail_address ? values.linkman.mail_address + "&nbsp;&nbsp;&nbsp;&nbsp;邮编:&nbsp;" + [values.linkman.postcode || ""] : "" ]}</td>'+
+		'<td class="label">'+ langUtils.main("cust.base.postalAddr") +':</td>' +
+		'<td class="input" colspan="3">&nbsp;{[values.linkman.mail_address ? values.linkman.mail_address + "&nbsp;&nbsp;&nbsp;&nbsp;postal:&nbsp;" + [values.linkman.postcode || ""] : "" ]}</td>'+
 	'</tr>' +	
 	'<tpl if="values.cust.cust_colony == \'MNDKH\' || values.cust.cust_colony == \'XYKH\' ">' +
 	'<tr height=24>'+
@@ -78,7 +78,7 @@ var custInfoHTML =
 	'</tr>' +
 	'</tpl>' +
 	'<tr height=24>'+
-		'<td class="label">备注:</td>' +
+		'<td class="label">'+ langUtils.main("cust.base.remark") +':</td>' +
 		'<td class="input" colspan="3">&nbsp;{[values.cust.remark || ""]}</td>'+
 	'</tr>' +	
 	'<tpl if="values.acctBank && values.acctBank.bank_account && (values.acctBank.status==\'ACTIVE\' || values.acctBank.status==\'STOP\')">' +
@@ -110,7 +110,7 @@ CustInfoPanel = Ext.extend( Ext.ux.Gpanel , {
 		this.extInfoPanel = new ExtInfoPanel();
 		CustInfoPanel.superclass.constructor.call(this, {
 			id:cmpId,
-			title:"<font style='font-family:微软雅黑;font-size:12'>基本信息</font>",
+			title:"<font style='font-family:微软雅黑;font-size:12'>" + langUtils.main("cust.base._title") +"</font>",
 			border: false,
 			layout: 'anchor',
 			anchor: '100%',

@@ -33,7 +33,6 @@ InfoPanel = Ext.extend( CommonTab , {
 		this.docPanel = new DocPanel();
 		this.doneCodePanel = new DoneCodePanel();
 		this.commandInfoPanel = new CommandInfoPanel();
-		
 		InfoPanel.superclass.constructor.call(this, {
 			border: false,
 			defaults: {
@@ -43,14 +42,14 @@ InfoPanel = Ext.extend( CommonTab , {
 			items: [{
 				id: 'CUST_PANEL',
 				iconCls:'cust',
-				title: '客户信息',
+				title: langUtils.bc("home.main.tabs.[0]"),
 				layout: 'fit',
 				border: false,
 				items: [this.custPanel]
 			},{
 				id: 'UNIT_PANEL',
 				iconCls:'cust',
-				title: '单位信息',
+				title: langUtils.bc("home.main.tabs.[1]"),
 				hidden:true,
 				layout: 'fit',
 				border: false,
@@ -58,42 +57,42 @@ InfoPanel = Ext.extend( CommonTab , {
 			},{
 				id: 'USER_PANEL',
 				iconCls:'user',
-				title: '用户信息',
+				title: langUtils.bc("home.main.tabs.[2]"),
 				layout: 'fit',
 				border: false,
 				items: [this.userPanel]
 			},{
 				id: 'ACCT_PANEL',
 				iconCls:'acct',
-				title: '账户信息',
+				title: langUtils.bc("home.main.tabs.[3]"),
 				layout: 'fit',
 				border: false,
 				items: [this.acctPanel]
 			},{
 				id: 'PAY_PANEL',
 				iconCls:'pay_fee',
-				title: '收费信息',
+				title: langUtils.bc("home.main.tabs.[4]"),
 				layout: 'fit',
 				border: false,
 				items: [this.payfeePanel]
 			},{
 				id: 'DOC_PANEL',
 				iconCls:'doc',
-				title: '单据信息',
+				title: langUtils.bc("home.main.tabs.[5]"),
 				layout: 'fit',
 				border: false,
 				items: [this.docPanel]
 			},{
 				id: 'DONECODE_PANEL',
 				iconCls:'done_code',
-				title: '受理记录',
+				title: langUtils.bc("home.main.tabs.[6]"),
 				layout: 'fit',
 				border: false,
 				items: [this.doneCodePanel]
 			},{
 				id: 'COMMAND_PANEL',
 				iconCls:'resendCmd',
-				title: '指令信息',
+				title: langUtils.bc("home.main.tabs.[7]"),
 				layout: 'fit',
 				border: false,
 				items:[this.commandInfoPanel],
@@ -101,7 +100,7 @@ InfoPanel = Ext.extend( CommonTab , {
 			},{
 				id: 'BILL_PANEL',
 				iconCls:'bill',
-				title: '账单信息',
+				title: langUtils.bc("home.main.tabs.[8]"),
 				layout: 'fit',
 				border: false,
 				items: [this.billPanel]
