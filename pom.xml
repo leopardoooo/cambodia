@@ -12,6 +12,7 @@
 		<module>boss-sysmanager</module>
 		<module>boss-core</module>
 		<!-- <module>boss-report</module> <module>cas-job</module> -->
+		<module>boss-remoting</module>
 	</modules>
 
 	<licenses>
