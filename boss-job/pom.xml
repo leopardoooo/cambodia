@@ -23,10 +23,5 @@
 			<artifactId>myquartz</artifactId>
 			<version>1.0</version>
 		</dependency>
-		<dependency>
-			<groupId>org.codehaus.xfire</groupId>
-			<artifactId>xfire-all</artifactId>
-			<version>1.2.6</version>
-		</dependency>
 	</dependencies>
 </project>

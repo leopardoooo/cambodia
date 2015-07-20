@@ -10,8 +10,6 @@ import static com.ycsoft.commons.constants.SystemConstants.BILL_COME_FROM_MANUAL
 import static com.ycsoft.commons.constants.SystemConstants.BILL_COME_FROM_MUCH;
 import static com.ycsoft.commons.constants.SystemConstants.BOOLEAN_FALSE;
 import static com.ycsoft.commons.constants.SystemConstants.BOOLEAN_TRUE;
-import static com.ycsoft.commons.constants.SystemConstants.CARD_RECHARGE_CARD;
-import static com.ycsoft.commons.constants.SystemConstants.CARD_USER_NAME;
 import static com.ycsoft.commons.constants.SystemConstants.COUNTY_9005;
 import static com.ycsoft.commons.constants.SystemConstants.DEVICE_TYPE_MODEM;
 import static com.ycsoft.commons.constants.SystemConstants.DTV_SERV_TYPE_DOUBLE;
@@ -21,7 +19,6 @@ import static com.ycsoft.commons.constants.SystemConstants.PRESENT_TYPE_FEE;
 import static com.ycsoft.commons.constants.SystemConstants.PRESENT_TYPE_TIME;
 import static com.ycsoft.commons.constants.SystemConstants.PROD_ORDER_TYPE_PRESENT;
 import static com.ycsoft.commons.constants.SystemConstants.PROD_TYPE_BASE;
-import static com.ycsoft.commons.constants.SystemConstants.RECHARFE_CARD_URL;
 import static com.ycsoft.commons.constants.SystemConstants.REFRESH_TYPE_TERMINAL;
 import static com.ycsoft.commons.constants.SystemConstants.USER_TYPE_ATV;
 import static com.ycsoft.commons.constants.SystemConstants.USER_TYPE_BAND;
@@ -42,9 +39,6 @@ import org.apache.commons.lang.RandomStringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
-import com.bjdv.bean.RechargeReq;
-import com.bjdv.bean.RechargeRes;
-import com.bjdv.www.RechargeService.RechargeServiceHttpBindingStub;
 import com.google.gson.reflect.TypeToken;
 import com.ycsoft.beans.config.TBusiFee;
 import com.ycsoft.beans.config.TOpenTemp;
@@ -2110,18 +2104,19 @@ public class UserService extends BaseBusiService implements IUserService {
 	}
 	
 	//充值卡充值
-	public RechargeRes saveRechargeCard(String icCard,String rechargeCard) throws Exception {
-		java.net.URL endpointURL = new java.net.URL(RECHARFE_CARD_URL);
-		javax.xml.rpc.Service service = new org.apache.axis.client.Service();
-		RechargeServiceHttpBindingStub drcom = new RechargeServiceHttpBindingStub(endpointURL, service);
+	@Deprecated
+	public void saveRechargeCard(String icCard,String rechargeCard) throws Exception {
+//		java.net.URL endpointURL = new java.net.URL(RECHARFE_CARD_URL);
+//		javax.xml.rpc.Service service = new org.apache.axis.client.Service();
+//		RechargeServiceHttpBindingStub drcom = new RechargeServiceHttpBindingStub(endpointURL, service);
+//		
+//		RechargeReq req = new RechargeReq();
+//		req.setUserName(CARD_USER_NAME);
+//		req.setPassword(CARD_RECHARGE_CARD);
+//		req.setIcCard(icCard);
+//		req.setRechargeCard(rechargeCard);
 		
-		RechargeReq req = new RechargeReq();
-		req.setUserName(CARD_USER_NAME);
-		req.setPassword(CARD_RECHARGE_CARD);
-		req.setIcCard(icCard);
-		req.setRechargeCard(rechargeCard);
-		
-		return drcom.recharge(req);
+//		return drcom.recharge(req);
 	}
 
 	/* (non-Javadoc)

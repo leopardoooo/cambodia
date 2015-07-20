@@ -1,0 +1,1 @@
+ ${AXIS2_HOME}/bin/wsdl2java.sh -uri http://172.18.1.19:8685/services/AAAInterfaceBusinessMgrService?wsdl -o ./../../main/java -p com.ycsoft.boss.remoting.aaa -d adb -s -l java --noBuildXML -t

@@ -1,0 +1,1 @@
+mvn ../../../pom.xml dependency:copy-dependencies

@@ -705,10 +705,11 @@ public class UserAction extends BaseBusiAction {
 	}
 	
 	//充值卡充值
+	@Deprecated
 	public String rechargeCard() throws Exception {
 		String icCard = request.getParameter("icCard");
 		String rechargeCard = request.getParameter("rechargeCard");
-		getRoot().setSimpleObj(userService.saveRechargeCard(icCard, rechargeCard));
+//		getRoot().setSimpleObj(userService.saveRechargeCard(icCard, rechargeCard));
 		return JSON_SIMPLEOBJ;
 	}
 	
