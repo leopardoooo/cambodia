@@ -1,5 +1,6 @@
 package com.ycsoft.http;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -32,7 +33,12 @@ public class HttpClientOrderly extends AbstractHttpClient {
 	private ResponseBody doRequestForSingleTask(CloseableHttpClient httpClient,
 			HttpTask task) throws Exception{
 		HttpPost post = new HttpPost(task.getRequestUrl());
-		post.setEntity(new StringEntity(task.getJsonData(), getContentType()));
+
+		StringEntity stringEntity = new StringEntity(task.getJsonData(),
+				Charset.forName("utf-8"));
+		stringEntity.setContentType("application/json");
+		post.setEntity(stringEntity);
+		
 		CloseableHttpResponse response = null;
 		try {
 			response = httpClient.execute(post);
