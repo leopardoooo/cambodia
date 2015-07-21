@@ -24,24 +24,23 @@
 	
 	<logger name="com.opensymphony">
 		<level value="INFO" />
-		<appender-ref ref="SYS" />
+		<appender-ref ref="CON" />
 	</logger>
 	<logger name="org.apache">
 		<level value="INFO" />
-		<appender-ref ref="SYS" />
+		<appender-ref ref="CON" />
 	</logger>
 	<logger name="org.springframework.jdbc.datasource">
-		<level value="DEBUG" />
+		<level value="INFO" />
 		<appender-ref ref="CON" />
 	</logger>
 	<logger name="org.springframework">
 		<level value="INFO" />
-		<appender-ref ref="SYS" />
+		<appender-ref ref="CON" />
 	</logger>
 	<logger name="com.ycsoft">
 		<level value="DEBUG" />
 		<appender-ref ref="CON" />
-		<appender-ref ref="SYS" />
 	</logger>
 	<logger name="com.ycsoft.daos">
 		<level value="INFO" />
