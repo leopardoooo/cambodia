@@ -14,8 +14,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.rpc.ServiceException;
-
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +22,6 @@ import com.google.gson.reflect.TypeToken;
 import com.ycsoft.beans.core.acct.CAcct;
 import com.ycsoft.beans.core.acct.CAcctAcctitem;
 import com.ycsoft.beans.core.acct.CAcctAcctitemInactive;
-import com.ycsoft.beans.core.acct.CAcctBank;
 import com.ycsoft.beans.core.bill.BBill;
 import com.ycsoft.beans.core.cust.CCust;
 import com.ycsoft.beans.core.job.JCaCommand;
@@ -153,14 +150,14 @@ public class UserProdService extends BaseBusiService implements IUserProdService
 		for(String userId : userIdList){
 			UserDto user = userComponent.queryUserById(userId);
 			if(user == null){
-				throw new ServiceException("用户不存在,用户ID: " + userId);
+				throw new ServicesException("用户不存在,用户ID: " + userId);
 			}
 			
 			//用户是否订购基本包
 			if(SystemConstants.BOOLEAN_TRUE.equals(needBaseProd)){
 				List<CProdDto> orderProdList = userProdComponent.queryByUserId(userId);
 				if( orderProdList.size() == 0){
-					throw new ServiceException("用户没订购基本包,用户ID: " + userId);
+					throw new ServicesException("用户没订购基本包,用户ID: " + userId);
 				}
 			}
 			
@@ -168,7 +165,7 @@ public class UserProdService extends BaseBusiService implements IUserProdService
 			//产品已订购
 			CProd cprod = expressionUtil.orderPord(prodId);
 			if(cprod != null){
-				throw new ServiceException("产品 "+cprod.getProd_name()+" 已订购,用户ID: " + userId);
+				throw new ServicesException("产品 "+cprod.getProd_name()+" 已订购,用户ID: " + userId);
 			}
 			
 			PProd prod = prodComponent.queryById(prodId);
@@ -176,11 +173,11 @@ public class UserProdService extends BaseBusiService implements IUserProdService
 				if (!user.getUser_type().equals(SystemConstants.USER_TYPE_DTV)
 						|| user.getServ_type().equals(
 								SystemConstants.DTV_SERV_TYPE_SINGLE)) {
-					throw new ServiceException("产品服务编号和用户类型不匹配,产品为数字双向产品,用户类型为"+user.getUser_type_text()+",用户ID: " + userId);
+					throw new ServicesException("产品服务编号和用户类型不匹配,产品为数字双向产品,用户类型为"+user.getUser_type_text()+",用户ID: " + userId);
 				}
 			}else{
 				if(!prod.getServ_id().equals(user.getUser_type())){
-					throw new ServiceException("产品服务编号和用户类型不匹配,用户ID: " + userId);
+					throw new ServicesException("产品服务编号和用户类型不匹配,用户ID: " + userId);
 				}
 			}
 			
@@ -190,7 +187,7 @@ public class UserProdService extends BaseBusiService implements IUserProdService
 			ProdTariffDto tariff = userProdComponent.queryTariffByTariffIds(new String[]{tariffId}).get(0);
 			//资费不适用当前用户
 			if (!expressionUtil.parseBoolean(tariff.getRule_id_text())) {
-				throw new ServiceException("资费规则不适用,用户ID: " + userId);
+				throw new ServicesException("资费规则不适用,用户ID: " + userId);
 			}
 			
 			
@@ -805,13 +802,13 @@ public class UserProdService extends BaseBusiService implements IUserProdService
 		for(String userId : userIdList){
 			UserDto user = userComponent.queryUserById(userId);
 			if(user == null){
-				throw new ServiceException("用户不存在,用户ID: " + userId);
+				throw new ServicesException("用户不存在,用户ID: " + userId);
 			}
 			
 			expressionUtil.setCuser(user);
 			CProd prod = expressionUtil.orderPord(prodId);
 			if(prod == null){
-				throw new ServiceException("未订购该产品,用户ID: " + userId);
+				throw new ServicesException("未订购该产品,用户ID: " + userId);
 			}
 			
 			//如果是基本包，且用户下无其他基本包，则不能退订
@@ -826,14 +823,14 @@ public class UserProdService extends BaseBusiService implements IUserProdService
 					}
 				}
 				if(flag){
-					throw new ServiceException("该产品为基本包,用户下已无基本包,无法退订,用户ID: " + userId);
+					throw new ServicesException("该产品为基本包,用户下已无基本包,无法退订,用户ID: " + userId);
 				}
 			}
 			
 			AcctitemDto acctitem = acctComponent.queryAcctItemByUserId(user.getUser_id(), prodId);
 			if (acctitem.getReal_balance().intValue() < 0
 					&& acctitem.getOrder_balance().intValue() != acctitem.getReal_balance().intValue() * -1) {
-				throw new ServiceException("用户账目欠费,无法退订,用户ID: " + userId);
+				throw new ServicesException("用户账目欠费,无法退订,用户ID: " + userId);
 			}
 			
 			Integer doneCode = doneCodeComponent.gDoneCode();
@@ -1572,7 +1569,7 @@ public class UserProdService extends BaseBusiService implements IUserProdService
 			if(prodTariffDto.size() > 0){
 				changeTariff(prod.getProd_sn(), prodTariffDto.get(0).getTariff_id(), tariffStartDate, "", true, true, doneCode);
 			}else{
-				throw new ServiceException("没有匹配的资费信息，资费修改失败!");
+				throw new ServicesException("没有匹配的资费信息，资费修改失败!");
 			}
 		}
 		

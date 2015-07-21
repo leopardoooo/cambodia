@@ -4,7 +4,6 @@ package com.ycsoft.business.service;
 import java.util.Date;
 import java.util.List;
 
-import com.bjdv.bean.RechargeRes;
 import com.ycsoft.beans.config.TBusiFee;
 import com.ycsoft.beans.core.user.CUser;
 import com.ycsoft.beans.core.user.CUserPropChange;
@@ -279,7 +278,8 @@ public interface IUserService extends IBaseService{
 	 * @param rechargeCard	充值卡密码
 	 * @throws Exception
 	 */
-	public RechargeRes saveRechargeCard(String icCard,String rechargeCard) throws Exception;
+	@Deprecated
+	public void saveRechargeCard(String icCard,String rechargeCard) throws Exception;
 	
 	/**
 	 * 获取宽带登录账号
