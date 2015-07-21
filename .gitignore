@@ -27,3 +27,7 @@ release.properties
 
 # MAC #
 .DS_Store
+
+# LOG #
+.LOG
+.log
