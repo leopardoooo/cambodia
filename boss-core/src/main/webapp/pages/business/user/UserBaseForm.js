@@ -546,7 +546,7 @@ BandUserForm = Ext.extend( Ext.Panel, {
 		}
 		var login_name = Ext.getCmp('login_name_id');
 		Ext.Ajax.request({
-			async: false,
+			//async: false,
 			url : Constant.ROOT_PATH+"/core/x/User!createLoginName.action",
 			params:{
 				loginName : App.getData().custFullInfo.cust.cust_name
@@ -655,7 +655,7 @@ UserBaseForm = Ext.extend( BaseForm , {
 		Ext.Ajax.request({
 			url : Constant.ROOT_PATH+"/commons/x/QueryParam!querySingleAddress.action",
 			params:{addrId:addrId},scope:this,
-			async:false,
+			//async:false,
 			timeout:99999999999999,//12位 报异常
 			success:function(res,opt){
 				var add = Ext.decode(res.responseText);
@@ -1009,7 +1009,7 @@ UserBaseForm = Ext.extend( BaseForm , {
 		if(Ext.isEmpty(value))return;
 		
 		Ext.Ajax.request({
-			async: false,
+			//async: false,
 			url:Constant.ROOT_PATH + "/core/x/Cust!queryUseableDevice.action",
 			params:{
 				deviceType:deviceType,
@@ -1101,7 +1101,7 @@ UserBaseForm = Ext.extend( BaseForm , {
 		}
 		if(value){
 			Ext.Ajax.request({
-				async: false,
+				//async: false,
 				url:Constant.ROOT_PATH + "/core/x/Cust!queryUseableDevice.action",
 				params:{
 					deviceCode:value,
@@ -1121,7 +1121,7 @@ UserBaseForm = Ext.extend( BaseForm , {
 		var value = txt.getValue();
 		if(value){
 			Ext.Ajax.request({
-				async: false,
+				//async: false,
 				url : Constant.ROOT_PATH+"/core/x/User!checkLoginName.action",
 				params:{
 					loginName : value

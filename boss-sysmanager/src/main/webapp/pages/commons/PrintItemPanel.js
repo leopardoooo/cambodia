@@ -212,7 +212,7 @@ PrintItemPanel = Ext.extend(Ext.form.CompositeField,{
 		Ext.Ajax.request({
 			url : root + '/config/PubAcctItem!queryAllPrintitems.action' ,
 			scope : this,
-			async: false,
+			async: true,
 			success : function(res,opt){
 				var data = Ext.decode(res.responseText);
 				this.printitemStore.loadData(data);
