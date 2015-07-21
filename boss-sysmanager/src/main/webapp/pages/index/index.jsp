@@ -5,11 +5,12 @@
 <% 
 	String root = request.getContextPath(),
 		   boss_res = Environment.ROOT_PATH_BOSS_LOGIN,
-		   sub_system_id=request.getParameter("sub_system_id");
+		   sub_system_id=request.getParameter("sub_systemß_id");
 	String optr = session.getAttribute(
 		Environment.USER_IN_SESSION_NAME).toString();//当前登录用户信息
 	String nowDate = DateHelper.formatNowTime();	
 	String basePath = request.getLocalAddr()+":"+request.getServerPort();
+	String lang = session.getAttribute(Environment.USER_IN_SESSION_LANG).toString();
 %>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
@@ -38,6 +39,7 @@
      <script type="text/javascript"> var root = '<%=root %>',token_id ='${param.tokenId }';</script>
      <script type="text/javascript"> var sub_system_id ='${param.sub_system_id }';</script>
 	 <script type="text/javascript"> var optr = '<%=optr%>';</script>
+	 
   </head>
   <body style="overflow: hide;">
   	
@@ -51,6 +53,10 @@
 	<script type="text/javascript" src="<%=boss_res %>/components/ext3/ext-all.js" ></script>
 	<script type="text/javascript" src="<%=boss_res %>/components/ext3/ext-lang-zh_CN.js" ></script>
 	
+    <script type="text/javascript" src="<%=boss_res%>/i18n/<%=lang %>/ext-lang.js"></script>
+	<script type="text/javascript" src="<%=boss_res%>/i18n/<%=lang %>/resouces-lang.js"></script>
+	<script type="text/javascript" src="<%=boss_res%>/i18n/<%=lang %>/boss-core-lang.js"></script>
+	<script type="text/javascript" src="<%=boss_res%>/i18n/langUtils.js"></script>
      
 	<script type="text/javascript" src="<%=boss_res %>/components/ext3/ux/CheckColumn.js"></script>
   	<script type="text/javascript" src="<%=boss_res %>/components/ext3/ux/SearchField.js"></script>	
