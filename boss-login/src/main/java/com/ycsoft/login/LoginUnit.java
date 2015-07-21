@@ -71,9 +71,8 @@ public class LoginUnit extends HttpServlet {
 			}
 			String lang = request.getParameter("lang");
 			SsoDto optr = null;
-			List<SsoDto> ssoList =checkLogin(loginName);
+			List<SsoDto> ssoList = checkLogin(loginName);
 			if(ssoList.size() == 0){
-				
 			}else if(ssoList.size() == 1){
 				optr = ssoList.get(0);
 			}else{
