@@ -5,7 +5,7 @@
 <% 
 	String root = request.getContextPath(),
 		   boss_res = Environment.ROOT_PATH_BOSS_LOGIN,
-		   sub_system_id=request.getParameter("sub_systemß_id");
+		   sub_system_id=request.getParameter("sub_system_id");
 	String optr = session.getAttribute(
 		Environment.USER_IN_SESSION_NAME).toString();//当前登录用户信息
 	String nowDate = DateHelper.formatNowTime();	
@@ -114,7 +114,8 @@
 	<script type="text/javascript" src="<%=boss_res %>/components/ext3/ux/LockingGridView.js"></script>
 
 	<!-- 系统管理系统 -->
-	<%if("2".equals(sub_system_id)){ %>
+	<%
+	if("2".equals(sub_system_id)){ %>
 		<jsp:include page = "/pages/index/systemLibrary.jsp" />
 	<!-- 仓库管理系统 -->
 	<%}else if("5".equals(sub_system_id)){ %>

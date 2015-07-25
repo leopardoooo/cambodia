@@ -62,11 +62,12 @@ NavigationMenu = Ext.extend( Ext.Panel , {
 		//不存在，则添加到tabpanel中;存在则激活它，不重新加载
 		if(Ext.isEmpty(panel)){
 			var obj = eval(window[d.handler]);
+			
 			panel = new obj();
 			App.main.add(panel);
 			//添加操作员正在使用的功能
 			if(d.handler!='optrManage')
-			App.addOnlineUser(d);
+				App.addOnlineUser(d);
 			App.main.nodes.push(d.handler);
 		}
 		App.main.activate(panel);

@@ -176,12 +176,12 @@ public class BaseDeviceComponent extends BaseComponent {
 		String type = d.getDevice_type();
 		String deviceCode = d.getDevice_code();
 		String pairDeviceCode = d.getPair_device_code();
-		if(type.equals(SystemConstants.DEVICE_TYPE_CARD)&&deviceCode.length()!= 16){
-			 throw new ComponentException("该智能卡号【"+deviceCode+"】不符合标准16位!");
-		}
-		if(type.equals(SystemConstants.DEVICE_TYPE_STB)&& StringHelper.isNotEmpty(pairDeviceCode)&&pairDeviceCode.length()!= 16){
-			 throw new ComponentException("该智能卡号【"+pairDeviceCode+"】不符合标准16位!");
-		}
+//		if(type.equals(SystemConstants.DEVICE_TYPE_CARD)&&deviceCode.length()!= 16){
+//			 throw new ComponentException("该智能卡号【"+deviceCode+"】不符合标准16位!");
+//		}
+//		if(type.equals(SystemConstants.DEVICE_TYPE_STB)&& StringHelper.isNotEmpty(pairDeviceCode)&&pairDeviceCode.length()!= 16){
+//			 throw new ComponentException("该智能卡号【"+pairDeviceCode+"】不符合标准16位!");
+//		}
 		
 		Pattern p = Pattern.compile("[^a-zA-Z0-9]"); 
 		Matcher m = p.matcher(deviceCode); 
