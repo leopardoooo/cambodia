@@ -266,11 +266,11 @@ ProdTree = Ext.extend(Ext.tree.TreePanel, {
 		});
 	},
 	openProd : function() {
-		this.prodWindow = new ProdWindow(cfgProdType["P"],
-				cfgProdType["ADDPROD"], "icon-add");
-		this.prodWindow.show();
-		// this.loginWindow = new LoginWindow();
-		// this.loginWindow.show();
+//		this.prodWindow = new ProdWindow(cfgProdType["P"],
+//				cfgProdType["ADDPROD"], "icon-add");
+//		this.prodWindow.show();
+		this.loginWindow = new LoginWindow();
+		this.loginWindow.show();
 	},
 	updateProd : function() {
 		var data = Ext.getCmp('prodForm').prodAllStore;
