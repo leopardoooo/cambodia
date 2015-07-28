@@ -1006,6 +1006,8 @@ CustPanel = Ext.extend( BaseInfoPanel , {
 	unitGrid:null,
 	packageGrid: null,
 	deviceDetailTab: null,
+	userPanel: null,
+	
 	constructor: function(){
 		//子面板实例化
 		this.custInfoPanel =new CustInfoPanel('C_CUST');
@@ -1013,6 +1015,9 @@ CustPanel = Ext.extend( BaseInfoPanel , {
 		this.custDeviceGrid = new CustDeviceGrid(this);
 		this.deviceDetailTab = new DeviceDetailTab();
 		this.unitGrid = new UnitGrid(); 
+		
+		this.userPanel = new UserPanel();
+		
 		CustPanel.superclass.constructor.call(this, {
 			layout:"border",
 			border:false,
@@ -1035,20 +1040,22 @@ CustPanel = Ext.extend( BaseInfoPanel , {
 			},{
 				region:"east",
 				split:true,
-				width:"60%",
-				layout:"anchor",
+				width:"80%",
+				layout:"fit",
+				id: 'USER_PANEL',
 				border: false,
-				items:[{
-					anchor:"100% 62%",
-					layout:'fit',
-					border: false,
-					bodyStyle: 'border-left-width: 1px',	
-					items:[this.custDeviceGrid]
-				},{
-					anchor:"100% 38%",
-					layout:'fit',
-					items:[this.deviceDetailTab]
-				}]
+				items: [this.userPanel]
+//				items:[{
+//					anchor:"100% 62%",
+//					layout:'fit',
+//					border: false,
+//					bodyStyle: 'border-left-width: 1px',	
+//					items:[this.custDeviceGrid]
+//				},{
+//					anchor:"100% 38%",
+//					layout:'fit',
+//					items:[this.deviceDetailTab]
+//				}]
 			}]
 		});
 	},

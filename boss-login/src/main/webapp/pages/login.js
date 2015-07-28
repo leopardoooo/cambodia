@@ -74,6 +74,8 @@ Ext.apply( Login , {
 		});
 	},
 	openUrl: function( url ){
+		window.location.href = url;
+		return;
 		var width = screen.width - 10;
 		var height = screen.height - 60;
 		var property = 'left=1,top=1,resizable=no,status=no,menubar=no,scrollbars=no,location=no,toolbar=no,' +
