@@ -36,7 +36,7 @@ UserBaseForm = Ext.extend( BaseForm , {
 						xtype:'paramcombo',
 						width:150,
 						allowBlank:false,
-						hiddenName:'user_type',
+						id: 'boxUserType',
 						paramName:'USER_TYPE',
 						listeners:{
 							scope:this,
@@ -49,7 +49,7 @@ UserBaseForm = Ext.extend( BaseForm , {
 						xtype:'paramcombo',
 						allowBlank:false,
 						width:150,
-						hiddenName:'stop_type',
+						id:'boxStopType',
 						paramName:'STOP_TYPE',
 						defaultValue:'KCKT'
 					}]
@@ -72,6 +72,7 @@ UserBaseForm = Ext.extend( BaseForm , {
 						xtype: 'checkbox',
 					    labelWidth: 120,
 					    fieldLabel: "施工回填",
+					    id: "boxTaskEl",
 					    checked: true,
 					    listeners:{
 			            	scope: this,
@@ -113,12 +114,16 @@ UserBaseForm = Ext.extend( BaseForm , {
 						hiddenName:'device_model',
 						paramName:'DEVICE_MODEL',
 						id: 'deviceCategoryEl',
-						name:'device_model_text'
+						name:'device_model_text',
+						listeners: {
+							scope: this,
+							change: this.doBuyModeSelect
+						}
 					},{
 						xtype: 'displayfield',
 			            fieldLabel: '费用名称',
 			            width : 150,
-			            disabled: true
+			            id: 'dfFeeNameEl'
 					}]
 				},{
 					items:[{
@@ -134,12 +139,16 @@ UserBaseForm = Ext.extend( BaseForm , {
 						valueField : 'buy_mode',
 						emptyText: '请选择',
 						allowBlank : false,
-						editable : false
+						editable : false,
+						listeners: {
+							scope: this,
+							change: this.doBuyModeSelect
+						}
 					},{
-						fieldLabel:'收费金额',
-						xtype:'textfield',
+						fieldLabel:'收费金额$',
+						xtype:'numberfield',
 						width:150,
-						allowBlank:false
+						id: 'txtFeeEl'
 					}]
 				}]
 			},{
@@ -147,15 +156,14 @@ UserBaseForm = Ext.extend( BaseForm , {
 				xtype: 'displayfield',
 			    labelWidth: 120,
 			    height: 50,
-			    disabled: true,
+			    id: 'dfProtocolInfoEl',
 			    fieldLabel: "协议信息"
 			},{
 			    xtype:'fieldset',
 			    width: '100%',
 		        style: 'margin: 0 22px 0 38px;padding: 10px 0;',
 			    layout:'column',
-			    title: 'OTT移动终端',
-			    id: 'ottMobileFieldSet',
+			    id: 'tmpFieldSet',
 			    labelWidth: 50,
 			    defaults: {
 			    	bodyStyle:'background:#F9F9F9;padding-top:4px',
@@ -165,298 +173,286 @@ UserBaseForm = Ext.extend( BaseForm , {
 			    items: [{
 			        items :[{
 			        	xtype: "textfield",
+			        	id: "txtLoginName",
 		                fieldLabel: '账号'
 		            }]
 			    },{
 			    	style: 'margin-left: 38px;',
 			    	items :[{
 			    		xtype: 'textfield',
-		                fieldLabel: '密码'
-		            }]
-			    }]
-			},{
-			    xtype:'fieldset',
-			    width: '100%',
-		        style: 'margin: 0 22px 0 38px;padding: 10px 0;',
-			    layout:'column',
-			    id: 'bandFieldSet',
-			    title: '宽带信息',
-			    labelWidth: 50,
-			    defaults: {
-			    	bodyStyle:'background:#F9F9F9;padding-top:4px',
-			        layout: 'form',
-			        border: false
-			    },
-			    items: [{
-			        items :[{
-			        	xtype: "displayfield",
-			        	value: 'kjfdhakfdha',
-		                fieldLabel: '账号'
-		            }]
-			    },{
-			    	style: 'margin-left: 78px;',
-			    	items :[{
-			    		xtype: 'textfield',
-			    		value: '123456',
+			    		id: "txtLoginPswd",
 		                fieldLabel: '密码'
 		            }]
 			    }]
 			}]
 		});
-		
 	},
 	// 施工回填
 	doCheckedChangeTask: function(box, checked){
 		if(checked){
 			var deviceCategoryEl = Ext.getCmp("deviceCategoryEl");
-			deviceCategoryEl.enable(true);
+			deviceCategoryEl.setEditable(true);
 			var deviceCodeEl = Ext.getCmp("deviceCodeEl");
 			deviceCodeEl.disable(true);
 		}else{
 			var deviceCategoryEl = Ext.getCmp("deviceCategoryEl");
-			deviceCategoryEl.disable(true);
+			deviceCategoryEl.setEditable(false);
 			var deviceCodeEl = Ext.getCmp("deviceCodeEl");
 			deviceCodeEl.enable(true);
 		}
 	},
 	doSelectUserType: function(c,r,i){
 		var type = c.getValue();
-		
-		var omfs = Ext.getCmp("ottMobileFieldSet"),
-			bfs = Ext.getCmp("bandFieldSet");
+		var fs = Ext.getCmp("tmpFieldSet");
+		fs.setTitle(type);
 		if(type === "BAND"){
-			bfs.setVisible(true);
-			omfs.setVisible(false);
+			// 账号规则，受理号 + 两位序号，不够补零
+			var users = App.getApp().users;
+			var bandCount = 0;
+			for(var i =0 ;i< users.length ; i++){
+				if(users[i]["user_type"] === "BAND"){
+					bandCount ++;
+				}
+			}
+			bandCount ++;
+			if(bandCount < 10){
+				bandCount = "0" + bandCount;
+			}
+			
+			// 密码，默认证件号后六位
+			var certNum = App.getApp().custFullInfo.cust.linkman.cert_num;
+			var newPswd = certNum.substr(certNum - 6);
+			Ext.getCmp("txtLoginName").setValue(App.getApp().custFullInfo.cust.cust_no + bandCount);
+			Ext.getCmp("txtLoginPswd").setValue(newPswd);
+			
+			fs.setVisible(true);
 		}else if(type === "OTT_MOBILE"){
-			omfs.setVisible(true);
-			bfs.setVisible(false);
+			fs.setVisible(true);
 		}else{
-			bfs.setVisible(false);
-			omfs.setVisible(false);
+			fs.setVisible(false);
 		}
-		// 过滤设备类型
-		this.doFilterDeviceModel(type);
 		
+		// 手机终端
+		if(type === "OTT_MOBILE"){
+			this.setDisplayItems(false);
+		}else{
+			this.setDisplayItems(true);
+			// 过滤设备类型
+			this.doFilterDeviceModel(type);
+		}
+		
+		// 表单重置
+		Ext.getCmp("deviceCodeEl").setValue("");
+		Ext.getCmp("deviceBuyMode").setRawValue("");
+		Ext.getCmp("txtFeeEl").setRawValue("");
+		Ext.getCmp("dfFeeNameEl").setRawValue("");
 	},
+	setDisplayItems: function(bool){
+		var elArr = [ "boxTaskEl", "deviceCodeEl", "deviceCategoryEl", "dfFeeNameEl",
+		              "deviceBuyMode", "txtFeeEl", "dfProtocolInfoEl" ];
+		for(var i = 0 ; i< elArr.length; i++){
+			Ext.get(elArr[i]).up('.x-form-item').setDisplayed(bool);
+		}
+	},
+	// 后台为了简单，直接在数据字典加了个类型
+	// 于是将OTT=1，DTT=2,BAND = 3
+	deviceDataBak: null,
 	doFilterDeviceModel: function(userType){
-		alert("过滤类型：" + userType);
+		var REF = {"OTT": "1", "DTT": "2", "BAND": "3" }
+		var type = REF[userType] || "";
+		var cmb = Ext.getCmp("deviceCategoryEl");
+		cmb.setRawValue("");
+		cmb.focus();
+		cmb.expand();
+		var store = cmb.getStore();
 		// 先清除过滤
+		if(!this.deviceDataBak){
+			this.deviceDataBak = [];
+			store.each(function(rs){
+				this.deviceDataBak.push(rs.data);
+			}, this);
+		}
+		var data = [];
+		// 开始过滤
+		for(var i = 0; i < this.deviceDataBak.length; i++){
+			if(this.deviceDataBak[i]["item_idx"] == type){
+				data.push(this.deviceDataBak[i]);
+			}
+		}
+		store.loadData(data);
 	},
 	//设备号发生变化
 	doDeviceCodeChange : function(field){
 		var v = field.getValue().trim();
+		var currUserTypeBox = Ext.getCmp("boxUserType");
+		var currUserType = currUserTypeBox.getValue();
 		if(!v)return ;
+		if(!currUserType){
+			Alert("请先选择用户类型!");
+			currUserTypeBox.focus();
+			currUserTypeBox.expand();
+			field.setValue("");
+			return;
+		}
 		Ext.Ajax.request({
 			scope : this,
 			url : root + '/commons/x/QueryDevice!queryDevice.action',
-			params : {
-				deviceCode: v
-			},
+			params : { deviceCode: v },
 			success : function(response,opts){
 				var obj = Ext.decode(response.responseText);
 				if(!obj.success){
 					Alert(obj.simpleObj);
+					field.setRawValue("");
 					return ;
 				}
-				
-				// 
+				var data = obj.simpleObj;
+				var dtype = data["device_type"];
+				if(dtype === "STB"){
+					// 单双向
+					var subType = data["deviceModel"]["interactive_type"]
+					if(subType === "SINGLE"){
+						if(currUserType !== "DTT"){
+							Alert("此设备为单向机顶盒，不支持当前的DTT用户类型");
+							field.setRawValue("");
+							return ;
+						}
+					}else if(currUserType !== "OTT"){
+						Alert("此设备为双向机顶盒，不支持当前的OTT用户类型");
+						field.setRawValue("");
+						return ;
+					}
+				}else if(dtype === "MODEM" ){
+					if(currUserType !== ""){
+						Alert("设备为Modem猫，不支持所选"+ currUserType +"用户类型");
+						field.setRawValue("");
+						return;
+					}
+				}else{
+					Alert("此设备不支持当前的用户类型!");
+					field.setRawValue("");
+					return;
+				}
+				var box = Ext.getCmp("deviceCategoryEl");
+				box.getStore().loadData([{
+					item_name: data["device_model_text"],
+					item_value: data["device_model"]
+				}]);
+				box.setValue(data["device_model_text"]);
+			}
+		});
+	},
+	// 查找设备费用
+	currentFeeData: null,
+	doBuyModeSelect : function(){
+		var deviceModelValue = Ext.getCmp("deviceCategoryEl").getValue();
+		var deviceBuyModeValue = Ext.getCmp("deviceBuyMode").getValue();
+		
+		if(!deviceModelValue || !deviceBuyModeValue){
+			return ;
+		}
+		Ext.Ajax.request({
+			scope : this,
+			url : root + '/commons/x/QueryDevice!queryDeviceFee.action',
+			params : {
+				deviceModel : deviceModelValue,
+				buyMode : deviceBuyModeValue
+			},
+			success : function(res,opt){
+				var data = Ext.decode(res.responseText);
+				var dfFeeName = Ext.getCmp("dfFeeNameEl");
+				var txtFee = Ext.getCmp("txtFeeEl");
+				if(data && data.length > 0 ){
+					data = data[0];
+					dfFeeName.setValue(data["fee_name"]);
+					txtFee.setValue(data["fee_value"]/100.0);
+					txtFee.setMaxValue(data["max_fee_value"]/100.0);
+					txtFee.setMinValue(data["min_fee_value"]/100.0);
+					txtFee.clearInvalid();
+					this.currentFeeData = data;
+				}else{
+					dfFeeName.setValue("--");
+					txtFee.setValue(0.00);
+					txtFee.setMaxValue(0);
+					txtFee.setMinValue(0);
+					this.currentFeeData = null;
+				}
 			}
 		});
 	},
 	doInit:function(){
 		UserBaseForm.superclass.doInit.call(this);
-		Ext.getCmp("ottMobileFieldSet").setVisible(false);
-		Ext.getCmp("bandFieldSet").setVisible(false);
-	},
-	//获取终端限制数量的数据
-	doConfigsData: function(){
-		//客户类别
-		var custType = App.getData().custFullInfo.cust.cust_type;
-		var data = App.getApp().findAllTerminalAmount();
-		for(var i=0;i<data.length;i++){
-			if(data[i].cust_type == custType && data[i].user_type == 'DTV'){
-				this.configs.push(data[i]);
-			}
-		}
-	},
-	//默认为新增的扩展信息
-	doInitAttrForm: function(group){
-		var cfg = [{
-	   	   columnWidth: .5,
-	   	   layout: 'form',
-	   	   baseCls: 'x-plain',
-	   	   labelWidth: 90
-	    },{
-		   columnWidth: .5,
-		   layout: 'form',
-		   baseCls: 'x-plain',
-		   labelWidth: 90
-	    }];
-	    //扩展信息面板
-		this.extAttrForm = ExtAttrFactory.gExtForm({
-			tabName: Constant.C_USER,
-			group: group,
-			prefixName : ''
-		}, cfg,this,this.doExtAttrFunc); 
-	},
-	doExtAttrFunc: function(){	//扩展属性添加并加载值后，触发(paramcombo)
-		var servTypeComp = Ext.getCmp('serv_type_id');
-		if(servTypeComp){
-			this.doVodUserType(servTypeComp.getValue());
-		}
-	},
-	doVodUserType: function(servType){
-		var vodUserType = this.getForm().findField('str11');
-		if(vodUserType){
-			//不是用户开用，已经有值的，不重新设置
-			//修改用户资料、用户等级时，有值，不重新设置
-			if(App.getApp().getData().currentResource.busicode == '1020' 
-				|| Ext.isEmpty(vodUserType.getValue())){
-				if(servType == 'DOUBLE'){
-					vodUserType.setValue('PUBLIC');
-					vodUserType.enable();
-					vodUserType.allowBlank = false;
-				}else{
-					vodUserType.setValue('');
-					vodUserType.allowBlank = true;
-					vodUserType.clearInvalid();
-					vodUserType.disable();
-				}
-			}
-		}
-		var SingleCardType = this.getForm().findField('str1');
-		if(SingleCardType){
-			//不是用户开用，已经有值的，不重新设置
-			//修改用户资料、用户等级时，有值，不重新设置
-			if(App.getApp().getData().currentResource.busicode == '1020' 
-				|| Ext.isEmpty(SingleCardType.getValue())){
-				if(servType == 'DOUBLE'){
-					SingleCardType.setValue('');
-					SingleCardType.clearInvalid();
-					SingleCardType.disable();
-				}else{
-					SingleCardType.enable();
-				}
-			}
-		}
+		Ext.getCmp("tmpFieldSet").setVisible(false);
 	},
 	doValid : function(){
-		var obj = {};
-		if(this.oldUsertype == 'DTV'){
-			if(Ext.getCmp('serv_type_id').getValue() == 'DOUBLE' 
-				&& this.interactiveType != 'DOUBLE' ){//双向服务，但机顶盒类型是单向
-				obj["isValid"] = false;
-				obj["msg"] = "请输入交互方式为双向的机顶盒";
-				return obj;
-			}
-			if(Ext.getCmp('serv_type_id').getValue() == 'DOUBLE' 
-				&& this.getForm().findField('str11')!=null && this.getForm().findField('str11').getValue() == '' ){//双向服务，双向用户类型不能为空
-				obj["isValid"] = false;
-				obj["msg"] = "请选择双向用户类型";
-				return obj;
-			}
-			if(Ext.isEmpty(Ext.getCmp('dtv_stb_id').getValue())){
-				
-				if (this.getForm().isValid()){
-					obj["isValid"] = true;
-					this.confirmMsg = "确定不输入机顶盒？";
-					this.yesBtn = false;
-					this.isCloseBigWin = false;
-				}else{
-					obj["isValid"] = false;
-					obj["msg"] = "含有验证不通过的输入项";
-				}
-				return obj;
-			}else{
-				this.confirmMsg = null;
+		var formValid =  UserBaseForm.superclass.doValid.call(this);
+		if(formValid !== true){
+			return formValid;
+		}
+		var boxUserType = Ext.getCmp("boxUserType");
+		var boxTask = Ext.getCmp("boxTaskEl");
+		var deviceCodeEl = Ext.getCmp("deviceCodeEl");
+		var deviceCategoryEl = Ext.getCmp("deviceCategoryEl");
+		var deviceBuyMode = Ext.getCmp("deviceBuyMode");
+		var txtFeeEl = Ext.getCmp("txtFeeEl");
+		var deviceCodeEl = Ext.getCmp("deviceCodeEl");
+		
+		// 设备回填
+		if(boxTask.checked && !deviceCodeEl.getValue()){
+			return {
+				"isValid": false,
+				"msg": "当设备没有选择施工回填时，设备编码是必须输入的"
 			}
 		}
 		
-		return UserBaseForm.superclass.doValid.call(this);
+		//设备费用检查
+		var fd = this.currentFeeData;
+		if(fd){
+			var maxfee = parseFloat(fd["min_fee_value"])/100.0;
+			var minfee = parseFloat(fd["max_fee_value"])/100.0;
+			var feeValue = parseFloat(txtFeeEl.getValue());
+			if(feeValue < minfee || feeValue > maxfee){
+				return {
+					isValid: false,
+					msg: "设备费用必须介于"+ minfee +"-" +maxfee +"之间"
+				};
+			}
+		}
+		
+		return true;
 	},
 	getValues : function(){
-		var values = this.getForm().getValues();
+		var values = {};
+		// 基本参数
+		values["user.user_type"] = Ext.getCmp("boxUserType").getValue(),
+		values["user.stop_type"] = Ext.getCmp("boxStopType").getValue(),
+		values["user.login_name"] = Ext.getCmp("txtLoginName").getValue(),
+		values["user.password"] = Ext.getCmp("txtLoginPswd").getValue(),
 		
-		var userType = values.user_type;//用户类型
-		var obj={};
-		var type;
-		if(userType == 'ATV'){
-			type="userAtv";
-		}else if(userType == 'DTV'){
-			type="userDtv";
-			values['terminal_type']=Ext.getCmp('terminal_type_id').getValue();
-		}else if(userType == 'BAND'){
-			type="userBroadband";
-		}
-		//根据不同用户类型，给需要的属性添加前缀，以供后台action中组合不同对象
-		for(var i in values){
-			if(i.indexOf(CoreConstant.Ext_FIELDNAME_PREFIX)==-1
-				&& i.indexOf('.')==-1)//去除扩展form字段和属性中有"."的
-				obj[type+'.'+i]=values[i];
-		}
-		return obj;
+		// 设备信息
+		values["deviceId"] = Ext.getCmp("deviceCodeEl").getValue();
+		values["deviceModel"] = Ext.getCmp("deviceCategoryEl").getValue();
+		values["deviceBuyMode"] = Ext.getCmp("deviceBuyMode").getValue();
+		
+		// 设备费用
+		var fee = this.currentFeeData;
+		values["deviceFee.fee_id"] = fee["fee_id"];
+		values["deviceFee.fee_std_id"] = fee["fee_std_id"];
+		values["deviceFee.fee"] = Ext.getCmp("txtFeeEl").getValue();
+		return values;
+	},
+	getFee: function(){
+		return Ext.getCmp("txtFeeEl").getValue();
 	}
 })
 
 /**
  * 新建用户
- * @class NewUserForm
- * @extends UserBaseForm
  */
 NewUserForm = Ext.extend(UserBaseForm , {
 	url : Constant.ROOT_PATH+"/core/x/User!createUser.action",
-	doValid : function(){
-		var stbCombo = Ext.getCmp('dtv_stb_id');
-		var cardCombo = Ext.getCmp('dtv_card_id');
-		var modemCombo = Ext.getCmp('modemMac');
-		if(stbCombo && stbCombo.hasFocus){
-			this.checkDevice(stbCombo,'STB',cardCombo);
-			if(stbCombo.checked != true){
-				var obj = {};
-				obj["isValid"] = false;
-				obj["msg"] = "机顶盒有问题，请在验证后保存";
-				return obj;
-			}
-		}
-		if(cardCombo && cardCombo.hasFocus){
-			this.checkCardDevice(cardCombo);
-			if(cardCombo.checked != true){
-				var obj = {};
-				obj["isValid"] = false;
-				obj["msg"] = "智能卡有问题，请在验证后保存";
-				return obj;
-			}
-		}
-		if(modemCombo && modemCombo.hasFocus){
-			this.checkDevice(modemCombo,'MODEM');
-			if(modemCombo.checked != true){
-				var obj = {};
-				obj["isValid"] = false;
-				obj["msg"] = "MODEM有问题，请在验证后保存";
-				return obj;
-			}
-		}
-		
-		return NewUserForm.superclass.doValid.call(this);
-	},
 	success : function(form,res){
 		var userId = res.simpleObj;
-		//清空参数
-//		App.getData().busiTaskToDo = [];
-		var orderProd = App.getData().busiTask['OrderProd'];
-		orderProd['callback'] = {
-			fn : App.getApp().selectRelativeUser,
-			params : [userId]
-		};
-//		
-//		var newUser = App.getData().busiTask['NewUser'];
-//		
-//		//跳转业务订购产品
-//		App.getData().busiTaskToDo.push(newUser);
-//		App.getData().busiTaskToDo.push(orderProd);
-		
 		App.getApp().refreshPanel(App.getApp().getData().currentResource.busicode);
-		
 	}
 });
 
