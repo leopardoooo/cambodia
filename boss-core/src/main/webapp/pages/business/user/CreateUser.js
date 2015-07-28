@@ -207,10 +207,11 @@ UserBaseForm = Ext.extend( BaseForm , {
 		fs.setTitle(type);
 		if(type === "BAND"){
 			// 账号规则，受理号 + 两位序号，不够补零
-			var users = App.getApp().users;
+			var users = App.getApp().data.users||[];
 			var bandCount = 0;
-			for(var i =0 ;i< users.length ; i++){
-				if(users[i]["user_type"] === "BAND"){
+			alert(users.length);	
+			for(var index =0 ;index<users.length ; index++){
+				if(users[index]["user_type"] === "BAND"){
 					bandCount ++;
 				}
 			}
@@ -220,9 +221,8 @@ UserBaseForm = Ext.extend( BaseForm , {
 			}
 			
 			// 密码，默认证件号后六位
-			var certNum = App.getApp().custFullInfo.cust.linkman.cert_num;
-			var newPswd = certNum.substr(certNum - 6);
-			Ext.getCmp("txtLoginName").setValue(App.getApp().custFullInfo.cust.cust_no + bandCount);
+			var newPswd = App.getApp().data.custFullInfo.cust.password;
+			Ext.getCmp("txtLoginName").setValue(App.getApp().data.custFullInfo.cust.cust_no + bandCount);
 			Ext.getCmp("txtLoginPswd").setValue(newPswd);
 			
 			fs.setVisible(true);
