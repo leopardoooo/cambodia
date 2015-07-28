@@ -32,7 +32,7 @@ public class SItemvalueDao extends BaseEntityDao<SItemvalue> {
 	}
 
 	public List<SItemvalue> findAllViewDict() throws JDBCException{
-		String sql = "select item_key, item_name, item_value,show_county_id from vew_dict order by item_key,item_idx";
+		String sql = "select item_key, item_name, item_value,show_county_id,item_idx from vew_dict order by item_key,item_idx";
 		return findList(sql);
 	}
 

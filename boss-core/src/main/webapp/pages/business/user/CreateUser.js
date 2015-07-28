@@ -138,7 +138,6 @@ UserBaseForm = Ext.extend( BaseForm , {
 						displayField : 'buy_mode_name',
 						valueField : 'buy_mode',
 						emptyText: '请选择',
-						allowBlank : false,
 						editable : false,
 						listeners: {
 							scope: this,
@@ -165,6 +164,7 @@ UserBaseForm = Ext.extend( BaseForm , {
 			    layout:'column',
 			    id: 'tmpFieldSet',
 			    labelWidth: 50,
+			    title: 'a',
 			    defaults: {
 			    	bodyStyle:'background:#F9F9F9;padding-top:4px',
 			        layout: 'form',
@@ -209,7 +209,6 @@ UserBaseForm = Ext.extend( BaseForm , {
 			// 账号规则，受理号 + 两位序号，不够补零
 			var users = App.getApp().data.users||[];
 			var bandCount = 0;
-			alert(users.length);	
 			for(var index =0 ;index<users.length ; index++){
 				if(users[index]["user_type"] === "BAND"){
 					bandCount ++;

@@ -32,7 +32,7 @@ Ext.ux.ParamCombo = Ext.extend(Ext.form.ComboBox, {
 		});
 
 		this.store = new Ext.data.JsonStore({
-			fields:['item_value','item_name','show_county_id'],
+			fields:['item_value','item_name','show_county_id','item_idx'],
 			autoDestroy:true,
 			baseParams:{paramName:this.paramName},
 			listeners:{

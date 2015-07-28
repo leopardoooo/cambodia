@@ -41,11 +41,11 @@ public class RDeviceFeeDao extends BaseEntityDao<RDeviceFee> {
 		String sql = " select t1.fee_id ,t3.fee_name, t1.default_value fee_value, t1.fee_std_id," +
 				"t1.max_value max_fee_value,t1.min_value min_fee_value"
 				+ " from t_busi_fee_std t1, (select a.* from t_busi_fee_device a "
-				+ " where a.device_type = ?  and a.device_model = ? "
+				+ " where  a.device_model = ? "
 				+ " and a.device_buy_mode = ?) t2,t_busi_fee t3 "
 				+ " where t1.fee_std_id = t2.fee_std_id and t1.fee_id=t3.fee_id "
 				+ " and t1.template_id = ? ";
-		return createQuery(sql,deviceType, deviceModel, buyMode,templateId).list();
+		return createQuery(sql,deviceModel, buyMode,templateId).list();
 	}
 
 	
