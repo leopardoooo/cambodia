@@ -55,27 +55,39 @@ UserBaseForm = Ext.extend( BaseForm , {
 					}]
 				}]
 			},{
+				xtype:'panel',
 				anchor:'100%',
-				xtype: 'compositefield',
-			    labelWidth: 120,
-			    fieldLabel: "设备编号",
-			    items: [{
-		            xtype: 'textfield',
-		            emptyText:'请输入设备编号..',
-		            disabled: true,
-		            flex: 1
-		        },{
-		            xtype: 'checkbox',
-		            boxLabel: "施工回填",
-		            checked: true,
-		            width: 84,
-		            listeners:{
-		            	scope: this,
-		            	check: function(box, checked){
-		            		alert(checked);
-		            	}
-		            }
-			    }]
+				layout:'column',
+				bodyStyle:'background:#F9F9F9;padding-top:4px',
+				baseCls: 'x-plain',
+				defaults: { 
+					layout: 'form',
+					baseCls: 'x-plain',
+					columnWidth:0.5,
+					anchor: '100%',
+					labelWidth:90
+				},
+				items: [{
+					items:[{
+						xtype: 'checkbox',
+					    labelWidth: 120,
+					    fieldLabel: "施工回填",
+					    checked: true,
+					    listeners:{
+			            	scope: this,
+			            	check: this.doCheckedChangeTask
+			            }
+					},]
+				},{
+					items:[{
+			            xtype: 'textfield',
+			            fieldLabel: '设备编码',
+			            width : 150,
+			            id: 'deviceCodeEl',
+			            emptyText: "输入设备编码..",
+			            disabled: true
+					}]
+				}]
 			},{
 				xtype:'panel',
 				anchor:'100%',
@@ -91,11 +103,21 @@ UserBaseForm = Ext.extend( BaseForm , {
 				},
 				items:[{
 					items:[{
-						fieldLabel:'设备类型',
-						xtype:'textfield',
-						disabled : true,
-						width:150
+						fieldLabel:'设备型号',
+						width : 150,
+						xtype:'paramcombo',
+						hiddenName:'device_model',
+						paramName:'DEVICE_MODEL',
+						id: 'deviceCategoryEl',
+						name:'device_model_text'
 					},{
+						xtype: 'displayfield',
+			            fieldLabel: '费用名称',
+			            width : 150,
+			            disabled: true
+					}]
+				},{
+					items:[{
 						fieldLabel:'购买方式',
 						xtype:'combo',
 						id : 'deviceBuyMode',
@@ -108,20 +130,7 @@ UserBaseForm = Ext.extend( BaseForm , {
 						valueField : 'buy_mode',
 						emptyText: '请选择',
 						allowBlank : false,
-						editable : false,
-						listeners:{
-							scope: this,
-							'beforequery' : this.loadBuyModeStore
-						}
-					}]
-				},{
-					items:[{
-						fieldLabel:'设备型号',
-						width : 150,
-						//style : Constant.TEXTFIELD_STYLE,
-						xtype:'textfield',
-						name:'device_model_text',
-						readOnly : true
+						editable : false
 					},{
 						fieldLabel:'收费金额',
 						xtype:'textfield',
@@ -131,34 +140,60 @@ UserBaseForm = Ext.extend( BaseForm , {
 				}]
 			},{
 				anchor:'96%',
-				xtype: 'textarea',
+				xtype: 'displayfield',
 			    labelWidth: 120,
 			    height: 50,
 			    disabled: true,
-			    fieldLabel: "协议信息",
-			    emptyText: "空空如也.."
+			    fieldLabel: "协议信息"
 			},{
 			    xtype:'fieldset',
-		        title: 'OTT_MOBILE',
-		        width: '100%',
+			    width: '100%',
 		        style: 'margin: 0 22px 0 38px;padding: 10px 0;',
 			    layout:'column',
-			    id: 'bandfieldSet',
+			    title: 'OTT移动终端',
+			    id: 'ottMobileFieldSet',
 			    labelWidth: 50,
 			    defaults: {
 			    	bodyStyle:'background:#F9F9F9;padding-top:4px',
 			        layout: 'form',
-			        border: false,
-			        defaultType: 'textfield'
+			        border: false
 			    },
 			    items: [{
 			        items :[{
+			        	xtype: "textfield",
 		                fieldLabel: '账号'
 		            }]
 			    },{
-			    	defaultType: 'textfield',
+			    	style: 'margin-left: 38px;',
+			    	items :[{
+			    		xtype: 'textfield',
+		                fieldLabel: '密码'
+		            }]
+			    }]
+			},{
+			    xtype:'fieldset',
+			    width: '100%',
+		        style: 'margin: 0 22px 0 38px;padding: 10px 0;',
+			    layout:'column',
+			    id: 'bandFieldSet',
+			    title: '宽带信息',
+			    labelWidth: 50,
+			    defaults: {
+			    	bodyStyle:'background:#F9F9F9;padding-top:4px',
+			        layout: 'form',
+			        border: false
+			    },
+			    items: [{
+			        items :[{
+			        	xtype: "displayfield",
+			        	value: 'kjfdhakfdha',
+		                fieldLabel: '账号'
+		            }]
+			    },{
 			    	style: 'margin-left: 78px;',
 			    	items :[{
+			    		xtype: 'textfield',
+			    		value: '123456',
 		                fieldLabel: '密码'
 		            }]
 			    }]
@@ -166,27 +201,40 @@ UserBaseForm = Ext.extend( BaseForm , {
 		});
 		
 	},
-	loadBuyModeStore : function(){//加载设备购买方式数据
-		var deviceCode = this.deviceInfo.device_code;
-		if(this.deviceCode != deviceCode){
-			this.buyModeStore.load();
-			this.deviceCode = deviceCode;
+	// 施工回填
+	doCheckedChangeTask: function(box, checked){
+		if(checked){
+			var deviceCategoryEl = Ext.getCmp("deviceCategoryEl");
+			deviceCategoryEl.enable(true);
+			var deviceCodeEl = Ext.getCmp("deviceCodeEl");
+			deviceCodeEl.disable(true);
+		}else{
+			var deviceCategoryEl = Ext.getCmp("deviceCategoryEl");
+			deviceCategoryEl.disable(true);
+			var deviceCodeEl = Ext.getCmp("deviceCodeEl");
+			deviceCodeEl.enable(true);
 		}
 	},
 	doSelectUserType: function(c,r,i){
-		var formtype = c.getValue();
-		var bfs = Ext.getCmp("bandfieldSet");
-		bfs.setTitle(formtype);
-		if(formtype === "BAND" || formtype === "OTT_MOBILE"){
-			bfs.show();
-			bfs.enable();
+		var type = c.getValue();
+		
+		var omfs = Ext.getCmp("ottMobileFieldSet"),
+			bfs = Ext.getCmp("bandFieldSet");
+		if(type === "BAND"){
+			bfs.setVisible(true);
+			omfs.setVisible(false);
+		}else if(type === "OTT_MOBILE"){
+			omfs.setVisible(true);
+			bfs.setVisible(false);
 		}else{
-			bfs.hide();
-			bfs.disable();
+			bfs.setVisible(false);
+			omfs.setVisible(false);
 		}
 	},
 	doInit:function(){
 		UserBaseForm.superclass.doInit.call(this);
+		Ext.getCmp("ottMobileFieldSet").setVisible(false);
+		Ext.getCmp("bandFieldSet").setVisible(false);
 	},
 	//获取终端限制数量的数据
 	doConfigsData: function(){
