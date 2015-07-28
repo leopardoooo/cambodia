@@ -15,6 +15,10 @@ import com.ycsoft.daos.config.POJO;
 /**
  * CUser -> C_USER mapping
  */
+/**
+ * @author yuben
+ *
+ */
 @POJO(tn = "C_USER", sn = "SEQ_USER_ID", pk = "USER_ID")
 public class CUser extends BusiBase implements Serializable {
 
@@ -42,6 +46,9 @@ public class CUser extends BusiBase implements Serializable {
 	private Date open_time;
 	private Date status_date;
 	private String is_rstop_fee;
+	private String login_name;
+	private String password;
+	private String terminal_type;
 	private String str1 ;
 	private String str2 ;
 	private String str3 ;
@@ -524,6 +531,30 @@ public class CUser extends BusiBase implements Serializable {
 	 */
 	public void setDevice_model(String device_model) {
 		this.device_model = device_model;
+	}
+
+	public String getLogin_name() {
+		return login_name;
+	}
+
+	public void setLogin_name(String login_name) {
+		this.login_name = login_name;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	public String getTerminal_type() {
+		return terminal_type;
+	}
+
+	public void setTerminal_type(String terminal_type) {
+		this.terminal_type = terminal_type;
 	}
 
 	
