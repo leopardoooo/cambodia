@@ -85,7 +85,11 @@ UserBaseForm = Ext.extend( BaseForm , {
 			            width : 150,
 			            id: 'deviceCodeEl',
 			            emptyText: "输入设备编码..",
-			            disabled: true
+			            disabled: true,
+			            listeners: {
+			            	scope: this,
+			            	change: this.doDeviceCodeChange
+			            }
 					}]
 				}]
 			},{
@@ -230,6 +234,34 @@ UserBaseForm = Ext.extend( BaseForm , {
 			bfs.setVisible(false);
 			omfs.setVisible(false);
 		}
+		// 过滤设备类型
+		this.doFilterDeviceModel(type);
+		
+	},
+	doFilterDeviceModel: function(userType){
+		alert("过滤类型：" + userType);
+		// 先清除过滤
+	},
+	//设备号发生变化
+	doDeviceCodeChange : function(field){
+		var v = field.getValue().trim();
+		if(!v)return ;
+		Ext.Ajax.request({
+			scope : this,
+			url : root + '/commons/x/QueryDevice!queryDevice.action',
+			params : {
+				deviceCode: v
+			},
+			success : function(response,opts){
+				var obj = Ext.decode(response.responseText);
+				if(!obj.success){
+					Alert(obj.simpleObj);
+					return ;
+				}
+				
+				// 
+			}
+		});
 	},
 	doInit:function(){
 		UserBaseForm.superclass.doInit.call(this);

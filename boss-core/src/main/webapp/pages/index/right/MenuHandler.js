@@ -727,9 +727,9 @@ Ext.apply(MenuHandler, {
 	// ----------------------用户信息---------------------------------------------------
 	// 用户开户
 	NewUser : function() {
-		if (!hasCust()) {
-			return false;
-		}
+//		if (!hasCust()) {
+//			return false;
+//		}
 		return {
 			width : 550,
 			height : 360
