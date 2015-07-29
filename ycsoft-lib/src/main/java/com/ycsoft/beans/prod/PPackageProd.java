@@ -19,8 +19,8 @@ public class PPackageProd implements Serializable {
 	// PPackageProd all properties
 
 	/**
-	 *
-	 */
+	 * 
+	 */ 
 	private static final long serialVersionUID = -2407441487593995420L;
 	private String package_id;
 	private String prod_id;
