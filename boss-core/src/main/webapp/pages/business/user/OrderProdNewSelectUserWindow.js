@@ -103,19 +103,37 @@ SelectUserWindow = Ext.extend(Ext.Window, {
  * 转移支付
  */
 TransferPayWindow = Ext.extend(Ext.Window, {
+	store: new Ext.data.JsonStore({
+		fields: ["prod_name","traff_name", "user_ids", "month_count", "fee", "last_order_end_date", "start_date", "start_date"]
+	}),
 	constructor: function(){
+		var columns = [
+       	    {header: "产品名称", width: 100,sortable:true, dataIndex: 'prod_name'},
+       	    {header: "资费", width: 70, sortable:true, dataIndex: 'traff_name'},
+       	    {header: "用户", width: 60, sortable:true, dataIndex: 'user_ids'},
+       	    {header: "转移计费日", width: 80, sortable:true, dataIndex: 'month_count'},
+       	    {header: "结束计费日", width: 80, sortable:true, dataIndex: 'fee'},
+       	    {header: "转移金额", width: 60, sortable:true, dataIndex: 'fee'}
+       	];
+		
 		// Window 构造
 		return TransferPayWindow.superclass.constructor.call(this, {
 			layout: "fit",
-			title: "转移支付明细",
-			width: 500,
-			height: 300,
+			title: "转移支付明细1",
+			width: 450,
+			height: 200,
 			resizable: false,
-			iconCls: 'icon-pay',
 			maximizable: false,
 			closeAction: 'hide',
 			minimizable: false,
-			items: []
+			items: [{
+				xtype: 'grid',
+				stripeRows: true,
+				border: false,
+				store: this.store,
+				columns: columns,
+		        stateful: true
+			}]
 		});
 	}
 });

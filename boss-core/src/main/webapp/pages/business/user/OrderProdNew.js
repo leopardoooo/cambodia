@@ -8,6 +8,8 @@ ProdOrderForm = Ext.extend( BaseForm, {
 	selectUserWindow: null,
 	switchUser: null,
 	
+	transferPayWindow: null,
+	
 	constructor: function(p){
 		this.buyModeStore = new Ext.data.JsonStore({
 			url :root + '/commons/x/QueryDevice!queryDeviceBuyMode.action',
@@ -142,8 +144,11 @@ ProdOrderForm = Ext.extend( BaseForm, {
 	doInit:function(){
 		ProdOrderForm.superclass.doInit.call(this);
 		Ext.get("transferHrefTag").on("click", function(e, t, o){
-			alert("hello");
-		}, this, ops);
+			if(!this.transferPayWindow){
+				this.transferPayWindow = new TransferPayWindow();
+			}
+			this.transferPayWindow.show();
+		}, this);
 	},
 	openSwitchUserWindow: function(){
 		if(!this.selectUserWindow){
