@@ -2,7 +2,6 @@
 package com.ycsoft.business.service.impl;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -47,7 +46,6 @@ import com.ycsoft.business.dto.core.user.ChangedUser;
 import com.ycsoft.business.dto.core.user.UserDto;
 import com.ycsoft.business.service.IQueryUserService;
 import com.ycsoft.commons.constants.StatusConstants;
-import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.helper.CollectionHelper;
 import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.commons.store.MemoryDict;
@@ -239,7 +237,7 @@ public class QueryUserService extends BaseService implements IQueryUserService {
 	}
 
 	
-	public UserDto queryUserById(String userId) throws Exception {
+	public CUser queryUserById(String userId) throws Exception {
 		return userComponent.queryUserById(userId);
 	}
 	
@@ -266,15 +264,15 @@ public class QueryUserService extends BaseService implements IQueryUserService {
 	public List<CUser> queryUserByCustNoAndStatus(String custNo,String userStatus) throws Exception {
 		List<CUser>	userList = userComponent.queryUserByCustNo(custNo);
 		List<CUser> users = new ArrayList<CUser>();
-		if(userStatus.equals(StatusConstants.ATVCLOSE)){
-			for(CUser user : userList){
-				if(user.getUser_type().equals(SystemConstants.USER_TYPE_ATV)){
-					users.add(user);
-				}
-			}
-		}else{
+//		if(userStatus.equals(StatusConstants.ATVCLOSE)){
+//			for(CUser user : userList){
+//				if(user.getUser_type().equals(SystemConstants.USER_TYPE_ATV)){
+//					users.add(user);
+//				}
+//			}
+//		}else{
 			users = userList;
-		}
+//		}
 		return users;
 	}
 	

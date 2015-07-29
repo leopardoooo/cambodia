@@ -144,86 +144,86 @@ public class UserProdService extends BaseBusiService implements IUserProdService
 	public void saveBatchOrder(List<String> userIdList, String prodId,
 			String tariffId, String feeDate,
 			List<UserProdRscDto> dynamicRscList, String expDate) throws Exception {
-		BusiParameter parameter = getBusiParam();
-		//操作员所在县市是否必须订购基本包
-		String needBaseProd = userProdComponent.queryTemplateConfig(Template.NEED_BASE_PROD.toString());
-		for(String userId : userIdList){
-			UserDto user = userComponent.queryUserById(userId);
-			if(user == null){
-				throw new ServicesException("用户不存在,用户ID: " + userId);
-			}
-			
-			//用户是否订购基本包
-			if(SystemConstants.BOOLEAN_TRUE.equals(needBaseProd)){
-				List<CProdDto> orderProdList = userProdComponent.queryByUserId(userId);
-				if( orderProdList.size() == 0){
-					throw new ServicesException("用户没订购基本包,用户ID: " + userId);
-				}
-			}
-			
-			expressionUtil.setCuser(user);
-			//产品已订购
-			CProd cprod = expressionUtil.orderPord(prodId);
-			if(cprod != null){
-				throw new ServicesException("产品 "+cprod.getProd_name()+" 已订购,用户ID: " + userId);
-			}
-			
-			PProd prod = prodComponent.queryById(prodId);
-			if(prod.getServ_id().equals(SystemConstants.PROD_SERV_ID_ITV)){
-				if (!user.getUser_type().equals(SystemConstants.USER_TYPE_DTV)
-						|| user.getServ_type().equals(
-								SystemConstants.DTV_SERV_TYPE_SINGLE)) {
-					throw new ServicesException("产品服务编号和用户类型不匹配,产品为数字双向产品,用户类型为"+user.getUser_type_text()+",用户ID: " + userId);
-				}
-			}else{
-				if(!prod.getServ_id().equals(user.getUser_type())){
-					throw new ServicesException("产品服务编号和用户类型不匹配,用户ID: " + userId);
-				}
-			}
-			
-			CCust cust = custComponent.queryCustById(user.getCust_id());
-			expressionUtil.setCcust(cust);
-			
-			ProdTariffDto tariff = userProdComponent.queryTariffByTariffIds(new String[]{tariffId}).get(0);
-			//资费不适用当前用户
-			if (!expressionUtil.parseBoolean(tariff.getRule_id_text())) {
-				throw new ServicesException("资费规则不适用,用户ID: " + userId);
-			}
-			
-			
-			List<CUser> userList = new ArrayList<CUser>();
-			userList.add(user);
-			
-			CustFullInfoDto custFullInfo = new CustFullInfoDto();
-			custFullInfo.setCust(cust);
-			parameter.setCustFullInfo(custFullInfo);
-			
-			if(user.getUser_type().equals(SystemConstants.USER_TYPE_DTV)){
-				List<CUserDtv> userDtvList = new ArrayList<CUserDtv>();
-				CUserDtv userDtv = new CUserDtv();
-				BeanUtils.copyProperties(user, userDtv);
-				userDtvList.add(userDtv);
-				parameter.setSelectedDtvs(userDtvList);
-			}else if(user.getUser_type().equals(SystemConstants.USER_TYPE_ATV)){
-				List<CUserAtv> userAtvList = new ArrayList<CUserAtv>();
-				CUserAtv userAtv = new CUserAtv();
-				BeanUtils.copyProperties(user, userAtv);
-				userAtvList.add(userAtv);
-				parameter.setSelectedAtvs(userAtvList);
-			}else if(user.getUser_type().equals(SystemConstants.USER_TYPE_BAND)){
-				List<CUserBroadband> userBandList = new ArrayList<CUserBroadband>();
-				CUserBroadband userBand = new CUserBroadband();
-				BeanUtils.copyProperties(user, userBand);
-				userBandList.add(userBand);
-				parameter.setSelectedBands(userBandList);
-			}
-			
-			Integer doneCode = doneCodeComponent.gDoneCode();
-			saveOrderBaseList(userList, doneCode, prodId, tariffId, feeDate,
-					expDate, dynamicRscList, SystemConstants.PROD_ORDER_TYPE_ORDER,null,SystemConstants.BOOLEAN_FALSE);
-			
-			saveAllPublic(doneCode,parameter);
-		}
+//		BusiParameter parameter = getBusiParam();
+//		//操作员所在县市是否必须订购基本包
+//		String needBaseProd = userProdComponent.queryTemplateConfig(Template.NEED_BASE_PROD.toString());
+//		for(String userId : userIdList){
+//			UserDto user = userComponent.queryUserById(userId);
+//			if(user == null){
+//				throw new ServicesException("用户不存在,用户ID: " + userId);
+//			}
+//			
+//			//用户是否订购基本包
+//			if(SystemConstants.BOOLEAN_TRUE.equals(needBaseProd)){
+//				List<CProdDto> orderProdList = userProdComponent.queryByUserId(userId);
+//				if( orderProdList.size() == 0){
+//					throw new ServicesException("用户没订购基本包,用户ID: " + userId);
+//				}
+//			}
+//			
+//			expressionUtil.setCuser(user);
+//			//产品已订购
+//			CProd cprod = expressionUtil.orderPord(prodId);
+//			if(cprod != null){
+//				throw new ServicesException("产品 "+cprod.getProd_name()+" 已订购,用户ID: " + userId);
+//			}
+//			
+//			PProd prod = prodComponent.queryById(prodId);
+//			if(prod.getServ_id().equals(SystemConstants.PROD_SERV_ID_ITV)){
+//				if (!user.getUser_type().equals(SystemConstants.USER_TYPE_DTV)
+//						|| user.getServ_type().equals(
+//								SystemConstants.DTV_SERV_TYPE_SINGLE)) {
+//					throw new ServicesException("产品服务编号和用户类型不匹配,产品为数字双向产品,用户类型为"+user.getUser_type_text()+",用户ID: " + userId);
+//				}
+//			}else{
+//				if(!prod.getServ_id().equals(user.getUser_type())){
+//					throw new ServicesException("产品服务编号和用户类型不匹配,用户ID: " + userId);
+//				}
+//			}
+//			
+//			CCust cust = custComponent.queryCustById(user.getCust_id());
+//			expressionUtil.setCcust(cust);
+//			
+//			ProdTariffDto tariff = userProdComponent.queryTariffByTariffIds(new String[]{tariffId}).get(0);
+//			//资费不适用当前用户
+//			if (!expressionUtil.parseBoolean(tariff.getRule_id_text())) {
+//				throw new ServicesException("资费规则不适用,用户ID: " + userId);
+//			}
+//			
+//			
+//			List<CUser> userList = new ArrayList<CUser>();
+//			userList.add(user);
+//			
+//			CustFullInfoDto custFullInfo = new CustFullInfoDto();
+//			custFullInfo.setCust(cust);
+//			parameter.setCustFullInfo(custFullInfo);
+//			
+//			if(user.getUser_type().equals(SystemConstants.USER_TYPE_DTV)){
+//				List<CUserDtv> userDtvList = new ArrayList<CUserDtv>();
+//				CUserDtv userDtv = new CUserDtv();
+//				BeanUtils.copyProperties(user, userDtv);
+//				userDtvList.add(userDtv);
+//				parameter.setSelectedDtvs(userDtvList);
+//			}else if(user.getUser_type().equals(SystemConstants.USER_TYPE_ATV)){
+//				List<CUserAtv> userAtvList = new ArrayList<CUserAtv>();
+//				CUserAtv userAtv = new CUserAtv();
+//				BeanUtils.copyProperties(user, userAtv);
+//				userAtvList.add(userAtv);
+//				parameter.setSelectedAtvs(userAtvList);
+//			}else if(user.getUser_type().equals(SystemConstants.USER_TYPE_BAND)){
+//				List<CUserBroadband> userBandList = new ArrayList<CUserBroadband>();
+//				CUserBroadband userBand = new CUserBroadband();
+//				BeanUtils.copyProperties(user, userBand);
+//				userBandList.add(userBand);
+//				parameter.setSelectedBands(userBandList);
+//			}
+//			
+//			Integer doneCode = doneCodeComponent.gDoneCode();
+//			saveOrderBaseList(userList, doneCode, prodId, tariffId, feeDate,
+//					expDate, dynamicRscList, SystemConstants.PROD_ORDER_TYPE_ORDER,null,SystemConstants.BOOLEAN_FALSE);
+//			
+//			saveAllPublic(doneCode,parameter);
+//		}
 		
 	}
 	
@@ -268,157 +268,157 @@ public class UserProdService extends BaseBusiService implements IUserProdService
 	public void saveOrderBaseList(List<CUser> userList,Integer doneCode, String prodId,
 			String tariffId, String feeDate, String expDate,
 			List<UserProdRscDto> dynamicRscList,String orderType, Date preOpenTime,String isBankPay) throws Exception {
-		//获取客户用户信息
-		CCust cust = getBusiParam().getCust();
-		//List<CUser> userList = getBusiParam().getSelectedUsers();
-		//获取业务流水
-		String busiCode = getBusiParam().getBusiCode();
-		
-		//根据产品和资费id获取产品和资费的基本信息
-		PProd prod = prodComponent.queryProdById(prodId);
-		PProdTariff tariff = prodComponent.queryTariffById(tariffId);
-		List<PProdUserRes> userResList = prodComponent.queryUserResByCountyId();
-		//判断产品是否按到期日停机
-		String stopByInvlaidDate = prodComponent.stopByInvaliddate(prod, tariff);
-		//计算免费天数
-		int freeAmount = DateHelper.getDifferDays(DateHelper.getDate("-"), feeDate);
-		//判断产品是套餐还是基本产品,如果是套餐先保存套餐信息，再将套餐包含的子产品
-		List<PPackageProd> packageProdList = null;
-		if (prod.isPkg()){
-			packageProdList = prodComponent.queryPackageProd(prodId,tariffId);
-		}
-		
-		//模拟转数转的钱是否需要转回订购的产品对应的账目的标志位
-		boolean needChange = false;
-		List<AcctAcctitemChangeDto> acctitemChangeList = null;//模拟转数转到公用账目的异动记录
-		List<CUserDtv> dtvList = getBusiParam().getSelectedDtvs();
-		
-		
-		List<CProdDto> cProdList = userProdComponent
-				.queryByUserIds(CollectionHelper.converValueToArray(dtvList,
-						"user_id"));
-		
-		if(null != cProdList && cProdList.size() == 0){
-			acctitemChangeList = acctComponent.queryAtvToDtvAcctitemChange(cust.getCust_id());
-			if(null != acctitemChangeList){
-				needChange = true;
-			}
-		}
-		
-		List<CAcctAcctitem> acctItemList = new ArrayList<CAcctAcctitem>();
-		List<String> custIdList = new ArrayList<String>();
-		//如果产品是基本产品，则直接保存产品信息
-		//保存产品时需要判断产品是否有对应的动态资源，如果有则保存产品对应的动态资源
-		String sn = null;
-		for (CUser user:userList){
-			if (prod.isPkg()){
-				sn = userProdComponent.addPackage(doneCode,cust.getCust_id(), user.getAcct_id(), user.getUser_id()
-						, prodId,prod.getProd_type(),orderType , feeDate, expDate,
-						user.getStop_type(),tariff,packageProdList,dynamicRscList,stopByInvlaidDate,prod.getIs_base(),preOpenTime,isBankPay);
-
-			} else {
-				sn = userProdComponent.addProd(doneCode,cust.getCust_id(), user.getAcct_id(), user.getUser_id(),
-						null,null, prodId,prod.getProd_type(), orderType, feeDate, expDate,
-						user.getStop_type(),tariff,dynamicRscList,stopByInvlaidDate,prod.getIs_base(),preOpenTime,isBankPay);
-			}
-			expressionUtil.setCcust(cust);
-			expressionUtil.setCuser(user);
-			for (PProdUserRes userRes:userResList){
-				if (userRes.getProd_id().equals(prod.getProd_id())){
-					if (StringHelper.isEmpty(userRes.getRule_id_text()) 
-							|| expressionUtil.parseBoolean(userRes.getRule_id_text())){
-						String[] res = userRes.getRes_id().split(",");
-						for (String resId:res){
-							userProdComponent.addUserProdres(sn, resId);
-						}
-					}
-				}
-			}
-			
-//			if (freeAmount>0){
-//				userProdComponent.addProdRscAcct(doneCode, sn, SystemConstants.BILLING_TYPE_DAY,freeAmount);
+//		//获取客户用户信息
+//		CCust cust = getBusiParam().getCust();
+//		//List<CUser> userList = getBusiParam().getSelectedUsers();
+//		//获取业务流水
+//		String busiCode = getBusiParam().getBusiCode();
+//		
+//		//根据产品和资费id获取产品和资费的基本信息
+//		PProd prod = prodComponent.queryProdById(prodId);
+//		PProdTariff tariff = prodComponent.queryTariffById(tariffId);
+//		List<PProdUserRes> userResList = prodComponent.queryUserResByCountyId();
+//		//判断产品是否按到期日停机
+//		String stopByInvlaidDate = prodComponent.stopByInvaliddate(prod, tariff);
+//		//计算免费天数
+//		int freeAmount = DateHelper.getDifferDays(DateHelper.getDate("-"), feeDate);
+//		//判断产品是套餐还是基本产品,如果是套餐先保存套餐信息，再将套餐包含的子产品
+//		List<PPackageProd> packageProdList = null;
+//		if (prod.isPkg()){
+//			packageProdList = prodComponent.queryPackageProd(prodId,tariffId);
+//		}
+//		
+//		//模拟转数转的钱是否需要转回订购的产品对应的账目的标志位
+//		boolean needChange = false;
+//		List<AcctAcctitemChangeDto> acctitemChangeList = null;//模拟转数转到公用账目的异动记录
+//		List<CUserDtv> dtvList = getBusiParam().getSelectedDtvs();
+//		
+//		
+//		List<CProdDto> cProdList = userProdComponent
+//				.queryByUserIds(CollectionHelper.converValueToArray(dtvList,
+//						"user_id"));
+//		
+//		if(null != cProdList && cProdList.size() == 0){
+//			acctitemChangeList = acctComponent.queryAtvToDtvAcctitemChange(cust.getCust_id());
+//			if(null != acctitemChangeList){
+//				needChange = true;
 //			}
-			
-			/*
-			if(needChange){//需要从公用账目转到新订购产品创建的账目
-				acctTrans(cust.getCust_id(), doneCode, busiCode, acctitemChange.getAcct_id(), acctitemChange.getAcctitem_id(), acctitem.getAcct_id(), acctitem.getAcctitem_id(), acctitemChange.getChange_fee());
-				needChange = false;
-			}*/
-			
-			//为新订购的产品创建账目
-			CAcctAcctitem acctitem = acctComponent.createAcctItem(user.getAcct_id(), prod.getProd_id());
-			if(needChange){
-				for(AcctAcctitemChangeDto acctitemChange : acctitemChangeList){
-					if(acctitemChange.getUser_id().equals(user.getUser_id())){
-						acctTrans(cust.getCust_id(), doneCode, busiCode,
-								acctitemChange.getAcct_id(), acctitemChange
-										.getAcctitem_id(), acctitem
-										.getAcct_id(), acctitem
-										.getAcctitem_id(), acctitemChange
-										.getChange_fee());
-					}
-				}
-			}
-			
-			//数字电视订购基本包时，查询是否有回退订购，账目异动作废金额小于零
-			if (prod.getIs_base().equals(SystemConstants.BOOLEAN_TRUE)
-					&& prod.getServ_id().equals(SystemConstants.USER_TYPE_DTV)) {
-				AcctAcctitemChangeDto changeDto = acctComponent
-						.queryOrderZFAcctitemChange(user.getUser_id(), cust.getCust_id());
-				if(null != changeDto){
-					int changeFee = changeDto.getChange_fee()*-1;
-					int refundBalance = 0;
-					int transBalance = 0;
-					if(prod.getRefund().equals(SystemConstants.BOOLEAN_TRUE)){
-						refundBalance = changeFee;
-					}
-					if(prod.getTrans().equals(SystemConstants.BOOLEAN_TRUE)){
-						transBalance = changeFee;
-					}
-					acctComponent.updateActiveBanlance(acctitem.getAcct_id(),
-							acctitem.getAcctitem_id(), changeFee, 0, refundBalance,
-							transBalance);
-				}
-			}
-			
-//  modify after compare
-
-
-			if(null != preOpenTime){//如果预开通不为空，则产品状态设置为 预开通 ，不发授权开通指令（数字和宽带），并生成预开通JOB等待执行
-				//生成预开通JOB等待执行
-				jobComponent.createPreAuthCmdJob(doneCode,sn,preOpenTime,user.getArea_id(),user.getCounty_id());
-			}else{
-				if(busiCode.equals(BusiCodeConstants.BATCH_PROD_ORDER)){
-					//批量订购产品 授权等级为20
-					jobComponent.createBusiCmdJob(doneCode,
-							BusiCmdConstants.ACCTIVATE_PROD, cust.getCust_id(),
-							user.getUser_id(), user.getStb_id(), user.getCard_id(),
-							user.getModem_mac(), sn, prod.getProd_id(), null,
-							SystemConstants.PRIORITY_DSSQ);
-				}else{
-					jobComponent.createBusiCmdJob(doneCode,
-							BusiCmdConstants.ACCTIVATE_PROD, cust.getCust_id(),
-							user.getUser_id(), user.getStb_id(), user.getCard_id(),
-							user.getModem_mac(), sn, prod.getProd_id());
-				}
-			}
-
-			acctItemList.add(acctitem);
-			
-			String custId = user.getCust_id();
-			if(StringHelper.isNotEmpty(custId) && !custIdList.contains(custId)){
-				custIdList.add(custId);
-			}
-			
-		}
-		if(needChange)needChange = false;
-		jobComponent.createCreditCalJob(doneCode, cust.getCust_id(), acctItemList,SystemConstants.BOOLEAN_FALSE);
-		
-		if(custIdList.size() > 0){
-			String[] custIds = custIdList.toArray(new String[custIdList.size()]);
-			jobComponent.createAcctModeCalJobByCustIds(doneCode, custIds);
-			jobComponent.createInvalidCalJobByCustIds(doneCode, custIds);
-		}
+//		}
+//		
+//		List<CAcctAcctitem> acctItemList = new ArrayList<CAcctAcctitem>();
+//		List<String> custIdList = new ArrayList<String>();
+//		//如果产品是基本产品，则直接保存产品信息
+//		//保存产品时需要判断产品是否有对应的动态资源，如果有则保存产品对应的动态资源
+//		String sn = null;
+//		for (CUser user:userList){
+//			if (prod.isPkg()){
+//				sn = userProdComponent.addPackage(doneCode,cust.getCust_id(), user.getAcct_id(), user.getUser_id()
+//						, prodId,prod.getProd_type(),orderType , feeDate, expDate,
+//						user.getStop_type(),tariff,packageProdList,dynamicRscList,stopByInvlaidDate,prod.getIs_base(),preOpenTime,isBankPay);
+//
+//			} else {
+//				sn = userProdComponent.addProd(doneCode,cust.getCust_id(), user.getAcct_id(), user.getUser_id(),
+//						null,null, prodId,prod.getProd_type(), orderType, feeDate, expDate,
+//						user.getStop_type(),tariff,dynamicRscList,stopByInvlaidDate,prod.getIs_base(),preOpenTime,isBankPay);
+//			}
+//			expressionUtil.setCcust(cust);
+//			expressionUtil.setCuser(user);
+//			for (PProdUserRes userRes:userResList){
+//				if (userRes.getProd_id().equals(prod.getProd_id())){
+//					if (StringHelper.isEmpty(userRes.getRule_id_text()) 
+//							|| expressionUtil.parseBoolean(userRes.getRule_id_text())){
+//						String[] res = userRes.getRes_id().split(",");
+//						for (String resId:res){
+//							userProdComponent.addUserProdres(sn, resId);
+//						}
+//					}
+//				}
+//			}
+//			
+////			if (freeAmount>0){
+////				userProdComponent.addProdRscAcct(doneCode, sn, SystemConstants.BILLING_TYPE_DAY,freeAmount);
+////			}
+//			
+//			/*
+//			if(needChange){//需要从公用账目转到新订购产品创建的账目
+//				acctTrans(cust.getCust_id(), doneCode, busiCode, acctitemChange.getAcct_id(), acctitemChange.getAcctitem_id(), acctitem.getAcct_id(), acctitem.getAcctitem_id(), acctitemChange.getChange_fee());
+//				needChange = false;
+//			}*/
+//			
+//			//为新订购的产品创建账目
+//			CAcctAcctitem acctitem = acctComponent.createAcctItem(user.getAcct_id(), prod.getProd_id());
+//			if(needChange){
+//				for(AcctAcctitemChangeDto acctitemChange : acctitemChangeList){
+//					if(acctitemChange.getUser_id().equals(user.getUser_id())){
+//						acctTrans(cust.getCust_id(), doneCode, busiCode,
+//								acctitemChange.getAcct_id(), acctitemChange
+//										.getAcctitem_id(), acctitem
+//										.getAcct_id(), acctitem
+//										.getAcctitem_id(), acctitemChange
+//										.getChange_fee());
+//					}
+//				}
+//			}
+//			
+//			//数字电视订购基本包时，查询是否有回退订购，账目异动作废金额小于零
+//			if (prod.getIs_base().equals(SystemConstants.BOOLEAN_TRUE)
+//					&& prod.getServ_id().equals(SystemConstants.USER_TYPE_DTV)) {
+//				AcctAcctitemChangeDto changeDto = acctComponent
+//						.queryOrderZFAcctitemChange(user.getUser_id(), cust.getCust_id());
+//				if(null != changeDto){
+//					int changeFee = changeDto.getChange_fee()*-1;
+//					int refundBalance = 0;
+//					int transBalance = 0;
+//					if(prod.getRefund().equals(SystemConstants.BOOLEAN_TRUE)){
+//						refundBalance = changeFee;
+//					}
+//					if(prod.getTrans().equals(SystemConstants.BOOLEAN_TRUE)){
+//						transBalance = changeFee;
+//					}
+//					acctComponent.updateActiveBanlance(acctitem.getAcct_id(),
+//							acctitem.getAcctitem_id(), changeFee, 0, refundBalance,
+//							transBalance);
+//				}
+//			}
+//			
+////  modify after compare
+//
+//
+//			if(null != preOpenTime){//如果预开通不为空，则产品状态设置为 预开通 ，不发授权开通指令（数字和宽带），并生成预开通JOB等待执行
+//				//生成预开通JOB等待执行
+//				jobComponent.createPreAuthCmdJob(doneCode,sn,preOpenTime,user.getArea_id(),user.getCounty_id());
+//			}else{
+//				if(busiCode.equals(BusiCodeConstants.BATCH_PROD_ORDER)){
+//					//批量订购产品 授权等级为20
+//					jobComponent.createBusiCmdJob(doneCode,
+//							BusiCmdConstants.ACCTIVATE_PROD, cust.getCust_id(),
+//							user.getUser_id(), user.getStb_id(), user.getCard_id(),
+//							user.getModem_mac(), sn, prod.getProd_id(), null,
+//							SystemConstants.PRIORITY_DSSQ);
+//				}else{
+//					jobComponent.createBusiCmdJob(doneCode,
+//							BusiCmdConstants.ACCTIVATE_PROD, cust.getCust_id(),
+//							user.getUser_id(), user.getStb_id(), user.getCard_id(),
+//							user.getModem_mac(), sn, prod.getProd_id());
+//				}
+//			}
+//
+//			acctItemList.add(acctitem);
+//			
+//			String custId = user.getCust_id();
+//			if(StringHelper.isNotEmpty(custId) && !custIdList.contains(custId)){
+//				custIdList.add(custId);
+//			}
+//			
+//		}
+//		if(needChange)needChange = false;
+//		jobComponent.createCreditCalJob(doneCode, cust.getCust_id(), acctItemList,SystemConstants.BOOLEAN_FALSE);
+//		
+//		if(custIdList.size() > 0){
+//			String[] custIds = custIdList.toArray(new String[custIdList.size()]);
+//			jobComponent.createAcctModeCalJobByCustIds(doneCode, custIds);
+//			jobComponent.createInvalidCalJobByCustIds(doneCode, custIds);
+//		}
 	}
 
 
@@ -531,343 +531,343 @@ public class UserProdService extends BaseBusiService implements IUserProdService
 	
 	public void changeBandProd(String prodId, String tariffId, String feeDate,
 			String expDate, String oldProdSn, int presentFee) throws Exception {
-		Integer doneCode = doneCodeComponent.gDoneCode();
-		String custId = getBusiParam().getCust().getCust_id();
-		
-		CProd oldProd = userProdComponent.queryByProdSn(oldProdSn);		//原产品
-		CUser user = userComponent.queryUserById(oldProd.getUser_id());	//前台用户记录有时未选中 UserPanel
-		List<CUserBroadband> userBandList = new ArrayList<CUserBroadband>();
-		CUserBroadband userBand = new CUserBroadband();
-		BeanUtils.copyProperties(user, userBand);
-		userBandList.add(userBand);
-		getBusiParam().setSelectedBands(userBandList);
-		
-		Map<String, Object> bu = new HashMap<String, Object>();
-		bu.put("net_type", userBand.getNet_type_text());
-		bu.put("login_name", userBand.getLogin_name());
-		bu.put("modem_mac", userBand.getModem_mac());
-		bu.put("bind_type", userBand.getBind_type_text());
-		
-		getBusiParam().setBusiConfirmParam("bandUser", bu);
-		/*原资费相关信息*/
-		String oldProdId = oldProd.getProd_id();
-		List<AcctAcctitemActiveDto> oldAcctItemActiveList = acctComponent.queryActiveById(user.getAcct_id(), oldProdId);
-		CAcctAcctitem oldAcctItem = acctComponent.queryAcctItemByAcctitemId(user.getAcct_id(), oldProdId);
-		PProdTariff oldTariff = userProdComponent.queryProdTariffById(oldProd.getTariff_id());
-		List<CAcctAcctitemInactive> oldInactiveList = acctComponent.queryInactive(user.getAcct_id(), oldProdId);
-		PProd oldP = userProdComponent.queryByProdId(oldProdId);
-		Map<String, String> oldMap = new HashMap<String, String>();
-		oldMap.put("prod_name", oldP.getProd_name());
-		oldMap.put("tariff_name", oldTariff.getTariff_name());
-		getBusiParam().setBusiConfirmParam("old_prod", oldMap);
-		
-		
-		//订购新产品
-		saveOrderBaseList(getBusiParam().getSelectedUsers(),doneCode,prodId,tariffId,feeDate,expDate,null,SystemConstants.PROD_ORDER_TYPE_ORDER,null,SystemConstants.BOOLEAN_FALSE);
-		
-		/*新资费相关信息*/
-		CAcctAcctitem newAcctItem = acctComponent.queryAcctItemByAcctitemId(user.getAcct_id(), prodId);
-		CProd newProd = userProdComponent.queryByAcctItem(user.getAcct_id(), prodId);
-		PProdTariff newTariff = userProdComponent.queryProdTariffById(tariffId);
-		Map<String, Object> newMap = new HashMap<String, Object>();
-		PProd newP = userProdComponent.queryByProdId(prodId);
-		newMap.put("prod_name", newP.getProd_name());
-		newMap.put("tariff_name", newTariff.getTariff_name());
-		String prod_desc = newP.getProd_desc();
-		prod_desc = StringHelper.isEmpty(prod_desc) ? "":prod_desc;
-		prod_desc = prod_desc.replaceAll("\n", "</br>").replaceAll("\r", "").replaceAll("\"", "") ;
-		int times = ( prod_desc.length() / 64 ) +  ( prod_desc.length() % 64 > 0 ? 1: 0 );
-		List<String> prod_descs = new ArrayList<String>();
-		for(int index =0;index<times;index++){
-			int start = index * 64;
-			int limit = start + 64;
-			limit = limit > prod_desc.length() ? prod_desc.length() : limit; 
-			String sub = prod_desc.substring(start,limit );
-			prod_descs.add(sub);
-		}
-		newMap.put("prod_desc", prod_desc);
-		newMap.put("prod_descs", prod_descs);
-		getBusiParam().setBusiConfirmParam("new_prod", newMap);
-		doneCodeComponent.saveDoneCodeInfo(doneCode, custId, user.getUser_id(), getBusiParam().getBusiConfirmParamInfo());
-		//非现金余额赠送			现金余额
-		int activeUnCashBalance = 0, activeCashBalance = 0, transFee = 0, cashNoTransFee = 0, realBill = 0, inactiveFee = 0;
-		
-		for(AcctAcctitemActiveDto active : oldAcctItemActiveList){
-			if(active.getIs_cash().equals(SystemConstants.BOOLEAN_FALSE)){
-				activeUnCashBalance += active.getBalance().intValue();
-			}else{
-				activeCashBalance += active.getBalance().intValue();
-			}
-			
-			//不是现金金额且能转账的，需要扣除，因为退订时已经转账过去了
-			if(active.getIs_cash().equals(SystemConstants.BOOLEAN_FALSE)
-					&& active.getCan_trans().equals(SystemConstants.BOOLEAN_TRUE)){
-				transFee += active.getBalance().intValue();
-			}
-			
-			//现金且不能转账的，赠送进新账目中
-			if(active.getIs_cash().equals(SystemConstants.BOOLEAN_TRUE)
-					&& active.getCan_trans().equals(SystemConstants.BOOLEAN_FALSE)){
-				cashNoTransFee += active.getBalance().intValue();
-			}
-		}
-		realBill = oldAcctItem.getReal_bill().intValue();	//原产品本月费用
-		
-//		if(activeCashBalance > 0 && activeUnCashBalance == 0){	//只有现金余额
-//			//有现金余额，原账目本月费用已除去，其余金额已作可转余额转到新账目中
-//			realBill = 0;
+//		Integer doneCode = doneCodeComponent.gDoneCode();
+//		String custId = getBusiParam().getCust().getCust_id();
+//		
+//		CProd oldProd = userProdComponent.queryByProdSn(oldProdSn);		//原产品
+//		CUser user = userComponent.queryUserById(oldProd.getUser_id());	//前台用户记录有时未选中 UserPanel
+//		List<CUserBroadband> userBandList = new ArrayList<CUserBroadband>();
+//		CUserBroadband userBand = new CUserBroadband();
+//		BeanUtils.copyProperties(user, userBand);
+//		userBandList.add(userBand);
+//		//getBusiParam().setSelectedBands(userBandList);
+//		
+//		Map<String, Object> bu = new HashMap<String, Object>();
+//		bu.put("net_type", userBand.getNet_type_text());
+//		bu.put("login_name", userBand.getLogin_name());
+//		bu.put("modem_mac", userBand.getModem_mac());
+//		bu.put("bind_type", userBand.getBind_type_text());
+//		
+//		getBusiParam().setBusiConfirmParam("bandUser", bu);
+//		/*原资费相关信息*/
+//		String oldProdId = oldProd.getProd_id();
+//		List<AcctAcctitemActiveDto> oldAcctItemActiveList = acctComponent.queryActiveById(user.getAcct_id(), oldProdId);
+//		CAcctAcctitem oldAcctItem = acctComponent.queryAcctItemByAcctitemId(user.getAcct_id(), oldProdId);
+//		PProdTariff oldTariff = userProdComponent.queryProdTariffById(oldProd.getTariff_id());
+//		List<CAcctAcctitemInactive> oldInactiveList = acctComponent.queryInactive(user.getAcct_id(), oldProdId);
+//		PProd oldP = userProdComponent.queryByProdId(oldProdId);
+//		Map<String, String> oldMap = new HashMap<String, String>();
+//		oldMap.put("prod_name", oldP.getProd_name());
+//		oldMap.put("tariff_name", oldTariff.getTariff_name());
+//		getBusiParam().setBusiConfirmParam("old_prod", oldMap);
+//		
+//		
+//		//订购新产品
+//		saveOrderBaseList(getBusiParam().getSelectedUsers(),doneCode,prodId,tariffId,feeDate,expDate,null,SystemConstants.PROD_ORDER_TYPE_ORDER,null,SystemConstants.BOOLEAN_FALSE);
+//		
+//		/*新资费相关信息*/
+//		CAcctAcctitem newAcctItem = acctComponent.queryAcctItemByAcctitemId(user.getAcct_id(), prodId);
+//		CProd newProd = userProdComponent.queryByAcctItem(user.getAcct_id(), prodId);
+//		PProdTariff newTariff = userProdComponent.queryProdTariffById(tariffId);
+//		Map<String, Object> newMap = new HashMap<String, Object>();
+//		PProd newP = userProdComponent.queryByProdId(prodId);
+//		newMap.put("prod_name", newP.getProd_name());
+//		newMap.put("tariff_name", newTariff.getTariff_name());
+//		String prod_desc = newP.getProd_desc();
+//		prod_desc = StringHelper.isEmpty(prod_desc) ? "":prod_desc;
+//		prod_desc = prod_desc.replaceAll("\n", "</br>").replaceAll("\r", "").replaceAll("\"", "") ;
+//		int times = ( prod_desc.length() / 64 ) +  ( prod_desc.length() % 64 > 0 ? 1: 0 );
+//		List<String> prod_descs = new ArrayList<String>();
+//		for(int index =0;index<times;index++){
+//			int start = index * 64;
+//			int limit = start + 64;
+//			limit = limit > prod_desc.length() ? prod_desc.length() : limit; 
+//			String sub = prod_desc.substring(start,limit );
+//			prod_descs.add(sub);
 //		}
-		
-		for(CAcctAcctitemInactive inactive : oldInactiveList){
-			inactiveFee += inactive.getBalance().intValue();
-		}
-		
-		//presentFee 根据资费不同，赠送金额
-		int activeBalance = activeUnCashBalance + inactiveFee - transFee + cashNoTransFee;
-		if(realBill>0){
-			if(activeCashBalance>realBill)
-				activeCashBalance-=realBill;
-			else{
-				activeCashBalance=0;
-				activeBalance-=realBill;
-			}
-			if(activeBalance<0)
-				throw new ComponentException("请先付清原欠费金额！");
-		}
-		activeBalance+=presentFee;
-		if(activeBalance > 0){
-			acctComponent.changeAcctItemBanlance(doneCode, BusiCodeConstants.BAND_CHANG_PROD, newProd.getCust_id(), 
-					newProd.getAcct_id(), newProd.getProd_id(), SystemConstants.ACCT_CHANGE_TRANS, SystemConstants.ACCT_FEETYPE_PRESENT, 
-					activeBalance, null);
-			
-		}else{
-			//创建欠费账单
-			String billingCycle = DateHelper.format(new Date(), DateHelper.FORMAT_YM);
-			billComponent.createBill(newProd, doneCode, billingCycle,
-					activeBalance * -1, activeBalance * -1, SystemConstants.BILL_COME_FROM_AUTO);
-			acctComponent.changeAcctItemOwefee(false, user.getAcct_id(), prodId, activeBalance * -1);
-		}
-		//原现金转入新账户
-		if(activeCashBalance>0)
-			acctComponent.changeAcctItemBanlance(doneCode, BusiCodeConstants.BAND_CHANG_PROD,
-					 newProd.getCust_id(), newProd.getAcct_id(), newProd.getProd_id(),
-				SystemConstants.ACCT_CHANGE_PAY , SystemConstants.ACCT_FEETYPE_CASH, activeCashBalance, null);
-		
-		//作废原账目欠费账单
-		if(oldAcctItem.getReal_balance().intValue() < 0 
-				&& oldAcctItem.getOrder_balance().intValue() < oldAcctItem.getReal_balance().intValue() * -1){
-			List<BBill> oweBillList = billComponent.queryOweBillByProdSn(oldProdSn);
-			for(BBill bill : oweBillList){
-				billComponent.cancelBill(bill.getBill_sn());
-			}
-		}
-		/*if(oldTariff.getBilling_cycle()>1 && newTariff.getBilling_cycle()>1){
-				billComponent.updateBillInfo(oldProdSn, newProd.getProd_sn(), newProd.getTariff_id(), 
-						newProd.getAcct_id(), newProd.getProd_id());
-				newAcctItem = acctComponent.queryAcctItemByAcctitemId(newProd.getAcct_id(), newProd.getProd_id());
-				int balance = newAcctItem.getActive_balance() + oldAcctItem.getActive_balance();
-				int oweFee = balance > newTariff.getRent() ? newTariff.getRent() : balance;
-				acctComponent.changeAcctItemOwefee(true, newProd.getAcct_id(), newProd.getProd_id(), oweFee);
-		}*/
-		
-		//退订原产品,将余额转账到新产品中
-		terminate(doneCode, new String[] { oldProdSn },
-				SystemConstants.ACCT_BALANCE_TRANS, newAcctItem.getAcct_id(),
-				newAcctItem.getAcctitem_id());
-		
-		if(newTariff.getBilling_cycle() > 1){
-			//修改新资费产品到期日和原资费产品到期日一样
-			userProdComponent.updateInvalidDate(doneCode, newProd.getProd_sn(), oldProd.getInvalid_date());
-			newAcctItem = acctComponent.queryAcctItemByAcctitemId(newProd.getAcct_id(), newProd.getProd_id());
-			//作废原有账单
-			billComponent.cancelBill(oldProd.getProd_sn(), DateHelper.nowYearMonth());
-//			if(oldTariff.getBilling_cycle() == 1){
-				//出账剩下还未出账的所有余额
-				int balance = newAcctItem.getActive_balance() - newAcctItem.getOwe_fee();
-				
-				if(balance>0){
-					int monthCycles=balance/newTariff.getRent();
-					if(monthCycles>0){
-						throw new ComponentException("数据异常，请与管理员联系");
-					}
-					int monthFee = newTariff.getRent()/newTariff.getBilling_cycle();
-					//余额小于月租，将金额累加到当前未出帐账单上
-					if(balance < monthFee && oldTariff.getBilling_cycle() == 1){
-						billComponent.updateMuchBill(newProd.getProd_sn(), balance, DateHelper.nowYearMonth());
-						acctComponent.changeAcctItemOwefee(true, newAcctItem.getAcct_id(), newAcctItem.getAcctitem_id(), balance);
-					}else{
-						int oweFee = balance;
-						Date invalidDate = newProd.getInvalid_date();
-						monthFee=(int)(newTariff.getRent()*1.0/newTariff.getBilling_cycle());
-						int monthIndex = 0;
-						while(balance>0){
-							int billFee = monthFee;
-							//按到期日来判断开始账单的账期
-							String billingCycle = DateHelper.format(DateHelper.getNextMonthByNum(invalidDate,monthIndex), DateHelper.FORMAT_YM);
-							if(monthFee >= balance){
-								billFee = balance;
-								balance = 0;
-							}else{
-								balance = balance - billFee;
-							}
-							billComponent.createBill(newProd, doneCode, billingCycle, billFee, billFee, SystemConstants.BILL_COME_FROM_MUCH);
-							monthIndex++;
-						}
-						acctComponent.changeAcctItemOwefee(true, newAcctItem.getAcct_id(), newAcctItem.getAcctitem_id(), oweFee);
-					}
-				}
-		}
-		userProdComponent.updateInvalidDate(doneCode,  newProd.getProd_sn(),0, activeUnCashBalance+activeCashBalance, null);
-		
-		acctComponent.saveBandUpgradeInfo(doneCode,
-				BusiCodeConstants.BAND_CHANG_PROD, custId, user.getUser_id(),
-				newAcctItem.getAcct_id(), oldProd.getProd_id(), prodId, oldProd.getTariff_id(), 
-				tariffId, oldAcctItem, oldAcctItemActiveList, inactiveFee+presentFee);
-		
-		jobComponent.createCreditCalJob(doneCode, custId, null, SystemConstants.BOOLEAN_TRUE);
-		jobComponent.createCustWriteOffJob(doneCode, custId, SystemConstants.BOOLEAN_TRUE);
-		jobComponent.createCreditExecJob(doneCode, custId);
-		jobComponent.createInvalidCalJob(doneCode, custId);
-		jobComponent.createAcctModeCalJob(doneCode, custId);
-		
-		saveAllPublic(doneCode,getBusiParam());
+//		newMap.put("prod_desc", prod_desc);
+//		newMap.put("prod_descs", prod_descs);
+//		getBusiParam().setBusiConfirmParam("new_prod", newMap);
+//		doneCodeComponent.saveDoneCodeInfo(doneCode, custId, user.getUser_id(), getBusiParam().getBusiConfirmParamInfo());
+//		//非现金余额赠送			现金余额
+//		int activeUnCashBalance = 0, activeCashBalance = 0, transFee = 0, cashNoTransFee = 0, realBill = 0, inactiveFee = 0;
+//		
+//		for(AcctAcctitemActiveDto active : oldAcctItemActiveList){
+//			if(active.getIs_cash().equals(SystemConstants.BOOLEAN_FALSE)){
+//				activeUnCashBalance += active.getBalance().intValue();
+//			}else{
+//				activeCashBalance += active.getBalance().intValue();
+//			}
+//			
+//			//不是现金金额且能转账的，需要扣除，因为退订时已经转账过去了
+//			if(active.getIs_cash().equals(SystemConstants.BOOLEAN_FALSE)
+//					&& active.getCan_trans().equals(SystemConstants.BOOLEAN_TRUE)){
+//				transFee += active.getBalance().intValue();
+//			}
+//			
+//			//现金且不能转账的，赠送进新账目中
+//			if(active.getIs_cash().equals(SystemConstants.BOOLEAN_TRUE)
+//					&& active.getCan_trans().equals(SystemConstants.BOOLEAN_FALSE)){
+//				cashNoTransFee += active.getBalance().intValue();
+//			}
+//		}
+//		realBill = oldAcctItem.getReal_bill().intValue();	//原产品本月费用
+//		
+////		if(activeCashBalance > 0 && activeUnCashBalance == 0){	//只有现金余额
+////			//有现金余额，原账目本月费用已除去，其余金额已作可转余额转到新账目中
+////			realBill = 0;
+////		}
+//		
+//		for(CAcctAcctitemInactive inactive : oldInactiveList){
+//			inactiveFee += inactive.getBalance().intValue();
+//		}
+//		
+//		//presentFee 根据资费不同，赠送金额
+//		int activeBalance = activeUnCashBalance + inactiveFee - transFee + cashNoTransFee;
+//		if(realBill>0){
+//			if(activeCashBalance>realBill)
+//				activeCashBalance-=realBill;
+//			else{
+//				activeCashBalance=0;
+//				activeBalance-=realBill;
+//			}
+//			if(activeBalance<0)
+//				throw new ComponentException("请先付清原欠费金额！");
+//		}
+//		activeBalance+=presentFee;
+//		if(activeBalance > 0){
+//			acctComponent.changeAcctItemBanlance(doneCode, BusiCodeConstants.BAND_CHANG_PROD, newProd.getCust_id(), 
+//					newProd.getAcct_id(), newProd.getProd_id(), SystemConstants.ACCT_CHANGE_TRANS, SystemConstants.ACCT_FEETYPE_PRESENT, 
+//					activeBalance, null);
+//			
+//		}else{
+//			//创建欠费账单
+//			String billingCycle = DateHelper.format(new Date(), DateHelper.FORMAT_YM);
+//			billComponent.createBill(newProd, doneCode, billingCycle,
+//					activeBalance * -1, activeBalance * -1, SystemConstants.BILL_COME_FROM_AUTO);
+//			acctComponent.changeAcctItemOwefee(false, user.getAcct_id(), prodId, activeBalance * -1);
+//		}
+//		//原现金转入新账户
+//		if(activeCashBalance>0)
+//			acctComponent.changeAcctItemBanlance(doneCode, BusiCodeConstants.BAND_CHANG_PROD,
+//					 newProd.getCust_id(), newProd.getAcct_id(), newProd.getProd_id(),
+//				SystemConstants.ACCT_CHANGE_PAY , SystemConstants.ACCT_FEETYPE_CASH, activeCashBalance, null);
+//		
+//		//作废原账目欠费账单
+//		if(oldAcctItem.getReal_balance().intValue() < 0 
+//				&& oldAcctItem.getOrder_balance().intValue() < oldAcctItem.getReal_balance().intValue() * -1){
+//			List<BBill> oweBillList = billComponent.queryOweBillByProdSn(oldProdSn);
+//			for(BBill bill : oweBillList){
+//				billComponent.cancelBill(bill.getBill_sn());
+//			}
+//		}
+//		/*if(oldTariff.getBilling_cycle()>1 && newTariff.getBilling_cycle()>1){
+//				billComponent.updateBillInfo(oldProdSn, newProd.getProd_sn(), newProd.getTariff_id(), 
+//						newProd.getAcct_id(), newProd.getProd_id());
+//				newAcctItem = acctComponent.queryAcctItemByAcctitemId(newProd.getAcct_id(), newProd.getProd_id());
+//				int balance = newAcctItem.getActive_balance() + oldAcctItem.getActive_balance();
+//				int oweFee = balance > newTariff.getRent() ? newTariff.getRent() : balance;
+//				acctComponent.changeAcctItemOwefee(true, newProd.getAcct_id(), newProd.getProd_id(), oweFee);
+//		}*/
+//		
+//		//退订原产品,将余额转账到新产品中
+//		terminate(doneCode, new String[] { oldProdSn },
+//				SystemConstants.ACCT_BALANCE_TRANS, newAcctItem.getAcct_id(),
+//				newAcctItem.getAcctitem_id());
+//		
+//		if(newTariff.getBilling_cycle() > 1){
+//			//修改新资费产品到期日和原资费产品到期日一样
+//			userProdComponent.updateInvalidDate(doneCode, newProd.getProd_sn(), oldProd.getInvalid_date());
+//			newAcctItem = acctComponent.queryAcctItemByAcctitemId(newProd.getAcct_id(), newProd.getProd_id());
+//			//作废原有账单
+//			billComponent.cancelBill(oldProd.getProd_sn(), DateHelper.nowYearMonth());
+////			if(oldTariff.getBilling_cycle() == 1){
+//				//出账剩下还未出账的所有余额
+//				int balance = newAcctItem.getActive_balance() - newAcctItem.getOwe_fee();
+//				
+//				if(balance>0){
+//					int monthCycles=balance/newTariff.getRent();
+//					if(monthCycles>0){
+//						throw new ComponentException("数据异常，请与管理员联系");
+//					}
+//					int monthFee = newTariff.getRent()/newTariff.getBilling_cycle();
+//					//余额小于月租，将金额累加到当前未出帐账单上
+//					if(balance < monthFee && oldTariff.getBilling_cycle() == 1){
+//						billComponent.updateMuchBill(newProd.getProd_sn(), balance, DateHelper.nowYearMonth());
+//						acctComponent.changeAcctItemOwefee(true, newAcctItem.getAcct_id(), newAcctItem.getAcctitem_id(), balance);
+//					}else{
+//						int oweFee = balance;
+//						Date invalidDate = newProd.getInvalid_date();
+//						monthFee=(int)(newTariff.getRent()*1.0/newTariff.getBilling_cycle());
+//						int monthIndex = 0;
+//						while(balance>0){
+//							int billFee = monthFee;
+//							//按到期日来判断开始账单的账期
+//							String billingCycle = DateHelper.format(DateHelper.getNextMonthByNum(invalidDate,monthIndex), DateHelper.FORMAT_YM);
+//							if(monthFee >= balance){
+//								billFee = balance;
+//								balance = 0;
+//							}else{
+//								balance = balance - billFee;
+//							}
+//							billComponent.createBill(newProd, doneCode, billingCycle, billFee, billFee, SystemConstants.BILL_COME_FROM_MUCH);
+//							monthIndex++;
+//						}
+//						acctComponent.changeAcctItemOwefee(true, newAcctItem.getAcct_id(), newAcctItem.getAcctitem_id(), oweFee);
+//					}
+//				}
+//		}
+//		userProdComponent.updateInvalidDate(doneCode,  newProd.getProd_sn(),0, activeUnCashBalance+activeCashBalance, null);
+//		
+//		acctComponent.saveBandUpgradeInfo(doneCode,
+//				BusiCodeConstants.BAND_CHANG_PROD, custId, user.getUser_id(),
+//				newAcctItem.getAcct_id(), oldProd.getProd_id(), prodId, oldProd.getTariff_id(), 
+//				tariffId, oldAcctItem, oldAcctItemActiveList, inactiveFee+presentFee);
+//		
+//		jobComponent.createCreditCalJob(doneCode, custId, null, SystemConstants.BOOLEAN_TRUE);
+//		jobComponent.createCustWriteOffJob(doneCode, custId, SystemConstants.BOOLEAN_TRUE);
+//		jobComponent.createCreditExecJob(doneCode, custId);
+//		jobComponent.createInvalidCalJob(doneCode, custId);
+//		jobComponent.createAcctModeCalJob(doneCode, custId);
+//		
+//		saveAllPublic(doneCode,getBusiParam());
 	}
 	
 	public void changeProdDynRes(String prodSn,List<UserProdRscDto> dyResList) throws Exception {
-		Integer doneCode = doneCodeComponent.gDoneCode();
-		String  custId = getBusiParam().getCust().getCust_id();
-		
-		CProd prod = userProdComponent.queryByProdSn(prodSn);
-		UserDto user = userComponent.queryUserById(prod.getUser_id());
-		
-		//用户下除旧产品外的所有资源
-		List<String> oldResIds = userProdComponent.queryResByUserId(user.getUser_id(), prod.getProd_id());
-		List<String> oldProdResIds = userProdComponent.queryUserProdRes(prodSn);		//旧产品资源
-		//旧产品资源在用户下其他产品不存在，则发减授权,否则不发减授权
-		for(String oldProdResId : oldProdResIds){
-			boolean flag = true;
-			for(String oldResId : oldResIds){
-				if(oldProdResId.equals(oldResId)){
-					flag = false;
-					break;
-				}
-			}
-			if(flag){
-				//减授权
-				jobComponent.createBusiCmdJob(doneCode, BusiCmdConstants.PASSVATE_PROD,
-						custId, user.getUser_id(), user.getStb_id(), user.getCard_id(),
-						user.getModem_mac(), prod.getProd_sn(), prod.getProd_id(),
-						"RES_ID:''"+oldProdResId+"''");
-			}
-		}
-		
-		//更换资源
-		userProdComponent.changeProdDynRes(prodSn, dyResList);
-		
-		//加授权
-		jobComponent.createBusiCmdJob(doneCode,BusiCmdConstants.ACCTIVATE_PROD, 
-				custId, user.getUser_id(), user.getStb_id(), user.getCard_id(), 
-				user.getModem_mac(), prod.getProd_sn(), prod.getProd_id(), 
-				JsonHelper.fromObject(user));
-		
-		jobComponent.createCreditCalJob(doneCode, custId, null, SystemConstants.BOOLEAN_TRUE);
-		
-		if(getBusiParam().getSelectedUserIds().size() == 0){
-			if(user.getUser_type().equals(SystemConstants.USER_TYPE_ATV)){
-				List<CUserAtv> userList = new ArrayList<CUserAtv>();
-				CUserAtv atv = new CUserAtv();
-				BeanUtils.copyProperties(user, atv);
-				userList.add(atv);
-				getBusiParam().setSelectedAtvs(userList);
-			}else if(user.getUser_type().equals(SystemConstants.USER_TYPE_DTV)){
-				List<CUserDtv> userList = new ArrayList<CUserDtv>();
-				CUserDtv dtv = new CUserDtv();
-				BeanUtils.copyProperties(user, dtv);
-				userList.add(dtv);
-				getBusiParam().setSelectedDtvs(userList);
-			}else if(user.getUser_type().equals(SystemConstants.USER_TYPE_BAND)){
-				List<CUserBroadband> userList = new ArrayList<CUserBroadband>();
-				CUserBroadband band = new CUserBroadband();
-				BeanUtils.copyProperties(user, band);
-				userList.add(band);
-				getBusiParam().setSelectedBands(userList);
-			}
-		}
-		saveAllPublic(doneCode, getBusiParam());
+//		Integer doneCode = doneCodeComponent.gDoneCode();
+//		String  custId = getBusiParam().getCust().getCust_id();
+//		
+//		CProd prod = userProdComponent.queryByProdSn(prodSn);
+//		UserDto user = userComponent.queryUserById(prod.getUser_id());
+//		
+//		//用户下除旧产品外的所有资源
+//		List<String> oldResIds = userProdComponent.queryResByUserId(user.getUser_id(), prod.getProd_id());
+//		List<String> oldProdResIds = userProdComponent.queryUserProdRes(prodSn);		//旧产品资源
+//		//旧产品资源在用户下其他产品不存在，则发减授权,否则不发减授权
+//		for(String oldProdResId : oldProdResIds){
+//			boolean flag = true;
+//			for(String oldResId : oldResIds){
+//				if(oldProdResId.equals(oldResId)){
+//					flag = false;
+//					break;
+//				}
+//			}
+//			if(flag){
+//				//减授权
+//				jobComponent.createBusiCmdJob(doneCode, BusiCmdConstants.PASSVATE_PROD,
+//						custId, user.getUser_id(), user.getStb_id(), user.getCard_id(),
+//						user.getModem_mac(), prod.getProd_sn(), prod.getProd_id(),
+//						"RES_ID:''"+oldProdResId+"''");
+//			}
+//		}
+//		
+//		//更换资源
+//		userProdComponent.changeProdDynRes(prodSn, dyResList);
+//		
+//		//加授权
+//		jobComponent.createBusiCmdJob(doneCode,BusiCmdConstants.ACCTIVATE_PROD, 
+//				custId, user.getUser_id(), user.getStb_id(), user.getCard_id(), 
+//				user.getModem_mac(), prod.getProd_sn(), prod.getProd_id(), 
+//				JsonHelper.fromObject(user));
+//		
+//		jobComponent.createCreditCalJob(doneCode, custId, null, SystemConstants.BOOLEAN_TRUE);
+//		
+//		if(getBusiParam().getSelectedUserIds().size() == 0){
+//			if(user.getUser_type().equals(SystemConstants.USER_TYPE_ATV)){
+//				List<CUserAtv> userList = new ArrayList<CUserAtv>();
+//				CUserAtv atv = new CUserAtv();
+//				BeanUtils.copyProperties(user, atv);
+//				userList.add(atv);
+//				getBusiParam().setSelectedAtvs(userList);
+//			}else if(user.getUser_type().equals(SystemConstants.USER_TYPE_DTV)){
+//				List<CUserDtv> userList = new ArrayList<CUserDtv>();
+//				CUserDtv dtv = new CUserDtv();
+//				BeanUtils.copyProperties(user, dtv);
+//				userList.add(dtv);
+//				getBusiParam().setSelectedDtvs(userList);
+//			}else if(user.getUser_type().equals(SystemConstants.USER_TYPE_BAND)){
+//				List<CUserBroadband> userList = new ArrayList<CUserBroadband>();
+//				CUserBroadband band = new CUserBroadband();
+//				BeanUtils.copyProperties(user, band);
+//				userList.add(band);
+//				getBusiParam().setSelectedBands(userList);
+//			}
+//		}
+//		saveAllPublic(doneCode, getBusiParam());
 	}
 	
 	
 	public void saveBatchCancel(List<String> userIdList, String prodId) throws Exception {
-		BusiParameter parameter = getBusiParam();
-		for(String userId : userIdList){
-			UserDto user = userComponent.queryUserById(userId);
-			if(user == null){
-				throw new ServicesException("用户不存在,用户ID: " + userId);
-			}
-			
-			expressionUtil.setCuser(user);
-			CProd prod = expressionUtil.orderPord(prodId);
-			if(prod == null){
-				throw new ServicesException("未订购该产品,用户ID: " + userId);
-			}
-			
-			//如果是基本包，且用户下无其他基本包，则不能退订
-			if(prod.getIs_base().equals(SystemConstants.BOOLEAN_TRUE)){
-				boolean flag = true;
-				List<CProdDto> prodList = userProdComponent.queryByUserId(userId);
-				for(CProdDto prodDto : prodList){
-					if (!prodId.equals(prodDto.getProd_id())
-							&& prodDto.getIs_base().equals(SystemConstants.BOOLEAN_TRUE)) {
-						flag = false;
-						break;
-					}
-				}
-				if(flag){
-					throw new ServicesException("该产品为基本包,用户下已无基本包,无法退订,用户ID: " + userId);
-				}
-			}
-			
-			AcctitemDto acctitem = acctComponent.queryAcctItemByUserId(user.getUser_id(), prodId);
-			if (acctitem.getReal_balance().intValue() < 0
-					&& acctitem.getOrder_balance().intValue() != acctitem.getReal_balance().intValue() * -1) {
-				throw new ServicesException("用户账目欠费,无法退订,用户ID: " + userId);
-			}
-			
-			Integer doneCode = doneCodeComponent.gDoneCode();
-			
-			CustFullInfoDto custFullInfo = new CustFullInfoDto();
-			custFullInfo.setCust(custComponent.queryCustById(user.getCust_id()));
-			parameter.setCustFullInfo(custFullInfo);
-			
-			String userType = user.getUser_type();
-			if(userType.equals(SystemConstants.USER_TYPE_DTV)){
-				List<CUserDtv> userDtvList = new ArrayList<CUserDtv>();
-				CUserDtv userDtv = new CUserDtv();
-				BeanUtils.copyProperties(user, userDtv);
-				userDtvList.add(userDtv);
-				parameter.setSelectedDtvs(userDtvList);
-			}else if(userType.equals(SystemConstants.USER_TYPE_ATV)){
-				List<CUserAtv> userAtvList = new ArrayList<CUserAtv>();
-				CUserAtv userAtv = new CUserAtv();
-				BeanUtils.copyProperties(user, userAtv);
-				userAtvList.add(userAtv);
-				parameter.setSelectedAtvs(userAtvList);
-			}else if(userType.equals(SystemConstants.USER_TYPE_BAND)){
-				List<CUserBroadband> userBandList = new ArrayList<CUserBroadband>();
-				CUserBroadband userBand = new CUserBroadband();
-				BeanUtils.copyProperties(user, userBand);
-				userBandList.add(userBand);
-				parameter.setSelectedBands(userBandList);
-			}
-			
-			//批量退订，账目余额默认作废掉
-			String busiInfo = terminate(doneCode, new String[] { prod.getProd_sn() }, 
-					SystemConstants.ACCT_BALANCE_EXPIRE, "", "");
-			//账务模式，重新计算到期日
-			jobComponent.createInvalidCalJob(doneCode, user.getCust_id());
-//			saveAllPublic(doneCode,getBusiParam(),busiInfo);
-			saveAllPublic(doneCode,getBusiParam());
-		}
+//		BusiParameter parameter = getBusiParam();
+//		for(String userId : userIdList){
+//			UserDto user = userComponent.queryUserById(userId);
+//			if(user == null){
+//				throw new ServicesException("用户不存在,用户ID: " + userId);
+//			}
+//			
+//			expressionUtil.setCuser(user);
+//			CProd prod = expressionUtil.orderPord(prodId);
+//			if(prod == null){
+//				throw new ServicesException("未订购该产品,用户ID: " + userId);
+//			}
+//			
+//			//如果是基本包，且用户下无其他基本包，则不能退订
+//			if(prod.getIs_base().equals(SystemConstants.BOOLEAN_TRUE)){
+//				boolean flag = true;
+//				List<CProdDto> prodList = userProdComponent.queryByUserId(userId);
+//				for(CProdDto prodDto : prodList){
+//					if (!prodId.equals(prodDto.getProd_id())
+//							&& prodDto.getIs_base().equals(SystemConstants.BOOLEAN_TRUE)) {
+//						flag = false;
+//						break;
+//					}
+//				}
+//				if(flag){
+//					throw new ServicesException("该产品为基本包,用户下已无基本包,无法退订,用户ID: " + userId);
+//				}
+//			}
+//			
+//			AcctitemDto acctitem = acctComponent.queryAcctItemByUserId(user.getUser_id(), prodId);
+//			if (acctitem.getReal_balance().intValue() < 0
+//					&& acctitem.getOrder_balance().intValue() != acctitem.getReal_balance().intValue() * -1) {
+//				throw new ServicesException("用户账目欠费,无法退订,用户ID: " + userId);
+//			}
+//			
+//			Integer doneCode = doneCodeComponent.gDoneCode();
+//			
+//			CustFullInfoDto custFullInfo = new CustFullInfoDto();
+//			custFullInfo.setCust(custComponent.queryCustById(user.getCust_id()));
+//			parameter.setCustFullInfo(custFullInfo);
+//			
+//			String userType = user.getUser_type();
+//			if(userType.equals(SystemConstants.USER_TYPE_DTV)){
+//				List<CUserDtv> userDtvList = new ArrayList<CUserDtv>();
+//				CUserDtv userDtv = new CUserDtv();
+//				BeanUtils.copyProperties(user, userDtv);
+//				userDtvList.add(userDtv);
+//				parameter.setSelectedDtvs(userDtvList);
+//			}else if(userType.equals(SystemConstants.USER_TYPE_ATV)){
+//				List<CUserAtv> userAtvList = new ArrayList<CUserAtv>();
+//				CUserAtv userAtv = new CUserAtv();
+//				BeanUtils.copyProperties(user, userAtv);
+//				userAtvList.add(userAtv);
+//				parameter.setSelectedAtvs(userAtvList);
+//			}else if(userType.equals(SystemConstants.USER_TYPE_BAND)){
+//				List<CUserBroadband> userBandList = new ArrayList<CUserBroadband>();
+//				CUserBroadband userBand = new CUserBroadband();
+//				BeanUtils.copyProperties(user, userBand);
+//				userBandList.add(userBand);
+//				parameter.setSelectedBands(userBandList);
+//			}
+//			
+//			//批量退订，账目余额默认作废掉
+//			String busiInfo = terminate(doneCode, new String[] { prod.getProd_sn() }, 
+//					SystemConstants.ACCT_BALANCE_EXPIRE, "", "");
+//			//账务模式，重新计算到期日
+//			jobComponent.createInvalidCalJob(doneCode, user.getCust_id());
+////			saveAllPublic(doneCode,getBusiParam(),busiInfo);
+//			saveAllPublic(doneCode,getBusiParam());
+//		}
 	}
 
 	/**
@@ -1000,7 +1000,7 @@ public class UserProdService extends BaseBusiService implements IUserProdService
 		//获取产品信息
 		CProd cProd = userProdComponent.queryByProdSn(prodSn);
 		PProd prod = prodComponent.queryProdById(cProd.getProd_id());
-		UserDto user = userComponent.queryUserById(cProd.getUser_id());
+		CUser user = userComponent.queryUserById(cProd.getUser_id());
 		
 		CProdPropChange propChange = new CProdPropChange();
 		propChange.setColumn_name("is_bank_pay");
@@ -1413,12 +1413,12 @@ public class UserProdService extends BaseBusiService implements IUserProdService
 	
 	private List<PProd> queryOrderProd(String[] userIds, String userType,String servType)
 		throws Exception {
-		String servId = userType;
-		if (userType.equals(SystemConstants.USER_TYPE_DTV)
-				&& servType.equals(SystemConstants.DTV_SERV_TYPE_DOUBLE)) {
-			servId = SystemConstants.USER_TYPE_DTV + ","+SystemConstants.PROD_SERV_ID_ITV;
-		}
-		return userProdComponent.queryCanOrderProds(userIds,servId);
+//		String servId = userType;
+//		if (userType.equals(SystemConstants.USER_TYPE_DTV)
+//				&& servType.equals(SystemConstants.DTV_SERV_TYPE_DOUBLE)) {
+//			servId = SystemConstants.USER_TYPE_DTV + ","+SystemConstants.PROD_SERV_ID_ITV;
+//		}
+		return null;//userProdComponent.queryCanOrderProds(userIds,servId);
 	}
 	
 	private List<PProd> filterProd(List<PProd> prodList, List<CUser> selectedUsers) throws Exception {
@@ -1660,12 +1660,12 @@ public class UserProdService extends BaseBusiService implements IUserProdService
 		//	 产品规则
 			if(selectedUsers.size() > 0){
 				for (CUser user : selectedUsers) {
-					//user原先是免费的，改成超额；原先超额改免费
-					if(type.equals("OUT")){
-						user.setStr19("F");
-					}else{
-						user.setStr19("T");
-					}
+//					//user原先是免费的，改成超额；原先超额改免费
+//					if(type.equals("OUT")){
+//						user.setStr19("F");
+//					}else{
+//						user.setStr19("T");
+//					}
 					expressionUtil.setCuser(user);
 					if (!expressionUtil.parseBoolean(tariff.getRule_id_text(),String.valueOf(selectedUsers.size()))) {
 						tariffList.remove(i);
@@ -1799,7 +1799,7 @@ public class UserProdService extends BaseBusiService implements IUserProdService
 		CCust cust = custComponent.queryCustById(custId);
 		expressionUtil.setCcust(cust);
 		
-		UserDto userDto = userComponent.queryUserById(userId);
+		CUser userDto = userComponent.queryUserById(userId);
 		CUserDtv dtvUser = new CUserDtv();
 		BeanUtils.copyProperties(userDto, dtvUser);
 		
@@ -2017,7 +2017,7 @@ public class UserProdService extends BaseBusiService implements IUserProdService
 	
 	public void tempPauseProd(Integer doneCode,String prodSn,String userId) throws Exception {
 		String custId = getBusiParam().getCust().getCust_id();
-		UserDto user = queryUserById(userId);
+		CUser user = queryUserById(userId);
 		CProd prod = userProdComponent.queryByProdSn(prodSn);
 		
 		if(prod.getProd_type().equals(SystemConstants.PROD_TYPE_BASE)){
@@ -2045,7 +2045,7 @@ public class UserProdService extends BaseBusiService implements IUserProdService
 	public void resumeProd(String prodSn,String userId) throws Exception {
 		Integer doneCode = doneCodeComponent.gDoneCode();
 		String custId = getBusiParam().getCust().getCust_id();
-		UserDto user = queryUserById(userId);
+		CUser user = queryUserById(userId);
 		
 		CProd prod = userProdComponent.queryByProdSn(prodSn);
 		

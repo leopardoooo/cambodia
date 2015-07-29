@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import com.ycsoft.beans.core.cust.CCust;
 import com.ycsoft.beans.core.cust.CCustLinkman;
+import com.ycsoft.beans.core.user.CUser;
 import com.ycsoft.beans.task.TTaskDetailType;
 import com.ycsoft.beans.task.WPrint;
 import com.ycsoft.beans.task.WTaskBaseInfo;
@@ -75,7 +76,7 @@ public class TaskService extends BaseBusiService implements ITaskService {
 			String tpl = taskComponent.queryPrintContent(taskTypes[i]);
 			CustFullInfoDto cust = custComponent.searchCustInfoById(cust_id[i]);
 			TaskQueryWorkDto task = taskComponent.queryTaskByTaskId(task_id[i]);
-			UserDto  user = userComponent.queryUserById(task.getUser_id());
+			CUser  user = userComponent.queryUserById(task.getUser_id());
 			Map<String,Object> map = new HashMap<String,Object>();
 			
 			//更新工单状态为施工中

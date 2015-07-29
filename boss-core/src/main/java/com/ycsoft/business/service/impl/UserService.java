@@ -1,12 +1,10 @@
 package com.ycsoft.business.service.impl;
 
-import static com.ycsoft.commons.constants.SystemConstants.ACCTITEM_PUBLIC_ID;
 import static com.ycsoft.commons.constants.SystemConstants.ACCTITEM_TJ;
 import static com.ycsoft.commons.constants.SystemConstants.ACCT_CHANGE_PROMOTION_CANCEL;
 import static com.ycsoft.commons.constants.SystemConstants.ACCT_FEETYPE_PRESENT;
 import static com.ycsoft.commons.constants.SystemConstants.ACCT_TYPE_SPEC;
 import static com.ycsoft.commons.constants.SystemConstants.BILLING_TYPE_MONTH;
-import static com.ycsoft.commons.constants.SystemConstants.BILL_COME_FROM_MANUAL;
 import static com.ycsoft.commons.constants.SystemConstants.BILL_COME_FROM_MUCH;
 import static com.ycsoft.commons.constants.SystemConstants.BOOLEAN_FALSE;
 import static com.ycsoft.commons.constants.SystemConstants.BOOLEAN_TRUE;
@@ -20,7 +18,6 @@ import static com.ycsoft.commons.constants.SystemConstants.PRESENT_TYPE_TIME;
 import static com.ycsoft.commons.constants.SystemConstants.PROD_ORDER_TYPE_PRESENT;
 import static com.ycsoft.commons.constants.SystemConstants.PROD_TYPE_BASE;
 import static com.ycsoft.commons.constants.SystemConstants.REFRESH_TYPE_TERMINAL;
-import static com.ycsoft.commons.constants.SystemConstants.USER_TYPE_ATV;
 import static com.ycsoft.commons.constants.SystemConstants.USER_TYPE_BAND;
 import static com.ycsoft.commons.helper.LoggerHelper.debug;
 
@@ -36,11 +33,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang.RandomStringUtils;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import com.google.gson.reflect.TypeToken;
 import com.ycsoft.beans.config.TBusiFee;
+import com.ycsoft.beans.config.TDeviceBuyMode;
 import com.ycsoft.beans.config.TOpenTemp;
 import com.ycsoft.beans.core.acct.CAcct;
 import com.ycsoft.beans.core.acct.CAcctAcctitem;
@@ -65,7 +62,6 @@ import com.ycsoft.beans.core.user.CUserAtv;
 import com.ycsoft.beans.core.user.CUserBroadband;
 import com.ycsoft.beans.core.user.CUserDtv;
 import com.ycsoft.beans.core.user.CUserPropChange;
-import com.ycsoft.beans.device.RDevice;
 import com.ycsoft.beans.prod.PPackageProd;
 import com.ycsoft.beans.prod.PProd;
 import com.ycsoft.beans.prod.PProdTariff;
@@ -77,16 +73,16 @@ import com.ycsoft.business.commons.pojo.BusiParameter;
 import com.ycsoft.business.component.config.BusiConfigComponent;
 import com.ycsoft.business.component.config.ExpressionUtil;
 import com.ycsoft.business.component.core.UserPromComponent;
+import com.ycsoft.business.component.resource.DeviceComponent;
 import com.ycsoft.business.component.resource.PromComponent;
 import com.ycsoft.business.dto.config.TemplateConfigDto;
 import com.ycsoft.business.dto.core.acct.AcctitemDto;
 import com.ycsoft.business.dto.core.acct.PayDto;
 import com.ycsoft.business.dto.core.fee.FeeBusiFormDto;
-import com.ycsoft.business.dto.core.prod.CProdDoneInfo;
+import com.ycsoft.business.dto.core.fee.FeeInfoDto;
 import com.ycsoft.business.dto.core.prod.CProdDto;
 import com.ycsoft.business.dto.core.prod.DisctFeeDto;
 import com.ycsoft.business.dto.core.prod.ProdResDto;
-import com.ycsoft.business.dto.core.prod.ProdTariffDto;
 import com.ycsoft.business.dto.core.prod.PromotionDto;
 import com.ycsoft.business.dto.core.prod.ResGroupDto;
 import com.ycsoft.business.dto.core.user.UserDto;
@@ -108,31 +104,30 @@ import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.commons.store.MemoryDict;
 import com.ycsoft.daos.core.JDBCException;
 
-@Service
+
 public class UserService extends BaseBusiService implements IUserService {
 	private PromComponent promComponent;
 	private UserPromComponent userPromComponent;
-	private BusiConfigComponent busiConfigComponent;
+	protected BusiConfigComponent busiConfigComponent;
 	private ExpressionUtil expressionUtil;
+	protected DeviceComponent deviceComponent;
+	
+	
 
-	public void createUser(CUser user) throws Exception {
+	@Override
+	public void createUser(CUser user, String deviceId, String deviceType, String deviceModel, String deviceBuyMode,
+			FeeInfoDto deviceFee) throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void createUser(CUser user,String deviceBuyMode,FeeInfoDto deviceFee) throws Exception {
 		//获取客户信息
 		CCust cust = getBusiParam().getCust();
-		
 		String  custId = cust.getCust_id();
 		String stbId = user.getStb_id();
 		String cardId = user.getCard_id();
-		String modemMac = user.getModem_mac();
-		
-		if(StringHelper.isNotEmpty(stbId) && StringHelper.isNotEmpty(cardId)){
-			RDevice stbDevice = deviceComponent.findByDeviceCode(stbId);
-			RDevice cardDevice = deviceComponent.findByDeviceCode(cardId);
-			boolean flag = deviceComponent.isPair(stbDevice.getDevice_model(), cardDevice.getDevice_model());
-			if(!flag){
-				throw new ComponentException("机顶盒型号和卡型号不能配对!");
-			}
-		}
-		
+		String modemMac = user.getModem_mac();		
 		//获取业务流水
 		Integer doneCode = doneCodeComponent.gDoneCode();
 		String user_id = userComponent.gUserId();
@@ -141,10 +136,7 @@ public class UserService extends BaseBusiService implements IUserService {
 		//创建用户信息
 		user.setUser_id(user_id);
 		user.setAcct_id(acctId);
-		user.setCust_id(custId);
-		if(StringHelper.isEmpty(user.getStr7()))	//用户类别 默认为一般用户
-			user.setStr7("YBYH");
-		
+		user.setCust_id(custId);		
 		userComponent.createUser(user);
 		
 		//处理客户设备
@@ -173,39 +165,39 @@ public class UserService extends BaseBusiService implements IUserService {
 		createUserJob(user, custId, doneCode);
 		
 		getBusiParam().setBusiConfirmParam("user", user);
-		if (user instanceof CUserDtv ){
-			//TODO 如果是双向用户自动订购按次点播节目
-			if(DTV_SERV_TYPE_DOUBLE.equals(((CUserDtv) user).getServ_type())){
-				if(BOOLEAN_TRUE.equals(userComponent.queryTemplateConfig(TemplateConfigDto.Config.AUTO_ORDER_VOD.toString()))){
-					orderVodProd(user,doneCode);
-				}
-			}
-		}
+//		if (user instanceof CUserDtv ){
+//			//TODO 如果是双向用户自动订购按次点播节目
+//			if(DTV_SERV_TYPE_DOUBLE.equals(((CUserDtv) user).getServ_type())){
+//				if(BOOLEAN_TRUE.equals(userComponent.queryTemplateConfig(TemplateConfigDto.Config.AUTO_ORDER_VOD.toString()))){
+//					orderVodProd(user,doneCode);
+//				}
+//			}
+//		}
+//		更新巡检标志		
+//		this.updateUserCheckFlag(user.getCard_id());
 		
-		this.updateUserCheckFlag(user.getCard_id());
-		
-		// 保存打印信息
-		if (user instanceof CUserAtv) {//模拟电视
-			Map<String, String> map = new HashMap<String, String>();
-			map.put("terminal_type", MemoryDict.getDictName(DictKey.TERMINAL_TYPE, ((CUserAtv) user).getTerminal_type()));
-			map.put("user_type", user.getUser_type_text());
-			doneCodeComponent.saveDoneCodeInfo(doneCode, custId,user.getUser_id(), map);
-		}else if (user instanceof CUserDtv) {// 数字电视
-			Map<String, String> map = new HashMap<String, String>();
-			map.put("terminal_type", MemoryDict.getDictName(DictKey.TERMINAL_TYPE, ((CUserDtv) user).getTerminal_type()));
-			map.put("user_type", user.getUser_type_text());
-			map.put("card_id", user.getCard_id());
-			map.put("stb_id", user.getStb_id());
-			doneCodeComponent.saveDoneCodeInfo(doneCode, custId,user.getUser_id(), map);
-		}else if (user instanceof CUserBroadband) {// 宽带
-			// 保存打印信息
-			Map<String, String> map = new HashMap<String, String>();
-			map.put("user_type", user.getUser_type_text());
-			map.put("modem_mac", user.getModem_mac());
-			map.put("login_name", ((UserDto) user).getLogin_name());
-			map.put("login_password", ((UserDto) user).getLogin_password());
-			doneCodeComponent.saveDoneCodeInfo(doneCode, custId, user.getUser_id(),map);
-		}
+//		// 保存打印信息
+//		if (user instanceof CUserAtv) {//模拟电视
+//			Map<String, String> map = new HashMap<String, String>();
+//			map.put("terminal_type", MemoryDict.getDictName(DictKey.TERMINAL_TYPE, ((CUserAtv) user).getTerminal_type()));
+//			map.put("user_type", user.getUser_type_text());
+//			doneCodeComponent.saveDoneCodeInfo(doneCode, custId,user.getUser_id(), map);
+//		}else if (user instanceof CUserDtv) {// 数字电视
+//			Map<String, String> map = new HashMap<String, String>();
+//			map.put("terminal_type", MemoryDict.getDictName(DictKey.TERMINAL_TYPE, ((CUserDtv) user).getTerminal_type()));
+//			map.put("user_type", user.getUser_type_text());
+//			map.put("card_id", user.getCard_id());
+//			map.put("stb_id", user.getStb_id());
+//			doneCodeComponent.saveDoneCodeInfo(doneCode, custId,user.getUser_id(), map);
+//		}else if (user instanceof CUserBroadband) {// 宽带
+//			// 保存打印信息
+//			Map<String, String> map = new HashMap<String, String>();
+//			map.put("user_type", user.getUser_type_text());
+//			map.put("modem_mac", user.getModem_mac());
+//			map.put("login_name", ((UserDto) user).getLogin_name());
+//			map.put("login_password", ((UserDto) user).getLogin_password());
+//			doneCodeComponent.saveDoneCodeInfo(doneCode, custId, user.getUser_id(),map);
+//		}
 		
 		//设置拦截器所需要的参数
 		getBusiParam().resetUser();
@@ -226,7 +218,7 @@ public class UserService extends BaseBusiService implements IUserService {
 		if(map.containsKey("password")){
 			String  custId = getBusiParam().getCust().getCust_id();
 			CUser user = getBusiParam().getSelectedUsers().get(0);
-			UserDto userDto = queryUserById(user.getUser_id());
+			CUser userDto = queryUserById(user.getUser_id());
 			CUserPropChange change = map.get("password");
 			userDto.setPassword(change.getOld_value());
 			userDto.setNewPassword(change.getNew_value());
@@ -251,8 +243,7 @@ public class UserService extends BaseBusiService implements IUserService {
 		if(map.containsKey("max_connection")){
 			String  custId = getBusiParam().getCust().getCust_id();
 			CUser user = getBusiParam().getSelectedUsers().get(0);
-			UserDto userDto = queryUserById(user.getUser_id());
-			jobComponent.createBusiCmdJob(doneCode, BusiCmdConstants.BAND_EDIT_CONNECT, custId, user.getUser_id(), null, null, user.getModem_mac(), null, null,  JsonHelper.fromObject(userDto));
+			jobComponent.createBusiCmdJob(doneCode, BusiCmdConstants.BAND_EDIT_CONNECT, custId, user.getUser_id(), null, null, user.getModem_mac(), null, null,  JsonHelper.fromObject(user));
 		}
 		saveAllPublic(doneCode,getBusiParam());
 	}
@@ -360,82 +351,82 @@ public class UserService extends BaseBusiService implements IUserService {
 	}
 
 	public void saveAtvToDtv(CUser user,int curMonthFee,int payFee) throws Exception {
-		//获取业务流水
-		String  custId = getBusiParam().getCust().getCust_id();
-		Integer doneCode = doneCodeComponent.gDoneCode();
-		String busiCode = getBusiParam().getBusiCode();
-		CUser oldUser = getBusiParam().getSelectedUsers().get(0);
-		String oldAcctId = oldUser.getAcct_id();
-
-		//模拟产品
-		List<CProdDto> prodList = userProdComponent.queryByUserId(oldUser.getUser_id());
-		CProdDto prod = null;
-		if(null != prodList && prodList.size() > 0){
-			prod = prodList.get(0);
-			CAcct custAcct = acctComponent.queryCustAcctByCustId(custId);
-			//保存缴费信息
-			if (payFee>0){
-				PayDto pay = new PayDto();
-				pay.setUser_id(prod.getUser_id());
-				pay.setAcct_id(prod.getAcct_id());
-				pay.setAcctitem_id(prod.getProd_id());
-				pay.setFee(payFee);
-				pay.setTariff_id(prod.getTariff_id());
-				pay.setInvalid_date(DateHelper.dateToStr(prod.getInvalid_date()));
-				this.saveAcctPay(doneCode, pay);
-			}
-			
-			//修改当月账单，出帐金额为curMonthFee
-			if (billComponent.updateBill(prod.getProd_sn(), curMonthFee) ==0){
-				//没有当月账单
-				String billingCycle = DateHelper.format(new Date(), DateHelper.FORMAT_YM);
-				billComponent.createBill(prod, doneCode, 
-						billingCycle, curMonthFee, curMonthFee, BILL_COME_FROM_MANUAL);
-			}
-			//终止模拟产品
-			terminateProd(custId, oldUser, doneCode, busiCode, prod, "TRANS", custAcct.getAcct_id(), ACCTITEM_PUBLIC_ID);
-		}
-
-		//注销模拟用户
-		userComponent.removeUserWithHis(doneCode,oldUser);
-		//生成终止用户的业务指令
-		delUserJob(user, custId, doneCode);
-//		acctComponent.removeAcctWithoutHis(oldUser.getAcct_id());
-		
-		String userId = userComponent.gUserId();
-		//创建用户账户
-		String acctId = acctComponent.createAcct(custId,userId,  ACCT_TYPE_SPEC, null);
-		//创建新用户
-		user.setUser_id(userId);
-		user.setCust_id(custId);
-		user.setAcct_id(acctId);
-		userComponent.createUser(user);
-		
-		//处理客户设备
-		if (StringHelper.isNotEmpty(user.getStb_id())){
-			updateDevice(doneCode,user.getStb_id(), custId,StatusConstants.USE);
-		}
-		if (StringHelper.isNotEmpty(user.getCard_id())){
-			updateDevice(doneCode,user.getCard_id(), custId,StatusConstants.USE);
-		}
-		if (StringHelper.isNotEmpty(user.getModem_mac())){
-			updateDevice(doneCode,user.getModem_mac(), custId,StatusConstants.USE);
-		}
-		getBusiParam().setBusiConfirmParam("user", user);
-		
-//		if (prod!=null){
-		//生成销帐任务
-		int jobId = jobComponent.createCustWriteOffJob(doneCode, custId,BOOLEAN_TRUE);
-		jobComponent.terminateAcct(jobId, oldAcctId,null,doneCode);
+//		//获取业务流水
+//		String  custId = getBusiParam().getCust().getCust_id();
+//		Integer doneCode = doneCodeComponent.gDoneCode();
+//		String busiCode = getBusiParam().getBusiCode();
+//		CUser oldUser = getBusiParam().getSelectedUsers().get(0);
+//		String oldAcctId = oldUser.getAcct_id();
+//
+//		//模拟产品
+//		List<CProdDto> prodList = userProdComponent.queryByUserId(oldUser.getUser_id());
+//		CProdDto prod = null;
+//		if(null != prodList && prodList.size() > 0){
+//			prod = prodList.get(0);
+//			CAcct custAcct = acctComponent.queryCustAcctByCustId(custId);
+//			//保存缴费信息
+//			if (payFee>0){
+//				PayDto pay = new PayDto();
+//				pay.setUser_id(prod.getUser_id());
+//				pay.setAcct_id(prod.getAcct_id());
+//				pay.setAcctitem_id(prod.getProd_id());
+//				pay.setFee(payFee);
+//				pay.setTariff_id(prod.getTariff_id());
+//				pay.setInvalid_date(DateHelper.dateToStr(prod.getInvalid_date()));
+//				this.saveAcctPay(doneCode, pay);
+//			}
+//			
+//			//修改当月账单，出帐金额为curMonthFee
+//			if (billComponent.updateBill(prod.getProd_sn(), curMonthFee) ==0){
+//				//没有当月账单
+//				String billingCycle = DateHelper.format(new Date(), DateHelper.FORMAT_YM);
+//				billComponent.createBill(prod, doneCode, 
+//						billingCycle, curMonthFee, curMonthFee, BILL_COME_FROM_MANUAL);
+//			}
+//			//终止模拟产品
+//			terminateProd(custId, oldUser, doneCode, busiCode, prod, "TRANS", custAcct.getAcct_id(), ACCTITEM_PUBLIC_ID);
 //		}
-		//生成'创建用户'JOB
-		createUserJob(user,custId,doneCode);
-		
-		getBusiParam().getSelectedAtvs().clear();
-		getBusiParam().addUser(user);
-		
-//		saveAllPublic(doneCode, getBusiParam(), busiInfo);
-		saveAllPublic(doneCode, getBusiParam());
+//
+//		//注销模拟用户
+//		userComponent.removeUserWithHis(doneCode,oldUser);
+//		//生成终止用户的业务指令
+//		delUserJob(user, custId, doneCode);
+////		acctComponent.removeAcctWithoutHis(oldUser.getAcct_id());
+//		
+//		String userId = userComponent.gUserId();
+//		//创建用户账户
+//		String acctId = acctComponent.createAcct(custId,userId,  ACCT_TYPE_SPEC, null);
+//		//创建新用户
+//		user.setUser_id(userId);
+//		user.setCust_id(custId);
+//		user.setAcct_id(acctId);
+//		userComponent.createUser(user);
+//		
+//		//处理客户设备
+//		if (StringHelper.isNotEmpty(user.getStb_id())){
+//			updateDevice(doneCode,user.getStb_id(), custId,StatusConstants.USE);
+//		}
+//		if (StringHelper.isNotEmpty(user.getCard_id())){
+//			updateDevice(doneCode,user.getCard_id(), custId,StatusConstants.USE);
+//		}
+//		if (StringHelper.isNotEmpty(user.getModem_mac())){
+//			updateDevice(doneCode,user.getModem_mac(), custId,StatusConstants.USE);
+//		}
+//		getBusiParam().setBusiConfirmParam("user", user);
+//		
+////		if (prod!=null){
+//		//生成销帐任务
+//		int jobId = jobComponent.createCustWriteOffJob(doneCode, custId,BOOLEAN_TRUE);
+//		jobComponent.terminateAcct(jobId, oldAcctId,null,doneCode);
+////		}
+//		//生成'创建用户'JOB
+//		createUserJob(user,custId,doneCode);
+//		
+//		getBusiParam().getSelectedAtvs().clear();
+//		getBusiParam().addUser(user);
+//		
+////		saveAllPublic(doneCode, getBusiParam(), busiInfo);
+//		saveAllPublic(doneCode, getBusiParam());
 	}
 	
 	public void saveCancelOpenInteractive() throws Exception {
@@ -444,7 +435,7 @@ public class UserService extends BaseBusiService implements IUserService {
 		//获取操作的客户、用户信息
 		String  custId = getBusiParam().getCust().getCust_id();
 		CUserDtv user = (CUserDtv) getBusiParam().getSelectedUsers().get(0);
-		UserDto userDto = queryUserById(user.getUser_id());
+		CUser userDto = queryUserById(user.getUser_id());
 		
 		userComponent.saveCancelOpenInteractive(user.getUser_id(), doneCode);
 		
@@ -472,6 +463,7 @@ public class UserService extends BaseBusiService implements IUserService {
 
 	public void saveOpenInteractive(String netType, String modemMac,
 			String password, String vodUserType,String remainReplacoverDate) throws Exception {
+		/*
 		//获取业务流水
 		Integer doneCode = doneCodeComponent.gDoneCode();
 		//获取操作的客户、用户信息
@@ -543,7 +535,7 @@ public class UserService extends BaseBusiService implements IUserService {
 		
 		//生成信用计算、修改用户信息、激活设备任务
 		jobComponent.createCreditCalJob(doneCode, custId, null,BOOLEAN_TRUE);
-		UserDto userDto = queryUserById(user.getUser_id());
+		CUser userDto = queryUserById(user.getUser_id());
 		jobComponent.createBusiCmdJob(doneCode, BusiCmdConstants.OPEN_INTERACTIVE, custId,
 				user.getUser_id(), user.getStb_id(), user.getCard_id(), modemMac, null, null,JsonHelper.fromObject(userDto));
 		
@@ -567,6 +559,7 @@ public class UserService extends BaseBusiService implements IUserService {
 //		getBusiParam().setBusiConfirmParam("user", user);
 		saveAllPublic(doneCode,getBusiParam());
 		doneCodeComponent.saveDoneCodeInfo(doneCode, custId, null, getBusiParam().getBusiConfirmParamInfo());
+		*/
 	}
 
 	/**
@@ -663,7 +656,7 @@ public class UserService extends BaseBusiService implements IUserService {
 				custComponent.updateDeviceStatusByCode(cust.getCust_id(), user.getStb_id(), StatusConstants.REQSTOP);
 				custComponent.updateDeviceStatusByCode(cust.getCust_id(), user.getCard_id(), StatusConstants.REQSTOP);
 				custComponent.updateDeviceStatusByCode(cust.getCust_id(), user.getModem_mac(), StatusConstants.REQSTOP);
-				UserDto userDto = queryUserById(user.getUser_id());
+				CUser userDto = queryUserById(user.getUser_id());
 				if(userDto.getStatus().equals(StatusConstants.REQSTOP)){
 					throw new ServicesException("该用户已经报停!请重新查询该客户!");
 				}
@@ -909,7 +902,7 @@ public class UserService extends BaseBusiService implements IUserService {
 			updateUserStatus(doneCode, user.getUser_id(), user.getStatus(), StatusConstants.ACTIVE);
 			
 			//生成激活用户JOB
-			UserDto userDto = queryUserById(user.getUser_id());
+			CUser userDto = queryUserById(user.getUser_id());
 //			if(USER_TYPE_BAND.equals(userDto.getUser_type()) || StringHelper.isNotEmpty(userDto.getCard_id())){
 				jobComponent.createBusiCmdJob(doneCode, BusiCmdConstants.ACCTIVATE_USER, custId,
 						user.getUser_id(), StringHelper.isNotEmpty(user.getStb_id())?user.getStb_id():stbId,
@@ -938,10 +931,7 @@ public class UserService extends BaseBusiService implements IUserService {
 									StringHelper.isNotEmpty(user.getCard_id())?user.getCard_id():cardId,
 											StringHelper.isNotEmpty(user.getModem_mac())?user.getModem_mac():modemMac, prod.getProd_sn(),prod.getProd_id());
 					}
-					// 0资费免费终端，到期日不变
-					if("T".equals(user.getStr19()) && "T".equals(prod.getIs_base()) && prod.getTariff_rent()==0){
-						continue;
-					}
+					
 					Date invalidDate = userProdComponent.getInvalidDateByFeePro(prod.getProd_sn(), 0);
 					//报开后更新到期日
 					userProdComponent.updateInvalidDate(doneCode, prod.getProd_sn(), invalidDate);
@@ -1125,7 +1115,7 @@ public class UserService extends BaseBusiService implements IUserService {
 							user.getCust_id(), user.getUser_id(), user.getStb_id(), user.getCard_id(), user.getModem_mac(), prodList.get(0).getProd_sn(),prodList.get(0).getProd_id());
 				}
 			}else{
-				UserDto userDto = queryUserById(user.getUser_id());
+				CUser userDto = queryUserById(user.getUser_id());
 				jobComponent.createBusiCmdJob(doneCode, BusiCmdConstants.CREAT_USER, custId,
 						user.getUser_id(), user.getStb_id(), user.getCard_id(), userDto.getModem_mac(), null, null,JsonHelper.fromObject(userDto));
 			}
@@ -1192,15 +1182,15 @@ public class UserService extends BaseBusiService implements IUserService {
 		//生成计算用户信用度的JOB
 		jobComponent.createCreditCalJob(doneCode, custId, null,BOOLEAN_TRUE);
 		List<CUserPropChange> propChangeList = new ArrayList<CUserPropChange>();
-		UserDto userDto = queryUserById(user.getUser_id());
+		CUser userDto = queryUserById(user.getUser_id());
 
 		userDto.setNewPassword(newPwd);
 		jobComponent.createBusiCmdJob(doneCode, BusiCmdConstants.BAND_EDIT_PWD, custId, user.getUser_id(), null, null, user.getModem_mac(), null, null, JsonHelper.fromObject(userDto));
 	
 		
 		CUserPropChange propChange = new CUserPropChange();
-		propChange.setColumn_name("login_password");
-		propChange.setOld_value(userDto.getLogin_password());
+		propChange.setColumn_name("password");
+		propChange.setOld_value(userDto.getPassword());
 		propChange.setNew_value(newPwd);
 		propChangeList.add(propChange);
 		userComponent.editUser(doneCode, getBusiParam().getSelectedUserIds().get(0), propChangeList);
@@ -1672,7 +1662,7 @@ public class UserService extends BaseBusiService implements IUserService {
 		//获取操作的客户、用户信息
 		String  custId = getBusiParam().getCust().getCust_id();
 		CUserAtv user = (CUserAtv) getBusiParam().getSelectedUsers().get(0);
-		UserDto userDto = queryUserById(user.getUser_id());
+		CUser userDto = queryUserById(user.getUser_id());
 		
 		String userId = user.getUser_id();
 		
@@ -2124,13 +2114,14 @@ public class UserService extends BaseBusiService implements IUserService {
 	 */
 	public void saveToSingleCard(String newCardId, String str4, String str5,
 			boolean reclaim, String deviceStatus) throws Exception {
+		/*
 		Integer doneCode = doneCodeComponent.gDoneCode();
 		CCust cust = getBusiParam().getCust();
 		CUser user = getBusiParam().getSelectedUsers().get(0);
 		String busiCode = getBusiParam().getBusiCode();
 		
 		//取消原来的双向,变成单向
-		UserDto userDto = queryUserById(user.getUser_id());
+		CUser userDto = queryUserById(user.getUser_id());
 		if(DTV_SERV_TYPE_DOUBLE.equals(userDto.getServ_type())){
 			jobComponent.createBusiCmdJob(doneCode, BusiCmdConstants.CANCEL_INTERACTIVE, user.getCust_id(),
 					user.getUser_id(), user.getStb_id(), user.getCard_id(), "", null,null,JsonHelper.fromObject(userDto));
@@ -2226,6 +2217,7 @@ public class UserService extends BaseBusiService implements IUserService {
 		userComponent.editUser(doneCode, user.getUser_id(), propChangeList);
 		
 		saveAllPublic(doneCode,getBusiParam());
+		*/
 	}
 	
 	public void updateUserStatus(List<String> userIds,String userStatus) throws Exception {
@@ -2233,18 +2225,18 @@ public class UserService extends BaseBusiService implements IUserService {
 		if(userList == null || userList.size()==0)
 			throw new Exception("未查询到用户，请确定用户ID是否正确");
 		List<CUser> users = new ArrayList<CUser>();
-		if(userStatus.equals(StatusConstants.ATVCLOSE)){//关模隔离 只针对模拟用户
-			for(CUser user : userList){
-				if(user.getUser_type().equals(USER_TYPE_ATV)){
-					users.add(user);
-				}
-			}
-			if(users.size() == 0){
-				throw new Exception("关模隔离只针对模拟用户，请重新确认用户ID");
-			}
-		}else{
-			users = userList;
-		}
+//		if(userStatus.equals(StatusConstants.ATVCLOSE)){//关模隔离 只针对模拟用户
+//			for(CUser user : userList){
+//				if(user.getUser_type().equals(USER_TYPE_ATV)){
+//					users.add(user);
+//				}
+//			}
+//			if(users.size() == 0){
+//				throw new Exception("关模隔离只针对模拟用户，请重新确认用户ID");
+//			}
+//		}else{
+		users = userList;
+//		}
 		BusiParameter bp = getBusiParam();
 		List<CUserPropChange> upcList = new ArrayList<CUserPropChange>();
 		List<CDoneCode> dcList = new ArrayList<CDoneCode>();
@@ -2308,7 +2300,7 @@ public class UserService extends BaseBusiService implements IUserService {
 	
 	public void renewUser(String userId) throws Exception {
 		Integer doneCode = doneCodeComponent.gDoneCode();
-		UserDto user = queryUserById(userId);
+		CUser user = queryUserById(userId);
 		
 		//恢复用户状态，取最近状态异动：如果最近状态异动为报停，则新状态为报停，否则均为正常
 		userComponent.renewUser(doneCode, userId);
@@ -2463,6 +2455,7 @@ public class UserService extends BaseBusiService implements IUserService {
 	 * @see com.ycsoft.business.service.IUserService#editFreeUser(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.util.Date)
 	 */
 	public void editFreeUser(String userId, String prodSn, String newTariffId,String type,Date tariffStartDate )throws Exception {
+		/*
 		// 获取业务流水
 		Integer doneCode = doneCodeComponent.gDoneCode();
 		String  custId = getBusiParam().getCust().getCust_id();
@@ -2476,7 +2469,6 @@ public class UserService extends BaseBusiService implements IUserService {
 		List<CUserPropChange> changeList = new ArrayList<CUserPropChange>();
 		CUserPropChange change =new CUserPropChange();
 		change.setColumn_name("str19");
-		change.setOld_value(user.getStr19());
 		change.setNew_value(newValue);
 		changeList.add(change);
 		
@@ -2493,271 +2485,274 @@ public class UserService extends BaseBusiService implements IUserService {
 			jobComponent.createInvalidCalJob(doneCode, custId);
 		}
 		saveAllPublic(doneCode, getBusiParam());
+		*/
 	}
-
+	
+	
+	
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see com.ycsoft.business.service.IUserService#transferUsers(java.lang.String)
 	 */
 	public void transferUsers(String toCustId) throws Exception {
-	    Integer doneCode = doneCodeComponent.gDoneCode();
-	    String busiCode = this.getBusiParam().getBusiCode();
-	    List<CUser>  cuserList = this.getBusiParam().getSelectedUsers();
-	    CUser cuser = cuserList.get(0);
-	    String userId = cuser.getUser_id();
-	    CCust oldCust = this.getBusiParam().getCust();
-	    if(StringHelper.isEmpty(toCustId)){
-	    	throw new ServicesException("转户失败:目标客户不存在!");
-	    }
-	    CCust newCust  = custComponent.queryCustById(toCustId);
-	    String custId = oldCust.getCust_id();
-	    List<CProdDoneInfo> prodDoneInfoList = new ArrayList<CProdDoneInfo>(); 
- 
-	    if(!oldCust.getCust_type().equals(SystemConstants.CUST_TYPE_RESIDENT) || !newCust.getCust_type().equals(SystemConstants.CUST_TYPE_RESIDENT)){
-	    	throw new ServicesException("转户失败:原客户与目标客户必须都是居民客户!");
-	    }
-	    
-		List<UserDto>  userList = userComponent.queryUser(toCustId);
-
-		if(!newCust.getStatus().equals(StatusConstants.PREOPEN)&&!newCust.getStatus().equals(StatusConstants.ACTIVE)){
-			 throw new ServicesException("转户失败:目标客户非正常客户或者预开户客户!");
-		}
-		UserDto oldUser = userComponent.queryUserById(userId);
-		if(StringHelper.isNotEmpty(oldUser.getCard_id())){
-			RDevice device = deviceComponent.findByDeviceCode(oldUser.getCard_id());
-			if(null != device && SystemConstants.OWNERSHIP_GD.equals(device.getOwnership())){
-				throw new ServicesException("数字用户转户失败:智能卡"+oldUser.getCard_id()+",属于广电！");
-			}
-		}
-		if(StringHelper.isNotEmpty(oldUser.getStb_id())){
-			RDevice device = deviceComponent.findByDeviceCode(oldUser.getStb_id());
-			if(null != device && SystemConstants.OWNERSHIP_GD.equals(device.getOwnership())){
-				throw new ServicesException("数字用户转户失败:机顶盒号"+oldUser.getStb_id()+",属于广电！");
-			}
-		}
-		if(oldUser.getUser_type().equals("BAND") && StringHelper.isNotEmpty(oldUser.getModem_mac())){
-			RDevice device = deviceComponent.findByDeviceCode(oldUser.getModem_mac());
-			if(null != device && SystemConstants.OWNERSHIP_GD.equals(device.getOwnership())){
-				throw new ServicesException("宽带用户转户失败:Modem号"+oldUser.getModem_mac()+",属于广电！");
-			}
-		}
-		
-		
-		String fromflag = acctComponent.queryWhetherUserOwnfee(userId);
-		String zZDflag = "0";
-		if(cuser.getUser_type().equals("DTV")){
-			List<CUser> fromUserList = userComponent.queryUserByCustId(cuser.getCust_id());
-			for(CUser user : fromUserList){
-				if(user.getUser_type().equals("DTV")){
-					UserDto fromUser = userComponent.queryUserById(user.getUser_id());
-					if(!userId.equals(fromUser.getUser_id()) && fromUser.getTerminal_type().equals(SystemConstants.USER_TERMINAL_TYPE_ZZD)) {
-						zZDflag = acctComponent.queryWhetherUserOwnfee(userId);
-					}
-				}
-			}
-		}
-		//主机和转出用户不能欠费
-		if(!"0".equals(fromflag) || !"0".equals(zZDflag)){
-			throw new ServicesException("数字用户转户失败:主机和转出用户不能欠费！");
-		}
-		
-		
-		//标准目标客户无数字用户
-		boolean toCustNoDtvFlag=true;
-//	    标识宽带用户，必须有一个用户状态正常
-	    boolean normalUserFlag=false;
-	    Integer freeNum = 0; //免费终端
-	    for(UserDto user : userList){
-	      if(oldUser.getUser_type().equals("DTV")){
-	    	  if(user.getUser_type().equals("DTV")){
-	    		  toCustNoDtvFlag=false;
-		    	  if(oldUser.getTerminal_type().equals(SystemConstants.USER_TERMINAL_TYPE_ZZD) && user.getTerminal_type().equals(SystemConstants.USER_TERMINAL_TYPE_ZZD)){
-		    		  throw new ServicesException("数字用户转户失败:目标客户名下数字用户已经是主机，不能同是主机!");
-		    	  }
-		    	  if(oldUser.getTerminal_type().equals(SystemConstants.USER_TERMINAL_TYPE_FZD)){
-		    		  if(user.getTerminal_type().equals(SystemConstants.USER_TERMINAL_TYPE_ZZD)){
-		    			  if(!user.getStatus().equals(StatusConstants.ACTIVE) && !user.getStatus().equals(StatusConstants.OWENOTSTOP)){
-			    			  throw new ServicesException("数字用户转户失败:目标客户名下数字用户主机状态必须是正常或欠费未停!");
-			    		  }
-		    		  }else{
-		    			  if("T".equals(user.getStr19())){
-		    				  freeNum++;
-		    	    	  }
-		    		  }
-		    	  }
-		    	  normalUserFlag=true;
-		    	  
-		    	  if (user.getTerminal_type().equals(SystemConstants.USER_TERMINAL_TYPE_ZZD)){
-		    		  List<CProdDto>  prodList = userProdComponent.queryByUserId(user.getUser_id());
-		    		  for (CProdDto prod : prodList) {
-							if (!prod.getStatus().equals(StatusConstants.ACTIVE)&& !prod.getStatus().equals(StatusConstants.OWENOTSTOP)&& prod.getIs_base().equals("T")) {
-								throw new ServicesException(
-										"数字用户转户失败:转户时目标客户名下所有用户基本产品状态必须是正常或欠费未停!");
-							}
-						}
-		    	  }
-	    	  }
-	    	  
-	      }else if(oldUser.getUser_type().equals("BAND") || oldUser.getUser_type().equals("ATV")){
-	    	  //宽带转户时，目标客户而状态必须正常
-	    	  if(user.getStatus().equals(StatusConstants.ACTIVE)){
-	    		  normalUserFlag=true;
-	    	  }
-	      }
-	    }
-//	    if("T".equals(oldUser.getStr19()) && freeNum>1){
-//	    	throw new ServicesException("数字用户转户失败:目标客户名下已经有2个免费终端!");
+//	    Integer doneCode = doneCodeComponent.gDoneCode();
+//	    String busiCode = this.getBusiParam().getBusiCode();
+//	    List<CUser>  cuserList = this.getBusiParam().getSelectedUsers();
+//	    CUser cuser = cuserList.get(0);
+//	    String userId = cuser.getUser_id();
+//	    CCust oldCust = this.getBusiParam().getCust();
+//	    if(StringHelper.isEmpty(toCustId)){
+//	    	throw new ServicesException("转户失败:目标客户不存在!");
 //	    }
-	    
-	    if(oldUser.getUser_type().equals("BAND") && !normalUserFlag&&userList.size()>0){
-	    	 throw new ServicesException("宽带用户转户失败:目标客户名下用户状态不正常，转户时目标客户名下至少有一个用户状态正常!");
-	    }
-	    if(toCustNoDtvFlag&& oldUser.getUser_type().equals(SystemConstants.USER_TYPE_DTV) && !oldUser.getTerminal_type().equals(SystemConstants.USER_TERMINAL_TYPE_ZZD)){
-	    	 throw new ServicesException("数字用户转户失败:转户用户是非主机，目标客户名下无主机!");
-	    }
-	 
-	    List<CProdDto>  prodList = userProdComponent.queryByUserId(userId);
-//	    3. 副机过户，目标客户主机有空余位置挂载。
-	    if (cuser instanceof CUserDtv || cuser instanceof CUserBroadband) {
-	    	if("DTV".equals(oldUser.getUser_type())){
-	    		List<UserDto>  oldUserList = userComponent.queryUser(oldUser.getCust_id());
-	    		//超额终端
-	    		UserDto outUser = new UserDto();
-	    		if("T".equals(oldUser.getStr19())){
-	    			//目标客户已经有2台免费终端，转户用户由免费转为超额
-	    			if(freeNum>1){
-		        		updateUserDyn(doneCode,userId,"str19",oldUser.getStr19(),"T".equals(oldUser.getStr19())?"F":"T");
-	    			}
-	    			for(UserDto dto:oldUserList){
-		    			if("DTV".equals(dto.getUser_type()) && dto.getTerminal_type().equals(SystemConstants.USER_TERMINAL_TYPE_FZD) && !"T".equals(dto.getStr19())){
-		    				BeanUtils.copyProperties(dto, outUser);
-		    				break;
-		    			}
-		    		}
-	    			//原客户其中一台超额终端变成免费终端
-	    			if(StringHelper.isNotEmpty(outUser.getUser_id())){
-	    				updateUserDyn(doneCode,outUser.getUser_id(),"str19",outUser.getStr19(),"T".equals(outUser.getStr19())?"F":"T");
-	    			}
-	    		}else{
-	    			//目标客户已经没满2台免费终端，转户用户由超额转为免费
-	    			if(freeNum<2){
-	    				updateUserDyn(doneCode,userId,"str19",oldUser.getStr19(),"F".equals(oldUser.getStr19())?"T":"F");
-	    			}
-	    		}
-	    		if(StringHelper.isNotEmpty(outUser.getUser_id())){
-	    			List<CProdDto>  outProdList = userProdComponent.queryByUserId(outUser.getUser_id());
-	    			for(CProdDto prod : outProdList){
-    					  List<ProdTariffDto> tariffList = prodComponent.queryTariffByProd(prod.getProd_id());
-    					  if("T".equals(prod.getIs_base())){
-    						  //删除资费job
-    						userProdComponent.removeNextByProdSn(prod.getProd_sn());
-      		        	  }
-    		        	  // tId "F":不能操作；"T":用原来的资费；"**"：变更成适合新客户条件的资费
-    		        	  String tId = userComponent.toUtilValue(outUser.getCust_id(), outUser.getUser_id(), prod.getTariff_id(),tariffList);
-    		        	  if(tId.equals("F")){
-    		        		  throw new ServicesException("转户失败:原客户的超额终端不能转为免费终端!"); 
-    		        	  }else if(!tId.equals("T")){
-    		        		  //如果原来就有prodSn,变更基本包资费资费
-    		        		  changeTariff(prod.getProd_sn(), tId, DateHelper.format(DateHelper.getNextMonth(new Date()), "yyyy-MM-dd"), null, true, true, doneCode);
-//	    		        		  userProdComponent.updateProdTariff(doneCode, prod.getProd_sn(), tId);
-    		        	  }
-	    			}
-	    		}
-	    		
-	    	}
-	        for(CProdDto prod : prodList){
-//		          4. 目标客户能否使用 被过户用户产品资费的权限。
-	        	  List<ProdTariffDto> tariffList = prodComponent.queryTariffByProd(prod.getProd_id());
-	        	  if("T".equals(prod.getIs_base())){
-	        		//删除资费job
-	        		  userProdComponent.removeNextByProdSn(prod.getProd_sn());
-	        	  }
-	        	  if(tariffList.size() == 0){
-	        		  throw new ServicesException("转户失败:请检查本操作员是否具有使用["+prod.getProd_name()+"]资费的权限或者该资费是否适用本地区!");
-	        	  }
-	        	  // tId "F":不能操作；"T":用原来的资费；"**"：变更成适合新客户条件的资费
-	        	  String tId = userComponent.toUtilValue(toCustId, cuser.getUser_id(), prod.getTariff_id(),tariffList);
-	        	  if(tId.equals("F")){
-	        		  throw new ServicesException("转户失败:目标客户不能使用原产品:"+prod.getProd_name()+"的资费:"+prod.getTariff_name()+"!"); 
-	        	  }else if(!tId.equals("T")){
-	        		  //如果原来就有prodSn,变更基本包资费资费
-	        		  changeTariff(prod.getProd_sn(), tId, DateHelper.format(DateHelper.getNextMonth(new Date()), "yyyy-MM-dd"), null, true, true, doneCode);
-//	        		  userProdComponent.updateProdTariff(doneCode, prod.getProd_sn(), tId);
-	        	  }
-	        }
-	    }
-	    //修改状体为正常
-		if (newCust.getStatus().equals(StatusConstants.PREOPEN)){
-			custComponent.updateCustStatus(doneCode,toCustId,StatusConstants.PREOPEN,StatusConstants.ACTIVE);
-		}
-		
-	    //更新产品账单状态为出帐
-	    for(CProdDto prod : prodList){
-	    	CProdDoneInfo prodDoneInfo = new CProdDoneInfo();
-	    	prodDoneInfo.setProd_name(prod.getProd_name());
-	    	prodDoneInfo.setTariff_name(prod.getTariff_name());
-	    	prodDoneInfoList.add(prodDoneInfo);
-		    billComponent.confirmBill(prod.getProd_sn(), doneCode);
-	    }
-	  //将账目的实时费用更新为欠费和同时清空实时费用
-	    List<AcctitemDto>  userAcctItemList =  acctComponent.queryAcctItemByUserId(userId);
-	    for(AcctitemDto acctitem : userAcctItemList){
-		    acctComponent.changeAcctItemOwefee(true, acctitem.getAcct_id(), acctitem.getAcctitem_id(),acctitem.getReal_bill());
-	    }
-	    //销账	    
-		jobComponent.createCustWriteOffJob(doneCode, custId, SystemConstants.BOOLEAN_TRUE);//销帐会自动查信控
-		
-		jobComponent.createCreditExecJob(doneCode, custId);
-		//生成账务模式判断任务
-		jobComponent.createAcctModeCalJob(doneCode, custId);
-		//生成计算到期日任务
-		jobComponent.createInvalidCalJob(doneCode, custId);
-	    
-		//信控任务
-		jobComponent.createCreditExecJob(doneCode, custId);
-		
-		getBusiParam().getTempVar().put(SystemConstants.EXTEND_ATTR_KEY_NEWADDR, newCust.getAddress());
-		String deviceId = StringHelper.isEmpty(oldUser.getStb_id())?(StringHelper.isEmpty(oldUser.getModem_mac())?"":oldUser.getModem_mac()):oldUser.getStb_id();
-	    if(StringHelper.isNotEmpty(deviceId)){
-	    	deviceId = ",设备号:"+deviceId;
-	    }
-		//1.  生成施工单， 3.  杂费收取
-		String info = "新受理编号:"+newCust.getCust_no()+",新客户名称:"+newCust.getCust_name()+deviceId;
-		getBusiParam().setRemark(StringHelper.isEmpty(getBusiParam().getRemark())?info:getBusiParam().getRemark()+"("+info+")");
-	    saveAllPublic(doneCode,getBusiParam());
-	    // 保存打印信息
-	    Map<String, Object> map = new HashMap<String, Object>();
-
-	    //进行用户转户
-	    userComponent.changeCust(userId, toCustId, doneCode, busiCode);
-	    
-	    //生成计算到期日任务
-		jobComponent.createInvalidCalJob(doneCode, toCustId);
-		
-	    map.put("old_cust_name",oldCust.getCust_name() );
-	    map.put("new_cust_name",newCust.getCust_name() );
-	    map.put("old_cust_no", oldCust.getCust_no());
-	    map.put("new_cust_no", newCust.getCust_no());
-//	    map.put("old_address", oldCust.getAddress());
-//	    map.put("new_address", newCust.getAddress());
-	    map.put("user_type", cuser.getUser_type_text());
-	    map.put("modem_mac", cuser.getModem_mac());
-		// 数字电视
-		  if (cuser instanceof CUserDtv) {
- 			map.put("terminal_type", MemoryDict.getDictName(DictKey.TERMINAL_TYPE, ((CUserDtv) cuser).getTerminal_type()));
-			map.put("card_id", cuser.getCard_id());
-			map.put("stb_id", cuser.getStb_id());
- 		}
-		// 宽带
-		else if (cuser instanceof CUserBroadband) {
-			map.put("login_name", ((UserDto) cuser).getLogin_name());
-			map.put("login_password", ((UserDto) cuser).getLogin_password());
-		}  
-//		  map.put("prodList", prodDoneInfoList);
-		  doneCodeComponent.saveDoneCodeInfo(doneCode, custId,null, map);
-		  Integer toDoneCode = doneCodeComponent.gDoneCode();
-		  saveDoneCode(toDoneCode, busiCode, toCustId,"原受理编号:"+oldCust.getCust_no()+",原客户流水号:"+doneCode);
-	  }
+//	    CCust newCust  = custComponent.queryCustById(toCustId);
+//	    String custId = oldCust.getCust_id();
+//	    List<CProdDoneInfo> prodDoneInfoList = new ArrayList<CProdDoneInfo>(); 
+// 
+//	    if(!oldCust.getCust_type().equals(SystemConstants.CUST_TYPE_RESIDENT) || !newCust.getCust_type().equals(SystemConstants.CUST_TYPE_RESIDENT)){
+//	    	throw new ServicesException("转户失败:原客户与目标客户必须都是居民客户!");
+//	    }
+//	    
+//		List<UserDto>  userList = userComponent.queryUser(toCustId);
+//
+//		if(!newCust.getStatus().equals(StatusConstants.PREOPEN)&&!newCust.getStatus().equals(StatusConstants.ACTIVE)){
+//			 throw new ServicesException("转户失败:目标客户非正常客户或者预开户客户!");
+//		}
+//		UserDto oldUser = userComponent.queryUserById(userId);
+//		if(StringHelper.isNotEmpty(oldUser.getCard_id())){
+//			RDevice device = deviceComponent.findByDeviceCode(oldUser.getCard_id());
+//			if(null != device && SystemConstants.OWNERSHIP_GD.equals(device.getOwnership())){
+//				throw new ServicesException("数字用户转户失败:智能卡"+oldUser.getCard_id()+",属于广电！");
+//			}
+//		}
+//		if(StringHelper.isNotEmpty(oldUser.getStb_id())){
+//			RDevice device = deviceComponent.findByDeviceCode(oldUser.getStb_id());
+//			if(null != device && SystemConstants.OWNERSHIP_GD.equals(device.getOwnership())){
+//				throw new ServicesException("数字用户转户失败:机顶盒号"+oldUser.getStb_id()+",属于广电！");
+//			}
+//		}
+//		if(oldUser.getUser_type().equals("BAND") && StringHelper.isNotEmpty(oldUser.getModem_mac())){
+//			RDevice device = deviceComponent.findByDeviceCode(oldUser.getModem_mac());
+//			if(null != device && SystemConstants.OWNERSHIP_GD.equals(device.getOwnership())){
+//				throw new ServicesException("宽带用户转户失败:Modem号"+oldUser.getModem_mac()+",属于广电！");
+//			}
+//		}
+//		
+//		
+//		String fromflag = acctComponent.queryWhetherUserOwnfee(userId);
+//		String zZDflag = "0";
+//		if(cuser.getUser_type().equals("DTV")){
+//			List<CUser> fromUserList = userComponent.queryUserByCustId(cuser.getCust_id());
+//			for(CUser user : fromUserList){
+//				if(user.getUser_type().equals("DTV")){
+//					UserDto fromUser = userComponent.queryUserById(user.getUser_id());
+//					if(!userId.equals(fromUser.getUser_id()) && fromUser.getTerminal_type().equals(SystemConstants.USER_TERMINAL_TYPE_ZZD)) {
+//						zZDflag = acctComponent.queryWhetherUserOwnfee(userId);
+//					}
+//				}
+//			}
+//		}
+//		//主机和转出用户不能欠费
+//		if(!"0".equals(fromflag) || !"0".equals(zZDflag)){
+//			throw new ServicesException("数字用户转户失败:主机和转出用户不能欠费！");
+//		}
+//		
+//		
+//		//标准目标客户无数字用户
+//		boolean toCustNoDtvFlag=true;
+////	    标识宽带用户，必须有一个用户状态正常
+//	    boolean normalUserFlag=false;
+//	    Integer freeNum = 0; //免费终端
+//	    for(UserDto user : userList){
+//	      if(oldUser.getUser_type().equals("DTV")){
+//	    	  if(user.getUser_type().equals("DTV")){
+//	    		  toCustNoDtvFlag=false;
+//		    	  if(oldUser.getTerminal_type().equals(SystemConstants.USER_TERMINAL_TYPE_ZZD) && user.getTerminal_type().equals(SystemConstants.USER_TERMINAL_TYPE_ZZD)){
+//		    		  throw new ServicesException("数字用户转户失败:目标客户名下数字用户已经是主机，不能同是主机!");
+//		    	  }
+//		    	  if(oldUser.getTerminal_type().equals(SystemConstants.USER_TERMINAL_TYPE_FZD)){
+//		    		  if(user.getTerminal_type().equals(SystemConstants.USER_TERMINAL_TYPE_ZZD)){
+//		    			  if(!user.getStatus().equals(StatusConstants.ACTIVE) && !user.getStatus().equals(StatusConstants.OWENOTSTOP)){
+//			    			  throw new ServicesException("数字用户转户失败:目标客户名下数字用户主机状态必须是正常或欠费未停!");
+//			    		  }
+//		    		  }else{
+//		    			  if("T".equals(user.getStr19())){
+//		    				  freeNum++;
+//		    	    	  }
+//		    		  }
+//		    	  }
+//		    	  normalUserFlag=true;
+//		    	  
+//		    	  if (user.getTerminal_type().equals(SystemConstants.USER_TERMINAL_TYPE_ZZD)){
+//		    		  List<CProdDto>  prodList = userProdComponent.queryByUserId(user.getUser_id());
+//		    		  for (CProdDto prod : prodList) {
+//							if (!prod.getStatus().equals(StatusConstants.ACTIVE)&& !prod.getStatus().equals(StatusConstants.OWENOTSTOP)&& prod.getIs_base().equals("T")) {
+//								throw new ServicesException(
+//										"数字用户转户失败:转户时目标客户名下所有用户基本产品状态必须是正常或欠费未停!");
+//							}
+//						}
+//		    	  }
+//	    	  }
+//	    	  
+//	      }else if(oldUser.getUser_type().equals("BAND") || oldUser.getUser_type().equals("ATV")){
+//	    	  //宽带转户时，目标客户而状态必须正常
+//	    	  if(user.getStatus().equals(StatusConstants.ACTIVE)){
+//	    		  normalUserFlag=true;
+//	    	  }
+//	      }
+//	    }
+////	    if("T".equals(oldUser.getStr19()) && freeNum>1){
+////	    	throw new ServicesException("数字用户转户失败:目标客户名下已经有2个免费终端!");
+////	    }
+//	    
+//	    if(oldUser.getUser_type().equals("BAND") && !normalUserFlag&&userList.size()>0){
+//	    	 throw new ServicesException("宽带用户转户失败:目标客户名下用户状态不正常，转户时目标客户名下至少有一个用户状态正常!");
+//	    }
+//	    if(toCustNoDtvFlag&& oldUser.getUser_type().equals(SystemConstants.USER_TYPE_DTV) && !oldUser.getTerminal_type().equals(SystemConstants.USER_TERMINAL_TYPE_ZZD)){
+//	    	 throw new ServicesException("数字用户转户失败:转户用户是非主机，目标客户名下无主机!");
+//	    }
+//	 
+//	    List<CProdDto>  prodList = userProdComponent.queryByUserId(userId);
+////	    3. 副机过户，目标客户主机有空余位置挂载。
+//	    if (cuser instanceof CUserDtv || cuser instanceof CUserBroadband) {
+//	    	if("DTV".equals(oldUser.getUser_type())){
+//	    		List<UserDto>  oldUserList = userComponent.queryUser(oldUser.getCust_id());
+//	    		//超额终端
+//	    		UserDto outUser = new UserDto();
+//	    		if("T".equals(oldUser.getStr19())){
+//	    			//目标客户已经有2台免费终端，转户用户由免费转为超额
+//	    			if(freeNum>1){
+//		        		updateUserDyn(doneCode,userId,"str19",oldUser.getStr19(),"T".equals(oldUser.getStr19())?"F":"T");
+//	    			}
+//	    			for(UserDto dto:oldUserList){
+//		    			if("DTV".equals(dto.getUser_type()) && dto.getTerminal_type().equals(SystemConstants.USER_TERMINAL_TYPE_FZD) && !"T".equals(dto.getStr19())){
+//		    				BeanUtils.copyProperties(dto, outUser);
+//		    				break;
+//		    			}
+//		    		}
+//	    			//原客户其中一台超额终端变成免费终端
+//	    			if(StringHelper.isNotEmpty(outUser.getUser_id())){
+//	    				updateUserDyn(doneCode,outUser.getUser_id(),"str19",outUser.getStr19(),"T".equals(outUser.getStr19())?"F":"T");
+//	    			}
+//	    		}else{
+//	    			//目标客户已经没满2台免费终端，转户用户由超额转为免费
+//	    			if(freeNum<2){
+//	    				updateUserDyn(doneCode,userId,"str19",oldUser.getStr19(),"F".equals(oldUser.getStr19())?"T":"F");
+//	    			}
+//	    		}
+//	    		if(StringHelper.isNotEmpty(outUser.getUser_id())){
+//	    			List<CProdDto>  outProdList = userProdComponent.queryByUserId(outUser.getUser_id());
+//	    			for(CProdDto prod : outProdList){
+//    					  List<ProdTariffDto> tariffList = prodComponent.queryTariffByProd(prod.getProd_id());
+//    					  if("T".equals(prod.getIs_base())){
+//    						  //删除资费job
+//    						userProdComponent.removeNextByProdSn(prod.getProd_sn());
+//      		        	  }
+//    		        	  // tId "F":不能操作；"T":用原来的资费；"**"：变更成适合新客户条件的资费
+//    		        	  String tId = userComponent.toUtilValue(outUser.getCust_id(), outUser.getUser_id(), prod.getTariff_id(),tariffList);
+//    		        	  if(tId.equals("F")){
+//    		        		  throw new ServicesException("转户失败:原客户的超额终端不能转为免费终端!"); 
+//    		        	  }else if(!tId.equals("T")){
+//    		        		  //如果原来就有prodSn,变更基本包资费资费
+//    		        		  changeTariff(prod.getProd_sn(), tId, DateHelper.format(DateHelper.getNextMonth(new Date()), "yyyy-MM-dd"), null, true, true, doneCode);
+////	    		        		  userProdComponent.updateProdTariff(doneCode, prod.getProd_sn(), tId);
+//    		        	  }
+//	    			}
+//	    		}
+//	    		
+//	    	}
+//	        for(CProdDto prod : prodList){
+////		          4. 目标客户能否使用 被过户用户产品资费的权限。
+//	        	  List<ProdTariffDto> tariffList = prodComponent.queryTariffByProd(prod.getProd_id());
+//	        	  if("T".equals(prod.getIs_base())){
+//	        		//删除资费job
+//	        		  userProdComponent.removeNextByProdSn(prod.getProd_sn());
+//	        	  }
+//	        	  if(tariffList.size() == 0){
+//	        		  throw new ServicesException("转户失败:请检查本操作员是否具有使用["+prod.getProd_name()+"]资费的权限或者该资费是否适用本地区!");
+//	        	  }
+//	        	  // tId "F":不能操作；"T":用原来的资费；"**"：变更成适合新客户条件的资费
+//	        	  String tId = userComponent.toUtilValue(toCustId, cuser.getUser_id(), prod.getTariff_id(),tariffList);
+//	        	  if(tId.equals("F")){
+//	        		  throw new ServicesException("转户失败:目标客户不能使用原产品:"+prod.getProd_name()+"的资费:"+prod.getTariff_name()+"!"); 
+//	        	  }else if(!tId.equals("T")){
+//	        		  //如果原来就有prodSn,变更基本包资费资费
+//	        		  changeTariff(prod.getProd_sn(), tId, DateHelper.format(DateHelper.getNextMonth(new Date()), "yyyy-MM-dd"), null, true, true, doneCode);
+////	        		  userProdComponent.updateProdTariff(doneCode, prod.getProd_sn(), tId);
+//	        	  }
+//	        }
+//	    }
+//	    //修改状体为正常
+//		if (newCust.getStatus().equals(StatusConstants.PREOPEN)){
+//			custComponent.updateCustStatus(doneCode,toCustId,StatusConstants.PREOPEN,StatusConstants.ACTIVE);
+//		}
+//		
+//	    //更新产品账单状态为出帐
+//	    for(CProdDto prod : prodList){
+//	    	CProdDoneInfo prodDoneInfo = new CProdDoneInfo();
+//	    	prodDoneInfo.setProd_name(prod.getProd_name());
+//	    	prodDoneInfo.setTariff_name(prod.getTariff_name());
+//	    	prodDoneInfoList.add(prodDoneInfo);
+//		    billComponent.confirmBill(prod.getProd_sn(), doneCode);
+//	    }
+//	  //将账目的实时费用更新为欠费和同时清空实时费用
+//	    List<AcctitemDto>  userAcctItemList =  acctComponent.queryAcctItemByUserId(userId);
+//	    for(AcctitemDto acctitem : userAcctItemList){
+//		    acctComponent.changeAcctItemOwefee(true, acctitem.getAcct_id(), acctitem.getAcctitem_id(),acctitem.getReal_bill());
+//	    }
+//	    //销账	    
+//		jobComponent.createCustWriteOffJob(doneCode, custId, SystemConstants.BOOLEAN_TRUE);//销帐会自动查信控
+//		
+//		jobComponent.createCreditExecJob(doneCode, custId);
+//		//生成账务模式判断任务
+//		jobComponent.createAcctModeCalJob(doneCode, custId);
+//		//生成计算到期日任务
+//		jobComponent.createInvalidCalJob(doneCode, custId);
+//	    
+//		//信控任务
+//		jobComponent.createCreditExecJob(doneCode, custId);
+//		
+//		getBusiParam().getTempVar().put(SystemConstants.EXTEND_ATTR_KEY_NEWADDR, newCust.getAddress());
+//		String deviceId = StringHelper.isEmpty(oldUser.getStb_id())?(StringHelper.isEmpty(oldUser.getModem_mac())?"":oldUser.getModem_mac()):oldUser.getStb_id();
+//	    if(StringHelper.isNotEmpty(deviceId)){
+//	    	deviceId = ",设备号:"+deviceId;
+//	    }
+//		//1.  生成施工单， 3.  杂费收取
+//		String info = "新受理编号:"+newCust.getCust_no()+",新客户名称:"+newCust.getCust_name()+deviceId;
+//		getBusiParam().setRemark(StringHelper.isEmpty(getBusiParam().getRemark())?info:getBusiParam().getRemark()+"("+info+")");
+//	    saveAllPublic(doneCode,getBusiParam());
+//	    // 保存打印信息
+//	    Map<String, Object> map = new HashMap<String, Object>();
+//
+//	    //进行用户转户
+//	    userComponent.changeCust(userId, toCustId, doneCode, busiCode);
+//	    
+//	    //生成计算到期日任务
+//		jobComponent.createInvalidCalJob(doneCode, toCustId);
+//		
+//	    map.put("old_cust_name",oldCust.getCust_name() );
+//	    map.put("new_cust_name",newCust.getCust_name() );
+//	    map.put("old_cust_no", oldCust.getCust_no());
+//	    map.put("new_cust_no", newCust.getCust_no());
+////	    map.put("old_address", oldCust.getAddress());
+////	    map.put("new_address", newCust.getAddress());
+//	    map.put("user_type", cuser.getUser_type_text());
+//	    map.put("modem_mac", cuser.getModem_mac());
+//		// 数字电视
+//		  if (cuser instanceof CUserDtv) {
+// 			map.put("terminal_type", MemoryDict.getDictName(DictKey.TERMINAL_TYPE, ((CUserDtv) cuser).getTerminal_type()));
+//			map.put("card_id", cuser.getCard_id());
+//			map.put("stb_id", cuser.getStb_id());
+// 		}
+//		// 宽带
+//		else if (cuser instanceof CUserBroadband) {
+//			map.put("login_name", ((UserDto) cuser).getLogin_name());
+//			map.put("login_password", ((UserDto) cuser).getLogin_password());
+//		}  
+////		  map.put("prodList", prodDoneInfoList);
+//		  doneCodeComponent.saveDoneCodeInfo(doneCode, custId,null, map);
+//		  Integer toDoneCode = doneCodeComponent.gDoneCode();
+//		  saveDoneCode(toDoneCode, busiCode, toCustId,"原受理编号:"+oldCust.getCust_no()+",原客户流水号:"+doneCode);
+	}
 
 }

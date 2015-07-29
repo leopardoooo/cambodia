@@ -271,7 +271,7 @@ public class AcctService extends BaseBusiService implements IAcctService {
 							ConfirmPrint confirmPrint = confirmPrintDto.new ConfirmPrint();
 							if(StringHelper.isNotEmpty(pay.getUser_id())){
 								//确认单打印
-								UserDto userDto = userComponent.queryUserById(pay.getUser_id());
+								CUser userDto = userComponent.queryUserById(pay.getUser_id());
 								confirmPrint.setUser_name(userDto.getUser_name());
 								confirmPrint.setUser_type(userDto.getUser_type());
 								confirmPrint.setUser_type_text(userDto.getUser_type_text());
@@ -386,7 +386,7 @@ public class AcctService extends BaseBusiService implements IAcctService {
 	private void acctivateBandProd(Integer doneCode, CProd prod) throws Exception {
 		if(prod != null){
 			if(StringHelper.isNotEmpty(prod.getUser_id())){
-				UserDto userDto = userComponent.queryUserById(prod.getUser_id());
+				CUser userDto = userComponent.queryUserById(prod.getUser_id());
 				if(userDto != null && userDto.getUser_type().equals(SystemConstants.USER_TYPE_BAND)){
 					jobComponent.createBusiCmdJob(doneCode,
 							BusiCmdConstants.ACCTIVATE_PROD, userDto.getCust_id(), userDto.getUser_id(), 
@@ -396,7 +396,7 @@ public class AcctService extends BaseBusiService implements IAcctService {
 				if(prod.getProd_type().equals(SystemConstants.PROD_TYPE_CUSTPKG)){
 					List<CProd> childProdList = userProdComponent.queryByPkgSn(prod.getProd_sn());
 					for(CProd childProd : childProdList){
-						UserDto userDto = userComponent.queryUserById(childProd.getUser_id());
+						CUser userDto = userComponent.queryUserById(childProd.getUser_id());
 						if(userDto != null && userDto.getUser_type().equals(SystemConstants.USER_TYPE_BAND)){
 							jobComponent.createBusiCmdJob(doneCode,
 									BusiCmdConstants.ACCTIVATE_PROD, userDto.getCust_id(), userDto.getUser_id(), 
@@ -460,7 +460,7 @@ public class AcctService extends BaseBusiService implements IAcctService {
 		if (null == cust)
 			throw new ServicesException("客户已经销户，退款至银行");
 		
-		UserDto userdto = userComponent.queryUserById(userId);
+		CUser userdto = userComponent.queryUserById(userId);
 		if (userdto==null)
 			throw new ServicesException("用户已经销户，退款至银行");
 		if (userdto.getStatus().equals(StatusConstants.REQSTOP)){
@@ -645,7 +645,7 @@ public class AcctService extends BaseBusiService implements IAcctService {
 	 */
 	public void savePromPayFee(String promFeeId, int promFee,
 			List<PromFeeProdDto> prodList, String preOpenTime) throws Exception {
-		
+		/*
 		
 		
 		//获取业务流水
@@ -1059,6 +1059,7 @@ public class AcctService extends BaseBusiService implements IAcctService {
 		
 		getBusiParam().getBusiConfirmParamInfo().put("details", details);
 		saveAllPublic(doneCode,getBusiParam());
+		*/
 	}
 
 	

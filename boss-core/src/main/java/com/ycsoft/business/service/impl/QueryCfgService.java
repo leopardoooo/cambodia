@@ -63,7 +63,7 @@ public class QueryCfgService extends BaseService implements IQueryCfgService{
 		String dtvCfg = busiConfigComponent.queryTemplateConfig(TemplateConfig.Template.BASE_PROD_FREE_DAY.toString());
 		Map<String, String> map = new HashMap<String, String>();
 		//如果需要,以后会加入宽带
-		map.put(SystemConstants.USER_TYPE_DTV.toString(), dtvCfg);
+		map.put(SystemConstants.USER_TYPE_OTT.toString(), dtvCfg);
 		return map;
 	}
 	

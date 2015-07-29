@@ -1,7 +1,5 @@
 package com.ycsoft.business.component.core;
 
-import static com.ycsoft.commons.constants.SystemConstants.PROD_SERV_ID_DTV;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -14,22 +12,17 @@ import com.ycsoft.beans.config.TCustColonyCfg;
 import com.ycsoft.beans.core.common.CDoneCode;
 import com.ycsoft.beans.core.common.CDoneCodeDetail;
 import com.ycsoft.beans.core.cust.CCust;
-import com.ycsoft.beans.core.fee.CFee;
 import com.ycsoft.beans.core.job.JUserStop;
 import com.ycsoft.beans.core.promotion.CPromFee;
 import com.ycsoft.beans.core.promotion.CPromProdRefund;
 import com.ycsoft.beans.core.user.CRejectRes;
 import com.ycsoft.beans.core.user.CUser;
 import com.ycsoft.beans.core.user.CUserAtv;
-import com.ycsoft.beans.core.user.CUserAtvHis;
 import com.ycsoft.beans.core.user.CUserBroadband;
-import com.ycsoft.beans.core.user.CUserBroadbandHis;
 import com.ycsoft.beans.core.user.CUserDtv;
-import com.ycsoft.beans.core.user.CUserDtvHis;
 import com.ycsoft.beans.core.user.CUserHis;
 import com.ycsoft.beans.core.user.CUserPropChange;
 import com.ycsoft.beans.core.user.CUserStb;
-import com.ycsoft.beans.device.RDevice;
 import com.ycsoft.beans.prod.PPromFee;
 import com.ycsoft.beans.prod.PPromFeeUser;
 import com.ycsoft.beans.prod.PRes;
@@ -58,11 +51,8 @@ import com.ycsoft.business.dao.prod.PPromFeeProdDao;
 import com.ycsoft.business.dao.prod.PPromFeeUserDao;
 import com.ycsoft.business.dao.resource.device.RDeviceDao;
 import com.ycsoft.business.dao.system.SOptrDao;
-import com.ycsoft.business.dto.core.acct.AcctitemDto;
 import com.ycsoft.business.dto.core.bill.UserBillDto;
-import com.ycsoft.business.dto.core.prod.CProdDto;
 import com.ycsoft.business.dto.core.prod.CPromotionDto;
-import com.ycsoft.business.dto.core.prod.ProdTariffDto;
 import com.ycsoft.business.dto.core.prod.PromFeeProdDto;
 import com.ycsoft.business.dto.core.user.ChangedUser;
 import com.ycsoft.business.dto.core.user.UserDto;
@@ -119,42 +109,23 @@ public class UserComponent extends BaseBusiComponent {
 	 * @throws Exception
 	 */
 	public String createUser(CUser user) throws Exception {
-
-		user.setStatus(StatusConstants.ACTIVE);
+		//DTT,OTT用户没有机顶盒号、宽带用户没有MAC
+		if (((user.getUser_type().equals(SystemConstants.USER_TYPE_DTT)
+				|| user.getUser_type().equals(SystemConstants.USER_TYPE_OTT))) && StringHelper.isEmpty(user.getStb_id())
+				|| (user.getUser_type().equals(SystemConstants.USER_TYPE_BAND)
+						&& StringHelper.isEmpty(user.getModem_mac())))
+			user.setStatus(StatusConstants.INSTALL);
+		else
+			user.setStatus(StatusConstants.ACTIVE);
 		user.setIs_rstop_fee(isStopFee());
 		setBaseInfo(user);
-		if (user instanceof CUserAtv ){
-			CUserAtv atv = (CUserAtv)user;
-			user.setUser_type(SystemConstants.USER_TYPE_ATV);
-			atv.setTerminal_type(SystemConstants.USER_TERMINAL_TYPE_ZZD);
-			cUserAtvDao.save(atv);
-		} else if (user instanceof CUserDtv ){
-			CUserDtv dtv = (CUserDtv)user;
-			user.setUser_type(SystemConstants.USER_TYPE_DTV);
-			if (SystemConstants.USER_TERMINAL_TYPE_FZD.equals(dtv.getTerminal_type()))
-				dtv.setStr19(SystemConstants.BOOLEAN_TRUE);
-			else 
-				dtv.setStr19(null);
-			decideFreeUser(dtv);
-			cUserDtvDao.save(dtv);
-		}  else if (user instanceof CUserBroadband ){
-			CUserBroadband bBand = (CUserBroadband)user;
-			user.setUser_type(SystemConstants.USER_TYPE_BAND);
-			CUser cu = this.queryUserByLoginName(bBand.getLogin_name());
-			if(null != cu){
-				throw new ServicesException("宽带登录账号不能重复");
-			}
-			cUserBroadbandDao.save(bBand);
-		}
-		user.setUser_class_area(getOptr().getArea_id());
 		cUserDao.save(user);
-		//同步客户属性用户开户数量限制
-		addUserCfg(user);
-		
+	
 		return user.getUser_id();
 	}
 
 	private void decideFreeUser(CUserDtv dtv) throws JDBCException {
+		/*
 		// 客户允许有2个免费副机
 		List<CUser> users = queryUserByCustId(dtv.getCust_id());
 		if (dtv.getTerminal_type().equals(
@@ -171,6 +142,7 @@ public class UserComponent extends BaseBusiComponent {
 		} else {
 			dtv.setStr19("F");
 		}
+		*/
 	}
 
 	/**
@@ -252,31 +224,31 @@ public class UserComponent extends BaseBusiComponent {
 		BeanUtils.copyProperties(user, userHis);
 		userHis.setStatus(StatusConstants.INVALID);
 		userHis.setStatus_date(DateHelper.now());
-		if (user.getUser_type().equals(SystemConstants.USER_TYPE_DTV))
-			userHis.setNeed_check("T");
-		else 
-			userHis.setNeed_check("F");
+//		if (user.getUser_type().equals(SystemConstants.USER_TYPE_DTV))
+//			userHis.setNeed_check("T");
+//		else 
+//			userHis.setNeed_check("F");
 		cUserHisDao.save(userHis);
 		
-		if (user.getUser_type().equals(SystemConstants.USER_TYPE_ATV)){
-			CUserAtv atv = cUserAtvDao.findByKey(user.getUser_id());
-			CUserAtvHis atvHis = new CUserAtvHis();
-			BeanUtils.copyProperties(atv, atvHis);
-			atvHis.setDone_code(doneCode);
-			cUserAtvHisDao.save(atvHis);
-		} else if (user.getUser_type().equals(SystemConstants.USER_TYPE_DTV)){
-			CUserDtv dtv = cUserDtvDao.findByKey(user.getUser_id());
-			CUserDtvHis dtvHis = new CUserDtvHis();
-			BeanUtils.copyProperties(dtv, dtvHis);
-			dtvHis.setDone_code(doneCode);
-			cUserDtvHisDao.save(dtvHis);
-		} else if (user.getUser_type().equals(SystemConstants.USER_TYPE_BAND)){
-			CUserBroadband band = cUserBroadbandDao.findByKey(user.getUser_id());
-			CUserBroadbandHis bandHis = new CUserBroadbandHis();
-			BeanUtils.copyProperties(band, bandHis);
-			bandHis.setDone_code(doneCode);
-			cUserBroadbandHisDao.save(bandHis);
-		} 
+//		if (user.getUser_type().equals(SystemConstants.USER_TYPE_ATV)){
+//			CUserAtv atv = cUserAtvDao.findByKey(user.getUser_id());
+//			CUserAtvHis atvHis = new CUserAtvHis();
+//			BeanUtils.copyProperties(atv, atvHis);
+//			atvHis.setDone_code(doneCode);
+//			cUserAtvHisDao.save(atvHis);
+//		} else if (user.getUser_type().equals(SystemConstants.USER_TYPE_DTV)){
+//			CUserDtv dtv = cUserDtvDao.findByKey(user.getUser_id());
+//			CUserDtvHis dtvHis = new CUserDtvHis();
+//			BeanUtils.copyProperties(dtv, dtvHis);
+//			dtvHis.setDone_code(doneCode);
+//			cUserDtvHisDao.save(dtvHis);
+//		} else if (user.getUser_type().equals(SystemConstants.USER_TYPE_BAND)){
+//			CUserBroadband band = cUserBroadbandDao.findByKey(user.getUser_id());
+//			CUserBroadbandHis bandHis = new CUserBroadbandHis();
+//			BeanUtils.copyProperties(band, bandHis);
+//			bandHis.setDone_code(doneCode);
+//			cUserBroadbandHisDao.save(bandHis);
+//		} 
 		
 		removeUserWithoutHis(user.getUser_id());
 	}
@@ -301,10 +273,7 @@ public class UserComponent extends BaseBusiComponent {
 	 * @param cust
 	 */
 	public List<CUser> queryUserByCustId(String custId) throws JDBCException {
-		List<CUser> users= new ArrayList<CUser>();
-		users.addAll(cUserAtvDao.queryAtvByCustId(custId));
-		users.addAll(cUserDtvDao.queryDtvByCustId(custId));
-		users.addAll(cUserBroadbandDao.queryBandByCustId(custId));
+		List<CUser> users= cUserDao.queryUserByCustId(custId);
 		fillUserName(users);
 		return users;
 	}
@@ -389,6 +358,7 @@ public class UserComponent extends BaseBusiComponent {
 	}
 	
 	public void saveCancelOpenInteractive(String userId,Integer doneCode) throws Exception {
+		/*
 		CUser user = cUserDao.findByKey(userId);
 		CUserDtv dtv = cUserDtvDao.findByKey(userId);
 		List<CUserPropChange> changeList = new ArrayList<CUserPropChange>();
@@ -464,7 +434,7 @@ public class UserComponent extends BaseBusiComponent {
 		cUserDao.update(user);
 		cUserDtvDao.update(dtv);
 		cUserPropChangeDao.save(changeList.toArray(new CUserPropChange[changeList.size()]));
-		
+		*/
 	}
 	
 	
@@ -475,23 +445,10 @@ public class UserComponent extends BaseBusiComponent {
 	 * @return
 	 * @throws JDBCException
 	 */
-	public UserDto queryUserById(String userId) throws JDBCException {
-		List<CUser> users= new ArrayList<CUser>();
-		CUser atv = cUserAtvDao.queryAtvById(userId);
-		if (atv!=null) users.add(atv);
-		CUser dtv = cUserDtvDao.queryDtvById(userId);
-		if (dtv!=null) users.add(dtv);
-		CUser broadband = cUserBroadbandDao.queryBandById(userId);
-		if (broadband!=null) users.add(broadband);
-		fillUserName(users);
-
-		UserDto userdto = null;
-		if (users.size()>0){
-			userdto = new UserDto();
-			BeanUtils.copyProperties(users.get(0), userdto);
-		}
-		return userdto;
+	public CUser queryUserById(String userId) throws JDBCException {
+		return cUserDao.findByKey(userId);
 	}
+		
 
 	/**
 	 * 根据用户ID， 查询用户异动信息
@@ -573,26 +530,12 @@ public class UserComponent extends BaseBusiComponent {
 	 */
 	private void fillUserName(List<CUser> records) {
 		for( CUser user :records){
-			if("DTV".equals(user.getUser_type())){
-				CUserDtv dtv = (CUserDtv)user;
-				//if (StringHelper.isEmpty(dtv.getUser_name()))
-				String terminal_type = dtv.getTerminal_type();
-				user.setUser_name(MemoryDict.getDictName(DictKey.TERMINAL_TYPE,terminal_type));
-				if(terminal_type.equals(SystemConstants.USER_TERMINAL_TYPE_FZD)){//主终端不加 免费超额之类的后缀
-					if(SystemConstants.BOOLEAN_TRUE.equals(user.getStr19())){
-						user.setUser_name(user.getUser_name()+"(免费)");
-					} else if (SystemConstants.BOOLEAN_FALSE.equals(user.getStr19())){
-						user.setUser_name(user.getUser_name()+"(超额)");
-					}
-				}
-			}else if("BAND".equals(user.getUser_type())){
-				CUserBroadband band = (CUserBroadband)user;
-				user.setUser_name(band.getLogin_name());
-			}else if("ATV".equals(user.getUser_type())){
-				CUserAtv atv = (CUserAtv)user;
-//				user.setUser_name(MemoryDict.getDictName(DictKey.TERMINAL_TYPE,atv.getTerminal_type()));
-				if (StringHelper.isEmpty(atv.getUser_name()))
-					atv.setUser_name("模拟终端");
+			if(SystemConstants.USER_TYPE_BAND.equals(user.getUser_type()) 
+					|| SystemConstants.USER_TYPE_OTT_MOBILE.equals(user.getUser_type())){
+				user.setUser_name(user.getLogin_name());
+			} else if(SystemConstants.USER_TYPE_OTT.equals(user.getUser_type()) 
+					|| SystemConstants.USER_TYPE_DTT.equals(user.getUser_type())){
+				user.setUser_name(MemoryDict.getDictName(DictKey.TERMINAL_TYPE,user.getTerminal_type()));
 			}
 		}
 	}
@@ -866,81 +809,81 @@ public class UserComponent extends BaseBusiComponent {
 	public void updateUser(Integer doneCode, String busiCode, CUser oldUser,
 			String newCustId, String newUserId,boolean forceAsZZD) throws Exception {
 		
-		CUser newUser = new CUser();
-		BeanUtils.copyProperties(oldUser, newUser);
-		newUser.setUser_id(newUserId);
-		newUser.setCust_id(newCustId);
-		newUser.setUser_name(forceAsZZD?"主终端":oldUser.getUser_name());
-		cUserDao.save(newUser);
-		
-		List<CUserPropChange> changeList = new ArrayList<CUserPropChange>();
-		CUserPropChange change = new CUserPropChange();
-		
-		String oldUserId = oldUser.getUser_id();
-		String oldCustId = oldUser.getCust_id();
-		String userType = oldUser.getUser_type();
-		if(userType.equals(SystemConstants.USER_TYPE_DTV)){
-			CUserDtv oldUserDtv = cUserDtvDao.findByKey(oldUserId);
-			CUserDtv newUserDtv = new CUserDtv();
-			BeanUtils.copyProperties(oldUserDtv, newUserDtv);
-			newUserDtv.setUser_id(newUserId);
-			
-			if(!oldUserDtv.getTerminal_type().equals(SystemConstants.USER_TERMINAL_TYPE_ZZD) && forceAsZZD ){//
-				change = new CUserPropChange();
-				change.setDone_code(doneCode);
-				change.setUser_id(newUserId);
-				change.setColumn_name("terminal_type");
-				change.setOld_value(oldUserDtv.getTerminal_type());
-				change.setNew_value(SystemConstants.USER_TERMINAL_TYPE_ZZD);
-				change.setBusi_code(busiCode);
-				setBaseInfo(change);
-				changeList.add(change);
-			}
-			if(forceAsZZD){
-				newUserDtv.setTerminal_type(SystemConstants.USER_TERMINAL_TYPE_ZZD);
-			}
-			cUserDtvDao.save(newUserDtv);
-		} else if(userType.equals(SystemConstants.USER_TYPE_ATV)){
-			CUserAtv oldUserAtv = cUserAtvDao.findByKey(oldUserId);
-			CUserAtv newUserAtv = new CUserAtv();
-			BeanUtils.copyProperties(oldUserAtv, newUserAtv);
-			newUserAtv.setUser_id(newUserId);
-			newUserAtv.setTerminal_type(SystemConstants.USER_TERMINAL_TYPE_ZZD);
-			cUserAtvDao.save(newUserAtv);
-		} else if(userType.equals(SystemConstants.USER_TYPE_BAND)){
-			CUserBroadband oldUserBand = cUserBroadbandDao.findByKey(oldUserId);
-			CUserBroadband newUserBand = new CUserBroadband();
-			BeanUtils.copyProperties(oldUserBand, newUserBand);
-			newUserBand.setUser_id(newUserId);
-			cUserBroadbandDao.save(newUserBand);
-		}
-		
-		change.setDone_code(doneCode);
-		change.setUser_id(newUserId);
-		change.setColumn_name("user_id");
-		change.setOld_value(oldUserId);
-		change.setNew_value(newUserId);
-		change.setBusi_code(busiCode);
-		setBaseInfo(change);
-		changeList.add(change);
-		
-		change = new CUserPropChange();
-		change.setDone_code(doneCode);
-		change.setUser_id(newUserId);
-		change.setColumn_name("cust_id");
-		change.setOld_value(oldCustId);
-		change.setNew_value(newCustId);
-		change.setBusi_code(busiCode);
-		setBaseInfo(change);
-		changeList.add(change);
-		
-		cUserPropChangeDao.save(changeList.toArray(new CUserPropChange[changeList.size()]));
-		
-		jUserStopDao.updateByUserId(oldUserId, newUserId);
-		
-		cUserDao.updateProdInclude(oldUserId, oldCustId, newUserId, newCustId);
-		
-		this.removeUserWithHis(doneCode, oldUser);
+//		CUser newUser = new CUser();
+//		BeanUtils.copyProperties(oldUser, newUser);
+//		newUser.setUser_id(newUserId);
+//		newUser.setCust_id(newCustId);
+//		newUser.setUser_name(forceAsZZD?"主终端":oldUser.getUser_name());
+//		cUserDao.save(newUser);
+//		
+//		List<CUserPropChange> changeList = new ArrayList<CUserPropChange>();
+//		CUserPropChange change = new CUserPropChange();
+//		
+//		String oldUserId = oldUser.getUser_id();
+//		String oldCustId = oldUser.getCust_id();
+//		String userType = oldUser.getUser_type();
+//		if(userType.equals(SystemConstants.USER_TYPE_DTV)){
+//			CUserDtv oldUserDtv = cUserDtvDao.findByKey(oldUserId);
+//			CUserDtv newUserDtv = new CUserDtv();
+//			BeanUtils.copyProperties(oldUserDtv, newUserDtv);
+//			newUserDtv.setUser_id(newUserId);
+//			
+//			if(!oldUserDtv.getTerminal_type().equals(SystemConstants.USER_TERMINAL_TYPE_ZZD) && forceAsZZD ){//
+//				change = new CUserPropChange();
+//				change.setDone_code(doneCode);
+//				change.setUser_id(newUserId);
+//				change.setColumn_name("terminal_type");
+//				change.setOld_value(oldUserDtv.getTerminal_type());
+//				change.setNew_value(SystemConstants.USER_TERMINAL_TYPE_ZZD);
+//				change.setBusi_code(busiCode);
+//				setBaseInfo(change);
+//				changeList.add(change);
+//			}
+//			if(forceAsZZD){
+//				newUserDtv.setTerminal_type(SystemConstants.USER_TERMINAL_TYPE_ZZD);
+//			}
+//			cUserDtvDao.save(newUserDtv);
+//		} else if(userType.equals(SystemConstants.USER_TYPE_ATV)){
+//			CUserAtv oldUserAtv = cUserAtvDao.findByKey(oldUserId);
+//			CUserAtv newUserAtv = new CUserAtv();
+//			BeanUtils.copyProperties(oldUserAtv, newUserAtv);
+//			newUserAtv.setUser_id(newUserId);
+//			newUserAtv.setTerminal_type(SystemConstants.USER_TERMINAL_TYPE_ZZD);
+//			cUserAtvDao.save(newUserAtv);
+//		} else if(userType.equals(SystemConstants.USER_TYPE_BAND)){
+//			CUserBroadband oldUserBand = cUserBroadbandDao.findByKey(oldUserId);
+//			CUserBroadband newUserBand = new CUserBroadband();
+//			BeanUtils.copyProperties(oldUserBand, newUserBand);
+//			newUserBand.setUser_id(newUserId);
+//			cUserBroadbandDao.save(newUserBand);
+//		}
+//		
+//		change.setDone_code(doneCode);
+//		change.setUser_id(newUserId);
+//		change.setColumn_name("user_id");
+//		change.setOld_value(oldUserId);
+//		change.setNew_value(newUserId);
+//		change.setBusi_code(busiCode);
+//		setBaseInfo(change);
+//		changeList.add(change);
+//		
+//		change = new CUserPropChange();
+//		change.setDone_code(doneCode);
+//		change.setUser_id(newUserId);
+//		change.setColumn_name("cust_id");
+//		change.setOld_value(oldCustId);
+//		change.setNew_value(newCustId);
+//		change.setBusi_code(busiCode);
+//		setBaseInfo(change);
+//		changeList.add(change);
+//		
+//		cUserPropChangeDao.save(changeList.toArray(new CUserPropChange[changeList.size()]));
+//		
+//		jUserStopDao.updateByUserId(oldUserId, newUserId);
+//		
+//		cUserDao.updateProdInclude(oldUserId, oldCustId, newUserId, newCustId);
+//		
+//		this.removeUserWithHis(doneCode, oldUser);
 	}
 	
 	/**
@@ -1251,51 +1194,51 @@ public class UserComponent extends BaseBusiComponent {
 	public SOptr queryOptrById(String optr_id) throws Exception{
 		return sOptrDao.findByKey(optr_id);
 	}
-	public String toUtilValue(String custId,String userId,String tariffId,List<ProdTariffDto> tariffList) throws Exception{
-		//查找用户基本信息
-		CUser user = cUserDao.findByKey(userId);
-		if (user == null)
-			throw new ComponentException("用户不存在userId="+userId);
-		CCust cust = cCustDao.findByKey(custId);
-		if (cust == null)
-			throw new ComponentException("客户不存在custId="+user.getCust_id());
-		CUserAtv userAtv = new CUserAtv();
-		CUserDtv userDtv = new CUserDtv();
-		CUserBroadband userBroadband = new CUserBroadband();
-		if (user.getUser_type().equals(SystemConstants.USER_TYPE_ATV))
-			userAtv = cUserAtvDao.queryAtvById(user.getUser_id());
-		else if (user.getUser_type().equals(SystemConstants.USER_TYPE_DTV))
-			userDtv =  cUserDtvDao.queryDtvById(user.getUser_id());
-		else if (user.getUser_type().equals(SystemConstants.USER_TYPE_BAND))
-			userBroadband = cUserBroadbandDao.queryBandById(user.getUser_id());
-		List<CFee> feeList = cFeeDao.queryUserFee(user.getCust_id(),userId);
-		List<AcctitemDto> balanceList = cAcctAcctitemDao.queryAcctAndAcctItemByUserId(custId,userId,user.getCounty_id());
-		List<CProdDto> prodList = cProdDao.queryUserProd(userId, user.getCounty_id());
-		expressionUtil.setAllValue(cust, user, userDtv, userAtv,userBroadband, feeList, balanceList,prodList);
-		expressionUtil.setCuserStb(cUserDao.queryUserStbByUserId(userId));
-		String flag = "F";
-		for (int i = tariffList.size() - 1; i >= 0; i--) {
-			ProdTariffDto tariff = tariffList.get(i);
-			if(StringHelper.isNotEmpty(tariff.getRule_id())){
-				if (expressionUtil.parseBoolean(tariff.getRule_id_text())){
-					if( tariff.getTariff_id().equals(tariffId)){
-						flag = "T";
-						break;
-					}else{
-						flag = tariff.getTariff_id();
-					}
-				}
-			}else{
-				if( tariff.getTariff_id().equals(tariffId)){
-					flag = "T";
-					break;
-				}else{
-					flag = tariff.getTariff_id();
-				}
-			}
-		}
-		return flag;
-	}
+//	public String toUtilValue(String custId,String userId,String tariffId,List<ProdTariffDto> tariffList) throws Exception{
+//		//查找用户基本信息
+//		CUser user = cUserDao.findByKey(userId);
+//		if (user == null)
+//			throw new ComponentException("用户不存在userId="+userId);
+//		CCust cust = cCustDao.findByKey(custId);
+//		if (cust == null)
+//			throw new ComponentException("客户不存在custId="+user.getCust_id());
+//		CUserAtv userAtv = new CUserAtv();
+//		CUserDtv userDtv = new CUserDtv();
+//		CUserBroadband userBroadband = new CUserBroadband();
+//		if (user.getUser_type().equals(SystemConstants.USER_TYPE_ATV))
+//			userAtv = cUserAtvDao.queryAtvById(user.getUser_id());
+//		else if (user.getUser_type().equals(SystemConstants.USER_TYPE_DTV))
+//			userDtv =  cUserDtvDao.queryDtvById(user.getUser_id());
+//		else if (user.getUser_type().equals(SystemConstants.USER_TYPE_BAND))
+//			userBroadband = cUserBroadbandDao.queryBandById(user.getUser_id());
+//		List<CFee> feeList = cFeeDao.queryUserFee(user.getCust_id(),userId);
+//		List<AcctitemDto> balanceList = cAcctAcctitemDao.queryAcctAndAcctItemByUserId(custId,userId,user.getCounty_id());
+//		List<CProdDto> prodList = cProdDao.queryUserProd(userId, user.getCounty_id());
+//		expressionUtil.setAllValue(cust, user, userDtv, userAtv,userBroadband, feeList, balanceList,prodList);
+//		expressionUtil.setCuserStb(cUserDao.queryUserStbByUserId(userId));
+//		String flag = "F";
+//		for (int i = tariffList.size() - 1; i >= 0; i--) {
+//			ProdTariffDto tariff = tariffList.get(i);
+//			if(StringHelper.isNotEmpty(tariff.getRule_id())){
+//				if (expressionUtil.parseBoolean(tariff.getRule_id_text())){
+//					if( tariff.getTariff_id().equals(tariffId)){
+//						flag = "T";
+//						break;
+//					}else{
+//						flag = tariff.getTariff_id();
+//					}
+//				}
+//			}else{
+//				if( tariff.getTariff_id().equals(tariffId)){
+//					flag = "T";
+//					break;
+//				}else{
+//					flag = tariff.getTariff_id();
+//				}
+//			}
+//		}
+//		return flag;
+//	}
 
 	public void setExpressionUtil(ExpressionUtil expressionUtil) {
 		this.expressionUtil = expressionUtil;

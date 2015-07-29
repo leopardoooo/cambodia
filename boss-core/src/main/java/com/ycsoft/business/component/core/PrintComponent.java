@@ -160,15 +160,15 @@ public class PrintComponent extends BaseBusiComponent  {
 	 * @return
 	 */
 	private boolean isAtvCust(String custId) throws JDBCException{
-		boolean result = true;
-		List<CUser> users = cUserDao.queryUserByCustId(custId);
-		for(CUser user:users){
-			if (!SystemConstants.USER_TYPE_ATV.equals(user.getUser_type()) && !SystemConstants.USER_TYPE_BAND.equals(user.getUser_type())){
-				result=false;
-				break;
-			}
-		}
-		return result;
+//		boolean result = true;
+//		List<CUser> users = cUserDao.queryUserByCustId(custId);
+//		for(CUser user:users){
+//			if (!SystemConstants.USER_TYPE_ATV.equals(user.getUser_type()) && !SystemConstants.USER_TYPE_BAND.equals(user.getUser_type())){
+//				result=false;
+//				break;
+//			}
+//		}
+		return false;
 	}
 	
 	/**

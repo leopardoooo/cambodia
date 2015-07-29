@@ -203,9 +203,9 @@ public class CustService extends BaseBusiService implements ICustService {
 				propChangeList.remove(i);
 		}
 		custComponent.editCust(doneCode,cust.getCust_id(), propChangeList);
-		String busiCode = getBusiParam().getBusiCode();
+		//String busiCode = getBusiParam().getBusiCode();
 		Map<String, Object> doneInfo = new HashMap<String, Object>();
-		
+		/*
 		//如果是移机或者是过户业务，且客户状态为拆迁
 		if((BusiCodeConstants.CUST_CHANGE_ADDR.equals(busiCode)|| BusiCodeConstants.CUST_TRANS.equals(busiCode) ) ){
 			//修改拆迁客户状态为正常
@@ -238,6 +238,7 @@ public class CustService extends BaseBusiService implements ICustService {
 			
 			
 		}
+		*/
 		
 		//判断客户地址是否变化，如果有变化，设置旧客户地址
 		for (CCustPropChange change:propChangeList){
@@ -602,19 +603,19 @@ public class CustService extends BaseBusiService implements ICustService {
 			for(CUser oldUser : resUserList){
 				String newUserId = userComponent.gUserId();		//新建用户ID
 				//原双向用户 销户指令，双向用户按用户id来授权
-				UserDto oldUserDto = userComponent.queryUserById(oldUser.getUser_id());
-				if(oldUserDto.getServ_type().equals(SystemConstants.DTV_SERV_TYPE_DOUBLE)){
-					delUserJob(oldUser, oldUser.getCust_id(), doneCode);
-				}
+				CUser oldUserDto = userComponent.queryUserById(oldUser.getUser_id());
+//				if(oldUserDto.getServ_type().equals(SystemConstants.DTV_SERV_TYPE_DOUBLE)){
+//					delUserJob(oldUser, oldUser.getCust_id(), doneCode);
+//				}
 				
 				//复制用户
 				userComponent.updateUser(doneCode, busiCode, oldUser, targetCustId, newUserId,false);
 				
-				UserDto newUser = userComponent.queryUserById(newUserId);
+				CUser newUser = userComponent.queryUserById(newUserId);
 				//新双向用户发开户指令
-				if(newUser.getServ_type().equals(SystemConstants.DTV_SERV_TYPE_DOUBLE)){
-					createUserJob(newUser, newUser.getCust_id(), doneCode);
-				}
+//				if(newUser.getServ_type().equals(SystemConstants.DTV_SERV_TYPE_DOUBLE)){
+//					createUserJob(newUser, newUser.getCust_id(), doneCode);
+//				}
 				
 				//复制专用账户、账目
 				CAcct oldAcct = acctComponent.queryUserAcct(oldUser.getCust_id(), oldUser.getUser_id());
@@ -696,19 +697,19 @@ public class CustService extends BaseBusiService implements ICustService {
 		for(CUser oldUser : resUserList){
 			String newUserId = userComponent.gUserId();		//新建用户ID
 			//原双向用户 销户指令，双向用户按用户id来授权
-			UserDto oldUserDto = userComponent.queryUserById(oldUser.getUser_id());
-			if(oldUserDto.getServ_type().equals(SystemConstants.DTV_SERV_TYPE_DOUBLE)){
-				delUserJob(oldUser, oldUser.getCust_id(), doneCode);
-			}
+			CUser oldUserDto = userComponent.queryUserById(oldUser.getUser_id());
+//			if(oldUserDto.getServ_type().equals(SystemConstants.DTV_SERV_TYPE_DOUBLE)){
+//				delUserJob(oldUser, oldUser.getCust_id(), doneCode);
+//			}
 			
 			//复制用户
 			userComponent.updateUser(doneCode, busiCode, oldUser, nonresCustId, newUserId);
 			
-			UserDto newUser = userComponent.queryUserById(newUserId);
+			CUser newUser = userComponent.queryUserById(newUserId);
 			//新双向用户发开户指令
-			if(newUser.getServ_type().equals(SystemConstants.DTV_SERV_TYPE_DOUBLE)){
-				createUserJob(newUser, newUser.getCust_id(), doneCode);
-			}
+//			if(newUser.getServ_type().equals(SystemConstants.DTV_SERV_TYPE_DOUBLE)){
+//				createUserJob(newUser, newUser.getCust_id(), doneCode);
+//			}
 			
 			//复制专用账户、账目
 			CAcct oldAcct = acctComponent.queryUserAcct(oldUser.getCust_id(), oldUser.getUser_id());
@@ -1747,7 +1748,7 @@ public class CustService extends BaseBusiService implements ICustService {
 			throw new ServicesException(MemoryDict.getDictName(DictKey.DEVICE_TYPE, deviceType) + " " + deviceCode + " 不存在或者未被使用");
 		}
 		CUser user = users.get(0);
-		UserDto userDto = userComponent.queryUserById(user.getUser_id());
+		CUser userDto = userComponent.queryUserById(user.getUser_id());
 		result.put("user", userDto);
 		
 		DeviceDto dev = deviceComponent.queryDevice(deviceCode);
