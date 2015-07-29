@@ -795,13 +795,13 @@ UserDetailInfo = Ext.extend(Ext.Panel,{
 		});
 	},
 	reset:function(){//重置详细信息
-//		if(this.items.itemAt(0).getEl()){
-//			this.tpl.overwrite( this.items.itemAt(0).body, {});
-//		}
+		if(this.items.itemAt(0).getEl()){
+			this.tpl.overwrite( this.items.itemAt(0).body, {});
+		}
 	},
 	refresh:function(type,record){
-//		this.tpl = UserDetailTemplate[type];
-//		this.tpl.overwrite( this.items.itemAt(0).body, record.data);
+		this.tpl = UserDetailTemplate[type];
+		this.tpl.overwrite( this.items.itemAt(0).body, record.data);
 	}
 });
 
