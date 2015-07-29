@@ -101,6 +101,25 @@ public class CCust extends BusiBase implements Serializable {
 	
 	private String is_bank = "F";
 	
+	private String spkg_sn;
+	private String spkg_text;
+	
+	public String getSpkg_sn() {
+		return spkg_sn;
+	}
+
+	public void setSpkg_sn(String spkg_sn) {
+		this.spkg_sn = spkg_sn;
+	}
+
+	public String getSpkg_text() {
+		return spkg_text;
+	}
+
+	public void setSpkg_text(String spkg_text) {
+		this.spkg_text = spkg_text;
+	}
+
 	public String getIs_bank() {
 		return is_bank;
 	}

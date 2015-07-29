@@ -37,6 +37,8 @@ public class PProdTariffDisct extends OptrBase implements Serializable {
 	private Date exp_date;
 	private String refund;
 	private String trans;
+	private Integer billing_cycle;
+	private Integer max_cycle_order;
 
 	private String refund_text;
 	private String trans_text;
@@ -50,6 +52,22 @@ public class PProdTariffDisct extends OptrBase implements Serializable {
 
 	public void setRule_name(String rule_name) {
 		this.rule_name = rule_name;
+	}
+	
+	public Integer getBilling_cycle() {
+		return billing_cycle;
+	}
+
+	public void setBilling_cycle(Integer billing_cycle) {
+		this.billing_cycle = billing_cycle;
+	}
+
+	public Integer getMax_cycle_order() {
+		return max_cycle_order;
+	}
+
+	public void setMax_cycle_order(Integer max_cycle_order) {
+		this.max_cycle_order = max_cycle_order;
 	}
 
 	public String getStatus_text() {
