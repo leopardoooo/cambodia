@@ -59,23 +59,14 @@ public class CUser extends BusiBase implements Serializable {
 	private String str8 ;
 	private String str9 ;
 	private String str10 ;
-	private String str11;
-	private String str12;
-	private String str13;
-	private String str14;
-	private String str15;
-	private String str16;
-	private String str17;
-	private String str18;
-	private String str19;
-	private String str20;
-
+	
 	
 	private String user_type_text = "";
 	private String stop_type_text = "";
 	private String status_text = "";
 	private String net_type_text = "";
 	private String user_class_text = "";
+	private String terminal_type_text="";
 	//电视机厂家
 	private String tv_model_text = "";
 	
@@ -89,6 +80,7 @@ public class CUser extends BusiBase implements Serializable {
 	private String modem_buy;
 	
 	private String auto_promotion;
+	private String newPassword;
 
 	public String getAuto_promotion() {
 		return auto_promotion;
@@ -423,102 +415,6 @@ public class CUser extends BusiBase implements Serializable {
 		return str7_text;
 	}
 
-
-
-	public String getStr11_text() {
-		return str11_text;
-	}
-
-	public String getStr11() {
-		return str11;
-	}
-
-	public void setStr11(String str11) {
-		this.str11 = str11;
-		this.str11_text = MemoryDict.getDictName(DictKey.VOD_USER_TYPE, str11);
-	}
-
-	public String getStr12() {
-		return str12;
-	}
-
-	public void setStr12(String str12) {
-		this.str12 = str12;
-	}
-
-	public String getStr13() {
-		return str13;
-	}
-
-	public void setStr13(String str13) {
-		this.str13 = str13;
-	}
-
-	public String getStr14() {
-		return str14;
-	}
-
-	public void setStr14(String str14) {
-		this.str14 = str14;
-	}
-
-	public String getStr15() {
-		return str15;
-	}
-
-	public void setStr15(String str15) {
-		this.str15 = str15;
-	}
-
-	public String getStr16() {
-		return str16;
-	}
-
-	public void setStr16(String str16) {
-		this.str16 = str16;
-	}
-
-	public String getStr17() {
-		return str17;
-	}
-
-	public void setStr17(String str17) {
-		this.str17 = str17;
-	}
-
-	public String getStr18() {
-		return str18;
-	}
-
-	public void setStr18(String str18) {
-		this.str18 = str18;
-	}
-
-	public String getStr19() {
-		return str19;
-	}
-
-	public void setStr19(String str19) {
-		this.str19 = str19;
-		this.str19_text = MemoryDict.getDictName(DictKey.BOOLEAN, str19);
-	}
-	
-	public String getStr19_text() {
-		return str19_text;
-	}
-
-	public String getStr20() {
-		return str20;
-	}
-
-	public void setStr20(String str20) {
-		this.str20 = str20;
-	}
-
-	public void setStr11_text(String str11_text) {
-		this.str11_text = str11_text;
-	}
-
 	/**
 	 * @return the device_model
 	 */
@@ -555,7 +451,26 @@ public class CUser extends BusiBase implements Serializable {
 
 	public void setTerminal_type(String terminal_type) {
 		this.terminal_type = terminal_type;
+		this.terminal_type_text =  MemoryDict.getDictName(DictKey.TERMINAL_TYPE,terminal_type);
 	}
+
+	public String getTerminal_type_text() {
+		return terminal_type_text;
+	}
+
+	public void setTerminal_type_text(String terminal_type_text) {
+		this.terminal_type_text = terminal_type_text;
+	}
+
+	public String getNewPassword() {
+		return newPassword;
+	}
+
+	public void setNewPassword(String newPassword) {
+		this.newPassword = newPassword;
+	}
+	
+	
 
 	
 

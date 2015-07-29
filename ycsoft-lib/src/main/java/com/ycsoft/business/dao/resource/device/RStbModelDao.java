@@ -78,10 +78,15 @@ public class RStbModelDao extends BaseEntityDao<RStbModel> {
 	
 	public List<RStbModel> queryStbModelByCountyId(String countyId) throws Exception {
 		String sql = "select distinct t.* from r_stb_model t,r_device_model_county dc"
-			+ " where t.device_model=dc.device_model and dc.device_type=?";
+			+ " where t.device_model=dc.device_model(+) and dc.device_type=?";
 		if(!countyId.equals(SystemConstants.COUNTY_ALL)){
 			sql += " and dc.county_id='"+countyId+"'";
 		}
 		return this.createQuery(sql, SystemConstants.DEVICE_TYPE_STB).list();
+	}
+	
+	public List<RStbModel> queryStbModel() throws Exception {
+		String sql = "select distinct t.* from r_stb_model t";
+		return this.createQuery(sql).list();
 	}
 }

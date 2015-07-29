@@ -141,10 +141,10 @@ public class SystemConstants {
 	/**
 	 * 用户类型
 	 */
-	public final static String USER_TYPE_ATV = "ATV";// 模拟
-	public final static String USER_TYPE_DTV = "DTV";// 数字
+	public final static String USER_TYPE_DTT = "DTT";// 模拟
+	public final static String USER_TYPE_OTT = "OTT";// 数字
 	public final static String USER_TYPE_BAND = "BAND";// 宽带
-	public final static String USER_TYPE_ITV = "ITV";// 互动
+	public final static String USER_TYPE_OTT_MOBILE = "OTT_MOBILE";// 互动
 
 	/**
 	 * 用户网络类型

@@ -25,9 +25,9 @@ public class DeviceDto extends RDevice{
 	private String isPairCard;
 	private RModem pairModem;			//配对的MODEM
 	private String buy_mode;			//购买方式
-	private String buy_mode_text;			//购买方式
+	private String buy_mode_text;		//购买方式
 	private Integer price;				//价格
-	private Integer fee;			//实收金额
+	private Integer fee;			    //实收金额
 	private String isPairModem;
 
 

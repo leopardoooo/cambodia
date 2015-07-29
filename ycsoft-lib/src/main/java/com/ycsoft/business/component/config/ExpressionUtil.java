@@ -113,12 +113,12 @@ public class ExpressionUtil {
 		ccust = busiParam.getCust();
 		cuser = busiParam.getSelectedUsers().size() > 0 ? busiParam
 				.getSelectedUsers().get(0) : null;
-		cuserdtv = busiParam.getSelectedDtvs().size() > 0 ? busiParam
-				.getSelectedDtvs().get(0) : null;
-		cuseratv = busiParam.getSelectedAtvs().size() > 0 ? busiParam
-				.getSelectedAtvs().get(0) : null;
-		cuserBroadband = busiParam.getSelectedBands().size() > 0 ? busiParam
-				.getSelectedBands().get(0) : null;
+//		cuserdtv = busiParam.getSelectedDtvs().size() > 0 ? busiParam
+//				.getSelectedDtvs().get(0) : null;
+//		cuseratv = busiParam.getSelectedAtvs().size() > 0 ? busiParam
+//				.getSelectedAtvs().get(0) : null;
+//		cuserBroadband = busiParam.getSelectedBands().size() > 0 ? busiParam
+//				.getSelectedBands().get(0) : null;
 		payacctitem = feeList;
 		balanceacctitem = balanceList;
 		orderprods = prodList;
@@ -252,7 +252,7 @@ public class ExpressionUtil {
 			ccust.setUser_count(cUserDao.queryUserCount(ccust.getCust_id()));
 		}
 		if (ccust != null && ruleStr.indexOf(".user_count_dtv") >= 0) {
-			ccust.setUser_count_dtv(cUserDao.queryUserByCustId(ccust.getCust_id(),SystemConstants.USER_TYPE_DTV).size());
+			//ccust.setUser_count_dtv(cUserDao.queryUserByCustId(ccust.getCust_id(),SystemConstants.USER_TYPE_DTV).size());
 		}
 		if (ccust != null && ruleStr.indexOf(".is_bank") >= 0) {
 			CAcctBank acctBank = cAcctBankDao.findByCustId(ccust.getCust_id());

@@ -55,4 +55,9 @@ public class RModemModelDao extends BaseEntityDao<RModemModel> {
 		}
 		return this.createQuery(sql, SystemConstants.DEVICE_TYPE_MODEM).list();
 	}
+
+	public List<RModemModel> queryModemModel() throws Exception{
+		String sql = "select t.* from r_modem_model t";
+		return this.createQuery(sql).list();
+	}
 }
