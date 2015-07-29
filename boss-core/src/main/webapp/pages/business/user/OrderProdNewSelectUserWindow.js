@@ -107,7 +107,7 @@ TransferPayWindow = Ext.extend(Ext.Window, {
 		// Window 构造
 		return TransferPayWindow.superclass.constructor.call(this, {
 			layout: "fit",
-			title: "转移支付明细",
+			title: "转移支付明细哈哈哈哈哈哈",
 			width: 500,
 			height: 300,
 			resizable: false,
