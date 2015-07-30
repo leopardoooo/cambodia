@@ -3,7 +3,6 @@
  */
 ProdOrderForm = Ext.extend( BaseForm, {
 	url : Constant.ROOT_PATH+"/core/x/User!createUser.action",
-	buyModeStore: null,
 	
 	selectUserWindow: null,
 	switchUser: null,
@@ -11,11 +10,64 @@ ProdOrderForm = Ext.extend( BaseForm, {
 	transferPayWindow: null,
 	
 	constructor: function(p){
-		this.buyModeStore = new Ext.data.JsonStore({
-			url :root + '/commons/x/QueryDevice!queryDeviceBuyMode.action',
-			fields : ['buy_mode','buy_mode_name'],
-			autoLoad: true
+		// 续订下拉框
+		this.storeWithValidOrderList = new Ext.data.JsonStore({
+			url :root + '/commons/x/Order!loadGoonOrderList.action',
+			fields : ['order_sn','order_desc'],
+			autoLoad: true,
+			listeners: {
+				scope: this,
+				beforeload: function(s, ops){
+					//  cust_id:  客户编号必填
+					//  single_user_id : 单用户入口填对应的user_id；通用入口不填
+				}
+			}
 		});
+		
+		// 升级下拉框数据源
+		this.storeWithUpgradeOrderList = new Ext.data.JsonStore({
+			url :root + '/commons/x/Order!loadUpOrderList.action',
+			fields : ['order_sn','order_desc'],
+			autoLoad: true,
+			listeners: {
+				scope: this,
+				beforeload: function(s, ops){
+					//  cust_id:  客户编号必填
+					//  single_user_id : 单用户入口填对应的user_id；通用入口不填
+				}
+			}
+		});
+		
+		// 产品下拉框数据源
+		this.storeWithProdList = new Ext.data.JsonStore({
+			url :root + '/commons/x/Order!loadProdList.action',
+			fields : ['prod_id','prod_name'],
+			autoLoad: true,
+			listeners: {
+				scope: this,
+				beforeload: function(s, ops){
+					//cust_id:
+					//single_user_id : 单用户入口填对应的user_id；通用入口不填
+					//up_order_sn: 有选升级则填上
+					//goon_order_sn:有选升级则填上
+				}
+			}
+		}); 
+		
+		// 资费下拉框
+		this.storeWithTariffList = new Ext.data.JsonStore({
+			url :root + '/commons/x/Order!loadTariff.action',
+			fields : ['tariff_id','disct_id',"disct_name","tariff_name"],
+			autoLoad: true,
+			listeners: {
+				scope: this,
+				beforeload: function(s, ops){
+					//  cust_id:
+					//  prod_id:
+					//  user_id: prod_id是套餐时不填，否则填用户栏选中的user_id
+				}
+			}
+		});  
 		
 		// 选择用户
 		var that = this;
@@ -31,7 +83,7 @@ ProdOrderForm = Ext.extend( BaseForm, {
 		ProdOrderForm.superclass.constructor.call(this, {
 			trackResetOnLoad:true,
 			autoScroll:true,
-            labelWidth:80,
+            labelWidth:100,
             border: false,
 			bodyStyle:'background:#F9F9F9;padding-top:4px',
 			defaults: {
@@ -45,21 +97,21 @@ ProdOrderForm = Ext.extend( BaseForm, {
 					baseCls: 'x-plain',
 					columnWidth:0.5,
 					anchor: '100%',
-					labelWidth:80,
-					defaults: {width: 150}
+					labelWidth:100,
+					defaults: {width: 130}
 				}
 			},
-			items:[{
-				xtype: 'radiogroup',
+			items:[/*{
+				xtype: 'checkboxgroup',
 				fieldLabel: '类型过滤',
 			    anchor: "92%",
 			    items: [
-			        {boxLabel: '有线OTT', name: 'aa'},
-			        {boxLabel: '无线OTT', name: 'aa', checked: true},
-			        {boxLabel: 'DTT', name: 'aa'},
-			        {boxLabel: 'BAND', name: 'aa'},
-			        {boxLabel: '普通套餐', name: 'aa'},
-			        {boxLabel: '协议套餐', name: 'aa'}
+			        {boxLabel: '有线OTT', name: 'p_prod.serv_id',value: 'OTT'},
+			        {boxLabel: '无线OTT', name: 'p_prod.serv_id', value: "OTT_MOBILE", checked: true},
+			        {boxLabel: 'DTT', name: 'p_prod.serv_id', value: "DTT"},
+			        {boxLabel: 'BAND', name: 'p_prod.serv_id',value: "BAND"},
+			        {boxLabel: '普通套餐', name: 'p_prod.prod_type', value: 'cpkg'},
+			        {boxLabel: '协议套餐', name: 'p_prod.prod_type', value: 'spkg'}
 			    ]
 			},{
 				items: [{
@@ -75,7 +127,7 @@ ProdOrderForm = Ext.extend( BaseForm, {
 			            emptyText: "可升级的订购记录."
 					}]
 				}]
-			},{
+			},*/{
 				items: [{
 					items:[{
 						xtype: 'paramcombo',
@@ -108,6 +160,11 @@ ProdOrderForm = Ext.extend( BaseForm, {
 					}]
 				}]
 			},{
+				xtype: 'displayfield',
+				fieldLabel: '上期订购结束日',
+				labelWidth: 120,
+				value: '2015-07-30'
+			},{
 				items: [{
 					items:[{
 						xtype: 'datefield',
@@ -122,11 +179,10 @@ ProdOrderForm = Ext.extend( BaseForm, {
 					}]
 				}]
 			},{
-				baseCls: 'xx',
 				items: [{
 					columnWidth: .7,
 					xtype: "panel",
-					bodyStyle: 'padding: 10px 0 10px 30px; color: #333',
+					bodyStyle: 'padding: 10px 0 10px 30px; color: red',
 					html: "<b> * 收费小计:$100.00（新增订购:<b>58.00</b> + <a id='transferHrefTag' href='#'>转移支付:<b>42.00</b></a>）</b>"
 				},{
 					columnWidth: .223,
@@ -156,6 +212,30 @@ ProdOrderForm = Ext.extend( BaseForm, {
 		}
 		this.selectUserWindow.show(this.switchUser);
 	},
+	// 上期订购结束日
+	loadLastOrderExpDate: function(){
+		Ext.Ajax.request({
+			scope : this,
+			url : root + '/commons/x/Order.loadLastOrderExpDate.action',
+			params : { /*cust_id: prod_id: user_id:prod_id是套餐则填空，否则填用户栏选中的user_id */},
+			success : function(response,opts){
+				var obj = Ext.decode(response.responseText);
+				alert(response.responseText);
+			}
+		});
+	},
+	// 开始计费日
+	loadLastOrderExpDate: function(){
+		Ext.Ajax.request({
+			scope : this,
+			url : root + '/commons/x/Order.loadOrderEffDate.action',
+			params : { /*cust_id: prod_id: user_id: prod_id是套餐则填空，否则填用户栏选中的user_id last_order_sn:上期订购结束日获得的order_sn order_months: 订购月数  */},
+			success : function(response,opts){
+				var obj = Ext.decode(response.responseText);
+				alert("date: " + response.responseText);
+			}
+		});
+	},
 	//加入产品列表
 	doAddProdList: function(){
 		alert("加入产品列表..");
@@ -179,7 +259,7 @@ ProdOrderForm = Ext.extend( BaseForm, {
 // 产品临时列表
 SelectedProdGrid = Ext.extend(Ext.grid.GridPanel, {
 	store: new Ext.data.JsonStore({
-		fields: ["prod_name","traff_name", "user_ids", "month_count", "fee", "last_order_end_date", "start_date", "start_date"]
+		fields: ["cust_id","user_id","user_name","user_selected","prod_id", "prod_name","tariff_id","tariff_name","last_order_sn","last_exp_date"]
 	}),
 	constructor: function(){
 		var sm = new Ext.grid.CheckboxSelectionModel();
@@ -218,7 +298,7 @@ Ext.onReady(function(){
 		defaults: {border: false},
 		items:[{
 			region: "north",
-			height: 230,
+			height: 200,
 			layout: "fit",
 			items: new ProdOrderForm()
 		}, new SelectedProdGrid()]
