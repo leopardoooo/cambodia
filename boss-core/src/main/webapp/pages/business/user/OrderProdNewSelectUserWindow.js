@@ -116,7 +116,7 @@ TransferPayWindow = Ext.extend(Ext.Window, {
        	    {header: "转移金额", width: 60, sortable:true, dataIndex: 'fee'}
        	];
 		
-		// Window 构造
+		// Window 构造 
 		return TransferPayWindow.superclass.constructor.call(this, {
 			layout:"fit",
 			title: "转移支付明细",
