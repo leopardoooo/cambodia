@@ -28,7 +28,33 @@ public class PPackageProd implements Serializable {
 	private String user_type;
 	private String terminal_type;
 	private Integer max_user_cnt;
+	private String prod_list;
+	private Integer precent;
 	
+
+
+	public String getProd_list() {
+		return prod_list;
+	}
+
+
+
+	public void setProd_list(String prod_list) {
+		this.prod_list = prod_list;
+	}
+
+
+
+	public Integer getPrecent() {
+		return precent;
+	}
+
+
+
+	public void setPrecent(Integer precent) {
+		this.precent = precent;
+	}
+
 
 
 	/**
