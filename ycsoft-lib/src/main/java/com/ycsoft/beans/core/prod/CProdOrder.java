@@ -50,8 +50,7 @@ public class CProdOrder extends BusiBase implements Serializable {
     private String order_type;
 //	  PACKAGE_GROUP_ID        VARCHAR2(8),
     private String package_group_id;
-//	  PACKAGE_PROD_CONTENT_ID VARCHAR2(8),
-    private String package_content_id;
+
 //	  AREA_ID                 VARCHAR2(8) not null,
    
 //	  COUNTY_ID               VARCHAR2(8) not null,
@@ -192,12 +191,7 @@ public class CProdOrder extends BusiBase implements Serializable {
 	public void setPackage_group_id(String package_group_id) {
 		this.package_group_id = package_group_id;
 	}
-	public String getPackage_content_id() {
-		return package_content_id;
-	}
-	public void setPackage_content_id(String package_content_id) {
-		this.package_content_id = package_content_id;
-	}
+
 	public String getRemark() {
 		return remark;
 	}
