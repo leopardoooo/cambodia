@@ -3,7 +3,11 @@ package com.ycsoft.business.dto.core.prod;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
-
+/**
+ * 订购产品提交的数据bean
+ * @author new
+ *
+ */
 public class OrderProd implements Serializable{
 	private String cust_id;
 	private String user_id;
