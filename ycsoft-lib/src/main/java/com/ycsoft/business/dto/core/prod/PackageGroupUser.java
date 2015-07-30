@@ -19,7 +19,7 @@ public class PackageGroupUser implements Serializable  {
    
     //套餐内容组定义
     private PPackageProd pPackageProd;
-    //套餐内容产品组定义
+    //套餐内容产品组定义和prod_list对应的所有产品信息
     private Map<PPackageProdDetail,List<PProd>> prodcontentMap;
 	public String getPackage_group_id() {
 		return package_group_id;
