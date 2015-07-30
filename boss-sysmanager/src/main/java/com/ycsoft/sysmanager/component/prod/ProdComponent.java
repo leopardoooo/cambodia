@@ -752,9 +752,9 @@ public class ProdComponent extends BaseComponent {
 					PPackageProd pp = ppList.get(0);
 					PPackageProd pkgProd = new PPackageProd();
 					pkgProd.setPackage_id(pp.getPackage_id());
-					pkgProd.setProd_id(pp.getProd_id());
-					pkgProd.setPackage_tariff_id(pp.getPackage_tariff_id());
-					pkgProd.setType(SystemConstants.PACKAGE_FINANCE_TYPE);
+//					pkgProd.setProd_id(pp.getProd_id());
+//					pkgProd.setPackage_tariff_id(pp.getPackage_tariff_id());
+//					pkgProd.setType(SystemConstants.PACKAGE_FINANCE_TYPE);
 					pkgProdList.add(pkgProd);
 				}
 				
@@ -764,13 +764,13 @@ public class ProdComponent extends BaseComponent {
 			List<PPackageProd> pList = pPackageProdDao.queryPkgProdById(pkgId);
 			for(PPackageProd pkg : pList){
 				pkg.setPackage_id(pkgId);
-				pkg.setType(SystemConstants.PACKAGE_MARKET_TYPE);
+		//		pkg.setType(SystemConstants.PACKAGE_MARKET_TYPE);
 				pkgProdList.add(pkg);
 				
 				PPackageProd pp = new PPackageProd();
 				pp.setPackage_id(pkgId);
-				pp.setProd_id(pkg.getProd_id());
-				pp.setType(SystemConstants.PACKAGE_FINANCE_TYPE);
+//				pp.setProd_id(pkg.getProd_id());
+//				pp.setType(SystemConstants.PACKAGE_FINANCE_TYPE);
 				pkgProdList.add(pp);
 			}
 		}
@@ -779,20 +779,20 @@ public class ProdComponent extends BaseComponent {
 	}
 	
 	public List<PPackageProd> changeProd(List<PPackageProd> list) throws Exception {
-		for (PPackageProd pkg : list) {
-			pkg.setProd(pProdDao.findByKey(pkg.getProd_id()));
-			if (StringHelper.isNotEmpty(pkg.getTariff_id())) {
-				pkg.setProdTariff(pProdTariffDao.findByKey(pkg.getTariff_id()));
-				if (pkg.getProdTariff() != null)
-					pkg.setTariff_name(pkg.getProdTariff().getTariff_name());
-			}
-			if (StringHelper.isNotEmpty(pkg.getPackage_tariff_id())) {
-				PProdTariff pt = pProdTariffDao.findByKey(pkg.getPackage_tariff_id());
-				if(pt!=null){
-					pkg.setPackage_tariff_name(pt.getTariff_name());
-				}
-			}
-		}
+//		for (PPackageProd pkg : list) {
+////			pkg.setProd(pProdDao.findByKey(pkg.getProd_id()));
+////			if (StringHelper.isNotEmpty(pkg.getTariff_id())) {
+////				pkg.setProdTariff(pProdTariffDao.findByKey(pkg.getTariff_id()));
+////				if (pkg.getProdTariff() != null)
+////					pkg.setTariff_name(pkg.getProdTariff().getTariff_name());
+////			}
+//			if (StringHelper.isNotEmpty(pkg.getPackage_tariff_id())) {
+//				PProdTariff pt = pProdTariffDao.findByKey(pkg.getPackage_tariff_id());
+//				if(pt!=null){
+//				//	pkg.setPackage_tariff_name(pt.getTariff_name());
+//				}
+//			}
+//		}
 		return list;
 	}
 
@@ -1272,7 +1272,7 @@ public class ProdComponent extends BaseComponent {
 			for(PPackageProd pk :prodDto.getPackList()){
 				PPackageProd pack = new PPackageProd();
 				pack.setPackage_id(prodDto.getProd_id());
-				pack.setProd_id(pk.getProd_id());
+//				pack.setProd_id(pk.getProd_id());
 				pkList.add(pack);
 			}
 			pPackageProdDao.save(pkList.toArray(new PPackageProd[pkList.size()]));
@@ -1319,10 +1319,10 @@ public class ProdComponent extends BaseComponent {
 				if (!"null".equals(odlpackList) && odlpackList != null) {
 					boolean ck = false;
 					for (int k = odlpackList.size() - 1; k >= 0; k--) {
-						if (prodDto.getPackList().get(i).getProd_id().equals(odlpackList.get(k).getProd_id())){
-								odlpackList.remove(k);
-								ck = true;
-							}
+//						if (prodDto.getPackList().get(i).getProd_id().equals(odlpackList.get(k).getProd_id())){
+//								odlpackList.remove(k);
+//								ck = true;
+//							}
 					}
 					if (ck) {
 						prodDto.getPackList().remove(i);
@@ -1330,7 +1330,7 @@ public class ProdComponent extends BaseComponent {
 				}
 			}
 			for(PPackageProd pk :odlpackList){
-				aList.add(pk.getProd_id());
+//				aList.add(pk.getProd_id());
 				aList.add(prodDto.getProd_id());
 				oldPkgList.add(aList.toArray(new String[aList.size()]));
 				aList.clear();
@@ -1338,7 +1338,7 @@ public class ProdComponent extends BaseComponent {
 			for(PPackageProd pk :prodDto.getPackList()){
 				PPackageProd pack = new PPackageProd();
 				pack.setPackage_id(prodDto.getProd_id());
-				pack.setProd_id(pk.getProd_id());
+//				pack.setProd_id(pk.getProd_id());
 				pkList.add(pack);
 			}
 			
@@ -1549,25 +1549,25 @@ public class ProdComponent extends BaseComponent {
 					PPackageProd pp = list.get(i);
 					PPackageProdHis packdto = new PPackageProdHis();
 					packdto.setPackage_id(tariff.getProd_id());
-					packdto.setProd_id(pp.getProd_id());
-					packdto.setTariff_id(pp.getTariff_id());
-					packdto.setMax_prod_count(pp.getMax_prod_count());
-					packdto.setPercent_value(pp.getPercent_value());
-					packdto.setPackage_tariff_id(tariff.getTariff_id());
-					packdto.setType(pp.getType());
-					if(i==list.size()-1){
-						if(value > 0){
-							packdto.setPercent(100-value);
-						}else if(value == 0 && pp.getPercent_value() == 0){
-							packdto.setPercent(0);
-						}
-					}else{
-						packdto.setPercent(calculationPercent(pp.getPercent_value(), (float)(tariff.getRent())/100));
-						value +=packdto.getPercent();
-					}
-					
-					packdto.setOptr_id(WebOptr.getOptr().getOptr_id());
-					PacksList.add(packdto);
+//					packdto.setProd_id(pp.getProd_id());
+//					packdto.setTariff_id(pp.getTariff_id());
+//					packdto.setMax_prod_count(pp.getMax_prod_count());
+//					packdto.setPercent_value(pp.getPercent_value());
+//					packdto.setPackage_tariff_id(tariff.getTariff_id());
+//					packdto.setType(pp.getType());
+//					if(i==list.size()-1){
+//						if(value > 0){
+//							packdto.setPercent(100-value);
+//						}else if(value == 0 && pp.getPercent_value() == 0){
+//							packdto.setPercent(0);
+//						}
+//					}else{
+//						packdto.setPercent(calculationPercent(pp.getPercent_value(), (float)(tariff.getRent())/100));
+//						value +=packdto.getPercent();
+//					}
+//					
+//					packdto.setOptr_id(WebOptr.getOptr().getOptr_id());
+//					PacksList.add(packdto);
 				}
 				value = 0;
 			}

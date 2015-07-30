@@ -137,13 +137,13 @@ public class ProdComponent extends BaseBusiComponent {
 		if(null != prod){
 			if (prod.isPkg()){
 				//查找套餐对应的自产品
-				List<PPackageProd> pkgProdList = queryPackageProd(prod.getProd_id());
-				for(PPackageProd p:pkgProdList){
-					ProdResDto prodResDto = this.queryProdRes(p.getProd());
-					if(null==prodResMap.get(prodResDto.getProd_id())){
-						prodResMap.put(prodResDto.getProd_id(), prodResDto);
-					}
- 				}
+//				List<PPackageProd> pkgProdList = queryPackageProd(prod.getProd_id());
+//				for(PPackageProd p:pkgProdList){
+//					ProdResDto prodResDto = this.queryProdRes(p.getProd());
+//					if(null==prodResMap.get(prodResDto.getProd_id())){
+//						prodResMap.put(prodResDto.getProd_id(), prodResDto);
+//					}
+// 				}
 			} else {
 				prodResList.add(this.queryProdRes(prod));
 			}
@@ -258,26 +258,26 @@ public class ProdComponent extends BaseBusiComponent {
 	public List<PPackageProd> queryPackageProd(String pkgId)  throws Exception{
 		PPackageProd pkgProd = new PPackageProd();
 		pkgProd.setPackage_id(pkgId);
-		pkgProd.setType(SystemConstants.PACKAGE_MARKET_TYPE);
+		//pkgProd.setType(SystemConstants.PACKAGE_MARKET_TYPE);
 		List<PPackageProd> pkgProdList= pPackageProdDao.findByEntity(pkgProd);
-		
-		String[] prodIds = CollectionHelper.converValueToArray(pkgProdList, "prod_id");
-		Map<String, PProd> prodMap = null;
-		if(null!=prodIds && prodIds.length>0){
-			prodMap = CollectionHelper.converToMapSingle(
-				pProdDao.findByProdIds(prodIds), "prod_id");
-		}
-		String[] prodTariffIds = CollectionHelper.converValueToArray(pkgProdList, "tariff_id");
-		Map<String, PProdTariff> tariffMap = CollectionHelper
-				.converToMapSingle(pProdTariffDao
-						.queryPTariffByIds(prodTariffIds),
-						"tariff_id");
-		
-		for(PPackageProd pkg:pkgProdList){
-			pkg.setProd(prodMap.get(pkg.getProd_id()));
-			if (StringHelper.isNotEmpty(pkg.getTariff_id()))
-				pkg.setProdTariff(tariffMap.get(pkg.getTariff_id()));
-		}
+//		
+//		String[] prodIds = CollectionHelper.converValueToArray(pkgProdList, "prod_id");
+//		Map<String, PProd> prodMap = null;
+//		if(null!=prodIds && prodIds.length>0){
+//			prodMap = CollectionHelper.converToMapSingle(
+//				pProdDao.findByProdIds(prodIds), "prod_id");
+//		}
+//		String[] prodTariffIds = CollectionHelper.converValueToArray(pkgProdList, "tariff_id");
+//		Map<String, PProdTariff> tariffMap = CollectionHelper
+//				.converToMapSingle(pProdTariffDao
+//						.queryPTariffByIds(prodTariffIds),
+//						"tariff_id");
+//		
+//		for(PPackageProd pkg:pkgProdList){
+//			pkg.setProd(prodMap.get(pkg.getProd_id()));
+//			if (StringHelper.isNotEmpty(pkg.getTariff_id()))
+//				pkg.setProdTariff(tariffMap.get(pkg.getTariff_id()));
+//		}
 
 		return pkgProdList;
 	}
@@ -290,23 +290,23 @@ public class ProdComponent extends BaseBusiComponent {
 	public List<PPackageProd> queryPackageProd(String pkgId,String tariffId)  throws Exception{
 		List<PPackageProd> pkgProdList= pPackageProdDao.getMarketPackProdById(pkgId, tariffId);
 		
-		String[] prodIds = CollectionHelper.converValueToArray(pkgProdList, "prod_id");
-		Map<String, PProd> prodMap = null;
-		if(null!=prodIds && prodIds.length>0){
-			prodMap = CollectionHelper.converToMapSingle(
-				pProdDao.findByProdIds(prodIds), "prod_id");
-		}
-		String[] prodTariffIds = CollectionHelper.converValueToArray(pkgProdList, "tariff_id");
-		Map<String, PProdTariff> tariffMap = CollectionHelper
-				.converToMapSingle(pProdTariffDao
-						.queryPTariffByIds(prodTariffIds),
-						"tariff_id");
-		
-		for(PPackageProd pkg:pkgProdList){
-			pkg.setProd(prodMap.get(pkg.getProd_id()));
-			if (StringHelper.isNotEmpty(pkg.getTariff_id()))
-				pkg.setProdTariff(tariffMap.get(pkg.getTariff_id()));
-		}
+//		String[] prodIds = CollectionHelper.converValueToArray(pkgProdList, "prod_id");
+//		Map<String, PProd> prodMap = null;
+//		if(null!=prodIds && prodIds.length>0){
+//			prodMap = CollectionHelper.converToMapSingle(
+//				pProdDao.findByProdIds(prodIds), "prod_id");
+//		}
+//		String[] prodTariffIds = CollectionHelper.converValueToArray(pkgProdList, "tariff_id");
+//		Map<String, PProdTariff> tariffMap = CollectionHelper
+//				.converToMapSingle(pProdTariffDao
+//						.queryPTariffByIds(prodTariffIds),
+//						"tariff_id");
+//		
+//		for(PPackageProd pkg:pkgProdList){
+//			pkg.setProd(prodMap.get(pkg.getProd_id()));
+//			if (StringHelper.isNotEmpty(pkg.getTariff_id()))
+//				pkg.setProdTariff(tariffMap.get(pkg.getTariff_id()));
+//		}
 
 		return pkgProdList;
 	}

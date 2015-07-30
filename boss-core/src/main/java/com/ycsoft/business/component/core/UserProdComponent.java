@@ -261,9 +261,9 @@ public class UserProdComponent extends BaseBusiComponent {
 		createRecordChange( "C_PROD", "INS", prod.getProd_sn());
 		
 		for (PPackageProd p : packageProdList){
-			addProd(doneCode,custId, acctId, userId, prod.getProd_sn(), prodId, p
-					.getProd_id(), p.getProd().getProd_type(),SystemConstants.PROD_ORDER_TYPE_ORDER,
-					feeDate, expDate, prod.getStop_type(), p.getProdTariff(), dynamicRscs,stopByInvalidDate,isBase,preOpenTime,isBankPay);
+//			addProd(doneCode,custId, acctId, userId, prod.getProd_sn(), prodId, p
+//					.getProd_id(), p.getProd().getProd_type(),SystemConstants.PROD_ORDER_TYPE_ORDER,
+//					feeDate, expDate, prod.getStop_type(), p.getProdTariff(), dynamicRscs,stopByInvalidDate,isBase,preOpenTime,isBankPay);
 		}
 		return prod.getProd_sn();
 	}
