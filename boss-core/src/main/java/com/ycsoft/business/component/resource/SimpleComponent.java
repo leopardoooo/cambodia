@@ -32,7 +32,7 @@ public class SimpleComponent extends BaseBusiComponent {
 		} catch (Exception e) {
 			dataRight = " 1=1 ";
 		}
-		List<TAddressDto> list = tAddressDao.queryActiveAddrByName(q, getOptr().getCounty_id(),getOptr().getDept_id(), dataRight);
+		List<TAddressDto> list = tAddressDao.queryActiveAddrByName(q, getOptr().getCounty_id(),null, dataRight);
 		return list;
 	}
 	

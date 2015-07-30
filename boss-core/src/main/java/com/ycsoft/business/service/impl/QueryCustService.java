@@ -101,11 +101,11 @@ public class QueryCustService extends BaseService implements IQueryCustService {
 			if(StringHelper.isNotEmpty(userId)){
 				CUser user = userMap.get(userId);
 				if(null != user){
-					if(user.getUser_type().equals(SystemConstants.USER_TYPE_DTV)){
-						bill.setUser_name(user.getUser_name()+"("+user.getCard_id()+")");
-					}else{
+//					if(user.getUser_type().equals(SystemConstants.USER_TYPE_DTV)){
+//						bill.setUser_name(user.getUser_name()+"("+user.getCard_id()+")");
+//					}else{
 						bill.setUser_name(user.getUser_name());
-					}
+//					}
 				}
 			}
 		}
@@ -126,11 +126,11 @@ public class QueryCustService extends BaseService implements IQueryCustService {
 			if(StringHelper.isNotEmpty(userId)){
 				CUser user = userMap.get(userId);
 				if(null != user){
-					if(user.getUser_type().equals(SystemConstants.USER_TYPE_DTV)){
-						bill.setUser_name(user.getUser_name()+"("+user.getCard_id()+")");
-					}else{
+//					if(user.getUser_type().equals(SystemConstants.USER_TYPE_DTV)){
+//						bill.setUser_name(user.getUser_name()+"("+user.getCard_id()+")");
+//					}else{
 						bill.setUser_name(user.getUser_name());
-					}
+//					}
 				}
 			}
 		}

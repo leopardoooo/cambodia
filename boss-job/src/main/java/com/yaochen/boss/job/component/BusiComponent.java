@@ -619,19 +619,20 @@ public class BusiComponent {
 		CUser user = cUserDao.findByKey(stopJob.getUser_id());
 		if(user==null)
 			return ;
-		if (user.getUser_type().equals(SystemConstants.USER_TYPE_ATV)) {
-			List<CUserAtv> atvs = new ArrayList<CUserAtv>();
-			atvs.add(cUserAtvDao.queryAtvById(user.getUser_id()));
-			p.setSelectedAtvs(atvs);
-		} else if (user.getUser_type().equals(SystemConstants.USER_TYPE_DTV)) {
-			List<CUserDtv> dtvs = new ArrayList<CUserDtv>();
-			dtvs.add(cUserDtvDao.queryDtvById(user.getUser_id()));
-			p.setSelectedDtvs(dtvs);
-		} else if (user.getUser_type().equals(SystemConstants.USER_TYPE_BAND)) {
-			List<CUserBroadband> bands = new ArrayList<CUserBroadband>();
-			bands.add(cUserBroadbandDao.queryBandById(user.getUser_id()));
-			p.setSelectedBands(bands);
-		}
+		p.addUser(user);
+//		if (user.getUser_type().equals(SystemConstants.USER_TYPE_ATV)) {
+//			List<CUserAtv> atvs = new ArrayList<CUserAtv>();
+//			atvs.add(cUserAtvDao.queryAtvById(user.getUser_id()));
+//			p.setSelectedAtvs(atvs);
+//		} else if (user.getUser_type().equals(SystemConstants.USER_TYPE_DTV)) {
+//			List<CUserDtv> dtvs = new ArrayList<CUserDtv>();
+//			dtvs.add(cUserDtvDao.queryDtvById(user.getUser_id()));
+//			p.setSelectedDtvs(dtvs);
+//		} else if (user.getUser_type().equals(SystemConstants.USER_TYPE_BAND)) {
+//			List<CUserBroadband> bands = new ArrayList<CUserBroadband>();
+//			bands.add(cUserBroadbandDao.queryBandById(user.getUser_id()));
+//			p.setSelectedBands(bands);
+//		}
 		CustFullInfoDto custFullInfo = new CustFullInfoDto();
 		custFullInfo.setCust(cCustDao.findByKey(user.getCust_id()));
 		p.setCustFullInfo(custFullInfo);
@@ -695,19 +696,21 @@ public class BusiComponent {
 	public void saveProdStop(CProdDto prod) throws Exception {
 		BusiParameter p = new BusiParameter();
 		CUser user = cUserDao.findByKey(prod.getUser_id());
-		if (user.getUser_type().equals(SystemConstants.USER_TYPE_ATV)) {
-			List<CUserAtv> atvs = new ArrayList<CUserAtv>();
-			atvs.add(cUserAtvDao.queryAtvById(user.getUser_id()));
-			p.setSelectedAtvs(atvs);
-		} else if (user.getUser_type().equals(SystemConstants.USER_TYPE_DTV)) {
-			List<CUserDtv> dtvs = new ArrayList<CUserDtv>();
-			dtvs.add(cUserDtvDao.queryDtvById(user.getUser_id()));
-			p.setSelectedDtvs(dtvs);
-		} else if (user.getUser_type().equals(SystemConstants.USER_TYPE_BAND)) {
-			List<CUserBroadband> bands = new ArrayList<CUserBroadband>();
-			bands.add(cUserBroadbandDao.queryBandById(user.getUser_id()));
-			p.setSelectedBands(bands);
-		}
+//		if (user.getUser_type().equals(SystemConstants.USER_TYPE_ATV)) {
+//			List<CUserAtv> atvs = new ArrayList<CUserAtv>();
+//			atvs.add(cUserAtvDao.queryAtvById(user.getUser_id()));
+//			p.setSelectedAtvs(atvs);
+//		} else if (user.getUser_type().equals(SystemConstants.USER_TYPE_DTV)) {
+//			List<CUserDtv> dtvs = new ArrayList<CUserDtv>();
+//			dtvs.add(cUserDtvDao.queryDtvById(user.getUser_id()));
+//			p.setSelectedDtvs(dtvs);
+//		} else if (user.getUser_type().equals(SystemConstants.USER_TYPE_BAND)) {
+//			List<CUserBroadband> bands = new ArrayList<CUserBroadband>();
+//			bands.add(cUserBroadbandDao.queryBandById(user.getUser_id()));
+//			p.setSelectedBands(bands);
+//		}
+		
+		p.addUser(user);
 		CustFullInfoDto custFullInfo = new CustFullInfoDto();
 		custFullInfo.setCust(cCustDao.findByKey(user.getCust_id()));
 		p.setCustFullInfo(custFullInfo);
@@ -1075,15 +1078,15 @@ public class BusiComponent {
 		CCust cust = busiDao.queryCust(user.getCust_id());
 		if (cust == null)
 			throw new ComponentException("客户不存在custId="+user.getCust_id());
-		CUserAtv userAtv = new CUserAtv();
-		CUserDtv userDtv = new CUserDtv();
-		CUserBroadband userBroadband = new CUserBroadband();
-		if (user.getUser_type().equals(SystemConstants.USER_TYPE_ATV))
-			userAtv = cUserAtvDao.queryAtvById(user.getUser_id());
-		else if (user.getUser_type().equals(SystemConstants.USER_TYPE_DTV))
-			userDtv =  cUserDtvDao.queryDtvById(user.getUser_id());
-		else if (user.getUser_type().equals(SystemConstants.USER_TYPE_BAND))
-			userBroadband = cUserBroadbandDao.queryBandById(user.getUser_id());
+//		CUserAtv userAtv = new CUserAtv();
+//		CUserDtv userDtv = new CUserDtv();
+//		CUserBroadband userBroadband = new CUserBroadband();
+//		if (user.getUser_type().equals(SystemConstants.USER_TYPE_ATV))
+//			userAtv = cUserAtvDao.queryAtvById(user.getUser_id());
+//		else if (user.getUser_type().equals(SystemConstants.USER_TYPE_DTV))
+//			userDtv =  cUserDtvDao.queryDtvById(user.getUser_id());
+//		else if (user.getUser_type().equals(SystemConstants.USER_TYPE_BAND))
+//			userBroadband = cUserBroadbandDao.queryBandById(user.getUser_id());
 		//获取用户当日累积缴费
 		List<CFee> feeList = cFeeDao.queryUserFee(user.getCust_id(),userId);
 		List<AcctitemDto> balanceList = cAcctAcctitemDao.queryAcctAndAcctItemByUserId(cust.getCust_id(),userId,cust.getCounty_id());
@@ -1093,7 +1096,7 @@ public class BusiComponent {
 		
 		List<CProdDto> prodList = cProdDao.queryUserProd(userId, user.getCounty_id());
 		
-		expressionUtil.setAllValue(cust, user, userDtv, userAtv,userBroadband, feeList, balanceList,prodList);
+		expressionUtil.setAllValue(cust, user, null,null,null, feeList, balanceList,prodList);
 		expressionUtil.setCuserStb(cUserDao.queryUserStbByUserId(userId));
 		
 
@@ -1119,19 +1122,21 @@ public class BusiComponent {
 					BusiParameter p = new BusiParameter();
 					p.setBusiCode(BusiCodeConstants.PROMOTION_AUTO);
 
-					if (user.getUser_type().equals(SystemConstants.USER_TYPE_ATV)) {
-						List<CUserAtv> atvs = new ArrayList<CUserAtv>();
-						atvs.add(userAtv);
-						p.setSelectedAtvs(atvs);
-					} else if (user.getUser_type().equals(SystemConstants.USER_TYPE_DTV)) {
-						List<CUserDtv> dtvs = new ArrayList<CUserDtv>();
-						dtvs.add(userDtv);
-						p.setSelectedDtvs(dtvs);
-					} else if (user.getUser_type().equals(SystemConstants.USER_TYPE_BAND)) {
-						List<CUserBroadband> bands = new ArrayList<CUserBroadband>();
-						bands.add(userBroadband);
-						p.setSelectedBands(bands);
-					}
+//					if (user.getUser_type().equals(SystemConstants.USER_TYPE_ATV)) {
+//						List<CUserAtv> atvs = new ArrayList<CUserAtv>();
+//						atvs.add(userAtv);
+//						p.setSelectedAtvs(atvs);
+//					} else if (user.getUser_type().equals(SystemConstants.USER_TYPE_DTV)) {
+//						List<CUserDtv> dtvs = new ArrayList<CUserDtv>();
+//						dtvs.add(userDtv);
+//						p.setSelectedDtvs(dtvs);
+//					} else if (user.getUser_type().equals(SystemConstants.USER_TYPE_BAND)) {
+//						List<CUserBroadband> bands = new ArrayList<CUserBroadband>();
+//						bands.add(userBroadband);
+//						p.setSelectedBands(bands);
+//					}
+					
+					p.addUser(user);
 					CustFullInfoDto custFullInfo = new CustFullInfoDto();
 					custFullInfo.setCust(cust);
 					p.setCustFullInfo(custFullInfo);
@@ -1156,22 +1161,22 @@ public class BusiComponent {
 			if (user == null)
 				continue;
 			
-			CUserAtv userAtv = new CUserAtv();
-			CUserDtv userDtv = new CUserDtv();
-			CUserBroadband userBroadband = new CUserBroadband();
-			if (user.getUser_type().equals(SystemConstants.USER_TYPE_ATV))
-				userAtv = cUserAtvDao.queryAtvById(user.getUser_id());
-			else if (user.getUser_type().equals(SystemConstants.USER_TYPE_DTV))
-				userDtv =  cUserDtvDao.queryDtvById(user.getUser_id());
-			else if (user.getUser_type().equals(SystemConstants.USER_TYPE_BAND))
-				userBroadband = cUserBroadbandDao.queryBandById(user.getUser_id());
+//			CUserAtv userAtv = new CUserAtv();
+//			CUserDtv userDtv = new CUserDtv();
+//			CUserBroadband userBroadband = new CUserBroadband();
+//			if (user.getUser_type().equals(SystemConstants.USER_TYPE_ATV))
+//				userAtv = cUserAtvDao.queryAtvById(user.getUser_id());
+//			else if (user.getUser_type().equals(SystemConstants.USER_TYPE_DTV))
+//				userDtv =  cUserDtvDao.queryDtvById(user.getUser_id());
+//			else if (user.getUser_type().equals(SystemConstants.USER_TYPE_BAND))
+//				userBroadband = cUserBroadbandDao.queryBandById(user.getUser_id());
 			//获取用户当日累积缴费
 			List<CFee> feeList = cFeeDao.queryUserFee(cp.getCust_id(),cp.getUser_id());
 			List<AcctitemDto> balanceList = cAcctAcctitemDao.queryAcctAndAcctItemByUserId(custId,cp.getUser_id(),cust.getCounty_id());
 			//设备公式的参数
 			
 			List<CProdDto> prodList = cProdDao.queryUserProd(user.getUser_id(), user.getCounty_id());
-			expressionUtil.setAllValue(cust, user, userDtv, userAtv,userBroadband, feeList, balanceList,prodList);
+			expressionUtil.setAllValue(cust, user,null,null,null, feeList, balanceList,prodList);
 			for (PPromotionDto promotion:BusiCfgDataJob.CFG.getPromotionList()){
 				if (promotion.getPromotion_id().equals(cp.getPromotion_id())){
 					int repetitionTimes = expressionUtil.parsePromotion(BusiCfgDataJob.CFG.getRuleStr(promotion.getRule_id()),
@@ -1232,20 +1237,22 @@ public class BusiComponent {
 			cpc.setNew_value(DateHelper.dateToStr(new Date()));
 			propChangeList.add(cpc);
 			
-			String userType = user.getUser_type();
-			if(userType.equals(SystemConstants.USER_TYPE_ATV)){
-				List<CUserAtv> selectedAtvs = new ArrayList<CUserAtv>();
-				CUserAtv userAtv = new CUserAtv();
-				userAtv.setUser_id(userId);
-				selectedAtvs.add(userAtv);
-				p.setSelectedAtvs(selectedAtvs);
-			}else if(userType.equals(SystemConstants.USER_TYPE_DTV)){
-				List<CUserDtv> selectedDtvs = new ArrayList<CUserDtv>();
-				CUserDtv userDtv = new CUserDtv();
-				userDtv.setUser_id(userId);
-				selectedDtvs.add(userDtv);
-				p.setSelectedDtvs(selectedDtvs);
-			}
+//			String userType = user.getUser_type();
+//			if(userType.equals(SystemConstants.USER_TYPE_ATV)){
+//				List<CUserAtv> selectedAtvs = new ArrayList<CUserAtv>();
+//				CUserAtv userAtv = new CUserAtv();
+//				userAtv.setUser_id(userId);
+//				selectedAtvs.add(userAtv);
+//				p.setSelectedAtvs(selectedAtvs);
+//			}else if(userType.equals(SystemConstants.USER_TYPE_DTV)){
+//				List<CUserDtv> selectedDtvs = new ArrayList<CUserDtv>();
+//				CUserDtv userDtv = new CUserDtv();
+//				userDtv.setUser_id(userId);
+//				selectedDtvs.add(userDtv);
+//				p.setSelectedDtvs(selectedDtvs);
+//			}
+			
+			p.addUser(user);
 			
 			CustFullInfoDto dto = new CustFullInfoDto();
 			CCust cust = new CCust();

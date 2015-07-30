@@ -10,6 +10,7 @@ import com.ycsoft.beans.core.user.CUserPropChange;
 import com.ycsoft.beans.prod.PPromotionAcct;
 import com.ycsoft.beans.system.SOptr;
 import com.ycsoft.business.commons.abstracts.IBaseService;
+import com.ycsoft.business.dto.core.fee.FeeInfoDto;
 import com.ycsoft.business.dto.core.prod.DisctFeeDto;
 import com.ycsoft.business.dto.core.prod.PromotionDto;
 import com.ycsoft.business.dto.core.user.UserRes;
@@ -26,7 +27,20 @@ public interface IUserService extends IBaseService{
 	 * 用户开户
 	 * @param user
 	 */
-	public void createUser(CUser user) throws Exception;
+	public void createUser(CUser user,String deviceBuyMode,FeeInfoDto deviceFee) throws Exception;
+	
+	/**
+	 * supernet 使用
+	 * @param user
+	 * @param deviceId
+	 * @param deviceType
+	 * @param deviceModel
+	 * @param deviceBuyMode
+	 * @param deviceFee
+	 * @throws Exception
+	 */
+	public void createUser(CUser user, String deviceId, String deviceType, String deviceModel, String deviceBuyMode,
+			FeeInfoDto deviceFee)  throws Exception;
 
 	/**
 	 * 修改用户信息

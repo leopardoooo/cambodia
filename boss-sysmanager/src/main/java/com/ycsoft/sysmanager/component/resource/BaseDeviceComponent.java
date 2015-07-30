@@ -340,9 +340,9 @@ public class BaseDeviceComponent extends BaseComponent {
 		}else {
 			//配对设备号空，设置相应的虚拟卡信息
 			RStbModel model = stbModels.get(device.getDevice_model());
-			if (model == null)
-				throw new ComponentException("错误的设备型号："
-						+ device.getDevice_model()+",请检查该型号是否适用当前地区");
+//			if (model == null)
+//				throw new ComponentException("错误的设备型号："
+//						+ device.getDevice_model()+",请检查该型号是否适用当前地区");
 			
 			if (StringHelper.isNotEmpty(model.getVirtual_card_model())) {
 				RCardModel cardM = cardModels.get(model.getVirtual_card_model());

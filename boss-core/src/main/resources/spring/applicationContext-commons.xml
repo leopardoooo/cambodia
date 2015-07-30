@@ -20,7 +20,7 @@
 
 	<bean id="iservices" class="org.springframework.aop.framework.autoproxy.BeanNameAutoProxyCreator">
 		<property name="proxyTargetClass" value="true"/>
-		<property name="beanNames" value="*Service"/>
+		<property name="beanNames" value="*Service*"/>
 		<property name="interceptorNames">
 			<list>
 				<value>setterParameterInterceptor</value>

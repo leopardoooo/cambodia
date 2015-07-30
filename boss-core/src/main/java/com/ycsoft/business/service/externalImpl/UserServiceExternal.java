@@ -41,7 +41,7 @@ public class UserServiceExternal extends ParentService implements
 
 	public void createUser(BusiParameter p, CUser u) throws Exception {
 		UserService userService = (UserService) getBean(UserService.class, p);
-		userService.createUser(u);
+		userService.createUser(u,null,null);
 	}
 
 	/*

@@ -1529,13 +1529,13 @@ Ext.apply(MenuHandler, {
 	},
 	//订购
 	OrderProd: function(){
-		if(!hasCust())return false
+		//if(!hasCust())return false
 		var userRecords =  App.main.infoPanel.getUserPanel().userGrid.getSelections();
 		var len = userRecords.length;
-		if (len == 0) {
-			Alert('请先选择用户!');
-			return false;
-		}
+//		if (len == 0) {
+//			Alert('请先选择用户!');
+//			return false;
+//		}
 
 		for (var i = 0; i < len; i++) {
 			if (userRecords[i].get("status") != "ACTIVE" && userRecords[i].get("status") != "OWELONG" ) {
@@ -1552,7 +1552,7 @@ Ext.apply(MenuHandler, {
 			}
 		}
 		return {
-			width : 600,
+			width : 570,
 			height : 550
 		};
 	},

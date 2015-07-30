@@ -132,8 +132,8 @@ public class CustComponent extends BaseBusiComponent {
 		cust.setCust_id(gCustId());
 		cust.setCust_no(gCustNoByAddr(cust.getAddr_id()));
 
-		//设置默认信息
-		cust.setPassword( SystemConstants.CUST_PASSWORD_DEFAULT );
+		//设置默认信息:密码为证件号的后6位
+		cust.setPassword(linkMan.getCert_num().length()>6?linkMan.getCert_num().substring(0, 6):linkMan.getCert_num());
 		if(SystemConstants.CUST_TYPE_UNIT.equals(cust.getCust_type())){
 			cust.setStatus(StatusConstants.ACTIVE);
 		}else{
@@ -529,7 +529,7 @@ public class CustComponent extends BaseBusiComponent {
 		custDevice.setReplacover_date(now.getTime());
 		custDevice.setBuy_mode(buyMode);
 		custDevice.setBuy_time(DateHelper.now());
-		custDevice.setStatus(StatusConstants.IDLE);
+		custDevice.setStatus(StatusConstants.USE);
 		custDevice.setLoss_reg(SystemConstants.BOOLEAN_FALSE);
 		custDevice.setDone_code(doneCode);
 		cCustDeviceDao.save(custDevice);
@@ -1195,7 +1195,7 @@ public class CustComponent extends BaseBusiComponent {
 		while(seq.length()<6){
 			seq ="0"+seq;
 		}
-		return addrId+seq;
+		return getOptr().getCounty_id()+seq;
 	}
 
 	private void setPropText(CCustPropChange change) {

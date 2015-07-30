@@ -241,7 +241,7 @@ public class SendMsgComponent  extends  BaseComponent {
 		String sql = " select cc.cust_id cust_id,cu.user_id user_id,cu.acct_id acct_id,cc.cust_name cust_name,cu.stb_id stb_id,cu.card_id card_id," +
 				" cu.modem_mac modem_mac,cu.county_id county_id,cu.area_id area_id  " +
 				"from  busi.c_user cu, busi.c_cust cc where cc.cust_id = cu.cust_id  and cc.county_id=cc.county_id " +
-				" and cu.user_type ='"+SystemConstants.USER_TYPE_DTV+"' and cc.county_id ='"+countyId+"' ";
+				" and cu.user_type ='"+SystemConstants.USER_TYPE_DTT+"' and cc.county_id ='"+countyId+"' ";
 		
 		String addSql = "";
 		

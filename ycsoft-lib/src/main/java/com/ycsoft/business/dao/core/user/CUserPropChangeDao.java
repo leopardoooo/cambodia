@@ -66,17 +66,8 @@ public class CUserPropChangeDao extends BaseEntityDao<CUserPropChange> {
 	 * @throws Exception
 	 */
 	public List<CUserPropChange> queryByUserId (String userId,String userType, String countyId) throws Exception{
-		String tableName="",groupId="";
-		if (userType.equals(SystemConstants.USER_TYPE_ATV)){
-			tableName="CUSERATV";
-			groupId = " and t.group_id='2'";
-		}else if  (userType.equals(SystemConstants.USER_TYPE_DTV)){
-			tableName="CUSERDTV";
-			groupId = " and t.group_id='1'";
-		}else if  (userType.equals(SystemConstants.USER_TYPE_BAND)){
-			tableName="CUSERBROADBAND";
-			groupId = " and t.group_id='3'";
-		}
+		String tableName="";
+		
 		List<CUserPropChange> userPropChangeList = null;
 		String sql = "select * from (" +
 				"select a.column_name,a.old_value,a.new_value,a.change_time," +
@@ -90,7 +81,7 @@ public class CUserPropChangeDao extends BaseEntityDao<CUserPropChange> {
 				" t.attribute_name column_name_text,t.param_name,c.busi_code,c.optr_id" +
 				" from c_user_prop_change a, t_extend_attribute t, c_done_code c,t_extend e"+
 				" where a.column_name=t.col_name and a.done_code = c.done_code" +
-				" and t.extend_id=e.extend_id and e.extend_table='C_USER'"+groupId+
+				" and t.extend_id=e.extend_id and e.extend_table='C_USER'"+
 				" and a.user_id = ? and a.county_id = ?) order by change_time desc";
 		
 		userPropChangeList = this.createQuery(CUserPropChange.class, sql,

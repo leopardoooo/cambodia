@@ -518,17 +518,17 @@ public class BaseBusiComponent extends BaseComponent{
 		String userType =user.getUser_type();
 		target.setUser_type( userType );
 		target.setNet_type(user.getNet_type());
-		if (userList.size() ==1){
-			if (userType.equals(SystemConstants.USER_TYPE_DTV)){
-				CUserDtv dtv = (CUserDtv)user;
-				target.setServ_type(dtv.getServ_type());
-				target.setTerminal_type(dtv.getTerminal_type());
-			} else if (userType.equals(SystemConstants.USER_TYPE_ATV)){
-				CUserAtv atv = (CUserAtv)user;
-				target.setServ_type(atv.getServ_type());
-				target.setTerminal_type(atv.getTerminal_type());
-			}
-		}
+//		if (userList.size() ==1){
+//			if (userType.equals(SystemConstants.USER_TYPE_DTV)){
+//				CUserDtv dtv = (CUserDtv)user;
+//				target.setServ_type(dtv.getServ_type());
+//				target.setTerminal_type(dtv.getTerminal_type());
+//			} else if (userType.equals(SystemConstants.USER_TYPE_ATV)){
+//				CUserAtv atv = (CUserAtv)user;
+//				target.setServ_type(atv.getServ_type());
+//				target.setTerminal_type(atv.getTerminal_type());
+//			}
+//		}
 	}
 	
 

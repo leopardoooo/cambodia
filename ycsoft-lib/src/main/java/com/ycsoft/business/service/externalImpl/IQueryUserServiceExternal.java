@@ -31,7 +31,7 @@ public interface IQueryUserServiceExternal {
 	public UserDto queryUserByDeviceId(BusiParameter p, String deviceId)
 			throws Exception;
 
-	public UserDto queryUserById(BusiParameter p, String userId)
+	public CUser queryUserById(BusiParameter p, String userId)
 			throws Exception;
 
 	public List<CUser> queryUserByCustId(BusiParameter p, String custId)

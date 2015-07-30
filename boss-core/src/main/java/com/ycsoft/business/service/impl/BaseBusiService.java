@@ -573,7 +573,7 @@ public class BaseBusiService extends BaseService {
 	 */
 	protected void createUserJob(CUser user, String custId, Integer doneCode)
 			throws Exception {
-		UserDto userDto = queryUserById(user.getUser_id());
+		CUser userDto = queryUserById(user.getUser_id());
 		
 		jobComponent.createBusiCmdJob(doneCode, BusiCmdConstants.CREAT_USER, custId,
 			user.getUser_id(), user.getStb_id(), user.getCard_id(), user.getModem_mac(), null,null,JsonHelper.fromObject(userDto));
@@ -601,7 +601,7 @@ public class BaseBusiService extends BaseService {
 	 */
 	protected void delUserJob(CUser user, String custId, Integer doneCode)
 		throws Exception {
-		UserDto userDto = queryUserById(user.getUser_id());
+		CUser userDto = queryUserById(user.getUser_id());
 		
 		jobComponent.createBusiCmdJob(doneCode, BusiCmdConstants.DEL_USER,custId,
 			user.getUser_id(), user.getStb_id(), user.getCard_id(), user.getModem_mac(), null,null,JsonHelper.fromObject(userDto));
@@ -621,7 +621,7 @@ public class BaseBusiService extends BaseService {
 	 * @return
 	 * @throws JDBCException
 	 */
-	protected UserDto queryUserById(String userId) throws JDBCException{
+	protected CUser queryUserById(String userId) throws JDBCException{
 		return userComponent.queryUserById(userId);
 	}
 
@@ -970,7 +970,7 @@ public class BaseBusiService extends BaseService {
 				}
 				if(!busiCode.equals(BusiCodeConstants.USER_SINGLE_CARD)){
 					//修改用户指令
-					UserDto userDto = queryUserById(user.getUser_id());
+					CUser userDto = queryUserById(user.getUser_id());
 					jobComponent.createBusiCmdJob(doneCode, BusiCmdConstants.CHANGE_USER, custId,
 							userDto.getUser_id(), userDto.getStb_id(), userDto.getCard_id(), userDto.getModem_mac(), null, null,JsonHelper.fromObject(userDto));
 				}
@@ -1258,7 +1258,7 @@ public class BaseBusiService extends BaseService {
 			//产品状态暂停修改为正常
 			if(prod.getStatus().equals(StatusConstants.TMPPAUSE)){
 				userProdComponent.updateProdStatus(doneCode, prod.getProd_sn(), StatusConstants.TMPPAUSE, StatusConstants.ACTIVE);
-				UserDto  user = userComponent.queryUserById(prod.getUser_id());
+				CUser  user = userComponent.queryUserById(prod.getUser_id());
 				jobComponent.createBusiCmdJob(doneCode, BusiCmdConstants.ACCTIVATE_PROD, user.getCust_id(),
 						user.getUser_id(), user.getStb_id(), user.getCard_id(), user.getModem_mac(), prod.getProd_sn(),prod.getProd_id());
 				
@@ -1736,44 +1736,44 @@ public class BaseBusiService extends BaseService {
 	
 	//恢复长期欠费的用户状态为正常
 	public void recoverUserStatus(CUser user,Integer doneCode) throws Exception{
-	    //如果是长期欠费状态的用户 或 关模隔离的用户 ，将状态改成正常,待销户
-	    if(null != user && (StatusConstants.OWELONG.equals(user.getStatus()) ||  StatusConstants.ATVCLOSE.equals(user.getStatus()) || StatusConstants.WAITLOGOFF.equals(user.getStatus()) ) ){
-	    	String userId = user.getUser_id();
-	    	List<CUserPropChange> upcList= new ArrayList<CUserPropChange>();
-	    	CUserPropChange upc = new CUserPropChange();
-	    	upc.setUser_id(userId);
-	    	upc.setDone_code(doneCode);
-	    	upc.setColumn_name("status");
-	    	upc.setOld_value(user.getStatus());
-	    	upc.setNew_value(StatusConstants.ACTIVE);
-	    	upcList.add(upc);
-	      
-	    	userComponent.editUser(doneCode, userId, upcList);
-	      
-	    	//修改用户产品状态为正常
-	    	List<CProdDto> prodList = userProdComponent.queryByUserId(userId);
-	    	for (CProdDto cPprod:prodList){
-	          // 如果产品状态时隔离  或者 用户类型是模拟用户。
-	    		if(StatusConstants.ISOLATED.equals(cPprod.getStatus()) ||  SystemConstants.USER_TYPE_ATV.equals(user.getUser_type())){
-	    			List<CProdPropChange> changeList = new ArrayList<CProdPropChange>();
-	    			changeList.add(new CProdPropChange("status",
-	    					cPprod.getStatus(),StatusConstants.ACTIVE));
-    				changeList.add(new CProdPropChange("status_date",
-    						DateHelper.dateToStr(cPprod.getStatus_date()),DateHelper.dateToStr(new Date())));
-	            
-    				userProdComponent.editProd(doneCode,cPprod.getProd_sn(),changeList);
-	            
-    				//如果不是模拟用户则，生成激活产品任务
-    				if(!SystemConstants.USER_TYPE_ATV.equals(user.getUser_type())){
-    					jobComponent.createBusiCmdJob(doneCode, BusiCmdConstants.ACCTIVATE_PROD, user.getCust_id(),
-    							user.getUser_id(), user.getStb_id(), user.getCard_id(), user.getModem_mac(), cPprod.getProd_sn(),cPprod.getProd_id());
-    				}
-	    		}
-	        
-	    	}
- 	    	//生成销账任务
-			jobComponent.createCustWriteOffJob(doneCode, user.getCust_id(), SystemConstants.BOOLEAN_FALSE);
-    	}
+//	    //如果是长期欠费状态的用户 或 关模隔离的用户 ，将状态改成正常,待销户
+//	    if(null != user && (StatusConstants.OWELONG.equals(user.getStatus()) ||  StatusConstants.ATVCLOSE.equals(user.getStatus()) || StatusConstants.WAITLOGOFF.equals(user.getStatus()) ) ){
+//	    	String userId = user.getUser_id();
+//	    	List<CUserPropChange> upcList= new ArrayList<CUserPropChange>();
+//	    	CUserPropChange upc = new CUserPropChange();
+//	    	upc.setUser_id(userId);
+//	    	upc.setDone_code(doneCode);
+//	    	upc.setColumn_name("status");
+//	    	upc.setOld_value(user.getStatus());
+//	    	upc.setNew_value(StatusConstants.ACTIVE);
+//	    	upcList.add(upc);
+//	      
+//	    	userComponent.editUser(doneCode, userId, upcList);
+//	      
+//	    	//修改用户产品状态为正常
+//	    	List<CProdDto> prodList = userProdComponent.queryByUserId(userId);
+//	    	for (CProdDto cPprod:prodList){
+//	          // 如果产品状态时隔离  或者 用户类型是模拟用户。
+//	    		if(StatusConstants.ISOLATED.equals(cPprod.getStatus()) ||  SystemConstants.USER_TYPE_ATV.equals(user.getUser_type())){
+//	    			List<CProdPropChange> changeList = new ArrayList<CProdPropChange>();
+//	    			changeList.add(new CProdPropChange("status",
+//	    					cPprod.getStatus(),StatusConstants.ACTIVE));
+//    				changeList.add(new CProdPropChange("status_date",
+//    						DateHelper.dateToStr(cPprod.getStatus_date()),DateHelper.dateToStr(new Date())));
+//	            
+//    				userProdComponent.editProd(doneCode,cPprod.getProd_sn(),changeList);
+//	            
+//    				//如果不是模拟用户则，生成激活产品任务
+//    				if(!SystemConstants.USER_TYPE_ATV.equals(user.getUser_type())){
+//    					jobComponent.createBusiCmdJob(doneCode, BusiCmdConstants.ACCTIVATE_PROD, user.getCust_id(),
+//    							user.getUser_id(), user.getStb_id(), user.getCard_id(), user.getModem_mac(), cPprod.getProd_sn(),cPprod.getProd_id());
+//    				}
+//	    		}
+//	        
+//	    	}
+// 	    	//生成销账任务
+//			jobComponent.createCustWriteOffJob(doneCode, user.getCust_id(), SystemConstants.BOOLEAN_FALSE);
+//    	}
 	}
 	
 	

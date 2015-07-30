@@ -54,7 +54,7 @@ public class QueryUserServiceExternal extends ParentService implements IQueryUse
 	/* (non-Javadoc)
 	 * @see com.ycsoft.business.service.externalImpl.IQueryUserServiceExternal#queryUserById(com.ycsoft.business.commons.pojo.BusiParameter, java.lang.String)
 	 */
-	public UserDto queryUserById(BusiParameter p, String userId)
+	public CUser queryUserById(BusiParameter p, String userId)
 			throws Exception {
 		QueryUserService queryUserService = (QueryUserService) getBean(
 				QueryUserService.class, p);

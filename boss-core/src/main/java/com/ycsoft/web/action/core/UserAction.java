@@ -6,26 +6,29 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.ycsoft.beans.core.user.CUser;
-import com.ycsoft.beans.core.user.CUserAtv;
-import com.ycsoft.beans.core.user.CUserBroadband;
-import com.ycsoft.beans.core.user.CUserDtv;
 import com.ycsoft.beans.core.user.CUserPropChange;
 import com.ycsoft.beans.prod.PPromotionAcct;
+import com.ycsoft.business.commons.UpdateFlag;
 import com.ycsoft.business.dto.config.ChangeValueDto;
+import com.ycsoft.business.dto.core.fee.FeeInfoDto;
 import com.ycsoft.business.dto.core.prod.CProdBacthDto;
 import com.ycsoft.business.dto.core.prod.DisctFeeDto;
 import com.ycsoft.business.dto.core.user.UserProdRscDto;
 import com.ycsoft.business.service.IUserProdService;
 import com.ycsoft.business.service.IUserService;
+import com.ycsoft.business.service.impl.UserServiceSN;
 import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.helper.DateHelper;
 import com.ycsoft.commons.helper.FileHelper;
 import com.ycsoft.commons.helper.StringHelper;
+import com.ycsoft.daos.core.JDBCException;
 import com.ycsoft.web.commons.abstracts.BaseBusiAction;
 
 /**
@@ -43,12 +46,17 @@ public class UserAction extends BaseBusiAction {
 	private static final long serialVersionUID = 3927133051583505986L;
 
 	private CUser user;
-	private CUserDtv userDtv;
-	private CUserAtv userAtv;
-	private CUserBroadband userBroadband;
+	private String deviceId;
+	private String deviceType;
+	private String deviceModel;
+	private String deviceBuyMode;
+	private FeeInfoDto deviceFee;
+//	private CUserDtv userDtv;
+//	private CUserAtv userAtv;
+//	private CUserBroadband userBroadband;
 
-	private int payFee;
-	private int curMonthFee;
+//	private int payFee;
+//	private int curMonthFee;
 	
 	private String userChangeInfo;
 	private String effectiveDate;
@@ -84,7 +92,7 @@ public class UserAction extends BaseBusiAction {
 	
 	private String promotionSn;
 
-	private IUserService userService;
+	private UserServiceSN userServiceSN;
 	private IUserProdService userProdService;
 	private String refreshType;
 
@@ -104,23 +112,20 @@ public class UserAction extends BaseBusiAction {
 	/**
 	 * 用户开户
 	 * @throws Exception
+	 * 
+	 * 
 	 */
+	@UpdateFlag
 	public String createUser() throws Exception {
-		if (userDtv!=null){
-			if (StringHelper.isEmpty(userDtv.getPassword())
-					&& userDtv.getServ_type().equals(
-							SystemConstants.DTV_SERV_TYPE_DOUBLE)) {
-				userDtv.setPassword(SystemConstants.DEFAULT_PAY_PASSWORD);
-			}
-			userService.createUser(userDtv);
-			getRoot().setSimpleObj(userDtv.getUser_id());
-		}else if (userAtv!=null){
-			userService.createUser(userAtv);
-			getRoot().setSimpleObj(userAtv.getUser_id());
-		}else if (userBroadband!=null){
-			userService.createUser(userBroadband);
-			getRoot().setSimpleObj(userBroadband.getUser_id());
+		
+		if (user.getUser_type().equals(SystemConstants.USER_TYPE_DTT) || user.getUser_type().equals(SystemConstants.USER_TYPE_OTT)){
+			deviceType = SystemConstants.DEVICE_TYPE_STB;
+		} else if (user.getUser_type().equals(SystemConstants.USER_TYPE_BAND)){
+			deviceType = SystemConstants.DEVICE_TYPE_MODEM;
 		}
+		
+		userServiceSN.createUser(user, deviceId, deviceType, deviceModel, deviceBuyMode, deviceFee);
+		getRoot().setSimpleObj(user.getUser_id());
 
 		return JSON;
 	}
@@ -130,7 +135,7 @@ public class UserAction extends BaseBusiAction {
 	 * @throws Exception
 	 */
 	public String logoffUser() throws Exception{
-		userService.saveRemoveUser(banlanceDealType, transAcctId, transAcctItemId);
+		userServiceSN.saveRemoveUser(banlanceDealType, transAcctId, transAcctItemId);
 		return JSON_SUCCESS;
 	}
 
@@ -139,12 +144,12 @@ public class UserAction extends BaseBusiAction {
 	 * @throws Exception
 	 */
 	public String atvToDtv() throws Exception{
-		if (StringHelper.isEmpty(userDtv.getPassword())
-				&& userDtv.getServ_type().equals(
-						SystemConstants.DTV_SERV_TYPE_DOUBLE)) {
-			userDtv.setPassword(SystemConstants.DEFAULT_PAY_PASSWORD);
-		}
-		userService.saveAtvToDtv(userDtv,curMonthFee,payFee);
+//		if (StringHelper.isEmpty(userDtv.getPassword())
+//				&& userDtv.getServ_type().equals(
+//						SystemConstants.DTV_SERV_TYPE_DOUBLE)) {
+//			userDtv.setPassword(SystemConstants.DEFAULT_PAY_PASSWORD);
+//		}
+//		userService.saveAtvToDtv(userDtv,curMonthFee,payFee);
 		return JSON_SUCCESS;
 	}
 
@@ -162,7 +167,7 @@ public class UserAction extends BaseBusiAction {
 		String vodUserType = request.getParameter("str11");
 		//是否保留远机顶盒的保修期还是延期三年
 		String remainReplacoverDate = request.getParameter("remainReplacoverDate");
-		userService.saveOpenInteractive(netType, modemMac,password,vodUserType,remainReplacoverDate);
+		userServiceSN.saveOpenInteractive(netType, modemMac,password,vodUserType,remainReplacoverDate);
 		return JSON_SUCCESS;
 	}
 
@@ -171,7 +176,7 @@ public class UserAction extends BaseBusiAction {
 	 * @throws Exception
 	 */
 	public String transferUsers() throws Exception{
-		userService.transferUsers(custId);
+		userServiceSN.transferUsers(custId);
 		return JSON_SUCCESS;
 	}
 	/**
@@ -193,7 +198,7 @@ public class UserAction extends BaseBusiAction {
 				propChangeList.add(propChange);
 			}
 		}
-		userService.editUser(propChangeList);
+		userServiceSN.editUser(propChangeList);
 		return JSON_SUCCESS;
 	}
 	
@@ -218,7 +223,7 @@ public class UserAction extends BaseBusiAction {
 			}
 		}
 		
-		userService.saveEzdtoFzd(propChangeList, prodSn, newTariffId);
+		userServiceSN.saveEzdtoFzd(propChangeList, prodSn, newTariffId);
 		
 		return JSON_SUCCESS;
 	}
@@ -226,22 +231,22 @@ public class UserAction extends BaseBusiAction {
 	public String editStb() throws Exception {
 		String stbId = request.getParameter("stb_id");
 		String cardId = request.getParameter("card_id");
-		userService.editStb(stbId,cardId);
+		userServiceSN.editStb(stbId,cardId);
 		return JSON_SUCCESS;
 	}
 	
 	public String saveOfflineCmd() throws Exception{
-			userService.saveOffLine();
+			userServiceSN.saveOffLine();
 		return JSON_SUCCESS;
 	}
 	public String saveClearBind() throws Exception{
-			userService.saveClearBind();
+			userServiceSN.saveClearBind();
 		return JSON_SUCCESS;
 	}
 	
 	public String saveEditPwd() throws Exception{
 		String pwd = request.getParameter("login_password");
-		userService.saveEditPwd(pwd);
+		userServiceSN.saveEditPwd(pwd);
 	return JSON_SUCCESS;
 }
 	
@@ -251,7 +256,7 @@ public class UserAction extends BaseBusiAction {
 	 * @throws Exception
 	 */
 	public String saveCancelOpenInteractive() throws Exception {
-		userService.saveCancelOpenInteractive();
+		userServiceSN.saveCancelOpenInteractive();
 		return JSON;
 	}
 	
@@ -261,7 +266,7 @@ public class UserAction extends BaseBusiAction {
 	 * @throws Exception
 	 */
 	public String saveEditNetType() throws Exception {
-		userService.saveEditNetType(netType, modemMac);
+		userServiceSN.saveEditNetType(netType, modemMac);
 		return JSON;
 	}
 	
@@ -270,7 +275,7 @@ public class UserAction extends BaseBusiAction {
 	 * @throws Exception
 	 */
 	public String stopUser() throws Exception{
-		userService.saveStop(effectiveDate,specFee);
+		userServiceSN.saveStop(effectiveDate,specFee);
 		return JSON_SUCCESS;
 	}
 	
@@ -280,23 +285,23 @@ public class UserAction extends BaseBusiAction {
 	 * @throws Exception
 	 */
 	public String cancelStopUser() throws Exception{
-		userService.cancelStopUser();
+		userServiceSN.cancelStopUser();
 		return JSON_SUCCESS;
 	}
 	
 	//续报停
 	public String editUserStop() throws Exception {
-		userService.editUserStop();
+		userServiceSN.editUserStop();
 		return JSON;
 	}
 	//重算到期日任务
 	public String userInvalid() throws Exception{
-		userService.saveUserInvalid();
+		userServiceSN.saveUserInvalid();
 		return JSON;
 	}
 	
 	public String queryStopByUsers() throws Exception {
-		getRoot().setSimpleObj(userService.queryStopByUsers(userLists));
+		getRoot().setSimpleObj(userServiceSN.queryStopByUsers(userLists));
 		return JSON;
 	}
 	/**
@@ -307,19 +312,19 @@ public class UserAction extends BaseBusiAction {
 		String stbId = request.getParameter("stb_id");
 		String cardId = request.getParameter("card_id");
 		String modemMac = request.getParameter("modem_mac");
-		userService.saveOpen(stbId,cardId,modemMac,specFee);
+		userServiceSN.saveOpen(stbId,cardId,modemMac,specFee);
 		return JSON_SUCCESS;
 	}
 	
 	//模拟剪线
 	public String saveAtvCustLine() throws Exception {
-		userService.saveAtvCustLine();
+		userServiceSN.saveAtvCustLine();
 		return JSON;
 	}
 	
 	//模拟恢复
 	public String saveAtvActive() throws Exception {
-		userService.saveAtvActive();
+		userServiceSN.saveAtvActive();
 		return JSON;
 	}
 
@@ -517,7 +522,7 @@ public class UserAction extends BaseBusiAction {
 	 * @throws Exception
 	 */
 	public String ResendCmd() throws Exception{
-		userService.saveResendCa();
+		userServiceSN.saveResendCa();
 		return JSON_SUCCESS;
 	}
 	
@@ -526,7 +531,7 @@ public class UserAction extends BaseBusiAction {
 	 * @throws Exception
 	 */
 	public String ResendVodCmd() throws Exception{
-		userService.saveResendUserCmd();
+		userServiceSN.saveResendUserCmd();
 		return JSON_SUCCESS;
 	}
 	
@@ -536,7 +541,7 @@ public class UserAction extends BaseBusiAction {
 	 * @throws Exception
 	 */
 	public String RefreshCmd() throws Exception{
-		userService.saveRefreshCa(refreshType);
+		userServiceSN.saveRefreshCa(refreshType);
 		return JSON_SUCCESS;
 	}
 
@@ -554,7 +559,7 @@ public class UserAction extends BaseBusiAction {
 	 * @throws Exception
 	 */
 	public String querySelectableProm() throws Exception{
-		getRoot().setRecords(userService.querySelectableProm());
+		getRoot().setRecords(userServiceSN.querySelectableProm());
 		return JSON_RECORDS;
 	}
 
@@ -564,7 +569,7 @@ public class UserAction extends BaseBusiAction {
 	 * @throws Exception
 	 */
 	public String queryPromInfo() throws Exception{
-		getRoot().setSimpleObj(userService.queryPromInfoById(custId,userId,promotionId));
+		getRoot().setSimpleObj(userServiceSN.queryPromInfoById(custId,userId,promotionId));
 		return JSON;
 	}
 
@@ -587,7 +592,7 @@ public class UserAction extends BaseBusiAction {
 			Gson gson = new Gson();
 			acctList = gson.fromJson(acctListJson, type);
 		}
-		userService.savePromotion(times,promotionId, feeList,acctList);
+		userServiceSN.savePromotion(times,promotionId, feeList,acctList);
 		return JSON_SUCCESS;
 	}
 	
@@ -598,12 +603,12 @@ public class UserAction extends BaseBusiAction {
 			Gson gson = new Gson();
 			acctList = gson.fromJson(acctListJson, type);
 		}
-		userService.saveChangePromotion(times, promotionSn, promotionId, acctList);
+		userServiceSN.saveChangePromotion(times, promotionSn, promotionId, acctList);
 		return JSON_SUCCESS;
 	}
 	
 	public String saveCancelPromotion() throws Exception{
-		userService.saveCancelPromotion(promotionSn);
+		userServiceSN.saveCancelPromotion(promotionSn);
 		return JSON_SUCCESS;
 	}
 
@@ -615,7 +620,7 @@ public class UserAction extends BaseBusiAction {
 	public String saveLeaseFee() throws Exception{
 		String amount = request.getParameter("amount");
 		String feeId = request.getParameter("fee_id");
-		userService.saveLeaseFee(feeId,amount);
+		userServiceSN.saveLeaseFee(feeId,amount);
 		return JSON_SUCCESS;
 		
 	}
@@ -627,7 +632,7 @@ public class UserAction extends BaseBusiAction {
 	 * @throws Exception
 	 */
 	public String saveOpenTemp() throws Exception {
-		userService.saveOpenTemp();
+		userServiceSN.saveOpenTemp();
 		return JSON_SUCCESS;
 	}
 	
@@ -637,7 +642,7 @@ public class UserAction extends BaseBusiAction {
 	 * @throws Exception
 	 */
 	public String saveOpenTempBatch() throws Exception {
-		userService.saveOpenTempBatch();
+		userServiceSN.saveOpenTempBatch();
 		return JSON_SUCCESS;
 	}
 	
@@ -648,7 +653,7 @@ public class UserAction extends BaseBusiAction {
 	 */
 	public String saveRejectRes() throws Exception {
 		String resIds = request.getParameter("resIds");
-		userService.saveRejectRes(userId, custId, resIds);
+		userServiceSN.saveRejectRes(userId, custId, resIds);
 		return JSON_SUCCESS;
 	}
 	
@@ -658,7 +663,7 @@ public class UserAction extends BaseBusiAction {
 	 * @throws Exception
 	 */
 	public String queryValidRes() throws Exception{
-		getRoot().setRecords(userService.queryValidRes(userId));
+		getRoot().setRecords(userServiceSN.queryValidRes(userId));
 		return JSON_RECORDS;
 	}
 	
@@ -670,7 +675,7 @@ public class UserAction extends BaseBusiAction {
 	 */
 	public String getByDeptId() throws Exception {
 		String deptId = request.getParameter("deptId");
-		getRoot().setRecords(userService.getByDeptId(deptId));
+		getRoot().setRecords(userServiceSN.getByDeptId(deptId));
 		return JSON_RECORDS;
 	}
 
@@ -680,17 +685,17 @@ public class UserAction extends BaseBusiAction {
 	 * @throws Exception
 	 */
 	public String queryZlFeeById() throws Exception{
-		getRoot().setSimpleObj(userService.queryZlFeeById());
+		getRoot().setSimpleObj(userServiceSN.queryZlFeeById());
 		return JSON;
 	}
 	
 	public String checkLoginName() throws Exception{
-		userService.checkLoginName(loginName);
+		userServiceSN.checkLoginName(loginName);
 		return JSON;
 	}
 	
 	public String createLoginName() throws Exception{
-		getRoot().setSimpleObj(userService.createLoginName(loginName,optr.getCounty_id()));
+		getRoot().setSimpleObj(userServiceSN.createLoginName(loginName,optr.getCounty_id()));
 		return JSON_SIMPLEOBJ;
 	}
 	
@@ -700,7 +705,7 @@ public class UserAction extends BaseBusiAction {
 		String str5 = request.getParameter("str5");
 		boolean reclaim = SystemConstants.BOOLEAN_TRUE.equals(request.getParameter("reclaimDevice"))?true:false;
 		String deviceStatus = request.getParameter("deviceStatus");
-		userService.saveToSingleCard(newCardId,str4,str5,reclaim,deviceStatus);
+		userServiceSN.saveToSingleCard(newCardId,str4,str5,reclaim,deviceStatus);
 		return JSON;
 	}
 	
@@ -740,7 +745,7 @@ public class UserAction extends BaseBusiAction {
 					}
 				}
 			}
-			userService.updateUserStatus(list, userStatus);
+			userServiceSN.updateUserStatus(list, userStatus);
 		} catch (Exception e) {
 			e.printStackTrace();
 			msg = e.getMessage();
@@ -765,7 +770,7 @@ public class UserAction extends BaseBusiAction {
 		try{
 			if(userIdList.size() > 2500)
 				throw new Exception("请一次性录入小于2500条数据");
-			userService.batchLogoffUser(userIdList,isReclaimDevice,deviceStatus,remark);
+			userServiceSN.batchLogoffUser(userIdList,isReclaimDevice,deviceStatus,remark);
 		} catch (Exception e) {
 			e.printStackTrace();
 			msg = e.getMessage();
@@ -782,7 +787,7 @@ public class UserAction extends BaseBusiAction {
 	}
 	
 	public String renewUser() throws Exception {
-		userService.renewUser(userId);
+		userServiceSN.renewUser(userId);
 		return JSON;
 	}
 	
@@ -791,7 +796,7 @@ public class UserAction extends BaseBusiAction {
 	 * @throws Exception
 	 */
 	public String cancelCaAuth() throws Exception{
-		userService.saveCancelCaAuth();
+		userServiceSN.saveCancelCaAuth();
 		return JSON_SUCCESS;
 	}
 	
@@ -810,7 +815,7 @@ public class UserAction extends BaseBusiAction {
 		if(StringHelper.isNotEmpty(request.getParameter("tariffStartDate"))){
 			tariffStartDate = DateHelper.parseDate(request.getParameter("tariffStartDate"), "yyyy-MM-dd");
 		}
-		userService.editFreeUser(userId, prodSn, tariffId,type, tariffStartDate);
+		userServiceSN.editFreeUser(userId, prodSn, tariffId,type, tariffStartDate);
 		return JSON;
 	}
 	
@@ -824,19 +829,13 @@ public class UserAction extends BaseBusiAction {
 		return JSON;
 	}
 	
-	/**
-	 * @return the userService
-	 */
-	public IUserService getUserService() {
-		return userService;
-	}
 
 	/**
 	 * @param userService
 	 *            the userService to set
 	 */
-	public void setUserService(IUserService userService) {
-		this.userService = userService;
+	public void setUserService(UserServiceSN userService) {
+		this.userServiceSN = userService;
 	}
 
 
@@ -866,6 +865,16 @@ public class UserAction extends BaseBusiAction {
 	public void setUser(CUser user) {
 		this.user = user;
 	}
+	
+	
+
+	public FeeInfoDto getDeviceFee() {
+		return deviceFee;
+	}
+
+	public void setDeviceFee(FeeInfoDto deviceFee) {
+		this.deviceFee = deviceFee;
+	}
 
 	/**
 	 * @param effectiveDate
@@ -881,35 +890,6 @@ public class UserAction extends BaseBusiAction {
 		this.userChangeInfo = userChangeInfo;
 	}
 
-	public void setUserDtv(CUserDtv userDtv) {
-		this.userDtv = userDtv;
-	}
-
-	public CUserDtv getUserDtv() {
-		return userDtv;
-	}
-
-	/**
-	 * @param userAtv the userAtv to set
-	 */
-	public void setUserAtv(CUserAtv userAtv) {
-		this.userAtv = userAtv;
-	}
-
-	/**
-	 * @param userBroadband the userBroadband to set
-	 */
-	public void setUserBroadband(CUserBroadband userBroadband) {
-		this.userBroadband = userBroadband;
-	}
-
-	public CUserAtv getUserAtv() {
-		return userAtv;
-	}
-
-	public CUserBroadband getUserBroadband() {
-		return userBroadband;
-	}
 
 	public String getUserChangeInfo() {
 		return userChangeInfo;
@@ -1031,13 +1011,13 @@ public class UserAction extends BaseBusiAction {
 		this.expDate = expDate;
 	}
 
-	public void setPayFee(int payFee) {
-		this.payFee = payFee;
-	}
-
-	public void setCurMonthFee(int curMonthFee) {
-		this.curMonthFee = curMonthFee;
-	}
+//	public void setPayFee(int payFee) {
+//		this.payFee = payFee;
+//	}
+//
+//	public void setCurMonthFee(int curMonthFee) {
+//		this.curMonthFee = curMonthFee;
+//	}
 
 	public void setTimes(int times) {
 		this.times = times;
@@ -1111,6 +1091,42 @@ public class UserAction extends BaseBusiAction {
 	public void setIsBankPay(String isBankPay) {
 		this.isBankPay = isBankPay;
 	}
+
+	public String getDeviceId() {
+		return deviceId;
+	}
+
+	public void setDeviceId(String deviceId) {
+		this.deviceId = deviceId;
+	}
+
+	public String getDeviceType() {
+		return deviceType;
+	}
+
+	public void setDeviceType(String deviceType) {
+		this.deviceType = deviceType;
+	}
+
+	public String getDeviceModel() {
+		return deviceModel;
+	}
+
+	public void setDeviceModel(String deviceModel) {
+		this.deviceModel = deviceModel;
+	}
+
+	public void setUserServiceSN(UserServiceSN userServiceSN) {
+		this.userServiceSN = userServiceSN;
+	}
+
+	public void setDeviceBuyMode(String deviceBuyMode) {
+		this.deviceBuyMode = deviceBuyMode;
+	}
+	
+	
+	
+	
 	
 	
 }

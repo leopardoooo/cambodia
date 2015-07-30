@@ -287,7 +287,7 @@ public class DoneCodeService extends BaseBusiService implements IDoneCodeService
 	private void cancelOpenInteractive(String custId,Integer doneCode) throws Exception {
 		//查找流水对应的用户
 		CDoneCodeDetail detail = doneCodeComponent.queryDetail(doneCode).get(0);
-		UserDto userDto = queryUserById(detail.getUser_id());
+		CUser userDto = queryUserById(detail.getUser_id());
 		//取消修改用户属性
 		cancelEditUser(userDto.getUser_id(), doneCode);
 		jobComponent.createBusiCmdJob(doneCode, BusiCmdConstants.CANCEL_INTERACTIVE, custId,
@@ -323,7 +323,7 @@ public class DoneCodeService extends BaseBusiService implements IDoneCodeService
 				//修改用户状态
 				updateUserStatus(doneCode, user.getUser_id(), user.getStatus(), StatusConstants.ACTIVE);
 				//生成激活用户JOB
-				UserDto userDto = queryUserById(user.getUser_id());
+				CUser userDto = queryUserById(user.getUser_id());
 				jobComponent.createBusiCmdJob(doneCode, BusiCmdConstants.ACCTIVATE_USER, custId,
 						user.getUser_id(), user.getStb_id(), user.getCard_id(), user.getModem_mac(), null,null,JsonHelper.fromObject(userDto));
 			}

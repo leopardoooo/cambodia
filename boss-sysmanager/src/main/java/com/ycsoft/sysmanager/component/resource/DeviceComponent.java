@@ -934,9 +934,9 @@ public class DeviceComponent extends BaseDeviceComponent {
 		List<RCard> cardList = new ArrayList<RCard>();
 		List<RModem> modemList = new ArrayList<RModem>();
 
-		Map<String ,RStbModel> stbModelList = CollectionHelper.converToMapSingle(rStbModelDao.queryStbModelByCountyId(WebOptr.getOptr().getCounty_id()), "device_model");
-		Map<String, RCardModel> cardModelList = CollectionHelper.converToMapSingle(rCardModelDao.queryCardModelByCountyId(WebOptr.getOptr().getCounty_id()), "device_model");
-		Map<String ,RModemModel> modemModelList = CollectionHelper.converToMapSingle(rModemModelDao.queryModemModelByCountyId(WebOptr.getOptr().getCounty_id()), "device_model");
+		Map<String ,RStbModel> stbModelList = CollectionHelper.converToMapSingle(rStbModelDao.findAll(), "device_model");
+		Map<String, RCardModel> cardModelList = CollectionHelper.converToMapSingle(rCardModelDao.findAll(), "device_model");
+		Map<String ,RModemModel> modemModelList = CollectionHelper.converToMapSingle(rModemModelDao.findAll(), "device_model");
 		
 		List<RPairCfg> pairs = rPairCfgDao.findAll();
 		for (DeviceDto d : devices) {
@@ -944,7 +944,7 @@ public class DeviceComponent extends BaseDeviceComponent {
 			String deivceId = gDeviceId();
 			
 			if (d.getDevice_type().equals(SystemConstants.DEVICE_TYPE_STB)) {
-				fillDeviceModel(stbModelList,cardModelList,modemModelList,pairs,d);
+				//fillDeviceModel(stbModelList,cardModelList,modemModelList,pairs,d);
 				if(StringHelper.isEmpty(d.getDevice_code()))
 					throw new ComponentException("设备编号存在空值!");
 				RStb stb = new RStb();

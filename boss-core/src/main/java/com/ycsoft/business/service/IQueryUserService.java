@@ -210,7 +210,7 @@ public interface IQueryUserService extends IBaseService{
 	 * @return
 	 * @throws Exception 
 	 */
-	public UserDto queryUserById(String userId) throws Exception;
+	public CUser queryUserById(String userId) throws Exception;
 	/**
 	 * 根据设备编号查询用户信息
 	 * @return
