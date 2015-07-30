@@ -274,7 +274,7 @@ import com.ycsoft.sysmanager.dto.prod.ProdDto;
 	public String queryResByCountyId() throws Exception{
 		getRoot().setRecords(prodComponent.getStaticByServId(SystemConstants.USER_TYPE_DTV+","+SystemConstants.USER_TYPE_ITV,countyId));
 		return JSON_RECORDS;
-	}
+	} 
 	/**
 	 * 保存产品信息
 	 */
@@ -306,7 +306,7 @@ import com.ycsoft.sysmanager.dto.prod.ProdDto;
 			List<PPackageProd> pack = JsonHelper.gson.fromJson(packList, type);
 				for (PPackageProd dto:pack){
 					PPackageProd packdto = new PPackageProd();
-					packdto.setProd_id(dto.getProd_id());
+//					packdto.setProd_id(dto.getProd_id());
 					PacksList.add(packdto);
 				}
 			proddto.setPackList(PacksList);
