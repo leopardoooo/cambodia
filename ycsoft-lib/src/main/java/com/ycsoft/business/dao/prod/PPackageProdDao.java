@@ -29,8 +29,9 @@ public class PPackageProdDao extends BaseEntityDao<PPackageProd> {
 	 * default empty constructor
 	 */
 	public PPackageProdDao() {}
+	
 	public List<PPackageProd> queryPackProdById(String prodId)  throws Exception{
-		String sql = "select p.* from p_package_prod p where p.package_id=? order by p.type desc";
+		String sql = "select p.* from p_package_prod p where p.package_id=? ";
 		List<PPackageProd> tariffList = this.createQuery(PPackageProd.class,sql, prodId).list();
 		return tariffList;
 	}

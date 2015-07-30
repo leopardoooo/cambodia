@@ -96,6 +96,18 @@ SelectUserWindow = Ext.extend(Ext.Window, {
 			this.store.clearFilter();
 			Ext.getCmp("btnClearFilter").setVisible(false);
 		}
+	},
+	// 加载数据
+	loadBaseUser: function(){
+		Ext.Ajax.request({
+			scope : this,
+			url : root + '/commons/x/Order.loadPackageUserSelect.action',
+			params : { /*cust_id:prod_id: */},
+			success : function(response,opts){
+				var obj = Ext.decode(response.responseText);
+				alert(response.responseText);
+			}
+		});
 	}
 });
 
