@@ -434,4 +434,23 @@ public class CUserDao extends BaseEntityDao<CUser> {
 	public void callChangeCust(String userId, String toCustId,Integer doneCode ,String busiCode,SOptr optr){
 		this.getJdbcTemplate().execute("call proc_user_change_cust('"+userId+"','"+toCustId+"',"+doneCode+",'"+busiCode+"','"+optr.getOptr_id()+"','"+optr.getDept_id()+"')");
 	}
+	
+	/**
+	 * 查找客户名下不同用户类型的用户数
+	 * 状态为：正常或者install的用户
+	 */
+	
+	public Map<String,Integer> queryUserCountGroupByType(String custId) throws Exception {
+		Map<String,Integer> userCountMap = new HashMap<>();
+		final String sql = "select user_type,count(1) count from c_user "
+				+ "where cust_id =? and status in ('ACTIVE','INSTALL') "
+				+ "group by user_type";
+		List<Object[]> userTypeList= this.createSQLQuery(sql, custId).list();
+		if (CollectionHelper.isNotEmpty(userTypeList)){
+			for (Object[] obj:userTypeList){
+				userCountMap.put(obj[0].toString(), (Integer)obj[1]);
+			}
+		}
+		return userCountMap;
+	}
 }
