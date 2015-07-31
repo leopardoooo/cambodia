@@ -76,7 +76,7 @@ if(Ext.util.Format){
    Ext.util.Format.date = function(v, format){
       if(!v) return "";
       if(!(v instanceof Date)) v = new Date(Date.parse(v));
-      return v.dateFormat(format || "y年m月d日");
+      return v.dateFormat(format || "Y-m-d");
    };
 }
 

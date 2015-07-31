@@ -5,14 +5,8 @@ ProdOrderForm = Ext.extend( BaseForm, {
 	url : Constant.ROOT_PATH+"/core/x/User!createUser.action",
 	selectUserPanel: null,
 	transferPayWindow: null,
-	// 当前业务代码,单产品订购102，升级100，续订101
+	// 单产品订购102，升级100，续订101, 套餐订购1015
 	busiCode: null,
-	// 客户编号
-	custId: null,
-	// 当前选中的用户编号
-	userId: null,
-	// 订单sn（仅在续订和升级才有效）
-	filterOrderSn: null,
 	// 初始化参数，包括产品列表、资费、上一次订购记录
 	baseData: null,
 	constructor: function(p){
@@ -92,21 +86,32 @@ ProdOrderForm = Ext.extend( BaseForm, {
 			            fieldLabel: '订购月数',
 			            value: 0,
 			            id: 'sfOrderCycle',
-			            minValue: 0
+			            editable: false,
+			            minValue: 0,
+					    listeners: {
+					    	scope: this,
+					    	click: this.doChangeEndDate
+					    }
 					},{
 						xtype: 'panel',
 						anchor: '100%',
 						baseCls: 'x-plain',
 						style: 'padding-bottom: 10px;',
-						html: '<b>【上期订购结束日：2015-07-30】</b>'
+						html: '<b>【上期订购结束日：<span id="lastOrderProdExtDate">--</span>】</b>'
 					},{
 						xtype: 'datefield',
 					    fieldLabel: "开始计费日",
-					    minValue: new Date()
+					    id: 'dfStartDate',
+					    format: 'Y-m-d',
+					    listeners: {
+					    	scope: this,
+					    	change: this.doChangeEndDate
+					    }
 					},{
-						xtype: 'datefield',
-			            fieldLabel: '结束计费日',
-			            minValue: new Date()
+						xtype: 'textfield',
+						id: 'dfExpDate',
+						readOnly: true,
+			            fieldLabel: '结束计费日'
 					}]
 				}]
 			},{
@@ -119,20 +124,20 @@ ProdOrderForm = Ext.extend( BaseForm, {
 	},
 	// 加载产品，资费等数据
 	doLoadBaseData: function(){
+		this.busiCode = App.getData().currentResource.busicode;
 		var requestObj = {};
-		requestObj["busiCode"] = App.getData().currentResource.busicode;
-		requestObj["custId"] = App.getCustId();
 		// 单用户订购
-		if(requestObj.busiCode === "102"){
+		if(this.busiCode === "102"){
 			var users = App.getApp().main.infoPanel.getUserPanel().userGrid.getSelections();
-			requestObj["userId"] = users[0].get("user_id");
+			requestObj["user_id"] = users[0].get("user_id");
 		// 续订和升级
-		}else if(requestObj.busiCode === "100" || requestObj.busiCode === "101"){
+		}else if(this.busiCode === "100" || this.busiCode === "101"){
 			var prodGrid = App.getApp().main.infoPanel.getUserPanel().prodGrid;
 			var prodData = prodGrid.selModel.getSelected().data;
 			requestObj["filter_order_sn"] = prodData["order_sn"];
 		}
 		
+		// 模拟数据
 		this.baseData = {
 			"userDesc": "DTT_12312312,OTT_122",
 			"prodList": [
@@ -151,7 +156,10 @@ ProdOrderForm = Ext.extend( BaseForm, {
 				     {disct_id: 103,disct_name: "10元/月",billing_cycle: 1,max_order_cycle: null}
 				 ]
 			 },
-			 "lastOrderMap":null
+			 "lastOrderMap": {
+				 "100001": {exp_date: '2015-08-31 13:49:05'},
+				 "100002": {exp_date: '2015-10-31 13:49:05'}
+			 }
 		}
 		
 		Ext.getCmp("boxProdId").getStore().loadData(this.baseData["prodList"]);
@@ -162,8 +170,8 @@ ProdOrderForm = Ext.extend( BaseForm, {
 //			params: requestObj,
 //			success : function(response,opts){
 //				var responseObj = Ext.decode(response.responseText);
-//				// 'userDesc', 'prodList', 'tariffMap','lastOrderMap'
 //				this.baseData = responseObj;
+//				Ext.getCmp("boxProdId").getStore().loadData(this.baseData["prodList"]);
 //			}
 //		});
 	},
@@ -190,6 +198,22 @@ ProdOrderForm = Ext.extend( BaseForm, {
 		}else{
 			boxProdTariff.setRawValue("");
 		}
+		
+		// 上期结束日期
+		var lastOrderProd = this.baseData["lastOrderMap"][prodId];
+		var lastOrderProdDate = lastOrderProd ? lastOrderProd["exp_date"].split(" ")[0] : "--";
+		Ext.get("lastOrderProdExtDate").update(lastOrderProdDate);
+		
+		// 开始计费日期
+		// 默认为当前时间
+		var startDate = nowDate(); 
+		// 有上期结束日并且当前不是升级业务
+		if(lastOrderProd && this.busiCode != "100"){
+			startDate.setDate(startDate.getDate() + 1);
+		}
+		Ext.getCmp("dfStartDate").setValue(startDate);
+		// 结束计费日期
+		this.doChangeEndDate();
 	},
 	// 资费下拉框选中事件
 	doSelectTariff: function(box, record, index){
@@ -208,34 +232,21 @@ ProdOrderForm = Ext.extend( BaseForm, {
 		}else{
 			sfOrderCycle.setMaxValue(null);
 		}
+		// 结算结束计费日
+		this.doChangeEndDate();
 	},
-	// 上期订购结束日
-	loadLastOrderExpDate: function(){
-		Ext.Ajax.request({
-			scope : this,
-			url : root + '/commons/x/Order.loadLastOrderExpDate.action',
-			params : { /*cust_id: prod_id: user_id:prod_id是套餐则填空，否则填用户栏选中的user_id */},
-			success : function(response,opts){
-				var obj = Ext.decode(response.responseText);
-				alert(response.responseText);
-			}
-		});
-	},
-	// 开始计费日
-	loadLastOrderExpDate: function(){
-		Ext.Ajax.request({
-			scope : this,
-			url : root + '/commons/x/Order.loadOrderEffDate.action',
-			params : { /*cust_id: prod_id: user_id: prod_id是套餐则填空，否则填用户栏选中的user_id last_order_sn:上期订购结束日获得的order_sn order_months: 订购月数  */},
-			success : function(response,opts){
-				var obj = Ext.decode(response.responseText);
-				alert("date: " + response.responseText);
-			}
-		});
-	},
-	//加入产品列表
-	doAddProdList: function(){
-		alert("加入产品列表..");
+	// 结束日期
+	doChangeEndDate: function(){
+		var startDate = Ext.getCmp("dfStartDate").getValue();
+		var months = Ext.getCmp("sfOrderCycle").getValue();
+		alert("startDate: " + startDate + ", months: " + months);
+		if(startDate){
+			// 计算结束日
+			startDate.setMonth(startDate.getMonth() + months);
+			Ext.getCmp("dfExpDate").setValue(startDate.format("Y-m-d"));
+		}else{ 
+			Ext.getCmp("dfExpDate").setValue(null);
+		}
 	},
 	doValid : function(){
 		return ProdOrderForm.superclass.doValid.call(this);
