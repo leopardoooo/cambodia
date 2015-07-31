@@ -1,5 +1,5 @@
 /**
- * 产品订购之选择用户 aaa
+ * 产品订购之选择用户 aaa bbb
  */
 SelectUserPanel = Ext.extend(Ext.Panel, {
 	userGrid: null,
