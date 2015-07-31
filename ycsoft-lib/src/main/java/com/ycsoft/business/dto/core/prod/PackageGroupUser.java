@@ -6,17 +6,24 @@ import java.util.List;
 import com.ycsoft.beans.prod.PPackageProd;
 import com.ycsoft.beans.prod.PProd;
 
-public class PackageGroupUser implements Serializable  {
+public class PackageGroupUser extends PPackageProd  implements Serializable  {
 	
-	//套餐内容组ID
-	private String package_group_id;
     //内容组选中的终端用户id数组
     private List<String>  userSelectList;
-    //套餐内容组定义
-    private PPackageProd pPackageProd;
 	//套餐内容组中产品内容清单
     private List<PProd>  prodList;
 
+    
+    public PackageGroupUser(PPackageProd pakProd){
+    	this.setMax_user_cnt(pakProd.getMax_user_cnt());
+    	this.setPackage_group_id(pakProd.getPackage_group_id());
+    	this.setPackage_group_name(pakProd.getPackage_group_name());
+    	this.setProd_list(pakProd.getProd_list());
+    	this.setUser_type(pakProd.getUser_type());
+    	this.setTerminal_type(pakProd.getTerminal_type());
+    	this.setPackage_id(pakProd.getPackage_id());
+    	this.setPrecent(pakProd.getPrecent());
+    }
     
     public List<PProd> getProdList() {
 		return prodList;
@@ -25,12 +32,6 @@ public class PackageGroupUser implements Serializable  {
 		this.prodList = prodList;
 	}
 
-	public String getPackage_group_id() {
-		return package_group_id;
-	}
-	public void setPackage_group_id(String package_group_id) {
-		this.package_group_id = package_group_id;
-	}
 	public List<String> getUserSelectList() {
 		return userSelectList;
 	}
@@ -38,11 +39,4 @@ public class PackageGroupUser implements Serializable  {
 		this.userSelectList = userSelectList;
 	}
 	
-	public PPackageProd getpPackageProd() {
-		return pPackageProd;
-	}
-	public void setpPackageProd(PPackageProd pPackageProd) {
-		this.pPackageProd = pPackageProd;
-	}
-    
 }

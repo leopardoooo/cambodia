@@ -350,9 +350,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		List<PackageGroupUser> groupList=new ArrayList<PackageGroupUser>();
 		panel.setGroupList(groupList);
 		for(PPackageProd pakprod: pakprodList){
-			PackageGroupUser pgu=new PackageGroupUser();
-			pgu.setPackage_group_id(pakprod.getPackage_group_id());
-			pgu.setpPackageProd(pakprod);
+			PackageGroupUser pgu=new PackageGroupUser(pakprod);
 			pgu.setProdList(new ArrayList<PProd>());
 			for(String prod_id: pakprod.getProd_list().split(",")){
 				if(StringHelper.isNotEmpty(prod_id)){
@@ -381,9 +379,9 @@ public class OrderService extends BaseBusiService implements IOrderService{
 			Iterator<CUser> it= userSets.iterator();
 			while(it.hasNext()){
 				CUser user=it.next();
-				if(pgu.getpPackageProd().getUser_type().equals(user.getUser_type())){
-					if(StringHelper.isEmpty(pgu.getpPackageProd().getTerminal_type())
-							||pgu.getpPackageProd().getTerminal_type().equals(user.getTerminal_type())){
+				if(pgu.getUser_type().equals(user.getUser_type())){
+					if(StringHelper.isEmpty(pgu.getTerminal_type())
+							||pgu.getTerminal_type().equals(user.getTerminal_type())){
 						if(checkMap.get(pgu)==null){
 							checkMap.put(pgu, new ArrayList<String>());
 						}
@@ -400,7 +398,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 				return false;
 			}
 			//内容组最大用户数量和适配用户数量不一致，则不能自动适配
-			if(checkMap.get(pgu).size()!=pgu.getpPackageProd().getMax_user_cnt()){
+			if(checkMap.get(pgu).size()!=pgu.getMax_user_cnt()){
 				return false;
 			}
 		}
