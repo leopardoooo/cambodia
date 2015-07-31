@@ -1,4 +1,4 @@
-/**
+/** 
  * 产品订购之选择用户
  */
 SelectUserPanel = Ext.extend(Ext.Panel, {
@@ -121,7 +121,6 @@ TransferPayWindow = Ext.extend(Ext.Window, {
        	    {header: "结束计费日", width: 80, sortable:true, dataIndex: 'fee'},
        	    {header: "转移金额", width: 60, sortable:true, dataIndex: 'fee'}
        	];
-		
 		// Window Construct instance
 		return TransferPayWindow.superclass.constructor.call(this, {
 			layout:"fit",
@@ -143,4 +142,3 @@ TransferPayWindow = Ext.extend(Ext.Window, {
 		});
 	}
 });
-
