@@ -1,5 +1,6 @@
-/** 
+/** 000000000000000000000000
  * 产品订购之选择用户  
+ * 0000000000000000
  */
 SelectUserPanel = Ext.extend(Ext.Panel, {
 	userGrid: null,
