@@ -1536,24 +1536,24 @@ Ext.apply(MenuHandler, {
 //			Alert('请先选择用户!');
 //			return false;
 //		}
-
-		for (var i = 0; i < len; i++) {
-			if (userRecords[i].get("status") != "ACTIVE" && userRecords[i].get("status") != "OWELONG" ) {
-				Alert("所选用户的状态必须是正常");
-				return false;
-			}
-			for (var j = i + 1; j < len; j++) {
-				if (userRecords[i].get('user_type') != userRecords[j]
-						.get('user_type')) {
-
-					Alert("用户的类型必须一致");
-					return false;
-				}
-			}
-		}
+//
+//		for (var i = 0; i < len; i++) {
+//			if (userRecords[i].get("status") != "ACTIVE" && userRecords[i].get("status") != "OWELONG" ) {
+//				Alert("所选用户的状态必须是正常");
+//				return false;
+//			}
+//			for (var j = i + 1; j < len; j++) {
+//				if (userRecords[i].get('user_type') != userRecords[j]
+//						.get('user_type')) {
+//
+//					Alert("用户的类型必须一致");
+//					return false;
+//				}
+//			}
+//		}
 		return {
-			width : 570,
-			height : 550
+			width : 550,
+			height : 480
 		};
 	},
 	// 取消套餐
