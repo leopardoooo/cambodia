@@ -1,6 +1,7 @@
 /**
- * 【用户产品订购】
+ * 【用户产品订购】0000000
  */
+我就是爱音乐
 ProdOrderForm = Ext.extend( BaseForm, {
 	url : Constant.ROOT_PATH+"/core/x/User!createUser.action",
 	selectUserPanel: null,
