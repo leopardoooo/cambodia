@@ -81,6 +81,7 @@ public class CUser extends BusiBase implements Serializable {
 	
 	private String auto_promotion;
 	private String newPassword;
+	private Date protocol_date;
 
 	public String getAuto_promotion() {
 		return auto_promotion;
@@ -468,6 +469,14 @@ public class CUser extends BusiBase implements Serializable {
 
 	public void setNewPassword(String newPassword) {
 		this.newPassword = newPassword;
+	}
+
+	public Date getProtocol_date() {
+		return protocol_date;
+	}
+
+	public void setProtocol_date(Date protocol_date) {
+		this.protocol_date = protocol_date;
 	}
 	
 	

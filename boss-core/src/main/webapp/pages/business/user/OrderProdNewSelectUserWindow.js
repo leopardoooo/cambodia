@@ -1,7 +1,7 @@
 /**
  * 产品订购之选择用户
  */
-SelectUserWindow = Ext.extend(Ext.Window, {
+SelectUserPanel = Ext.extend(Ext.Panel, {
 	userGrid: null,
 	store: null,
 	constructor: function(){
@@ -42,7 +42,7 @@ SelectUserWindow = Ext.extend(Ext.Window, {
 	        	emptyText: 'filter..',
 	        	enableKeyEvents: true,
 	        	id: 'txtFilterInput',
-	        	width: 180,
+	        	width: 150,
 	        	listeners: { 
 	        		scope: this,
 	        		specialKey: function(field, e){
@@ -72,16 +72,10 @@ SelectUserWindow = Ext.extend(Ext.Window, {
 		});
 		
 		// Window 构造
-		return SelectUserWindow.superclass.constructor.call(this, {
+		return SelectUserPanel.superclass.constructor.call(this, {
 			layout: "fit",
-			title: "选择订购的用户",
-			width: 300,
-			height: 400,
-			resizable: false,
+			border: false,
 			iconCls: 'icon-edit-user',
-			maximizable: false,
-			closeAction: 'hide',
-			minimizable: false,
 			items: [this.userGrid]
 		});
 	},
@@ -96,6 +90,18 @@ SelectUserWindow = Ext.extend(Ext.Window, {
 			this.store.clearFilter();
 			Ext.getCmp("btnClearFilter").setVisible(false);
 		}
+	},
+	// 加载数据
+	loadBaseUser: function(){
+		Ext.Ajax.request({
+			scope : this,
+			url : root + '/commons/x/Order.loadPackageUserSelect.action',
+			params : { /*cust_id:prod_id: */},
+			success : function(response,opts){
+				var obj = Ext.decode(response.responseText);
+				alert(response.responseText);
+			}
+		});
 	}
 });
 
