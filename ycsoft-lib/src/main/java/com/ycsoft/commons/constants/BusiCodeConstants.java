@@ -22,7 +22,14 @@ public final class BusiCodeConstants {
 	public final static String DEVICE_REG_LOST = "1014";//设备挂失
 	public final static String DEVICE_SALE = "1013";//销售
 	public final static String DEVICE_CANCEL_LOST = "1011";//取消设备挂失
-	public final static String PROD_ORDER = "1015";//订购
+	
+	// Add business for the Cambodia
+	// Modified since 2015-07-31
+	public final static String PROD_ORDER = "1015";//套餐订购
+	public final static String PROD_SINGLE_ORDER = "102"; //单用户订购
+	public final static String PROD_CONTINUE = "101";//续订
+	public final static String PROD_UPGRADE = "100";//升级
+	
 	public final static String PROD_CHANGE_TARIFF = "1028";//资费变更
 	public final static String PROD_TERMINATE = "1027";//退订
 	public final static String PKG_ORDER = "1016";//订购套餐
