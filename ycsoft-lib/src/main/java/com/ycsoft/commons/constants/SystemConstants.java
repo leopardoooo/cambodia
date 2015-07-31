@@ -290,8 +290,9 @@ public class SystemConstants {
 	 * 产品打包类型
 	 */
 	public final static String PROD_TYPE_BASE ="BASE";//基础产品
-	public final static String PROD_TYPE_USERPKG ="UPKG";//用户产品包
-	public final static String PROD_TYPE_CUSTPKG ="CPKG";//客户产品包
+	public final static String PROD_TYPE_SPKG ="SPKG";//协议套餐
+	public final static String PROD_TYPE_CUSTPKG ="CPKG";//普通套餐
+	public final static String PROD_TYPE_USERPKG = "UPKG";// 
 
 	 /**
 	  * 计费方式
