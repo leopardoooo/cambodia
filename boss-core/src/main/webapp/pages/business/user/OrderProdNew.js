@@ -1,5 +1,5 @@
 /**
- * 【用户产品订购】
+ * 【用户产品订购】a simple test
  */
 ProdOrderForm = Ext.extend( BaseForm, {
 	url : Constant.ROOT_PATH+"/core/x/User!createUser.action",
