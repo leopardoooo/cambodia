@@ -75,7 +75,7 @@ import com.ycsoft.daos.core.Pager;
  * @author YC-SOFT
  *
  */
-@Service
+//@Service
 public class UserProdService extends BaseBusiService implements IUserProdService {
 	private ExpressionUtil expressionUtil;
 

@@ -8,7 +8,9 @@ import static com.ycsoft.commons.constants.SystemConstants.PROD_TYPE_BASE;
 import static com.ycsoft.commons.constants.SystemConstants.PROD_TYPE_CUSTPKG;
 import static com.ycsoft.commons.constants.SystemConstants.PROD_TYPE_USERPKG;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Component;
 
@@ -19,6 +21,7 @@ import com.ycsoft.business.dto.core.prod.PProdDto;
 import com.ycsoft.business.dto.core.prod.ResGroupDto;
 import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.constants.SystemConstants;
+import com.ycsoft.commons.helper.CollectionHelper;
 import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.daos.abstracts.BaseEntityDao;
 import com.ycsoft.daos.core.JDBCException;
@@ -139,48 +142,18 @@ public class PProdDao extends BaseEntityDao<PProd> {
 	public List<PProd> queryCanOrderUserProd(String servId,
 			String areaId,String countyId,String dataRight) throws Exception {
 		List<PProd> prodList = null;
-		/*String sql = "select * from p_prod  where  eff_date<SYSDATE AND (exp_date IS NULL OR exp_date>SYSDATE)" +
-				"  AND (for_area_id=? or for_area_id =?)"
-		+ " and status=? and prod_type in (?,?) "
-		+ " and prod_id in (SELECT DISTINCT PROD_ID FROM P_PROD_TARIFF a,P_PROD_TARIFF_COUNTY b WHERE a.TARIFF_ID=b.tariff_id AND b.COUNTY_ID = ? AND a.status=?)";
-		sql +=" and "+dataRight;
-		if(servId.indexOf(",") > -1){//双向（DTV,ITV）
-			sql = StringHelper.append(sql," and serv_id in (?,?,?)");
-			String[] servIds = servId.split(",");
-			prodList = this.createQuery(sql, AREA_ALL, areaId,
-					StatusConstants.ACTIVE, PROD_TYPE_BASE, PROD_TYPE_USERPKG,countyId,StatusConstants.ACTIVE,servIds[0],servIds[1],SystemConstants.PROD_SERV_ID_RENT).list();
-		} else if (servId.equals(SystemConstants.PROD_SERV_ID_ATV)){
-			//如果是模拟用户不能选租赁产品
-			sql = StringHelper.append(sql," and serv_id =? ");
-			prodList = this.createQuery(sql, AREA_ALL, areaId,
-					StatusConstants.ACTIVE, PROD_TYPE_BASE, PROD_TYPE_USERPKG,countyId,StatusConstants.ACTIVE,servId).list();
-		}else{
-			sql = StringHelper.append(sql," and (serv_id =? or serv_id=?)");
-			prodList = this.createQuery(sql, AREA_ALL, areaId,
-					StatusConstants.ACTIVE, PROD_TYPE_BASE, PROD_TYPE_USERPKG,countyId,StatusConstants.ACTIVE,servId,SystemConstants.PROD_SERV_ID_RENT).list();
-		}*/
+		
 		if(!SystemConstants.DEFAULT_DATA_RIGHT.equals(dataRight)){
 			dataRight = StringHelper.append("t2.",dataRight.trim());
 		}
 		
 		String sql = StringHelper.append("select distinct t.* from p_prod t,p_prod_county t2,P_PROD_TARIFF t3,P_PROD_TARIFF_COUNTY t4 ",
 				" where t.eff_date < SYSDATE AND (t.exp_date IS NULL OR t.exp_date > SYSDATE) and t.prod_id=t2.prod_id and t.prod_id=t3.prod_id and t3.tariff_id=t4.tariff_id",
-				" and t.status = ? and prod_type in (?, ?) and t2.county_id=? and t4.county_id=? and ",dataRight);
-		if(servId.indexOf(",") > -1){//双向（DTV,ITV）
-			sql = StringHelper.append(sql," and serv_id in (?,?,?)");
-			String[] servIds = servId.split(",");
-			prodList = this.createQuery(sql,StatusConstants.ACTIVE, PROD_TYPE_BASE, PROD_TYPE_USERPKG,
-					countyId ,countyId,servIds[0],servIds[1],SystemConstants.PROD_SERV_ID_RENT).list();
-		} else if (servId.equals(SystemConstants.PROD_SERV_ID_ATV)){
-			//如果是模拟用户不能选租赁产品
-			sql = StringHelper.append(sql," and serv_id =? ");
-			prodList = this.createQuery(sql,StatusConstants.ACTIVE, PROD_TYPE_BASE, PROD_TYPE_USERPKG,
-					countyId ,countyId,servId).list();
-		}else{
-			sql = StringHelper.append(sql," and (serv_id =? or serv_id=?)");
-			prodList = this.createQuery(sql,StatusConstants.ACTIVE, PROD_TYPE_BASE, PROD_TYPE_USERPKG,
-					countyId ,countyId,servId,SystemConstants.PROD_SERV_ID_RENT).list();
-		}
+				" and t.status = ? and prod_type =? and t2.county_id=? and t4.county_id=? and serv_id =? and ",dataRight);
+		
+		
+		prodList = this.createQuery(sql,StatusConstants.ACTIVE, PROD_TYPE_BASE,
+				countyId ,countyId,servId).list();
 		return prodList;
 	}
 
@@ -194,9 +167,9 @@ public class PProdDao extends BaseEntityDao<PProd> {
 		}
 		String sql = StringHelper.append("select p.* from p_prod p,p_prod_county pc where p.prod_id=pc.prod_id",
 				" and p.eff_date<SYSDATE AND (p.exp_date IS NULL OR p.exp_date>SYSDATE) and ",dataRight,
-				" and status=? and prod_type=? and pc.county_id=?");
+				" and status=? and (prod_type=? or prod_type=?) and pc.county_id=?");
 		List<PProd> prodList = this.createQuery(sql,
-				StatusConstants.ACTIVE, PROD_TYPE_CUSTPKG,countyId).list();
+				StatusConstants.ACTIVE, SystemConstants.PROD_TYPE_CUSTPKG,SystemConstants.PROD_TYPE_SPKG,countyId).list();
 		return prodList;
 	}
 
@@ -381,6 +354,42 @@ public class PProdDao extends BaseEntityDao<PProd> {
 		sql = StringHelper.append(sql," order by p.prod_name");
 		
 		return this.createQuery(PProdDto.class,sql).list();
+	}
+	
+	public Map<String,Integer> queryUserCountGroupByType(String pkgId) throws Exception {
+		Map<String,Integer> userCountMap = new HashMap<>();
+		final String sql = "select user_type,sum(MAX_USER_CNT) count from p_package_prod "
+				+ "where PACKAGE_ID=? "
+				+ "group by user_type";
+		List<Object[]> userTypeList= this.createSQLQuery(sql, pkgId).list();
+		if (CollectionHelper.isNotEmpty(userTypeList)){
+			for (Object[] obj:userTypeList){
+				userCountMap.put(obj[0].toString(), (Integer)obj[1]);
+			}
+		}
+		return userCountMap;
+	}
+	
+	/**
+	 * 查找所有包含宽带的产品或者套餐的实际带宽
+	 * @return
+	 * @throws Exception
+	 */
+	public Map<String,Integer> queryProdBandWidth() throws Exception{
+		Map<String,Integer> prodBandWidthMap = new HashMap<>();
+		String sql = "select a.prod_id,c.band_width from p_prod a,p_prod_static_res b,p_res c where "
+				+ "	a.prod_id = b.prod_id and b.res_id=c.res_id and a.prod_type='BASE' AND A.SERV_ID='BAND' "
+				+ "	union  "
+				+ "	select d.package_id,c.band_width from p_prod a,p_prod_static_res b,p_res c ,p_package_prod d where "
+				+ "	d.user_type='BAND' AND d.prod_list=a.prod_id and "
+				+ "	a.prod_id = b.prod_id and b.res_id=c.res_id and a.prod_type='BASE' AND A.SERV_ID='BAND'";
+		List<Object[]> bandWidthList= this.createSQLQuery(sql).list();
+		if (CollectionHelper.isNotEmpty(bandWidthList)){
+			for (Object[] obj:bandWidthList){
+				prodBandWidthMap.put(obj[0].toString(), (Integer)obj[1]);
+			}
+		}
+		return prodBandWidthMap;
 	}
 	
 }

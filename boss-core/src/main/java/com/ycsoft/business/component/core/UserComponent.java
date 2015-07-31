@@ -1186,6 +1186,8 @@ public class UserComponent extends BaseBusiComponent {
 	public Integer queryUserCount(String custId) throws Exception {
 		return cUserDao.queryUserCount(custId);
 	}
+	
+	
 
 	/**
 	 * @param optr_id
@@ -1247,5 +1249,7 @@ public class UserComponent extends BaseBusiComponent {
 	public void setCFeeDao(CFeeDao feeDao) {
 		cFeeDao = feeDao;
 	}
+	
+	
 	
 }
