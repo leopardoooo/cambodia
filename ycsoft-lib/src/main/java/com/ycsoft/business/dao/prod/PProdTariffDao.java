@@ -44,7 +44,7 @@ public class PProdTariffDao extends BaseEntityDao<PProdTariff> {
 		String sql = "select t.*,r.rule_str rule_id_text,r.rule_name from p_prod_tariff t,p_prod_tariff_county tc,t_rule_define r " +
 				" where t.tariff_id=tc.tariff_id and tc.county_id =? " +
 				" and t.prod_id=? and t.status=? and t.rule_id=r.rule_id(+) " +
-				" and t.tariff_id in (select tariff_id from p_prod_tariff where "+dataRight+")";
+				" and t.tariff_id in (select tariff_id from p_prod_tariff where "+dataRight+") order by t.rent";
 		List<ProdTariffDto> tariffList = this.createQuery(ProdTariffDto.class,sql,countyId,prodId,StatusConstants.ACTIVE).list();
 		return tariffList;
 	}
