@@ -168,7 +168,7 @@ public class CProdDao extends BaseEntityDao<CProd> {
 		sqlBul.append(" where cp.prod_id=p.prod_id and cp.tariff_id=pt.tariff_id");
 		sqlBul.append(" and cp.user_id=? and cp.county_id=?  and ( cp.package_sn is null or " +
 				" cp.package_sn not in (select prod_sn from c_prod c where c.user_id= ? and c.prod_type=?))");
-		return createQuery(CProdDto.class,sqlBul.toString(), userId,countyId,userId,SystemConstants.PROD_TYPE_USERPKG).list();
+		return createQuery(CProdDto.class,sqlBul.toString(), userId,countyId,userId,SystemConstants.PROD_TYPE_CUSTPKG).list();
 
 	}
 	

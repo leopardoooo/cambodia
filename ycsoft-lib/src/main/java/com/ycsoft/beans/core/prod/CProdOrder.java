@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 import com.ycsoft.beans.base.BusiBase;
+import com.ycsoft.business.dto.core.prod.OrderProd;
 import com.ycsoft.daos.config.POJO;
 
 @POJO(tn = "C_PROD_ORDER", sn = "SEQ_ORDER_SN", pk = "ORDER_SN")
@@ -59,6 +60,7 @@ public class CProdOrder extends BusiBase implements Serializable {
 //	  PUBLIC_ACCTITEM_TYPE    VARCHAR2(8) default 'NONE'
     private String remark;
     private String public_acctitem_type;
+    
 	public String getOrder_sn() {
 		return order_sn;
 	}

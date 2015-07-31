@@ -2,7 +2,9 @@ package com.ycsoft.business.component.core;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Component;
 
@@ -12,6 +14,7 @@ import com.ycsoft.beans.prod.PPackageProd;
 import com.ycsoft.beans.prod.PProd;
 import com.ycsoft.business.commons.abstracts.BaseBusiComponent;
 import com.ycsoft.business.dao.core.prod.CProdOrderDao;
+import com.ycsoft.business.dao.core.user.CUserDao;
 import com.ycsoft.business.dao.prod.PPackageProdDao;
 import com.ycsoft.business.dao.prod.PProdDao;
 import com.ycsoft.business.dto.core.prod.OrderProd;
@@ -23,6 +26,7 @@ import com.ycsoft.commons.exception.ServicesException;
 import com.ycsoft.commons.helper.DateHelper;
 import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.daos.core.JDBCException;
+import com.ycsoft.daos.helper.BeanHelper;
 /**
  * 订单组件
  * @author new
@@ -33,6 +37,8 @@ public class OrderComponent extends BaseBusiComponent {
 	private PProdDao pProdDao;
 	private PPackageProdDao pPackageProdDao;
 	private CProdOrderDao cProdOrderDao;
+	private CUserDao cUserDao;
+	
 	/**
 	 * 查询被覆盖取消的订单(套餐订购和升级的情况)
 	 * @param orderProd
@@ -138,6 +144,42 @@ public class OrderComponent extends BaseBusiComponent {
 		return prod;
 	}
 	
+	
+	
+	/**
+	 * 创建新订购记录产品状态判断
+	 * @param orderProd
+	 * @return
+	 * @throws Exception 
+	 */
+	public String getNewOrderProdStatus(CProdOrder lastOrder,OrderProd orderProd) throws Exception{
+		if(lastOrder!=null){
+			//有上期订单的情况，返回上期订单状态
+			return lastOrder.getStatus();
+		}else if(StringHelper.isNotEmpty(orderProd.getUser_id())){
+			//单产品的情况：状态跟用户一致
+			return cUserDao.findByKey(orderProd.getUser_id()).getStatus();
+		}else{
+			if(orderProd.getGroupSelected()!=null&&orderProd.getGroupSelected().size()>0){
+				//套餐的情况: 根据用户选择的情况判断,选中的用户有非正常状态，则返回用户的非正常状态作为产品状态
+				Map<String,CUser> userMap=new HashMap<String,CUser>();
+				for(CUser user: cUserDao.queryUserByCustId(orderProd.getCust_id())){
+					userMap.put(user.getUser_id(), user);
+				}
+				for(PackageGroupUser pgu: orderProd.getGroupSelected()){
+					if(pgu.getUserSelectList()!=null){
+						for(String user_id:pgu.getUserSelectList()){
+							if(!userMap.get(user_id).getStatus().equals(StatusConstants.ACTIVE)){
+								return userMap.get(user_id).getStatus();
+							}
+						}
+					}
+				}
+			}
+		}
+		return StatusConstants.ACTIVE;
+	}
+	
 	/**
 	 * 保存订购记录
 	 * @return
@@ -146,13 +188,40 @@ public class OrderComponent extends BaseBusiComponent {
 	public String saveCProdOrder(CProdOrder cProdOrder,OrderProd orderProd) throws Exception{
 		
 		//保存订单
-		String order_sn=cProdOrderDao.findSequence().toString();
-		CProdOrder order=new CProdOrder();
+		cProdOrderDao.save(cProdOrder);
 		
 		//保存套餐的子订单
+		if(orderProd.getGroupSelected()!=null&&orderProd.getGroupSelected().size()>0){
+			List<CProdOrder> orderList=new ArrayList<>();
+			for(PackageGroupUser pgu: orderProd.getGroupSelected()){
+				if(pgu.getUserSelectList()==null){
+					continue;
+				}
+				for(String prod_id:pgu.getpPackageProd().getProd_list().split(",")){
+					if(StringHelper.isNotEmpty(prod_id)){
+						for(String user_id: pgu.getUserSelectList()){
+							CProdOrder order=new CProdOrder();
+							//copy
+							BeanHelper.copyProperties(order, cProdOrder);
+							order.setOrder_sn(cProdOrderDao.findSequence().toString());
+							order.setProd_id(prod_id);
+							order.setUser_id(user_id);
+							order.setPackage_id(cProdOrder.getProd_id());
+							order.setPackage_sn(cProdOrder.getOrder_sn());
+							order.setPackage_group_id(pgu.getPackage_group_id());
+							order.setOrder_fee(0);
+							order.setActive_fee(0);
+							orderList.add(order);
+						}
+					}
+				}
+			}
+			if(orderList.size()>0){
+				cProdOrderDao.save(orderList.toArray(new CProdOrder[orderList.size()]));
+			}
+		}
 		
-		
-		return order_sn;
+		return cProdOrder.getOrder_sn();
 	}
 	
 	public void setpProdDao(PProdDao pProdDao) {
