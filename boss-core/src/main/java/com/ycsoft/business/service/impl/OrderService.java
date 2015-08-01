@@ -463,12 +463,14 @@ public class OrderService extends BaseBusiService implements IOrderService{
 	@Override
 	public String saveOrderProd(OrderProd orderProd,String busi_code) throws Exception{
 		
+		//参数检查
+		CProdOrder lastOrder=checkOrderProdParam(orderProd,busi_code);
+				
 		Integer doneCode = doneCodeComponent.gDoneCode();
 		
 		String optr_id=this.getBusiParam().getOptr().getOptr_id();
 		CCust cust=cCustDao.findByKey(orderProd.getCust_id());
-		//参数检查
-		CProdOrder lastOrder=checkOrderProdParam(orderProd,busi_code);
+		
 		
 		//主订购记录bean生成
 		CProdOrder cProdOrder=orderComponent.createCProdOrder(orderProd, doneCode, optr_id, cust.getArea_id(), cust.getCounty_id());
@@ -486,6 +488,13 @@ public class OrderService extends BaseBusiService implements IOrderService{
 	}
 	
 	private  CProdOrder checkOrderProdParam(OrderProd orderProd,String busi_code) throws Exception{
+		
+		PProd prod=pProdDao.findByKey(orderProd.getProd_id());
+		if(!prod.getProd_type().equals(SystemConstants.PROD_TYPE_BASE)){
+			if(StringHelper.isNotEmpty(orderProd.getUser_id())){
+				throw new ServicesException("订购套餐时，不能填user_id！");
+			}
+		}
 		CProdOrder lastOrder=null;
 		//user_id数据校验
 		if(StringHelper.isNotEmpty(orderProd.getLast_order_sn())){
