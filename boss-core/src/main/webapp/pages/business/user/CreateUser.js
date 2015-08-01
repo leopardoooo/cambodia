@@ -381,6 +381,11 @@ UserBaseForm = Ext.extend( BaseForm , {
 	doInit:function(){
 		UserBaseForm.superclass.doInit.call(this);
 		Ext.getCmp("tmpFieldSet").setVisible(false);
+		/* TODO 如果客户地址对应的业务信息不为空，过滤掉不能开通的业务
+		 * 如果客户名下没有状态为正常的宽带业务则不能开ott用户
+		 * 
+		*/
+		
 	},
 	doValid : function(){
 		var formValid =  UserBaseForm.superclass.doValid.call(this);
