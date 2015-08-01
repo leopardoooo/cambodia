@@ -10,6 +10,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.springframework.stereotype.Service;
+
+import com.ycsoft.beans.config.TRuleDefine;
 import com.ycsoft.beans.core.cust.CCust;
 import com.ycsoft.beans.core.prod.CProdOrder;
 import com.ycsoft.beans.core.user.CUser;
@@ -43,7 +46,7 @@ import com.ycsoft.commons.helper.CollectionHelper;
 import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.commons.store.MemoryDict;
 import com.ycsoft.daos.core.JDBCException;
-
+@Service
 public class OrderService extends BaseBusiService implements IOrderService{
 	private PProdDao pProdDao;
 	private PProdTariffDao pProdTariffDao;
@@ -59,19 +62,18 @@ public class OrderService extends BaseBusiService implements IOrderService{
 	private TRuleDefineDao tRuleDefineDao;
 
 	@Override
-	public OrderProdPanel queryOrderableProd(String userId, String filterOrderSn)
+	public OrderProdPanel queryOrderableProd(String busiCode,String custId,String userId, String filterOrderSn)
 			throws Exception {
 		OrderProdPanel panel =new OrderProdPanel();
-		String custId = getBusiParam().getCust().getCust_id();
-		String busiCode = getBusiParam().getBusiCode();
+		CCust cust = cCustDao.findByKey(custId);
 		List<CProdOrder> orderList = cProdOrderDao.queryCustEffOrder(custId);
 		
 		if (busiCode.equals(BusiCodeConstants.PROD_SINGLE_ORDER)){
-			queryUserOrderableProd(userId,panel,orderList);
+			queryUserOrderableProd(cust,userId,panel,orderList);
 		} else if (busiCode.equals(BusiCodeConstants.PROD_ORDER)){
-			queryCustOrderablePkg(panel,orderList);
+			queryCustOrderablePkg(cust,panel,orderList);
 		} else if (busiCode.equals(BusiCodeConstants.PROD_CONTINUE)){
-			queryOrderableGoon(filterOrderSn,panel,orderList);
+			queryOrderableGoon(cust,filterOrderSn,panel,orderList);
 		} else if (busiCode.equals(BusiCodeConstants.PROD_UPGRADE)){
 			CProdOrder order = cProdOrderDao.findByKey(filterOrderSn);
 			if (order == null)
@@ -81,12 +83,13 @@ public class OrderService extends BaseBusiService implements IOrderService{
 			if (prod.getProd_type().equals(SystemConstants.PROD_TYPE_BASE) 
 					&& prod.getServ_id().equals(SystemConstants.USER_TYPE_BAND)){
 				//升级宽带产品
-				queryUserOrderableProd(order.getUser_id(),panel,orderList);
+				queryUserOrderableProd(cust,order.getUser_id(),panel,orderList);
 				//过滤掉带宽小于等于当前套餐的产品
-				for (PProd selectedProd:panel.getProdList()){
+				for (Iterator<PProd> it = panel.getProdList().iterator();it.hasNext();){
+					PProd selectedProd = it.next();
 					if (prodBandWidthMap.get(selectedProd.getProd_id())==null ||
 							prodBandWidthMap.get(selectedProd.getProd_id())<= prodBandWidthMap.get(prod.getProd_id())){
-						panel.getProdList().remove(selectedProd);
+						it.remove();
 						panel.getTariffMap().remove(selectedProd.getProd_id());
 						panel.getLastOrderMap().remove(prod.getProd_id());
 					}
@@ -94,24 +97,26 @@ public class OrderService extends BaseBusiService implements IOrderService{
 			} else if (prod.getProd_type().equals(SystemConstants.PROD_TYPE_CUSTPKG)
 					&& prodBandWidthMap.get(prod.getProd_id()) != null){
 				//含宽带的普通套餐
-				queryCustOrderablePkg(panel,orderList);
+				queryCustOrderablePkg(cust,panel,orderList);
 				//过滤掉带宽小于等于当前套餐的产品
-				for (PProd selectedProd:panel.getProdList()){
+				for (Iterator<PProd> it = panel.getProdList().iterator();it.hasNext();){
+					PProd selectedProd = it.next();
 					if (prod.getProd_type().equals(SystemConstants.PROD_TYPE_SPKG) ||
 							prodBandWidthMap.get(selectedProd.getProd_id())==null ||
 							prodBandWidthMap.get(selectedProd.getProd_id())<= prodBandWidthMap.get(prod.getProd_id())){
-						panel.getProdList().remove(selectedProd);
+						it.remove();
 						panel.getTariffMap().remove(selectedProd.getProd_id());
 						panel.getLastOrderMap().remove(prod.getProd_id());
 					}
 				}
 			} else if (prod.getProd_type().equals(SystemConstants.PROD_TYPE_SPKG)){
 				//协议套餐
-				queryCustOrderablePkg(panel,orderList);
+				queryCustOrderablePkg(cust,panel,orderList);
 				//过滤掉普通套餐
-				for (PProd selectedProd:panel.getProdList()){
+				for (Iterator<PProd> it = panel.getProdList().iterator();it.hasNext();){
+					PProd selectedProd = it.next();
 					if (prod.getProd_type().equals(SystemConstants.PROD_TYPE_CUSTPKG)){
-						panel.getProdList().remove(selectedProd);
+						it.remove();
 						panel.getTariffMap().remove(selectedProd.getProd_id());
 						panel.getLastOrderMap().remove(prod.getProd_id());
 					}
@@ -126,7 +131,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 	}
 
 	//查找用户能够订购的单产品
-	private void queryUserOrderableProd(String userId,OrderProdPanel panel,List<CProdOrder> orderList) throws Exception {
+	private void queryUserOrderableProd(CCust cust,String userId,OrderProdPanel panel,List<CProdOrder> orderList) throws Exception {
 		CUser user = userComponent.queryUserById(userId);
 		if (user == null)
 			return;
@@ -134,7 +139,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		List<PProd> prodList = pProdDao.queryCanOrderUserProd(user.getUser_type(), user.getCounty_id(),
 				user.getCounty_id(), SystemConstants.DEFAULT_DATA_RIGHT);
 		for (PProd prod:prodList){
-			List<PProdTariffDisct> tariffList = this.queryTariffList(user, prod);
+			List<PProdTariffDisct> tariffList = this.queryTariffList(cust,user, prod);
 			if (!CollectionHelper.isEmpty(tariffList)){
 				panel.getProdList().add(prod);
 				panel.getTariffMap().put(prod.getProd_id(), tariffList);
@@ -147,12 +152,12 @@ public class OrderService extends BaseBusiService implements IOrderService{
 
 	}
 	//查找客户能够订购的套餐
-	private void queryCustOrderablePkg(OrderProdPanel panel,List<CProdOrder> orderList) throws Exception {
-		String custId = getBusiParam().getCust().getCust_id();
+	private void queryCustOrderablePkg(CCust cust,OrderProdPanel panel,List<CProdOrder> orderList) throws Exception {
+		String custId = cust.getCust_id();
 		Map<String,Integer> userCountMap = cUserDao.queryUserCountGroupByType(custId);
-		List<PProd> prodList = pProdDao.queryCanOrderPkg(getBusiParam().getCust().getCounty_id(),  SystemConstants.DEFAULT_DATA_RIGHT);
+		List<PProd> prodList = pProdDao.queryCanOrderPkg(cust.getCounty_id(),  SystemConstants.DEFAULT_DATA_RIGHT);
 		for (PProd prod:prodList){
-			List<PProdTariffDisct> tariffList = this.queryTariffList(null, prod);
+			List<PProdTariffDisct> tariffList = this.queryTariffList(cust,null, prod);
 			if (!CollectionHelper.isEmpty(tariffList)){
 				boolean flag = true;
 				if (prod.getProd_type().equals(SystemConstants.PROD_TYPE_CUSTPKG)){
@@ -179,7 +184,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 
 	}
 
-	private void queryOrderableGoon(String filterOrderSn,OrderProdPanel panel,List<CProdOrder> orderList) throws Exception {
+	private void queryOrderableGoon(CCust cust,String filterOrderSn,OrderProdPanel panel,List<CProdOrder> orderList) throws Exception {
 		CProdOrder order = cProdOrderDao.findByKey(filterOrderSn);
 		if (order == null)
 			return;
@@ -196,7 +201,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		} else {
 			lastOrder = getCustLastOrder(orderList);
 		}
-		List<PProdTariffDisct> tariffList = this.queryTariffList(user, prod);
+		List<PProdTariffDisct> tariffList = this.queryTariffList(cust,user, prod);
 		if (!CollectionHelper.isEmpty(tariffList)){
 			panel.getProdList().add(prod);
 			panel.getTariffMap().put(prod.getProd_id(), tariffList);
@@ -204,52 +209,41 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		}
 	}
 
-	/**
-	 * 升级的产品必须是
-	 * 1、协议套餐：查找匹配的其它套餐，不包含当前套餐
-	 * 2、宽带产品或者是包含宽带的普通套餐
-	 * @param filterOrderSn
-	 * @param panel
-	 * @param orderList
-	 * @throws Exception
-	 */
-	private void queryOrderableUpgrade(String filterOrderSn,OrderProdPanel panel,List<CProdOrder> orderList) throws Exception {
-		
-	}
-
-	private List<PProdTariffDisct> queryTariffList(CUser user, PProd prod) throws Exception {
+	private List<PProdTariffDisct> queryTariffList(CCust cust,CUser user, PProd prod) throws Exception {
 		List<PProdTariffDisct> tariffList = new ArrayList<>();
-		List<ProdTariffDto> ptList = pProdTariffDao.queryProdTariff(prod.getProd_id(), user.getCounty_id(),
+		List<ProdTariffDto> ptList = pProdTariffDao.queryProdTariff(prod.getProd_id(), cust.getCounty_id(),
 				SystemConstants.DEFAULT_DATA_RIGHT);
 		if (prod.getProd_type().equals(SystemConstants.PROD_TYPE_SPKG)){//协议套餐，验证协议号
-			for (ProdTariffDto tariff : ptList) {
-				if (!tariff.getSpkg_sn().equals(getBusiParam().getCust().getSpkg_sn()))
-					ptList.remove(tariff);
+			for (Iterator<ProdTariffDto> tariffIt = ptList.iterator();tariffIt.hasNext();) {
+				ProdTariffDto  tariff = tariffIt.next();
+				if (!tariff.getSpkg_sn().equals(cust.getSpkg_sn()))
+					tariffIt.remove();
 			}
 		} else {
-			for (ProdTariffDto tariff : ptList) {
-				if (!checkRule(user, tariff.getBill_rule_text()))
-					ptList.remove(tariff);
+			for (Iterator<ProdTariffDto> tariffIt = ptList.iterator();tariffIt.hasNext();) {
+				ProdTariffDto  tariff = tariffIt.next();
+				if (!checkRule(cust,user, tariff.getBill_rule()))
+					tariffIt.remove();
 			}
 		}
 		
 		// 如果有适用的资费
-		if (!CollectionHelper.isNotEmpty(ptList)) {
+		if (CollectionHelper.isNotEmpty(ptList)) {
 			ProdTariffDto pt = ptList.get(0);
 			PProdTariffDisct tariff = new PProdTariffDisct();
 			tariff.setTariff_id(pt.getTariff_id());
 			tariff.setBilling_cycle(pt.getBilling_cycle());
 			tariff.setDisct_rent(pt.getRent());
-			tariff.setDisct_name(pt.getTariff_desc());
+			tariff.setDisct_name(pt.getTariff_name());
 			tariffList.add(tariff);
 			// 查找资费所有的优惠
 			List<PProdTariffDisct> disctList = pProdTariffDisctDao.queryDisctByTariffId(pt.getTariff_id(),
-					user.getCounty_id());
-			if (!CollectionHelper.isNotEmpty(disctList)) {
+					cust.getCounty_id());
+			if (CollectionHelper.isNotEmpty(disctList)) {
 				for (PProdTariffDisct disct : disctList) {
 					boolean flag = true;
 					if (StringHelper.isNotEmpty(disct.getRule_id())) {
-						if (!checkRule(user, tRuleDefineDao.findByKey(disct.getRule_id()).getRule_str()))
+						if (!checkRule(cust,user, tRuleDefineDao.findByKey(disct.getRule_id()).getRule_str()))
 							flag = false;
 					}
 					if (flag) {
@@ -263,12 +257,15 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		return tariffList;
 	}
 
-	private boolean checkRule(CUser user, String ruleText) {
-		if (StringHelper.isEmpty(ruleText))
+	private boolean checkRule(CCust cust,CUser user, String ruleId) throws Exception{
+		if (StringHelper.isEmpty(ruleId))
 			return true;
-		expressionUtil.setCcust(getBusiParam().getCust());
+		TRuleDefine rule = tRuleDefineDao.findByKey(ruleId);
+		if (rule == null)
+			return true;
+		expressionUtil.setCcust(cust);
 		expressionUtil.setCuser(user);
-		return expressionUtil.parseBoolean(ruleText);
+		return expressionUtil.parseBoolean(rule.getRule_str());
 	}
 
 	private String getUserDesc(CUser user) {
@@ -519,19 +516,19 @@ public class OrderService extends BaseBusiService implements IOrderService{
 	}
 
 
-	public void setpProdDao(PProdDao pProdDao) {
+	public void setPProdDao(PProdDao pProdDao) {
 		this.pProdDao = pProdDao;
 	}
 
-	public void setpProdTariffDao(PProdTariffDao pProdTariffDao) {
+	public void setPProdTariffDao(PProdTariffDao pProdTariffDao) {
 		this.pProdTariffDao = pProdTariffDao;
 	}
 
-	public void setpProdTariffDisctDao(PProdTariffDisctDao pProdTariffDisctDao) {
+	public void setPProdTariffDisctDao(PProdTariffDisctDao pProdTariffDisctDao) {
 		this.pProdTariffDisctDao = pProdTariffDisctDao;
 	}
 
-	public void setpPackageProdDao(PPackageProdDao pPackageProdDao) {
+	public void setPPackageProdDao(PPackageProdDao pPackageProdDao) {
 		this.pPackageProdDao = pPackageProdDao;
 	}
 
@@ -539,7 +536,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		this.userComponent = userComponent;
 	}
 
-	public void setcProdOrderDao(CProdOrderDao cProdOrderDao) {
+	public void setCProdOrderDao(CProdOrderDao cProdOrderDao) {
 		this.cProdOrderDao = cProdOrderDao;
 	}
 
@@ -551,11 +548,11 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		this.orderComponent = orderComponent;
 	}
 
-	public void setcCustDao(CCustDao cCustDao) {
+	public void setCCustDao(CCustDao cCustDao) {
 		this.cCustDao = cCustDao;
 	}
 
-	public void setcUserDao(CUserDao cUserDao) {
+	public void setCUserDao(CUserDao cUserDao) {
 		this.cUserDao = cUserDao;
 	}
 
@@ -563,7 +560,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		this.expressionUtil = expressionUtil;
 	}
 
-	public void settRuleDefineDao(TRuleDefineDao tRuleDefineDao) {
+	public void setTRuleDefineDao(TRuleDefineDao tRuleDefineDao) {
 		this.tRuleDefineDao = tRuleDefineDao;
 	}
 	
