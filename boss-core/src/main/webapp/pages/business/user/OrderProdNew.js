@@ -2,7 +2,7 @@
  * 【用户产品订购】
  */
 ProdOrderForm = Ext.extend( BaseForm, {
-	url : Constant.ROOT_PATH+"/core/x/User!createUser.action",
+	url : Constant.ROOT_PATH+"/core/x/ProdOrder!saveOrderList.action",
 	selectUserPanel: null,
 	transferPayWindow: null,
 	// 单产品订购102，升级100，续订101, 套餐订购1015
@@ -94,8 +94,7 @@ ProdOrderForm = Ext.extend( BaseForm, {
 					},{
 						xtype: 'spinnerfield',
 			            fieldLabel: '订购月数',
-			            value: 0,
-			            allowBlank: false,
+			           // allowBlank: false,
 			            id: 'sfOrderCycle',
 			            minValue: 0,
 					    listeners: {
@@ -122,6 +121,7 @@ ProdOrderForm = Ext.extend( BaseForm, {
 						xtype: 'textfield',
 						id: 'dfExpDate',
 						readOnly: true,
+						allowBlank: false,
 			            fieldLabel: '结束计费日'
 					}]
 				}]
@@ -151,46 +151,21 @@ ProdOrderForm = Ext.extend( BaseForm, {
 			this.lastOrderSn  = prodData["order_sn"];
 		}
 		
-		// 模拟数据
-		this.baseData = {
-			"userDesc": "DTT_12312312,OTT_122",
-			"prodList": [
-			     {prod_id: 100001,prod_name: 'OTT基本包', prod_desc: '没什么好说的，爱定不定',"pkg": "false"},
-			     {prod_id: 100002,prod_name: '宽带1M',prod_desc: '蜗牛一样的速度，你还敢定吗', "pkg": "false"},
-			     {prod_id: 100003,prod_name: '普通套餐：金包',prod_desc: '大资生活',"pkg": "true"},
-			     {prod_id: 100004,prod_name: '普通套餐：银包',prod_desc: '小资生活',"pkg": "true"},
-			     {prod_id: 100005,prod_name: '协议套餐：110',prod_desc: '高干子弟，惹不起。',"pkg": "true"}
-			 ],
-			 "tariffMap": {
-				 "100001": [
-				     {disct_id: 101,disct_name: "10元/月",billing_cycle: 1,max_order_cycle: null,final_rent: 1000},
-				     {disct_id: 102,disct_name: "50元半年",billing_cycle: 6,max_order_cycle: 4, final_rent: 5000}
-				 ],
-				 "100002": [
-				     {disct_id: 103,disct_name: "10元/月",billing_cycle: 1,max_order_cycle: null, final_rent: 1000}
-				 ]
-			 },
-			 "lastOrderMap": {
-				 "100001": {exp_date: '2015-08-31 13:49:05'},
-				 "100002": {exp_date: '2015-10-31 13:49:05'}
-			 }
-		}
-		
-		Ext.getCmp("boxProdId").getStore().loadData(this.baseData["prodList"]);
-		
-//		Ext.Ajax.request({
-//			// url :root + '/commons/x/Order.loadProdList.action',
-//			scope : this,
-//			params: {
-//				user_id: this.userId,
-//				filter_order_sn: this.lastOrderSn
-//			},
-//			success : function(response,opts){
-//				var responseObj = Ext.decode(response.responseText);
-//				this.baseData = responseObj;
-//				Ext.getCmp("boxProdId").getStore().loadData(this.baseData["prodList"]);
-//			}
-//		});
+		Ext.Ajax.request({
+			url :root + '/core/x/ProdOrder!loadProdList.action',
+			scope : this,
+			params: {
+				busi_code: this.busiCode,
+				cust_id: App.getCustId(),
+				user_id: this.userId,
+				filter_order_sn: this.lastOrderSn
+			},
+			success : function(response,opts){
+				var responseObj = Ext.decode(response.responseText);
+				this.baseData = responseObj;
+				Ext.getCmp("boxProdId").getStore().loadData(this.baseData["prodList"]);
+			}
+		});
 	},
 	doInit:function(){
 		this.doLoadBaseData();
@@ -227,15 +202,13 @@ ProdOrderForm = Ext.extend( BaseForm, {
 			boxProdTariff.setRawValue("");
 		}
 		// 上期结束日期
-		var lastOrderProd = this.baseData["lastOrderMap"][prodId];
-		var lastOrderProdDate = lastOrderProd ? lastOrderProd["exp_date"].split(" ")[0] : "--";
+		var lastOrderProdDate = this.getLastProdEndDate(prodId) || "--";
 		Ext.get("lastOrderProdExtDate").update(lastOrderProdDate);
 		
-		// 开始计费日期
-		// 默认为当前时间
+		// 开始计费日期 默认为当前时间
 		var startDate = nowDate(); 
 		// 有上期结束日并且当前不是升级业务
-		if(lastOrderProd && this.busiCode != "100"){
+		if(lastOrderProdDate && this.busiCode != "100"){
 			startDate.setDate(startDate.getDate() + 1);
 		}
 		Ext.getCmp("dfStartDate").setValue(startDate);
@@ -252,8 +225,7 @@ ProdOrderForm = Ext.extend( BaseForm, {
 	// 加载终端用户
 	doLoadUsers: function(selectProdRecord){
 		// 单产品
-		var pkgMark = selectProdRecord.get("pkg");
-		if(pkgMark && pkgMark === "true"){
+		if(this.isPkg()){
 			this.selectUserPanel.loadPackageUsers({
 				prod_id: selectProdRecord.get("prod_id"),
 				last_order_sn: this.lastOrderSn
@@ -271,9 +243,12 @@ ProdOrderForm = Ext.extend( BaseForm, {
 		// 递增值
 		sfOrderCycle.spinner.incrementValue = billingCycle;
 		//最小值
-		sfOrderCycle.setMinValue(billingCycle);
-		// 最小周期
-		sfOrderCycle.setValue(billingCycle);
+		if(this.isProtocolPkgAndUpgradeBusiCode()){
+			sfOrderCycle.setMinValue(0);
+		}else{
+			sfOrderCycle.setMinValue(billingCycle);
+			sfOrderCycle.setValue(billingCycle);
+		}
 		//最大值
 		if(maxOrderCycle){
 			sfOrderCycle.setMaxValue(maxOrderCycle*billingCycle);
@@ -285,10 +260,22 @@ ProdOrderForm = Ext.extend( BaseForm, {
 		// 计算结算金额
 		this.doLoadTransferAmount();
 	},
+	// 上期结束计费日
+	getLastProdEndDate: function(prodId){
+		var lastOrderProd = this.baseData["lastOrderMap"][prodId];
+		return lastOrderProd ? lastOrderProd["exp_date"].split(" ")[0] : null;
+	},
 	// 结束日期
 	doChangeEndDate: function(){
 		var startDate = Ext.getCmp("dfStartDate").getValue();
 		var months = Ext.getCmp("sfOrderCycle").getValue();
+		//如果是协议套餐，并且当前周期为0，则结束日为上期结束计费日
+		if(this.isProtocolPkgAndUpgradeBusiCode() && months == 0){
+			var lastOrderProdDate = this.getLastProdEndDate(prodId);
+			Ext.getCmp("dfExpDate").setValue(lastOrderProdDate);
+			return;
+		}
+		// 其它根据周期进行计算
 		if(startDate){
 			// 计算结束日
 			startDate.setMonth(startDate.getMonth() + months);
@@ -296,6 +283,7 @@ ProdOrderForm = Ext.extend( BaseForm, {
 		}else{ 
 			Ext.getCmp("dfExpDate").setValue(null);
 		}
+		
 	},
 	doLoadTransferAmount: function(){
 		var validObj = ProdOrderForm.superclass.doValid.call(this); 
@@ -328,9 +316,6 @@ ProdOrderForm = Ext.extend( BaseForm, {
 			for(var i = 0; i< responseData.length; i++){
 				sumAmount += responseData[i]["active_fee"];
 			}
-			Ext.get("transferAmount").update(sumAmount);
-		}else{
-			Ext.get("transferAmount").update("0.00");
 		}
 		this.transferAmount = sumAmount;
 		// 修改小计信息
@@ -355,15 +340,46 @@ ProdOrderForm = Ext.extend( BaseForm, {
 		// 实付
 		this.totalAmount = this.addAmount - this.transferAmount;
 		Ext.get("totalAmount").update(String(this.totalAmount/100));
+		// 转移支付
+		Ext.get("transferAmount").update(String(this.transferAmount/100));
+	},
+	// 是否为套餐
+	isPkg: function(){
+		if(this.currentSelectedProd){
+			var prodType = this.currentSelectedProd.get("prod_type");
+			return prodType === "SPKG" || prodType === "CPKG";
+		}
+		return false;
+	},
+	// 是否为协议套餐
+	isProtocolPkgAndUpgradeBusiCode: function(){
+		if(this.currentSelectedProd){
+			var prodType = this.currentSelectedProd.get("prod_type");
+			return prodType === "SPKG" && this.busiCode === "100";
+		}
+		return false;
 	},
 	doValid : function(){
+		var validObj = ProdOrderForm.superclass.doValid.call(this); 
+		if(validObj["isValid"] !== true){
+			Alert(validObj["msg"]);
+			return false;
+		}
+		var orderCycle = Ext.getCmp("sfOrderCycle").getValue();
+		if(String(orderCycle).trim() === ""){
+			return {
+				isValid: false,
+				msg: "订购月数是必须的!"
+			}
+		}
+		
 		if(this.totalAmount < 0){
 			return {
 				isValid: false,
 				msg: "实际应付不能小于0，请增加订购月数"
 			}
 		}
-		return ProdOrderForm.superclass.doValid.call(this);
+		return true;
 	},
 	getValues : function(){
 		var values = this.getTransferValues();
@@ -373,8 +389,12 @@ ProdOrderForm = Ext.extend( BaseForm, {
 		values["pay_fee"] = this.totalAmount;
 		// 转移支付
 		values["transfer_fee"] = this.transferAmount;
+		// 失效日期
+		values["exp_date"] = Ext.getCmp("dfExpDate").getValue();
 		
-		return values;
+		return {
+			"orderProd": Ext.encode(values)
+		};
 	},
 	getTransferValues: function(){
 		var values = {};
@@ -390,9 +410,25 @@ ProdOrderForm = Ext.extend( BaseForm, {
 		var index = boxProdTariff.getStore().find("disct_id", disctId);
 		
 		// 如果当前是套餐，则封装分组用户
-		if(currentSelectedProd.get("pkg") === "true"){
-			values["groupSelected"] = [];
-			
+		if(this.isPkg()){
+			// 获得选中的用户
+			var groupUserMap = {};
+			this.selectUserPanel.store.each(function(rs){
+				var gid = rs.get("package_group_id");
+				if(!groupUserMap[gid]){
+					groupUserMap[gid] = [];
+				}
+				groupUserMap[gid].push(rs.get("user_id"));
+			}, this);
+			// 封装后台数据结构
+			var groupSelected = [];
+			for(var key in groupUserMap){
+				groupSelected.push({
+					"package_group_id": key,
+					"userSelectList": groupUserMap[key]
+				})
+			}
+			values["groupSelected"] = groupSelected;
 		}
 		
 		// 产品信息
@@ -403,7 +439,7 @@ ProdOrderForm = Ext.extend( BaseForm, {
 		return values;
 	},
 	getFee: function(){
-		return 0;
+		return this.totalAmount/100;
 	},
 	success : function(form,res){
 		var userId = res.simpleObj;
