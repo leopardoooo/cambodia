@@ -7,8 +7,16 @@ ProdOrderForm = Ext.extend( BaseForm, {
 	transferPayWindow: null,
 	// 单产品订购102，升级100，续订101, 套餐订购1015
 	busiCode: null,
+	// 单用户
+	userId: null,
+	// 最近一次订购SN
+	lastOrderSn: null,
 	// 初始化参数，包括产品列表、资费、上一次订购记录
 	baseData: null,
+	// 转移支付数据明细
+	transferPayData: [],
+	//  套餐订购用户
+	packageGroups: null,
 	constructor: function(p){
 		this.selectUserPanel = new SelectUserPanel();
 		ProdOrderForm.superclass.constructor.call(this, {
@@ -28,6 +36,7 @@ ProdOrderForm = Ext.extend( BaseForm, {
 				    width: 200,
 				    displayField: 'prod_name',
 				    valueField: 'prod_id',
+				    allowBlank: false,
 				    mode: 'local',
 				    id: 'boxProdId',
 				    store: new Ext.data.JsonStore({
@@ -70,12 +79,13 @@ ProdOrderForm = Ext.extend( BaseForm, {
 					    xtype: 'combo',
 					    fieldLabel: "产品资费",
 					    displayField: 'disct_name',
+					    allowBlank: false,
 					    valueField: 'disct_id',
 					    mode: 'local',
 					    emptyText: '选择产品资费..',
 					    id: 'boxProdTariff',
 					    store: new Ext.data.JsonStore({
-							fields: ['disct_id', 'disct_name', 'billing_cycle','max_order_cycle']
+							fields: ['disct_id', 'disct_name', 'billing_cycle','max_order_cycle', 'final_rent']
 						}),
 						listeners: {
 							scope: this,
@@ -85,12 +95,12 @@ ProdOrderForm = Ext.extend( BaseForm, {
 						xtype: 'spinnerfield',
 			            fieldLabel: '订购月数',
 			            value: 0,
+			            allowBlank: false,
 			            id: 'sfOrderCycle',
-			            editable: false,
 			            minValue: 0,
 					    listeners: {
 					    	scope: this,
-					    	click: this.doChangeEndDate
+					    	spin: this.doChangeEndDate
 					    }
 					},{
 						xtype: 'panel',
@@ -103,6 +113,7 @@ ProdOrderForm = Ext.extend( BaseForm, {
 					    fieldLabel: "开始计费日",
 					    id: 'dfStartDate',
 					    format: 'Y-m-d',
+					    allowBlank: false,
 					    listeners: {
 					    	scope: this,
 					    	change: this.doChangeEndDate
@@ -116,25 +127,28 @@ ProdOrderForm = Ext.extend( BaseForm, {
 				}]
 			},{
 				region: "south",
-				height: 40,
+				height: 40, 
 				bodyStyle: 'background-color: rgb(213,225,241);padding: 10px 0 10px 30px; color: red',
-				html: "<b> * 共计:$100.00（新增订购:<b>58.00</b> + <a id='transferHrefTag' href='#'>转移支付:<b>42.00</b></a>）</b>"
+				html: "* 共计$:<span id='totalAmount'>--</span>"
+					+"（新增订购:<b id='addAmount'>--</b> "
+					+" + "
+					+" <a id='transferHrefTag' href='#'>转移支付:<b id='transferAmount'>--</b></a>"
+					+" ）"
 			}]
 		});
 	},
 	// 加载产品，资费等数据
 	doLoadBaseData: function(){
 		this.busiCode = App.getData().currentResource.busicode;
-		var requestObj = {};
 		// 单用户订购
 		if(this.busiCode === "102"){
 			var users = App.getApp().main.infoPanel.getUserPanel().userGrid.getSelections();
-			requestObj["user_id"] = users[0].get("user_id");
+			this.userId = users[0].get("user_id");
 		// 续订和升级
 		}else if(this.busiCode === "100" || this.busiCode === "101"){
 			var prodGrid = App.getApp().main.infoPanel.getUserPanel().prodGrid;
 			var prodData = prodGrid.selModel.getSelected().data;
-			requestObj["filter_order_sn"] = prodData["order_sn"];
+			this.lastOrderSn  = prodData["order_sn"];
 		}
 		
 		// 模拟数据
@@ -149,11 +163,11 @@ ProdOrderForm = Ext.extend( BaseForm, {
 			 ],
 			 "tariffMap": {
 				 "100001": [
-				     {disct_id: 101,disct_name: "10元/月",billing_cycle: 1,max_order_cycle: null},
-				     {disct_id: 102,disct_name: "50元半年",billing_cycle: 6,max_order_cycle: 4}
+				     {disct_id: 101,disct_name: "10元/月",billing_cycle: 1,max_order_cycle: null,final_rent: 1000},
+				     {disct_id: 102,disct_name: "50元半年",billing_cycle: 6,max_order_cycle: 4, final_rent: 5000}
 				 ],
 				 "100002": [
-				     {disct_id: 103,disct_name: "10元/月",billing_cycle: 1,max_order_cycle: null}
+				     {disct_id: 103,disct_name: "10元/月",billing_cycle: 1,max_order_cycle: null, final_rent: 1000}
 				 ]
 			 },
 			 "lastOrderMap": {
@@ -167,7 +181,10 @@ ProdOrderForm = Ext.extend( BaseForm, {
 //		Ext.Ajax.request({
 //			// url :root + '/commons/x/Order.loadProdList.action',
 //			scope : this,
-//			params: requestObj,
+//			params: {
+//				user_id: this.userId,
+//				filter_order_sn: this.lastOrderSn
+//			},
 //			success : function(response,opts){
 //				var responseObj = Ext.decode(response.responseText);
 //				this.baseData = responseObj;
@@ -178,12 +195,21 @@ ProdOrderForm = Ext.extend( BaseForm, {
 	doInit:function(){
 		this.doLoadBaseData();
 		ProdOrderForm.superclass.doInit.call(this);
-//		Ext.get("transferHrefTag").on("click", function(e, t, o){
-//			if(!this.transferPayWindow){
-//				this.transferPayWindow = new TransferPayWindow();
-//			}
-//			this.transferPayWindow.show();
-//		}, this);
+		//this.on("render",function(){
+		var that = this;
+		setTimeout(function(){
+			Ext.get("transferHrefTag").on("click", function(e, t, o){
+				if(!that.transferPayWindow){
+					that.transferPayWindow = new TransferPayWindow();
+				}
+				if(that.transferPayData && that.transferPayData.length > 0){
+					that.transferPayWindow.show(that.transferPayData);
+				}else{
+					Alert("没有转移支付项目!");
+				}
+			});
+		}, 2000);
+		//}, this);
 	},
 	//产品下拉框选中事件
 	doSelectProd: function(box, record, index){
@@ -214,6 +240,34 @@ ProdOrderForm = Ext.extend( BaseForm, {
 		Ext.getCmp("dfStartDate").setValue(startDate);
 		// 结束计费日期
 		this.doChangeEndDate();
+		
+		// 加载结算金额
+		if(tariffs.length == 1){
+			this.doLoadTransferAmount();
+		}
+		// 加载终端用户
+		this.doLoadUsers();
+	},
+	// 加载终端用户
+	doLoadUsers: function(selectProdRecord){
+		// 单产品
+		if(selectProdRecord.get("pkg") === "false"){
+			var user = this.baseData["userDesc"];
+			alert("加载单用户");
+		}else{
+			Ext.Ajax.request({
+				url :root + '/commons/x/Order.loadPackageUserSelect.action',
+				scope : this,
+				params: {
+					prod_id: selectProdRecord.get("prod_id"),
+					last_order_sn: this.lastOrderSn
+				},
+				success : function(response,opts){
+					var responseObj = Ext.decode(response.responseText);
+					this.packageGroups = responseObj;
+				}
+			});
+		}
 	},
 	// 资费下拉框选中事件
 	doSelectTariff: function(box, record, index){
@@ -234,12 +288,13 @@ ProdOrderForm = Ext.extend( BaseForm, {
 		}
 		// 结算结束计费日
 		this.doChangeEndDate();
+		// 计算结算金额
+		this.doLoadTransferAmount();
 	},
 	// 结束日期
 	doChangeEndDate: function(){
 		var startDate = Ext.getCmp("dfStartDate").getValue();
 		var months = Ext.getCmp("sfOrderCycle").getValue();
-		alert("startDate: " + startDate + ", months: " + months);
 		if(startDate){
 			// 计算结束日
 			startDate.setMonth(startDate.getMonth() + months);
@@ -248,11 +303,80 @@ ProdOrderForm = Ext.extend( BaseForm, {
 			Ext.getCmp("dfExpDate").setValue(null);
 		}
 	},
+	doLoadTransferAmount: function(){
+		var validObj = this.doValid(); 
+		if(validObj["isValid"] !== true){
+			Alert(validObj["msg"]);
+			return ;
+		}
+//		Ext.Ajax.request({
+//			url :root + '/commons/x/Order.loadTransferFee.action',
+//			scope : this,
+//			params: this.getTransferValues(),
+//			success : function(response,opts){
+//				var responseObj = Ext.decode(response.responseText);
+//				alert(response.responseText);
+//			}
+//		});
+		
+		var responseData = [{
+			active_fee: 10
+		},{
+			active_fee: 20
+		},{
+			active_fee: 80
+		}];
+		
+		//修改转移金额
+		this.transferPayData = responseData;
+		var sumAmount = 0;
+		if(responseData){
+			for(var i = 0; i< responseData.length; i++){
+				sumAmount += responseData[i]["active_fee"];
+			}
+			Ext.get("transferAmount").update(sumAmount);
+		}else{
+			Ext.get("transferAmount").update("0.00");
+		}
+		
+		//计算新增金额
+		var boxProdTariff = Ext.getCmp("boxProdTariff");
+		var disctId = boxProdTariff.getValue();
+		var index = boxProdTariff.getStore().find("disct_id", disctId);
+		var tariffRecord = boxProdTariff.getStore().getAt(index);
+		var addAmount = Ext.getCmp("sfOrderCycle").getValue() * tariffRecord.get("final_rent")/100;
+		Ext.get("addAmount").update(String(addAmount));
+		
+		// 合计
+		var totalAmount = sumAmount + addAmount;
+		Ext.get("totalAmount").update(totalAmount);
+	},
 	doValid : function(){
 		return ProdOrderForm.superclass.doValid.call(this);
 	},
 	getValues : function(){
 		var values = {};
+		
+		values["order_months"] = Ext.getCmp("sfOrderCycle").getValue();
+		
+		return values;
+	},
+	getTransferValues: function(){
+		var values = {};
+		
+		// 基础信息
+		values["cust_id"] = App.getCustId();
+		values["user_id"] = this.userId;
+		values["last_order_sn"] = this.lastOrderSn;
+		
+		// 套餐数据
+		// values["groupSelected"] =
+		
+		// 产品信息
+		values["prod_id"] = Ext.getCmp("boxProdId").getValue();
+		values["tariff_id"] = Ext.getCmp("boxProdTariff").getValue();
+		values["eff_date"] = Ext.getCmp("dfStartDate").getValue();
+		
 		return values;
 	},
 	getFee: function(){
