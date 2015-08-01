@@ -383,3 +383,38 @@
             font:bold 11px tahoma,arial,sans-serif;
             float:left;
         }
+.pkg-sub-prod{
+	float: left;
+	width: 40%;
+	margin: 5px 0 0 10px;
+	padding: 5px 20px 5px 10px;
+	background: #fff;
+	border: 1px solid #ddd;
+	cursor: pointer;
+	position: relative;
+}
+.pkg-sub-prod .pkg-user-selected{
+	position: absolute;
+	right: 2;
+	bottom: 0;
+	padding: 0 5px;
+	border-radius: 3px 3px 0 0;
+	border-bottom: 0;
+	color: #fff;
+	background: green;
+}
+.pkg-sub-prod.selected{
+	background: #eee;
+	border: 1px solid #999;
+}
+.pkg-sub-prod>.pkg-title{
+	font-weight: bold;
+}
+.pkg-sub-prod>.pkg-detail{
+	margin-top: 6px;
+}
+.pkg-sub-prod>.pkg-detail>div{
+	padding: 1px;
+	color: #333;
+}
+.

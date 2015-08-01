@@ -2,7 +2,7 @@
  * 【用户产品订购】
  */
 ProdOrderForm = Ext.extend( BaseForm, {
-	url : Constant.ROOT_PATH+"/core/x/User!createUser.action",
+	url : Constant.ROOT_PATH+"/core/x/ProdOrder!saveOrderProd.action",
 	selectUserPanel: null,
 	transferPayWindow: null,
 	// 单产品订购102，升级100，续订101, 套餐订购1015
@@ -40,7 +40,7 @@ ProdOrderForm = Ext.extend( BaseForm, {
 				    mode: 'local',
 				    id: 'boxProdId',
 				    store: new Ext.data.JsonStore({
-						fields : ['prod_id', 'prod_name', 'prod_desc']
+						fields : ['prod_id', 'prod_name', 'prod_desc',"pkg"]
 					}),
 					listeners: {
 						scope: this,
@@ -80,12 +80,12 @@ ProdOrderForm = Ext.extend( BaseForm, {
 					    fieldLabel: "产品资费",
 					    displayField: 'disct_name',
 					    allowBlank: false,
-					    valueField: 'disct_id',
+					    valueField: 'tariff_id',
 					    mode: 'local',
 					    emptyText: '选择产品资费..',
 					    id: 'boxProdTariff',
 					    store: new Ext.data.JsonStore({
-							fields: ['disct_id', 'disct_name', 'billing_cycle','max_order_cycle', 'final_rent']
+							fields: ['tariff_id', 'disct_name', 'billing_cycle','max_order_cycle', 'disct_rent']
 						}),
 						listeners: {
 							scope: this,
@@ -94,13 +94,15 @@ ProdOrderForm = Ext.extend( BaseForm, {
 					},{
 						xtype: 'spinnerfield',
 			            fieldLabel: '订购月数',
-			            value: 0,
-			            allowBlank: false,
+			           // allowBlank: false,
 			            id: 'sfOrderCycle',
 			            minValue: 0,
 					    listeners: {
 					    	scope: this,
-					    	spin: this.doChangeEndDate
+					    	spin: function(){
+					    		this.doChangeEndDate();
+					    		this.doChangeAmount();
+					    	}
 					    }
 					},{
 						xtype: 'panel',
@@ -114,14 +116,12 @@ ProdOrderForm = Ext.extend( BaseForm, {
 					    id: 'dfStartDate',
 					    format: 'Y-m-d',
 					    allowBlank: false,
-					    listeners: {
-					    	scope: this,
-					    	change: this.doChangeEndDate
-					    }
+					    readOnly: true
 					},{
 						xtype: 'textfield',
 						id: 'dfExpDate',
 						readOnly: true,
+						allowBlank: false,
 			            fieldLabel: '结束计费日'
 					}]
 				}]
@@ -129,9 +129,9 @@ ProdOrderForm = Ext.extend( BaseForm, {
 				region: "south",
 				height: 40, 
 				bodyStyle: 'background-color: rgb(213,225,241);padding: 10px 0 10px 30px; color: red',
-				html: "* 共计$:<span id='totalAmount'>--</span>"
+				html: "* 实际应收$:<span id='totalAmount'>--</span>"
 					+"（新增订购:<b id='addAmount'>--</b> "
-					+" + "
+					+" - "
 					+" <a id='transferHrefTag' href='#'>转移支付:<b id='transferAmount'>--</b></a>"
 					+" ）"
 			}]
@@ -151,46 +151,21 @@ ProdOrderForm = Ext.extend( BaseForm, {
 			this.lastOrderSn  = prodData["order_sn"];
 		}
 		
-		// 模拟数据
-		this.baseData = {
-			"userDesc": "DTT_12312312,OTT_122",
-			"prodList": [
-			     {prod_id: 100001,prod_name: 'OTT基本包', prod_desc: '没什么好说的，爱定不定'},
-			     {prod_id: 100002,prod_name: '宽带1M',prod_desc: '蜗牛一样的速度，你还敢定吗'},
-			     {prod_id: 100003,prod_name: '普通套餐：金包',prod_desc: '大资生活'},
-			     {prod_id: 100004,prod_name: '普通套餐：银包',prod_desc: '小资生活'},
-			     {prod_id: 100005,prod_name: '协议套餐：110',prod_desc: '高干子弟，惹不起。'}
-			 ],
-			 "tariffMap": {
-				 "100001": [
-				     {disct_id: 101,disct_name: "10元/月",billing_cycle: 1,max_order_cycle: null,final_rent: 1000},
-				     {disct_id: 102,disct_name: "50元半年",billing_cycle: 6,max_order_cycle: 4, final_rent: 5000}
-				 ],
-				 "100002": [
-				     {disct_id: 103,disct_name: "10元/月",billing_cycle: 1,max_order_cycle: null, final_rent: 1000}
-				 ]
-			 },
-			 "lastOrderMap": {
-				 "100001": {exp_date: '2015-08-31 13:49:05'},
-				 "100002": {exp_date: '2015-10-31 13:49:05'}
-			 }
-		}
-		
-		Ext.getCmp("boxProdId").getStore().loadData(this.baseData["prodList"]);
-		
-//		Ext.Ajax.request({
-//			// url :root + '/commons/x/Order.loadProdList.action',
-//			scope : this,
-//			params: {
-//				user_id: this.userId,
-//				filter_order_sn: this.lastOrderSn
-//			},
-//			success : function(response,opts){
-//				var responseObj = Ext.decode(response.responseText);
-//				this.baseData = responseObj;
-//				Ext.getCmp("boxProdId").getStore().loadData(this.baseData["prodList"]);
-//			}
-//		});
+		Ext.Ajax.request({
+			url :root + '/core/x/ProdOrder!loadProdList.action',
+			scope : this,
+			params: {
+				busi_code: this.busiCode,
+				cust_id: App.getCustId(),
+				user_id: this.userId,
+				filter_order_sn: this.lastOrderSn
+			},
+			success : function(response,opts){
+				var responseObj = Ext.decode(response.responseText);
+				this.baseData = responseObj;
+				Ext.getCmp("boxProdId").getStore().loadData(this.baseData["prodList"]);
+			}
+		});
 	},
 	doInit:function(){
 		this.doLoadBaseData();
@@ -213,6 +188,8 @@ ProdOrderForm = Ext.extend( BaseForm, {
 	},
 	//产品下拉框选中事件
 	doSelectProd: function(box, record, index){
+		// 当前选中的产品
+		this.currentSelectedProd = record;
 		var prodId = record.get("prod_id");
 		Ext.getCmp("dfProdDesc").setValue(record.get("prod_desc"));
 		var boxProdTariff = Ext.getCmp("boxProdTariff");
@@ -220,22 +197,20 @@ ProdOrderForm = Ext.extend( BaseForm, {
 		boxProdTariff.getStore().loadData(tariffs);
 		// 如果只有一个默认选中
 		if(tariffs.length == 1){
-			boxProdTariff.setValue(tariffs[0]["disct_id"]);
+			boxProdTariff.setValue(tariffs[0]["tariff_id"]);
 		}else{
 			boxProdTariff.setRawValue("");
 		}
-		
 		// 上期结束日期
-		var lastOrderProd = this.baseData["lastOrderMap"][prodId];
-		var lastOrderProdDate = lastOrderProd ? lastOrderProd["exp_date"].split(" ")[0] : "--";
-		Ext.get("lastOrderProdExtDate").update(lastOrderProdDate);
+		var lastOrderProdDate = this.getLastProdEndDate(prodId);
+		Ext.get("lastOrderProdExtDate").update(lastOrderProdDate || "--");
 		
-		// 开始计费日期
-		// 默认为当前时间
+		// 开始计费日期 默认为当前时间
 		var startDate = nowDate(); 
 		// 有上期结束日并且当前不是升级业务
-		if(lastOrderProd && this.busiCode != "100"){
-			startDate.setDate(startDate.getDate() + 1);
+		if(lastOrderProdDate && this.busiCode != "100"){
+			var tmpDate = Date.parseDate(lastOrderProdDate, "Y-m-d");
+			startDate.setDate(tmpDate.getDate() + 1);
 		}
 		Ext.getCmp("dfStartDate").setValue(startDate);
 		// 结束计费日期
@@ -246,27 +221,19 @@ ProdOrderForm = Ext.extend( BaseForm, {
 			this.doLoadTransferAmount();
 		}
 		// 加载终端用户
-		this.doLoadUsers();
+		this.doLoadUsers(record);
 	},
 	// 加载终端用户
 	doLoadUsers: function(selectProdRecord){
 		// 单产品
-		if(selectProdRecord.get("pkg") === "false"){
-			var user = this.baseData["userDesc"];
-			alert("加载单用户");
-		}else{
-			Ext.Ajax.request({
-				url :root + '/commons/x/Order.loadPackageUserSelect.action',
-				scope : this,
-				params: {
-					prod_id: selectProdRecord.get("prod_id"),
-					last_order_sn: this.lastOrderSn
-				},
-				success : function(response,opts){
-					var responseObj = Ext.decode(response.responseText);
-					this.packageGroups = responseObj;
-				}
+		if(this.isPkg()){
+			this.selectUserPanel.loadPackageUsers({
+				prod_id: selectProdRecord.get("prod_id"),
+				last_order_sn: this.lastOrderSn
 			});
+		}else{
+			var user = this.baseData["userDesc"];
+			this.selectUserPanel.loadSingleUser(user);
 		}
 	},
 	// 资费下拉框选中事件
@@ -277,9 +244,12 @@ ProdOrderForm = Ext.extend( BaseForm, {
 		// 递增值
 		sfOrderCycle.spinner.incrementValue = billingCycle;
 		//最小值
-		sfOrderCycle.setMinValue(billingCycle);
-		// 最小周期
-		sfOrderCycle.setValue(billingCycle);
+		if(this.isProtocolPkgAndUpgradeBusiCode()){
+			sfOrderCycle.setMinValue(0);
+		}else{
+			sfOrderCycle.setMinValue(billingCycle);
+			sfOrderCycle.setValue(billingCycle);
+		}
 		//最大值
 		if(maxOrderCycle){
 			sfOrderCycle.setMaxValue(maxOrderCycle*billingCycle);
@@ -291,10 +261,22 @@ ProdOrderForm = Ext.extend( BaseForm, {
 		// 计算结算金额
 		this.doLoadTransferAmount();
 	},
+	// 上期结束计费日
+	getLastProdEndDate: function(prodId){
+		var lastOrderProd = this.baseData["lastOrderMap"][prodId];
+		return lastOrderProd ? lastOrderProd["exp_date"].split(" ")[0] : null;
+	},
 	// 结束日期
 	doChangeEndDate: function(){
 		var startDate = Ext.getCmp("dfStartDate").getValue();
 		var months = Ext.getCmp("sfOrderCycle").getValue();
+		//如果是协议套餐，并且当前周期为0，则结束日为上期结束计费日
+		if(this.isProtocolPkgAndUpgradeBusiCode() && months == 0){
+			var lastOrderProdDate = this.getLastProdEndDate(prodId);
+			Ext.getCmp("dfExpDate").setValue(lastOrderProdDate);
+			return;
+		}
+		// 其它根据周期进行计算
 		if(startDate){
 			// 计算结束日
 			startDate.setMonth(startDate.getMonth() + months);
@@ -302,64 +284,112 @@ ProdOrderForm = Ext.extend( BaseForm, {
 		}else{ 
 			Ext.getCmp("dfExpDate").setValue(null);
 		}
+		
 	},
 	doLoadTransferAmount: function(){
-		var validObj = this.doValid(); 
+		var validObj = ProdOrderForm.superclass.doValid.call(this); 
 		if(validObj["isValid"] !== true){
 			Alert(validObj["msg"]);
 			return ;
 		}
-//		Ext.Ajax.request({
-//			url :root + '/commons/x/Order.loadTransferFee.action',
-//			scope : this,
-//			params: this.getTransferValues(),
-//			success : function(response,opts){
-//				var responseObj = Ext.decode(response.responseText);
-//				alert(response.responseText);
-//			}
-//		});
-		
-		var responseData = [{
-			active_fee: 10
-		},{
-			active_fee: 20
-		},{
-			active_fee: 80
-		}];
-		
-		//修改转移金额
-		this.transferPayData = responseData;
-		var sumAmount = 0;
-		if(responseData){
-			for(var i = 0; i< responseData.length; i++){
-				sumAmount += responseData[i]["active_fee"];
+		Ext.Ajax.request({
+			url :root + '/core/x/ProdOrder!loadTransferFee.action',
+			scope : this,
+			params: { 
+				"orderProd": Ext.encode(this.getTransferValues()),
+				"busi_code": this.busiCode
+			},
+			success : function(response,opts){
+				var responseData = Ext.decode(response.responseText);
+				//修改转移金额
+				this.transferPayData = responseData;
+				var sumAmount = 0;
+				if(responseData){
+					for(var i = 0; i< responseData.length; i++){
+						sumAmount += responseData[i]["active_fee"];
+					}
+				}
+				this.transferAmount = sumAmount;
+				// 修改小计信息
+				this.doChangeAmount();
 			}
-			Ext.get("transferAmount").update(sumAmount);
-		}else{
-			Ext.get("transferAmount").update("0.00");
-		}
-		
+		});
+	},
+	// 实际应付
+	totalAmount: -1,
+	// 转移支付
+	transferAmount: -1,
+	// 新增订购
+	addAmount: -1,
+	//当前选中的产品
+	currentSelectedProd: null,
+	doChangeAmount: function(){
 		//计算新增金额
 		var boxProdTariff = Ext.getCmp("boxProdTariff");
 		var disctId = boxProdTariff.getValue();
-		var index = boxProdTariff.getStore().find("disct_id", disctId);
+		var index = boxProdTariff.getStore().find("tariff_id", disctId);
 		var tariffRecord = boxProdTariff.getStore().getAt(index);
-		var addAmount = Ext.getCmp("sfOrderCycle").getValue() * tariffRecord.get("final_rent")/100;
-		Ext.get("addAmount").update(String(addAmount));
-		
-		// 合计
-		var totalAmount = sumAmount + addAmount;
-		Ext.get("totalAmount").update(totalAmount);
+		this.addAmount = Ext.getCmp("sfOrderCycle").getValue() * tariffRecord.get("disct_rent");
+		Ext.get("addAmount").update(String(this.addAmount/100));
+		// 实付
+		this.totalAmount = this.addAmount - this.transferAmount;
+		Ext.get("totalAmount").update(String(this.totalAmount/100));
+		// 转移支付
+		Ext.get("transferAmount").update(String(this.transferAmount/100));
+	},
+	// 是否为套餐
+	isPkg: function(){
+		if(this.currentSelectedProd){
+			var prodType = this.currentSelectedProd.get("prod_type");
+			return prodType === "SPKG" || prodType === "CPKG";
+		}
+		return false;
+	},
+	// 是否为协议套餐
+	isProtocolPkgAndUpgradeBusiCode: function(){
+		if(this.currentSelectedProd){
+			var prodType = this.currentSelectedProd.get("prod_type");
+			return prodType === "SPKG" && this.busiCode === "100";
+		}
+		return false;
 	},
 	doValid : function(){
-		return ProdOrderForm.superclass.doValid.call(this);
+		var validObj = ProdOrderForm.superclass.doValid.call(this); 
+		if(validObj["isValid"] !== true){
+			Alert(validObj["msg"]);
+			return false;
+		}
+		var orderCycle = Ext.getCmp("sfOrderCycle").getValue();
+		if(String(orderCycle).trim() === ""){
+			return {
+				isValid: false,
+				msg: "订购月数是必须的!"
+			}
+		}
+		
+		if(this.totalAmount < 0){
+			return {
+				isValid: false,
+				msg: "实际应付不能小于0，请增加订购月数"
+			}
+		}
+		return true;
 	},
 	getValues : function(){
-		var values = {};
-		
+		var values = this.getTransferValues();
 		values["order_months"] = Ext.getCmp("sfOrderCycle").getValue();
 		
-		return values;
+		// 实际支付金额（小计金额）
+		values["pay_fee"] = this.totalAmount;
+		// 转移支付
+		values["transfer_fee"] = this.transferAmount;
+		// 失效日期
+		values["exp_date"] = Ext.getCmp("dfExpDate").getValue() + " 00:00:00";
+		
+		return {
+			"busi_code": this.busiCode,
+			"orderProd": Ext.encode(values)
+		};
 	},
 	getTransferValues: function(){
 		var values = {};
@@ -369,18 +399,42 @@ ProdOrderForm = Ext.extend( BaseForm, {
 		values["user_id"] = this.userId;
 		values["last_order_sn"] = this.lastOrderSn;
 		
-		// 套餐数据
-		// values["groupSelected"] =
+		//计算新增金额
+		var boxProdTariff = Ext.getCmp("boxProdTariff");
+		var disctId = boxProdTariff.getValue();
+		var index = boxProdTariff.getStore().find("disct_id", disctId);
+		
+		// 如果当前是套餐，则封装分组用户
+		if(this.isPkg()){
+			// 获得选中的用户
+			var groupUserMap = {};
+			this.selectUserPanel.store.each(function(rs){
+				var gid = rs.get("package_group_id");
+				if(!groupUserMap[gid]){
+					groupUserMap[gid] = [];
+				}
+				groupUserMap[gid].push(rs.get("user_id"));
+			}, this);
+			// 封装后台数据结构
+			var groupSelected = [];
+			for(var key in groupUserMap){
+				groupSelected.push({
+					"package_group_id": key,
+					"userSelectList": groupUserMap[key]
+				})
+			}
+			values["groupSelected"] = groupSelected;
+		}
 		
 		// 产品信息
 		values["prod_id"] = Ext.getCmp("boxProdId").getValue();
 		values["tariff_id"] = Ext.getCmp("boxProdTariff").getValue();
-		values["eff_date"] = Ext.getCmp("dfStartDate").getValue();
+		values["eff_date"] = Ext.getCmp("dfStartDate").getValue().format("Y-m-d H:i:s");
 		
 		return values;
 	},
 	getFee: function(){
-		return 0;
+		return this.totalAmount/100;
 	},
 	success : function(form,res){
 		var userId = res.simpleObj;
@@ -425,15 +479,5 @@ SelectedProdGrid = Ext.extend(Ext.grid.GridPanel, {
 
 /** 入口 */
 Ext.onReady(function(){
-//	var main = new Ext.Panel({
-//		layout: "border",
-//		defaults: {border: false},
-//		items:[{
-//			region: "north",
-//			height: 200,
-//			layout: "fit",
-//			items: new ProdOrderForm()
-//		}, new SelectedProdGrid()]
-//	});
-	var box = TemplateFactory.gTemplate(new ProdOrderForm());
+	TemplateFactory.gTemplate(new ProdOrderForm());
 });
