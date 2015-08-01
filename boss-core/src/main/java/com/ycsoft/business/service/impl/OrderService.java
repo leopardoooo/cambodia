@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import com.ycsoft.beans.config.TRuleDefine;
 import com.ycsoft.beans.core.cust.CCust;
 import com.ycsoft.beans.core.prod.CProdOrder;
+import com.ycsoft.beans.core.prod.CProdOrderDto;
 import com.ycsoft.beans.core.user.CUser;
 import com.ycsoft.beans.prod.PPackageProd;
 import com.ycsoft.beans.prod.PProd;
@@ -65,7 +66,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 			throws Exception {
 		OrderProdPanel panel =new OrderProdPanel();
 		CCust cust = cCustDao.findByKey(custId);
-		List<CProdOrder> orderList = cProdOrderDao.queryCustEffOrder(custId);
+		List<CProdOrderDto> orderList = cProdOrderDao.queryCustEffOrderDto(custId);
 		
 		if (busiCode.equals(BusiCodeConstants.PROD_SINGLE_ORDER)){
 			queryUserOrderableProd(cust,userId,panel,orderList);
@@ -130,7 +131,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 	}
 
 	//查找用户能够订购的单产品
-	private void queryUserOrderableProd(CCust cust,String userId,OrderProdPanel panel,List<CProdOrder> orderList) throws Exception {
+	private void queryUserOrderableProd(CCust cust,String userId,OrderProdPanel panel,List<CProdOrderDto> orderList) throws Exception {
 		CUser user = userComponent.queryUserById(userId);
 		if (user == null)
 			return;
@@ -151,7 +152,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 
 	}
 	//查找客户能够订购的套餐
-	private void queryCustOrderablePkg(CCust cust,OrderProdPanel panel,List<CProdOrder> orderList) throws Exception {
+	private void queryCustOrderablePkg(CCust cust,OrderProdPanel panel,List<CProdOrderDto> orderList) throws Exception {
 		String custId = cust.getCust_id();
 		Map<String,Integer> userCountMap = cUserDao.queryUserCountGroupByType(custId);
 		List<PProd> prodList = pProdDao.queryCanOrderPkg(cust.getCounty_id(),  SystemConstants.DEFAULT_DATA_RIGHT);
@@ -183,7 +184,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 
 	}
 
-	private void queryOrderableGoon(CCust cust,String filterOrderSn,OrderProdPanel panel,List<CProdOrder> orderList) throws Exception {
+	private void queryOrderableGoon(CCust cust,String filterOrderSn,OrderProdPanel panel,List<CProdOrderDto> orderList) throws Exception {
 		CProdOrder order = cProdOrderDao.findByKey(filterOrderSn);
 		if (order == null)
 			return;
@@ -255,6 +256,13 @@ public class OrderService extends BaseBusiService implements IOrderService{
 
 		return tariffList;
 	}
+	
+	
+
+	@Override
+	public List<CProdOrderDto> queryCustEffOrder(String custId) throws Exception {
+		return cProdOrderDao.queryCustEffOrderDto(custId);
+	}
 
 	private boolean checkRule(CCust cust,CUser user, String ruleId) throws Exception{
 		if (StringHelper.isEmpty(ruleId))
@@ -283,7 +291,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 
 	}
 	
-	private CProdOrder getUserLastOrder(String userId,PProd prod,List<CProdOrder> orderList){
+	private CProdOrder getUserLastOrder(String userId,PProd prod,List<CProdOrderDto> orderList){
 		CProdOrder lastOrder = null;
 		Date maxExpDate = new Date();
 		if (CollectionHelper.isNotEmpty(orderList)){
@@ -301,12 +309,12 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		return lastOrder;
 	}
 	
-	private CProdOrder getCustLastOrder(List<CProdOrder> orderList){
-		CProdOrder lastOrder = null;
+	private CProdOrder getCustLastOrder(List<CProdOrderDto> orderList){
+		CProdOrderDto lastOrder = null;
 		Date maxExpDate = new Date();
 		if (CollectionHelper.isNotEmpty(orderList)){
-			for(CProdOrder order:orderList){
-				if (StringHelper.isEmpty(order.getPackage_sn()) && order.getExp_date().after(maxExpDate)){
+			for(CProdOrderDto order:orderList){
+				if (!order.getProd_type().equals(SystemConstants.PROD_TYPE_BASE) && order.getExp_date().after(maxExpDate)){
 					lastOrder = order;
 					maxExpDate = order.getExp_date();
 				}

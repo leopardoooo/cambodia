@@ -68,13 +68,13 @@ public class AddressComponent extends BaseComponent {
 //		}
 //		tSpellDao.save(spell.toArray(new TSpell[spell.size()]));
 		List<TAddressDto> addressList = tAddressDao.queryAddrByName(q, optr.getCounty_id(), " 1=1 ");
-		for(TAddressDto addr :addressList ){
-			if(addr.getIs_leaf().equals("T")){
-				if(StringHelper.isNotEmpty(addr.getBusi_optr_name())){
-					addr.setAddr_name(addr.getAddr_name()+"[客户经理："+addr.getBusi_optr_name()+"]");
- 				}
-			}
-		}
+//		for(TAddressDto addr :addressList ){
+//			if(addr.getIs_leaf().equals("T")){
+//				if(StringHelper.isNotEmpty(addr.getBusi_optr_name())){
+//					addr.setAddr_name(addr.getAddr_name()+"[客户经理："+addr.getBusi_optr_name()+"]");
+// 				}
+//			}
+//		}
 		return addressList;
 	}
 
@@ -176,13 +176,13 @@ public class AddressComponent extends BaseComponent {
 		addr.setIs_leaf(SystemConstants.BOOLEAN_TRUE);
 		tAddressDao.save(addr);
 		
-		//保存地区拼音
-		TSpell sp = new TSpell();
-		sp.setData_id(addr.getAddr_id());
-		sp.setData_type(SystemConstants.DATA_TYPE_ADDRESS);
-		sp.setFull_sepll(CnToSpell.getPinYin(addr.getAddr_name()));
-		sp.setSeq_sepll(CnToSpell.getPinYinHeadChar(addr.getAddr_name()));
-		tSpellDao.save(sp);
+//		//保存地区拼音
+//		TSpell sp = new TSpell();
+//		sp.setData_id(addr.getAddr_id());
+//		sp.setData_type(SystemConstants.DATA_TYPE_ADDRESS);
+//		sp.setFull_sepll(CnToSpell.getPinYin(addr.getAddr_name()));
+//		sp.setSeq_sepll(CnToSpell.getPinYinHeadChar(addr.getAddr_name()));
+//		tSpellDao.save(sp);
 		
 		//修改父节点is_leaf为F
 		updateAddress(addr.getAddr_pid(), SystemConstants.BOOLEAN_FALSE);

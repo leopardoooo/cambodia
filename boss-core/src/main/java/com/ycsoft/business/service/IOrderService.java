@@ -3,6 +3,7 @@ package com.ycsoft.business.service;
 import java.util.List;
 
 import com.ycsoft.beans.core.prod.CProdOrder;
+import com.ycsoft.beans.core.prod.CProdOrderDto;
 import com.ycsoft.business.commons.abstracts.IBaseService;
 import com.ycsoft.business.dto.core.prod.OrderProd;
 import com.ycsoft.business.dto.core.prod.OrderProdPanel;
@@ -15,6 +16,7 @@ public interface IOrderService extends IBaseService{
 	
 	public List<CProdOrder> queryTransferFee(OrderProd orderProd,String busi_code) throws Exception;
 	
+	public List<CProdOrderDto> queryCustEffOrder(String cust_id) throws Exception;
 	
 	public String saveOrderProd(OrderProd orderProd,String busi_code) throws Exception;
 }

@@ -43,6 +43,11 @@ public class ProdOrderAction extends BaseBusiAction {
 		return JSON_SUCCESS;
 	}
 	
+	public String queryCustEffOrder() throws Exception{
+		getRoot().setRecords(orderService.queryCustEffOrder(cust_id));
+		return JSON_RECORDS;
+	}
+	
 	public String queryProdOrderInit(){
 		
 		return JSON_OTHER;

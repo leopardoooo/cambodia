@@ -2,6 +2,7 @@ package com.ycsoft.business.service.impl;
 
 import static com.ycsoft.commons.constants.SystemConstants.ACCT_TYPE_SPEC;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -10,22 +11,32 @@ import org.springframework.stereotype.Service;
 import com.ycsoft.beans.config.TBusiFee;
 import com.ycsoft.beans.config.TDeviceBuyMode;
 import com.ycsoft.beans.core.cust.CCust;
+import com.ycsoft.beans.core.job.JUserStop;
+import com.ycsoft.beans.core.prod.CProdPropChange;
 import com.ycsoft.beans.core.user.CUser;
 import com.ycsoft.beans.core.user.CUserPropChange;
 import com.ycsoft.beans.prod.PPromotionAcct;
 import com.ycsoft.beans.system.SOptr;
+import com.ycsoft.business.component.core.OrderComponent;
 import com.ycsoft.business.dto.core.fee.FeeInfoDto;
+import com.ycsoft.business.dto.core.prod.CProdDto;
 import com.ycsoft.business.dto.core.prod.DisctFeeDto;
 import com.ycsoft.business.dto.core.prod.PromotionDto;
 import com.ycsoft.business.dto.core.user.UserRes;
 import com.ycsoft.business.dto.device.DeviceDto;
 import com.ycsoft.business.service.IUserService;
+import com.ycsoft.commons.constants.BusiCmdConstants;
+import com.ycsoft.commons.constants.BusiCodeConstants;
 import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.constants.SystemConstants;
+import com.ycsoft.commons.helper.DateHelper;
+import com.ycsoft.commons.helper.JsonHelper;
 import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.daos.core.JDBCException;
 @Service
 public class UserServiceSN extends BaseBusiService implements IUserService {
+	
+	private OrderComponent orderComponent;
 	
 	public void createUser(CUser user, String deviceId, String deviceType, String deviceModel, String deviceBuyMode,
 			FeeInfoDto deviceFee) throws Exception {
@@ -43,7 +54,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		user.setCust_id(custId);
 		DeviceDto device = null;
 		if (StringHelper.isNotEmpty(deviceId)){
-			device = deviceComponent.queryDeviceByDeviceId(deviceId);
+			device = deviceComponent.queryDeviceByDeviceCode(deviceId);
 			if (user.getUser_type().equals(SystemConstants.USER_TYPE_BAND)){
 				user.setModem_mac(device.getDevice_code());
 			}
@@ -165,13 +176,51 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		
 	}
 
-
-
-
 	@Override
-	public void saveStop(String effectiveDat, int tjFee) throws Exception {
-		// TODO Auto-generated method stub
-		
+	public void saveStop(String effectiveDate, int tjFee) throws Exception {
+		//获取业务流水
+		Integer doneCode = doneCodeComponent.gDoneCode();
+		//获取操作的客户、用户信息
+		CCust cust = getBusiParam().getCust();
+		List<CUser> users = getBusiParam().getSelectedUsers();
+		if (effectiveDate.equals(DateHelper.getDate("-"))){
+			//当天报停
+			for(CUser user:users){
+				//清除原有未执行的预报停
+				removeStopByUserId(user.getUser_id());
+				//修改用户状态
+				updateUserStatus(doneCode, user.getUser_id(), user.getStatus(), StatusConstants.REQSTOP);
+				//生成钝化用户JOB
+				jobComponent.createBusiCmdJob(doneCode, BusiCmdConstants.PASSVATE_USER, cust.getCust_id(),
+						user.getUser_id(), user.getStb_id(), user.getCard_id(), user.getModem_mac(), null, null,JsonHelper.fromObject(user));
+				//修改用户产品状态为报停
+				List<CProdDto> prodList = userProdComponent.queryAllProdsByUserId(user.getUser_id());
+				for (CProdDto prod:prodList){
+					List<CProdPropChange> changeList = new ArrayList<CProdPropChange>();
+					changeList.add(new CProdPropChange("status",
+							prod.getStatus(),StatusConstants.REQSTOP));
+					changeList.add(new CProdPropChange("status_date",
+							DateHelper.dateToStr(prod.getStatus_date()),DateHelper.dateToStr(new Date())));
+					
+					userProdComponent.editProd(doneCode,prod.getProd_sn(),changeList);
+					
+					//生成钝化产品任务
+					if (isProdOpen(prod.getStatus())){
+						jobComponent.createBusiCmdJob(doneCode, BusiCmdConstants.PASSVATE_PROD, cust.getCust_id(),
+							user.getUser_id(), user.getStb_id(), user.getCard_id(), user.getModem_mac(), prod.getProd_sn(),prod.getProd_id());
+					}
+				}
+			}
+		} else {
+			getBusiParam().setBusiCode(BusiCodeConstants.USER_PRE_REQUIRE_STOP);		
+			//预报停
+			for(CUser user:users){
+				//清除原有未执行的预报停
+				removeStopByUserId(user.getUser_id());
+				jobComponent.createUserStopJob(doneCode, user.getUser_id(), effectiveDate);
+			}
+		}
+		saveAllPublic(doneCode,getBusiParam());
 	}
 
 
@@ -558,6 +607,18 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 			//更新设备为旧设备
 			if (SystemConstants.BOOLEAN_TRUE.equals(device.getUsed()))
 				deviceComponent.updateDeviceUsed(doneCode, busiCode, device.getDevice_id(), SystemConstants.BOOLEAN_TRUE, SystemConstants.BOOLEAN_FALSE,true);
+		}
+	}
+	
+	/**
+	 * 清除预报停，并且使得操作流水失效
+	 * @param userId
+	 * @throws Exception
+	 */
+	public void removeStopByUserId(String userId) throws Exception{
+		List<JUserStop> userList = jobComponent.queryStopByUserId(userId);
+		if(userList.size()>0){
+			jobComponent.removeByUserId(userId);
 		}
 	}
 

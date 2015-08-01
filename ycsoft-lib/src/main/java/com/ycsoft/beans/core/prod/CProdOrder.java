@@ -9,55 +9,28 @@ import com.ycsoft.daos.config.POJO;
 
 @POJO(tn = "C_PROD_ORDER", sn = "SEQ_ORDER_SN", pk = "ORDER_SN")
 public class CProdOrder extends BusiBase implements Serializable {
-	private String order_sn;
+	private String order_sn;//display(0)
     private String	 package_sn;
-//	  PACKAGE_ID              VARCHAR2(8),
     private String package_id;
-//	  CUST_ID                 VARCHAR2(16) not null,
     private String cust_id;
-//	  USER_ID                 VARCHAR2(16),
     private String user_id;
-//	  PROD_ID                 VARCHAR2(8) not null,
     private String prod_id;
-//	  TARIFF_ID               VARCHAR2(8) not null,
     private String tariff_id;
-//	  DISCT_ID                VARCHAR2(8),
     private String disct_id;
-//	  STATUS                  VARCHAR2(8) not null,
-    private String status;
-//	  STATUS_DATE             DATE default sysdate not null,
+    private String status;//display(5)
     private Date status_date;
-//	  EFF_DATE                DATE not null,
-    private Date eff_date;
-//	  EXP_DATE                DATE not null,
-    private Date exp_date;
-//	  ACTIVE_FEE              NUMBER(12) default 0 not null,
+    private Date eff_date;//display(6)
+    private Date exp_date;//display(7)
     private Integer active_fee;
-//	  BILL_FEE                NUMBER(12) default 0 not null,
     private Integer bill_fee;
-//	  RENT_FEE                NUMBER(12) default 0 not null,
     private Integer rent_fee ;
-//	  LAST_BILL_DATE          DATE not null,
     private Date last_bill_date;
-//	  NEXT_BILL_DATE          DATE not null,
     private Date next_bill_date;
-//	  ORDER_MONTHS            NUMBER(8),
     private Integer order_months;
-//	  ORDER_FEE               NUMBER(12),
     private Integer order_fee;
-//	  ORDER_TIME              DATE default sysdate,
-    private Date order_time;
-//	  ORDER_TYPE              VARCHAR2(8) not null,
+    private Date order_time;//display(8)
     private String order_type;
-//	  PACKAGE_GROUP_ID        VARCHAR2(8),
     private String package_group_id;
-
-//	  AREA_ID                 VARCHAR2(8) not null,
-   
-//	  COUNTY_ID               VARCHAR2(8) not null,
-//	  OPTR_ID                 VARCHAR2(8),
-//	  REMARK                  VARCHAR2(500),
-//	  PUBLIC_ACCTITEM_TYPE    VARCHAR2(8) default 'NONE'
     private String remark;
     private String public_acctitem_type;
     
