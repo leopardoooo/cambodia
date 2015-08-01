@@ -249,12 +249,13 @@ public class OrderComponent extends BaseBusiComponent {
 		}
 		
 		//覆盖退订并转移支付余额到新订购记录
+		int transfee=0;
 		List<CProdOrder> cacleOrderList=this.queryTransCancelOrderList(orderProd, busi_code);
 		if(cacleOrderList!=null&&cacleOrderList.size()>0){
-			int transfee=saveTransCancelProd(cProdOrder,cacleOrderList,orderProd.getEff_date());
-			if(transfee!=orderProd.getTransfer_fee().intValue()){
-				throw new ComponentException("转移支付金额不一致，请重新操作!");
-			}
+			transfee=saveTransCancelProd(cProdOrder,cacleOrderList,orderProd.getEff_date());
+		}
+		if(transfee!=orderProd.getTransfer_fee().intValue()){
+			throw new ComponentException("转移支付金额不一致，请重新操作!");
 		}
 		
 		return cProdOrder.getOrder_sn();
@@ -356,27 +357,27 @@ public class OrderComponent extends BaseBusiComponent {
 		}
 	}
 	
-	public void setpProdDao(PProdDao pProdDao) {
+	public void setPProdDao(PProdDao pProdDao) {
 		this.pProdDao = pProdDao;
 	}
 
-	public void setpPackageProdDao(PPackageProdDao pPackageProdDao) {
+	public void setPPackageProdDao(PPackageProdDao pPackageProdDao) {
 		this.pPackageProdDao = pPackageProdDao;
 	}
 
-	public void setcProdOrderDao(CProdOrderDao cProdOrderDao) {
+	public void setCProdOrderDao(CProdOrderDao cProdOrderDao) {
 		this.cProdOrderDao = cProdOrderDao;
 	}
 
-	public void setcUserDao(CUserDao cUserDao) {
+	public void setCUserDao(CUserDao cUserDao) {
 		this.cUserDao = cUserDao;
 	}
 
-	public void setcProdOrderHisDao(CProdOrderHisDao cProdOrderHisDao) {
+	public void setCProdOrderHisDao(CProdOrderHisDao cProdOrderHisDao) {
 		this.cProdOrderHisDao = cProdOrderHisDao;
 	}
 
-	public void setcProdOrderTransfeeDao(CProdOrderTransfeeDao cProdOrderTransfeeDao) {
+	public void setCProdOrderTransfeeDao(CProdOrderTransfeeDao cProdOrderTransfeeDao) {
 		this.cProdOrderTransfeeDao = cProdOrderTransfeeDao;
 	}
 	

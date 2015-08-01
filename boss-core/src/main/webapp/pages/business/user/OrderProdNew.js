@@ -2,7 +2,7 @@
  * 【用户产品订购】
  */
 ProdOrderForm = Ext.extend( BaseForm, {
-	url : Constant.ROOT_PATH+"/core/x/ProdOrder!saveOrderList.action",
+	url : Constant.ROOT_PATH+"/core/x/ProdOrder!saveOrderProd.action",
 	selectUserPanel: null,
 	transferPayWindow: null,
 	// 单产品订购102，升级100，续订101, 套餐订购1015
@@ -80,12 +80,12 @@ ProdOrderForm = Ext.extend( BaseForm, {
 					    fieldLabel: "产品资费",
 					    displayField: 'disct_name',
 					    allowBlank: false,
-					    valueField: 'disct_id',
+					    valueField: 'tariff_id',
 					    mode: 'local',
 					    emptyText: '选择产品资费..',
 					    id: 'boxProdTariff',
 					    store: new Ext.data.JsonStore({
-							fields: ['disct_id', 'disct_name', 'billing_cycle','max_order_cycle', 'final_rent']
+							fields: ['tariff_id', 'disct_name', 'billing_cycle','max_order_cycle', 'disct_rent']
 						}),
 						listeners: {
 							scope: this,
@@ -197,19 +197,20 @@ ProdOrderForm = Ext.extend( BaseForm, {
 		boxProdTariff.getStore().loadData(tariffs);
 		// 如果只有一个默认选中
 		if(tariffs.length == 1){
-			boxProdTariff.setValue(tariffs[0]["disct_id"]);
+			boxProdTariff.setValue(tariffs[0]["tariff_id"]);
 		}else{
 			boxProdTariff.setRawValue("");
 		}
 		// 上期结束日期
-		var lastOrderProdDate = this.getLastProdEndDate(prodId) || "--";
-		Ext.get("lastOrderProdExtDate").update(lastOrderProdDate);
+		var lastOrderProdDate = this.getLastProdEndDate(prodId);
+		Ext.get("lastOrderProdExtDate").update(lastOrderProdDate || "--");
 		
 		// 开始计费日期 默认为当前时间
 		var startDate = nowDate(); 
 		// 有上期结束日并且当前不是升级业务
 		if(lastOrderProdDate && this.busiCode != "100"){
-			startDate.setDate(startDate.getDate() + 1);
+			var tmpDate = Date.parseDate(lastOrderProdDate, "Y-m-d");
+			startDate.setDate(tmpDate.getDate() + 1);
 		}
 		Ext.getCmp("dfStartDate").setValue(startDate);
 		// 结束计费日期
@@ -291,35 +292,28 @@ ProdOrderForm = Ext.extend( BaseForm, {
 			Alert(validObj["msg"]);
 			return ;
 		}
-//		Ext.Ajax.request({
-//			url :root + '/commons/x/Order.loadTransferFee.action',
-//			scope : this,
-//			params: this.getTransferValues(),
-//			success : function(response,opts){
-//				var responseObj = Ext.decode(response.responseText);
-//				alert(response.responseText);
-//			}
-//		});
-		
-		var responseData = [{
-			active_fee: 10
-		},{
-			active_fee: 20
-		},{
-			active_fee: 80
-		}];
-		
-		//修改转移金额
-		this.transferPayData = responseData;
-		var sumAmount = 0;
-		if(responseData){
-			for(var i = 0; i< responseData.length; i++){
-				sumAmount += responseData[i]["active_fee"];
+		Ext.Ajax.request({
+			url :root + '/core/x/ProdOrder!loadTransferFee.action',
+			scope : this,
+			params: { 
+				"orderProd": Ext.encode(this.getTransferValues()),
+				"busi_code": this.busiCode
+			},
+			success : function(response,opts){
+				var responseData = Ext.decode(response.responseText);
+				//修改转移金额
+				this.transferPayData = responseData;
+				var sumAmount = 0;
+				if(responseData){
+					for(var i = 0; i< responseData.length; i++){
+						sumAmount += responseData[i]["active_fee"];
+					}
+				}
+				this.transferAmount = sumAmount;
+				// 修改小计信息
+				this.doChangeAmount();
 			}
-		}
-		this.transferAmount = sumAmount;
-		// 修改小计信息
-		this.doChangeAmount();
+		});
 	},
 	// 实际应付
 	totalAmount: -1,
@@ -333,9 +327,9 @@ ProdOrderForm = Ext.extend( BaseForm, {
 		//计算新增金额
 		var boxProdTariff = Ext.getCmp("boxProdTariff");
 		var disctId = boxProdTariff.getValue();
-		var index = boxProdTariff.getStore().find("disct_id", disctId);
+		var index = boxProdTariff.getStore().find("tariff_id", disctId);
 		var tariffRecord = boxProdTariff.getStore().getAt(index);
-		this.addAmount = Ext.getCmp("sfOrderCycle").getValue() * tariffRecord.get("final_rent");
+		this.addAmount = Ext.getCmp("sfOrderCycle").getValue() * tariffRecord.get("disct_rent");
 		Ext.get("addAmount").update(String(this.addAmount/100));
 		// 实付
 		this.totalAmount = this.addAmount - this.transferAmount;
@@ -390,9 +384,10 @@ ProdOrderForm = Ext.extend( BaseForm, {
 		// 转移支付
 		values["transfer_fee"] = this.transferAmount;
 		// 失效日期
-		values["exp_date"] = Ext.getCmp("dfExpDate").getValue();
+		values["exp_date"] = Ext.getCmp("dfExpDate").getValue() + " 00:00:00";
 		
 		return {
+			"busi_code": this.busiCode,
 			"orderProd": Ext.encode(values)
 		};
 	},
@@ -434,7 +429,7 @@ ProdOrderForm = Ext.extend( BaseForm, {
 		// 产品信息
 		values["prod_id"] = Ext.getCmp("boxProdId").getValue();
 		values["tariff_id"] = Ext.getCmp("boxProdTariff").getValue();
-		values["eff_date"] = Ext.getCmp("dfStartDate").getValue();
+		values["eff_date"] = Ext.getCmp("dfStartDate").getValue().format("Y-m-d H:i:s");
 		
 		return values;
 	},

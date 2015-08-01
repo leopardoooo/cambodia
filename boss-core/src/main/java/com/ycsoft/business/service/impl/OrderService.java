@@ -507,6 +507,10 @@ public class OrderService extends BaseBusiService implements IOrderService{
 				}
 			}
 		}
+		//上期订购记录校检
+		
+		
+		
 		//开始计费日校检
 		if(StringHelper.isNotEmpty(orderProd.getLast_order_sn())
 				&&!busi_code.equals(BusiCodeConstants.PROD_UPGRADE)){
@@ -579,38 +583,6 @@ public class OrderService extends BaseBusiService implements IOrderService{
 	}
 
 	public void setTRuleDefineDao(TRuleDefineDao tRuleDefineDao) {
-		this.tRuleDefineDao = tRuleDefineDao;
-	}
-
-	public void setpProdDao(PProdDao pProdDao) {
-		this.pProdDao = pProdDao;
-	}
-
-	public void setpProdTariffDao(PProdTariffDao pProdTariffDao) {
-		this.pProdTariffDao = pProdTariffDao;
-	}
-
-	public void setpProdTariffDisctDao(PProdTariffDisctDao pProdTariffDisctDao) {
-		this.pProdTariffDisctDao = pProdTariffDisctDao;
-	}
-
-	public void setpPackageProdDao(PPackageProdDao pPackageProdDao) {
-		this.pPackageProdDao = pPackageProdDao;
-	}
-
-	public void setcProdOrderDao(CProdOrderDao cProdOrderDao) {
-		this.cProdOrderDao = cProdOrderDao;
-	}
-
-	public void setcCustDao(CCustDao cCustDao) {
-		this.cCustDao = cCustDao;
-	}
-
-	public void setcUserDao(CUserDao cUserDao) {
-		this.cUserDao = cUserDao;
-	}
-
-	public void settRuleDefineDao(TRuleDefineDao tRuleDefineDao) {
 		this.tRuleDefineDao = tRuleDefineDao;
 	}
 	
