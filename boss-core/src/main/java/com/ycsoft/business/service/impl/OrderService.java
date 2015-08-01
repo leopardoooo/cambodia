@@ -443,6 +443,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 	 * 
 	 * @throws Exception 
 	 */
+	@Override
 	public List<CProdOrder> queryTransferFee(OrderProd orderProd,String busi_code) throws Exception{
 		 List<CProdOrder> list= orderComponent.queryTransCancelOrderList(orderProd, busi_code);
 		 //计算可退余额
@@ -459,6 +460,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 	 * @return
 	 * @throws Exception 
 	 */
+	@Override
 	public String saveOrderProd(OrderProd orderProd,String busi_code) throws Exception{
 		
 		Integer doneCode = doneCodeComponent.gDoneCode();
@@ -480,7 +482,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		
 		//打印信息-发票 业务单
 		//业务流水
-		return null;
+		return cProdOrder.getOrder_sn();
 	}
 	
 	private  CProdOrder checkOrderProdParam(OrderProd orderProd,String busi_code) throws Exception{
