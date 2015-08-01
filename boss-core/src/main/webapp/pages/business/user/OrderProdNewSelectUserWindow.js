@@ -38,11 +38,14 @@ SelectUserPanel = Ext.extend(Ext.Panel, {
 	        height: 450,
 	        animCollapse: false,
 	        tbar: [{
+	        	text: '选用户',
+	        	iconCls: 'icon-add-user'
+	        },'->',{
 	        	xtype: 'textfield',
 	        	emptyText: 'filter..',
 	        	enableKeyEvents: true,
 	        	id: 'txtFilterInput',
-	        	width: 150,
+	        	width: 50,
 	        	listeners: { 
 	        		scope: this,
 	        		specialKey: function(field, e){
@@ -110,7 +113,7 @@ SelectUserPanel = Ext.extend(Ext.Panel, {
  */
 TransferPayWindow = Ext.extend(Ext.Window, {
 	store: new Ext.data.JsonStore({
-		fields: ["prod_name","traff_name", "user_ids", "month_count", "fee", "last_order_end_date", "start_date", "start_date"]
+		fields: ["prod_name","traff_name", "user_ids", "month_count", "active_fee", "last_order_end_date", "start_date", "start_date"]
 	}),
 	constructor: function(){
 		var columns = [
@@ -119,7 +122,7 @@ TransferPayWindow = Ext.extend(Ext.Window, {
        	    {header: "用户", width: 60, sortable:true, dataIndex: 'user_ids'},
        	    {header: "转移计费日", width: 80, sortable:true, dataIndex: 'month_count'},
        	    {header: "结束计费日", width: 80, sortable:true, dataIndex: 'fee'},
-       	    {header: "转移金额", width: 60, sortable:true, dataIndex: 'fee'}
+       	    {header: "转移金额", width: 60, sortable:true, dataIndex: 'active_fee'}
        	];
 		// Window Construct instance
 		return TransferPayWindow.superclass.constructor.call(this, {
@@ -140,5 +143,9 @@ TransferPayWindow = Ext.extend(Ext.Window, {
 		        stateful: true
 			}]
 		});
+	},
+	show: function(data){
+		this.store.loadData(data);
+		return TransferPayWindow.superclass.show.call(this);
 	}
 });

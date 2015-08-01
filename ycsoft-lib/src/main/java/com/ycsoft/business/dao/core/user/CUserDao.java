@@ -448,7 +448,7 @@ public class CUserDao extends BaseEntityDao<CUser> {
 		List<Object[]> userTypeList= this.createSQLQuery(sql, custId).list();
 		if (CollectionHelper.isNotEmpty(userTypeList)){
 			for (Object[] obj:userTypeList){
-				userCountMap.put(obj[0].toString(), (Integer)obj[1]);
+				userCountMap.put(obj[0].toString(), Integer.parseInt(obj[1].toString()));
 			}
 		}
 		return userCountMap;
