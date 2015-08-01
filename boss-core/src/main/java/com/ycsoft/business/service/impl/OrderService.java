@@ -10,6 +10,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.springframework.stereotype.Service;
+
+import com.ycsoft.beans.config.TRuleDefine;
 import com.ycsoft.beans.core.cust.CCust;
 import com.ycsoft.beans.core.prod.CProdOrder;
 import com.ycsoft.beans.core.user.CUser;
@@ -40,6 +43,7 @@ import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.exception.ComponentException;
 import com.ycsoft.commons.exception.ServicesException;
 import com.ycsoft.commons.helper.CollectionHelper;
+import com.ycsoft.commons.helper.DateHelper;
 import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.commons.store.MemoryDict;
 import com.ycsoft.daos.core.JDBCException;
@@ -446,29 +450,14 @@ public class OrderService extends BaseBusiService implements IOrderService{
 	 * @throws Exception 
 	 */
 	public List<CProdOrder> queryTransferFee(OrderProd orderProd,String busi_code) throws Exception{
-		List<CProdOrder> orderCancelList=orderComponent.queryTransCancelOrderList(orderProd, busi_code);
-		//按天计算每条被取消订单要转移支付的金额。
-		calTransferFee(orderProd.getEff_date(),orderCancelList);
-		return orderCancelList;
+		 List<CProdOrder> list= orderComponent.queryTransCancelOrderList(orderProd, busi_code);
+		 //计算可退余额
+		 for(CProdOrder order:list){
+			 order.setActive_fee(orderComponent.getTransCancelFee(orderProd.getEff_date(), order));
+		 }
+		 return list;
 	}
-	/**
-	 * 转移支付 计算每条被覆盖退订的订购记录的余额(active_fee)
-	 * 如果当期已出账(next_bill_date>cancelDate),则当期金额(rent_fee)按实际使用天数重算。
-	 * @param orderProd
-	 * @param orderCancelList
-	 */
-	private void calTransferFee(Date cancelDate,List<CProdOrder> orderCancelList){
-		for(CProdOrder order:orderCancelList){
-			int rent_fee=billingComponent.recalculateRentFee(order, cancelDate);
-			if(order.getActive_fee()>rent_fee){
-				order.setActive_fee(order.getActive_fee()-rent_fee);
-			}else{
-				order.setActive_fee(0);
-			}
-			order.setRent_fee(0);
-			order.setEff_date(cancelDate);
-		}
-	}
+
 	
 	
 	/**
@@ -482,6 +471,25 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		
 		String optr_id=this.getBusiParam().getOptr().getOptr_id();
 		CCust cust=cCustDao.findByKey(orderProd.getCust_id());
+		//参数检查
+		CProdOrder lastOrder=checkOrderProdParam(orderProd,busi_code);
+		
+		//主订购记录bean生成
+		CProdOrder cProdOrder=orderComponent.createCProdOrder(orderProd, doneCode, optr_id, cust.getArea_id(), cust.getCounty_id());
+		//产品状态设置
+		cProdOrder.setStatus(orderComponent.getNewOrderProdStatus(lastOrder,orderProd));		
+		//保存订购记录
+		orderComponent.saveCProdOrder(cProdOrder,orderProd,busi_code);
+		
+		//费用信息
+		
+		
+		//打印信息-发票 业务单
+		//业务流水
+		return null;
+	}
+	
+	private  CProdOrder checkOrderProdParam(OrderProd orderProd,String busi_code) throws Exception{
 		CProdOrder lastOrder=null;
 		//user_id数据校验
 		if(StringHelper.isNotEmpty(orderProd.getLast_order_sn())){
@@ -495,25 +503,34 @@ public class OrderService extends BaseBusiService implements IOrderService{
 				}
 			}
 		}
-		//主订购记录bean生成
-		CProdOrder cProdOrder=orderComponent.createCProdOrder(orderProd, doneCode, optr_id, cust.getArea_id(), cust.getCounty_id());
-		//产品状态设置
-		cProdOrder.setStatus(orderComponent.getNewOrderProdStatus(lastOrder,orderProd));
-		//保存订购记录
-		String order_sn=orderComponent.saveCProdOrder(cProdOrder,orderProd);
-		
-		//覆盖退订处理和转移支付异动
-		if(orderProd.getTransfer_fee()>0){
-			List<CProdOrder> cancelList=orderComponent.queryTransCancelOrderList(orderProd, busi_code);
-			if(cancelList!=null&&cancelList.size()>0){
-				//TODO 简单覆盖模式（潘计费模型）
+		//开始计费日校检
+		if(StringHelper.isNotEmpty(orderProd.getLast_order_sn())
+				&&!busi_code.equals(BusiCodeConstants.PROD_UPGRADE)){
+			//有上期订购记录且非升级的情况，开始计费日是上期计费日+1天
+			if(DateHelper.addDate(lastOrder.getExp_date(), 1).equals(orderProd.getEff_date())){
+				throw new ServicesException("开始计费日错误！");
+			}
+		}else{
+			//没有上期订购记录 或者 升级的情况，开始计费日=今天
+			if(!DateHelper.isToday(orderProd.getEff_date())){
+				throw new ServicesException("开始计费日错误！");
+			}
+		}
+		//结束计费日校检
+		if(busi_code.equals(BusiCodeConstants.PROD_UPGRADE)&&orderProd.getOrder_months()==0){
+			//升级且0订购月数的情况，结束日期=上期订购结束日
+			if(!orderProd.getExp_date().equals(lastOrder.getExp_date())){
+				throw new ServicesException("结束计费日错误！");
+			}
+		}else{
+			//其他情况应该是 结束计费日=开始计费日+订购月数。
+			if(!DateHelper.getNextMonthByNum(orderProd.getEff_date(), orderProd.getOrder_months())
+					.equals(orderProd.getExp_date())){
+				throw new ServicesException("结束计费日错误！");
 			}
 		}
 		
-		//费用信息
-		//打印信息-发票 业务单
-		//业务流水
-		return null;
+		return lastOrder;
 	}
 
 
