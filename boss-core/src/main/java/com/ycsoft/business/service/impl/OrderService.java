@@ -116,6 +116,8 @@ public class OrderService extends BaseBusiService implements IOrderService{
 						panel.getLastOrderMap().remove(prod.getProd_id());
 					}
 				}
+			} else {
+				throw new ServicesException("该产品不能升级");
 			}
 		} 
 		
