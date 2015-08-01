@@ -26,6 +26,15 @@ public class OrderProd implements Serializable{
 	private Integer transfer_fee;
 	//开始计费日
 	private Date eff_date;
+	//失效日期
+	private Date exp_date;
+	
+	public Date getExp_date() {
+		return exp_date;
+	}
+	public void setExp_date(Date exp_date) {
+		this.exp_date = exp_date;
+	}
 	public String getCust_id() {
 		return cust_id;
 	}
