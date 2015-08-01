@@ -25,6 +25,8 @@ public class PackageGroupUser extends PPackageProd  implements Serializable  {
     	this.setPrecent(pakProd.getPrecent());
     }
     
+    public PackageGroupUser(){}
+    
     public List<PProd> getProdList() {
 		return prodList;
 	}
