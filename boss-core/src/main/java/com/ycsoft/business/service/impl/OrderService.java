@@ -20,7 +20,6 @@ import com.ycsoft.beans.prod.PPackageProd;
 import com.ycsoft.beans.prod.PProd;
 import com.ycsoft.beans.prod.PProdTariffDisct;
 import com.ycsoft.business.component.config.ExpressionUtil;
-import com.ycsoft.business.component.core.BillingComponent;
 import com.ycsoft.business.component.core.OrderComponent;
 import com.ycsoft.business.component.core.UserComponent;
 import com.ycsoft.business.dao.config.TRuleDefineDao;
@@ -55,7 +54,6 @@ public class OrderService extends BaseBusiService implements IOrderService{
 	private PPackageProdDao pPackageProdDao;
 	private UserComponent userComponent;
 	private CProdOrderDao cProdOrderDao;
-	private BillingComponent billingComponent;
 	private OrderComponent orderComponent;
 	private CCustDao cCustDao;
 	private CUserDao cUserDao;
@@ -554,10 +552,6 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		this.cProdOrderDao = cProdOrderDao;
 	}
 
-	public void setBillingComponent(BillingComponent billingComponent) {
-		this.billingComponent = billingComponent;
-	}
-
 	public void setOrderComponent(OrderComponent orderComponent) {
 		this.orderComponent = orderComponent;
 	}
@@ -575,6 +569,38 @@ public class OrderService extends BaseBusiService implements IOrderService{
 	}
 
 	public void setTRuleDefineDao(TRuleDefineDao tRuleDefineDao) {
+		this.tRuleDefineDao = tRuleDefineDao;
+	}
+
+	public void setpProdDao(PProdDao pProdDao) {
+		this.pProdDao = pProdDao;
+	}
+
+	public void setpProdTariffDao(PProdTariffDao pProdTariffDao) {
+		this.pProdTariffDao = pProdTariffDao;
+	}
+
+	public void setpProdTariffDisctDao(PProdTariffDisctDao pProdTariffDisctDao) {
+		this.pProdTariffDisctDao = pProdTariffDisctDao;
+	}
+
+	public void setpPackageProdDao(PPackageProdDao pPackageProdDao) {
+		this.pPackageProdDao = pPackageProdDao;
+	}
+
+	public void setcProdOrderDao(CProdOrderDao cProdOrderDao) {
+		this.cProdOrderDao = cProdOrderDao;
+	}
+
+	public void setcCustDao(CCustDao cCustDao) {
+		this.cCustDao = cCustDao;
+	}
+
+	public void setcUserDao(CUserDao cUserDao) {
+		this.cUserDao = cUserDao;
+	}
+
+	public void settRuleDefineDao(TRuleDefineDao tRuleDefineDao) {
 		this.tRuleDefineDao = tRuleDefineDao;
 	}
 	

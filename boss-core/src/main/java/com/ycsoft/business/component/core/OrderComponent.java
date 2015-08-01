@@ -331,7 +331,8 @@ public class OrderComponent extends BaseBusiComponent {
 			if(pgu.getUserSelectList()==null){
 				continue;
 			}
-			for(String prod_id:pgu.getProd_list().split(",")){
+			PPackageProd pakprod= pPackageProdDao.findByKey(pgu.getPackage_group_id());
+			for(String prod_id:pakprod.getProd_list().split(",")){
 				if(StringHelper.isNotEmpty(prod_id)){
 					for(String user_id: pgu.getUserSelectList()){
 						CProdOrder order=new CProdOrder();
