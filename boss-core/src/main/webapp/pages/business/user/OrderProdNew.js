@@ -364,6 +364,13 @@ ProdOrderForm = Ext.extend( BaseForm, {
 			}
 		}
 		
+		if(this.selectUserPanel.store.getCount() == 0){
+			return {
+				isValid: false,
+				msg: '没有需要订购的用户'
+			}
+		}
+		
 		if(this.totalAmount < 0){
 			return {
 				isValid: false,
