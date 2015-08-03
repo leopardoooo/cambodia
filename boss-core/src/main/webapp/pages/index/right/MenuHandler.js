@@ -1529,32 +1529,36 @@ Ext.apply(MenuHandler, {
 	},
 	//订购
 	OrderProd: function(){
-		//if(!hasCust())return false
-		var userRecords =  App.main.infoPanel.getUserPanel().userGrid.getSelections();
-		var len = userRecords.length;
-//		if (len == 0) {
-//			Alert('请先选择用户!');
-//			return false;
-//		}
-//
-//		for (var i = 0; i < len; i++) {
-//			if (userRecords[i].get("status") != "ACTIVE" && userRecords[i].get("status") != "OWELONG" ) {
-//				Alert("所选用户的状态必须是正常");
-//				return false;
-//			}
-//			for (var j = i + 1; j < len; j++) {
-//				if (userRecords[i].get('user_type') != userRecords[j]
-//						.get('user_type')) {
-//
-//					Alert("用户的类型必须一致");
-//					return false;
-//				}
-//			}
-//		}
-		return {
+		if(!hasCust())return false;
+		var windowSize = {
 			width : 600,
 			height : 520
 		};
+		//套餐订购
+		if(App.data.currentResource.busicode === "1015"){
+			return windowSize;
+		}
+		var userRecords =  App.main.infoPanel.getUserPanel().userGrid.getSelections();
+		var len = userRecords.length;
+		if (len == 0) {
+			Alert('请先选择用户!');
+			return false;
+		}
+		for (var i = 0; i < len; i++) {
+			if (userRecords[i].get("status") != "ACTIVE" && userRecords[i].get("status") != "OWELONG" ) {
+				Alert("所选用户的状态必须是正常");
+				return false;
+			}
+			for (var j = i + 1; j < len; j++) {
+				if (userRecords[i].get('user_type') != userRecords[j]
+						.get('user_type')) {
+
+					Alert("用户的类型必须一致");
+					return false;
+				}
+			}
+		}
+		return windowSize;
 	},
 	// 取消套餐
 	CancelPromFee : function() {

@@ -121,6 +121,18 @@ public class CUserDao extends BaseEntityDao<CUser> {
 		String sql = "select * from c_user where cust_id=?";
 		return createQuery(sql, custId).list();
 	}
+	/**
+	 * 查询正常和施工中的用户清单
+	 * @param custId
+	 * @return
+	 * @throws JDBCException
+	 */
+	public List<CUser> queryCanSelectUserByCustId(String custId) throws JDBCException {
+		if (custId == null) return new ArrayList<CUser>();
+		
+		String sql = "select * from c_user where cust_id=? and status in (?,?)";
+		return createQuery(sql, custId,StatusConstants.ACTIVE,StatusConstants.INSTALL).list();
+	}
 	
 	/**
 	 * 根据客户ID查询正常用户,类型

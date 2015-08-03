@@ -72,67 +72,21 @@ SelectUserPanel = Ext.extend(Ext.Panel, {
 		//清空数据
 		this.store.loadData([]);
 		
-		// 模拟数据
-		var data = {
-			groupList: [{
-				"package_group_id": 3,
-		         "package_group_name":"协议套餐：A产品",
-		         "user_type": "OTT",
-		         "terminal_type": '',
-		         "max_user_cnt": 10,
-		         userSelectList: ["user_id"]
-		      },{
-		    	  "package_group_id": 2,
-		         "package_group_name":"协议套餐：B产品",
-		         "user_type": "BAND",
-		         "terminal_type": '',
-		         "max_user_cnt": 1
-		      },{
-		    	  "package_group_id": 1,
-		         "package_group_name":"协议套餐：C产品",
-		         "user_type": "DTT",
-		         "terminal_type": '',
-		         "max_user_cnt": 5
-		    }],
-			userList: [{
-				user_type: 'OTT',
-				user_id: 10000001,
-				user_name: 'aaaaaaaaaaaaaaaaaaaa'
-			},{
-				user_type: 'BAND',
-				user_id: 10000002,
-				user_name: '11111111111111111111'
-			},{
-				user_type: 'DTT',
-				user_id: 10000003,
-				user_name: 'ccccccccccccccccccc'
-			},{
-				user_type: 'DTT',
-				user_id: 10000004,
-				user_name: '2222222222222222222222'
-			},{
-				user_type: 'OTT',
-				user_id: 10000005,
-				user_name: 'qqqqqqqqqqqqqqqqqqqq'
-			}] 
-		};
-		this.selectUserData = data;
-		this.openDispatchUserWindow(this.selectUserData);
-		
-//		Ext.Ajax.request({
-//			url :root + '/commons/x/Order.loadPackageUserSelect.action',
-//			scope : this,
-//			params: {
-//				prod_id: prodId,
-//				last_order_sn: lastOrderSn
-//			},
-//			success : function(response,opts){
-//				var responseObj = Ext.decode(response.responseText);
-//				this.packageGroups = responseObj;
-//				this.selectUserData = obj;
-//				this.openDispatchUserWindow(this.selectUserData);
-//			}
-//		});
+		Ext.Ajax.request({
+			url :root + '/core/x/ProdOrder!loadPackageUserSelect.action',
+			scope : this,
+			params: {
+				prod_id: prodId,
+				last_order_sn: lastOrderSn,
+				cust_id: App.getCustId()
+			},
+			success : function(response,opts){
+				var responseObj = Ext.decode(response.responseText);
+				this.packageGroups = responseObj;
+				this.selectUserData = responseObj;
+				this.openDispatchUserWindow(this.selectUserData);
+			}
+		});
 	}
 });
 
@@ -423,7 +377,7 @@ OpenDispatchUserWindow = Ext.extend(Ext.Window, {
 				if(userType && user["user_type"] !=  userType){
 					continue;
 				}
-				if(terminalType && user["user_type"] != terminalType){
+				if(terminalType && user["terminal_type"] != terminalType){
 					continue;
 				}
 				tmpUsers.push(user);

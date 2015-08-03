@@ -60,7 +60,7 @@ public class OrderComponent extends BaseBusiComponent {
 	public List<CProdOrder> queryTransCancelOrderList(OrderProd orderProd,String busi_code) throws Exception{
 		List<CProdOrder> orderCancelList=new ArrayList<>(); 
 		//提取被取消的订购记录
-		if(busi_code.equals(BusiCodeConstants.PROD_ORDER)&&StringHelper.isEmpty(orderProd.getLast_order_sn())
+		if(busi_code.equals(BusiCodeConstants.PROD_PACKAGE_ORDER)&&StringHelper.isEmpty(orderProd.getLast_order_sn())
 				&&orderProd.getGroupSelected()!=null&&orderProd.getGroupSelected().size()>0){
 			//套餐订购覆盖普通订购
 			orderCancelList= queryTransferFeeByPackage(orderProd);

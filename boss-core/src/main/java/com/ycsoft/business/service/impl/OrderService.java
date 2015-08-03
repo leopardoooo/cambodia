@@ -70,7 +70,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		
 		if (busiCode.equals(BusiCodeConstants.PROD_SINGLE_ORDER)){
 			queryUserOrderableProd(cust,userId,panel,orderList);
-		} else if (busiCode.equals(BusiCodeConstants.PROD_ORDER)){
+		} else if (busiCode.equals(BusiCodeConstants.PROD_PACKAGE_ORDER)){
 			queryCustOrderablePkg(cust,panel,orderList);
 		} else if (busiCode.equals(BusiCodeConstants.PROD_CONTINUE)){
 			queryOrderableGoon(cust,filterOrderSn,panel,orderList);
@@ -335,9 +335,9 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		panel.setNeedShow(true);
 		//装入用户清单
 		//TODO 要装入施工中和正常的状态终端用户
-		panel.setUserList(userComponent.queryUserByCustId(cust_id));
+		panel.setUserList(userComponent.queryCanSelectByCustId(cust_id));
 		//装入内容配置信息
-		fillPackageProdConfig(panel,pPackageProdDao.queryPackProdByProdId(prod_id));
+		fillPackageProdConfig(panel,pPackageProdDao.queryPackProdById(prod_id));
 		
 		//自动适配选定用户数量
 		if(!autoSelectUser(panel)){
@@ -357,6 +357,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		panel.setGroupList(groupList);
 		for(PPackageProd pakprod: pakprodList){
 			PackageGroupUser pgu=new PackageGroupUser(pakprod);
+			groupList.add(pgu);
 			pgu.setProdList(new ArrayList<PProd>());
 			for(String prod_id: pakprod.getProd_list().split(",")){
 				if(StringHelper.isNotEmpty(prod_id)){
@@ -471,12 +472,14 @@ public class OrderService extends BaseBusiService implements IOrderService{
 	@Override
 	public String saveOrderProd(OrderProd orderProd,String busi_code) throws Exception{
 		
+		//参数检查
+		CProdOrder lastOrder=checkOrderProdParam(orderProd,busi_code);
+				
 		Integer doneCode = doneCodeComponent.gDoneCode();
 		
 		String optr_id=this.getBusiParam().getOptr().getOptr_id();
 		CCust cust=cCustDao.findByKey(orderProd.getCust_id());
-		//参数检查
-		CProdOrder lastOrder=checkOrderProdParam(orderProd,busi_code);
+		
 		
 		//主订购记录bean生成
 		CProdOrder cProdOrder=orderComponent.createCProdOrder(orderProd, doneCode, optr_id, cust.getArea_id(), cust.getCounty_id());
@@ -494,6 +497,13 @@ public class OrderService extends BaseBusiService implements IOrderService{
 	}
 	
 	private  CProdOrder checkOrderProdParam(OrderProd orderProd,String busi_code) throws Exception{
+		
+		PProd prod=pProdDao.findByKey(orderProd.getProd_id());
+		if(!prod.getProd_type().equals(SystemConstants.PROD_TYPE_BASE)){
+			if(StringHelper.isNotEmpty(orderProd.getUser_id())){
+				throw new ServicesException("订购套餐时，不能填user_id！");
+			}
+		}
 		CProdOrder lastOrder=null;
 		//user_id数据校验
 		if(StringHelper.isNotEmpty(orderProd.getLast_order_sn())){

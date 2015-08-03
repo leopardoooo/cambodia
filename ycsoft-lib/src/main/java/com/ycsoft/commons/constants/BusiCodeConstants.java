@@ -25,7 +25,7 @@ public final class BusiCodeConstants {
 	
 	// Add business for the Cambodia
 	// Modified since 2015-07-31
-	public final static String PROD_ORDER = "1015";//套餐订购
+	public final static String PROD_PACKAGE_ORDER = "1015";//套餐订购
 	public final static String PROD_SINGLE_ORDER = "102"; //单用户订购
 	public final static String PROD_CONTINUE = "101";//续订
 	public final static String PROD_UPGRADE = "100";//升级

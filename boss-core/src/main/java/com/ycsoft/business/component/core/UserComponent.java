@@ -277,6 +277,16 @@ public class UserComponent extends BaseBusiComponent {
 		fillUserName(users);
 		return users;
 	}
+	/**
+	 * 查询正常和施工中的用户清单
+	 * @param custId
+	 * @return
+	 */
+	public List<CUser> queryCanSelectByCustId(String custId)throws JDBCException {
+		List<CUser> users=cUserDao.queryCanSelectUserByCustId(custId);
+		fillUserName(users);
+		return users;
+	}
 	
 	/**
 	 * @param custId

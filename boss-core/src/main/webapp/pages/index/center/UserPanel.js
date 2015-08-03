@@ -197,12 +197,12 @@ UserGrid = Ext.extend(Ext.ux.Grid,{
 			var type = records[0].get("user_type");
 			var record = records[0];
 			
-			var userDetailTab = this.parent.userDetailTab;
-			userDetailTab.resetPanel();
-			userDetailTab.userId = uid;
-			userDetailTab.type = type;
-			userDetailTab.userRecord = record;
-			userDetailTab.refreshPanel(userDetailTab.getActiveTab());
+//			var userDetailTab = this.parent.userDetailTab;
+//			userDetailTab.resetPanel();
+//			userDetailTab.userId = uid;
+//			userDetailTab.type = type;
+//			userDetailTab.userRecord = record;
+//			userDetailTab.refreshPanel(userDetailTab.getActiveTab());
 			
 			//刷新产品信息
 			this.parent.prodGrid.userId = uid;
@@ -262,15 +262,21 @@ ProdGrid = Ext.extend(Ext.ux.Grid,{
 	constructor:function(p){
 		this.parent = p;
 		this.userProdStore = new Ext.data.JsonStore({
-			fields: ["prod_sn","cust_id","acct_id","user_id","prod_id","serv_id","tariff_id","package_sn","order_type","status","status_date","is_base",
-				"invalid_date","prod_eff_time","order_date","billinfo_eff_time","area_id","county_id","prod_name","package_name","next_bill_date",
-				"tariff_name","tariff_rent","next_tariff_id","next_tariff_name","order_type_text","status_text","prod_desc","resList","resSize",
-				"prod_type","is_zero_tariff","is_invalid_tariff","allow_pay","just_for_once","exp_date","pkg",'pre_open_time',"stop_by_invalid_date",
-				"public_acctitem_type_text","public_acctitem_type","billinfo_eff_date",'user_status',"billing_cycle","has_dyn","is_pause","month_rent_cal_type",
-				"is_bank_pay","is_bank_pay_text","p_bank_pay"],
+//			fields: ["prod_sn","cust_id","acct_id","user_id","prod_id","serv_id","tariff_id","package_sn","order_type","status","status_date","is_base",
+//				"invalid_date","prod_eff_time","order_date","billinfo_eff_time","area_id","county_id","prod_name","package_name","next_bill_date",
+//				"tariff_name","tariff_rent","next_tariff_id","next_tariff_name","order_type_text","status_text","prod_desc","resList","resSize",
+//				"prod_type","is_zero_tariff","is_invalid_tariff","allow_pay","just_for_once","exp_date","pkg",'pre_open_time',"stop_by_invalid_date",
+//				"public_acctitem_type_text","public_acctitem_type","billinfo_eff_date",'user_status',"billing_cycle","has_dyn","is_pause","month_rent_cal_type",
+//				"is_bank_pay","is_bank_pay_text","p_bank_pay"],
+			fields: ["tariff_name","disct_name","prod_type","prod_name","prod_type_text","serv_id",
+			         "serv_id_text","is_base","is_base_text","public_acctitem_type_text","package_name",
+			         "order_sn","package_sn","package_id","cust_id","user_id","prod_id","tariff_id","disct_id",
+			         "status","status_text","status_date","eff_date","exp_date","active_fee","bill_fee",
+			         "rent_fee","last_bill_date","next_bill_date","order_months","order_fee","order_time",
+			         "order_type","package_group_id","remark","public_acctitem_type"],
 			sortInfo: {
-				field:'order_type',direction:'ASC',
-				field:'is_base',direction:'DESC'
+				//field:'order_type',direction:'ASC',
+				//field:'is_base',direction:'DESC'
 			}
 		});
 		this.userProdStore.on('load',this.doLoadResult,this);
@@ -278,13 +284,15 @@ ProdGrid = Ext.extend(Ext.ux.Grid,{
 		var cm = new Ext.ux.grid.LockingColumnModel({ 
     		columns : [
 			{header:'产品名称',dataIndex:'prod_name',width:120},
-			{header:'所属套餐',dataIndex:'package_name',width:100},
 			{header:'当前资费',dataIndex:'tariff_name',	width:80},
-			{header:'未生效资费',dataIndex:'next_tariff_name',width:80},
-			{header:'预计到期日',dataIndex:'invalid_date',width:80,renderer:Ext.util.Format.dateFormat},
 			{header:'状态',dataIndex:'status_text',	width:60,renderer:Ext.util.Format.statusShow},
-			{header:'状态日期',dataIndex:'status_date',	width:120}
-			
+			{header:'生效日期',dataIndex:'eff_date',width:120},
+			{header:'失效日期',dataIndex:'exp_date',width:120},
+			{header:'所属套餐',dataIndex:'package_name',width:100},
+			{header:'产品类型',dataIndex:'prod_type_text',width:100},
+			{header:'订购时间',dataIndex:'order_time',width:80},
+			{header:'订购SN',dataIndex:'order_sn',width:80}
+			//renderer:Ext.util.Format.dateFormat
 	        ]
 	      });
 		
@@ -385,11 +393,8 @@ ProdGrid = Ext.extend(Ext.ux.Grid,{
 		App.showTip();
 		Ext.Ajax.request({
 			scope : this,
-			url : Constant.ROOT_PATH + "/commons/x/QueryUser!queryAllProd.action",
-			params : {
-				custId : cust['cust_id'],
-				custStatus : cust['status']
-			},
+			url : Constant.ROOT_PATH + "/core/x/ProdOrder!queryCustEffOrder.action",
+			params : {cust_id : App.getCustId()},
 			success : function(res,opt){
 				var data = Ext.decode(res.responseText);
 				this.prodMap = data;

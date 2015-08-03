@@ -40,7 +40,7 @@ ProdOrderForm = Ext.extend( BaseForm, {
 				    mode: 'local',
 				    id: 'boxProdId',
 				    store: new Ext.data.JsonStore({
-						fields : ['prod_id', 'prod_name', 'prod_desc',"pkg"]
+						fields : ['prod_id', 'prod_name', 'prod_desc',"prod_type"]
 					}),
 					listeners: {
 						scope: this,
@@ -227,10 +227,7 @@ ProdOrderForm = Ext.extend( BaseForm, {
 	doLoadUsers: function(selectProdRecord){
 		// 单产品
 		if(this.isPkg()){
-			this.selectUserPanel.loadPackageUsers({
-				prod_id: selectProdRecord.get("prod_id"),
-				last_order_sn: this.lastOrderSn
-			});
+			this.selectUserPanel.loadPackageUsers(selectProdRecord.get("prod_id"), this.lastOrderSn);
 		}else{
 			var user = this.baseData["userDesc"];
 			this.selectUserPanel.loadSingleUser(user);
