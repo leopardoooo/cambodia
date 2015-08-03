@@ -10,6 +10,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.ycsoft.beans.config.TRuleDefine;
@@ -49,17 +51,28 @@ import com.ycsoft.commons.store.MemoryDict;
 import com.ycsoft.daos.core.JDBCException;
 @Service
 public class OrderService extends BaseBusiService implements IOrderService{
+	@Autowired
 	private PProdDao pProdDao;
+	@Autowired
 	private PProdTariffDao pProdTariffDao;
+	@Autowired
 	private PProdTariffDisctDao pProdTariffDisctDao;
+	@Autowired
 	private PPackageProdDao pPackageProdDao;
+	@Autowired
 	private UserComponent userComponent;
+	@Autowired
 	private CProdOrderDao cProdOrderDao;
+	@Autowired
 	private OrderComponent orderComponent;
+	@Autowired
 	private CCustDao cCustDao;
+	@Autowired
 	private CUserDao cUserDao;
-	private ExpressionUtil expressionUtil;
+	@Autowired
 	private TRuleDefineDao tRuleDefineDao;
+	@Autowired
+	private BeanFactory beanFactory;
 
 	@Override
 	public OrderProdPanel queryOrderableProd(String busiCode,String custId,String userId, String filterOrderSn)
@@ -270,6 +283,8 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		TRuleDefine rule = tRuleDefineDao.findByKey(ruleId);
 		if (rule == null)
 			return true;
+		
+		ExpressionUtil expressionUtil=new ExpressionUtil(beanFactory);
 		expressionUtil.setCcust(cust);
 		expressionUtil.setCuser(user);
 		return expressionUtil.parseBoolean(rule.getRule_str());
@@ -334,7 +349,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		PackageGroupPanel panel=new PackageGroupPanel();
 		panel.setNeedShow(true);
 		//装入用户清单
-		//TODO 要装入施工中和正常的状态终端用户
+		//要装入施工中和正常的状态终端用户
 		panel.setUserList(userComponent.queryCanSelectByCustId(cust_id));
 		//装入内容配置信息
 		fillPackageProdConfig(panel,pPackageProdDao.queryPackProdById(prod_id));
@@ -549,51 +564,6 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		}
 		
 		return lastOrder;
-	}
-
-
-	public void setPProdDao(PProdDao pProdDao) {
-		this.pProdDao = pProdDao;
-	}
-
-	public void setPProdTariffDao(PProdTariffDao pProdTariffDao) {
-		this.pProdTariffDao = pProdTariffDao;
-	}
-
-	public void setPProdTariffDisctDao(PProdTariffDisctDao pProdTariffDisctDao) {
-		this.pProdTariffDisctDao = pProdTariffDisctDao;
-	}
-
-	public void setPPackageProdDao(PPackageProdDao pPackageProdDao) {
-		this.pPackageProdDao = pPackageProdDao;
-	}
-
-	public void setUserComponent(UserComponent userComponent) {
-		this.userComponent = userComponent;
-	}
-
-	public void setCProdOrderDao(CProdOrderDao cProdOrderDao) {
-		this.cProdOrderDao = cProdOrderDao;
-	}
-
-	public void setOrderComponent(OrderComponent orderComponent) {
-		this.orderComponent = orderComponent;
-	}
-
-	public void setCCustDao(CCustDao cCustDao) {
-		this.cCustDao = cCustDao;
-	}
-
-	public void setCUserDao(CUserDao cUserDao) {
-		this.cUserDao = cUserDao;
-	}
-
-	public void setExpressionUtil(ExpressionUtil expressionUtil) {
-		this.expressionUtil = expressionUtil;
-	}
-
-	public void setTRuleDefineDao(TRuleDefineDao tRuleDefineDao) {
-		this.tRuleDefineDao = tRuleDefineDao;
 	}
 	
 }

@@ -912,7 +912,7 @@ public class UserService extends BaseBusiService implements IUserService {
 			//修改用户产品状态为报停前的状态
 			List<CProdDto> prodList = userProdComponent.queryAllProdsByUserId(user.getUser_id());
 			for (CProdDto prod:prodList){
-//				String oldStatus = userProdComponent.queryLastStatus(prod.getProd_sn());
+				String oldStatus = userProdComponent.queryLastStatus(prod.getProd_sn());
 //				if (StringHelper.isEmpty(oldStatus)) {
 //					if (prod.getInvalid_date().after(prod.getStatus_date()))
 //						oldStatus = StatusConstants.ACTIVE;
@@ -921,7 +921,7 @@ public class UserService extends BaseBusiService implements IUserService {
 //				}else if(oldStatus.equals(StatusConstants.REQSTOP)){
 //					oldStatus = StatusConstants.ACTIVE;
 //				}
-				String oldStatus = StatusConstants.ACTIVE;
+//				String oldStatus = StatusConstants.ACTIVE;
 				userProdComponent.updateProdStatus(doneCode,prod.getProd_sn(),prod.getStatus(), oldStatus);
 				//生成激活产品任务
 //				if(StringHelper.isNotEmpty(userDto.getCard_id())){
@@ -2754,5 +2754,14 @@ public class UserService extends BaseBusiService implements IUserService {
 //		  Integer toDoneCode = doneCodeComponent.gDoneCode();
 //		  saveDoneCode(toDoneCode, busiCode, toCustId,"原受理编号:"+oldCust.getCust_no()+",原客户流水号:"+doneCode);
 	}
+
+	@Override
+	public void checkStopUser() throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	
+	
 
 }

@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.ycsoft.beans.core.prod.CProd;
@@ -42,11 +43,17 @@ import com.ycsoft.daos.helper.BeanHelper;
  */
 @Component
 public class OrderComponent extends BaseBusiComponent {
+	@Autowired
 	private PProdDao pProdDao;
+	@Autowired
 	private PPackageProdDao pPackageProdDao;
+	@Autowired
 	private CProdOrderDao cProdOrderDao;
+	@Autowired
 	private CUserDao cUserDao;
+	@Autowired
 	private CProdOrderHisDao cProdOrderHisDao;
+	@Autowired
 	private CProdOrderTransfeeDao cProdOrderTransfeeDao;
 	
 	

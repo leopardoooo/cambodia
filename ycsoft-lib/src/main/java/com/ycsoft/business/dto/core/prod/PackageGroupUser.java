@@ -1,6 +1,7 @@
 package com.ycsoft.business.dto.core.prod;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.ycsoft.beans.prod.PPackageProd;
@@ -9,9 +10,9 @@ import com.ycsoft.beans.prod.PProd;
 public class PackageGroupUser extends PPackageProd  implements Serializable  {
 	
     //内容组选中的终端用户id数组
-    private List<String>  userSelectList;
+    private List<String>  userSelectList=new ArrayList<>();
 	//套餐内容组中产品内容清单
-    private List<PProd>  prodList;
+    private List<PProd>  prodList=new ArrayList<>();
 
     
     public PackageGroupUser(PPackageProd pakProd){

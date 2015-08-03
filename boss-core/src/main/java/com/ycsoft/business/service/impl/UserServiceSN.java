@@ -24,6 +24,7 @@ import com.ycsoft.beans.prod.PPromotionAcct;
 import com.ycsoft.beans.system.SOptr;
 import com.ycsoft.business.component.core.OrderComponent;
 import com.ycsoft.business.dao.core.prod.CProdOrderDao;
+import com.ycsoft.business.dao.core.prod.CProdPropChangeDao;
 import com.ycsoft.business.dto.core.fee.FeeInfoDto;
 import com.ycsoft.business.dto.core.prod.DisctFeeDto;
 import com.ycsoft.business.dto.core.prod.PromotionDto;
@@ -35,6 +36,7 @@ import com.ycsoft.commons.constants.BusiCodeConstants;
 import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.exception.ServicesException;
+import com.ycsoft.commons.helper.CollectionHelper;
 import com.ycsoft.commons.helper.DateHelper;
 import com.ycsoft.commons.helper.JsonHelper;
 import com.ycsoft.commons.helper.StringHelper;
@@ -45,6 +47,8 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 	private OrderComponent orderComponent;
 	@Autowired
 	private CProdOrderDao cProdOrderDao;
+	@Autowired
+	private CProdPropChangeDao cProdPropChangeDao;
 	
 	public void createUser(CUser user, String deviceId, String deviceType, String deviceModel, String deviceBuyMode,
 			FeeInfoDto deviceFee) throws Exception {
@@ -297,18 +301,35 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		saveAllPublic(doneCode,getBusiParam());
 	}
 
+	//取消预报听
 	@Override
 	public void cancelStopUser() throws Exception {
-		// TODO Auto-generated method stub
-		
+		Integer doneCode = doneCodeComponent.gDoneCode();
+		List<CUser> users = getBusiParam().getSelectedUsers();
+		String[] userall = CollectionHelper.converValueToArray(users, "user_id");
+		jobComponent.cancelStopUser(userall);
+		saveAllPublic(doneCode,getBusiParam());
 	}
 
 
-
-
+	/**
+	 * 报开，传入参数都没有用
+	 */
 	@Override
 	public void saveOpen(String stbId, String cardId, String modemMac, int tjFee) throws Exception {
-		// TODO Auto-generated method stub
+		//获取业务流水
+		Integer doneCode = doneCodeComponent.gDoneCode();
+		//获取操作的客户、用户信息
+		CCust cust = getBusiParam().getCust();
+		List<CUser> users = getBusiParam().getSelectedUsers();
+		List<CProdOrderDto> orderList = cProdOrderDao.queryCustEffOrderDto(cust.getCust_id());
+		for(CUser user:users){
+			updateUserStatus(doneCode, user.getUser_id(), user.getStatus(), StatusConstants.ACTIVE);
+			//生成钝化用户JOB
+			jobComponent.createBusiCmdJob(doneCode, BusiCmdConstants.ACCTIVATE_USER, cust.getCust_id(),
+					user.getUser_id(), user.getStb_id(), user.getCard_id(), user.getModem_mac(), null, null,JsonHelper.fromObject(user));
+			//修改订单状态为正常状态，并更新到期日
+		}
 		
 	}
 
