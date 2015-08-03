@@ -23,6 +23,7 @@ import com.ycsoft.beans.core.job.JProdNextTariff;
 import com.ycsoft.beans.core.job.JRecordChange;
 import com.ycsoft.beans.core.prod.CProd;
 import com.ycsoft.beans.core.prod.CProdPropChange;
+import com.ycsoft.beans.core.prod.CProdStatusChange;
 import com.ycsoft.beans.core.user.CUser;
 import com.ycsoft.beans.prod.PProd;
 import com.ycsoft.beans.prod.PProdTariff;
@@ -485,6 +486,8 @@ public class BaseBusiComponent extends BaseComponent{
 		if(propChangeList == null || propChangeList.size() == 0) return ;
 		CProd prod = new CProd();
 		prod.setProd_sn(prodSn);
+		
+		CProdStatusChange statusChange =null;
 		for (CProdPropChange change:propChangeList){
 			BeanHelper.setPropertyString(prod, change.getColumn_name(), change
 					.getNew_value());
@@ -493,6 +496,11 @@ public class BaseBusiComponent extends BaseComponent{
 			change.setDone_code(doneCode);
 			change.setArea_id(getOptr().getArea_id());
 			change.setCounty_id(getOptr().getCounty_id());
+			
+			if (change.getColumn_name().equals("status")){
+				statusChange = new CProdStatusChange();
+				BeanUtils.copyProperties(change, statusChange);
+			}
 		}
 		//修改产品信息
 		cProdDao.update(prod);
@@ -500,6 +508,10 @@ public class BaseBusiComponent extends BaseComponent{
 		
 		//保存产品异动信息
 		cProdPropChangeDao.save(propChangeList.toArray(new CProdPropChange[propChangeList.size()]));
+		//单独保存产品状态异动
+		if (statusChange != null){
+			cProdStatusChangeDao.save(statusChange);
+		}
 	}
 	
 	/**

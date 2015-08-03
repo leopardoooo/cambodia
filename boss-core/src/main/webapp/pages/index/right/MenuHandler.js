@@ -1246,80 +1246,29 @@ Ext.apply(MenuHandler, {
 		}
 		var userGrid = App.main.infoPanel.getUserPanel().userGrid;
 		var userRecords = userGrid.getSelections();
-
-		var len = userRecords.length;// 选中记录
-
-		var zzdUser = userGrid.store.getAt(userGrid.store.find('terminal_type','ZZD'));
-		if (len == 0) {
+		if (userRecords.length == 0) {
 			Alert('请选择用户');
 			return false;
-		} else {
-			var dtv = false;// 如果选中的用户中不存在数字电视
-			var dtvNum = 0 ;//选中的数字电视用户数 
-			for (i = 0; i < len; i++) {
-				if (userRecords[i].get("status") != "ACTIVE" && userRecords[i].get("status") != "OWELONG") {
-					Alert("选择的用户状态非正常");
-					return false;
-				}
-				if (userRecords[i].get("user_type") == 'DTV') {
-					dtv = true;
-					dtvNum++;
-				}
-				if(userRecords[i].get('terminal_type') == 'FZD' && zzdUser.get('status') == 'REQSTOP'){
-					Alert("主终端状态为报停,不能进行当前业务!");
-					return false;
-				}
+		}
+		
+		App.sendRequest(Constant.ROOT_PATH
+				+ "/core/x/User!saveCancelPromotion.action", {
+			custId: App.getCustId()
+		}, function(res, opt) {
+			var data = Ext.decode(res.responseText);
+			if (data === true) {
+				Alert('回退促销成功!');
+				App.getApp().refreshPanel(App.getApp().getData().currentResource.busicode);
 			}
-			if (dtv) {// 存在数字电视
-				var selectedUseridArr = userGrid.getSelectedUserIds(); 
-				var userIds = selectedUseridArr.join(',') + ',';
-				var oweFeeAcctids = App.getApp().getUserBaseProdOweFeeAccts(selectedUseridArr);
-				
-				if(!Ext.isEmpty(oweFeeAcctids)){
-//					App.getApp().main.infoPanel.activate('ACCT_PANEL');
-					Alert('有基本产品欠费,请先缴费');
-					return false;
-				}else{
-					var store = userGrid.getStore();
-					// 选中用户数不等于总数
-					if (len != store.getCount()) {
-						var flag = true;// 没选中的用户中没有主终端
-						var flag2 = true;// 选中的用户没有主终端
-						var dtvAmount = 0;
-						for (var i = 0; i < store.getCount(); i++) {
-							var record = store.getAt(i);
-							if (record.get('user_type') != 'BAND'
-									&& record.get("status") == "ACTIVE") {
-								if (record.get('terminal_type') == 'ZZD') {
-									// 不在选中的用户中
-									if (userIds.indexOf(record.get('user_id') + ",") == -1) {
-										flag = false;// 没选中的用户中有主终端
-										break;
-									} else {
-										flag2 = false;// 选中的用户中有主终端
-									}
-								}
-	
-								// 数字电视数
-								dtvAmount = dtvAmount + 1;
-							}
-						}
-						// 选中的用户中有主终端,没选中的用户中没有主终端,有未选中的数字用户
-						if (!flag2 && flag && dtvAmount != dtvNum) {
-							Alert('主终端不能先报停');
-							return false;
-						}
-					}
-				}
-			}
-			return {
-				width : 540,
-				height : 460
-			};	
+		}, false);
+		
+		return {
+			width : 540,
+			height : 460
 		}
 	},
 	// 报开
-	UserOpen : function() {
+	UserOpen:function() {
 		if (!hasCust()) {
 			return false;
 		}
