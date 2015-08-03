@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.ycsoft.beans.config.TConfigTemplate;
@@ -23,8 +24,6 @@ import com.ycsoft.beans.core.job.JRecordChange;
 import com.ycsoft.beans.core.prod.CProd;
 import com.ycsoft.beans.core.prod.CProdPropChange;
 import com.ycsoft.beans.core.user.CUser;
-import com.ycsoft.beans.core.user.CUserAtv;
-import com.ycsoft.beans.core.user.CUserDtv;
 import com.ycsoft.beans.prod.PProd;
 import com.ycsoft.beans.prod.PProdTariff;
 import com.ycsoft.beans.system.SCounty;
@@ -40,6 +39,7 @@ import com.ycsoft.business.dao.core.job.JProdNextTariffDao;
 import com.ycsoft.business.dao.core.job.JRecordChangeDao;
 import com.ycsoft.business.dao.core.prod.CProdDao;
 import com.ycsoft.business.dao.core.prod.CProdPropChangeDao;
+import com.ycsoft.business.dao.core.prod.CProdStatusChangeDao;
 import com.ycsoft.business.dao.prod.PProdDao;
 import com.ycsoft.business.dao.prod.PProdTariffDao;
 import com.ycsoft.business.dao.system.SCountyDao;
@@ -77,6 +77,8 @@ public class BaseBusiComponent extends BaseComponent{
 	protected PProdTariffDao pProdTariffDao;
 	protected CProdDao cProdDao;
 	protected CProdPropChangeDao cProdPropChangeDao;
+	@Autowired
+	protected CProdStatusChangeDao cProdStatusChangeDao;
 	protected CAcctAcctitemDao cAcctAcctitemDao;
 	protected BBillDao bBillDao;
 	protected JProdNextTariffDao jProdNextTariffDao;

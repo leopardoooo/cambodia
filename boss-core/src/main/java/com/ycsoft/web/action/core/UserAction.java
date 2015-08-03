@@ -106,7 +106,7 @@ public class UserAction extends BaseBusiAction {
 	
 	private String userStatus;
 	private File file;
-	private String userIds;
+	private String[] userIds;
 
 	private String promFeeSn;
 	/**
@@ -268,6 +268,15 @@ public class UserAction extends BaseBusiAction {
 	public String saveEditNetType() throws Exception {
 		userServiceSN.saveEditNetType(netType, modemMac);
 		return JSON;
+	}
+	
+	/**
+	 * 验证用户是否可以报停
+	 * @throws Exception
+	 */
+	public String checkStop() throws Exception{
+		userServiceSN.checkStopUser(userIds);
+		return JSON_SUCCESS;
 	}
 	
 	/**
@@ -718,40 +727,7 @@ public class UserAction extends BaseBusiAction {
 		return JSON_SIMPLEOBJ;
 	}
 	
-	public String updateUserStatus() throws Exception {
-		String msg = "";
-		List<String> list = new ArrayList<String>();
-		List<String> userIdList = null;
-		String[] ids = null;
-		if(StringHelper.isNotEmpty(userIds)){
-			ids = userIds.split(",");
-		}
-		try {
-			if(file != null){
-				userIdList = FileHelper.fileToArray(file);
-				list.addAll(userIdList);
-				if(ids != null){
-					for(int i=0,len=ids.length;i<len;i++){
-						if(!list.contains(ids[i])){
-							list.add(ids[i]);
-						}
-					}
-				}
-			}else{
-				if(ids != null){
-					for(int i=0,len=ids.length;i<len;i++){
-						if(!list.contains(ids[i]))
-							list.add(ids[i]);
-					}
-				}
-			}
-			userServiceSN.updateUserStatus(list, userStatus);
-		} catch (Exception e) {
-			e.printStackTrace();
-			msg = e.getMessage();
-		}
-		return retrunNone(msg);
-	}
+	
 	
 	/**
 	 * 调用存储过程，批量销用户
@@ -1060,7 +1036,7 @@ public class UserAction extends BaseBusiAction {
 		this.userStatus = userStatus;
 	}
 
-	public void setUserIds(String userIds) {
+	public void setUserIds(String[] userIds) {
 		this.userIds = userIds;
 	}
 

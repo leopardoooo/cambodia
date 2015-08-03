@@ -123,9 +123,18 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 
 	}
 	
-	
-	
-	
+	@Override
+	public void saveChangeDevice(String userId, String deviceId, String devcieBuyMode, FeeInfoDto deviceFee)
+			throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+
+
+
+
 	@Override
 	public void createUser(CUser user, String deviceBuyMode, FeeInfoDto deviceFee) throws Exception {
 		// TODO Auto-generated method stub
@@ -186,15 +195,17 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		// TODO Auto-generated method stub
 		
 	}
-	
-	public void checkStopUser() throws Exception{
+	@Override
+	public void checkStopUser(String[] userIds) throws Exception{
 		//获取操作的客户、用户信息
-		CCust cust = getBusiParam().getCust();
-		List<CUser> users = getBusiParam().getSelectedUsers();
+		//CCust cust = getBusiParam().getCust();
+		List<CUser> users = userComponent.queryAllUserByUserIds(userIds);
+		if (users == null || users.get(0) == null)
+			throw new ServicesException("请选择用户");
 		
 		//查找客户名下所有有效的产品
 		Map<String,String> packageUserIdS = new HashMap<String,String>();
-		List<CProdOrder> orderList = cProdOrderDao.queryCustEffOrder(cust.getCust_id());
+		List<CProdOrder> orderList = cProdOrderDao.queryCustEffOrder(users.get(0).getCust_id());
 		for (CProdOrder order:orderList){
 			if (StringHelper.isNotEmpty(order.getPackage_sn()) && StringHelper.isNotEmpty(order.getUser_id())){
 				packageUserIdS.put(order.getUser_id(),order.getPackage_sn());

@@ -115,6 +115,13 @@ public class UserService extends BaseBusiService implements IUserService {
 	
 
 	@Override
+	public void saveChangeDevice(String userId, String deviceId, String devcieBuyMode, FeeInfoDto deviceFee)
+			throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
 	public void createUser(CUser user, String deviceId, String deviceType, String deviceModel, String deviceBuyMode,
 			FeeInfoDto deviceFee) throws Exception {
 		// TODO Auto-generated method stub
@@ -2756,7 +2763,7 @@ public class UserService extends BaseBusiService implements IUserService {
 	}
 
 	@Override
-	public void checkStopUser() throws Exception {
+	public void checkStopUser(String[] userIds) throws Exception {
 		// TODO Auto-generated method stub
 		
 	}

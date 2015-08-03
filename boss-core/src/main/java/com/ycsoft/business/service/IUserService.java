@@ -41,6 +41,8 @@ public interface IUserService extends IBaseService{
 	 */
 	public void createUser(CUser user, String deviceId, String deviceType, String deviceModel, String deviceBuyMode,
 			FeeInfoDto deviceFee)  throws Exception;
+	
+	public void saveChangeDevice(String userId,String deviceId,String devcieBuyMode,FeeInfoDto deviceFee)  throws Exception;
 
 	/**
 	 * 修改用户信息
@@ -94,7 +96,7 @@ public interface IUserService extends IBaseService{
 	 * 检查用户能报停
 	 * @throws Exception
 	 */
-	public void checkStopUser() throws Exception;
+	public void checkStopUser(String[] userIds) throws Exception;
 
 	/**
 	 * 报停(支持多用户)
