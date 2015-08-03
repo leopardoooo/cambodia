@@ -58,7 +58,7 @@ import com.ycsoft.daos.core.JDBCException;
  * @author liujiaqi
  *
  */
-@Component
+//@Component
 public class ExpressionUtil {
 
 	private static final String [] replaceParmer={"ACCTITEM","times","BALANCE"};
@@ -66,7 +66,7 @@ public class ExpressionUtil {
     
 	//不再使用
 	@Deprecated
-	public ExpressionUtil(){}
+	//public ExpressionUtil(){}
 	
 	public ExpressionUtil(BeanFactory beanFactory) {
 		tAddressDao=beanFactory.getBean(TAddressDao.class);	

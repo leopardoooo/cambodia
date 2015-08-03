@@ -44,8 +44,8 @@ public class ProdOrderAction extends BaseBusiAction {
 	}
 	
 	public String queryCustEffOrder() throws Exception{
-		getRoot().setRecords(orderService.queryCustEffOrder(cust_id));
-		return JSON_RECORDS;
+		getRoot().setSimpleObj(orderService.queryCustEffOrder(cust_id));
+		return JSON_SIMPLEOBJ;
 	}
 	
 	public String queryProdOrderInit(){
