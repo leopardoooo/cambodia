@@ -26,6 +26,7 @@ import com.ycsoft.beans.prod.PProd;
 import com.ycsoft.beans.prod.PProdTariffDisct;
 import com.ycsoft.business.component.config.ExpressionUtil;
 import com.ycsoft.business.component.core.FeeComponent;
+import com.ycsoft.business.component.core.JobComponent;
 import com.ycsoft.business.component.core.OrderComponent;
 import com.ycsoft.business.component.core.UserComponent;
 import com.ycsoft.business.dao.config.TRuleDefineDao;
