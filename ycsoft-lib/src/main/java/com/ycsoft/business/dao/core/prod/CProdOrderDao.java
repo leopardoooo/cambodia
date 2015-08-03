@@ -84,4 +84,15 @@ public class CProdOrderDao extends BaseEntityDao<CProdOrder> {
 				" and exp_date >=trunc(sysdate) ");
 		return this.createQuery(sql, cust_id).list();
 	} 
+	
+	/**
+	 * 查询用户的产品订购记录清单
+	 * @param user_id
+	 * @return
+	 * @throws JDBCException
+	 */
+	public List<CProdOrder> queryProdOrderByUserId(String user_id) throws JDBCException{
+		String sql="select * from c_prod_order where user_id=? ";
+		return this.createQuery(sql, user_id).list();
+	}
 }

@@ -628,7 +628,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 			if(lastOrder==null){
 				throw new ServicesException("上期订购记录不存在！");
 			}
-			if(lastOrder.getCust_id()!=orderProd.getCust_id()){
+			if(!lastOrder.getCust_id().equals(orderProd.getCust_id())){
 				throw new ServicesException("上期订购记录和本期客户不一致！");
 			}
 			if(StringHelper.isNotEmpty(lastOrder.getUser_id())){
@@ -642,16 +642,20 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		}
 		//上期订购记录校检，是否最近一条订购记录
 		if(lastOrder!=null){
-			List<CProdOrder> lastOrderList=null;
+			List<CProdOrder> lastOrderList=new ArrayList<>();
 			if(!prod.getProd_type().equals(SystemConstants.PROD_TYPE_BASE)){
 				//套餐的情况
 				lastOrderList=cProdOrderDao.queryTransOrderByPackage(orderProd.getCust_id());
 			}else if(prod.getServ_id().equals(SystemConstants.PROD_SERV_ID_BAND)){
 				//单产品宽带的情况
-				lastOrderList=cProdOrderDao.queryTransOrderByBand(orderProd.getUser_id());
+				lastOrderList=cProdOrderDao.queryProdOrderByUserId(orderProd.getUser_id());
 			}else{
 				//单产品非宽带的情况
-				lastOrderList=cProdOrderDao.queryTransOrderByProd(orderProd.getUser_id(), orderProd.getProd_id());
+				for(CProdOrder order: cProdOrderDao.queryProdOrderByUserId(orderProd.getUser_id())){
+					if(order.getProd_id().equals(orderProd.getProd_id())){
+						lastOrderList.add(order);
+					}
+				}
 			}
 			
 			if(lastOrderList==null||lastOrderList.size()==0){
@@ -667,7 +671,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		if(StringHelper.isNotEmpty(orderProd.getLast_order_sn())
 				&&!busi_code.equals(BusiCodeConstants.PROD_UPGRADE)){
 			//有上期订购记录且非升级的情况，开始计费日是上期计费日+1天
-			if(DateHelper.addDate(lastOrder.getExp_date(), 1).equals(orderProd.getEff_date())){
+			if(!DateHelper.addDate(lastOrder.getExp_date(), 1).equals(orderProd.getEff_date())){
 				throw new ServicesException("开始计费日错误！");
 			}
 		}else{
