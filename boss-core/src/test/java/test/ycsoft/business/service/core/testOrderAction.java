@@ -77,17 +77,23 @@ public class testOrderAction extends JunitSpringBase {
 		
 		orderService.saveOrderProd(order, BusiCodeConstants.PROD_PACKAGE_ORDER);
 	}
-	
+	/**
+	 * 用户终端用户选择界面
+	 * @throws Exception
+	 */
 	@Test
 	public void testUserSelect() throws Exception{
 		//order.setCust_id("11078537");
-		PackageGroupPanel panel=orderService.queryPackageGroupPanel("11078537", "101", null);
+		PackageGroupPanel panel=orderService.queryPackageGroupPanel("11078637", "101", null);
 		
 		System.out.println(JsonHelper.fromObject(panel));
 	}
-	
+	/**
+	 * 转移支付
+	 * @throws Exception
+	 */
 	@Test
-	public void test2() throws Exception{
+	public void testTransFee() throws Exception{
 		OrderProd order=new OrderProd();
 		order.setCust_id("11078637");
 		order.setUser_id("1302501");

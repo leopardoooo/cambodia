@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.ycsoft.beans.core.prod.CProdOrder;
@@ -40,11 +41,17 @@ import com.ycsoft.daos.helper.BeanHelper;
  */
 @Component
 public class OrderComponent extends BaseBusiComponent {
+	@Autowired
 	private PProdDao pProdDao;
+	@Autowired
 	private PPackageProdDao pPackageProdDao;
+	@Autowired
 	private CProdOrderDao cProdOrderDao;
+	@Autowired
 	private CUserDao cUserDao;
+	@Autowired
 	private CProdOrderHisDao cProdOrderHisDao;
+	@Autowired
 	private CProdOrderTransfeeDao cProdOrderTransfeeDao;
 	
 	
@@ -356,30 +363,5 @@ public class OrderComponent extends BaseBusiComponent {
 			cProdOrderDao.save(orderList.toArray(new CProdOrder[orderList.size()]));
 		}
 	}
-	
-	public void setPProdDao(PProdDao pProdDao) {
-		this.pProdDao = pProdDao;
-	}
-
-	public void setPPackageProdDao(PPackageProdDao pPackageProdDao) {
-		this.pPackageProdDao = pPackageProdDao;
-	}
-
-	public void setCProdOrderDao(CProdOrderDao cProdOrderDao) {
-		this.cProdOrderDao = cProdOrderDao;
-	}
-
-	public void setCUserDao(CUserDao cUserDao) {
-		this.cUserDao = cUserDao;
-	}
-
-	public void setCProdOrderHisDao(CProdOrderHisDao cProdOrderHisDao) {
-		this.cProdOrderHisDao = cProdOrderHisDao;
-	}
-
-	public void setCProdOrderTransfeeDao(CProdOrderTransfeeDao cProdOrderTransfeeDao) {
-		this.cProdOrderTransfeeDao = cProdOrderTransfeeDao;
-	}
-	
-	
+		
 }
