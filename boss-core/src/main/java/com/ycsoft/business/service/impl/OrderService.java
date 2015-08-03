@@ -490,8 +490,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		//参数检查
 		CProdOrder lastOrder=checkOrderProdParam(orderProd,busi_code);
 				
-		Integer doneCode = doneCodeComponent.gDoneCode();
-		
+		Integer doneCode = doneCodeComponent.gDoneCode();		
 		String optr_id=this.getBusiParam().getOptr().getOptr_id();
 		CCust cust=cCustDao.findByKey(orderProd.getCust_id());
 		
@@ -504,13 +503,17 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		orderComponent.saveCProdOrder(cProdOrder,orderProd,busi_code);
 		
 		//费用信息
-		
-		
 		//打印信息-发票 业务单
 		//业务流水
 		return cProdOrder.getOrder_sn();
 	}
-	
+	/**
+	 * 检查保存产品订购的参数
+	 * @param orderProd
+	 * @param busi_code
+	 * @return
+	 * @throws Exception
+	 */
 	private  CProdOrder checkOrderProdParam(OrderProd orderProd,String busi_code) throws Exception{
 		
 		PProd prod=pProdDao.findByKey(orderProd.getProd_id());
@@ -523,6 +526,12 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		//user_id数据校验
 		if(StringHelper.isNotEmpty(orderProd.getLast_order_sn())){
 			lastOrder=cProdOrderDao.findByKey(orderProd.getLast_order_sn());
+			if(lastOrder==null){
+				throw new ServicesException("上期订购记录不存在！");
+			}
+			if(lastOrder.getCust_id()!=orderProd.getCust_id()){
+				throw new ServicesException("上期订购记录和本期客户不一致！");
+			}
 			if(StringHelper.isNotEmpty(lastOrder.getUser_id())){
 				if(StringHelper.isEmpty(orderProd.getUser_id())){
 					orderProd.setUser_id(lastOrder.getUser_id());
@@ -532,10 +541,29 @@ public class OrderService extends BaseBusiService implements IOrderService{
 				}
 			}
 		}
-		//上期订购记录校检
-		
-		
-		
+		//上期订购记录校检，是否最近一条订购记录
+		if(lastOrder!=null){
+			List<CProdOrder> lastOrderList=null;
+			if(!prod.getProd_type().equals(SystemConstants.PROD_TYPE_BASE)){
+				//套餐的情况
+				lastOrderList=cProdOrderDao.queryTransOrderByPackage(orderProd.getCust_id());
+			}else if(prod.getServ_id().equals(SystemConstants.PROD_SERV_ID_BAND)){
+				//单产品宽带的情况
+				lastOrderList=cProdOrderDao.queryTransOrderByBand(orderProd.getUser_id());
+			}else{
+				//单产品非宽带的情况
+				lastOrderList=cProdOrderDao.queryTransOrderByProd(orderProd.getUser_id(), orderProd.getProd_id());
+			}
+			
+			if(lastOrderList==null||lastOrderList.size()==0){
+				throw new ServicesException("上期订购记录已过期，请重新打开订购界面！");
+			}
+			for(CProdOrder tmpOrder:lastOrderList){
+				if(tmpOrder.getExp_date().after(lastOrder.getExp_date())){
+					throw new ServicesException("上期订购记录已过期，请重新打开订购界面！");
+				}
+			}
+		}
 		//开始计费日校检
 		if(StringHelper.isNotEmpty(orderProd.getLast_order_sn())
 				&&!busi_code.equals(BusiCodeConstants.PROD_UPGRADE)){
@@ -549,6 +577,22 @@ public class OrderService extends BaseBusiService implements IOrderService{
 				throw new ServicesException("开始计费日错误！");
 			}
 		}
+		
+		//订购月数校检
+		String[] tmpTariff=orderProd.getTariff_id().split("_");
+		int billing_cycle=0;
+		if(tmpTariff.length==2){
+			billing_cycle=pProdTariffDisctDao.findByKey(tmpTariff[1]).getBilling_cycle();
+		}else{
+			billing_cycle=pProdTariffDao.findByKey(tmpTariff[0]).getBilling_cycle();
+		}
+		if(orderProd.getOrder_months()==0&&!busi_code.equals(BusiCodeConstants.PROD_UPGRADE)){
+			throw new  ComponentException("订购月数的不能=0");
+		}
+		if(orderProd.getOrder_months()%billing_cycle!=0){
+			throw new  ComponentException("订购月数非资费周期月数的倍数");
+		}
+		
 		//结束计费日校检
 		if(busi_code.equals(BusiCodeConstants.PROD_UPGRADE)&&orderProd.getOrder_months()==0){
 			//升级且0订购月数的情况，结束日期=上期订购结束日
