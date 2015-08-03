@@ -6,7 +6,9 @@ SelectUserPanel = Ext.extend(Ext.Panel, {
 	store: null,
 	dispatchUserWindow: null,
 	selectUserData: null,
-	constructor: function(){
+	parent: null,
+	constructor: function(parent){
+		this.parent = parent;
 	    this.store = new Ext.data.GroupingStore({
             reader: new Ext.data.JsonReader({}, [
        	       'user_id','user_name',
@@ -34,10 +36,12 @@ SelectUserPanel = Ext.extend(Ext.Panel, {
 	        	text: '选用户',
 	        	iconCls: 'icon-add-user',
 	        	scope: this,
+	        	disabled: true,
+	        	id: 'btnSelUser',
 	        	handler: function(){
 	        		this.openDispatchUserWindow();
 	        	}
-	        },'-',{
+	        },' ',{
 	        	iconCls: 'icon-collapse-all',
 	        	text: '展开或收缩',
 	        	scope: this,
@@ -59,7 +63,14 @@ SelectUserPanel = Ext.extend(Ext.Panel, {
 		if(!this.dispatchUserWindow){
 			this.dispatchUserWindow = new OpenDispatchUserWindow(this);
 		}
-		this.dispatchUserWindow.show(data);
+		// 
+		if(data["needShow"] === true){
+			this.dispatchUserWindow.show(data);
+			Ext.getCmp("btnSelUser").setDisabled(false);
+		}else{
+			Ext.getCmp("btnSelUser").setDisabled(true);
+			this.dispatchUserWindow.saveDefaultUsersWithNoShow(data);
+		}
 	},
 	loadSingleUser: function(userDesc){
 		this.store.loadData([{
@@ -243,6 +254,35 @@ OpenDispatchUserWindow = Ext.extend(Ext.Window, {
 			var users = this.selectedDataMap[gid];
 			for(var i = 0; i< users.length; i++){
 				var user = users[i];
+				targetData.push({
+					 'user_id': user["user_id"],
+					 'user_name': user["user_name"],
+					 'package_group_id': group["package_group_id"],
+					 'package_group_name': group["package_group_name"]
+				});
+			}
+		}
+		// 父面板加载数据
+		this.parent.store.loadData(targetData);
+	},
+	// 如果已经有默认值了，就不需要显示窗口，跳过选择的步骤
+	saveDefaultUsersWithNoShow: function(data){
+		var userList = data["userList"];
+		var userMap = {/* key: user_id , value: userDto */};
+		// 准备用户的数据结构，方便提取用户
+		for(var i = 0 ; i < userList.length; i++){
+			var userDto = userList[i]; 
+			userMap[userDto["user_id"]] = userDto;
+		}
+		// 抽取默认用户
+		var groupList = data["groupList"];
+		var targetData = [];
+		for(var i = 0; i < groupList.length; i++){
+			var group = groupList[i];
+			var selectUserList = group["userSelectList"]; 
+			for(var j = 0; j < selectUserList.length; j++){
+				var user = userMap[selectUserList[j]];
+				console.log(user);
 				targetData.push({
 					 'user_id': user["user_id"],
 					 'user_name': user["user_name"],
