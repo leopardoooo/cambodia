@@ -134,7 +134,7 @@ public class CAcctAcctitemChangeDao extends BaseEntityDao<CAcctAcctitemChange> {
 				" and a.county_id=? and c.county_id=? and d.county_id=?"+
 				" and d.user_id=? and d.cust_id=? and c.busi_code=? order by a.done_date desc";
 		return this.createQuery(AcctAcctitemChangeDto.class, sql, SystemConstants.ACCT_CHANGE_INVALID,
-				countyId, countyId, countyId, userId, custId, BusiCodeConstants.PROD_ORDER).first();
+				countyId, countyId, countyId, userId, custId, BusiCodeConstants.PROD_PACKAGE_ORDER).first();
 	}
 	
 	/**

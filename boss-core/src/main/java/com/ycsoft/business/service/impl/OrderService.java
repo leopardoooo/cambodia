@@ -70,7 +70,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		
 		if (busiCode.equals(BusiCodeConstants.PROD_SINGLE_ORDER)){
 			queryUserOrderableProd(cust,userId,panel,orderList);
-		} else if (busiCode.equals(BusiCodeConstants.PROD_ORDER)){
+		} else if (busiCode.equals(BusiCodeConstants.PROD_PACKAGE_ORDER)){
 			queryCustOrderablePkg(cust,panel,orderList);
 		} else if (busiCode.equals(BusiCodeConstants.PROD_CONTINUE)){
 			queryOrderableGoon(cust,filterOrderSn,panel,orderList);

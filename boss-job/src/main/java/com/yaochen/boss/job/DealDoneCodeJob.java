@@ -66,7 +66,7 @@ public class DealDoneCodeJob implements Job2 {
 		for (CDoneCode cDoneCode:doneCodeList){
 			List<CDoneCodeDetail> detailList = jobComponent.queryDoneCodeDetail(cDoneCode.getDone_code());
 			String busiCode = cDoneCode.getBusi_code();
-			if (busiCode.equals(BusiCodeConstants.PROD_ORDER) ||
+			if (busiCode.equals(BusiCodeConstants.PROD_PACKAGE_ORDER) ||
 					busiCode.equals(BusiCodeConstants.PROD_TERMINATE) || 
 					busiCode.equals(BusiCodeConstants.JOB_PROD_STOP) ||
 					busiCode.equals(BusiCodeConstants.PROMOTION_AUTO) ||
@@ -93,7 +93,7 @@ public class DealDoneCodeJob implements Job2 {
 							logger.error("设置产品包含关系","用户【"+detail.getUser_id()+"】"+e.getMessage());
 						}
 						
-						if (busiCode.equals(BusiCodeConstants.PROD_ORDER)){
+						if (busiCode.equals(BusiCodeConstants.PROD_PACKAGE_ORDER)){
 							//判断订购是否是基本产品，如果是，执行自动促销
 							PProd prod = jobComponent.queryProdByDoneCode(cDoneCode.getDone_code());
 							if (prod != null && SystemConstants.BOOLEAN_TRUE.equals(prod.getIs_base())){

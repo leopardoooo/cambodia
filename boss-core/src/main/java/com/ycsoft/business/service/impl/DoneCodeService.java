@@ -15,7 +15,7 @@ import static com.ycsoft.commons.constants.BusiCodeConstants.DEVICE_RECLAIM;
 import static com.ycsoft.commons.constants.BusiCodeConstants.DEVICE_SALE;
 import static com.ycsoft.commons.constants.BusiCodeConstants.EDIT_INVALID_DATE;
 import static com.ycsoft.commons.constants.BusiCodeConstants.PROD_CHANGE_TARIFF;
-import static com.ycsoft.commons.constants.BusiCodeConstants.PROD_ORDER;
+import static com.ycsoft.commons.constants.BusiCodeConstants.PROD_PACKAGE_ORDER;
 import static com.ycsoft.commons.constants.BusiCodeConstants.USER_DTOI;
 import static com.ycsoft.commons.constants.BusiCodeConstants.USER_EDIT;
 import static com.ycsoft.commons.constants.BusiCodeConstants.USER_EDIT_LEVEL;
@@ -173,7 +173,7 @@ public class DoneCodeService extends BaseBusiService implements IDoneCodeService
 			cancelOpenInteractive(custId, doneCode);
 		else if (busiCode.equals(USER_REQUIRE_STOP))
 			cancelRequireStop(custId, doneCode);
-		else if (busiCode.equals(PROD_ORDER))
+		else if (busiCode.equals(PROD_PACKAGE_ORDER))
 			cancelOrder(custId, doneCode);
 		else if (busiCode.equals(PROD_CHANGE_TARIFF))
 			cancelEditTariff(custId, doneCode);
@@ -629,7 +629,7 @@ public class DoneCodeService extends BaseBusiService implements IDoneCodeService
 			}
 			return new Pager(infoList,infoList.size());
 //			return doneCodeComponent.getUserOpenDate(doneCode,start,limit);
-		}else if(busiCode.equals(PROD_ORDER)){
+		}else if(busiCode.equals(PROD_PACKAGE_ORDER)){
 			return doneCodeComponent.getOrderProdDate(doneCode,cDoneCode.getCounty_id(),start,limit);
 		}else if(busiCode.equals(DEVICE_CHANGE)){
 			return doneCodeComponent.getDeviceChangeDate(doneCode,cDoneCode.getCounty_id(),start,limit);
