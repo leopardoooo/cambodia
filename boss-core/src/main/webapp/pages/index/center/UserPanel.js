@@ -265,15 +265,15 @@ ProdGrid = Ext.extend(Ext.TabPanel,{
 		// 列定义
 		this.baseProdCm = new Ext.ux.grid.LockingColumnModel({ 
     		columns : [
+    		{header:'订购SN',dataIndex:'order_sn',width:40},
 			{header:'产品名称',dataIndex:'prod_name',width:120},
+			{header:'所属套餐',dataIndex:'package_name',width:80},
 			{header:'当前资费',dataIndex:'tariff_name',	width:80},
+			{header:'生效日期',dataIndex:'eff_date',width:80,renderer: Ext.util.Format.dateFormat},
+			{header:'失效日期',dataIndex:'exp_date',width:80,renderer: Ext.util.Format.dateFormat},
 			{header:'状态',dataIndex:'status_text',	width:60,renderer:Ext.util.Format.statusShow},
-			{header:'生效日期',dataIndex:'eff_date',width:120},
-			{header:'失效日期',dataIndex:'exp_date',width:120},
-			{header:'所属套餐',dataIndex:'package_name',width:100},
-			{header:'产品类型',dataIndex:'prod_type_text',width:100},
-			{header:'订购时间',dataIndex:'order_time',width:80},
-			{header:'订购SN',dataIndex:'order_sn',width:80}
+			//{header:'产品类型',dataIndex:'prod_type_text',width:100},
+			{header:'订购时间',dataIndex:'order_time',width:80}
 	        ]
 	      });
 		
@@ -302,15 +302,14 @@ ProdGrid = Ext.extend(Ext.TabPanel,{
 		// 列定义
 		this.custPkgCm = new Ext.ux.grid.LockingColumnModel({ 
     		columns : [
+    		{header:'订购SN',dataIndex:'order_sn',width:40},
 			{header:'产品名称',dataIndex:'prod_name',width:120},
 			{header:'当前资费',dataIndex:'tariff_name',	width:80},
 			{header:'状态',dataIndex:'status_text',	width:60,renderer:Ext.util.Format.statusShow},
-			{header:'生效日期',dataIndex:'eff_date',width:120},
-			{header:'失效日期',dataIndex:'exp_date',width:120},
-			{header:'所属套餐',dataIndex:'package_name',width:100},
-			{header:'产品类型',dataIndex:'prod_type_text',width:100},
-			{header:'订购时间',dataIndex:'order_time',width:80},
-			{header:'订购SN',dataIndex:'order_sn',width:80}
+			{header:'生效日期',dataIndex:'eff_date',width:80,renderer: Ext.util.Format.dateFormat},
+			{header:'失效日期',dataIndex:'exp_date',width:80,renderer: Ext.util.Format.dateFormat},
+			{header:'产品类型',dataIndex:'prod_type_text',width:80},
+			{header:'订购时间',dataIndex:'order_time',width:80}
 	        ]
 	      });
 		this.custPkgStore = new Ext.data.JsonStore({
@@ -322,7 +321,7 @@ ProdGrid = Ext.extend(Ext.TabPanel,{
 			         "order_type","package_group_id","remark","public_acctitem_type"]
 		});
 		this.custPkgGrid = new Ext.ux.Grid({
-			id:'C_PKG',
+			id:'U_CUST_PKG',
 			stripeRows: true, 
 			border: false,
 			store:this.custPkgStore,
@@ -425,19 +424,16 @@ ProdGrid = Ext.extend(Ext.TabPanel,{
 			success : function(res,opt){
 				var data = Ext.decode(res.responseText);
 				// 过滤出客户套餐及用户产品
-				var custPkgData = [];
 				this.prodMap = {};
 				for(var key in data){
-					if(key === "CUST"){
-						custPkgData.push(data[key]);
-					}else{
+					if(key !== "CUST"){
 						this.prodMap[key] = data[key];
 					}
 				}
 				this.refresh();
 				//隐藏数据加载提示框
 				App.hideTip();
-				this.custPkgGrid.getStore().loadData(custPkgData);
+				this.custPkgGrid.getStore().loadData(data["CUST"]);
 			}
 		});
 	},
