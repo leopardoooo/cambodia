@@ -4,7 +4,8 @@ import java.io.Serializable;
 import java.util.Date;
 
 import com.ycsoft.beans.base.BusiBase;
-import com.ycsoft.business.dto.core.prod.OrderProd;
+import com.ycsoft.commons.constants.DictKey;
+import com.ycsoft.commons.store.MemoryDict;
 import com.ycsoft.daos.config.POJO;
 
 @POJO(tn = "C_PROD_ORDER", sn = "SEQ_ORDER_SN", pk = "ORDER_SN")
@@ -17,7 +18,8 @@ public class CProdOrder extends BusiBase implements Serializable {
     private String prod_id;
     private String tariff_id;
     private String disct_id;
-    private String status;//display(5)
+    private String status;
+    private String status_text;//display(5)
     private Date status_date;
     private Date eff_date;//display(6)
     private Date exp_date;//display(7)
@@ -87,6 +89,7 @@ public class CProdOrder extends BusiBase implements Serializable {
 	}
 	public void setStatus(String status) {
 		this.status = status;
+		this.status_text = MemoryDict.getDictName(DictKey.STATUS, this.status);
 	}
 	public Date getStatus_date() {
 		return status_date;
