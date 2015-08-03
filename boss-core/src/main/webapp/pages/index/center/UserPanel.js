@@ -252,36 +252,18 @@ UserGrid = Ext.extend(Ext.ux.Grid,{
 /**
  * 产品信息表格
  */ 
-ProdGrid = Ext.extend(Ext.ux.Grid,{
+ProdGrid = Ext.extend(Ext.TabPanel,{
 	border:false,
 	userProdStore:null,
+	custPkgStore:null,
 	region: 'center',
 	userId : null,
 	parent: null,
 	prodMap : null,
 	constructor:function(p){
 		this.parent = p;
-		this.userProdStore = new Ext.data.JsonStore({
-//			fields: ["prod_sn","cust_id","acct_id","user_id","prod_id","serv_id","tariff_id","package_sn","order_type","status","status_date","is_base",
-//				"invalid_date","prod_eff_time","order_date","billinfo_eff_time","area_id","county_id","prod_name","package_name","next_bill_date",
-//				"tariff_name","tariff_rent","next_tariff_id","next_tariff_name","order_type_text","status_text","prod_desc","resList","resSize",
-//				"prod_type","is_zero_tariff","is_invalid_tariff","allow_pay","just_for_once","exp_date","pkg",'pre_open_time',"stop_by_invalid_date",
-//				"public_acctitem_type_text","public_acctitem_type","billinfo_eff_date",'user_status',"billing_cycle","has_dyn","is_pause","month_rent_cal_type",
-//				"is_bank_pay","is_bank_pay_text","p_bank_pay"],
-			fields: ["tariff_name","disct_name","prod_type","prod_name","prod_type_text","serv_id",
-			         "serv_id_text","is_base","is_base_text","public_acctitem_type_text","package_name",
-			         "order_sn","package_sn","package_id","cust_id","user_id","prod_id","tariff_id","disct_id",
-			         "status","status_text","status_date","eff_date","exp_date","active_fee","bill_fee",
-			         "rent_fee","last_bill_date","next_bill_date","order_months","order_fee","order_time",
-			         "order_type","package_group_id","remark","public_acctitem_type"],
-			sortInfo: {
-				//field:'order_type',direction:'ASC',
-				//field:'is_base',direction:'DESC'
-			}
-		});
-		this.userProdStore.on('load',this.doLoadResult,this);
-		
-		var cm = new Ext.ux.grid.LockingColumnModel({ 
+		// 列定义
+		this.baseProdCm = new Ext.ux.grid.LockingColumnModel({ 
     		columns : [
 			{header:'产品名称',dataIndex:'prod_name',width:120},
 			{header:'当前资费',dataIndex:'tariff_name',	width:80},
@@ -292,43 +274,87 @@ ProdGrid = Ext.extend(Ext.ux.Grid,{
 			{header:'产品类型',dataIndex:'prod_type_text',width:100},
 			{header:'订购时间',dataIndex:'order_time',width:80},
 			{header:'订购SN',dataIndex:'order_sn',width:80}
-			//renderer:Ext.util.Format.dateFormat
 	        ]
 	      });
 		
-		ProdGrid.superclass.constructor.call(this,{
+		// 基本产品
+		this.userProdStore = new Ext.data.JsonStore({
+			fields: ["tariff_name","disct_name","prod_type","prod_name","prod_type_text","serv_id",
+			         "serv_id_text","is_base","is_base_text","public_acctitem_type_text","package_name",
+			         "order_sn","package_sn","package_id","cust_id","user_id","prod_id","tariff_id","disct_id",
+			         "status","status_text","status_date","eff_date","exp_date","active_fee","bill_fee",
+			         "rent_fee","last_bill_date","next_bill_date","order_months","order_fee","order_time",
+			         "order_type","package_group_id","remark","public_acctitem_type"]
+		});
+		this.userProdStore.on('load',this.doLoadResult,this);
+		// 基本产品
+		this.baseProdGrid = new Ext.ux.Grid({
 			id:'U_PROD',
-			title: '产品信息',
 			stripeRows: true, 
+			border: false,
 			store:this.userProdStore,
 			sm:new Ext.grid.RowSelectionModel(),
 			view: new Ext.ux.grid.ColumnLockBufferView(),
-			cm:cm
-			,tools:[{id:'search',qtip:'查询',cls:'tip-target',scope:this,handler:function(){
-				
-					var comp = this.tools.search;
-					if(this.userProdStore.getCount()>0){
-						if(win)win.close();
-						win = FilterWindow.addComp(this,[
-							{text:'当前资费',field:'tariff_name',type:'textfield'},
-							{text:'状态',field:'status',showField:'status_text'},
-							{text:'订购方式',field:'order_type',showField:'order_type_text'}
-						],335);
-						if(win){	
-							win.setPosition(comp.getX()-win.width, comp.getY()-50);//弹出框右对齐
-							win.show();
-						}
-					}else{
-						Alert('请先查询数据！');
-					}
-		    	}
-		    }]
+			cm: this.baseProdCm
+		});
+		
+		// 客户套餐
+		// 列定义
+		this.custPkgCm = new Ext.ux.grid.LockingColumnModel({ 
+    		columns : [
+			{header:'产品名称',dataIndex:'prod_name',width:120},
+			{header:'当前资费',dataIndex:'tariff_name',	width:80},
+			{header:'状态',dataIndex:'status_text',	width:60,renderer:Ext.util.Format.statusShow},
+			{header:'生效日期',dataIndex:'eff_date',width:120},
+			{header:'失效日期',dataIndex:'exp_date',width:120},
+			{header:'所属套餐',dataIndex:'package_name',width:100},
+			{header:'产品类型',dataIndex:'prod_type_text',width:100},
+			{header:'订购时间',dataIndex:'order_time',width:80},
+			{header:'订购SN',dataIndex:'order_sn',width:80}
+	        ]
+	      });
+		this.custPkgStore = new Ext.data.JsonStore({
+			fields: ["tariff_name","disct_name","prod_type","prod_name","prod_type_text","serv_id",
+			         "serv_id_text","is_base","is_base_text","public_acctitem_type_text","package_name",
+			         "order_sn","package_sn","package_id","cust_id","user_id","prod_id","tariff_id","disct_id",
+			         "status","status_text","status_date","eff_date","exp_date","active_fee","bill_fee",
+			         "rent_fee","last_bill_date","next_bill_date","order_months","order_fee","order_time",
+			         "order_type","package_group_id","remark","public_acctitem_type"]
+		});
+		this.custPkgGrid = new Ext.ux.Grid({
+			id:'C_PKG',
+			stripeRows: true, 
+			border: false,
+			store:this.custPkgStore,
+			sm:new Ext.grid.RowSelectionModel(),
+			view: new Ext.ux.grid.ColumnLockBufferView(),
+			cm: this.custPkgCm
+		});
+		
+		ProdGrid.superclass.constructor.call(this,{
+			activeTab: 0,
+			border: false,
+			items: [{
+				title: '基本产品',
+				border: false,
+				layout: 'fit',
+				items: [this.baseProdGrid]
+			},{
+				title: '客户套餐',
+				border: false,
+				layout: 'fit',
+				items: [this.custPkgGrid]
+			}]
 		})
 	},
 	initEvents: function(){
-		this.on("rowclick", this.doClickRecord, this );
-		this.on("afterrender",function(){
-			this.swapViews();
+		this.baseProdGrid.on("rowclick", this.doClickRecord, this );
+		this.baseProdGrid.on("afterrender",function(){
+			this.baseProdGrid.swapViews();
+		},this,{delay:10});
+		
+		this.custPkgGrid.on("afterrender",function(){
+			this.custPkgGrid.swapViews();
 		},this,{delay:10});
 		
 		ProdGrid.superclass.initEvents.call(this);
@@ -372,6 +398,7 @@ ProdGrid = Ext.extend(Ext.ux.Grid,{
 	},
 	refresh:function(){
 		this.userProdStore.removeAll();
+		this.setActiveTab(0);
 		if(this.userId){
 			var userProd = null;
 			if(this.prodMap && (userProd=this.prodMap[this.userId]) ){
@@ -397,10 +424,20 @@ ProdGrid = Ext.extend(Ext.ux.Grid,{
 			params : {cust_id : App.getCustId()},
 			success : function(res,opt){
 				var data = Ext.decode(res.responseText);
-				this.prodMap = data;
+				// 过滤出客户套餐及用户产品
+				var custPkgData = [];
+				this.prodMap = {};
+				for(var key in data){
+					if(key === "CUST"){
+						custPkgData.push(data[key]);
+					}else{
+						this.prodMap[key] = data[key];
+					}
+				}
 				this.refresh();
 				//隐藏数据加载提示框
 				App.hideTip();
+				this.custPkgGrid.getStore().loadData(custPkgData);
 			}
 		});
 	},
@@ -415,7 +452,8 @@ ProdGrid = Ext.extend(Ext.ux.Grid,{
 		return params;
 	},
 	reset : function(){//重置面板信息
-		this.getStore().removeAll();
+		this.baseProdGrid.getStore().removeAll();
+		this.custPkgGrid.getStore().removeAll();
 		this.userId = null;
 	},
 	getProdByUserId: function(user_id, prod_sn){
@@ -600,8 +638,8 @@ UserBroadbandTemplate = new Ext.XTemplate(
 	'</table>'
 );
 UserDetailTemplate = {
-	"ATV": UserAtvTemplate,
-	"DTV": UserDtvTemplate,
+	"OTT": UserAtvTemplate,
+	"DTT": UserDtvTemplate,
 	"BAND": UserBroadbandTemplate
 };
 
@@ -778,7 +816,7 @@ UserValidResGrid = Ext.extend(Ext.grid.GridPanel,{
  * @extends Ext.Panel
  */
 UserDetailInfo = Ext.extend(Ext.Panel,{
-	type : 'DTV',//默认为数字电视用户的模板
+	type : 'DTT',//默认为数字电视用户的模板
 	tpl: null,
 	constructor: function(){
 		this.tpl = UserDetailTemplate[this.type];

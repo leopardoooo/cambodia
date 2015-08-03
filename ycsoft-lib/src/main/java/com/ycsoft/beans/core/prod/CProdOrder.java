@@ -34,8 +34,16 @@ public class CProdOrder extends BusiBase implements Serializable {
     private String order_type;
     private String package_group_id;
     private String remark;
-    private String public_acctitem_type;
+    private String public_acctitem_type; 
+    private String is_pay;
     
+    
+	public String getIs_pay() {
+		return is_pay;
+	}
+	public void setIs_pay(String is_pay) {
+		this.is_pay = is_pay;
+	}
 	public String getOrder_sn() {
 		return order_sn;
 	}

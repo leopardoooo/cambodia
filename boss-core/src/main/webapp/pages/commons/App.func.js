@@ -279,7 +279,7 @@ Ext.apply(App.func,{
 				if(!flag) return false;
 				
 				if(data['is_base'] == 'T'){//基本包
-					var store = App.getApp().main.infoPanel.getUserPanel().prodGrid.getStore();
+					var store = App.getApp().main.infoPanel.getUserPanel().prodGrid.baseProdGrid.getStore();
 					flag = false;
 					store.each(function(record){
 						//当前行的产品为基本包且有其他基本包，当前基本包产品才能退订

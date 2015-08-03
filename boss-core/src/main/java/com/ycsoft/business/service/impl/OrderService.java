@@ -1,5 +1,6 @@
 package com.ycsoft.business.service.impl;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.ycsoft.beans.config.TRuleDefine;
+import com.ycsoft.beans.core.common.CDoneCodeUnpay;
 import com.ycsoft.beans.core.cust.CCust;
 import com.ycsoft.beans.core.prod.CProdOrder;
 import com.ycsoft.beans.core.prod.CProdOrderDto;
@@ -23,9 +25,12 @@ import com.ycsoft.beans.prod.PPackageProd;
 import com.ycsoft.beans.prod.PProd;
 import com.ycsoft.beans.prod.PProdTariffDisct;
 import com.ycsoft.business.component.config.ExpressionUtil;
+import com.ycsoft.business.component.core.FeeComponent;
+import com.ycsoft.business.component.core.JobComponent;
 import com.ycsoft.business.component.core.OrderComponent;
 import com.ycsoft.business.component.core.UserComponent;
 import com.ycsoft.business.dao.config.TRuleDefineDao;
+import com.ycsoft.business.dao.core.common.CDoneCodeUnpayDao;
 import com.ycsoft.business.dao.core.cust.CCustDao;
 import com.ycsoft.business.dao.core.prod.CProdOrderDao;
 import com.ycsoft.business.dao.core.user.CUserDao;
@@ -33,6 +38,7 @@ import com.ycsoft.business.dao.prod.PPackageProdDao;
 import com.ycsoft.business.dao.prod.PProdDao;
 import com.ycsoft.business.dao.prod.PProdTariffDao;
 import com.ycsoft.business.dao.prod.PProdTariffDisctDao;
+import com.ycsoft.business.dto.core.acct.PayDto;
 import com.ycsoft.business.dto.core.prod.OrderProd;
 import com.ycsoft.business.dto.core.prod.OrderProdPanel;
 import com.ycsoft.business.dto.core.prod.PackageGroupPanel;
@@ -41,6 +47,7 @@ import com.ycsoft.business.dto.core.prod.ProdTariffDto;
 import com.ycsoft.business.service.IOrderService;
 import com.ycsoft.commons.constants.BusiCodeConstants;
 import com.ycsoft.commons.constants.DictKey;
+import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.exception.ComponentException;
 import com.ycsoft.commons.exception.ServicesException;
@@ -49,6 +56,7 @@ import com.ycsoft.commons.helper.DateHelper;
 import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.commons.store.MemoryDict;
 import com.ycsoft.daos.core.JDBCException;
+import com.ycsoft.daos.helper.BeanHelper;
 @Service
 public class OrderService extends BaseBusiService implements IOrderService{
 	@Autowired
@@ -73,7 +81,13 @@ public class OrderService extends BaseBusiService implements IOrderService{
 	private TRuleDefineDao tRuleDefineDao;
 	@Autowired
 	private BeanFactory beanFactory;
-
+	@Autowired
+	private FeeComponent feeComponent;
+	@Autowired
+	private CDoneCodeUnpayDao cDoneCodeUnpayDao;
+	@Autowired
+	private JobComponent jobComponent;
+	
 	@Override
 	public OrderProdPanel queryOrderableProd(String busiCode,String custId,String userId, String filterOrderSn)
 			throws Exception {
@@ -505,15 +519,59 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		//主订购记录bean生成
 		CProdOrder cProdOrder=orderComponent.createCProdOrder(orderProd, doneCode, optr_id, cust.getArea_id(), cust.getCounty_id());
 		//产品状态设置
-		cProdOrder.setStatus(orderComponent.getNewOrderProdStatus(lastOrder,orderProd));		
+		cProdOrder.setStatus(orderComponent.getNewOrderProdStatus(lastOrder,orderProd));
+		//业务是否需要支付判断
+		cProdOrder.setIs_pay(this.saveDoneCodeUnPay(orderProd, doneCode)?SystemConstants.BOOLEAN_TRUE:SystemConstants.BOOLEAN_FALSE);
 		//保存订购记录
 		orderComponent.saveCProdOrder(cProdOrder,orderProd,busi_code);
 		
 		//费用信息
+		if(orderProd.getPay_fee()>0){
+			this.saveCFee(cProdOrder,orderProd.getPay_fee(),cust,doneCode,busi_code);
+		}
+		
 		//打印信息-发票 业务单
 		//业务流水
 		return cProdOrder.getOrder_sn();
 	}
+	/**
+	 * 保存费用信息
+	 * @param orderProd
+	 * @throws InvocationTargetException 
+	 * @throws IllegalAccessException 
+	 */
+	private void saveCFee(CProdOrder cProdorder,Integer payFee,CCust cust,Integer doneCode,String busi_code) throws Exception{
+		PayDto pay=new PayDto();
+		BeanHelper.copyProperties(pay, cProdorder);
+		pay.setProd_sn(cProdorder.getOrder_sn());
+		pay.setAcctitem_id(cProdorder.getProd_id());
+		pay.setBegin_date(DateHelper.dateToStr(cProdorder.getEff_date()));
+		pay.setInvalid_date(DateHelper.dateToStr(cProdorder.getExp_date()));
+		pay.setPresent_fee(0);
+		pay.setFee(payFee);
+		
+		feeComponent.saveAcctFee(cust.getCust_id(), cust.getAddr_id(), pay, doneCode, busi_code, StatusConstants.UNPAY);
+	}
+	
+	/**
+	 * 保存业务的未支付信息
+	 * @param orderProd
+	 * @return
+	 * @throws JDBCException 
+	 */
+	private boolean saveDoneCodeUnPay(OrderProd orderProd,Integer done_code) throws JDBCException{
+		List<CDoneCodeUnpay> uppayList=cDoneCodeUnpayDao.queryUnPayByLock(orderProd.getCust_id());
+		if(uppayList.size()==0&&orderProd.getPay_fee()==0){
+			//没有未支付的业务，且当前新订单不需要支付，则该笔订单业务设置为已支付
+			//已支付的要发授权指令
+			
+			return true;
+		}else{
+			cDoneCodeUnpayDao.saveUnpay(orderProd.getCust_id(), done_code);
+			return false;
+		}
+	}
+	
 	/**
 	 * 检查保存产品订购的参数
 	 * @param orderProd
