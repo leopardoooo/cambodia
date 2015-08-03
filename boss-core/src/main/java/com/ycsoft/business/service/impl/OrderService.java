@@ -335,9 +335,9 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		panel.setNeedShow(true);
 		//装入用户清单
 		//TODO 要装入施工中和正常的状态终端用户
-		panel.setUserList(userComponent.queryUserByCustId(cust_id));
+		panel.setUserList(userComponent.queryCanSelectByCustId(cust_id));
 		//装入内容配置信息
-		fillPackageProdConfig(panel,pPackageProdDao.queryPackProdByProdId(prod_id));
+		fillPackageProdConfig(panel,pPackageProdDao.queryPackProdById(prod_id));
 		
 		//自动适配选定用户数量
 		if(!autoSelectUser(panel)){
@@ -357,6 +357,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		panel.setGroupList(groupList);
 		for(PPackageProd pakprod: pakprodList){
 			PackageGroupUser pgu=new PackageGroupUser(pakprod);
+			groupList.add(pgu);
 			pgu.setProdList(new ArrayList<PProd>());
 			for(String prod_id: pakprod.getProd_list().split(",")){
 				if(StringHelper.isNotEmpty(prod_id)){

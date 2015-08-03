@@ -10,10 +10,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.ycsoft.beans.system.SOptr;
 import com.ycsoft.business.commons.pojo.BusiParameter;
 import com.ycsoft.business.dto.core.prod.OrderProd;
+import com.ycsoft.business.dto.core.prod.PackageGroupPanel;
 import com.ycsoft.business.dto.core.prod.PackageGroupUser;
 import com.ycsoft.business.service.impl.OrderService;
 import com.ycsoft.commons.constants.BusiCodeConstants;
 import com.ycsoft.commons.helper.DateHelper;
+import com.ycsoft.commons.helper.JsonHelper;
 
 import test.ycsoft.testcomm.JunitSpringBase;
 
@@ -75,6 +77,15 @@ public class testOrderAction extends JunitSpringBase {
 		
 		orderService.saveOrderProd(order, BusiCodeConstants.PROD_PACKAGE_ORDER);
 	}
+	
+	@Test
+	public void testUserSelect() throws Exception{
+		//order.setCust_id("11078537");
+		PackageGroupPanel panel=orderService.queryPackageGroupPanel("11078537", "101", null);
+		
+		System.out.println(JsonHelper.fromObject(panel));
+	}
+	
 	@Test
 	public void test2() throws Exception{
 		OrderProd order=new OrderProd();

@@ -48,20 +48,20 @@ public class PPackageProdDao extends BaseEntityDao<PPackageProd> {
 		executeUpdate(sql, pkgId,pkgTariffId);
 	}
 	public List<PPackageProd> queryPackProdByProdId(String prodId)  throws Exception{
-		String sql = "select * from p_package_prod where prod_id=? and type=?";
-		List<PPackageProd> tariffList = this.createQuery(PPackageProd.class,sql, prodId, SystemConstants.PACKAGE_MARKET_TYPE).list();
+		String sql = "select * from p_package_prod where prod_id=? ";
+		List<PPackageProd> tariffList = this.createQuery(PPackageProd.class,sql, prodId).list();
 		return tariffList;
 	}
 	
 	public List<PPackageProd> queryPkgById(String pkId)  throws Exception{
-		String sql = "select  distinct prod_id  from p_package_prod where package_id=? and type=?";
-		List<PPackageProd> pkList = this.createQuery(PPackageProd.class,sql, pkId, SystemConstants.PACKAGE_MARKET_TYPE).list();
+		String sql = "select  distinct prod_id  from p_package_prod where package_id=? ";
+		List<PPackageProd> pkList = this.createQuery(PPackageProd.class,sql, pkId).list();
 		return pkList;
 	}
 	
 	public List<PPackageProd> queryPkgProdById(String prodId)  throws Exception{
-		String sql = "select  distinct prod_id  from p_package_prod where package_id=? and type=?";
-		List<PPackageProd> tariffList = this.createQuery(PPackageProd.class,sql, prodId, SystemConstants.PACKAGE_MARKET_TYPE).list();
+		String sql = "select  distinct prod_id  from p_package_prod where package_id=? ";
+		List<PPackageProd> tariffList = this.createQuery(PPackageProd.class,sql, prodId).list();
 		return tariffList;
 	}
 	
@@ -78,8 +78,8 @@ public class PPackageProdDao extends BaseEntityDao<PPackageProd> {
 	}
 	
 	public List<PPackageProd> getMarketPackProdById(String pkgId,String pkgTariffId)  throws Exception{
-		String sql = "select p.* from  p_package_prod p where p.package_id= ? and p.package_tariff_id =? and p.type=?";
-		List<PPackageProd> tariffList = this.createQuery(PPackageProd.class,sql, pkgId,pkgTariffId, SystemConstants.PACKAGE_MARKET_TYPE).list();
+		String sql = "select p.* from  p_package_prod p where p.package_id= ? and p.package_tariff_id =? ";
+		List<PPackageProd> tariffList = this.createQuery(PPackageProd.class,sql, pkgId,pkgTariffId).list();
 		return tariffList;
 	}
 	
