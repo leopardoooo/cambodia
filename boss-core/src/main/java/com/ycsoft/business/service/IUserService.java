@@ -89,6 +89,12 @@ public interface IUserService extends IBaseService{
 	 * @throws Exception
 	 */
 	public void saveAtvToDtv(CUser user,int curMonthFee,int payFee) throws Exception;
+	
+	/**
+	 * 检查用户能报停
+	 * @throws Exception
+	 */
+	public void checkStopUser() throws Exception;
 
 	/**
 	 * 报停(支持多用户)

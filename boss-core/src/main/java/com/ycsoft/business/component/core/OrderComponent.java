@@ -9,9 +9,11 @@ import java.util.Map;
 
 import org.springframework.stereotype.Component;
 
+import com.ycsoft.beans.core.prod.CProd;
 import com.ycsoft.beans.core.prod.CProdOrder;
 import com.ycsoft.beans.core.prod.CProdOrderHis;
 import com.ycsoft.beans.core.prod.CProdOrderTransfee;
+import com.ycsoft.beans.core.prod.CProdPropChange;
 import com.ycsoft.beans.core.user.CUser;
 import com.ycsoft.beans.prod.PPackageProd;
 import com.ycsoft.beans.prod.PProd;
@@ -355,6 +357,44 @@ public class OrderComponent extends BaseBusiComponent {
 		if(orderList.size()>0){
 			cProdOrderDao.save(orderList.toArray(new CProdOrder[orderList.size()]));
 		}
+	}
+	
+	/**
+	 * 修改产品信息
+	 * @param doneCode
+	 * @param orderSn
+	 * @param propChangeList
+	 * @throws Exception
+	 */
+	public void editOrder(Integer doneCode,String orderSn,List<CProdPropChange> propChangeList) throws Exception{
+		if(propChangeList == null || propChangeList.size() == 0) return ;
+		CProdOrder order = new CProdOrder();
+		order.setOrder_sn(orderSn);
+		for (CProdPropChange change:propChangeList){
+			if (change.getColumn_name().indexOf("date")>-1){
+				if (change.getNew_value().length() ==10)
+					BeanHelper.setProperty(order, change.getColumn_name(), 
+							DateHelper.parseDate(change.getNew_value(), DateHelper.FORMAT_YMD));
+				else 
+					BeanHelper.setProperty(order, change.getColumn_name(), 
+							DateHelper.parseDate(change.getNew_value(), DateHelper.FORMAT_TIME));
+			} else {
+				BeanHelper.setProperty(order, change.getColumn_name(), change
+						.getNew_value());
+			}
+			
+
+			change.setProd_sn(orderSn);
+			change.setDone_code(doneCode);
+			change.setArea_id(getOptr().getArea_id());
+			change.setCounty_id(getOptr().getCounty_id());
+		}
+		//修改产品信息
+		cProdOrderDao.update(order);
+		
+		
+		//保存产品异动信息
+		cProdPropChangeDao.save(propChangeList.toArray(new CProdPropChange[propChangeList.size()]));
 	}
 	
 	public void setPProdDao(PProdDao pProdDao) {
