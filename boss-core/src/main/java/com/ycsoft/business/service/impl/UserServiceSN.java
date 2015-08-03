@@ -270,8 +270,6 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 							packageSn = order.getPackage_sn();
 						}
 					}
-//					jobComponent.createBusiCmdJob(doneCode, BusiCmdConstants.PASSVATE_PROD, cust.getCust_id(),
-//						user.getUser_id(), user.getStb_id(), user.getCard_id(), user.getModem_mac(), order.getOrder_sn(),order.getProd_id());
 				}
 				
 				if (packageSn != null){
@@ -329,6 +327,33 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 			jobComponent.createBusiCmdJob(doneCode, BusiCmdConstants.ACCTIVATE_USER, cust.getCust_id(),
 					user.getUser_id(), user.getStb_id(), user.getCard_id(), user.getModem_mac(), null, null,JsonHelper.fromObject(user));
 			//修改订单状态为正常状态，并更新到期日
+			String packageSn= null;
+			for (CProdOrderDto order:orderList){
+				if (StringHelper.isNotEmpty(order.getUser_id()) && order.getUser_id().equals(user.getUser_id())){
+					CProdPropChange statusChange = cProdPropChangeDao.queryLastStatus(order.getOrder_sn(), order.getCounty_id());
+					if (statusChange == null)
+						throw new ServicesException("找不到产品报停记录，请联系管理员");
+					//计算报停天数
+					int stopDays = DateHelper.getDiffDays(statusChange.getChange_time(), new Date());
+					
+					List<CProdPropChange> changeList = new ArrayList<CProdPropChange>();
+					changeList.add(new CProdPropChange("status",
+							order.getStatus(),statusChange.getNew_value()));
+					changeList.add(new CProdPropChange("status_date",
+							DateHelper.dateToStr(order.getStatus_date()),DateHelper.dateToStr(new Date())));
+					changeList.add(new CProdPropChange("exp_date",
+							DateHelper.dateToStr(order.getExp_date()),DateHelper.dateToStr(new Date())));
+					
+					orderComponent.editProd(doneCode,order.getOrder_sn(),changeList);
+					
+					if (StringHelper.isNotEmpty(order.getPackage_sn())){
+						packageSn = order.getPackage_sn();
+					}
+				}
+			}
+			
+			
+			
 		}
 		
 	}

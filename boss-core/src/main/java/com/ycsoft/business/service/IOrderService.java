@@ -1,6 +1,7 @@
 package com.ycsoft.business.service;
 
 import java.util.List;
+import java.util.Map;
 
 import com.ycsoft.beans.core.prod.CProdOrder;
 import com.ycsoft.beans.core.prod.CProdOrderDto;
@@ -16,7 +17,7 @@ public interface IOrderService extends IBaseService{
 	
 	public List<CProdOrder> queryTransferFee(OrderProd orderProd,String busi_code) throws Exception;
 	
-	public List<CProdOrderDto> queryCustEffOrder(String cust_id) throws Exception;
+	public Map<String,List<CProdOrderDto>> queryCustEffOrder(String cust_id) throws Exception;
 	
 	public String saveOrderProd(OrderProd orderProd,String busi_code) throws Exception;
 }

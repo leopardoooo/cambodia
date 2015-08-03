@@ -286,8 +286,15 @@ public class OrderService extends BaseBusiService implements IOrderService{
 	
 
 	@Override
-	public List<CProdOrderDto> queryCustEffOrder(String custId) throws Exception {
-		return cProdOrderDao.queryCustEffOrderDto(custId);
+	public Map<String,List<CProdOrderDto>> queryCustEffOrder(String custId) throws Exception {
+		
+		List<CProdOrderDto> orderList = cProdOrderDao.queryCustEffOrderDto(custId);
+		for (CProdOrderDto order :orderList){
+			if (StringHelper.isEmpty(order.getUser_id()))
+				order.setUser_id("CUST");
+		}
+		
+		return CollectionHelper.converToMap(orderList, "user_id");
 	}
 
 	private boolean checkRule(CCust cust,CUser user, String ruleId) throws Exception{
