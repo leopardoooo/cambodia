@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 
 import com.ycsoft.beans.core.prod.CProdOrder;
 import com.ycsoft.beans.core.prod.CProdOrderDto;
+import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.daos.abstracts.BaseEntityDao;
 import com.ycsoft.daos.core.JDBCException;
@@ -17,19 +18,21 @@ public class CProdOrderDao extends BaseEntityDao<CProdOrder> {
 				+ " from c_prod_order a,p_prod b,p_prod_tariff c,p_prod_tariff_disct d,p_prod e "
 				+ " where a.cust_id=? and a.prod_id=b.prod_id and a.package_id=e.prod_id(+) "
 				+ " and a.tariff_id=c.tariff_id(+) and a.disct_id= d.disct_id(+) "
-				+ " and a.eff_date<=sysdate and a.exp_date>=sysdate  "
+				+ " (a.exp_date>=sysdate or a.status in (?,?,?)"
 				+ " order by a.cust_id,a.user_id,a.exp_date desc ";
 		
-		return this.createQuery(CProdOrderDto.class, sql, custId).list();
+		return this.createQuery(CProdOrderDto.class, sql, custId,StatusConstants.REQSTOP,
+				StatusConstants.LINKSTOP,StatusConstants.INSTALL).list();
 	}
 	
 	
 	public List<CProdOrder> queryCustEffOrder(String custId) throws JDBCException{
 		String sql = "select * from c_prod_order where cust_id=? "
-				+ " and eff_date<=sysdate and exp_date>=sysdate "
+				+ " and exp_date>=sysdate or status in (?,?,?)"
 				+ "order by cust_id,user_id,exp_date desc";
 		
-		return this.createQuery(CProdOrder.class, sql, custId).list();
+		return this.createQuery(CProdOrder.class, sql, custId,StatusConstants.REQSTOP,
+				StatusConstants.LINKSTOP,StatusConstants.INSTALL).list();
 	}
 
 	/**
