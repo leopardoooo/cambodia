@@ -45,6 +45,7 @@ import com.ycsoft.business.dto.core.prod.PackageGroupPanel;
 import com.ycsoft.business.dto.core.prod.PackageGroupUser;
 import com.ycsoft.business.dto.core.prod.ProdTariffDto;
 import com.ycsoft.business.service.IOrderService;
+import com.ycsoft.commons.constants.BusiCmdConstants;
 import com.ycsoft.commons.constants.BusiCodeConstants;
 import com.ycsoft.commons.constants.DictKey;
 import com.ycsoft.commons.constants.StatusConstants;
@@ -508,8 +509,9 @@ public class OrderService extends BaseBusiService implements IOrderService{
 	@Override
 	public String saveOrderProd(OrderProd orderProd,String busi_code) throws Exception{
 		
+		PProd prodConfig=pProdDao.findByKey(orderProd.getProd_id());
 		//参数检查
-		CProdOrder lastOrder=checkOrderProdParam(orderProd,busi_code);
+		CProdOrder lastOrder=checkOrderProdParam(orderProd,prodConfig,busi_code);
 				
 		Integer doneCode = doneCodeComponent.gDoneCode();		
 		String optr_id=this.getBusiParam().getOptr().getOptr_id();
@@ -520,18 +522,26 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		CProdOrder cProdOrder=orderComponent.createCProdOrder(orderProd, doneCode, optr_id, cust.getArea_id(), cust.getCounty_id());
 		//产品状态设置
 		cProdOrder.setStatus(orderComponent.getNewOrderProdStatus(lastOrder,orderProd));
-		//业务是否需要支付判断
+		//业务是否需要支付判断                     
 		cProdOrder.setIs_pay(this.saveDoneCodeUnPay(orderProd, doneCode)?SystemConstants.BOOLEAN_TRUE:SystemConstants.BOOLEAN_FALSE);
 		//保存订购记录
 		orderComponent.saveCProdOrder(cProdOrder,orderProd,busi_code);
+		
+		//已支付且订单状态是正常的要发加授权指令
+		if(cProdOrder.getIs_pay().equals(SystemConstants.BOOLEAN_TRUE)
+				&&cProdOrder.getStatus().equals(StatusConstants.ACTIVE)){
+			this.saveOrderProdBusiCmd(cProdOrder, prodConfig.getProd_type(), BusiCmdConstants.ACCTIVATE_PROD, doneCode);
+		}
 		
 		//费用信息
 		if(orderProd.getPay_fee()>0){
 			this.saveCFee(cProdOrder,orderProd.getPay_fee(),cust,doneCode,busi_code);
 		}
 		
-		//打印信息-发票 业务单
+		//打印信息-业务单
+		
 		//业务流水
+		this.saveAllPublic(doneCode, getBusiParam());
 		return cProdOrder.getOrder_sn();
 	}
 	/**
@@ -558,17 +568,41 @@ public class OrderService extends BaseBusiService implements IOrderService{
 	 * @param orderProd
 	 * @return
 	 * @throws JDBCException 
+	 * @throws Exception 
 	 */
 	private boolean saveDoneCodeUnPay(OrderProd orderProd,Integer done_code) throws JDBCException{
 		List<CDoneCodeUnpay> uppayList=cDoneCodeUnpayDao.queryUnPayByLock(orderProd.getCust_id());
 		if(uppayList.size()==0&&orderProd.getPay_fee()==0){
 			//没有未支付的业务，且当前新订单不需要支付，则该笔订单业务设置为已支付
-			//已支付的要发授权指令
-			
 			return true;
 		}else{
 			cDoneCodeUnpayDao.saveUnpay(orderProd.getCust_id(), done_code);
 			return false;
+		}
+	}
+	/**
+	 * 创建订单的授权任务
+	 * @param cProdOrder
+	 * @param prod_type
+	 * @param busi_cmd_type
+	 * @throws Exception 
+	 */
+	public  void saveOrderProdBusiCmd(CProdOrder cProdOrder,String prod_type,String busi_cmd_type,Integer done_code) throws Exception{
+		if(prod_type.equals(SystemConstants.PROD_TYPE_BASE)){
+			//单产品授权
+			CUser user=cUserDao.findByKey(cProdOrder.getUser_id());
+			jobComponent.createBusiCmdJob(done_code,busi_cmd_type, cProdOrder.getCust_id(), cProdOrder.getUser_id()
+					, user.getStb_id(), user.getCard_id(), user.getModem_mac(),
+					cProdOrder.getOrder_sn(), cProdOrder.getProd_id(), null, SystemConstants.PRIORITY_SSSQ);
+		}else{
+			//套餐的授权
+			Map<String,CUser> userMap=CollectionHelper.converToMapSingle(cUserDao.queryUserByCustId(cProdOrder.getCust_id()), "user_id");
+			for(CProdOrder order:cProdOrderDao.queryPakDetailOrder(cProdOrder.getOrder_sn())){
+				CUser user=cUserDao.findByKey(cProdOrder.getUser_id());
+				jobComponent.createBusiCmdJob(done_code,busi_cmd_type, order.getCust_id(), order.getUser_id()
+						, user.getStb_id(), user.getCard_id(), user.getModem_mac(),
+						order.getOrder_sn(), order.getProd_id(), null, SystemConstants.PRIORITY_SSSQ);
+			}
 		}
 	}
 	
@@ -579,9 +613,9 @@ public class OrderService extends BaseBusiService implements IOrderService{
 	 * @return
 	 * @throws Exception
 	 */
-	private  CProdOrder checkOrderProdParam(OrderProd orderProd,String busi_code) throws Exception{
+	private  CProdOrder checkOrderProdParam(OrderProd orderProd,PProd prodConfig,String busi_code) throws Exception{
 		
-		PProd prod=pProdDao.findByKey(orderProd.getProd_id());
+		PProd prod=prodConfig;
 		if(!prod.getProd_type().equals(SystemConstants.PROD_TYPE_BASE)){
 			if(StringHelper.isNotEmpty(orderProd.getUser_id())){
 				throw new ServicesException("订购套餐时，不能填user_id！");
