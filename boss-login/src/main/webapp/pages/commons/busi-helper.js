@@ -200,7 +200,7 @@ Ext.apply( App, {
 	 * 公共的参数包括客户信息，所选用户信息，业务代码不需要提供
 	 * @param {} callback 成功后回调函数
 	 */
-	sendRequest : function(url,params,callback){
+	sendRequest : function(url,params,callback, async){
 		var all = {};
 		//公有的参数
 		var common = App.getValues();
@@ -216,6 +216,7 @@ Ext.apply( App, {
 			scope : this,
 			url : url,
 			params : all,
+			async: async === false ? false : true,
 			success : function(res,opt){
 				tip.hide();
 				tip = null;
