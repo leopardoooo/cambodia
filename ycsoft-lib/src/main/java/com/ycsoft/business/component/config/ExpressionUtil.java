@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
@@ -62,8 +63,36 @@ public class ExpressionUtil {
 
 	private static final String [] replaceParmer={"ACCTITEM","times","BALANCE"};
 	private static String[] datefunname= {"TODAY","THISYEAR","THISMONTH"};
-
-	public ExpressionUtil() {
+    
+	//不再使用
+	@Deprecated
+	public ExpressionUtil(){}
+	
+	public ExpressionUtil(BeanFactory beanFactory) {
+		tAddressDao=beanFactory.getBean(TAddressDao.class);	
+		//private CCustDao cCustDao;
+		cCustDao=beanFactory.getBean(CCustDao.class);
+		//private CFeeDeviceDao cFeeDeviceDao;
+		cFeeDeviceDao=beanFactory.getBean(CFeeDeviceDao.class);
+		//private CUserDao cUserDao;
+		cUserDao=beanFactory.getBean(CUserDao.class);
+//		private CUserDtvDao cUserDtvDao;
+		cUserDtvDao=beanFactory.getBean(CUserDtvDao.class);
+//		private CUserAtvDao cUserAtvDao;
+		cUserAtvDao=beanFactory.getBean(CUserAtvDao.class);
+//		private TRuleEditDao tRuleEditDao;
+		tRuleEditDao=beanFactory.getBean(TRuleEditDao.class);
+//		private TRuleDefineDao tRuleDefineDao;
+		tRuleDefineDao=beanFactory.getBean(TRuleDefineDao.class);
+//		@SuppressWarnings("unused")
+//		private PPromotionDao pPromotionDao;
+		pPromotionDao=beanFactory.getBean(PPromotionDao.class);
+//		private CFeeDao cFeeDao;
+		cFeeDao=beanFactory.getBean(CFeeDao.class);
+//		private CProdDao cProdDao;
+		cProdDao=beanFactory.getBean(CProdDao.class);
+//		private CAcctBankDao cAcctBankDao;
+		cAcctBankDao=beanFactory.getBean(CAcctBankDao.class);
 	}
 
 	private TAddressDao tAddressDao;
