@@ -18,7 +18,7 @@ ProdOrderForm = Ext.extend( BaseForm, {
 	//  套餐订购用户
 	packageGroups: null,
 	constructor: function(p){
-		this.selectUserPanel = new SelectUserPanel();
+		this.selectUserPanel = new SelectUserPanel(this);
 		ProdOrderForm.superclass.constructor.call(this, {
 			trackResetOnLoad:true,
 			autoScroll:true,
@@ -195,7 +195,8 @@ ProdOrderForm = Ext.extend( BaseForm, {
 		var boxProdTariff = Ext.getCmp("boxProdTariff");
 		var tariffs = this.baseData["tariffMap"][prodId] || [];
 		boxProdTariff.getStore().loadData(tariffs);
-		// 如果只有一个默认选中
+		// 如果只有一个默认选中, 
+		// Update: 尽管只有1个资费，也不选中，因为转移支付的初始化问题
 		if(tariffs.length == 1){
 			boxProdTariff.setValue(tariffs[0]["tariff_id"]);
 		}else{
@@ -210,16 +211,12 @@ ProdOrderForm = Ext.extend( BaseForm, {
 		// 有上期结束日并且当前不是升级业务
 		if(lastOrderProdDate && this.busiCode != "100"){
 			var tmpDate = Date.parseDate(lastOrderProdDate, "Y-m-d");
-			startDate.setDate(tmpDate.getDate() + 1);
+			tmpDate.setDate(tmpDate.getDate() + 1);
+			startDate = tmpDate;
 		}
 		Ext.getCmp("dfStartDate").setValue(startDate);
 		// 结束计费日期
 		this.doChangeEndDate();
-		
-		// 加载结算金额
-		if(tariffs.length == 1){
-			this.doLoadTransferAmount();
-		}
 		// 加载终端用户
 		this.doLoadUsers(record);
 	},
@@ -281,10 +278,9 @@ ProdOrderForm = Ext.extend( BaseForm, {
 		}else{ 
 			Ext.getCmp("dfExpDate").setValue(null);
 		}
-		
 	},
 	doLoadTransferAmount: function(){
-		var validObj = ProdOrderForm.superclass.doValid.call(this); 
+		var validObj = this.doBaseValid(); 
 		if(validObj["isValid"] !== true){
 			Alert(validObj["msg"]);
 			return ;
@@ -315,7 +311,7 @@ ProdOrderForm = Ext.extend( BaseForm, {
 	// 实际应付
 	totalAmount: -1,
 	// 转移支付
-	transferAmount: -1,
+	transferAmount: 0,
 	// 新增订购
 	addAmount: -1,
 	//当前选中的产品
@@ -351,23 +347,15 @@ ProdOrderForm = Ext.extend( BaseForm, {
 		return false;
 	},
 	doValid : function(){
-		var validObj = ProdOrderForm.superclass.doValid.call(this); 
+		var validObj = this.doBaseValid(); 
 		if(validObj["isValid"] !== true){
-			Alert(validObj["msg"]);
-			return false;
+			return validObj;
 		}
 		var orderCycle = Ext.getCmp("sfOrderCycle").getValue();
 		if(String(orderCycle).trim() === ""){
 			return {
 				isValid: false,
 				msg: "订购月数是必须的!"
-			}
-		}
-		
-		if(this.selectUserPanel.store.getCount() == 0){
-			return {
-				isValid: false,
-				msg: '没有需要订购的用户'
 			}
 		}
 		
@@ -378,6 +366,23 @@ ProdOrderForm = Ext.extend( BaseForm, {
 			}
 		}
 		return true;
+	},
+	doBaseValid : function(){
+		var validObj = ProdOrderForm.superclass.doValid.call(this); 
+		if(validObj["isValid"] !== true){
+			return validObj;
+		}
+		
+		if(this.selectUserPanel.store.getCount() == 0){
+			return {
+				isValid: false,
+				msg: '没有需要订购的用户'
+			}
+		}
+		
+		return {
+			isValid: true
+		};
 	},
 	getValues : function(){
 		var values = this.getTransferValues();
@@ -401,7 +406,10 @@ ProdOrderForm = Ext.extend( BaseForm, {
 		// 基础信息
 		values["cust_id"] = App.getCustId();
 		values["user_id"] = this.userId;
-		values["last_order_sn"] = this.lastOrderSn;
+		// 上期产品SN
+		var prodId = this.currentSelectedProd.get("prod_id");
+		var lastProd = this.baseData["lastOrderMap"][prodId];
+		values["last_order_sn"] = lastProd ? lastProd["order_sn"] : null;
 		
 		//计算新增金额
 		var boxProdTariff = Ext.getCmp("boxProdTariff");

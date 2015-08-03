@@ -16,7 +16,10 @@ SelectUserPanel = Ext.extend(Ext.Panel, {
     	    ]),
             groupField: 'package_group_name'
         });
-    
+	    // 计算转移支付
+	    this.store.on("load", function(){
+	    	this.parent.doLoadTransferAmount();
+	    } ,this);
 		this.userGrid = new Ext.grid.GridPanel({
 			store: this.store,
 	        columns: [
@@ -81,7 +84,7 @@ SelectUserPanel = Ext.extend(Ext.Panel, {
 	// 加载数据
 	loadPackageUsers: function(prodId, lastOrderSn){
 		//清空数据
-		this.store.loadData([]);
+		this.store.removeAll();
 		
 		Ext.Ajax.request({
 			url :root + '/core/x/ProdOrder!loadPackageUserSelect.action',
@@ -282,7 +285,6 @@ OpenDispatchUserWindow = Ext.extend(Ext.Window, {
 			var selectUserList = group["userSelectList"]; 
 			for(var j = 0; j < selectUserList.length; j++){
 				var user = userMap[selectUserList[j]];
-				console.log(user);
 				targetData.push({
 					 'user_id': user["user_id"],
 					 'user_name': user["user_name"],
