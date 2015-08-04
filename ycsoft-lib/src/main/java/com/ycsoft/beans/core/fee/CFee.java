@@ -65,6 +65,15 @@ public class CFee extends BusiBase implements Serializable {
 	private String invoice_mode_text;
 	private Integer buy_num;
 	private String addr_id;
+	private String pay_sn;
+	
+	public String getPay_sn() {
+		return pay_sn;
+	}
+
+	public void setPay_sn(String pay_sn) {
+		this.pay_sn = pay_sn;
+	}
 
 	public String getAddr_id() {
 		return addr_id;

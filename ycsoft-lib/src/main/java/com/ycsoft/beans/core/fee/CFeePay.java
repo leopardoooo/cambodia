@@ -32,7 +32,33 @@ public class CFeePay extends BusiBase implements Serializable {
 	private Date acct_date;
 	private String invoice_mode;
 	private String remark;
+	private Integer usd;
+	private Integer khr;
+	private String  exchange;	
 
+	public Integer getUsd() {
+		return usd;
+	}
+
+	public void setUsd(Integer usd) {
+		this.usd = usd;
+	}
+
+	public Integer getKhr() {
+		return khr;
+	}
+
+	public void setKhr(Integer khr) {
+		this.khr = khr;
+	}
+
+	public String getExchange() {
+		return exchange;
+	}
+
+	public void setExchange(String exchange) {
+		this.exchange = exchange;
+	}
 
 	/**
 	 * default empty constructor
