@@ -48,6 +48,27 @@ public class CProdOrderDao extends BaseEntityDao<CProdOrder> {
 			    " and  o.order_sn=? "); 
 		return this.createQuery(CProdOrderDto.class, sql,order_sn).first();
 	}
+	
+	/**
+	 * 查询待支付的订单
+	 * @param cust_id
+	 * @return
+	 * @throws JDBCException
+	 */
+	public List<CProdOrder> queryUnPayOrder(String cust_id) throws JDBCException{
+		String sql="select  o.* from c_prod_order o,c_done_code_unpay u where o.package_sn is null and  o.cust_id=u.cust_id and o.done_code=u.done_code and u.cust_id=? ";
+		return this.createQuery( sql,cust_id).list();
+	}
+	/**
+	 * 更新未支付订单支付属性
+	 * @param done_code
+	 * @param cust_id
+	 * @throws JDBCException
+	 */
+    public void updateOrderToPay(Integer done_code,String cust_id) throws JDBCException{
+    	String sql="update c_prod_order set is_pay='T' where done_code=? and cust_id=? ";
+    	this.executeUpdate(sql, done_code,cust_id);
+    }
 
 	/**
 	 * 查询一个套餐的子订单明细

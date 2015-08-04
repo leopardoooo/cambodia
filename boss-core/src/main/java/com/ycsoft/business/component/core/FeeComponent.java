@@ -28,6 +28,7 @@ import com.ycsoft.beans.core.acct.CGeneralAcctDedail;
 import com.ycsoft.beans.core.acct.CGeneralCredential;
 import com.ycsoft.beans.core.bank.CBankPay;
 import com.ycsoft.beans.core.bill.BillDto;
+import com.ycsoft.beans.core.common.CDoneCodeUnpay;
 import com.ycsoft.beans.core.cust.CCust;
 import com.ycsoft.beans.core.fee.CFee;
 import com.ycsoft.beans.core.fee.CFeeAcct;
@@ -154,6 +155,13 @@ public class FeeComponent extends BaseBusiComponent {
 	 */
 	public Integer queryUnPaySum(String cust_id) throws Exception{
 		return cFeeDao.queryUnPaySum(cust_id);
+	}
+	
+	public void updateCFeeToPay(List<CDoneCodeUnpay> unpayList,CFeePayDto pay) throws JDBCException{
+		for(CDoneCodeUnpay un:unpayList){
+			cFeeDao.updateCFeeToPay(un, pay);
+		}
+		
 	}
 	/**
 	 * 保存支付

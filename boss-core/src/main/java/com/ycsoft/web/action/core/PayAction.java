@@ -86,6 +86,28 @@ public class PayAction extends BaseBusiAction{
 	
 	private String status;
 	
+	private String cust_id;
+	
+	
+	public void setCust_id(String cust_id) {
+		this.cust_id = cust_id;
+	}
+	
+	public String queryUnPaySum() throws Exception{
+		getRoot().setSimpleObj(payService.queryUnPaySum(cust_id));
+		return JSON_SIMPLEOBJ;
+	}
+	public String queryUnPayDetail() throws Exception{
+		getRoot().setRecords(payService.queryUnPayDetail(cust_id));
+		return JSON_RECORDS;
+	}
+	
+	public String savePay(String cust_id) throws Exception{
+		payService.savePay(cust_id);
+		return JSON_SUCCESS;
+	}
+
+	
 	/**
 	 * 保存确认单打印
 	 * @return

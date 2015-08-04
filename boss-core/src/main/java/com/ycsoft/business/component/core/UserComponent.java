@@ -102,6 +102,9 @@ public class UserComponent extends BaseBusiComponent {
 	private TCustColonyCfgDao tCustColonyCfgDao;
 	private ExpressionUtil expressionUtil ;
 
+	public Map<String,CUser> queryUserMap(String cust_id) throws Exception{
+		return CollectionHelper.converToMapSingle(cUserDao.queryUserByCustId(cust_id), "user_id");
+	}
 	/**
 	 * 创建用户
 	 * @param user

@@ -28,6 +28,11 @@ import com.ycsoft.business.dto.core.print.CInvoiceDto;
  */
 public interface IPayService extends IBaseService{
 
+	public Integer queryUnPaySum(String cust_id) throws Exception;
+	
+	public List<FeeDto> queryUnPayDetail(String cust_id)throws Exception;
+	
+	public void savePay(String cust_id) throws Exception;
 	/**
 	 * 根据用户类型查询一次性费用信息
 	 * @param feeType 预收费
