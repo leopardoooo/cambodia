@@ -25,12 +25,8 @@ import com.ycsoft.beans.prod.PPackageProd;
 import com.ycsoft.beans.prod.PProd;
 import com.ycsoft.beans.prod.PProdTariffDisct;
 import com.ycsoft.business.component.config.ExpressionUtil;
-import com.ycsoft.business.component.core.FeeComponent;
-import com.ycsoft.business.component.core.JobComponent;
 import com.ycsoft.business.component.core.OrderComponent;
-import com.ycsoft.business.component.core.UserComponent;
 import com.ycsoft.business.dao.config.TRuleDefineDao;
-import com.ycsoft.business.dao.core.common.CDoneCodeUnpayDao;
 import com.ycsoft.business.dao.core.cust.CCustDao;
 import com.ycsoft.business.dao.core.prod.CProdOrderDao;
 import com.ycsoft.business.dao.core.user.CUserDao;
@@ -69,8 +65,6 @@ public class OrderService extends BaseBusiService implements IOrderService{
 	@Autowired
 	private PPackageProdDao pPackageProdDao;
 	@Autowired
-	private UserComponent userComponent;
-	@Autowired
 	private CProdOrderDao cProdOrderDao;
 	@Autowired
 	private OrderComponent orderComponent;
@@ -82,12 +76,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 	private TRuleDefineDao tRuleDefineDao;
 	@Autowired
 	private BeanFactory beanFactory;
-	@Autowired
-	private FeeComponent feeComponent;
-	@Autowired
-	private CDoneCodeUnpayDao cDoneCodeUnpayDao;
-	@Autowired
-	private JobComponent jobComponent;
+
 	
 	@Override
 	public OrderProdPanel queryOrderableProd(String busiCode,String custId,String userId, String filterOrderSn)
@@ -571,12 +560,12 @@ public class OrderService extends BaseBusiService implements IOrderService{
 	 * @throws Exception 
 	 */
 	private boolean saveDoneCodeUnPay(OrderProd orderProd,Integer done_code) throws JDBCException{
-		List<CDoneCodeUnpay> uppayList=cDoneCodeUnpayDao.queryUnPayByLock(orderProd.getCust_id());
+		List<CDoneCodeUnpay> uppayList=doneCodeComponent.lockQueryUnPay(orderProd.getCust_id());
 		if(uppayList.size()==0&&orderProd.getPay_fee()==0){
 			//没有未支付的业务，且当前新订单不需要支付，则该笔订单业务设置为已支付
 			return true;
 		}else{
-			cDoneCodeUnpayDao.saveUnpay(orderProd.getCust_id(), done_code);
+			doneCodeComponent.saveDoneCodeUnPay(orderProd.getCust_id(), done_code);
 			return false;
 		}
 	}

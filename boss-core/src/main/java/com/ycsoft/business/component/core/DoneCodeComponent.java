@@ -11,9 +11,11 @@ import com.google.gson.Gson;
 import com.ycsoft.beans.core.common.CDoneCode;
 import com.ycsoft.beans.core.common.CDoneCodeDetail;
 import com.ycsoft.beans.core.common.CDoneCodeInfo;
+import com.ycsoft.beans.core.common.CDoneCodeUnpay;
 import com.ycsoft.business.commons.abstracts.BaseBusiComponent;
 import com.ycsoft.business.dao.config.TBusiConfirmDao;
 import com.ycsoft.business.dao.core.common.CDoneCodeInfoDao;
+import com.ycsoft.business.dao.core.common.CDoneCodeUnpayDao;
 import com.ycsoft.business.dto.core.cust.DoneCodeDto;
 import com.ycsoft.business.dto.core.cust.DoneCodeExtAttrDto;
 import com.ycsoft.business.dto.core.cust.DoneInfoDto;
@@ -23,6 +25,7 @@ import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.exception.ComponentException;
 import com.ycsoft.commons.helper.CollectionHelper;
 import com.ycsoft.commons.helper.StringHelper;
+import com.ycsoft.daos.core.JDBCException;
 import com.ycsoft.daos.core.Pager;
 
 /**
@@ -39,7 +42,56 @@ import com.ycsoft.daos.core.Pager;
 public class DoneCodeComponent extends BaseBusiComponent {
 	private CDoneCodeInfoDao cDoneCodeInfoDao;
 	private TBusiConfirmDao tBusiConfirmDao;
-	
+	private CDoneCodeUnpayDao cDoneCodeUnpayDao;
+	/**
+	 * 保存未支付业务
+	 * @param cust_id
+	 * @param done_code
+	 * @throws JDBCException
+	 */
+	public void saveDoneCodeUnPay(String cust_id,Integer done_code) throws JDBCException{
+		cDoneCodeUnpayDao.saveUnpay(cust_id, done_code);
+	}
+
+	/**
+	 * 查询一个客户的未支付信息明细
+	 * 要返回c_fee相关明细信息
+	 * @param cust_id
+	 */
+	public void queryDoneCodeUnPayDetail(String cust_id){
+		
+	}
+	/**
+	 * 
+	 * @param doneCode
+	 * @return
+	 * @throws JDBCException
+	 */
+	public CDoneCodeUnpay queryDoneCodeUnPayByKey(Integer doneCode) throws JDBCException{
+		return cDoneCodeUnpayDao.findByKey(doneCode);
+	}
+	/**
+	 * 加锁查询未支付业务
+	 * @param cust_id
+	 * @return
+	 * @throws JDBCException 
+	 */
+	public List<CDoneCodeUnpay> lockQueryUnPay(String cust_id) throws JDBCException{
+		return cDoneCodeUnpayDao.queryUnPayByLock(cust_id);
+	}
+	/**
+	 * 删除未支付业务信息
+	 * @param unPayList
+	 * @throws JDBCException
+	 */
+	public void deleteDoneCodeUnPay(List<CDoneCodeUnpay> unPayList) throws JDBCException{
+		Integer[] doneCodes=new Integer[unPayList.size()];
+		for(int i=0;i<unPayList.size();i++){
+			doneCodes[i]=unPayList.get(i).getDone_code();
+		}
+		cDoneCodeUnpayDao.remove(doneCodes);
+	}
+		
 	public void updateStatus(Integer doneCode,String busiCode) throws Exception{
 		CDoneCode cDoneCode = new CDoneCode();
 		cDoneCode.setDone_code(doneCode);
@@ -422,4 +474,9 @@ public class DoneCodeComponent extends BaseBusiComponent {
 	public void setTBusiConfirmDao(TBusiConfirmDao tBusiConfirmDao) {
 		this.tBusiConfirmDao = tBusiConfirmDao;
 	}
+
+	public void setCDoneCodeUnpayDao(CDoneCodeUnpayDao cDoneCodeUnpayDao) {
+		this.cDoneCodeUnpayDao = cDoneCodeUnpayDao;
+	}
+	
 }

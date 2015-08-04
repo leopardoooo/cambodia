@@ -59,6 +59,8 @@ public class PayService extends BaseBusiService implements IPayService {
 	private CBankReturnDao cBankReturnDao;
 	private CBankReturnPayerrorDao cBankReturnPayerrorDao;
 	private CBankGotodiskDao cBankGotodiskDao;
+	
+	
 	/**
 	 * 根据用户类型查询一次性费用信息
 	 * @param feeType 预收费
