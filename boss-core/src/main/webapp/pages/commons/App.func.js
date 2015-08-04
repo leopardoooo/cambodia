@@ -265,6 +265,11 @@ Ext.apply(App.func,{
 		
 /**************************************用户产品信息开始************************************************/
 		else if(panelName.indexOf('U_PROD')>=0){//用户产品信息
+			// 如果是套餐所有按钮在基本产品列表中都不显示
+			if(data["package_id"]){
+				return false; 
+			}
+			
 			if(data['user_status'] == 'DORMANCY' || data['user_status'] == 'ATVCLOSE' || data['user_status'] == 'WAITLOGOFF' )
 				return false;
 			if(busicode == '1027'){//产品退订

@@ -24,6 +24,17 @@ public class CDoneCodeUnpayDao extends BaseEntityDao<CDoneCodeUnpay> {
 	}
 	
 	/**
+	 * 【加锁】查询一个客户未支付的业务信息
+	 * @param cust_id
+	 * @return
+	 * @throws JDBCException 
+	 */
+	public List<CDoneCodeUnpay> queryUnPay(String cust_id) throws JDBCException{
+		String sql="select * from c_done_code_unpay where cust_id=? ";
+		return this.createQuery(sql, cust_id).list();
+	}
+	
+	/**
 	 * 保存为支付业务信息
 	 * @param cust_id
 	 * @param done_code

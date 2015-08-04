@@ -1668,14 +1668,21 @@ public class BaseBusiService extends BaseService {
 			payType = pay.getPay_type();
 		}
 		//保存业务费用信息
-		if (busiParam.getFees() !=null)
+		if (busiParam.getFees() !=null){
+			boolean hasUnpay=false;
 			for (FeeBusiFormDto feeDto : busiParam.getFees()) {
 				if(feeDto.getReal_pay() > 0){
-					feeComponent.saveBusiFee(custId,cust!=null?cust.getAddr_id():null, feeDto.getFee_id(), feeDto.getCount(),payType,feeDto
+					feeComponent.saveBusiFee(custId,cust!=null?cust.getAddr_id():null, feeDto.getFee_id(), feeDto.getCount(),SystemConstants.PAY_TYPE_UNPAY,feeDto
 							.getReal_pay(), busiParam.getDoneCode(),busiParam.getDoneCode(), busiParam.getBusiCode(),
 							busiParam.getSelectedUsers());
+					hasUnpay=true;
 				}
 			}
+			if(hasUnpay&&doneCodeComponent.queryDoneCodeUnPayByKey(doneCode)==null){
+				//保存未支付业务
+				doneCodeComponent.saveDoneCodeUnPay(custId, doneCode);
+			}
+		}
 
 		if(null != pay){
 			//保存缴费信息

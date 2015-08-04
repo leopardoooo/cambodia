@@ -99,6 +99,13 @@ public class CProdOrder extends BusiBase implements Serializable {
 		this.status = status;
 		this.status_text = MemoryDict.getDictName(DictKey.STATUS, this.status);
 	}
+	
+	public String getStatus_text() {
+		return status_text;
+	}
+	public void setStatus_text(String status_text) {
+		this.status_text = status_text;
+	}
 	public Date getStatus_date() {
 		return status_date;
 	}

@@ -805,7 +805,10 @@ public class FeeComponent extends BaseBusiComponent {
 		tFee.setFee_sn(gFeeSn());
 		tFee.setCust_id( custId );
 		//新保存的费用，都是未支付状态
-		tFee.setStatus( StatusConstants.PAY );
+		if(SystemConstants.PAY_TYPE_UNPAY.equals(tFee.getPay_type())){
+			tFee.setStatus( StatusConstants.UNPAY );
+		}
+		
 		//支付方式为银行代扣默认为不打印，其他支付方式为未打印
 		if (tFee.getPay_type().equals(SystemConstants.PAY_TYPE_BANK_DEDU))
 			tFee.setIs_doc( BOOLEAN_NO );
