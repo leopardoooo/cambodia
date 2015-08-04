@@ -479,13 +479,17 @@ public class OrderService extends BaseBusiService implements IOrderService{
 	 * @throws Exception 
 	 */
 	@Override
-	public List<CProdOrder> queryTransferFee(OrderProd orderProd,String busi_code) throws Exception{
-		 List<CProdOrder> list= orderComponent.queryTransCancelOrderList(orderProd, busi_code);
-		 //计算可退余额
-		 for(CProdOrder order:list){
-			 order.setActive_fee(orderComponent.getTransCancelFee(orderProd.getEff_date(), order));
-		 }
-		 return list;
+	public List<CProdOrderDto> queryTransferFee(OrderProd orderProd,String busi_code) throws Exception{
+		
+		List<CProdOrderDto> list=new ArrayList<>();
+		
+		for(CProdOrder order:  orderComponent.queryTransCancelOrderList(orderProd, busi_code)){
+			CProdOrderDto dto=cProdOrderDao.queryCProdOrderDtoByKey(order.getOrder_sn());
+			//计算可退余额
+			dto.setActive_fee(orderComponent.getTransCancelFee(orderProd.getEff_date(), order));
+			list.add(dto);
+		}
+		return list;
 	}
 
 	

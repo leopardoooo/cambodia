@@ -284,7 +284,16 @@ public class UserComponent extends BaseBusiComponent {
 	 */
 	public List<CUser> queryCanSelectByCustId(String custId)throws JDBCException {
 		List<CUser> users=cUserDao.queryCanSelectUserByCustId(custId);
-		fillUserName(users);
+		
+		for( CUser user :users){
+			if(SystemConstants.USER_TYPE_BAND.equals(user.getUser_type()) 
+					|| SystemConstants.USER_TYPE_OTT_MOBILE.equals(user.getUser_type())){
+				user.setUser_name(user.getLogin_name());
+			} else if(SystemConstants.USER_TYPE_OTT.equals(user.getUser_type()) 
+					|| SystemConstants.USER_TYPE_DTT.equals(user.getUser_type())){
+				user.setUser_name(StringHelper.isEmpty(user.getStb_id())?"unknow":user.getStb_id());
+			}
+		}
 		return users;
 	}
 	

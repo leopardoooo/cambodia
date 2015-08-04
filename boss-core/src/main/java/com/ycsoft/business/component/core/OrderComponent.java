@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 import com.ycsoft.beans.core.prod.CProd;
 import com.ycsoft.beans.core.prod.CProdOrder;
+import com.ycsoft.beans.core.prod.CProdOrderDto;
 import com.ycsoft.beans.core.prod.CProdOrderHis;
 import com.ycsoft.beans.core.prod.CProdOrderTransfee;
 import com.ycsoft.beans.core.prod.CProdPropChange;
