@@ -5,7 +5,7 @@
  *  提供对Ext library 的帮助类。
  */
 
-Ext.Ajax.handleResponse = Ext.Ajax.handleResponse.createInterceptor(function(response){//处理函数。 
+Ext.Ajax.handleResponse = Ext.Ajax.handleResponse.createInterceptor(function(response, options){//处理函数。 
 	var data = Ext.decode(response.responseText);
 	if(data && data["success"]===false && data["exception"]){
 		var obj = data["exception"];
@@ -54,8 +54,8 @@ Ext.Ajax.handleResponse = Ext.Ajax.handleResponse.createInterceptor(function(res
 			}
 		}
 		//自定义处理错误数据函数(函数名统一为clearData)
-		if(Ext.isFunction(response.argument.options.clearData)){
-			response.argument.options.clearData.call();
+		if(Ext.isFunction(options.clearData)){
+			options.clearData.call();
 		}
 		return false;
 	}
@@ -123,20 +123,21 @@ Ext.apply( App, {
 		ps["custFullInfo"] = data.custFullInfo;
 		//设置选中的用户信息
 		var selectedUsers = App.getApp().main.infoPanel.getUserPanel().userGrid.getSelectedUsers();
-		ps["selectedAtvs"] =[];
-		ps["selectedDtvs"] =[];
-		ps["selectedBands"] =[];
-		for (i=0;i<selectedUsers.length;i++){
-			if (selectedUsers[i].user_type=="ATV"){
-				ps["selectedAtvs"].push(selectedUsers[i]);
-			}
-			if (selectedUsers[i].user_type=="DTV"){
-				ps["selectedDtvs"].push(selectedUsers[i]);
-			}
-			if (selectedUsers[i].user_type=="BAND"){
-				ps["selectedBands"].push(selectedUsers[i]);
-			}
-		}
+		ps["selectedUsers"] = selectedUsers;
+//		ps["selectedAtvs"] = [];
+//		ps["selectedDtvs"] = [];
+//		ps["selectedBands"] = [];
+//		for (i=0;i<selectedUsers.length;i++){
+//			if (selectedUsers[i].user_type=="OTT"){
+//				ps["selectedUsers"].push(selectedUsers[i]);
+//			}
+//			if (selectedUsers[i].user_type=="DTT"){
+//				ps["selectedDtvs"].push(selectedUsers[i]);
+//			}
+//			if (selectedUsers[i].user_type=="BAND"){
+//				ps["selectedBands"].push(selectedUsers[i]);
+//			}
+//		}
 		//业务代码
 		if (data.currentResource)
 			ps["busiCode"] = data.currentResource.busicode;

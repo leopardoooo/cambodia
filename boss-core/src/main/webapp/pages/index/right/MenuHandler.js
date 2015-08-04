@@ -1241,31 +1241,45 @@ Ext.apply(MenuHandler, {
 	},
 	// 报停
 	UserStop : function() {
-		if (!hasCust()) {
-			return false;
-		}
+		if (!hasCust()) return false;
 		var userGrid = App.main.infoPanel.getUserPanel().userGrid;
 		var userRecords = userGrid.getSelections();
 		if (userRecords.length == 0) {
 			Alert('请选择用户');
 			return false;
 		}
-		
-		App.sendRequest(Constant.ROOT_PATH
-				+ "/core/x/User!saveCancelPromotion.action", {
-			custId: App.getCustId()
-		}, function(res, opt) {
-			var data = Ext.decode(res.responseText);
-			if (data === true) {
-				Alert('回退促销成功!');
-				App.getApp().refreshPanel(App.getApp().getData().currentResource.busicode);
-			}
-		}, false);
-		
-		return {
-			width : 540,
-			height : 460
+		var userIds = [];
+		for(var i = 0; i< userRecords.length; i++){
+			userIds.push(userRecords[i].get("user_id"));
 		}
+		
+		// 同步请求
+		var flag = false;
+		Ext.Ajax.request({
+			url: Constant.ROOT_PATH + "/core/x/User!checkStop.action",
+			params: {
+				custId: App.getCustId(),
+				userIds: userIds
+			},
+			async: false,
+			success: function(response, options){
+				var data = Ext.decode(response.responseText);
+				if(data !== true){
+					Ext.Ajax.handleResponse(response, options);
+					flag = (data && data["success"] === true);
+				}else{
+					flag = true;
+				}
+			}
+		});
+		
+		if(flag){
+			return {
+				width : 540,
+				height : 460
+			}
+		}
+		return flag;
 	},
 	// 报开
 	UserOpen:function() {
@@ -1279,60 +1293,17 @@ Ext.apply(MenuHandler, {
 			Alert('请选择要报开的用户!');
 			return false;
 		}
-		var arr = [];
-		var store = App.main.infoPanel.getUserPanel().userGrid.getStore();
-		for (i = 0; i < store.getCount(); i++) {
-			if (store.getAt(i).data.user_type == 'DTV') {
-				arr.push(store.getAt(i).data);
-			}
-		}
-		var allDtvNum = 0;  //所有主终端
-		var selectFZD = 0;  //选中的非主终端
-		var selectZZD = 0; //选中的主终端
-		for (i = 0; i < arr.length; i++) {
-			if (arr[i].status == "REQSTOP" && arr[i].terminal_type == "ZZD") {
-				allDtvNum++;
-			}
-		}
-		var zzdUser = store.getAt(store.find('terminal_type','ZZD'));
 		for (i = 0; i < userRecords.length; i++) {
 			if (userRecords[i].get("status") != "REQSTOP") {
 				Alert("请选择【报停】状态的用户");
 				return false;
-			};
-			if (userRecords[i].get("serv_type") == "SINGLE"
-					&& Ext.isEmpty(userRecords[i].get("stb_id"))) {
-				typecout++;
 			}
-			if (userRecords[i].get("serv_type") == "DOUBLE"
-					&& (Ext.isEmpty(userRecords[i].get("stb_id")) || Ext
-							.isEmpty(userRecords[i].get("modem_mac")))) {
-				typecout++;
-			}
-			if (userRecords[i].get("user_type") == "BAND"
-					&& Ext.isEmpty(userRecords[i].get("modem_mac"))) {
-				typecout++;
-			}
-			if (typecout > 1) {
-				Alert("请选择1个需要补充设备的用户");
-				return false;
-			}
-			if (userRecords[i].get("user_type") == "DTV" && userRecords[i].get("status") == "REQSTOP" && userRecords[i].get("terminal_type")== "ZZD") {
-				selectZZD++;
-			}
-			if (userRecords[i].get("user_type") == "DTV" && userRecords[i].get("status") == "REQSTOP" && userRecords[i].get("terminal_type") != "ZZD"){
-				selectFZD++;
-			}
-		}
-		if(selectFZD > 0 && selectZZD != allDtvNum){
-			Alert("主终端状态为报停,不能进行当前业务!");
-			return false;
 		}
 		
 		return {
 			width : 580,
 			height : 500
-		};
+		}
 	},
 	UserInvalid : function(){
 		if (!hasCust())

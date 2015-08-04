@@ -16,11 +16,14 @@ Ext.apply(Ext.lib.Ajax, {
                 timeout: options.timeout,
                 success: function(dataText, textStatus){
                 	if(options.success){
+                		if(!options["scope"]){
+                			options["scope"] = this;
+                		}
                 		// 伪造Ext Ajax Success回调参数
-                		options.success.call(options.scope, {
+                		options.success.call(options["scope"], {
                 			responseText: dataText,
                 			statusText: textStatus
-                		}, options);
+                		},options);
                 	}
                 },
                 error: function(){
