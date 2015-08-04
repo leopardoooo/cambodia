@@ -523,7 +523,14 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		//已支付且订单状态是正常的要发加授权指令
 		if(cProdOrder.getIs_pay().equals(SystemConstants.BOOLEAN_TRUE)
 				&&cProdOrder.getStatus().equals(StatusConstants.ACTIVE)){
-			this.saveOrderProdBusiCmd(cProdOrder, prodConfig.getProd_type(), BusiCmdConstants.ACCTIVATE_PROD, doneCode);
+			Map<String,CUser> userMap=null;
+			if(prodConfig.getProd_type().equals(SystemConstants.PROD_TYPE_BASE)){
+				userMap=new HashMap<String,CUser>();
+				userMap.put(cProdOrder.getUser_id(), cUserDao.findByKey(cProdOrder.getUser_id()));
+			}else{
+				userMap=CollectionHelper.converToMapSingle(cUserDao.queryUserByCustId(cust.getCust_id()), "user_id");
+			}
+			jobComponent.createProdBusiCmdJob(cProdOrder, prodConfig.getProd_type(), userMap, doneCode, BusiCmdConstants.ACCTIVATE_PROD, SystemConstants.PRIORITY_SSSQ);
 		}
 		
 		//费用信息
@@ -571,31 +578,6 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		}else{
 			doneCodeComponent.saveDoneCodeUnPay(orderProd.getCust_id(), done_code);
 			return false;
-		}
-	}
-	/**
-	 * 创建订单的授权任务
-	 * @param cProdOrder
-	 * @param prod_type
-	 * @param busi_cmd_type
-	 * @throws Exception 
-	 */
-	public  void saveOrderProdBusiCmd(CProdOrder cProdOrder,String prod_type,String busi_cmd_type,Integer done_code) throws Exception{
-		if(prod_type.equals(SystemConstants.PROD_TYPE_BASE)){
-			//单产品授权
-			CUser user=cUserDao.findByKey(cProdOrder.getUser_id());
-			jobComponent.createBusiCmdJob(done_code,busi_cmd_type, cProdOrder.getCust_id(), cProdOrder.getUser_id()
-					, user.getStb_id(), user.getCard_id(), user.getModem_mac(),
-					cProdOrder.getOrder_sn(), cProdOrder.getProd_id(), null, SystemConstants.PRIORITY_SSSQ);
-		}else{
-			//套餐的授权
-			Map<String,CUser> userMap=CollectionHelper.converToMapSingle(cUserDao.queryUserByCustId(cProdOrder.getCust_id()), "user_id");
-			for(CProdOrder order:cProdOrderDao.queryPakDetailOrder(cProdOrder.getOrder_sn())){
-				CUser user=cUserDao.findByKey(cProdOrder.getUser_id());
-				jobComponent.createBusiCmdJob(done_code,busi_cmd_type, order.getCust_id(), order.getUser_id()
-						, user.getStb_id(), user.getCard_id(), user.getModem_mac(),
-						order.getOrder_sn(), order.getProd_id(), null, SystemConstants.PRIORITY_SSSQ);
-			}
 		}
 	}
 	

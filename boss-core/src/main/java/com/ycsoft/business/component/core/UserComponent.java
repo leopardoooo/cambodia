@@ -102,6 +102,9 @@ public class UserComponent extends BaseBusiComponent {
 	private TCustColonyCfgDao tCustColonyCfgDao;
 	private ExpressionUtil expressionUtil ;
 
+	public Map<String,CUser> queryUserMap(String cust_id) throws Exception{
+		return CollectionHelper.converToMapSingle(cUserDao.queryUserByCustId(cust_id), "user_id");
+	}
 	/**
 	 * 创建用户
 	 * @param user
@@ -497,47 +500,33 @@ public class UserComponent extends BaseBusiComponent {
 	}
 
 	/**
-	 * 给没有设备的用户分配设备
+	 * 修改用户设备信息
 	 * @param userId
-	 * @param stbId 机顶盒号
-	 * @param cardId 智能卡号
-	 * @param modemMac modem Mac 地址
 	 */
-	public void updateDevice(Integer doneCode,CUser user, String stbId, String cardId,
-			String modemMac) throws Exception {
-		stbId = stbId == null?"":stbId;
-		cardId = cardId == null?"":cardId;
-		modemMac = modemMac == null?"":modemMac;
-		user.setStb_id(user.getStb_id() == null?"":user.getStb_id());
-		user.setCard_id(user.getCard_id() == null?"":user.getCard_id());
-		user.setModem_mac(user.getModem_mac() == null?"":user.getModem_mac());
-
-		List<CUserPropChange> changeList = new ArrayList<CUserPropChange>();
-		if (!user.getStb_id().equals(stbId)){
-			CUserPropChange change = new CUserPropChange();
-			change.setColumn_name("stb_id");
-			change.setOld_value(user.getStb_id());
-			change.setNew_value(stbId);
-			changeList.add(change);
+	public void updateDevice(Integer doneCode,CUser user) throws Exception {
+		CUser oldUser = cUserDao.findByKey(user.getUser_id());
+		String[] propNames = {"stb_id","card_id","modem_mac"};
+		List<CUserPropChange> upcList = new ArrayList<CUserPropChange>();
+		for (String propName:propNames){
+			if (!BeanHelper.getPropertyString(oldUser, propName).equals(BeanHelper.getPropertyString(user, propName))){
+				CUserPropChange upc = new CUserPropChange();
+				upc.setUser_id(user.getUser_id());
+				upc.setDone_code(doneCode);
+				upc.setColumn_name(propName);
+				upc.setOld_value(BeanHelper.getPropertyString(oldUser, propName));
+				upc.setNew_value(BeanHelper.getPropertyString(user, propName));
+				setBaseInfo(upc);
+				upcList.add(upc);
+			}
 		}
-
-		if (!user.getCard_id().equals(cardId)){
-			CUserPropChange change = new CUserPropChange();
-			change.setColumn_name("card_id");
-			change.setOld_value(user.getCard_id());
-			change.setNew_value(cardId);
-			changeList.add(change);
+		//修改用户信息
+		cUserDao.update(user);
+		//处理授权
+		if (user.getUser_type().equals(SystemConstants.USER_TYPE_OTT)){
+			
 		}
-
-		if (!user.getModem_mac().equals(modemMac)){
-			CUserPropChange change = new CUserPropChange();
-			change.setColumn_name("modem_mac");
-			change.setOld_value(user.getModem_mac());
-			change.setNew_value(modemMac);
-			changeList.add(change);
-		}
-
-		editUser(doneCode, user.getUser_id(), changeList);
+		//记录异动
+		cUserPropChangeDao.update(upcList.toArray(new CUserPropChange[upcList.size()]));
 	}
 
 	/**

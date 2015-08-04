@@ -37,6 +37,7 @@ public class FeeDto extends CFee {
 	
 	private Date begin_date;
 	private Date prod_invalid_date;
+	private String prod_sn;
 	
 	//用户是否销户
 	private String is_logoff;
@@ -46,6 +47,13 @@ public class FeeDto extends CFee {
 	private String doc_type_text;
 	private String allow_done_code;
 
+	
+	public String getProd_sn() {
+		return prod_sn;
+	}
+	public void setProd_sn(String prod_sn) {
+		this.prod_sn = prod_sn;
+	}
 	/**
 	 * @return the deposit
 	 */

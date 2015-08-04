@@ -52,6 +52,7 @@ import com.ycsoft.commons.constants.DataRight;
 import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.exception.ComponentException;
+import com.ycsoft.commons.exception.ServicesException;
 import com.ycsoft.commons.helper.CollectionHelper;
 import com.ycsoft.commons.helper.DateHelper;
 import com.ycsoft.commons.helper.JsonHelper;
@@ -808,6 +809,19 @@ public class DeviceComponent extends BaseBusiComponent {
 			return cValuableCardDao.queryValuableAllCard(start,limit,query,getOptr().getCounty_id());
 		}
 		
+	}
+	
+	public void checkChangeDevice(DeviceDto oldDevice, DeviceDto device) throws Exception {
+		if (!oldDevice.getDevice_type().equals(device.getDevice_type()))
+			throw new ServicesException("设备类型不正确!");
+		if (device.getDevice_type().equals(SystemConstants.DEVICE_TYPE_STB)){
+			//判断设备型号的INTERACTIVE_TYPE是否一致
+			RStbModel oldModel = rStbModelDao.findByKey(oldDevice.getDevice_model());
+			RStbModel newModel = rStbModelDao.findByKey(device.getDevice_model());
+			if (!oldModel.getInteractive_type().equals(newModel.getInteractive_type()))
+				throw new ServicesException("设备类型不正确!");
+			
+		}
 	}
 	
 	/**

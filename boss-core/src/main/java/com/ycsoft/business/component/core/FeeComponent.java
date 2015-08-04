@@ -28,6 +28,7 @@ import com.ycsoft.beans.core.acct.CGeneralAcctDedail;
 import com.ycsoft.beans.core.acct.CGeneralCredential;
 import com.ycsoft.beans.core.bank.CBankPay;
 import com.ycsoft.beans.core.bill.BillDto;
+import com.ycsoft.beans.core.common.CDoneCodeUnpay;
 import com.ycsoft.beans.core.cust.CCust;
 import com.ycsoft.beans.core.fee.CFee;
 import com.ycsoft.beans.core.fee.CFeeAcct;
@@ -136,6 +137,39 @@ public class FeeComponent extends BaseBusiComponent {
 	private CPromFeeProdDao cPromFeeProdDao;
 	
 	private ExpressionUtil expressionUtil;
+	
+	/**
+	 * 查询未支付详细信息
+	 * @param cust_id
+	 * @return
+	 * @throws Exception
+	 */
+	public List<FeeDto> queryUnPay(String cust_id) throws Exception{
+		return cFeeDao.queryUnPay(cust_id);
+	}
+	/**
+	 * 查询未支付总额
+	 * @param cust_id
+	 * @return
+	 * @throws Exception
+	 */
+	public Integer queryUnPaySum(String cust_id) throws Exception{
+		return cFeeDao.queryUnPaySum(cust_id);
+	}
+	
+	public void updateCFeeToPay(List<CDoneCodeUnpay> unpayList,CFeePayDto pay) throws JDBCException{
+		for(CDoneCodeUnpay un:unpayList){
+			cFeeDao.updateCFeeToPay(un, pay);
+		}
+		
+	}
+	/**
+	 * 保存支付
+	 */
+	public void savePay(){
+		//保存支付记录c_fee_pay和detail
+		//更新缴费信息update c_fee set status='pay' ,pay_type=支付方式
+	}
 	
 	public CVoucher queryVoucherById(String voucherId) throws Exception {
 		return cVoucherDao.queryVoucherById(voucherId, getOptr().getCounty_id());

@@ -1047,7 +1047,7 @@ public class CustService extends BaseBusiService implements ICustService {
 		//调用用户组件，更新用户设备编号
 		List<CUser> userList = userComponent.queryUserByDevice(SystemConstants.DEVICE_TYPE_MODEM, oldModemId);
 		for (CUser user : userList){
-			userComponent.updateDevice(doneCode, user, user.getStb_id(), user.getCard_id(), newModemId);
+			userComponent.updateDevice(doneCode, user);
 		}
 	}
 	
@@ -1240,8 +1240,8 @@ public class CustService extends BaseBusiService implements ICustService {
 		}
 		//实体猫不给换，虚拟猫不用换
 		//修改用户的设备属性.
-		userComponent.updateDevice(doneCode, newUser, oldUser.getStb_id(), oldUser.getCard_id(), newModemMac);
-		userComponent.updateDevice(doneCode, oldUser, newUser.getStb_id(), newUser.getCard_id(), oldModemMac);
+		//userComponent.updateDevice(doneCode, newUser, oldUser.getStb_id(), oldUser.getCard_id(), newModemMac);
+		//userComponent.updateDevice(doneCode, oldUser, newUser.getStb_id(), newUser.getCard_id(), oldModemMac);
 		String fromCustId = newUser.getCust_id();
 		String currentCustId = oldUser.getCust_id();
 

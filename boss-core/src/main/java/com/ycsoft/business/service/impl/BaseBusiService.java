@@ -585,11 +585,6 @@ public class BaseBusiService extends BaseService {
 			jobComponent.createBusiCmdJob(doneCode, BusiCmdConstants.ACCTIVATE_TERMINAL, custId,
 					user.getUser_id(), null,null, user.getModem_mac(), null,null);
 		}
-		
-		//支付密码同步
-		if(StringHelper.isNotEmpty(userDto.getPassword())){
-			jobComponent.saveDataSyncJob(BusiCmdConstants.PSWD_SYNC, JsonHelper.fromObject(userDto), "C_USER");
-		}
 	}
 
 	/**
@@ -943,9 +938,9 @@ public class BaseBusiService extends BaseService {
 						user.getCard_id(), user.getModem_mac(),null,null);
 				
 				if(userType.equals(SystemConstants.USER_TYPE_BAND)){
-					userComponent.updateDevice(doneCode, user, null, null, newModemId);
+					//userComponent.updateDevice(doneCode, user, null, null, newModemId);
 				}else{
-					userComponent.updateDevice(doneCode, user, newStbId, newCardId, newModemId);
+					//userComponent.updateDevice(doneCode, user, newStbId, newCardId, newModemId);
 				}
 				
 				String userStbId = StringHelper.isNotEmpty(newStbId)
@@ -1050,7 +1045,7 @@ public class BaseBusiService extends BaseService {
 				}else if (deviceType.equals(SystemConstants.DEVICE_TYPE_MODEM)){
 					modem_mac = null;
 				}
-				userComponent.updateDevice(doneCode, cuser, stb_id, card_id, modem_mac);
+				//userComponent.updateDevice(doneCode, cuser, stb_id, card_id, modem_mac);
 			}
 		}
 		//如果收取了折旧费，保存折旧费信息
@@ -1665,13 +1660,8 @@ public class BaseBusiService extends BaseService {
 		//保存业务单据
 //		printComponent.saveDoc(param.getDoneCode(),param.getBusiCode(), param.getCust().getCust_id(),param.getDocTypes());
 
-		//检查支付信息是否为NULL，如果不为NULL则保存支付信息，并根据一定的规则保存合并记录。
-		CFeePayDto pay = busiParam.getPay();
+
 		
-		String payType = SystemConstants.PAY_TYPE_CASH;
-		if(null != pay){
-			payType = pay.getPay_type();
-		}
 		//保存业务费用信息
 		if (busiParam.getFees() !=null){
 			boolean hasUnpay=false;
@@ -1689,30 +1679,6 @@ public class BaseBusiService extends BaseService {
 			}
 		}
 
-		if(null != pay){
-			//保存缴费信息
-			feeComponent.savePayFee(pay, busiParam.getCust().getCust_id(),busiParam.getDoneCode());
-			
-			//if (pay.getInvoice_mode().equals(SystemConstants.INVOICE_MODE_AUTO))
-			//	printComponent.saveDoc( feeComponent.queryAutoMergeFees(param.getDoneCode()),param.getCust().getCust_id(), param.getDoneCode(),param.getBusiCode());
-			if (SystemConstants.INVOICE_MODE_MANUAL.equals(pay.getInvoice_mode())){
-				feeComponent.saveManualInvoice(busiParam.getDoneCode(), pay
-						.getInvoice_code(), pay.getInvoice_id(), pay
-						.getInvoice_book_id());
-				invoiceComponent.useInvoice(pay.getInvoice_code(),pay.getInvoice_id(), 
-						SystemConstants.INVOICE_MODE_MANUAL, pay.getFee());
-			}else if(SystemConstants.INVOICE_MODE_AUTO.equals(pay.getInvoice_mode())){//机打
-				if (StringHelper.isNotEmpty(custId)) {
-					List<CFee> feeList = feeComponent.queryByDoneCode(doneCode);
-					for(CFee fee : feeList){
-						MemoryPrintData.appendPrintData(optr.getOptr_id(), fee.getFee_sn());
-					}
-					
-				}
-			}else if(SystemConstants.INVOICE_MODE_QUOTA.equals(pay.getInvoice_mode())){
-				feeComponent.saveQuatoInvoice(busiParam.getDoneCode());
-			}
-		}
 	}
 	
 	/**

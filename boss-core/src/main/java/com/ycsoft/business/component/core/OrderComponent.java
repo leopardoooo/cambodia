@@ -271,6 +271,14 @@ public class OrderComponent extends BaseBusiComponent {
 		return cProdOrder.getOrder_sn();
 	}
 	
+	/**
+	 * 覆盖退订产品
+	 * @param cProdOrder
+	 * @param cancelList
+	 * @param cancelDate
+	 * @return
+	 * @throws Exception
+	 */
 	private int saveTransCancelProd(CProdOrder cProdOrder,List<CProdOrder> cancelList,Date cancelDate) throws Exception{
 		int transFee=0;
 		List<CProdOrderTransfee>  transFeeList=new ArrayList<>();
@@ -325,7 +333,7 @@ public class OrderComponent extends BaseBusiComponent {
 				detailSnList.add(pakdetail.getOrder_sn());
 			}
 			cProdOrderHisDao.save(pakDetailList.toArray(new CProdOrderHis[pakDetailList.size()]));
-			cProdOrderDao.remove(detailSnList.toArray());
+			cProdOrderDao.remove(detailSnList.toArray(new String[detailSnList.size()]));
 		}
 		
 		//TODO 财务账单处理

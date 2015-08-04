@@ -14,6 +14,7 @@ import java.util.Map;
 import org.springframework.stereotype.Component;
 
 import com.ycsoft.beans.core.bill.BillDto;
+import com.ycsoft.beans.core.common.CDoneCodeUnpay;
 import com.ycsoft.beans.core.fee.CFee;
 import com.ycsoft.beans.core.fee.CFeeAcct;
 import com.ycsoft.beans.core.fee.CFeeDevice;
@@ -21,6 +22,7 @@ import com.ycsoft.beans.core.prod.CProd;
 import com.ycsoft.beans.system.SOptr;
 import com.ycsoft.business.dto.core.fee.BBillPrintDto;
 import com.ycsoft.business.dto.core.fee.BbillingcycleCfgDto;
+import com.ycsoft.business.dto.core.fee.CFeePayDto;
 import com.ycsoft.business.dto.core.fee.FeeDto;
 import com.ycsoft.business.dto.core.print.CInvoiceDto;
 import com.ycsoft.business.dto.print.PrintFeeitemDto;
@@ -49,7 +51,54 @@ public class CFeeDao extends BaseEntityDao<CFee> {
 	 * default empty constructor
 	 */
 	public CFeeDao() {}
-	
+	/**
+	 * 更新缴费记录的未支付状态
+	 * @param cust_id
+	 * @param done_code
+	 * @throws JDBCException 
+	 */
+	public void updateCFeeToPay(CDoneCodeUnpay unpay,CFeePayDto pay) throws JDBCException{
+		String sql=StringHelper.append(
+				"update c_fee set status=? ,pay_type=?, invoice_mode=?,invoice_id=?,invoice_book_id=?,pay_sn=? "
+				," where create_done_code=? and cust_id=? ");
+		this.executeUpdate(sql, 
+				StatusConstants.PAY,pay.getPay_type(),pay.getInvoice_mode(),pay.getInvoice_id(),pay.getInvoice_book_id(),pay.getInvoice_code(),pay.getPay_sn(),
+				unpay.getDone_code(),unpay.getCust_id());
+		
+	}
+	/**
+	 * 查询待支付的总额
+	 * @param cust_id
+	 * @return
+	 * @throws JDBCException
+	 */
+	public Integer queryUnPaySum(String cust_id) throws JDBCException{
+		String sql="select sum(cf.real_pay) from c_fee cf,c_done_code_unpay un where cf.create_done_code=un.done_code and un.cust_id=? ";
+		String sum=this.findUnique(sql, cust_id);
+		if(StringHelper.isNotEmpty(sum)){
+			return Integer.valueOf(sum);
+		}else{
+			return 0;
+		}
+	}
+	/**
+	 * 查询未支付的费用明细
+	 * 显示 费用编号 fee_sn,业务名称busi_name,费用名称fee_text,数量(当count不为空，显示count否则显示begin_date(yyyymmdd)+“-”+prod_invalid_date),操作员 optr_name,操作时间create_time,金额 real_pay,
+	 * @param cust_id
+	 * @return
+	 * @throws JDBCException
+	 */
+	public List<FeeDto> queryUnPay(String cust_id) throws JDBCException{
+		String sql=StringHelper.append("select cf.*,nvl(atm.acctitem_name,bf.fee_name) fee_text,fa.prod_invalid_date,fa.begin_date,fa.prod_sn ",
+				" from c_fee cf,c_done_code_unpay un,c_fee_acct fa,vew_acctitem atm,busi.t_busi_fee bf ",
+				" where cf.create_done_code=un.done_code ",
+				" and  bf.fee_id(+)=cf.fee_id ",
+				" and atm.acctitem_id(+)=cf.acctitem_id ",
+				" and fa.fee_sn(+)=cf.fee_sn ",
+				" and un.cust_id=? ",
+				" order by cf.create_time ");
+		return this.createQuery(FeeDto.class, sql, cust_id).list();
+	}
 	//客户受理单打印获取收费
 	public List<PrintFeeitemDto> queryPrintFee(String custId,SOptr optr,String docSn)throws Exception{
 		String countyId = optr.getCounty_id();
