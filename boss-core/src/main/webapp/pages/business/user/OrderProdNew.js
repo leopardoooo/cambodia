@@ -19,6 +19,35 @@ ProdOrderForm = Ext.extend( BaseForm, {
 	packageGroups: null,
 	constructor: function(p){
 		this.selectUserPanel = new SelectUserPanel(this);
+		
+		// 订购月份
+		var orderMonthField = new Ext.ux.form.SpinnerField({
+			xtype: 'spinnerfield',
+            fieldLabel: '订购月数',
+           // allowBlank: false,
+            readOnly: true,
+            id: 'sfOrderCycle',
+            minValue: 0,
+		    listeners: {
+		    	scope: this,
+		    	spin: function(){
+		    		this.doChangeEndDate();
+		    		this.doChangeAmount();
+		    	}
+		    }
+		});
+		
+		// 重写spinner的触发规则，支持readonly
+		orderMonthField.spinner.isSpinnable = function(){
+			return true;
+		}
+		orderMonthField.spinner.onTriggerClick = function(){
+	        var middle = orderMonthField.spinner.getMiddle();
+	        var ud = (Ext.EventObject.getPageY() < middle) ? 'Up' : 'Down';
+	        orderMonthField.spinner['onSpin' + ud]();
+		}
+		
+		// 构造表单
 		ProdOrderForm.superclass.constructor.call(this, {
 			trackResetOnLoad:true,
 			autoScroll:true,
@@ -91,20 +120,7 @@ ProdOrderForm = Ext.extend( BaseForm, {
 							scope: this,
 							select: this.doSelectTariff
 						}
-					},{
-						xtype: 'spinnerfield',
-			            fieldLabel: '订购月数',
-			           // allowBlank: false,
-			            id: 'sfOrderCycle',
-			            minValue: 0,
-					    listeners: {
-					    	scope: this,
-					    	spin: function(){
-					    		this.doChangeEndDate();
-					    		this.doChangeAmount();
-					    	}
-					    }
-					},{
+					},orderMonthField,{
 						xtype: 'panel',
 						anchor: '100%',
 						baseCls: 'x-plain',
@@ -120,7 +136,7 @@ ProdOrderForm = Ext.extend( BaseForm, {
 					},{
 						xtype: 'textfield',
 						id: 'dfExpDate',
-						readOnly: true,
+						editable: true,
 						allowBlank: false,
 			            fieldLabel: '结束计费日'
 					}]
@@ -146,8 +162,16 @@ ProdOrderForm = Ext.extend( BaseForm, {
 			this.userId = users[0].get("user_id");
 		// 续订和升级
 		}else if(this.busiCode === "100" || this.busiCode === "101"){
+			var panelId = App.getData().currentPanelId;
+			var prodData = null;
 			var prodGrid = App.getApp().main.infoPanel.getUserPanel().prodGrid;
-			var prodData = prodGrid.selModel.getSelected().data;
+			// 套餐
+			if(panelId === "U_CUST_PKG"){
+				prodData = prodGrid.custPkgGrid.selModel.getSelected().data;
+			}else{
+				prodData = prodGrid.baseProdGrid.selModel.getSelected().data;
+				this.userId = prodGrid.userId;
+			}
 			this.lastOrderSn  = prodData["order_sn"];
 		}
 		
@@ -178,7 +202,7 @@ ProdOrderForm = Ext.extend( BaseForm, {
 					that.transferPayWindow = new TransferPayWindow();
 				}
 				if(that.transferPayData && that.transferPayData.length > 0){
-					that.transferPayWindow.show(that.transferPayData);
+					that.transferPayWindow.show(that.transferPayData, Ext.getCmp("dfStartDate").getValue());
 				}else{
 					Alert("没有转移支付项目!");
 				}
@@ -282,7 +306,7 @@ ProdOrderForm = Ext.extend( BaseForm, {
 	doLoadTransferAmount: function(){
 		var validObj = this.doBaseValid(); 
 		if(validObj["isValid"] !== true){
-			Alert(validObj["msg"]);
+			// Alert(validObj["msg"]);
 			return ;
 		}
 		Ext.Ajax.request({
@@ -356,6 +380,20 @@ ProdOrderForm = Ext.extend( BaseForm, {
 			return {
 				isValid: false,
 				msg: "订购月数是必须的!"
+			}
+		}
+		
+		// 升级业务，失效日期必须比上期结束日大
+		var prodId = this.currentSelectedProd.get("prod_id");
+		var lastOrderProdDate = this.getLastProdEndDate(prodId);
+		if( lastOrderProdDate && this.busiCode == "100"){
+			var tmpDate = Date.parseDate(lastOrderProdDate, "Y-m-d");
+			// 如果失效日期小雨上期结束日，则不给于提交
+			if(Date.parseDate(Ext.getCmp("dfExpDate").getValue(), "Y-m-d").getTime() <= tmpDate.getTime()){
+				return {
+					isValid: false,
+					msg: '升级时，结束计费日必须大于上期订购结束日，请调整订购月数'
+				}
 			}
 		}
 		
