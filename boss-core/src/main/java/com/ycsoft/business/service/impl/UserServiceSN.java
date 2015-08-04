@@ -102,8 +102,13 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 			custComponent.updateCustStatus(doneCode, custId, StatusConstants.PREOPEN, StatusConstants.ACTIVE);
 		}
 		//处理购买设备
-		if (!user.getUser_type().equals(SystemConstants.USER_TYPE_OTT_MOBILE))
-			this.buyDevice(device, deviceBuyMode, deviceFee, getBusiParam().getBusiCode(), cust, doneCode);
+		if (!user.getUser_type().equals(SystemConstants.USER_TYPE_OTT_MOBILE)){
+			TDeviceBuyMode buyModeCfg = busiConfigComponent.queryBuyMode(deviceBuyMode);
+			String ownership = SystemConstants.OWNERSHIP_GD;
+			if (buyModeCfg.getChange_ownship().equals(SystemConstants.BOOLEAN_TRUE))
+				ownership = SystemConstants.OWNERSHIP_CUST;
+			this.buyDevice(device, deviceBuyMode,ownership, deviceFee, getBusiParam().getBusiCode(), cust, doneCode);
+		}
 		// 生成'创建用户'JOB
 		createUserJob(user, custId, doneCode);
 		// 设置拦截器所需要的参数
@@ -119,19 +124,50 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 	 * 用户更换设备
 	 */
 	@Override
-	public void saveChangeDevice(String userId, String deviceCode, String devcieBuyMode, FeeInfoDto deviceFee)
+	public void saveChangeDevice(String userId, String deviceCode, String devcieBuyMode, 
+			FeeInfoDto deviceFee,boolean reclaim)
 			throws Exception {
 		Integer doneCode = doneCodeComponent.gDoneCode();
+		CUser oldUser = userComponent.queryUserById(userId);
 		CUser user = userComponent.queryUserById(userId);
 		CCust cust = custComponent.queryCustById(user.getCust_id());
-		//修改用户设备信息
+		
+		String oldDeviceCode = user.getStb_id();
+		if (user.getUser_type().equals(SystemConstants.USER_TYPE_BAND))
+			oldDeviceCode = user.getModem_mac();
+		DeviceDto oldDevice = deviceComponent.queryDeviceByDeviceCode(oldDeviceCode);
 		DeviceDto device = deviceComponent.queryDeviceByDeviceCode(deviceCode);
+		deviceComponent.checkChangeDevice(oldDevice, device);
+		
+		//修改用户设备信息
 		setUserDeviceInfo(user, device);
 		userComponent.updateDevice(doneCode, user);
+		//处理授权
+		if (user.getUser_type().equals(SystemConstants.USER_TYPE_OTT)){
+			jobComponent.createBusiCmdJob(doneCode, BusiCmdConstants.CHANGE_USER,
+					cust.getCust_id(), userId, null, null,
+					null, null, null, null);
+		} else if (user.getUser_type().equals(SystemConstants.USER_TYPE_DTT)){
+			jobComponent.createBusiCmdJob(doneCode, BusiCmdConstants.PASSVATE_TERMINAL,
+					user.getCust_id(), userId, oldUser.getStb_id(), oldUser.getCard_id(), oldUser.getModem_mac(), 
+					null, null, null);
+			jobComponent.createBusiCmdJob(doneCode, BusiCmdConstants.REFRESH_TERMINAL,
+					cust.getCust_id(), userId, null, null,
+					null, null, null, null);
+		}
+		//处理设备购买和回收
 		
-		
-		
+		this.buyDevice(device, devcieBuyMode, oldDevice.getOwnership(), deviceFee, getBusiParam().getBusiCode(),
+				cust, doneCode);
+		if (reclaim){
+			deviceComponent.saveDeviceReclaim(doneCode,  getBusiParam().getBusiCode(),
+					oldDevice.getDevice_id(), cust.getCust_id(), "change device");
+		}
 	}
+
+
+
+	
 
 	@Override
 	public void createUser(CUser user, String deviceBuyMode, FeeInfoDto deviceFee) throws Exception {
@@ -687,7 +723,8 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 
 
 
-	private void buyDevice(DeviceDto device,String buyMode,FeeInfoDto fee, String busiCode,CCust cust,Integer doneCode) throws Exception {
+	private void buyDevice(DeviceDto device,String buyMode,String ownership,FeeInfoDto fee, 
+			String busiCode,CCust cust,Integer doneCode) throws Exception {
 		//增加客户设备
 		custComponent.addDevice(doneCode, cust.getCust_id(),
 				device.getDevice_id(), device.getDevice_type(), device.getDevice_model(), 
@@ -706,7 +743,8 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 					null,
 					null,
 					device.getDevice_model(),
-					fee.getFee(), doneCode,doneCode, busiCode, 1);			
+					fee.getFee(), doneCode,doneCode, busiCode, 1);	
+			
 		}
 		
 		if (StringHelper.isNotEmpty(device.getDevice_id())){
@@ -714,8 +752,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 			deviceComponent.updateDeviceDepotStatus(doneCode, busiCode, device.getDevice_id(),
 					device.getDepot_status(), StatusConstants.USE,true);
 			//更新设备产权
-			TDeviceBuyMode deviceBuyMode = busiConfigComponent.queryBuyMode(buyMode);
-			if (SystemConstants.BOOLEAN_TRUE.equals(deviceBuyMode.getChange_ownship())){
+			if (SystemConstants.OWNERSHIP_CUST.equals(ownership)){
 				deviceComponent.updateDeviceOwnership(doneCode, busiCode, device.getDevice_id(),device.getOwnership(),SystemConstants.OWNERSHIP_CUST,true);
 			}
 			//更新设备为旧设备
