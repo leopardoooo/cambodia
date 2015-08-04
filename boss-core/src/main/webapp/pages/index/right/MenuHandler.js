@@ -1484,9 +1484,16 @@ Ext.apply(MenuHandler, {
 			height : 520
 		};
 		//套餐订购
-		if(App.data.currentResource.busicode === "1015"){
+		var busiCode = App.data.currentResource.busicode;
+		if(busiCode === "1015"){
 			return windowSize;
 		}
+		// 如果是套餐续订或升级，不用判断用户
+		// 单产品订购102，升级100，续订101, 套餐订购1015
+		if(App.data.currentPanelId === "U_CUST_PKG" && (busiCode === "100" || busiCode === "101")){
+			return windowSize;
+		}
+		
 		var userRecords =  App.main.infoPanel.getUserPanel().userGrid.getSelections();
 		var len = userRecords.length;
 		if (len == 0) {

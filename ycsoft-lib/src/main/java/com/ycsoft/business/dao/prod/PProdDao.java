@@ -5,9 +5,8 @@
 package com.ycsoft.business.dao.prod;
 
 import static com.ycsoft.commons.constants.SystemConstants.PROD_TYPE_BASE;
-import static com.ycsoft.commons.constants.SystemConstants.PROD_TYPE_CUSTPKG;
-import static com.ycsoft.commons.constants.SystemConstants.PROD_TYPE_USERPKG;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -386,7 +385,8 @@ public class PProdDao extends BaseEntityDao<PProd> {
 		List<Object[]> bandWidthList= this.createSQLQuery(sql).list();
 		if (CollectionHelper.isNotEmpty(bandWidthList)){
 			for (Object[] obj:bandWidthList){
-				prodBandWidthMap.put(obj[0].toString(), (Integer)obj[1]);
+				BigDecimal bd = (BigDecimal)obj[1];
+				prodBandWidthMap.put(obj[0].toString(), bd.intValue());
 			}
 		}
 		return prodBandWidthMap;
