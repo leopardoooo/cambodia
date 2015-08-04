@@ -15,7 +15,7 @@ public interface IOrderService extends IBaseService{
 
 	public PackageGroupPanel queryPackageGroupPanel(String cust_id,String prod_id,String last_order_sn) throws Exception;
 	
-	public List<CProdOrder> queryTransferFee(OrderProd orderProd,String busi_code) throws Exception;
+	public List<CProdOrderDto> queryTransferFee(OrderProd orderProd,String busi_code) throws Exception;
 	
 	public Map<String,List<CProdOrderDto>> queryCustEffOrder(String cust_id) throws Exception;
 	

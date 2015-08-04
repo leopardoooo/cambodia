@@ -34,6 +34,19 @@ public class CProdOrderDao extends BaseEntityDao<CProdOrder> {
 		return this.createQuery(CProdOrder.class, sql, custId,StatusConstants.REQSTOP,
 				StatusConstants.LINKSTOP,StatusConstants.INSTALL).list();
 	}
+	/**
+	 * 按主键获得一个订单的信息信息
+	 * @param order_sn
+	 * @return
+	 * @throws JDBCException 
+	 */
+	public CProdOrderDto queryCProdOrderDtoByKey(String order_sn) throws JDBCException{
+		String sql=StringHelper.append(" select case when cu.user_id is null then null when   cu.user_type in ('OTT_MOBILE','BAND') then cu.login_name else nvl(cu.stb_id,'INSTALL') end user_name ,nvl(d.disct_name,ppt.tariff_name) tariff_name,p.prod_name, o.* ",
+				" from c_prod_order o,p_prod p,p_prod_tariff ppt ,p_prod_tariff_disct d,c_user cu ",
+			    " where p.prod_id=o.prod_id and ppt.tariff_id=o.tariff_id and d.disct_id(+)=o.disct_id and cu.user_id(+)=o.user_id ",
+			    " and  o.order_sn=? "); 
+		return this.createQuery(CProdOrderDto.class, sql,order_sn).first();
+	}
 
 	/**
 	 * 查询一个套餐的子订单明细

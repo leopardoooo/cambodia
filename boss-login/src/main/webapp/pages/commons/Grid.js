@@ -150,6 +150,7 @@ var goUrl = function(btn,div){
 	
 	//设置当前选中行
 	if(div && div.id){
+		App.getData().currentPanelId = div.id;
 		App.getData().currentRec = Ext.getCmp(div.id).getSelectionModel().getSelected();
 	}
 	

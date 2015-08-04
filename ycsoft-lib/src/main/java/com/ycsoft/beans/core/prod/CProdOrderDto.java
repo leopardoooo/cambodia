@@ -15,6 +15,14 @@ public class CProdOrderDto extends CProdOrder {
 	private String is_base_text;
 	private String public_acctitem_type_text;
 	private String package_name;//display(2)
+	private String user_name;
+	
+	public String getUser_name() {
+		return user_name;
+	}
+	public void setUser_name(String user_name) {
+		this.user_name = user_name;
+	}
 	public String getProd_name() {
 		return prod_name;
 	}

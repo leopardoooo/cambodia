@@ -50,6 +50,39 @@ public class CFeeDao extends BaseEntityDao<CFee> {
 	 */
 	public CFeeDao() {}
 	
+	/**
+	 * 查询待支付的总额
+	 * @param cust_id
+	 * @return
+	 * @throws JDBCException
+	 */
+	public Integer queryUnPaySum(String cust_id) throws JDBCException{
+		String sql="select sum(cf.real_pay) from c_fee cf,c_done_code_unpay un where cf.create_done_code=un.done_code and un.cust_id=? ";
+		String sum=this.findUnique(sql, cust_id);
+		if(StringHelper.isNotEmpty(sum)){
+			return Integer.valueOf(sum);
+		}else{
+			return 0;
+		}
+	}
+	/**
+	 * 查询未支付的费用明细
+	 * 显示 费用编号 fee_sn,业务名称busi_name,费用名称fee_text,数量(当count不为空，显示count否则显示begin_date(yyyymmdd)+“-”+prod_invalid_date),操作员 optr_name,操作时间create_time,金额 real_pay,
+	 * @param cust_id
+	 * @return
+	 * @throws JDBCException
+	 */
+	public List<FeeDto> queryUnPay(String cust_id) throws JDBCException{
+		String sql=StringHelper.append("select cf.*,nvl(atm.acctitem_name,bf.fee_name) fee_text,fa.prod_invalid_date,fa.begin_date,fa.prod_sn ",
+				" from c_fee cf,c_done_code_unpay un,c_fee_acct fa,vew_acctitem atm,busi.t_busi_fee bf ",
+				" where cf.create_done_code=un.done_code ",
+				" and  bf.fee_id(+)=cf.fee_id ",
+				" and atm.acctitem_id(+)=cf.acctitem_id ",
+				" and fa.fee_sn(+)=cf.fee_sn ",
+				" and un.cust_id=? ",
+				" order by cf.create_time ");
+		return this.createQuery(FeeDto.class, sql, cust_id).list();
+	}
 	//客户受理单打印获取收费
 	public List<PrintFeeitemDto> queryPrintFee(String custId,SOptr optr,String docSn)throws Exception{
 		String countyId = optr.getCounty_id();

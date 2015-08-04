@@ -60,6 +60,35 @@ public class PayService extends BaseBusiService implements IPayService {
 	private CBankReturnPayerrorDao cBankReturnPayerrorDao;
 	private CBankGotodiskDao cBankGotodiskDao;
 	
+	/**
+	 * 查询未支付总额
+	 * @param cust_id
+	 * @return
+	 * @throws Exception
+	 */
+	public Integer queryUnPaySum(String cust_id) throws Exception{
+		return feeComponent.queryUnPaySum(cust_id);
+	}
+	/**
+	 * 查询未支付的费用明细
+	 * 显示 费用编号 fee_sn,业务名称busi_name,费用名称fee_text,数量(当count不为空，显示count否则显示begin_date(yyyymmdd)+“-”+prod_invalid_date),操作员 optr_name,操作时间create_time,金额 real_pay,
+	 * @param cust_id
+	 * @return
+	 */
+	public List<FeeDto> queryUnPayDetail(String cust_id)throws Exception{
+		return feeComponent.queryUnPay(cust_id);
+	}
+	/**
+	 * 保存支付信息
+	 */
+	public void savePay(String cust_id,CFeePay pay){
+		//验证支付金额和待支付金额是否一致
+		//更新订购支付信息
+		//给订单发授权
+		//保存支付记录
+		//删除未支付业务信息
+		
+	}
 	
 	/**
 	 * 根据用户类型查询一次性费用信息

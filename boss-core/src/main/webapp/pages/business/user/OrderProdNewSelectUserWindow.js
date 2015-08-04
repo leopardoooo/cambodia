@@ -439,16 +439,16 @@ OpenDispatchUserWindow = Ext.extend(Ext.Window, {
  */
 TransferPayWindow = Ext.extend(Ext.Window, {
 	store: new Ext.data.JsonStore({
-		fields: ["prod_name","traff_name", "user_ids", "month_count", "active_fee", "last_order_end_date", "start_date", "start_date"]
+		fields: ["prod_name","tariff_name", "user_name", "month_count", "active_fee", "last_order_end_date", "eff_date", "exp_date"]
 	}),
 	constructor: function(){
 		var columns = [
        	    {header: "产品名称", width: 100,sortable:true, dataIndex: 'prod_name'},
-       	    {header: "资费", width: 70, sortable:true, dataIndex: 'traff_name'},
-       	    {header: "用户", width: 60, sortable:true, dataIndex: 'user_ids'},
-       	    {header: "转移计费日", width: 80, sortable:true, dataIndex: 'month_count'},
-       	    {header: "结束计费日", width: 80, sortable:true, dataIndex: 'fee'},
-       	    {header: "转移金额", width: 60, sortable:true, dataIndex: 'active_fee'}
+       	    {header: "资费", width: 70, sortable:true, dataIndex: 'tariff_name'},
+       	    {header: "用户", width: 60, sortable:true, dataIndex: 'user_name'},
+       	    {header: "开始计费日", width: 80, sortable:true, dataIndex: 'eff_date',renderer: Ext.util.Format.dateFormat},
+       	    {header: "结束计费日", width: 80, sortable:true, dataIndex: 'exp_date',renderer: Ext.util.Format.dateFormat},
+       	    {header: "转移金额$", width: 60, sortable:true, dataIndex: 'active_fee',renderer: Ext.util.Format.convertToYuan}
        	];
 		// Window Construct instance
 		return TransferPayWindow.superclass.constructor.call(this, {
@@ -470,8 +470,9 @@ TransferPayWindow = Ext.extend(Ext.Window, {
 			}]
 		});
 	},
-	show: function(data){
+	show: function(data, effDate){
 		this.store.loadData(data);
+		this.setTitle("转移明细（开始计费日：" + effDate.format("Y-m-d") + "）");
 		return TransferPayWindow.superclass.show.call(this);
 	}
 });
