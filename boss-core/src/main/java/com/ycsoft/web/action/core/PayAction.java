@@ -102,7 +102,7 @@ public class PayAction extends BaseBusiAction{
 		return JSON_RECORDS;
 	}
 	
-	public String savePay(String cust_id) throws Exception{
+	public String savePayNew() throws Exception{
 		payService.savePay(cust_id);
 		return JSON_SUCCESS;
 	}
