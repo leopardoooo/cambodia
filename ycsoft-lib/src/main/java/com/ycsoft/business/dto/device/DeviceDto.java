@@ -20,6 +20,7 @@ public class DeviceDto extends RDevice{
 	 */
 	private static final long serialVersionUID = -1026219756512633039L;
 	private String device_code;			//设备编号
+	private String device_mac;          //设备mac地址
 	private RDeviceModel deviceModel;	//设备型号
 	private RCard pairCard;				//配对的智能卡
 	private String isPairCard;
@@ -29,6 +30,7 @@ public class DeviceDto extends RDevice{
 	private Integer price;				//价格
 	private Integer fee;			    //实收金额
 	private String isPairModem;
+	
 
 
 	public String getIsPairModem() {
@@ -98,6 +100,13 @@ public class DeviceDto extends RDevice{
 	public void setBuy_mode_text(String buy_mode_text) {
 		this.buy_mode_text = buy_mode_text;
 	}
+	public String getDevice_mac() {
+		return device_mac;
+	}
+	public void setDevice_mac(String device_mac) {
+		this.device_mac = device_mac;
+	}
 
+	
 	
 }

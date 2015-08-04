@@ -115,7 +115,7 @@ public class UserService extends BaseBusiService implements IUserService {
 	
 
 	@Override
-	public void saveChangeDevice(String userId, String deviceId, String devcieBuyMode, FeeInfoDto deviceFee)
+	public void saveChangeDevice(String userId, String deviceId, String devcieBuyMode, FeeInfoDto deviceFee,boolean reclaim)
 			throws Exception {
 		// TODO Auto-generated method stub
 		
@@ -893,11 +893,11 @@ public class UserService extends BaseBusiService implements IUserService {
 			custComponent.updateDeviceStatusByCode(custId, user.getCard_id(), StatusConstants.USE);
 			custComponent.updateDeviceStatusByCode(custId, user.getModem_mac(), StatusConstants.USE);
 
-			userComponent.updateDevice(doneCode,user,
-					StringHelper.isNotEmpty(user.getStb_id())?user.getStb_id():stbId,
-					StringHelper.isNotEmpty(user.getCard_id())?user.getCard_id():cardId,
-					StringHelper.isNotEmpty(user.getModem_mac())?user.getModem_mac():modemMac);
-			
+//			userComponent.updateDevice(doneCode,user,
+//					StringHelper.isNotEmpty(user.getStb_id())?user.getStb_id():stbId,
+//					StringHelper.isNotEmpty(user.getCard_id())?user.getCard_id():cardId,
+//					StringHelper.isNotEmpty(user.getModem_mac())?user.getModem_mac():modemMac);
+//			
 			//修改用户状态
 //			String userOldStatus = userComponent.queryUserLastStatus(user.getUser_id());
 //			if(StringHelper.isNotEmpty(userOldStatus)){

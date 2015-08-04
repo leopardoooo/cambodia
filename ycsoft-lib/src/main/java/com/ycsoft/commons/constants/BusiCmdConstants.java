@@ -8,7 +8,7 @@ public class BusiCmdConstants {
 	public static final String CHANGE_USER="CHG_USER";//		用户信息变更
 	public static final String ACCTIVATE_TERMINAL="AVT_TERMINAL";//		激活终端设备
 	public static final String PASSVATE_TERMINAL="PST_TERMINAL";//		钝化终端设备
-	public static final String REFRESH_TERMINAL="REF_TERMINAL";//		刷新设备
+	public static final String REFRESH_TERMINAL="REF_TERMINAL";//		刷新设备,重发授权
 	public static final String ACCTIVATE_PROD="AVT_PROD";//		激活产品
 	public static final String PASSVATE_PROD="PST_PROD";//		钝化产品
 	public static final String ADD_REJECT_RES="ADD_REJ_RES";//		增加排斥资源
