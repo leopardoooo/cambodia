@@ -50,7 +50,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 	@Autowired
 	private CProdPropChangeDao cProdPropChangeDao;
 	
-	public void createUser(CUser user, String deviceId, String deviceType, String deviceModel, String deviceBuyMode,
+	public void createUser(CUser user, String deviceCode, String deviceType, String deviceModel, String deviceBuyMode,
 			FeeInfoDto deviceFee) throws Exception {
 		// 获取客户信息
 		CCust cust = getBusiParam().getCust();
@@ -65,18 +65,9 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		user.setAcct_id(acctId);
 		user.setCust_id(custId);
 		DeviceDto device = null;
-		if (StringHelper.isNotEmpty(deviceId)){
-			device = deviceComponent.queryDeviceByDeviceCode(deviceId);
-			if (user.getUser_type().equals(SystemConstants.USER_TYPE_BAND)){
-				user.setModem_mac(device.getDevice_code());
-			}
-			if (user.getUser_type().equals(SystemConstants.USER_TYPE_OTT)){
-				user.setStb_id(device.getDevice_code());
-			}
-			if (user.getUser_type().equals(SystemConstants.USER_TYPE_DTT)){
-				user.setStb_id(device.getDevice_code());
-				user.setCard_id(device.getPairCard().getCard_id());
-			}
+		if (StringHelper.isNotEmpty(deviceCode)){
+			device = deviceComponent.queryDeviceByDeviceCode(deviceCode);
+			setUserDeviceInfo(user, device);
 		} else {
 			device = new DeviceDto();
 			device.setDevice_type(deviceType);
@@ -115,25 +106,32 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 			this.buyDevice(device, deviceBuyMode, deviceFee, getBusiParam().getBusiCode(), cust, doneCode);
 		// 生成'创建用户'JOB
 		createUserJob(user, custId, doneCode);
-		getBusiParam().setBusiConfirmParam("user", user);
 		// 设置拦截器所需要的参数
 		getBusiParam().resetUser();
 		getBusiParam().addUser(user);
 		saveAllPublic(doneCode, getBusiParam());
 
 	}
+
 	
+	
+	/**
+	 * 用户更换设备
+	 */
 	@Override
-	public void saveChangeDevice(String userId, String deviceId, String devcieBuyMode, FeeInfoDto deviceFee)
+	public void saveChangeDevice(String userId, String deviceCode, String devcieBuyMode, FeeInfoDto deviceFee)
 			throws Exception {
-		// TODO Auto-generated method stub
+		Integer doneCode = doneCodeComponent.gDoneCode();
+		CUser user = userComponent.queryUserById(userId);
+		CCust cust = custComponent.queryCustById(user.getCust_id());
+		//修改用户设备信息
+		DeviceDto device = deviceComponent.queryDeviceByDeviceCode(deviceCode);
+		setUserDeviceInfo(user, device);
+		userComponent.updateDevice(doneCode, user);
+		
+		
 		
 	}
-
-
-
-
-
 
 	@Override
 	public void createUser(CUser user, String deviceBuyMode, FeeInfoDto deviceFee) throws Exception {
@@ -764,6 +762,20 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 				DateHelper.dateToStr(order.getExp_date()),DateHelper.dateToStr(DateHelper.addDate(order.getExp_date(), stopDays))));
 		
 		orderComponent.editProd(doneCode,order.getOrder_sn(),changeList);
+	}
+	
+	private void setUserDeviceInfo(CUser user, DeviceDto device) {
+		if (user.getUser_type().equals(SystemConstants.USER_TYPE_BAND)){
+			user.setModem_mac(device.getDevice_mac());
+		}
+		if (user.getUser_type().equals(SystemConstants.USER_TYPE_OTT)){
+			user.setStb_id(device.getDevice_code());
+			user.setModem_mac(device.getDevice_mac());
+		}
+		if (user.getUser_type().equals(SystemConstants.USER_TYPE_DTT)){
+			user.setStb_id(device.getDevice_code());
+			user.setCard_id(device.getPairCard().getCard_id());
+		}
 	}
 	/**验证用户能不能报停
 	 * 1、协议期用户不能报亭

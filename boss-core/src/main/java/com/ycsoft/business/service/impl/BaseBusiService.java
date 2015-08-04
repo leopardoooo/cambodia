@@ -585,11 +585,6 @@ public class BaseBusiService extends BaseService {
 			jobComponent.createBusiCmdJob(doneCode, BusiCmdConstants.ACCTIVATE_TERMINAL, custId,
 					user.getUser_id(), null,null, user.getModem_mac(), null,null);
 		}
-		
-		//支付密码同步
-		if(StringHelper.isNotEmpty(userDto.getPassword())){
-			jobComponent.saveDataSyncJob(BusiCmdConstants.PSWD_SYNC, JsonHelper.fromObject(userDto), "C_USER");
-		}
 	}
 
 	/**
@@ -943,9 +938,9 @@ public class BaseBusiService extends BaseService {
 						user.getCard_id(), user.getModem_mac(),null,null);
 				
 				if(userType.equals(SystemConstants.USER_TYPE_BAND)){
-					userComponent.updateDevice(doneCode, user, null, null, newModemId);
+					//userComponent.updateDevice(doneCode, user, null, null, newModemId);
 				}else{
-					userComponent.updateDevice(doneCode, user, newStbId, newCardId, newModemId);
+					//userComponent.updateDevice(doneCode, user, newStbId, newCardId, newModemId);
 				}
 				
 				String userStbId = StringHelper.isNotEmpty(newStbId)
@@ -1050,7 +1045,7 @@ public class BaseBusiService extends BaseService {
 				}else if (deviceType.equals(SystemConstants.DEVICE_TYPE_MODEM)){
 					modem_mac = null;
 				}
-				userComponent.updateDevice(doneCode, cuser, stb_id, card_id, modem_mac);
+				//userComponent.updateDevice(doneCode, cuser, stb_id, card_id, modem_mac);
 			}
 		}
 		//如果收取了折旧费，保存折旧费信息
