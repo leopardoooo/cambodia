@@ -94,12 +94,14 @@ public class PayAction extends BaseBusiAction{
 	}
 	/**
 	 * 查询未支付业务总额
+	 * Map<String,Integer>: {"FEE":"未支付总额","CNT":"未支付业务数"}
+	 * 当未支付业务数>0时，未支付总额可能=0。
 	 * @return
 	 * @throws Exception
 	 */
 	public String queryUnPaySum() throws Exception{
-		getRoot().setSimpleObj(payService.queryUnPaySum(cust_id));
-		return JSON_SIMPLEOBJ;
+		getRoot().setOthers(payService.queryUnPaySum(cust_id));
+		return JSON_OTHER;
 	}
 	/**
 	 * 查询待支付的费用清单和当前汇率

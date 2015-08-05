@@ -29,7 +29,7 @@ import com.ycsoft.commons.exception.ServicesException;
  */
 public interface IPayService extends IBaseService{
 
-	public Integer queryUnPaySum(String cust_id) throws Exception;
+	public Map<String, Integer> queryUnPaySum(String cust_id) throws Exception;
 	
 	public List<FeeDto> queryUnPayDetail(String cust_id)throws Exception;
 	

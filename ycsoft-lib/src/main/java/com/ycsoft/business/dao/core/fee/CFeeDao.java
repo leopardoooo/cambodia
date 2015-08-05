@@ -76,14 +76,19 @@ public class CFeeDao extends BaseEntityDao<CFee> {
 	 * @return
 	 * @throws JDBCException
 	 */
-	public Integer queryUnPaySum(String cust_id) throws JDBCException{
-		String sql="select sum(cf.real_pay) from c_fee cf,c_done_code_unpay un where cf.create_done_code=un.done_code and un.cust_id=? ";
-		String sum=this.findUnique(sql, cust_id);
-		if(StringHelper.isNotEmpty(sum)){
-			return Integer.valueOf(sum);
+	public Map<String,Integer> queryUnPaySum(String cust_id) throws JDBCException{
+		
+		String sql="select sum(cf.real_pay) fee,count(1) cnt from c_fee cf,c_done_code_unpay un where cf.create_done_code=un.done_code and un.cust_id=? ";
+		List<Object[]> list=this.createSQLQuery(sql, cust_id).list();
+		Map<String,Integer> map=new HashMap<>();
+		if(list==null||list.size()==0){
+			map.put("FEE", 0);
+			map.put("CNT", 0);
 		}else{
-			return 0;
+			map.put("FEE", Integer.valueOf(list.get(0)[0].toString()));
+			map.put("CNT", Integer.valueOf(list.get(0)[1].toString()));
 		}
+		return map;
 	}
 	/**
 	 * 查询未支付的费用明细

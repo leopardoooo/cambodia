@@ -571,7 +571,30 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		return list;
 	}
 
-	
+	/**
+	 * 查询退订\销户可退的订单金额
+	 * 当天订购的订单退全部金额（可能误操作的情况）
+	 * a.普通退订和普通销户：1.包多月产品不可退。
+	 *         2.单月基础产品未过协议期，则协议期外可退，退订业务时重发加授权至协议期。
+	 *         3.单月基础产品已过协议期(或无协议)，则可退并终止产品
+	 *         4.单月非基础产品可退并终止产品
+	 * b.高级退订和高级销户可以退钱并终止产品
+	 * c.退款金额按剩余使用月整数计算
+	 * @return
+	 */
+	public List<CProdOrder> queryCancelOrderFee(String busi_code,String cust_id,String user_id,String order_sn)throws Exception{
+		//检查是否未支付项目
+		List<CDoneCodeUnpay> unPays=doneCodeComponent.queryUnPayList(cust_id);
+		if(unPays!=null&&unPays.size()>0){
+			throw new ServicesException("有未支付费用，请先支付");
+		}
+		//是否高级权限
+		boolean isHigh=BusiCodeConstants.PROD_HIGH_TERMINATE.equals(busi_code)||BusiCodeConstants.USER_HIGH_WRITE_OFF.equals(busi_code)
+						?true:false;
+		
+		
+		return null;
+	}
 	
 	/**
 	 * 保存订购记录
