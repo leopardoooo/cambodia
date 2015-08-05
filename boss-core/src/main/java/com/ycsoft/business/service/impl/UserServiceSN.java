@@ -234,7 +234,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		//获取操作的客户、用户信息
 		//CCust cust = getBusiParam().getCust();
 		List<CUser> users = userComponent.queryAllUserByUserIds(userIds);
-		if (users == null || users.get(0) == null)
+		if (users == null || users.size() == 0 || users.get(0) == null)
 			throw new ServicesException("请选择用户");
 		
 		//查找客户名下所有有效的产品

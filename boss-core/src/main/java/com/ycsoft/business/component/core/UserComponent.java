@@ -779,9 +779,7 @@ public class UserComponent extends BaseBusiComponent {
 	
 	public List<CUser> queryAllUserByUserIds(String[] userIds) throws JDBCException {
 		List<CUser> users= new ArrayList<CUser>();
-		users.addAll(cUserAtvDao.queryAtvByUserIds(userIds));
-		users.addAll(cUserDtvDao.queryDtvByUserIds(userIds));
-		users.addAll(cUserBroadbandDao.queryBandByUserIds(userIds));
+		users = cUserDao.queryUserByUserIds(userIds);
 		fillUserName(users);
 		return users;
 	}
