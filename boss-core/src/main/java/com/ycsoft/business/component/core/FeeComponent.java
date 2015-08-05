@@ -157,18 +157,27 @@ public class FeeComponent extends BaseBusiComponent {
 		return cFeeDao.queryUnPaySum(cust_id);
 	}
 	
+	/**
+	 * 缴费记录更新支付信息
+	 * @param unpayList
+	 * @param pay
+	 * @throws JDBCException
+	 */
 	public void updateCFeeToPay(List<CDoneCodeUnpay> unpayList,CFeePayDto pay) throws JDBCException{
 		for(CDoneCodeUnpay un:unpayList){
 			cFeeDao.updateCFeeToPay(un, pay);
 		}
-		
 	}
 	/**
-	 * 保存支付
+	 * 取消未支付的缴费记录
+	 * @param fee_sn
+	 * @throws JDBCException
 	 */
-	public void savePay(){
-		//保存支付记录c_fee_pay和detail
-		//更新缴费信息update c_fee set status='pay' ,pay_type=支付方式
+	public void deleteUnPayCFee(String fee_sn) throws JDBCException{
+		cFeeDao.remove(fee_sn);
+		cFeeBusiDao.remove(fee_sn);
+		cFeeDeviceDao.remove(fee_sn);
+		cFeeAcctDao.remove(fee_sn);
 	}
 	
 	public CVoucher queryVoucherById(String voucherId) throws Exception {

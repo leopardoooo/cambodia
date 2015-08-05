@@ -1467,9 +1467,9 @@ public class BaseBusiService extends BaseService {
 					disct = prodComponent.queryDisctById(feeAcct.getDisct_id());
 					if (disct != null){
 						inactiveItem.setActive_amount(disct.getDisct_rent());
-						int disctAmount = feeAcct.getReal_pay()/disct.getFinal_rent()*disct.getDisct_rent();
-						inactiveItem.setInit_amount(disctAmount);
-						inactiveItem.setBalance(disctAmount);
+						//int disctAmount = feeAcct.getReal_pay()/disct.getFinal_rent()*disct.getDisct_rent();
+						//inactiveItem.setInit_amount(disctAmount);
+						//inactiveItem.setBalance(disctAmount);
 					}
 				}
 				acctComponent.addAcctItemInactive(inactiveItem);

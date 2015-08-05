@@ -57,7 +57,25 @@ public class OrderComponent extends BaseBusiComponent {
 	@Autowired
 	private CProdOrderTransfeeDao cProdOrderTransfeeDao;
 	
-	
+	/**
+	 * 恢复被覆盖的订单
+	 * @param recoverDoneCode
+	 * @throws JDBCException 
+	 */
+	public void recoverTransCancelOrder(Integer recoverDoneCode,String cust_id) throws JDBCException{
+		
+		List<CProdOrder> list=cProdOrderHisDao.queryCProdOrderByDelete(recoverDoneCode, cust_id);
+		if(list!=null&&list.size()>0){
+			cProdOrderDao.save(list.toArray(new CProdOrder[list.size()]));
+			String orderSns[]=new String[list.size()];
+			for(int i=0;i<list.size();i++){
+				orderSns[i]=list.get(i).getOrder_sn();
+			}
+			cProdOrderHisDao.remove(orderSns);
+			cProdOrderTransfeeDao.deleteTransfeeChange(recoverDoneCode, cust_id);
+		}
+		
+	}
 	/**
 	 * 查询被覆盖取消的订单(套餐订购和升级的情况)
 	 * @param orderProd
@@ -192,11 +210,8 @@ public class OrderComponent extends BaseBusiComponent {
 		prod.setStatus_date(new Date());
 		prod.setBill_fee(0);
 		prod.setActive_fee(orderProd.getPay_fee()+orderProd.getTransfer_fee());
-		prod.setRent_fee(0);
 		prod.setEff_date(orderProd.getEff_date());
 		prod.setExp_date(orderProd.getExp_date());
-		prod.setLast_bill_date(orderProd.getEff_date());
-		prod.setNext_bill_date(orderProd.getEff_date());
 		prod.setDone_code(done_code);
 		prod.setOptr_id(optr_id);
 		prod.setArea_id(area_id);
@@ -273,6 +288,7 @@ public class OrderComponent extends BaseBusiComponent {
 	
 	/**
 	 * 覆盖退订产品
+	 * 未支付的产品不算转移支付余额
 	 * @param cProdOrder
 	 * @param cancelList
 	 * @param cancelDate
@@ -284,7 +300,7 @@ public class OrderComponent extends BaseBusiComponent {
 		List<CProdOrderTransfee>  transFeeList=new ArrayList<>();
 		for(CProdOrder cancelOrder:cancelList){
 			CProdOrderTransfee trans=new CProdOrderTransfee();
-			transFeeList.add(trans);
+			
 			trans.setDone_code(cProdOrder.getDone_code());
 			trans.setCust_id(cProdOrder.getCust_id());
 			trans.setOrder_sn(cProdOrder.getOrder_sn());
@@ -292,9 +308,14 @@ public class OrderComponent extends BaseBusiComponent {
 			trans.setFrom_order_sn(cancelOrder.getOrder_sn());
 			//TODO 有充值卡业务时要修改
 			trans.setFee_type(SystemConstants.ACCT_FEETYPE_CASH);
-			int fee=this.getTransCancelFee(cancelDate, cancelOrder);
-			trans.setBalance(fee);
-			transFee=transFee+fee;
+			if(cProdOrder.getIs_pay().equals(SystemConstants.BOOLEAN_TRUE)){
+				int fee=this.getTransCancelFee(cancelDate, cancelOrder);
+				trans.setBalance(fee);
+				transFee=transFee+fee;
+				transFeeList.add(trans);
+				
+				cancelOrder.setActive_fee(fee);
+			}
 			//退订订购记录
 			this.saveCancelProdOrder(cancelOrder,cProdOrder.getDone_code());
 		}

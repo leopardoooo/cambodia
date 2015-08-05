@@ -39,6 +39,17 @@ public class CCustDao extends BaseEntityDao<CCust> {
 	 * default empty constructor
 	 */
 	public CCustDao() {}
+	
+	/**
+	 * 客户锁，并发锁定
+	 * @param cust_id
+	 * @return
+	 * @throws JDBCException
+	 */
+	public CCust lockCust(String cust_id) throws JDBCException{
+		String sql="select * from c_cust where cust_id=? for update ";
+		return this.createQuery(sql, cust_id).first();
+	}
 
 	/**
 	 * 按条件搜索客户

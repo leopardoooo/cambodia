@@ -97,9 +97,19 @@ public class PayAction extends BaseBusiAction{
 		getRoot().setSimpleObj(payService.queryUnPaySum(cust_id));
 		return JSON_SIMPLEOBJ;
 	}
+	/**
+	 * 查询待支付的费用清单和当前汇率
+	 * 显示 费用编号 fee_sn,业务名称busi_name,费用名称fee_text,数量(当count不为空，显示count否则显示begin_date(yyyymmdd)+“-”+prod_invalid_date),
+	 * 操作员 optr_name,操作时间create_time,金额 real_pay,订单号 prod_sn,X按钮(当prod_sn不为空时显示)
+	 * @return
+	 * @throws Exception
+	 */
 	public String queryUnPayDetail() throws Exception{
+		//费用信息
 		getRoot().setRecords(payService.queryUnPayDetail(cust_id));
-		return JSON_RECORDS;
+		//汇率
+		getRoot().setSimpleObj(payService.queryExchage());
+		return JSON;
 	}
 	
 	public String savePay(String cust_id) throws Exception{

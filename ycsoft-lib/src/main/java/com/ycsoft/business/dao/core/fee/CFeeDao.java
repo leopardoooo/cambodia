@@ -51,6 +51,7 @@ public class CFeeDao extends BaseEntityDao<CFee> {
 	 * default empty constructor
 	 */
 	public CFeeDao() {}
+
 	/**
 	 * 更新缴费记录的未支付状态
 	 * @param cust_id

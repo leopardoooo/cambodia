@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import com.ycsoft.beans.core.prod.CProdOrder;
 import com.ycsoft.beans.core.prod.CProdOrderDto;
 import com.ycsoft.commons.constants.StatusConstants;
+import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.daos.abstracts.BaseEntityDao;
 import com.ycsoft.daos.core.JDBCException;
@@ -78,6 +79,19 @@ public class CProdOrderDao extends BaseEntityDao<CProdOrder> {
 	public List<CProdOrder> queryPakDetailOrder(String package_sn) throws JDBCException{
 		String sql= "select * from c_prod_order where package_sn=? ";
 		return this.createQuery(sql, package_sn).list();
+	}
+	/**
+	 * 查询在套餐之后续订的单产品(跟套餐子产品重叠)
+	 * @param package_sn
+	 * @return
+	 * @throws JDBCException 
+	 */
+	public List<CProdOrder> querySingleProdOrderAfterPak(String package_sn) throws JDBCException{
+		String sql=StringHelper.append(" select t.* from c_prod_order t,c_prod_order pak,p_prod p ",
+				" where pak.package_sn=? and  pak.prod_id=p.prod_id and p.prod_type=? ",
+				" and pak.user_id=t.user_id and t.package_sn is null ",
+				" and t.exp_date>pak.exp_date and( p.serv_id =? or pak.prod_id=t.prod_id) order by t.exp_date desc ");
+		return this.createQuery(sql, package_sn,SystemConstants.PROD_TYPE_BASE,SystemConstants.PROD_SERV_ID_BAND).list();
 	}
 	/**
 	 * 查询转移支付被覆盖退订的单产品订购记录

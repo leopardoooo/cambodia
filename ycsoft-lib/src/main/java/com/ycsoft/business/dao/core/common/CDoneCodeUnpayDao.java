@@ -11,20 +11,9 @@ import com.ycsoft.daos.core.JDBCException;
 
 @Component
 public class CDoneCodeUnpayDao extends BaseEntityDao<CDoneCodeUnpay> {
-
-	/**
-	 * 【加锁】查询一个客户未支付的业务信息
-	 * @param cust_id
-	 * @return
-	 * @throws JDBCException 
-	 */
-	public List<CDoneCodeUnpay> queryUnPayByLock(String cust_id) throws JDBCException{
-		String sql="select * from c_done_code_unpay where cust_id=? for update";
-		return this.createQuery(sql, cust_id).list();
-	}
 	
 	/**
-	 * 【加锁】查询一个客户未支付的业务信息
+	 * 查询一个客户未支付的业务信息
 	 * @param cust_id
 	 * @return
 	 * @throws JDBCException 

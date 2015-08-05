@@ -32,6 +32,7 @@ import com.ycsoft.beans.core.prod.CProdOrder;
 import com.ycsoft.beans.core.user.CUser;
 import com.ycsoft.beans.invoice.RInvoice;
 import com.ycsoft.beans.prod.PProd;
+import com.ycsoft.beans.system.SItemvalue;
 import com.ycsoft.beans.system.SOptr;
 import com.ycsoft.business.commons.pojo.BusiParameter;
 import com.ycsoft.business.dao.core.bank.CBankGotodiskDao;
@@ -73,6 +74,19 @@ public class PayService extends BaseBusiService implements IPayService {
 	private CProdOrderDao cProdOrderDao;
 	@Autowired
 	private PProdDao pProdDao;
+	
+	/**
+	 * 查询汇率
+	 * @return
+	 * @throws ServicesException
+	 */
+	public Integer queryExchage() throws ServicesException{
+		SItemvalue item= MemoryDict.getDictItem(DictKey.EXCHANGE, DictKey.EXCHANGE.toString());
+		if(item==null||item.getItem_idx()==null||item.getItem_idx()<=0){
+			throw new ServicesException("系统未正确配置汇率，请联系管理员");
+		}
+		return item.getItem_idx();
+	}
 	/**
 	 * 查询未支付总额
 	 * @param cust_id
@@ -84,7 +98,8 @@ public class PayService extends BaseBusiService implements IPayService {
 	}
 	/**
 	 * 查询未支付的费用明细
-	 * 显示 费用编号 fee_sn,业务名称busi_name,费用名称fee_text,数量(当count不为空，显示count否则显示begin_date(yyyymmdd)+“-”+prod_invalid_date),操作员 optr_name,操作时间create_time,金额 real_pay,
+	 * 显示 费用编号 fee_sn,业务名称busi_name,费用名称fee_text,数量(当count不为空，显示count否则显示begin_date(yyyymmdd)+“-”+prod_invalid_date),
+	 * 操作员 optr_name,操作时间create_time,金额 real_pay,订单号 prod_sn,X按钮(当prod_sn不为空时显示)
 	 * @param cust_id
 	 * @return
 	 */
@@ -96,21 +111,18 @@ public class PayService extends BaseBusiService implements IPayService {
 	 * @throws Exception 
 	 */
 	public void savePay(String cust_id) throws Exception{
-		
+		//用户锁
+		doneCodeComponent.lockCust(cust_id);
 		//数据验证
-		this.checkCFeePay(cust_id);
+		this.checkCFeePayParam(cust_id);
+		//锁定未支付业务，防止客户被多个营业员同时操作
+		List<CDoneCodeUnpay> upPayDoneCodes=doneCodeComponent.queryUnPayList(cust_id);
 		
 		Integer done_code=doneCodeComponent.gDoneCode();
-		//锁定未支付业务
-		CFeePayDto pay=this.getBusiParam().getPay();
-		List<CDoneCodeUnpay> upPayDoneCodes=doneCodeComponent.lockQueryUnPay(cust_id);
-		//验证支付金额和待支付金额是否一致
-		int payFee=pay.getUsd()+pay.getKhr()/Integer.valueOf(pay.getExchange());
-		if(upPayDoneCodes==null||upPayDoneCodes.size()==0||payFee!=feeComponent.queryUnPaySum(cust_id).intValue()){
-			throw new ServicesException("待支付金额已失效，请重新打开待支付界面");
-		}
+		//验证支付信息和待支付信息是否一致
+		this.checkCFeePayFee(upPayDoneCodes,cust_id);
 		//保存支付记录和发票
-		saveCFeePay(this.getBusiParam(),done_code);
+		CFeePayDto pay=saveCFeePay(this.getBusiParam(),done_code);
 		
 		//更新缴费信息状态和支付方式
 		feeComponent.updateCFeeToPay(upPayDoneCodes, pay);
@@ -121,16 +133,54 @@ public class PayService extends BaseBusiService implements IPayService {
 		//删除未支付业务信息
 		doneCodeComponent.deleteDoneCodeUnPay(upPayDoneCodes);
 	
-		
 		//保存业务流水
 		this.saveAllPublic(done_code, this.getBusiParam());
 	}
-	
-	private void checkCFeePay(String cust_id){
+	/**
+	 * 检查支付参数
+	 * @param cust_id
+	 * @throws ServicesException 
+	 */
+	private void checkCFeePayParam(String cust_id) throws ServicesException{
+		CFeePayDto pay=this.getBusiParam().getPay();
+		//参数不能为空
+		if(StringHelper.isEmpty(cust_id)||StringHelper.isEmpty(pay.getExchange())
+				||pay.getUsd()==null||pay.getKhr()==null||this.getBusiParam().getCust()==null
+				||StringHelper.isEmpty(pay.getPay_type())
+				){
+			throw new ServicesException("参数不能为空");
+		}
+		//串数据判断
+		if(!cust_id.equals(this.getBusiParam().getCust().getCust_id())){
+			throw new ServicesException("客户不一致，系统异常，请联系管理员");
+		}
+		//发票和打印判断
 		
 	}
 	
-	private String saveCFeePay(BusiParameter busiParam,Integer doneCode) throws Exception{
+	/**
+	 * 验证待支付金额和实际支付金额是否一致
+	 * @param upPayDoneCodes
+	 * @param cust_id
+	 * @throws Exception
+	 */
+	private void checkCFeePayFee(List<CDoneCodeUnpay> upPayDoneCodes,String cust_id) throws Exception{
+		CFeePayDto pay=this.getBusiParam().getPay();
+		//验证汇率是否一致
+		//List list=MemoryDict.getDicts(DictKey.EXCHANGE,DictKey.ex);
+		SItemvalue item= MemoryDict.getDictItem(DictKey.EXCHANGE, DictKey.EXCHANGE.toString());
+		if(item==null||item.getItem_idx()==null||item.getItem_idx()<=0||item.getItem_idx().equals(Integer.valueOf(pay.getExchange()))){
+			throw new ServicesException("汇率未正确配置或汇率不一致");
+		}
+
+		//验证支付金额和待支付金额是否一致
+		int payFee=pay.getUsd()+pay.getKhr()/item.getItem_idx();
+		if(upPayDoneCodes==null||upPayDoneCodes.size()==0||payFee!=feeComponent.queryUnPaySum(cust_id).intValue()){
+			throw new ServicesException("待支付金额已失效，请重新打开待支付界面");
+		}
+	}
+	
+	private CFeePayDto saveCFeePay(BusiParameter busiParam,Integer doneCode) throws Exception{
 		//检查支付信息是否为NULL，如果不为NULL则保存支付信息，并根据一定的规则保存合并记录。
 		busiParam.setDoneCode(doneCode);
 		SOptr optr=busiParam.getOptr();
