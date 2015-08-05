@@ -92,7 +92,11 @@ public class PayAction extends BaseBusiAction{
 	public void setCust_id(String cust_id) {
 		this.cust_id = cust_id;
 	}
-	
+	/**
+	 * 查询未支付业务总额
+	 * @return
+	 * @throws Exception
+	 */
 	public String queryUnPaySum() throws Exception{
 		getRoot().setSimpleObj(payService.queryUnPaySum(cust_id));
 		return JSON_SIMPLEOBJ;
@@ -111,7 +115,11 @@ public class PayAction extends BaseBusiAction{
 		getRoot().setSimpleObj(payService.queryExchage());
 		return JSON;
 	}
-	
+	/**
+	 * 保存支付
+	 * @return
+	 * @throws Exception
+	 */
 	public String savePayNew() throws Exception{
 		payService.savePay(cust_id);
 		return JSON_SUCCESS;

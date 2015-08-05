@@ -169,7 +169,7 @@ public class PayService extends BaseBusiService implements IPayService {
 		//验证汇率是否一致
 		//List list=MemoryDict.getDicts(DictKey.EXCHANGE,DictKey.ex);
 		SItemvalue item= MemoryDict.getDictItem(DictKey.EXCHANGE, DictKey.EXCHANGE.toString());
-		if(item==null||item.getItem_idx()==null||item.getItem_idx()<=0||item.getItem_idx().equals(Integer.valueOf(pay.getExchange()))){
+		if(item==null||item.getItem_idx()==null||item.getItem_idx()<=0||!item.getItem_idx().equals(Integer.valueOf(pay.getExchange()))){
 			throw new ServicesException("汇率未正确配置或汇率不一致");
 		}
 
