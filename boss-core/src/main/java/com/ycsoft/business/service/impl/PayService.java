@@ -113,15 +113,14 @@ public class PayService extends BaseBusiService implements IPayService {
 	public void savePay(String cust_id) throws Exception{
 		//用户锁
 		doneCodeComponent.lockCust(cust_id);
-		//数据验证
-		this.checkCFeePayParam(cust_id);
-		//锁定未支付业务，防止客户被多个营业员同时操作
+		
+		//查询未支付业务
 		List<CDoneCodeUnpay> upPayDoneCodes=doneCodeComponent.queryUnPayList(cust_id);
+		//数据验证
+		this.checkCFeePayParam(upPayDoneCodes,cust_id);
 		
 		Integer done_code=doneCodeComponent.gDoneCode();
-		//验证支付信息和待支付信息是否一致
-		this.checkCFeePayFee(upPayDoneCodes,cust_id);
-		//保存支付记录和发票
+		//保存支付记录
 		CFeePayDto pay=saveCFeePay(this.getBusiParam(),done_code);
 		
 		//更新缴费信息状态和支付方式
@@ -139,9 +138,9 @@ public class PayService extends BaseBusiService implements IPayService {
 	/**
 	 * 检查支付参数
 	 * @param cust_id
-	 * @throws ServicesException 
+	 * @throws Exception 
 	 */
-	private void checkCFeePayParam(String cust_id) throws ServicesException{
+	private void checkCFeePayParam(List<CDoneCodeUnpay> upPayDoneCodes,String cust_id) throws Exception{
 		CFeePayDto pay=this.getBusiParam().getPay();
 		//参数不能为空
 		if(StringHelper.isEmpty(cust_id)||StringHelper.isEmpty(pay.getExchange())
@@ -152,20 +151,9 @@ public class PayService extends BaseBusiService implements IPayService {
 		}
 		//串数据判断
 		if(!cust_id.equals(this.getBusiParam().getCust().getCust_id())){
-			throw new ServicesException("客户不一致，系统异常，请联系管理员");
+			throw new ServicesException("客户不一致");
 		}
-		//发票和打印判断
 		
-	}
-	
-	/**
-	 * 验证待支付金额和实际支付金额是否一致
-	 * @param upPayDoneCodes
-	 * @param cust_id
-	 * @throws Exception
-	 */
-	private void checkCFeePayFee(List<CDoneCodeUnpay> upPayDoneCodes,String cust_id) throws Exception{
-		CFeePayDto pay=this.getBusiParam().getPay();
 		//验证汇率是否一致
 		//List list=MemoryDict.getDicts(DictKey.EXCHANGE,DictKey.ex);
 		SItemvalue item= MemoryDict.getDictItem(DictKey.EXCHANGE, DictKey.EXCHANGE.toString());
@@ -179,7 +167,13 @@ public class PayService extends BaseBusiService implements IPayService {
 			throw new ServicesException("待支付金额已失效，请重新打开待支付界面");
 		}
 	}
-	
+	/**
+	 * 保存支付信息
+	 * @param busiParam
+	 * @param doneCode
+	 * @return
+	 * @throws Exception
+	 */
 	private CFeePayDto saveCFeePay(BusiParameter busiParam,Integer doneCode) throws Exception{
 		//检查支付信息是否为NULL，如果不为NULL则保存支付信息，并根据一定的规则保存合并记录。
 		busiParam.setDoneCode(doneCode);
@@ -194,12 +188,14 @@ public class PayService extends BaseBusiService implements IPayService {
 			//if (pay.getInvoice_mode().equals(SystemConstants.INVOICE_MODE_AUTO))
 			//	printComponent.saveDoc( feeComponent.queryAutoMergeFees(param.getDoneCode()),param.getCust().getCust_id(), param.getDoneCode(),param.getBusiCode());
 			if (SystemConstants.INVOICE_MODE_MANUAL.equals(pay.getInvoice_mode())){
+				//手开发票M
 				feeComponent.saveManualInvoice(busiParam.getDoneCode(), pay
 						.getInvoice_code(), pay.getInvoice_id(), pay
 						.getInvoice_book_id());
 				invoiceComponent.useInvoice(pay.getInvoice_code(),pay.getInvoice_id(), 
 						SystemConstants.INVOICE_MODE_MANUAL, pay.getFee());
-			}else if(SystemConstants.INVOICE_MODE_AUTO.equals(pay.getInvoice_mode())){//机打
+			}else if(SystemConstants.INVOICE_MODE_AUTO.equals(pay.getInvoice_mode())){
+				//机打发票 A
 				if (StringHelper.isNotEmpty(custId)) {
 					List<CFee> feeList = feeComponent.queryByDoneCode(doneCode);
 					for(CFee fee : feeList){
@@ -208,10 +204,11 @@ public class PayService extends BaseBusiService implements IPayService {
 					
 				}
 			}else if(SystemConstants.INVOICE_MODE_QUOTA.equals(pay.getInvoice_mode())){
+				//定额发票
 				feeComponent.saveQuatoInvoice(busiParam.getDoneCode());
 			}
 		}
-		return null;
+		return pay;
 	}
 	/**
 	 * 更新产品订单的支付属性并发加授权
