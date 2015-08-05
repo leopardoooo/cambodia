@@ -35,7 +35,9 @@ public class TestPayService extends JunitSpringBase{
 		//测试支付
 		SOptr soptr=new SOptr();
 		soptr.setOptr_id("test");
-		
+		soptr.setDept_id("21");
+		soptr.setCounty_id("5001");
+		soptr.setArea_id("5000");
 		BusiParameter parm=new BusiParameter();
 		payService.setParam(parm);
 		parm.setOptr(soptr);
@@ -44,6 +46,8 @@ public class TestPayService extends JunitSpringBase{
 		CustFullInfoDto custinfo=new CustFullInfoDto();
 		custinfo.setCust(cust);
 		parm.setCustFullInfo(custinfo);
+		
+		parm.setBusiCode("1");
 
 		CFeePayDto pay=new CFeePayDto();
 		parm.setPay(pay);

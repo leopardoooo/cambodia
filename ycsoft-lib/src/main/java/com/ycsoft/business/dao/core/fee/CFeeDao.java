@@ -60,12 +60,15 @@ public class CFeeDao extends BaseEntityDao<CFee> {
 	 */
 	public void updateCFeeToPay(CDoneCodeUnpay unpay,CFeePayDto pay) throws JDBCException{
 		String sql=StringHelper.append(
-				"update c_fee set status=? ,pay_type=?, invoice_mode=?,invoice_id=?,invoice_book_id=?,pay_sn=? "
+				"update c_fee set status=? ,pay_type=?,",
+				" invoice_mode=?,invoice_id=?,invoice_book_id=?,invoice_code=?,",
+				" pay_sn=?,acct_date=?,is_doc=? "
 				," where create_done_code=? and cust_id=? ");
 		this.executeUpdate(sql, 
-				StatusConstants.PAY,pay.getPay_type(),pay.getInvoice_mode(),pay.getInvoice_id(),pay.getInvoice_book_id(),pay.getInvoice_code(),pay.getPay_sn(),
+				StatusConstants.PAY,pay.getPay_type(),
+				pay.getInvoice_mode(),pay.getInvoice_id(),pay.getInvoice_book_id(),pay.getInvoice_code(),
+				pay.getPay_sn(),pay.getAcct_date(),(pay.getInvoice_mode().equals(SystemConstants.INVOICE_MODE_AUTO)?SystemConstants.BOOLEAN_FALSE:SystemConstants.BOOLEAN_TRUE),
 				unpay.getDone_code(),unpay.getCust_id());
-		
 	}
 	/**
 	 * 查询待支付的总额

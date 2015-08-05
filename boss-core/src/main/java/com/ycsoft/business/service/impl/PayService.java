@@ -121,9 +121,9 @@ public class PayService extends BaseBusiService implements IPayService {
 		
 		Integer done_code=doneCodeComponent.gDoneCode();
 		//保存支付记录
-		CFeePayDto pay=saveCFeePay(this.getBusiParam(),done_code);
+		CFeePayDto pay=feeComponent.savePayFeeNew(this.getBusiParam().getPay(),cust_id,done_code);
 		
-		//更新缴费信息状态和支付方式
+		//更新缴费信息状态、支付方式和发票相关信息
 		feeComponent.updateCFeeToPay(upPayDoneCodes, pay);
 		
 		//更新订单状体并给订单发授权
@@ -174,42 +174,7 @@ public class PayService extends BaseBusiService implements IPayService {
 	 * @return
 	 * @throws Exception
 	 */
-	private CFeePayDto saveCFeePay(BusiParameter busiParam,Integer doneCode) throws Exception{
-		//检查支付信息是否为NULL，如果不为NULL则保存支付信息，并根据一定的规则保存合并记录。
-		busiParam.setDoneCode(doneCode);
-		SOptr optr=busiParam.getOptr();
-		String custId=busiParam.getCust().getCust_id();
-		
-		CFeePayDto pay = busiParam.getPay();
-		if(null != pay){
-			//保存缴费信息
-			feeComponent.savePayFee(pay, busiParam.getCust().getCust_id(),busiParam.getDoneCode());
-			
-			//if (pay.getInvoice_mode().equals(SystemConstants.INVOICE_MODE_AUTO))
-			//	printComponent.saveDoc( feeComponent.queryAutoMergeFees(param.getDoneCode()),param.getCust().getCust_id(), param.getDoneCode(),param.getBusiCode());
-			if (SystemConstants.INVOICE_MODE_MANUAL.equals(pay.getInvoice_mode())){
-				//手开发票M
-				feeComponent.saveManualInvoice(busiParam.getDoneCode(), pay
-						.getInvoice_code(), pay.getInvoice_id(), pay
-						.getInvoice_book_id());
-				invoiceComponent.useInvoice(pay.getInvoice_code(),pay.getInvoice_id(), 
-						SystemConstants.INVOICE_MODE_MANUAL, pay.getFee());
-			}else if(SystemConstants.INVOICE_MODE_AUTO.equals(pay.getInvoice_mode())){
-				//机打发票 A
-				if (StringHelper.isNotEmpty(custId)) {
-					List<CFee> feeList = feeComponent.queryByDoneCode(doneCode);
-					for(CFee fee : feeList){
-						MemoryPrintData.appendPrintData(optr.getOptr_id(), fee.getFee_sn());
-					}
-					
-				}
-			}else if(SystemConstants.INVOICE_MODE_QUOTA.equals(pay.getInvoice_mode())){
-				//定额发票
-				feeComponent.saveQuatoInvoice(busiParam.getDoneCode());
-			}
-		}
-		return pay;
-	}
+	
 	/**
 	 * 更新产品订单的支付属性并发加授权
 	 * @param unPayDoneCodes
