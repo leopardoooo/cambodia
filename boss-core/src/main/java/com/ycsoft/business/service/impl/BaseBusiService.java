@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.ycsoft.beans.config.TBusiConfirm;
@@ -43,6 +44,7 @@ import com.ycsoft.business.commons.pojo.BusiParameter;
 import com.ycsoft.business.component.config.BusiConfigComponent;
 import com.ycsoft.business.component.config.ExtTableComponent;
 import com.ycsoft.business.component.core.AcctComponent;
+import com.ycsoft.business.component.core.AuthComponent;
 import com.ycsoft.business.component.core.BillComponent;
 import com.ycsoft.business.component.core.CustComponent;
 import com.ycsoft.business.component.core.FeeComponent;
@@ -68,7 +70,7 @@ import com.ycsoft.commons.constants.DictKey;
 import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.exception.ComponentException;
-import com.ycsoft.commons.exception.ErrorCodeConstants;
+import com.ycsoft.commons.exception.ErrorCode;
 import com.ycsoft.commons.exception.ServicesException;
 import com.ycsoft.commons.helper.DateHelper;
 import com.ycsoft.commons.helper.JsonHelper;
@@ -97,6 +99,8 @@ public class BaseBusiService extends BaseService {
 	protected ExtTableComponent extTableComponent;
 	protected TaskComponent taskComponent;
 	protected BusiConfigComponent busiConfigComponent;
+	@Autowired
+	protected AuthComponent authComponent;
 	
 	/**
 	 * 保存订购产品受理单
@@ -1637,7 +1641,7 @@ public class BaseBusiService extends BaseService {
 		SOptr optr = getOptr();
 		if(null!= cust && StringHelper.isNotEmpty(cust.getCounty_id()) && !cust.getCounty_id().equals(optr.getCounty_id())){
 			LoggerHelper.error(getClass(), "串数据：操作员"+optr.getOptr_name()+"，地区："+optr.getCounty_id()+",客户："+cust.getCust_name()+"，地区"+cust.getCounty_id());
-			throw new ServicesException(ErrorCodeConstants.CustDataException);
+			throw new ServicesException(ErrorCode.CustDataException);
 		}
 		saveDoneCode(busiParam);
 		

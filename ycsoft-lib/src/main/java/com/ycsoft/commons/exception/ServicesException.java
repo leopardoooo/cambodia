@@ -12,19 +12,19 @@ public class ServicesException extends Exception {
 	 */
 	private static final long serialVersionUID = 2758171495592228753L;
 
-	public ServicesException(ErrorCodeConstants errorCode){
+	public ServicesException(ErrorCode errorCode){
 		super(errorCode.getDesc());
 	}
 	
-	public ServicesException(ErrorCodeConstants errorCode,Object ... args){
+	public ServicesException(ErrorCode errorCode,Object ... args){
 		super(String.format(errorCode.getDesc(), args));
 	}
 	
-	public ServicesException(ErrorCodeConstants errorCode ,Exception e){
+	public ServicesException(ErrorCode errorCode ,Exception e){
 		super( errorCode.getDesc() , e );
 	}
 	
-	public ServicesException(ErrorCodeConstants errorCode ,Exception e,Object ... args){
+	public ServicesException(ErrorCode errorCode ,Exception e,Object ... args){
 		super( String.format(errorCode.getDesc(),args) , e );
 	}
 	

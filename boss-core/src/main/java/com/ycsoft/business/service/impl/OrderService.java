@@ -49,7 +49,7 @@ import com.ycsoft.commons.constants.DictKey;
 import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.exception.ComponentException;
-import com.ycsoft.commons.exception.ErrorCodeConstants;
+import com.ycsoft.commons.exception.ErrorCode;
 import com.ycsoft.commons.exception.ServicesException;
 import com.ycsoft.commons.helper.CollectionHelper;
 import com.ycsoft.commons.helper.DateHelper;
@@ -100,7 +100,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		
 		CProdOrderDto cancelOrder=cProdOrderDao.queryCProdOrderDtoByKey(order_sn);
 		if(cancelOrder==null||StringHelper.isEmpty(busi_code)){
-			throw new ServicesException(ErrorCodeConstants.ParamIsNull);
+			throw new ServicesException(ErrorCode.ParamIsNull);
 		}
 
 		List<CProdOrderDto> orderList=orderComponent.queryOrderByCancelOrder(cancelOrder);
@@ -166,7 +166,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 	private List<CProdOrderDto> checkCancelProdOrderParm(String busi_code,String cust_id,String[] orderSns,Integer cancel_fee) throws Exception{
 		
 		if(StringHelper.isEmpty(cust_id)||StringHelper.isEmpty(busi_code)||cancel_fee==null||orderSns==null||orderSns.length==0){
-			throw new ServicesException(ErrorCodeConstants.ParamIsNull);
+			throw new ServicesException(ErrorCode.ParamIsNull);
 		}
 		//高级
 		boolean isHigh=isHighCancel(busi_code);
@@ -194,13 +194,13 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		}
 		//金额核对
 		if(cancel_fee!=fee){
-			throw new ServicesException(ErrorCodeConstants.FeeDateException);
+			throw new ServicesException(ErrorCode.FeeDateException);
 		}
 		//订单相关的所有订单的未支付判断,判断各类订单的相关所有订单的未支付状态
 		for(CProdOrderDto checkOrder: unPayCheckMap.values()){
 			for(CProdOrderDto unPayOrder: orderComponent.queryOrderByCancelOrder(checkOrder)){
 				if(unPayOrder.getIs_pay().equals(SystemConstants.BOOLEAN_FALSE)){
-					throw new ServicesException(ErrorCodeConstants.NotCancleHasUnPay);
+					throw new ServicesException(ErrorCode.NotCancleHasUnPay);
 				}
 			}
 		}
@@ -218,29 +218,29 @@ public class OrderService extends BaseBusiService implements IOrderService{
 	private void checkOrderCanCancel(String cust_id,boolean isHigh,CProdOrderDto order) throws Exception{
 		
 		if(!cust_id.equals(order.getCust_id())){
-			throw new ServicesException(ErrorCodeConstants.CustDataException);
+			throw new ServicesException(ErrorCode.CustDataException);
 		}
 		
 		if(order.getIs_pay().equals(SystemConstants.BOOLEAN_FALSE)){
 			//未支付判断
-			throw new ServicesException(ErrorCodeConstants.NotCancleHasUnPay);
+			throw new ServicesException(ErrorCode.NotCancleHasUnPay);
 		}
 		if(!isHigh&&order.getBilling_cycle()>1){
 			//包多月判断
-			throw new ServicesException(ErrorCodeConstants.NotCancelHasMoreBillingCycle);
+			throw new ServicesException(ErrorCode.NotCancelHasMoreBillingCycle);
 		}
 		if(!isHigh&&order.getProd_type().equals(SystemConstants.PROD_TYPE_BASE)
 				&& order.getIs_base().equals(SystemConstants.BOOLEAN_TRUE)
 				&&DateHelper.today().before(order.getProtocol_date())){
 			//基础单产品协议期未到不能终止
-			throw new ServicesException(ErrorCodeConstants.NotCancelUserProtocol);
+			throw new ServicesException(ErrorCode.NotCancelUserProtocol);
 		}
 		if(!isHigh&&!order.getProd_type().equals(SystemConstants.PROD_TYPE_BASE)){
 			//套餐的判断
 			for(CProdOrderDto son:  cProdOrderDao.queryProdOrderByPackageSn(order.getOrder_sn())){
 				if(son.getIs_base().equals(SystemConstants.BOOLEAN_TRUE)
 						&&DateHelper.today().before(son.getProtocol_date())){
-					throw new ServicesException(ErrorCodeConstants.NotCancelUserProtocol);
+					throw new ServicesException(ErrorCode.NotCancelUserProtocol);
 				}
 			}
 		}
@@ -797,6 +797,9 @@ public class OrderService extends BaseBusiService implements IOrderService{
 			}else{
 				userMap=CollectionHelper.converToMapSingle(cUserDao.queryUserByCustId(cProdOrder.getCust_id()), "user_id");
 			}
+			//TODO 使用新的授权类型
+			//authComponent.sendAuth(user, orderList, BusiCmdConstants.ACCTIVATE_PROD, cProdOrder.getDone_code());
+			
 			jobComponent.createProdBusiCmdJob(cProdOrder, prodConfig.getProd_type(), userMap, cProdOrder.getDone_code(), BusiCmdConstants.ACCTIVATE_PROD, SystemConstants.PRIORITY_SSSQ);
 		}
 	}
