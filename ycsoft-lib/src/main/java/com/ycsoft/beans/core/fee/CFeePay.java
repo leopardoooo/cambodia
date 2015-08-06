@@ -34,7 +34,7 @@ public class CFeePay extends BusiBase implements Serializable {
 	private String remark;
 	private Integer usd;
 	private Integer khr;
-	private String  exchange;	
+	private Integer  exchange;	
 
 	public Integer getUsd() {
 		return usd;
@@ -52,11 +52,11 @@ public class CFeePay extends BusiBase implements Serializable {
 		this.khr = khr;
 	}
 
-	public String getExchange() {
+	public Integer getExchange() {
 		return exchange;
 	}
 
-	public void setExchange(String exchange) {
+	public void setExchange(Integer exchange) {
 		this.exchange = exchange;
 	}
 

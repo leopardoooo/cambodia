@@ -89,6 +89,7 @@ public class PayAction extends BaseBusiAction{
 	private String cust_id;
 	
 	
+	
 	public void setCust_id(String cust_id) {
 		this.cust_id = cust_id;
 	}
@@ -119,11 +120,12 @@ public class PayAction extends BaseBusiAction{
 	}
 	/**
 	 * 保存支付
+	 * 
 	 * @return
 	 * @throws Exception
 	 */
 	public String savePayNew() throws Exception{
-		payService.savePay(cust_id);
+		payService.savePay(pay);
 		return JSON_SUCCESS;
 	}
 
