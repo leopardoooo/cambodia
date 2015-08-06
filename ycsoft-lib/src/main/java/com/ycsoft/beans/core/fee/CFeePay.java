@@ -34,7 +34,17 @@ public class CFeePay extends BusiBase implements Serializable {
 	private String remark;
 	private Integer usd;
 	private Integer khr;
-	private Integer  exchange;	
+	private Integer exchange;	
+	private Integer cos;
+	
+
+	public Integer getCos() {
+		return cos;
+	}
+
+	public void setCos(Integer cos) {
+		this.cos = cos;
+	}
 
 	public Integer getUsd() {
 		return usd;

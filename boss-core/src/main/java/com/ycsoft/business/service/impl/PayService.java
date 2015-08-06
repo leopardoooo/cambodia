@@ -165,10 +165,13 @@ public class PayService extends BaseBusiService implements IPayService {
 		}
 
 		//验证支付金额和待支付金额是否一致
-		int payFee=pay.getUsd()+pay.getKhr()/exchange.intValue();
-		if(upPayDoneCodes==null||upPayDoneCodes.size()==0||payFee!=feeComponent.queryUnPaySum(cust_id).get("FEE").intValue()){
+		int payFee=pay.getUsd()+Math.round(pay.getKhr()*1.0f/exchange.intValue());
+		int needPayFee=feeComponent.queryUnPaySum(cust_id).get("FEE").intValue();
+		if(upPayDoneCodes==null||upPayDoneCodes.size()==0||payFee!=needPayFee){
 			throw new ServicesException("待支付金额已失效，请重新打开待支付界面");
 		}
+		//四舍五入部分
+		pay.setCos((needPayFee-pay.getUsd())*exchange.intValue()-Math.round(pay.getKhr()*1.0f/exchange.intValue()));
 	}
 	/**
 	 * 保存支付信息
