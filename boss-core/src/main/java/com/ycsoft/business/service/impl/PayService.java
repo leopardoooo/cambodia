@@ -107,7 +107,7 @@ public class PayService extends BaseBusiService implements IPayService {
 	 * @return
 	 */
 	public List<FeeDto> queryUnPayDetail(String cust_id)throws Exception{
-		return feeComponent.queryUnPay(cust_id);
+		return feeComponent.queryUnPay(cust_id,this.getOptr().getOptr_id());
 	}
 	/**
 	 * 保存支付信息

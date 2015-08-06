@@ -99,16 +99,16 @@ public class CFeeDao extends BaseEntityDao<CFee> {
 	 * @return
 	 * @throws JDBCException
 	 */
-	public List<FeeDto> queryUnPay(String cust_id) throws JDBCException{
+	public List<FeeDto> queryUnPay(String cust_id,String optr_id) throws JDBCException{
 		String sql=StringHelper.append("select cf.*,nvl(atm.acctitem_name,bf.fee_name) fee_text,fa.prod_invalid_date,fa.begin_date,fa.prod_sn ",
 				" from c_fee cf,c_done_code_unpay un,c_fee_acct fa,vew_acctitem atm,busi.t_busi_fee bf ",
 				" where cf.create_done_code=un.done_code ",
 				" and  bf.fee_id(+)=cf.fee_id ",
 				" and atm.acctitem_id(+)=cf.acctitem_id ",
 				" and fa.fee_sn(+)=cf.fee_sn ",
-				" and un.cust_id=? ",
+				" and un.cust_id=? and un.optr_id=? ",
 				" order by cf.create_time ");
-		return this.createQuery(FeeDto.class, sql, cust_id).list();
+		return this.createQuery(FeeDto.class, sql, cust_id,optr_id).list();
 	}
 	//客户受理单打印获取收费
 	public List<PrintFeeitemDto> queryPrintFee(String custId,SOptr optr,String docSn)throws Exception{
