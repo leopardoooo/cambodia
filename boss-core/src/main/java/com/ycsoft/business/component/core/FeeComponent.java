@@ -154,8 +154,8 @@ public class FeeComponent extends BaseBusiComponent {
 	 * @return
 	 * @throws Exception
 	 */
-	public Map<String,Integer> queryUnPaySum(String cust_id) throws Exception{
-		return cFeeDao.queryUnPaySum(cust_id);
+	public Map<String,Integer> queryUnPaySum(String cust_id,String optr_id) throws Exception{
+		return cFeeDao.queryUnPaySum(cust_id,optr_id);
 	}
 	
 	/**

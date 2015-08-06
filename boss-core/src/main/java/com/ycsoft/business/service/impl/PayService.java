@@ -96,7 +96,8 @@ public class PayService extends BaseBusiService implements IPayService {
 	 * @throws Exception
 	 */
 	public Map<String,Integer> queryUnPaySum(String cust_id) throws Exception{
-		return feeComponent.queryUnPaySum(cust_id);
+		
+		return feeComponent.queryUnPaySum(cust_id,this.getOptr().getOptr_id());
 	}
 	/**
 	 * 查询未支付的费用明细
@@ -166,7 +167,7 @@ public class PayService extends BaseBusiService implements IPayService {
 
 		//验证支付金额和待支付金额是否一致
 		int payFee=pay.getUsd()+Math.round(pay.getKhr()*1.0f/exchange.intValue());
-		int needPayFee=feeComponent.queryUnPaySum(cust_id).get("FEE").intValue();
+		int needPayFee=feeComponent.queryUnPaySum(cust_id,this.getOptr().getOptr_id()).get("FEE").intValue();
 		if(upPayDoneCodes==null||upPayDoneCodes.size()==0||payFee!=needPayFee){
 			throw new ServicesException("待支付金额已失效，请重新打开待支付界面");
 		}
