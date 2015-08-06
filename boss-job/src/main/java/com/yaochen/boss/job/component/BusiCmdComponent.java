@@ -24,6 +24,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.yaochen.boss.commons.LoggerUtil;
 import com.yaochen.boss.dao.BusiDao;
 import com.yaochen.boss.dao.CfgDao;

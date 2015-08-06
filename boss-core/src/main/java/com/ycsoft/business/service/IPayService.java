@@ -33,9 +33,9 @@ public interface IPayService extends IBaseService{
 	
 	public List<FeeDto> queryUnPayDetail(String cust_id)throws Exception;
 	
-	public void savePay(String cust_id) throws Exception;
+	public void savePay(CFeePayDto pay) throws Exception;
 	
-	public Integer queryExchage() throws ServicesException;
+	public Integer queryExchage() throws Exception;
 	/**
 	 * 根据用户类型查询一次性费用信息
 	 * @param feeType 预收费

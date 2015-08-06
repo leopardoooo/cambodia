@@ -57,12 +57,14 @@ public class TestPayService extends JunitSpringBase{
 		pay.setInvoice_mode("A");
 		pay.setPayer("大大");
 		
-		pay.setExchange("4000");
+		pay.setExchange(4000);
 		pay.setUsd(34900);
 		pay.setKhr(400000);
+		
+		pay.setCust_id(cust_id);
 		 
 		
-		payService.savePay(cust_id);
+		payService.savePay(pay);
 		
 		
 		

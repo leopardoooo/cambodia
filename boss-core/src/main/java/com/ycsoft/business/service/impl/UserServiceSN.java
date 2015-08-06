@@ -20,6 +20,7 @@ import com.ycsoft.beans.core.prod.CProdOrderDto;
 import com.ycsoft.beans.core.prod.CProdPropChange;
 import com.ycsoft.beans.core.user.CUser;
 import com.ycsoft.beans.core.user.CUserPropChange;
+import com.ycsoft.beans.core.user.FillUSerDeviceDto;
 import com.ycsoft.beans.prod.PPromotionAcct;
 import com.ycsoft.beans.system.SOptr;
 import com.ycsoft.business.component.core.OrderComponent;
@@ -64,6 +65,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		user.setUser_id(user_id);
 		user.setAcct_id(acctId);
 		user.setCust_id(custId);
+		user.setStr10(deviceBuyMode);//用户开始时设备购买方式
 		DeviceDto device = null;
 		if (StringHelper.isNotEmpty(deviceCode)){
 			device = deviceComponent.queryDeviceByDeviceCode(deviceCode);
@@ -101,25 +103,52 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		if (cust.getStatus().equals(StatusConstants.PREOPEN)) {
 			custComponent.updateCustStatus(doneCode, custId, StatusConstants.PREOPEN, StatusConstants.ACTIVE);
 		}
-		//处理购买设备
+		//处理设备和授权
 		if (!user.getUser_type().equals(SystemConstants.USER_TYPE_OTT_MOBILE)){
 			TDeviceBuyMode buyModeCfg = busiConfigComponent.queryBuyMode(deviceBuyMode);
 			String ownership = SystemConstants.OWNERSHIP_GD;
 			if (buyModeCfg.getChange_ownship().equals(SystemConstants.BOOLEAN_TRUE))
 				ownership = SystemConstants.OWNERSHIP_CUST;
 			this.buyDevice(device, deviceBuyMode,ownership, deviceFee, getBusiParam().getBusiCode(), cust, doneCode);
+			
 		}
-		// 生成'创建用户'JOB
-		createUserJob(user, custId, doneCode);
+		
+		
+		if (user.getStatus().equals(StatusConstants.ACTIVE)){
+			createUserJob(user, custId, doneCode);
+		}
+		
 		// 设置拦截器所需要的参数
 		getBusiParam().resetUser();
 		getBusiParam().addUser(user);
 		saveAllPublic(doneCode, getBusiParam());
 
 	}
+	
+	@Override
+	public void saveFillDevice(List<FillUSerDeviceDto> deviceList) throws Exception {
+		Integer doneCode = doneCodeComponent.gDoneCode();
+		CCust cust = null;
+		for (FillUSerDeviceDto userDevice:deviceList){
+			CUser user = userComponent.queryUserById(userDevice.getUser_id());
+			DeviceDto device = deviceComponent.queryDeviceByDeviceCode(userDevice.getDevice_id());
+			setUserDeviceInfo(user, device);
+			userComponent.updateDevice(doneCode, user);
+			//发送授权
+			this.createUserJob(user, user.getCust_id(), doneCode);
+			jobComponent.createBusiCmdJob(doneCode, BusiCmdConstants.REFRESH_TERMINAL, user.getCust_id(), user.getUser_id(),
+					null, null, null, null, null, null);
+			//处理设备
+			TDeviceBuyMode buyModeCfg = busiConfigComponent.queryBuyMode(user.getStr10());
+			String ownership = SystemConstants.OWNERSHIP_GD;
+			if (buyModeCfg.getChange_ownship().equals(SystemConstants.BOOLEAN_TRUE))
+				ownership = SystemConstants.OWNERSHIP_CUST;
+			if (cust == null)
+				cust = custComponent.queryCustById(user.getCust_id());
+			this.buyDevice(device, user.getStr10(), ownership, null, getBusiParam().getBusiCode(), cust, doneCode);
+		}
+	}
 
-	
-	
 	/**
 	 * 用户更换设备
 	 */
@@ -156,7 +185,6 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 					null, null, null, null);
 		}
 		//处理设备购买和回收
-		
 		this.buyDevice(device, devcieBuyMode, oldDevice.getOwnership(), deviceFee, getBusiParam().getBusiCode(),
 				cust, doneCode);
 		if (reclaim){
@@ -801,15 +829,22 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		orderComponent.editProd(doneCode,order.getOrder_sn(),changeList);
 	}
 	
-	private void setUserDeviceInfo(CUser user, DeviceDto device) {
+	private void setUserDeviceInfo(CUser user, DeviceDto device) throws Exception{
 		if (user.getUser_type().equals(SystemConstants.USER_TYPE_BAND)){
-			user.setModem_mac(device.getDevice_mac());
+			if (!device.getDevice_type().equals(SystemConstants.DEVICE_TYPE_MODEM))
+				throw new ServicesException("设备类型不正确");
+			user.setModem_mac(device.getDevice_code());
 		}
 		if (user.getUser_type().equals(SystemConstants.USER_TYPE_OTT)){
+			if (!device.getDevice_type().equals(SystemConstants.DEVICE_TYPE_STB) 
+					|| StringHelper.isNotEmpty(device.getPairCard().getCard_id()))
+				throw new ServicesException("设备类型不正确");
 			user.setStb_id(device.getDevice_code());
 			user.setModem_mac(device.getDevice_mac());
 		}
 		if (user.getUser_type().equals(SystemConstants.USER_TYPE_DTT)){
+			if ( StringHelper.isEmpty(device.getPairCard().getCard_id()))
+				throw new ServicesException("设备类型不正确");
 			user.setStb_id(device.getDevice_code());
 			user.setCard_id(device.getPairCard().getCard_id());
 		}

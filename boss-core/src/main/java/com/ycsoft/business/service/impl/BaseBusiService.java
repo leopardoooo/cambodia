@@ -68,6 +68,7 @@ import com.ycsoft.commons.constants.DictKey;
 import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.exception.ComponentException;
+import com.ycsoft.commons.exception.ErrorCodeConstants;
 import com.ycsoft.commons.exception.ServicesException;
 import com.ycsoft.commons.helper.DateHelper;
 import com.ycsoft.commons.helper.JsonHelper;
@@ -1636,7 +1637,7 @@ public class BaseBusiService extends BaseService {
 		SOptr optr = getOptr();
 		if(null!= cust && StringHelper.isNotEmpty(cust.getCounty_id()) && !cust.getCounty_id().equals(optr.getCounty_id())){
 			LoggerHelper.error(getClass(), "串数据：操作员"+optr.getOptr_name()+"，地区："+optr.getCounty_id()+",客户："+cust.getCust_name()+"，地区"+cust.getCounty_id());
-			throw new ServicesException("数据异常，请重新保存业务");
+			throw new ServicesException(ErrorCodeConstants.CustDataException);
 		}
 		saveDoneCode(busiParam);
 		
@@ -1653,7 +1654,7 @@ public class BaseBusiService extends BaseService {
 			}
 			if(hasUnpay&&doneCodeComponent.queryDoneCodeUnPayByKey(doneCode)==null){
 				//保存未支付业务
-				doneCodeComponent.saveDoneCodeUnPay(custId, doneCode);
+				doneCodeComponent.saveDoneCodeUnPay(custId, doneCode,this.getOptr().getOptr_id());
 			}
 		}
 		

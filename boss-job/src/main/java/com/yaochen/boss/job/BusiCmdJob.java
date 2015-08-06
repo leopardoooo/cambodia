@@ -51,14 +51,17 @@ public class BusiCmdJob implements Job2 {
 		try {
 			logger.info("业务指令任务处理开始...");
 			cmdList = busiCmdComponent.queryBusiCmd(null);
-			osdList = busiCmdComponent.queryAllOsdCmd();
-			if(cmdList.size() == 0 && osdList.size() == 0){
+			//osdList = busiCmdComponent.queryAllOsdCmd();
+//			if(cmdList.size() == 0 && osdList.size() == 0){
+//				Thread.currentThread().sleep(5000);
+//			}
+			if(cmdList.size() == 0){
 				Thread.currentThread().sleep(5000);
 			}
-			if(osdList.size()>0){
-				//发送通授权
-				dealAllOsd(osdList);
-			}
+//			if(osdList.size()>0){
+//				//发送通授权
+//				dealAllOsd(osdList);
+//			}
 			if(cmdList.size()>0){
 				//获取卡信息
 				String[] userIds = new String[cmdList.size()];
@@ -121,13 +124,9 @@ public class BusiCmdJob implements Job2 {
 					busiCmdComponent.saveBusiCmdHis(cmd.getJob_id());
 					continue;
 				}
-				if (cmd.getBusi_cmd_type().equals(BusiCmdConstants.ACCTIVATE_USER) 
-						|| cmd.getBusi_cmd_type().equals(BusiCmdConstants.PASSVATE_USER)
-						|| cmd.getBusi_cmd_type().equals(BusiCmdConstants.DEL_USER)
+				if (cmd.getBusi_cmd_type().equals(BusiCmdConstants.DEL_USER)
 						|| cmd.getBusi_cmd_type().equals(BusiCmdConstants.CREAT_USER)
-						|| cmd.getBusi_cmd_type().equals(BusiCmdConstants.CHANGE_USER)
-						|| cmd.getBusi_cmd_type().equals(BusiCmdConstants.OPEN_INTERACTIVE)
-						|| cmd.getBusi_cmd_type().equals(BusiCmdConstants.CANCEL_INTERACTIVE)){
+						|| cmd.getBusi_cmd_type().equals(BusiCmdConstants.CHANGE_USER)){
 					// 处理用户vod指令
 					if(StringHelper.isNotEmpty(cmd.getDetail_params())){
 						UserDto userDto = JsonHelper.toObject(cmd.getDetail_params(), UserDto.class);

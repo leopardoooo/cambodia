@@ -7,6 +7,7 @@ import java.util.List;
 import com.ycsoft.beans.config.TBusiFee;
 import com.ycsoft.beans.core.user.CUser;
 import com.ycsoft.beans.core.user.CUserPropChange;
+import com.ycsoft.beans.core.user.FillUSerDeviceDto;
 import com.ycsoft.beans.prod.PPromotionAcct;
 import com.ycsoft.beans.system.SOptr;
 import com.ycsoft.business.commons.abstracts.IBaseService;
@@ -44,6 +45,7 @@ public interface IUserService extends IBaseService{
 	
 	public void saveChangeDevice(String userId,String deviceId,String devcieBuyMode,FeeInfoDto deviceFee, boolean reclaim)  throws Exception;
 
+	public void saveFillDevice(List<FillUSerDeviceDto> deviceList) throws Exception;
 	/**
 	 * 修改用户信息
 	 * @param propChangeList	变化的属性集合

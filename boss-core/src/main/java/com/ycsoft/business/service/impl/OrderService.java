@@ -582,19 +582,38 @@ public class OrderService extends BaseBusiService implements IOrderService{
 	 * c.退款金额按剩余使用月整数计算
 	 * @return
 	 */
-	public List<CProdOrder> queryCancelOrderFee(String busi_code,String cust_id,String user_id,String order_sn)throws Exception{
+	public List<CProdOrder> queryCancelOrderFee(String busi_code,String order_sn)throws Exception{
 		//检查是否未支付项目
-		List<CDoneCodeUnpay> unPays=doneCodeComponent.queryUnPayList(cust_id);
-		if(unPays!=null&&unPays.size()>0){
-			throw new ServicesException("有未支付费用，请先支付");
+		//List<CDoneCodeUnpay> unPays=doneCodeComponent.queryUnPayList(cust_id);
+		CProdOrder cancelOrder=cProdOrderDao.findByKey(order_sn);
+		if(cancelOrder==null||StringHelper.isEmpty(busi_code)){
+			throw new ServicesException("参数为空");
 		}
+		PProd prodConfig=pProdDao.findByKey(cancelOrder.getProd_id());
+		List<CProdOrder> orderList=orderComponent.queryCancelOrder(cancelOrder, prodConfig);
 		//是否高级权限
 		boolean isHigh=BusiCodeConstants.PROD_HIGH_TERMINATE.equals(busi_code)||BusiCodeConstants.USER_HIGH_WRITE_OFF.equals(busi_code)
 						?true:false;
 		
+		if(!isHigh){
+			//
+		}
 		
 		return null;
 	}
+	
+	/**
+	 * 硬件合约和包多月协议检查
+	 * @param isHigh
+	 * @param order_sn
+	 * @param busi_code
+	 */
+	private void checkCancelContract(boolean isHigh,String order_sn,String busi_code){
+		
+		
+	}
+	
+	
 	
 	/**
 	 * 保存订购记录
@@ -624,7 +643,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		//产品状态设置
 		cProdOrder.setStatus(orderComponent.getNewOrderProdStatus(lastOrder,orderProd));
 		//业务是否需要支付判断                     
-		cProdOrder.setIs_pay(this.saveDoneCodeUnPay(orderProd, doneCode)?SystemConstants.BOOLEAN_TRUE:SystemConstants.BOOLEAN_FALSE);
+		cProdOrder.setIs_pay(this.saveDoneCodeUnPay(orderProd, doneCode,optr_id)?SystemConstants.BOOLEAN_TRUE:SystemConstants.BOOLEAN_FALSE);
 		//保存订购记录
 		orderComponent.saveCProdOrder(cProdOrder,orderProd,busi_code);
 		
@@ -686,13 +705,13 @@ public class OrderService extends BaseBusiService implements IOrderService{
 	 * @throws JDBCException 
 	 * @throws Exception 
 	 */
-	private boolean saveDoneCodeUnPay(OrderProd orderProd,Integer done_code) throws JDBCException{
+	private boolean saveDoneCodeUnPay(OrderProd orderProd,Integer done_code,String optr_id) throws Exception{
 		List<CDoneCodeUnpay> unPayList =doneCodeComponent.queryUnPayList(orderProd.getCust_id());
 		if(unPayList.size()==0&&orderProd.getPay_fee()==0){
 			//没有未支付的业务，且当前新订单不需要支付，则该笔订单业务设置为已支付
 			return true;
 		}else{
-			doneCodeComponent.saveDoneCodeUnPay(orderProd.getCust_id(), done_code);
+			doneCodeComponent.saveDoneCodeUnPay(orderProd.getCust_id(), done_code,optr_id);
 			return false;
 		}
 	}

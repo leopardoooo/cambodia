@@ -35,4 +35,25 @@ public class PProdStaticResDao extends BaseEntityDao<PProdStaticRes> {
 			String sql = "select r.res_id from p_prod t,p_prod_static_res r where t.is_base =? and t.prod_id=r.prod_id";
 			return createQuery(sql,SystemConstants.BOOLEAN_TRUE).list();
 		}
+		
+		public String[] queryResByProdIds(List<String> prodIds) throws JDBCException{
+			String prodIdStr ="";
+			for (String prodId:prodIds){
+				prodIdStr = ",'"+prodId+"'";
+			}
+			
+			prodIdStr = prodIdStr.substring(1);
+			
+			String sql = "select distinct res_id from p_prod_static_res where prod_id in ("+prodIdStr+")";
+			
+			List<PProdStaticRes> list = this.createQuery(sql).list();
+			String[] resIds = new String[list.size()];
+			int i=0;
+			for(PProdStaticRes res:list){
+				resIds[i] = res.getRes_id();
+				i++;
+			}
+			
+			return resIds;
+		}
 }

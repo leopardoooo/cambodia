@@ -131,7 +131,19 @@ public class CProdOrderDao extends BaseEntityDao<CProdOrder> {
 				" and exp_date >=trunc(sysdate) ");
 		return this.createQuery(sql, cust_id).list();
 	} 
-	
+	/**
+	 * 查询一个客户套餐订单清单
+	 * @param cust_id
+	 * @return
+	 * @throws JDBCException
+	 */
+	public List<CProdOrder> queryPackageOrderByCustId(String cust_id)throws JDBCException{
+		String sql=StringHelper.append("select * from c_prod_order ",
+				"where cust_id=? and prod_id in (select a.prod_id from p_prod a where a.prod_type<>'BASE') ",
+				"and package_sn is null ",
+				"  order by exp_date ");
+		return this.createQuery(sql, cust_id).list();
+	}
 	/**
 	 * 查询用户的产品订购记录清单
 	 * @param user_id
@@ -139,7 +151,8 @@ public class CProdOrderDao extends BaseEntityDao<CProdOrder> {
 	 * @throws JDBCException
 	 */
 	public List<CProdOrder> queryProdOrderByUserId(String user_id) throws JDBCException{
-		String sql="select * from c_prod_order where user_id=? ";
+		String sql="select * from c_prod_order where user_id=? order by exp_date ";
 		return this.createQuery(sql, user_id).list();
 	}
+
 }

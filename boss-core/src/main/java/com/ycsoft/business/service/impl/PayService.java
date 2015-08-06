@@ -35,6 +35,7 @@ import com.ycsoft.beans.prod.PProd;
 import com.ycsoft.beans.system.SItemvalue;
 import com.ycsoft.beans.system.SOptr;
 import com.ycsoft.business.commons.pojo.BusiParameter;
+import com.ycsoft.business.dao.config.TExchangeDao;
 import com.ycsoft.business.dao.core.bank.CBankGotodiskDao;
 import com.ycsoft.business.dao.core.bank.CBankReturnDao;
 import com.ycsoft.business.dao.core.bank.CBankReturnPayerrorDao;
@@ -74,18 +75,19 @@ public class PayService extends BaseBusiService implements IPayService {
 	private CProdOrderDao cProdOrderDao;
 	@Autowired
 	private PProdDao pProdDao;
-	
+	@Autowired
+	private TExchangeDao tExchangeDao;
 	/**
 	 * 查询汇率
 	 * @return
 	 * @throws ServicesException
 	 */
-	public Integer queryExchage() throws ServicesException{
-		SItemvalue item= MemoryDict.getDictItem(DictKey.EXCHANGE, DictKey.EXCHANGE.toString());
-		if(item==null||item.getItem_idx()==null||item.getItem_idx()<=0){
+	public Integer queryExchage() throws Exception{
+		Integer exchange= tExchangeDao.getExchange();
+		if(exchange==null||exchange<=0){
 			throw new ServicesException("系统未正确配置汇率，请联系管理员");
 		}
-		return item.getItem_idx();
+		return exchange;
 	}
 	/**
 	 * 查询未支付总额
@@ -110,7 +112,8 @@ public class PayService extends BaseBusiService implements IPayService {
 	 * 保存支付信息
 	 * @throws Exception 
 	 */
-	public void savePay(String cust_id) throws Exception{
+	public void savePay(CFeePayDto pay) throws Exception{
+		String cust_id=pay.getCust_id();
 		//用户锁
 		doneCodeComponent.lockCust(cust_id);
 		
@@ -121,7 +124,7 @@ public class PayService extends BaseBusiService implements IPayService {
 		
 		Integer done_code=doneCodeComponent.gDoneCode();
 		//保存支付记录
-		CFeePayDto pay=feeComponent.savePayFeeNew(this.getBusiParam().getPay(),cust_id,done_code);
+		feeComponent.savePayFeeNew(pay,cust_id,done_code);
 		
 		//更新缴费信息状态、支付方式和发票相关信息
 		feeComponent.updateCFeeToPay(upPayDoneCodes, pay);
@@ -143,7 +146,7 @@ public class PayService extends BaseBusiService implements IPayService {
 	private void checkCFeePayParam(List<CDoneCodeUnpay> upPayDoneCodes,String cust_id) throws Exception{
 		CFeePayDto pay=this.getBusiParam().getPay();
 		//参数不能为空
-		if(StringHelper.isEmpty(cust_id)||StringHelper.isEmpty(pay.getExchange())
+		if(StringHelper.isEmpty(cust_id)||pay.getExchange()==null
 				||pay.getUsd()==null||pay.getKhr()==null||this.getBusiParam().getCust()==null
 				||StringHelper.isEmpty(pay.getPay_type())
 				){
@@ -156,16 +159,19 @@ public class PayService extends BaseBusiService implements IPayService {
 		
 		//验证汇率是否一致
 		//List list=MemoryDict.getDicts(DictKey.EXCHANGE,DictKey.ex);
-		SItemvalue item= MemoryDict.getDictItem(DictKey.EXCHANGE, DictKey.EXCHANGE.toString());
-		if(item==null||item.getItem_idx()==null||item.getItem_idx()<=0||!item.getItem_idx().equals(Integer.valueOf(pay.getExchange()))){
+		Integer exchange=tExchangeDao.getExchange();
+		if(exchange==null||exchange<=0||!exchange.equals(pay.getExchange())){
 			throw new ServicesException("汇率未正确配置或汇率不一致");
 		}
 
 		//验证支付金额和待支付金额是否一致
-		int payFee=pay.getUsd()+pay.getKhr()/item.getItem_idx();
-		if(upPayDoneCodes==null||upPayDoneCodes.size()==0||payFee!=feeComponent.queryUnPaySum(cust_id).get("FEE").intValue()){
+		int payFee=pay.getUsd()+Math.round(pay.getKhr()*1.0f/exchange.intValue());
+		int needPayFee=feeComponent.queryUnPaySum(cust_id).get("FEE").intValue();
+		if(upPayDoneCodes==null||upPayDoneCodes.size()==0||payFee!=needPayFee){
 			throw new ServicesException("待支付金额已失效，请重新打开待支付界面");
 		}
+		//四舍五入部分
+		pay.setCos((needPayFee-pay.getUsd())*exchange.intValue()-Math.round(pay.getKhr()*1.0f/exchange.intValue()));
 	}
 	/**
 	 * 保存支付信息
