@@ -56,7 +56,38 @@ public class OrderComponent extends BaseBusiComponent {
 	private CProdOrderHisDao cProdOrderHisDao;
 	@Autowired
 	private CProdOrderTransfeeDao cProdOrderTransfeeDao;
-	
+	/**
+	 * 查询一个订单相关的退订清单
+	 * 套餐=客户所有未失效套餐
+	 * 宽带=相同用户所有宽带产品（含套餐子宽带产品）
+	 * 非宽带单产品=相同用户相同单产品（含套餐子产品)
+	 * @param cancelOrder
+	 * @param prodConfig
+	 * @return
+	 * @throws Exception 
+	 */
+	public List<CProdOrder> queryCancelOrder(CProdOrder cancelOrder,PProd prodConfig) throws Exception{
+		List<CProdOrder> list=new ArrayList<>();
+		Date today=DateHelper.today();
+		if(!prodConfig.getProd_type().equals(SystemConstants.PROD_TYPE_BASE)){
+			//套餐的情况
+			for(CProdOrder order: cProdOrderDao.queryPackageOrderByCustId(cancelOrder.getCust_id())){
+				if(order.getExp_date().after(today)||order.getExp_date().equals(today)){
+					//结束日>=今天
+					list.add(order);
+				}
+			}
+		}else {
+			//单产品
+			for(CProdOrder order: cProdOrderDao.queryProdOrderByUserId(cancelOrder.getUser_id())){
+				if((order.getExp_date().after(today)||order.getExp_date().equals(today))
+						&&(prodConfig.getServ_id().equals(SystemConstants.PROD_SERV_ID_BAND)||prodConfig.getProd_id().equals(order.getProd_id()))){
+					list.add(order);
+				}
+			}
+		}
+		return list;
+	}
 	/**
 	 * 恢复被覆盖的订单
 	 * @param recoverDoneCode

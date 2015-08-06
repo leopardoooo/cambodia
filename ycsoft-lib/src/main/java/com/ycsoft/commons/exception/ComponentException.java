@@ -14,6 +14,22 @@ public class ComponentException extends Exception {
 	 */
 	private static final long serialVersionUID = 5888503597834560573L;
 
+	public ComponentException(ErrorCodeConstants errorCode){
+		super(errorCode.getDesc());
+	}
+	
+	public ComponentException(ErrorCodeConstants errorCode,Object ... args){
+		super(String.format(errorCode.getDesc(), args));
+	}
+	
+	public ComponentException(ErrorCodeConstants errorCode ,Exception e){
+		super( errorCode.getDesc() , e );
+	}
+	
+	public ComponentException(ErrorCodeConstants errorCode ,Exception e,Object ... args){
+		super( String.format(errorCode.getDesc(),args) , e );
+	}
+	
 	public ComponentException(String msg){
 		super(msg);
 	}
