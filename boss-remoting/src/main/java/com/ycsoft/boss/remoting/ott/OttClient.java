@@ -13,7 +13,7 @@ public class OttClient {
 	private static String UNDEFINED_ERROR_STATUS="10000";
 	
 	/**
-	 * ´´½¨ĞÂÓÃ»§
+	 * åˆ›å»ºç”¨æˆ·
 	 * @return
 	 */
 	public Result createUser(Integer userId,String password,String custName,String address,
@@ -40,7 +40,7 @@ public class OttClient {
 	
 
 	/**
-	 * ĞŞ¸ÄÓÃ»§ĞÅÏ¢
+	 * ä¿®æ”¹ç”¨æˆ·
 	 * @return
 	 */
 	public Result editUser(Integer userId,String password,String custName,String address,
@@ -50,7 +50,7 @@ public class OttClient {
 	}
 	
 	/**
-	 * ÓÃ»§Ïú»§
+	 * åˆ é™¤ç”¨æˆ·
 	 * @return
 	 */
 	public Result deleteUser(Integer userId){
@@ -73,7 +73,7 @@ public class OttClient {
 	}
 	
 	/**
-	 * ¿ªÍ¨²úÆ·
+	 * å‘é€äº§å“åŠ æˆæƒ
 	 * @return
 	 */
 	public Result openUserProduct(Integer userId,String productId){
@@ -95,7 +95,7 @@ public class OttClient {
 		return result;
 	}
 	/**
-	 * È¡Ïû²úÆ·ÊÚÈ¨
+	 * å‘ç”Ÿäº§å“å‡æˆæƒ
 	 * @return
 	 */
 	
@@ -119,7 +119,7 @@ public class OttClient {
 	}
 	
 	/**
-	 * ĞÂÔö»òÕßĞŞ¸Ä²úÆ·
+	 * å¢åŠ æˆ–è€…ä¿®æ”¹äº§å“
 	 * @return
 	 */
 	public Result addOrUpdateProduct(String productId,String productName){
@@ -141,7 +141,7 @@ public class OttClient {
 	}
 	
 	/**
-	 * É¾³ı²úÆ·
+	 * åˆ é™¤äº§å“
 	 * @return
 	 */
 	public Result deleteProduct(String productId){
@@ -164,7 +164,7 @@ public class OttClient {
 	}
 	
 	/**
-	 * Éú³Éuser bean
+	 * ï¿½ï¿½ï¿½user bean
 	 * @param userId
 	 * @param custName
 	 * @param address

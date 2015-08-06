@@ -5,7 +5,6 @@
 package com.ycsoft.business.dao.core.user;
 
 import java.io.Serializable;
-import java.sql.CallableStatement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -16,6 +15,7 @@ import org.springframework.stereotype.Component;
 
 import com.ycsoft.beans.core.user.CUser;
 import com.ycsoft.beans.core.user.CUserStb;
+import com.ycsoft.beans.core.user.UserResExpDate;
 import com.ycsoft.beans.system.SOptr;
 import com.ycsoft.business.dto.core.bill.UserBillDto;
 import com.ycsoft.business.dto.core.user.ChangedUser;
@@ -464,5 +464,14 @@ public class CUserDao extends BaseEntityDao<CUser> {
 			}
 		}
 		return userCountMap;
+	}
+	
+	/**
+	 * 查找一个用户下所有有效资源的到期日
+	 */
+	public List<UserResExpDate> queryUserProdResExpDate(String userId) throws Exception{
+		String sql = "select res_id,exp_date from c_prod_order a,p_prod_static_res b "
+				+ "where user_id=? and a.is_pay='T' and exp_date>sysdate and a.prod_id=b.prod_id";
+		return this.createQuery(UserResExpDate.class, sql, userId).list();
 	}
 }
