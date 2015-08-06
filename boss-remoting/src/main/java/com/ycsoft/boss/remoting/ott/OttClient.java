@@ -76,11 +76,12 @@ public class OttClient {
 	 * 发送产品加授权
 	 * @return
 	 */
-	public Result openUserProduct(Integer userId,String productId){
+	public Result openUserProduct(Integer userId,String productId,Date expDate){
 		String url = URLBuilder.getUrl(URLBuilder.Method.OPEN_USER_PRODCT); 
 		Result result =null;
 		try {
 			Auth auth = new Auth(userId.toString(),productId);
+			auth.setEnd_time(expDate);
 			List<Auth> authList = new ArrayList<>();
 			authList.add(auth);
 			ResponseBody response = HttpUtils.doPost(url, new Gson().toJson(authList));
@@ -95,7 +96,7 @@ public class OttClient {
 		return result;
 	}
 	/**
-	 * 发生产品减授权
+	 * 发产品减授权
 	 * @return
 	 */
 	
@@ -164,7 +165,7 @@ public class OttClient {
 	}
 	
 	/**
-	 * ���user bean
+	 * user bean
 	 * @param userId
 	 * @param custName
 	 * @param address

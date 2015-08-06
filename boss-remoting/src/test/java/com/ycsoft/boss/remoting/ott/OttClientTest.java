@@ -2,6 +2,8 @@ package com.ycsoft.boss.remoting.ott;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.Date;
+
 import org.junit.Test;
 
 public class OttClientTest {
@@ -33,13 +35,13 @@ public class OttClientTest {
 	
 	@Test
 	public void testOpenUserProduct() {
-		Result result = client.openUserProduct(100000, "12345321");
+		Result result = client.openUserProduct(100000, "12345321",new Date());
 		assertEquals("0", result.getErr());
 	}
 	
 	@Test
 	public void testStopUserProduct() {
-		Result result = client.openUserProduct(100000, "12345321");
+		Result result = client.openUserProduct(100000, "12345321",new Date());
 		assertEquals("0", result.getErr());
 	}
 

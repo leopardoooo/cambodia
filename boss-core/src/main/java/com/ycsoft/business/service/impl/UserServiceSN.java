@@ -764,6 +764,8 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 			String payType = SystemConstants.PAY_TYPE_CASH;
 			if (this.getBusiParam().getPay()!= null && this.getBusiParam().getPay().getPay_type() !=null)
 				payType = this.getBusiParam().getPay().getPay_type();
+			doneCodeComponent.saveDoneCodeUnPay(cust.getCust_id(), doneCode, getBusiParam().getOptr().getOptr_id());
+			
 			feeComponent.saveDeviceFee( cust.getCust_id(), cust.getAddr_id(),fee.getFee_id(),fee.getFee_std_id(), 
 					payType,device.getDevice_type(), device.getDevice_id(), device.getDevice_code(),
 					null,
