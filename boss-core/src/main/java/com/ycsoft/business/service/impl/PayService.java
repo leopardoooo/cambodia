@@ -121,7 +121,7 @@ public class PayService extends BaseBusiService implements IPayService {
 		//查询未支付业务
 		List<CDoneCodeUnpay> upPayDoneCodes=doneCodeComponent.queryUnPayList(cust_id);
 		//数据验证
-		this.checkCFeePayParam(upPayDoneCodes,cust_id);
+		this.checkCFeePayParam(pay, upPayDoneCodes,cust_id);
 		
 		Integer done_code=doneCodeComponent.gDoneCode();
 		//保存支付记录
@@ -144,8 +144,7 @@ public class PayService extends BaseBusiService implements IPayService {
 	 * @param cust_id
 	 * @throws Exception 
 	 */
-	private void checkCFeePayParam(List<CDoneCodeUnpay> upPayDoneCodes,String cust_id) throws Exception{
-		CFeePayDto pay=this.getBusiParam().getPay();
+	private void checkCFeePayParam(CFeePayDto pay, List<CDoneCodeUnpay> upPayDoneCodes,String cust_id) throws Exception{
 		//参数不能为空
 		if(StringHelper.isEmpty(cust_id)||pay.getExchange()==null
 				||pay.getUsd()==null||pay.getKhr()==null||this.getBusiParam().getCust()==null

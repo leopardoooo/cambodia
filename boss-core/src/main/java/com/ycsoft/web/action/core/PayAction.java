@@ -114,8 +114,10 @@ public class PayAction extends BaseBusiAction{
 	public String queryUnPayDetail() throws Exception{
 		//费用信息
 		getRoot().setRecords(payService.queryUnPayDetail(cust_id));
+		Map<String, Integer> feeMap = payService.queryUnPaySum(cust_id);
+		feeMap.put("EXC", payService.queryExchage());
 		//汇率
-		getRoot().setSimpleObj(payService.queryExchage());
+		getRoot().setSimpleObj(feeMap);
 		return JSON;
 	}
 	/**
