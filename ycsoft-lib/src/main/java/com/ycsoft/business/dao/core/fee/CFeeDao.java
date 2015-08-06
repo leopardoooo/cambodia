@@ -80,7 +80,7 @@ public class CFeeDao extends BaseEntityDao<CFee> {
 	 */
 	public Map<String,Integer> queryUnPaySum(String cust_id) throws JDBCException{
 		
-		String sql="select sum(cf.real_pay) fee,count(1) cnt from c_fee cf,c_done_code_unpay un where cf.create_done_code=un.done_code and un.cust_id=? ";
+		String sql="select nvl(sum(cf.real_pay),0) fee,count(1) cnt from c_fee cf,c_done_code_unpay un where cf.create_done_code=un.done_code and un.cust_id=? ";
 		List<Object[]> list=this.createSQLQuery(sql, cust_id).list();
 		Map<String,Integer> map=new HashMap<>();
 		if(list==null||list.size()==0){

@@ -5,7 +5,9 @@
  */
 PayForm = Ext.extend( Ext.form.FormPanel , {
 	payTypeStore : null,
-	constructor: function(){
+	parent: null,
+	constructor: function(parent){
+		this.parent = parent;
 		this.payTypeStore = new Ext.data.JsonStore({
 			url : Constant.ROOT_PATH+"/commons/x/QueryParam!queryPayType.action",
 			fields : ['pay_type','pay_type_name']
@@ -16,116 +18,114 @@ PayForm = Ext.extend( Ext.form.FormPanel , {
 			border: false,
 //			iconCls: 'icon-pay',
 			title: '收费信息',
-			bodyStyle: 'background: #F2F2F2;padding: 5px',
-			layout: 'column',
-			defaults:{
-				layout: 'form',
-				border: false,
-				baseCls: 'x-plain'
-			},
+			bodyStyle: 'background: #F2F2F2;padding:15px 5px 5px 5px',
+			labelWidth: 80,
+			defaults: {width: 110},
 			items:[{
-				columnWidth: .25,
-				labelWidth: 73,
-				items:[{
-					xtype: 'label',
-					style: Constant.MONEY_LABEL_STYLE,
-					fieldLabel: '累计需付费',
-					text: '0.00', 
-					name: 'lblFee'
-				},{
-					width: 73,
-					fieldLabel: '缴费方式',
-					xtype: 'combo',
-					store : this.payTypeStore,
-					name: 'pay_type',
-					hiddenValue : 'pay_type',
-					valueField : 'pay_type',
-					displayField : "pay_type_name",					
-					allowBlank: false,
-					hiddenName: 'pay.pay_type',
-					defaultValue: 'XJ'
-				}]
+				xtype: 'label',
+				style: Constant.MONEY_LABEL_STYLE,
+				fieldLabel: '总额USD',
+				text: '0.00',
+				id: 'labelDollor',
+				name: 'lblFee'
 			},{
-				columnWidth: .25,
-				labelWidth: 60,
-				items:[{
-					width: 90,
-					fieldLabel: '账务日期',
-					editable:false,
-					xtype:'datefield',
-					format:'Y-m-d 00:00:00',
-					name: 'pay.acct_date'
-				},{
-					width: 90,
-					fieldLabel: '票据编号',
-					maxLength: 18,
-					disabled: true,
-					xtype: 'textfield',
-					name: 'pay.receipt_id'
-				}]
+				xtype: 'label',
+				fieldLabel: '当日汇率',
+				id: 'labelExchange'
 			},{
-				columnWidth: .25,
-				labelWidth: 70,
-				items:[{
-					width: 90,
-					name: 'invoice_mode',
-					fieldLabel: '出票方式',
-					maxLength: 18,
-					xtype: 'paramcombo',
-					paramName: 'INVOICE_MODE',
-					defaultValue: 'A',
-					hiddenName: 'pay.invoice_mode'
-				},{
-					width: 90,
-					fieldLabel: '发票号',
-					vtype : 'invoiceId',
-					xtype: 'textfield',
-					name: 'pay.invoice_id',
-					listeners:{
-						scope:this,
-						'change':this.checkInvoice
-					}
-				}]
+				xtype: 'label',
+				fieldLabel: '柬埔寨KHR',
+				text: '0.00',
+				id: 'LabelJian'
 			},{
-				columnWidth: .25,
-				labelWidth: 60,
-				items:[{
-					width: 90,
-					xtype: 'textfield',
-					fieldLabel: '付款人',
-					name: 'pay.payer',
-					emptyText: '默认为客户名称'
-				},{
-					width: 90,
-					fieldLabel: '发票代码',
-					xtype : 'combo',
-					store : new Ext.data.JsonStore({
-						fields : ['invoice_code','invoice']
-					}),
-					hiddenName:'pay.invoice_code',
-					displayField : 'invoice_code',
-					valueField : 'invoice',
-					forceSelection : true,
-					editable : true
-				}]
+				xtype: 'textfield',
+				fieldLabel: '付款人',
+				name: 'pay.payer',
+				value: App.getApp().data.custFullInfo.cust.cust_name,
+				emptyText: '默认为客户名称'
+			},{
+				fieldLabel: '缴费方式',
+				xtype: 'combo',
+				store : this.payTypeStore,
+				name: 'pay_type',
+				hiddenValue : 'pay_type',
+				valueField : 'pay_type',
+				displayField : "pay_type_name",					
+				allowBlank: false,
+				hiddenName: 'pay.pay_type',
+				defaultValue: 'XJ',
+				listeners: {
+					scope: this,
+					select: this.doChangePayType
+				}
+			},{
+				fieldLabel: '票据编号',
+				maxLength: 18,
+				disabled: true,
+				xtype: 'textfield',
+				name: 'pay.receipt_id'
+			},{
+				fieldLabel: '账务日期',
+				editable:false,
+				xtype:'datefield',
+				format:'Y-m-d',
+				name: 'pay.acct_date'
+			},{
+				name: 'invoice_mode',
+				fieldLabel: '出票方式',
+				maxLength: 18,
+				xtype: 'paramcombo',
+				paramName: 'INVOICE_MODE',
+				defaultValue: 'A',
+				hiddenName: 'pay.invoice_mode'
+			},{
+				fieldLabel: '实收USD',
+				xtype: 'numberfield',
+				decimalPrecision: 0,
+				id: 'nfDollar',
+				name: 'pay.usd',
+				listeners: {
+					scope: this,
+					change: this.doCalcJianYuan
+				}
+			},{
+				fieldLabel: '实收KHR',
+				xtype: 'numberfield',
+				name: 'pay.khr',
+				decimalPrecision: 0,
+				id: 'nfJianYuan'
+			},{
+				xtype: 'hidden',
+				id: 'hdExchange',
+				name: 'pay.exchange'
 			}]
 			
 		});
 		var acctdatecmp = this.find("name","pay.acct_date")[0];
 		App.acctDate(acctdatecmp);
-		this.doInit();
 	},
-	doInit: function(){
-		App.form.initComboData( this.findByType("paramcombo"));
-		var custName = App.getData().custFullInfo.cust.cust_name;
-		//为缴费方式添加change事件
-		var paytypecmd = this.find("name","pay_type")[0];
-		paytypecmd.on("select", this.doChangePayType, this);
-		
-		var payer = this.find("name","pay.payer")[0];
-		payer.setValue(custName);
+	doCalcJianYuan: function(field, newValue, oldValue){
+		var exchange = this.parent.feeData["EXC"];
+		var sumDollar = this.parent.feeData["FEE"]/100.0;
+		var inputDollar = Ext.getCmp("nfDollar");
+		var inputJianYuan = Ext.getCmp("nfJianYuan");
+		var inputDollarValue = inputDollar.getValue() || 0;
+		var inputJianYuanValue = inputJianYuan.getValue();
+		// 规则，优先取美元，如果美元不足时自动生成柬埔寨瑞尔，如果超出，则瑞尔显示找零
+		if(inputDollarValue > sumDollar || inputDollarValue < sumDollar){
+			var v = (sumDollar - inputDollarValue) * exchange;
+			// 做四舍五入
+			var modV = v % 100;
+			if(modV >= 50){
+				v = v - modV + 100;
+			}else{
+				v = v - modV;
+			}
+			inputJianYuan.setValue( v );
+		}else{
+			inputJianYuan.setValue( "0");
+		}
 	},
-
 	doChangePayType: function(cb, record, index){
 		var b = false;
 		var receiptId = this.find("name", "pay.receipt_id")[0];
@@ -140,59 +140,9 @@ PayForm = Ext.extend( Ext.form.FormPanel , {
 			receiptId.focus();
 		}
 	},
-	checkInvoice : function() {
-		var invoiceCode = this.find("hiddenName", "pay.invoice_code")[0];
-		var invoiceid = this.find("name", "pay.invoice_id")[0];
-		
-		if(invoiceid.isValid()){
-			App.checkInvoice(invoiceid,invoiceCode)
-//			if(rec.length == 0){
-//				Alert('该发票无法使用');
-//			}else if(rec.length == 1){
-//				invoiceBookId.setValue(rec[0]);
-//				invoiceBookId.setReadOnly(true);
-//			}else{
-//				invoiceBookId.getStore().loadData(rec);
-//				invoiceBookId.setReadOnly(false);
-//			}
-		}
-	},
-	//private
-	amount: null,
-	/**
-	 * 将所传递的金额替换为累计需付费金额
-	 * @param float total
-	 */
-	setTotalValue: function( total ){
-		this.amount += total ;
-		this.find("name" ,'lblFee')[0].setText( Ext.util.Format.convertToYuan(this.amount) );
-	},
-	resetAmount: function(){
-		this.amount = 0 ;
-		this.setTotalValue( 0 );
-	},
 	getValues:function(){
 		var all = this.getForm().getValues();
-		var invoice = all['invoice_book_id'];
-		if (invoice!=""){
-			var invoice = invoice.split(',');
-			all['invoice_book_id']= invoice[0];
-			all['invoice_code'] = invoice[1];
-		}
+		
 		return all;
-	},
-	doReset: function(){
-		this.amount = 0 ;
-		this.getForm().reset();
-		var cm = this.find("name","pay.receipt_id")[0];
-		cm.clearInvalid();
-		cm.setDisabled( true );
-		cm.allowBlank = true ;
-		cm = this.find("name","pay.invoice_id")[0];
-		cm.clearInvalid();
-		cm.setDisabled( true );
-		cm.allowBlank = true ;
-		cm = this.find("name","pay.invoice_book_id")[0];
-		cm.clearInvalid();
 	}
 });

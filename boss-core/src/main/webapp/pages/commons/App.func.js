@@ -334,19 +334,7 @@ Ext.apply(App.func,{
 				if(data['serv_id'] != 'BAND'  || data['status'] == 'REQSTOP')
 					return false;
 			}else if(busicode == '1128'){	//更换动态资源
-				var status = data['status'];
-				if (data['has_dyn'] == 'F' || (status != 'ACTIVE'
-						&& status != 'LNKUSTOP' && status != 'OUNSTOP'
-						&& status != 'TMPOPEN')) {
-					return false;
-				}
-				var date = Date.parseDate(data['order_date'].substring(0,10),'Y-m-d');
-				var cfgData = App.getApp().findCfgData('CHANGE_PROD_DYN_RES');
-				if(cfgData){
-					date = date.add(Date.DAY,parseInt(cfgData.config_value));
-				}
-				if(Ext.isEmpty(cfgData) || nowDate().format('Y-m-d') > date.format('Y-m-d'))
-					return false;
+				
 			}else if(busicode == '1983'){	//修改产品预开通日期
 				if(Ext.isEmpty(data.pre_open_time) || data.status != 'PREAUTH'){
 					return false;

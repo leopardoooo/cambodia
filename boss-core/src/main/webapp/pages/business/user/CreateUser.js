@@ -141,7 +141,7 @@ UserBaseForm = Ext.extend( BaseForm , {
 						editable : false,
 						listeners: {
 							scope: this,
-							change: this.doBuyModeSelect
+							select: this.doBuyModeSelect
 						}
 					},{
 						fieldLabel:'收费金额$',
@@ -458,6 +458,7 @@ NewUserForm = Ext.extend(UserBaseForm , {
 	url : Constant.ROOT_PATH+"/core/x/User!createUser.action",
 	success : function(form,res){
 		var userId = res.simpleObj;
+		App.getApp().refreshPayInfo(parent);
 		App.getApp().refreshPanel(App.getApp().getData().currentResource.busicode);
 	}
 });

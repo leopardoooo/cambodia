@@ -61,9 +61,9 @@
 					<li> <a href="#" boss:name="tel" onclick='changeSearchType(false)' id="_search3" ></a> </li>
 					<li> <a href="#" boss:name="mutipleSearch" id="_search4" ></a> </li>
 				</ul>
-
-				<div id='tool' class="toolpanel">
-				</div>
+			</div>
+			
+			<div id='tool' class="toolpanel" style="display: block;">
 			</div>
 
 		</div>

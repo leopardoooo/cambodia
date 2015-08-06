@@ -284,7 +284,8 @@ ProdGrid = Ext.extend(Ext.TabPanel,{
 			         "order_sn","package_sn","package_id","cust_id","user_id","prod_id","tariff_id","disct_id",
 			         "status","status_text","status_date","eff_date","exp_date","active_fee","bill_fee",
 			         "rent_fee","last_bill_date","next_bill_date","order_months","order_fee","order_time",
-			         "order_type","package_group_id","remark","public_acctitem_type"]
+			         "order_type","package_group_id","remark","public_acctitem_type"],
+			sortInfo: []
 		});
 		this.userProdStore.on('load',this.doLoadResult,this);
 		// 基本产品
