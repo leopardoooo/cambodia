@@ -57,7 +57,8 @@ public class OrderComponent extends BaseBusiComponent {
 	@Autowired
 	private CProdOrderTransfeeDao cProdOrderTransfeeDao;
 	/**
-	 * 查询一个订单相关的退订清单
+	 * 单产品退订
+	 * 查询一个订单相关的退订清单和可退费用(active_fee)
 	 * 套餐=客户所有未失效套餐
 	 * 宽带=相同用户所有宽带产品（含套餐子宽带产品）
 	 * 非宽带单产品=相同用户相同单产品（含套餐子产品)
@@ -66,12 +67,12 @@ public class OrderComponent extends BaseBusiComponent {
 	 * @return
 	 * @throws Exception 
 	 */
-	public List<CProdOrder> queryCancelOrder(CProdOrder cancelOrder,PProd prodConfig) throws Exception{
-		List<CProdOrder> list=new ArrayList<>();
+	public List<CProdOrderDto> queryOrderByCancelOrder(CProdOrderDto cancelOrder) throws Exception{
+		List<CProdOrderDto> list=new ArrayList<>();
 		Date today=DateHelper.today();
-		if(!prodConfig.getProd_type().equals(SystemConstants.PROD_TYPE_BASE)){
+		if(!cancelOrder.getProd_type().equals(SystemConstants.PROD_TYPE_BASE)){
 			//套餐的情况
-			for(CProdOrder order: cProdOrderDao.queryPackageOrderByCustId(cancelOrder.getCust_id())){
+			for(CProdOrderDto order: cProdOrderDao.queryPackageOrderByCustId(cancelOrder.getCust_id())){
 				if(order.getExp_date().after(today)||order.getExp_date().equals(today)){
 					//结束日>=今天
 					list.add(order);
@@ -79,14 +80,47 @@ public class OrderComponent extends BaseBusiComponent {
 			}
 		}else {
 			//单产品
-			for(CProdOrder order: cProdOrderDao.queryProdOrderByUserId(cancelOrder.getUser_id())){
+			for(CProdOrderDto order: cProdOrderDao.queryProdOrderByUserId(cancelOrder.getUser_id())){
 				if((order.getExp_date().after(today)||order.getExp_date().equals(today))
-						&&(prodConfig.getServ_id().equals(SystemConstants.PROD_SERV_ID_BAND)||prodConfig.getProd_id().equals(order.getProd_id()))){
+						&&(cancelOrder.getServ_id().equals(SystemConstants.PROD_SERV_ID_BAND)||cancelOrder.getProd_id().equals(order.getProd_id()))){
 					list.add(order);
 				}
 			}
-		}
+		}	
 		return list;
+	}
+	/**
+	 * 计算一个订单的可退金额（终止退订和销户退订）
+	 * @param order
+	 * @return
+	 */
+	public Integer getOrderCancelFee(CProdOrder cancelOrder){
+		if(StringHelper.isNotEmpty(cancelOrder.getPackage_sn())){
+			//套餐子产品可退金额=0;
+			return 0;
+		}
+		Date cancelDate=DateHelper.today();
+		//1.退订日在订购计费完整区间之前
+		if(cancelDate.before(cancelOrder.getEff_date())||cancelDate.equals(cancelOrder.getEff_date())){
+			//覆盖退订在订购的生效日之前(含)
+			return cancelOrder.getOrder_fee();
+		}
+		//2.退订日在订购计费完整区间之间
+		//订购的停止计费日根据订购月数反推开始计费日
+		Date effDate= DateHelper.getNextMonthByNum(cancelOrder.getExp_date(),cancelOrder.getOrder_months()*-1);
+		if(cancelDate.equals(effDate)||cancelDate.before(effDate)){
+			//退订日包含了整个订单的订购期间
+			return cancelOrder.getOrder_fee();
+		}
+		
+		//3.退订日在 订购的计费区间内（按剩余使用天数折算）
+		int months=DateHelper.compareToMonthByDate(cancelDate, cancelOrder.getExp_date());
+		Date newExpDate=DateHelper.getNextMonthByNum(cancelDate,months);
+		if(newExpDate.after(cancelOrder.getExp_date())){
+			//新到期日大于实际到期日，则需要回退一个月再计算
+			months=months-1;
+		}
+		return Math.round(months*1.0f*cancelOrder.getOrder_fee()/cancelOrder.getOrder_months());
 	}
 	/**
 	 * 恢复被覆盖的订单

@@ -49,6 +49,7 @@ import com.ycsoft.commons.constants.DictKey;
 import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.exception.ComponentException;
+import com.ycsoft.commons.exception.ErrorCodeConstants;
 import com.ycsoft.commons.exception.ServicesException;
 import com.ycsoft.commons.helper.CollectionHelper;
 import com.ycsoft.commons.helper.DateHelper;
@@ -81,6 +82,170 @@ public class OrderService extends BaseBusiService implements IOrderService{
 	@Autowired
 	private CFeeDao cFeeDao;
 
+	/**
+	 * 产品终止退订
+	 * 查询退订\销户可退的订单金额
+	 * 当天订购的订单退全部金额（可能误操作的情况）
+	 * a.普通退订和普通销户：1.包多月产品不可退。
+	 *         2.单月基础产品未过协议期，则协议期外可退，退订业务时重发加授权至协议期。
+	 *         3.单月基础产品已过协议期(或无协议)，则可退并终止产品
+	 *         4.单月非基础产品可退并终止产品
+	 * b.高级退订和高级销户可以退钱并终止产品
+	 * c.退款金额按剩余使用月整数计算
+	 * @return
+	 */
+	public List<CProdOrderDto> queryCancelFeeByCancelOrder(String busi_code,String cust_id,String order_sn)throws Exception{
+		//检查是否未支付项目
+		//List<CDoneCodeUnpay> unPays=doneCodeComponent.queryUnPayList(cust_id);
+		
+		CProdOrderDto cancelOrder=cProdOrderDao.queryCProdOrderDtoByKey(order_sn);
+		if(cancelOrder==null||StringHelper.isEmpty(busi_code)){
+			throw new ServicesException(ErrorCodeConstants.ParamIsNull);
+		}
+
+		List<CProdOrderDto> orderList=orderComponent.queryOrderByCancelOrder(cancelOrder);
+		//是否高级权限
+		boolean isHigh=isHighCancel(busi_code);
+		//参数检查		
+		for(CProdOrderDto order:orderList){
+			//检查能否退订
+			this.checkOrderCanCancel(cust_id, isHigh, order);
+			//费用计算
+			order.setActive_fee(orderComponent.getOrderCancelFee(order));
+		}
+		
+		return orderList;
+	}
+	/**
+	 * 是否高级退订或销户功能
+	 * @param busi_code
+	 * @return
+	 */
+	private boolean isHighCancel(String busi_code){
+		return BusiCodeConstants.PROD_HIGH_TERMINATE.equals(busi_code)||BusiCodeConstants.USER_HIGH_WRITE_OFF.equals(busi_code)
+				?true:false;
+	}
+	/**
+	 * 终止产品
+	 * @throws Exception 
+	 */
+	public void saveCancelProdOrder(String busi_code,String[] orderSns,Integer cancel_fee) throws Exception{
+		
+		String cust_id=this.getBusiParam().getCust().getCust_id();
+		doneCodeComponent.lockCust(cust_id);
+		
+		//参数检查
+		List<CProdOrderDto> cancelList=checkCancelProdOrderParm(busi_code, cust_id, orderSns, cancel_fee);
+		
+		Integer done_code=doneCodeComponent.gDoneCode();
+		if(cancel_fee!=0){
+			//记录未支付业务
+			doneCodeComponent.saveDoneCodeUnPay(cust_id, done_code, this.getOptr().getOptr_id());
+			//保存缴费信息
+			
+		}else{
+			//解除授权
+		}
+		
+		//执行退订
+		
+		
+		
+		this.saveAllPublic(done_code, this.getBusiParam());
+	}
+	/**
+	 * 退订产品参数检查
+	 * @param busi_code
+	 * @param cust_id
+	 * @param isHigh
+	 * @param orderSns
+	 * @param cancel_fee
+	 * @return
+	 * @throws Exception
+	 */
+	private List<CProdOrderDto> checkCancelProdOrderParm(String busi_code,String cust_id,String[] orderSns,Integer cancel_fee) throws Exception{
+		
+		if(StringHelper.isEmpty(cust_id)||StringHelper.isEmpty(busi_code)||cancel_fee==null||orderSns==null||orderSns.length==0){
+			throw new ServicesException(ErrorCodeConstants.ParamIsNull);
+		}
+		//高级
+		boolean isHigh=isHighCancel(busi_code);
+		
+		List<CProdOrderDto> cancelList=new ArrayList<>();
+		//参数检查
+		//退款总额核对
+		int fee=0;
+		//相关订单的未支付核对
+		Map<String,CProdOrderDto> unPayCheckMap=new HashMap<String,CProdOrderDto>();
+		for(String order_sn:orderSns){
+			CProdOrderDto order= cProdOrderDao.queryCProdOrderDtoByKey(order_sn);
+			cancelList.add(order);
+			this.checkOrderCanCancel(cust_id, isHigh, order);
+			//可退费用计算
+			order.setActive_fee(orderComponent.getOrderCancelFee(order));
+			fee=fee+order.getActive_fee();
+			if(!order.getProd_type().equals(SystemConstants.PROD_TYPE_BASE)){
+				unPayCheckMap.put("PACKAGE", order);
+			}else if(order.getServ_id().equals(SystemConstants.PROD_SERV_ID_BAND)){
+				unPayCheckMap.put("BAND", order);
+			}else {
+				unPayCheckMap.put("NOBAND", order);
+			}
+		}
+		//金额核对
+		if(cancel_fee!=fee){
+			throw new ServicesException(ErrorCodeConstants.FeeDateException);
+		}
+		//订单相关的所有订单的未支付判断,判断各类订单的相关所有订单的未支付状态
+		for(CProdOrderDto checkOrder: unPayCheckMap.values()){
+			for(CProdOrderDto unPayOrder: orderComponent.queryOrderByCancelOrder(checkOrder)){
+				if(unPayOrder.getIs_pay().equals(SystemConstants.BOOLEAN_FALSE)){
+					throw new ServicesException(ErrorCodeConstants.NotCancleHasUnPay);
+				}
+			}
+		}
+		return cancelList;
+	}
+	
+	/**
+	 * 判断订单能否退订
+	 * @param cust_id
+	 * @param isHigh
+	 * @param order
+	 * @param prodConfig
+	 * @throws Exception
+	 */
+	private void checkOrderCanCancel(String cust_id,boolean isHigh,CProdOrderDto order) throws Exception{
+		
+		if(!cust_id.equals(order.getCust_id())){
+			throw new ServicesException(ErrorCodeConstants.CustDataException);
+		}
+		
+		if(order.getIs_pay().equals(SystemConstants.BOOLEAN_FALSE)){
+			//未支付判断
+			throw new ServicesException(ErrorCodeConstants.NotCancleHasUnPay);
+		}
+		if(!isHigh&&order.getBilling_cycle()>1){
+			//包多月判断
+			throw new ServicesException(ErrorCodeConstants.NotCancelHasMoreBillingCycle);
+		}
+		if(!isHigh&&order.getProd_type().equals(SystemConstants.PROD_TYPE_BASE)
+				&& order.getIs_base().equals(SystemConstants.BOOLEAN_TRUE)
+				&&DateHelper.today().before(order.getProtocol_date())){
+			//基础单产品协议期未到不能终止
+			throw new ServicesException(ErrorCodeConstants.NotCancelUserProtocol);
+		}
+		if(!isHigh&&!order.getProd_type().equals(SystemConstants.PROD_TYPE_BASE)){
+			//套餐的判断
+			for(CProdOrderDto son:  cProdOrderDao.queryProdOrderByPackageSn(order.getOrder_sn())){
+				if(son.getIs_base().equals(SystemConstants.BOOLEAN_TRUE)
+						&&DateHelper.today().before(son.getProtocol_date())){
+					throw new ServicesException(ErrorCodeConstants.NotCancelUserProtocol);
+				}
+			}
+		}
+	}
+	
 	/**
 	 * 取消未支付订单
 	 * @param order_sn
@@ -570,50 +735,6 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		}
 		return list;
 	}
-
-	/**
-	 * 查询退订\销户可退的订单金额
-	 * 当天订购的订单退全部金额（可能误操作的情况）
-	 * a.普通退订和普通销户：1.包多月产品不可退。
-	 *         2.单月基础产品未过协议期，则协议期外可退，退订业务时重发加授权至协议期。
-	 *         3.单月基础产品已过协议期(或无协议)，则可退并终止产品
-	 *         4.单月非基础产品可退并终止产品
-	 * b.高级退订和高级销户可以退钱并终止产品
-	 * c.退款金额按剩余使用月整数计算
-	 * @return
-	 */
-	public List<CProdOrder> queryCancelOrderFee(String busi_code,String order_sn)throws Exception{
-		//检查是否未支付项目
-		//List<CDoneCodeUnpay> unPays=doneCodeComponent.queryUnPayList(cust_id);
-		CProdOrder cancelOrder=cProdOrderDao.findByKey(order_sn);
-		if(cancelOrder==null||StringHelper.isEmpty(busi_code)){
-			throw new ServicesException("参数为空");
-		}
-		PProd prodConfig=pProdDao.findByKey(cancelOrder.getProd_id());
-		List<CProdOrder> orderList=orderComponent.queryCancelOrder(cancelOrder, prodConfig);
-		//是否高级权限
-		boolean isHigh=BusiCodeConstants.PROD_HIGH_TERMINATE.equals(busi_code)||BusiCodeConstants.USER_HIGH_WRITE_OFF.equals(busi_code)
-						?true:false;
-		
-		if(!isHigh){
-			//
-		}
-		
-		return null;
-	}
-	
-	/**
-	 * 硬件合约和包多月协议检查
-	 * @param isHigh
-	 * @param order_sn
-	 * @param busi_code
-	 */
-	private void checkCancelContract(boolean isHigh,String order_sn,String busi_code){
-		
-		
-	}
-	
-	
 	
 	/**
 	 * 保存订购记录
@@ -758,7 +879,9 @@ public class OrderService extends BaseBusiService implements IOrderService{
 				lastOrderList=cProdOrderDao.queryTransOrderByPackage(orderProd.getCust_id());
 			}else if(prod.getServ_id().equals(SystemConstants.PROD_SERV_ID_BAND)){
 				//单产品宽带的情况
-				lastOrderList=cProdOrderDao.queryProdOrderByUserId(orderProd.getUser_id());
+				for(CProdOrder order: cProdOrderDao.queryProdOrderByUserId(orderProd.getUser_id())){
+					lastOrderList.add(order);
+				}
 			}else{
 				//单产品非宽带的情况
 				for(CProdOrder order: cProdOrderDao.queryProdOrderByUserId(orderProd.getUser_id())){
