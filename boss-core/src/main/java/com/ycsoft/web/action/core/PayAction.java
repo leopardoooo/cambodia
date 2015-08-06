@@ -89,6 +89,7 @@ public class PayAction extends BaseBusiAction{
 	private String cust_id;
 	
 	
+	
 	public void setCust_id(String cust_id) {
 		this.cust_id = cust_id;
 	}
@@ -113,17 +114,20 @@ public class PayAction extends BaseBusiAction{
 	public String queryUnPayDetail() throws Exception{
 		//费用信息
 		getRoot().setRecords(payService.queryUnPayDetail(cust_id));
+		Map<String, Integer> feeMap = payService.queryUnPaySum(cust_id);
+		feeMap.put("EXC", payService.queryExchage());
 		//汇率
-		getRoot().setSimpleObj(payService.queryExchage());
+		getRoot().setSimpleObj(feeMap);
 		return JSON;
 	}
 	/**
 	 * 保存支付
+	 * 
 	 * @return
 	 * @throws Exception
 	 */
 	public String savePayNew() throws Exception{
-		payService.savePay(cust_id);
+		payService.savePay(pay);
 		return JSON_SUCCESS;
 	}
 

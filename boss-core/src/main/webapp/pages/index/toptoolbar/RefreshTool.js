@@ -348,16 +348,39 @@ Ext.apply( App, {
 		var toolstr = "<div style='width:"+width+"px;float:left;"+pLeft+"' >" +
 				"<div class='top_button print_big' onClick='App.openPrint()'></div>" +
 				"<div style='font:11px'>" +
-				"&nbsp;&nbsp;发票打印</div></div>";
+				"发票打印</div></div>";
 		toolstr +="<div style='width:"+width+"px;float:left;padding-left:"+leftWidth+"px;' >" +
 				"<div class='top_button print_big' onClick='App.openBankPayment()'>" +
 				"</div><div style='font:11px'>银行打印</div></div>";
 		toolstr +="<div style='width:"+width+"px;float:left;padding-left:"+leftWidth+"px;' >" +
 				"<div class='top_button config_big' onClick='App.openBusiPrint()'>" +
 				"</div><div style='font:11px'>受理单打印</div></div>";
-				
 		Ext.get('tool').update(toolstr);
 		
+ 	},
+ 	// 刷新支付信息
+ 	refreshPayInfo: function(W){
+ 		// 请求后台的数据
+ 		Ext.Ajax.request({
+			scope : this,
+			url : Constant.ROOT_PATH + "/core/x/Pay!queryUnPaySum.action",
+			params : {cust_id : App.getCustId()},
+			success : function(res, opt){
+				W = W || window;
+				var data = W.Ext.decode(res.responseText);
+				var count = data["CNT"], payfeeAmount = data["FEE"];
+				// 删除当前的支付DOM
+				var el = Ext.get("payAllContainer");
+				
+				if(el){ el.remove(); }
+				if(count > 0){
+					Ext.get('tool').insertHtml("beforeEnd",'<div id="payAllContainer">'
+							+'<div class="amount">您有<b>'+ count +'</b>笔待支付,共<b>'+ payfeeAmount/100.0 +'</b></div>' 
+							+'<div class="nowToPayBtn"><button onclick="App.openPay()">现在支付</button></div>'
+						+'</div>');
+				}
+			}
+		});
  	},
  	openPrint:function(){
  		App.getApp().data.currentResource = {busicode:'1068'};

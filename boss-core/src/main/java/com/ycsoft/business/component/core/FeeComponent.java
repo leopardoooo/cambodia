@@ -145,8 +145,8 @@ public class FeeComponent extends BaseBusiComponent {
 	 * @return
 	 * @throws Exception
 	 */
-	public List<FeeDto> queryUnPay(String cust_id) throws Exception{
-		return cFeeDao.queryUnPay(cust_id);
+	public List<FeeDto> queryUnPay(String cust_id,String optr_id) throws Exception{
+		return cFeeDao.queryUnPay(cust_id,optr_id);
 	}
 	/**
 	 * 查询未支付总额
@@ -154,8 +154,8 @@ public class FeeComponent extends BaseBusiComponent {
 	 * @return
 	 * @throws Exception
 	 */
-	public Map<String,Integer> queryUnPaySum(String cust_id) throws Exception{
-		return cFeeDao.queryUnPaySum(cust_id);
+	public Map<String,Integer> queryUnPaySum(String cust_id,String optr_id) throws Exception{
+		return cFeeDao.queryUnPaySum(cust_id,optr_id);
 	}
 	
 	/**

@@ -189,6 +189,7 @@ Ext.apply(TopSearch.prototype , {
 	  	App.main.infoPanel.getUserPanel().refresh();
 	  	App.main.infoPanel.getAcctPanel().refresh();
 	  	App.refreshFeeView();
+	  	App.refreshPayInfo();
 	    
 	    App.main.infoPanel.getCustPanel().setReload(false);
 	    App.main.infoPanel.getUnitPanel().setReload(false);

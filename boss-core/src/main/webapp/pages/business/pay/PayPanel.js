@@ -82,59 +82,43 @@ MoreInfoTemplate = {
  * 封装支付面板
  */ 
 PayPanel = Ext.extend( Ext.Panel ,{
-	
 	feeStore: null ,
 	payForm: null,
-	sm: null,
 	constructor: function(){
-		
 		// 缴费信息的表单
-		this.payForm = new PayForm();
-		
+		this.payForm = new PayForm(this);
 		//实例化fee store
 		this.feeStore = new Ext.data.JsonStore({
-			url: Constant.ROOT_PATH+"/core/x/Pay!queryUnPay.action",
+			data: [],
 			fields: [
-				'fee_sn','fee_text','fee_type','fee_type_text','busi_name','optr_name',
+				'fee_sn','busi_name','fee_text','count','optr_name','create_time',
 				{name: 'real_pay', type: 'int'},
-				'optr_id', 'create_time'
+				'prod_sn', 'begin_date','prod_invalid_date'
 			]
 		});
 		p = this.payForm ;
-		this.sm = new Ext.grid.CheckboxSelectionModel({
-			singleSelect: false,
-			checkOnly: true,
-			//该函数是为了解决 ext CheckboxSelectionModel的一个BUG
-			onBeforeSelAllHanlder: function(){
-				p.resetAmount();
-			}
-		});
-		current = this;
-		//处理更多详细数据的函数
-		more = function(rowIndex ){
-			var r = current.feeStore.getAt(rowIndex);
-			current.loadMoreInfo(r);
-		}
 		//费用表格
 		var feeGrid = new Ext.grid.GridPanel({
-			title: '选择支付的费用项',
+			title: '支付项目',
 			region: 'center',
 			border: false,
 			autoExpandColumn: 'e',
 			columns: [
-				this.sm,
+				{ header: '业务名称', dataIndex: 'busi_name', width: 80},
 				{ id: 'e', header: '费用名称', dataIndex: 'fee_text'},
-				{ header: '费用类型', dataIndex: 'fee_type_text', width: 100},
-				{ header: '业务名称', dataIndex: 'busi_name', width: 100},
-				{ header: '操作员', dataIndex: 'optr_name', width: 100},
-				{ header: '实付金额', dataIndex: 'real_pay', width: 100, xtype: 'moneycolumn'},
-				{ header: '费用时间', dataIndex: 'create_time', width: 140}
-//				,
-//				{ header: '查看详细' , dataIndex: '' , width: 60, renderer: function(v , md, record , i  ){
-//					return "<DIV><a href='#' onclick='more("+ i +");'>更多...</a></DIV>";
-//				}}
+				{ header: '数量', dataIndex: 'count', width: 80,renderer: function(v,md,record,i){
+					return v;
+				}},
+				{ header: '实付金额', dataIndex: 'real_pay', width: 60, xtype: 'moneycolumn'},
+				{ header: '操作员', dataIndex: 'optr_name', width: 60},
+				{ header: '操作时间', dataIndex: 'create_time', width: 80},
+				{ header: '订单号', dataIndex: 'prod_sn', width: 60,renderer: function(v , md, record , i  ){
+					if(v){
+						return "<DIV><a href='#' onclick='more("+ i +");'>取消</a></DIV>";
+					}
+					return "";
+				}}
 			],
-			sm: this.sm,
 			ds: this.feeStore
 		});
 		this.infoPanel = new Ext.Panel({
@@ -147,98 +131,56 @@ PayPanel = Ext.extend( Ext.Panel ,{
 			html: '请点击<更多...>查看更多费用信息!'
 		});
 		
-		//加载数据
-		this.feeStore.load({
-			params: {custId: App.getData().custFullInfo.cust.cust_id }
-		});
-		
 		PayPanel.superclass.constructor.call(this,{
 			border: false,
 			layout: 'border',
 			region: 'center',
 			items: [
 				{
-				border: false,
 				region: 'center',
 				layout: 'border',
 				items: [feeGrid ]
 			},
 				{
-				region: 'south',
-				border: false,
+				region: 'east',
+				split: true,
 				layout: 'fit',
-				height: 98,
+				width: 230,
 				items: this.payForm
 			}],
 			buttons: [{
-				text: '重置信息',
+				text: '保存',
 				width: 100,
 				scope: this,
-				handler: this.doReset
-			},
-//			{
-//				text: '保存后合并',
-//				width: 100,
-//				scope: this,
-//				handler: function(){ 
-//					Confirm("确定要保存信息吗?",this,this.doSaveAndMerge);
-//				}
-//			},
-			{
-				text: '保存后打印',
-				width: 100,
-				scope: this,
-				handler: function(){ 
-					Confirm("确定要保存信息吗?",this, this.doSaveAndPrint);
-				}
+				handler: this.doSave
 			}]
 		});
+		this.loadBaseData();
 	},
-	initEvents: function(){
-		this.sm.on("rowselect", function(sm , rowIndex , record ){
-			this.payForm.setTotalValue( record.get("real_pay") );
-		}, this );
-		this.sm.on("rowdeselect", function(sm , rowIndex , record ){
-			this.payForm.setTotalValue( -record.get("real_pay") );
-		}, this );
-		PayPanel.superclass.initEvents.call(this);
-	},
-	/**
-	 * 加载更多信息
-	 */ 
-	loadMoreInfo: function(r){
-		var feeSn = r.get('fee_sn');
-		var feeType = r.get('fee_type');
-		//提交 
+	feeData: null,
+	loadBaseData: function(){
+		// 请求后台的数据
 		Ext.Ajax.request({
 			scope: this,
-			params: {feeSn: feeSn , feeType: feeType},
-			url: Constant.ROOT_PATH+"/core/x/Pay!queryFeeInfo.action",
-			success: function( res, ops){
-				var o = Ext.decode( res.responseText );
-				if(o["exception"]){
-					new DebugWindow( o , "btnBusiSave").show();
-				} else {
-					o["fee_name"] = r.get('fee_text');
-					MoreInfoTemplate[feeType].overwrite( this.infoPanel.body, o );
-				}
+			url: Constant.ROOT_PATH + "/core/x/Pay!queryUnPayDetail.action",
+			params: {cust_id: App.getCustId()},
+			success: function(res, ops){
+				var data = Ext.decode(res.responseText);
+				this.feeStore.loadData(data["records"]);
+				this.feeData = data["simpleObj"];
+				var dollar = this.feeData["FEE"]/100.0;
+				Ext.getCmp("nfDollar").setValue(dollar);
+				Ext.getCmp("nfJianYuan").setValue(0);
+				Ext.getCmp("labelDollor").setText(Ext.util.Format.usMoney(dollar).substr(1));
+				var jianYuan = Ext.util.Format.usMoney(dollar * this.feeData["EXC"]);
+				Ext.getCmp("LabelJian").setText(jianYuan.substr(1));
+				Ext.getCmp("labelExchange").setText("1USD=" + this.feeData["EXC"] + "KHR");
+				Ext.getCmp("hdExchange").setValue(this.feeData["EXC"]);
 			}
 		});
 	},
-	doReset: function(){ 
-		this.payForm.doReset();
-		this.sm.selectAll();
-	},
-	doSaveAndMerge: function(){
-		var params = this.getValues();
-		params['notMerge']= true;
-		this.doSave(function(){
-			var menu = App.getApp().menu;
-			menu.bigWindow.toggleBusi( menu.MERGE_FEE_RESOURCE , {width: 700, height: 450} );
-		},params);
-	},
 	doSaveAndPrint: function(){
-		var params = this.getValues();
+//		var params = this.getValues();
 		this.doSave(params);
 //		this.doSave(function(){
 //			var invoiceId =this.payForm.find("name", "pay.invoice_id")[0].getValue();
@@ -248,51 +190,42 @@ PayPanel = Ext.extend( Ext.Panel ,{
 //					"/pages/business/pay/Print.jsp?type=through&invoiceId="+invoiceId+"&invoiceBookId="+invoiceBookId );
 //		}, params);
 	},
-	doSave: function(params,callback){
-		if(!this.doValid()) return ;
-		var comomonParams = App.getValues();
-		comomonParams["busiCode"] = "1207";
-		params[CoreConstant.JSON_PARAMS] = Ext.encode(comomonParams);
-		var mb = Show();
-		//提交
-		Ext.Ajax.request({
-			scope: this,
-			params: params,
-			url: Constant.ROOT_PATH+"/core/x/Pay!savePay.action",
-			success: function( res, ops){
-				var o = Ext.decode( res.responseText );
-				mb.hide();
-				if(o["exception"]){
-					new DebugWindow( o , "btnBusiSave").show();
-				} else {
-					Alert('支付成功!',callback ,this);
-					//App.getApp().refreshFeeView();
-					var panel = App.getApp().main.infoPanel;
-					panel.getUserPanel().prodGrid.remoteRefresh();
-					panel.getAcctPanel().acctGrid.remoteRefresh();
-				}
-			}
-		});
-	},
-	doValid: function(){
-		var f = this.payForm.getForm();
-		if(!f.isValid())
-			return false;
-		if(this.sm.getSelections().length == 0 ){
-			Alert("没有可以支付的费用项!");
-			return false;
+	doSave: function(){
+		if(!this.payForm.getForm().isValid()){ 
+			Alert("含有验证不通过的输入项");
+			return ;
 		}
-		return true;
+		Confirm("确定要保存信息吗?", this, function(){
+			var params = this.getValues()
+			var comomonParams = App.getValues();
+			comomonParams["busiCode"] = "1207";
+			params[CoreConstant.JSON_PARAMS] = Ext.encode(comomonParams);
+			var mb = Show();
+			//提交
+			Ext.Ajax.request({
+				scope: this,
+				params: params,
+				url: Constant.ROOT_PATH + "/core/x/Pay!savePayNew.action",
+				success: function( res, ops){
+					var o = Ext.decode( res.responseText );
+					mb.hide();
+					if(o["exception"]){
+						new DebugWindow( o , "btnBusiSave").show();
+					} else {
+						Alert('支付成功!');
+						App.getApp().refreshPayInfo(parent);
+						App.getApp().menu.bigWindow.hide();
+					}
+				}
+			});
+		});
 	},
 	getValues: function(){
 		var f = this.payForm.getForm();
 		var all = f.getValues();
-		//获得选中的记录
-		var feeSn = [];
-		for(var i =0,rsArr = this.sm.getSelections();i< rsArr.length ;i++){
-			feeSn[i] = rsArr[i].get("fee_sn");
-		}
-		all["feeSn"] = feeSn;
+		all["pay.khr"] = all["pay.khr"] * 100;
+		all["pay.usd"] = all["pay.usd"] * 100; 
+		all["pay.cust_id"] = App.getApp().data.custFullInfo.cust.cust_id;
 		return all;
 	},
 	getFee: function(){

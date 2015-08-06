@@ -45,6 +45,7 @@ public class CDoneCodeUnpayDao extends BaseEntityDao<CDoneCodeUnpay> {
 		unpay.setDone_code(done_code);
 		unpay.setCust_id(cust_id);
 		unpay.setDone_date(new Date());
+		unpay.setOptr_id(optr_id);
 		this.save(unpay);
 	}
 }

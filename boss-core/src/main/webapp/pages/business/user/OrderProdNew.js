@@ -483,11 +483,9 @@ ProdOrderForm = Ext.extend( BaseForm, {
 		
 		return values;
 	},
-	getFee: function(){
-		return this.totalAmount/100;
-	},
 	success : function(form,res){
 		var userId = res.simpleObj;
+		App.getApp().refreshPayInfo(parent);
 		App.getApp().refreshPanel(App.getApp().getData().currentResource.busicode);
 	}
 });

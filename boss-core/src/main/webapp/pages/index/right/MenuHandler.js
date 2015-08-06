@@ -1300,10 +1300,16 @@ Ext.apply(MenuHandler, {
 			}
 		}
 		
-		return {
-			width : 580,
-			height : 500
-		}
+		var url = Constant.ROOT_PATH + "/core/x/User!openUser.action";
+		Confirm("确定要报开吗?", this, function() {
+			App.sendRequest(url, null, function(res, opt){
+				var data = Ext.decode(res.responseText);
+				if (data['success'] == true) {
+					App.getApp().main.infoPanel.getUserPanel().userGrid.remoteRefresh();
+				}
+			});
+		});
+		return false;
 	},
 	UserInvalid : function(){
 		if (!hasCust())

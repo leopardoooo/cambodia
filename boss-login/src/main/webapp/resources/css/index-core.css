@@ -82,19 +82,40 @@ a {text-decoration: none; color: #f50;}a:hover {text-decoration: underline;color
 #search .feepanel LABEL{
 	font-weight: bold;color: blue
 }
-#search .toolpanel{
-	float:right;
-	width:210 !important;
-	width:210px;
-	height:100px;
-	padding:0px;
-	padding-left:0px;
-	padding-top:12px;
+#tool{
+	position: absolute;
+	left: 580px;
+	right: 10px;
+	top: 28px;
+	bottom: 0;
+	height:70px;
 	padding-bottom:0px;
-	
 }
-#search .toolpanel .top_button{
-	width:32;height:32;margin-left: 16px;cursor:pointer;
+#payAllContainer{
+	text-align: center;
+}
+#payAllContainer .amount {padding: 5px 0; }
+#payAllContainer .amount >b{font-size: 20px;}
+#payAllContainer .nowToPayBtn>button{
+	width: 170px;
+	height: 30px;
+	border: 1px solid #e67e22;
+	font-size: 17px;
+	color: #fff;
+	background: #e67e22;
+	border-radius: 5px;
+	cursor: pointer;
+}
+#payAllContainer{
+	float: right;
+}
+.toolpanel>div{text-align: center;}
+.toolpanel .top_button{
+	margin-top: 12px;
+	width:32px;
+	height:32px;
+	margin-left: 16px;
+	cursor:pointer;
 }
 
 .search-panel .search-input-box{
