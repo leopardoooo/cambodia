@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import com.ycsoft.beans.core.prod.CProdOrder;
 import com.ycsoft.beans.core.prod.CProdOrderDto;
 import com.ycsoft.commons.constants.StatusConstants;
+import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.daos.abstracts.BaseEntityDao;
 import com.ycsoft.daos.core.JDBCException;
@@ -47,6 +48,27 @@ public class CProdOrderDao extends BaseEntityDao<CProdOrder> {
 			    " and  o.order_sn=? "); 
 		return this.createQuery(CProdOrderDto.class, sql,order_sn).first();
 	}
+	
+	/**
+	 * 查询待支付的订单
+	 * @param cust_id
+	 * @return
+	 * @throws JDBCException
+	 */
+	public List<CProdOrder> queryUnPayOrder(String cust_id) throws JDBCException{
+		String sql="select  o.* from c_prod_order o,c_done_code_unpay u where o.package_sn is null and  o.cust_id=u.cust_id and o.done_code=u.done_code and u.cust_id=? ";
+		return this.createQuery( sql,cust_id).list();
+	}
+	/**
+	 * 更新未支付订单支付属性
+	 * @param done_code
+	 * @param cust_id
+	 * @throws JDBCException
+	 */
+    public void updateOrderToPay(Integer done_code,String cust_id) throws JDBCException{
+    	String sql="update c_prod_order set is_pay='T' where done_code=? and cust_id=? ";
+    	this.executeUpdate(sql, done_code,cust_id);
+    }
 
 	/**
 	 * 查询一个套餐的子订单明细
@@ -57,6 +79,19 @@ public class CProdOrderDao extends BaseEntityDao<CProdOrder> {
 	public List<CProdOrder> queryPakDetailOrder(String package_sn) throws JDBCException{
 		String sql= "select * from c_prod_order where package_sn=? ";
 		return this.createQuery(sql, package_sn).list();
+	}
+	/**
+	 * 查询在套餐之后续订的单产品(跟套餐子产品重叠)
+	 * @param package_sn
+	 * @return
+	 * @throws JDBCException 
+	 */
+	public List<CProdOrder> querySingleProdOrderAfterPak(String package_sn) throws JDBCException{
+		String sql=StringHelper.append(" select t.* from c_prod_order t,c_prod_order pak,p_prod p ",
+				" where pak.package_sn=? and  pak.prod_id=p.prod_id and p.prod_type=? ",
+				" and pak.user_id=t.user_id and t.package_sn is null ",
+				" and t.exp_date>pak.exp_date and( p.serv_id =? or pak.prod_id=t.prod_id) order by t.exp_date desc ");
+		return this.createQuery(sql, package_sn,SystemConstants.PROD_TYPE_BASE,SystemConstants.PROD_SERV_ID_BAND).list();
 	}
 	/**
 	 * 查询转移支付被覆盖退订的单产品订购记录
@@ -96,7 +131,19 @@ public class CProdOrderDao extends BaseEntityDao<CProdOrder> {
 				" and exp_date >=trunc(sysdate) ");
 		return this.createQuery(sql, cust_id).list();
 	} 
-	
+	/**
+	 * 查询一个客户套餐订单清单
+	 * @param cust_id
+	 * @return
+	 * @throws JDBCException
+	 */
+	public List<CProdOrder> queryPackageOrderByCustId(String cust_id)throws JDBCException{
+		String sql=StringHelper.append("select * from c_prod_order ",
+				"where cust_id=? and prod_id in (select a.prod_id from p_prod a where a.prod_type<>'BASE') ",
+				"and package_sn is null ",
+				"  order by exp_date ");
+		return this.createQuery(sql, cust_id).list();
+	}
 	/**
 	 * 查询用户的产品订购记录清单
 	 * @param user_id
@@ -104,7 +151,8 @@ public class CProdOrderDao extends BaseEntityDao<CProdOrder> {
 	 * @throws JDBCException
 	 */
 	public List<CProdOrder> queryProdOrderByUserId(String user_id) throws JDBCException{
-		String sql="select * from c_prod_order where user_id=? ";
+		String sql="select * from c_prod_order where user_id=? order by exp_date ";
 		return this.createQuery(sql, user_id).list();
 	}
+
 }

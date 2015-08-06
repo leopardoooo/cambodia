@@ -68,6 +68,7 @@ import com.ycsoft.commons.constants.DictKey;
 import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.exception.ComponentException;
+import com.ycsoft.commons.exception.ErrorCodeConstants;
 import com.ycsoft.commons.exception.ServicesException;
 import com.ycsoft.commons.helper.DateHelper;
 import com.ycsoft.commons.helper.JsonHelper;
@@ -1467,9 +1468,9 @@ public class BaseBusiService extends BaseService {
 					disct = prodComponent.queryDisctById(feeAcct.getDisct_id());
 					if (disct != null){
 						inactiveItem.setActive_amount(disct.getDisct_rent());
-						int disctAmount = feeAcct.getReal_pay()/disct.getFinal_rent()*disct.getDisct_rent();
-						inactiveItem.setInit_amount(disctAmount);
-						inactiveItem.setBalance(disctAmount);
+						//int disctAmount = feeAcct.getReal_pay()/disct.getFinal_rent()*disct.getDisct_rent();
+						//inactiveItem.setInit_amount(disctAmount);
+						//inactiveItem.setBalance(disctAmount);
 					}
 				}
 				acctComponent.addAcctItemInactive(inactiveItem);
@@ -1636,37 +1637,10 @@ public class BaseBusiService extends BaseService {
 		SOptr optr = getOptr();
 		if(null!= cust && StringHelper.isNotEmpty(cust.getCounty_id()) && !cust.getCounty_id().equals(optr.getCounty_id())){
 			LoggerHelper.error(getClass(), "串数据：操作员"+optr.getOptr_name()+"，地区："+optr.getCounty_id()+",客户："+cust.getCust_name()+"，地区"+cust.getCounty_id());
-			throw new ServicesException("数据异常，请重新保存业务");
+			throw new ServicesException(ErrorCodeConstants.CustDataException);
 		}
 		saveDoneCode(busiParam);
 		
-		if(cust != null){
-			//获取业务流水
-			custId = cust.getCust_id();
-		}
-		
-		//保存扩展信息
-		extTableComponent.saveOrUpdate(busiParam.getExtAttrForm());
-		//保存业务扩展信息
-		if(null != busiParam.getBusiExtAttr()){
-			extTableComponent.saveBusiAttr(busiParam.getDoneCode(), busiParam.getBusiExtAttr());
-		}
-		//保存业务工单
-		String newAddr= busiParam.getTempVar().get(SystemConstants.EXTEND_ATTR_KEY_NEWADDR)==null?
-				null:busiParam.getTempVar().get(SystemConstants.EXTEND_ATTR_KEY_NEWADDR).toString();
-		taskComponent.createTask(busiParam.getTaskIds(), busiParam.getDoneCode(), busiParam.getCustFullInfo(),
-				busiParam.getSelectedUsers(), newAddr,busiParam.getTask_books_time(),busiParam.getTask_cust_name(),busiParam.getTask_mobile(),null,busiParam.getTask_remark(),optr);
-
-		//保存业务单据
-//		printComponent.saveDoc(param.getDoneCode(),param.getBusiCode(), param.getCust().getCust_id(),param.getDocTypes());
-
-		//检查支付信息是否为NULL，如果不为NULL则保存支付信息，并根据一定的规则保存合并记录。
-		CFeePayDto pay = busiParam.getPay();
-		
-		String payType = SystemConstants.PAY_TYPE_CASH;
-		if(null != pay){
-			payType = pay.getPay_type();
-		}
 		//保存业务费用信息
 		if (busiParam.getFees() !=null){
 			boolean hasUnpay=false;
@@ -1680,10 +1654,35 @@ public class BaseBusiService extends BaseService {
 			}
 			if(hasUnpay&&doneCodeComponent.queryDoneCodeUnPayByKey(doneCode)==null){
 				//保存未支付业务
-				doneCodeComponent.saveDoneCodeUnPay(custId, doneCode);
+				doneCodeComponent.saveDoneCodeUnPay(custId, doneCode,this.getOptr().getOptr_id());
 			}
 		}
+		
+		/**
+		if(cust != null){
+			//获取业务流水
+			custId = cust.getCust_id();
+		}
+		
+		//保存扩展信息
+		extTableComponent.saveOrUpdate(busiParam.getExtAttrForm());
+		//保存业务扩展信息
+		if(null != busiParam.getBusiExtAttr()){
+			extTableComponent.saveBusiAttr(busiParam.getDoneCode(), busiParam.getBusiExtAttr());
+		}
+		
+		//保存业务工单
+		String newAddr= busiParam.getTempVar().get(SystemConstants.EXTEND_ATTR_KEY_NEWADDR)==null?
+				null:busiParam.getTempVar().get(SystemConstants.EXTEND_ATTR_KEY_NEWADDR).toString();
+		taskComponent.createTask(busiParam.getTaskIds(), busiParam.getDoneCode(), busiParam.getCustFullInfo(),
+				busiParam.getSelectedUsers(), newAddr,busiParam.getTask_books_time(),busiParam.getTask_cust_name(),busiParam.getTask_mobile(),null,busiParam.getTask_remark(),optr);
 
+		//保存业务单据
+//		printComponent.saveDoc(param.getDoneCode(),param.getBusiCode(), param.getCust().getCust_id(),param.getDocTypes());
+		**/
+
+		/**原有支付
+		CFeePayDto pay= this.getBusiParam().getPay();
 		if(null != pay){
 			//保存缴费信息
 			feeComponent.savePayFee(pay, busiParam.getCust().getCust_id(),busiParam.getDoneCode());
@@ -1708,6 +1707,7 @@ public class BaseBusiService extends BaseService {
 				feeComponent.saveQuatoInvoice(busiParam.getDoneCode());
 			}
 		}
+		**/
 	}
 	
 	/**

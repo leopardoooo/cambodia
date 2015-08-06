@@ -1,10 +1,15 @@
 package com.ycsoft.business.service.impl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.ycsoft.beans.config.TBusiFee;
@@ -13,6 +18,7 @@ import com.ycsoft.beans.core.bank.CBankGotodisk;
 import com.ycsoft.beans.core.bank.CBankReturn;
 import com.ycsoft.beans.core.bank.CBankReturnPayerror;
 import com.ycsoft.beans.core.common.CDoneCodeDetail;
+import com.ycsoft.beans.core.common.CDoneCodeUnpay;
 import com.ycsoft.beans.core.cust.CCust;
 import com.ycsoft.beans.core.fee.CFee;
 import com.ycsoft.beans.core.fee.CFeeBusi;
@@ -22,21 +28,26 @@ import com.ycsoft.beans.core.fee.CFeePropChange;
 import com.ycsoft.beans.core.fee.CFeeUnitpre;
 import com.ycsoft.beans.core.job.JCustWriteoff;
 import com.ycsoft.beans.core.prod.CProdMobileBill;
+import com.ycsoft.beans.core.prod.CProdOrder;
 import com.ycsoft.beans.core.user.CUser;
 import com.ycsoft.beans.invoice.RInvoice;
+import com.ycsoft.beans.prod.PProd;
+import com.ycsoft.beans.system.SItemvalue;
 import com.ycsoft.beans.system.SOptr;
 import com.ycsoft.business.commons.pojo.BusiParameter;
 import com.ycsoft.business.dao.core.bank.CBankGotodiskDao;
 import com.ycsoft.business.dao.core.bank.CBankReturnDao;
 import com.ycsoft.business.dao.core.bank.CBankReturnPayerrorDao;
+import com.ycsoft.business.dao.core.prod.CProdOrderDao;
+import com.ycsoft.business.dao.prod.PProdDao;
 import com.ycsoft.business.dto.core.acct.PayDto;
 import com.ycsoft.business.dto.core.fee.CFeePayDto;
 import com.ycsoft.business.dto.core.fee.FeeBusiFormDto;
 import com.ycsoft.business.dto.core.fee.FeeDto;
 import com.ycsoft.business.dto.core.fee.MergeFeeDto;
 import com.ycsoft.business.dto.core.print.CInvoiceDto;
-import com.ycsoft.business.dto.device.DeviceDto;
 import com.ycsoft.business.service.IPayService;
+import com.ycsoft.commons.constants.BusiCmdConstants;
 import com.ycsoft.commons.constants.BusiCodeConstants;
 import com.ycsoft.commons.constants.DictKey;
 import com.ycsoft.commons.constants.StatusConstants;
@@ -59,19 +70,36 @@ public class PayService extends BaseBusiService implements IPayService {
 	private CBankReturnDao cBankReturnDao;
 	private CBankReturnPayerrorDao cBankReturnPayerrorDao;
 	private CBankGotodiskDao cBankGotodiskDao;
+	@Autowired
+	private CProdOrderDao cProdOrderDao;
+	@Autowired
+	private PProdDao pProdDao;
 	
+	/**
+	 * 查询汇率
+	 * @return
+	 * @throws ServicesException
+	 */
+	public Integer queryExchage() throws ServicesException{
+		SItemvalue item= MemoryDict.getDictItem(DictKey.EXCHANGE, DictKey.EXCHANGE.toString());
+		if(item==null||item.getItem_idx()==null||item.getItem_idx()<=0){
+			throw new ServicesException("系统未正确配置汇率，请联系管理员");
+		}
+		return item.getItem_idx();
+	}
 	/**
 	 * 查询未支付总额
 	 * @param cust_id
 	 * @return
 	 * @throws Exception
 	 */
-	public Integer queryUnPaySum(String cust_id) throws Exception{
+	public Map<String,Integer> queryUnPaySum(String cust_id) throws Exception{
 		return feeComponent.queryUnPaySum(cust_id);
 	}
 	/**
 	 * 查询未支付的费用明细
-	 * 显示 费用编号 fee_sn,业务名称busi_name,费用名称fee_text,数量(当count不为空，显示count否则显示begin_date(yyyymmdd)+“-”+prod_invalid_date),操作员 optr_name,操作时间create_time,金额 real_pay,
+	 * 显示 费用编号 fee_sn,业务名称busi_name,费用名称fee_text,数量(当count不为空，显示count否则显示begin_date(yyyymmdd)+“-”+prod_invalid_date),
+	 * 操作员 optr_name,操作时间create_time,金额 real_pay,订单号 prod_sn,X按钮(当prod_sn不为空时显示)
 	 * @param cust_id
 	 * @return
 	 */
@@ -80,13 +108,108 @@ public class PayService extends BaseBusiService implements IPayService {
 	}
 	/**
 	 * 保存支付信息
+	 * @throws Exception 
 	 */
-	public void savePay(String cust_id,CFeePay pay){
-		//验证支付金额和待支付金额是否一致
-		//更新订购支付信息
-		//给订单发授权
+	public void savePay(String cust_id) throws Exception{
+		//用户锁
+		doneCodeComponent.lockCust(cust_id);
+		
+		//查询未支付业务
+		List<CDoneCodeUnpay> upPayDoneCodes=doneCodeComponent.queryUnPayList(cust_id);
+		//数据验证
+		this.checkCFeePayParam(upPayDoneCodes,cust_id);
+		
+		Integer done_code=doneCodeComponent.gDoneCode();
 		//保存支付记录
+		CFeePayDto pay=feeComponent.savePayFeeNew(this.getBusiParam().getPay(),cust_id,done_code);
+		
+		//更新缴费信息状态、支付方式和发票相关信息
+		feeComponent.updateCFeeToPay(upPayDoneCodes, pay);
+		
+		//更新订单状体并给订单发授权
+		updateOrder(cust_id,done_code);
+		
 		//删除未支付业务信息
+		doneCodeComponent.deleteDoneCodeUnPay(upPayDoneCodes);
+	
+		//保存业务流水
+		this.saveAllPublic(done_code, this.getBusiParam());
+	}
+	/**
+	 * 检查支付参数
+	 * @param cust_id
+	 * @throws Exception 
+	 */
+	private void checkCFeePayParam(List<CDoneCodeUnpay> upPayDoneCodes,String cust_id) throws Exception{
+		CFeePayDto pay=this.getBusiParam().getPay();
+		//参数不能为空
+		if(StringHelper.isEmpty(cust_id)||StringHelper.isEmpty(pay.getExchange())
+				||pay.getUsd()==null||pay.getKhr()==null||this.getBusiParam().getCust()==null
+				||StringHelper.isEmpty(pay.getPay_type())
+				){
+			throw new ServicesException("参数不能为空");
+		}
+		//串数据判断
+		if(!cust_id.equals(this.getBusiParam().getCust().getCust_id())){
+			throw new ServicesException("客户不一致");
+		}
+		
+		//验证汇率是否一致
+		//List list=MemoryDict.getDicts(DictKey.EXCHANGE,DictKey.ex);
+		SItemvalue item= MemoryDict.getDictItem(DictKey.EXCHANGE, DictKey.EXCHANGE.toString());
+		if(item==null||item.getItem_idx()==null||item.getItem_idx()<=0||!item.getItem_idx().equals(Integer.valueOf(pay.getExchange()))){
+			throw new ServicesException("汇率未正确配置或汇率不一致");
+		}
+
+		//验证支付金额和待支付金额是否一致
+		int payFee=pay.getUsd()+pay.getKhr()/item.getItem_idx();
+		if(upPayDoneCodes==null||upPayDoneCodes.size()==0||payFee!=feeComponent.queryUnPaySum(cust_id).get("FEE").intValue()){
+			throw new ServicesException("待支付金额已失效，请重新打开待支付界面");
+		}
+	}
+	/**
+	 * 保存支付信息
+	 * @param busiParam
+	 * @param doneCode
+	 * @return
+	 * @throws Exception
+	 */
+	
+	/**
+	 * 更新产品订单的支付属性并发加授权
+	 * @param unPayDoneCodes
+	 * @param cust_id
+	 * @param done_code
+	 * @throws Exception
+	 */
+	private void updateOrder(String cust_id,Integer done_code) throws Exception{
+		
+		List<CProdOrder> orderList=cProdOrderDao.queryUnPayOrder(cust_id);
+		Set<Integer> doneCodeSet=new HashSet<Integer>();
+		Map<String,CUser> userMap=userComponent.queryUserMap(cust_id);
+		Map<String,PProd> prodMap=new HashMap<String,PProd>();
+		for(CProdOrder order:orderList){ 
+			//订单状态是正常的才要授权
+			if(order.getStatus().equals(StatusConstants.ACTIVE)){
+				PProd config=prodMap.get(order.getProd_id());
+				if(config==null){
+					config=pProdDao.findByKey(order.getProd_id());
+					prodMap.put(config.getProd_id(), config);
+				}
+				if(userMap==null){
+					userMap=userComponent.queryUserMap(cust_id);
+				}
+				//授权
+				jobComponent.createProdBusiCmdJob(order, config.getProd_type(), userMap, done_code, BusiCmdConstants.ACCTIVATE_PROD, SystemConstants.PRIORITY_SSSQ);
+			}
+			//有订单的未支付业务流水号
+			doneCodeSet.add(order.getDone_code());
+		}
+		//更改订单支付属性
+		Iterator<Integer> it= doneCodeSet.iterator();
+		while(it.hasNext()){
+			cProdOrderDao.updateOrderToPay(it.next(), cust_id);
+		}
 		
 	}
 	

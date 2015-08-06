@@ -12,6 +12,22 @@ public class ServicesException extends Exception {
 	 */
 	private static final long serialVersionUID = 2758171495592228753L;
 
+	public ServicesException(ErrorCodeConstants errorCode){
+		super(errorCode.getDesc());
+	}
+	
+	public ServicesException(ErrorCodeConstants errorCode,Object ... args){
+		super(String.format(errorCode.getDesc(), args));
+	}
+	
+	public ServicesException(ErrorCodeConstants errorCode ,Exception e){
+		super( errorCode.getDesc() , e );
+	}
+	
+	public ServicesException(ErrorCodeConstants errorCode ,Exception e,Object ... args){
+		super( String.format(errorCode.getDesc(),args) , e );
+	}
+	
 	public ServicesException( String msg ){
 		super(msg);
 	}

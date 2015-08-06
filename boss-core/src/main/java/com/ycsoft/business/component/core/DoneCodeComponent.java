@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.google.gson.Gson;
@@ -16,15 +17,19 @@ import com.ycsoft.business.commons.abstracts.BaseBusiComponent;
 import com.ycsoft.business.dao.config.TBusiConfirmDao;
 import com.ycsoft.business.dao.core.common.CDoneCodeInfoDao;
 import com.ycsoft.business.dao.core.common.CDoneCodeUnpayDao;
+import com.ycsoft.business.dao.core.cust.CCustDao;
 import com.ycsoft.business.dto.core.cust.DoneCodeDto;
 import com.ycsoft.business.dto.core.cust.DoneCodeExtAttrDto;
 import com.ycsoft.business.dto.core.cust.DoneInfoDto;
 import com.ycsoft.business.dto.core.cust.ExtAttributeDto;
 import com.ycsoft.business.dto.core.fee.QueryFeeInfo;
+import com.ycsoft.commons.constants.DictKey;
 import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.exception.ComponentException;
+import com.ycsoft.commons.exception.ErrorCodeConstants;
 import com.ycsoft.commons.helper.CollectionHelper;
 import com.ycsoft.commons.helper.StringHelper;
+import com.ycsoft.commons.store.MemoryDict;
 import com.ycsoft.daos.core.JDBCException;
 import com.ycsoft.daos.core.Pager;
 
@@ -43,24 +48,40 @@ public class DoneCodeComponent extends BaseBusiComponent {
 	private CDoneCodeInfoDao cDoneCodeInfoDao;
 	private TBusiConfirmDao tBusiConfirmDao;
 	private CDoneCodeUnpayDao cDoneCodeUnpayDao;
+	@Autowired
+	private CCustDao cCustDao;
+	/**
+	 * 给业务增加用户锁，防止并发临界时数据不一致。
+	 * @param cust_id
+	 * @throws JDBCException 
+	 */
+	public boolean lockCust(String cust_id) throws JDBCException{
+		if( cCustDao.lockCust(cust_id)==null){
+			return false;
+		}else{
+			return true;
+		}
+	}
 	/**
 	 * 保存未支付业务
 	 * @param cust_id
 	 * @param done_code
 	 * @throws JDBCException
 	 */
-	public void saveDoneCodeUnPay(String cust_id,Integer done_code) throws JDBCException{
-		cDoneCodeUnpayDao.saveUnpay(cust_id, done_code);
-	}
-
-	/**
-	 * 查询一个客户的未支付信息明细
-	 * 要返回c_fee相关明细信息
-	 * @param cust_id
-	 */
-	public void queryDoneCodeUnPayDetail(String cust_id){
+	public void saveDoneCodeUnPay(String cust_id,Integer done_code,String optr_id) throws Exception{
+		//检查未支付业务，只能一个营业员操作。
+		List<CDoneCodeUnpay>  otherLocks=cDoneCodeUnpayDao.queryUnPayOtherLock(cust_id,optr_id);
+		if(otherLocks!=null&&otherLocks.size()>0){
+			
+			String login_name = MemoryDict.getDictName(DictKey.OPTR_LOGIN, otherLocks.get(0).getOptr_id());
+			String optr_name=MemoryDict.getDictName(DictKey.OPTR, otherLocks.get(0).getOptr_id());
+			throw new ComponentException(ErrorCodeConstants.UnPayLock,optr_name,login_name);
+		}else{
+			cDoneCodeUnpayDao.saveUnpay(cust_id, done_code,optr_id);
+		}
 		
 	}
+
 	/**
 	 * 
 	 * @param doneCode
@@ -76,8 +97,8 @@ public class DoneCodeComponent extends BaseBusiComponent {
 	 * @return
 	 * @throws JDBCException 
 	 */
-	public List<CDoneCodeUnpay> lockQueryUnPay(String cust_id) throws JDBCException{
-		return cDoneCodeUnpayDao.queryUnPayByLock(cust_id);
+	public List<CDoneCodeUnpay> queryUnPayList(String cust_id) throws JDBCException{
+		return cDoneCodeUnpayDao.queryUnPay(cust_id);
 	}
 	/**
 	 * 删除未支付业务信息

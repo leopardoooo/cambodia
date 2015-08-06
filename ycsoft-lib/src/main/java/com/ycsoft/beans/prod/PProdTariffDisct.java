@@ -27,7 +27,6 @@ public class PProdTariffDisct extends OptrBase implements Serializable {
 	private String disct_id;
 	private String disct_name;
 	private String tariff_id;
-	private Integer final_rent;
 	private Integer disct_rent;
 	private Integer min_pay;
 	private String status;
@@ -127,13 +126,7 @@ public class PProdTariffDisct extends OptrBase implements Serializable {
 	}
 
 	// final_rent getter and setter
-	public Integer getFinal_rent() {
-		return final_rent;
-	}
 
-	public void setFinal_rent(Integer final_rent) {
-		this.final_rent = final_rent;
-	}
 
 	// disct_rent getter and setter
 	public Integer getDisct_rent() {

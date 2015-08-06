@@ -1516,7 +1516,7 @@ public class UserProdService extends BaseBusiService implements IUserProdService
 					PProdTariffDisct disct = disctList.get(0);
 					ppDto.setDisct_id(disct.getDisct_id());
 					ppDto.setDisct_name(disct.getDisct_name());
-					ppDto.setFinal_rent(disct.getFinal_rent());
+					//ppDto.setFinal_rent(disct.getFinal_rent());
 					ppDto.setDisct_rent(disct.getDisct_rent());
 				}
 				list.add(ppDto);

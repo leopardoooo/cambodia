@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.ycsoft.beans.core.acct.CAcctAcctitem;
@@ -26,6 +27,7 @@ import com.ycsoft.beans.core.job.JProdNextTariffHis;
 import com.ycsoft.beans.core.job.JProdPreopen;
 import com.ycsoft.beans.core.job.JUserStop;
 import com.ycsoft.beans.core.job.JVodCommand;
+import com.ycsoft.beans.core.prod.CProdOrder;
 import com.ycsoft.beans.core.user.CUser;
 import com.ycsoft.beans.prod.PPackageProd;
 import com.ycsoft.beans.prod.PProd;
@@ -46,6 +48,7 @@ import com.ycsoft.business.dao.core.job.JProdNextTariffHisDao;
 import com.ycsoft.business.dao.core.job.JProdPreopenDao;
 import com.ycsoft.business.dao.core.job.JUserStopDao;
 import com.ycsoft.business.dao.core.job.JVodCommandDao;
+import com.ycsoft.business.dao.core.prod.CProdOrderDao;
 import com.ycsoft.business.dto.core.prod.CProdDto;
 import com.ycsoft.business.dto.core.prod.JBandCommandDto;
 import com.ycsoft.business.dto.core.prod.JCaCommandDto;
@@ -82,7 +85,8 @@ public class JobComponent  extends BaseBusiComponent {
 	private JBandCommandDao jBandCommandDao;
 	private JProdPreopenDao jProdPreopenDao;
 	private JCustAcctmodeCalDao jCustAcctmodeCalDao;
-	
+	@Autowired
+	private CProdOrderDao cProdOrderDao;
 	
 	/**
 	 * 创建计算信用度任务
@@ -359,6 +363,35 @@ public class JobComponent  extends BaseBusiComponent {
 		return this.createBusiCmdJob(doneCode, busiCmdType, custId, userId,
 				stbId, cardId, modemMac, prodSn, prodId, detailParams,
 				SystemConstants.PRIORITY_SSSQ);
+	}
+	
+	/**
+	 * 创建产品的授权任务
+	 * @param cProdOrder
+	 * @param prod_type
+	 * @param userMap
+	 * @param done_code
+	 * @param busi_cmd_type
+	 * @throws Exception
+	 */
+	public void createProdBusiCmdJob(CProdOrder cProdOrder,String prod_type,Map<String,CUser> userMap,Integer done_code,String busi_cmd_type,int priority) throws Exception{
+		
+		if(prod_type.equals(SystemConstants.PROD_TYPE_BASE)){
+			//单产品授权
+			CUser user=userMap.get(cProdOrder.getUser_id());
+			this.createBusiCmdJob(done_code,busi_cmd_type, cProdOrder.getCust_id(), cProdOrder.getUser_id()
+					, user.getStb_id(), user.getCard_id(), user.getModem_mac(),
+					cProdOrder.getOrder_sn(), cProdOrder.getProd_id(), null, priority);
+		}else{
+			//套餐的授权
+			//Map<String,CUser> userMap=CollectionHelper.converToMapSingle(cUserDao.queryUserByCustId(cProdOrder.getCust_id()), "user_id");
+			for(CProdOrder order:cProdOrderDao.queryPakDetailOrder(cProdOrder.getOrder_sn())){
+				CUser user=userMap.get(order.getUser_id());
+				this.createBusiCmdJob(done_code,busi_cmd_type, order.getCust_id(), order.getUser_id()
+						, user.getStb_id(), user.getCard_id(), user.getModem_mac(),
+						order.getOrder_sn(), order.getProd_id(), null, priority);
+			}
+		}
 	}
 	
 	public int createBusiCmdJob(Integer doneCode, String busiCmdType,

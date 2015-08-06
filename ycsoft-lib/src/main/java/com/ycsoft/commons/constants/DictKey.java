@@ -36,6 +36,8 @@ public enum DictKey {
 	/**OSD合法词组**/
 	OSD_PHRASE,
 	/**工单类型*/
-	TASK_DETAIL_TYPE
+	TASK_DETAIL_TYPE,
+	/**汇率*/
+	EXCHANGE
 
 }

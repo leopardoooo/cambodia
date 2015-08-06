@@ -11,20 +11,9 @@ import com.ycsoft.daos.core.JDBCException;
 
 @Component
 public class CDoneCodeUnpayDao extends BaseEntityDao<CDoneCodeUnpay> {
-
-	/**
-	 * 【加锁】查询一个客户未支付的业务信息
-	 * @param cust_id
-	 * @return
-	 * @throws JDBCException 
-	 */
-	public List<CDoneCodeUnpay> queryUnPayByLock(String cust_id) throws JDBCException{
-		String sql="select * from c_done_code_unpay where cust_id=? for update";
-		return this.createQuery(sql, cust_id).list();
-	}
 	
 	/**
-	 * 【加锁】查询一个客户未支付的业务信息
+	 * 查询一个客户未支付的业务信息
 	 * @param cust_id
 	 * @return
 	 * @throws JDBCException 
@@ -33,6 +22,17 @@ public class CDoneCodeUnpayDao extends BaseEntityDao<CDoneCodeUnpay> {
 		String sql="select * from c_done_code_unpay where cust_id=? ";
 		return this.createQuery(sql, cust_id).list();
 	}
+	/**
+	 * 查询非当前营业员的未支付业务
+	 * @param cust_id
+	 * @param optr_id
+	 * @return
+	 * @throws JDBCException 
+	 */
+	public List<CDoneCodeUnpay> queryUnPayOtherLock(String cust_id,String optr_id) throws JDBCException{
+		String sql="select * from c_done_code_unpay where cust_id=? and optr_id<>?";
+		return this.createQuery(sql, cust_id,optr_id).list();
+	}
 	
 	/**
 	 * 保存为支付业务信息
@@ -40,7 +40,7 @@ public class CDoneCodeUnpayDao extends BaseEntityDao<CDoneCodeUnpay> {
 	 * @param done_code
 	 * @throws JDBCException
 	 */
-	public void saveUnpay(String cust_id,Integer done_code) throws JDBCException{
+	public void saveUnpay(String cust_id,Integer done_code,String optr_id) throws JDBCException{
 		CDoneCodeUnpay unpay=new CDoneCodeUnpay();
 		unpay.setDone_code(done_code);
 		unpay.setCust_id(cust_id);

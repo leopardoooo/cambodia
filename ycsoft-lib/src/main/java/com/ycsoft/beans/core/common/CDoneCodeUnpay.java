@@ -1,13 +1,23 @@
 package com.ycsoft.beans.core.common;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import com.ycsoft.daos.config.POJO;
 @POJO(tn = "C_DONE_CODE_UNPAY",  pk = "DONE_CODE")
-public class CDoneCodeUnpay {
+public class CDoneCodeUnpay implements Serializable {
 	private Integer done_code;
 	private String cust_id;
 	private Date done_date;
+	private String optr_id;
+	
+
+	public String getOptr_id() {
+		return optr_id;
+	}
+	public void setOptr_id(String optr_id) {
+		this.optr_id = optr_id;
+	}
 	public Integer getDone_code() {
 		return done_code;
 	}

@@ -86,6 +86,48 @@ public class PayAction extends BaseBusiAction{
 	
 	private String status;
 	
+	private String cust_id;
+	
+	
+	public void setCust_id(String cust_id) {
+		this.cust_id = cust_id;
+	}
+	/**
+	 * 查询未支付业务总额
+	 * Map<String,Integer>: {"FEE":"未支付总额","CNT":"未支付业务数"}
+	 * 当未支付业务数>0时，未支付总额可能=0。
+	 * @return
+	 * @throws Exception
+	 */
+	public String queryUnPaySum() throws Exception{
+		getRoot().setOthers(payService.queryUnPaySum(cust_id));
+		return JSON_OTHER;
+	}
+	/**
+	 * 查询待支付的费用清单和当前汇率
+	 * 显示 费用编号 fee_sn,业务名称busi_name,费用名称fee_text,数量(当count不为空，显示count否则显示begin_date(yyyymmdd)+“-”+prod_invalid_date),
+	 * 操作员 optr_name,操作时间create_time,金额 real_pay,订单号 prod_sn,X按钮(当prod_sn不为空时显示)
+	 * @return
+	 * @throws Exception
+	 */
+	public String queryUnPayDetail() throws Exception{
+		//费用信息
+		getRoot().setRecords(payService.queryUnPayDetail(cust_id));
+		//汇率
+		getRoot().setSimpleObj(payService.queryExchage());
+		return JSON;
+	}
+	/**
+	 * 保存支付
+	 * @return
+	 * @throws Exception
+	 */
+	public String savePayNew() throws Exception{
+		payService.savePay(cust_id);
+		return JSON_SUCCESS;
+	}
+
+	
 	/**
 	 * 保存确认单打印
 	 * @return

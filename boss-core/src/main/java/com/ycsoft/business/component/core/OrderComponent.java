@@ -56,8 +56,57 @@ public class OrderComponent extends BaseBusiComponent {
 	private CProdOrderHisDao cProdOrderHisDao;
 	@Autowired
 	private CProdOrderTransfeeDao cProdOrderTransfeeDao;
-	
-	
+	/**
+	 * 查询一个订单相关的退订清单
+	 * 套餐=客户所有未失效套餐
+	 * 宽带=相同用户所有宽带产品（含套餐子宽带产品）
+	 * 非宽带单产品=相同用户相同单产品（含套餐子产品)
+	 * @param cancelOrder
+	 * @param prodConfig
+	 * @return
+	 * @throws Exception 
+	 */
+	public List<CProdOrder> queryCancelOrder(CProdOrder cancelOrder,PProd prodConfig) throws Exception{
+		List<CProdOrder> list=new ArrayList<>();
+		Date today=DateHelper.today();
+		if(!prodConfig.getProd_type().equals(SystemConstants.PROD_TYPE_BASE)){
+			//套餐的情况
+			for(CProdOrder order: cProdOrderDao.queryPackageOrderByCustId(cancelOrder.getCust_id())){
+				if(order.getExp_date().after(today)||order.getExp_date().equals(today)){
+					//结束日>=今天
+					list.add(order);
+				}
+			}
+		}else {
+			//单产品
+			for(CProdOrder order: cProdOrderDao.queryProdOrderByUserId(cancelOrder.getUser_id())){
+				if((order.getExp_date().after(today)||order.getExp_date().equals(today))
+						&&(prodConfig.getServ_id().equals(SystemConstants.PROD_SERV_ID_BAND)||prodConfig.getProd_id().equals(order.getProd_id()))){
+					list.add(order);
+				}
+			}
+		}
+		return list;
+	}
+	/**
+	 * 恢复被覆盖的订单
+	 * @param recoverDoneCode
+	 * @throws JDBCException 
+	 */
+	public void recoverTransCancelOrder(Integer recoverDoneCode,String cust_id) throws JDBCException{
+		
+		List<CProdOrder> list=cProdOrderHisDao.queryCProdOrderByDelete(recoverDoneCode, cust_id);
+		if(list!=null&&list.size()>0){
+			cProdOrderDao.save(list.toArray(new CProdOrder[list.size()]));
+			String orderSns[]=new String[list.size()];
+			for(int i=0;i<list.size();i++){
+				orderSns[i]=list.get(i).getOrder_sn();
+			}
+			cProdOrderHisDao.remove(orderSns);
+			cProdOrderTransfeeDao.deleteTransfeeChange(recoverDoneCode, cust_id);
+		}
+		
+	}
 	/**
 	 * 查询被覆盖取消的订单(套餐订购和升级的情况)
 	 * @param orderProd
@@ -192,11 +241,8 @@ public class OrderComponent extends BaseBusiComponent {
 		prod.setStatus_date(new Date());
 		prod.setBill_fee(0);
 		prod.setActive_fee(orderProd.getPay_fee()+orderProd.getTransfer_fee());
-		prod.setRent_fee(0);
 		prod.setEff_date(orderProd.getEff_date());
 		prod.setExp_date(orderProd.getExp_date());
-		prod.setLast_bill_date(orderProd.getEff_date());
-		prod.setNext_bill_date(orderProd.getEff_date());
 		prod.setDone_code(done_code);
 		prod.setOptr_id(optr_id);
 		prod.setArea_id(area_id);
@@ -271,12 +317,21 @@ public class OrderComponent extends BaseBusiComponent {
 		return cProdOrder.getOrder_sn();
 	}
 	
+	/**
+	 * 覆盖退订产品
+	 * 未支付的产品不算转移支付余额
+	 * @param cProdOrder
+	 * @param cancelList
+	 * @param cancelDate
+	 * @return
+	 * @throws Exception
+	 */
 	private int saveTransCancelProd(CProdOrder cProdOrder,List<CProdOrder> cancelList,Date cancelDate) throws Exception{
 		int transFee=0;
 		List<CProdOrderTransfee>  transFeeList=new ArrayList<>();
 		for(CProdOrder cancelOrder:cancelList){
 			CProdOrderTransfee trans=new CProdOrderTransfee();
-			transFeeList.add(trans);
+			
 			trans.setDone_code(cProdOrder.getDone_code());
 			trans.setCust_id(cProdOrder.getCust_id());
 			trans.setOrder_sn(cProdOrder.getOrder_sn());
@@ -284,9 +339,14 @@ public class OrderComponent extends BaseBusiComponent {
 			trans.setFrom_order_sn(cancelOrder.getOrder_sn());
 			//TODO 有充值卡业务时要修改
 			trans.setFee_type(SystemConstants.ACCT_FEETYPE_CASH);
-			int fee=this.getTransCancelFee(cancelDate, cancelOrder);
-			trans.setBalance(fee);
-			transFee=transFee+fee;
+			if(cProdOrder.getIs_pay().equals(SystemConstants.BOOLEAN_TRUE)){
+				int fee=this.getTransCancelFee(cancelDate, cancelOrder);
+				trans.setBalance(fee);
+				transFee=transFee+fee;
+				transFeeList.add(trans);
+				
+				cancelOrder.setActive_fee(fee);
+			}
 			//退订订购记录
 			this.saveCancelProdOrder(cancelOrder,cProdOrder.getDone_code());
 		}
@@ -325,7 +385,7 @@ public class OrderComponent extends BaseBusiComponent {
 				detailSnList.add(pakdetail.getOrder_sn());
 			}
 			cProdOrderHisDao.save(pakDetailList.toArray(new CProdOrderHis[pakDetailList.size()]));
-			cProdOrderDao.remove(detailSnList.toArray());
+			cProdOrderDao.remove(detailSnList.toArray(new String[detailSnList.size()]));
 		}
 		
 		//TODO 财务账单处理

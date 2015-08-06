@@ -28,6 +28,7 @@ import com.ycsoft.beans.core.acct.CGeneralAcctDedail;
 import com.ycsoft.beans.core.acct.CGeneralCredential;
 import com.ycsoft.beans.core.bank.CBankPay;
 import com.ycsoft.beans.core.bill.BillDto;
+import com.ycsoft.beans.core.common.CDoneCodeUnpay;
 import com.ycsoft.beans.core.cust.CCust;
 import com.ycsoft.beans.core.fee.CFee;
 import com.ycsoft.beans.core.fee.CFeeAcct;
@@ -89,6 +90,7 @@ import com.ycsoft.commons.constants.DataRight;
 import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.exception.ComponentException;
+import com.ycsoft.commons.exception.ServicesException;
 import com.ycsoft.commons.helper.CollectionHelper;
 import com.ycsoft.commons.helper.DateHelper;
 import com.ycsoft.commons.helper.StringHelper;
@@ -152,15 +154,31 @@ public class FeeComponent extends BaseBusiComponent {
 	 * @return
 	 * @throws Exception
 	 */
-	public Integer queryUnPaySum(String cust_id) throws Exception{
+	public Map<String,Integer> queryUnPaySum(String cust_id) throws Exception{
 		return cFeeDao.queryUnPaySum(cust_id);
 	}
+	
 	/**
-	 * 保存支付
+	 * 缴费记录更新支付信息
+	 * @param unpayList
+	 * @param pay
+	 * @throws JDBCException
 	 */
-	public void savePay(){
-		//保存支付记录c_fee_pay和detail
-		//更新缴费信息update c_fee set status='pay' ,pay_type=支付方式
+	public void updateCFeeToPay(List<CDoneCodeUnpay> unpayList,CFeePayDto pay) throws JDBCException{
+		for(CDoneCodeUnpay un:unpayList){
+			cFeeDao.updateCFeeToPay(un, pay);
+		}
+	}
+	/**
+	 * 取消未支付的缴费记录
+	 * @param fee_sn
+	 * @throws JDBCException
+	 */
+	public void deleteUnPayCFee(String fee_sn) throws JDBCException{
+		cFeeDao.remove(fee_sn);
+		cFeeBusiDao.remove(fee_sn);
+		cFeeDeviceDao.remove(fee_sn);
+		cFeeAcctDao.remove(fee_sn);
 	}
 	
 	public CVoucher queryVoucherById(String voucherId) throws Exception {
@@ -667,6 +685,31 @@ public class FeeComponent extends BaseBusiComponent {
 			return;
 		this.savePayFee(pay, cFeePayDao.queryFeeSn(doneCode, getOptr()
 				.getCounty_id()),custId, doneCode);
+	}
+	
+	/**
+	 * 柬埔寨保存支付信息
+	 * @param pay
+	 * @param custId
+	 * @param doneCode
+	 * @return
+	 * @throws Exception
+	 */
+	public CFeePayDto savePayFeeNew(CFeePayDto pay,String custId,Integer doneCode) throws Exception{
+		setBaseInfo(pay);
+		pay.setPay_sn(gPaySn());
+		pay.setCreate_time(new Date());
+		pay.setIs_valid(BOOLEAN_TRUE);
+		pay.setDone_code(doneCode);
+		pay.setCust_id(custId);
+		if ("M".equals(pay.getInvoice_mode())) {
+			pay.setInvoice_id("xs" + doneCode);
+			pay.setInvoice_code("xs" + doneCode);
+			pay.setInvoice_book_id("xs" + doneCode);
+		}
+		// 保存支付信息
+		cFeePayDao.save(pay);
+		return pay;
 	}
 	/**
 	 * 保存支付信息及明细
