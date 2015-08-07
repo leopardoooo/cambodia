@@ -13,7 +13,7 @@ CancelProdGrid = Ext.extend(Ext.grid.GridPanel,{
 		this.busiCode = App.getData().currentResource.busicode;
 		this.custId = App.getData().custFullInfo.cust.cust_id;
 		this.parent = parent;
-		// 基本产品
+		// 选中的产品
 		this.selectProdStore = new Ext.data.JsonStore({
 			url: Constant.ROOT_PATH + '/core/x/ProdOrder!queryCancelOrderAndFee.action' ,
 			fields: ["tariff_name","disct_name","prod_type","prod_name","prod_type_text","serv_id",
