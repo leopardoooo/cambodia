@@ -35,7 +35,9 @@ import com.ycsoft.commons.constants.BusiCodeConstants;
 import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.exception.ComponentException;
+import com.ycsoft.commons.exception.ErrorCode;
 import com.ycsoft.commons.exception.ServicesException;
+import com.ycsoft.commons.helper.CollectionHelper;
 import com.ycsoft.commons.helper.DateHelper;
 import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.daos.core.JDBCException;
@@ -543,14 +545,36 @@ public class OrderComponent extends BaseBusiComponent {
 	 */
 	private void savePackageUserProd(CProdOrder cProdOrder,OrderProd orderProd) throws Exception{
 		List<CProdOrder> orderList=new ArrayList<>();
+		Map<String,CUser> userMap=CollectionHelper.converToMapSingle(cUserDao.queryUserByCustId(cProdOrder.getCust_id()),"user_id");
+		
 		for(PackageGroupUser pgu: orderProd.getGroupSelected()){
 			if(pgu.getUserSelectList()==null){
 				continue;
 			}
 			PPackageProd pakprod= pPackageProdDao.findByKey(pgu.getPackage_group_id());
+			if(!pakprod.getPackage_id().equals(cProdOrder.getProd_id())){
+				throw new ServicesException(ErrorCode.OrderDatePackageConfig);
+			}
+			if(pgu.getUserSelectList().size()>pakprod.getMax_user_cnt()){
+				throw new ServicesException(ErrorCode.OrderDatePackageUserLimit);
+			}
 			for(String prod_id:pakprod.getProd_list().split(",")){
 				if(StringHelper.isNotEmpty(prod_id)){
 					for(String user_id: pgu.getUserSelectList()){
+						CUser user=userMap.get(user_id);
+						if(user==null){
+							//用户存在检查
+							throw new ServicesException(ErrorCode.OrderDateUserNotCust,user_id);
+						}
+						if(!user.getUser_type().equals(pakprod.getUser_type())){
+							//用户适用检查
+							throw new ServicesException(ErrorCode.OrderDateUserNotCust,user_id);
+						}
+						if(StringHelper.isNotEmpty(pakprod.getTerminal_type())
+								&&pakprod.getTerminal_type().equals(user.getTerminal_type())){
+							//用户适用检查
+							throw new ServicesException(ErrorCode.OrderDateUserNotCust,user_id);
+						}
 						CProdOrder order=new CProdOrder();
 						//copy
 						BeanHelper.copyProperties(order, cProdOrder);
