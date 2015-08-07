@@ -4,6 +4,8 @@
  
 package com.ycsoft.business.dao.core.job; 
 
+import java.util.List;
+
 import org.springframework.stereotype.Component;
 
 import com.ycsoft.beans.core.job.JVodCommand;
@@ -49,5 +51,10 @@ public class JVodCommandDao extends BaseEntityDao<JVodCommand> {
 					" from j_vod_command_his jvch , busi.c_user cu"+
 					" where jvch.user_id = cu.user_id and cu.card_id=?";
 		return createQuery(JVodCommandDto.class,sql, cardId,cardId).setStart(start).setLimit(limit).page();
+	}
+	
+	public List<JVodCommand> queryCmd() throws JDBCException {
+		String sql = "select * from j_vod_command where is_send='F' and rownum<500 order by transnum";
+		return this.createQuery(sql).list();
 	}
 }

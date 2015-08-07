@@ -1,15 +1,13 @@
 package com.ycsoft.boss.remoting.ott;
 
-import java.util.Date;
-
 import com.ycsoft.commons.helper.DateHelper;
 
 public class Auth {
 	private String user_id;
 	private String product_id;
 	private String product_fee_id;
-	private Date begin_time;
-	private Date end_time;
+	private String begin_time;
+	private String end_time;
 	private String state;
 	private String[] ott_data;
 	public String getUser_id() {
@@ -30,16 +28,17 @@ public class Auth {
 	public void setProduct_fee_id(String product_fee_id) {
 		this.product_fee_id = product_fee_id;
 	}
-	public Date getBegin_time() {
+	
+	public String getBegin_time() {
 		return begin_time;
 	}
-	public void setBegin_time(Date begin_time) {
+	public void setBegin_time(String begin_time) {
 		this.begin_time = begin_time;
 	}
-	public Date getEnd_time() {
+	public String getEnd_time() {
 		return end_time;
 	}
-	public void setEnd_time(Date end_time) {
+	public void setEnd_time(String end_time) {
 		this.end_time = end_time;
 	}
 	public String getState() {
@@ -61,11 +60,8 @@ public class Auth {
 		this.product_fee_id = "";
 		this.state = "0";
 		
-		this.begin_time = new Date();
-		try {
-			this.end_time = DateHelper.parseDate("2050-06-19 08:59:59", DateHelper.FORMAT_TIME);
-		} catch (Exception e) {
-		}
+		this.begin_time = DateHelper.formatNowTime();
+		this.end_time ="2050-06-19 08:59:59";
 		
 		this.ott_data = new String[0];
 	}
