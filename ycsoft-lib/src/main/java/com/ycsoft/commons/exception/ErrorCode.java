@@ -15,7 +15,7 @@ public enum ErrorCode {
 	UnPayOrderCancelBefor("请先取消订单号=%s的订单费用"),
 	UnPayOrderCancelUnsubscribe("Error:不能取消退订费用"),
 	OrderNotExists("Error:订单不存在"),
-	OrderDateException("Error:订单数据异常，请联系厂商！");
+	OrderDateException("Error:订单数据异常，请联系厂商!(order_sn=%s)");
 	;
 
 	private ErrorCode(String desc){

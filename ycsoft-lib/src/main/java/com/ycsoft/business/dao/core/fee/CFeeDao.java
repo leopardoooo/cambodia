@@ -68,7 +68,7 @@ public class CFeeDao extends BaseEntityDao<CFee> {
 		this.executeUpdate(sql, 
 				StatusConstants.PAY,pay.getPay_type(),
 				pay.getInvoice_mode(),pay.getInvoice_id(),pay.getInvoice_book_id(),pay.getInvoice_code(),
-				pay.getPay_sn(),pay.getAcct_date(),pay.getOptr_id(),
+				pay.getPay_sn(),pay.getAcct_date(),pay.getBusi_optr_id(),
 				(pay.getInvoice_mode().equals(SystemConstants.INVOICE_MODE_AUTO)?SystemConstants.BOOLEAN_FALSE:SystemConstants.BOOLEAN_TRUE),
 				unpay.getDone_code(),unpay.getCust_id());
 	}

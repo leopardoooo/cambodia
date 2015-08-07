@@ -205,7 +205,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 			    	user=cUserDao.findByKey(order.getUser_id());
 			    	userMap.put(order.getUser_id(), user);
 			    	if(user==null){
-			    		throw new ServicesException(ErrorCode.OrderDateException);
+			    		throw new ServicesException(ErrorCode.OrderDateException,order.getOrder_sn());
 			    	}
 			    }
 			    if(user.getUser_type().equals(SystemConstants.USER_TYPE_BAND)){
@@ -856,7 +856,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		orderComponent.saveCProdOrder(cProdOrder,orderProd,busi_code);
 		
 		//已支付且订单状态是正常的要发加授权指令
-		this.atvProd(cProdOrder, prodConfig);
+		this.atvProd(cProdOrder, prodConfig,doneCode);
 		
 		//费用信息
 		if(orderProd.getPay_fee()>0){
@@ -874,20 +874,34 @@ public class OrderService extends BaseBusiService implements IOrderService{
 	 * @param prodConfig
 	 * @throws JDBCException
 	 */
-	private void atvProd(CProdOrder cProdOrder,PProd prodConfig) throws Exception{
+	private void atvProd(CProdOrder cProdOrder,PProd prodConfig,Integer doneCode) throws Exception{
 		if(cProdOrder.getIs_pay().equals(SystemConstants.BOOLEAN_TRUE)
 				&&cProdOrder.getStatus().equals(StatusConstants.ACTIVE)){
-			Map<String,CUser> userMap=null;
-			if(prodConfig.getProd_type().equals(SystemConstants.PROD_TYPE_BASE)){
-				userMap=new HashMap<String,CUser>();
-				userMap.put(cProdOrder.getUser_id(), cUserDao.findByKey(cProdOrder.getUser_id()));
-			}else{
-				userMap=CollectionHelper.converToMapSingle(cUserDao.queryUserByCustId(cProdOrder.getCust_id()), "user_id");
-			}
-			//TODO 使用新的授权类型
-			//authComponent.sendAuth(user, orderList, BusiCmdConstants.ACCTIVATE_PROD, cProdOrder.getDone_code());
 			
-			jobComponent.createProdBusiCmdJob(cProdOrder, prodConfig.getProd_type(), userMap, cProdOrder.getDone_code(), BusiCmdConstants.ACCTIVATE_PROD, SystemConstants.PRIORITY_SSSQ);
+			if(prodConfig.getProd_type().equals(SystemConstants.PROD_TYPE_BASE)){
+				List<CProdOrder> list=new ArrayList<>();
+				list.add(cProdOrder);
+				authComponent.sendAuth(cUserDao.findByKey(cProdOrder.getUser_id()), list, BusiCmdConstants.ACCTIVATE_PROD, doneCode);
+			}else{
+				//套餐的授权
+				Map<String,CUser> userMap=CollectionHelper.converToMapSingle(cUserDao.queryUserByCustId(cProdOrder.getCust_id()), "user_id");
+				Map<CUser,List<CProdOrder>> atvMap=new HashMap<>();
+				for(CProdOrder order: cProdOrderDao.queryPakDetailOrder(cProdOrder.getOrder_sn())){
+					CUser user=userMap.get(order.getUser_id());
+					if(user==null){
+						throw new ServicesException(ErrorCode.OrderDateException,order.getOrder_sn());
+					}
+					List<CProdOrder> list=atvMap.get(user);
+					if(list==null){
+						list=new ArrayList<>();
+						atvMap.put(user, list);
+					}
+					list.add(order);
+				}
+				for(CUser user:atvMap.keySet()){
+					authComponent.sendAuth(user, atvMap.get(user),  BusiCmdConstants.ACCTIVATE_PROD, doneCode);
+				}
+			}
 		}
 	}
 	/**
@@ -905,7 +919,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 			    	user=cUserDao.findByKey(pstorder.getUser_id());
 			    	userMap.put(pstorder.getUser_id(), user);
 			    	if(user==null){
-			    		throw new ServicesException(ErrorCode.OrderDateException);
+			    		throw new ServicesException(ErrorCode.OrderDateException,pstorder.getOrder_sn());
 			    	}
 			    }
 			    List<CProdOrder> pstlist=pstProdMap.get(user);
