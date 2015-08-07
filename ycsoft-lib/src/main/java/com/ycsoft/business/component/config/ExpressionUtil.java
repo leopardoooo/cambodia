@@ -65,7 +65,6 @@ public class ExpressionUtil {
 	private static String[] datefunname= {"TODAY","THISYEAR","THISMONTH"};
     
 	//不再使用
-	@Deprecated
 	//public ExpressionUtil(){}
 	
 	public ExpressionUtil(BeanFactory beanFactory) {

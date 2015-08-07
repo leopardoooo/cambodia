@@ -1,7 +1,10 @@
 package com.ycsoft.web.action.core;
 
+import java.util.List;
+
 import org.springframework.stereotype.Controller;
 
+import com.ycsoft.beans.core.prod.CProdOrderDto;
 import com.ycsoft.business.dto.core.prod.OrderProd;
 import com.ycsoft.business.service.IOrderService;
 import com.ycsoft.commons.helper.JsonHelper;
@@ -19,6 +22,37 @@ public class ProdOrderAction extends BaseBusiAction {
 	private String last_order_sn;
 	private String prod_id;
 	private String orderProd;
+	
+	private Integer cancelFee;
+	private String[] orderSns;
+	private String order_sn;
+	/**
+	 * 退订界面数据初始化查询
+	 * @return
+	 * @throws Exception 
+	 */
+	public String queryCancelOrderAndFee() throws Exception{
+		getRoot().setRecords(orderService.queryCancelFeeByCancelOrder(busi_code, cust_id, order_sn));
+		return JSON_RECORDS;
+	}
+	/**
+	 * 退订产品(高级和普通退订)
+	 * @return
+	 * @throws Exception 
+	 */
+	public String cancelProd() throws Exception{
+		orderService.saveCancelProd(orderSns, cancelFee);
+		return JSON_SUCCESS;
+	}
+	/**
+	 * 取消当天已支付订单
+	 * @return
+	 * @throws Exception
+	 */
+	public String cancelTodayOrder() throws Exception{
+		orderService.saveCancelTodayOrder(order_sn, cancelFee);
+		return JSON_SUCCESS;
+	}
 	
 	public String loadProdList() throws Exception{
 		getRoot().setSimpleObj(orderService.queryOrderableProd(busi_code,cust_id,user_id, filter_order_sn));
@@ -108,6 +142,24 @@ public class ProdOrderAction extends BaseBusiAction {
 
 	public void setOrderProd(String orderProd) {
 		this.orderProd = orderProd;
+	}
+	public Integer getCancelFee() {
+		return cancelFee;
+	}
+	public void setCancelFee(Integer cancelFee) {
+		this.cancelFee = cancelFee;
+	}
+	public String[] getOrderSns() {
+		return orderSns;
+	}
+	public void setOrderSns(String[] orderSns) {
+		this.orderSns = orderSns;
+	}
+	public String getOrder_sn() {
+		return order_sn;
+	}
+	public void setOrder_sn(String order_sn) {
+		this.order_sn = order_sn;
 	}
 	
 }

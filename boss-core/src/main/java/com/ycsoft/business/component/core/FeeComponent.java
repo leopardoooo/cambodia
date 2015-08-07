@@ -160,6 +160,7 @@ public class FeeComponent extends BaseBusiComponent {
 	
 	/**
 	 * 缴费记录更新支付信息
+	 * 状态，发票，打印，支付方式，等等
 	 * @param unpayList
 	 * @param pay
 	 * @throws JDBCException

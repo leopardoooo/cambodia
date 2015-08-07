@@ -53,6 +53,7 @@ import com.ycsoft.commons.constants.BusiCodeConstants;
 import com.ycsoft.commons.constants.DictKey;
 import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.constants.SystemConstants;
+import com.ycsoft.commons.exception.ErrorCode;
 import com.ycsoft.commons.exception.ServicesException;
 import com.ycsoft.commons.helper.CollectionHelper;
 import com.ycsoft.commons.helper.DateHelper;
@@ -85,7 +86,7 @@ public class PayService extends BaseBusiService implements IPayService {
 	public Integer queryExchage() throws Exception{
 		Integer exchange= tExchangeDao.getExchange();
 		if(exchange==null||exchange<=0){
-			throw new ServicesException("系统未正确配置汇率，请联系管理员");
+			throw new ServicesException(ErrorCode.ExchangeConfigError);
 		}
 		return exchange;
 	}
@@ -190,31 +191,37 @@ public class PayService extends BaseBusiService implements IPayService {
 	 */
 	private void updateOrder(String cust_id,Integer done_code) throws Exception{
 		
-		List<CProdOrder> orderList=cProdOrderDao.queryUnPayOrder(cust_id);
 		Set<Integer> doneCodeSet=new HashSet<Integer>();
 		Map<String,CUser> userMap=userComponent.queryUserMap(cust_id);
-		Map<String,PProd> prodMap=new HashMap<String,PProd>();
-		for(CProdOrder order:orderList){ 
-			//订单状态是正常的才要授权
-			if(order.getStatus().equals(StatusConstants.ACTIVE)){
-				PProd config=prodMap.get(order.getProd_id());
-				if(config==null){
-					config=pProdDao.findByKey(order.getProd_id());
-					prodMap.put(config.getProd_id(), config);
-				}
-				if(userMap==null){
-					userMap=userComponent.queryUserMap(cust_id);
-				}
-				//授权
-				jobComponent.createProdBusiCmdJob(order, config.getProd_type(), userMap, done_code, BusiCmdConstants.ACCTIVATE_PROD, SystemConstants.PRIORITY_SSSQ);
-			}
+		
+		Map<CUser,List<CProdOrder>> atvMap=new HashMap<>();
+		//查询待支付的订单(含套餐和套餐子产品)
+		for(CProdOrder order:cProdOrderDao.queryUnPayOrder(cust_id)){ 
 			//有订单的未支付业务流水号
 			doneCodeSet.add(order.getDone_code());
+			//订单状态是正常的才要授权
+			if(StringHelper.isNotEmpty(order.getUser_id())
+					&&order.getStatus().equals(StatusConstants.ACTIVE)){
+				CUser user=userMap.get(order.getUser_id());
+				if(user==null){
+					throw new ServicesException(ErrorCode.OrderDateException,order.getOrder_sn());
+				}
+				List<CProdOrder> list=atvMap.get(user);
+				if(list==null){
+					list=new ArrayList<>();
+					atvMap.put(user, list);
+				}
+				list.add(order);
+			}
 		}
 		//更改订单支付属性
 		Iterator<Integer> it= doneCodeSet.iterator();
 		while(it.hasNext()){
 			cProdOrderDao.updateOrderToPay(it.next(), cust_id);
+		}
+		//发授权
+		for(CUser user:atvMap.keySet()){
+			authComponent.sendAuth(user, atvMap.get(user),  BusiCmdConstants.ACCTIVATE_PROD, done_code);
 		}
 		
 	}

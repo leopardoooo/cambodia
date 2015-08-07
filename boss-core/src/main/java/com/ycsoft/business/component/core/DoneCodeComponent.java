@@ -26,7 +26,7 @@ import com.ycsoft.business.dto.core.fee.QueryFeeInfo;
 import com.ycsoft.commons.constants.DictKey;
 import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.exception.ComponentException;
-import com.ycsoft.commons.exception.ErrorCodeConstants;
+import com.ycsoft.commons.exception.ErrorCode;
 import com.ycsoft.commons.helper.CollectionHelper;
 import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.commons.store.MemoryDict;
@@ -75,7 +75,7 @@ public class DoneCodeComponent extends BaseBusiComponent {
 			
 			String login_name = MemoryDict.getDictName(DictKey.OPTR_LOGIN, otherLocks.get(0).getOptr_id());
 			String optr_name=MemoryDict.getDictName(DictKey.OPTR, otherLocks.get(0).getOptr_id());
-			throw new ComponentException(ErrorCodeConstants.UnPayLock,optr_name,login_name);
+			throw new ComponentException(ErrorCode.UnPayLock,optr_name,login_name);
 		}else{
 			cDoneCodeUnpayDao.saveUnpay(cust_id, done_code,optr_id);
 		}

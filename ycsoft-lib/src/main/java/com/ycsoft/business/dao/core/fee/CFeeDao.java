@@ -68,7 +68,7 @@ public class CFeeDao extends BaseEntityDao<CFee> {
 		this.executeUpdate(sql, 
 				StatusConstants.PAY,pay.getPay_type(),
 				pay.getInvoice_mode(),pay.getInvoice_id(),pay.getInvoice_book_id(),pay.getInvoice_code(),
-				pay.getPay_sn(),pay.getAcct_date(),pay.getOptr_id(),
+				pay.getPay_sn(),pay.getAcct_date(),pay.getBusi_optr_id(),
 				(pay.getInvoice_mode().equals(SystemConstants.INVOICE_MODE_AUTO)?SystemConstants.BOOLEAN_FALSE:SystemConstants.BOOLEAN_TRUE),
 				unpay.getDone_code(),unpay.getCust_id());
 	}
@@ -80,7 +80,7 @@ public class CFeeDao extends BaseEntityDao<CFee> {
 	 */
 	public Map<String,Integer> queryUnPaySum(String cust_id,String optr_id) throws JDBCException{
 		String sql="select nvl(sum(cf.real_pay),0) fee,count(1) cnt from c_fee cf,c_done_code_unpay un where cf.create_done_code=un.done_code and un.cust_id=? and un.optr_id=? ";
-		List<Object[]> list=this.createSQLQuery(sql, cust_id).list();
+		List<Object[]> list=this.createSQLQuery(sql, cust_id,optr_id).list();
 		Map<String,Integer> map=new HashMap<>();
 		if(list==null||list.size()==0){
 			map.put("FEE", 0);

@@ -7,6 +7,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import com.google.gson.JsonObject;
 import com.ycsoft.beans.core.job.BusiCmdParam;
 import com.ycsoft.beans.core.job.JBandCommand;
@@ -27,12 +30,19 @@ import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.helper.DateHelper;
 import com.ycsoft.daos.core.JDBCException;
 
+@Component
 public class AuthComponent extends BaseComponent{
+	@Autowired
 	private JCaCommandDao jCaCommandDao;
+	@Autowired
 	private JVodCommandDao jVodCommandDao;
+	@Autowired
 	private JBandCommandDao jBandCommandDao;
+	@Autowired
 	private PProdStaticResDao pProdStaticResDao;
+	@Autowired
 	private CUserDao cUserDao;
+	
 	public void sendAuth(CUser user,List<CProdOrder> orderList,String authCmdType,Integer doneCode) throws Exception{
 	
 			if (user.getUser_type().equals(SystemConstants.USER_TYPE_OTT) || 

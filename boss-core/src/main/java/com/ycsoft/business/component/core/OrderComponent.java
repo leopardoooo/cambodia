@@ -7,15 +7,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.net.ssl.SSLEngineResult.Status;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.ycsoft.beans.core.prod.CProd;
 import com.ycsoft.beans.core.prod.CProdOrder;
 import com.ycsoft.beans.core.prod.CProdOrderDto;
 import com.ycsoft.beans.core.prod.CProdOrderHis;
 import com.ycsoft.beans.core.prod.CProdOrderTransfee;
 import com.ycsoft.beans.core.prod.CProdPropChange;
+import com.ycsoft.beans.core.prod.CProdStatusChange;
 import com.ycsoft.beans.core.user.CUser;
 import com.ycsoft.beans.prod.PPackageProd;
 import com.ycsoft.beans.prod.PProd;
@@ -23,6 +25,7 @@ import com.ycsoft.business.commons.abstracts.BaseBusiComponent;
 import com.ycsoft.business.dao.core.prod.CProdOrderDao;
 import com.ycsoft.business.dao.core.prod.CProdOrderHisDao;
 import com.ycsoft.business.dao.core.prod.CProdOrderTransfeeDao;
+import com.ycsoft.business.dao.core.prod.CProdStatusChangeDao;
 import com.ycsoft.business.dao.core.user.CUserDao;
 import com.ycsoft.business.dao.prod.PPackageProdDao;
 import com.ycsoft.business.dao.prod.PProdDao;
@@ -32,7 +35,9 @@ import com.ycsoft.commons.constants.BusiCodeConstants;
 import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.exception.ComponentException;
+import com.ycsoft.commons.exception.ErrorCode;
 import com.ycsoft.commons.exception.ServicesException;
+import com.ycsoft.commons.helper.CollectionHelper;
 import com.ycsoft.commons.helper.DateHelper;
 import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.daos.core.JDBCException;
@@ -56,8 +61,98 @@ public class OrderComponent extends BaseBusiComponent {
 	private CProdOrderHisDao cProdOrderHisDao;
 	@Autowired
 	private CProdOrderTransfeeDao cProdOrderTransfeeDao;
+	@Autowired
+	private CProdStatusChangeDao cProdStatusChangeDao;
+
 	/**
-	 * 查询一个订单相关的退订清单
+	 * 因为产品退订而重新计算套餐订单的计费时间段（不处理子产品）
+	 * @return 返回开始失效时间变化的订单信息
+	 * @throws Exception 
+	 */
+	public List<CProdOrder> movePackageOrderToFollow(String cust_id,Integer done_code) throws Exception{
+		return this.changeToFollow(cProdOrderDao.queryNotExpPackageOrder(cust_id), done_code);
+	}
+	/**
+	 * 因为产品退订而重新计算宽带用户订单（含套餐子产品）的计费时间段
+	 * @return 返回开始失效时间变化的订单信息
+	 * @throws Exception
+	 */
+	public List<CProdOrder> moveBandOrderToFollow(String user_id,Integer done_code) throws Exception{
+		return this.changeToFollow(cProdOrderDao.queryNotExpAllOrderByUser(user_id), done_code);
+	}
+	/**
+	 * 因为产品退订而重新计算普通产品订单（含套餐子产品）(非宽带)的计费时间段
+	 * @return 返回开始失效时间变化的订单信息
+	 * @throws Exception
+	 */
+	public List<CProdOrder> moveProdOrderToFollow(String user_id,String prod_id,Integer done_code)throws Exception{
+		return this.changeToFollow(cProdOrderDao.queryNotExpAllOrderByProd(user_id, prod_id), done_code);
+	}
+	
+	/**
+	 * 移动订单接续，并记录开始和结束计费日的异动
+	 * 传入的参数moveList是按exp_date排序的
+	 * @param moveList
+	 * @throws InvocationTargetException 
+	 * @throws Exception 
+	 */
+	private List<CProdOrder> changeToFollow(List<CProdOrder> moveList,Integer done_code) throws Exception{
+		Date start=DateHelper.today();
+		Date today=start;
+		List<CProdPropChange> changeList=new ArrayList<CProdPropChange>();
+		List<CProdOrder> updateList=new ArrayList<>();
+		List<CProdOrder> moveResult=new ArrayList<>();
+		for(CProdOrder order:moveList){
+			//第一个订购记录必须是今天之前(含今天)开始，后面的订购是接续在上一条订购之后
+			if((start.equals(today)&&order.getEff_date().after(start))
+				||(!start.equals(today)&&!start.equals(order.getEff_date()))){
+				
+				Date eff_date=new Date(start.getTime());
+				Date exp_date=DateHelper.getNextMonthByNum(eff_date, order.getOrder_months());
+				start=DateHelper.addDate(exp_date, 1);
+				
+				//记录异动
+				CProdPropChange change_effdate=new CProdPropChange();
+				changeList.add(change_effdate);
+				BeanHelper.copyProperties(change_effdate, order);
+				change_effdate.setDone_code(done_code);
+				change_effdate.setProd_sn(order.getOrder_sn());
+				change_effdate.setColumn_name("eff_date");
+				change_effdate.setOld_value(DateHelper.dateToStr(order.getEff_date()));
+				change_effdate.setNew_value(DateHelper.dateToStr(eff_date));
+				
+				CProdPropChange change_expdate=new CProdPropChange();
+				changeList.add(change_expdate);
+				BeanHelper.copyProperties(change_expdate, order);
+				change_expdate.setDone_code(done_code);
+				change_expdate.setProd_sn(order.getOrder_sn());
+				change_expdate.setColumn_name("exp_date");
+				change_expdate.setOld_value(DateHelper.dateToStr(order.getExp_date()));
+				change_expdate.setNew_value(DateHelper.dateToStr(exp_date));
+				
+				//更新开始计费日和结束计费日
+				order.setEff_date(eff_date);//外部要使用所以更新
+				order.setExp_date(exp_date);//外部要使用所以更新
+				moveResult.add(order);
+				
+				CProdOrder update=new CProdOrder();
+				update.setOrder_sn(order.getOrder_sn());
+				update.setEff_date(eff_date);
+				update.setExp_date(exp_date);
+				updateList.add(update);	
+			}
+		}
+		if(changeList.size()>0){
+			cProdPropChangeDao.save(changeList.toArray(new CProdPropChange[changeList.size()]));
+		}
+		if(updateList.size()>0){
+			cProdOrderDao.update(updateList.toArray(new CProdOrder[updateList.size()]));
+		}
+		return moveResult;
+	}
+	/**
+	 * 单产品退订
+	 * 查询一个订单相关的退订清单和可退费用(active_fee)
 	 * 套餐=客户所有未失效套餐
 	 * 宽带=相同用户所有宽带产品（含套餐子宽带产品）
 	 * 非宽带单产品=相同用户相同单产品（含套餐子产品)
@@ -66,27 +161,61 @@ public class OrderComponent extends BaseBusiComponent {
 	 * @return
 	 * @throws Exception 
 	 */
-	public List<CProdOrder> queryCancelOrder(CProdOrder cancelOrder,PProd prodConfig) throws Exception{
-		List<CProdOrder> list=new ArrayList<>();
+	public List<CProdOrderDto> queryOrderByCancelOrder(CProdOrderDto cancelOrder) throws Exception{
+		List<CProdOrderDto> list=new ArrayList<>();
 		Date today=DateHelper.today();
-		if(!prodConfig.getProd_type().equals(SystemConstants.PROD_TYPE_BASE)){
+		if(!cancelOrder.getProd_type().equals(SystemConstants.PROD_TYPE_BASE)){
 			//套餐的情况
-			for(CProdOrder order: cProdOrderDao.queryPackageOrderByCustId(cancelOrder.getCust_id())){
+			for(CProdOrderDto order: cProdOrderDao.queryPackageOrderDtoByCustId(cancelOrder.getCust_id())){
 				if(order.getExp_date().after(today)||order.getExp_date().equals(today)){
 					//结束日>=今天
 					list.add(order);
 				}
 			}
 		}else {
-			//单产品
-			for(CProdOrder order: cProdOrderDao.queryProdOrderByUserId(cancelOrder.getUser_id())){
-				if((order.getExp_date().after(today)||order.getExp_date().equals(today))
-						&&(prodConfig.getServ_id().equals(SystemConstants.PROD_SERV_ID_BAND)||prodConfig.getProd_id().equals(order.getProd_id()))){
+			//单产品,非套餐子产品
+			for(CProdOrderDto order: cProdOrderDao.queryProdOrderDtoByUserId(cancelOrder.getUser_id())){
+				if(StringHelper.isEmpty(order.getPackage_sn())
+						&&(order.getExp_date().after(today)||order.getExp_date().equals(today))
+						&&(cancelOrder.getServ_id().equals(SystemConstants.PROD_SERV_ID_BAND)||cancelOrder.getProd_id().equals(order.getProd_id()))){
 					list.add(order);
 				}
 			}
-		}
+		}	
 		return list;
+	}
+	/**
+	 * 计算一个订单的可退金额（终止退订和销户退订）
+	 * @param order
+	 * @return
+	 */
+	public Integer getOrderCancelFee(CProdOrder cancelOrder){
+		if(StringHelper.isNotEmpty(cancelOrder.getPackage_sn())){
+			//套餐子产品可退金额=0;
+			return 0;
+		}
+		Date cancelDate=DateHelper.today();
+		//1.退订日在订购计费完整区间之前
+		if(cancelDate.before(cancelOrder.getEff_date())||cancelDate.equals(cancelOrder.getEff_date())){
+			//覆盖退订在订购的生效日之前(含)
+			return cancelOrder.getOrder_fee();
+		}
+		//2.退订日在订购计费完整区间之间
+		//订购的停止计费日根据订购月数反推开始计费日
+		Date effDate= DateHelper.getNextMonthByNum(cancelOrder.getExp_date(),cancelOrder.getOrder_months()*-1);
+		if(cancelDate.equals(effDate)||cancelDate.before(effDate)){
+			//退订日包含了整个订单的订购期间
+			return cancelOrder.getOrder_fee();
+		}
+		
+		//3.退订日在 订购的计费区间内（按剩余使用天数折算）
+		int months=DateHelper.compareToMonthByDate(cancelDate, cancelOrder.getExp_date());
+		Date newExpDate=DateHelper.getNextMonthByNum(cancelDate,months);
+		if(newExpDate.after(cancelOrder.getExp_date())){
+			//新到期日大于实际到期日，则需要回退一个月再计算
+			months=months-1;
+		}
+		return Math.round(months*1.0f*cancelOrder.getOrder_fee()/cancelOrder.getOrder_months());
 	}
 	/**
 	 * 恢复被覆盖的订单
@@ -94,16 +223,21 @@ public class OrderComponent extends BaseBusiComponent {
 	 * @throws JDBCException 
 	 */
 	public void recoverTransCancelOrder(Integer recoverDoneCode,String cust_id) throws JDBCException{
-		
+		//查询被覆盖移入历史表的订购记录
 		List<CProdOrder> list=cProdOrderHisDao.queryCProdOrderByDelete(recoverDoneCode, cust_id);
 		if(list!=null&&list.size()>0){
+			//移回正式表
 			cProdOrderDao.save(list.toArray(new CProdOrder[list.size()]));
 			String orderSns[]=new String[list.size()];
 			for(int i=0;i<list.size();i++){
 				orderSns[i]=list.get(i).getOrder_sn();
 			}
+			//历史记录表移除
 			cProdOrderHisDao.remove(orderSns);
+			//删除转移支付异动
 			cProdOrderTransfeeDao.deleteTransfeeChange(recoverDoneCode, cust_id);
+			//删除出账状态异动
+			cProdStatusChangeDao.deleteByDoneCode(recoverDoneCode);
 		}
 		
 	}
@@ -189,9 +323,9 @@ public class OrderComponent extends BaseBusiComponent {
 				PProd prod=pProdDao.findByKey(prod_id);
 				for(String user_id: pgu.getUserSelectList()){
 					if(SystemConstants.PROD_SERV_ID_BAND.equals(prod.getServ_id())){
-						orderCancelList.addAll(cProdOrderDao.queryTransOrderByBand(user_id));
+						orderCancelList.addAll(cProdOrderDao.queryNotExpOrderByBand(user_id));
 					}else{
-						orderCancelList.addAll(cProdOrderDao.queryTransOrderByProd(user_id, prod_id));
+						orderCancelList.addAll(cProdOrderDao.queryNotExpOrderByProd(user_id, prod_id));
 					}
 				}
 			
@@ -208,16 +342,18 @@ public class OrderComponent extends BaseBusiComponent {
 			//宽带升级
 			if(SystemConstants.PROD_SERV_ID_BAND.equals(prod.getServ_id())){
 				CProdOrder prodOrder=cProdOrderDao.findByKey(orderProd.getLast_order_sn());
-				return cProdOrderDao.queryTransOrderByBand(prodOrder.getUser_id());
+				return cProdOrderDao.queryNotExpOrderByBand(prodOrder.getUser_id());
 			}else{
 				throw new ServicesException("非宽带单产品不能升级");
 			}
 		}else{
 			//套餐升级
-			return cProdOrderDao.queryTransOrderByPackage(orderProd.getCust_id());
+			return cProdOrderDao.queryNotExpPackageOrder(orderProd.getCust_id());
 		}
 	}
-	
+	/**
+	 * 生成订单信息
+	 */
 	public CProdOrder createCProdOrder(OrderProd orderProd,
 			Integer done_code,String optr_id,String area_id,String county_id) throws Exception{
 		CProdOrder prod=new CProdOrder();
@@ -299,6 +435,8 @@ public class OrderComponent extends BaseBusiComponent {
 		//保存订单
 		cProdOrderDao.save(cProdOrder);
 		
+		//记录创建订单的原始状态
+		cProdStatusChangeDao.saveStatusChange(cProdOrder.getDone_code(), cProdOrder.getOrder_sn(), cProdOrder.getStatus());
 		//保存套餐的子订单
 		if(orderProd.getGroupSelected()!=null&&orderProd.getGroupSelected().size()>0){
 			savePackageUserProd(cProdOrder,orderProd);
@@ -362,7 +500,10 @@ public class OrderComponent extends BaseBusiComponent {
 	 * @param order
 	 * @throws Exception 
 	 */
-	public void saveCancelProdOrder(CProdOrder order,Integer done_code) throws Exception{
+	public List<CProdOrder> saveCancelProdOrder(CProdOrder order,Integer done_code) throws Exception{
+		//map<
+		List<CProdOrder> cancelResultList=new ArrayList<>();
+		
 		PProd prod=pProdDao.findByKey(order.getProd_id());
 		CProdOrderHis deleteOrder=new CProdOrderHis();
 		BeanHelper.copyProperties(deleteOrder, order);
@@ -370,6 +511,11 @@ public class OrderComponent extends BaseBusiComponent {
 		deleteOrder.setDelete_time(new Date());
 		cProdOrderHisDao.save(deleteOrder);
 		cProdOrderDao.remove(deleteOrder.getOrder_sn());
+		
+		//财务出账相关退订状态设置为失效
+		cProdStatusChangeDao.saveStatusChange(done_code, order.getOrder_sn(), StatusConstants.INVALID);
+		
+		cancelResultList.add(order);
 		
 		if(!prod.getProd_type().equals(SystemConstants.PROD_TYPE_BASE)){
 			//套餐的情况，要退子产品
@@ -383,13 +529,14 @@ public class OrderComponent extends BaseBusiComponent {
 				
 				pakDetailList.add(pakdetailhis);
 				detailSnList.add(pakdetail.getOrder_sn());
+				
+				cancelResultList.add(pakdetail);
 			}
 			cProdOrderHisDao.save(pakDetailList.toArray(new CProdOrderHis[pakDetailList.size()]));
 			cProdOrderDao.remove(detailSnList.toArray(new String[detailSnList.size()]));
 		}
 		
-		//TODO 财务账单处理
-		
+		return cancelResultList;
 	}
 	/**
 	 * 保存套餐子产品
@@ -398,14 +545,36 @@ public class OrderComponent extends BaseBusiComponent {
 	 */
 	private void savePackageUserProd(CProdOrder cProdOrder,OrderProd orderProd) throws Exception{
 		List<CProdOrder> orderList=new ArrayList<>();
+		Map<String,CUser> userMap=CollectionHelper.converToMapSingle(cUserDao.queryUserByCustId(cProdOrder.getCust_id()),"user_id");
+		
 		for(PackageGroupUser pgu: orderProd.getGroupSelected()){
 			if(pgu.getUserSelectList()==null){
 				continue;
 			}
 			PPackageProd pakprod= pPackageProdDao.findByKey(pgu.getPackage_group_id());
+			if(!pakprod.getPackage_id().equals(cProdOrder.getProd_id())){
+				throw new ServicesException(ErrorCode.OrderDatePackageConfig);
+			}
+			if(pgu.getUserSelectList().size()>pakprod.getMax_user_cnt()){
+				throw new ServicesException(ErrorCode.OrderDatePackageUserLimit);
+			}
 			for(String prod_id:pakprod.getProd_list().split(",")){
 				if(StringHelper.isNotEmpty(prod_id)){
 					for(String user_id: pgu.getUserSelectList()){
+						CUser user=userMap.get(user_id);
+						if(user==null){
+							//用户存在检查
+							throw new ServicesException(ErrorCode.OrderDateUserNotCust,user_id);
+						}
+						if(!user.getUser_type().equals(pakprod.getUser_type())){
+							//用户适用检查
+							throw new ServicesException(ErrorCode.OrderDateUserNotCust,user_id);
+						}
+						if(StringHelper.isNotEmpty(pakprod.getTerminal_type())
+								&&pakprod.getTerminal_type().equals(user.getTerminal_type())){
+							//用户适用检查
+							throw new ServicesException(ErrorCode.OrderDateUserNotCust,user_id);
+						}
 						CProdOrder order=new CProdOrder();
 						//copy
 						BeanHelper.copyProperties(order, cProdOrder);
@@ -464,30 +633,5 @@ public class OrderComponent extends BaseBusiComponent {
 		//保存产品异动信息
 		cProdPropChangeDao.save(propChangeList.toArray(new CProdPropChange[propChangeList.size()]));
 	}
-	
-	public void setPProdDao(PProdDao pProdDao) {
-		this.pProdDao = pProdDao;
-	}
-
-	public void setPPackageProdDao(PPackageProdDao pPackageProdDao) {
-		this.pPackageProdDao = pPackageProdDao;
-	}
-
-	public void setCProdOrderDao(CProdOrderDao cProdOrderDao) {
-		this.cProdOrderDao = cProdOrderDao;
-	}
-
-	public void setCUserDao(CUserDao cUserDao) {
-		this.cUserDao = cUserDao;
-	}
-
-	public void setCProdOrderHisDao(CProdOrderHisDao cProdOrderHisDao) {
-		this.cProdOrderHisDao = cProdOrderHisDao;
-	}
-
-	public void setCProdOrderTransfeeDao(CProdOrderTransfeeDao cProdOrderTransfeeDao) {
-		this.cProdOrderTransfeeDao = cProdOrderTransfeeDao;
-	}
-	
-	
+		
 }

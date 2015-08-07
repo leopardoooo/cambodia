@@ -1,5 +1,7 @@
 package com.ycsoft.beans.core.prod;
 
+import java.util.Date;
+
 import com.ycsoft.commons.constants.DictKey;
 import com.ycsoft.commons.store.MemoryDict;
 
@@ -16,7 +18,23 @@ public class CProdOrderDto extends CProdOrder {
 	private String public_acctitem_type_text;
 	private String package_name;//display(2)
 	private String user_name;
+	//nvl(折扣周期月数，资费周期月数)
+	private Integer billing_cycle;
+	//用户协议期限
+	private Date protocol_date;
 	
+	public Integer getBilling_cycle() {
+		return billing_cycle;
+	}
+	public void setBilling_cycle(Integer billing_cycle) {
+		this.billing_cycle = billing_cycle;
+	}
+	public Date getProtocol_date() {
+		return protocol_date;
+	}
+	public void setProtocol_date(Date protocol_date) {
+		this.protocol_date = protocol_date;
+	}
 	public String getUser_name() {
 		return user_name;
 	}
