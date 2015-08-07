@@ -789,20 +789,40 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		}
 		
 		//提取原订购记录的套餐组用户选择情况,且适用现在的套餐产品限制条件
-		//TODO
-		Map<String,List<String>> selectUsers=new HashMap<String,List<String>>();
+		Map<String,Set<String>> selectUsers=new HashMap<String,Set<String>>();
 		for(CProdOrder order:cProdOrderDao.queryPakDetailOrder(last_order_sn)){
 			if(StringHelper.isNotEmpty(order.getPackage_group_id())
 					&&StringHelper.isNotEmpty(order.getUser_id())){
 				if(selectUsers.get(order.getPackage_group_id())==null){
-					selectUsers.put(order.getPackage_group_id(), new ArrayList<String>());
+					selectUsers.put(order.getPackage_group_id(), new HashSet<String>());
 				}
 				selectUsers.get(order.getPackage_group_id()).add(order.getUser_id());
 			}
 		}
 		//装到新订购的套餐内容组用户选择中
+		Map<String,CUser> userMap=CollectionHelper.converToMapSingle(panel.getUserList(), "user_id"); 
 		for(PackageGroupUser pgu: panel.getGroupList()){
-			pgu.setUserSelectList(selectUsers.get(pgu.getPackage_group_id()));
+			Set<String> userSet=selectUsers.get(pgu.getPackage_group_id());
+			if(userSet!=null){
+				pgu.setUserSelectList(new ArrayList<String>());
+				for(String user_id:userSet){
+					if(pgu.getUserSelectList().size()>=pgu.getMax_user_cnt()){
+						break;
+					}
+					CUser user=userMap.get(user_id);
+					if(user!=null){
+						continue;
+					}
+					if(!user.getUser_type().equals(pgu.getUser_type())){
+						continue;
+					}
+					if(StringHelper.isNotEmpty(pgu.getTerminal_type())
+							&&!pgu.getTerminal_type().equals(user.getTerminal_type())){
+						continue;
+					}
+					pgu.getUserSelectList().add(user_id);
+				}
+			}
 		}
 	}
 	/**
