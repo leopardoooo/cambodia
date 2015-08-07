@@ -86,7 +86,7 @@ public class PayService extends BaseBusiService implements IPayService {
 	public Integer queryExchage() throws Exception{
 		Integer exchange= tExchangeDao.getExchange();
 		if(exchange==null||exchange<=0){
-			throw new ServicesException("系统未正确配置汇率，请联系管理员");
+			throw new ServicesException(ErrorCode.ExchangeConfigError);
 		}
 		return exchange;
 	}
