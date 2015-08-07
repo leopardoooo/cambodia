@@ -273,29 +273,29 @@ Ext.apply(App.func,{
 			if(data['user_status'] == 'DORMANCY' || data['user_status'] == 'ATVCLOSE' || data['user_status'] == 'WAITLOGOFF' )
 				return false;
 			if(busicode == '1027'){//产品退订
-				var userId = data['user_id'];
-				var acctItemData = App.getAcctItemByProdId(data['prod_id'],userId);
-				var flag = true;
-				//欠费账户不能退订
-				if(acctItemData){
-					if(acctItemData.real_balance < 0 && acctItemData.order_balance != -acctItemData.real_balance)
-						flag = false;
-				}
-				if(!flag) return false;
-				
-				if(data['is_base'] == 'T'){//基本包
-					var store = App.getApp().main.infoPanel.getUserPanel().prodGrid.baseProdGrid.getStore();
-					flag = false;
-					store.each(function(record){
-						//当前行的产品为基本包且有其他基本包，当前基本包产品才能退订
-						if(data['prod_id']!=record.get('prod_id') 
-							&& record.get('is_base') == 'T'){
-							flag = true;
-							return false;
-						}
-					},store);
-					if(!flag)return false;
-				}
+//				var userId = data['user_id'];
+//				var acctItemData = App.getAcctItemByProdId(data['prod_id'],userId);
+//				var flag = true;
+//				//欠费账户不能退订
+//				if(acctItemData){
+//					if(acctItemData.real_balance < 0 && acctItemData.order_balance != -acctItemData.real_balance)
+//						flag = false;
+//				}
+//				if(!flag) return false;
+//				
+//				if(data['is_base'] == 'T'){//基本包
+//					var store = App.getApp().main.infoPanel.getUserPanel().prodGrid.baseProdGrid.getStore();
+//					flag = false;
+//					store.each(function(record){
+//						//当前行的产品为基本包且有其他基本包，当前基本包产品才能退订
+//						if(data['prod_id']!=record.get('prod_id') 
+//							&& record.get('is_base') == 'T'){
+//							flag = true;
+//							return false;
+//						}
+//					},store);
+//					if(!flag)return false;
+//				}
 			}else if(busicode == '1028'){//资费变更
 				var userId = data['user_id'];
 				var acctItemData = App.getAcctItemByProdId(data['prod_id'],userId);

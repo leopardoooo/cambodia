@@ -1596,6 +1596,15 @@ Ext.apply(MenuHandler, {
 		return false;
 	},
 	// 退订
+	CancelProdNew: function(){
+		//柬埔寨
+		return {
+			width:750,
+			height:450
+		};
+	},
+	
+	// 退订
 	CancelProd: function(){
 		
 		if(!hasCust())return false
