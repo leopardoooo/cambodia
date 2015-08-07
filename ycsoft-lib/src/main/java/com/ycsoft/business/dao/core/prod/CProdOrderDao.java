@@ -94,24 +94,47 @@ public class CProdOrderDao extends BaseEntityDao<CProdOrder> {
 		return this.createQuery(sql, package_sn,SystemConstants.PROD_TYPE_BASE,SystemConstants.PROD_SERV_ID_BAND).list();
 	}
 	/**
-	 * 查询转移支付被覆盖退订的单产品订购记录
+	 * 查询一个用户一个产品的有效的所有订购记录(不含套餐子产品)
 	 * @param user_id
 	 * @param prod_id
 	 * @return
 	 */
-	public List<CProdOrder> queryTransOrderByProd(String user_id,String prod_id)throws JDBCException{
-		
+	public List<CProdOrder> queryNotExpOrderByProd(String user_id,String prod_id)throws JDBCException{	
 		String sql=StringHelper.append("select * from c_prod_order ",
 				"where user_id=? and prod_id=? and package_sn is null ",
-				" and exp_date >=trunc(sysdate) ");
+				" and exp_date >=trunc(sysdate)  ");
+		return this.createQuery(sql, user_id,prod_id).list();
+	}
+
+	/**
+	 * 查询一个用户一个单产品有效的所有订购记录(含套餐子产品)
+	 * @param user_id
+	 * @param prod_id
+	 * @return
+	 */
+	public List<CProdOrder> queryNotExpAllOrderByProd(String user_id,String prod_id)throws JDBCException{
+		
+		String sql=StringHelper.append("select * from c_prod_order ",
+				"where user_id=? and prod_id=?  and exp_date >=trunc(sysdate)  order by exp_date ");
 		return this.createQuery(sql, user_id,prod_id).list();
 	}
 	/**
-	 * 查询转移支付被覆盖退订的宽带单产品订购记录
+	 * 查询一个用户有效的所有产品订购记录(含套餐子产品)
+	 * @param user_id
+	 * @param prod_id
+	 * @return
+	 */
+	public List<CProdOrder> queryNotExpAllOrderByUser(String user_id)throws JDBCException{
+		String sql=StringHelper.append("select * from c_prod_order ",
+				"where user_id=?  and exp_date >=trunc(sysdate)  order by exp_date ");
+		return this.createQuery(sql, user_id).list();
+	}	
+	/**
+	 * 查询一个宽带用户的所有单产品订购记录(不含套餐子产品)
 	 * @param user_id
 	 * @return
 	 */
-	public List<CProdOrder> queryTransOrderByBand(String user_id)throws JDBCException{
+	public List<CProdOrder> queryNotExpOrderByBand(String user_id)throws JDBCException{
 		
 		String sql=StringHelper.append("select * from c_prod_order ",
 				"where user_id=? and prod_id in (select a.prod_id from p_prod a where a.serv_id='BAND') ",
@@ -119,25 +142,27 @@ public class CProdOrderDao extends BaseEntityDao<CProdOrder> {
 				" and exp_date >=trunc(sysdate) ");
 		return this.createQuery(sql, user_id).list();
 	}
+	
 	/**
-	 * 查询转移支付被覆盖退订的套餐订购记录
+	 * 查询一个客户有效的套餐所有订购记录
 	 * @param user_id
 	 * @return
 	 */
-	public List<CProdOrder> queryTransOrderByPackage(String cust_id)throws JDBCException{
+	public List<CProdOrder> queryNotExpPackageOrder(String cust_id)throws JDBCException{
 		String sql=StringHelper.append("select * from c_prod_order ",
 				"where cust_id=? and prod_id in (select a.prod_id from p_prod a where a.prod_type<>'BASE') ",
 				"and package_sn is null ",
-				" and exp_date >=trunc(sysdate) ");
+				" and exp_date >=trunc(sysdate) order by exp_date");
 		return this.createQuery(sql, cust_id).list();
-	} 
+	}
+	
 	/**
 	 * 查询一个客户所有套餐订单详细清单
 	 * @param cust_id
 	 * @return
 	 * @throws JDBCException
 	 */
-	public List<CProdOrderDto> queryPackageOrderByCustId(String cust_id)throws JDBCException{
+	public List<CProdOrderDto> queryPackageOrderDtoByCustId(String cust_id)throws JDBCException{
 		
 		String sql=StringHelper.append(" select p.prod_type,p.serv_id,p.is_base,nvl(d.billing_cycle,ppt.billing_cycle) billing_cycle, nvl(d.disct_name,ppt.tariff_name) tariff_name,p.prod_name, o.* ",
 				" from c_prod_order o,p_prod p,p_prod_tariff ppt ,p_prod_tariff_disct d",
@@ -154,7 +179,7 @@ public class CProdOrderDao extends BaseEntityDao<CProdOrder> {
 	 * @return
 	 * @throws JDBCException
 	 */
-	public List<CProdOrderDto> queryProdOrderByUserId(String user_id) throws JDBCException{
+	public List<CProdOrderDto> queryProdOrderDtoByUserId(String user_id) throws JDBCException{
 
 		String sql=StringHelper.append(
 				" select p.prod_type,p.serv_id, p.is_base, cu.protocol_date, nvl(d.billing_cycle,ppt.billing_cycle) billing_cycle,"
@@ -170,7 +195,7 @@ public class CProdOrderDao extends BaseEntityDao<CProdOrder> {
 	 * @param package_sn
 	 * @return
 	 */
-	public List<CProdOrderDto> queryProdOrderByPackageSn(String package_sn)throws JDBCException{
+	public List<CProdOrderDto> queryProdOrderDtoByPackageSn(String package_sn)throws JDBCException{
 		String sql=StringHelper.append(
 				" select p.prod_type,p.serv_id, p.is_base,cu.protocol_date, nvl(d.billing_cycle,ppt.billing_cycle) billing_cycle,"
 				," case when cu.user_id is null then null when   cu.user_type in ('OTT_MOBILE','BAND') then cu.login_name else nvl(cu.stb_id,'INSTALL') end user_name ,nvl(d.disct_name,ppt.tariff_name) tariff_name,p.prod_name, o.* ",

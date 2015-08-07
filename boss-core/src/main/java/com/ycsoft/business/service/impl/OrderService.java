@@ -126,32 +126,111 @@ public class OrderService extends BaseBusiService implements IOrderService{
 				?true:false;
 	}
 	/**
+	 * 退订产品(高级和普通退订)
+	 */
+	public void saveCancelProd(String[] orderSns,Integer cancelFee) throws Exception{
+		this.saveCancelProdOrder(isHighCancel(this.getBusiParam().getBusiCode()), cancelFee,orderSns);
+	}
+	/**
+	 * 退订当天订单
+	 */
+	public void saveCancelTodayOrder(String orderSn,Integer cancelFee) throws Exception{
+		checkTodayCancelOrder(orderSn);
+		this.saveCancelProdOrder(true, cancelFee,orderSn);
+	}
+	private void checkTodayCancelOrder(String orderSn)throws Exception{
+		CProdOrder order=cProdOrderDao.findByKey(orderSn);
+		if(!DateHelper.isToday(order.getOrder_time())||!order.getOptr_id().equals(this.getOptr().getOptr_id())){
+			throw new ServicesException(ErrorCode.NotCancelOnlyTodayIsYou);
+		}
+	}
+	
+	/**
 	 * 终止产品
+	 * @param isHigh 是否高级权限 orderSns 退订的订单 cancel_fee 退订的总金额
 	 * @throws Exception 
 	 */
-	public void saveCancelProdOrder(String busi_code,String[] orderSns,Integer cancel_fee) throws Exception{
+	public void saveCancelProdOrder(boolean  isHigh,Integer cancel_fee,String... orderSns) throws Exception{
 		
 		String cust_id=this.getBusiParam().getCust().getCust_id();
 		doneCodeComponent.lockCust(cust_id);
 		
-		//参数检查
-		List<CProdOrderDto> cancelList=checkCancelProdOrderParm(busi_code, cust_id, orderSns, cancel_fee);
+		//参数检查，返回退订订单详细信息列表
+		List<CProdOrderDto> cancelList=checkCancelProdOrderParm(isHigh, cust_id, orderSns, cancel_fee);
 		
 		Integer done_code=doneCodeComponent.gDoneCode();
-		if(cancel_fee!=0){
+		if(cancel_fee<0){
 			//记录未支付业务
 			doneCodeComponent.saveDoneCodeUnPay(cust_id, done_code, this.getOptr().getOptr_id());
 			//保存缴费信息
-			
-		}else{
-			//解除授权
+			this.saveCancelFee(cancelList, this.getBusiParam().getCust(), done_code, this.getBusiParam().getBusiCode());
 		}
 		
-		//执行退订
+		List<CProdOrder> cancelResultList=new ArrayList<>();
 		
-		
+		for(CProdOrderDto dto:cancelList){
+			//执行退订 返回被退订的用户订单清单
+			cancelResultList.addAll(orderComponent.saveCancelProdOrder(dto, done_code));
+		}
+
+		//退订直接解除授权，不等支付（因为不能取消）
+		Map<String,CUser> userMap=new  HashMap<>();
+	    pstProdNoPackage(cancelResultList, userMap, done_code);
+	    
+		//整体移动剩下订单的开始和结束计算日期
+	    moveOrderByCancelOrder(cancelResultList, userMap, done_code);
 		
 		this.saveAllPublic(done_code, this.getBusiParam());
+	}
+	/**
+	 * 整体移动剩下订单的开始和结束计算日期
+	 * @param cancelResultList
+	 * @param userMap
+	 * @param done_code
+	 * @throws Exception 
+	 */
+	private void moveOrderByCancelOrder(List<CProdOrder> cancelResultList,Map<String,CUser> userMap,Integer done_code) throws Exception{
+		//key=cust_id+'_'+user_id+"_"
+		Map<String,CProdOrder> movePackageMap=new HashMap<>();
+		Map<String,CProdOrder> moveBandMap=new HashMap<>();
+		Map<String,CProdOrder> moveProdMap=new HashMap<>();
+		
+		for(CProdOrder order:cancelResultList){
+			if(StringHelper.isEmpty(order.getUser_id())){
+				//套餐订单
+				movePackageMap.put(order.getCust_id(), order);
+			}else{
+				CUser user=userMap.get(order.getUser_id());
+			    if(user==null){
+			    	user=cUserDao.findByKey(order.getUser_id());
+			    	userMap.put(order.getUser_id(), user);
+			    	if(user==null){
+			    		throw new ServicesException(ErrorCode.OrderDateException);
+			    	}
+			    }
+			    if(user.getUser_type().equals(SystemConstants.USER_TYPE_BAND)){
+			    	//宽带订单
+			    	moveBandMap.put(order.getUser_id(), order);
+			    }else{
+			    	//非宽带单产品订单
+			    	String key=StringHelper.append(order.getUser_id()+"_"+order.getProd_id());
+			    	moveProdMap.put(key, order);
+			    }
+			}
+		}
+		//套餐订单的接续处理
+		for(String cust_id: movePackageMap.keySet()){
+			orderComponent.movePackageOrderToFollow(cust_id, done_code);
+		}
+		//宽带订单的接续处理
+		for(String user_id:moveBandMap.keySet()){
+			orderComponent.moveBandOrderToFollow(user_id, done_code);
+		}
+		//非宽带单产品的接续处理
+		for(CProdOrder order:moveProdMap.values()){
+			orderComponent.moveProdOrderToFollow(order.getUser_id(), order.getProd_id(), done_code);
+		}
+		
 	}
 	/**
 	 * 退订产品参数检查
@@ -163,14 +242,12 @@ public class OrderService extends BaseBusiService implements IOrderService{
 	 * @return
 	 * @throws Exception
 	 */
-	private List<CProdOrderDto> checkCancelProdOrderParm(String busi_code,String cust_id,String[] orderSns,Integer cancel_fee) throws Exception{
+	private List<CProdOrderDto> checkCancelProdOrderParm(boolean isHigh,String cust_id,String[] orderSns,Integer cancel_fee) throws Exception{
 		
-		if(StringHelper.isEmpty(cust_id)||StringHelper.isEmpty(busi_code)||cancel_fee==null||orderSns==null||orderSns.length==0){
+		if(StringHelper.isEmpty(cust_id)||cancel_fee==null||orderSns==null||orderSns.length==0){
 			throw new ServicesException(ErrorCode.ParamIsNull);
 		}
-		//高级
-		boolean isHigh=isHighCancel(busi_code);
-		
+
 		List<CProdOrderDto> cancelList=new ArrayList<>();
 		//参数检查
 		//退款总额核对
@@ -193,7 +270,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 			}
 		}
 		//金额核对
-		if(cancel_fee!=fee){
+		if(cancel_fee!=fee*-1){
 			throw new ServicesException(ErrorCode.FeeDateException);
 		}
 		//订单相关的所有订单的未支付判断,判断各类订单的相关所有订单的未支付状态
@@ -217,10 +294,15 @@ public class OrderService extends BaseBusiService implements IOrderService{
 	 */
 	private void checkOrderCanCancel(String cust_id,boolean isHigh,CProdOrderDto order) throws Exception{
 		
+		if(order==null){
+			throw new ServicesException(ErrorCode.OrderNotExists);
+		}
 		if(!cust_id.equals(order.getCust_id())){
 			throw new ServicesException(ErrorCode.CustDataException);
 		}
-		
+		if(StringHelper.isNotEmpty(order.getPackage_sn())){
+			throw new ServicesException(ErrorCode.NotCancelIsPackageDetail);
+		}
 		if(order.getIs_pay().equals(SystemConstants.BOOLEAN_FALSE)){
 			//未支付判断
 			throw new ServicesException(ErrorCode.NotCancleHasUnPay);
@@ -236,8 +318,8 @@ public class OrderService extends BaseBusiService implements IOrderService{
 			throw new ServicesException(ErrorCode.NotCancelUserProtocol);
 		}
 		if(!isHigh&&!order.getProd_type().equals(SystemConstants.PROD_TYPE_BASE)){
-			//套餐的判断
-			for(CProdOrderDto son:  cProdOrderDao.queryProdOrderByPackageSn(order.getOrder_sn())){
+			//套餐子产品的硬件协议期判断
+			for(CProdOrderDto son:  cProdOrderDao.queryProdOrderDtoByPackageSn(order.getOrder_sn())){
 				if(son.getIs_base().equals(SystemConstants.BOOLEAN_TRUE)
 						&&DateHelper.today().before(son.getProtocol_date())){
 					throw new ServicesException(ErrorCode.NotCancelUserProtocol);
@@ -257,6 +339,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 	    
 		CProdOrder order=cProdOrderDao.findByKey(order_sn);
 		//检查套餐类要按订购顺序取消，同一个用户的宽带类单产品要按订购顺序取消，用户一个用户的非宽带单产品按相同产品订购顺序取消。
+		//退订不能取消
 		this.checkUnPayOrderCancel(order,cust_id,fee_sn);
 		
 		//恢复被覆盖转移的订单
@@ -279,40 +362,44 @@ public class OrderService extends BaseBusiService implements IOrderService{
 	 */
 	private void checkUnPayOrderCancel(CProdOrder order,String cust_id,String fee_sn) throws Exception{
 		if(StringHelper.isEmpty(cust_id)||StringHelper.isEmpty(fee_sn)||order==null){
-			throw new ServicesException("参数为空");
+			throw new ServicesException(ErrorCode.ParamIsNull);
 		}
 		if(!cust_id.equals(order.getCust_id())){
-			throw new ServicesException("客户信息不一致");
+			throw new ServicesException(ErrorCode.CustDataException);
 		}
 		CFee cfee=cFeeDao.findByKey(fee_sn);
 		if(!cust_id.equals(cfee.getCust_id())){
-			throw new ServicesException("客户信息不一致");
+			throw new ServicesException(ErrorCode.CustDataException);
+		}
+		if(cfee.getReal_pay()<0){
+			throw new ServicesException(ErrorCode.UnPayOrderCancelUnsubscribe);
 		}
 		
 		if(!order.getDone_code().equals(cfee.getCreate_done_code())||!order.getProd_id().equals(cfee.getAcctitem_id())){
-			throw new ServicesException("订单信息和费用记录不一致");
+			throw new ServicesException(ErrorCode.CFeeAndProdOrderIsNotOne);
 		}
 		
 		PProd prod=pProdDao.findByKey(order.getProd_id());
+		//碰撞检测
 		if(!prod.getProd_type().equals(SystemConstants.PROD_TYPE_BASE)){	
 			//套餐处理
-			for(CProdOrder checkOrder: cProdOrderDao.queryTransOrderByPackage(cust_id)){
+			for(CProdOrder checkOrder: cProdOrderDao.queryNotExpPackageOrder(cust_id)){
 				if(order.getExp_date().before(checkOrder.getExp_date())){
-					throw new ServicesException("请先取消订单号="+checkOrder.getOrder_sn()+"的订单");
+					throw new ServicesException(ErrorCode.UnPayOrderCancelBefor,checkOrder.getOrder_sn());
 				}
 			}
 			//跟单产品在套餐后续订碰撞
 			List<CProdOrder>  orderAfterPakList=cProdOrderDao.querySingleProdOrderAfterPak(order.getOrder_sn());
 			if(orderAfterPakList!=null&&orderAfterPakList.size()>0){
-				throw new ServicesException("请先取消订单号="+orderAfterPakList.get(0).getOrder_sn()+"的订单");
+				throw new ServicesException(ErrorCode.UnPayOrderCancelBefor,orderAfterPakList.get(0).getOrder_sn());
 			}
 			
 		}else{
 			//单产品直接碰撞处理
-			for(CProdOrder checkOrder: cProdOrderDao.queryProdOrderByUserId(order.getUser_id())){
+			for(CProdOrder checkOrder: cProdOrderDao.queryProdOrderDtoByUserId(order.getUser_id())){
 				if(prod.getServ_id().equals(SystemConstants.PROD_SERV_ID_BAND)||order.getProd_id().equals(checkOrder.getProd_id())){
 					if(order.getExp_date().before(checkOrder.getExp_date())){
-						throw new ServicesException("请先取消订单号="+checkOrder.getOrder_sn()+"的订单");
+						throw new ServicesException(ErrorCode.UnPayOrderCancelBefor,checkOrder.getOrder_sn());
 					}
 				}
 			}
@@ -804,7 +891,37 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		}
 	}
 	/**
-	 * 保存费用信息
+	 * 钝化产品（不处理套餐，但是一个产品如果套餐子产品则会被处理）
+	 * @param cancelList
+	 * @throws Exception 
+	 */
+	private void pstProdNoPackage(List<CProdOrder> cancelResultList,Map<String,CUser> userMap,Integer done_code) throws Exception{
+	
+		Map<CUser,List<CProdOrder>> pstProdMap=new HashMap<>();
+		for(CProdOrder pstorder:cancelResultList){
+			if(StringHelper.isNotEmpty(pstorder.getUser_id())){
+				CUser user=userMap.get(pstorder.getUser_id());
+			    if(user==null){
+			    	user=cUserDao.findByKey(pstorder.getUser_id());
+			    	userMap.put(pstorder.getUser_id(), user);
+			    	if(user==null){
+			    		throw new ServicesException(ErrorCode.OrderDateException);
+			    	}
+			    }
+			    List<CProdOrder> pstlist=pstProdMap.get(user);
+			    if(pstlist==null){
+			    	pstlist=new ArrayList<>();
+			    	pstProdMap.put(user, pstlist);
+			    }
+			    pstlist.add(pstorder);
+			}
+		}
+		for(CUser user:  pstProdMap.keySet()){
+			authComponent.sendAuth(user, pstProdMap.get(user), BusiCmdConstants.PASSVATE_PROD, done_code);
+		}
+	}
+	/**
+	 * 保存订单收费费用信息
 	 * @param orderProd
 	 * @throws InvocationTargetException 
 	 * @throws IllegalAccessException 
@@ -820,6 +937,31 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		pay.setFee(payFee);
 		
 		feeComponent.saveAcctFee(cust.getCust_id(), cust.getAddr_id(), pay, doneCode, busi_code, StatusConstants.UNPAY);
+	}
+	/**
+	 * 保存订单退款费用信息
+	 * @param cancelList
+	 * @param cust
+	 * @param doneCode
+	 * @param busi_code
+	 * @throws InvocationTargetException 
+	 * @throws Exception 
+	 */
+	private void saveCancelFee(List<CProdOrderDto> cancelList,CCust cust,Integer doneCode,String busi_code) throws Exception{
+		//按订单退款
+		for(CProdOrderDto order:cancelList){
+			if(order.getActive_fee()>0){
+				PayDto pay=new PayDto();
+				BeanHelper.copyProperties(pay, order);
+				pay.setProd_sn(order.getOrder_sn());
+				pay.setAcctitem_id(order.getProd_id());
+				pay.setBegin_date(DateHelper.dateToStr(DateHelper.today().before(order.getEff_date())? order.getEff_date():DateHelper.today()));
+				pay.setInvalid_date(DateHelper.dateToStr(order.getExp_date()));
+				pay.setPresent_fee(0);
+				pay.setFee(order.getActive_fee()*-1);
+				feeComponent.saveAcctFee(cust.getCust_id(), cust.getAddr_id(), pay, doneCode, busi_code, StatusConstants.UNPAY);
+			}
+		}
 	}
 	
 	/**
@@ -879,15 +1021,15 @@ public class OrderService extends BaseBusiService implements IOrderService{
 			List<CProdOrder> lastOrderList=new ArrayList<>();
 			if(!prod.getProd_type().equals(SystemConstants.PROD_TYPE_BASE)){
 				//套餐的情况
-				lastOrderList=cProdOrderDao.queryTransOrderByPackage(orderProd.getCust_id());
+				lastOrderList=cProdOrderDao.queryNotExpPackageOrder(orderProd.getCust_id());
 			}else if(prod.getServ_id().equals(SystemConstants.PROD_SERV_ID_BAND)){
 				//单产品宽带的情况
-				for(CProdOrder order: cProdOrderDao.queryProdOrderByUserId(orderProd.getUser_id())){
+				for(CProdOrder order: cProdOrderDao.queryProdOrderDtoByUserId(orderProd.getUser_id())){
 					lastOrderList.add(order);
 				}
 			}else{
 				//单产品非宽带的情况
-				for(CProdOrder order: cProdOrderDao.queryProdOrderByUserId(orderProd.getUser_id())){
+				for(CProdOrder order: cProdOrderDao.queryProdOrderDtoByUserId(orderProd.getUser_id())){
 					if(order.getProd_id().equals(orderProd.getProd_id())){
 						lastOrderList.add(order);
 					}

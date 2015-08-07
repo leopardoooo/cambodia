@@ -20,6 +20,29 @@ public class ProdOrderAction extends BaseBusiAction {
 	private String prod_id;
 	private String orderProd;
 	
+	private Integer cancelFee;
+	private String[] orderSns;
+	private String orderSn;
+	
+	/**
+	 * 退订产品(高级和普通退订)
+	 * @return
+	 * @throws Exception 
+	 */
+	public String cancelProd() throws Exception{
+		orderService.saveCancelProd(orderSns, cancelFee);
+		return JSON_SUCCESS;
+	}
+	/**
+	 * 取消当天已支付订单
+	 * @return
+	 * @throws Exception
+	 */
+	public String cancelTodayOrder() throws Exception{
+		orderService.saveCancelTodayOrder(orderSn, cancelFee);
+		return JSON_SUCCESS;
+	}
+	
 	public String loadProdList() throws Exception{
 		getRoot().setSimpleObj(orderService.queryOrderableProd(busi_code,cust_id,user_id, filter_order_sn));
 		return JSON_SIMPLEOBJ;
@@ -108,6 +131,24 @@ public class ProdOrderAction extends BaseBusiAction {
 
 	public void setOrderProd(String orderProd) {
 		this.orderProd = orderProd;
+	}
+	public Integer getCancelFee() {
+		return cancelFee;
+	}
+	public void setCancelFee(Integer cancelFee) {
+		this.cancelFee = cancelFee;
+	}
+	public String[] getOrderSns() {
+		return orderSns;
+	}
+	public void setOrderSns(String[] orderSns) {
+		this.orderSns = orderSns;
+	}
+	public String getOrderSn() {
+		return orderSn;
+	}
+	public void setOrderSn(String orderSn) {
+		this.orderSn = orderSn;
 	}
 	
 }
