@@ -307,6 +307,11 @@ public class OrderService extends BaseBusiService implements IOrderService{
 			//未支付判断
 			throw new ServicesException(ErrorCode.NotCancleHasUnPay);
 		}
+		//状态判断
+		if(!order.getStatus().equals(StatusConstants.ACTIVE)
+				&&!order.getStatus().equals(StatusConstants.INSTALL)){
+			throw new ServicesException(ErrorCode.NotCancelStatusException);
+		}
 		if(!isHigh&&order.getBilling_cycle()>1){
 			//包多月判断
 			throw new ServicesException(ErrorCode.NotCancelHasMoreBillingCycle);

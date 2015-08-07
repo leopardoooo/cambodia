@@ -12,6 +12,8 @@ public enum ErrorCode {
 	NotCancelUserProtocol("设备协议期未结束，不能退订"),
 	NotCancelIsPackageDetail("订单是套餐子产品，不能独立退订"),
 	NotCancelOnlyTodayIsYou("只能取消当天自己操作的订单"),
+	NotCancelStatusException("订单状态异常，不能退订"),
+	
 	FeeDateException("前后台金额不一致"),
 	CFeeAndProdOrderIsNotOne("费用记录和订单信息不一致"),
 	UnPayOrderCancelBefor("请先取消订单号=%s的订单费用"),
