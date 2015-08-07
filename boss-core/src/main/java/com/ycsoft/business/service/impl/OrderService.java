@@ -313,6 +313,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		}
 		if(!isHigh&&order.getProd_type().equals(SystemConstants.PROD_TYPE_BASE)
 				&& order.getIs_base().equals(SystemConstants.BOOLEAN_TRUE)
+				&&order.getProtocol_date()!=null
 				&&DateHelper.today().before(order.getProtocol_date())){
 			//基础单产品协议期未到不能终止
 			throw new ServicesException(ErrorCode.NotCancelUserProtocol);
@@ -321,7 +322,8 @@ public class OrderService extends BaseBusiService implements IOrderService{
 			//套餐子产品的硬件协议期判断
 			for(CProdOrderDto son:  cProdOrderDao.queryProdOrderDtoByPackageSn(order.getOrder_sn())){
 				if(son.getIs_base().equals(SystemConstants.BOOLEAN_TRUE)
-						&& son.getProtocol_date() != null &&DateHelper.today().before(son.getProtocol_date())){
+						&&son.getProtocol_date()!=null
+						&&DateHelper.today().before(son.getProtocol_date())){
 					throw new ServicesException(ErrorCode.NotCancelUserProtocol);
 				}
 			}
@@ -467,7 +469,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 					}
 				}
 			} else {
-				throw new ServicesException("该产品不能升级");
+				throw new ServicesException(ErrorCode.OrderDateCanNotUp);
 			}
 		} 
 		
@@ -535,7 +537,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 			return;
 		PProd prod= pProdDao.findByKey(order.getProd_id());
 		if (prod.getExp_date() != null && prod.getEff_date().before(new Date())){
-			throw new ServicesException("产品已失效");
+			throw new ServicesException(ErrorCode.ProdIsInvalid);
 		}
 		CUser user = null;
 		CProdOrder lastOrder = null;
@@ -718,7 +720,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 				if(StringHelper.isNotEmpty(prod_id)){
 					PProd prodconfig=pProdDao.findByKey(prod_id);
 					if(prodconfig==null){
-						throw new ComponentException("套餐配置有错误，请联系管理员!");
+						throw new ComponentException(ErrorCode.OrderDatePackageConfig);
 					}
 					pgu.getProdList().add(pProdDao.findByKey(prod_id));
 				}
@@ -786,7 +788,8 @@ public class OrderService extends BaseBusiService implements IOrderService{
 			return;
 		}
 		
-		//提取原订购记录的套餐组用户选择情况
+		//提取原订购记录的套餐组用户选择情况,且适用现在的套餐产品限制条件
+		//TODO
 		Map<String,List<String>> selectUsers=new HashMap<String,List<String>>();
 		for(CProdOrder order:cProdOrderDao.queryPakDetailOrder(last_order_sn)){
 			if(StringHelper.isNotEmpty(order.getPackage_group_id())
@@ -797,7 +800,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 				selectUsers.get(order.getPackage_group_id()).add(order.getUser_id());
 			}
 		}
-		//状态到新订购的套餐内容组用户选择中
+		//装到新订购的套餐内容组用户选择中
 		for(PackageGroupUser pgu: panel.getGroupList()){
 			pgu.setUserSelectList(selectUsers.get(pgu.getPackage_group_id()));
 		}
@@ -905,7 +908,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		}
 	}
 	/**
-	 * 钝化产品（不处理套餐，但是一个产品如果套餐子产品则会被处理）
+	 * 钝化产品（不处理套餐，但是一个产品如果是套餐子产品则会被处理）
 	 * @param cancelList
 	 * @throws Exception 
 	 */
@@ -1008,7 +1011,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		PProd prod=prodConfig;
 		if(!prod.getProd_type().equals(SystemConstants.PROD_TYPE_BASE)){
 			if(StringHelper.isNotEmpty(orderProd.getUser_id())){
-				throw new ServicesException("订购套餐时，不能填user_id！");
+				throw new ServicesException(ErrorCode.OrderPackageHasSingleUserParam);
 			}
 		}
 		CProdOrder lastOrder=null;
@@ -1016,17 +1019,24 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		if(StringHelper.isNotEmpty(orderProd.getLast_order_sn())){
 			lastOrder=cProdOrderDao.findByKey(orderProd.getLast_order_sn());
 			if(lastOrder==null){
-				throw new ServicesException("上期订购记录不存在！");
+				throw new ServicesException(ErrorCode.OrderDateLastOrderIsLost);
 			}
 			if(!lastOrder.getCust_id().equals(orderProd.getCust_id())){
-				throw new ServicesException("上期订购记录和本期客户不一致！");
+				throw new ServicesException(ErrorCode.OrderDateLastOrderNotCust);
 			}
 			if(StringHelper.isNotEmpty(lastOrder.getUser_id())){
 				if(StringHelper.isEmpty(orderProd.getUser_id())){
 					orderProd.setUser_id(lastOrder.getUser_id());
 				}
 				if(!lastOrder.getUser_id().equals(orderProd.getUser_id())){
-					throw new ServicesException("上期订购记录和本期用户不一致！");
+					throw new ServicesException(ErrorCode.OrderDateLastOrderNotUser);
+				}
+				CUser user=cUserDao.findByKey(orderProd.getUser_id());
+				if(user==null){
+					throw new ServicesException(ErrorCode.OrderDateUserNotCust,orderProd.getUser_id());
+				}
+				if(!user.getCust_id().equals(orderProd.getCust_id())){
+					throw new ServicesException(ErrorCode.OrderDateUserNotCust,orderProd.getUser_id());
 				}
 			}
 		}
@@ -1051,11 +1061,11 @@ public class OrderService extends BaseBusiService implements IOrderService{
 			}
 			
 			if(lastOrderList==null||lastOrderList.size()==0){
-				throw new ServicesException("上期订购记录已过期，请重新打开订购界面！");
+				throw new ServicesException(ErrorCode.OrderDateLastOrderIsLost);
 			}
 			for(CProdOrder tmpOrder:lastOrderList){
 				if(tmpOrder.getExp_date().after(lastOrder.getExp_date())){
-					throw new ServicesException("上期订购记录已过期，请重新打开订购界面！");
+					throw new ServicesException(ErrorCode.OrderDateLastOrderIsLost);
 				}
 			}
 		}
@@ -1064,12 +1074,12 @@ public class OrderService extends BaseBusiService implements IOrderService{
 				&&!busi_code.equals(BusiCodeConstants.PROD_UPGRADE)){
 			//有上期订购记录且非升级的情况，开始计费日是上期计费日+1天
 			if(!DateHelper.addDate(lastOrder.getExp_date(), 1).equals(orderProd.getEff_date())){
-				throw new ServicesException("开始计费日错误！");
+				throw new ServicesException(ErrorCode.OrderDateEffDateError);
 			}
 		}else{
 			//没有上期订购记录 或者 升级的情况，开始计费日=今天
 			if(!DateHelper.isToday(orderProd.getEff_date())){
-				throw new ServicesException("开始计费日错误！");
+				throw new ServicesException(ErrorCode.OrderDateEffDateError);
 			}
 		}
 		
@@ -1082,26 +1092,25 @@ public class OrderService extends BaseBusiService implements IOrderService{
 			billing_cycle=pProdTariffDao.findByKey(tmpTariff[0]).getBilling_cycle();
 		}
 		if(orderProd.getOrder_months()==0&&!busi_code.equals(BusiCodeConstants.PROD_UPGRADE)){
-			throw new  ComponentException("订购月数的不能=0");
+			throw new  ComponentException(ErrorCode.OrderDateOrderMonthError);
 		}
 		if(orderProd.getOrder_months()%billing_cycle!=0){
-			throw new  ComponentException("订购月数非资费周期月数的倍数");
+			throw new  ComponentException(ErrorCode.OrderDateOrderMonthError);
 		}
 		
 		//结束计费日校检
 		if(busi_code.equals(BusiCodeConstants.PROD_UPGRADE)&&orderProd.getOrder_months()==0){
 			//升级且0订购月数的情况，结束日期=上期订购结束日
 			if(!orderProd.getExp_date().equals(lastOrder.getExp_date())){
-				throw new ServicesException("结束计费日错误！");
+				throw new ServicesException(ErrorCode.OrderDateExpDateError);
 			}
 		}else{
 			//其他情况应该是 结束计费日=开始计费日+订购月数。
 			if(!DateHelper.getNextMonthByNum(orderProd.getEff_date(), orderProd.getOrder_months())
 					.equals(orderProd.getExp_date())){
-				throw new ServicesException("结束计费日错误！");
+				throw new ServicesException(ErrorCode.OrderDateExpDateError);
 			}
-		}
-		
+		}		
 		return lastOrder;
 	}
 	
