@@ -335,7 +335,7 @@ ProdGrid = Ext.extend(Ext.TabPanel,{
 			activeTab: 0,
 			border: false,
 			items: [{
-				title: '基本产品',
+				title: '用户产品',
 				border: false,
 				layout: 'fit',
 				items: [this.baseProdGrid]
@@ -435,6 +435,7 @@ ProdGrid = Ext.extend(Ext.TabPanel,{
 				//隐藏数据加载提示框
 				App.hideTip();
 				this.custPkgGrid.getStore().loadData(data["CUST"]);
+				this.setActiveTab(1);
 			}
 		});
 	},

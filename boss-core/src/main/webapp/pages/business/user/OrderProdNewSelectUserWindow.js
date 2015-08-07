@@ -67,12 +67,16 @@ SelectUserPanel = Ext.extend(Ext.Panel, {
 			this.dispatchUserWindow = new OpenDispatchUserWindow(this);
 		}
 		// 
-		if(data["needShow"] === true){
-			this.dispatchUserWindow.show(data);
-			Ext.getCmp("btnSelUser").setDisabled(false);
+		if(data){
+			if(data["needShow"] === true){
+				this.dispatchUserWindow.show(data);
+				Ext.getCmp("btnSelUser").setDisabled(false);
+			}else{
+				Ext.getCmp("btnSelUser").setDisabled(true);
+				this.dispatchUserWindow.saveDefaultUsersWithNoShow(data);
+			}
 		}else{
-			Ext.getCmp("btnSelUser").setDisabled(true);
-			this.dispatchUserWindow.saveDefaultUsersWithNoShow(data);
+			this.dispatchUserWindow.show();
 		}
 	},
 	loadSingleUser: function(userDesc){
