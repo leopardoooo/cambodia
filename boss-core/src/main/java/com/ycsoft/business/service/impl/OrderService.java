@@ -321,7 +321,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 			//套餐子产品的硬件协议期判断
 			for(CProdOrderDto son:  cProdOrderDao.queryProdOrderDtoByPackageSn(order.getOrder_sn())){
 				if(son.getIs_base().equals(SystemConstants.BOOLEAN_TRUE)
-						&&DateHelper.today().before(son.getProtocol_date())){
+						&& son.getProtocol_date() != null &&DateHelper.today().before(son.getProtocol_date())){
 					throw new ServicesException(ErrorCode.NotCancelUserProtocol);
 				}
 			}
