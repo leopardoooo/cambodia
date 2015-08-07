@@ -4,7 +4,7 @@ import java.util.Date;
 import java.util.List;
 
 public class User {
-	private Integer user_id;
+	private String user_id;
 	private String user_name;
 	private String user_passwd;
 	private String state;
@@ -18,11 +18,13 @@ public class User {
 	
 	private List<DeviceInfo> device_info;
 
-	public Integer getUser_id() {
+	
+
+	public String getUser_id() {
 		return user_id;
 	}
 
-	public void setUser_id(Integer user_id) {
+	public void setUser_id(String user_id) {
 		this.user_id = user_id;
 	}
 

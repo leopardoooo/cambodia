@@ -10,42 +10,27 @@ import com.ycsoft.http.HttpUtils;
 import com.ycsoft.http.ResponseBody;
 
 public class OttClient {
-	private static String UNDEFINED_ERROR_STATUS="10000";
+	public static String UNDEFINED_ERROR_STATUS="10000";
 	
 	/**
 	 * 创建用户
 	 * @return
 	 */
-	public Result createUser(Integer userId,String password,String custName,String address,
+	public Result createUser(String userId,String password,String userName,String address,
 			String email,String telephone,String deviceId,String deviceMac){
-		User user = generateUser(userId,password,custName,address,email,telephone,deviceId,deviceMac);
+		User user = generateUser(userId,password,userName,address,email,telephone,deviceId,deviceMac);
 		String url = URLBuilder.getUrl(URLBuilder.Method.CREATE_USER); 
-		Result result =null;
-		
-		try {
-			String jsonData = new Gson().toJson(user);
-			ResponseBody response = HttpUtils.doPost(url, jsonData);
-			result = new Gson().fromJson(response.getBody(), Result.class);
-		} catch (Throwable e) {
-			result = new Result();
-			result.setErr("1");
-			result.setStatus(UNDEFINED_ERROR_STATUS);
-			result.setReason(e.getMessage());
-		}
-		
-		return result;
-		
+		String jsonData = new Gson().toJson(user);
+		return sendOttCmdOnHttp(url, jsonData);
 	}
-	
-	
 
 	/**
 	 * 修改用户
 	 * @return
 	 */
-	public Result editUser(Integer userId,String password,String custName,String address,
+	public Result editUser(String userId,String password,String userName,String address,
 			String email,String telephone,String deviceId,String deviceMac){
-		return this.createUser(userId, password, custName, address, email,
+		return this.createUser(userId, password, userName, address, email,
 				telephone, deviceId, deviceMac);
 	}
 	
@@ -53,70 +38,38 @@ public class OttClient {
 	 * 删除用户
 	 * @return
 	 */
-	public Result deleteUser(Integer userId){
+	public Result deleteUser(String userId){
 		String url = URLBuilder.getUrl(URLBuilder.Method.DELETE_USER); 
-		Result result =null;
-		
-		try {
-			JsonObject jsonData = new JsonObject();
-			jsonData.addProperty("user_id", userId.toString());
-			ResponseBody response = HttpUtils.doPost(url, jsonData.toString());
-			result = new Gson().fromJson(response.getBody(), Result.class);
-		} catch (Throwable e) {
-			result = new Result();
-			result.setErr("1");
-			result.setStatus(UNDEFINED_ERROR_STATUS);
-			result.setReason(e.getMessage());
-		}
-		
-		return result;
+		JsonObject jsonData = new JsonObject();
+		jsonData.addProperty("user_id", userId);
+		return sendOttCmdOnHttp(url, jsonData.toString());
 	}
 	
 	/**
 	 * 发送产品加授权
 	 * @return
 	 */
-	public Result openUserProduct(Integer userId,String productId,Date expDate){
+	public Result openUserProduct(String userId,String productId,String expDate){
 		String url = URLBuilder.getUrl(URLBuilder.Method.OPEN_USER_PRODCT); 
-		Result result =null;
-		try {
-			Auth auth = new Auth(userId.toString(),productId);
-			auth.setEnd_time(expDate);
-			List<Auth> authList = new ArrayList<>();
-			authList.add(auth);
-			ResponseBody response = HttpUtils.doPost(url, new Gson().toJson(authList));
-			result = new Gson().fromJson(response.getBody(), Result.class);
-		} catch (Throwable e) {
-			result = new Result();
-			result.setErr("1");
-			result.setStatus(UNDEFINED_ERROR_STATUS);
-			result.setReason(e.getMessage());
-		}
+		Auth auth = new Auth(userId.toString(),productId);
+		auth.setEnd_time(expDate);
+		List<Auth> authList = new ArrayList<>();
+		authList.add(auth);
+		return sendOttCmdOnHttp(url, new Gson().toJson(authList));
 		
-		return result;
 	}
 	/**
 	 * 发产品减授权
 	 * @return
 	 */
 	
-	public Result stopUserProduct(Integer userId,String productId){
+	public Result stopUserProduct(String userId,String productId){
 		String url = URLBuilder.getUrl(URLBuilder.Method.STOP_USER_PRODCT); 
-		Result result =null;
-		try {
-			JsonObject jsonData = new JsonObject();
-			jsonData.addProperty("user_Id", userId.toString());
-			jsonData.addProperty("product_id", productId);
-			ResponseBody response = HttpUtils.doPost(url, jsonData.toString());
-			result = new Gson().fromJson(response.getBody(), Result.class);
-		} catch (Throwable e) {
-			result = new Result();
-			result.setErr("1");
-			result.setStatus(UNDEFINED_ERROR_STATUS);
-			result.setReason(e.getMessage());
-		}
+		JsonObject jsonData = new JsonObject();
+		jsonData.addProperty("user_Id", userId);
+		jsonData.addProperty("product_id", productId);
+		return sendOttCmdOnHttp(url, jsonData.toString());
 		
-		return result;
 	}
 	
 	/**
@@ -125,20 +78,8 @@ public class OttClient {
 	 */
 	public Result addOrUpdateProduct(String productId,String productName){
 		String url = URLBuilder.getUrl(URLBuilder.Method.ADD_UPDATE_PRODUCT); 
-		Result result =null;
-		
-		try {
-			Product product = new Product(productId,productName);
-			ResponseBody response = HttpUtils.doPost(url, new Gson().toJson(product));
-			result = new Gson().fromJson(response.getBody(), Result.class);
-		} catch (Throwable e) {
-			result = new Result();
-			result.setErr("1");
-			result.setStatus(UNDEFINED_ERROR_STATUS);
-			result.setReason(e.getMessage());
-		}
-		
-		return result;
+		Product product = new Product(productId,productName);
+		return sendOttCmdOnHttp(url, new Gson().toJson(product));
 	}
 	
 	/**
@@ -147,12 +88,18 @@ public class OttClient {
 	 */
 	public Result deleteProduct(String productId){
 		String url = URLBuilder.getUrl(URLBuilder.Method.DELETE_PRODUCT); 
-		Result result =null;
+		JsonObject jsonData = new JsonObject();
+		jsonData.addProperty("ids", productId);
 		
+		return sendOttCmdOnHttp(url,  jsonData.toString());
+		
+	}
+	
+	//发送指令
+	private Result sendOttCmdOnHttp(String url,String param){
+		Result result =null;
 		try {
-			JsonObject jsonData = new JsonObject();
-			jsonData.addProperty("ids", productId);
-			ResponseBody response = HttpUtils.doPost(url, jsonData.toString());
+			ResponseBody response = HttpUtils.doPost(url, param);
 			result = new Gson().fromJson(response.getBody(), Result.class);
 		} catch (Throwable e) {
 			result = new Result();
@@ -160,7 +107,6 @@ public class OttClient {
 			result.setStatus(UNDEFINED_ERROR_STATUS);
 			result.setReason(e.getMessage());
 		}
-		
 		return result;
 	}
 	
@@ -175,12 +121,12 @@ public class OttClient {
 	 * @param deviceMac
 	 * @return
 	 */
-	private User generateUser(Integer userId,String password, String custName, String address, String email, String telephone,
+	private User generateUser(String userId,String password, String userName, String address, String email, String telephone,
 			String deviceId, String deviceMac) {
 		User user = new User();
 		user.setUser_id(userId);
 		user.setUser_passwd(password);
-		user.setUser_name(custName);
+		user.setUser_name(userName);
 		user.setAddress(address);
 		user.setEmail(email);
 		user.setTelephone(telephone);
