@@ -11,7 +11,7 @@ hasCust = function() {
 	return true;
 }
 // 冲正
-UnPay = function(record) {
+UnPayBak = function(record) {
 	// 回调函数
 	function callback(res, opt) {
 		Alert('冲正成功!');
@@ -45,7 +45,35 @@ UnPay = function(record) {
 		return false;
 	}
 	return false;
-},
+}
+
+// UpdateFlag: 回退当天的订单
+UnPay = function(record) {
+	// 回调函数
+	function callback(res, opt) {
+		Alert('冲正成功!');
+		App.main.infoPanel.setReload(true);
+		App.main.infoPanel.getPayfeePanel().refresh();
+		App.main.infoPanel.getAcctPanel().refresh();
+		App.main.infoPanel.getDocPanel().setReload(true);
+		App.main.infoPanel.getDoneCodePanel().setReload(true);
+	}
+
+	if (record) {
+		var params = {};
+		params["order_sn"] = record.get("prod_sn");
+		params["cancelFee"] = record.get("real_pay");
+
+		var url = Constant.ROOT_PATH + "/core/x/ProdOrder!cancelTodayOrder.action";
+		Confirm("确定要回退【金额："+ params["cancelFee"]/100.0+"】吗?", this, function() {
+			App.sendRequest(url, params, callback);
+		});
+	} else {
+		Alert('请选择要冲正的费用记录!');
+		return false;
+	}
+	return false;
+}
 
 /**
  * 为MenuHandler添加处理函数
@@ -1595,6 +1623,15 @@ Ext.apply(MenuHandler, {
 		
 		return false;
 	},
+	// 退订
+	CancelProdNew: function(){
+		//柬埔寨
+		return {
+			width:750,
+			height:450
+		};
+	},
+	
 	// 退订
 	CancelProd: function(){
 		

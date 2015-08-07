@@ -19,6 +19,11 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>com.yaochen.cambodia</groupId>
+			<artifactId>boss-remoting</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>com.yaochen</groupId>
 			<artifactId>myquartz</artifactId>
 			<version>1.0</version>

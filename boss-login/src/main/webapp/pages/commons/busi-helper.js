@@ -406,7 +406,7 @@ Ext.apply( App, {
 		}else if(busiCode == '1500'){//订购，刷新产品和账户
 			panel.getUserPanel().prodGrid.remoteRefresh();
 			panel.getAcctPanel().acctGrid.remoteRefresh();
-		}else if(busiCode == '1015' || busiCode == '1027' || busiCode == '1127' || busiCode == '1034' || busiCode == '1028'|| busiCode == '1072' || busiCode == '1232' || busiCode == '1081'|| busiCode == '1983' || busiCode == '1984' || busiCode == '1036' || busiCode =='1304' ){//产品退订或套餐退订，刷新账户、产品和套餐, //资费变更、协议缴费,失效日期变更、取消变更资费,修改到期日,修改预开通时间,修改公用账目使用类型
+		}else if(busiCode == '1015' || busiCode == '1027' || busiCode == '1127' || busiCode == '1034' || busiCode == '1028'|| busiCode == '1072' || busiCode == '1232' || busiCode == '1081'|| busiCode == '1983' || busiCode == '1984' || busiCode == '1036' || busiCode =='1304' || busiCode == '110'){//产品退订或套餐退订，刷新账户、产品和套餐, //资费变更、协议缴费,失效日期变更、取消变更资费,修改到期日,修改预开通时间,修改公用账目使用类型
 			panel.getUserPanel().prodGrid.remoteRefresh();
 			panel.getAcctPanel().acctGrid.remoteRefresh();
 			if(busiCode == '1015')
