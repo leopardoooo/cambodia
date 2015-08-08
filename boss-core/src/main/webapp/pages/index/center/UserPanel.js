@@ -284,8 +284,11 @@ ProdGrid = Ext.extend(Ext.TabPanel,{
 			         "order_sn","package_sn","package_id","cust_id","user_id","prod_id","tariff_id","disct_id",
 			         "status","status_text","status_date","eff_date","exp_date","active_fee","bill_fee",
 			         "rent_fee","last_bill_date","next_bill_date","order_months","order_fee","order_time",
-			         "order_type","package_group_id","remark","public_acctitem_type"],
-			sortInfo: []
+			         "order_type","package_group_id","remark","public_acctitem_type"],			
+			sortInfo : {
+				field : 'prod_name',
+				direction:'DESC'
+			}
 		});
 		this.userProdStore.on('load',this.doLoadResult,this);
 		// 基本产品
@@ -335,7 +338,7 @@ ProdGrid = Ext.extend(Ext.TabPanel,{
 			activeTab: 0,
 			border: false,
 			items: [{
-				title: '基本产品',
+				title: '用户产品',
 				border: false,
 				layout: 'fit',
 				items: [this.baseProdGrid]
@@ -435,6 +438,7 @@ ProdGrid = Ext.extend(Ext.TabPanel,{
 				//隐藏数据加载提示框
 				App.hideTip();
 				this.custPkgGrid.getStore().loadData(data["CUST"]);
+				this.setActiveTab(1);
 			}
 		});
 	},
