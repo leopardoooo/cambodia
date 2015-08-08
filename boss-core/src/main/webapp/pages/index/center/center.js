@@ -25,7 +25,7 @@ InfoPanel = Ext.extend( CommonTab , {
 		this.unitPanel = new UnitPanel();
 		this.custPanel = new CustPanel();
 		
-		this.userPanel = this.custPanel.userPanel;
+		this.userPanel = new UserPanel();
 		
 		this.acctPanel = new AcctPanel();
 		this.payfeePanel = new PayfeePanel();
@@ -54,21 +54,21 @@ InfoPanel = Ext.extend( CommonTab , {
 				layout: 'fit',
 				border: false,
 				items: [this.unitPanel]
-			},/*{
+			},{
 				id: 'USER_PANEL',
 				iconCls:'user',
 				title: langUtils.bc("home.main.tabs.[2]"),
 				layout: 'fit',
 				border: false,
 				items: [this.userPanel]
-			},*/{
+			}/*,{
 				id: 'ACCT_PANEL',
 				iconCls:'acct',
 				title: langUtils.bc("home.main.tabs.[3]"),
 				layout: 'fit',
 				border: false,
 				items: [this.acctPanel]
-			},{
+			}*/,{
 				id: 'PAY_PANEL',
 				iconCls:'pay_fee',
 				title: langUtils.bc("home.main.tabs.[4]"),

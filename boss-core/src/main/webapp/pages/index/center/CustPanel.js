@@ -879,15 +879,15 @@ CustDetailTab = Ext.extend(Ext.TabPanel,{
 				border: false
 			},
 			items: [{
-			    title: '综合信息',
-			    items: [this.generalPanel]
-			},{
+//			    title: '综合信息',
+//			    items: [this.generalPanel]
+//			},
 				title: '异动信息',
 			    items: [this.propChangeGrid]
-			},{
+			}/*,{
 				title: '套餐信息',
 				items:[this.promFeeGrid]
-			}]
+			}*/]
 		})
 	}
 })
@@ -1006,7 +1006,6 @@ CustPanel = Ext.extend( BaseInfoPanel , {
 	unitGrid:null,
 	packageGrid: null,
 	deviceDetailTab: null,
-	userPanel: null,
 	
 	constructor: function(){
 		//子面板实例化
@@ -1016,7 +1015,7 @@ CustPanel = Ext.extend( BaseInfoPanel , {
 		this.deviceDetailTab = new DeviceDetailTab();
 		this.unitGrid = new UnitGrid(); 
 		
-		this.userPanel = new UserPanel();
+		this.acctPanel = new AcctPanel();
 		
 		CustPanel.superclass.constructor.call(this, {
 			layout:"border",
@@ -1040,12 +1039,13 @@ CustPanel = Ext.extend( BaseInfoPanel , {
 			},{
 				region:"east",
 				split:true,
-				width:"80%",
+				width:"50%",
 				layout:"fit",
 				id: 'USER_PANEL',
 				border: false,
-				items: [this.userPanel]
-//				items:[{
+				layout: 'fit',
+				items: [this.acctPanel]
+//				,items:[{
 //					anchor:"100% 62%",
 //					layout:'fit',
 //					border: false,

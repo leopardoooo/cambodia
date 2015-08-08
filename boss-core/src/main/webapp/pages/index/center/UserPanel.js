@@ -877,13 +877,13 @@ UserDetailTab = Ext.extend(CommonTab,{
 			},{
 				title:'异动信息',
 				items:[this.userPropChangeGrid]
-			},{
+			}/*,{
 				title : '有效资源',
 				items:[this.userValidResGrid]
 			},{
 				title : '促销信息',
 				items:[this.promotionGrid]
-			}]
+			}*/]
 		});
 	},
 	refreshPanel : function(p){
@@ -1207,10 +1207,10 @@ ProdDetailTab = Ext.extend(CommonTab,{
 	userRecord : null,
 	isReload:true,
 	constructor:function(){
-		this.prodExpensesGrid = new ProdExpensesGrid();
+//		this.prodExpensesGrid = new ProdExpensesGrid();
 		this.prodPropChangeGrid = new ProdPropChangeGrid();
-		this.tariffChangeGrid = new TariffChangeGrid();
-		this.prodResGrid = new ProdResGrid();
+//		this.tariffChangeGrid = new TariffChangeGrid();
+//		this.prodResGrid = new ProdResGrid();
 		this.prodDetailInfo = new ProdDetailInfo();
 		ProdDetailTab.superclass.constructor.call(this, {
 			activeTab: 0,
@@ -1222,19 +1222,19 @@ ProdDetailTab = Ext.extend(CommonTab,{
 			items:[{
 				title:'详细信息',
 				items:[this.prodDetailInfo]
-			},{
+			}/*,{
 				title:'资源信息',
 				items:[this.prodResGrid]
 			},{
 				title:'资费信息',
 				items:[this.prodExpensesGrid]
-			},{
+			}*/,{
 				title:'状态异动',
 				items:[this.prodPropChangeGrid]
-			},{
+			}/*,{
 				title:'资费变更',
 				items:[this.tariffChangeGrid]
-			}]
+			}*/]
 		});
 	},
 	refreshPanel : function(p){
@@ -1278,10 +1278,10 @@ ProdDetailTab = Ext.extend(CommonTab,{
 	},
 	resetPanel : function(){//重置Tab面板的子面板信息
 		this.prodDetailInfo.reset();
-		this.prodExpensesGrid.reset();
+		//this.prodExpensesGrid.reset();
 		this.prodPropChangeGrid.reset();
-		this.prodResGrid.reset();
-		this.tariffChangeGrid.reset();
+		//this.prodResGrid.reset();
+		//this.tariffChangeGrid.reset();
 		this.prodSn = null;
 		this.tariffId = null;
 		this.userRecord = null;
