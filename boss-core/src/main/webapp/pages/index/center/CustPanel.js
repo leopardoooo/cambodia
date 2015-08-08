@@ -869,8 +869,8 @@ CustDetailTab = Ext.extend(Ext.TabPanel,{
 	promFeeGrid : null,
 	constructor : function(){
 		this.propChangeGrid = new PropChangeGrid();
-		this.generalPanel = new GeneralPanel();
-		this.promFeeGrid = new PromFeeGrid();
+		//this.generalPanel = new GeneralPanel();
+		//this.promFeeGrid = new PromFeeGrid();
 		CustDetailTab.superclass.constructor.call(this,{
 			activeTab: 0,
 			border : false,
@@ -1041,7 +1041,6 @@ CustPanel = Ext.extend( BaseInfoPanel , {
 				split:true,
 				width:"50%",
 				layout:"fit",
-				id: 'USER_PANEL',
 				border: false,
 				layout: 'fit',
 				items: [this.acctPanel]
@@ -1064,13 +1063,13 @@ CustPanel = Ext.extend( BaseInfoPanel , {
 		//this.custDeviceGrid.remoteRefresh();
 		//this.deviceDetailTab.resetPanel();
 		this.refreshPropChangeGrid();
-		this.refreshPromFeeGrid();
+		//this.refreshPromFeeGrid();
 	},
 	refreshPropChangeGrid : function(){
 		this.custDetailTab.propChangeGrid.remoteRefresh();
 	},
 	refreshPromFeeGrid : function(){
-		this.custDetailTab.promFeeGrid.remoteRefresh();
+		//this.custDetailTab.promFeeGrid.remoteRefresh();
 	}
 });
 Ext.reg( "custpanel" , CustPanel );
