@@ -477,7 +477,7 @@ public class OrderComponent extends BaseBusiComponent {
 			trans.setFrom_order_sn(cancelOrder.getOrder_sn());
 			//TODO 有充值卡业务时要修改
 			trans.setFee_type(SystemConstants.ACCT_FEETYPE_CASH);
-			if(cProdOrder.getIs_pay().equals(SystemConstants.BOOLEAN_TRUE)){
+			if(cancelOrder.getIs_pay().equals(SystemConstants.BOOLEAN_TRUE)){
 				int fee=this.getTransCancelFee(cancelDate, cancelOrder);
 				trans.setBalance(fee);
 				transFee=transFee+fee;
@@ -571,7 +571,7 @@ public class OrderComponent extends BaseBusiComponent {
 							throw new ServicesException(ErrorCode.OrderDateUserNotCust,user_id);
 						}
 						if(StringHelper.isNotEmpty(pakprod.getTerminal_type())
-								&&pakprod.getTerminal_type().equals(user.getTerminal_type())){
+								&&!pakprod.getTerminal_type().equals(user.getTerminal_type())){
 							//用户适用检查
 							throw new ServicesException(ErrorCode.OrderDateUserNotCust,user_id);
 						}

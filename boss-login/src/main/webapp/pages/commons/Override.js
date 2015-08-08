@@ -27,7 +27,11 @@ new Ext.KeyMap(document,
  Ext.data.Store.prototype.applySort = function() {
 	if (this.sortInfo && !this.remoteSort) {
 		var s = this.sortInfo, f = s.field;
-		var st = this.fields.get(f).sortType;
+		var tmp = this.fields.get(f);
+		if(!tmp || tmp.sortType){
+			return;
+		}
+		var st = tmp.sortType;
 		var fn = function(r1, r2) {
 			var v1 = st(r1.data[f]), v2 = st(r2.data[f]);
 			// 添加:修复汉字排序异常的Bug

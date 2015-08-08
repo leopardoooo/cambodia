@@ -113,7 +113,7 @@ PayPanel = Ext.extend( Ext.Panel ,{
 				{ header: '操作员', dataIndex: 'optr_name', width: 60},
 				{ header: '操作时间', dataIndex: 'create_time', width: 80},
 				{ header: '订单号', dataIndex: 'prod_sn', width: 60,renderer: function(v , md, record , i  ){
-					if(v){
+					if(v && record.get("real_pay") > 0){
 						return "<DIV><a href='#' onclick='more("+ i +");'>取消</a></DIV>";
 					}
 					return "";

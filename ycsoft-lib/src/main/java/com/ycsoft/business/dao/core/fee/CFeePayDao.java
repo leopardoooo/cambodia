@@ -369,14 +369,14 @@ public class CFeePayDao extends BaseEntityDao<CFeePay> {
 		}
 		if(StringHelper.isEmpty(sql)){
 			sql = " select * from (SELECT t.*,t2.acctitem_name fee_text,t2.acctitem_name,ca.acct_type,t3.begin_date,"
-				+ " t3.prod_invalid_date,r.finance_status,r.invoice_type doc_type"
+				+ " t3.prod_invalid_date,r.finance_status,r.invoice_type doc_type,t3.prod_sn"
 				+ " FROM c_fee t,vew_acctitem t2,c_acct ca,c_fee_acct t3,r_invoice r"
 				+ " WHERE ca.acct_id(+)=t.acct_id and t.fee_sn=t3.fee_sn"
 				+ " and t.invoice_id=r.invoice_id(+) and t.invoice_code=r.invoice_code(+)"
 				+ " and t.cust_id=? and t.county_id=? and t3.county_id=? and t.acctitem_id = t2.acctitem_id " +str
 				+ " Union "
 				+ " SELECT t.*,t2.prom_fee_name fee_text,'' acctitem_name,'' acct_type,null begin_date,"
-				+ " null prod_invalid_date,r.finance_status,r.invoice_type doc_type"
+				+ " null prod_invalid_date,r.finance_status,r.invoice_type doc_type,null prod_sn"
 				+ " FROM c_fee t,p_prom_fee t2,r_invoice r"
 				+ " where t.fee_type = ? and t.fee_id=t2.prom_fee_id"
 				+ " and t.invoice_id=r.invoice_id(+) and t.invoice_code=r.invoice_code(+)"
@@ -389,7 +389,7 @@ public class CFeePayDao extends BaseEntityDao<CFeePay> {
 				+ " null auto_promotion,t.is_doc,t.invoice_mode,t.invoice_id,t.invoice_book_id,t.invoice_code,"
 				+ " t.optr_id,t.dept_id,t.area_id,t.county_id,null busi_optr_id,null invoice_fee,null addr_id,null pay_sn,"
 				+ " t2.acctitem_name fee_text,t2.acctitem_name,'UNIT' acct_type,null begin_date,"
-				+ " null prod_invalid_date,null finance_status,null doc_type"
+				+ " null prod_invalid_date,null finance_status,null doc_type,null prod_sn"
 				+ " from c_fee t,vew_acctitem t2,c_done_code cd,c_done_code_detail cdc"
 				+ " where t.create_done_code = cd.done_code and cd.done_code = cdc.done_code"
 				+ " and t.acctitem_id = t2.acctitem_id and cd.busi_code=?"
