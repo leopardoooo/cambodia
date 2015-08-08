@@ -776,17 +776,18 @@ AcctPanel = Ext.extend(BaseInfoPanel,{
 		this.acctItemDetailTab = new AcctItemDetailTab();
 		AcctPanel.superclass.constructor.call(this, {
 			id : 'acctPanel',
-			layout:"border",
+			layout:"anchor",
 			border:false,
 			items:[{
-				region:"center",
+				anchor:"100% 62.3%",
+				layout:'fit',
 				layout:"fit",
 				border: true,
 				bodyStyle: 'border-top-width: 0;border-right-width: 0;',
 				items:[this.acctItemGrid]
 			},{
-				region:"south",
-				layout:"fit",
+				anchor:"100% 38.1%",
+				layout:'fit',
 				height: 200,
 				border: false,
 				bodyStyle: 'border-left-width: 1px;',

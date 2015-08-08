@@ -171,9 +171,14 @@ PayPanel = Ext.extend( Ext.Panel ,{
 				var dollar = this.feeData["FEE"]/100.0;
 				Ext.getCmp("nfDollar").setValue(dollar);
 				Ext.getCmp("nfJianYuan").setValue(0);
-				Ext.getCmp("labelDollor").setText(Ext.util.Format.usMoney(dollar).substr(1));
+				var substrIndex = 1, append = "";
+				if(dollar < 0){
+					substrIndex = 2;
+					append = "-";
+				} 
+				Ext.getCmp("labelDollor").setText(append+ Ext.util.Format.usMoney(dollar).substr(substrIndex));
 				var jianYuan = Ext.util.Format.usMoney(dollar * this.feeData["EXC"]);
-				Ext.getCmp("LabelJian").setText(jianYuan.substr(1));
+				Ext.getCmp("LabelJian").setText(append+jianYuan.substr(substrIndex));
 				Ext.getCmp("labelExchange").setText("1USD=" + this.feeData["EXC"] + "KHR");
 				Ext.getCmp("hdExchange").setValue(this.feeData["EXC"]);
 			}

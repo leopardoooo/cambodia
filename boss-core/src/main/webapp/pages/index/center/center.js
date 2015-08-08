@@ -130,7 +130,7 @@ InfoPanel = Ext.extend( CommonTab , {
 			}else{
 				//当有多个用户时，切换回用户面板，删除所属产品，不然操作产品相关功能，后台getBusiParam()取不到选中user_id
 				if(userGrid.getStore().getCount() > 1){
-					App.getApp().main.infoPanel.getUserPanel().prodGrid.getStore().removeAll();
+					App.getApp().main.infoPanel.getUserPanel().prodGrid.userProdStore.removeAll();
 				}
 			}
 		}else{
