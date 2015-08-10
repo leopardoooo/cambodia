@@ -106,7 +106,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 
 		List<CProdOrderDto> orderList=orderComponent.queryOrderByCancelOrder(cancelOrder);
 		//是否高级权限
-		boolean isHigh=isHighCancel(busi_code);
+		boolean isHigh=orderComponent.isHighCancel(busi_code);
 		//参数检查		
 		for(CProdOrderDto order:orderList){
 			//检查能否退订
@@ -125,7 +125,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 	public List<CProdOrderDto> queryLogoffUserProd(String busi_code,String user_id) throws Exception{
 		List<CProdOrderDto> orderList=orderComponent.queryProdOrderDtoByUserId(user_id);
 		//是否高级权限
-		boolean isHigh=isHighCancel(busi_code);
+		boolean isHigh=orderComponent.isHighCancel(busi_code);
 		//参数检查		
 		for(CProdOrderDto order:orderList){
 			if(order.getIs_pay().equals(SystemConstants.BOOLEAN_FALSE)){
@@ -142,19 +142,10 @@ public class OrderService extends BaseBusiService implements IOrderService{
 	}
 	
 	/**
-	 * 是否高级退订或销户功能
-	 * @param busi_code
-	 * @return
-	 */
-	private boolean isHighCancel(String busi_code){
-		return BusiCodeConstants.PROD_HIGH_TERMINATE.equals(busi_code)||BusiCodeConstants.USER_HIGH_WRITE_OFF.equals(busi_code)
-				?true:false;
-	}
-	/**
 	 * 退订产品(高级和普通退订)
 	 */
 	public void saveCancelProd(String[] orderSns,Integer cancelFee) throws Exception{
-		this.saveCancelProdOrder(isHighCancel(this.getBusiParam().getBusiCode()), cancelFee,orderSns);
+		this.saveCancelProdOrder(orderComponent.isHighCancel(this.getBusiParam().getBusiCode()), cancelFee,orderSns);
 	}
 		
 	/**

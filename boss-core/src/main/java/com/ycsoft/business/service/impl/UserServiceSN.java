@@ -2,8 +2,8 @@ package com.ycsoft.business.service.impl;
 
 import static com.ycsoft.commons.constants.SystemConstants.ACCT_TYPE_SPEC;
 import static com.ycsoft.commons.constants.SystemConstants.BOOLEAN_TRUE;
-import static com.ycsoft.commons.constants.SystemConstants.DEVICE_TYPE_MODEM;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -18,7 +18,6 @@ import com.ycsoft.beans.config.TDeviceBuyMode;
 import com.ycsoft.beans.core.cust.CCust;
 import com.ycsoft.beans.core.cust.CCustDevice;
 import com.ycsoft.beans.core.job.JUserStop;
-import com.ycsoft.beans.core.prod.CProd;
 import com.ycsoft.beans.core.prod.CProdOrder;
 import com.ycsoft.beans.core.prod.CProdOrderDto;
 import com.ycsoft.beans.core.prod.CProdPropChange;
@@ -30,8 +29,8 @@ import com.ycsoft.beans.system.SOptr;
 import com.ycsoft.business.component.core.OrderComponent;
 import com.ycsoft.business.dao.core.prod.CProdOrderDao;
 import com.ycsoft.business.dao.core.prod.CProdPropChangeDao;
+import com.ycsoft.business.dto.core.acct.PayDto;
 import com.ycsoft.business.dto.core.fee.FeeInfoDto;
-import com.ycsoft.business.dto.core.prod.CProdDto;
 import com.ycsoft.business.dto.core.prod.DisctFeeDto;
 import com.ycsoft.business.dto.core.prod.PromotionDto;
 import com.ycsoft.business.dto.core.user.UserDto;
@@ -49,6 +48,7 @@ import com.ycsoft.commons.helper.DateHelper;
 import com.ycsoft.commons.helper.JsonHelper;
 import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.daos.core.JDBCException;
+import com.ycsoft.daos.helper.BeanHelper;
 @Service
 public class UserServiceSN extends BaseBusiService implements IUserService {
 	@Autowired
@@ -294,15 +294,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		user.setStb_buy(map.get(user.getStb_id()) != null?map.get(user.getStb_id()).getBuy_mode():null);
 		user.setCard_buy(map.get(user.getCard_id()) != null?map.get(user.getCard_id()).getBuy_mode():null);
 		user.setModem_buy(map.get(user.getModem_mac()) != null?map.get(user.getModem_mac()).getBuy_mode():null);
-		//终止用户的产品
-		List<CProdDto> prodList = userProdComponent.queryByUserId(user.getUser_id());
-		info.put("prods", prodList );
-		for (CProd prod:prodList){
-			terminateProd(custId,user, doneCode, busiCode, prod, banlanceDealType, transAcctId, transAcctItemId);
-		}
-		//柬埔寨 没有用户账目
-		//终止用户对应的账户
-//			jobComponent.terminateAcct(jobId, user.getAcct_id(), null,doneCode);
+		
 		
 		//柬埔寨 用户销户 回收设备
 		if(SystemConstants.BOOLEAN_TRUE.equals(reclaim)){
@@ -321,16 +313,28 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 				reclaimDevice(device.getDevice_id(), null,SystemConstants.RECLAIM_REASON_XHTH, 0, cust, doneCode, busiCode);
 			}							
 		}
+		//是否高级权限
+		boolean isHigh=orderComponent.isHighCancel(busiCode);
+		//检查数据
+		List<CProdOrderDto> cancelList=checkCancelProdOrderParm(isHigh, userId, cancelFee);
 		
 		if(cancelFee<0){
 			//记录未支付业务
 			doneCodeComponent.saveDoneCodeUnPay(custId, doneCode, this.getOptr().getOptr_id());
 			//保存缴费信息
-//			this.saveCancelFee(cancelList, this.getBusiParam().getCust(), doneCode, this.getBusiParam().getBusiCode());
+			this.saveCancelFee(cancelList, this.getBusiParam().getCust(), doneCode, this.getBusiParam().getBusiCode());
 		}
 		
-		//生成终止用户的业务指令
-		delUserJob(user, custId, doneCode);
+		List<CProdOrder> cancelResultList=new ArrayList<>();
+		
+		for(CProdOrderDto dto:cancelList){
+			//执行退订 返回被退订的用户订单清单
+			cancelResultList.addAll(orderComponent.saveCancelProdOrder(dto, doneCode));
+		}
+		
+		//直接解除授权，不等支付（因为不能取消）	
+		authComponent.sendAuth(user, cancelResultList, BusiCmdConstants.PASSVATE_PROD, doneCode);
+		
 		//记录用户到历史表
 		userComponent.removeUserWithHis(doneCode, user);
 		
@@ -338,8 +342,59 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		saveAllPublic(doneCode,getBusiParam());
 	}
 
+	
+	
+	private List<CProdOrderDto> checkCancelProdOrderParm(boolean isHigh,String userId,Integer cancelFee) throws Exception{
+		
+		if(StringHelper.isEmpty(userId)||cancelFee==null){
+			throw new ServicesException(ErrorCode.ParamIsNull);
+		}
 
+		List<CProdOrderDto> cancelList=new ArrayList<>();
+		//参数检查
+		//退款总额核对
+		int fee=0;
+		List<CProdOrderDto> orderList = cProdOrderDao.queryProdOrderDtoByUserId(userId);
+		
+		for(CProdOrderDto order:orderList){
+			cancelList.add(order);
+			//可退费用计算
+			order.setActive_fee(orderComponent.getOrderCancelFee(order));
+			fee=fee+order.getActive_fee();
+			
+		}
+		//金额核对
+		if(cancelFee!=fee*-1){
+			throw new ServicesException(ErrorCode.FeeDateException);
+		}		
+		return cancelList;
+	}
 
+	/**
+	 * 保存订单退款费用信息
+	 * @param cancelList
+	 * @param cust
+	 * @param doneCode
+	 * @param busi_code
+	 * @throws InvocationTargetException 
+	 * @throws Exception 
+	 */
+	private void saveCancelFee(List<CProdOrderDto> cancelList,CCust cust,Integer doneCode,String busi_code) throws Exception{
+		//按订单退款
+		for(CProdOrderDto order:cancelList){
+			if(order.getActive_fee()>0){
+				PayDto pay=new PayDto();
+				BeanHelper.copyProperties(pay, order);
+				pay.setProd_sn(order.getOrder_sn());
+				pay.setAcctitem_id(order.getProd_id());
+				pay.setBegin_date(DateHelper.dateToStr(DateHelper.today().before(order.getEff_date())? order.getEff_date():DateHelper.today()));
+				pay.setInvalid_date(DateHelper.dateToStr(order.getExp_date()));
+				pay.setPresent_fee(0);
+				pay.setFee(order.getActive_fee()*-1);
+				feeComponent.saveAcctFee(cust.getCust_id(), cust.getAddr_id(), pay, doneCode, busi_code, StatusConstants.UNPAY);
+			}
+		}
+	}
 
 	@Override
 	public void saveOpenInteractive(String netType, String modemMac, String password, String vodUserType,

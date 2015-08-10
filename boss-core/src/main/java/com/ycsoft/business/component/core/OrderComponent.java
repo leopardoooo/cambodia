@@ -7,8 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.net.ssl.SSLEngineResult.Status;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -17,7 +15,6 @@ import com.ycsoft.beans.core.prod.CProdOrderDto;
 import com.ycsoft.beans.core.prod.CProdOrderHis;
 import com.ycsoft.beans.core.prod.CProdOrderTransfee;
 import com.ycsoft.beans.core.prod.CProdPropChange;
-import com.ycsoft.beans.core.prod.CProdStatusChange;
 import com.ycsoft.beans.core.user.CUser;
 import com.ycsoft.beans.prod.PPackageProd;
 import com.ycsoft.beans.prod.PProd;
@@ -64,6 +61,17 @@ public class OrderComponent extends BaseBusiComponent {
 	@Autowired
 	private CProdStatusChangeDao cProdStatusChangeDao;
 
+	
+	/**
+	 * 是否高级退订或销户功能
+	 * @param busi_code
+	 * @return
+	 */
+	public boolean isHighCancel(String busi_code){
+		return BusiCodeConstants.PROD_HIGH_TERMINATE.equals(busi_code)||BusiCodeConstants.USER_HIGH_WRITE_OFF.equals(busi_code)
+				?true:false;
+	}
+	
 	/**
 	 * 因为产品退订而重新计算套餐订单的计费时间段（不处理子产品）
 	 * @return 返回开始失效时间变化的订单信息
