@@ -54,7 +54,7 @@ Ext.Ajax.handleResponse = Ext.Ajax.handleResponse.createInterceptor(function(res
 			}
 		}
 		//自定义处理错误数据函数(函数名统一为clearData)
-		if(Ext.isFunction(options.clearData)){
+		if(options && Ext.isFunction(options["clearData"])){
 			options.clearData.call();
 		}
 		return false;

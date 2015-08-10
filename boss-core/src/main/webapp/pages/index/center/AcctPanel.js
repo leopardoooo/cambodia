@@ -678,10 +678,10 @@ AcctItemDetailTab = Ext.extend(CommonTab,{
 		this.acctItemAdjustGrid = new AcctItemAdjustGrid();
 		this.acctItemActiveGrid = new AcctItemActiveGrid();
 		this.acctItemPropChangeGrid = new AcctItemPropChangeGrid();
-		this.acctitemInactiveGrid = new AcctitemInactiveGrid();
-		this.acctitemThresholdGrid = new AcctitemThresholdGrid();
-		this.acctItemOrderGrid = new AcctItemOrderGrid();
-		this.acctitemThresholdPropGrid = new AcctitemThresholdPropGrid();
+//		this.acctitemInactiveGrid = new AcctitemInactiveGrid();
+//		this.acctitemThresholdGrid = new AcctitemThresholdGrid();
+//		this.acctItemOrderGrid = new AcctItemOrderGrid();
+//		this.acctitemThresholdPropGrid = new AcctitemThresholdPropGrid();
 		AcctItemDetailTab.superclass.constructor.call(this, {
 			activeTab: 0,
 			border: false,
@@ -692,25 +692,25 @@ AcctItemDetailTab = Ext.extend(CommonTab,{
 			items:[{
 				title:'明细',
 				items : [this.acctItemActiveGrid]
-			},{
+			}/*,{
 				title:'冻结',
 				items : [this.acctitemInactiveGrid]
-			},{
+			}*/,{
 				title:'调账',
 				items : [this.acctItemAdjustGrid]
-			},{
+			}/*,{
 				title:'阈值',
 				items : [this.acctitemThresholdGrid]
-			},{
+			}*/,{
 				title:'异动',
 				items : [this.acctItemPropChangeGrid]
-			},{
+			}/*,{
 				title:'预约',
 				items : [this.acctItemOrderGrid]
 			},{
 				title:'阈值异动',
 				items : [this.acctitemThresholdPropGrid]
-			}]
+			}*/]
 		});
 	},
 	refreshPanel : function(p){//重写父类CommonTab的方法，必须
@@ -723,11 +723,11 @@ AcctItemDetailTab = Ext.extend(CommonTab,{
 	resetPanel : function(acctId,acctItemId){
 		this.acctItemActiveGrid.reset();
 		this.acctItemPropChangeGrid.reset();
-		this.acctitemInactiveGrid.reset();
+//		this.acctitemInactiveGrid.reset();
 		this.acctItemAdjustGrid.reset();
-		this.acctitemThresholdGrid.reset();
-		this.acctItemOrderGrid.reset();
-		this.acctitemThresholdPropGrid.reset();
+//		this.acctitemThresholdGrid.reset();
+//		this.acctItemOrderGrid.reset();
+//		this.acctitemThresholdPropGrid.reset();
 		
 		if(acctId){
 			this.acctId = acctId;
@@ -776,47 +776,29 @@ AcctPanel = Ext.extend(BaseInfoPanel,{
 		this.acctItemDetailTab = new AcctItemDetailTab();
 		AcctPanel.superclass.constructor.call(this, {
 			id : 'acctPanel',
-			layout:"border",
+			layout:"anchor",
 			border:false,
 			items:[{
-				region:"center",
-				layout:"anchor",
+				anchor:"100% 62.3%",
+				layout:'fit',
+				layout:"fit",
+				border: true,
+				bodyStyle: 'border-top-width: 0;border-right-width: 0;',
+				items:[this.acctItemGrid]
+			},{
+				anchor:"100% 38.1%",
+				layout:'fit',
+				height: 200,
 				border: false,
-				items:[{
-					anchor:"100% 50%",
-					layout:'border',
-					border:false,
-					items:[{
-						region:"center",
-						layout:"fit",
-						border: false,
-						bodyStyle: 'border-right-width: 1px;',
-						items:[this.acctGrid]
-					},{
-						region:"east",
-						layout:"fit",
-						split:true,
-						width:"42%",
-						minSize:270,
-						maxSize:400,
-						border: false,
-						bodyStyle: 'border-left-width: 1px;',
-						items:[this.acctItemDetailTab]
-					}]
-				},{
-					anchor:"100% 50%",
-					layout:'border',
-					border: false,
-					bodyStyle: 'border-top-width: 1px;',
-					items:[this.acctItemGrid]
-				}]
+				bodyStyle: 'border-left-width: 1px;',
+				items:[this.acctItemDetailTab]
 			}]
 		});
 	},
 	refresh:function(){
 		this.acctItemGrid.reset();
 		this.acctItemDetailTab.resetPanel();
-		this.acctGrid.remoteRefresh();
+		//this.acctGrid.remoteRefresh();
 	}
 });
 Ext.reg( "acctPanel" , AcctPanel );

@@ -47,7 +47,7 @@ ViewPortPanel = Ext.extend( Ext.Panel , {
 			if(this.mask)
 				this.mask.hide();
 			//刷新客户综合信息
-			Ext.getCmp('GeneralPanel').remoteRefresh();
+			//Ext.getCmp('GeneralPanel').remoteRefresh();
 			if(App.data.paySearch && App.getCust().status!='INVALID' && App.getCust().cust_type!='UNIT'){
 				App.main.infoPanel.activate('ACCT_PANEL');
 				

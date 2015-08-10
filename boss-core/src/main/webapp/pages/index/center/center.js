@@ -25,7 +25,7 @@ InfoPanel = Ext.extend( CommonTab , {
 		this.unitPanel = new UnitPanel();
 		this.custPanel = new CustPanel();
 		
-		this.userPanel = this.custPanel.userPanel;
+		this.userPanel = new UserPanel();
 		
 		this.acctPanel = new AcctPanel();
 		this.payfeePanel = new PayfeePanel();
@@ -54,21 +54,21 @@ InfoPanel = Ext.extend( CommonTab , {
 				layout: 'fit',
 				border: false,
 				items: [this.unitPanel]
-			},/*{
+			},{
 				id: 'USER_PANEL',
 				iconCls:'user',
 				title: langUtils.bc("home.main.tabs.[2]"),
 				layout: 'fit',
 				border: false,
 				items: [this.userPanel]
-			},*/{
+			}/*,{
 				id: 'ACCT_PANEL',
 				iconCls:'acct',
 				title: langUtils.bc("home.main.tabs.[3]"),
 				layout: 'fit',
 				border: false,
 				items: [this.acctPanel]
-			},{
+			}*/,{
 				id: 'PAY_PANEL',
 				iconCls:'pay_fee',
 				title: langUtils.bc("home.main.tabs.[4]"),
@@ -130,7 +130,7 @@ InfoPanel = Ext.extend( CommonTab , {
 			}else{
 				//当有多个用户时，切换回用户面板，删除所属产品，不然操作产品相关功能，后台getBusiParam()取不到选中user_id
 				if(userGrid.getStore().getCount() > 1){
-					App.getApp().main.infoPanel.getUserPanel().prodGrid.getStore().removeAll();
+					App.getApp().main.infoPanel.getUserPanel().prodGrid.userProdStore.removeAll();
 				}
 			}
 		}else{
