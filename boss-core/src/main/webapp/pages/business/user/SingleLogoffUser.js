@@ -149,10 +149,12 @@ LogoffUserForm = Ext.extend(BaseForm,{
 	publicAcctInfo : null,
 	userProdGrid : null,
 	url: Constant.ROOT_PATH + "/core/x/User!logoffUser.action",
+	userId:null,
 	constructor: function(){
 		this.userProdGrid = new UserProdGrid();
 		this.userProdGrid["region"]='north';
 		var record = App.getApp().main.infoPanel.getUserPanel().userGrid.getSelectionModel().getSelected();
+		this.userId = record.get('user_id');
 		var acctStore = App.getApp().main.infoPanel.acctPanel.acctGrid.getStore();
 		for(var i=0;i<acctStore.getCount();i++){
 			if(acctStore.getAt(i).get('acct_type') == 'PUBLIC'){
@@ -221,8 +223,8 @@ LogoffUserForm = Ext.extend(BaseForm,{
 						id : 'refundFeeValue',
 						fieldLabel : '退款金额',
 						width : 100,
-//						readOnly: true,
-//						style: Constant.TEXTFIELD_STYLE,
+						readOnly: true,
+						style: Constant.TEXTFIELD_STYLE,
 						allowNegative : false,
 						allowBlank : false
 //						value : Ext.util.Format.formatFee(this.userProdGrid.totalFee),
@@ -267,9 +269,10 @@ LogoffUserForm = Ext.extend(BaseForm,{
 		var all = {};
 		all['banlanceDealType'] = Ext.getCmp('banlanceDealType').getValue();
 		all['reclaim'] = Ext.getCmp('reclaim').getValue();
+		all['userId'] = this.userId;
 		var cmp = Ext.getCmp('refundFeeValue');
 		if(cmp){
-			all['cancelFee'] = -cmp.getValue();
+			all['cancelFee'] = -Ext.util.Format.formatToFen(cmp.getValue());
 		}
 		if(Ext.getCmp('newAcctItemId')){
 			all['transAcctId'] = this.publicAcctInfo.acct_id;
@@ -282,6 +285,8 @@ LogoffUserForm = Ext.extend(BaseForm,{
 		return all;
 	},
 	success : function(){
+		//刷新支付
+		App.getApp().refreshPayInfo(parent);
 		App.getApp().refreshPanel(App.getApp().getData().currentResource.busicode);
 	}
 	

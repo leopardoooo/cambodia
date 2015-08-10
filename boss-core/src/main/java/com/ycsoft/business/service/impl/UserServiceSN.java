@@ -298,20 +298,21 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		
 		//柬埔寨 用户销户 回收设备
 		if(SystemConstants.BOOLEAN_TRUE.equals(reclaim)){
-			DeviceDto device = null;
+			DeviceDto stbDevice = null;
 			//回收机顶盒
-			device = deviceComponent.queryDeviceByDeviceCode(user.getStb_id());
-			reclaimDevice(device.getDevice_id(), null,SystemConstants.RECLAIM_REASON_XHTH, 0, cust, doneCode, busiCode);
-			//回收非配对的智能卡
-			if(device.getPairCard() != null  && !user.getCard_id().equals(device.getPairCard().getCard_id())){
-				device = deviceComponent.queryDeviceByDeviceCode(user.getCard_id());
+			if(StringHelper.isNotEmpty(user.getStb_id())){
+				stbDevice = deviceComponent.queryDeviceByDeviceCode(user.getStb_id());
+				reclaimDevice(stbDevice.getDevice_id(), null,SystemConstants.RECLAIM_REASON_XHTH, 0, cust, doneCode, busiCode);
+			}
+			if(StringHelper.isNotEmpty(user.getCard_id()) && (stbDevice.getPairCard() == null  || !user.getCard_id().equals(stbDevice.getPairCard().getCard_id()))){
+				DeviceDto device = deviceComponent.queryDeviceByDeviceCode(user.getCard_id());
 				reclaimDevice(device.getDevice_id(), null,SystemConstants.RECLAIM_REASON_XHTH, 0, cust, doneCode, busiCode);
 			}
-			//回收非配对的modem
-			if(device.getPairModem() != null  && !user.getModem_mac().equals(device.getPairModem().getModem_mac())){
-				device = deviceComponent.queryDeviceByDeviceCode(user.getModem_mac());
+			if(StringHelper.isNotEmpty(user.getModem_mac()) && (stbDevice.getPairModem() == null  || !user.getModem_mac().equals(stbDevice.getPairModem().getModem_mac()))){
+				DeviceDto device = deviceComponent.queryDeviceByDeviceCode(user.getModem_mac());
 				reclaimDevice(device.getDevice_id(), null,SystemConstants.RECLAIM_REASON_XHTH, 0, cust, doneCode, busiCode);
-			}							
+			}
+												
 		}
 		//是否高级权限
 		boolean isHigh=orderComponent.isHighCancel(busiCode);
@@ -332,8 +333,10 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 			cancelResultList.addAll(orderComponent.saveCancelProdOrder(dto, doneCode));
 		}
 		
-		//直接解除授权，不等支付（因为不能取消）	
-		authComponent.sendAuth(user, cancelResultList, BusiCmdConstants.PASSVATE_PROD, doneCode);
+		//直接解除授权，不等支付（因为不能取消）
+		if(cancelResultList.size()>0){
+			authComponent.sendAuth(user, cancelResultList, BusiCmdConstants.PASSVATE_PROD, doneCode);
+		}
 		
 		//记录用户到历史表
 		userComponent.removeUserWithHis(doneCode, user);
