@@ -135,15 +135,14 @@ UserGrid = Ext.extend(Ext.ux.Grid,{
 			for(i=0;i<len; i++){
 				App.getApp().data.users.push(_rs[i].data);
 			}
+			var prodGrid = this.parent.prodGrid;
+			//用户信息加载完后再加载产品信息,类似与同步
+			//当用户只有一个时，产品信息还没加载完，就去取产品数据了
+			if(len == 1){
+				prodGrid.userId = _rs[0].get('user_id');
+			}
+			prodGrid.remoteRefresh();
 		}
-		var prodGrid = this.parent.prodGrid;
-		//用户信息加载完后再加载产品信息,类似与同步
-		//当用户只有一个时，产品信息还没加载完，就去取产品数据了
-		if(len == 1){
-			prodGrid.userId = _rs[0].get('user_id');
-		}
-		prodGrid.remoteRefresh();
-		
 		//刷新userDetailTab
 		var userId = this.parent.userDetailTab.userId;
 		if(userId){

@@ -67,7 +67,7 @@ CancelProdGrid = Ext.extend(Ext.grid.GridPanel,{
 			orderSns.push(records[i].get('order_sn'))
 		}
 		this.orderSns = orderSns;
-		this.totalFee = totalBusiFee*-1;
+		this.totalFee = totalBusiFee;
 		Ext.get("totalAmount").update(String(this.totalFee/100));
 	},
 	refresh:function(orderSn){
@@ -124,7 +124,7 @@ CancelProdNewForm = Ext.extend(BaseForm,{
 	},
 	getValues:function(){
 		var obj = {};
-		obj['cancelFee'] = this.cancelProdGrid.checkSm.totalFee;
+		obj['cancelFee'] = this.cancelProdGrid.checkSm.totalFee*-1;
 		obj['orderSns'] = this.cancelProdGrid.checkSm.orderSns;
 		return obj;
 	},

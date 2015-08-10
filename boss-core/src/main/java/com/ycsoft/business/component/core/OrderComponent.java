@@ -184,6 +184,11 @@ public class OrderComponent extends BaseBusiComponent {
 		}	
 		return list;
 	}
+	
+	public List<CProdOrderDto> queryProdOrderDtoByUserId(String user_id) throws Exception{
+		return cProdOrderDao.queryProdOrderDtoByUserId(user_id);
+	}
+	
 	/**
 	 * 计算一个订单的可退金额（终止退订和销户退订）
 	 * @param order
@@ -633,5 +638,6 @@ public class OrderComponent extends BaseBusiComponent {
 		//保存产品异动信息
 		cProdPropChangeDao.save(propChangeList.toArray(new CProdPropChange[propChangeList.size()]));
 	}
+
 		
 }

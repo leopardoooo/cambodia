@@ -1,6 +1,8 @@
 package com.ycsoft.business.service.impl;
 
 import static com.ycsoft.commons.constants.SystemConstants.ACCT_TYPE_SPEC;
+import static com.ycsoft.commons.constants.SystemConstants.BOOLEAN_TRUE;
+import static com.ycsoft.commons.constants.SystemConstants.DEVICE_TYPE_MODEM;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -14,7 +16,9 @@ import org.springframework.stereotype.Service;
 import com.ycsoft.beans.config.TBusiFee;
 import com.ycsoft.beans.config.TDeviceBuyMode;
 import com.ycsoft.beans.core.cust.CCust;
+import com.ycsoft.beans.core.cust.CCustDevice;
 import com.ycsoft.beans.core.job.JUserStop;
+import com.ycsoft.beans.core.prod.CProd;
 import com.ycsoft.beans.core.prod.CProdOrder;
 import com.ycsoft.beans.core.prod.CProdOrderDto;
 import com.ycsoft.beans.core.prod.CProdPropChange;
@@ -27,8 +31,10 @@ import com.ycsoft.business.component.core.OrderComponent;
 import com.ycsoft.business.dao.core.prod.CProdOrderDao;
 import com.ycsoft.business.dao.core.prod.CProdPropChangeDao;
 import com.ycsoft.business.dto.core.fee.FeeInfoDto;
+import com.ycsoft.business.dto.core.prod.CProdDto;
 import com.ycsoft.business.dto.core.prod.DisctFeeDto;
 import com.ycsoft.business.dto.core.prod.PromotionDto;
+import com.ycsoft.business.dto.core.user.UserDto;
 import com.ycsoft.business.dto.core.user.UserRes;
 import com.ycsoft.business.dto.device.DeviceDto;
 import com.ycsoft.business.service.IUserService;
@@ -36,6 +42,7 @@ import com.ycsoft.commons.constants.BusiCmdConstants;
 import com.ycsoft.commons.constants.BusiCodeConstants;
 import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.constants.SystemConstants;
+import com.ycsoft.commons.exception.ErrorCode;
 import com.ycsoft.commons.exception.ServicesException;
 import com.ycsoft.commons.helper.CollectionHelper;
 import com.ycsoft.commons.helper.DateHelper;
@@ -234,9 +241,101 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 
 
 	@Override
-	public void saveRemoveUser(String banlanceDealType, String transAcctId, String transAcctItemId) throws Exception {
+	public void saveRemoveUser(String userId,String banlanceDealType,String reclaim,Integer cancelFee, String transAcctId, String transAcctItemId) throws Exception {
 		// TODO Auto-generated method stub
+		//获取客户用户信息
+		CCust cust = getBusiParam().getCust();
+		String  custId = cust.getCust_id();
+		List<CUser> userList = getBusiParam().getSelectedUsers();
+		CUser user = null;
+		for(CUser u : userList){
+			if(userId.equals(u.getUser_id())){
+				user = u;
+			}
+		}
+		if(user == null){
+			throw new ServicesException(ErrorCode.CustDataException);
+		}
+		//获取业务流水
+		Integer doneCode = doneCodeComponent.gDoneCode();
+		String busiCode = getBusiParam().getBusiCode();
+		//生成销帐任务
+		int jobId = jobComponent.createCustWriteOffJob(doneCode, custId,BOOLEAN_TRUE);
+
+		List<String> devoceList = new ArrayList<String>();
+		if(user.getStb_id() != null){
+			devoceList.add(user.getStb_id());
+		}
+		if(user.getCard_id()!=null){
+			devoceList.add(user.getCard_id());
+		}
+		if(user.getModem_mac() != null){
+			devoceList.add(user.getModem_mac());
+		}
 		
+		List<CCustDevice> buyModeList = null;
+		if(devoceList.size()>0){
+			buyModeList = custComponent.findBuyModeById(custId, devoceList.toArray(new String[devoceList.size()]));
+		}
+		Map<String, CCustDevice> map = CollectionHelper.converToMapSingle(buyModeList, "device_code");
+		Map<String, UserDto> userMap = new HashMap<String, UserDto>();
+		
+		if(CollectionHelper.isNotEmpty(userList)){
+			List<UserDto> allUsers = userComponent.queryUser(custId);
+			userMap = CollectionHelper.converToMapSingle(allUsers, "user_id");
+		}
+		
+		//处理用户销户
+		Map<String, Object> info = new HashMap<String, Object>();
+		info.put("user_type", user.getUser_type_text());
+		info.put("user", userMap.get(userId));
+		
+		//销户后保存原来的设备购买方式
+		user.setStb_buy(map.get(user.getStb_id()) != null?map.get(user.getStb_id()).getBuy_mode():null);
+		user.setCard_buy(map.get(user.getCard_id()) != null?map.get(user.getCard_id()).getBuy_mode():null);
+		user.setModem_buy(map.get(user.getModem_mac()) != null?map.get(user.getModem_mac()).getBuy_mode():null);
+		//终止用户的产品
+		List<CProdDto> prodList = userProdComponent.queryByUserId(user.getUser_id());
+		info.put("prods", prodList );
+		for (CProd prod:prodList){
+			terminateProd(custId,user, doneCode, busiCode, prod, banlanceDealType, transAcctId, transAcctItemId);
+		}
+		//柬埔寨 没有用户账目
+		//终止用户对应的账户
+//			jobComponent.terminateAcct(jobId, user.getAcct_id(), null,doneCode);
+		
+		//柬埔寨 用户销户 回收设备
+		if(SystemConstants.BOOLEAN_TRUE.equals(reclaim)){
+			DeviceDto device = null;
+			//回收机顶盒
+			device = deviceComponent.queryDeviceByDeviceCode(user.getStb_id());
+			reclaimDevice(device.getDevice_id(), null,SystemConstants.RECLAIM_REASON_XHTH, 0, cust, doneCode, busiCode);
+			//回收非配对的智能卡
+			if(device.getPairCard() != null  && !user.getCard_id().equals(device.getPairCard().getCard_id())){
+				device = deviceComponent.queryDeviceByDeviceCode(user.getCard_id());
+				reclaimDevice(device.getDevice_id(), null,SystemConstants.RECLAIM_REASON_XHTH, 0, cust, doneCode, busiCode);
+			}
+			//回收非配对的modem
+			if(device.getPairModem() != null  && !user.getModem_mac().equals(device.getPairModem().getModem_mac())){
+				device = deviceComponent.queryDeviceByDeviceCode(user.getModem_mac());
+				reclaimDevice(device.getDevice_id(), null,SystemConstants.RECLAIM_REASON_XHTH, 0, cust, doneCode, busiCode);
+			}							
+		}
+		
+		if(cancelFee<0){
+			//记录未支付业务
+			doneCodeComponent.saveDoneCodeUnPay(custId, doneCode, this.getOptr().getOptr_id());
+			//保存缴费信息
+//			this.saveCancelFee(cancelList, this.getBusiParam().getCust(), doneCode, this.getBusiParam().getBusiCode());
+		}
+		
+		//生成终止用户的业务指令
+		delUserJob(user, custId, doneCode);
+		//记录用户到历史表
+		userComponent.removeUserWithHis(doneCode, user);
+		
+		doneCodeComponent.saveDoneCodeInfo(doneCode, custId, null, info);
+		saveAllPublic(doneCode,getBusiParam());
 	}
 
 
