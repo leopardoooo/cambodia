@@ -1,6 +1,8 @@
 package com.ycsoft.boss.remoting.ott;
 
 public class Result {
+	public static String UNDEFINED_ERROR_STATUS="10000";
+	
 	private String err;
 	private String status;
 	private String reason;
@@ -28,7 +30,7 @@ public class Result {
 	}
 	
 	public boolean isUndefinedError(){
-		return status.equals(OttClient.UNDEFINED_ERROR_STATUS);
+		return status.equals(UNDEFINED_ERROR_STATUS);
 	}
 	
 	public boolean isConnectionError(){

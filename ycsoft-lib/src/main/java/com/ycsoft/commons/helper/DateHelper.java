@@ -5,9 +5,15 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 包含一系列对日期处理的函数
@@ -20,7 +26,7 @@ public class DateHelper {
 	public final static String FORMAT_YMD_STR="yyyyMMdd";
 	public final static String FORMAT_YMD="yyyy-MM-dd";
 	public final static String FORMAT_TIME="yyyy-MM-dd HH:mm:ss";
-	public final static String FORMAT_TIME_VOD="yyyyMMddHHmmss";
+	public final static String FORMAT_TIME_VOD="yyyyMMdd000000";
 	
 	private final static DateFormat df = new SimpleDateFormat(FORMAT_TIME);
 	private final static DateFormat sdf = new SimpleDateFormat(FORMAT_YMD);
@@ -664,12 +670,31 @@ public class DateHelper {
 	}
 	
 	public static void main(String[] args){
-		System.out.println(DateHelper.dateToStr(DateHelper.addDate(new Date(), 2)));
+//		System.out.println(DateHelper.dateToStr(DateHelper.addDate(new Date(), 2)));
+//		
+//		System.out.println(DateHelper.getDiffDays(new Date(),DateHelper.addDate(new Date(), 3)));
+//		
+//		
+//		System.out.println(DateHelper.format(new Date(), DateHelper.FORMAT_TIME_VOD));
 		
-		System.out.println(DateHelper.getDiffDays(new Date(),DateHelper.addDate(new Date(), 3)));
-		
-		
-		//System.out.println(DateHelper.dateToStr(DateHelper.addMonths(new Date(), 2)));
+		List<Map.Entry<String,String>> mappingList = null; 
+		  Map<String,String> map = new HashMap<String,String>(); 
+		  map.put("aaaa", "month"); 
+		  map.put("bbbb", "bread"); 
+		  map.put("ccccc", "attack"); 
+		  
+		  //通过ArrayList构造函数把map.entrySet()转换成list 
+		  mappingList = new ArrayList<Map.Entry<String,String>>(map.entrySet()); 
+		  //通过比较器实现比较排序 
+		  Collections.sort(mappingList, new Comparator<Map.Entry<String,String>>(){ 
+		   public int compare(Map.Entry<String,String> mapping1,Map.Entry<String,String> mapping2){ 
+		    return mapping1.getValue().compareTo(mapping2.getValue()); 
+		   } 
+		  }); 
+		  
+		  for(Map.Entry<String,String> mapping:mappingList){ 
+		   System.out.println(mapping.getKey()+":"+mapping.getValue()); 
+		  } 
 	}
 
 
