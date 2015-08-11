@@ -23,8 +23,8 @@ public class AuthComponent {
 		return jVodCommandDao.queryCmd();
 	}
 	
-	public List<JBandCommand> queryBandCmd(){
-		return null;
+	public List<JBandCommand> queryBandCmd() throws Exception{
+		return jBandCommandDao.queryCmd();
 	} 
 	
 	public void saveOttSendResult(JVodCommand cmd,Result result) throws Exception{
@@ -34,6 +34,15 @@ public class AuthComponent {
 		cmd.setError_info(result.getReason());
 		cmd.setReturn_code(Integer.parseInt(result.getStatus()));
 		jVodCommandDao.update(cmd);
+	}
+	
+	public void saveBandSendResult(JBandCommand cmd,Result result) throws Exception{
+		cmd.setIs_send(SystemConstants.BOOLEAN_TRUE);
+		cmd.setSend_time(new Date());
+		cmd.setIs_success(result.isSuccess()?SystemConstants.BOOLEAN_TRUE:SystemConstants.BOOLEAN_FALSE);
+		cmd.setError_info(result.getReason());
+		cmd.setReturn_code(Integer.parseInt(result.getStatus()));
+		jBandCommandDao.update(cmd);
 	}
 	
 	

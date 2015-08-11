@@ -61,6 +61,7 @@ UnPay = function(record) {
 
 	if (record) {
 		var params = {};
+		console.log(record.data);
 		params["order_sn"] = record.get("prod_sn");
 		params["cancelFee"] = record.get("real_pay");
 
