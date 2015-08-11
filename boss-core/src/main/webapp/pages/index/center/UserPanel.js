@@ -640,7 +640,8 @@ UserBroadbandTemplate = new Ext.XTemplate(
 UserDetailTemplate = {
 	"OTT": UserAtvTemplate,
 	"DTT": UserDtvTemplate,
-	"BAND": UserBroadbandTemplate
+	"BAND": UserBroadbandTemplate,
+	"OTT_MOBILE": UserAtvTemplate
 };
 
 /**

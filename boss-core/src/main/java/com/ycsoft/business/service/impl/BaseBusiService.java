@@ -579,17 +579,13 @@ public class BaseBusiService extends BaseService {
 	 */
 	protected void createUserJob(CUser user, String custId, Integer doneCode)
 			throws Exception {
-		CUser userDto = queryUserById(user.getUser_id());
 		
-		jobComponent.createBusiCmdJob(doneCode, BusiCmdConstants.CREAT_USER, custId,
-			user.getUser_id(), user.getStb_id(), user.getCard_id(), user.getModem_mac(), null,null,JsonHelper.fromObject(userDto));
+		authComponent.sendAuth(user, null, BusiCmdConstants.CREAT_USER, doneCode);
 		if (StringHelper.isNotEmpty(user.getCard_id())){
-			jobComponent.createBusiCmdJob(doneCode, BusiCmdConstants.ACCTIVATE_TERMINAL, custId,
-			user.getUser_id(), user.getStb_id(), user.getCard_id(), null, null,null);
+			authComponent.sendAuth(user, null, BusiCmdConstants.ACCTIVATE_TERMINAL, doneCode);
 		}
 		if (StringHelper.isNotEmpty(user.getModem_mac())){
-			jobComponent.createBusiCmdJob(doneCode, BusiCmdConstants.ACCTIVATE_TERMINAL, custId,
-					user.getUser_id(), null,null, user.getModem_mac(), null,null);
+			authComponent.sendAuth(user, null, BusiCmdConstants.ACCTIVATE_TERMINAL, doneCode);
 		}
 	}
 

@@ -1,0 +1,7 @@
+09-27 19:36:55 [ERROR]-[com.yaochen.boss.job.OttAuthJob:70]     - 读取指令失败主键未设置，无法根据主键更新
+09-27 19:37:46 [ERROR]-[com.yaochen.boss.job.OttAuthJob:71]     - 保存指令发送结果失败主键未设置，无法根据主键更新
+09-27 19:37:48 [ERROR]-[com.yaochen.boss.job.OttAuthJob:71]     - 保存指令发送结果失败主键未设置，无法根据主键更新
+09-27 19:37:50 [ERROR]-[com.yaochen.boss.job.OttAuthJob:71]     - 保存指令发送结果失败主键未设置，无法根据主键更新
+09-27 19:37:52 [ERROR]-[com.yaochen.boss.job.OttAuthJob:71]     - 保存指令发送结果失败主键未设置，无法根据主键更新
+09-27 19:37:54 [ERROR]-[com.yaochen.boss.job.OttAuthJob:71]     - 保存指令发送结果失败主键未设置，无法根据主键更新
+09-27 19:37:56 [ERROR]-[com.yaochen.boss.job.OttAuthJob:71]     - 保存指令发送结果失败主键未设置，无法根据主键更新

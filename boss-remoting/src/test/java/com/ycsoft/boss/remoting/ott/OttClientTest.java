@@ -11,38 +11,8 @@ public class OttClientTest {
 
 	@Test
 	public void testCreateUser() {
-		Result result = client.createUser("10000001", "123456", "ptest1", "moniwang", null, null, null, null);
+		Result result = client.createUser("10000005", "123456", "ptest1", "moniwang", null, null, null, null);
 		assertEquals("0",result.getErr());
 	}
 	
-	@Test
-	public void testDeleteUser() {
-		Result result = client.deleteUser("99032342");
-		assertEquals("0", result.getErr());
-	}
-	
-	@Test
-	public void addProduct() {
-		Result result = client.addOrUpdateProduct("12345321", "好产品啊");
-		assertEquals("0", result.getErr());
-	}
-	
-	@Test
-	public void testDeleteProduct() {
-		Result result = client.deleteProduct("12345321");
-		assertEquals("0", result.getErr());
-	}
-	
-	@Test
-	public void testOpenUserProduct() {
-		Result result = client.openUserProduct("100000", "12345321","2016-05-05 10:11:11");
-		assertEquals("0", result.getErr());
-	}
-	
-	@Test
-	public void testStopUserProduct() {
-		Result result = client.stopUserProduct("100000", "12345321");
-		assertEquals("0", result.getErr());
-	}
-
 }

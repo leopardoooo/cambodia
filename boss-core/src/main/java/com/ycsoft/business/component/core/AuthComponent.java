@@ -165,7 +165,7 @@ public class AuthComponent extends BaseComponent{
 	 * @param doneCode
 	 * @throws Exception
 	 */
-	public void refreshOttUserAuth(CUser user,Integer doneCode) throws Exception{
+	private void refreshOttUserAuth(CUser user,Integer doneCode) throws Exception{
 		//获取用户所有资源的所有到期日
 		Map<String,Date> userResMap = this.getUserResExpDate(user.getUser_id());
 		for (Entry<String,Date> entry:userResMap.entrySet()){
@@ -207,7 +207,7 @@ public class AuthComponent extends BaseComponent{
 	}
 	
 	//发送DTT授权
-	public void authDttProd(CUser user,List<CProdOrder> orderList,Integer doneCode) throws Exception{
+	private void authDttProd(CUser user,List<CProdOrder> orderList,Integer doneCode) throws Exception{
 		//获取用户所有资源的所有到期日
 		Map<String,Date> userResMap = this.getUserResExpDate(user.getUser_id());
 		//获取订单包含的资源
@@ -223,9 +223,9 @@ public class AuthComponent extends BaseComponent{
 			jCaCommandDao.save(dttCmd);
 			if (expDate != null && expDate.after(new Date())){
 				dttCmd.setTransnum(gTransnum());
-				dttCmd.setCmd_type(SmsxCmd.CancelProduct.name());
-				dttCmd.setAuth_begin_date(DateHelper.formatNow());
-				dttCmd.setAuth_end_date( DateHelper.format(expDate, DateHelper.FORMAT_TIME));
+				dttCmd.setCmd_type(SmsxCmd.AddProduct.name());
+				dttCmd.setAuth_begin_date(DateHelper.format(new Date(), DateHelper.FORMAT_TIME_VOD));
+				dttCmd.setAuth_end_date( DateHelper.format(expDate, DateHelper.FORMAT_TIME_VOD));
 				jCaCommandDao.save(dttCmd);
 			}
 		}
@@ -237,7 +237,7 @@ public class AuthComponent extends BaseComponent{
 	 * @param doneCode
 	 * @throws Exception
 	 */
-	public void refreshDttUserAuth(CUser user,Integer doneCode) throws Exception{
+	private void refreshDttUserAuth(CUser user,Integer doneCode) throws Exception{
 		//获取用户所有资源的所有到期日
 		Map<String,Date> userResMap = this.getUserResExpDate(user.getUser_id());
 		//先全部取消授权
@@ -368,7 +368,7 @@ public class AuthComponent extends BaseComponent{
 		return Integer.parseInt(jCaCommandDao.findSequence().toString());
 	}
 	
-	public Map<String,Date> getUserResExpDate(String userId) throws Exception{
+	private Map<String,Date> getUserResExpDate(String userId) throws Exception{
 		List<UserResExpDate> resList = cUserDao.queryUserProdResExpDate(userId);
 		Map<String,Date> resMap = new HashMap<>();
 		for (UserResExpDate res :resList){

@@ -255,8 +255,8 @@ public class DateHelper {
 	*/
 	public static java.util.Date addDate(java.util.Date date, int day) {
 		java.util.Calendar c = java.util.Calendar.getInstance();
-			c.setTime(date);
-			c.setTimeInMillis(c.getTimeInMillis() + (long) day * 24 * 3600 * 1000);
+		c.setTime(date);
+		c.add(Calendar.DATE, day);
 		return c.getTime();
 	}
 	/**
@@ -264,6 +264,13 @@ public class DateHelper {
 	* @return
 	*/
 	public static int getDiffDays(Date beginDate, Date endDate){
+		//舍去时分秒
+		try {
+			beginDate = DateHelper.parseDate(DateHelper.dateToStr(beginDate), DateHelper.FORMAT_YMD);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		long lBeginTime = beginDate.getTime();
 		long lEndTime = endDate.getTime();
 		int iDay = (int) ((lEndTime - lBeginTime) / 86400000);
@@ -622,13 +629,6 @@ public class DateHelper {
 	}
 
 
-	public static Date addMonths(Date date, int day) {
-		java.util.Calendar c = java.util.Calendar.getInstance();
-		c.setTime(date);
-		c.setTimeInMillis(c.getTimeInMillis() + (long) day * 24 * 3600 * 1000);
-		return c.getTime();
-	}
-
 	/**
 	 * 按照指定格式将给出的字符串转化成Date对象
 	 * @param strDate
@@ -650,7 +650,12 @@ public class DateHelper {
 	}
 	
 	public static void main(String[] args){
-		System.out.println(DateHelper.format(getNextMonthByNum(new Date(),2)));
+		System.out.println(DateHelper.dateToStr(DateHelper.addDate(new Date(), 2)));
+		
+		System.out.println(DateHelper.getDiffDays(new Date(),DateHelper.addDate(new Date(), 3)));
+		
+		
+		//System.out.println(DateHelper.dateToStr(DateHelper.addMonths(new Date(), 2)));
 	}
 
 
