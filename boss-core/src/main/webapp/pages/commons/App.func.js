@@ -370,19 +370,14 @@ Ext.apply(App.func,{
 				return false;
 			}
 			if(busicode == '1051'){//冲正(预存费用和业务费用相同的限制)
-				if(data['pay_type'] == 'YHDK'){
+				var date = Date.parseDate(data['create_time'],'Y-m-d H:i:s');
+				date = date.add(Date.DAY,30);
+				if(nowDate() > date || App.getData().optr.optr_id != data['optr_id']){
 					return false;
 				}
-				//赠送的30天内冲正，其余当天冲正
-				if(data['pay_type'] != 'PRESENT'){
-					if(data['allow_done_code']=='F' ||Ext.util.Format.date(nowDate(),'Y-m-d') !== data['create_time'].substring(0,10)|| App.getData().optr.optr_id != data['optr_id'])
-						return false;
-				}else{
-					var date = Date.parseDate(data['create_time'],'Y-m-d H:i:s');
-					date = date.add(Date.DAY,30);
-					if(nowDate() > date || App.getData().optr.optr_id != data['optr_id']){
-						return false;
-					}
+				
+				if(data["real_pay"] < 0){
+					return false;
 				}
 				
 			}else if(busicode == '1054'){//银行冲正

@@ -112,7 +112,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 			//检查能否退订
 			this.checkOrderCanCancel(cust_id, isHigh, order);
 			//费用计算
-			order.setActive_fee(orderComponent.getOrderCancelFee(order));
+			order.setActive_fee(orderComponent.getOrderCancelFee(order,DateHelper.today()));
 		}
 		
 		return orderList;
@@ -123,21 +123,12 @@ public class OrderService extends BaseBusiService implements IOrderService{
 	 * 用户销户查询该用户的所有产品信息包含退款金额（高级销户，普通销户）
 	 */
 	public List<CProdOrderDto> queryLogoffUserProd(String busi_code,String user_id) throws Exception{
-		List<CProdOrderDto> orderList=orderComponent.queryProdOrderDtoByUserId(user_id);
+		
+		List<CProdOrderDto> orderList=orderComponent.queryLogoffProdOrderDtoByUserId(user_id);
 		//是否高级权限
 		boolean isHigh=orderComponent.isHighCancel(busi_code);
-		//参数检查		
-		for(CProdOrderDto order:orderList){
-			if(order.getIs_pay().equals(SystemConstants.BOOLEAN_FALSE)){
-				//未支付判断
-				throw new ServicesException(ErrorCode.NotCancleHasUnPay);
-			}
-			//TODO 后续方法判断高级权限 的退款金额
-//			this.checkOrderCanCancel(order.getCust_id(), isHigh, order);
-			//费用计算
-			order.setActive_fee(orderComponent.getOrderCancelFee(order));
-		}
-		
+		//费用
+		orderComponent.getLogoffOrderFee(orderList, isHigh);
 		return orderList;
 	}
 	
@@ -281,7 +272,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 			cancelList.add(order);
 			this.checkOrderCanCancel(cust_id, isHigh, order);
 			//可退费用计算
-			order.setActive_fee(orderComponent.getOrderCancelFee(order));
+			order.setActive_fee(orderComponent.getOrderCancelFee(order,DateHelper.today()));
 			fee=fee+order.getActive_fee();
 			if(!order.getProd_type().equals(SystemConstants.PROD_TYPE_BASE)){
 				unPayCheckMap.put("PACKAGE", order);
@@ -925,18 +916,38 @@ public class OrderService extends BaseBusiService implements IOrderService{
 	    }
 		return JsonHelper.fromObject(busiMap);
 	}
+	
+	public List<String> saveOrderProdList(String busi_code,OrderProd...orderProds) throws Exception{
+		//锁定未支付业务,防止同一个客户被多个操作员操作订购产品
+		if(orderProds==null||orderProds.length==0){
+			throw new ServicesException(ErrorCode.OrderNotExists);
+		}
+		String cust_id=null;
+		for(OrderProd orderProd:orderProds){
+			if(cust_id!=null&&!cust_id.equals(orderProd.getCust_id())){
+				throw new ServicesException(ErrorCode.CustDataException);
+			}else if(cust_id==null){
+				cust_id=orderProd.getCust_id();
+			}
+		}
+		doneCodeComponent.lockCust(cust_id);
+		Integer doneCode = doneCodeComponent.gDoneCode();	
+		List<String> prodSns=new ArrayList<>();
+		for(OrderProd orderProd:orderProds){
+			prodSns.add(this.saveOrderProd(orderProd,busi_code,doneCode));
+		}
+		//业务流水
+		this.saveAllPublic(doneCode, getBusiParam());
+		return prodSns;
+	}
 	/**
 	 * 保存订购记录
 	 * @return
 	 * @throws Exception 
 	 */
-	@Override
-	public String saveOrderProd(OrderProd orderProd,String busi_code) throws Exception{
-		//锁定未支付业务,防止同一个客户被多个操作员操作订购产品
-		doneCodeComponent.lockCust(orderProd.getCust_id());
-		
-		Integer doneCode = doneCodeComponent.gDoneCode();	
-		
+	//@Override
+	private String saveOrderProd(OrderProd orderProd,String busi_code,Integer doneCode) throws Exception{
+
 		//订单的业务参数
 		String remark=getOrderProdRemark(orderProd,busi_code);
 		
@@ -966,9 +977,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		if(orderProd.getPay_fee()>0){
 			this.saveCFee(cProdOrder,orderProd.getPay_fee(),cust,doneCode,busi_code);
 		}
-		
-		//业务流水
-		this.saveAllPublic(doneCode, getBusiParam());
+	
 		return cProdOrder.getOrder_sn();
 	}
 	/**

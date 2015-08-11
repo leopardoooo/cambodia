@@ -5,11 +5,13 @@
 package com.ycsoft.business.dao.core.job; 
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.stereotype.Component;
 
 import com.ycsoft.beans.core.job.JBandCommand;
+import com.ycsoft.beans.core.job.JVodCommand;
 import com.ycsoft.business.dto.core.prod.JBandCommandDto;
 import com.ycsoft.commons.constants.BusiCmdConstants;
 import com.ycsoft.commons.helper.StringHelper;
@@ -68,5 +70,10 @@ public class JBandCommandDao extends BaseEntityDao<JBandCommand> {
 	public void deleteUserBand(String userId, String cmdType) throws JDBCException {
 		String sql = "delete from j_band_command j where j.user_id=? and j.cmd_type=?";
 		executeUpdate(sql, userId,cmdType);
+	}
+
+	public List<JBandCommand> queryCmd() throws JDBCException{
+		String sql = "select * from j_band_command where is_send='F' and rownum<500 order by transnum";
+		return this.createQuery(sql).list();
 	}
 }
