@@ -81,7 +81,7 @@ public class ProdOrderAction extends BaseBusiAction {
 	
 	public String saveOrderProd()throws Exception{
 		OrderProd order=JsonHelper.toObject(orderProd, OrderProd.class);
-		orderService.saveOrderProd(order, busi_code);
+		orderService.saveOrderProdList(busi_code,order);
 		return JSON_SUCCESS;
 	}
 	

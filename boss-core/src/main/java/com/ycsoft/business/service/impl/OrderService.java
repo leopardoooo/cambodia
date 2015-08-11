@@ -916,18 +916,38 @@ public class OrderService extends BaseBusiService implements IOrderService{
 	    }
 		return JsonHelper.fromObject(busiMap);
 	}
+	
+	public List<String> saveOrderProdList(String busi_code,OrderProd...orderProds) throws Exception{
+		//锁定未支付业务,防止同一个客户被多个操作员操作订购产品
+		if(orderProds==null||orderProds.length==0){
+			throw new ServicesException(ErrorCode.OrderNotExists);
+		}
+		String cust_id=null;
+		for(OrderProd orderProd:orderProds){
+			if(cust_id!=null&&!cust_id.equals(orderProd.getCust_id())){
+				throw new ServicesException(ErrorCode.CustDataException);
+			}else if(cust_id==null){
+				cust_id=orderProd.getCust_id();
+			}
+		}
+		doneCodeComponent.lockCust(cust_id);
+		Integer doneCode = doneCodeComponent.gDoneCode();	
+		List<String> prodSns=new ArrayList<>();
+		for(OrderProd orderProd:orderProds){
+			prodSns.add(this.saveOrderProd(orderProd,busi_code,doneCode));
+		}
+		//业务流水
+		this.saveAllPublic(doneCode, getBusiParam());
+		return prodSns;
+	}
 	/**
 	 * 保存订购记录
 	 * @return
 	 * @throws Exception 
 	 */
-	@Override
-	public String saveOrderProd(OrderProd orderProd,String busi_code) throws Exception{
-		//锁定未支付业务,防止同一个客户被多个操作员操作订购产品
-		doneCodeComponent.lockCust(orderProd.getCust_id());
-		
-		Integer doneCode = doneCodeComponent.gDoneCode();	
-		
+	//@Override
+	private String saveOrderProd(OrderProd orderProd,String busi_code,Integer doneCode) throws Exception{
+
 		//订单的业务参数
 		String remark=getOrderProdRemark(orderProd,busi_code);
 		
@@ -957,9 +977,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		if(orderProd.getPay_fee()>0){
 			this.saveCFee(cProdOrder,orderProd.getPay_fee(),cust,doneCode,busi_code);
 		}
-		
-		//业务流水
-		this.saveAllPublic(doneCode, getBusiParam());
+	
 		return cProdOrder.getOrder_sn();
 	}
 	/**
