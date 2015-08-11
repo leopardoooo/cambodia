@@ -1,7 +1,9 @@
 package com.ycsoft.business.service.impl;
 
 import static com.ycsoft.commons.constants.SystemConstants.ACCT_TYPE_SPEC;
+import static com.ycsoft.commons.constants.SystemConstants.BOOLEAN_TRUE;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Service;
 import com.ycsoft.beans.config.TBusiFee;
 import com.ycsoft.beans.config.TDeviceBuyMode;
 import com.ycsoft.beans.core.cust.CCust;
+import com.ycsoft.beans.core.cust.CCustDevice;
 import com.ycsoft.beans.core.job.JUserStop;
 import com.ycsoft.beans.core.prod.CProdOrder;
 import com.ycsoft.beans.core.prod.CProdOrderDto;
@@ -26,9 +29,11 @@ import com.ycsoft.beans.system.SOptr;
 import com.ycsoft.business.component.core.OrderComponent;
 import com.ycsoft.business.dao.core.prod.CProdOrderDao;
 import com.ycsoft.business.dao.core.prod.CProdPropChangeDao;
+import com.ycsoft.business.dto.core.acct.PayDto;
 import com.ycsoft.business.dto.core.fee.FeeInfoDto;
 import com.ycsoft.business.dto.core.prod.DisctFeeDto;
 import com.ycsoft.business.dto.core.prod.PromotionDto;
+import com.ycsoft.business.dto.core.user.UserDto;
 import com.ycsoft.business.dto.core.user.UserRes;
 import com.ycsoft.business.dto.device.DeviceDto;
 import com.ycsoft.business.service.IUserService;
@@ -36,12 +41,14 @@ import com.ycsoft.commons.constants.BusiCmdConstants;
 import com.ycsoft.commons.constants.BusiCodeConstants;
 import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.constants.SystemConstants;
+import com.ycsoft.commons.exception.ErrorCode;
 import com.ycsoft.commons.exception.ServicesException;
 import com.ycsoft.commons.helper.CollectionHelper;
 import com.ycsoft.commons.helper.DateHelper;
 import com.ycsoft.commons.helper.JsonHelper;
 import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.daos.core.JDBCException;
+import com.ycsoft.daos.helper.BeanHelper;
 @Service
 public class UserServiceSN extends BaseBusiService implements IUserService {
 	@Autowired
@@ -76,7 +83,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 			device.setDevice_model(deviceModel);
 		}
 		
-		//设置用户终端类型
+		//设置OTT用户终端类型和默认用户名
 		if (user.getUser_type().equals(SystemConstants.USER_TYPE_OTT)) {
 			if (cust.getCust_type().equals(SystemConstants.CUST_TYPE_NONRESIDENT)){
 				user.setTerminal_type(SystemConstants.USER_TERMINAL_TYPE_ZZD);
@@ -95,6 +102,9 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 					user.setTerminal_type(SystemConstants.USER_TERMINAL_TYPE_ZZD);
 				}
 			}
+			
+			if (StringHelper.isEmpty(user.getLogin_name()))
+				user.setLogin_name("supertv"+user.getUser_id());
 		}
 		
 		userComponent.createUser(user);
@@ -136,8 +146,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 			userComponent.updateDevice(doneCode, user);
 			//发送授权
 			this.createUserJob(user, user.getCust_id(), doneCode);
-			jobComponent.createBusiCmdJob(doneCode, BusiCmdConstants.REFRESH_TERMINAL, user.getCust_id(), user.getUser_id(),
-					null, null, null, null, null, null);
+			authComponent.sendAuth(user, null, BusiCmdConstants.REFRESH_TERMINAL, doneCode);
 			//处理设备
 			TDeviceBuyMode buyModeCfg = busiConfigComponent.queryBuyMode(user.getStr10());
 			String ownership = SystemConstants.OWNERSHIP_GD;
@@ -173,16 +182,11 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		userComponent.updateDevice(doneCode, user);
 		//处理授权
 		if (user.getUser_type().equals(SystemConstants.USER_TYPE_OTT)){
-			jobComponent.createBusiCmdJob(doneCode, BusiCmdConstants.CHANGE_USER,
-					cust.getCust_id(), userId, null, null,
-					null, null, null, null);
+			authComponent.sendAuth(user, null, BusiCmdConstants.CHANGE_USER, doneCode);
 		} else if (user.getUser_type().equals(SystemConstants.USER_TYPE_DTT)){
-			jobComponent.createBusiCmdJob(doneCode, BusiCmdConstants.PASSVATE_TERMINAL,
-					user.getCust_id(), userId, oldUser.getStb_id(), oldUser.getCard_id(), oldUser.getModem_mac(), 
-					null, null, null);
-			jobComponent.createBusiCmdJob(doneCode, BusiCmdConstants.REFRESH_TERMINAL,
-					cust.getCust_id(), userId, null, null,
-					null, null, null, null);
+			authComponent.sendAuth(oldUser, null, BusiCmdConstants.PASSVATE_TERMINAL, doneCode);
+			authComponent.sendAuth(user, null, BusiCmdConstants.ACCTIVATE_TERMINAL, doneCode);
+			authComponent.sendAuth(user, null, BusiCmdConstants.REFRESH_TERMINAL, doneCode);
 		}
 		//处理设备购买和回收
 		this.buyDevice(device, devcieBuyMode, oldDevice.getOwnership(), deviceFee, getBusiParam().getBusiCode(),
@@ -234,13 +238,163 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 
 
 	@Override
-	public void saveRemoveUser(String banlanceDealType, String transAcctId, String transAcctItemId) throws Exception {
+	public void saveRemoveUser(String userId,String banlanceDealType,String reclaim,Integer cancelFee, String transAcctId, String transAcctItemId) throws Exception {
 		// TODO Auto-generated method stub
+		//获取客户用户信息
+		CCust cust = getBusiParam().getCust();
+		String  custId = cust.getCust_id();
+		List<CUser> userList = getBusiParam().getSelectedUsers();
+		CUser user = null;
+		for(CUser u : userList){
+			if(userId.equals(u.getUser_id())){
+				user = u;
+			}
+		}
+		if(user == null){
+			throw new ServicesException(ErrorCode.CustDataException);
+		}
+		//获取业务流水
+		Integer doneCode = doneCodeComponent.gDoneCode();
+		String busiCode = getBusiParam().getBusiCode();
+		//生成销帐任务
+		int jobId = jobComponent.createCustWriteOffJob(doneCode, custId,BOOLEAN_TRUE);
+
+		List<String> devoceList = new ArrayList<String>();
+		if(user.getStb_id() != null){
+			devoceList.add(user.getStb_id());
+		}
+		if(user.getCard_id()!=null){
+			devoceList.add(user.getCard_id());
+		}
+		if(user.getModem_mac() != null){
+			devoceList.add(user.getModem_mac());
+		}
 		
+		List<CCustDevice> buyModeList = null;
+		if(devoceList.size()>0){
+			buyModeList = custComponent.findBuyModeById(custId, devoceList.toArray(new String[devoceList.size()]));
+		}
+		Map<String, CCustDevice> map = CollectionHelper.converToMapSingle(buyModeList, "device_code");
+		Map<String, UserDto> userMap = new HashMap<String, UserDto>();
+		
+		if(CollectionHelper.isNotEmpty(userList)){
+			List<UserDto> allUsers = userComponent.queryUser(custId);
+			userMap = CollectionHelper.converToMapSingle(allUsers, "user_id");
+		}
+		
+		//处理用户销户
+		Map<String, Object> info = new HashMap<String, Object>();
+		info.put("user_type", user.getUser_type_text());
+		info.put("user", userMap.get(userId));
+		
+		//销户后保存原来的设备购买方式
+		user.setStb_buy(map.get(user.getStb_id()) != null?map.get(user.getStb_id()).getBuy_mode():null);
+		user.setCard_buy(map.get(user.getCard_id()) != null?map.get(user.getCard_id()).getBuy_mode():null);
+		user.setModem_buy(map.get(user.getModem_mac()) != null?map.get(user.getModem_mac()).getBuy_mode():null);
+		
+		
+		//柬埔寨 用户销户 回收设备
+		if(SystemConstants.BOOLEAN_TRUE.equals(reclaim)){
+			DeviceDto stbDevice = null;
+			//回收机顶盒
+			if(StringHelper.isNotEmpty(user.getStb_id())){
+				stbDevice = deviceComponent.queryDeviceByDeviceCode(user.getStb_id());
+				reclaimDevice(stbDevice.getDevice_id(), null,SystemConstants.RECLAIM_REASON_XHTH, 0, cust, doneCode, busiCode);
+			}
+			if(StringHelper.isNotEmpty(user.getCard_id()) && (stbDevice.getPairCard() == null  || !user.getCard_id().equals(stbDevice.getPairCard().getCard_id()))){
+				DeviceDto device = deviceComponent.queryDeviceByDeviceCode(user.getCard_id());
+				reclaimDevice(device.getDevice_id(), null,SystemConstants.RECLAIM_REASON_XHTH, 0, cust, doneCode, busiCode);
+			}
+			if(StringHelper.isNotEmpty(user.getModem_mac()) && (stbDevice.getPairModem() == null  || !user.getModem_mac().equals(stbDevice.getPairModem().getModem_mac()))){
+				DeviceDto device = deviceComponent.queryDeviceByDeviceCode(user.getModem_mac());
+				reclaimDevice(device.getDevice_id(), null,SystemConstants.RECLAIM_REASON_XHTH, 0, cust, doneCode, busiCode);
+			}
+												
+		}
+		//是否高级权限
+		boolean isHigh=orderComponent.isHighCancel(busiCode);
+		//检查数据
+		List<CProdOrderDto> cancelList=checkCancelProdOrderParm(isHigh, userId, cancelFee);
+		
+		if(cancelFee<0){
+			//记录未支付业务
+			doneCodeComponent.saveDoneCodeUnPay(custId, doneCode, this.getOptr().getOptr_id());
+			//保存缴费信息
+			this.saveCancelFee(cancelList, this.getBusiParam().getCust(), doneCode, this.getBusiParam().getBusiCode());
+		}
+		
+		List<CProdOrder> cancelResultList=new ArrayList<>();
+		
+		for(CProdOrderDto dto:cancelList){
+			//执行退订 返回被退订的用户订单清单
+			cancelResultList.addAll(orderComponent.saveCancelProdOrder(dto, doneCode));
+		}
+		
+		//直接解除授权，不等支付（因为不能取消）
+		if(cancelResultList.size()>0){
+			authComponent.sendAuth(user, cancelResultList, BusiCmdConstants.PASSVATE_PROD, doneCode);
+		}
+		
+		//记录用户到历史表
+		userComponent.removeUserWithHis(doneCode, user);
+		
+		doneCodeComponent.saveDoneCodeInfo(doneCode, custId, null, info);
+		saveAllPublic(doneCode,getBusiParam());
 	}
 
+	
+	
+	private List<CProdOrderDto> checkCancelProdOrderParm(boolean isHigh,String userId,Integer cancelFee) throws Exception{
+		
+		if(StringHelper.isEmpty(userId)||cancelFee==null){
+			throw new ServicesException(ErrorCode.ParamIsNull);
+		}
 
+		List<CProdOrderDto> cancelList=new ArrayList<>();
+		//参数检查
+		//退款总额核对
+		int fee=0;
+		List<CProdOrderDto> orderList = cProdOrderDao.queryProdOrderDtoByUserId(userId);
+		
+		for(CProdOrderDto order:orderList){
+			cancelList.add(order);
+			//可退费用计算
+			order.setActive_fee(orderComponent.getOrderCancelFee(order));
+			fee=fee+order.getActive_fee();
+			
+		}
+		//金额核对
+		if(cancelFee!=fee*-1){
+			throw new ServicesException(ErrorCode.FeeDateException);
+		}		
+		return cancelList;
+	}
 
+	/**
+	 * 保存订单退款费用信息
+	 * @param cancelList
+	 * @param cust
+	 * @param doneCode
+	 * @param busi_code
+	 * @throws InvocationTargetException 
+	 * @throws Exception 
+	 */
+	private void saveCancelFee(List<CProdOrderDto> cancelList,CCust cust,Integer doneCode,String busi_code) throws Exception{
+		//按订单退款
+		for(CProdOrderDto order:cancelList){
+			if(order.getActive_fee()>0){
+				PayDto pay=new PayDto();
+				BeanHelper.copyProperties(pay, order);
+				pay.setProd_sn(order.getOrder_sn());
+				pay.setAcctitem_id(order.getProd_id());
+				pay.setBegin_date(DateHelper.dateToStr(DateHelper.today().before(order.getEff_date())? order.getEff_date():DateHelper.today()));
+				pay.setInvalid_date(DateHelper.dateToStr(order.getExp_date()));
+				pay.setPresent_fee(0);
+				pay.setFee(order.getActive_fee()*-1);
+				feeComponent.saveAcctFee(cust.getCust_id(), cust.getAddr_id(), pay, doneCode, busi_code, StatusConstants.UNPAY);
+			}
+		}
+	}
 
 	@Override
 	public void saveOpenInteractive(String netType, String modemMac, String password, String vodUserType,
@@ -326,8 +480,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 				//修改用户状态
 				updateUserStatus(doneCode, user.getUser_id(), user.getStatus(), StatusConstants.REQSTOP);
 				//生成钝化用户JOB
-				jobComponent.createBusiCmdJob(doneCode, BusiCmdConstants.PASSVATE_USER, cust.getCust_id(),
-						user.getUser_id(), user.getStb_id(), user.getCard_id(), user.getModem_mac(), null, null,JsonHelper.fromObject(user));
+				authComponent.sendAuth(user, null, BusiCmdConstants.PASSVATE_USER, doneCode);
 				//修改用户订单状态为报停状态
 				
 				for (CProdOrderDto order:orderList){
@@ -354,6 +507,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 			for(CUser user:users){
 				//清除原有未执行的预报停
 				removeStopByUserId(user.getUser_id());
+				//TODO 预报停
 				jobComponent.createUserStopJob(doneCode, user.getUser_id(), effectiveDate);
 			}
 		}
@@ -390,26 +544,32 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		boolean isCustPkgOpen = false;
 		for(CUser user:users){
 			updateUserStatus(doneCode, user.getUser_id(), user.getStatus(), StatusConstants.ACTIVE);
-			//生成钝化用户JOB
-			jobComponent.createBusiCmdJob(doneCode, BusiCmdConstants.ACCTIVATE_USER, cust.getCust_id(),
-					user.getUser_id(), user.getStb_id(), user.getCard_id(), user.getModem_mac(), null, null,JsonHelper.fromObject(user));
 			//修改订单状态为正常状态，并更新到期日
+			Date startDate = null;
+			String curProdId = null;
 			for (CProdOrderDto order:orderList){
 				if (StringHelper.isNotEmpty(order.getUser_id()) && order.getUser_id().equals(user.getUser_id())){
-					openProd(doneCode, order);
-					
+					if (curProdId == null || !order.getProd_id().equals(curProdId))
+						startDate = null;
+					startDate = openProd(doneCode, order,startDate);
 					if (StringHelper.isNotEmpty(order.getPackage_sn())){
 						isCustPkgOpen = true;
 					}
+					
+					curProdId = order.getProd_id();
 				}
-			}			
+			}
+			
+			//发授权
+			authComponent.sendAuth(user, null, BusiCmdConstants.ACCTIVATE_USER, doneCode);
 		}
 		
 		if (isCustPkgOpen){
 			//修改套餐状态
+			Date startDate = null;
 			for (CProdOrderDto order:orderList){
 				if (!order.getProd_type().equals(SystemConstants.PROD_TYPE_BASE)){
-					openProd(doneCode, order);
+					startDate = openProd(doneCode, order,startDate);
 				}
 			}
 		}
@@ -813,22 +973,38 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		orderComponent.editProd(doneCode,order.getOrder_sn(),changeList);
 	}
 	
-	private void openProd(Integer doneCode, CProdOrderDto order) throws Exception, ServicesException {
+	private Date openProd(Integer doneCode, CProdOrderDto order,Date startDate) throws Exception, ServicesException {
+		Date expDate = null;
+		Date effDate = null;
 		CProdPropChange statusChange = cProdPropChangeDao.queryLastStatus(order.getOrder_sn(), order.getCounty_id());
 		if (statusChange == null)
 			throw new ServicesException("找不到产品报停记录，请联系管理员");
-		//计算报停天数
-		int stopDays = DateHelper.getDiffDays(statusChange.getChange_time(), new Date());
+		if (startDate == null) {
+			//计算报停天数
+			int stopDays = DateHelper.getDiffDays(statusChange.getChange_time(), new Date());
+			expDate = DateHelper.addDate(order.getExp_date(), stopDays);
+		} else {
+			effDate =  DateHelper.addDate(startDate, 1);
+			expDate = DateHelper.getNextMonthByNum(effDate, order.getOrder_months());
+		}
 		
 		List<CProdPropChange> changeList = new ArrayList<CProdPropChange>();
 		changeList.add(new CProdPropChange("status",
-				order.getStatus(),statusChange.getNew_value()));
+				order.getStatus(),statusChange.getOld_value()));
 		changeList.add(new CProdPropChange("status_date",
 				DateHelper.dateToStr(order.getStatus_date()),DateHelper.dateToStr(new Date())));
-		changeList.add(new CProdPropChange("exp_date",
-				DateHelper.dateToStr(order.getExp_date()),DateHelper.dateToStr(DateHelper.addDate(order.getExp_date(), stopDays))));
+		changeList.add(new CProdPropChange("exp_date",DateHelper.dateToStr(order.getExp_date()),
+				DateHelper.dateToStr(expDate)));
 		
+		
+		if (effDate != null){
+			changeList.add(new CProdPropChange("eff_date",DateHelper.dateToStr(order.getEff_date()),
+					DateHelper.dateToStr(effDate)));
+		}
 		orderComponent.editProd(doneCode,order.getOrder_sn(),changeList);
+		
+		return expDate;
+		
 	}
 	
 	private void setUserDeviceInfo(CUser user, DeviceDto device) throws Exception{
@@ -839,13 +1015,13 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		}
 		if (user.getUser_type().equals(SystemConstants.USER_TYPE_OTT)){
 			if (!device.getDevice_type().equals(SystemConstants.DEVICE_TYPE_STB) 
-					|| StringHelper.isNotEmpty(device.getPairCard().getCard_id()))
+					|| (device.getPairCard() != null && StringHelper.isNotEmpty(device.getPairCard().getCard_id())))
 				throw new ServicesException("设备类型不正确");
 			user.setStb_id(device.getDevice_code());
 			user.setModem_mac(device.getDevice_mac());
 		}
 		if (user.getUser_type().equals(SystemConstants.USER_TYPE_DTT)){
-			if ( StringHelper.isEmpty(device.getPairCard().getCard_id()))
+			if ( device.getPairCard() == null || StringHelper.isEmpty(device.getPairCard().getCard_id()))
 				throw new ServicesException("设备类型不正确");
 			user.setStb_id(device.getDevice_code());
 			user.setCard_id(device.getPairCard().getCard_id());

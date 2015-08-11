@@ -20,7 +20,7 @@ public class CProdOrderDao extends BaseEntityDao<CProdOrder> {
 				+ " where a.cust_id=? and a.prod_id=b.prod_id and a.package_id=e.prod_id(+) "
 				+ " and a.tariff_id=c.tariff_id(+) and a.disct_id= d.disct_id(+) "
 				+ " and (a.exp_date>=sysdate or a.status in (?,?,?)) "
-				+ " order by a.cust_id,a.user_id,a.exp_date desc ";
+				+ " order by a.cust_id,a.user_id,a.exp_date  ";
 		
 		return this.createQuery(CProdOrderDto.class, sql, custId,StatusConstants.REQSTOP,
 				StatusConstants.LINKSTOP,StatusConstants.INSTALL).list();
@@ -30,7 +30,7 @@ public class CProdOrderDao extends BaseEntityDao<CProdOrder> {
 	public List<CProdOrder> queryCustEffOrder(String custId) throws JDBCException{
 		String sql = "select * from c_prod_order where cust_id=? "
 				+ " and (exp_date>=sysdate or status in (?,?,?))"
-				+ "order by cust_id,user_id,exp_date desc";
+				+ "order by cust_id,user_id,exp_date ";
 		
 		return this.createQuery(CProdOrder.class, sql, custId,StatusConstants.REQSTOP,
 				StatusConstants.LINKSTOP,StatusConstants.INSTALL).list();

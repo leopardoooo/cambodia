@@ -15,7 +15,7 @@ import com.ycsoft.daos.config.POJO;
 /**
  * JVodCommand -> J_VOD_COMMAND mapping
  */
-@POJO(tn = "J_VOD_COMMAND", sn = "", pk = "")
+@POJO(tn = "J_VOD_COMMAND", sn = "", pk = "transnum")
 public class JVodCommand extends BusiBase implements Serializable {
 
 	/**

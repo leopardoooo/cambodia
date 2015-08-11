@@ -1,10 +1,7 @@
 package com.ycsoft.web.action.core;
 
-import java.util.List;
-
 import org.springframework.stereotype.Controller;
 
-import com.ycsoft.beans.core.prod.CProdOrderDto;
 import com.ycsoft.business.dto.core.prod.OrderProd;
 import com.ycsoft.business.service.IOrderService;
 import com.ycsoft.commons.helper.JsonHelper;
@@ -35,6 +32,17 @@ public class ProdOrderAction extends BaseBusiAction {
 		getRoot().setRecords(orderService.queryCancelFeeByCancelOrder(busi_code, cust_id, order_sn));
 		return JSON_RECORDS;
 	}
+	
+	/**
+	 * 用户销户产品数据初始化
+	 * @return
+	 * @throws Exception
+	 */
+	public String queryLogoffUserProd() throws Exception{
+		getRoot().setRecords(orderService.queryLogoffUserProd(busi_code,user_id));
+		return JSON_RECORDS;
+	}
+	
 	/**
 	 * 退订产品(高级和普通退订)
 	 * @return

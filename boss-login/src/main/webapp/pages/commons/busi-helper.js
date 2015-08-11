@@ -388,21 +388,23 @@ Ext.apply( App, {
 			panel.getUserPanel().userGrid.remoteRefresh();
 		}
 /****************用户面板相关业务*************************/		
-		else if(busiCode == '1020' || busiCode == '1021'){//用户开户、销户，刷新用户和设备，账户
+		else if(busiCode == '1021' || busiCode == '111'){//销户，高级销户
+			panel.getUserPanel().userGrid.remoteRefresh();
+		}else if(busiCode == '1020'){//用户开户、刷新用户和设备，账户
 			//panel.getCustPanel().custInfoPanel.remoteRefresh();
 			//panel.getCustPanel().refreshPropChangeGrid();
 		//	
 			//panel.getCustPanel().custDeviceGrid.remoteRefresh();
 			panel.getUserPanel().userGrid.remoteRefresh();
-		//	panel.getAcctPanel().acctGrid.remoteRefresh();
+//			panel.getAcctPanel().acctGrid.remoteRefresh();
 		}else if(busiCode == '1023' || busiCode == '1018' ||busiCode == '1118' || busiCode == '1074'||busiCode == '1075'||busiCode == '1078'||busiCode == '1079'){//用户修改资料，刷新用户，修改宽带密码，修改最大连接数,取消预报停,修改最大用户数
 			panel.getUserPanel().userGrid.remoteRefresh();
 		}else if(busiCode == '1024' || busiCode == '1025' 
 			|| busiCode == '1222' || busiCode == '1129' || busiCode == '1031' || busiCode == '1236'){
 				//报停、报开、开通双向或取消双向、修改接入方式，刷新用户和设备,账户
-			panel.getCustPanel().custDeviceGrid.remoteRefresh();
+			//panel.getCustPanel().custDeviceGrid.remoteRefresh();
 			panel.getUserPanel().userGrid.remoteRefresh();
-			panel.getAcctPanel().acctGrid.remoteRefresh();
+			//panel.getAcctPanel().acctGrid.remoteRefresh();
 		}else if(busiCode == '1500'){//订购，刷新产品和账户
 			panel.getUserPanel().prodGrid.remoteRefresh();
 			panel.getAcctPanel().acctGrid.remoteRefresh();

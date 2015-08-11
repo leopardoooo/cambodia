@@ -765,6 +765,21 @@ Ext.apply(MenuHandler, {
 		};
 	},
 	// 用户销户
+	SingleLogoffUser : function() {
+		if (!hasCust())
+			return false;
+		var record = App.getApp().main.infoPanel.getUserPanel().userGrid.getSelectionModel().getSelected();	
+		if (record.get("status") != "ACTIVE" ) {
+			Alert("选择的用户状态非正常");
+			return false;
+		}
+			
+		return {
+				width : 650,
+				height : 550
+			};
+	},
+	// 用户销户
 	LogoffUser : function() {
 		if (!hasCust())
 			return false;

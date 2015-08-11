@@ -1,7 +1,7 @@
 package com.ycsoft.commons.exception;
 
 public enum ErrorCode {
-	ParamIsNull("参数不能未空！"),
+	ParamIsNull("参数为空！"),
 	CustDataException("客户数据异常，请重新索搜客户！"),
 	UnPayLock("客户被锁定,请等待%s(%s)完成支付!"),
 	
@@ -19,6 +19,7 @@ public enum ErrorCode {
 	UnPayOrderCancelBefor("请先取消订单号=%s的订单费用"),
 	UnPayOrderCancelUnsubscribe("不能取消退订费用"),
 	OrderNotExists("订单不存在"),
+	OrderTodayHasCancel("订单已取消，不能再次取消"),
 	
 	ProdNotExists("产品不存在"),
 	ProdIsInvalid("产品已失效"),

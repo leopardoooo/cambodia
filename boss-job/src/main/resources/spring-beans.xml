@@ -25,9 +25,8 @@
 		class="com.ycsoft.commons.config.CustomPropertyConfigurer">
 		<property name="locations">
 			<list>
-				<value>classpath*:jdbc.properties</value>
 				<value>classpath*:spring.properties</value>
-				<value>classpath*:environment.properties</value>
+				<value>classpath*:/config/*.properties</value>
 			</list>
 		</property>
 	</bean>
