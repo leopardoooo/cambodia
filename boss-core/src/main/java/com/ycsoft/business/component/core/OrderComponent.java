@@ -4,21 +4,31 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.ycsoft.beans.config.TRuleDefine;
+import com.ycsoft.beans.core.cust.CCust;
 import com.ycsoft.beans.core.prod.CProdOrder;
 import com.ycsoft.beans.core.prod.CProdOrderDto;
+import com.ycsoft.beans.core.prod.CProdOrderFollowPay;
 import com.ycsoft.beans.core.prod.CProdOrderHis;
 import com.ycsoft.beans.core.prod.CProdOrderTransfee;
 import com.ycsoft.beans.core.prod.CProdPropChange;
 import com.ycsoft.beans.core.user.CUser;
 import com.ycsoft.beans.prod.PPackageProd;
 import com.ycsoft.beans.prod.PProd;
+import com.ycsoft.beans.prod.PProdTariffDisct;
 import com.ycsoft.business.commons.abstracts.BaseBusiComponent;
+import com.ycsoft.business.component.config.ExpressionUtil;
+import com.ycsoft.business.dao.config.TRuleDefineDao;
+import com.ycsoft.business.dao.core.cust.CCustDao;
 import com.ycsoft.business.dao.core.prod.CProdOrderDao;
 import com.ycsoft.business.dao.core.prod.CProdOrderHisDao;
 import com.ycsoft.business.dao.core.prod.CProdOrderTransfeeDao;
@@ -26,9 +36,13 @@ import com.ycsoft.business.dao.core.prod.CProdStatusChangeDao;
 import com.ycsoft.business.dao.core.user.CUserDao;
 import com.ycsoft.business.dao.prod.PPackageProdDao;
 import com.ycsoft.business.dao.prod.PProdDao;
+import com.ycsoft.business.dao.prod.PProdTariffDisctDao;
 import com.ycsoft.business.dto.core.prod.OrderProd;
+import com.ycsoft.business.dto.core.prod.OrderProdPanel;
 import com.ycsoft.business.dto.core.prod.PackageGroupUser;
+import com.ycsoft.business.dto.core.prod.ProdTariffDto;
 import com.ycsoft.commons.constants.BusiCodeConstants;
+import com.ycsoft.commons.constants.DictKey;
 import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.exception.ComponentException;
@@ -37,6 +51,7 @@ import com.ycsoft.commons.exception.ServicesException;
 import com.ycsoft.commons.helper.CollectionHelper;
 import com.ycsoft.commons.helper.DateHelper;
 import com.ycsoft.commons.helper.StringHelper;
+import com.ycsoft.commons.store.MemoryDict;
 import com.ycsoft.daos.core.JDBCException;
 import com.ycsoft.daos.helper.BeanHelper;
 /**
@@ -60,7 +75,93 @@ public class OrderComponent extends BaseBusiComponent {
 	private CProdOrderTransfeeDao cProdOrderTransfeeDao;
 	@Autowired
 	private CProdStatusChangeDao cProdStatusChangeDao;
-
+	@Autowired
+	private TRuleDefineDao tRuleDefineDao;
+	@Autowired
+	private CCustDao cCustDao;
+	@Autowired
+	private PProdTariffDisctDao pProdTariffDisctDao;
+	@Autowired
+	private BeanFactory beanFactory;
+	/**
+	 * cust-user-prod
+	 * 客户套餐key=cust--
+	 * 宽带单产品key=cust-user-
+	 * 普通单产品key=cust-user-prod
+	 */
+	private String getOrderKey(CProdOrderDto dto){
+		String key=StringHelper.append(dto.getCust_id(),"-",
+				dto.getProd_type().equals(SystemConstants.PROD_TYPE_BASE)?dto.getUser_id():"","-",
+				dto.getProd_type().equals(SystemConstants.PROD_TYPE_BASE)
+				&&!dto.getServ_id().equals(SystemConstants.PROD_SERV_ID_BAND)?dto.getProd_id():"");
+		return key;
+	}
+	/**
+	 * 查询前 要做锁定判断doneCodeCom*t.checkUnPayOtherLock
+	 * 查询可以缴费的产品信息
+	 * @throws Exception 
+	 */
+	public List<CProdOrderFollowPay> queryFollowPayOrderDto(String cust_id) throws Exception{
+		
+		//有效的订购记录
+		List<CProdOrderFollowPay> list=cProdOrderDao.queryFollowPayOrderDto(cust_id);
+		//Map<cust_user_prod,不能续费的原因> 
+		Map<String,String> hasPakDetailMap=new HashMap<String,String>();
+		Map<String,CProdOrderFollowPay> maxFPMap=new HashMap<String,CProdOrderFollowPay>();
+		
+		for(CProdOrderFollowPay dto:list){
+			String key=this.getOrderKey(dto);
+			
+			if(StringHelper.isNotEmpty(dto.getPackage_sn())){
+				//记录是否套餐子产品
+				hasPakDetailMap.put(key, "");
+			}else{
+				//非套餐,且截止日期大 则装入
+				CProdOrderDto order=maxFPMap.get(key);
+				if(order==null||dto.getExp_date().after(order.getExp_date())){
+					maxFPMap.put(key, dto);
+				}
+			}
+		}
+		//能否缴费判断和提取可选资费
+		Map<String,CProdOrderFollowPay> canFollowMap=new HashMap<>();
+		CCust cust=cCustDao.findByKey(cust_id);
+		for(Map.Entry<String, CProdOrderFollowPay>  entry: maxFPMap.entrySet()){
+			CProdOrderFollowPay dto= entry.getValue();
+			canFollowMap.put(dto.getOrder_sn(), dto);
+			//资费重新组装
+			if(StringHelper.isNotEmpty(dto.getDisct_id())){
+				dto.setTariff_id(StringHelper.append(dto.getTariff_id(),"_",dto.getDisct_id()));
+			}
+			dto.setCanFollowPay(true);
+			dto.setRemark("");
+			
+			if(hasPakDetailMap.containsKey(entry.getKey())){
+				//存在套餐子产品订单，能不能缴费
+				dto.setCanFollowPay(false);
+			}else{
+				//判断资费是否还适用判断
+				CUser user=cUserDao.findByKey(dto.getUser_id());
+				PProd prod=pProdDao.findByKey(dto.getProd_id());
+				dto.setTariffList(this.queryTariffList(cust,user,prod));
+				for(PProdTariffDisct disct: dto.getTariffList()){
+					if(disct.getTariff_id().equals(dto.getTariff_id())){
+						//资费有效
+						dto.setCurrentTariffStatus(true);
+					}
+				}
+			}		
+		}	
+		List<CProdOrderFollowPay> followPayList=new ArrayList<CProdOrderFollowPay>();
+		//排序处理
+		for(CProdOrderFollowPay dto:list){
+			if(canFollowMap.containsKey(dto.getOrder_sn())){
+				followPayList.add(canFollowMap.get(dto.getOrder_sn()));
+			}
+		}
+		return followPayList;
+	}
+	
 	/**
 	 * 销户时订单退款金额计算
 	 * @param orderList
@@ -693,5 +794,275 @@ public class OrderComponent extends BaseBusiComponent {
 		cProdPropChangeDao.save(propChangeList.toArray(new CProdPropChange[propChangeList.size()]));
 	}
 
+	
+	/**
+	 * 产品订购面板产品数据初始化加载
+	 * @param busiCode
+	 * @param custId
+	 * @param userId
+	 * @param filterOrderSn
+	 * @return
+	 * @throws Exception
+	 */
+	public OrderProdPanel queryOrderableProd(String busiCode,String custId,String userId, String filterOrderSn)
+			throws Exception {
+		OrderProdPanel panel =new OrderProdPanel();
+		CCust cust = cCustDao.findByKey(custId);
+		List<CProdOrderDto> orderList = cProdOrderDao.queryCustEffOrderDto(custId);
+		
+		if (busiCode.equals(BusiCodeConstants.PROD_SINGLE_ORDER)){
+			queryUserOrderableProd(cust,userId,panel,orderList);
+		} else if (busiCode.equals(BusiCodeConstants.PROD_PACKAGE_ORDER)){
+			queryCustOrderablePkg(cust,panel,orderList);
+		} else if (busiCode.equals(BusiCodeConstants.PROD_CONTINUE)){
+			queryOrderableGoon(cust,filterOrderSn,panel,orderList);
+		} else if (busiCode.equals(BusiCodeConstants.PROD_UPGRADE)){
+			CProdOrder order = cProdOrderDao.findByKey(filterOrderSn);
+			if (order == null)
+				return panel;
+			Map<String,Integer> prodBandWidthMap = pProdDao.queryProdBandWidth();
+			PProd prod= pProdDao.findByKey(order.getProd_id());
+			if (prod.getProd_type().equals(SystemConstants.PROD_TYPE_BASE) 
+					&& prod.getServ_id().equals(SystemConstants.USER_TYPE_BAND)){
+				//升级宽带产品
+				queryUserOrderableProd(cust,order.getUser_id(),panel,orderList);
+				//过滤掉带宽小于等于当前套餐的产品
+				for (Iterator<PProd> it = panel.getProdList().iterator();it.hasNext();){
+					PProd selectedProd = it.next();
+					if (prodBandWidthMap.get(selectedProd.getProd_id())==null ||
+							prodBandWidthMap.get(selectedProd.getProd_id())<= prodBandWidthMap.get(prod.getProd_id())){
+						it.remove();
+						panel.getTariffMap().remove(selectedProd.getProd_id());
+						panel.getLastOrderMap().remove(prod.getProd_id());
+					}
+				}
+			} else if (prod.getProd_type().equals(SystemConstants.PROD_TYPE_CUSTPKG)
+					&& prodBandWidthMap.get(prod.getProd_id()) != null){
+				//含宽带的普通套餐
+				queryCustOrderablePkg(cust,panel,orderList);
+				//过滤掉带宽小于等于当前套餐的产品
+				for (Iterator<PProd> it = panel.getProdList().iterator();it.hasNext();){
+					PProd selectedProd = it.next();
+					if (prod.getProd_type().equals(SystemConstants.PROD_TYPE_SPKG) ||
+							prodBandWidthMap.get(selectedProd.getProd_id())==null ||
+							prodBandWidthMap.get(selectedProd.getProd_id())<= prodBandWidthMap.get(prod.getProd_id())){
+						it.remove();
+						panel.getTariffMap().remove(selectedProd.getProd_id());
+						panel.getLastOrderMap().remove(prod.getProd_id());
+					}
+				}
+			} else if (prod.getProd_type().equals(SystemConstants.PROD_TYPE_SPKG)){
+				//协议套餐
+				queryCustOrderablePkg(cust,panel,orderList);
+				//过滤掉普通套餐
+				for (Iterator<PProd> it = panel.getProdList().iterator();it.hasNext();){
+					PProd selectedProd = it.next();
+					if (prod.getProd_type().equals(SystemConstants.PROD_TYPE_CUSTPKG)){
+						it.remove();
+						panel.getTariffMap().remove(selectedProd.getProd_id());
+						panel.getLastOrderMap().remove(prod.getProd_id());
+					}
+				}
+			} else {
+				throw new ServicesException(ErrorCode.OrderDateCanNotUp);
+			}
+		} 
+		
+		
+		return panel;
+	}
+
+	//查找用户能够订购的单产品
+	private void queryUserOrderableProd(CCust cust,String userId,OrderProdPanel panel,List<CProdOrderDto> orderList) throws Exception {
+		CUser user = cUserDao.findByKey(userId);
+		if (user == null)
+			return;
+		panel.setUserDesc(getUserDesc(user));
+		List<PProd> prodList = pProdDao.queryCanOrderUserProd(user.getUser_type(), user.getCounty_id(),
+				user.getCounty_id(), SystemConstants.DEFAULT_DATA_RIGHT);
+		for (PProd prod:prodList){
+			List<PProdTariffDisct> tariffList = this.queryTariffList(cust,user, prod);
+			if (!CollectionHelper.isEmpty(tariffList)){
+				panel.getProdList().add(prod);
+				panel.getTariffMap().put(prod.getProd_id(), tariffList);
+				CProdOrder order = getUserLastOrder(userId, prod, orderList);
+				if (order != null){
+					panel.getLastOrderMap().put(prod.getProd_id(), order);
+				}
+			}
+		}
+
+	}
+	//查找客户能够订购的套餐
+	private void queryCustOrderablePkg(CCust cust,OrderProdPanel panel,List<CProdOrderDto> orderList) throws Exception {
+		String custId = cust.getCust_id();
+		Map<String,Integer> userCountMap = cUserDao.queryUserCountGroupByType(custId);
+		List<PProd> prodList = pProdDao.queryCanOrderPkg(cust.getCounty_id(),  SystemConstants.DEFAULT_DATA_RIGHT);
+		for (PProd prod:prodList){
+			List<PProdTariffDisct> tariffList = this.queryTariffList(cust,null, prod);
+			if (!CollectionHelper.isEmpty(tariffList)){
+				boolean flag = true;
+				if (prod.getProd_type().equals(SystemConstants.PROD_TYPE_CUSTPKG)){
+					//验证客户名下终端是否满足要求
+					Map<String,Integer> pkgUserCountMap = pProdDao.queryUserCountGroupByType(prod.getProd_id());
+					for (Entry<String,Integer> entry:pkgUserCountMap.entrySet()){
+						if (entry.getValue()>(userCountMap.get(entry.getKey())==null?0:userCountMap.get(entry.getKey()))){
+							flag = false;
+							break;
+						}
+					}
+					
+				}
+				if (flag){
+					panel.getProdList().add(prod);
+					panel.getTariffMap().put(prod.getProd_id(), tariffList);
+					CProdOrder order = getCustLastOrder(orderList);
+					if (order != null){
+						panel.getLastOrderMap().put(prod.getProd_id(), order);
+					}
+				}
+			}
+		}
+
+	}
+
+	private void queryOrderableGoon(CCust cust,String filterOrderSn,OrderProdPanel panel,List<CProdOrderDto> orderList) throws Exception {
+		CProdOrder order = cProdOrderDao.findByKey(filterOrderSn);
+		if (order == null)
+			return;
+		PProd prod= pProdDao.findByKey(order.getProd_id());
+		if (prod.getExp_date() != null && prod.getEff_date().before(new Date())){
+			throw new ServicesException(ErrorCode.ProdIsInvalid);
+		}
+		CUser user = null;
+		CProdOrder lastOrder = null;
+		if (StringHelper.isNotEmpty(order.getUser_id())){
+			user = cUserDao.findByKey(order.getUser_id());
+			panel.setUserDesc(getUserDesc(user));
+			lastOrder = getUserLastOrder(user.getUser_id(), prod, orderList);
+		} else {
+			lastOrder = getCustLastOrder(orderList);
+		}
+		List<PProdTariffDisct> tariffList = this.queryTariffList(cust,user, prod);
+		if (!CollectionHelper.isEmpty(tariffList)){
+			panel.getProdList().add(prod);
+			panel.getTariffMap().put(prod.getProd_id(), tariffList);
+			panel.getLastOrderMap().put(prod.getProd_id(), lastOrder);
+		}
+	}
+	/**
+	 * 查找客户用户适用的资费和优惠
+	 * @throws Exception
+	 */
+	private List<PProdTariffDisct> queryTariffList(CCust cust,CUser user, PProd prod) throws Exception {
+		List<PProdTariffDisct> tariffList = new ArrayList<>();
+		List<ProdTariffDto> ptList = pProdTariffDao.queryProdTariff(prod.getProd_id(), cust.getCounty_id(),
+				SystemConstants.DEFAULT_DATA_RIGHT);
+		if (prod.getProd_type().equals(SystemConstants.PROD_TYPE_SPKG)){//协议套餐，验证协议号
+			for (Iterator<ProdTariffDto> tariffIt = ptList.iterator();tariffIt.hasNext();) {
+				ProdTariffDto  tariff = tariffIt.next();
+				if (!tariff.getSpkg_sn().equals(cust.getSpkg_sn()))
+					tariffIt.remove();
+			}
+		} else {
+			for (Iterator<ProdTariffDto> tariffIt = ptList.iterator();tariffIt.hasNext();) {
+				ProdTariffDto  tariff = tariffIt.next();
+				if (!checkRule(cust,user, tariff.getBill_rule()))
+					tariffIt.remove();
+			}
+		}
+		
+		// 如果有适用的资费
+		if (CollectionHelper.isNotEmpty(ptList)) {
+			ProdTariffDto pt = ptList.get(0);
+			PProdTariffDisct tariff = new PProdTariffDisct();
+			tariff.setTariff_id(pt.getTariff_id());
+			tariff.setBilling_cycle(pt.getBilling_cycle());
+			tariff.setDisct_rent(pt.getRent());
+			tariff.setDisct_name(pt.getTariff_name());
+			tariffList.add(tariff);
+			// 查找资费所有的优惠
+			List<PProdTariffDisct> disctList = pProdTariffDisctDao.queryDisctByTariffId(pt.getTariff_id(),
+					cust.getCounty_id());
+			if (CollectionHelper.isNotEmpty(disctList)) {
+				for (PProdTariffDisct disct : disctList) {
+					boolean flag = true;
+					if (StringHelper.isNotEmpty(disct.getRule_id())) {
+						if (!checkRule(cust,user, tRuleDefineDao.findByKey(disct.getRule_id()).getRule_str()))
+							flag = false;
+					}
+					if (flag) {
+						disct.setTariff_id(disct.getTariff_id() + "_" + disct.getDisct_id());
+						//disct.setDisct_id(disct.getTariff_id() + "-" + disct.getDisct_id());
+						tariffList.add(disct);
+					}
+				}
+			}
+		}
+
+		return tariffList;
+	}
+	
+	private boolean checkRule(CCust cust,CUser user, String ruleId) throws Exception{
+		if (StringHelper.isEmpty(ruleId))
+			return true;
+		TRuleDefine rule = tRuleDefineDao.findByKey(ruleId);
+		if (rule == null)
+			return true;
+		
+		ExpressionUtil expressionUtil=new ExpressionUtil(beanFactory);
+		expressionUtil.setCcust(cust);
+		expressionUtil.setCuser(user);
+		return expressionUtil.parseBoolean(rule.getRule_str());
+	}
+
+	private String getUserDesc(CUser user) {
+		String desc = user.getUser_type();
+		if (SystemConstants.USER_TYPE_BAND.equals(user.getUser_type())
+				|| SystemConstants.USER_TYPE_OTT_MOBILE.equals(user.getUser_type())) {
+			desc = desc + "-" + user.getLogin_name();
+		} else {
+			desc = desc + "-" + MemoryDict.getDictName(DictKey.TERMINAL_TYPE, user.getTerminal_type());
+			if (StringHelper.isNotEmpty(user.getStb_id())) {
+				desc = desc + "-" + user.getStb_id();
+			}
+		}
+
+		return desc;
+
+	}
+	
+	private CProdOrder getUserLastOrder(String userId,PProd prod,List<CProdOrderDto> orderList){
+		CProdOrder lastOrder = null;
+		Date maxExpDate = new Date();
+		if (CollectionHelper.isNotEmpty(orderList)){
+			for(CProdOrder order:orderList){
+				if (order.getExp_date().after(maxExpDate)){
+					if (userId.equals(order.getUser_id()) && (order.getProd_id().equals(prod.getProd_id()) || 
+							prod.getServ_id().equals(SystemConstants.USER_TYPE_BAND))){
+						lastOrder = order;
+						maxExpDate = order.getExp_date();
+					}
+				}
+				
+			}
+		}
+		return lastOrder;
+	}
+	
+	private CProdOrder getCustLastOrder(List<CProdOrderDto> orderList){
+		CProdOrderDto lastOrder = null;
+		Date maxExpDate = new Date();
+		if (CollectionHelper.isNotEmpty(orderList)){
+			for(CProdOrderDto order:orderList){
+				if (!order.getProd_type().equals(SystemConstants.PROD_TYPE_BASE) && order.getExp_date().after(maxExpDate)){
+					lastOrder = order;
+					maxExpDate = order.getExp_date();
+				}
+				
+			}
+		}
+		return lastOrder;
+	}
 		
 }

@@ -62,6 +62,7 @@ public class OttAuthJob implements Job2 {
 				break; 
 			} else if (result.isUndefinedError()){
 				logger.error("未知严重错误，暂停发送!"+result.getReason());
+				break;
 			} else {
 				//保存发送结果
 				try{

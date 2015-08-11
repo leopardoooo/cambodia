@@ -6,6 +6,7 @@ public enum BusiCmdParam {
 	stb_id,
 	stb_mac,
 	prod_exp_date,
+	prod_eff_date,
+	band_policy_id,
 	user_status,
-	band_auth
 }
