@@ -18,7 +18,7 @@ AcctFeeGrid = Ext.extend(Ext.ux.Grid, {
 							'pay_type', 'status_text', 'status', 'dept_id','dept_name',
 							'user_id','user_name', 'user_type_text','fee_sn','optr_id','optr_name',
 							'OPERATE','busi_code','busi_name','create_done_code','data_right',
-							'busi_optr_id','busi_optr_name','invoice_fee',"doc_type","doc_type_text","invoice_mode_text","allow_done_code"]
+							'busi_optr_id','busi_optr_name','prod_sn','invoice_fee',"doc_type","doc_type_text","invoice_mode_text","allow_done_code"]
 				});
 		this.acctFeeStore.on("load",this.doOperate);
 		
