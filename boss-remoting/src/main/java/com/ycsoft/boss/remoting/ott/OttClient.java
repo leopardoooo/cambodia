@@ -10,7 +10,7 @@ import com.ycsoft.http.HttpUtils;
 import com.ycsoft.http.ResponseBody;
 
 public class OttClient {
-	public static String UNDEFINED_ERROR_STATUS="10000";
+	
 	
 	/**
 	 * 创建用户
@@ -104,7 +104,7 @@ public class OttClient {
 		} catch (Throwable e) {
 			result = new Result();
 			result.setErr("1");
-			result.setStatus(UNDEFINED_ERROR_STATUS);
+			result.setStatus(Result.UNDEFINED_ERROR_STATUS);
 			result.setReason(e.getMessage());
 			e.printStackTrace();
 		}

@@ -408,11 +408,13 @@ ProdGrid = Ext.extend(Ext.TabPanel,{
 				if(Ext.isEmpty(userRecord)){
 					userRecord = this.parent.userGrid.getStore().getAt(0);
 				}
-				var status = userRecord.get('status');
-				for(var i=0,len=userProd.length;i<len;i++){
-					userProd[i]['user_status'] = status;
+				if(userRecord){
+					var status = userRecord.get('status');
+					for(var i=0,len=userProd.length;i<len;i++){
+						userProd[i]['user_status'] = status;
+					}
+					this.userProdStore.loadData(userProd);
 				}
-				this.userProdStore.loadData(userProd);
 			}
 		}
 	},
