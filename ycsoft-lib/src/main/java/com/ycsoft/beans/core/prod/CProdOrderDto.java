@@ -22,7 +22,35 @@ public class CProdOrderDto extends CProdOrder {
 	private Integer billing_cycle;
 	//用户协议期限
 	private Date protocol_date;
+	//用户类型
+	private String user_type;
 	
+	private String user_type_text;
+	//终端类型（主\副）
+	private String terminal_type;
+	
+	private String terminal_type_text;
+
+	public String getUser_type_text() {
+		return user_type_text;
+	}
+	public String getTerminal_type_text() {
+		return terminal_type_text;
+	}
+	public String getUser_type() {
+		return user_type;
+	}
+	public void setUser_type(String user_type) {
+		this.user_type = user_type;
+		this.user_type = MemoryDict.getDictName(DictKey.USER_TYPE, this.user_type);
+	}
+	public String getTerminal_type() {
+		return terminal_type;
+	}
+	public void setTerminal_type(String terminal_type) {
+		this.terminal_type = terminal_type;
+		this.terminal_type_text=MemoryDict.getDictName(DictKey.TERMINAL_TYPE, this.terminal_type);
+	}
 	public Integer getBilling_cycle() {
 		return billing_cycle;
 	}

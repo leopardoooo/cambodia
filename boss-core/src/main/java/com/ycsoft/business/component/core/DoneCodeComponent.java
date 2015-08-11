@@ -81,6 +81,21 @@ public class DoneCodeComponent extends BaseBusiComponent {
 		}
 		
 	}
+	/**
+	 * 业务被其他营业员锁定检查
+	 * @param cust_id
+	 * @param done_code
+	 * @param optr_id
+	 * @throws Exception
+	 */
+	public void checkUnPayOtherLock(String cust_id,String optr_id)throws Exception{
+		List<CDoneCodeUnpay>  otherLocks=cDoneCodeUnpayDao.queryUnPayOtherLock(cust_id,optr_id);
+		if(otherLocks!=null&&otherLocks.size()>0){	
+			String login_name = MemoryDict.getDictName(DictKey.OPTR_LOGIN, otherLocks.get(0).getOptr_id());
+			String optr_name=MemoryDict.getDictName(DictKey.OPTR, otherLocks.get(0).getOptr_id());
+			throw new ComponentException(ErrorCode.UnPayLock,optr_name,login_name);
+		}
+	}
 
 	/**
 	 * 

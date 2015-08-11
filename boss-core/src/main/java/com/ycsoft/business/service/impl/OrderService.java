@@ -356,7 +356,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 	public void saveUnPayOrderCancel(String  cust_id,String order_sn,String fee_sn) throws Exception{
 		//锁定未支付业务，防止客户被多个营业员同时操作
 	    doneCodeComponent.lockCust(cust_id);
-	    
+	    doneCodeComponent.checkUnPayOtherLock(cust_id, this.getOptr().getOptr_id());
 		CProdOrder order=cProdOrderDao.findByKey(order_sn);
 		//检查套餐类要按订购顺序取消，同一个用户的宽带类单产品要按订购顺序取消，用户一个用户的非宽带单产品按相同产品订购顺序取消。
 		//退订不能取消
@@ -426,205 +426,13 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		}
 	}
 	
+	
+	
 	@Override
 	public OrderProdPanel queryOrderableProd(String busiCode,String custId,String userId, String filterOrderSn)
-			throws Exception {
-		OrderProdPanel panel =new OrderProdPanel();
-		CCust cust = cCustDao.findByKey(custId);
-		List<CProdOrderDto> orderList = cProdOrderDao.queryCustEffOrderDto(custId);
-		
-		if (busiCode.equals(BusiCodeConstants.PROD_SINGLE_ORDER)){
-			queryUserOrderableProd(cust,userId,panel,orderList);
-		} else if (busiCode.equals(BusiCodeConstants.PROD_PACKAGE_ORDER)){
-			queryCustOrderablePkg(cust,panel,orderList);
-		} else if (busiCode.equals(BusiCodeConstants.PROD_CONTINUE)){
-			queryOrderableGoon(cust,filterOrderSn,panel,orderList);
-		} else if (busiCode.equals(BusiCodeConstants.PROD_UPGRADE)){
-			CProdOrder order = cProdOrderDao.findByKey(filterOrderSn);
-			if (order == null)
-				return panel;
-			Map<String,Integer> prodBandWidthMap = pProdDao.queryProdBandWidth();
-			PProd prod= pProdDao.findByKey(order.getProd_id());
-			if (prod.getProd_type().equals(SystemConstants.PROD_TYPE_BASE) 
-					&& prod.getServ_id().equals(SystemConstants.USER_TYPE_BAND)){
-				//升级宽带产品
-				queryUserOrderableProd(cust,order.getUser_id(),panel,orderList);
-				//过滤掉带宽小于等于当前套餐的产品
-				for (Iterator<PProd> it = panel.getProdList().iterator();it.hasNext();){
-					PProd selectedProd = it.next();
-					if (prodBandWidthMap.get(selectedProd.getProd_id())==null ||
-							prodBandWidthMap.get(selectedProd.getProd_id())<= prodBandWidthMap.get(prod.getProd_id())){
-						it.remove();
-						panel.getTariffMap().remove(selectedProd.getProd_id());
-						panel.getLastOrderMap().remove(prod.getProd_id());
-					}
-				}
-			} else if (prod.getProd_type().equals(SystemConstants.PROD_TYPE_CUSTPKG)
-					&& prodBandWidthMap.get(prod.getProd_id()) != null){
-				//含宽带的普通套餐
-				queryCustOrderablePkg(cust,panel,orderList);
-				//过滤掉带宽小于等于当前套餐的产品
-				for (Iterator<PProd> it = panel.getProdList().iterator();it.hasNext();){
-					PProd selectedProd = it.next();
-					if (prod.getProd_type().equals(SystemConstants.PROD_TYPE_SPKG) ||
-							prodBandWidthMap.get(selectedProd.getProd_id())==null ||
-							prodBandWidthMap.get(selectedProd.getProd_id())<= prodBandWidthMap.get(prod.getProd_id())){
-						it.remove();
-						panel.getTariffMap().remove(selectedProd.getProd_id());
-						panel.getLastOrderMap().remove(prod.getProd_id());
-					}
-				}
-			} else if (prod.getProd_type().equals(SystemConstants.PROD_TYPE_SPKG)){
-				//协议套餐
-				queryCustOrderablePkg(cust,panel,orderList);
-				//过滤掉普通套餐
-				for (Iterator<PProd> it = panel.getProdList().iterator();it.hasNext();){
-					PProd selectedProd = it.next();
-					if (prod.getProd_type().equals(SystemConstants.PROD_TYPE_CUSTPKG)){
-						it.remove();
-						panel.getTariffMap().remove(selectedProd.getProd_id());
-						panel.getLastOrderMap().remove(prod.getProd_id());
-					}
-				}
-			} else {
-				throw new ServicesException(ErrorCode.OrderDateCanNotUp);
-			}
-		} 
-		
-		
-		return panel;
+			throws Exception{
+		return orderComponent.queryOrderableProd(busiCode, custId, userId, filterOrderSn);
 	}
-
-	//查找用户能够订购的单产品
-	private void queryUserOrderableProd(CCust cust,String userId,OrderProdPanel panel,List<CProdOrderDto> orderList) throws Exception {
-		CUser user = userComponent.queryUserById(userId);
-		if (user == null)
-			return;
-		panel.setUserDesc(getUserDesc(user));
-		List<PProd> prodList = pProdDao.queryCanOrderUserProd(user.getUser_type(), user.getCounty_id(),
-				user.getCounty_id(), SystemConstants.DEFAULT_DATA_RIGHT);
-		for (PProd prod:prodList){
-			List<PProdTariffDisct> tariffList = this.queryTariffList(cust,user, prod);
-			if (!CollectionHelper.isEmpty(tariffList)){
-				panel.getProdList().add(prod);
-				panel.getTariffMap().put(prod.getProd_id(), tariffList);
-				CProdOrder order = getUserLastOrder(userId, prod, orderList);
-				if (order != null){
-					panel.getLastOrderMap().put(prod.getProd_id(), order);
-				}
-			}
-		}
-
-	}
-	//查找客户能够订购的套餐
-	private void queryCustOrderablePkg(CCust cust,OrderProdPanel panel,List<CProdOrderDto> orderList) throws Exception {
-		String custId = cust.getCust_id();
-		Map<String,Integer> userCountMap = cUserDao.queryUserCountGroupByType(custId);
-		List<PProd> prodList = pProdDao.queryCanOrderPkg(cust.getCounty_id(),  SystemConstants.DEFAULT_DATA_RIGHT);
-		for (PProd prod:prodList){
-			List<PProdTariffDisct> tariffList = this.queryTariffList(cust,null, prod);
-			if (!CollectionHelper.isEmpty(tariffList)){
-				boolean flag = true;
-				if (prod.getProd_type().equals(SystemConstants.PROD_TYPE_CUSTPKG)){
-					//验证客户名下终端是否满足要求
-					Map<String,Integer> pkgUserCountMap = pProdDao.queryUserCountGroupByType(prod.getProd_id());
-					for (Entry<String,Integer> entry:pkgUserCountMap.entrySet()){
-						if (entry.getValue()>(userCountMap.get(entry.getKey())==null?0:userCountMap.get(entry.getKey()))){
-							flag = false;
-							break;
-						}
-					}
-					
-				}
-				if (flag){
-					panel.getProdList().add(prod);
-					panel.getTariffMap().put(prod.getProd_id(), tariffList);
-					CProdOrder order = getCustLastOrder(orderList);
-					if (order != null){
-						panel.getLastOrderMap().put(prod.getProd_id(), order);
-					}
-				}
-			}
-		}
-
-	}
-
-	private void queryOrderableGoon(CCust cust,String filterOrderSn,OrderProdPanel panel,List<CProdOrderDto> orderList) throws Exception {
-		CProdOrder order = cProdOrderDao.findByKey(filterOrderSn);
-		if (order == null)
-			return;
-		PProd prod= pProdDao.findByKey(order.getProd_id());
-		if (prod.getExp_date() != null && prod.getEff_date().before(new Date())){
-			throw new ServicesException(ErrorCode.ProdIsInvalid);
-		}
-		CUser user = null;
-		CProdOrder lastOrder = null;
-		if (StringHelper.isNotEmpty(order.getUser_id())){
-			user = userComponent.queryUserById(order.getUser_id());
-			panel.setUserDesc(getUserDesc(user));
-			lastOrder = getUserLastOrder(user.getUser_id(), prod, orderList);
-		} else {
-			lastOrder = getCustLastOrder(orderList);
-		}
-		List<PProdTariffDisct> tariffList = this.queryTariffList(cust,user, prod);
-		if (!CollectionHelper.isEmpty(tariffList)){
-			panel.getProdList().add(prod);
-			panel.getTariffMap().put(prod.getProd_id(), tariffList);
-			panel.getLastOrderMap().put(prod.getProd_id(), lastOrder);
-		}
-	}
-
-	private List<PProdTariffDisct> queryTariffList(CCust cust,CUser user, PProd prod) throws Exception {
-		List<PProdTariffDisct> tariffList = new ArrayList<>();
-		List<ProdTariffDto> ptList = pProdTariffDao.queryProdTariff(prod.getProd_id(), cust.getCounty_id(),
-				SystemConstants.DEFAULT_DATA_RIGHT);
-		if (prod.getProd_type().equals(SystemConstants.PROD_TYPE_SPKG)){//协议套餐，验证协议号
-			for (Iterator<ProdTariffDto> tariffIt = ptList.iterator();tariffIt.hasNext();) {
-				ProdTariffDto  tariff = tariffIt.next();
-				if (!tariff.getSpkg_sn().equals(cust.getSpkg_sn()))
-					tariffIt.remove();
-			}
-		} else {
-			for (Iterator<ProdTariffDto> tariffIt = ptList.iterator();tariffIt.hasNext();) {
-				ProdTariffDto  tariff = tariffIt.next();
-				if (!checkRule(cust,user, tariff.getBill_rule()))
-					tariffIt.remove();
-			}
-		}
-		
-		// 如果有适用的资费
-		if (CollectionHelper.isNotEmpty(ptList)) {
-			ProdTariffDto pt = ptList.get(0);
-			PProdTariffDisct tariff = new PProdTariffDisct();
-			tariff.setTariff_id(pt.getTariff_id());
-			tariff.setBilling_cycle(pt.getBilling_cycle());
-			tariff.setDisct_rent(pt.getRent());
-			tariff.setDisct_name(pt.getTariff_name());
-			tariffList.add(tariff);
-			// 查找资费所有的优惠
-			List<PProdTariffDisct> disctList = pProdTariffDisctDao.queryDisctByTariffId(pt.getTariff_id(),
-					cust.getCounty_id());
-			if (CollectionHelper.isNotEmpty(disctList)) {
-				for (PProdTariffDisct disct : disctList) {
-					boolean flag = true;
-					if (StringHelper.isNotEmpty(disct.getRule_id())) {
-						if (!checkRule(cust,user, tRuleDefineDao.findByKey(disct.getRule_id()).getRule_str()))
-							flag = false;
-					}
-					if (flag) {
-						disct.setTariff_id(disct.getTariff_id() + "_" + disct.getDisct_id());
-						//disct.setDisct_id(disct.getTariff_id() + "-" + disct.getDisct_id());
-						tariffList.add(disct);
-					}
-				}
-			}
-		}
-
-		return tariffList;
-	}
-	
-	
-
 	@Override
 	public Map<String,List<CProdOrderDto>> queryCustEffOrder(String custId) throws Exception {
 		
@@ -637,67 +445,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		return CollectionHelper.converToMap(orderList, "user_id");
 	}
 
-	private boolean checkRule(CCust cust,CUser user, String ruleId) throws Exception{
-		if (StringHelper.isEmpty(ruleId))
-			return true;
-		TRuleDefine rule = tRuleDefineDao.findByKey(ruleId);
-		if (rule == null)
-			return true;
-		
-		ExpressionUtil expressionUtil=new ExpressionUtil(beanFactory);
-		expressionUtil.setCcust(cust);
-		expressionUtil.setCuser(user);
-		return expressionUtil.parseBoolean(rule.getRule_str());
-	}
-
-	private String getUserDesc(CUser user) {
-		String desc = user.getUser_type();
-		if (SystemConstants.USER_TYPE_BAND.equals(user.getUser_type())
-				|| SystemConstants.USER_TYPE_OTT_MOBILE.equals(user.getUser_type())) {
-			desc = desc + "-" + user.getLogin_name();
-		} else {
-			desc = desc + "-" + MemoryDict.getDictName(DictKey.TERMINAL_TYPE, user.getTerminal_type());
-			if (StringHelper.isNotEmpty(user.getStb_id())) {
-				desc = desc + "-" + user.getStb_id();
-			}
-		}
-
-		return desc;
-
-	}
 	
-	private CProdOrder getUserLastOrder(String userId,PProd prod,List<CProdOrderDto> orderList){
-		CProdOrder lastOrder = null;
-		Date maxExpDate = new Date();
-		if (CollectionHelper.isNotEmpty(orderList)){
-			for(CProdOrder order:orderList){
-				if (order.getExp_date().after(maxExpDate)){
-					if (userId.equals(order.getUser_id()) && (order.getProd_id().equals(prod.getProd_id()) || 
-							prod.getServ_id().equals(SystemConstants.USER_TYPE_BAND))){
-						lastOrder = order;
-						maxExpDate = order.getExp_date();
-					}
-				}
-				
-			}
-		}
-		return lastOrder;
-	}
-	
-	private CProdOrder getCustLastOrder(List<CProdOrderDto> orderList){
-		CProdOrderDto lastOrder = null;
-		Date maxExpDate = new Date();
-		if (CollectionHelper.isNotEmpty(orderList)){
-			for(CProdOrderDto order:orderList){
-				if (!order.getProd_type().equals(SystemConstants.PROD_TYPE_BASE) && order.getExp_date().after(maxExpDate)){
-					lastOrder = order;
-					maxExpDate = order.getExp_date();
-				}
-				
-			}
-		}
-		return lastOrder;
-	}
 
 	/**
 	 * 套餐的用户选择界面加载初始化数据
