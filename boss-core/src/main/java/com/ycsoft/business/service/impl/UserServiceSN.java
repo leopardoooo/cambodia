@@ -247,17 +247,21 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		CUser user = null;
 		for(CUser u : userList){
 			if(userId.equals(u.getUser_id())){
-				user = u;
+				//user = u;
+				user=userComponent.queryUserById(userId);
 			}
 		}
 		if(user == null){
+			throw new ServicesException(ErrorCode.CustDataException);
+		}
+		if(!user.getCust_id().equals(custId)){
 			throw new ServicesException(ErrorCode.CustDataException);
 		}
 		//获取业务流水
 		Integer doneCode = doneCodeComponent.gDoneCode();
 		String busiCode = getBusiParam().getBusiCode();
 		//生成销帐任务
-		int jobId = jobComponent.createCustWriteOffJob(doneCode, custId,BOOLEAN_TRUE);
+		//int jobId = jobComponent.createCustWriteOffJob(doneCode, custId,BOOLEAN_TRUE);
 
 		List<String> devoceList = new ArrayList<String>();
 		if(user.getStb_id() != null){
@@ -338,7 +342,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		//记录用户到历史表
 		userComponent.removeUserWithHis(doneCode, user);
 		
-		doneCodeComponent.saveDoneCodeInfo(doneCode, custId, null, info);
+		//doneCodeComponent.saveDoneCodeInfo(doneCode, custId, null, info);
 		saveAllPublic(doneCode,getBusiParam());
 	}
 
@@ -353,16 +357,10 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		List<CProdOrderDto> cancelList=new ArrayList<>();
 		//参数检查
 		//退款总额核对
-		int fee=0;
+		
 		List<CProdOrderDto> orderList = cProdOrderDao.queryProdOrderDtoByUserId(userId);
 		
-		for(CProdOrderDto order:orderList){
-			cancelList.add(order);
-			//可退费用计算
-			order.setActive_fee(orderComponent.getOrderCancelFee(order));
-			fee=fee+order.getActive_fee();
-			
-		}
+		int fee=orderComponent.getLogoffOrderFee(orderList, isHigh);
 		//金额核对
 		if(cancelFee!=fee*-1){
 			throw new ServicesException(ErrorCode.FeeDateException);

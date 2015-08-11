@@ -112,7 +112,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 			//检查能否退订
 			this.checkOrderCanCancel(cust_id, isHigh, order);
 			//费用计算
-			order.setActive_fee(orderComponent.getOrderCancelFee(order));
+			order.setActive_fee(orderComponent.getOrderCancelFee(order,DateHelper.today()));
 		}
 		
 		return orderList;
@@ -123,21 +123,12 @@ public class OrderService extends BaseBusiService implements IOrderService{
 	 * 用户销户查询该用户的所有产品信息包含退款金额（高级销户，普通销户）
 	 */
 	public List<CProdOrderDto> queryLogoffUserProd(String busi_code,String user_id) throws Exception{
-		List<CProdOrderDto> orderList=orderComponent.queryProdOrderDtoByUserId(user_id);
+		
+		List<CProdOrderDto> orderList=orderComponent.queryLogoffProdOrderDtoByUserId(user_id);
 		//是否高级权限
 		boolean isHigh=orderComponent.isHighCancel(busi_code);
-		//参数检查		
-		for(CProdOrderDto order:orderList){
-			if(order.getIs_pay().equals(SystemConstants.BOOLEAN_FALSE)){
-				//未支付判断
-				throw new ServicesException(ErrorCode.NotCancleHasUnPay);
-			}
-			//TODO 后续方法判断高级权限 的退款金额
-//			this.checkOrderCanCancel(order.getCust_id(), isHigh, order);
-			//费用计算
-			order.setActive_fee(orderComponent.getOrderCancelFee(order));
-		}
-		
+		//费用
+		orderComponent.getLogoffOrderFee(orderList, isHigh);
 		return orderList;
 	}
 	
@@ -281,7 +272,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 			cancelList.add(order);
 			this.checkOrderCanCancel(cust_id, isHigh, order);
 			//可退费用计算
-			order.setActive_fee(orderComponent.getOrderCancelFee(order));
+			order.setActive_fee(orderComponent.getOrderCancelFee(order,DateHelper.today()));
 			fee=fee+order.getActive_fee();
 			if(!order.getProd_type().equals(SystemConstants.PROD_TYPE_BASE)){
 				unPayCheckMap.put("PACKAGE", order);
