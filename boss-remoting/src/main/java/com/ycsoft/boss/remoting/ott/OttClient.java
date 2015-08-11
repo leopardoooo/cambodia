@@ -106,6 +106,7 @@ public class OttClient {
 			result.setErr("1");
 			result.setStatus(UNDEFINED_ERROR_STATUS);
 			result.setReason(e.getMessage());
+			e.printStackTrace();
 		}
 		return result;
 	}

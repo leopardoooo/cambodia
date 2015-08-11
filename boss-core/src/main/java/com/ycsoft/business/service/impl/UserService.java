@@ -1011,7 +1011,7 @@ public class UserService extends BaseBusiService implements IUserService {
 	/**
 	 *	保存用户销户
 	 */
-	public void saveRemoveUser(String banlanceDealType, String transAcctId,
+	public void saveRemoveUser(String userId ,String banlanceDealType,String reclaim,Integer cancelFee, String transAcctId,
 			String transAcctItemId) throws Exception {
 		//获取客户用户信息
 		String  custId = getBusiParam().getCust().getCust_id();

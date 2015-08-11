@@ -230,7 +230,7 @@ public class UserComponent extends BaseBusiComponent {
 //		if (user.getUser_type().equals(SystemConstants.USER_TYPE_DTV))
 //			userHis.setNeed_check("T");
 //		else 
-//			userHis.setNeed_check("F");
+			userHis.setNeed_check("F");
 		cUserHisDao.save(userHis);
 		
 //		if (user.getUser_type().equals(SystemConstants.USER_TYPE_ATV)){

@@ -129,6 +129,7 @@ UserGrid = Ext.extend(Ext.ux.Grid,{
 		//隐藏数据加载提示框
 		App.hideTip();
 		
+		var prodGrid = this.parent.prodGrid;
 		var len = _rs.length;
 		App.getApp().data.users=[];
 		if(len>0){
@@ -136,14 +137,12 @@ UserGrid = Ext.extend(Ext.ux.Grid,{
 				App.getApp().data.users.push(_rs[i].data);
 			}
 		}
-		var prodGrid = this.parent.prodGrid;
 		//用户信息加载完后再加载产品信息,类似与同步
 		//当用户只有一个时，产品信息还没加载完，就去取产品数据了
 		if(len == 1){
 			prodGrid.userId = _rs[0].get('user_id');
 		}
 		prodGrid.remoteRefresh();
-		
 		//刷新userDetailTab
 		var userId = this.parent.userDetailTab.userId;
 		if(userId){
@@ -284,8 +283,11 @@ ProdGrid = Ext.extend(Ext.TabPanel,{
 			         "order_sn","package_sn","package_id","cust_id","user_id","prod_id","tariff_id","disct_id",
 			         "status","status_text","status_date","eff_date","exp_date","active_fee","bill_fee",
 			         "rent_fee","last_bill_date","next_bill_date","order_months","order_fee","order_time",
-			         "order_type","package_group_id","remark","public_acctitem_type"],
-			sortInfo: []
+			         "order_type","package_group_id","remark","public_acctitem_type"],			
+			sortInfo : {
+				field : 'prod_name',
+				direction:'DESC'
+			}
 		});
 		this.userProdStore.on('load',this.doLoadResult,this);
 		// 基本产品
@@ -638,7 +640,8 @@ UserBroadbandTemplate = new Ext.XTemplate(
 UserDetailTemplate = {
 	"OTT": UserAtvTemplate,
 	"DTT": UserDtvTemplate,
-	"BAND": UserBroadbandTemplate
+	"BAND": UserBroadbandTemplate,
+	"OTT_MOBILE": UserAtvTemplate
 };
 
 /**

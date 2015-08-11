@@ -109,6 +109,11 @@ public class UserAction extends BaseBusiAction {
 	private String[] userIds;
 
 	private String promFeeSn;
+	
+	//柬埔寨
+	//是否回收设备T,F
+	private String reclaim;
+	private Integer cancelFee;
 	/**
 	 * 用户开户
 	 * @throws Exception
@@ -135,7 +140,7 @@ public class UserAction extends BaseBusiAction {
 	 * @throws Exception
 	 */
 	public String logoffUser() throws Exception{
-		userServiceSN.saveRemoveUser(banlanceDealType, transAcctId, transAcctItemId);
+		userServiceSN.saveRemoveUser(userId,banlanceDealType,reclaim,cancelFee, transAcctId, transAcctItemId);
 		return JSON_SUCCESS;
 	}
 
@@ -1098,6 +1103,14 @@ public class UserAction extends BaseBusiAction {
 
 	public void setDeviceBuyMode(String deviceBuyMode) {
 		this.deviceBuyMode = deviceBuyMode;
+	}
+
+	public void setReclaim(String reclaim) {
+		this.reclaim = reclaim;
+	}
+
+	public void setCancelFee(Integer cancelFee) {
+		this.cancelFee = cancelFee;
 	}
 	
 	
