@@ -241,6 +241,8 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		//获取客户用户信息
 		CCust cust = getBusiParam().getCust();
 		String  custId = cust.getCust_id();
+		doneCodeComponent.lockCust(custId);
+		
 		List<CUser> userList = getBusiParam().getSelectedUsers();
 		CUser user = null;
 		for(CUser u : userList){
