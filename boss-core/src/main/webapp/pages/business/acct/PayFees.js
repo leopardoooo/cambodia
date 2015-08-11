@@ -34,84 +34,32 @@ PaymentPanel = Ext.extend(Ext.Panel,{
 		//用户选中的账户行
 		var records = App.getApp().main.infoPanel.acctPanel.acctGrid.getSelectionModel().getSelections();
 		
-		var dataArr = [];
-		Ext.each(records,function(record){
-			dataArr.push(record.data);
-		},this);
-		
-		var acctIds=[];//用户选中的所有账户ID,账户类型,用户ID
-		for(var i=0;i<dataArr.length;i++){
-			acctIds.push([dataArr[i]['acct_id'],dataArr[i]['acct_type_text'],dataArr[i]['user_id']
-				,dataArr[i]['user_name'],dataArr[i]['user_type_text'],dataArr[i]['stb_id']
-				,dataArr[i]['card_id'],dataArr[i]['modem_mac']]);
-		}
+
 		
 		//账户面板store
 		var acctstore = App.getApp().main.infoPanel.acctPanel.acctGrid.getStore();
 		
-//		var publicAcctitem = [];
-//		var specAcctitem = [];
 		acctstore.each(function(record){
-			for(var j=0;j<acctIds.length;j++){
-				var acctItems = record.get('acctitems');
-				if(record.get('acct_id') == acctIds[j][0]){
-					if(record.get('acct_type') =='PUBLIC' && record.get('status') != 'DATACLOSE'){
-						if(acctItems && acctItems.length>0){
-							for(var k=0;k<acctItems.length;k++){
-								if(acctItems[k]["allow_pay"]=='T'){//当前账户是否允许缴费
-									//给当前账目附加2个属性:账户类型,用户ID
-									acctItems[k]["acct_type_text"] = acctIds[j][1];
-									acctItems[k]["user_id"] = acctIds[j][2];
-									acctItems[k]["user_name"] = acctIds[j][3];
-									acctItems[k]["user_type_text"] = acctIds[j][4];
-									acctItems[k]["stb_id"] = acctIds[j][5];
-									acctItems[k]["card_id"] = acctIds[j][6];
-									acctItems[k]["modem_mac"] = acctIds[j][7];
-									this.publicAcctitem.push(acctItems[k]);
-								}
-							}
-							break;
-						}
-					} else if (record.get('acct_type') == 'SPEC' //待销户 ，休眠 不能进行缴费
-							&& record.get('status') != 'DORMANCY' && record.get('status') != 'WAITLOGOFF') {
-						if(acctItems && acctItems.length>0){
-							for(var k=0;k<acctItems.length;k++){
-								if(acctItems[k]["allow_pay"]=='T'&&acctItems[k]["prod_status"]!='REQSTOP'){//当前账户是否允许缴费
-									//给当前账目附加2个属性:账户类型,用户ID
-									acctItems[k]["acct_type_text"] = acctIds[j][1];
-									acctItems[k]["user_id"] = acctIds[j][2];
-									acctItems[k]["user_name"] = acctIds[j][3];
-									acctItems[k]["user_type_text"] = acctIds[j][4];
-									acctItems[k]["stb_id"] = acctIds[j][5];
-									acctItems[k]["card_id"] = acctIds[j][6];
-									acctItems[k]["modem_mac"] = acctIds[j][7];
-									this.specAcctitem.push(acctItems[k]);
-								}
-							}
-							break;
+			var acctItems = record.get('acctitems');
+			if(record.get('acct_type') =='PUBLIC' && record.get('status') != 'DATACLOSE'){
+				if(acctItems && acctItems.length>0){
+					for(var k=0;k<acctItems.length;k++){
+						if(acctItems[k]["allow_pay"]=='T'){//当前账户是否允许缴费
+							//给当前账目附加2个属性:账户类型,用户ID
+							acctItems[k]["acct_type_text"] = acctIds[j][1];
+							acctItems[k]["user_id"] = acctIds[j][2];
+							acctItems[k]["user_name"] = acctIds[j][3];
+							acctItems[k]["user_type_text"] = acctIds[j][4];
+							acctItems[k]["stb_id"] = acctIds[j][5];
+							acctItems[k]["card_id"] = acctIds[j][6];
+							acctItems[k]["modem_mac"] = acctIds[j][7];
+							this.publicAcctitem.push(acctItems[k]);
 						}
 					}
+					break;
 				}
 			}
 		},this);
-		
-		function getAcctItem(acctItems){
-			var arr = [];
-			for(var k=0;k<acctItems.length;k++){
-				if(acctItems[k]["allow_pay"]=='T'){//当前账户是否允许缴费
-					//给当前账目附加2个属性:账户类型,用户ID
-					acctItems[k]["acct_type_text"] = acctIds[j][1];
-					acctItems[k]["user_id"] = acctIds[j][2];
-					acctItems[k]["user_name"] = acctIds[j][3];
-					acctItems[k]["user_type_text"] = acctIds[j][4];
-					acctItems[k]["stb_id"] = acctIds[j][5];
-					acctItems[k]["card_id"] = acctIds[j][6];
-					acctItems[k]["modem_mac"] = acctIds[j][7];
-					arr.push(acctItems[k]);
-				}
-			}
-			return arr;
-		}
 		
 		
 		if(this.publicAcctitem.length>0){
@@ -121,19 +69,7 @@ PaymentPanel = Ext.extend(Ext.Panel,{
 		}
 		
 		if(this.specAcctitem.length>0){
-			if(!App.getApp().getData().batchPayFee){
-				//不是批量缴费
-				if(this.specAcctitem.length < 30){
-					this.grid = new SinglePayFeesGrid(this.specAcctitem);
-				}else{
-					//普通计费大于30个账目，自动变为批量缴费
-					this.grid = new SpecPanel(this.specAcctitem);
-					this.batchPay = true;
-				}
-			}else{
-				this.grid = new SpecPanel(this.parent,this.specAcctitem);
-				this.batchPay = true;
-			}
+			this.grid = new SinglePayFeesGrid(this.specAcctitem);
 		}else{
 			this.grid = {};
 		}
@@ -170,32 +106,10 @@ PayFeesForm = Ext.extend( BaseForm , {
 	},
 	getValues: function(){
 		var all = {'payFeesData':Ext.encode(this.data)};
-		if(Ext.getCmp('shouldPay')){
-			all['shouldPay'] = Ext.util.Format.formatToFen(Ext.getCmp('shouldPay').getValue()) ;
-			all['realPay'] = Ext.util.Format.formatToFen(Ext.getCmp('realPay').getValue()) ;
-		}
 		return all;
 	},
 	doValid: function(){
-		if(Ext.getCmp('shouldPay')){
-			this.url = Constant.ROOT_PATH+"/core/x/Acct!payBatchFees.action"
-			var shouldPay = Ext.util.Format.formatToFen(Ext.getCmp('shouldPay').getValue()) ;
-			var realPay = Ext.util.Format.formatToFen(Ext.getCmp('realPay').getValue()) ;
-			var lowestDisct=0;
-			if('BAND'==Ext.getCmp('servId').getValue()){
-				lowestDisct = App.getApp().getBandLowestDisct();
-			}else{
-				lowestDisct = App.getApp().getLowestDisct();
-			}
-			if(realPay/shouldPay < lowestDisct){
-				var obj = {};
-				obj['msg'] = '实收金额小于配置的最小的折扣，请重新输入';
-				obj['isValid'] = false;
-				return obj;
-			}
-		}else{
-			this.url = Constant.ROOT_PATH+"/core/x/Acct!payFees.action"
-		}
+		this.url = Constant.ROOT_PATH+"/core/x/Acct!payFees.action"
 		this.data = [];
 		//提取需要提交的字段集合
 		this.createData();
@@ -233,18 +147,13 @@ PayFeesForm = Ext.extend( BaseForm , {
 		this.data;
 	},
 	getFee:function(){
-		if(!Ext.getCmp('realPay')){
-			var num = 0;
-			Ext.each(this.data,function(d){
-				if(d['fee']){
-					num +=d['fee'];
-				}
-			},this);
-			return Ext.util.Format.formatFee(num);
-		}else{
-			return Ext.util.Format.formatFee(num) + parseFloat(Ext.getCmp('realPay').getValue());
-		}
-		
+		var num = 0;
+		Ext.each(this.data,function(d){
+			if(d['fee']){
+				num +=d['fee'];
+			}
+		},this);
+		return Ext.util.Format.formatFee(num);
 	}
 });
 
