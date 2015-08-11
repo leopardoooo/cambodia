@@ -73,10 +73,23 @@ Ext.ux.grid.BufferView = Ext.extend(Ext.grid.GridView, {
 	getCalculatedRowHeight : function(){
 		return this.rowHeight + this.borderHeight;
 	},
-
+	/*!
+	 * NOTE: BufferView BUG解决 
+	 * Date: 2015-08-11 18:06:21
+	 * BUG描述：在Chrome浏览器时，该组件存在部分行显示但内容不显示的BUG，
+	 * 经过跟踪主要是因为getVisibleRowCount方法在内部的一句代码，当View所在的组件被隐藏时，
+	 * this.scroller.dom.clientHeight该属性永远返回0，导致计算的getVisibleRowCount总是返回0，
+	 * 
+	 * 针对这个BUG有好几种解决方案
+	 * 1、在用户激活响应的tab页的时候，主动调用一次layout方法，这就意味着该解决方案不能通用
+	 * 2、重写getVisibleRowCount方法，返回一个固定的超大值， 该方案禁用了bufferView的特性，但是为了保证系统的兼容性，而没有选择直接移除该组件
+	 * 3、缓存第一次读取的高度，后面直接获取缓存的高度，但是如果窗口发生变化了，需要修改高度
+	 * 这里使用了一种依赖Jquery的解决方案，采用Jquery的height()方法，解决浏览器的差异性
+	 */ 
 	getVisibleRowCount : function(){
 		var rh = this.getCalculatedRowHeight(),
-		    visibleHeight = this.scroller.dom.clientHeight;
+		    visibleHeight = $(this.scroller.dom).height();
+		
 		return (visibleHeight < 1) ? 0 : Math.ceil(visibleHeight / rh);
 	},
 
