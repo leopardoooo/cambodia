@@ -10,9 +10,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.ycsoft.boss.remoting.aaa.AAAInterfaceBusinessMgrServiceStub.ActivateSubscriberRequestMsg;
+import com.ycsoft.boss.remoting.aaa.AAAInterfaceBusinessMgrServiceStub.CancelSubscriberServiceRequestMsg;
 import com.ycsoft.boss.remoting.aaa.AAAInterfaceBusinessMgrServiceStub.DeactivateSubscriberRequestMsg;
 import com.ycsoft.boss.remoting.aaa.AAAInterfaceBusinessMgrServiceStub.DeleteAAASubscriberRequestMsg;
 import com.ycsoft.boss.remoting.aaa.AAAInterfaceBusinessMgrServiceStub.NewAAASubscriberRequestMsg;
+import com.ycsoft.boss.remoting.aaa.AAAInterfaceBusinessMgrServiceStub.OrderSubscriberServiceRequestMsg;
 import com.ycsoft.boss.remoting.aaa.AAAInterfaceBusinessMgrServiceStub.ResetAAASubscriberPswdRequestMsg;
 import com.ycsoft.boss.remoting.aaa.AAAInterfaceBusinessMgrServiceStub.ResultHeader;
 
@@ -131,6 +133,44 @@ public class BOSSBandServiceAdapter {
 	public boolean resetPswd(long doneCode, String bandId, String newPswd)throws AAAException{
 		ResetAAASubscriberPswdRequestMsg request = AAARequestUtils.buildResetAAASubscriberPswdRequestMsg(doneCode, bandId, newPswd);
 		return resetPswd(request);
+	}
+	
+	/** 订购业务 */
+	public boolean orderService(final OrderSubscriberServiceRequestMsg request)throws AAAException{
+		return applyTemplate(new Callback(){
+			@Override
+			public ResultHeader doCallback() throws RemoteException {
+				return aaaStub.orderSubscriberService(request).getResultHeader();
+			}
+		});
+	}
+	
+	/**
+	 * 订购业务
+	 * @see AAARequestUtils#buildOrderSubscriberServiceRequestMsg(long, String, Integer, String, String)
+	 */
+	public boolean orderService(long doneCode, String userId, Integer policyId, String effectTime, String expireTime)throws AAAException{
+		OrderSubscriberServiceRequestMsg request = AAARequestUtils.buildOrderSubscriberServiceRequestMsg(doneCode, userId, policyId, effectTime, expireTime);
+		return orderService(request);
+	}
+	
+	/** 取消用户下所有订购业务 */
+	public boolean cancelOrder(final CancelSubscriberServiceRequestMsg request)throws AAAException{
+		return applyTemplate(new Callback(){
+			@Override
+			public ResultHeader doCallback() throws RemoteException {
+				return aaaStub.cancelSubscriberService(request).getResultHeader();
+			}
+		});
+	}
+	
+	/**
+	 * 取消用户下所有订购业务
+	 * @see AAARequestUtils#buildCancelSubscriberServiceRequestMsg(long, String)
+	 */
+	public boolean cancelOrder(long doneCode, String userId)throws AAAException{
+		CancelSubscriberServiceRequestMsg request = AAARequestUtils.buildCancelSubscriberServiceRequestMsg(doneCode, userId);
+		return cancelOrder(request);
 	}
 	
 	public boolean applyTemplate(Callback callback)throws AAAException{

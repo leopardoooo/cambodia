@@ -7,12 +7,17 @@ import com.ycsoft.boss.remoting.aaa.AAAInterfaceBusinessMgrServiceStub.AAASubscr
 import com.ycsoft.boss.remoting.aaa.AAAInterfaceBusinessMgrServiceStub.AAASubscriberServiceInfo;
 import com.ycsoft.boss.remoting.aaa.AAAInterfaceBusinessMgrServiceStub.ActivateSubscriberRequest;
 import com.ycsoft.boss.remoting.aaa.AAAInterfaceBusinessMgrServiceStub.ActivateSubscriberRequestMsg;
+import com.ycsoft.boss.remoting.aaa.AAAInterfaceBusinessMgrServiceStub.CancelSubscriberServiceRequest;
+import com.ycsoft.boss.remoting.aaa.AAAInterfaceBusinessMgrServiceStub.CancelSubscriberServiceRequestMsg;
 import com.ycsoft.boss.remoting.aaa.AAAInterfaceBusinessMgrServiceStub.DeactivateSubscriberRequest;
 import com.ycsoft.boss.remoting.aaa.AAAInterfaceBusinessMgrServiceStub.DeactivateSubscriberRequestMsg;
 import com.ycsoft.boss.remoting.aaa.AAAInterfaceBusinessMgrServiceStub.DeleteAAASubscriberRequest;
 import com.ycsoft.boss.remoting.aaa.AAAInterfaceBusinessMgrServiceStub.DeleteAAASubscriberRequestMsg;
 import com.ycsoft.boss.remoting.aaa.AAAInterfaceBusinessMgrServiceStub.NewAAASubscriberRequest;
 import com.ycsoft.boss.remoting.aaa.AAAInterfaceBusinessMgrServiceStub.NewAAASubscriberRequestMsg;
+import com.ycsoft.boss.remoting.aaa.AAAInterfaceBusinessMgrServiceStub.OperatorInfo;
+import com.ycsoft.boss.remoting.aaa.AAAInterfaceBusinessMgrServiceStub.OrderSubscriberServiceRequest;
+import com.ycsoft.boss.remoting.aaa.AAAInterfaceBusinessMgrServiceStub.OrderSubscriberServiceRequestMsg;
 import com.ycsoft.boss.remoting.aaa.AAAInterfaceBusinessMgrServiceStub.RequestHeader;
 import com.ycsoft.boss.remoting.aaa.AAAInterfaceBusinessMgrServiceStub.RequestType_type1;
 import com.ycsoft.boss.remoting.aaa.AAAInterfaceBusinessMgrServiceStub.ResetAAASubscriberPswdRequest;
@@ -38,7 +43,64 @@ public final class AAARequestUtils {
 		// 恢复用户
 		ActivateSubscriber,
 		// 重置密码
-		ResetAAASubscriberPswd
+		ResetAAASubscriberPswd,
+		// 订购业务
+		OrderSubscriberService,
+		// 删除订购业务
+		CancelSubscriberService
+	}
+	
+	/**
+	 * 构建订购业务的请求数据结构
+	 * @param doneCode 流水号用于生成请求头信息
+	 * @param userId boss系统的userId
+	 * @param policyId 对应AAA的policyId
+	 * @param effectTime YYMMDDhhmmss 如：20370101000000
+	 * @param expireTime YYMMDDhhmmss 如：20370101000000
+	 * @return
+	 */
+	public static OrderSubscriberServiceRequestMsg buildOrderSubscriberServiceRequestMsg(long doneCode, String userId, Integer policyId, String effectTime, String expireTime){
+		OrderSubscriberServiceRequestMsg request = new OrderSubscriberServiceRequestMsg();
+		
+		OrderSubscriberServiceRequest body = new OrderSubscriberServiceRequest();
+		body.setSubscriberID(userId);
+		
+		AAASubscriberServiceInfo serviceInfo = createServiceInfo(policyId, null, null);
+		body.setAAASubscriberServiceInfo(serviceInfo);
+		
+		request.setOrderSubscriberServiceRequest(body);
+		request.setRequestHeader(buildReqeustHeader(CommandId.OrderSubscriberService, doneCode));
+		
+		return request;
+	}
+	
+	public static OrderSubscriberServiceRequestMsg buildOrderSubscriberServiceRequestMsg(String userId, Integer policyId, String effectTime, String expireTime){
+		return buildOrderSubscriberServiceRequestMsg(DEFAULT_DONE_CODE, userId, policyId, effectTime, expireTime);
+	}
+	
+	/**
+	 * 取消业务订购
+	 * @param doneCode 业务流水号
+	 * @param userId BOSS系统的用户编号
+	 * @return
+	 */
+	public static CancelSubscriberServiceRequestMsg buildCancelSubscriberServiceRequestMsg(long doneCode, String userId){
+		CancelSubscriberServiceRequestMsg request = new CancelSubscriberServiceRequestMsg();
+		
+		CancelSubscriberServiceRequest body = new CancelSubscriberServiceRequest();
+		body.setSubscriberID(userId);
+		// 接入方式 1090204:FBB&WiFi
+		body.setAccessType(1090204);
+		body.setOperatorInfo(createDefaultOperatorInfo());
+		
+		request.setCancelSubscriberServiceRequest(body);
+		request.setRequestHeader(buildReqeustHeader(CommandId.CancelSubscriberService, doneCode));
+		
+		return request;
+	}
+	
+	public static CancelSubscriberServiceRequestMsg buildCancelSubscriberServiceRequestMsg(String userId){
+		return buildCancelSubscriberServiceRequestMsg(DEFAULT_DONE_CODE, userId);
 	}
 	
 	/**
@@ -154,6 +216,25 @@ public final class AAARequestUtils {
 		AAASubscriberInfo basic = new AAASubscriberInfo();
 		// 密码
 		basic.setPassword(pswd);
+		AAASubscriberServiceInfo serviceInfo = createServiceInfo(policyId, null, null);
+		
+		body.setAAASubscriberInfo(basic);
+		body.setAAASubscriberServiceInfo(new AAASubscriberServiceInfo[]{serviceInfo});
+		
+		request.setRequestHeader(buildReqeustHeader(CommandId.NewSubscriber, doneCode));
+		request.setNewAAASubscriberRequest(body);
+		
+		return request;
+	}
+	
+	/**
+	 * 创建一个订购内容
+	 * @param policyId 策略编号， 可以为空
+	 * @param effectTime 生效时间， 可以为空
+	 * @param expireTime 失效时间，可以为空
+	 * @return
+	 */
+	private static AAASubscriberServiceInfo createServiceInfo(Integer policyId, String effectTime, String expireTime){
 		AAASubscriberServiceInfo serviceInfo = new AAASubscriberServiceInfo();
 		// 接入方式 1090204:FBB&WiFi
 		serviceInfo.setAccessType(1090204);
@@ -166,13 +247,19 @@ public final class AAARequestUtils {
 		serviceInfo.setCancelBinding(0);
 		serviceInfo.setPortBindingType(0);
 		
-		body.setAAASubscriberInfo(basic);
-		body.setAAASubscriberServiceInfo(new AAASubscriberServiceInfo[]{serviceInfo});
+		return serviceInfo;
+	}
+	
+	/**
+	 * 创建一个默认的操作员
+	 * @return
+	 */
+	private static OperatorInfo createDefaultOperatorInfo(){
+		OperatorInfo optr = new OperatorInfo();
+		optr.setDeptID("boss");
+		optr.setOperID("0");
 		
-		request.setRequestHeader(buildReqeustHeader(CommandId.NewSubscriber, doneCode));
-		request.setNewAAASubscriberRequest(body);
-		
-		return request;
+		return optr;
 	}
 	
 	public static NewAAASubscriberRequestMsg buildNewAAASubscriberRequestMsg(String bandId, String pswd, Integer policyId){
