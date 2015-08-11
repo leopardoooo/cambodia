@@ -1,7 +1,6 @@
 package com.ycsoft.business.service.impl;
 
 import static com.ycsoft.commons.constants.SystemConstants.ACCT_TYPE_SPEC;
-import static com.ycsoft.commons.constants.SystemConstants.BOOLEAN_TRUE;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -45,7 +44,6 @@ import com.ycsoft.commons.exception.ErrorCode;
 import com.ycsoft.commons.exception.ServicesException;
 import com.ycsoft.commons.helper.CollectionHelper;
 import com.ycsoft.commons.helper.DateHelper;
-import com.ycsoft.commons.helper.JsonHelper;
 import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.daos.core.JDBCException;
 import com.ycsoft.daos.helper.BeanHelper;
@@ -354,10 +352,6 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 			throw new ServicesException(ErrorCode.ParamIsNull);
 		}
 
-		List<CProdOrderDto> cancelList=new ArrayList<>();
-		//参数检查
-		//退款总额核对
-		
 		List<CProdOrderDto> orderList = cProdOrderDao.queryProdOrderDtoByUserId(userId);
 		
 		int fee=orderComponent.getLogoffOrderFee(orderList, isHigh);
@@ -365,7 +359,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		if(cancelFee!=fee*-1){
 			throw new ServicesException(ErrorCode.FeeDateException);
 		}		
-		return cancelList;
+		return orderList;
 	}
 
 	/**
