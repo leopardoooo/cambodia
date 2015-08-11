@@ -18,7 +18,8 @@ public interface IOrderService extends IBaseService{
 	
 	public Map<String,List<CProdOrderDto>> queryCustEffOrder(String cust_id) throws Exception;
 	
-	public String saveOrderProd(OrderProd orderProd,String busi_code) throws Exception;
+	public List<String> saveOrderProdList(String busi_code,OrderProd...orderProds) throws Exception;
+	//public String saveOrderProd(OrderProd orderProd,String busi_code) throws Exception;
 	
 	
 	public void saveCancelProd(String[] orderSns,Integer cancelFee)throws Exception;;

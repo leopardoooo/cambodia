@@ -97,6 +97,20 @@ public class DateHelper {
 		calendar.set(Calendar.MILLISECOND, 0);
 		return calendar.getTime();
 	}
+	/**
+	 * 日期去时分秒
+	 * @param date
+	 * @return
+	 */
+	public static Date getTruncDate(Date date){
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(date);
+		calendar.set(Calendar.HOUR_OF_DAY, 0);
+		calendar.set(Calendar.MINUTE, 0);
+		calendar.set(Calendar.SECOND, 0);
+		calendar.set(Calendar.MILLISECOND, 0);
+		return calendar.getTime();
+	}
 
 	public static int getCurrYear(Date date) {
 		Calendar c = Calendar.getInstance();

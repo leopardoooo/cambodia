@@ -61,7 +61,38 @@ public class OrderComponent extends BaseBusiComponent {
 	@Autowired
 	private CProdStatusChangeDao cProdStatusChangeDao;
 
-	
+	/**
+	 * 销户时订单退款金额计算
+	 * @param orderList
+	 * @param isHigh
+	 * @throws Exception
+	 */
+	public Integer getLogoffOrderFee(List<CProdOrderDto> orderList,boolean isHigh) throws Exception{
+		int cancelFee=0;
+		for(CProdOrderDto order:orderList){
+			if(order.getIs_pay().equals(SystemConstants.BOOLEAN_FALSE)){
+				//未支付判断
+				throw new ServicesException(ErrorCode.NotCancleHasUnPay);
+			}
+			if(isHigh){
+				order.setActive_fee(getOrderCancelFee(order,DateHelper.today()));
+			}else if(StringHelper.isNotEmpty(order.getPackage_sn())
+					||order.getBilling_cycle()>1){
+				//套餐子产品和包多月产品，低权限人员退款金额=0
+				order.setActive_fee(0);
+			}else if(order.getProd_type().equals(SystemConstants.PROD_TYPE_BASE)
+					&& order.getIs_base().equals(SystemConstants.BOOLEAN_TRUE)
+					&&order.getProtocol_date()!=null
+					&&DateHelper.today().before(order.getProtocol_date())){
+				//包1月产品在硬件协议期未到时计算退款余额
+				order.setActive_fee(getOrderCancelFee(order,DateHelper.getTruncDate(order.getProtocol_date())));
+			}else {
+				order.setActive_fee(getOrderCancelFee(order,DateHelper.today()));
+			}
+			cancelFee=cancelFee+order.getActive_fee();
+		}
+		return cancelFee;
+	}
 	/**
 	 * 是否高级退订或销户功能
 	 * @param busi_code
@@ -192,9 +223,21 @@ public class OrderComponent extends BaseBusiComponent {
 		}	
 		return list;
 	}
-	
-	public List<CProdOrderDto> queryProdOrderDtoByUserId(String user_id) throws Exception{
-		return cProdOrderDao.queryProdOrderDtoByUserId(user_id);
+	/**
+	 * 提取未过期的订单记录
+	 * @param user_id
+	 * @return
+	 * @throws Exception
+	 */
+	public List<CProdOrderDto> queryLogoffProdOrderDtoByUserId(String user_id) throws Exception{
+		List<CProdOrderDto> list=new ArrayList<>();
+		Date today=DateHelper.today();
+		for(CProdOrderDto order:cProdOrderDao.queryProdOrderDtoByUserId(user_id)){
+			if(order.getExp_date().equals(today)||order.getExp_date().after(today)){
+				list.add(order);
+			}
+		}
+		return list;
 	}
 	
 	/**
@@ -202,12 +245,12 @@ public class OrderComponent extends BaseBusiComponent {
 	 * @param order
 	 * @return
 	 */
-	public Integer getOrderCancelFee(CProdOrder cancelOrder){
+	public Integer getOrderCancelFee(CProdOrder cancelOrder,Date cancelDate){
 		if(StringHelper.isNotEmpty(cancelOrder.getPackage_sn())){
 			//套餐子产品可退金额=0;
 			return 0;
 		}
-		Date cancelDate=DateHelper.today();
+		//Date cancelDate=DateHelper.today();
 		//1.退订日在订购计费完整区间之前
 		if(cancelDate.before(cancelOrder.getEff_date())||cancelDate.equals(cancelOrder.getEff_date())){
 			//覆盖退订在订购的生效日之前(含)
@@ -227,6 +270,9 @@ public class OrderComponent extends BaseBusiComponent {
 		if(newExpDate.after(cancelOrder.getExp_date())){
 			//新到期日大于实际到期日，则需要回退一个月再计算
 			months=months-1;
+		}
+		if(months<0){
+			months=0;
 		}
 		return Math.round(months*1.0f*cancelOrder.getOrder_fee()/cancelOrder.getOrder_months());
 	}
