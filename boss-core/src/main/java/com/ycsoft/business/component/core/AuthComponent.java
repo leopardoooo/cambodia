@@ -260,7 +260,7 @@ public class AuthComponent extends BaseComponent{
 	/**===============================Band========================================*/
 	private void createBandUser(CUser user,Integer doneCode)  throws Exception{
 		JBandCommand bandCmd = gBandCmd(user,doneCode);
-		bandCmd.setCmd_type(BusiCmdConstants.CHANGE_USER);	
+		bandCmd.setCmd_type(BusiCmdConstants.CREAT_USER);	
 		JsonObject params = new JsonObject();
 		params.addProperty(BusiCmdParam.login_name.name(), user.getLogin_name());
 		params.addProperty(BusiCmdParam.login_password.name(), user.getPassword());

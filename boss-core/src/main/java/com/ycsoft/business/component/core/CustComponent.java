@@ -134,12 +134,8 @@ public class CustComponent extends BaseBusiComponent {
 
 		//设置默认信息:密码为证件号的后6位
 		cust.setPassword(linkMan.getCert_num().length()>6?linkMan.getCert_num().substring(0, 6):linkMan.getCert_num());
-		if(SystemConstants.CUST_TYPE_UNIT.equals(cust.getCust_type())){
-			cust.setStatus(StatusConstants.ACTIVE);
-		}else{
-			if (!StatusConstants.TRANSFER_LOGOFF.equals(cust.getStatus()))
-				cust.setStatus(StatusConstants.PREOPEN);
-		}
+		cust.setStatus(StatusConstants.ACTIVE);
+		
 		cust.setIs_black(SystemConstants.BOOLEAN_FALSE);
 		if(StringHelper.isEmpty(cust.getCust_class())){
 			cust.setCust_class(SystemConstants.CUST_CLASS_YBKH);
