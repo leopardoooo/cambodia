@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions name="AgentPaymentService" targetNamespace="http://pay.service.outwardtps.sysway.com/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://pay.service.outwardtps.sysway.com/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
+  <wsdl:types>
+    <xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://pay.service.outwardtps.sysway.com/" xmlns:tns="http://pay.service.outwardtps.sysway.com/" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<xs:complexType name="RequestHeader">
+<xs:sequence>
+<xs:element minOccurs="0" name="org" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="CustomerValidateResponseMsg">
+<xs:sequence>
+<xs:element minOccurs="0" name="responseHeader" type="tns:ResponseHeader"/>
+<xs:element minOccurs="0" name="customerValidateResponse" type="tns:CustomerValidateResponse"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="ResponseHeader">
+<xs:sequence>
+<xs:element minOccurs="0" name="resultCode" type="xs:string"/>
+<xs:element minOccurs="0" name="resultDesc" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="CustomerValidateResponse">
+<xs:sequence>
+<xs:element minOccurs="0" name="customerName" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="CustomerValidateRequest">
+<xs:sequence>
+<xs:element minOccurs="0" name="customerID" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="RechargeRequestMsg">
+<xs:sequence>
+<xs:element minOccurs="0" name="requestHeader" type="tns:RequestHeader"/>
+<xs:element minOccurs="0" name="rechargeRequest" type="tns:RechargeRequest"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="RechargeRequest">
+<xs:sequence>
+<xs:element minOccurs="0" name="businessID" type="xs:string"/>
+<xs:element minOccurs="0" name="customerID" type="xs:string"/>
+<xs:element minOccurs="0" name="amount" type="xs:string"/>
+<xs:element minOccurs="0" name="transactionTime" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="RechargeResponseMsg">
+<xs:sequence>
+<xs:element minOccurs="0" name="responseHeader" type="tns:ResponseHeader"/>
+<xs:element minOccurs="0" name="rechargeResponse" type="tns:RechargeResponse"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="RechargeResponse">
+<xs:sequence>
+<xs:element minOccurs="0" name="accountBalance" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="CustomerValidateRequestMsg">
+<xs:sequence>
+<xs:element minOccurs="0" name="requestHeader" type="tns:RequestHeader"/>
+<xs:element minOccurs="0" name="customerValidateRequest" type="tns:CustomerValidateRequest"/>
+</xs:sequence>
+</xs:complexType>
+<xs:element name="recharge" type="tns:recharge"/>
+<xs:complexType name="recharge">
+<xs:sequence>
+<xs:element minOccurs="0" name="msg" type="tns:RechargeRequestMsg"/>
+</xs:sequence>
+</xs:complexType>
+<xs:element name="rechargeResponse" type="tns:rechargeResponse"/>
+<xs:complexType name="rechargeResponse">
+<xs:sequence>
+<xs:element minOccurs="0" name="return" type="tns:RechargeResponseMsg"/>
+</xs:sequence>
+</xs:complexType>
+<xs:element name="customerValidate" type="tns:customerValidate"/>
+<xs:complexType name="customerValidate">
+<xs:sequence>
+<xs:element minOccurs="0" name="msg" type="tns:CustomerValidateRequestMsg"/>
+</xs:sequence>
+</xs:complexType>
+<xs:element name="customerValidateResponse" type="tns:customerValidateResponse"/>
+<xs:complexType name="customerValidateResponse">
+<xs:sequence>
+<xs:element minOccurs="0" name="return" type="tns:CustomerValidateResponseMsg"/>
+</xs:sequence>
+</xs:complexType>
+</xs:schema>
+  </wsdl:types>
+  <wsdl:message name="recharge">
+    <wsdl:part name="parameters" element="tns:recharge">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="customerValidateResponse">
+    <wsdl:part name="parameters" element="tns:customerValidateResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="rechargeResponse">
+    <wsdl:part name="parameters" element="tns:rechargeResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="customerValidate">
+    <wsdl:part name="parameters" element="tns:customerValidate">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="IAgentPayment">
+    <wsdl:operation name="recharge">
+      <wsdl:input name="recharge" message="tns:recharge">
+    </wsdl:input>
+      <wsdl:output name="rechargeResponse" message="tns:rechargeResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="customerValidate">
+      <wsdl:input name="customerValidate" message="tns:customerValidate">
+    </wsdl:input>
+      <wsdl:output name="customerValidateResponse" message="tns:customerValidateResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="AgentPaymentServiceSoapBinding" type="tns:IAgentPayment">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="customerValidate">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="customerValidate">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="customerValidateResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="recharge">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="recharge">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="rechargeResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="AgentPaymentService">
+    <wsdl:port name="IAgentPaymentPort" binding="tns:AgentPaymentServiceSoapBinding">
+      <soap:address location="http://172.16.128.110:7002/sysway-boss-service/cxf/pay"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>
