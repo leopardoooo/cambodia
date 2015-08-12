@@ -14,6 +14,7 @@ import com.ycsoft.business.commons.abstracts.IBaseService;
 import com.ycsoft.business.dto.core.fee.FeeInfoDto;
 import com.ycsoft.business.dto.core.prod.DisctFeeDto;
 import com.ycsoft.business.dto.core.prod.PromotionDto;
+import com.ycsoft.business.dto.core.user.UserInfo;
 import com.ycsoft.business.dto.core.user.UserRes;
 import com.ycsoft.daos.core.JDBCException;
 
@@ -42,6 +43,8 @@ public interface IUserService extends IBaseService{
 	 */
 	public void createUser(CUser user, String deviceId, String deviceType, String deviceModel, String deviceBuyMode,
 			FeeInfoDto deviceFee)  throws Exception;
+	
+	public void createUserBatch(List<UserInfo> userList,String workBillAsignType) throws Exception;
 	
 	public void saveChangeDevice(String userId,String deviceId,String devcieBuyMode,FeeInfoDto deviceFee, boolean reclaim)  throws Exception;
 
