@@ -1060,6 +1060,9 @@ CustPanel = Ext.extend( BaseInfoPanel , {
 	},
 	refresh:function(){
 		this.custInfoPanel.remoteRefresh();
+//		this.acctPanel.remoteRefresh();
+		
+		this.acctPanel.refresh();
 		//this.custDeviceGrid.remoteRefresh();
 		//this.deviceDetailTab.resetPanel();
 		this.refreshPropChangeGrid();

@@ -125,6 +125,17 @@ AcctGrid = Ext.extend(Ext.ux.Grid,{
 				batchModifyThreshold.setDisabled(true);
 			}
 		}
+		var rec = null;
+		//柬埔寨
+		_store.each(function(record){
+			if(record.get('acct_type') == 'PUBLIC'){
+				rec = record;			
+			}
+		});
+		this.parent.acctItemGrid.doLoadAcctItem(_store,rec.get('acct_id'));
+		this.parent.acctItemGrid.userId = rec.get('user_id');
+		this.parent.acctItemGrid.acctType = rec.get('acct_type');
+		
 		
 		//隐藏数据加载提示框
 		App.hideTip();
@@ -142,6 +153,7 @@ AcctGrid = Ext.extend(Ext.ux.Grid,{
 		
 		this.parent.acctItemDetailTab.resetPanel();
 		
+			
 		//过滤tbar按钮
 		if(App.getCust().status == 'RELOCATE'){
 			App.getApp().disableBarByBusiCode(this.getTopToolbar(),['1040'],true);
@@ -798,7 +810,7 @@ AcctPanel = Ext.extend(BaseInfoPanel,{
 	refresh:function(){
 		this.acctItemGrid.reset();
 		this.acctItemDetailTab.resetPanel();
-		//this.acctGrid.remoteRefresh();
+		this.acctGrid.remoteRefresh();
 	}
 });
 Ext.reg( "acctPanel" , AcctPanel );
