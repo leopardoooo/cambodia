@@ -6,8 +6,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 
 import com.google.gson.Gson;
@@ -20,9 +18,9 @@ import com.ycsoft.business.dto.config.ChangeValueDto;
 import com.ycsoft.business.dto.core.fee.FeeInfoDto;
 import com.ycsoft.business.dto.core.prod.CProdBacthDto;
 import com.ycsoft.business.dto.core.prod.DisctFeeDto;
+import com.ycsoft.business.dto.core.user.UserInfo;
 import com.ycsoft.business.dto.core.user.UserProdRscDto;
 import com.ycsoft.business.service.IUserProdService;
-import com.ycsoft.business.service.IUserService;
 import com.ycsoft.business.service.impl.UserServiceSN;
 import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.helper.DateHelper;
@@ -110,6 +108,11 @@ public class UserAction extends BaseBusiAction {
 
 	private String promFeeSn;
 	
+	private List<UserInfo> openUserList;
+	private String workBillAsignType;
+	
+	
+	
 	//柬埔寨
 	//是否回收设备T,F
 	private String reclaim;
@@ -133,6 +136,11 @@ public class UserAction extends BaseBusiAction {
 		getRoot().setSimpleObj(user.getUser_id());
 
 		return JSON;
+	}
+	
+	public String createUserBatch() throws Exception{
+		userServiceSN.createUserBatch(openUserList, workBillAsignType);
+		return JSON_SUCCESS;
 	}
 
 	/**

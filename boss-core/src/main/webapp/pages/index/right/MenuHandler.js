@@ -764,6 +764,13 @@ Ext.apply(MenuHandler, {
 			height : 360
 		};
 	},
+	//派单开户
+	NewUserBatch: function(){
+		return {
+			width: 580,
+			height: 460
+		}
+	},
 	// 用户销户
 	SingleLogoffUser : function() {
 		if (!hasCust())

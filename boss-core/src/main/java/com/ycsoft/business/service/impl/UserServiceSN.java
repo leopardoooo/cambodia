@@ -33,6 +33,7 @@ import com.ycsoft.business.dto.core.fee.FeeInfoDto;
 import com.ycsoft.business.dto.core.prod.DisctFeeDto;
 import com.ycsoft.business.dto.core.prod.PromotionDto;
 import com.ycsoft.business.dto.core.user.UserDto;
+import com.ycsoft.business.dto.core.user.UserInfo;
 import com.ycsoft.business.dto.core.user.UserRes;
 import com.ycsoft.business.dto.device.DeviceDto;
 import com.ycsoft.business.service.IUserService;
@@ -58,11 +59,55 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 	
 	public void createUser(CUser user, String deviceCode, String deviceType, String deviceModel, String deviceBuyMode,
 			FeeInfoDto deviceFee) throws Exception {
-		// 获取客户信息
-		CCust cust = getBusiParam().getCust();
-		String custId = cust.getCust_id();
 		// 获取业务流水
 		Integer doneCode = doneCodeComponent.gDoneCode();
+		// 获取客户信息
+		CCust cust = getBusiParam().getCust();
+		openSingle(cust, user, doneCode, deviceCode, deviceType, deviceModel, deviceBuyMode, deviceFee);
+		
+		// 设置拦截器所需要的参数
+		getBusiParam().resetUser();
+		getBusiParam().addUser(user);
+		saveAllPublic(doneCode, getBusiParam());
+
+	}
+	
+	@Override
+	public void createUserBatch(List<UserInfo> userList, String workBillAsignType) throws Exception {
+		Integer doneCode = doneCodeComponent.gDoneCode();
+		// 获取客户信息
+		CCust cust = getBusiParam().getCust();
+		for (UserInfo userInfo:userList){
+			for (int i=0;i<userInfo.getUser_count();i++){
+				CUser user = new CUser();
+				user.setUser_type(userInfo.getUser_type());
+				String deviceType;
+				if (user.getUser_type().equals(SystemConstants.USER_TYPE_BAND)){
+					deviceType = SystemConstants.DEVICE_TYPE_MODEM;
+				} else {
+					deviceType = SystemConstants.DEVICE_TYPE_STB;
+				}
+				
+				String deviceModel = userInfo.getDevice_model();
+				String deviceBuyMode = userInfo.getDevice_buy_mode();
+				FeeInfoDto deviceFee = new FeeInfoDto();
+				deviceFee.setFee_id(userInfo.getFee_id());
+				deviceFee.setFee(userInfo.getFee());
+				
+				this.openSingle(cust, user, doneCode, null, deviceType, deviceModel, deviceBuyMode, deviceFee);
+			}
+		}
+		//TODO 工单处理
+		
+		saveAllPublic(doneCode, getBusiParam());
+	}
+
+
+
+	private void openSingle(CCust cust, CUser user, Integer doneCode, String deviceCode, String deviceType,
+			String deviceModel, String deviceBuyMode, FeeInfoDto deviceFee) throws Exception, JDBCException {
+		String custId = cust.getCust_id();
+		
 		String user_id = userComponent.gUserId();
 		// 创建账户信息
 		String acctId = acctComponent.createAcct(custId, user_id, ACCT_TYPE_SPEC, null);
@@ -106,11 +151,6 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		}
 		
 		userComponent.createUser(user);
-
-		// 修改客户状态为正常状态
-		if (cust.getStatus().equals(StatusConstants.PREOPEN)) {
-			custComponent.updateCustStatus(doneCode, custId, StatusConstants.PREOPEN, StatusConstants.ACTIVE);
-		}
 		//处理设备和授权
 		if (!user.getUser_type().equals(SystemConstants.USER_TYPE_OTT_MOBILE)){
 			TDeviceBuyMode buyModeCfg = busiConfigComponent.queryBuyMode(deviceBuyMode);
@@ -125,12 +165,6 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		if (user.getStatus().equals(StatusConstants.ACTIVE)){
 			createUserJob(user, custId, doneCode);
 		}
-		
-		// 设置拦截器所需要的参数
-		getBusiParam().resetUser();
-		getBusiParam().addUser(user);
-		saveAllPublic(doneCode, getBusiParam());
-
 	}
 	
 	@Override

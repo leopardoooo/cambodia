@@ -87,6 +87,7 @@ import com.ycsoft.business.dto.core.prod.ProdResDto;
 import com.ycsoft.business.dto.core.prod.PromotionDto;
 import com.ycsoft.business.dto.core.prod.ResGroupDto;
 import com.ycsoft.business.dto.core.user.UserDto;
+import com.ycsoft.business.dto.core.user.UserInfo;
 import com.ycsoft.business.dto.core.user.UserRes;
 import com.ycsoft.business.dto.device.DeviceDto;
 import com.ycsoft.business.service.IUserService;
@@ -114,6 +115,12 @@ public class UserService extends BaseBusiService implements IUserService {
 	protected DeviceComponent deviceComponent;
 	
 	
+
+	@Override
+	public void createUserBatch(List<UserInfo> userList, String workBillAsignType) throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
 
 	@Override
 	public void saveFillDevice(List<FillUSerDeviceDto> deviceList) throws Exception {
