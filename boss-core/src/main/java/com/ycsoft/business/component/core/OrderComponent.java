@@ -2,12 +2,15 @@ package com.ycsoft.business.component.core;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -135,7 +138,9 @@ public class OrderComponent extends BaseBusiComponent {
 			}
 			dto.setCanFollowPay(true);
 			dto.setRemark("");
-			
+			if(StringHelper.isEmpty(dto.getUser_id())){
+				dto.setUser_name("客户套餐");
+			}
 			if(hasPakDetailMap.containsKey(entry.getKey())){
 				//存在套餐子产品订单，能不能缴费
 				dto.setCanFollowPay(false);
@@ -151,6 +156,27 @@ public class OrderComponent extends BaseBusiComponent {
 					}
 				}
 			}		
+			//套餐的子产品选择情况
+			if(!dto.getProd_type().equals(SystemConstants.PROD_TYPE_BASE)){
+				
+				Map<String,Set<String>> groupUserMap=new HashMap<>();
+				for(CProdOrder detail: cProdOrderDao.queryPakDetailOrder(dto.getOrder_sn())){
+					Set<String> set=groupUserMap.get(detail.getPackage_group_id());
+					if(set==null){
+						set=new HashSet<String>();
+						groupUserMap.put(detail.getPackage_group_id(), set);
+					}
+					set.add(detail.getUser_id());
+				}
+				List<PackageGroupUser> groupSelected=new ArrayList<>();
+				for(String group_id:   groupUserMap.keySet()){
+					PackageGroupUser pgu=new PackageGroupUser();
+					groupSelected.add(pgu);
+					pgu.setPackage_group_id(group_id);
+					pgu.setUserSelectList(Arrays.asList(groupUserMap.get(group_id).toArray(new String[groupUserMap.get(group_id).size()])));
+				}
+				dto.setGroupSelected(groupSelected);
+			}
 		}	
 		List<CProdOrderFollowPay> followPayList=new ArrayList<CProdOrderFollowPay>();
 		//排序处理
@@ -411,8 +437,7 @@ public class OrderComponent extends BaseBusiComponent {
 	public List<CProdOrder> queryTransCancelOrderList(OrderProd orderProd,String busi_code) throws Exception{
 		List<CProdOrder> orderCancelList=new ArrayList<>(); 
 		//提取被取消的订购记录
-		if(busi_code.equals(BusiCodeConstants.PROD_PACKAGE_ORDER)&&StringHelper.isEmpty(orderProd.getLast_order_sn())
-				&&orderProd.getGroupSelected()!=null&&orderProd.getGroupSelected().size()>0){
+		if(orderProd.getGroupSelected()!=null&&orderProd.getGroupSelected().size()>0){
 			//套餐订购覆盖普通订购
 			orderCancelList= queryTransferFeeByPackage(orderProd);
 		}else if(busi_code.equals(BusiCodeConstants.PROD_UPGRADE)&&StringHelper.isNotEmpty(orderProd.getLast_order_sn())){

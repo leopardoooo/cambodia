@@ -21,6 +21,7 @@ import com.ycsoft.beans.core.cust.CCust;
 import com.ycsoft.beans.core.fee.CFee;
 import com.ycsoft.beans.core.prod.CProdOrder;
 import com.ycsoft.beans.core.prod.CProdOrderDto;
+import com.ycsoft.beans.core.prod.CProdOrderFollowPay;
 import com.ycsoft.beans.core.user.CUser;
 import com.ycsoft.beans.prod.PPackageProd;
 import com.ycsoft.beans.prod.PProd;
@@ -681,9 +682,18 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		doneCodeComponent.lockCust(cust_id);
 		Integer doneCode = doneCodeComponent.gDoneCode();	
 		List<String> prodSns=new ArrayList<>();
+		//支付总额
+		int payFeeSum=0;
 		for(OrderProd orderProd:orderProds){
-			prodSns.add(this.saveOrderProd(orderProd,busi_code,doneCode));
+			payFeeSum=payFeeSum+orderProd.getPay_fee();
 		}
+		//支付状态判断
+		boolean isPay=this.saveDoneCodeUnPay(cust_id,payFeeSum, doneCode,this.getOptr().getOptr_id());
+		
+		for(OrderProd orderProd:orderProds){
+			prodSns.add(this.saveOrderProd(orderProd,busi_code,doneCode,isPay));
+		}
+		
 		//业务流水
 		this.saveAllPublic(doneCode, getBusiParam());
 		return prodSns;
@@ -694,7 +704,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 	 * @throws Exception 
 	 */
 	//@Override
-	private String saveOrderProd(OrderProd orderProd,String busi_code,Integer doneCode) throws Exception{
+	private String saveOrderProd(OrderProd orderProd,String busi_code,Integer doneCode,boolean isPay) throws Exception{
 
 		//订单的业务参数
 		String remark=getOrderProdRemark(orderProd,busi_code);
@@ -713,7 +723,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		//产品状态设置
 		cProdOrder.setStatus(orderComponent.getNewOrderProdStatus(lastOrder,orderProd));
 		//业务是否需要支付判断                     
-		cProdOrder.setIs_pay(this.saveDoneCodeUnPay(orderProd, doneCode,optr_id)?SystemConstants.BOOLEAN_TRUE:SystemConstants.BOOLEAN_FALSE);
+		cProdOrder.setIs_pay(isPay?SystemConstants.BOOLEAN_TRUE:SystemConstants.BOOLEAN_FALSE);
 		cProdOrder.setRemark(remark);
 		//保存订购记录
 		orderComponent.saveCProdOrder(cProdOrder,orderProd,busi_code);
@@ -846,13 +856,13 @@ public class OrderService extends BaseBusiService implements IOrderService{
 	 * @throws JDBCException 
 	 * @throws Exception 
 	 */
-	private boolean saveDoneCodeUnPay(OrderProd orderProd,Integer done_code,String optr_id) throws Exception{
-		List<CDoneCodeUnpay> unPayList =doneCodeComponent.queryUnPayList(orderProd.getCust_id());
-		if(unPayList.size()==0&&orderProd.getPay_fee()==0){
+	private boolean saveDoneCodeUnPay(String custId,Integer payFee,Integer done_code,String optr_id) throws Exception{
+		List<CDoneCodeUnpay> unPayList =doneCodeComponent.queryUnPayList(custId);
+		if(unPayList.size()==0&&payFee==0){
 			//没有未支付的业务，且当前新订单不需要支付，则该笔订单业务设置为已支付
 			return true;
 		}else{
-			doneCodeComponent.saveDoneCodeUnPay(orderProd.getCust_id(), done_code,optr_id);
+			doneCodeComponent.saveDoneCodeUnPay(custId, done_code,optr_id);
 			return false;
 		}
 	}
@@ -970,6 +980,14 @@ public class OrderService extends BaseBusiService implements IOrderService{
 			}
 		}		
 		return lastOrder;
+	}
+	
+	public List<CProdOrderFollowPay> queryFollowPayOrderDto(String custId) throws Exception{
+		doneCodeComponent.checkUnPayOtherLock(custId, this.getOptr().getOptr_id());
+		List<CProdOrderFollowPay> orderList  = orderComponent.queryFollowPayOrderDto(custId);
+		
+		return orderList;
+		
 	}
 
 	

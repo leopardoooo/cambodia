@@ -1,10 +1,18 @@
 package com.ycsoft.web.action.core;
 
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.stereotype.Controller;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import com.ycsoft.business.dto.core.prod.OrderProd;
 import com.ycsoft.business.service.IOrderService;
 import com.ycsoft.commons.helper.JsonHelper;
+import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.web.commons.abstracts.BaseBusiAction;
 
 @Controller
@@ -23,6 +31,8 @@ public class ProdOrderAction extends BaseBusiAction {
 	private Integer cancelFee;
 	private String[] orderSns;
 	private String order_sn;
+	
+	private String payFeesData;
 	/**
 	 * 退订界面数据初始化查询
 	 * @return
@@ -85,9 +95,30 @@ public class ProdOrderAction extends BaseBusiAction {
 		return JSON_SUCCESS;
 	}
 	
+	/**
+	 * 保存缴费
+	 * @return
+	 * @throws Exception
+	 */
+	public String savePayFee() throws Exception{
+		List<OrderProd> orderList = new ArrayList<OrderProd>();
+		if(StringHelper.isNotEmpty(payFeesData)){
+			Type type = new TypeToken<List<OrderProd>>(){}.getType();
+			Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd").create();
+			orderList = gson.fromJson(payFeesData,type);
+		}
+		orderService.saveOrderProdList(busi_code,orderList.toArray(new OrderProd[orderList.size()]));
+		return JSON_SUCCESS;
+	}
+	
 	public String queryCustEffOrder() throws Exception{
 		getRoot().setSimpleObj(orderService.queryCustEffOrder(cust_id));
 		return JSON_SIMPLEOBJ;
+	}
+	
+	public String queryFollowPayOrderDto() throws Exception{
+		getRoot().setRecords(orderService.queryFollowPayOrderDto(cust_id));
+		return JSON_RECORDS;
 	}
 	
 	public String queryProdOrderInit(){
@@ -168,6 +199,14 @@ public class ProdOrderAction extends BaseBusiAction {
 	}
 	public void setOrder_sn(String order_sn) {
 		this.order_sn = order_sn;
+	}
+
+	public String getPayFeesData() {
+		return payFeesData;
+	}
+
+	public void setPayFeesData(String payFeesData) {
+		this.payFeesData = payFeesData;
 	}
 	
 }
