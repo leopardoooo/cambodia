@@ -96,7 +96,7 @@
  			bigItems.push({region: 'center',layout: 'border',border: false,items: lItems});
  		}
  		if(rItems.length > 0){
- 			winW = 260;
+ 			winW = 200;
  			bigItems.push({region: 'east',width: winW,split: true,layout: 'border',border: false,items: rItems});
  		}
  		if(lItems.length == 0 && rItems.length > 0){
