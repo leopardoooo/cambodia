@@ -108,10 +108,10 @@ public class TaskComponent extends BaseBusiComponent {
 				tTask.setCust_id(cust.getCust().getCust_id());
 				tTask.setDone_code(doneCode);
 				//设置工单对应的用户数,如果用户信息为空，则设置用户数为1
-				if (users != null && users.size()>0)
-					tTask.setUser_count(users.size());
-				else
-					tTask.setUser_count(1);
+//				if (users != null && users.size()>0)
+//					tTask.setUser_count(users.size());
+//				else
+//					tTask.setUser_count(1);
 				tTask.setCust_name(cust.getCust().getCust_name());
 				//设置工单的施工地址
 				if (StringHelper.isNotEmpty(newAddr)){
@@ -122,7 +122,7 @@ public class TaskComponent extends BaseBusiComponent {
 				}
 				tTask.setMobile(cust.getLinkman().getMobile());
 				tTask.setTel(cust.getLinkman().getTel());
-				setUserType( users , tTask );
+				//setUserType( users , tTask );
 				//设置地区县市信息
 				tTask.setCounty_id(cust.getCust().getCounty_id());
 				tTask.setArea_id(cust.getCust().getArea_id());
@@ -387,7 +387,7 @@ public class TaskComponent extends BaseBusiComponent {
 			Date finishTime) throws Exception{
 		WTaskBaseInfo task = new WTaskBaseInfo();
 		task.setTask_id(taskId);
-		task.setTask_finish_teime(finishTime);
+		task.setTask_finish_time(finishTime);
 		task.setTask_finish_type(String.valueOf(success));
 		task.setRemark(failureCause);
 		wTaskBaseInfoDao.save(task);

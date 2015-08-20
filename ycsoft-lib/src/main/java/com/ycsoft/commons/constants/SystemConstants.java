@@ -552,4 +552,18 @@ public class SystemConstants {
 	public static final String EXT_ATTRID_PROTOCOL = "100"; 
 	
 	
+	public static final String TEAM_TYPE_SUPERNET="SUPERNET";
+	public static final String TEAM_TYPE_CFOCN="CFOCN";
+	
+	public static final String TASK_ASSIGN_SUPPERNET="SUPERNET";
+	public static final String TASK_ASSIGN_CFOCN="CFOCN";
+	public static final String TASK_ASSIGN_BOTH="CFOCN+SUPERNET";
+	
+	public static final String TASK_TYPE_INSTALL="1";//新装工单
+	public static final String TASK_TYPE_FAULT="2";//故障工单
+	public static final String TASK_TYPE_MOVE="3";//迁移工单
+	public static final String TASK_TYPE_CHANGE="5";//变动工单
+	public static final String TASK_TYPE_WRITEOFF="7";//拆除工单
+	public static final String TASK_TYPE_PROJECT="8";//工程工单
+		
  }

@@ -60,4 +60,11 @@ public class StatusConstants {
 	public static String REQSTOPSLEEP = "REQSTOPSLEEP";//休眠报停   红
 	
 	public static String INSTALL = "INSTALL";//施工中
+	
+	public static String NONE = "NONE";//空
+	public static String SUCCESS = "SUCCESS";//成功
+	public static String FAILURE = "FAILURE";//失败
+	public static String NOT_EXEC = "NOT_EXEC";//未执行
+	
+	
 }

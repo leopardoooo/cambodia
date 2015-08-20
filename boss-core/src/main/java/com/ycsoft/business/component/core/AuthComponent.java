@@ -404,7 +404,7 @@ public class AuthComponent extends BaseComponent{
 	
 	//获取订单产品对应的资源id
 	private String[] getOrderProdRes(List<CProdOrder> orderList) throws JDBCException {
-		List<String> orderProdList = new ArrayList();
+		List<String> orderProdList = new ArrayList<>();
 		for (CProdOrder order:orderList){
 			orderProdList.add(order.getProd_id());
 		}

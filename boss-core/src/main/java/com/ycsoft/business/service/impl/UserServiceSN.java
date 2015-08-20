@@ -26,6 +26,7 @@ import com.ycsoft.beans.core.user.FillUSerDeviceDto;
 import com.ycsoft.beans.prod.PPromotionAcct;
 import com.ycsoft.beans.system.SOptr;
 import com.ycsoft.business.component.core.OrderComponent;
+import com.ycsoft.business.component.task.SnTaskComponent;
 import com.ycsoft.business.dao.core.prod.CProdOrderDao;
 import com.ycsoft.business.dao.core.prod.CProdPropChangeDao;
 import com.ycsoft.business.dto.core.acct.PayDto;
@@ -56,13 +57,17 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 	private CProdOrderDao cProdOrderDao;
 	@Autowired
 	private CProdPropChangeDao cProdPropChangeDao;
+	@Autowired
+	private SnTaskComponent snTaskComponent;
 	
 	public void createUser(CUser user, String deviceCode, String deviceType, String deviceModel, String deviceBuyMode,
 			FeeInfoDto deviceFee) throws Exception {
+		CCust cust = getBusiParam().getCust();
+		doneCodeComponent.lockCust(cust.getCust_id());
 		// 获取业务流水
 		Integer doneCode = doneCodeComponent.gDoneCode();
 		// 获取客户信息
-		CCust cust = getBusiParam().getCust();
+		
 		openSingle(cust, user, doneCode, deviceCode, deviceType, deviceModel, deviceBuyMode, deviceFee);
 		
 		// 设置拦截器所需要的参数
@@ -74,9 +79,11 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 	
 	@Override
 	public void createUserBatch(List<UserInfo> userList, String workBillAsignType) throws Exception {
-		Integer doneCode = doneCodeComponent.gDoneCode();
-		// 获取客户信息
 		CCust cust = getBusiParam().getCust();
+		doneCodeComponent.lockCust(cust.getCust_id());
+		Integer doneCode = doneCodeComponent.gDoneCode();
+		List<CUser> taskUserList = new ArrayList<CUser>();
+		// 获取客户信息
 		for (UserInfo userInfo:userList){
 			for (int i=0;i<userInfo.getUser_count();i++){
 				CUser user = new CUser();
@@ -95,10 +102,12 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 				deviceFee.setFee(userInfo.getFee());
 				
 				this.openSingle(cust, user, doneCode, null, deviceType, deviceModel, deviceBuyMode, deviceFee);
+				
+				taskUserList.add(user);
 			}
 		}
-		//TODO 工单处理
-		
+		//工单处理
+		snTaskComponent.createOpenTask(doneCode, cust, taskUserList, workBillAsignType);
 		saveAllPublic(doneCode, getBusiParam());
 	}
 
@@ -197,10 +206,13 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 	public void saveChangeDevice(String userId, String deviceCode, String devcieBuyMode, 
 			FeeInfoDto deviceFee,boolean reclaim)
 			throws Exception {
-		Integer doneCode = doneCodeComponent.gDoneCode();
+		
+		CCust cust = getBusiParam().getCust();
+		//lock cust
+		doneCodeComponent.lockCust(cust.getCust_id());
 		CUser oldUser = userComponent.queryUserById(userId);
 		CUser user = userComponent.queryUserById(userId);
-		CCust cust = custComponent.queryCustById(user.getCust_id());
+		Integer doneCode = doneCodeComponent.gDoneCode();
 		
 		String oldDeviceCode = user.getStb_id();
 		if (user.getUser_type().equals(SystemConstants.USER_TYPE_BAND))
@@ -387,6 +399,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		if(cancelResultList.size()>0){
 			authComponent.sendAuth(user, cancelResultList, BusiCmdConstants.PASSVATE_PROD, doneCode);
 		}
+		authComponent.sendAuth(user, cancelResultList, BusiCmdConstants.DEL_USER, doneCode);
 		
 		//记录用户到历史表
 		userComponent.removeUserWithHis(doneCode, user);
@@ -507,10 +520,12 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 
 	@Override
 	public void saveStop(String effectiveDate, int tjFee) throws Exception {
+		CCust cust = getBusiParam().getCust();
+		doneCodeComponent.lockCust(cust.getCust_id());
 		//获取业务流水
 		Integer doneCode = doneCodeComponent.gDoneCode();
 		//获取操作的客户、用户信息
-		CCust cust = getBusiParam().getCust();
+		
 		List<CUser> users = getBusiParam().getSelectedUsers();
 		
 		if (effectiveDate.equals(DateHelper.getDate("-"))){
@@ -578,10 +593,11 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 	 */
 	@Override
 	public void saveOpen(String stbId, String cardId, String modemMac, int tjFee) throws Exception {
+		CCust cust = getBusiParam().getCust();
+		doneCodeComponent.lockCust(cust.getCust_id());
 		//获取业务流水
 		Integer doneCode = doneCodeComponent.gDoneCode();
 		//获取操作的客户、用户信息
-		CCust cust = getBusiParam().getCust();
 		List<CUser> users = getBusiParam().getSelectedUsers();
 		List<CProdOrderDto> orderList = cProdOrderDao.queryCustEffOrderDto(cust.getCust_id());
 		boolean isCustPkgOpen = false;
@@ -963,12 +979,13 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 				device.getPairCard() ==null?null:device.getPairCard().getCard_id(), 
 				null, null,buyMode);
 		//保存设备费用
-		if (fee != null && fee.getFee_id()!= null){
+		if (fee != null && fee.getFee_id()!= null && fee.getFee()>0){
 			String payType = SystemConstants.PAY_TYPE_UNPAY;
 			if (this.getBusiParam().getPay()!= null && this.getBusiParam().getPay().getPay_type() !=null)
 				payType = this.getBusiParam().getPay().getPay_type();
-			doneCodeComponent.saveDoneCodeUnPay(cust.getCust_id(), doneCode, getBusiParam().getOptr().getOptr_id());
-			
+			if(doneCodeComponent.queryDoneCodeUnPayByKey(doneCode)==null){
+				doneCodeComponent.saveDoneCodeUnPay(cust.getCust_id(), doneCode, getBusiParam().getOptr().getOptr_id());
+			}
 			feeComponent.saveDeviceFee( cust.getCust_id(), cust.getAddr_id(),fee.getFee_id(),fee.getFee_std_id(), 
 					payType,device.getDevice_type(), device.getDevice_id(), device.getDevice_code(),
 					null,
