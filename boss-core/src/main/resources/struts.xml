@@ -146,6 +146,32 @@
 				<param name="root">root</param>
 			</result>
 		</action>
+		
+		<action name="external/*" class="com.ycsoft.web.action.external.BossExternalAction" method="{1}">
+			<result type="json" name="json">
+				<param name="root">resultBody</param>
+			</result>
+		</action>
+	</package>
+	
+	<package name="external" namespace="/external" extends="struts-default">
+		<result-types>
+            <result-type name="json" class="org.apache.struts2.json.JSONResult"/>
+        </result-types>
+		<interceptors>
+			<interceptor name="json" class="org.apache.struts2.json.JSONInterceptor"/>
+			<interceptor-stack name="baseStack">
+				<interceptor-ref name="defaultStack"/>
+				<interceptor-ref name="timer"/>
+				<interceptor-ref name="json"/>
+			</interceptor-stack>
+		</interceptors>
+		<default-interceptor-ref name="baseStack" />
+		<action name="/*" class="com.ycsoft.web.action.external.BossExternalAction" method="{1}">
+			<result type="json" name="json">
+				<param name="root">resultBody</param>
+			</result>
+		</action>
 	</package>
 	<!-- 包含自定义struts配置文件 -->
 </struts>

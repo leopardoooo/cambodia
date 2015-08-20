@@ -25,6 +25,7 @@ import com.ycsoft.business.service.impl.UserServiceSN;
 import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.helper.DateHelper;
 import com.ycsoft.commons.helper.FileHelper;
+import com.ycsoft.commons.helper.JsonHelper;
 import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.daos.core.JDBCException;
 import com.ycsoft.web.commons.abstracts.BaseBusiAction;
@@ -108,7 +109,7 @@ public class UserAction extends BaseBusiAction {
 
 	private String promFeeSn;
 	
-	private List<UserInfo> openUserList;
+	private String openUserList;
 	private String workBillAsignType;
 	
 	
@@ -139,7 +140,9 @@ public class UserAction extends BaseBusiAction {
 	}
 	
 	public String createUserBatch() throws Exception{
-		userServiceSN.createUserBatch(openUserList, workBillAsignType);
+		Type type = new TypeToken<List<UserInfo>>(){}.getType();
+		List<UserInfo> rs = new Gson().fromJson(openUserList,type);
+		userServiceSN.createUserBatch(rs, workBillAsignType);
 		return JSON_SUCCESS;
 	}
 
@@ -1119,6 +1122,14 @@ public class UserAction extends BaseBusiAction {
 
 	public void setCancelFee(Integer cancelFee) {
 		this.cancelFee = cancelFee;
+	}
+
+	public void setOpenUserList(String openUserList) {
+		this.openUserList = openUserList;
+	}
+
+	public void setWorkBillAsignType(String workBillAsignType) {
+		this.workBillAsignType = workBillAsignType;
 	}
 	
 	

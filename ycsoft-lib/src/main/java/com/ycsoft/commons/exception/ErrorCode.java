@@ -1,6 +1,9 @@
 package com.ycsoft.commons.exception;
 
 public enum ErrorCode {
+	
+	UNKNOW_EXCEPTION("未知异常，请联系管理员"),
+	
 	ParamIsNull("参数为空！"),
 	CustDataException("客户数据异常，请重新索搜客户！"),
 	UnPayLock("客户被锁定,请等待%s(%s)完成支付!"),

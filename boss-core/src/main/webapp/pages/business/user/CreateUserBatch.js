@@ -156,17 +156,17 @@ UserBaseBatchForm = Ext.extend( BaseForm , {
 			            id: 'radioAssignWay',
 			            columns: [70, 90, 120],
 			            items: [{
-			            	boxLabel: 'CFONE',
+			            	boxLabel: 'CFOCN',
 			            	name: 'assignWay',
-			            	inputValue: 'CFONE'
+			            	inputValue: 'CFOCN'
 			            },{
 			            	boxLabel: 'SUPERNET',
 			            	name: 'assignWay',
 			            	inputValue: 'SUPERNET'
 			            },{
-			            	boxLabel: 'CFONE+SUPERNET',
+			            	boxLabel: 'CFOCN+SUPERNET',
 			            	name: 'assignWay',
-			            	inputValue: 'CFONE+SUPERNET'
+			            	inputValue: 'CFOCN+SUPERNET'
 			            }]
 					}]
 				},{
@@ -287,7 +287,7 @@ UserBaseBatchForm = Ext.extend( BaseForm , {
 				fee_id: r.get("fee_id"),
 				fee: r.get("fee") * 100.0,
 				user_count: r.get("open_amount"),
-				device_type: r.get("device_type")
+				device_model: r.get("device_type")
 			});
 		});
 		return {
@@ -304,7 +304,7 @@ UserBaseBatchForm = Ext.extend( BaseForm , {
  * 新建用户
  */
 NewUserBatchForm = Ext.extend(UserBaseBatchForm , {
-	url : Constant.ROOT_PATH+"/core/x/User!createUser.action",
+	url : Constant.ROOT_PATH+"/core/x/User!createUserBatch.action",
 	success : function(form,res){
 		var userId = res.simpleObj;
 		App.getApp().refreshPayInfo(parent);
