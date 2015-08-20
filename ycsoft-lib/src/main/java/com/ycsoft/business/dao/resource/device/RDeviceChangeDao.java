@@ -121,6 +121,25 @@ public class RDeviceChangeDao extends BaseEntityDao<RDeviceChange> {
 	}
 	
 	/**
+	 * 器材确认调拨异动
+	 * @param doneCode
+	 * @param busiCode
+	 * @param deviceDoneCode
+	 * @param county_id
+	 * @param area_id
+	 * @throws JDBCException
+	 */
+	public void saveMateralTransArrirmChange(Integer doneCode,String busiCode,Integer deviceDoneCode,String county_id,String area_id) throws JDBCException {
+		String sql = " insert into r_device_change (done_code, busi_code, device_id,column_name, old_value," +
+				" new_value, change_date, optr_id, dept_id, county_id, area_id) select ?,?,rd.device_id, " +
+				" 'depot_id',i.depot_source,i.depot_order,sysdate,i.confirm_optr_id,i.depot_order,?,?  " +
+				" from r_device_transfer i,r_device_done_deviceid d,r_device rd " +
+				" where i.device_done_code=d.device_done_code and rd.device_id=d.device_id " +
+				" and i.device_done_code= ?  ";
+		executeUpdate(sql, doneCode, busiCode,county_id,area_id,deviceDoneCode);
+	}
+	
+	/**
 	 * 调拨取消
 	 * @param doneCode
 	 * @param busiCode
@@ -138,6 +157,7 @@ public class RDeviceChangeDao extends BaseEntityDao<RDeviceChange> {
 				" and i.device_done_code=?  ";
 		executeUpdate(sql, doneCode, busiCode,county_id,area_id,deviceDoneCode);
 	}
+	
 	
 	/**
 	 * 出库异动
@@ -196,6 +216,15 @@ public class RDeviceChangeDao extends BaseEntityDao<RDeviceChange> {
 					" and i.device_done_code= ?  "+str;
 			executeUpdate(sql, doneCode, busiCode,buyMode,buyMode,county_id,area_id,doneCode);
 		}
+	}
+
+	public void saveMateralTransChange(Integer doneCode,
+			String busiCode, String device_id, String columnName,
+			Integer oldValue, Integer newValue, String confirm_optr_id,
+			String depot_source, String county_id, String area_id) throws JDBCException {
+			String sql = " insert into r_device_change (done_code, busi_code, device_id,column_name, old_value, " +
+					" new_value, change_date, optr_id, dept_id, county_id, area_id)  VALUES(?,?,?,?,?,?,sysdate,?,?,?,?)";
+			executeUpdate(sql, doneCode, busiCode,device_id,columnName,oldValue,newValue,confirm_optr_id,depot_source,county_id,area_id);
 	}
 	
 	

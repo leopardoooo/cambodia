@@ -36,6 +36,14 @@ public enum ErrorCode {
 	OrderDateExpDateError("结束计费日错误"),
 	OrderDateOrderMonthError("订购月数不能填0或订购月数必须是资费周期的倍数"),
 	OrderPackageHasSingleUserParam("订购套餐时，单用户参数不能填"),
+	
+	
+	
+	//depot
+	DeviceRepeat("设备重复"),
+	DeviceNotExists("设备不存在"),
+	DeviceTotalNumIsNull("设备数量不够"),
+	DeviceTotalNumIsTooBig("设备入库数量超出了订货数量"),
 	;
 
 	private ErrorCode(String desc){

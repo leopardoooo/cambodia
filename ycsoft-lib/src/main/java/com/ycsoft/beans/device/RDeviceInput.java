@@ -40,6 +40,7 @@ public class RDeviceInput extends RDeviceDoneDetail implements Serializable {
 	private String depot_name;
 	private String optr_name;
 	private String ownership_text;
+	private String batch_num;
 
 	/**
 	 * default empty constructor
@@ -199,4 +200,13 @@ public class RDeviceInput extends RDeviceDoneDetail implements Serializable {
 		this.order_no = order_no;
 	}
 
+	public String getBatch_num() {
+		return batch_num;
+	}
+
+	public void setBatch_num(String batch_num) {
+		this.batch_num = batch_num;
+	}
+
+	
 }

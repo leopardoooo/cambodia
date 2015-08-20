@@ -42,6 +42,7 @@ public class RDevice extends RDeviceModel implements Serializable {
 	private String is_loss;
 	private String is_new_stb;
 	private String batch_num;
+	private Integer total_num;
 
 	private String ownership_text;
 	private String device_status_text;
@@ -323,6 +324,16 @@ public class RDevice extends RDeviceModel implements Serializable {
 	 */
 	public String getIs_new_stb_text() {
 		return is_new_stb_text;
+	}
+
+
+	public Integer getTotal_num() {
+		return total_num;
+	}
+
+
+	public void setTotal_num(Integer total_num) {
+		this.total_num = total_num;
 	}
 
 }

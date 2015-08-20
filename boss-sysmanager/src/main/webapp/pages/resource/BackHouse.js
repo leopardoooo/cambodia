@@ -81,7 +81,8 @@ var BackHouseGrid = Ext.extend(Ext.grid.GridPanel,{
 	                emptyText: '支持退库编号模糊查询'
 	            }),'-','->','-',
 				{text:'文件退库',iconCls:'icon-excel',scope:this,handler:this.fileBack},'-',
-				{text:'手工退库',iconCls:'icon-hand',scope:this,handler:this.handBack},'-'
+				{text:'手工退库',iconCls:'icon-hand',scope:this,handler:this.handBack},'-',
+				{text:'器材退库',iconCls:'icon-batch-number',scope:this,handler:this.materalBack}
 			],
 			bbar : new Ext.PagingToolbar({
 										store : this.backHouseGridStore,
@@ -140,8 +141,117 @@ var BackHouseGrid = Ext.extend(Ext.grid.GridPanel,{
 			handWin = new BackHandWin();
 		}
 		handWin.show();
+	},
+	materalBack:function(){
+		var materalWin = Ext.getCmp('backMateralWinId');
+		if(!materalWin){
+			materalWin = new BackMateralWin();
+		}
+		materalWin.show();
 	}
 });
+
+//器材调拨
+BackMateralWin = Ext.extend(Ext.Window,{
+	handForm:null,
+	queryDeviceGrid:null,
+	constructor:function(){
+		this.handForm = new BackHandForm();
+		this.queryDeviceGrid = new MateralTransferDeviceGrid();
+		BackMateralWin.superclass.constructor.call(this,{
+			id : 'backMateralWinId',
+			title:'器材退库',
+			closeAction:'hide',
+			maximizable:false,
+			width: 600,
+			height: 500,
+			border: false,
+			layout:'border',
+			items:[this.handForm, this.queryDeviceGrid],
+			buttonAlign:'right',
+			buttons:[{text:'保存',iconCls:'icon-save',scope:this,handler:this.doSave},
+				{text:'关闭',iconCls:'icon-close',scope:this,handler:function(){
+					this.hide();
+				}}],
+			listeners:{
+				scope:this,
+				hide:function(){
+					this.handForm.getForm().reset();
+					this.queryDeviceGrid.getStore().removeAll();
+				}
+			}
+		});
+	},
+	show:function(){
+		BackMateralWin.superclass.show.call(this);
+		var that = this;
+		Ext.Ajax.request({
+			url:'resource/Device!queryMateralTransferDeviceByDepotId.action',
+			success: function(res, ops){
+				that.queryDeviceGrid.remoteData = Ext.decode(res.responseText);
+			}
+		});
+	},
+	doSave:function(){
+		var form = this.handForm.getForm();
+		if(!form.isValid())return;
+		
+		var formValues = form.getValues();
+		this.queryDeviceGrid.stopEditing();
+		
+		var store = this.queryDeviceGrid.getStore();
+		
+		var arrCode = [];
+		for(var i=0;i<store.getCount();i++){
+			var data = store.getAt(i).data;
+			if(data['device_id']){
+				//过滤掉重复调拨的设备
+				if(arrCode.indexOf(data['device_id']) >=0){
+					Alert('器材有相同的，请检查！');
+					return ;
+				}
+				if(Ext.isEmpty(data['num'])){
+					Alert('退库数量不能为空！');
+					return;
+				}
+				arrCode.push(data);
+			}
+		}
+		var arr = [];//只传递device_id到后台
+		Ext.each(arrCode,function(d){
+			var obj = {};
+			obj['device_id'] = d['device_id'];
+			obj['device_type'] = d['device_type'];
+			obj['device_model'] = d['device_model'];
+			obj['total_num'] = d['num'];
+			arr.push(obj);
+		});
+		
+		if(arr.length === 0){
+			Alert('请正确输入设备信息！');
+			return;
+		}
+		var obj={};
+		Ext.apply(obj,formValues);
+		obj['deviceDtoList'] = Ext.encode(arr);
+	
+		var msg = Show();
+		Ext.Ajax.request({
+			url:'resource/Device!saveMateralOutput.action',
+			params:obj,
+			scope:this,
+			success:function(res,opt){
+				msg.hide();
+				msg = null;
+				Alert('添加成功',function(){
+					this.hide();
+					Ext.getCmp('backHourseGridId').getStore().reload();
+				},this);
+			}
+		});
+	}
+});
+
 
 /**
  * 文件退库form

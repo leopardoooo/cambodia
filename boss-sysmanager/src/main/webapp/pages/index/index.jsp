@@ -112,6 +112,8 @@
     <script type="text/javascript" src="<%=boss_res %>/pages/commons/ux/ParamComboBox.js" charset="UTF-8"></script>
 	<script type="text/javascript" src="<%=boss_res %>/pages/commons/ux/MonthPickerPlugin.js" charset="UTF-8"></script>
 	<script type="text/javascript" src="<%=boss_res %>/components/ext3/ux/LockingGridView.js"></script>
+	<script type="text/javascript" src="<%=boss_res %>/components/ext3/ux/Spinner.js"></script>
+	<script type="text/javascript" src="<%=boss_res %>/components/ext3/ux/SpinnerField.js"></script>
 
 	<!-- 系统管理系统 -->
 	<%

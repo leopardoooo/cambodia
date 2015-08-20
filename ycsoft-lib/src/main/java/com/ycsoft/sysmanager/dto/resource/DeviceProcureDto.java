@@ -37,7 +37,11 @@ public class DeviceProcureDto extends RDeviceProcure {
 		return device_type_text;
 	}
 	public String getDevice_model_text() {
-		return MemoryDict.getDictName(getDevice_type()+"_MODEL", getDevice_model())+"("+getDevice_model()+")";
+		String deviceType = getDevice_type();
+		if(!"STB".equals(deviceType) && !"CARD".equals(deviceType) && !"MODEM".equals(deviceType)){
+			deviceType = "CTL";
+		}
+		return MemoryDict.getDictName(deviceType+"_MODEL", getDevice_model())+"("+getDevice_model()+")";
 	}
 	public String getDevice_code() {
 		return device_code;

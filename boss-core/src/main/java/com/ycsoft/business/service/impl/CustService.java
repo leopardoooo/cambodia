@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import com.ycsoft.beans.config.TDeviceBuyMode;
@@ -513,6 +512,8 @@ public class CustService extends BaseBusiService implements ICustService {
 		String busiCode = getBusiParam().getBusiCode();
 		// 获取业务流水
 		Integer doneCode = doneCodeComponent.gDoneCode();
+		
+		deviceComponent.saveTotalNumDevice(deviceType, deviceModel, getOptr(),buyNum);
 		
 		//保存设备销售费用
 		if(feeInfoList != null){

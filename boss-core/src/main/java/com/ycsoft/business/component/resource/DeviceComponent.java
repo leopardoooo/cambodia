@@ -52,6 +52,7 @@ import com.ycsoft.commons.constants.DataRight;
 import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.exception.ComponentException;
+import com.ycsoft.commons.exception.ErrorCode;
 import com.ycsoft.commons.exception.ServicesException;
 import com.ycsoft.commons.helper.CollectionHelper;
 import com.ycsoft.commons.helper.DateHelper;
@@ -847,6 +848,28 @@ public class DeviceComponent extends BaseBusiComponent {
 		return true;
 	}
 	
+	/**
+	 * 处理器材数量
+	 * @param deviceType
+	 * @param deviceModel
+	 * @param optr
+	 * @param buyNum 
+	 * @throws Exception
+	 */
+	public void saveTotalNumDevice(String deviceType, String deviceModel,
+			SOptr optr, Integer buyNum) throws Exception{
+		//原器材
+		RDevice device = rDeviceDao.queryIdleMateralDevice(deviceType, deviceModel, optr.getDept_id());
+		if(device == null){
+			throw new ComponentException(ErrorCode.DeviceNotExists);
+		}
+		//减去调拨数量
+		rDeviceDao.removeMateralTransferDevice(device.getDevice_id(), buyNum);
+		RDevice nextRdevice = rDeviceDao.findByKey(device.getDevice_id());
+		if(nextRdevice.getTotal_num()<0){
+			throw new ComponentException(ErrorCode.DeviceTotalNumIsNull);
+		}
+	}
 	
 	
 	public void setCValuableCardHisDao(CValuableCardHisDao valuableCardHisDao) {
@@ -965,5 +988,6 @@ public class DeviceComponent extends BaseBusiComponent {
 	public void setCCustDeviceDao(CCustDeviceDao custDeviceDao) {
 		cCustDeviceDao = custDeviceDao;
 	}
+
 	
 }
