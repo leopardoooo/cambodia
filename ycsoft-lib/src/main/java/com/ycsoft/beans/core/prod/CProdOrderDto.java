@@ -31,6 +31,16 @@ public class CProdOrderDto extends CProdOrder {
 	
 	private String terminal_type_text;
 
+	private Integer rent;
+	
+	
+	
+	public Integer getRent() {
+		return rent;
+	}
+	public void setRent(Integer rent) {
+		this.rent = rent;
+	}
 	public String getUser_type_text() {
 		return user_type_text;
 	}
@@ -42,7 +52,7 @@ public class CProdOrderDto extends CProdOrder {
 	}
 	public void setUser_type(String user_type) {
 		this.user_type = user_type;
-		this.user_type = MemoryDict.getDictName(DictKey.USER_TYPE, this.user_type);
+		this.user_type_text = MemoryDict.getDictName(DictKey.USER_TYPE, this.user_type);
 	}
 	public String getTerminal_type() {
 		return terminal_type;

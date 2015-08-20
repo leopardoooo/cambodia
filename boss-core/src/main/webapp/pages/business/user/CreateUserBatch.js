@@ -156,17 +156,17 @@ UserBaseBatchForm = Ext.extend( BaseForm , {
 			            id: 'radioAssignWay',
 			            columns: [70, 90, 120],
 			            items: [{
-			            	boxLabel: 'CFONE',
+			            	boxLabel: 'CFOCN',
 			            	name: 'assignWay',
-			            	inputValue: 'CFONE'
+			            	inputValue: 'CFOCN'
 			            },{
 			            	boxLabel: 'SUPERNET',
 			            	name: 'assignWay',
 			            	inputValue: 'SUPERNET'
 			            },{
-			            	boxLabel: 'CFONE+SUPERNET',
+			            	boxLabel: 'CFOCN+SUPERNET',
 			            	name: 'assignWay',
-			            	inputValue: 'CFONE+SUPERNET'
+			            	inputValue: 'CFOCN+SUPERNET'
 			            }]
 					}]
 				},{

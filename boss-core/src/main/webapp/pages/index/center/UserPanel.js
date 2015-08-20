@@ -171,7 +171,6 @@ UserGrid = Ext.extend(Ext.ux.Grid,{
 		var cust = App.data.custFullInfo.cust;
 		this.userStore.baseParams={custId:cust['cust_id'],custStatus:cust['status']};
 		this.refresh();
-		
 		//过滤tbar按钮
 		if(App.getCust().status == 'RELOCATE'){
 			App.getApp().disableBarByBusiCode(this.getTopToolbar(),['1020','1025','1015'],true);
@@ -184,6 +183,7 @@ UserGrid = Ext.extend(Ext.ux.Grid,{
 				this.getTopToolbar().show();
 			App.getApp().disableBarByBusiCode(this.getTopToolbar(),['1020','1025','1015'],false);
 		}
+		App.getApp().disableBarByBusiCode(this.getTopToolbar(),['1040'],true);
 	},
 	refresh:function(){
 		this.userStore.load();
@@ -436,9 +436,12 @@ ProdGrid = Ext.extend(Ext.TabPanel,{
 					}
 				}
 				this.refresh();
+				this.custPkgGrid.getStore().removeAll();
 				//隐藏数据加载提示框
 				App.hideTip();
-				this.custPkgGrid.getStore().loadData(data["CUST"]);
+				if(data["CUST"]){
+					this.custPkgGrid.getStore().loadData(data["CUST"]);
+				}
 				this.setActiveTab(1);
 			}
 		});

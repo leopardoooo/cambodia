@@ -2372,34 +2372,41 @@ Ext.apply(MenuHandler, {
 	PayFees : function() {
 		if (!hasCust())
 			return false;
-		var records = App.getApp().main.infoPanel.acctPanel.acctGrid
-				.getSelectionModel().getSelections();
-
-		if (records.length == 0) {
-			Alert("请选择要缴费的账户！");
-			return false;
-		} else {
-			var flag = false;
-			for (var i = 0; i < records.length; i++) {
-				if ((records[i].get('acct_type') == 'PUBLIC' || (records[i]
-						.get('acct_type') == 'SPEC' && (records[i].get('status') == 'ACTIVE' 
-						|| records[i].get('status') == 'OWELONG' || records[i].get('status') == 'ATVCLOSE')))
-						&& records[i].get('acctitems')) {
-					flag = true;
-				}
-			}
-			if (flag) {
-				// 批量缴费的标志位
-				App.getApp().getData().batchPayFee = false;
-				return {
-					width : 750,
-					height : 550
-				};
-			} else {
-				Alert("选中账户下无任何账目或者用户账户状态不正常！");
-				return false;
-			}
-		}
+			
+			return {
+				width : 750,
+				height : 550
+			};
+			
+			
+//		var records = App.getApp().main.infoPanel.acctPanel.acctGrid
+//				.getSelectionModel().getSelections();
+//
+//		if (records.length == 0) {
+//			Alert("请选择要缴费的账户！");
+//			return false;
+//		} else {
+//			var flag = false;
+//			for (var i = 0; i < records.length; i++) {
+//				if ((records[i].get('acct_type') == 'PUBLIC' || (records[i]
+//						.get('acct_type') == 'SPEC' && (records[i].get('status') == 'ACTIVE' 
+//						|| records[i].get('status') == 'OWELONG' || records[i].get('status') == 'ATVCLOSE')))
+//						&& records[i].get('acctitems')) {
+//					flag = true;
+//				}
+//			}
+//			if (flag) {
+//				// 批量缴费的标志位
+//				App.getApp().getData().batchPayFee = false;
+//				return {
+//					width : 750,
+//					height : 550
+//				};
+//			} else {
+//				Alert("选中账户下无任何账目或者用户账户状态不正常！");
+//				return false;
+//			}
+//		}
 	},
 	ModifyThreshold : function() {
 		if (!hasCust())

@@ -1,441 +1,338 @@
 /**
  * 缴费
  */
-
-//用户选择一次缴几个月的费用,分 月，季，半年 三中情况
-//月 store data
-var feeMonth = [[1],[2],[3],[4],[5],[6],[7],[8],[9],[10],[11],[12]];
-//季 store data
-var feeSeason = [[1],[2],[3],[4]];
-//半年 store data
-var feeHalfYear = [[1],[2]];
-
 SinglePayFeesGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 	payFeesStore:null,
-	dataArr:null,//专用账目数据
-	disctData:[],//所有资费对应折扣信息
-	disctDataMap:{},//所有资费对应折扣信息,以tariff_id为key
 	disctCombo:null,
+	transferPayWindow: null,
+	//转移支付数据明细
+	transferPayData: [],
 	constructor:function(data){
-		this.dataArr = data;
 		this.payFeesStore = new Ext.data.GroupingStore({
-			reader: new Ext.data.JsonReader({},[
-				{name:'acct_id'},{name:'acctitem_id'},{name:'user_id'},{name:'prod_id'},
-				{name:'tariff_id'},{name:'tariff_name'},{name:'disct_id'},{name:'disct_name'},{name:'disct_name_all'},
-				{name:'user_name'},{name:'user_type_text'},{name:'stb_id'},{name:'card_id'},{name:'modem_mac'},
-				{name:'prod_sn'},{name:'acctitem_name'},{name:'real_bill'},{name:'status'},
-				{name:'fee'},{name:'fee_date',dataFormat:'Y-m-d'},{name:'invalid_date',dataFormat:'Y-m-d'},
-				{name:'real_balance'},{name:'acct_type_text'},{name:'next_tariff_id'},{name:'next_tariff_name'},
-				{name:'prod_status'},{name:'prod_status_text'},{name:'min_pay'},
-				{name:'rent'},{name:'billing_type'},{name:'feeOther'},//缴费金额备份字段
-				{name:'billing_cycle'},{name:'fee_month'}//自定义字段
-				//折扣备份字段
-				,{name:'disct_id_other'},{name:'disct_name_other'}
-			]),
-			groupField:'acct_id'//分组字段(根据账目分组)
+				url: Constant.ROOT_PATH + '/core/x/ProdOrder!queryFollowPayOrderDto.action', 
+				reader: new Ext.data.JsonReader({ 
+                    fields:[
+                    	{name:'acct_id',mapping:'acct_id'},
+                    	{name:'acctitem_id',mapping:'acctitem_id'},
+                    	{name:'user_id',mapping:'user_id'},
+                    	{name:'cust_id',mapping:'cust_id'},
+                    	{name:'prod_id',mapping:'prod_id'},
+						{name:'tariff_id',mapping:'tariff_id'},
+						{name:'tariff_name',mapping:'tariff_name'},
+						{name:'disct_id',mapping:'disct_id'},
+						{name:'disct_name',mapping:'disct_name'},							
+						{name:'user_name',mapping:'user_name'},
+						{name:'user_type_text',mapping:'user_type_text'},
+						{name:'stb_id',mapping:'stb_id'},
+						{name:'card_id',mapping:'card_id'},
+						{name:'modem_mac',mapping:'modem_mac'},
+						{name:'order_sn',mapping:'order_sn'},
+						{name:'acctitem_name',mapping:'acctitem_name'},
+						{name:'status',mapping:'status'},
+						{name:'fee',mapping:'fee'},
+						{name:'fee_date',dataFormat:'Y-m-d',mapping:'fee_date'},
+						{name:'exp_date',dataFormat:'Y-m-d',mapping:'exp_date'},
+						{name:'exp_date_back',dataFormat:'Y-m-d',mapping:'exp_date'},
+						{name:'active_fee',mapping:'active_fee'},
+						{name:'order_time',dataFormat:'Y-m-d',mapping:'order_time'},
+						{name:'status_text',mapping:'status_text'},
+						{name:'eff_date',dataFormat:'Y-m-d',mapping:'eff_date'},
+						{name:'rent',mapping:'rent'},{name:'billing_type',mapping:'billing_type'},
+						{name:'feeOther',mapping:'feeOther'},//缴费金额备份字段
+						{name:'billing_cycle',mapping:'billing_cycle'},
+						{name:'fee_month',mapping:'fee_month'},//自定义字段
+						{name:'pay_month',mapping:'pay_month'},
+						{name:'prod_type_text',mapping:'prod_type_text'},
+						{name:'prod_type',mapping:'prod_type'},
+						{name:'canFollowPay',mapping:'canFollowPay'},
+						{name:'currentTariffStatus',mapping:'currentTariffStatus'},
+						{name:'tariffList',mapping:'tariffList'},
+						{name:'terminal_type',mapping:'terminal_type'},
+						{name:'terminal_type_text',mapping:'terminal_type_text'},
+						{name:'protocol_date',dataFormat:'Y-m-d',mapping:'protocol_date'},
+						{name:'prod_name',mapping:'prod_name'},
+						{name:'tariff_name_next',mapping:'tariff_name'},
+						{name:'tariff_id_next',mapping:'tariff_id'}
+				//实际支付金额字段，转移支付字段
+				,{name:'fee_back'},{name:'transfer_fee'},{name:'transfer_fee_back'},{name:'groupSelected',mapping:'groupSelected'}
+				]}),
+			groupField:'user_id'//分组字段(根据账目分组)
 		});
-		this.payFeesStore.loadData(this.dataArr);
-		
-		this.disctCombo = new Ext.form.ComboBox({
-		store:new Ext.data.JsonStore({
-			fields : ['disct_id','disct_name_all','tariff_id','min_pay']
-		}),
-		hiddenName:'disct_id',//editable:true,forceSelection:true,
-		displayField:'disct_name_all',valueField:'disct_name_all',emptyText:'请选择。。',
-		minListWidth : 250,
-		listeners:{
-			scope:this,
-			select:function(combo,record){
-				var r = this.getSelectionModel().getSelected();
-				r.set('disct_id',record.get('disct_id'));
-				r.set('disct_name_all',record.get('disct_name_all'));
-				r.set('min_pay',Ext.util.Format.formatFee( record.get('min_pay') ));
-				//备份折扣信息
-				r.set('disct_id_other',record.get('disct_id'));
-				r.set('disct_name_other',record.get('disct_name_all'));
-				this.stopEditing();
+
+		this.payFeesStore.load({
+			params:{
+				cust_id:App.getData().custFullInfo.cust.cust_id
 			}
-		}
-	});
+		});
+		
+		this.payFeesStore.on('load',this.doLoadResult,this);
 		
 		var cm = new Ext.grid.ColumnModel({
 				defaults : {
 					sortable : false
 				},
 				columns:[new Ext.grid.RowNumberer(),
-					{header:'账户ID',dataIndex:'acct_id',hidden:true},
-					{header:'账目名称',dataIndex:'acctitem_name',width:160,renderer:App.qtipValue},
-					{header:'当前资费',dataIndex:'tariff_name',width:100,renderer:App.qtipValue},
-					{header:'未生效资费',dataIndex:'next_tariff_name',width:120,renderer:App.qtipValue},
-					{header:'状态',dataIndex:'prod_status_text',width:85,renderer:Ext.util.Format.statusShow},
-					{header:'预计到期日',dataIndex:'invalid_date',width:110,renderer:Ext.util.Format.dateFormat},
-					{header:'实时余额',dataIndex:'real_balance',width:100,renderer:Ext.util.Format.formatFee},
-					{id:'disct_name_id',header:'折扣',dataIndex:'disct_name_all',width:180,editor: this.disctCombo},
-					{id:'fee_month_id',header:'到期日',dataIndex:'fee_month',width:120, renderer:Ext.util.Format.dateFormat,
-						editor:new Ext.form.DateField({
-							format: 'Y-m-d'
-						})
-					},
-					{id:'fee_id',header:'缴费金额',dataIndex:'fee',width:100,
-						scope:this,editor: new Ext.form.NumberField({allowNegative:false,minValue:0,//enableKeyEvents: true,
+					{header:'用户编号',dataIndex:'user_id',hidden:true},
+					{header:'用户名称',dataIndex:'user_name',hidden:true},
+					{header:'产品名称',dataIndex:'prod_name',width:160,renderer:App.qtipValue},
+					{header:'原资费',dataIndex:'tariff_name',width:100,renderer:App.qtipValue},
+					{id:'tariff_name_next_id',header:'新资费',dataIndex:'tariff_name_next',width:100,
+						editor:new Ext.form.ComboBox({
+							store:new Ext.data.JsonStore({
+								fields:['disct_name','tariff_id']
+							}),displayField:'disct_name',valueField:'disct_name',triggerAction:'all',
+							scope:this,
+							listeners:{
+								scope:this,
+								select:function(combo,record){
+									this.getSelectionModel().getSelected().set('tariff_id_next',record.get('tariff_id'));
+								}
+							}})},
+					{header:'原到期日',dataIndex:'exp_date',width:110,renderer:Ext.util.Format.dateFormat},
+					{id:'pay_month_id',header:'缴费月数',dataIndex:'pay_month',width:100,
+						scope:this
+						,editor: new Ext.form.NumberField({
+							allowDecimals:false,//不允许输入小数 
+			    			allowNegative:false,
+			    			minValue:1,//enableKeyEvents: true,
 								scope:this,
 								listeners:{
 									specialKey : function(field, e) {
 						                if (e.getKey() == Ext.EventObject.ENTER) {//响应回车
 						                	var thiz = this.scope;
 						                	if(thiz.getStore().getCount()>currentRow+1)
-						                		setTimeout(function(){thiz.startEditing(currentRow,thiz.getColumnModel().getIndexById('fee_id'))},200);
+						                		setTimeout(function(){thiz.startEditing(currentRow,thiz.getColumnModel().getIndexById('pay_month_id'))},200);
 						                }  
 						            }
 								}
 							})
-					}
+					},
+					{header:'新到期日',dataIndex:'fee_month',width:120, renderer:Ext.util.Format.dateFormat},
+					{header:'转移支付金额',dataIndex:'transfer_fee_back',width:100,renderer:function(value,metaData,record){
+						that = this;
+						if(value != ''){
+							return '<div style="text-decoration:underline;font-weight:bold"  onclick="Ext.getCmp(\'SinglePayFeesId\').doTransferFeeShow();"  ext:qtitle="" ext:qtip="' + value + '">' + value +'</div>';
+						}else{
+							return '<div ext:qtitle="" ext:qtip="' + value + '">' + value +'</div>';
+						}
+					}},
+					{header:'缴费金额',dataIndex:'fee_back',width:100}
 				],
 				scope:this,
 				isCellEditable:this.isCellEditable
 		});
 		
 		SinglePayFeesGrid.superclass.constructor.call(this,{
-			title:'专用账目缴费',
+			title:'产品信息',
 			store:this.payFeesStore,
 			stripeRows:true,
 			columnLines:true,
 			cm:cm,
+			id:'SinglePayFeesId',
 			sm:new Ext.grid.RowSelectionModel({}),
 			height:450,
 			autoWidth:true,
 			clicksToEdit:1,
 			view: new Ext.grid.GroupingView({
 	            forceFit:true,
-	            groupTextTpl:'{[values.rs[0].data["user_name"] ? "用户名:"+[values.rs[0].data["user_name"]]+"&nbsp;&nbsp;用户类型:"+[values.rs[0].data["user_type_text"]] : "客户账户" ]}' +
-	            		'{[values.rs[0].data["stb_id"]?"&nbsp;&nbsp;机顶盒:"+[values.rs[0].data["stb_id"]]+" ":""]}' +
-        				'{[values.rs[0].data["card_id"]? "&nbsp;&nbsp;智能卡:"+[values.rs[0].data["card_id"]]+" ": ""]}' +
-        				'{[values.rs[0].data["modem_id"]? "&nbsp;&nbsp;modem号:"+[values.rs[0].data["modem_id"]]: ""]}'
+	            groupTextTpl:'用户名称:{[values.rs[0].data["user_name"]]}'+
+	            '{[values.rs[0].data["user_type_text"]?"&nbsp;&nbsp;用户类型:"+[values.rs[0].data["user_type_text"]]+" ":""]}',       
+	            getRowClass: function(record,index){
+		            if(record.get('canFollowPay') == false ){ 
+		                return 'x-grid-record-green';  
+	                }
+	                return '';  
+		        }  
+	            
         	})
 		});
 	},
+	doLoadResult : function(store){
+		store.each(function(record){
+			if(record.get('currentTariffStatus') != true){
+				record.set('tariff_name_next','');
+				record.set('tariff_id_next','');
+			}
+		})
+		
+	},
 	//是否可编辑
 	isCellEditable:function(colIndex,rowIndex){
-		var disctIndex = this.getIndexById('disct_name_id');//折扣index
 		var grid = this.scope;//当前grid引用
 		var record = grid.getStore().getAt(rowIndex);//当前编辑行对应record
-		var tariffID =record.get('tariff_id');//资费编号
-		if(disctIndex == colIndex){//折扣列
-			var store = this.getCellEditor(colIndex,rowIndex).field.getStore();
-			store.removeAll();//清空上一次选中行中 该列的数据
-			if(Ext.isEmpty(tariffID)) return false;
-			//资费对应的折扣信息,无折扣信息则不可编辑
-			//加载当前资费对应的折扣信息
-			if(grid.disctData.length>0){
-				for(var i=0;i<grid.disctData.length;i++){
-					var disct = grid.disctData[i];
-					if(tariffID == disct['tariff_id']){
-						if(disct['disctList'] && disct['disctList'].length>0){
-							store.loadData(disct['disctList']);
-						}else
-							return false;
-						break;
-					}
-				}
+		if(colIndex == this.getIndexById('pay_month_id')){
+			var canFollowPay = record.get("canFollowPay");			
+			if(canFollowPay == false){
+				return false;
 			}
-		}else if(colIndex == this.getIndexById('fee_month_id')){
-			var acctId = record.get("acct_id");
-			var acctitemId = record.get("acctitem_id");
-			var acctitem = App.getApp().main.infoPanel.getAcctPanel().acctItemGrid.getAcctItemByAcctId(acctId, acctitemId);
-			var prod = App.getApp().main.infoPanel.getUserPanel().prodGrid.getProdByUserId(acctitem["user_id"], acctitem["prod_sn"]);
-			if(prod["billing_cycle"] > 1){
+		}else if(colIndex == this.getIndexById('tariff_name_next_id')){
+			if(record.get('currentTariffStatus') != true){
+				var store = this.getCellEditor(colIndex,rowIndex).field.getStore();
+				store.removeAll();//清空上一次选中行中 该列的数据
+				var tariff = record.get('tariffList');
+				if(tariff.length>0){
+					store.loadData(tariff);
+				}
+			}else{
 				return false;
 			}
 		}
 		return Ext.grid.ColumnModel.prototype.isCellEditable.call(this, colIndex, rowIndex);
 	},
-	listeners:{
-		delay:100,
-		afterrender:function(grid){
+	initEvents : function(){
+		SinglePayFeesGrid.superclass.initEvents.call(this);
+		this.on('afterrender',function(){
+			this.swapViews();
+		},this,{delay:10});
 		
-			var store = grid.getStore();
+		this.on("afteredit",this.afterEdit,this);
+		this.on("beforeedit",this.beforeedit,this);
+	},
+	swapViews : function(){
+		if(this.view.lockedWrap){
+			this.view.lockedWrap.dom.style.right = "0px";
+		}
+        this.view.mainWrap.dom.style.left = "0px"; 
+        if(this.view.updateLockedWidth){
+        	this.view.updateLockedWidth = this.view.updateLockedWidth.createSequence(function(){ 
+	            this.view.mainWrap.dom.style.left = "0px"; 
+	        }, this); 
+        }
+          
+	},
+	afterEdit : function(obj){
+		var record = obj.record;
+		var fieldName = obj.field;//编辑的column对应的dataIndex
+		var value = obj.value;
+		if(fieldName=='pay_month'){
+			if(!this.doAfterFindDateFee(record,value)){
+				this.doIntNullValue(record);
+				this.startEditing(obj.row,obj.column);
+			}
+		}else if(fieldName = 'tariff_name_next'){
 			
-			//资费，用户id
-			var tariffIds = [],userIds = [];
-			store.each(function(record){
-				if(record.get('tariff_id')){
-					tariffIds.push(record.get('tariff_id'));
-					userIds.push(record.get('user_id'));
+			
+		}
+	},
+	beforeedit:function(obj){
+		var record = obj.record;
+		var fieldName = obj.field;//编辑的column对应的dataIndex
+		var value = obj.value;
+		if(fieldName == 'pay_month'){
+			//编辑行全局变量
+			currentRow = obj.row;
+			
+		//套餐考虑 转移支付
+		if(Ext.isEmpty(record.get('user_id'))){
+			Ext.Ajax.request({
+				url :root + '/core/x/ProdOrder!loadTransferFee.action',
+				scope : this,
+				params: { 
+					"orderProd": Ext.encode(this.getTransferValues(record)),
+					"busi_code": App.getData().currentResource.busicode
+				},
+				success : function(response,opts){
+					var responseData = Ext.decode(response.responseText);
+					//修改转移金额
+					this.transferPayData = responseData;
+					var sumAmount = 0;
+					if(responseData){
+						for(var i = 0; i< responseData.length; i++){
+							sumAmount += responseData[i]["active_fee"];
+						}
+					}
+					record.set('transfer_fee', sumAmount);
+					record.set('transfer_fee_back', Ext.util.Format.convertToYuan(sumAmount));
 				}
 			});
-			
-			//将所有产品资费对应的折扣信息一次性取回
-			if (tariffIds.length>0){
-				Ext.Ajax.request({
-					url:Constant.ROOT_PATH+'/core/x/Prod!queryTariffByTariffIds.action',
-					params:{
-						custId:App.getApp().getCustId(),
-						tariffIds:Ext.encode(tariffIds),
-						userIds:Ext.encode(userIds)
-					},
-					scope:this,
-					success:function(res,options){
-						this.disctData = Ext.decode(res.responseText);
-						for(var index =0;index<this.disctData.length;index++){
-							var data = this.disctData[index];
-							this.disctDataMap[data.tariff_id] = data;
-						}
-						if(this.disctData && this.disctData.length > 0){
-							//对应的资费金额匹配
-							store.each(function(record){
-								var tId = record.get('tariff_id');
-								if(tId){
-									for(var i=0;i<this.disctData.length;i++){
-										var disct = this.disctData[i];
-										if(tId == disct['tariff_id']){
-											//当前资费对应的 月租和计费方式 赋值
-											record.set('rent',disct['rent']);
-											record.set('billing_type',disct['billing_type']);
-											record.set('billing_cycle',disct['billing_cycle']);
-											
-											//初始化折扣字段
-											if(disct['disctList'] && disct['disctList'].length>0){
-												var disctArr = disct['disctList'];
-												disctArr.push({
-															'disct_id' : null,
-															'disct_name_all' : '清空折扣',
-															'tariff_id' : null,
-															'min_pay' : null
-														});
-												//默认给当前产品 资费选择第一个折扣
-												var disctListData = disctArr[0];
-												record.set('disct_id',disctListData['disct_id']);
-												record.set('disct_name_all',disctListData['disct_name_all']);
-												record.set('min_pay',Ext.util.Format.formatFee( disctListData['min_pay'] ));
-												
-												//备份折扣信息
-												record.set('disct_id_other',disctListData['disct_id']);
-												record.set('disct_name_other',disctListData['disct_name_all']);
-												
-												record.commit();
-											}
-											break;
-										}
-									}
-								}
-							},this);
-						}
-						this.startEditing.defer(100,this,[0,this.getColumnModel().getIndexById('fee_id')]);
-					}
-				});
-			}
-			},
-			beforeedit:function(obj){
-				if(obj.field == 'fee'){
-					//编辑行全局变量
-					currentRow = obj.row;
-				}else if(obj.field == 'fee_month'){
-					if(!Ext.isEmpty(obj.record.data.disct_id)){//有折扣,不能编辑到期日
-						this.stopEditing();
-						return false;
+		}
+		}
+	},
+	doTransferFeeShow:function(){
+		if(!App.getApp().getCustId()){
+			Alert('请查询客户之后再做操作.');
+			return false;
+		}
+		var recs = this.selModel.getSelections();
+		if(!recs || recs.length !=1){
+			Alert('请选择且仅选择一条记录!');
+			return false;
+		}
+		var rec = recs[0];
+		
+		if(!this.transferPayWindow){
+			this.transferPayWindow = new TransferPayWindow();
+		}
+		if(this.transferPayData && this.transferPayData.length > 0){
+			var invalidDate = this.getNextBeginDate(rec.get('exp_date'));
+			this.transferPayWindow.show(this.transferPayData, invalidDate);
+		}else{
+			Alert("没有转移支付项目!");
+		}
+	}	
+	,doAfterFindDateFee:function(record,value){
+		if(Ext.isEmpty(record.get('tariff_id_next'))){
+			 Alert("原资费已经失效，请选新的资费!");  
+			 return false;  
+		}
+		
+		if(value != null){
+			if(value >0 ){
+				//输入正整数
+				var re = /^[1-9]+[0-9]*]*$/;
+			    if (!re.test(value)){  
+			        Alert("请输入正整数");  
+			        return false;  
+			    }
+			    //判断 包多月的 输入月数 是周期数的倍数
+				var tariff = record.get('tariffList');
+				var tariffRecord = null;
+				for(var i=0;tariff.length;i++){
+					if(tariff[i].tariff_id == record.get('tariff_id_next')){
+						tariffRecord = tariff[i];
+						break;
 					}
 				}
-			},
-			afteredit:function(obj){
-				var record = obj.record;
-				var fieldName = obj.field;//编辑的column对应的dataIndex
-				var value = obj.value;
-				if(fieldName == 'disct_name_all'){//折扣
-					var feeValue = record.get('feeOther');
-					
-					//缴费金额小于折扣对应的最小金额，清空缴费，重新编辑
-					if(feeValue && record.get('min_pay') > feeValue){
-						record.set('fee',null);
-					}
-					if(value != '清空折扣'){
-						record.set('fee_month', "");
-						record.commit();
-					}else{
-//						debugger;
-						this.doAfterEditFee(record,record.get('fee'));
-					}
-					this.startEditing(obj.row,obj.column+2);
-					
-				}else if(fieldName == 'fee'){
-					var disctId = record.get('disct_id');
-					if(!Ext.isEmpty(disctId) && !Ext.isEmpty(value)){
-						disctId = this.chooseDisct(record,null);
-						if(!Ext.isEmpty(disctId)){
-							return;
-						}
-					}
-					this.doAfterEditFee(record,value);
-				}else if(fieldName == 'fee_month'){
-					if(this.disctCombo.getValue() != '清空折扣' && !Ext.isEmpty(this.disctCombo.getValue())){
-						record.set('fee_month','');
-						record.commit();
-						return false;
-					}
-					this.getFeeByInvalidDate(record, value, function(fee){
-						record.set('fee',fee);
-						record.set('feeOther',fee);
-						//总金额大于最小金额时，享受折扣
-						if(fee>=record.get('min_pay')){
-							record.set('disct_id',record.get('disct_id_other'));
-							record.set('disct_name_all',record.get('disct_name_other'));
-						}else{
-							record.set('disct_id',null);
-							record.set('disct_name_all',null);	
-						}
-					});
+				if(tariffRecord.billing_cycle>1 && value%tariffRecord.billing_cycle != 0){
+					Alert("请输入"+tariffRecord.billing_cycle+"的倍数");
+					return false;
 				}
-			}
-	},
-	chooseDisct:function(record,realMinPay){
-		var selectedDisctData = null;
-		var tariffData = this.disctDataMap[record.get('tariff_id')];
-		var disctRecs = tariffData.disctList;
-		
-		if(disctRecs && disctRecs.length >0){
-			this.disctCombo.store.removeAll();
-			for(var index =0;index<disctRecs.length;index++){
-				var disct = disctRecs[index];
-				if(Ext.isEmpty(realMinPay) && disct.min_pay/100 <=record.get('fee') ){
-					selectedDisctData = disct;
-					realMinPay = disct.min_pay/100;
-					minPay = realMinPay;
-					break;
-				}
-			}
-			if(!selectedDisctData || Ext.isEmpty(selectedDisctData['disct_id'])){
-				selectedDisctData = {};
-			}else{
-				record.set('fee_month', "");
-			}
-			record.set('disct_id',selectedDisctData['disct_id']);
-			record.set('disct_name_all',selectedDisctData['disct_name_all']);
-			record.set('min_pay',Ext.util.Format.formatFee( selectedDisctData['min_pay'] ));
-			
-			//备份折扣信息
-			record.set('disct_id_other',selectedDisctData['disct_id']);
-			record.set('disct_name_other',selectedDisctData['disct_name_all']);
-			record.commit();
-			return selectedDisctData['disct_id'];
-		}
-		return null;
-	},
-	doAfterEditFee:function(record, value){
-		this.getInvalidDateByFee(record, value, function(date){
-									record.set('fee_month', date);
-									var minPay = record.get('min_pay');//最低缴费
-									var realMinPay = null;//根据目前缴费判断可享受折扣的最低支付
-									this.chooseDisct(record,realMinPay);
-									//缴费金额小于折扣对应的最小金额,则无折扣
-									if(minPay){
-										if(minPay && value >= minPay){
-											//大于最小金额时，享受折扣
-											record.set('fee_month','');
-											record.set('disct_id',record.get('disct_id_other'));
-											record.set('disct_name_all',record.get('disct_name_other'));
-										}else{
-											record.set('disct_id',null);
-											record.set('disct_name_all',null);
-										}
-									}
-									record.set('feeOther',value);//用户单月缴费的数据备份
-								});
-	},
-	getFeeByInvalidDate: function(record, value, fn){
-		if("" == value){
-			record.set('fee', "");
-			record.commit();
-			return;
-		}
-		var prodSn = record.get("prod_sn");
-		var acctId = record.get("acct_id");
-		var acctitemId = record.get("acctitem_id");
-		var acctitem = App.getApp().main.infoPanel.getAcctPanel().acctItemGrid.getAcctItemByAcctId(acctId, acctitemId);
-		var prod = App.getApp().main.infoPanel.getUserPanel().prodGrid.getProdByUserId(acctitem["user_id"], acctitem["prod_sn"]);
-		
-		// valid date
-		var invalidDate = Date.parseDate(prod["invalid_date"], "Y-m-d H:i:s");
-		var billinfoEffDate = Date.parseDate(prod["billinfo_eff_date"], "Y-m-d H:i:s");
-		var now = nowDate();
-		
-		// TODO valid date
-		var maxDate = null;
-		if(now >= invalidDate && now >= billinfoEffDate){
-			maxDate = now;
-		}else if(invalidDate >= now && invalidDate >= billinfoEffDate){
-			maxDate = invalidDate;
-		}else if(billinfoEffDate >= now && billinfoEffDate >= invalidDate){
-			maxDate = billinfoEffDate;
-		}
-		if(value <= maxDate){
-			Alert("到期日至少要大于[" + maxDate.format("Y-m-d") + "]", function(){
-				record.set("fee_month", "");
-				record.set('fee', "");
-				record.commit();
-			});
-			return;
-		}
-		
-		
-		// ajax get fee
-		Ext.Ajax.request({
-			url:Constant.ROOT_PATH+'/core/x/Prod!getFeeByInvalidDate.action',
-			params:{
-				prodSn:prodSn,
-				invaidDate: value.format("Y-m-d")
-			},
-			scope:this,
-			success:function(res,options){
-				var fee = Ext.util.Format.formatFee( res.responseText);
-				fn.call(this, fee);
-			}
-		});
-	},
-	getInvalidDateByFee: function(record, value, fn){
-		if("" == value){
-			record.set('fee_month', "");
-			record.commit();
-			return;
-		}
-		var prodSn = record.get("prod_sn");
-		var acctId = record.get("acct_id");
-		var acctitemId = record.get("acctitem_id");
-		var acctitem = App.getApp().main.infoPanel.getAcctPanel().acctItemGrid.getAcctItemByAcctId(acctId, acctitemId);
-		var prod = App.getApp().main.infoPanel.getUserPanel().prodGrid.getProdByUserId(acctitem["user_id"], acctitem["prod_sn"]);
-		
-		
-		// 如果计费周期为包年或者大于1的
-		if(prod["billing_cycle"] > 1){
-			var valueFee = parseInt(Ext.util.Format.convertToCent(value));
-			var real_balance = acctitem.inactive_balance + acctitem.active_balance - acctitem.owe_fee + valueFee;
-			if(real_balance < record.data.rent){
-				record.set('fee_month', prod["invalid_date"]);
-				return;
-			}
-			var month = parseInt( real_balance / record.data.rent) * prod.billing_cycle;
-			var invalidDate = Date.parseDate(prod["invalid_date"], "Y-m-d H:i:s");
-			if(prod.status != 'ACTIVE'){
-				invalidDate = new Date();
-			}
-			invalidDate.setMonth(invalidDate.getMonth() + month);
-			record.set('fee_month', invalidDate);
-			return;
-		}
-		
-		
-		Ext.Ajax.request({
-			url:Constant.ROOT_PATH+'/core/x/Prod!getInvalidDateByFee.action',
-			params:{
 				
-				fee: Ext.util.Format.convertToCent(value),
-				prodSn:prodSn
-			},
-			scope:this,
-			success:function(res,options){
-				var o = Ext.decode(res.responseText);
-				var date = Date.parseDate(o["invalidDate"], "Y-m-d");
-				fn.call(this, date);
+				//计算金额
+				var fee = value*tariffRecord.disct_rent/tariffRecord.billing_cycle;
+				//转移支付金额
+				var transferFee =  record.get('transfer_fee')?record.get('transfer_fee'):0;
+				//实际缴费金额（计算金额-转移支付金额）
+				var payfee = fee - transferFee;
+				if(payfee<0){
+					Alert("缴费金额"+Ext.util.Format.convertToYuan(fee)+"必须大于等于转移支付金额"+Ext.util.Format.convertToYuan(transferFee)+"！请重新输入月数！");
+					return false;s
+				}else{
+					record.set('fee', payfee);
+					record.set('fee_back', Ext.util.Format.convertToYuan(payfee));
+				}
+				
+				//计算到期日
+				var invalidDate = this.getNextBeginDate(record.get('exp_date'));
+//				//原到期日小于当天的，到期日按当天算
+//				if(this.compareTodayDate(record.get('exp_date'))){
+//					invalidDate = Date.parseDate(record.get('exp_date'),  "Y-m-d H:i:s");
+//				}
+//				invalidDate.setDate(invalidDate.getDate()+1);
+				invalidDate.setMonth(invalidDate.getMonth() + value);
+				record.set('fee_month', invalidDate);
+				
+			}else if(value == 0){
+				return false;
 			}
-		});
+			return true;
+		}
+	},
+	doIntNullValue:function(record){
+		record.set('pay_month','');
+		record.set('fee_month', '');
+		record.set('fee', '');
+		record.set('fee_back', '');
 	},
 	getValues:function(){
 		this.stopEditing();
@@ -443,22 +340,62 @@ SinglePayFeesGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 		var store = this.getStore();
 		store.each(function(record){
 			data = record.data;
-			//当前行输入了 "缴费金额"，则提交当前行对应数据
-			if (data['fee'] && data['fee']>0 ){
-				var obj={};
-				obj["acct_id"] = data['acct_id'];
-				obj["acctitem_id"] = data['acctitem_id'];
-				obj["user_id"] = data['user_id'];
-				obj["prod_sn"] = data['prod_sn'];
-				obj["tariff_id"] = data['tariff_id'];
-				if(data['fee']>=data['min_pay']){
-					obj["disct_id"] = data['disct_id'];
-				}
-				obj["invalid_date"] = data['invalid_date'];
-				obj["fee"] = Ext.util.Format.formatToFen(data['fee']);
-				arr.push(obj);
+			//缴费月数大于0的时候，是进行缴费操作
+			if (data['pay_month'] && data['pay_month']>0 ){
+				var values = this.getTransferValues(record);
+				values["order_months"] = record.get('pay_month');
+				// 实际支付金额（小计金额）
+				values["pay_fee"] =record.get('fee')?record.get('fee'):0;
+				// 转移支付
+				values["transfer_fee"] = record.get('transfer_fee')?record.get('transfer_fee'):0;
+				// 失效日期
+				values["exp_date"] = record.get('fee_month');
+				arr.push(values);
 			}
 		},this);
 		return arr;
+	},
+	getNextBeginDate:function(date){
+		var invalidDate = new Date();
+		//原到期日小于当天的，到期日按当天算
+		if(this.compareTodayDate(date)){
+			invalidDate = Date.parseDate(date,  "Y-m-d H:i:s");
+		}
+		invalidDate.setDate(invalidDate.getDate()+1);
+		return invalidDate;
+	}
+	,
+	compareTodayDate:function(date){
+		var invalidDate = Date.parseDate(date,  "Y-m-d H:i:s");
+		var nowDate = Date.parseDate(new Date().format('Y-m-d'),'Y-m-d');
+		//原到期日小于当天的，到期日按当天算
+		if(invalidDate.getTime() - nowDate.getTime() >0 ){
+			return true;
+		}else{
+			return false;
+		}
+	},
+	getTransferValues: function(record){
+		var values = {};
+		// 基础信息
+		values["cust_id"] = record.get('cust_id');
+		values["user_id"] = record.get('user_id');
+		
+		values["groupSelected"] = record.get('groupSelected');;
+		
+		var invalidDate = new Date();
+		//原到期日小于当天的，到期日按当天算
+		if(this.compareTodayDate(record.get('exp_date'))){
+			values["last_order_sn"] = record.get('order_sn');
+			invalidDate = Date.parseDate(record.get('exp_date'),  "Y-m-d H:i:s");
+		}
+		invalidDate.setDate(invalidDate.getDate()+1);
+		values["eff_date"] = invalidDate.format("Y-m-d H:i:s");
+		
+		// 产品信息
+		values["prod_id"] = record.get('prod_id');
+		values["tariff_id"] = record.get('tariff_id_next');
+		
+		return values;
 	}
 });

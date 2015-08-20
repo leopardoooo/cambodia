@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.ycsoft.beans.core.prod.CProdOrderDto;
+import com.ycsoft.beans.core.prod.CProdOrderFollowPay;
 import com.ycsoft.business.commons.abstracts.IBaseService;
 import com.ycsoft.business.dto.core.prod.OrderProd;
 import com.ycsoft.business.dto.core.prod.OrderProdPanel;
@@ -27,4 +28,7 @@ public interface IOrderService extends IBaseService{
 	public List<CProdOrderDto> queryCancelFeeByCancelOrder(String busi_code,String cust_id,String order_sn)throws Exception;
 
 	public List<CProdOrderDto> queryLogoffUserProd(String busi_code, String user_id) throws Exception;
+
+	public List<CProdOrderFollowPay> queryFollowPayOrderDto(String custId) throws Exception;
+
 }

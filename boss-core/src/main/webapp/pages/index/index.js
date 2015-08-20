@@ -47,23 +47,20 @@ ViewPortPanel = Ext.extend( Ext.Panel , {
 			if(this.mask)
 				this.mask.hide();
 			//刷新客户综合信息
-			//Ext.getCmp('GeneralPanel').remoteRefresh();
+//			Ext.getCmp('GeneralPanel').remoteRefresh();
+			//缴费按钮
 			if(App.data.paySearch && App.getCust().status!='INVALID' && App.getCust().cust_type!='UNIT'){
-				App.main.infoPanel.activate('ACCT_PANEL');
-				
-				var acctGrid = App.getApp().main.infoPanel.getAcctPanel().acctGrid;
-				var store = acctGrid.getStore();
+				App.main.infoPanel.activate('USER_PANEL');
+				var userGrid = App.getApp().main.infoPanel.getUserPanel().userGrid;
+				var store = userGrid.getStore();
 				if(store.getCount() >0){
 					if(App.getCustId() == store.getAt(0).get('cust_id')){
-						for(var i=0;i<store.getCount();i++){
-							acctGrid.getSelectionModel().selectRow(i,true);
-						}
-						var button = acctGrid.getTopToolbar().items.itemAt(0);
+						var button = userGrid.getTopToolbar().items.itemAt(0);
 						button.handler.call(button);
-						
 						App.data.paySearch = false;
 					}
 				}
+				
 			}else{
 				if(App.getApp().getCust().cust_type != 'UNIT'){
 					if(App.getApp().data.busiTaskBtn){
@@ -81,7 +78,6 @@ ViewPortPanel = Ext.extend( Ext.Panel , {
 		if(this.mask){
 			this.mask.hide();
 		}
-		
 		App.data.paySearch = false;
 	},
 	goUrl : function(btn){
@@ -151,7 +147,6 @@ Ext.onReady(function(){
 			App.main = new Center();
 		
 			App.search.init();
-			
 			new Ext.Viewport({
 				layout: 'fit',
 				items: new ViewPortPanel()

@@ -252,6 +252,21 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 	}
 
 
+	/**
+	 * 创建客户，并且自动创建一个用户
+	 * 
+	 * @param user_id 用户ID
+	 * @param version OTT业务版本号
+	 * @param user_passwd 用户密码
+	 * @param user_name 用户名称
+	 * @param user_rank 用户等级
+	 * @param telephone 手机号码
+	 * @param email 邮箱
+	 * @throws Exception
+	 */
+	public void createOttMobileUser(String userId, String userPassword, String userName, String userRank, String telephone, String email)throws Exception{
+		
+	}
 
 
 	@Override
@@ -287,6 +302,8 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		//获取客户用户信息
 		CCust cust = getBusiParam().getCust();
 		String  custId = cust.getCust_id();
+		doneCodeComponent.lockCust(custId);
+		
 		List<CUser> userList = getBusiParam().getSelectedUsers();
 		CUser user = null;
 		for(CUser u : userList){

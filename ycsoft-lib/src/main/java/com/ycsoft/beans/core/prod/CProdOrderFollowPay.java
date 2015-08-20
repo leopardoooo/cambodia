@@ -3,6 +3,7 @@ package com.ycsoft.beans.core.prod;
 import java.util.List;
 
 import com.ycsoft.beans.prod.PProdTariffDisct;
+import com.ycsoft.business.dto.core.prod.PackageGroupUser;
 
 public class CProdOrderFollowPay extends CProdOrderDto {
 
@@ -14,6 +15,18 @@ public class CProdOrderFollowPay extends CProdOrderDto {
 	//当前资费是否有效 :true 有效
 	private Boolean currentTariffStatus;
 	
+	// 套餐内容组的用户选择情况和产品组选择情况
+	private List<PackageGroupUser> groupSelected;
+	
+	
+	public List<PackageGroupUser> getGroupSelected() {
+		return groupSelected;
+	}
+
+	public void setGroupSelected(List<PackageGroupUser> groupSelected) {
+		this.groupSelected = groupSelected;
+	}
+
 	public Boolean getCanFollowPay() {
 		return canFollowPay;
 	}
