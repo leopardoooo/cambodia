@@ -111,7 +111,7 @@ public class UserComponent extends BaseBusiComponent {
 	 * @return
 	 * @throws Exception
 	 */
-	public String createUser(CUser user) throws Exception {
+	public CUser createUser(CUser user) throws Exception {
 		//DTT,OTT用户没有机顶盒号、宽带用户没有MAC
 		if (((user.getUser_type().equals(SystemConstants.USER_TYPE_DTT)
 				|| user.getUser_type().equals(SystemConstants.USER_TYPE_OTT))) && StringHelper.isEmpty(user.getStb_id())
@@ -124,7 +124,7 @@ public class UserComponent extends BaseBusiComponent {
 		setBaseInfo(user);
 		cUserDao.save(user);
 	
-		return user.getUser_id();
+		return user;
 	}
 
 	private void decideFreeUser(CUserDtv dtv) throws JDBCException {
