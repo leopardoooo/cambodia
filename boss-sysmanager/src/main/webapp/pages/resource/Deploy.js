@@ -114,11 +114,18 @@ var CheckDeviceModel = function(scopeThis,field){
  */
 var commonIsCellEditable = function(colIndex,rowIndex){
 		var deviceModelIndex = this.getIndexById("device_model_id");
+		var deviceTypeIndex = this.getIndexById("device_type_id");
 		if(deviceModelIndex === colIndex){
 			//激活面板
 			var record = Ext.getCmp('deviceTabId').getActiveTab().getStore().getAt(rowIndex);
 			//只能修改刚添加未保存的
 			if( record && record.get('device_model') && !record.isModified('device_model'))
+				return false;
+		}else if(deviceTypeIndex === colIndex){
+				//激活面板
+			var record = Ext.getCmp('deviceTabId').getActiveTab().getStore().getAt(rowIndex);
+			//只能修改刚添加未保存的
+			if( record && record.get('device_type_text') && !record.isModified('device_type_text'))
 				return false;
 		}
 		return Ext.grid.ColumnModel.prototype.isCellEditable.call(this, colIndex, rowIndex);
@@ -198,7 +205,7 @@ var BuyTypeGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 			fields:['buy_mode','buy_mode_name','change_ownship','buy','buy_type',
 				'buy_type_text','buy_text','buy_mode_text','change_ownship_text']
 		});
-		this.buyTypeStore.load();
+//		this.buyTypeStore.load();
 		
 		this.buyTypeCombo = new Ext.ux.ParamCombo({
 			paramName:'DEVICE_BUY_TYPE',typeAhead:false,valueField:'item_name',
@@ -328,7 +335,7 @@ var ProvideGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 			pruneModifiedRecords:true,
 			fields:['supplier_id','supplier_name']
 		});
-		this.provideStore.load();
+//		this.provideStore.load();
 		var cm = new Ext.grid.ColumnModel([
 			{header:'编号',dataIndex:'supplier_id',width:40,sortable:true},
 			{header:'名称',dataIndex:'supplier_name',width:100,sortable:true,
@@ -631,7 +638,7 @@ var StbGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 				'definition_type_text','virtual_card_model_name','virtual_modem_model_name','supplier_name','supplier_id',
 				'device_model','model_name','interactive_type_text','definition_type_text']
 		});
-		this.stbStore.load();
+//		this.stbStore.load();
 		
 		this.supplierCombo = new Ext.form.ComboBox({
 			store:new Ext.data.JsonStore({
@@ -772,7 +779,7 @@ var ModemGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 				'supplier_name','device_type_text','net_type','net_type_name','modem_type','modem_type_name',
 				'is_virtual','is_virtual_text']
 		});
-		this.modemStore.load();
+//		this.modemStore.load();
 		
 		this.supplierCombo = new Ext.form.ComboBox({
 			store:new Ext.data.JsonStore({
@@ -878,7 +885,7 @@ var CardGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 			fields:['device_model','model_name','supplier_id','supplier_name','device_type',
 				'device_type_text','ca_supplier_name','ca_type','remark','is_virtual','is_virtual_text']
 		});
-		this.cardStore.load();
+//		this.cardStore.load();
 		this.supplierCombo = new Ext.form.ComboBox({
 			store:new Ext.data.JsonStore({
 //				url:'resource/Device!queryDeviceSupplier.action',
@@ -1085,7 +1092,7 @@ var CountyModelGrid = Ext.extend(Ext.grid.GridPanel,{
 			url:'resource/ResourceCfg!queryCountyModel.action',
 			fields:['county_id','county_name','stb_model_src','card_model_src','modem_model_src']
 		});
-		this.countyStore.load();
+//		this.countyStore.load();
 
 		var cm = new Ext.grid.ColumnModel([
 			{header:'适用地区',dataIndex:'county_name',width:120},
@@ -1121,6 +1128,139 @@ var CountyModelGrid = Ext.extend(Ext.grid.GridPanel,{
     }
 });
 
+var MateralCfgGrid = Ext.extend(Ext.grid.EditorGridPanel,{
+	modemStore:null,
+//	supplierCombo:null,
+	deviceTypeCombo:null,
+	constructor:function(){
+		modemGrid = this;
+		this.modemStore = new Ext.data.JsonStore({
+			url:'resource/ResourceCfg!queryDeviceModelCfg.action',
+			pruneModifiedRecords:true,
+			fields:['device_model','device_type','model_name','device_type_text'
+//			,'supplier_id','supplier_name'
+			]
+		});
+//		this.modemStore.load();
+		
+		this.deviceTypeCombo = new Ext.ux.ParamCombo({paramName:'OTHER_DEVICE_TYPE',valueField:'item_name',
+			forceSelection:true,selectOnFocus:true,editable:true,
+			listeners:{
+				scope:this,
+				select:function(combo,record){
+					this.getSelectionModel().getSelected().set('device_type',record.get('item_value'));
+				}
+			}
+		});
+		
+//		this.supplierCombo = new Ext.form.ComboBox({
+//			store:new Ext.data.JsonStore({
+////				url:'resource/Device!queryDeviceSupplier.action',
+//				fields:['supplier_id','supplier_name']
+//			}),displayField:'supplier_name',valueField:'supplier_name',mode:'local',triggerAction:'all',
+//			forceSelection:true,selectOnFocus:true,editable:true,listWidth:150,
+//			listeners:{
+//				scope:this,
+//				select:function(combo,record){
+//					this.getSelectionModel().getSelected().set('supplier_id',record.get('supplier_id'));
+//				}
+//			}
+//		});
+		
+		var cm = new Ext.grid.ColumnModel([
+			{id:'device_type_id',header:'器材类型',dataIndex:'device_type_text',width:80,editor:this.deviceTypeCombo},
+			{id:'device_model_id',header:'型号',dataIndex:'device_model',width:120,editor:new Ext.form.TextField({vtype:'singleChar'})},
+			{header:'型号名称',dataIndex:'model_name',width:120,editor:new Ext.form.TextField({})}
+//			{header:'制造商',dataIndex:'supplier_name',width:70,editor:this.supplierCombo}
+		]);
+		cm.isCellEditable = commonIsCellEditable;
+		MateralCfgGrid.superclass.constructor.call(this,{
+			id:'MateralCfgGridId',
+			title:'器材型号配置',
+			ds:this.modemStore,
+			clicksToEdit:1,
+			cm:cm,
+			sm:new Ext.grid.RowSelectionModel({}),
+			tbar:[
+				'-',
+				{text:'添加',iconCls:'icon-add',handler:this.doAdd,scope:this},'-',
+				{text:'保存',iconCls:'icon-save',handler:this.doSave,scope:this},'-',
+				{text:'刷新',iconCls:'icon-refresh',handler:comomRefresh,scope:this},'-'
+			]
+		});
+	},
+	initComponent:function(){
+		MateralCfgGrid.superclass.initComponent.call(this);
+//		this.supplierCombo.getStore().load();
+		App.form.initComboData([this.deviceTypeCombo]);
+	},
+	initEvents:function(){
+		MateralCfgGrid.superclass.initEvents.call(this);
+		this.on("beforeedit",commonBeforeedit,this);
+	},
+	doAdd:function(){
+		commonDoAdd(this,{
+			device_model:'',device_type:'',model_name:'',device_type_text:''
+//			,supplier_id:'',supplier_name:''				
+		});
+	},
+	doSave:function(){
+		if(CheckDeviceModel(this,'model_name'))
+			commonDoSave(this,'resource/ResourceCfg!saveMateralModel.action','materalModelList');
+	}
+});
+
+
+var DeviceCfgGrid = Ext.extend(Ext.grid.EditorGridPanel,{
+	modemStore:null,
+	constructor:function(){
+		modemGrid = this;
+		this.modemStore = new Ext.data.JsonStore({
+			url:'resource/ResourceCfg!queryDeviceType.action',
+			pruneModifiedRecords:true,
+			fields:['device_type','type_name']
+		});
+//		this.modemStore.load();
+		
+		
+		var cm = new Ext.grid.ColumnModel([
+			{id:'device_type_id',header:'设备类型',dataIndex:'device_type',width:80,editor:new Ext.form.TextField({vtype:'singleChar'})},
+			{id:'device_model_id',header:'类型名称',dataIndex:'type_name',width:120,editor:new Ext.form.TextField({})}
+		]);
+		cm.isCellEditable = commonIsCellEditable;
+		DeviceCfgGrid.superclass.constructor.call(this,{
+			id:'DeviceCfgGridId',
+			title:'设备类型配置',
+			ds:this.modemStore,
+			clicksToEdit:1,
+			cm:cm,
+			sm:new Ext.grid.RowSelectionModel({}),
+			tbar:[
+				'-',
+				{text:'添加',iconCls:'icon-add',handler:this.doAdd,scope:this},'-',
+				{text:'保存',iconCls:'icon-save',handler:this.doSave,scope:this},'-',
+				{text:'刷新',iconCls:'icon-refresh',handler:comomRefresh,scope:this},'-'
+			]
+		});
+	},
+	initComponent:function(){
+		DeviceCfgGrid.superclass.initComponent.call(this);
+	},
+	initEvents:function(){
+		DeviceCfgGrid.superclass.initEvents.call(this);
+		this.on("beforeedit",commonBeforeedit,this);
+	},
+	doAdd:function(){
+		commonDoAdd(this,{
+			device_type:'',type_name:''				
+		});
+	},
+	doSave:function(){
+		if(CheckDeviceModel(this,'device_type'))
+			commonDoSave(this,'resource/ResourceCfg!saveDeviceType.action','deviceTypeList');
+	}
+});
+
 
 /**
  * 设备型号tabpanel
@@ -1132,18 +1272,40 @@ var DeviceTab = Ext.extend(Ext.TabPanel,{
 	cardGrid:null,
 	modemGrid:null,
 	countyCfgGrid:null,
+	materalCfgGrid:null,
+	deviceCfgGrid:null,
 	constructor:function(){
+		that = this;
 		this.stbGrid = new StbGrid();
 		this.cardGrid = new CardGrid();
 		this.modemGrid = new ModemGrid();
 		this.countyCfgGrid = new CountyModelGrid();
+		this.materalCfgGrid = new MateralCfgGrid();
+		this.deviceCfgGrid = new DeviceCfgGrid(); 
 		DeviceTab.superclass.constructor.call(this,{
 			id:'deviceTabId',
 			region:'center',
 			deferredRender:false,
 			enableTabScroll:true,
 			activeTab:0,
-			items:[this.stbGrid,this.cardGrid,this.modemGrid,this.countyCfgGrid]
+			items:[this.stbGrid,this.cardGrid,this.modemGrid,this.materalCfgGrid,this.deviceCfgGrid,this.countyCfgGrid]
+		});
+	},
+	initComponent:function(){
+		DeviceTab.superclass.initComponent.call(this);
+		Ext.Ajax.request({
+			url:'resource/ResourceCfg!queryCfgLoad.action',
+			success: function(res, ops){
+				var rs = Ext.decode(res.responseText);
+				that.modemGrid.getStore().loadData(rs.modemList);
+				that.stbGrid.getStore().loadData(rs.stbList);
+				that.cardGrid.getStore().loadData(rs.cardList);
+				Ext.getCmp('buyTypeGridId').getStore().loadData(rs.buyModeList);
+				Ext.getCmp('provideGridId').getStore().loadData(rs.supplierList);
+				that.materalCfgGrid.getStore().loadData(rs.modelList);
+				that.deviceCfgGrid.getStore().loadData(rs.typeList);
+				that.countyCfgGrid.getStore().loadData(rs.countyModelList);
+			}
 		});
 	}
 });

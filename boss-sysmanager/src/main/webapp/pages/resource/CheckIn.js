@@ -996,15 +996,15 @@ var MateralHandForm = Ext.extend(Ext.form.FormPanel,{
 			            	value: 1
 						}
 					]				
-				},{
-					columnWidth:1,
-					layout:'form',
-					items:[{
-						xtype: 'textfield',
-						fieldLabel: '批号',
-						name: 'batch_num',
-						width: 240
-					}]
+//				},{
+//					columnWidth:1,
+//					layout:'form',
+//					items:[{
+//						xtype: 'textfield',
+//						fieldLabel: '批号',
+//						name: 'batch_num',
+//						width: 240
+//					}]
 				},{
 					columnWidth:1,
 					layout:'form',

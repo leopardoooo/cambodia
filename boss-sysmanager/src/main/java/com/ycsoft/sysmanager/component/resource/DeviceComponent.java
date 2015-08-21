@@ -34,6 +34,7 @@ import com.ycsoft.beans.device.RDeviceProcure;
 import com.ycsoft.beans.device.RDeviceReclaim;
 import com.ycsoft.beans.device.RDeviceSupplier;
 import com.ycsoft.beans.device.RDeviceTransfer;
+import com.ycsoft.beans.device.RDeviceType;
 import com.ycsoft.beans.device.RModem;
 import com.ycsoft.beans.device.RModemModel;
 import com.ycsoft.beans.device.RPairCfg;
@@ -59,6 +60,7 @@ import com.ycsoft.business.dao.resource.device.RDeviceDoneDeviceidDao;
 import com.ycsoft.business.dao.resource.device.RDeviceEditDao;
 import com.ycsoft.business.dao.resource.device.RDeviceHisDao;
 import com.ycsoft.business.dao.resource.device.RDeviceInputDao;
+import com.ycsoft.business.dao.resource.device.RDeviceModelDao;
 import com.ycsoft.business.dao.resource.device.RDeviceOrderDao;
 import com.ycsoft.business.dao.resource.device.RDeviceOrderDetailDao;
 import com.ycsoft.business.dao.resource.device.RDeviceOutputDao;
@@ -66,6 +68,7 @@ import com.ycsoft.business.dao.resource.device.RDeviceProcureDao;
 import com.ycsoft.business.dao.resource.device.RDeviceReclaimDao;
 import com.ycsoft.business.dao.resource.device.RDeviceSupplierDao;
 import com.ycsoft.business.dao.resource.device.RDeviceTransferDao;
+import com.ycsoft.business.dao.resource.device.RDeviceTypeDao;
 import com.ycsoft.business.dao.resource.device.RDeviceUseRecordsDao;
 import com.ycsoft.business.dao.resource.device.RModemDao;
 import com.ycsoft.business.dao.resource.device.RStbDao;
@@ -134,6 +137,8 @@ public class DeviceComponent extends BaseDeviceComponent {
 	private SDeptDao sDeptDao;
 	private TDeviceBuyModeDao tDeviceBuyModeDao;
 	private SCountyDao sCountyDao;
+	private RDeviceModelDao rDeviceModelDao;
+	private RDeviceTypeDao rDeviceTypeDao;
 
 	public void setRDeviceDifeenceDao(RDeviceDifeenceDao deviceDifeenceDao) {
 		rDeviceDifeenceDao = deviceDifeenceDao;
@@ -1246,7 +1251,7 @@ public class DeviceComponent extends BaseDeviceComponent {
 	
 	
 	public List<MaterialDeviceDto> queryMateralTransferDeviceByDepotId(SOptr optr)throws Exception{
-		String depotId = findDepot(optr);
+		String depotId = optr.getDept_id();
 		List<RDevice> list = rDeviceDao.queryMateralDeviceByDepotId(depotId);
 		Map<String, List<RDevice>> deviceMap = CollectionHelper.converToMap(list, "device_type");
 		List<MaterialDeviceDto> deviceList = new ArrayList<MaterialDeviceDto>();
@@ -2336,13 +2341,6 @@ public class DeviceComponent extends BaseDeviceComponent {
 		return device;
 	}
 	
-	/**
-	 * 查询设备型号
-	 * @return
-	 */
-	public List<RDeviceModel> queryDeviceModel() throws Exception {
-		return tDeviceBuyModeDao.queryDeviceModel();
-	}
 
 	/**
 	 * @param deviceTransferDao
@@ -2496,6 +2494,14 @@ public class DeviceComponent extends BaseDeviceComponent {
 
 	public void setSCountyDao(SCountyDao countyDao) {
 		sCountyDao = countyDao;
+	}
+
+	public void setRDeviceModelDao(RDeviceModelDao deviceModelDao) {
+		this.rDeviceModelDao = deviceModelDao;
+	}
+
+	public void setRDeviceTypeDao(RDeviceTypeDao deviceTypeDao) {
+		this.rDeviceTypeDao = deviceTypeDao;
 	}
 
 

@@ -19,7 +19,7 @@ BuyMaterialForm = Ext.extend( BaseForm , {
  		this.buyModeStore.on("load",this.doLoadBuyMode,this);
  		
  		this.deviceModelStore = new Ext.data.JsonStore({
-			fields : ['device_model','device_type',"model_name"]
+			fields : ['device_model','device_type','model_name','total_num']
 		});
  		
 		BuyMaterialForm.superclass.constructor.call(this, {
@@ -53,6 +53,15 @@ BuyMaterialForm = Ext.extend( BaseForm , {
 						scope: this,
 						'select': this.doBuyModeSelect
 					}
+				},{
+					xtype : 'numberfield',
+					id : 'total_num_id',
+					fieldLabel : '库存数量',
+					name:'total_num',
+					width : 100,
+					readOnly: true,
+					style: Constant.TEXTFIELD_STYLE,
+					allowNegative : false
 				},{
 					fieldLabel : '购买方式',
 					xtype:'combo',
@@ -108,6 +117,7 @@ BuyMaterialForm = Ext.extend( BaseForm , {
 	},
 	filterDeviceModel: function(){
 		Ext.getCmp("ctlDeviceModel").reset();
+		Ext.getCmp("total_num_id").reset();
 		var arr = [];
 		for(var i= 0;i < this.remoteData.length; i++){
 			if(this.remoteData[i]["device_type"] == Ext.getCmp("ctlDeviceType").getValue()){
@@ -130,6 +140,16 @@ BuyMaterialForm = Ext.extend( BaseForm , {
 		var deviceModel = Ext.getCmp('ctlDeviceModel').getValue(),
 			deviceType = Ext.getCmp('ctlDeviceType').getValue(),
 			buyMode = Ext.getCmp('deviceBuyMode').getValue();
+			
+		
+		if(deviceType && deviceModel){
+			var store = this.getForm().findField('device_model').getStore();
+			store.each(function(record){
+				if(record.get('device_type') == deviceType && record.get('device_model') == deviceModel){
+					Ext.getCmp('total_num_id').setValue(record.get('total_num'));		
+				}
+			})
+		}	
 		
 		if(!deviceType || !deviceType || !buyMode){
 			return ;
@@ -185,6 +205,21 @@ BuyMaterialForm = Ext.extend( BaseForm , {
 		});
 		
 	},
+	doValid : function() {
+		var obj = {};
+		if (this.getForm().isValid()){
+			obj["isValid"] = true;
+		}else{
+			obj["isValid"] = false;
+			obj["msg"] = "含有验证不通过的输入项";
+		}
+		if(this.getForm().findField('total_num').getValue()==0 || 
+		this.getForm().findField('total_num').getValue()<this.getForm().findField('buy_num').getValue()){
+			obj["isValid"] = false;
+			obj["msg"] = "购买数量不能大于库存数量!";
+		}
+		return obj;
+	},
 	getValues : function(){
 		var o = {};
 		o["deviceType"]=this.getForm().findField('device_type').getValue();
@@ -210,25 +245,26 @@ BuyMaterialForm = Ext.extend( BaseForm , {
 	},
 	url : Constant.ROOT_PATH + "/core/x/Cust!buyMaterial.action",
 	success: function(form, resultData){
-		//清空参数
-		App.getData().busiTaskToDo = [];
-		var buyDevice = App.getData().busiTask['BuyMaterial'];
-		var newUser = App.getData().busiTask['NewUser'];
-		//跳转业务用户开户
-		App.getData().busiTaskToDo.push(buyDevice);
-		App.getData().busiTaskToDo.push(newUser);
-		
+//		//清空参数
+//		App.getData().busiTaskToDo = [];
+//		var buyDevice = App.getData().busiTask['BuyMaterial'];
+//		var newUser = App.getData().busiTask['NewUser'];
+//		//跳转业务用户开户
+//		App.getData().busiTaskToDo.push(buyDevice);
+//		App.getData().busiTaskToDo.push(newUser);
+		//刷新支付
+		App.getApp().refreshPayInfo(parent);
 		App.getApp().refreshPanel(App.getApp().getData().currentResource.busicode);
-	},
-	getFee : function(){
-		var buyNum = Ext.getCmp('buyNum').getValue();
-		var fee = 0;
-		for(var i=0,len=this.feeInfo.length;i<len;i++){
-			fee += Ext.getCmp('deviceFeeValue'+i).getValue();	
-		}
-		fee = fee * buyNum;
-		return fee;
 	}
+//	,getFee : function(){
+//		var buyNum = Ext.getCmp('buyNum').getValue();
+//		var fee = 0;
+//		for(var i=0,len=this.feeInfo.length;i<len;i++){
+//			fee += Ext.getCmp('deviceFeeValue'+i).getValue();	
+//		}
+//		fee = fee * buyNum;
+//		return fee;
+//	}
 });
 
 Ext.onReady(function(){
