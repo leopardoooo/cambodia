@@ -66,7 +66,7 @@ public class AuthComponent extends BaseComponent{
 				authCmdType.equals(BusiCmdConstants.ACCTIVATE_USER)){
 			this.editOttUser(user, doneCode);
 		} else if (authCmdType.equals(BusiCmdConstants.DEL_USER)){
-			this.deleteOttUser(user, doneCode);
+			this.deleteOttUser(user,orderList, doneCode);
 		} else if (authCmdType.equals(BusiCmdConstants.PASSVATE_PROD) ||
 				authCmdType.equals(BusiCmdConstants.ACCTIVATE_PROD)){
 			this.authOttProd(user, orderList, doneCode);
@@ -88,7 +88,6 @@ public class AuthComponent extends BaseComponent{
 		} else if (authCmdType.equals(BusiCmdConstants.PASSVATE_TERMINAL)){
 			this.StopTerminal(user, doneCode);
 		}
-		
 	}
 	
 	private void sendBandAuth(CUser user,List<CProdOrder> orderList, String authCmdType, Integer doneCode) throws Exception{
@@ -100,6 +99,7 @@ public class AuthComponent extends BaseComponent{
 			this.stopBandUser(user, doneCode);
 		} else if (authCmdType.equals(BusiCmdConstants.ACCTIVATE_USER)){
 			this.openBandUser(user, doneCode);
+			
 		} else if (authCmdType.equals(BusiCmdConstants.PASSVATE_PROD) ||
 				authCmdType.equals(BusiCmdConstants.ACCTIVATE_PROD) || 
 				authCmdType.equals(BusiCmdConstants.REFRESH_TERMINAL)){
@@ -185,7 +185,17 @@ public class AuthComponent extends BaseComponent{
 	 * @param doneCode
 	 * @throws Exception
 	 */
-	private void deleteOttUser(CUser user,Integer doneCode) throws Exception{
+	private void deleteOttUser(CUser user,List<CProdOrder> orderList,Integer doneCode) throws Exception{
+		//删除授权
+		String[] orderResIds = getOrderProdRes(orderList);
+		for (String orderResId:orderResIds){
+			JVodCommand ottCmd = gOttCmd(user,doneCode);
+			ottCmd.setRes_id(orderResId);
+			//发送减授权
+			ottCmd.setCmd_type(BusiCmdConstants.PASSVATE_PROD);
+			jVodCommandDao.save(ottCmd);
+		}
+		//销户
 		JVodCommand ottCmd = gOttCmd(user,doneCode);
 		ottCmd.setCmd_type(BusiCmdConstants.DEL_USER);		
 		jVodCommandDao.save(ottCmd);
@@ -266,6 +276,9 @@ public class AuthComponent extends BaseComponent{
 		params.addProperty(BusiCmdParam.login_password.name(), user.getPassword());
 		bandCmd.setDetail_param(params.toString());
 		jBandCommandDao.save(bandCmd);
+		
+		//删除订购记录
+		cancelOrder(user, doneCode);
 	}
 	
 	private void stopBandUser(CUser user,Integer doneCode) throws Exception{
@@ -287,6 +300,8 @@ public class AuthComponent extends BaseComponent{
 	}
 	
 	private void deleteBandUser(CUser user,Integer doneCode) throws Exception{
+		//取消授权
+		//cancelOrder(user,doneCode);
 		JBandCommand bandCmd = gBandCmd(user,doneCode);
 		bandCmd.setCmd_type(BusiCmdConstants.DEL_USER);	
 		JsonObject params = new JsonObject();
@@ -299,12 +314,8 @@ public class AuthComponent extends BaseComponent{
 		//获取用户所有资源的所有到期日
 		Map<String,Date> userResMap = this.getUserResExpDate(user.getUser_id());
 		//先取消所有授权
-		JBandCommand bandCmd = gBandCmd(user,doneCode);
-		bandCmd.setCmd_type(BusiCmdConstants.BAND_CLEAR_AUTH);	
-		JsonObject params = new JsonObject();
-		params.addProperty(BusiCmdParam.login_name.name(), user.getLogin_name());
-		bandCmd.setDetail_param(params.toString());
-		jBandCommandDao.save(bandCmd);
+		
+		//cancelOrder(user, doneCode);
 		//发送加授权
 		
 		List<Entry<String, Date>> mappingList = new ArrayList<Entry<String, Date>>(userResMap.entrySet());
@@ -316,10 +327,11 @@ public class AuthComponent extends BaseComponent{
 		});
 		
 		Date effDate = null;
+		JBandCommand bandCmd;
 		for (Entry<String, Date> entry : mappingList) {
 			bandCmd = gBandCmd(user, doneCode);
 			bandCmd.setCmd_type(BusiCmdConstants.BAND_ADD_AUTH);
-			params = new JsonObject();
+			JsonObject params = new JsonObject();
 			params.addProperty(BusiCmdParam.login_name.name(), user.getLogin_name());
 			params.addProperty(BusiCmdParam.band_policy_id.name(), entry.getKey());
 			if (effDate == null)
@@ -334,6 +346,16 @@ public class AuthComponent extends BaseComponent{
 			effDate = entry.getValue();
 		}
 		
+	}
+
+
+	private void cancelOrder(CUser user, Integer doneCode) throws Exception, JDBCException {
+		JBandCommand bandCmd = gBandCmd(user,doneCode);
+		bandCmd.setCmd_type(BusiCmdConstants.BAND_CLEAR_AUTH);	
+		JsonObject params = new JsonObject();
+		params.addProperty(BusiCmdParam.login_name.name(), user.getLogin_name());
+		bandCmd.setDetail_param(params.toString());
+		jBandCommandDao.save(bandCmd);
 	}
 	
 	

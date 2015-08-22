@@ -78,7 +78,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 	}
 	
 	@Override
-	public void createUserBatch(List<UserInfo> userList, String workBillAsignType) throws Exception {
+	public void createUserBatch(List<UserInfo> userList) throws Exception {
 		CCust cust = getBusiParam().getCust();
 		doneCodeComponent.lockCust(cust.getCust_id());
 		Integer doneCode = doneCodeComponent.gDoneCode();
@@ -107,7 +107,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 			}
 		}
 		//工单处理
-		snTaskComponent.createOpenTask(doneCode, cust, taskUserList, workBillAsignType);
+		snTaskComponent.createOpenTask(doneCode, cust, taskUserList, getBusiParam().getWorkBillAsignType());
 		saveAllPublic(doneCode, getBusiParam());
 	}
 

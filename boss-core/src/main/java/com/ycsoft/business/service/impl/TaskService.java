@@ -53,14 +53,14 @@ public class TaskService extends BaseBusiService implements ITaskService {
 		}
 		BusiParameter p = getBusiParam();
 		Integer doneCode = doneCodeComponent.gDoneCode();
-		// 保存流水
-		doneCodeComponent
-				.saveDoneCode(doneCode, p.getBusiCode(), p.getTask_remark(), p
-						.getCust().getCust_id(), p.getSelectedUserIds());
-		// 保存故障单
-		taskComponent.createTask(p.getTaskIds(), doneCode, p.getCustFullInfo(),
-				p.getSelectedUsers(), null, p.getTask_books_time(), p
-						.getTask_cust_name(), p.getTask_mobile(), bugCause,p.getTask_remark(),getOptr());
+//		// 保存流水
+//		doneCodeComponent
+//				.saveDoneCode(doneCode, p.getBusiCode(), p.getTask_remark(), p
+//						.getCust().getCust_id(), p.getSelectedUserIds());
+//		// 保存故障单
+//		taskComponent.createTask(p.getTaskIds(), doneCode, p.getCustFullInfo(),
+//				p.getSelectedUsers(), null, p.getTask_books_time(), p
+//						.getTask_cust_name(), p.getTask_mobile(), bugCause,p.getTask_remark(),getOptr());
 	}
 
 
@@ -179,14 +179,14 @@ public class TaskService extends BaseBusiService implements ITaskService {
 	public void saveNewTask() throws Exception {
 		BusiParameter p = getBusiParam();
 		Integer doneCode = doneCodeComponent.gDoneCode();
-		// 保存流水
-		doneCodeComponent
-				.saveDoneCode(doneCode, p.getBusiCode(), p.getTask_remark(), p
-						.getCust().getCust_id(), p.getSelectedUserIds());
-		// 保存故障单
-		taskComponent.createTask(p.getTaskIds(), doneCode, p.getCustFullInfo(),
-				p.getSelectedUsers(), null, p.getTask_books_time(), p
-						.getTask_cust_name(), p.getTask_mobile(), p.getTask_bug_cause(),p.getTask_remark(),getOptr());
+//		// 保存流水
+//		doneCodeComponent
+//				.saveDoneCode(doneCode, p.getBusiCode(), p.getTask_remark(), p
+//						.getCust().getCust_id(), p.getSelectedUserIds());
+//		// 保存故障单
+//		taskComponent.createTask(p.getTaskIds(), doneCode, p.getCustFullInfo(),
+//				p.getSelectedUsers(), null, p.getTask_books_time(), p
+//						.getTask_cust_name(), p.getTask_mobile(), p.getTask_bug_cause(),p.getTask_remark(),getOptr());
 	}
 
 	public void modifyTask(String task_id, String booksTime,String taskCustName, String tel, String remark, String bugCause) throws Exception {

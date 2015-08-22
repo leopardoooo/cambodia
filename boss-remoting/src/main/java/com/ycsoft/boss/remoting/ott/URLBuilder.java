@@ -1,7 +1,7 @@
 package com.ycsoft.boss.remoting.ott;
 
 public class URLBuilder {
-	private static String IP="172.18.21.100";
+	private static String IP="172.18.21.56";
 	private static int port=80;
 	
 	

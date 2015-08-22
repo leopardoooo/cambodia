@@ -42,12 +42,13 @@ public class OttAuthJob implements Job2 {
 			JsonObject params =new JsonParser().parse(cmd.getDetail_param()).getAsJsonObject();
 			if ((cmd.getCmd_type().equals(BusiCmdConstants.CHANGE_USER))){
 				
-				result = client.editUser(cmd.getUser_id(), 
+				result = client.editUser(cmd.getLogin_name(), 
 						getJsonValue(params,BusiCmdParam.login_name.name()), 
 						getJsonValue(params,BusiCmdParam.login_password.name()),
 						null, null,null,
 						getJsonValue(params,BusiCmdParam.stb_id.name()),
-						getJsonValue(params,BusiCmdParam.stb_mac.name()));
+						getJsonValue(params,BusiCmdParam.stb_mac.name()),
+						getJsonValue(params,BusiCmdParam.user_status.name()));
 			} else if ((cmd.getCmd_type().equals(BusiCmdConstants.DEL_USER))){
 				result = client.deleteUser(cmd.getUser_id());
 			} else if ((cmd.getCmd_type().equals(BusiCmdConstants.PASSVATE_PROD))){

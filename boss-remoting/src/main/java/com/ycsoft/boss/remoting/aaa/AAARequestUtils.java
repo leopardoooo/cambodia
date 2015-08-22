@@ -241,7 +241,8 @@ public final class AAARequestUtils {
 		// 1:固网 2:WLAN 3:固网+WLAN
 		serviceInfo.setPermittedANTYpe(3);
 		// 接入策略ID
-		serviceInfo.setAccessPolicyID(policyId);
+		if (policyId != null)
+			serviceInfo.setAccessPolicyID(policyId);
 		serviceInfo.setChargingType("1");
 		serviceInfo.setMaxSessNumber(0);
 		serviceInfo.setCancelBinding(0);

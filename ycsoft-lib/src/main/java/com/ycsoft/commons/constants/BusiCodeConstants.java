@@ -129,7 +129,14 @@ public final class BusiCodeConstants {
 	 * 设备购买包换期.
 	 */
 	public final static String DEVICE_BUY_REPLACOVER= "1091";//领用
-	
 	public final static String JOB_REQSTOP = "1060"; //job处理报停
-	public final static String TICKET_FINISH = "2256";	//工单完工
+	public final static String TASK_FINISH = "2256";	//工单完工
+	public final static String TASK_INIT = "2257";	//新建工单
+	public final static String TASK_ASSIGN = "2258";	//分配施工员
+	public final static String TASK_FILL = "2259";	//工单回填
+	public final static String TASK_ZTE_OPEN = "2260";	//开通zte授权
+	public final static String TASK_CANCEL = "2261";	//工单作废
+	public final static String TASK_CHANGE_DEVICE = "2262";	//工单更换回填的智能卡
+	public final static String TASK_CANCEL_USER = "2263";	//取消安装的终端
+	public final static String TASK_REMIND = "2264";	//催单
 }

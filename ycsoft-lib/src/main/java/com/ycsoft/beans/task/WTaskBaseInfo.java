@@ -41,8 +41,8 @@ public class WTaskBaseInfo implements Serializable{
 	private String county_id;
 	private String area_id;
 	private String remark;
-	private String syn_status;
 	private String visit_result;
+	private String zte_status;
 
 	private String task_type_name;
 	private String task_detail_type_name;
@@ -300,20 +300,6 @@ public class WTaskBaseInfo implements Serializable{
 		this.remark = remark;
 	}
 
-
-
-	public String getSyn_status() {
-		return syn_status;
-	}
-
-
-
-	public void setSyn_status(String syn_status) {
-		this.syn_status = syn_status;
-	}
-
-
-
 	public String getTask_type_name() {
 		return task_type_name;
 	}
@@ -374,6 +360,20 @@ public class WTaskBaseInfo implements Serializable{
 
 	public void setVisit_result(String visit_result) {
 		this.visit_result = visit_result;
+	}
+	
+	
+
+
+
+	public String getZte_status() {
+		return zte_status;
+	}
+
+
+
+	public void setZte_status(String zte_status) {
+		this.zte_status = zte_status;
 	}
 
 

@@ -203,33 +203,6 @@ public abstract class BaseComponent{
 		sLogDao.save(log);
 	}
 	
-	/**
-	 * 记录工单操作
-	 * @param doneCode
-	 * @param doneType
-	 * @param workId
-	 * @param info
-	 * @throws Exception
-	 */
-	public void saveWorkLog(String doneType,String[] workIds,SOptr optr,String info ) throws Exception {
-		Integer sDoneCode = getLogDonecode();
-		List<WLog> logList = new ArrayList<WLog>();
-		for(String dto : workIds){
-			WLog log = new WLog();
-			log.setDone_type(doneType);
-			log.setArea_id(optr.getArea_id());
-			log.setCounty_id(optr.getCounty_id());
-			log.setDept_id(optr.getDept_id());
-			log.setOptr_id(optr.getOptr_id());
-			log.setWork_id(dto);
-			log.setDone_code(sDoneCode);
-			log.setInfo(info);
-			logList.add(log);
-		}
-		wLogDao.save(logList.toArray(new WLog[logList.size()]));
-	}
-	
-	
 	private int getJobId() throws Exception{
 		return Integer.parseInt(jDataSyncDao.findSequence(SequenceConstants.SEQ_JOB_ID).toString());
 	}
