@@ -22,6 +22,7 @@ import com.ycsoft.commons.exception.ComponentException;
 import com.ycsoft.commons.exception.ServicesException;
 import com.ycsoft.daos.core.JDBCException;
 import com.ycsoft.daos.core.Pager;
+import com.ycsoft.sysmanager.dto.resource.RDeviceModelTotalDto;
 
 /**
  * @author YC-SOFT
@@ -36,7 +37,7 @@ public interface ICustService extends IBaseService{
 	 */
 	public List<TDeviceBuyMode> queryDeviceBuyModeByOwnership() throws Exception;
 	
-	public List<RDeviceModel> queryDeviceModel()throws Exception;
+	public List<RDeviceModelTotalDto> queryDeviceModel()throws Exception;
 	
 	public List<TDeviceBuyMode> queryDeviceCanFee() throws Exception;
 

@@ -607,14 +607,17 @@ var CheckInDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 				return false;
 			}
 		}else if(colIndex === modemMacIndex){
-			//"modem_mac"列只能在设备类型为MODEM或者机猫一体机时，才能编辑
-			if(deviceType !== 'MODEM'){
-				if(deviceType == 'STB' && devModcfg && devModcfg.virtual_modem_model){
-					return true;
-				}else{
-					return false;
-				}
+			if(deviceType !== 'STB'){
+				return false;
 			}
+			//"modem_mac"列只能在设备类型为MODEM或者机猫一体机时，才能编辑
+//			if(deviceType !== 'MODEM'){
+//				if(deviceType == 'STB')&& devModcfg && devModcfg.virtual_modem_model){
+//					return true;
+//				}else{
+//					return false;
+//				}
+//			}
 		}else if(colIndex === deviceModeIndex){
 			//"设备类型"列为空时，不能选择"型号"列
 			if(Ext.isEmpty(deviceType))
@@ -996,15 +999,15 @@ var MateralHandForm = Ext.extend(Ext.form.FormPanel,{
 			            	value: 1
 						}
 					]				
-				},{
-					columnWidth:1,
-					layout:'form',
-					items:[{
-						xtype: 'textfield',
-						fieldLabel: '批号',
-						name: 'batch_num',
-						width: 240
-					}]
+//				},{
+//					columnWidth:1,
+//					layout:'form',
+//					items:[{
+//						xtype: 'textfield',
+//						fieldLabel: '批号',
+//						name: 'batch_num',
+//						width: 240
+//					}]
 				},{
 					columnWidth:1,
 					layout:'form',

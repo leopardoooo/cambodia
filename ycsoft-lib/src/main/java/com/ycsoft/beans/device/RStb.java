@@ -23,12 +23,27 @@ public class RStb extends RDevice implements Serializable {
 	private String stb_id;
 	private String pair_card_id;
 	private String pair_modem_id;
+	private String mac;
 
 	/**
 	 * default empty constructor
 	 */
 	public RStb() {
 	}
+
+	
+	
+	public String getMac() {
+		return mac;
+	}
+
+
+
+	public void setMac(String mac) {
+		this.mac = mac;
+	}
+
+
 
 	// stb_id getter and setter
 	public String getStb_id() {

@@ -1,6 +1,8 @@
 package com.ycsoft.sysmanager.component.resource;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Component;
 
@@ -8,8 +10,10 @@ import com.ycsoft.beans.config.TBusiFee;
 import com.ycsoft.beans.config.TDeviceBuyMode;
 import com.ycsoft.beans.device.RCardModel;
 import com.ycsoft.beans.device.RDeviceFee;
+import com.ycsoft.beans.device.RDeviceModel;
 import com.ycsoft.beans.device.RDeviceModelCounty;
 import com.ycsoft.beans.device.RDeviceSupplier;
+import com.ycsoft.beans.device.RDeviceType;
 import com.ycsoft.beans.device.RModemModel;
 import com.ycsoft.beans.device.RStbModel;
 import com.ycsoft.beans.system.SOptr;
@@ -20,7 +24,9 @@ import com.ycsoft.business.dao.resource.device.RCardModelDao;
 import com.ycsoft.business.dao.resource.device.RDepotDefineDao;
 import com.ycsoft.business.dao.resource.device.RDeviceFeeDao;
 import com.ycsoft.business.dao.resource.device.RDeviceModelCountyDao;
+import com.ycsoft.business.dao.resource.device.RDeviceModelDao;
 import com.ycsoft.business.dao.resource.device.RDeviceSupplierDao;
+import com.ycsoft.business.dao.resource.device.RDeviceTypeDao;
 import com.ycsoft.business.dao.resource.device.RModemModelDao;
 import com.ycsoft.business.dao.resource.device.RStbModelDao;
 import com.ycsoft.commons.abstracts.BaseComponent;
@@ -30,7 +36,6 @@ import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.exception.ComponentException;
 import com.ycsoft.commons.helper.StringHelper;
-import com.ycsoft.commons.store.MemoryDict;
 import com.ycsoft.daos.core.JDBCException;
 import com.ycsoft.sysmanager.dto.resource.CardModelDto;
 import com.ycsoft.sysmanager.dto.resource.StbModelDto;
@@ -49,6 +54,8 @@ public class ResourceCfgComponent extends BaseComponent {
 	private TBusiFeeDao tBusiFeeDao;
 	private RDeviceModelCountyDao rDeviceModelCountyDao;
 	private MemoryComponent memoryComponent;
+	private RDeviceModelDao rDeviceModelDao;
+	private RDeviceTypeDao rDeviceTypeDao;
 	
 	/**
 	 * 查询设备的一次性收费
@@ -217,7 +224,38 @@ public class ResourceCfgComponent extends BaseComponent {
 	public List<StbModelDto> queryRStbModel() throws JDBCException {
 		return rStbModelDao.queryAll();
 	}
+	
+	/**
+	 * 加载基本配置数据
+	 * @param optr
+	 * @return
+	 * @throws Exception
+	 */
+	public Map<String , Object> queryCfgLoad(SOptr optr)throws Exception{
+		Map<String , Object> map = new HashMap<String, Object>();
+		map.put("stbList", queryRStbModel()); //机顶盒型号
+		map.put("supplierList", queryRDeviceSupplier()); //供应商配置
+		map.put("buyModeList", queryDeviceBuyMode());//设备购买方式
+		map.put("cardList", queryRCardModel());//智能卡型号
+		map.put("modemList", queryRModemModel());//modem型号
+		map.put("modelList", queryDeviceModel());//器材型号
+		map.put("typeList", queryDeviceType());//设备类型
+		map.put("countyModelList", queryCountyModel(optr));//设备适用地区
+		return map;
+	}
 
+	public List<RDeviceType> queryDeviceType() throws Exception {
+		return rDeviceTypeDao.queryDeviceType();
+	}
+	
+	/**
+	 * 查询设备型号
+	 * @return
+	 */
+	public List<RDeviceModel> queryDeviceModel() throws Exception {
+		return rDeviceModelDao.queryDeviceModel();
+	}
+	
 	/**
 	 * 保存机顶盒型号
 	 *
@@ -233,6 +271,49 @@ public class ResourceCfgComponent extends BaseComponent {
 		}
 		memoryComponent.addDictSignal(DictKey.STB_MODEL.toString());
 	}
+	
+	
+	/**
+	 * 更新器材型号
+	 * @param list
+	 * @throws Exception
+	 */
+	public void saveMateralModel(List<RDeviceModel> list) throws Exception{
+		for(RDeviceModel m: list){
+			RDeviceModel r = rDeviceModelDao.findDevice(m.getDevice_type(),m.getDevice_model());
+			if (r==null)
+				rDeviceModelDao.saveMateral(m.getDevice_type(),m.getDevice_model(),m.getModel_name());
+			else
+				rDeviceModelDao.updateMateral(m.getDevice_type(),m.getDevice_model(),m.getModel_name());
+		}
+		memoryComponent.addDictSignal(DictKey.CTL_MODEL.toString());
+	}
+	
+	/**
+	 * 更新设备类型配置
+	 * @param list
+	 * @throws Exception
+	 */
+	public void saveDeviceType(List<RDeviceType> list) throws Exception{
+		for(RDeviceType m: list){
+			if (rDeviceTypeDao.findByKey(m.getDevice_type())==null){
+				if(!m.getDevice_type().equals(SystemConstants.DEVICE_TYPE_STB) && 
+						!m.getDevice_type().equals(SystemConstants.DEVICE_TYPE_CARD) && 
+						!m.getDevice_type().equals(SystemConstants.DEVICE_TYPE_MODEM) ){
+					m.setManage_detail(SystemConstants.BOOLEAN_FALSE);
+				}else{
+					m.setManage_detail(SystemConstants.BOOLEAN_TRUE);
+				}
+				rDeviceTypeDao.save(m);
+			}else{
+				rDeviceTypeDao.update(m);
+			}
+		}
+		memoryComponent.addDictSignal(DictKey.ALL_DEVICE_TYPE.toString());
+		memoryComponent.addDictSignal(DictKey.DEVICE_TYPE.toString());
+		memoryComponent.addDictSignal(DictKey.OTHER_DEVICE_TYPE.toString());
+	}
+
 
 	/**
 	 * 查询智能卡型号
@@ -436,5 +517,21 @@ public class ResourceCfgComponent extends BaseComponent {
 	public void setMemoryComponent(MemoryComponent memoryComponent) {
 		this.memoryComponent = memoryComponent;
 	}
+
+
+
+	public void setRDeviceModelDao(RDeviceModelDao deviceModelDao) {
+		this.rDeviceModelDao = deviceModelDao;
+	}
+
+
+
+	public void setRDeviceTypeDao(RDeviceTypeDao deviceTypeDao) {
+		this.rDeviceTypeDao = deviceTypeDao;
+	}
+
+
+
+
 
 }

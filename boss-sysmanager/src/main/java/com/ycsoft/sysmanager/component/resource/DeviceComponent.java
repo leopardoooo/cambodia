@@ -34,6 +34,7 @@ import com.ycsoft.beans.device.RDeviceProcure;
 import com.ycsoft.beans.device.RDeviceReclaim;
 import com.ycsoft.beans.device.RDeviceSupplier;
 import com.ycsoft.beans.device.RDeviceTransfer;
+import com.ycsoft.beans.device.RDeviceType;
 import com.ycsoft.beans.device.RModem;
 import com.ycsoft.beans.device.RModemModel;
 import com.ycsoft.beans.device.RPairCfg;
@@ -59,6 +60,7 @@ import com.ycsoft.business.dao.resource.device.RDeviceDoneDeviceidDao;
 import com.ycsoft.business.dao.resource.device.RDeviceEditDao;
 import com.ycsoft.business.dao.resource.device.RDeviceHisDao;
 import com.ycsoft.business.dao.resource.device.RDeviceInputDao;
+import com.ycsoft.business.dao.resource.device.RDeviceModelDao;
 import com.ycsoft.business.dao.resource.device.RDeviceOrderDao;
 import com.ycsoft.business.dao.resource.device.RDeviceOrderDetailDao;
 import com.ycsoft.business.dao.resource.device.RDeviceOutputDao;
@@ -66,6 +68,7 @@ import com.ycsoft.business.dao.resource.device.RDeviceProcureDao;
 import com.ycsoft.business.dao.resource.device.RDeviceReclaimDao;
 import com.ycsoft.business.dao.resource.device.RDeviceSupplierDao;
 import com.ycsoft.business.dao.resource.device.RDeviceTransferDao;
+import com.ycsoft.business.dao.resource.device.RDeviceTypeDao;
 import com.ycsoft.business.dao.resource.device.RDeviceUseRecordsDao;
 import com.ycsoft.business.dao.resource.device.RModemDao;
 import com.ycsoft.business.dao.resource.device.RStbDao;
@@ -134,6 +137,8 @@ public class DeviceComponent extends BaseDeviceComponent {
 	private SDeptDao sDeptDao;
 	private TDeviceBuyModeDao tDeviceBuyModeDao;
 	private SCountyDao sCountyDao;
+	private RDeviceModelDao rDeviceModelDao;
+	private RDeviceTypeDao rDeviceTypeDao;
 
 	public void setRDeviceDifeenceDao(RDeviceDifeenceDao deviceDifeenceDao) {
 		rDeviceDifeenceDao = deviceDifeenceDao;
@@ -968,34 +973,37 @@ public class DeviceComponent extends BaseDeviceComponent {
 				
 				//根据配置信息取已经配置了的配置型号,
 				String pairCardModel = stbCfg.getVirtual_card_model();//与当前机顶盒型号配对的虚拟智能卡类型 
-				String pairModemModel = stbCfg.getVirtual_modem_model();//与当前机顶盒型号配对的虚拟猫类型
+				//jpz 机顶盒管理mac号的
+				stb.setMac(d.getModem_mac());
 				
-				if(StringHelper.isNotEmpty(d.getModem_mac())  ){
-					if(modemModelList.get(pairModemModel) == null){
-						throw new ComponentException("虚拟猫的设备类型错误：" + MemoryDict.getDictName(DictKey.MODEM_MODEL, pairModemModel) );
-					}
-					String modeMeivceId = gDeviceId();
-					stb.setPair_modem_id(modeMeivceId);
-					// 猫设备信息
-					RDevice modemDevice = new RDevice(
-							SystemConstants.DEVICE_TYPE_MODEM,
-							StatusConstants.ACTIVE, StatusConstants.IDLE);
-					modemDevice.setDevice_id(modeMeivceId);
-					modemDevice.setDevice_model(pairModemModel);
-					modemDevice.setDepot_id(depotId);
-					modemDevice.setOwnership(input.getOwnership());
-					modemDevice.setOwnership_depot(depotId);
-					modemDevice.setIs_virtual(modemModelList.get(pairModemModel).getIs_virtual());
-					deviceList.add(modemDevice);
-					// 猫信息
-					RModem modem = new RModem();
-					modem.setDevice_id(modeMeivceId);
-					modem.setModem_mac(d.getModem_mac().replace(":","").replace("：", ""));
-					modem.setDevice_model(pairModemModel);
-					modem.setModem_type(modemModelList.get(pairModemModel).getModem_type());
-					modemList.add(modem);
-					
-				}
+//				String pairModemModel = stbCfg.getVirtual_modem_model();//与当前机顶盒型号配对的虚拟猫类型
+//				
+//				if(StringHelper.isNotEmpty(d.getModem_mac())  ){
+//					if(modemModelList.get(pairModemModel) == null){
+//						throw new ComponentException("虚拟猫的设备类型错误：" + MemoryDict.getDictName(DictKey.MODEM_MODEL, pairModemModel) );
+//					}
+//					String modeMeivceId = gDeviceId();
+//					stb.setPair_modem_id(modeMeivceId);
+//					// 猫设备信息
+//					RDevice modemDevice = new RDevice(
+//							SystemConstants.DEVICE_TYPE_MODEM,
+//							StatusConstants.ACTIVE, StatusConstants.IDLE);
+//					modemDevice.setDevice_id(modeMeivceId);
+//					modemDevice.setDevice_model(pairModemModel);
+//					modemDevice.setDepot_id(depotId);
+//					modemDevice.setOwnership(input.getOwnership());
+//					modemDevice.setOwnership_depot(depotId);
+//					modemDevice.setIs_virtual(modemModelList.get(pairModemModel).getIs_virtual());
+//					deviceList.add(modemDevice);
+//					// 猫信息
+//					RModem modem = new RModem();
+//					modem.setDevice_id(modeMeivceId);
+//					modem.setModem_mac(d.getModem_mac().replace(":","").replace("：", ""));
+//					modem.setDevice_model(pairModemModel);
+//					modem.setModem_type(modemModelList.get(pairModemModel).getModem_type());
+//					modemList.add(modem);
+//					
+//				}
 				
 				if (StringHelper.isNotEmpty(d.getPair_device_code())) {
 //					if (cardModelList.get(d.getPair_device_model())==null)
@@ -1246,7 +1254,7 @@ public class DeviceComponent extends BaseDeviceComponent {
 	
 	
 	public List<MaterialDeviceDto> queryMateralTransferDeviceByDepotId(SOptr optr)throws Exception{
-		String depotId = findDepot(optr);
+		String depotId = optr.getDept_id();
 		List<RDevice> list = rDeviceDao.queryMateralDeviceByDepotId(depotId);
 		Map<String, List<RDevice>> deviceMap = CollectionHelper.converToMap(list, "device_type");
 		List<MaterialDeviceDto> deviceList = new ArrayList<MaterialDeviceDto>();
@@ -2336,13 +2344,6 @@ public class DeviceComponent extends BaseDeviceComponent {
 		return device;
 	}
 	
-	/**
-	 * 查询设备型号
-	 * @return
-	 */
-	public List<RDeviceModel> queryDeviceModel() throws Exception {
-		return tDeviceBuyModeDao.queryDeviceModel();
-	}
 
 	/**
 	 * @param deviceTransferDao
@@ -2496,6 +2497,14 @@ public class DeviceComponent extends BaseDeviceComponent {
 
 	public void setSCountyDao(SCountyDao countyDao) {
 		sCountyDao = countyDao;
+	}
+
+	public void setRDeviceModelDao(RDeviceModelDao deviceModelDao) {
+		this.rDeviceModelDao = deviceModelDao;
+	}
+
+	public void setRDeviceTypeDao(RDeviceTypeDao deviceTypeDao) {
+		this.rDeviceTypeDao = deviceTypeDao;
 	}
 
 

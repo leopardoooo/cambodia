@@ -9,7 +9,6 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 
 import com.ycsoft.beans.config.TDeviceBuyMode;
-import com.ycsoft.beans.device.RDeviceModel;
 import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.daos.abstracts.BaseEntityDao;
@@ -90,8 +89,4 @@ public class TDeviceBuyModeDao extends BaseEntityDao<TDeviceBuyMode> {
 		return this.createQuery(sql,SystemConstants.BOOLEAN_TRUE, SystemConstants.FEE_TYPE_BUSI).list();
 	}
 
-	public List<RDeviceModel> queryDeviceModel() throws Exception{
-		String sql = "SELECT * FROM r_device_model";
-		return this.createQuery(RDeviceModel.class, sql).list();
-	}
 }

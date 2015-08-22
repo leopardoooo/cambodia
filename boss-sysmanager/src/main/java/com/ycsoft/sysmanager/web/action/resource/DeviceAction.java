@@ -1018,10 +1018,6 @@ public class DeviceAction extends BaseAction {
 		return JSON_RECORDS;
 	}
 	
-	public String queryDeviceModel() throws Exception {
-		getRoot().setRecords(deviceComponent.queryDeviceModel());
-		return JSON_RECORDS;
-	}
 	
 	public String queryMateralTransferDeviceByDepotId() throws Exception {
 		getRoot().setRecords(deviceComponent.queryMateralTransferDeviceByDepotId(getOptr()));
