@@ -4,17 +4,24 @@
 package com.ycsoft.boss.remoting.aaa;
 
 import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.axis2.AxisFault;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.ycsoft.boss.remoting.aaa.AAAInterfaceBusinessMgrServiceStub.AAASubscriberServiceInfo;
 import com.ycsoft.boss.remoting.aaa.AAAInterfaceBusinessMgrServiceStub.ActivateSubscriberRequestMsg;
 import com.ycsoft.boss.remoting.aaa.AAAInterfaceBusinessMgrServiceStub.CancelSubscriberServiceRequestMsg;
 import com.ycsoft.boss.remoting.aaa.AAAInterfaceBusinessMgrServiceStub.DeactivateSubscriberRequestMsg;
 import com.ycsoft.boss.remoting.aaa.AAAInterfaceBusinessMgrServiceStub.DeleteAAASubscriberRequestMsg;
+import com.ycsoft.boss.remoting.aaa.AAAInterfaceBusinessMgrServiceStub.ModifySubscriberServiceRequestMsg;
 import com.ycsoft.boss.remoting.aaa.AAAInterfaceBusinessMgrServiceStub.NewAAASubscriberRequestMsg;
 import com.ycsoft.boss.remoting.aaa.AAAInterfaceBusinessMgrServiceStub.OrderSubscriberServiceRequestMsg;
+import com.ycsoft.boss.remoting.aaa.AAAInterfaceBusinessMgrServiceStub.QuerySubscriberServiceRequestMsg;
+import com.ycsoft.boss.remoting.aaa.AAAInterfaceBusinessMgrServiceStub.QuerySubscriberServiceResult;
+import com.ycsoft.boss.remoting.aaa.AAAInterfaceBusinessMgrServiceStub.QuerySubscriberServiceResultMsg;
 import com.ycsoft.boss.remoting.aaa.AAAInterfaceBusinessMgrServiceStub.ResetAAASubscriberPswdRequestMsg;
 import com.ycsoft.boss.remoting.aaa.AAAInterfaceBusinessMgrServiceStub.ResultHeader;
 
@@ -171,6 +178,56 @@ public class BOSSBandServiceAdapter {
 	public boolean cancelOrder(long doneCode, String userId)throws AAAException{
 		CancelSubscriberServiceRequestMsg request = AAARequestUtils.buildCancelSubscriberServiceRequestMsg(doneCode, userId);
 		return cancelOrder(request);
+	}
+	
+	/**
+	 * 查询用户订购记录
+	 * @see AAARequestUtils#buildQuerySubscriberServiceMsg(long, String)
+	 */
+	public List<AAASubscriberServiceInfoWrapper> querySubscriberService(long doneCode, String userId)throws AAAException{
+		QuerySubscriberServiceRequestMsg request = AAARequestUtils.buildQuerySubscriberServiceMsg(doneCode, userId);
+		return querySubscriberService(request);
+	}
+	
+	public List<AAASubscriberServiceInfoWrapper> querySubscriberService(QuerySubscriberServiceRequestMsg request)throws AAAException{
+		ResultHeader result = null;
+		QuerySubscriberServiceResult obj = null;
+		try {
+			QuerySubscriberServiceResultMsg resultMsg = aaaStub.querySubscriberService(request);
+			result = resultMsg.getResultHeader();
+			obj = resultMsg.getQuerySubscriberServiceResult();
+		} catch (RemoteException e) {
+			throw new AAAException(e);
+		}
+		if(AAAResultUtils.success(result)){	
+			List<AAASubscriberServiceInfoWrapper> aaas = new ArrayList<>(
+					obj.getAAASubscriberServiceInfo().length);
+			for (AAASubscriberServiceInfo a: obj.getAAASubscriberServiceInfo()) {
+				aaas.add(new AAASubscriberServiceInfoWrapper(a));
+			}
+			return aaas;
+		}else{
+			throw new AAAException(result);
+		}
+	}
+	
+	/** 修改订购业务 */
+	public boolean modifyOrderService(final ModifySubscriberServiceRequestMsg request)throws AAAException{
+		return applyTemplate(new Callback(){
+			@Override
+			public ResultHeader doCallback() throws RemoteException {
+				return aaaStub.modifySubscriberService(request).getResultHeader();
+			}
+		});
+	}
+	
+	/**
+	 * 修改订购业务
+	 * @see AAARequestUtils#buildModifySubscriberServiceRequestMsg(long, String, Integer, String, String)
+	 */
+	public boolean modifyOrderService(long doneCode, String userId, Integer policyId, String effectTime, String expireTime)throws AAAException{
+		ModifySubscriberServiceRequestMsg request = AAARequestUtils.buildModifySubscriberServiceRequestMsg(doneCode, userId, policyId, effectTime, expireTime);
+		return modifyOrderService(request);
 	}
 	
 	public boolean applyTemplate(Callback callback)throws AAAException{

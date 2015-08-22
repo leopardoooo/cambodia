@@ -13,11 +13,15 @@ import com.ycsoft.boss.remoting.aaa.AAAInterfaceBusinessMgrServiceStub.Deactivat
 import com.ycsoft.boss.remoting.aaa.AAAInterfaceBusinessMgrServiceStub.DeactivateSubscriberRequestMsg;
 import com.ycsoft.boss.remoting.aaa.AAAInterfaceBusinessMgrServiceStub.DeleteAAASubscriberRequest;
 import com.ycsoft.boss.remoting.aaa.AAAInterfaceBusinessMgrServiceStub.DeleteAAASubscriberRequestMsg;
+import com.ycsoft.boss.remoting.aaa.AAAInterfaceBusinessMgrServiceStub.ModifySubscriberServiceRequest;
+import com.ycsoft.boss.remoting.aaa.AAAInterfaceBusinessMgrServiceStub.ModifySubscriberServiceRequestMsg;
 import com.ycsoft.boss.remoting.aaa.AAAInterfaceBusinessMgrServiceStub.NewAAASubscriberRequest;
 import com.ycsoft.boss.remoting.aaa.AAAInterfaceBusinessMgrServiceStub.NewAAASubscriberRequestMsg;
 import com.ycsoft.boss.remoting.aaa.AAAInterfaceBusinessMgrServiceStub.OperatorInfo;
 import com.ycsoft.boss.remoting.aaa.AAAInterfaceBusinessMgrServiceStub.OrderSubscriberServiceRequest;
 import com.ycsoft.boss.remoting.aaa.AAAInterfaceBusinessMgrServiceStub.OrderSubscriberServiceRequestMsg;
+import com.ycsoft.boss.remoting.aaa.AAAInterfaceBusinessMgrServiceStub.QuerySubscriberServiceRequest;
+import com.ycsoft.boss.remoting.aaa.AAAInterfaceBusinessMgrServiceStub.QuerySubscriberServiceRequestMsg;
 import com.ycsoft.boss.remoting.aaa.AAAInterfaceBusinessMgrServiceStub.RequestHeader;
 import com.ycsoft.boss.remoting.aaa.AAAInterfaceBusinessMgrServiceStub.RequestType_type1;
 import com.ycsoft.boss.remoting.aaa.AAAInterfaceBusinessMgrServiceStub.ResetAAASubscriberPswdRequest;
@@ -33,6 +37,9 @@ public final class AAARequestUtils {
 	// 默认的业务流水号
 	private static final long DEFAULT_DONE_CODE = 0L;
 	
+	// 华为AAA接入方式支持很多种，但目前boss系统仅支持1090204:FBB&WiFi
+	private static final Integer DEFAULT_ACCESS_TYPE = 1090204;
+	
 	static enum CommandId{
 		// 开户
 		NewSubscriber,
@@ -46,8 +53,64 @@ public final class AAARequestUtils {
 		ResetAAASubscriberPswd,
 		// 订购业务
 		OrderSubscriberService,
+		// 修改订购业务
+		ModifySubscriberService,
 		// 删除订购业务
-		CancelSubscriberService
+		CancelSubscriberService,
+		// 查询用户订购业务
+		QuerySubscriberService
+	}
+	
+	/**
+	 * 构建修改订购业务的请求数据结构
+	 * @param doneCode 流水号用于生成请求头信息
+	 * @param userId boss系统的userId
+	 * @param policyId 对应AAA的policyId
+	 * @param effectTime YYMMDDhhmmss 如：20370101000000
+	 * @param expireTime YYMMDDhhmmss 如：20370101000000
+	 * @return
+	 */
+	public static ModifySubscriberServiceRequestMsg buildModifySubscriberServiceRequestMsg(long doneCode, String userId, Integer policyId, String effectTime, String expireTime){
+		ModifySubscriberServiceRequestMsg request = new ModifySubscriberServiceRequestMsg();
+		
+		ModifySubscriberServiceRequest body = new ModifySubscriberServiceRequest();
+		body.setSubscriberID(userId);
+		
+		AAASubscriberServiceInfo serviceInfo = createServiceInfo(policyId, effectTime, expireTime);
+		body.setAAASubscriberServiceInfo(serviceInfo);
+		
+		request.setModifySubscriberServiceRequest(body);
+		request.setRequestHeader(buildReqeustHeader(CommandId.ModifySubscriberService, doneCode));
+		
+		return request;
+	}
+	
+	public static ModifySubscriberServiceRequestMsg buildModifySubscriberServiceRequestMsg(String userId, Integer policyId, String effectTime, String expireTime){
+		return buildModifySubscriberServiceRequestMsg(DEFAULT_DONE_CODE, userId, policyId, effectTime, expireTime);
+	}
+	
+	/**
+	 * 构建查询订购业务的请求数据结构
+	 * @param doneCode 流水号用于生成请求头信息
+	 * @param userId boss系统的userId
+	 * @return
+	 */
+	public static QuerySubscriberServiceRequestMsg buildQuerySubscriberServiceMsg(long doneCode, String userId){
+		QuerySubscriberServiceRequestMsg request = new QuerySubscriberServiceRequestMsg();
+		
+		QuerySubscriberServiceRequest body = new QuerySubscriberServiceRequest();
+		body.setSubscriberID(userId);
+		// 接入方式 1090204:FBB&WiFi
+		body.setAccessType(DEFAULT_ACCESS_TYPE);
+		
+		request.setQuerySubscriberServiceRequest(body);
+		request.setRequestHeader(buildReqeustHeader(CommandId.QuerySubscriberService, doneCode));
+		
+		return request;
+	}
+	
+	public static QuerySubscriberServiceRequestMsg buildQuerySubscriberServiceMsg(String userId){
+		return buildQuerySubscriberServiceMsg(DEFAULT_DONE_CODE, userId);
 	}
 	
 	/**
@@ -65,7 +128,7 @@ public final class AAARequestUtils {
 		OrderSubscriberServiceRequest body = new OrderSubscriberServiceRequest();
 		body.setSubscriberID(userId);
 		
-		AAASubscriberServiceInfo serviceInfo = createServiceInfo(policyId, null, null);
+		AAASubscriberServiceInfo serviceInfo = createServiceInfo(policyId, effectTime, expireTime);
 		body.setAAASubscriberServiceInfo(serviceInfo);
 		
 		request.setOrderSubscriberServiceRequest(body);
@@ -90,7 +153,7 @@ public final class AAARequestUtils {
 		CancelSubscriberServiceRequest body = new CancelSubscriberServiceRequest();
 		body.setSubscriberID(userId);
 		// 接入方式 1090204:FBB&WiFi
-		body.setAccessType(1090204);
+		body.setAccessType(DEFAULT_ACCESS_TYPE);
 		body.setOperatorInfo(createDefaultOperatorInfo());
 		
 		request.setCancelSubscriberServiceRequest(body);
@@ -237,7 +300,7 @@ public final class AAARequestUtils {
 	private static AAASubscriberServiceInfo createServiceInfo(Integer policyId, String effectTime, String expireTime){
 		AAASubscriberServiceInfo serviceInfo = new AAASubscriberServiceInfo();
 		// 接入方式 1090204:FBB&WiFi
-		serviceInfo.setAccessType(1090204);
+		serviceInfo.setAccessType(DEFAULT_ACCESS_TYPE);
 		// 1:固网 2:WLAN 3:固网+WLAN
 		serviceInfo.setPermittedANTYpe(3);
 		// 接入策略ID
@@ -246,7 +309,14 @@ public final class AAARequestUtils {
 		serviceInfo.setMaxSessNumber(0);
 		serviceInfo.setCancelBinding(0);
 		serviceInfo.setPortBindingType(0);
-		
+		// 开始日期
+		if(null != effectTime){
+			serviceInfo.setEffectTime(effectTime);
+		}
+		// 结束日期
+		if(null != expireTime){
+			serviceInfo.setExpireTime(expireTime);
+		}
 		return serviceInfo;
 	}
 	
