@@ -3,6 +3,7 @@ package com.ycsoft.business.component.resource;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
@@ -37,6 +38,7 @@ import com.ycsoft.business.dao.resource.device.RDepotDefineDao;
 import com.ycsoft.business.dao.resource.device.RDeviceChangeDao;
 import com.ycsoft.business.dao.resource.device.RDeviceDao;
 import com.ycsoft.business.dao.resource.device.RDeviceFeeDao;
+import com.ycsoft.business.dao.resource.device.RDeviceModelDao;
 import com.ycsoft.business.dao.resource.device.RDeviceReclaimDao;
 import com.ycsoft.business.dao.resource.device.RDeviceUseRecordsDao;
 import com.ycsoft.business.dao.resource.device.RModemDao;
@@ -52,6 +54,7 @@ import com.ycsoft.commons.constants.DataRight;
 import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.exception.ComponentException;
+import com.ycsoft.commons.exception.ErrorCode;
 import com.ycsoft.commons.exception.ServicesException;
 import com.ycsoft.commons.helper.CollectionHelper;
 import com.ycsoft.commons.helper.DateHelper;
@@ -59,6 +62,7 @@ import com.ycsoft.commons.helper.JsonHelper;
 import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.daos.core.JDBCException;
 import com.ycsoft.daos.core.Pager;
+import com.ycsoft.sysmanager.dto.resource.RDeviceModelTotalDto;
 
 /**
  * 设备组件
@@ -88,6 +92,7 @@ public class DeviceComponent extends BaseBusiComponent {
 	private RDeviceUseRecordsDao rDeviceUseRecordsDao;
 	private TBusiFeeDeviceDao tBusiFeeDeviceDao;
 	private CCustDeviceDao cCustDeviceDao;
+	private RDeviceModelDao rDeviceModelDao;
 	/**
 	 * 根据设备编号查询设备及客户信息
 	 * @param deviceCode
@@ -714,7 +719,7 @@ public class DeviceComponent extends BaseBusiComponent {
 	 * @return
 	 */
 	public List<RDeviceModel> queryDeviceModel() throws Exception {
-		return tDeviceBuyModeDao.queryDeviceModel();
+		return rDeviceModelDao.queryDeviceModel();
 	}
 	
 	
@@ -847,7 +852,54 @@ public class DeviceComponent extends BaseBusiComponent {
 		return true;
 	}
 	
+	/**
+	 * 处理器材数量
+	 * @param deviceType
+	 * @param deviceModel
+	 * @param optr
+	 * @param buyNum 
+	 * @throws Exception
+	 */
+	public void removeTotalNumDevice(String deviceId, Integer buyNum) throws Exception{
+		//减去调拨数量
+		rDeviceDao.removeMateralTransferDevice(deviceId, buyNum);
+		RDevice nextRdevice = rDeviceDao.findByKey(deviceId);
+		if(nextRdevice.getTotal_num()<0){
+			throw new ComponentException(ErrorCode.DeviceTotalNumIsNull);
+		}
+	}
 	
+	public RDevice queryTotalNumDevice(String deviceType, String deviceModel,String deptId) throws Exception{
+		//原器材
+		RDevice device = rDeviceDao.queryIdleMateralDevice(deviceType, deviceModel, deptId);
+		if(device == null){
+			throw new ComponentException(ErrorCode.DeviceNotExists);
+		}
+		
+		return device;
+	}
+	
+	public List<RDeviceModelTotalDto> queryMateralTransferDeviceByDepotId(SOptr optr)throws Exception{
+		String depotId = optr.getDept_id();
+		List<RDevice> list = rDeviceDao.queryMateralDeviceByDepotId(depotId);
+		List<RDeviceModel> modelList = queryDeviceModel();
+		Map<String, List<RDevice>> deviceMap = CollectionHelper.converToMap(list,new String[]{"device_type","device_model"});
+		List<RDeviceModelTotalDto> deviceList = new ArrayList<RDeviceModelTotalDto>();
+		for(RDeviceModel _r : modelList){
+			RDeviceModelTotalDto dto = new RDeviceModelTotalDto();
+			BeanUtils.copyProperties(_r, dto);
+			dto.setTotal_num(0);
+			String type = StringHelper.join(new String[]{_r.getDevice_type(),_r.getDevice_model()},"_");
+			if(deviceMap != null &&  deviceMap.get(type) != null){
+				List<RDevice> device = deviceMap.get(type);
+				if(device.size()==1){
+					dto.setTotal_num(device.get(0).getTotal_num());
+				}
+			}
+			deviceList.add(dto);
+		}
+		return deviceList;
+	}
 	
 	public void setCValuableCardHisDao(CValuableCardHisDao valuableCardHisDao) {
 		cValuableCardHisDao = valuableCardHisDao;
@@ -965,5 +1017,10 @@ public class DeviceComponent extends BaseBusiComponent {
 	public void setCCustDeviceDao(CCustDeviceDao custDeviceDao) {
 		cCustDeviceDao = custDeviceDao;
 	}
+
+	public void setRDeviceModelDao(RDeviceModelDao deviceModelDao) {
+		this.rDeviceModelDao = deviceModelDao;
+	}
+
 	
 }

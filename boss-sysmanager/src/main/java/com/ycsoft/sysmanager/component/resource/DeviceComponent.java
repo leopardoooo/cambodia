@@ -34,6 +34,7 @@ import com.ycsoft.beans.device.RDeviceProcure;
 import com.ycsoft.beans.device.RDeviceReclaim;
 import com.ycsoft.beans.device.RDeviceSupplier;
 import com.ycsoft.beans.device.RDeviceTransfer;
+import com.ycsoft.beans.device.RDeviceType;
 import com.ycsoft.beans.device.RModem;
 import com.ycsoft.beans.device.RModemModel;
 import com.ycsoft.beans.device.RPairCfg;
@@ -59,6 +60,7 @@ import com.ycsoft.business.dao.resource.device.RDeviceDoneDeviceidDao;
 import com.ycsoft.business.dao.resource.device.RDeviceEditDao;
 import com.ycsoft.business.dao.resource.device.RDeviceHisDao;
 import com.ycsoft.business.dao.resource.device.RDeviceInputDao;
+import com.ycsoft.business.dao.resource.device.RDeviceModelDao;
 import com.ycsoft.business.dao.resource.device.RDeviceOrderDao;
 import com.ycsoft.business.dao.resource.device.RDeviceOrderDetailDao;
 import com.ycsoft.business.dao.resource.device.RDeviceOutputDao;
@@ -66,6 +68,7 @@ import com.ycsoft.business.dao.resource.device.RDeviceProcureDao;
 import com.ycsoft.business.dao.resource.device.RDeviceReclaimDao;
 import com.ycsoft.business.dao.resource.device.RDeviceSupplierDao;
 import com.ycsoft.business.dao.resource.device.RDeviceTransferDao;
+import com.ycsoft.business.dao.resource.device.RDeviceTypeDao;
 import com.ycsoft.business.dao.resource.device.RDeviceUseRecordsDao;
 import com.ycsoft.business.dao.resource.device.RModemDao;
 import com.ycsoft.business.dao.resource.device.RStbDao;
@@ -82,6 +85,7 @@ import com.ycsoft.commons.constants.SequenceConstants;
 import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.exception.ComponentException;
+import com.ycsoft.commons.exception.ErrorCode;
 import com.ycsoft.commons.helper.CollectionHelper;
 import com.ycsoft.commons.helper.DateHelper;
 import com.ycsoft.commons.helper.LoggerHelper;
@@ -94,6 +98,8 @@ import com.ycsoft.sysmanager.dto.resource.DeviceDto;
 import com.ycsoft.sysmanager.dto.resource.DeviceInputDetailDto;
 import com.ycsoft.sysmanager.dto.resource.DeviceProcureDto;
 import com.ycsoft.sysmanager.dto.resource.DeviceReclaimDto;
+import com.ycsoft.sysmanager.dto.resource.MaterialDeviceDto;
+import com.ycsoft.sysmanager.dto.resource.MaterialModelDto;
 import com.ycsoft.sysmanager.dto.system.RDepotDto;
 import com.ycsoft.sysmanager.dto.system.SDeptDto;
 import com.ycsoft.sysmanager.web.commons.interceptor.WebOptr;
@@ -131,6 +137,8 @@ public class DeviceComponent extends BaseDeviceComponent {
 	private SDeptDao sDeptDao;
 	private TDeviceBuyModeDao tDeviceBuyModeDao;
 	private SCountyDao sCountyDao;
+	private RDeviceModelDao rDeviceModelDao;
+	private RDeviceTypeDao rDeviceTypeDao;
 
 	public void setRDeviceDifeenceDao(RDeviceDifeenceDao deviceDifeenceDao) {
 		rDeviceDifeenceDao = deviceDifeenceDao;
@@ -897,6 +905,10 @@ public class DeviceComponent extends BaseDeviceComponent {
 	 */
 	public void saveDeviceInput(SOptr optr, RDeviceInput input,
 			List<DeviceDto> devices,String deviceType) throws Exception ,ComponentException{
+		if(devices.size()==0){
+			throw new ComponentException("无可入库的设备");
+		}
+		
 		checkDeviceOperRight(optr,devices);
 		//验证设备是否重复
 		checkDeviceIsNull(CollectionHelper.converValueToArray(devices, "device_code"),"设备号");
@@ -927,6 +939,7 @@ public class DeviceComponent extends BaseDeviceComponent {
 		input.setOptr_id(optr.getOptr_id());
 		input.setDepot_id(depotId);
 		input.setCreate_time(DateHelper.now());
+		input.setBatch_num(devices.get(0).getBatch_num());
 
 		List<RDeviceDoneDeviceid> doneDeviceidList = new ArrayList<RDeviceDoneDeviceid>();
 		List<RDevice> deviceList = new ArrayList<RDevice>();
@@ -938,10 +951,14 @@ public class DeviceComponent extends BaseDeviceComponent {
 		Map<String, RCardModel> cardModelList = CollectionHelper.converToMapSingle(rCardModelDao.findAll(), "device_model");
 		Map<String ,RModemModel> modemModelList = CollectionHelper.converToMapSingle(rModemModelDao.findAll(), "device_model");
 		
-		List<RPairCfg> pairs = rPairCfgDao.findAll();
+//		List<RPairCfg> pairs = rPairCfgDao.findAll();
 		for (DeviceDto d : devices) {
-			checkDeviceCodeNum(d);
 			String deivceId = gDeviceId();
+			if(d.getDevice_type().equals(SystemConstants.DEVICE_TYPE_STB) ||
+					d.getDevice_type().equals(SystemConstants.DEVICE_TYPE_CARD) ||
+					d.getDevice_type().equals(SystemConstants.DEVICE_TYPE_MODEM)){
+				checkDeviceCodeNum(d);
+			}
 			
 			if (d.getDevice_type().equals(SystemConstants.DEVICE_TYPE_STB)) {
 				//fillDeviceModel(stbModelList,cardModelList,modemModelList,pairs,d);
@@ -956,34 +973,37 @@ public class DeviceComponent extends BaseDeviceComponent {
 				
 				//根据配置信息取已经配置了的配置型号,
 				String pairCardModel = stbCfg.getVirtual_card_model();//与当前机顶盒型号配对的虚拟智能卡类型 
-				String pairModemModel = stbCfg.getVirtual_modem_model();//与当前机顶盒型号配对的虚拟猫类型
+				//jpz 机顶盒管理mac号的
+				stb.setMac(d.getModem_mac());
 				
-				if(StringHelper.isNotEmpty(d.getModem_mac())  ){
-					if(modemModelList.get(pairModemModel) == null){
-						throw new ComponentException("虚拟猫的设备类型错误：" + MemoryDict.getDictName(DictKey.MODEM_MODEL, pairModemModel) );
-					}
-					String modeMeivceId = gDeviceId();
-					stb.setPair_modem_id(modeMeivceId);
-					// 猫设备信息
-					RDevice modemDevice = new RDevice(
-							SystemConstants.DEVICE_TYPE_MODEM,
-							StatusConstants.ACTIVE, StatusConstants.IDLE);
-					modemDevice.setDevice_id(modeMeivceId);
-					modemDevice.setDevice_model(pairModemModel);
-					modemDevice.setDepot_id(depotId);
-					modemDevice.setOwnership(input.getOwnership());
-					modemDevice.setOwnership_depot(depotId);
-					modemDevice.setIs_virtual(modemModelList.get(pairModemModel).getIs_virtual());
-					deviceList.add(modemDevice);
-					// 猫信息
-					RModem modem = new RModem();
-					modem.setDevice_id(modeMeivceId);
-					modem.setModem_mac(d.getModem_mac().replace(":","").replace("：", ""));
-					modem.setDevice_model(pairModemModel);
-					modem.setModem_type(modemModelList.get(pairModemModel).getModem_type());
-					modemList.add(modem);
-					
-				}
+//				String pairModemModel = stbCfg.getVirtual_modem_model();//与当前机顶盒型号配对的虚拟猫类型
+//				
+//				if(StringHelper.isNotEmpty(d.getModem_mac())  ){
+//					if(modemModelList.get(pairModemModel) == null){
+//						throw new ComponentException("虚拟猫的设备类型错误：" + MemoryDict.getDictName(DictKey.MODEM_MODEL, pairModemModel) );
+//					}
+//					String modeMeivceId = gDeviceId();
+//					stb.setPair_modem_id(modeMeivceId);
+//					// 猫设备信息
+//					RDevice modemDevice = new RDevice(
+//							SystemConstants.DEVICE_TYPE_MODEM,
+//							StatusConstants.ACTIVE, StatusConstants.IDLE);
+//					modemDevice.setDevice_id(modeMeivceId);
+//					modemDevice.setDevice_model(pairModemModel);
+//					modemDevice.setDepot_id(depotId);
+//					modemDevice.setOwnership(input.getOwnership());
+//					modemDevice.setOwnership_depot(depotId);
+//					modemDevice.setIs_virtual(modemModelList.get(pairModemModel).getIs_virtual());
+//					deviceList.add(modemDevice);
+//					// 猫信息
+//					RModem modem = new RModem();
+//					modem.setDevice_id(modeMeivceId);
+//					modem.setModem_mac(d.getModem_mac().replace(":","").replace("：", ""));
+//					modem.setDevice_model(pairModemModel);
+//					modem.setModem_type(modemModelList.get(pairModemModel).getModem_type());
+//					modemList.add(modem);
+//					
+//				}
 				
 				if (StringHelper.isNotEmpty(d.getPair_device_code())) {
 //					if (cardModelList.get(d.getPair_device_model())==null)
@@ -1072,6 +1092,7 @@ public class DeviceComponent extends BaseDeviceComponent {
 			//0001407: r_device.is_new_stb属性单卡 单猫都使用 
 			device.setIs_new_stb(input.getIs_new_stb());
 			// device.setWarranty_date();
+			device.setTotal_num(1);
 			deviceList.add(device);
 
 			RDeviceDoneDeviceid doneDeviceid = new RDeviceDoneDeviceid();
@@ -1140,6 +1161,119 @@ public class DeviceComponent extends BaseDeviceComponent {
 		//记录异动
 		rDeviceChangeDao.saveInputChange(doneCode, BusiCodeConstants.DEVICE_INPUT, optr.getCounty_id(), optr.getArea_id());
 		
+	}
+
+	public void saveMateralDeviceInput(SOptr optr, RDeviceInput input,
+			String batchNum, String deviceType, String deviceModel,String totalNum) throws Exception{
+		
+		List<DeviceDto> devices = new ArrayList<>();
+		DeviceDto deviceDto = new DeviceDto();
+		deviceDto.setDevice_type(deviceType);
+		devices.add(deviceDto);
+		checkDeviceOperRight(optr,devices);
+		
+		String depotId = findDepot(optr);
+		Integer orderDoneCode = input.getOrder_done_code();
+		Integer num = Integer.parseInt(totalNum);
+		if(orderDoneCode != null){
+			List<RDeviceOrderDetail> orderList = rDeviceOrderDetailDao.queryByDoneCode(orderDoneCode);
+			int orderNum = 0;//剩余可入库数
+			
+			for(RDeviceOrderDetail r : orderList){
+				if(r.getDevice_type().equals(deviceType) && r.getDevice_model().equals(deviceModel)){
+					orderNum = r.getOrder_num()- (r.getSupply_num() !=null? r.getSupply_num():0);
+					//到货数应当小于等于订货数
+					if(num> orderNum){
+						throw new ComponentException("入库数不能大于剩余的订货数！订单订货数："
+								+ r.getOrder_num() + ";到货数：" + r.getSupply_num()+ ";入库数：" + num);
+					}
+				}
+			}
+		}
+		Integer doneCode = gDoneCode();
+		input.setDevice_done_code(doneCode);
+		input.setOptr_id(optr.getOptr_id());
+		input.setDepot_id(depotId);
+		input.setCreate_time(DateHelper.now());
+		input.setIs_new_stb(SystemConstants.BOOLEAN_TRUE);
+		input.setOwnership(SystemConstants.OWNERSHIP_GD);
+		input.setBackup(SystemConstants.BOOLEAN_FALSE);
+		input.setBatch_num(batchNum);
+
+		RDevice device = rDeviceDao.queryIdleMateralDevice(deviceType,deviceModel,depotId);
+		if(device == null){
+			device = new RDevice(deviceType, StatusConstants.ACTIVE,StatusConstants.IDLE);
+			String deivceId = gDeviceId();
+			device.setDevice_id(deivceId);
+			device.setDevice_model(deviceModel);
+			device.setDepot_id(depotId);
+//			device.setBatch_num(batchNum);
+			device.setOwnership(input.getOwnership());
+			device.setBackup(input.getBackup());
+			device.setOwnership_depot(depotId);
+			device.setIs_new_stb(input.getIs_new_stb());
+			device.setTotal_num(num);
+			rDeviceDao.save(device);
+		}else{
+			//更新器材原总数
+			rDeviceDao.addMateralTransferDevice(device.getDevice_id(),num);
+			checkDeviceNum(device.getDevice_id());
+		}
+
+		RDeviceDoneDeviceid doneDeviceid = new RDeviceDoneDeviceid();
+		doneDeviceid.setDevice_id(device.getDevice_id());
+		doneDeviceid.setDevice_done_code(doneCode);
+		
+		RDeviceDoneDetail deviceDetail = new RDeviceDoneDetail();
+		deviceDetail.setCount(num);
+		deviceDetail.setDevice_done_code(doneCode);
+		deviceDetail.setDevice_model(deviceModel);
+		deviceDetail.setDevice_type(deviceType);
+		
+		
+		
+		rDeviceInputDao.save(input);
+		rDeviceDoneDeviceidDao.save(doneDeviceid);
+		rDeviceDoneDetailDao.save(deviceDetail);
+		//更新到货数量
+		if(orderDoneCode != null){
+			rDeviceOrderDetailDao.updateMateralNum(orderDoneCode,deviceType,deviceModel,num);
+			RDeviceOrderDetail rDetail = rDeviceOrderDetailDao.queryMateralDeviceDetail(orderDoneCode,deviceType,deviceModel);
+			if(rDetail.getOrder_num()<rDetail.getSupply_num()){
+				throw new ComponentException(ErrorCode.DeviceTotalNumIsTooBig);
+			}
+		}
+		
+		//记录异动
+		rDeviceChangeDao.saveInputChange(doneCode, BusiCodeConstants.DEVICE_INPUT, optr.getCounty_id(), optr.getArea_id());
+		
+	}
+	
+	
+	
+	
+	
+	public List<MaterialDeviceDto> queryMateralTransferDeviceByDepotId(SOptr optr)throws Exception{
+		String depotId = optr.getDept_id();
+		List<RDevice> list = rDeviceDao.queryMateralDeviceByDepotId(depotId);
+		Map<String, List<RDevice>> deviceMap = CollectionHelper.converToMap(list, "device_type");
+		List<MaterialDeviceDto> deviceList = new ArrayList<MaterialDeviceDto>();
+		for(String type : deviceMap.keySet()){
+			MaterialDeviceDto _m = new MaterialDeviceDto();
+			_m.setDevice_type(type);
+			deviceList.add(_m);
+			
+			List<RDevice> rList = deviceMap.get(type);
+			for(RDevice r : rList){
+				MaterialModelDto _mm = new MaterialModelDto();
+				_mm.setDevice_model(r.getDevice_model());
+				_mm.setTotal_num(r.getTotal_num());
+				_mm.setDevice_id(r.getDevice_id());
+				_m.getMaterialList().add(_mm);
+			}
+		}
+		
+		return deviceList;
 	}
 
 	/**
@@ -1412,6 +1546,111 @@ public class DeviceComponent extends BaseDeviceComponent {
 		rDeviceChangeDao.saveTransChange(doneCode, BusiCodeConstants.DEVICE_TRANSFER, optr.getCounty_id(), optr.getArea_id());
 	}
 	
+	
+	/**
+	 * 器材调拨
+	 * @param optr
+	 * @param transfer
+	 * @param deviceList
+	 * @throws Exception
+	 */
+	public void saveMateralTransfer(SOptr optr, RDeviceTransfer transfer,
+			List<RDevice> deviceList) throws Exception {
+	
+		if(deviceList.size()== 0){
+			throw new ComponentException(ErrorCode.ParamIsNull);
+		}
+		
+		String[] deviceIds = CollectionHelper.converValueToArray(deviceList, "device_id");
+		if(deviceList.size() != deviceIds.length){
+			throw new ComponentException(ErrorCode.DeviceRepeat);
+		}
+		
+		
+		String depotId = findDepot(optr);
+		Integer doneCode = gDoneCode();
+		transfer.setDevice_done_code(doneCode);
+		transfer.setDepot_source(depotId);
+		transfer.setOptr_id(optr.getOptr_id());
+		transfer.setStatus(StatusConstants.UNCONFIRM);
+		transfer.setCreate_time(DateHelper.now());
+
+
+		List<RDevice> rList = rDeviceDao.queryDeviceByIds(deviceIds);
+		Map<String, RDevice> map = CollectionHelper.converToMapSingle(rList, "device_id");
+		
+		List<RDeviceDoneDeviceid> deviceDoneList = new ArrayList<RDeviceDoneDeviceid>();
+		
+		List<RDeviceDoneDetail> deviceDetailList = new ArrayList<RDeviceDoneDetail>();
+		
+		List<RDevice> deviceSaveList = new ArrayList<RDevice>();
+		
+		List<DeviceDto> devices = new ArrayList<>();
+		for (RDevice d : deviceList) {
+			//检查权限
+			DeviceDto deviceDto = new DeviceDto();
+			deviceDto.setDevice_type(d.getDevice_type());
+			devices.add(deviceDto);
+			
+			//新增器材数据
+			RDevice newDevice = new RDevice(d.getDevice_type(), StatusConstants.ACTIVE,StatusConstants.IDLE);
+			String deivceId = gDeviceId();
+			newDevice.setDevice_id(deivceId);
+			newDevice.setDevice_model(d.getDevice_model());
+			newDevice.setDepot_id(depotId);
+			newDevice.setOwnership(SystemConstants.OWNERSHIP_GD);
+			newDevice.setOwnership_depot(depotId);
+			newDevice.setTran_status(StatusConstants.UNCONFIRM);
+			newDevice.setIs_new_stb(SystemConstants.BOOLEAN_TRUE);
+			newDevice.setTotal_num(d.getTotal_num());
+			deviceSaveList.add(newDevice);
+			
+			
+			RDeviceDoneDeviceid device = new RDeviceDoneDeviceid();
+			device.setDevice_done_code(doneCode);
+			device.setDevice_id(deivceId);
+			deviceDoneList.add(device);
+			
+			RDeviceDoneDetail detail = new RDeviceDoneDetail();
+			detail.setDevice_done_code(doneCode);
+			detail.setDevice_type(d.getDevice_type());
+			detail.setDevice_model(d.getDevice_model());
+			detail.setCount(d.getTotal_num());
+			deviceDetailList.add(detail);
+			
+			//变更原有的设备数量
+			RDevice _r = map.get(d.getDevice_id());
+			Integer oldValue = _r.getTotal_num();
+			Integer newValue = _r.getTotal_num()-d.getTotal_num();
+			//总数异动记录
+			rDeviceChangeDao.saveMateralTransChange(doneCode,BusiCodeConstants.DEVICE_TRANSFER,device.getDevice_id(),"total_num",oldValue
+					,newValue,transfer.getOptr_id(),transfer.getDepot_source(),optr.getCounty_id(), optr.getArea_id());
+	
+			rDeviceDao.removeMateralTransferDevice(d.getDevice_id(), d.getTotal_num());
+			checkDeviceNum(d.getDevice_id());
+		}
+		
+		checkDeviceOperRight(optr,devices);
+		
+		rDeviceTransferDao.save(transfer);
+		rDeviceDoneDeviceidDao.save(deviceDoneList.toArray(new RDeviceDoneDeviceid[deviceDoneList.size()]));
+		rDeviceDoneDetailDao.save(deviceDetailList.toArray(new RDeviceDoneDetail[deviceDetailList.size()]));
+		
+		//新增调拨器材
+		rDeviceDao.save(deviceSaveList.toArray(new RDevice[deviceSaveList.size()]));
+	}
+	
+	public void checkDeviceNum(String deviceId) throws Exception{
+		RDevice nextRdevice = rDeviceDao.findByKey(deviceId);
+		if(nextRdevice == null){
+			throw new ComponentException(ErrorCode.DeviceNotExists);
+		}
+		if(nextRdevice.getTotal_num()<0){
+			throw new ComponentException(ErrorCode.DeviceTotalNumIsNull);
+		}
+	}
+	
+	
 	/**
 	 * 查询可以用来转发的设备.
 	 * @return
@@ -1444,15 +1683,50 @@ public class DeviceComponent extends BaseDeviceComponent {
 		transfer.setConfirm_info(confirmInfo);
 		rDeviceTransferDao.update(transfer);
 		
+		List<RDevice> rList = rDeviceDao.queryDeviceByDoneCode(deviceDoneCode);
+		Boolean isMateral = true;
+		for(RDevice r : rList){
+			//如果是器材调拨，所有的都只能是器材，判断1次就可以了
+			if(r.getDevice_type().equals(SystemConstants.DEVICE_TYPE_STB) || r.getDevice_type().equals(SystemConstants.DEVICE_TYPE_CARD) 
+					|| r.getDevice_type().equals(SystemConstants.DEVICE_TYPE_MODEM) ){
+				isMateral = false;
+				break;
+			}
+		}
+		
 		Integer doneCode = gDoneCode();
 		if (status.equals(StatusConstants.INVALID)){
-			rDeviceDao.updateTranIdel(transfer.getDevice_done_code());
-			//调拨取消记录异动
-			rDeviceChangeDao.saveTransCancelChange(doneCode, BusiCodeConstants.DEVICE_CANCEL_CONFIRM,deviceDoneCode, optr.getCounty_id(), optr.getArea_id());
+			if(isMateral){
+				for(RDevice r : rList){
+					//原器材
+					RDevice device = rDeviceDao.queryIdleMateralDevice(r.getDevice_type(), r.getDevice_model(), r.getDepot_id());
+					Integer oldValue = device.getTotal_num();
+					Integer newValue = oldValue + r.getTotal_num();
+					//总数异动记录
+					rDeviceChangeDao.saveMateralTransChange(doneCode,BusiCodeConstants.DEVICE_CANCEL_CONFIRM,device.getDevice_id(),"total_num",oldValue
+							,newValue,transfer.getConfirm_optr_id(),transfer.getDepot_source(),optr.getCounty_id(), optr.getArea_id());
+					//减去调拨数量
+					rDeviceDao.removeMateralTransferDevice(r.getDevice_id(), r.getTotal_num());
+					checkDeviceNum(r.getDevice_id());
+					//原器材总数+取消调拨的数量
+					rDeviceDao.addMateralTransferDevice(device.getDevice_id(),r.getTotal_num());
+					checkDeviceNum(device.getDevice_id());
+				}
+		
+			}else{
+				rDeviceDao.updateTranIdel(transfer.getDevice_done_code());
+				//调拨取消记录异动
+				rDeviceChangeDao.saveTransCancelChange(doneCode, BusiCodeConstants.DEVICE_CANCEL_CONFIRM,deviceDoneCode, optr.getCounty_id(), optr.getArea_id());
+			}
 		}else if(status.equals(StatusConstants.CONFIRM)){
-			rDeviceDao.updateTranIdelDepot(transfer.getDevice_done_code(), transfer.getDepot_order());
-			//调拨确认记录异动
-			rDeviceChangeDao.saveTransArrirmChange(doneCode, BusiCodeConstants.DEVICE_CONFIRM, deviceDoneCode,optr.getCounty_id(), optr.getArea_id());
+			if(isMateral){
+				rDeviceDao.updateMateralTransferDepot(transfer.getDevice_done_code(), transfer.getDepot_order());
+				rDeviceChangeDao.saveMateralTransArrirmChange(doneCode, BusiCodeConstants.DEVICE_CONFIRM, deviceDoneCode,optr.getCounty_id(), optr.getArea_id());
+			}else{
+				rDeviceDao.updateTranIdelDepot(transfer.getDevice_done_code(), transfer.getDepot_order());
+				//调拨确认记录异动
+				rDeviceChangeDao.saveTransArrirmChange(doneCode, BusiCodeConstants.DEVICE_CONFIRM, deviceDoneCode,optr.getCounty_id(), optr.getArea_id());
+			}
 		}
 	}
 
@@ -1813,6 +2087,85 @@ public class DeviceComponent extends BaseDeviceComponent {
 		
 	}
 
+	/**
+	 * 器材退库
+	 * @param optr
+	 * @param output
+	 * @param deviceList
+	 * @throws Exception
+	 */
+	public void saveMateralOutput(SOptr optr, RDeviceOutput output,
+			List<RDevice> deviceList) throws Exception{
+		if(deviceList.size()== 0){
+			throw new ComponentException(ErrorCode.ParamIsNull);
+		}
+		
+		String[] deviceIds = CollectionHelper.converValueToArray(deviceList, "device_id");
+		if(deviceList.size() != deviceIds.length){
+			throw new ComponentException(ErrorCode.DeviceRepeat);
+		}
+		
+		List<RDevice> rList = rDeviceDao.queryDeviceByIds(deviceIds);
+		for (RDevice d : rList) {
+			if(!StatusConstants.IDLE.equals(d.getTran_status())){
+				throw new ComponentException("设备正在调拨中，不允许退库");
+			}
+		}
+		
+		String depotId = findDepot(optr);
+		output.setDepot_id(depotId);
+		Integer doneCode = gDoneCode();
+		output.setDevice_done_code(doneCode);
+		output.setOptr_id(optr.getOptr_id());
+		output.setCreate_time(DateHelper.now());
+
+		Map<String, RDevice> map = CollectionHelper.converToMapSingle(rList, "device_id");
+		
+		List<RDeviceDoneDeviceid> deviceDoneList = new ArrayList<RDeviceDoneDeviceid>();
+		
+		List<RDeviceDoneDetail> deviceDetailList = new ArrayList<RDeviceDoneDetail>();
+		
+		List<DeviceDto> devices = new ArrayList<>();
+		for (RDevice d : deviceList) {
+			//检查权限
+			DeviceDto deviceDto = new DeviceDto();
+			deviceDto.setDevice_type(d.getDevice_type());
+			devices.add(deviceDto);
+			
+			RDeviceDoneDeviceid device = new RDeviceDoneDeviceid();
+			device.setDevice_done_code(doneCode);
+			device.setDevice_id(d.getDevice_id());
+			deviceDoneList.add(device);
+			
+			RDeviceDoneDetail detail = new RDeviceDoneDetail();
+			detail.setDevice_done_code(doneCode);
+			detail.setDevice_type(d.getDevice_type());
+			detail.setDevice_model(d.getDevice_model());
+			detail.setCount(d.getTotal_num());
+			deviceDetailList.add(detail);
+			
+			//变更原有的设备数量
+			RDevice _r = map.get(d.getDevice_id());
+			Integer oldValue = _r.getTotal_num();
+			Integer newValue = _r.getTotal_num()-d.getTotal_num();
+			//总数异动记录
+			rDeviceChangeDao.saveMateralTransChange(doneCode,BusiCodeConstants.DEVICE_OUT,device.getDevice_id(),"total_num",oldValue
+					,newValue,output.getOptr_id(),output.getDepot_id(),optr.getCounty_id(), optr.getArea_id());
+	
+			rDeviceDao.removeMateralTransferDevice(d.getDevice_id(), d.getTotal_num());
+			checkDeviceNum(d.getDevice_id());
+		}
+		
+		checkDeviceOperRight(optr,devices);
+		
+		rDeviceOutputDao.save(output);
+		rDeviceDoneDeviceidDao.save(deviceDoneList.toArray(new RDeviceDoneDeviceid[deviceDoneList.size()]));
+		rDeviceDoneDetailDao.save(deviceDetailList.toArray(new RDeviceDoneDetail[deviceDetailList.size()]));
+		
+		//删除设备
+//		rDeviceDao.removeDeviceToHis(doneCode);
+		
+	}
 
 
 
@@ -1990,6 +2343,7 @@ public class DeviceComponent extends BaseDeviceComponent {
 		checkDevice(depotId, device,deviceCode,false);
 		return device;
 	}
+	
 
 	/**
 	 * @param deviceTransferDao
@@ -2144,5 +2498,16 @@ public class DeviceComponent extends BaseDeviceComponent {
 	public void setSCountyDao(SCountyDao countyDao) {
 		sCountyDao = countyDao;
 	}
+
+	public void setRDeviceModelDao(RDeviceModelDao deviceModelDao) {
+		this.rDeviceModelDao = deviceModelDao;
+	}
+
+	public void setRDeviceTypeDao(RDeviceTypeDao deviceTypeDao) {
+		this.rDeviceTypeDao = deviceTypeDao;
+	}
+
+
+
 	
 }

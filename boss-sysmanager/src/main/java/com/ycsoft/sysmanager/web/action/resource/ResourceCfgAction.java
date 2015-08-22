@@ -10,8 +10,10 @@ import com.google.gson.reflect.TypeToken;
 import com.ycsoft.beans.config.TDeviceBuyMode;
 import com.ycsoft.beans.device.RCardModel;
 import com.ycsoft.beans.device.RDeviceFee;
+import com.ycsoft.beans.device.RDeviceModel;
 import com.ycsoft.beans.device.RDeviceModelCounty;
 import com.ycsoft.beans.device.RDeviceSupplier;
+import com.ycsoft.beans.device.RDeviceType;
 import com.ycsoft.beans.device.RModemModel;
 import com.ycsoft.beans.device.RStbModel;
 import com.ycsoft.commons.abstracts.BaseAction;
@@ -40,6 +42,8 @@ public class ResourceCfgAction extends BaseAction {
 	private String stbModelList;
 	private String modemModelList;
 	private String cardModelList;
+	private String materalModelList;
+	private String deviceTypeList;
 
 	private String buyMode;
 	private String supplierId;
@@ -189,7 +193,23 @@ public class ResourceCfgAction extends BaseAction {
 		resourceCfgComponent.saveRStbModel(list);
 		return JSON_SUCCESS;
 	}
+	
+	
+	public String saveMateralModel() throws Exception {
+		Type type = new TypeToken<List<RDeviceModel>>(){}.getType();
+		List<RDeviceModel> list = new Gson().fromJson(materalModelList, type);
+		resourceCfgComponent.saveMateralModel(list);
+		return JSON_SUCCESS;
+	}
 
+	
+	public String saveDeviceType() throws Exception {
+		Type type = new TypeToken<List<RDeviceType>>(){}.getType();
+		List<RDeviceType> list = new Gson().fromJson(deviceTypeList, type);
+		resourceCfgComponent.saveDeviceType(list);
+		return JSON_SUCCESS;
+	}
+	
 	/**
 	 * 查询购买方式
 	 * @return
@@ -241,6 +261,19 @@ public class ResourceCfgAction extends BaseAction {
 	}
 
 	/**
+	 * 加载基本配置数据
+	 * @return
+	 * @throws Exception
+	 */
+	public String queryCfgLoad() throws Exception {
+		getRoot().setOthers(resourceCfgComponent.queryCfgLoad(optr));
+		return JSON_OTHER;
+		
+	}
+	
+	
+	
+	/**
 	 * 查询智能卡型号
 	 * @return
 	 * @throws Exception
@@ -249,9 +282,19 @@ public class ResourceCfgAction extends BaseAction {
 		getRoot().setRecords(resourceCfgComponent.queryRCardModel());
 		return JSON_RECORDS;
 	}
+	
+	public String queryDeviceType() throws Exception {
+		getRoot().setRecords(resourceCfgComponent.queryDeviceType());
+		return JSON_RECORDS;
+	}
 
 	public String queryCountyModel() throws Exception {
 		getRoot().setRecords(resourceCfgComponent.queryCountyModel(optr));
+		return JSON_RECORDS;
+	}
+	
+	public String queryDeviceModelCfg() throws Exception {
+		getRoot().setRecords(resourceCfgComponent.queryDeviceModel());
 		return JSON_RECORDS;
 	}
 	
@@ -350,5 +393,14 @@ public class ResourceCfgAction extends BaseAction {
 	public void setModelCountyList(String modelCountyList) {
 		this.modelCountyList = modelCountyList;
 	}
+
+	public void setMateralModelList(String materalModelList) {
+		this.materalModelList = materalModelList;
+	}
+
+	public void setDeviceTypeList(String deviceTypeList) {
+		this.deviceTypeList = deviceTypeList;
+	}
+	
 
 }

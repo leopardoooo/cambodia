@@ -43,6 +43,12 @@ public class RDeviceOrderDetailDao extends BaseEntityDao<RDeviceOrderDetail> {
 		executeUpdate(sql, deviceDoneCode,orderDoneDode);
 	}
 
+	public void updateMateralNum(Integer orderDoneDode,String deviceType,String deviceModel, Integer num) throws JDBCException {
+		String sql = "UPDATE r_device_order_detail t SET t.supply_num=decode(t.supply_num,null,0,t.supply_num)+? WHERE " +
+				" t.device_type =? AND t.device_model=? and t.device_done_code=?";
+		executeUpdate(sql, num,deviceType,deviceModel,orderDoneDode);
+	}
+	
 	/**
 	 * 查询订购明细
 	 * @param deviceDoneCode
@@ -63,5 +69,11 @@ public class RDeviceOrderDetailDao extends BaseEntityDao<RDeviceOrderDetail> {
 	public void removeByDoneCode(Integer doneCode) throws JDBCException {
 		String sql = "DELETE r_device_order_detail WHERE device_done_code=?";
 		executeUpdate(sql, doneCode);
+	}
+	
+	public RDeviceOrderDetail queryMateralDeviceDetail(Integer orderDoneDode,String deviceType,String deviceModel) throws JDBCException {
+		String sql = "SELECT * FROM r_device_order_detail t WHERE " +
+				" t.device_type =? AND t.device_model=? and t.device_done_code=?";
+		return createQuery(sql,deviceType,deviceModel,orderDoneDode).first();
 	}
 }

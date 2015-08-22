@@ -18,14 +18,12 @@ import com.ycsoft.beans.device.RDevice;
 import com.ycsoft.beans.device.RDeviceModel;
 import com.ycsoft.beans.device.RStb;
 import com.ycsoft.beans.system.SOptr;
-import com.ycsoft.commons.constants.BusiCodeConstants;
 import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.daos.abstracts.BaseEntityDao;
 import com.ycsoft.daos.core.JDBCException;
 import com.ycsoft.daos.core.Pager;
-import com.ycsoft.sysmanager.dto.depot.RDeviceTransferDto;
 import com.ycsoft.sysmanager.dto.resource.DeviceDto;
 
 
@@ -579,7 +577,7 @@ public class RDeviceDao extends BaseEntityDao<RDevice> {
 			+" d.device_model,d.device_status,d.depot_status,d.tran_status,d.used,d.backup,d.freezed,"
 			+" d.diffence_type,d.depot_id,d.ownership,d.ownership_depot,d.warranty_date,d.is_virtual,"
 			+" d.is_local,d.is_loss,d.is_new_stb,device_code,pair_device_code,pair_device_model,"
-			+" pair_device_modem_code,pair_device_modem_model,modem_mac,batch_num order by create_time desc";
+			+" pair_device_modem_code,pair_device_modem_model,modem_mac,batch_num,total_num order by create_time desc";
 		return createNameQuery(DeviceDto.class, sql, paramers).setStart(start).setLimit(limit).page();
 
 	}
@@ -651,9 +649,9 @@ public class RDeviceDao extends BaseEntityDao<RDevice> {
 	public void removeToHis(Integer doneCode) throws JDBCException {
 		String sql = "insert into r_device_his"+
 				"    (device_id, device_type, device_status, depot_status, used, backup, freezed, diffence_type, depot_id, ownership, warranty_date, is_virtual, is_local, "+
-				"      stb_id, pair_card_id, card_id, modem_id, modem_mac, is_new_stb, device_model, pair_modem_id, batch_num)"+
+				"      stb_id, pair_card_id, card_id, modem_id, modem_mac, is_new_stb, device_model, pair_modem_id, batch_num,total_num)"+
 				" select r.device_id, r.device_type, r.device_status, r.depot_status, r.used, r.backup, r.freezed, r.diffence_type, r.depot_id, r.ownership, r.warranty_date, r.is_virtual, r.is_local,"+
-				" rs.stb_id,rs.pair_card_id,rc.card_id,rm.modem_id,rm.modem_mac,r.is_new_stb,r.device_model,rs.pair_modem_id,r.batch_num"+
+				" rs.stb_id,rs.pair_card_id,rc.card_id,rm.modem_id,rm.modem_mac,r.is_new_stb,r.device_model,rs.pair_modem_id,r.batch_num,r.total_num"+
 				" from r_device_output o,r_device_done_deviceid d,r_device r,r_stb rs,r_card rc,r_modem rm"+
 				" where o.device_done_code=d.device_done_code "+
 				" and r.device_id=d.device_id and rs.device_id=r.device_id"+
@@ -661,7 +659,7 @@ public class RDeviceDao extends BaseEntityDao<RDevice> {
 				" and o.device_done_code=?"+
 				" union all"+
 				" select r.device_id, r.device_type, r.device_status, r.depot_status, r.used, r.backup, r.freezed, r.diffence_type, r.depot_id, r.ownership, r.warranty_date, r.is_virtual, r.is_local,"+
-				" null stb_id,null pair_card_id,rc.card_id,null modem_id,null modem_mac,r.is_new_stb,r.device_model,null pair_modem_id,r.batch_num"+
+				" null stb_id,null pair_card_id,rc.card_id,null modem_id,null modem_mac,r.is_new_stb,r.device_model,null pair_modem_id,r.batch_num,r.total_num"+
 				" from r_device_output o,r_device_done_deviceid d,r_device r,r_stb rs,r_card rc"+
 				" where o.device_done_code=d.device_done_code "+
 				" and rs.device_id=d.device_id and rs.pair_card_id=r.device_id"+
@@ -669,7 +667,7 @@ public class RDeviceDao extends BaseEntityDao<RDevice> {
 				" and o.device_done_code=? "+
 				" union all"+
 				" select r.device_id, r.device_type, r.device_status, r.depot_status, r.used, r.backup, r.freezed, r.diffence_type, r.depot_id, r.ownership, r.warranty_date, r.is_virtual, r.is_local,"+
-				" null stb_id,null pair_card_id, null card_id,rm.modem_id,rm.modem_mac,r.is_new_stb,r.device_model,null pair_modem_id,r.batch_num"+
+				" null stb_id,null pair_card_id, null card_id,rm.modem_id,rm.modem_mac,r.is_new_stb,r.device_model,null pair_modem_id,r.batch_num,r.total_num"+
 				" from r_device_output o,r_device_done_deviceid d,r_device r,r_stb rs,r_modem rm"+
 				" where o.device_done_code=d.device_done_code "+
 				" and d.device_id=rs.device_id "+
@@ -677,14 +675,14 @@ public class RDeviceDao extends BaseEntityDao<RDevice> {
 				" and o.device_done_code=?"+
 				" union all"+
 				" select r.device_id, r.device_type, r.device_status, r.depot_status, r.used, r.backup, r.freezed, r.diffence_type, r.depot_id, r.ownership, r.warranty_date, r.is_virtual, r.is_local,"+
-				" null stb_id,null pair_card_id,rc.card_id,null modem_id,null modem_mac,r.is_new_stb,r.device_model,null pair_modem_id,r.batch_num"+
+				" null stb_id,null pair_card_id,rc.card_id,null modem_id,null modem_mac,r.is_new_stb,r.device_model,null pair_modem_id,r.batch_num,r.total_num"+
 				" from r_device_output o,r_device_done_deviceid d,r_device r,r_card rc"+
 				" where o.device_done_code=d.device_done_code "+
 				" and r.device_id=d.device_id and  d.device_id=rc.device_id"+
 				" and o.device_done_code=?"+
 				" union all"+
 				" select r.device_id, r.device_type, r.device_status, r.depot_status, r.used, r.backup, r.freezed, r.diffence_type, r.depot_id, r.ownership, r.warranty_date, r.is_virtual, r.is_local,"+
-				" null stb_id,null pair_card_id, null card_id,rm.modem_id,rm.modem_mac,r.is_new_stb,r.device_model,null pair_modem_id,r.batch_num"+
+				" null stb_id,null pair_card_id, null card_id,rm.modem_id,rm.modem_mac,r.is_new_stb,r.device_model,null pair_modem_id,r.batch_num,r.total_num"+
 				" from r_device_output o,r_device_done_deviceid d,r_device r,r_modem rm"+
 				" where o.device_done_code=d.device_done_code "+
 				" and d.device_id=r.device_id"+
@@ -814,5 +812,63 @@ public class RDeviceDao extends BaseEntityDao<RDevice> {
 		sql += "  where  di.device_id = b.device_id and b.device_id=r.device_id and  di.device_done_code=?  order by device_code";
 		return createQuery(DeviceDto.class,sql, deviceDoneCode)
 				.setStart(start).setLimit(limit).page();
+	}
+
+	public RDevice queryIdleMateralDevice(String deviceType, String deviceModel,String depotId) throws Exception {
+		String sql = "select * from r_device where depot_id=? and device_type=? and device_model=? and device_status=? "
+				+ "and depot_status=? and tran_status=?";
+		return createQuery(RDevice.class, sql,depotId,deviceType,deviceModel,
+				StatusConstants.ACTIVE,StatusConstants.IDLE,StatusConstants.IDLE).first();
+	}
+	
+	public List<RDevice> queryMateralDeviceByDepotId(String depotId) throws Exception {
+		String sql = "select * from r_device where depot_id=? and device_type not in(?,?,?) and device_status=? "
+				+ "and depot_status=? and tran_status=?";
+		return createQuery(RDevice.class, sql,depotId,SystemConstants.DEVICE_TYPE_STB,SystemConstants.DEVICE_TYPE_CARD
+				,SystemConstants.DEVICE_TYPE_MODEM,StatusConstants.ACTIVE,StatusConstants.IDLE,StatusConstants.IDLE).list();
+	}
+	
+	public List<RDevice> queryDeviceByIds(String[] deviceIds) throws Exception {
+		String sql = "select * from r_device where("+getSqlGenerator().setWhereInArray("device_id", deviceIds)+") ";
+		return createQuery(RDevice.class, sql).list();
+	}
+	
+	public List<RDevice> queryDeviceByDoneCode(Integer doneCode)throws JDBCException {
+		String sql = "select * from r_device WHERE device_id IN "
+				+ " (SELECT device_id FROM r_device_done_deviceid t WHERE t.device_done_code=?)";
+		return createQuery(RDevice.class, sql,doneCode).list();
+	}
+	
+	public void removeDeviceToHis(Integer doneCode) throws JDBCException {
+		String sql = "insert into r_device_his"+
+				"    (device_id, device_type, device_status, depot_status, used, backup, freezed, diffence_type, depot_id, ownership, warranty_date, is_virtual, is_local, "+
+				"       is_new_stb, device_model, batch_num,total_num)"+
+				" select r.device_id, r.device_type, r.device_status, r.depot_status, r.used, r.backup, r.freezed, r.diffence_type, r.depot_id, r.ownership, r.warranty_date, r.is_virtual, r.is_local,"+
+				" r.is_new_stb,r.device_model,r.batch_num,r.total_num"+
+				" from r_device_done_deviceid d,r_device r"+
+				" where r.device_id=d.device_id "+
+				" and d.device_done_code=? ";
+		executeUpdate(sql, doneCode);
+		
+		sql = "delete r_device where device_id IN ( SELECT device_id FROM r_device_done_deviceid t WHERE t.device_done_code=?)";
+		executeUpdate(sql, doneCode);
+	}
+	
+	public void updateMateralTransferDepot(Integer doneCode, String depotOrder)
+			throws JDBCException {
+		String sql = "UPDATE r_device SET tran_status=?,depot_id=? WHERE device_id IN "
+				+ " (SELECT device_id FROM r_device_done_deviceid t WHERE t.device_done_code=?)";
+
+		executeUpdate(sql, StatusConstants.IDLE,depotOrder, doneCode);
+	}
+
+	public void removeMateralTransferDevice(String device_id, Integer total_num) throws JDBCException{
+		String sql = "UPDATE r_device SET total_num= total_num-?  WHERE device_id=?";
+		executeUpdate(sql,total_num, device_id);
+	}
+	
+	public void addMateralTransferDevice(String device_id, Integer total_num) throws JDBCException{
+		String sql = "UPDATE r_device SET total_num= total_num + ?  WHERE device_id=?";
+		executeUpdate(sql,total_num, device_id);
 	}
 }

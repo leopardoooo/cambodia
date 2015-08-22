@@ -81,7 +81,8 @@ var BackHouseGrid = Ext.extend(Ext.grid.GridPanel,{
 	                emptyText: '支持退库编号模糊查询'
 	            }),'-','->','-',
 				{text:'文件退库',iconCls:'icon-excel',scope:this,handler:this.fileBack},'-',
-				{text:'手工退库',iconCls:'icon-hand',scope:this,handler:this.handBack},'-'
+				{text:'手工退库',iconCls:'icon-hand',scope:this,handler:this.handBack},'-',
+				{text:'器材退库',iconCls:'icon-batch-number',scope:this,handler:this.materalBack}
 			],
 			bbar : new Ext.PagingToolbar({
 										store : this.backHouseGridStore,
@@ -140,8 +141,289 @@ var BackHouseGrid = Ext.extend(Ext.grid.GridPanel,{
 			handWin = new BackHandWin();
 		}
 		handWin.show();
+	},
+	materalBack:function(){
+		var materalWin = Ext.getCmp('backMateralWinId');
+		if(!materalWin){
+			materalWin = new BackMateralWin();
+		}
+		materalWin.show();
 	}
 });
+
+var MateralBackDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
+	materalStore:null,
+	remoteData:null,
+	constructor:function(parent){
+		this.parent = parent;
+		materalThat = this;
+		this.materalStore = new Ext.data.JsonStore({
+			fields:['device_model','device_type','device_model_text',
+				'device_type_text','total_num','num','device_id']
+		});	
+		
+		doDel = function(){
+			Confirm('确定删除吗?',this,function(){
+				materalThat.getStore().remove(materalThat.getSelectionModel().getSelected());
+			});
+		};
+		var cm = new Ext.grid.ColumnModel([
+				{id:'device_type_text_id',header:'设备类型',dataIndex:'device_type_text',width:80,editor:new Ext.form.ComboBox({
+					store:new Ext.data.JsonStore({
+						fields:['device_type_text','device_type','materialList']
+					}),displayField:'device_type_text',valueField:'device_type_text',triggerAction:'all',mode: 'local'
+					,listeners:{
+						scope:this,
+						select:function(combo,record){
+							this.getSelectionModel().getSelected().set('device_type',record.get('device_type'));
+							var model = record.get('materialList');
+							if(model.length == 1){
+								this.getSelectionModel().getSelected().set('device_model_text',model[0]['device_model_text']);
+								this.getSelectionModel().getSelected().set('device_model',model[0]['device_model']);
+								this.getSelectionModel().getSelected().set('total_num',model[0]['total_num']);
+								this.getSelectionModel().getSelected().set('device_id',model[0]['device_id']);
+							}else{
+								this.getSelectionModel().getSelected().set('device_model_text','');
+								this.getSelectionModel().getSelected().set('device_model','');
+								this.getSelectionModel().getSelected().set('total_num','');
+								this.getSelectionModel().getSelected().set('device_id','');
+							}
+						}
+					}
+				})},
+				{id:'device_model_text_id',header:'设备型号',dataIndex:'device_model_text',width:120,editor:new Ext.form.ComboBox({
+					store:new Ext.data.JsonStore({
+						fields:['device_model_text','device_model','total_num','device_id']
+					}),displayField:'device_model_text',valueField:'device_model_text',triggerAction:'all',mode: 'local'
+					,listeners:{
+						scope:this,
+						select:function(combo,record){
+							this.getSelectionModel().getSelected().set('device_model',record.get('device_model'));
+							this.getSelectionModel().getSelected().set('total_num',record.get('total_num'));
+							this.getSelectionModel().getSelected().set('device_id',record.get('device_id'));
+						}
+					}
+				})},
+				{header:'库存数量',dataIndex:'total_num',width:70,renderer:App.qtipValue},
+				{id:'num_id',header:'数量',dataIndex:'num',width:100,
+					scope:this
+					,editor: new Ext.form.NumberField({
+						allowDecimals:false,//不允许输入小数 
+		    			allowNegative:false,
+		    			minValue:1//enableKeyEvents: true,
+					})
+				},
+				{header:'设备编号',dataIndex:'device_id',hidden:true},
+				{header:'设备类型编号',dataIndex:'device_type',hidden:true},
+				{header:'操作',dataIndex:'',width:40,renderer:function(value,metavalue,record,i){
+					return "<a href='#' onclick=doDel()>删除</a>";
+				}}
+			]
+		);
+		cm.isCellEditable = this.cellEditable;
+		MateralBackDeviceGrid.superclass.constructor.call(this,{
+			title:'器材信息',
+			region:'center',
+			id:'MateralBackDeviceGridId',
+			ds:this.materalStore,
+			clicksToEdit:1,
+			cm:cm,
+			sm:new Ext.grid.RowSelectionModel({}),
+			tbar:[
+				'-',
+				{text:'添加',iconCls:'icon-add',handler:this.doAdd,scope:this},'-'
+			]
+		});
+	},//是否可编辑
+	cellEditable:function(colIndex,rowIndex){
+		var record = materalThat.getStore().getAt(rowIndex);//当前编辑行对应record
+		if(colIndex == this.getIndexById('device_type_text_id')){
+			var store = this.getCellEditor(colIndex,rowIndex).field.getStore();
+			store.removeAll();//清空上一次选中行中 该列的数据
+			var data =  Ext.getCmp('MateralBackDeviceGridId').remoteData;
+			var arr = [];
+			for(var i= 0;i < data.length; i++){
+				arr.push(data[i]);
+			}
+			store.loadData(arr);
+		}else if(colIndex == this.getIndexById('device_model_text_id')){
+			if(Ext.isEmpty(record.get('device_type_text'))){
+				return false;
+			}
+			
+		}else if(colIndex == this.getIndexById('num_id')){
+			if(Ext.isEmpty(record.get('device_model_text'))){
+				return false;
+			}
+		}
+		return Ext.grid.ColumnModel.prototype.isCellEditable.call(this, colIndex, rowIndex);
+	},
+	initComponent:function(){
+		MateralBackDeviceGrid.superclass.initComponent.call(this);
+	},
+	initEvents:function(){
+		MateralBackDeviceGrid.superclass.initEvents.call(this);
+		this.on('afterrender',function(){
+			this.swapViews();
+		},this,{delay:10});
+		
+		this.on("afteredit",this.afterEdit,this);
+		this.on("beforeedit",this.beforeedit,this);
+	},
+	swapViews : function(){
+		if(this.view.lockedWrap){
+			this.view.lockedWrap.dom.style.right = "0px";
+		}
+        this.view.mainWrap.dom.style.left = "0px"; 
+        if(this.view.updateLockedWidth){
+        	this.view.updateLockedWidth = this.view.updateLockedWidth.createSequence(function(){ 
+	            this.view.mainWrap.dom.style.left = "0px"; 
+	        }, this); 
+        }
+          
+	},
+	beforeedit:function(obj){
+	
+	},
+	afterEdit:function(obj){
+		var record = obj.record;
+		var fieldName = obj.field;//编辑的column对应的dataIndex
+		var value = obj.value;
+		if(fieldName == 'device_type_text'){
+			var typeStore = this.getColumnModel().getColumnById('device_type_text_id').editor.getStore();
+			var indexe = typeStore.find('device_type',record.get('device_type'));
+			var data = typeStore.getAt(indexe).get('materialList');
+			var arr = [];
+			Ext.each(data,function(d){
+				arr.push(d);
+			});
+			var store = this.getColumnModel().getColumnById('device_model_text_id').editor.getStore();
+			store.loadData(arr);
+		}else if(fieldName == 'num'){
+			if(value >record.get('total_num')){
+				record.set('num','');
+				Confirm('不能大于库存数量！',this,function(){
+					materalThat.startEditing(obj.row,obj.column);
+				});
+			}
+		}
+	},
+	doAdd:function(){
+		var count = this.getStore().getCount();
+		var recordType = this.getStore().recordType;
+		var record = new recordType({
+			device_id:'',device_type_text:'',device_type:'',device_model:'',
+			device_model_text:'',total_num:'',num:''
+		});
+		this.stopEditing();
+		this.getStore().add(record);
+		this.startEditing(count,0);
+		this.getSelectionModel().selectRow(count);
+	}
+});
+
+
+//器材调拨
+BackMateralWin = Ext.extend(Ext.Window,{
+	handForm:null,
+	queryDeviceGrid:null,
+	constructor:function(){
+		this.handForm = new BackHandForm();
+		this.queryDeviceGrid = new MateralBackDeviceGrid();
+		BackMateralWin.superclass.constructor.call(this,{
+			id : 'backMateralWinId',
+			title:'器材退库',
+			closeAction:'hide',
+			maximizable:false,
+			width: 600,
+			height: 500,
+			border: false,
+			layout:'border',
+			items:[this.handForm, this.queryDeviceGrid],
+			buttonAlign:'right',
+			buttons:[{text:'保存',iconCls:'icon-save',scope:this,handler:this.doSave},
+				{text:'关闭',iconCls:'icon-close',scope:this,handler:function(){
+					this.hide();
+				}}],
+			listeners:{
+				scope:this,
+				hide:function(){
+					this.handForm.getForm().reset();
+					this.queryDeviceGrid.getStore().removeAll();
+				}
+			}
+		});
+	},
+	show:function(){
+		BackMateralWin.superclass.show.call(this);
+		var that = this;
+		Ext.Ajax.request({
+			url:'resource/Device!queryMateralTransferDeviceByDepotId.action',
+			success: function(res, ops){
+				that.queryDeviceGrid.remoteData = Ext.decode(res.responseText);
+			}
+		});
+	},
+	doSave:function(){
+		var form = this.handForm.getForm();
+		if(!form.isValid())return;
+		
+		var formValues = form.getValues();
+		this.queryDeviceGrid.stopEditing();
+		
+		var store = this.queryDeviceGrid.getStore();
+		
+		var arrCode = [];
+		for(var i=0;i<store.getCount();i++){
+			var data = store.getAt(i).data;
+			if(data['device_id']){
+				//过滤掉重复调拨的设备
+				if(arrCode.indexOf(data['device_id']) >=0){
+					Alert('器材有相同的，请检查！');
+					return ;
+				}
+				if(Ext.isEmpty(data['num'])){
+					Alert('退库数量不能为空！');
+					return;
+				}
+				arrCode.push(data);
+			}
+		}
+		var arr = [];//只传递device_id到后台
+		Ext.each(arrCode,function(d){
+			var obj = {};
+			obj['device_id'] = d['device_id'];
+			obj['device_type'] = d['device_type'];
+			obj['device_model'] = d['device_model'];
+			obj['total_num'] = d['num'];
+			arr.push(obj);
+		});
+		
+		if(arr.length === 0){
+			Alert('请正确输入设备信息！');
+			return;
+		}
+		var obj={};
+		Ext.apply(obj,formValues);
+		obj['deviceDtoList'] = Ext.encode(arr);
+	
+		var msg = Show();
+		Ext.Ajax.request({
+			url:'resource/Device!saveMateralOutput.action',
+			params:obj,
+			scope:this,
+			success:function(res,opt){
+				msg.hide();
+				msg = null;
+				Alert('添加成功',function(){
+					this.hide();
+					Ext.getCmp('backHourseGridId').getStore().reload();
+				},this);
+			}
+		});
+	}
+});
+
 
 /**
  * 文件退库form

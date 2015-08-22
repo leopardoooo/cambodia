@@ -33,7 +33,7 @@ var OrderGrid = Ext.extend(Ext.grid.GridPanel,{
 			{header:'编号',dataIndex:'order_no',width:90,renderer:App.qtipValue},
 			{header:'供应商',dataIndex:'supplier_name',width:70,renderer:App.qtipValue},
 			{header:'供货日期',dataIndex:'supply_date',width:85,renderer:Ext.util.Format.dateFormat},
-			{header:'设备类型',dataIndex:'device_type_text',width:60},
+			{header:'设备类型',dataIndex:'device_type_text',width:90},
 			{header:'型号',dataIndex:'device_model_text',width:120,renderer:App.qtipValue},
 			{header:'单价',dataIndex:'price',renderer:App.qtipValue,width:60},
 			{header:'订购数量',dataIndex:'order_num',width:60},
@@ -286,7 +286,7 @@ var DeviceInfoGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 				}
 			}});
 		this.deviceTypeCombo = new Ext.ux.ParamCombo({
-			xtype:'paramcombo',typeAhead:false,paramName:'DEVICE_TYPE',
+			xtype:'paramcombo',typeAhead:false,paramName:'ALL_DEVICE_TYPE',
 			listeners:{
 				scope:this,
 				select:function(combo){
@@ -347,9 +347,19 @@ var DeviceInfoGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 		}
 		return '';
 	},
+	remoteData: null,
 	initComponent:function(){
 		DeviceInfoGrid.superclass.initComponent.call(this);
-		App.form.initComboData([this.deviceTypeCombo]);
+//		App.form.initComboData([this.deviceTypeCombo]);
+		var that = this;
+		App.form.initComboData([this.deviceTypeCombo], function(){
+			Ext.Ajax.request({
+				url:'resource/Device!queryDeviceModel.action',
+				success: function(res, ops){
+					that.remoteData = Ext.decode(res.responseText);
+				}
+			});
+		});
 	},
 	initEvents:function(){
 		DeviceInfoGrid.superclass.initEvents.call(this);
@@ -361,23 +371,36 @@ var DeviceInfoGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 				var deviceType = record.get('device_type');
 				if(Ext.isEmpty(deviceType))return false;
 //				this.deviceModelCombo.paramName = deviceType.concat('_MODEL');
-				var paramName = deviceType+'_MODEL';
-				Ext.Ajax.request({
-					url:root + '/ps.action',
-					params:{comboParamNames: [paramName]},
-					scope:this,
-					success:function(res,opt){
-						var data = Ext.decode(res.responseText)[0];
-						var arr = [];
-						Ext.each(data,function(d){
+				if(deviceType == 'STB' || deviceType == 'CARD' || deviceType == 'MODEM'){
+					var paramName = deviceType+'_MODEL';
+					Ext.Ajax.request({
+						url:root + '/ps.action',
+						params:{comboParamNames: [paramName]},
+						scope:this,
+						success:function(res,opt){
+							var data = Ext.decode(res.responseText)[0];
+							var arr = [];
+							Ext.each(data,function(d){
+								var obj = {};
+								obj['item_name'] = d['item_name']+'('+d['item_value']+')';
+								obj['item_value'] = d['item_value'];
+								arr.push(obj);
+							});
+							this.deviceModelCombo.getStore().loadData(arr);
+						}
+					});
+				}else{
+					var arr = [];
+					for(var i= 0;i < this.remoteData.length; i++){
+						if(this.remoteData[i]["device_type"] == deviceType){
 							var obj = {};
-							obj['item_name'] = d['item_name']+'('+d['item_value']+')';
-							obj['item_value'] = d['item_value'];
+							obj['item_name'] = this.remoteData[i]['model_name']+'('+this.remoteData[i]['device_model']+')';
+							obj['item_value'] = this.remoteData[i]['device_model'];
 							arr.push(obj);
-						});
-						this.deviceModelCombo.getStore().loadData(arr);
+						}
 					}
-				});
+					this.deviceModelCombo.getStore().loadData(arr);
+				}
 			}
 		},this);
 		this.on('afteredit',function(obj){

@@ -429,6 +429,18 @@ public class DeviceAction extends BaseAction {
 	}
 
 	/**
+	 * 器材退库
+	 * @return
+	 * @throws Exception
+	 */
+	public String saveMateralOutput() throws Exception {
+		Type type = new TypeToken<List<RDevice>>(){}.getType();
+		List<RDevice> list = new Gson().fromJson(deviceDtoList, type);
+		deviceComponent.saveMateralOutput(optr, deviceOutput, list);
+		return JSON_SUCCESS;
+	}
+	
+	/**
 	 * 退库（文件）
 	 * @return
 	 * @throws Exception
@@ -647,6 +659,14 @@ public class DeviceAction extends BaseAction {
 		return JSON_SUCCESS;
 	}
 	
+	public String saveMateralTransfer() throws Exception {
+		Type type = new TypeToken<List<RDevice>>(){}.getType();
+		List<RDevice> list = new Gson().fromJson(deviceDtoList, type);
+		deviceComponent.saveMateralTransfer(optr, deviceTransfer, list);
+		return JSON_SUCCESS;
+	}
+	
+	
 	/**
 	 * 查询可以用来转发的设备.
 	 * @return
@@ -841,6 +861,21 @@ public class DeviceAction extends BaseAction {
 		deviceComponent.saveDeviceInput(optr, deviceInput, list,SystemConstants.DEVICE_CFG_TYPE_HAND);
 		return JSON_SUCCESS;
 	}
+	
+	/**
+	 * 器材入库
+	 * @return
+	 * @throws Exception
+	 */
+	public String saveMateralDeviceInput() throws Exception {
+		String batchNum = request.getParameter("batch_num");
+		String deviceType = request.getParameter("device_type");
+		String deviceModel = request.getParameter("device_model");
+		String totalNum = request.getParameter("total_num");
+		deviceComponent.saveMateralDeviceInput(optr, deviceInput, batchNum,deviceType,deviceModel,totalNum);
+		return JSON_SUCCESS;
+	}
+	
 
 	/**
 	 * 查询待收货设备订单
@@ -980,6 +1015,12 @@ public class DeviceAction extends BaseAction {
 	public String querySendTypeByType() throws Exception {
 		String countyId = request.getParameter("county_id");
 		getRoot().setRecords(deviceComponent.querySendTypeByType(deviceType, countyId));
+		return JSON_RECORDS;
+	}
+	
+	
+	public String queryMateralTransferDeviceByDepotId() throws Exception {
+		getRoot().setRecords(deviceComponent.queryMateralTransferDeviceByDepotId(getOptr()));
 		return JSON_RECORDS;
 	}
 	

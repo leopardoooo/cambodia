@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import com.ycsoft.beans.config.TDeviceBuyMode;
@@ -63,6 +62,7 @@ import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.commons.store.MemoryDict;
 import com.ycsoft.daos.core.JDBCException;
 import com.ycsoft.daos.core.Pager;
+import com.ycsoft.sysmanager.dto.resource.RDeviceModelTotalDto;
 
 @Service
 public class CustService extends BaseBusiService implements ICustService {
@@ -506,27 +506,36 @@ public class CustService extends BaseBusiService implements ICustService {
 	
 	
 
+	
+	/** 
+	 * 保存购买器材
+	 */
 	public void saveBuyMaterial(String deviceType, String deviceModel,
 			String buyMode, List<FeeInfoDto> feeInfoList, int buyNum)
 			throws Exception {
 		CCust cust = getBusiParam().getCustFullInfo().getCust();
+		doneCodeComponent.lockCust(cust.getCust_id());
 		String busiCode = getBusiParam().getBusiCode();
 		// 获取业务流水
 		Integer doneCode = doneCodeComponent.gDoneCode();
+		//获取本地该器材的数量
+		RDevice device = deviceComponent.queryTotalNumDevice(deviceType, deviceModel, getOptr().getDept_id());
+		//本地器材数量减去已购数量
+		deviceComponent.removeTotalNumDevice(device.getDevice_id(), buyNum);
 		
 		//保存设备销售费用
 		if(feeInfoList != null){
-			String payType = SystemConstants.PAY_TYPE_CASH;
-			if (this.getBusiParam().getPay()!= null && this.getBusiParam().getPay().getPay_type() !=null)
-				payType = this.getBusiParam().getPay().getPay_type();
+			//记录未支付业务
+			doneCodeComponent.saveDoneCodeUnPay(cust.getCust_id(), doneCode, getOptr().getOptr_id());
+			
 			for(int i=0,len=feeInfoList.size();i<len;i++){
 				FeeInfoDto dto = feeInfoList.get(i);
 				String feeId = dto.getFee_id();
 				String feeStdId = dto.getFee_std_id();
 				Integer fee = dto.getFee().intValue() * buyNum;
 				
-				feeComponent.saveDeviceFee( cust.getCust_id(),cust.getAddr_id(), feeId,feeStdId, payType,deviceType, 
-						null, null, null, null, null, null,deviceModel,
+				feeComponent.saveDeviceFee( cust.getCust_id(),cust.getAddr_id(), feeId,feeStdId, StatusConstants.UNPAY,deviceType, 
+						device.getDevice_id(), null, null, null, null, null,deviceModel,
 						fee, doneCode,doneCode, busiCode, buyNum);
 			}
 		}
@@ -1898,8 +1907,9 @@ public class CustService extends BaseBusiService implements ICustService {
 		return deviceComponent.queryDeviceBuyModel();
 	}
 	
-	public List<RDeviceModel> queryDeviceModel()throws Exception{
-		return deviceComponent.queryDeviceModel();
+	public List<RDeviceModelTotalDto> queryDeviceModel()throws Exception{
+//		return deviceComponent.queryDeviceModel();
+		return deviceComponent.queryMateralTransferDeviceByDepotId(getOptr());
 	}
 
 	public List<CustProdDto> queryCustProdForPkg(String custId,

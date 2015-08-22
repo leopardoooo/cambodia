@@ -54,7 +54,7 @@ public class RDeviceDoneDetail implements Serializable {
 	}
 
 	public void setDevice_type(String device_type){
-		device_type_text = MemoryDict.getDictName(DictKey.DEVICE_TYPE, device_type);
+		device_type_text = MemoryDict.getDictName(DictKey.ALL_DEVICE_TYPE, device_type);
 		this.device_type = device_type ;
 	}
 
@@ -85,7 +85,11 @@ public class RDeviceDoneDetail implements Serializable {
 	}
 
 	public String getDevice_model_text() {
-		return MemoryDict.getDictName(getDevice_type()+"_MODEL", getDevice_model())+"("+getDevice_model()+")";
+		String deviceType = getDevice_type();
+		if(!"STB".equals(deviceType) && !"CARD".equals(deviceType) && !"MODEM".equals(deviceType)){
+			deviceType = "CTL";
+		}
+		return MemoryDict.getDictName(deviceType+"_MODEL", getDevice_model())+"("+getDevice_model()+")";
 	}
 
 }

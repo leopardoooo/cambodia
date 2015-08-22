@@ -82,7 +82,7 @@ public class RDeviceModel {
 	 * @param device_type the device_type to set
 	 */
 	public void setDevice_type(String device_type) {
-		device_type_text = MemoryDict.getDictName(DictKey.DEVICE_TYPE,
+		device_type_text = MemoryDict.getDictName(DictKey.ALL_DEVICE_TYPE,
 				device_type);
 		this.device_type = device_type;
 	}
@@ -102,7 +102,11 @@ public class RDeviceModel {
 	}
 
 	public String getDevice_model_text() {
-		device_model_text=MemoryDict.getDictName(device_type+"_MODEL", device_model);
+		String deviceType = getDevice_type();
+		if(!"STB".equals(deviceType) && !"CARD".equals(deviceType) && !"MODEM".equals(deviceType)){
+			deviceType = "CTL";
+		}
+		device_model_text=MemoryDict.getDictName(deviceType+"_MODEL", device_model);
 		return device_model_text;
 	}
 	
