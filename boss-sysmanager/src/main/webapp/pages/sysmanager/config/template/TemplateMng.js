@@ -677,7 +677,7 @@ FeeTemplateWin = Ext.extend(Ext.Window,{
 	initComponent : function(){
 		if(this.record){
 			if (this.record.get('device_type')){
-				this.items.first().add(this.devicePanel);
+				this.form.add(this.devicePanel);
 			}
 			Ext.getCmp('fee_name').setReadOnly(true);
 			this.doLayout();

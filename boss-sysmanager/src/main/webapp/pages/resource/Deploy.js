@@ -717,7 +717,7 @@ var StbGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 			{header:'交互方式',dataIndex:'interactive_type_text',width:60,editor:this.interactiveTypeCombo},
 			{header:'清晰',dataIndex:'definition_type_text',width:50,editor:this.definitionTypeCombo},
 			{header:'配对卡类型',dataIndex:'virtual_card_model_name',width:80,editor:this.virtualCardModelCombo},
-			{header:'虚拟MODEM类型',dataIndex:'virtual_modem_model_name',width:95,editor:this.virtualModemModelCombo},
+//			{header:'虚拟MODEM类型',dataIndex:'virtual_modem_model_name',width:95,editor:this.virtualModemModelCombo},
 			{header:'操作',dataIndex:'device_model',width:80,renderer:function(value){
 				return "<a href='#' onclick=stbGrid.matchCard('"+value+"')>机卡配对配置</a>";
 			}}
