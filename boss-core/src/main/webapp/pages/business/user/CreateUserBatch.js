@@ -51,7 +51,7 @@ UserBaseBatchForm = Ext.extend( BaseForm , {
 			border: false,
 			items: [{
 				region: 'north',
-				height: 68,
+				height: 88,
 				bodyStyle:'background:#F9F9F9;padding-top:4px;border-bottom-width: 0px;',
 				layout: 'column',
 				defaults: {
@@ -65,7 +65,7 @@ UserBaseBatchForm = Ext.extend( BaseForm , {
 					items:[{
 						fieldLabel:'用户类型',
 						xtype:'combo',
-						width:120,
+						width:122,
 						allowBlank:false,
 						id: 'boxUserType',
 						displayField : 'user_type',
@@ -80,20 +80,26 @@ UserBaseBatchForm = Ext.extend( BaseForm , {
 						}),
 						listeners:{
 							scope: this,
+							select: this.doFiltDeviceModel
+						}
+					},{
+						xtype:'paramcombo',
+						hiddenName:'device_model',
+						fieldLabel: '设备类型',
+						paramName:'DEVICE_MODEL',
+						id: 'boxDeviceCategory',
+						allowBlank: false,
+						name:'device_model_text',
+						listeners:{
+							scope: this,
 							select: this.doLoadFeeSelect
 						}
 					},{
 						xtype: 'numberfield',
 			            fieldLabel: '费用名称',
-			            width : 120,
+			            width : 122,
+			            labelWidth: 100,
 			            id: 'nfFee'
-					},{
-						xtype:'paramcombo',
-						hiddenName:'device_model',
-						hidden: true,
-						paramName:'DEVICE_MODEL',
-						id: 'boxDeviceCategory',
-						name:'device_model_text'
 					}]
 				},{
 					items:[{
@@ -183,6 +189,31 @@ UserBaseBatchForm = Ext.extend( BaseForm , {
 			}]
 		});
 	},
+	doFiltDeviceModel: function(){
+		var userType = Ext.getCmp("boxUserType").getValue();
+		var REF = {"OTT": "1", "DTT": "2", "BAND": "3" }
+		var type = REF[userType] || "";
+		var cmb = Ext.getCmp("boxDeviceCategory");
+		cmb.setRawValue("");
+		cmb.focus();
+		cmb.expand();
+		var store = cmb.getStore();
+		// 先清除过滤
+		if(!this.deviceDataBak){
+			this.deviceDataBak = [];
+			store.each(function(rs){
+				this.deviceDataBak.push(rs.data);
+			}, this);
+		}
+		var data = [];
+		// 开始过滤
+		for(var i = 0; i < this.deviceDataBak.length; i++){
+			if(this.deviceDataBak[i]["item_idx"] == type){
+				data.push(this.deviceDataBak[i]);
+			}
+		}
+		store.loadData(data);
+	},
 	addToGrid: function(){
 		var formValid = UserBaseBatchForm.superclass.doValid.call(this);
 		if(formValid["isValid"] !== true){
@@ -206,7 +237,7 @@ UserBaseBatchForm = Ext.extend( BaseForm , {
 			fee_id: (fd ? fd["fee_id"] : 0),
 			fee: fee,
 			sub_total: amount * (fee || 0),
-			device_type: this.getDeviceType(userType)
+			device_type: Ext.getCmp("boxDeviceCategory").getValue()
 		})]);
 		
 		// 计算费用总额
@@ -216,29 +247,17 @@ UserBaseBatchForm = Ext.extend( BaseForm , {
 		});
 		Ext.getCmp("tfTotal").setValue(total);
 	},
-	getDeviceType: function(userType){
-		// 这是后台定死的
-		var FEE = {"OTT": "1", "DTT": "2", "BAND": "3" }
-		var store = Ext.getCmp("boxDeviceCategory").getStore();
-		
-		//根据用户类型过滤出最先匹配的设备类型
-		for(var i = 0; i < store.getCount(); i++){
-			var r = store.getAt(i);
-			if(r.get("item_idx") == FEE[userType]){
-				return r.get("item_value"); 
-			}
-		}
-		return null;
-	},
 	doLoadFeeSelect : function(){
 		var deviceBuyModeValue = Ext.getCmp("deviceBuyMode").getValue();
 		var userType = Ext.getCmp("boxUserType").getValue();
-		if(!deviceBuyModeValue || !userType){ return ; }
+		var deviceMode = Ext.getCmp("boxDeviceCategory").getValue();
+		
+		if(!deviceBuyModeValue || !userType || !deviceMode){ return ; }
 		Ext.Ajax.request({
 			scope : this,
 			url : root + '/commons/x/QueryDevice!queryDeviceFee.action',
 			params : {
-				deviceModel: this.getDeviceType(userType),
+				deviceModel: deviceMode,
 				buyMode : deviceBuyModeValue
 			},
 			success : function(res,opt){
