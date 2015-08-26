@@ -5,8 +5,9 @@ public enum ErrorCode {
 	UNKNOW_EXCEPTION("未知异常，请联系管理员"),
 	
 	ParamIsNull("参数为空！"),
+	DataNumTooMuch("数据量过大！%s"),
 	CustAddressIsNull("地址为空"),
-	CustDistrictIsNull("该地区未配置对应的行政区域,地区编号=%s"),
+	CustDistrictIsNull("%s未配置对应的行政区域！"),
 	CustProvinceIsNull("该行政区域未配置对应的省,行政区域编号=%s"),
 	DeptAddrIsNull("操作员所在部门,未在部门和地区对应表s_dept_addr配置,部门编号=%s"),
 	CustDataException("客户数据异常，请重新索搜客户！"),
