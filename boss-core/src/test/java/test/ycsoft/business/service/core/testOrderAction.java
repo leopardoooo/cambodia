@@ -43,7 +43,7 @@ public class testOrderAction extends JunitSpringBase {
 		order.setUser_id("1302200");
 		order.setProd_id("604");
 		order.setTariff_id("1494");
-		order.setOrder_months(1);
+		order.setOrder_months(1.0f);
 		order.setPay_fee(1);
 		order.setTransfer_fee(0);
 		order.setEff_date(DateHelper.today());
@@ -99,7 +99,7 @@ public class testOrderAction extends JunitSpringBase {
 		order.setUser_id("1302501");
 		order.setProd_id("603");
 		order.setTariff_id("1491");
-		order.setOrder_months(1);
+		order.setOrder_months(1.0f);
 		order.setPay_fee(1);
 		order.setTransfer_fee(0);
 		order.setEff_date(DateHelper.today());
