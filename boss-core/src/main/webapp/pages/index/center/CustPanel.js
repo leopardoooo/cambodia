@@ -7,10 +7,10 @@ var custInfoHTML =
 		'<td class="input_bold" width=30%>&nbsp;{[values.cust.cust_no || ""]}</td>'+
 	'</tr>'+
 	'<tr height=24>'+
-	'<td class="label">'+ langUtils.main("cust.base.openDate") +':</td>' +
-		'<td class="input" >&nbsp;{[fm.dateFormat(values.cust.open_time) || ""]}</td>'+
 		'<td class="label">'+ langUtils.main("cust.base.addr") +':</td>' +
 		'<td class="input">&nbsp;{[values.cust.address || ""]}</td>'+
+		'<td class="label">'+ langUtils.main("cust.base.openDate") +':</td>' +
+		'<td class="input" >&nbsp;{[fm.dateFormat(values.cust.open_time) || ""]}</td>'+
 	'</tr>' +
 	'<tr height=24>'+
 		'<td class="label">'+ langUtils.main("cust.base.status") +':</td>' +
@@ -1025,13 +1025,13 @@ CustPanel = Ext.extend( BaseInfoPanel , {
 				layout:"anchor",
 				border: false,
 				items:[{
-					anchor:"100% 62%",
+					anchor:"100% 64%",
 					layout:'fit',
 					border: false,
 					bodyStyle: 'border-right-width: 1px',	
 					items:[this.custInfoPanel]
 				},{
-					anchor:"100% 38.2%",
+					anchor:"100% 36.2%",
 					layout:'fit',
 					bodyStyle: 'border-left-width: 0; border-bottom-width: 0;',
 					items:[this.custDetailTab]
@@ -1039,7 +1039,7 @@ CustPanel = Ext.extend( BaseInfoPanel , {
 			},{
 				region:"east",
 				split:true,
-				width:"50%",
+				width:"40%",
 				layout:"fit",
 				border: false,
 				layout: 'fit',

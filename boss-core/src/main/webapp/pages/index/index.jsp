@@ -155,6 +155,7 @@
 	<script type="text/javascript" src="<%=boss_res %>/pages/commons/Grid.js"  charset="UTF-8"></script>
 	<script type="text/javascript" src="<%=boss_res %>/pages/commons/Gpanel.js"  charset="UTF-8"></script>
 	<script type="text/javascript" src="<%=boss_res %>/pages/commons/ux/FilterTreePanel.js" charset="UTF-8"></script>
+	<script type="text/javascript" src="<%=boss_res %>/pages/commons/ux/QueryFilterTreePanel.js" charset="UTF-8"></script>
 	<script type="text/javascript" src="<%=boss_res %>/pages/commons/ux/lovcombo.js" charset="UTF-8"></script>
 	<script type="text/javascript" src="<%=boss_res %>/pages/commons/ux/TreeComboBox.js" charset="UTF-8"></script>
 	<script type="text/javascript" src="<%=boss_res %>/pages/commons/ux/ParamComboBox.js" charset="UTF-8"></script>

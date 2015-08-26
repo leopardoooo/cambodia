@@ -101,7 +101,9 @@ public interface IQueryCfgService extends IBaseService {
 	 * @return
 	 * @throws Exception
 	 */
-	public List<TAddressDto> queryAddrByName(String name) throws Exception;
+	public List<TAddressDto> queryAddrByName(String name,String addrId) throws Exception;
+	
+	public String queryCustAddrName(String addrId) throws Exception;
 
 	/**
 	 * 返回当前地区的部门

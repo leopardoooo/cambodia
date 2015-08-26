@@ -565,5 +565,10 @@ public class SystemConstants {
 	public static final String TASK_TYPE_CHANGE="5";//变动工单
 	public static final String TASK_TYPE_WRITEOFF="7";//拆除工单
 	public static final String TASK_TYPE_PROJECT="8";//工程工单
+	
+	public static final String ADDR_TREE_LEVEL_ONE = "1";
+	public static final String ADDR_TREE_LEVEL_TWO = "2";
+	public static final String ADDR_TREE_LEVEL_THREE = "3";
+	public static final String ADDR_TREE_LEVEL_FOUR = "4";
 		
  }

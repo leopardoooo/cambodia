@@ -1,4 +1,109 @@
+
+QueryFilterTree = Ext.extend(Ext.ux.QueryFilterTreePanel,{
+	doSearch:function(){
+		var _v = this.searchT.getValue();
+		Ext.Ajax.request({
+			url: Constant.ROOT_PATH+"/commons/x/QueryParam!queryAddrTree.action",
+			scope : this,
+			params : {
+				comboQueryText : _v
+			},
+			success : function(res,opt){
+				var data = Ext.decode(res.responseText);
+				var root = new Ext.tree.AsyncTreeNode({
+						  text:'gen',
+						  id:'root',
+						  draggable:false,
+						  children:data
+						 });
+				this.setRootNode(root);
+//				this.root.expand(true);
+//				this.expandAll();	
+			}
+		});				
+			
+//		alert(_v);
+//		this.setRootNode(root);
+//		this.root.expand(true);
+	}
+});
+
+
+QueryTreeLoader = Ext.extend(Ext.tree.TreeLoader,{
+
+    load : function(node, callback, scope){
+        if(this.clearOnLoad){
+            while(node.firstChild){
+                node.removeChild(node.firstChild);
+            }
+        }
+        if(this.doPreload(node)){ // preloaded json children
+            this.runCallback(callback, scope || node, [node]);
+        }else if(this.directFn || this.dataUrl || this.url){
+            this.requestData(node, callback, scope || node);
+        }
+    },
+
+    doPreload : function(node){
+        if(node.attributes.children){
+            if(node.childNodes.length < 1){ // preloaded?
+                var cs = node.attributes.children;
+                node.beginUpdate();
+                for(var i = 0, len = cs.length; i < len; i++){
+                    var cn = node.appendChild(this.createNode(cs[i]));
+                    if(this.preloadChildren){
+                        this.doPreload(cn);
+                    }
+                }
+                node.endUpdate();
+            }
+            return true;
+        }
+        return false;
+    }
+
+
+})
+
 AddressTreeCombo = Ext.extend(Ext.ux.TreeCombo,{
+	initList : function() {
+		var rootVisible = false;
+		if (this.rootNodeCfg) {
+			rootVisible = true;
+		} else {
+			this.rootNodeCfg = {
+				expanded : true
+			};
+		}
+		this.list = new QueryFilterTree({
+			root : new Ext.tree.AsyncTreeNode(this.rootNodeCfg),
+			loader : new QueryTreeLoader({
+						dataUrl : this.treeUrl,
+						baseParams : this.treeParams
+						,listeners : {
+							beforeload : this.onBeforeLoad,
+							scope : this
+						}
+					}),
+			floating : true,
+			height : this.treeHeight,
+			autoScroll : true,
+			animate : false,
+			searchFieldWidth : this.treeWidth - 80,
+			rootVisible : rootVisible,
+			listeners : {
+				click : this.onNodeClick,
+				checkchange : this.onCheckchange,
+				scope : this
+			},
+			alignTo : function(el, pos) {
+				this.setPagePosition(this.el.getAlignToXY(el, pos));
+			}
+		});
+		if (this.minChars == 0) {
+			this.doQuery("");
+		}
+	},
 	listeners:{
 		expand:function(thisCmp){
 			function getFocus(){
@@ -12,44 +117,45 @@ AddressTreeCombo = Ext.extend(Ext.ux.TreeCombo,{
 			getFocus.defer(200,this);
 		}
 	},
-	onNodeClick : function(node, e) {
+	onNodeClick : function(node, e) {		
 		if (!this.isCanClick(node)) {
 			return;
 		}
-		var attrs = this.dispAttr.split(".");
+		Ext.Ajax.request({
+			scope : this,
+			url: Constant.ROOT_PATH+"/commons/x/QueryParam!queryCustAddrName.action",
+			params : {
+				addrId : node.id
+			},
+			success : function(res,opt){
+				var rec = Ext.decode(res.responseText);
+				//		// 显示隐藏值
+				this.addOption(node.id, rec);
+				this.setValue(node.id);
+				this.setRawValue(rec);
+				this.collapse();
+				this.fireEvent('select', this, node, node.attributes);
+			}
+		});
 		
-		 var level = node.attributes.others.tree_level;
-		if(!Ext.isEmpty(level)){
-			this.level =level;
-		}
-		
-		var temp = null;
-		
-		//区域对应的文本
-		var temp = node.parentNode.attributes;
-		var addrText = temp[this.dispAttr];
-		
-		temp = node.attributes;
-		addrText = addrText + temp[this.dispAttr];
-		
-		
-		// 显示隐藏值
-		this.addOption(node.id, addrText);
-		this.setValue(node.id);
-		// 设置显示值
-		this.setRawValue(addrText);
-		this.collapse();
-		this.fireEvent('select', this, node, node.attributes);
 	},
-	firstExpand: false,
+	firstExpand: true,
 	doQuery : function(q, forceAll) {
 		if(!this.firstExpand){
 			this.firstExpand = true;
 			this.list.expandAll();
 		}
 		this.expand();
+	},
+	onBeforeLoad:function(l,node){
+		l.on('beforeload',function(loader,node){
+  			l.baseParams.addrId=node.id; //通过这个传递参数，这样就可以点一个节点出来它的子节点来实现异步加载
+		},l);
 	}
-});
+	
+}); 
+
+
 
 ResidentForm = Ext.extend( Ext.Panel , {
 	parent : null,
@@ -200,10 +306,11 @@ LinkPanel = Ext.extend(Ext.Panel,{
 						xtype:'textfield',
 						vtype:'email'
 					},{
-						fieldLabel:'邮寄地址',
-						id : 'linkman.mail_address',
-						name:'linkman.mail_address',
-						xtype:'textfield'
+						fieldLabel:'邮编',
+						name:'linkman.postcode',
+						xtype:'textfield',
+						regex: /^[1-9]{1}[0-9]{5}$/,
+						invalidText : '请输入6位不以0开头的数字'
 					}]
 				},{
 					items:[{
@@ -226,13 +333,17 @@ LinkPanel = Ext.extend(Ext.Panel,{
 						name:'linkman.birthday',
 						xtype:'datefield',
 						format:'Y-m-d'
-					},{
-						fieldLabel:'邮编',
-						name:'linkman.postcode',
-						xtype:'textfield',
-						regex: /^[1-9]{1}[0-9]{5}$/,
-						invalidText : '请输入6位不以0开头的数字'
 					}]
+				},{
+					columnWidth:1,
+					items:[{
+						fieldLabel:'邮寄地址',
+						width : 400,
+						id : 'linkman.mail_address',
+						name:'linkman.mail_address',
+						xtype:'textfield'
+					}]
+					
 				}]
 			},{
 				fieldLabel:'备注',
@@ -259,6 +370,7 @@ CustBaseForm = Ext.extend( BaseForm , {
 	oldCustType:'RESIDENT',
 	custAddress : null,//客户拼接后的地址
 	custColony : null,
+	navMenu:null,
 	constructor: function(config){
 		Ext.apply(this, config);
 		//居民信息扩展
@@ -307,116 +419,50 @@ CustBaseForm = Ext.extend( BaseForm , {
 							'change': this.doCustNameChange
 						}
 					}]
+				},{
+					columnWidth:0.75,
+					items:[new AddressTreeCombo({
+						id : 'addrTreeCombo',
+				    	width:300,
+						treeWidth:350,
+						treeHeight : 300,
+						minChars:0,
+						height: 22,
+						fieldLabel : '客户地址',
+						allowBlank: false,
+						emptyText :'选择地址..',
+						hideTrigger: false,
+						editable: true,
+						blankText:'请选择客户地址',
+						treeUrl: Constant.ROOT_PATH+"/commons/x/QueryParam!queryAddrTree.action",
+						hiddenName:'cust.addr_id',
+						listeners:{
+							scope: this,
+							'select': function(combo){
+								Ext.getCmp('tempCustAddress').setValue(combo.getRawValue());
+								this.doAddressChange();
+							}
+						}
+					})]
+				},{
+					columnWidth:0.25,
+				    labelWidth: 45,
+					items:[{
+				    	width : 50,
+				    	id : 'cust.note',
+				    	name : 'cust.note',
+				    	fieldLabel : 'Room',
+				    	xtype : 'textfield',
+				    	listeners:{
+							scope: this,
+							'change': this.doAddressChange
+						}
+				    }]
 				}]
-			},new AddressTreeCombo({
-				id : 'addrTreeCombo',
-		    	width:200,
-				treeWidth:400,
-				minChars:0,
-				height: 22,
-				fieldLabel : '客户地址',
-				allowBlank: false,
-				emptyText :'选择地址..',
-				hideTrigger: false,
-				editable: false,
-				blankText:'请选择客户地址',
-				treeUrl: Constant.ROOT_PATH+"/commons/x/QueryParam!queryAddrTree.action",
-				hiddenName:'cust.addr_id',
-				listeners:{
-					scope: this,
-					'select': function(combo){
-						Ext.getCmp('tempCustAddress').setValue(combo.getRawValue());
-						this.doAddressChange();
-					}
-				}
-			}),{
+			}
+			,{
 				xtype : 'hidden',
 				id : 'tempCustAddress'
-			},{
-				layout:'table',
-				layoutConfig: { columns:12 },
-				baseCls: 'x-plain',
-				anchor: '100%',
-				bodyStyle: "background:#F9F9F9; padding-bottom: 5px;",
-				labelWidth: 75,
-				defaults : {
-					xtype : 'textfield'
-				},
-			    items: [{
-			    	//只用来当空格对齐
-			    	xtype : 'textfield',
-			    	width : 83,
-			    	disabled : true,
-			    	style : Constant.TEXTFIELD_STYLE
-			    },{
-			    	width : 40,
-			    	id : 'cust.t1',
-			    	vtype : 'alphanum',
-			    	name : 'cust.t1',
-			    	listeners:{
-						scope: this,
-						'change': this.doAddressChange
-					}
-			    },{
-			    	xtype : 'label',
-			    	html : '<font size="2"/>'+'号'
-			    },{
-			    	width : 20,
-			    	id : 'cust.t2',
-			    	vtype : 'alphanum',
-			    	name : 'cust.t2',
-			    	listeners:{
-						scope: this,
-						'change': this.doAddressChange
-					}
-			    },{
-			    	xtype : 'label',
-			    	html : '<font size="2"/>'+'栋'
-			    },{
-			    	width : 20,
-			    	id : 'cust.t3',
-			    	vtype : 'alphanum',
-			    	name : 'cust.t3',
-			    	listeners:{
-						scope: this,
-						'change': this.doAddressChange
-					}
-			    },{
-			    	xtype : 'label',
-			    	html : '<font size="2"/>'+'单元'
-			    },{
-			    	width : 20,
-			    	id : 'cust.t4',
-			    	vtype : 'alphanum',
-			    	name : 'cust.t4',
-			    	listeners:{
-						scope: this,
-						'change': this.doAddressChange
-					}
-			    },{
-			    	xtype : 'label',
-			    	html : '<font size="2"/>'+'楼'
-			    },{
-			    	width : 20,
-			    	id : 'cust.t5',
-			    	vtype : 'alphanum',
-			    	name : 'cust.t5',
-			    	listeners:{
-						scope: this,
-						'change': this.doAddressChange
-					}
-			    },{
-			    	xtype : 'label',
-			    	html : '<font size="2"/>'+'室'
-			    },{
-			    	width : 100,
-			    	id : 'cust.note',
-			    	name : 'cust.note',
-			    	listeners:{
-						scope: this,
-						'change': this.doAddressChange
-					}
-			    }]
 			},{
 				layout:'column',
 				baseCls: 'x-plain',
@@ -462,6 +508,7 @@ CustBaseForm = Ext.extend( BaseForm , {
 					}]
 				}]
 			},this.residentForm,this.linkPanel,this.extAttrForm]
+//            }]
 		});
 	},
 	doInit:function(){
@@ -649,23 +696,8 @@ CustBaseForm = Ext.extend( BaseForm , {
 	doAddressChange : function(){
 		if(!Ext.isEmpty(Ext.getCmp('addrTreeCombo').getRawValue())){
 			this.custAddress = Ext.getCmp('tempCustAddress').getValue();
-			if(!Ext.isEmpty(Ext.getCmp('cust.t1').getValue())){
-				this.custAddress = this.custAddress + Ext.getCmp('cust.t1').getValue()+'号';
-			}
-			if(!Ext.isEmpty(Ext.getCmp('cust.t2').getValue())){
-				this.custAddress = this.custAddress + Ext.getCmp('cust.t2').getValue()+'栋';
-			}
-			if(!Ext.isEmpty(Ext.getCmp('cust.t3').getValue())){
-				this.custAddress = this.custAddress + Ext.getCmp('cust.t3').getValue()+'单元';
-			}
-			if(!Ext.isEmpty(Ext.getCmp('cust.t4').getValue())){
-				this.custAddress = this.custAddress + Ext.getCmp('cust.t4').getValue()+'楼';
-			}
-			if(!Ext.isEmpty(Ext.getCmp('cust.t5').getValue())){
-				this.custAddress = this.custAddress + Ext.getCmp('cust.t5').getValue()+'室';
-			}
 			if(!Ext.isEmpty(Ext.getCmp('cust.note').getValue())){
-				this.custAddress = this.custAddress + Ext.getCmp('cust.note').getValue();
+				this.custAddress = "Room "+Ext.getCmp('cust.note').getValue()+ ","+this.custAddress;
 			}
 			Ext.getCmp('linkman.mail_address').setValue(this.custAddress);
 		}

@@ -56,6 +56,42 @@ public class TreeBuilder {
 		removeNullNode(target);
 		return target;
 	}
+	
+	
+	public static List<TreeNode> createAdreeTree(List<Tree> src,boolean falseChildren){
+		List<TreeNode> target = new ArrayList<TreeNode>();
+		Map<String,TreeNode> tempMap = new HashMap<String,TreeNode>();
+		for (Tree tree : src){
+			TreeNode node = new TreeNode();
+			node.setChildren(null);
+			tree.transform( node );
+			
+			//如果不是叶子节点，直接修改
+			if(StringHelper.isNotEmpty(node.getIs_leaf()) && node.getIs_leaf().equals("F")){
+				node.setLeaf(false);
+				node.setCls("fold");
+			}
+			TreeNode parentNode = tempMap.get( node.getPid() );
+			if (parentNode == null){
+				target.add(node);
+
+			} else {
+				if(parentNode.getChildren() == null){
+					parentNode.setChildren(new ArrayList<TreeNode>());
+				}
+				parentNode.setExpanded(true);
+				parentNode.getChildren().add( node );
+				parentNode.setLeaf(false);
+				parentNode.setCls("fold");
+			}
+			tempMap.put( node.getId() , node);
+		}
+//		if(falseChildren){
+//			removeNullNode(target);
+//		}
+		return target;
+	}
+	
 /**
  * 复选框树，src已经设定好Checked的值
  */
@@ -95,7 +131,7 @@ public class TreeBuilder {
 				flag = false;
 			} else{
 				//不是叶子
-				if (t.getChildren().size() > 0) {
+				if (t.getChildren()!=null && t.getChildren().size() > 0) {
 					//有儿子
 					if (removeNullNode(t.getChildren()))
 						dels.add(t);

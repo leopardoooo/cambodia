@@ -12,7 +12,7 @@ public class SequenceConstants {
 	// 客户id
 	public static final String SEQ_CUST_ID = "SEQ_CUST_ID";
 	// 客户受理名
-	public static final String SEQ_CUST_NO = "SEQ_CUST_NAME";
+	public static final String SEQ_CUST_NO = "SEQ_CUST_NO";
 	// 业务流水号
 	public static final String SEQ_DONE_CODE = "SEQ_DONE_CODE";
 	// 工单编号

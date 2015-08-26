@@ -6,6 +6,7 @@ import com.ycsoft.beans.config.TAddress;
 import com.ycsoft.business.service.IQueryCfgService;
 import com.ycsoft.commons.constants.DataRight;
 import com.ycsoft.commons.constants.DictKey;
+import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.commons.tree.TreeBuilder;
 import com.ycsoft.web.commons.abstracts.BaseBusiAction;
 
@@ -39,9 +40,20 @@ public class QueryParamAction extends BaseBusiAction {
 	 * @throws Exception
 	 */
 	public String queryAddrTree() throws Exception{
-		List addrs = queryCfgService.queryAddrByName(comboQueryText);
-		getRoot().setRecords(TreeBuilder.createTree(addrs));
+		List addrs =  queryCfgService.queryAddrByName(comboQueryText,addrId);
+		if(StringHelper.isNotEmpty(comboQueryText) ){
+			getRoot().setRecords(TreeBuilder.createAdreeTree(addrs,true));
+		}else{
+			getRoot().setRecords(TreeBuilder.createAdreeTree(addrs,false));
+		}
 		return JSON_RECORDS;
+	}
+	
+	
+	public String queryCustAddrName() throws Exception{
+		String name = queryCfgService.queryCustAddrName(addrId);
+		getRoot().setSimpleObj(name);
+		return JSON_SIMPLEOBJ;
 	}
 	
 	public String querySingleAddress() throws Exception {

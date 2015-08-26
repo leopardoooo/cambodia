@@ -5,7 +5,12 @@ public enum ErrorCode {
 	UNKNOW_EXCEPTION("未知异常，请联系管理员"),
 	
 	ParamIsNull("参数为空！"),
+	CustAddressIsNull("地址为空"),
+	CustDistrictIsNull("该地区未配置对应的行政区域,地区编号=%s"),
+	CustProvinceIsNull("该行政区域未配置对应的省,行政区域编号=%s"),
+	DeptAddrIsNull("操作员所在部门,未在部门和地区对应表s_dept_addr配置,部门编号=%s"),
 	CustDataException("客户数据异常，请重新索搜客户！"),
+	CustSeqIsNull("系统未正确配置客户序列号,客户前缀号=%s"),
 	UnPayLock("客户被锁定,请等待%s(%s)完成支付!"),
 	
 	ExchangeConfigError("系统未正确配置汇率，请联系管理员"),

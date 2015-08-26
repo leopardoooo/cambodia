@@ -320,7 +320,7 @@ var NavMenu = Ext.extend( Ext.ux.FilterTreePanel , {
 				text: '系统资源菜单'
 			}
 		});
-		this.getRootNode().expand();
+		this.getRootNode().expand();	  
 	},
 	initEvents : function(){
 		this.on("click" , function( node , e){

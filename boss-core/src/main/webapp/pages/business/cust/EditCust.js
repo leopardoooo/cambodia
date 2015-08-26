@@ -51,11 +51,22 @@ EditCustForm = Ext.extend( CustBaseForm , {
 		 */
 		var custAddress = cust.address;
 		if(cust.address){//割接 无地址
-			if(cust.t1 || cust.t2 || cust.t3 || cust.t4 || cust.t5 || cust.note){
-				index = cust.address.indexOf(cust.addr_id_text);
-				//index + index+cust.addr_id_text.length 客户地址前面部分
-				custAddress = cust.address.substring(0,index+cust.addr_id_text.length);
+//			if(cust.t1 || cust.t2 || cust.t3 || cust.t4 || cust.t5 || cust.note){
+//				index = cust.address.indexOf(cust.addr_id_text);
+//				//index + index+cust.addr_id_text.length 客户地址前面部分
+//				custAddress = cust.address.substring(0,index+cust.addr_id_text.length);
+//			}
+			if(cust.note){
+				if(custAddress.substring(0,4)=='Room'){
+					var arr = custAddress.split(",");
+					if(arr.length>0){
+						var index = arr[0].length;
+						custAddress = custAddress.substring(index+1,custAddress.length);
+					}
+				}
+				
 			}
+			
 		}
 		addrTreeCombo.addOption(cust.addr_id,custAddress);
 		Ext.getCmp('tempCustAddress').setValue(custAddress);

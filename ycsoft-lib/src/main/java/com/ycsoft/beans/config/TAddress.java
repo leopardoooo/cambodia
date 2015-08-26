@@ -33,11 +33,16 @@ public class TAddress extends OptrBase implements Serializable {
 	private String net_type;
 	private String busi_optr_id;
 	private String status;
+	private String district_id;
+	private String remark;
+	private Integer sort_num;
 	
 	private String busi_optr_name;
 	
 	private String serv_optr_id;//运维人员
 	private String serv_optr_name;//运维人员
+	
+	 
 
 	/**
 	 * default empty constructor
@@ -154,5 +159,31 @@ public class TAddress extends OptrBase implements Serializable {
 	public String getServ_optr_name() {
 		return serv_optr_name;
 	}
+
+	public String getDistrict_id() {
+		return district_id;
+	}
+
+	public void setDistrict_id(String district_id) {
+		this.district_id = district_id;
+	}
+
+	public String getRemark() {
+		return remark;
+	}
+
+	public void setRemark(String remark) {
+		this.remark = remark;
+	}
+
+	public Integer getSort_num() {
+		return sort_num;
+	}
+
+	public void setSort_num(Integer sort_num) {
+		this.sort_num = sort_num;
+	}
+	
+	
 
 }

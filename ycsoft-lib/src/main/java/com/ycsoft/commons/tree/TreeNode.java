@@ -17,7 +17,7 @@ public class TreeNode {
 	private String attr;
 	private String attr_src;
 	private String attr_src_id;
-	private boolean disabled;
+	private boolean expanded = false;
 	private boolean singleClickExpand = true;
 	private Map<String,String> others = new HashMap<String,String>();
 	private List<TreeNode> children = new ArrayList<TreeNode>();
@@ -30,11 +30,12 @@ public class TreeNode {
 		this.children = children;
 	}
 
-	public boolean isDisabled() {
-		return disabled;
+
+	public boolean isExpanded() {
+		return expanded;
 	}
-	public void setDisabled(boolean disabled) {
-		this.disabled = disabled;
+	public void setExpanded(boolean expanded) {
+		this.expanded = expanded;
 	}
 	public String getText() {
 		return text;

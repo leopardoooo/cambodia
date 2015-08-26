@@ -45,6 +45,7 @@
 <script type="text/javascript" src="<%=boss_res %>/components/ext3/ux/SpinnerField.js"></script>
 
 <script type="text/javascript" src="<%=boss_res %>/pages/commons/ux/FilterTreePanel.js" charset="UTF-8"></script>
+<script type="text/javascript" src="<%=boss_res %>/pages/commons/ux/QueryFilterTreePanel.js" charset="UTF-8"></script>
 <script type="text/javascript" src="<%=boss_res %>/pages/commons/ux/TreeComboBox.js" charset="UTF-8"></script>
 <script type="text/javascript" src="<%=boss_res %>/pages/commons/ux/ParamComboBox.js" charset="UTF-8"></script>
 <script type="text/javascript" src="<%=boss_res %>/pages/commons/ux/MoneyColumn.js" charset="UTF-8"></script>

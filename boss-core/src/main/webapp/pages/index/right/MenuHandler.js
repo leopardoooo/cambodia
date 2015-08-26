@@ -91,7 +91,7 @@ Ext.apply(MenuHandler, {
 	// 开户
 	NewCust : function() {
 		return {
-			width : 500,
+			width : 550,
 			height : 470
 		};
 	},

@@ -14,7 +14,6 @@ import org.springframework.stereotype.Component;
 import com.ycsoft.beans.config.TAddress;
 import com.ycsoft.beans.core.cust.CCust;
 import com.ycsoft.business.dto.config.TAddressDto;
-import com.ycsoft.commons.constants.SequenceConstants;
 import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.helper.StringHelper;
@@ -40,7 +39,7 @@ public class TAddressDao extends BaseEntityDao<TAddress> {
 	 */
 	public TAddressDao() {}
 	
-	public List<TAddressDto> queryActiveAddrByName(String q, String countyId, String deptId, String dataRight)
+	public List<TAddressDto> queryActiveAddrByName(String q,String pId, String countyId, String deptId, String dataRight)
 		throws Exception {
 	String str = "";
 	if(!countyId.equals(SystemConstants.COUNTY_ALL)){
@@ -50,18 +49,22 @@ public class TAddressDao extends BaseEntityDao<TAddress> {
 	if(StringHelper.isNotEmpty(q)){
 		filter=" and  (t.addr_name like '%"+q+"%' or t2.full_sepll like '%"+q+"%' or t2.seq_sepll like '%"+q+"%') ";
 	}
-	String sql = "select distinct a.*,level  from t_address a "
-			+ " start with a.addr_id in (select addr_id from t_address t,t_spell t2 "
-			+ " where t.addr_id = t2.data_id(+)"+str
-			+ " and t.is_leaf='T' and t.status='ACTIVE' "
-			+ (StringHelper.isNotEmpty(deptId) ? 
-						" and t.addr_pid in (select sda.addr_id from s_dept_addr sda where sda.dept_id = '" + deptId + "') "
-						: " ")
-			+ filter+")"
-			+ " and a.status='ACTIVE' and "+dataRight
-			+ " connect by prior a.addr_pid=a.addr_id order by level desc";
+//	String sql = "select distinct a.*,level  from t_address a "
+//			+ " start with a.addr_id in (select addr_id from t_address t,t_spell t2 "
+//			+ " where t.addr_id = t2.data_id(+)"+str
+//			+ " and t.is_leaf='T' and t.status='ACTIVE' "
+//			+ (StringHelper.isNotEmpty(deptId) ? 
+//						" and t.addr_pid in (select sda.addr_id from s_dept_addr sda where sda.dept_id = '" + deptId + "') "
+//						: " ")
+//			+ filter+")"
+//			+ " and a.status='ACTIVE' and "+dataRight
+//			+ " connect by prior a.addr_pid=a.addr_id order by level desc";
+//	String sql = "select  a.*, level from t_address a start with a.addr_PID=10 "
+//			+ "connect by prior a.addr_id = a.addr_Pid "
+//			+ "order by level asc";
+	String sql = " select  a.* from t_address a where a.addr_PID=? ";
 	
-	return createQuery(TAddressDto.class, sql).list();
+	return createQuery(TAddressDto.class, sql,pId).list();
 	}
 	
 	public List<TAddressDto> queryActiveAddrByName(String q, String countyId, String dataRight)
@@ -337,4 +340,66 @@ public class TAddressDao extends BaseEntityDao<TAddress> {
 		String sql = "select t.* from t_address t  where t.county_id = ? and t.tree_level = '2' " ;
 		return createQuery(sql, countyId).list();
 	}
+
+	public List<TAddressDto> queryAddrByName(String name,String[] addrPid) throws Exception {
+		String src = "";
+		if(addrPid != null){
+			src = " and "+getSqlGenerator().setWhereInArray("t.addr_pid",addrPid);
+		}
+		String sql = " select t.*,level from t_address t start with "
+				+ " t.addr_name like '%"+name+"%' and t.status = ? "+src
+						+ "connect by prior t.addr_id = t.addr_Pid order by level asc ";
+		return createQuery(TAddressDto.class,sql, StatusConstants.ACTIVE).list();
+	}
+	
+	public List<TAddressDto> queryAddrByAllowPids(String levelId,String[] addrPid) throws JDBCException {
+		String src = "";
+		if(addrPid != null && addrPid.length>0){
+			src = " and "+getSqlGenerator().setWhereInArray("addr_pid",addrPid);
+		}
+		String sql = "SELECT * FROM t_address where status='ACTIVE' and tree_level = ? "+src;
+		return createQuery(TAddressDto.class,sql,levelId).list();
+	}
+	
+	public List<TAddressDto> queryAddrByAllowIds(String levelId,String[] addrIds) throws JDBCException {
+		String src = "";
+		if(addrIds != null && addrIds.length>0){
+			src = " and "+getSqlGenerator().setWhereInArray("addr_id",addrIds);
+		}
+		String sql = "SELECT * FROM t_address where status='ACTIVE' and tree_level = ? "+src;
+		return createQuery(TAddressDto.class,sql,levelId).list();
+	}
+	
+	
+	public List<TAddressDto> queryAddrByaddrPids(String name,String[] addrPids) throws JDBCException {
+		String src = "";
+		if(addrPids != null && addrPids.length>0){
+			src = " and "+getSqlGenerator().setWhereInArray("addr_pid",addrPids);
+		}
+		String sql = "SELECT * FROM t_address  where  addr_name like '%"+name+"%' and status='ACTIVE'  "+src;
+		return createQuery(TAddressDto.class,sql).list();
+	}
+	
+	public List<TAddressDto> queryAddrByaddrIds(String name,String[] addrIds) throws JDBCException {
+		String src = "";
+		if(addrIds != null&& addrIds.length>0){
+			src = " and "+getSqlGenerator().setWhereInArray("addr_id",addrIds);
+		}
+		String sql = "SELECT * FROM t_address where  addr_name like '%"+name+"%' and status='ACTIVE'  "+src;
+		return createQuery(TAddressDto.class,sql).list();
+	}
+	public List<TAddressDto> queryAddrByIds(String[] addrIds) throws JDBCException {
+		String src = "";
+		if(addrIds != null && addrIds.length>0){
+			src = " and "+getSqlGenerator().setWhereInArray("addr_id",addrIds);
+		}
+		String sql = "SELECT * FROM t_address where status='ACTIVE'  "+ src;
+		return createQuery(TAddressDto.class,sql).list();
+	}
+	
+	public List<TAddressDto> queryAddrById(String addrId) throws JDBCException {
+		String sql = "SELECT * FROM t_address where status='ACTIVE'  and addr_pid = ? ";
+		return createQuery(TAddressDto.class,sql,addrId).list();
+	}
+	
 }

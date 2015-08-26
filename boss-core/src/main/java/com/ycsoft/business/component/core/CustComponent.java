@@ -13,9 +13,12 @@ import org.apache.commons.beanutils.PropertyUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
+import com.ycsoft.beans.config.TAddress;
 import com.ycsoft.beans.config.TCustColonyCfg;
 import com.ycsoft.beans.config.TDeviceBuyMode;
+import com.ycsoft.beans.config.TDistrict;
 import com.ycsoft.beans.config.TNonresCustApproval;
+import com.ycsoft.beans.config.TProvince;
 import com.ycsoft.beans.config.TTabDefine;
 import com.ycsoft.beans.core.acct.CAcctBank;
 import com.ycsoft.beans.core.common.CDoneCode;
@@ -38,7 +41,9 @@ import com.ycsoft.business.commons.abstracts.BaseBusiComponent;
 import com.ycsoft.business.dao.config.TAddressDao;
 import com.ycsoft.business.dao.config.TCustColonyCfgDao;
 import com.ycsoft.business.dao.config.TDeviceBuyModeDao;
+import com.ycsoft.business.dao.config.TDistrictDao;
 import com.ycsoft.business.dao.config.TNonresCustApprovalDao;
+import com.ycsoft.business.dao.config.TProvinceDao;
 import com.ycsoft.business.dao.core.acct.CAcctBankDao;
 import com.ycsoft.business.dao.core.cust.CCustAddrDao;
 import com.ycsoft.business.dao.core.cust.CCustAddrHisDao;
@@ -63,6 +68,7 @@ import com.ycsoft.commons.constants.SequenceConstants;
 import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.exception.ComponentException;
+import com.ycsoft.commons.exception.ErrorCode;
 import com.ycsoft.commons.exception.ServicesException;
 import com.ycsoft.commons.helper.BeanHelper;
 import com.ycsoft.commons.helper.DateHelper;
@@ -92,6 +98,8 @@ public class CustComponent extends BaseBusiComponent {
 	private TCustColonyCfgDao tCustColonyCfgDao;
 	private CCustDeviceBuymodePropDao cCustDeviceBuymodePropDao;
 	private TNonresCustApprovalDao tNonresCustApprovalDao;
+	private TDistrictDao tDistrictDao;
+	private TProvinceDao tProvinceDao;
 	
 	/**
 	 * 查询变更产权的设备销售方式
@@ -156,7 +164,7 @@ public class CustComponent extends BaseBusiComponent {
 		BeanUtils.copyProperties(cust, custAddr);
 		cCustAddrDao.save(custAddr);
 		//同步客户开户数量限制
-		addCustColony(cust.getCust_id());
+//		addCustColony(cust.getCust_id());
 		
 		return cust.getCust_id();
 	}
@@ -1186,12 +1194,30 @@ public class CustComponent extends BaseBusiComponent {
 	 * @param cust
 	 * @return
 	 */
-	private String gCustNoByAddr(String addrId ) throws JDBCException, ServicesException {
-		String seq=cCustDao.findSequence(SequenceConstants.SEQ_CUST_NO+"_"+getOptr().getCounty_id()).toString();
-		while(seq.length()<6){
-			seq ="0"+seq;
+	private String gCustNoByAddr(String addrId ) throws Exception {
+		TAddress adr = tAddressDao.findByKey(addrId);
+		if(adr == null){
+			throw new ComponentException(ErrorCode.CustAddressIsNull);
 		}
-		return getOptr().getCounty_id()+seq;
+		TDistrict district = tDistrictDao.findByKey(adr.getDistrict_id());
+		if(district == null){
+			throw new ComponentException(ErrorCode.CustDistrictIsNull,addrId);
+		}
+		TProvince province = tProvinceDao.findByKey(district.getProvince_id());
+		if(province == null || StringHelper.isEmpty(province.getCust_code())){
+			throw new ComponentException(ErrorCode.CustProvinceIsNull,adr.getDistrict_id());
+		}
+		
+		String seq=cCustDao.findSequence(SequenceConstants.SEQ_CUST_NO+"_"+province.getCust_code()).toString();
+		if(seq == null){
+			throw new ComponentException(ErrorCode.CustSeqIsNull,province.getCust_code());
+		}
+		seq = province.getCust_code()+seq;
+		
+//		while(seq.length()<6){
+//			seq ="0"+seq;
+//		}
+		return seq;
 	}
 
 	private void setPropText(CCustPropChange change) {
@@ -1582,6 +1608,58 @@ public class CustComponent extends BaseBusiComponent {
 		return tNonresCustApprovalDao.queryNonresCustApp(status, query, start, limit);
 	}
 	
+
+	/**
+	 * 恢复已注销的客户.
+	 * @param custId
+	 * @return
+	 */
+	public CustFullInfoDto restoeCust(String custId,Integer doneCode) throws Exception{
+		CustFullInfoDto custFullInfo = searchCustInfoById(custId);
+		CCust cust = custFullInfo.getCust();
+		
+		CCustPropChange cpc = new CCustPropChange();
+		cpc.setArea_id(cust.getAddr_id());
+		cpc.setCounty_id(cust.getCounty_id());
+		cpc.setCust_id(cust.getCust_id());
+		cpc.setColumn_name("status");
+		cpc.setOld_value(cust.getStatus());
+		//更改状态
+		cust.setStatus(StatusConstants.ACTIVE);
+		cpc.setNew_value(cust.getStatus());
+		cpc.setDone_code(doneCode);
+		cCustPropChangeDao.save(cpc);
+		
+		
+		CCustLinkman linkman = custFullInfo.getLinkman();
+		if(linkman ==null){
+			throw new ComponentException("获取客户的联系人信息出错!");
+		}
+		Map<String, Serializable> params = new HashMap<String, Serializable>();
+		params.put("cust_id", custId);
+		
+		CCustAddrHis addrHis = cCustAddrHisDao.findByKey(custId);
+		if(null == addrHis){
+			throw new ComponentException("获取客户的地址信息出错!");
+		}
+		CCustAddr addr = new CCustAddr();
+		BeanUtils.copyProperties(addrHis, addr);
+		
+		cCustDao.save(cust);
+		cCustAddrDao.save(addr);
+		cCustLinkmanDao.save(linkman);
+		
+		cCustHisDao.remove(custId);
+		cCustLinkmanHisDao.remove(custId);
+		cCustAddrHisDao.remove(custId);
+		
+		//同步客户开户数量限制
+		addCustColony(cust.getCust_id());
+		
+		return custFullInfo;
+	}
+	
+	
 	public void setCCustDao(CCustDao custDao) {
 		cCustDao = custDao;
 	}
@@ -1659,54 +1737,13 @@ public class CustComponent extends BaseBusiComponent {
 		tNonresCustApprovalDao = nonresCustApprovalDao;
 	}
 
-	/**
-	 * 恢复已注销的客户.
-	 * @param custId
-	 * @return
-	 */
-	public CustFullInfoDto restoeCust(String custId,Integer doneCode) throws Exception{
-		CustFullInfoDto custFullInfo = searchCustInfoById(custId);
-		CCust cust = custFullInfo.getCust();
-		
-		CCustPropChange cpc = new CCustPropChange();
-		cpc.setArea_id(cust.getAddr_id());
-		cpc.setCounty_id(cust.getCounty_id());
-		cpc.setCust_id(cust.getCust_id());
-		cpc.setColumn_name("status");
-		cpc.setOld_value(cust.getStatus());
-		//更改状态
-		cust.setStatus(StatusConstants.ACTIVE);
-		cpc.setNew_value(cust.getStatus());
-		cpc.setDone_code(doneCode);
-		cCustPropChangeDao.save(cpc);
-		
-		
-		CCustLinkman linkman = custFullInfo.getLinkman();
-		if(linkman ==null){
-			throw new ComponentException("获取客户的联系人信息出错!");
-		}
-		Map<String, Serializable> params = new HashMap<String, Serializable>();
-		params.put("cust_id", custId);
-		
-		CCustAddrHis addrHis = cCustAddrHisDao.findByKey(custId);
-		if(null == addrHis){
-			throw new ComponentException("获取客户的地址信息出错!");
-		}
-		CCustAddr addr = new CCustAddr();
-		BeanUtils.copyProperties(addrHis, addr);
-		
-		cCustDao.save(cust);
-		cCustAddrDao.save(addr);
-		cCustLinkmanDao.save(linkman);
-		
-		cCustHisDao.remove(custId);
-		cCustLinkmanHisDao.remove(custId);
-		cCustAddrHisDao.remove(custId);
-		
-		//同步客户开户数量限制
-		addCustColony(cust.getCust_id());
-		
-		return custFullInfo;
+	public void setTDistrictDao(TDistrictDao districtDao) {
+		this.tDistrictDao = districtDao;
 	}
+
+	public void setTProvinceDao(TProvinceDao provinceDao) {
+		this.tProvinceDao = provinceDao;
+	}
+
 
 }
