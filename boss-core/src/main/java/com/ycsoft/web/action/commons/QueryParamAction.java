@@ -41,11 +41,7 @@ public class QueryParamAction extends BaseBusiAction {
 	 */
 	public String queryAddrTree() throws Exception{
 		List addrs =  queryCfgService.queryAddrByName(comboQueryText,addrId);
-		if(StringHelper.isNotEmpty(comboQueryText) ){
-			getRoot().setRecords(TreeBuilder.createAdreeTree(addrs,true));
-		}else{
-			getRoot().setRecords(TreeBuilder.createAdreeTree(addrs,false));
-		}
+		getRoot().setRecords(TreeBuilder.createAdreeTree(addrs,false));
 		return JSON_RECORDS;
 	}
 	

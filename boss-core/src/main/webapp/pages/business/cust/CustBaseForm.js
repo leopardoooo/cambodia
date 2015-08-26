@@ -17,53 +17,10 @@ QueryFilterTree = Ext.extend(Ext.ux.QueryFilterTreePanel,{
 						  children:data
 						 });
 				this.setRootNode(root);
-//				this.root.expand(true);
-//				this.expandAll();	
 			}
 		});				
-			
-//		alert(_v);
-//		this.setRootNode(root);
-//		this.root.expand(true);
 	}
 });
-
-
-QueryTreeLoader = Ext.extend(Ext.tree.TreeLoader,{
-
-    load : function(node, callback, scope){
-        if(this.clearOnLoad){
-            while(node.firstChild){
-                node.removeChild(node.firstChild);
-            }
-        }
-        if(this.doPreload(node)){ // preloaded json children
-            this.runCallback(callback, scope || node, [node]);
-        }else if(this.directFn || this.dataUrl || this.url){
-            this.requestData(node, callback, scope || node);
-        }
-    },
-
-    doPreload : function(node){
-        if(node.attributes.children){
-            if(node.childNodes.length < 1){ // preloaded?
-                var cs = node.attributes.children;
-                node.beginUpdate();
-                for(var i = 0, len = cs.length; i < len; i++){
-                    var cn = node.appendChild(this.createNode(cs[i]));
-                    if(this.preloadChildren){
-                        this.doPreload(cn);
-                    }
-                }
-                node.endUpdate();
-            }
-            return true;
-        }
-        return false;
-    }
-
-
-})
 
 AddressTreeCombo = Ext.extend(Ext.ux.TreeCombo,{
 	initList : function() {
@@ -77,7 +34,7 @@ AddressTreeCombo = Ext.extend(Ext.ux.TreeCombo,{
 		}
 		this.list = new QueryFilterTree({
 			root : new Ext.tree.AsyncTreeNode(this.rootNodeCfg),
-			loader : new QueryTreeLoader({
+			loader : new Ext.tree.TreeLoader({
 						dataUrl : this.treeUrl,
 						baseParams : this.treeParams
 						,listeners : {
@@ -121,6 +78,7 @@ AddressTreeCombo = Ext.extend(Ext.ux.TreeCombo,{
 		if (!this.isCanClick(node)) {
 			return;
 		}
+		this.setRawValue('');
 		Ext.Ajax.request({
 			scope : this,
 			url: Constant.ROOT_PATH+"/commons/x/QueryParam!queryCustAddrName.action",
@@ -407,6 +365,7 @@ CustBaseForm = Ext.extend( BaseForm , {
 					labelWidth: 75
 				},
 				items: [{
+					columnWidth:0.95,
 					items:[{
 						fieldLabel:'客户名称',
 						xtype:'textfield',
@@ -420,19 +379,33 @@ CustBaseForm = Ext.extend( BaseForm , {
 						}
 					}]
 				},{
+					columnWidth:0.25,
+					items:[{
+				    	width : 40,
+				    	id : 'cust.note',
+				    	name : 'cust.note',
+				    	fieldLabel : 'Room',
+				    	xtype : 'textfield',
+				    	listeners:{
+							scope: this,
+							'change': this.doAddressChange
+						}
+				    }]
+				},{
+					labelWidth: 45,
 					columnWidth:0.75,
 					items:[new AddressTreeCombo({
 						id : 'addrTreeCombo',
-				    	width:300,
+				    	width:280,
 						treeWidth:350,
 						treeHeight : 300,
 						minChars:0,
 						height: 22,
-						fieldLabel : '客户地址',
+						fieldLabel : '地址',
 						allowBlank: false,
 						emptyText :'选择地址..',
 						hideTrigger: false,
-						editable: true,
+						editable: false,
 						blankText:'请选择客户地址',
 						treeUrl: Constant.ROOT_PATH+"/commons/x/QueryParam!queryAddrTree.action",
 						hiddenName:'cust.addr_id',
@@ -444,20 +417,6 @@ CustBaseForm = Ext.extend( BaseForm , {
 							}
 						}
 					})]
-				},{
-					columnWidth:0.25,
-				    labelWidth: 45,
-					items:[{
-				    	width : 50,
-				    	id : 'cust.note',
-				    	name : 'cust.note',
-				    	fieldLabel : 'Room',
-				    	xtype : 'textfield',
-				    	listeners:{
-							scope: this,
-							'change': this.doAddressChange
-						}
-				    }]
 				}]
 			}
 			,{

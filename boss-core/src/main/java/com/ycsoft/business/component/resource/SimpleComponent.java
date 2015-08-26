@@ -2,17 +2,12 @@ package com.ycsoft.business.component.resource;
 
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
-import org.apache.axis2.databinding.types.soapencoding.Array;
 import org.springframework.stereotype.Component;
 
 import com.ycsoft.beans.config.TAddress;
 import com.ycsoft.beans.config.TDistrict;
-import com.ycsoft.beans.prod.PPromFeeUser;
-import com.ycsoft.beans.prod.PRes;
 import com.ycsoft.beans.system.SDeptAddr;
 import com.ycsoft.business.commons.abstracts.BaseBusiComponent;
 import com.ycsoft.business.dao.config.TAddressDao;
@@ -20,17 +15,13 @@ import com.ycsoft.business.dao.config.TDistrictDao;
 import com.ycsoft.business.dao.system.SDeptAddrDao;
 import com.ycsoft.business.dao.system.SParamDao;
 import com.ycsoft.business.dto.config.TAddressDto;
-import com.ycsoft.business.dto.core.prod.CProdDto;
-import com.ycsoft.business.dto.core.prod.PromFeeProdDto;
 import com.ycsoft.commons.constants.DataRight;
 import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.exception.ComponentException;
 import com.ycsoft.commons.exception.ErrorCode;
 import com.ycsoft.commons.helper.CollectionHelper;
 import com.ycsoft.commons.helper.StringHelper;
-import com.ycsoft.commons.tree.TreeNode;
 import com.ycsoft.daos.core.JDBCException;
-import com.ycsoft.sysmanager.dto.prod.ResGroupDto;
 /**
  * 简单资源操作：安装地址、ip地址等
  *
@@ -74,6 +65,8 @@ public class SimpleComponent extends BaseBusiComponent {
 			}
 		}
 		
+		name = name.toLowerCase();
+		
 		
 		//2级 允许查询的addr
 		List<TAddressDto> twoLevelList = tAddressDao.queryAddrByAllowPids(SystemConstants.ADDR_TREE_LEVEL_TWO,addrIds);
@@ -89,18 +82,21 @@ public class SimpleComponent extends BaseBusiComponent {
 		}
 		
 		List<String> addTwoQueryPids = new ArrayList<String>();
-		for(String t : addPids){
-			if(!twoPidList.contains(t)){
+		for(String t : twoPidList){
+			if(!addPids.contains(t)){
 				addTwoQueryPids.add(t);
 			}
 		}
 		//2级允许的 并且 过滤 name
-		List<TAddressDto> twoAllowList = tAddressDao.queryAddrByaddrIds(name,addPids.toArray(new String[addPids.size()]));
+		List<TAddressDto> twoAllowList = new ArrayList<TAddressDto>();
+		if(addPids.size()>0){
+			twoAllowList = tAddressDao.queryAddrByAllowIds(SystemConstants.ADDR_TREE_LEVEL_TWO,addPids.toArray(new String[addPids.size()]));
+		}
 		List<TAddressDto> twoQueryList = null;
 		if(addTwoQueryPids.size()>0){
-			twoQueryList = tAddressDao.queryAddrByAllowIds(SystemConstants.ADDR_TREE_LEVEL_TWO,addTwoQueryPids.toArray(new String[addTwoQueryPids.size()]));
+			twoQueryList = tAddressDao.queryAddrByaddrIds(name,addTwoQueryPids.toArray(new String[addTwoQueryPids.size()]));
 		}
-		List<TAddressDto> oneAllowList = tAddressDao.queryAddrByAllowIds(SystemConstants.ADDR_TREE_LEVEL_ONE,null);
+		List<TAddressDto> oneAllowList = tAddressDao.queryAddrByAllowIds(SystemConstants.ADDR_TREE_LEVEL_ONE,addrIds);
 		
 		if(twoAllowList.size()>0){
 			oneAllowList.addAll(twoAllowList);
@@ -111,7 +107,10 @@ public class SimpleComponent extends BaseBusiComponent {
 		if(threeList.size()>0){
 			oneAllowList.addAll(threeList);
 		}
-
+		System.out.println(oneAllowList.size());
+		if(oneAllowList.size()>2000){
+			throw new ComponentException(ErrorCode.DataNumTooMuch,oneAllowList.size());
+		}
 		
 		return oneAllowList;
 		
@@ -253,11 +252,15 @@ public class SimpleComponent extends BaseBusiComponent {
 	public String queryCustAddrName(String addrId) throws Exception{
 		TAddress addr = tAddressDao.findByKey(addrId);
 		TAddress paddr = tAddressDao.findByKey(addr.getAddr_pid());
-		TDistrict district = tDistrictDao.findByKey(addr.getDistrict_id());
-		
+		List<TDistrict> districtList = tDistrictDao.queryDistrictListById(addr.getDistrict_id());
+		if(districtList.size() == 0 || (districtList.size()==1 && districtList.get(0).getDistrict_level()==0)){
+			throw new ComponentException(ErrorCode.CustDistrictIsNull,addr.getAddr_name());
+		}
 		String addrName = "No."+addr.getAddr_name()+",St."+paddr.getAddr_name()+",";
-		if(district != null){
-			addrName = addrName+district.getDistrict_name();
+		for(TDistrict t : districtList){
+			if(t.getDistrict_level() != 0){
+				addrName = addrName+t.getDistrict_name();
+			}
 		}
 		return addrName;
 	}

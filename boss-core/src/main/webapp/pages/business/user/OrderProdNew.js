@@ -298,6 +298,7 @@ ProdOrderForm = Ext.extend( BaseForm, {
 		if(startDate){
 			// 计算结束日
 			startDate.setMonth(startDate.getMonth() + months);
+			startDate.setDate(startDate.getDate() - 1);
 			Ext.getCmp("dfExpDate").setValue(startDate.format("Y-m-d"));
 		}else{ 
 			Ext.getCmp("dfExpDate").setValue(null);

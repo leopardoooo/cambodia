@@ -361,7 +361,7 @@ SinglePayFeesGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 		if(this.compareTodayDate(date)){
 			invalidDate = Date.parseDate(date,  "Y-m-d H:i:s");
 		}
-		invalidDate.setDate(invalidDate.getDate()+1);
+		invalidDate.setDate(invalidDate.getDate());
 		return invalidDate;
 	}
 	,

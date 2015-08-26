@@ -5,6 +5,7 @@ package com.ycsoft.boss.remoting.aaa;
 
 import static org.junit.Assert.assertTrue;
 
+import java.util.List;
 import java.util.Scanner;
 
 /**
@@ -26,7 +27,7 @@ public class BOSSBandServiceAdapterTest {
 		String line = null;
 
 		System.out
-				.println("开户[create],暂停[pause],恢复[resume],重置密码[resetPswd],销户[delete],删除授权[deleteProd],加授权[addProd]]");
+				.println("开户[create],暂停[pause],恢复[resume],重置密码[resetPswd],销户[delete],删除授权[deleteProd],加授权[addProd],查授权信息[queryProd],修改授权[editProd]]");
 
 		Scanner sc = new Scanner(System.in);
 		while (true) {
@@ -46,6 +47,10 @@ public class BOSSBandServiceAdapterTest {
 				o.testDeleteProd();
 			} else if (line.equals("addProd")) {
 				o.testAddProd();
+			} else if (line.equals("queryProd")) {
+				o.testQueryProd();
+			} else if (line.equals("editProd")) {
+				o.testEditProd();
 			} else {
 				break;
 			}
@@ -125,9 +130,31 @@ public class BOSSBandServiceAdapterTest {
 	//加授权
 	public void testAddProd() {
 		try {
-			boolean success = bandService.orderService(0l, "0120433901@vip", 637, "20180823000000", "20180825000000");
+			boolean success = bandService.orderService(0l, "0120433901@vip", 1239, "20150822000000", "20160825000000");
 			//assertTrue(success);
 			System.out.println("加授权：" + success);
+		} catch (AAAException e) {
+			System.out.println(e.getMessage());
+		}
+	}
+	
+	public void testEditProd() {
+		try {
+			boolean success = bandService.modifyOrderService(0l, "0120433901@vip", 637, null, "20150823000000");
+			//assertTrue(success);
+			System.out.println("加授权：" + success);
+		} catch (AAAException e) {
+			System.out.println(e.getMessage());
+		}
+	}
+	
+	public void testQueryProd() {
+		try {
+			List<AAASubscriberServiceInfoWrapper> prodList = bandService.querySubscriberService(0l, "0120433901@vip");
+			for (AAASubscriberServiceInfoWrapper prod:prodList){
+				System.out.println(prod.getUeid()+"-"+prod.getAccessPolicyID()+"-"+prod.getExpireTime());
+			}
+		
 		} catch (AAAException e) {
 			System.out.println(e.getMessage());
 		}

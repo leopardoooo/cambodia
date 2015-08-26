@@ -15,7 +15,15 @@ Ext.ux.QueryFilterTreePanel = Ext.extend( Ext.tree.TreePanel , {
 			width: this.searchFieldWidth,
 			emptyText:'输入名称过滤...',
 			selectOnFocus: true,
-			enableKeyEvents: true
+			enableKeyEvents: true,
+			listeners: {
+				scope: this,
+				specialKey: function(field, e){
+        			if (e.getKey() == e.ENTER) {
+        				this.doSearch();
+        	        }
+        		}
+			}
 		});
 		
 		Ext.apply( this,{

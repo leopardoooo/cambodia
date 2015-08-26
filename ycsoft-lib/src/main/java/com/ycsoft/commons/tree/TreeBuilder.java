@@ -86,9 +86,9 @@ public class TreeBuilder {
 			}
 			tempMap.put( node.getId() , node);
 		}
-//		if(falseChildren){
-//			removeNullNode(target);
-//		}
+		if(falseChildren){
+			removeNullNode(target);
+		}
 		return target;
 	}
 	
