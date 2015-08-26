@@ -142,7 +142,7 @@ public class UserAction extends BaseBusiAction {
 	public String createUserBatch() throws Exception{
 		Type type = new TypeToken<List<UserInfo>>(){}.getType();
 		List<UserInfo> rs = new Gson().fromJson(openUserList,type);
-		userServiceSN.createUserBatch(rs, workBillAsignType);
+		userServiceSN.createUserBatch(rs);
 		return JSON_SUCCESS;
 	}
 

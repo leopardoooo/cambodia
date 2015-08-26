@@ -26,7 +26,7 @@ public class BOSSBandServiceAdapterTest {
 		String line = null;
 
 		System.out
-				.println("开户[create],暂停[pause],恢复[resume],重置密码[resetPswd],销户[delete]]");
+				.println("开户[create],暂停[pause],恢复[resume],重置密码[resetPswd],销户[delete],删除授权[deleteProd],加授权[addProd]]");
 
 		Scanner sc = new Scanner(System.in);
 		while (true) {
@@ -42,6 +42,10 @@ public class BOSSBandServiceAdapterTest {
 				o.testResetPswd();
 			} else if (line.equals("delete")) {
 				o.testDelete();
+			} else if (line.equals("deleteProd")) {
+				o.testDeleteProd();
+			} else if (line.equals("addProd")) {
+				o.testAddProd();
 			} else {
 				break;
 			}
@@ -54,7 +58,7 @@ public class BOSSBandServiceAdapterTest {
 	public void testCreate() {
 		try {
 			boolean success = bandService
-					.create(0l, "Killer001", "12345678", 536);
+					.create(0l, "0120433901@vip", "123456",null);
 			//assertTrue(success);
 			System.out.println("开户[create]执行结果：" + success);
 		} catch (AAAException e) {
@@ -65,7 +69,7 @@ public class BOSSBandServiceAdapterTest {
 	// 暂停
 	public void testPause() {
 		try {
-			boolean success = bandService.pause(0l, "Killer001");
+			boolean success = bandService.pause(0l, "0120433901@vip");
 			//assertTrue(success);
 			System.out.println("暂停[pause]执行结果：" + success);
 		} catch (AAAException e) {
@@ -76,7 +80,7 @@ public class BOSSBandServiceAdapterTest {
 	// 恢复
 	public void testResume() {
 		try {
-			boolean success = bandService.resume(0l, "Killer001");
+			boolean success = bandService.resume(0l, "0120433901@vip");
 			//assertTrue(success);
 			System.out.println("恢复[resume]执行结果：" + success);
 		} catch (AAAException e) {
@@ -88,7 +92,7 @@ public class BOSSBandServiceAdapterTest {
 	public void testResetPswd() {
 		try {
 			boolean success = bandService
-					.resetPswd(0l, "Killer001", "abcd1234");
+					.resetPswd(0l, "0120433901@vip", "123456");
 			//assertTrue(success);
 			System.out.println("恢复[resetPswd]执行结果：" + success);
 		} catch (AAAException e) {
@@ -99,9 +103,31 @@ public class BOSSBandServiceAdapterTest {
 	// 销户
 	public void testDelete() {
 		try {
-			boolean success = bandService.delete(0l, "Killer001");
+			boolean success = bandService.delete(0l, "0120433901@vip");
 			//assertTrue(success);
 			System.out.println("销户[delete]执行结果：" + success);
+		} catch (AAAException e) {
+			System.out.println(e.getMessage());
+		}
+	}
+	
+	// 删除授权
+	public void testDeleteProd() {
+		try {
+			boolean success = bandService.cancelOrder(0l, "0120433901@vip");
+			//assertTrue(success);
+			System.out.println("解除授权：" + success);
+		} catch (AAAException e) {
+			System.out.println(e.getMessage());
+		}
+	}
+	
+	//加授权
+	public void testAddProd() {
+		try {
+			boolean success = bandService.orderService(0l, "0120433901@vip", 637, "20180823000000", "20180825000000");
+			//assertTrue(success);
+			System.out.println("加授权：" + success);
 		} catch (AAAException e) {
 			System.out.println(e.getMessage());
 		}

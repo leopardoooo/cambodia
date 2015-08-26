@@ -216,7 +216,7 @@ public class TaskComponent extends BaseBusiComponent {
 				wCustList.add(info);
 			}
 			//记录工单操作记录
-			saveWorkLog(SystemConstants.WORK_CREATE,tTask.getWork_id().split(","),getOptr(),null);
+			//saveWorkLog(SystemConstants.WORK_CREATE,tTask.getWork_id().split(","),getOptr(),null);
 			
 			wTaskServDao.save(wTaskServs.toArray(new WTaskServ[wTaskServs.size()]));
 			//记录工单客户信息
@@ -276,7 +276,7 @@ public class TaskComponent extends BaseBusiComponent {
 		String[] workIds = CollectionHelper.converValueToArray(wList, "work_id"); 
 		//记录工单操作
 		String info = "工单打印:"+StatusConstants.TASK_CREATE+"->"+StatusConstants.TASK_INIT;
-		saveWorkLog(SystemConstants.WORK_CANCEL,workIds,getOptr(),info);
+		//saveWorkLog(SystemConstants.WORK_CANCEL,workIds,getOptr(),info);
 	}
 	
 	/**
@@ -291,7 +291,7 @@ public class TaskComponent extends BaseBusiComponent {
 		
 		//记录工单操作
 		String info = "业务冲正,流水号:"+doneCode;
-		saveWorkLog(SystemConstants.WORK_CANCEL,workIds,getOptr(),info);
+		//saveWorkLog(SystemConstants.WORK_CANCEL,workIds,getOptr(),info);
 	}
 
 	/**

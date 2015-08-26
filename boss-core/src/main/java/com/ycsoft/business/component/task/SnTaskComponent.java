@@ -1,25 +1,31 @@
 package com.ycsoft.business.component.task;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.google.gson.JsonObject;
 import com.ycsoft.beans.core.cust.CCust;
 import com.ycsoft.beans.core.cust.CCustLinkman;
 import com.ycsoft.beans.core.user.CUser;
 import com.ycsoft.beans.device.RDevice;
 import com.ycsoft.beans.task.WTaskBaseInfo;
+import com.ycsoft.beans.task.WTaskLog;
 import com.ycsoft.beans.task.WTaskUser;
 import com.ycsoft.beans.task.WTeam;
+import com.ycsoft.business.commons.abstracts.BaseBusiComponent;
 import com.ycsoft.business.dao.core.cust.CCustLinkmanDao;
 import com.ycsoft.business.dao.task.WTaskBaseInfoDao;
 import com.ycsoft.business.dao.task.WTaskLogDao;
 import com.ycsoft.business.dao.task.WTaskUserDao;
 import com.ycsoft.business.dao.task.WTeamDao;
+import com.ycsoft.commons.constants.BusiCodeConstants;
 import com.ycsoft.commons.constants.SequenceConstants;
+import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.helper.StringHelper;
 
@@ -29,7 +35,7 @@ import com.ycsoft.commons.helper.StringHelper;
  *
  */
 @Component
-public class SnTaskComponent {
+public class SnTaskComponent extends BaseBusiComponent{
 	@Autowired
 	private WTaskBaseInfoDao wTaskBaseInfoDao;
 	@Autowired
@@ -54,6 +60,8 @@ public class SnTaskComponent {
 	
 	//创建需要记录用户信息的工单
 	private void createTaskWithUser(int doneCode,CCust cust,List<CUser> userList,String taskType,String assignType) throws Exception{
+		if (StringHelper.isEmpty(assignType))
+			return;
 		//剔除ott_mobile用户
 		List<CUser> bandList = new ArrayList<CUser>();
 		List<CUser> tvUserList = new ArrayList<CUser>();
@@ -69,21 +77,28 @@ public class SnTaskComponent {
 		}
 		
 		if (assignType.equals(SystemConstants.TASK_ASSIGN_BOTH)){
-			createSingleTaskWithUser(doneCode, cust, tvUserList, 
+			String taskId = createSingleTaskWithUser(doneCode, cust, tvUserList, 
 					getTeamId(SystemConstants.TEAM_TYPE_SUPERNET), taskType);
-			createSingleTaskWithUser(doneCode, cust, bandList, 
-					getTeamId(SystemConstants.TEAM_TYPE_SUPERNET), taskType);
+			createTaskLog(taskId, BusiCodeConstants.TASK_INIT, doneCode, null, StatusConstants.NOT_EXEC);
+			
+			taskId = createSingleTaskWithUser(doneCode, cust, bandList, 
+					getTeamId(SystemConstants.TEAM_TYPE_CFOCN), taskType);
+			createTaskLog(taskId, BusiCodeConstants.TASK_INIT, doneCode, null, StatusConstants.NONE);
 		} else {
 			String teamType = SystemConstants.TEAM_TYPE_SUPERNET;
 			if(assignType.equals(SystemConstants.TASK_ASSIGN_CFOCN))
 				teamType = SystemConstants.TEAM_TYPE_CFOCN;
-			createSingleTaskWithUser(doneCode, cust, userList, getTeamId(teamType),taskType);
+			String taskId = createSingleTaskWithUser(doneCode, cust, userList, getTeamId(teamType),taskType);
+			if (teamType.equals(SystemConstants.TEAM_TYPE_CFOCN))
+				this.createTaskLog(taskId, BusiCodeConstants.TASK_INIT, doneCode, null, StatusConstants.NOT_EXEC);
+			else 
+				this.createTaskLog(taskId, BusiCodeConstants.TASK_INIT, doneCode, null, StatusConstants.NONE);
 		}
 		
 	}
 	
-	private void createSingleTaskWithUser(int doneCode,CCust cust,List<CUser> userList,String deptId,String taskType) throws Exception{
-		String taskId = this.saveTaskBaseInfo(cust, doneCode, SystemConstants.TASK_TYPE_INSTALL, deptId, null);
+	private String createSingleTaskWithUser(int doneCode,CCust cust,List<CUser> userList,String deptId,String taskType) throws Exception{
+		String taskId = this.saveTaskBaseInfo(cust, doneCode,taskType, deptId, null);
 		for (CUser user:userList){
 			WTaskUser taskUser = new WTaskUser();
 			taskUser.setTask_id(taskId);
@@ -92,6 +107,8 @@ public class SnTaskComponent {
 			taskUser.setUser_type(user.getUser_type());
 			wTaskUserDao.save(taskUser);
 		}
+		
+		return taskId;
 	}
 	
 	
@@ -135,7 +152,18 @@ public class SnTaskComponent {
 	}
 	
 	//完工
-	public void finishTask(int doneCode,String taskId) throws Exception{
+	public void finishTask(int doneCode,String taskId,String resultType) throws Exception{
+		WTaskBaseInfo task = new WTaskBaseInfo();
+		task.setTask_id(gTaskId());
+		task.setTask_status(StatusConstants.TASK_END);
+		task.setTask_finish_type(resultType);
+		task.setTask_finish_time(new Date());
+		
+		wTaskBaseInfoDao.save(task);
+		//记录操作日志
+		JsonObject jo = new JsonObject();
+		jo.addProperty("resultType", resultType);
+		createTaskLog(taskId,BusiCodeConstants.TASK_FINISH, doneCode, jo.toString(), StatusConstants.NONE);
 		
 	}
 	
@@ -179,6 +207,19 @@ public class SnTaskComponent {
 				return team.getDept_id();
 		}
 		return null;
+	}
+	
+	private void createTaskLog(String taskId,String busiCode,int doneCode,String logDetail,String synStatus) throws Exception{
+		WTaskLog log = new WTaskLog();
+		log.setTask_id(taskId);
+		log.setBusi_code(busiCode);
+		log.setDone_code(doneCode);
+		log.setOptr_id(getOptr().getOptr_id());
+		log.setSyn_status(synStatus);
+		log.setLog_time(new Date());
+		log.setLog_detail(logDetail);
+		wTaskLogDao.save(log);
+		
 	}
 
 	public WTaskBaseInfoDao getwTaskBaseInfoDao() {

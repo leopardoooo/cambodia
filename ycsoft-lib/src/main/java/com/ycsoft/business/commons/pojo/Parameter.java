@@ -32,27 +32,18 @@ public class Parameter implements IParameter {
 	//前台参数。可选
 	private CFeePayDto pay ;  	  //缴费信息
 	private List<FeeBusiFormDto> fees; //收费信息
-	private String[] taskIds ;	//施工单编号
-	private String task_books_time; //预约时间
-	private String task_cust_name; //工单联系人
-	private String task_mobile; // 工单联系电话
-	private String task_remark;	//工单备注
-	private String task_bug_cause;//故障原因
 	private String[] docTypes;	//业务单据类型
 	private ExtAttrFormDto extAttrForm; //表扩展属性
 	private ExtCDoneCode[] busiExtAttr; //业务扩展属性
 	private String remark ;
+	
+	private String workBillAsignType;
 
 	private Map<String,Object> tempVar = new HashMap<String,Object>() ; //临时变量,用于在拦截器访问Service的变量
 
 	
 	
-	public String getTask_bug_cause() {
-		return task_bug_cause;
-	}
-	public void setTask_bug_cause(String task_bug_cause) {
-		this.task_bug_cause = task_bug_cause;
-	}
+	
 	public CFeePayDto getPay() {
 		return pay;
 	}
@@ -65,12 +56,7 @@ public class Parameter implements IParameter {
 	public void setFees(List<FeeBusiFormDto> fees) {
 		this.fees = fees;
 	}
-	public String[] getTaskIds() {
-		return taskIds;
-	}
-	public void setTaskIds(String[] taskIds) {
-		this.taskIds = taskIds;
-	}
+	
 	public String[] getDocTypes() {
 		return docTypes;
 	}
@@ -125,29 +111,14 @@ public class Parameter implements IParameter {
 	public void setOptr(SOptr optr) {
 		this.optr = optr;
 	}
-	public String getTask_books_time() {
-		return task_books_time;
+	public String getWorkBillAsignType() {
+		return workBillAsignType;
 	}
-	public void setTask_books_time(String task_books_time) {
-		this.task_books_time = task_books_time;
+	public void setWorkBillAsignType(String workBillAsignType) {
+		this.workBillAsignType = workBillAsignType;
 	}
-	public String getTask_cust_name() {
-		return task_cust_name;
-	}
-	public void setTask_cust_name(String task_cust_name) {
-		this.task_cust_name = task_cust_name;
-	}
-	public String getTask_mobile() {
-		return task_mobile;
-	}
-	public void setTask_mobile(String task_mobile) {
-		this.task_mobile = task_mobile;
-	}
-	public String getTask_remark() {
-		return task_remark;
-	}
-	public void setTask_remark(String task_remark) {
-		this.task_remark = task_remark;
-	}
+	
+	
+	
 	
 }

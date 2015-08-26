@@ -275,7 +275,7 @@ public class TaskComponent extends  BaseComponent {
 		
 		//记录操作
 		String info = "预约时间:"+work.getBooks_time()+"->"+newPlanTime;
-		saveWorkLog(SystemConstants.WORK_CHANGE_TIME,task_id.split(","),WebOptr.getOptr(),info);
+		//saveWorkLog(SystemConstants.WORK_CHANGE_TIME,task_id.split(","),WebOptr.getOptr(),info);
 	}
 	
 	/**
@@ -342,7 +342,7 @@ public class TaskComponent extends  BaseComponent {
 		wRevisitInfoDao.save(revisit);
 		
 		//记录操作
-		saveWorkLog(SystemConstants.WORK_REVISIT,workId.split(","),WebOptr.getOptr(),null);
+		//saveWorkLog(SystemConstants.WORK_REVISIT,workId.split(","),WebOptr.getOptr(),null);
 	}
 	
 	/**
@@ -355,7 +355,7 @@ public class TaskComponent extends  BaseComponent {
 		wWorkDao.updateStatus(task_ids, StatusConstants.TASK_CANCEL);
 		
 		//记录操作
-		saveWorkLog(SystemConstants.WORK_CANCEL,task_ids,WebOptr.getOptr(),cancel_remak);
+		//saveWorkLog(SystemConstants.WORK_CANCEL,task_ids,WebOptr.getOptr(),cancel_remak);
 	}
 	
 	
@@ -386,7 +386,7 @@ public class TaskComponent extends  BaseComponent {
 		
 		//记录操作
 		String info = "安装人员:"+winfo.getInstaller_optr_text();
-		saveWorkLog(SystemConstants.WORK_CHANGE_OPTR,taskId.split(","),WebOptr.getOptr(),info);
+		//saveWorkLog(SystemConstants.WORK_CHANGE_OPTR,taskId.split(","),WebOptr.getOptr(),info);
 	}
 	
 //	/**

@@ -1,11 +1,15 @@
 package com.ycsoft.boss.remoting.ott;
 
 import java.util.List;
+
+import javax.net.ssl.SSLEngineResult.Status;
+
 import java.util.ArrayList;
 import java.util.Date;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.http.HttpUtils;
 import com.ycsoft.http.ResponseBody;
 
@@ -17,10 +21,11 @@ public class OttClient {
 	 * @return
 	 */
 	public Result createUser(String userId,String password,String userName,String address,
-			String email,String telephone,String deviceId,String deviceMac){
-		User user = generateUser(userId,password,userName,address,email,telephone,deviceId,deviceMac);
+			String email,String telephone,String deviceId,String deviceMac,String status){
+		User user = generateUser(userId,password,userName,address,email,telephone,deviceId,deviceMac,status);
 		String url = URLBuilder.getUrl(URLBuilder.Method.CREATE_USER); 
 		String jsonData = new Gson().toJson(user);
+		System.out.println(jsonData);
 		return sendOttCmdOnHttp(url, jsonData);
 	}
 
@@ -29,9 +34,9 @@ public class OttClient {
 	 * @return
 	 */
 	public Result editUser(String userId,String password,String userName,String address,
-			String email,String telephone,String deviceId,String deviceMac){
+			String email,String telephone,String deviceId,String deviceMac,String status){
 		return this.createUser(userId, password, userName, address, email,
-				telephone, deviceId, deviceMac);
+				telephone, deviceId, deviceMac,status);
 	}
 	
 	/**
@@ -66,8 +71,10 @@ public class OttClient {
 	public Result stopUserProduct(String userId,String productId){
 		String url = URLBuilder.getUrl(URLBuilder.Method.STOP_USER_PRODCT); 
 		JsonObject jsonData = new JsonObject();
-		jsonData.addProperty("user_Id", userId);
+		jsonData.addProperty("user_id", userId);
 		jsonData.addProperty("product_id", productId);
+		//jsonData.addProperty("product_fee_id","");
+		System.out.println(jsonData.toString());
 		return sendOttCmdOnHttp(url, jsonData.toString());
 		
 	}
@@ -123,7 +130,7 @@ public class OttClient {
 	 * @return
 	 */
 	private User generateUser(String userId,String password, String userName, String address, String email, String telephone,
-			String deviceId, String deviceMac) {
+			String deviceId, String deviceMac,String status) {
 		User user = new User();
 		user.setUser_id(userId);
 		user.setUser_passwd(password);
@@ -136,9 +143,14 @@ public class OttClient {
 			DeviceInfo device = new DeviceInfo();
 			device.setId(deviceId);
 			device.setMac(deviceMac);
+			user.getDevice_info().add(device);
 		}
-		
-		user.setState("0");
+		if (status != null && status.equals(StatusConstants.ACTIVE)){
+			user.setState("0");
+		} else {
+			user.setState("2");
+			user.setEnd_time(new Date());
+		}
 		user.setUser_rank("0");
 		user.setUser_permission("0");
 		user.setBegin_time(new Date());

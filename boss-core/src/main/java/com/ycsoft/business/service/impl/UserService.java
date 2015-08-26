@@ -117,7 +117,7 @@ public class UserService extends BaseBusiService implements IUserService {
 	
 
 	@Override
-	public void createUserBatch(List<UserInfo> userList, String workBillAsignType) throws Exception {
+	public void createUserBatch(List<UserInfo> userList) throws Exception {
 		// TODO Auto-generated method stub
 		
 	}
