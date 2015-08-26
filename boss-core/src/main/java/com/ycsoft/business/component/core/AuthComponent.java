@@ -318,32 +318,29 @@ public class AuthComponent extends BaseComponent{
 		//cancelOrder(user, doneCode);
 		//发送加授权
 		
-		List<Entry<String, Date>> mappingList = new ArrayList<Entry<String, Date>>(userResMap.entrySet());
-		// 通过比较器实现比较排序
-		Collections.sort(mappingList, new Comparator<Entry<String, Date>>() {
-			public int compare(Map.Entry<String, Date> mapping1, Map.Entry<String, Date> mapping2) {
-				return mapping1.getValue().compareTo(mapping2.getValue());
-			}
-		});
-		
-		Date effDate = null;
-		JBandCommand bandCmd;
-		for (Entry<String, Date> entry : mappingList) {
-			bandCmd = gBandCmd(user, doneCode);
+		if (userResMap!= null && userResMap.size()>0){
+			List<Entry<String, Date>> mappingList = new ArrayList<Entry<String, Date>>(userResMap.entrySet());
+			// 通过比较器实现比较排序
+			Collections.sort(mappingList, new Comparator<Entry<String, Date>>() {
+				public int compare(Map.Entry<String, Date> mapping1, Map.Entry<String, Date> mapping2) {
+					return mapping1.getValue().compareTo(mapping2.getValue());
+				}
+			});
+			
+			String resId = mappingList.get(0).getKey();
+			Date expDate = mappingList.get(mappingList.size()-1).getValue();
+			
+			JBandCommand bandCmd = gBandCmd(user, doneCode);
 			bandCmd.setCmd_type(BusiCmdConstants.BAND_ADD_AUTH);
 			JsonObject params = new JsonObject();
 			params.addProperty(BusiCmdParam.login_name.name(), user.getLogin_name());
-			params.addProperty(BusiCmdParam.band_policy_id.name(), entry.getKey());
-			if (effDate == null)
-				params.addProperty(BusiCmdParam.prod_eff_date.name(),
+			params.addProperty(BusiCmdParam.band_policy_id.name(), resId);
+			params.addProperty(BusiCmdParam.prod_eff_date.name(),
 						DateHelper.format(new Date(), DateHelper.FORMAT_TIME_VOD));
-			else
-				params.addProperty(BusiCmdParam.prod_eff_date.name(),
-						DateHelper.format(DateHelper.addDate(effDate, 1), DateHelper.FORMAT_TIME_VOD));
-			params.addProperty(entry.getKey(), DateHelper.format(entry.getValue(), DateHelper.FORMAT_TIME_VOD));
+			params.addProperty(BusiCmdParam.prod_exp_date.name(), DateHelper.format(expDate, DateHelper.FORMAT_TIME_VOD));
 			bandCmd.setDetail_param(params.toString());
 			jBandCommandDao.save(bandCmd);
-			effDate = entry.getValue();
+			
 		}
 		
 	}

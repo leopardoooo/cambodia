@@ -103,6 +103,7 @@ public final class AAARequestUtils {
 		// 接入方式 1090204:FBB&WiFi
 		body.setAccessType(DEFAULT_ACCESS_TYPE);
 		
+		
 		request.setQuerySubscriberServiceRequest(body);
 		request.setRequestHeader(buildReqeustHeader(CommandId.QuerySubscriberService, doneCode));
 		
