@@ -412,7 +412,7 @@ public class DoneCodeComponent extends BaseBusiComponent {
 	 * @throws Exception
 	 */
 	public void saveDoneCode(Integer doneCode,String busiCode,String remark
-			,String custId, List<String> userIds) throws Exception{
+			,String custId, List<String> userIds,String addr_id,String service_channel) throws Exception{
 		if (StringHelper.isEmpty(busiCode))
 			throw new ComponentException("业务代码为空");
 		if (0 == doneCode)
@@ -426,6 +426,8 @@ public class DoneCodeComponent extends BaseBusiComponent {
 		cDoneCode.setBusi_code(busiCode);
 		cDoneCode.setStatus(StatusConstants.ACTIVE);
 		cDoneCode.setRemark(remark);
+		cDoneCode.setAddr_id(addr_id);
+		cDoneCode.setService_channel(service_channel);
 		setBaseInfo(cDoneCode);
 		cDoneCodeDao.save(cDoneCode);
 

@@ -22,17 +22,19 @@ import java.util.Map;
  * @date Dec 3, 2009 1:16:21 PM
  */
 public class DateHelper {
+	
 	public final static String FORMAT_YM="yyyyMM";
 	public final static String FORMAT_YMD_STR="yyyyMMdd";
 	public final static String FORMAT_YMD="yyyy-MM-dd";
 	public final static String FORMAT_TIME="yyyy-MM-dd HH:mm:ss";
 	public final static String FORMAT_TIME_VOD="yyyyMMdd000000";
 	
-	private final static DateFormat df = new SimpleDateFormat(FORMAT_TIME);
-	private final static DateFormat sdf = new SimpleDateFormat(FORMAT_YMD);
-	private final static DateFormat ym = new SimpleDateFormat(FORMAT_YM);	
-	private final static DateFormat ymvod = new SimpleDateFormat(FORMAT_TIME_VOD);
-	private final static DateFormat ymd = new SimpleDateFormat(FORMAT_YMD_STR);
+	private final static NewDateFormat df = new NewDateFormat(FORMAT_TIME);
+	
+	private final static NewDateFormat sdf = new NewDateFormat(FORMAT_YMD);
+	private final static NewDateFormat ym = new NewDateFormat(FORMAT_YM);	
+	private final static NewDateFormat ymvod = new NewDateFormat(FORMAT_TIME_VOD);
+	private final static NewDateFormat ymd = new NewDateFormat(FORMAT_YMD_STR);
 
 	public static final String SECOND = "second";
 	public static final String MINUTE = "minute";
@@ -388,6 +390,19 @@ public class DateHelper {
 		c.add(Calendar.MONTH,num); //set next month
 		return c.getTime();
 	}
+	/**
+	 * 指定日期增加指定月数并减一天
+	 * @param date
+	 * @param month_num
+	 * @return
+	 */
+	public static Date getNextMonthPreviousDay(Date date,int month_num){
+		Calendar c = Calendar.getInstance();
+		c.setTime(date);
+		c.add(Calendar.MONTH,month_num); //set next month
+		c.add(Calendar.DAY_OF_MONTH, -1);
+		return c.getTime();
+	}
 	
 	/**
 	 * 获取明天日期 格式yyyy-MM-dd
@@ -504,6 +519,7 @@ public class DateHelper {
      */
     public static String GetDatePart(String date, int part) {
         try {
+        	SimpleDateFormat df=new SimpleDateFormat(FORMAT_TIME);
             Date time =df.parse(date);
         	df.format(time);
             if (Calendar.MONTH == part)
@@ -698,4 +714,28 @@ public class DateHelper {
 	}
 
 
+}
+/**
+ * 新的时间类型格式工具
+ * 解决parse方法在并发下的错误
+ * @author new
+ *
+ */
+class NewDateFormat{
+	private  String format_str=null;
+	private  DateFormat format =null; 
+	public NewDateFormat(String format_str){
+		this.format_str=format_str;
+		this.format=new SimpleDateFormat(format_str);
+	}
+	public String format(Date date){
+		return this.format.format(date);
+	}
+	public Date parse(String date) throws ParseException{
+		return new SimpleDateFormat(format_str).parse(date);
+	}
+	public Date parse(String date,ParsePosition pos){
+		return new SimpleDateFormat(format_str).parse(date,pos);
+	}
+	
 }

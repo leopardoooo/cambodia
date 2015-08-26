@@ -11,6 +11,7 @@ import com.ycsoft.beans.core.user.CUserAtv;
 import com.ycsoft.beans.core.user.CUserBroadband;
 import com.ycsoft.beans.core.user.CUserDtv;
 import com.ycsoft.business.dto.core.cust.CustFullInfoDto;
+import com.ycsoft.commons.constants.SystemConstants;
 
 /**
  * 单个客户业务的参数封装。 扩展<code>Parameter</code>基类
@@ -30,6 +31,18 @@ public class BusiParameter extends Parameter {
 	
 	private Map<String, Object> busiConfirmParamInfo = new HashMap<String, Object>();
 	
+	//服务渠道
+	private String service_channel=SystemConstants.SERVICE_CHANNEL_YYT;
+	
+	
+	public String getService_channel() {
+		return service_channel;
+	}
+
+	public void setService_channel(String service_channel) {
+		this.service_channel = service_channel;
+	}
+
 	public void setBusiConfirmParam(String name,Object value){
 		this.busiConfirmParamInfo.put(name, value);
 	}

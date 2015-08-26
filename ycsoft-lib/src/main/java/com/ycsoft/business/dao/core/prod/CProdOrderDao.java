@@ -24,7 +24,7 @@ public class CProdOrderDao extends BaseEntityDao<CProdOrder> {
 	public List<CProdOrderFollowPay> queryFollowPayOrderDto(String custId) throws JDBCException{
 		String sql=StringHelper.append(
 				" select b.prod_type,cu.user_type,cu.terminal_type,b.prod_name,b.serv_id,b.is_base,nvl(d.disct_rent, c.rent) rent,",
-				"  nvl(d.billing_cycle,c.billing_cycle) billing_cycle,nvl(d.disct_name,c.tariff_name) tariff_name ,",
+				"  nvl(d.billing_cycle,c.billing_cycle) billing_cycle,c.billing_type,nvl(d.disct_name,c.tariff_name) tariff_name ,",
 				"  case when cu.user_id is null then null when   cu.user_type in ('OTT_MOBILE','BAND') then cu.login_name else nvl(cu.stb_id,'INSTALL') end user_name,",
 				"   a.* ",
 		        " from c_prod_order a,p_prod b,p_prod_tariff c,p_prod_tariff_disct d,p_prod e ,c_user cu",
@@ -39,7 +39,7 @@ public class CProdOrderDao extends BaseEntityDao<CProdOrder> {
 		
 	}
 	public List<CProdOrderDto> queryCustEffOrderDto(String custId) throws JDBCException{
-		String sql = "select b.prod_name,b.prod_type,b.serv_id,b.is_base,e.prod_name package_name,c.tariff_name,d.disct_name, a.* "
+		String sql = "select c.billing_type, b.prod_name,b.prod_type,b.serv_id,b.is_base,e.prod_name package_name,c.tariff_name,d.disct_name, a.* "
 				+ " from c_prod_order a,p_prod b,p_prod_tariff c,p_prod_tariff_disct d,p_prod e "
 				+ " where a.cust_id=? and a.prod_id=b.prod_id and a.package_id=e.prod_id(+) "
 				+ " and a.tariff_id=c.tariff_id(+) and a.disct_id= d.disct_id(+) "
@@ -66,7 +66,7 @@ public class CProdOrderDao extends BaseEntityDao<CProdOrder> {
 	 * @throws JDBCException 
 	 */
 	public CProdOrderDto queryCProdOrderDtoByKey(String order_sn) throws JDBCException{
-		String sql=StringHelper.append(" select p.prod_type,p.serv_id,p.is_base,cu.protocol_date,case when cu.user_id is null then null when   cu.user_type in ('OTT_MOBILE','BAND') then cu.login_name else nvl(cu.stb_id,'INSTALL') end user_name ,nvl(d.disct_name,ppt.tariff_name) tariff_name,p.prod_name, o.* ",
+		String sql=StringHelper.append(" select p.prod_type,p.serv_id,p.is_base,nvl(d.billing_cycle,ppt.billing_cycle) billing_cycle,ppt.billing_type,cu.protocol_date,case when cu.user_id is null then null when   cu.user_type in ('OTT_MOBILE','BAND') then cu.login_name else nvl(cu.stb_id,'INSTALL') end user_name ,nvl(d.disct_name,ppt.tariff_name) tariff_name,p.prod_name, o.* ",
 				" from c_prod_order o,p_prod p,p_prod_tariff ppt ,p_prod_tariff_disct d,c_user cu ",
 			    " where p.prod_id=o.prod_id and ppt.tariff_id=o.tariff_id and d.disct_id(+)=o.disct_id and cu.user_id(+)=o.user_id ",
 			    " and  o.order_sn=? "); 
@@ -188,7 +188,7 @@ public class CProdOrderDao extends BaseEntityDao<CProdOrder> {
 	 */
 	public List<CProdOrderDto> queryPackageOrderDtoByCustId(String cust_id)throws JDBCException{
 		
-		String sql=StringHelper.append(" select p.prod_type,p.serv_id,p.is_base,nvl(d.billing_cycle,ppt.billing_cycle) billing_cycle, nvl(d.disct_name,ppt.tariff_name) tariff_name,p.prod_name, o.* ",
+		String sql=StringHelper.append(" select p.prod_type,p.serv_id,p.is_base,nvl(d.billing_cycle,ppt.billing_cycle) billing_cycle,ppt.billing_type, nvl(d.disct_name,ppt.tariff_name) tariff_name,p.prod_name, o.* ",
 				" from c_prod_order o,p_prod p,p_prod_tariff ppt ,p_prod_tariff_disct d",
 			    " where p.prod_id=o.prod_id and ppt.tariff_id=o.tariff_id and d.disct_id(+)=o.disct_id  ",
 			    " and  o.cust_id=? and o.prod_id in (select a.prod_id from p_prod a where a.prod_type<>'BASE')",
@@ -206,7 +206,7 @@ public class CProdOrderDao extends BaseEntityDao<CProdOrder> {
 	public List<CProdOrderDto> queryProdOrderDtoByUserId(String user_id) throws JDBCException{
 
 		String sql=StringHelper.append(
-				" select p.prod_type,p.serv_id, p.is_base, cu.protocol_date, nvl(d.billing_cycle,ppt.billing_cycle) billing_cycle,"
+				" select p.prod_type,p.serv_id, p.is_base, cu.protocol_date, nvl(d.billing_cycle,ppt.billing_cycle) billing_cycle,ppt.billing_type,"
 				," case when cu.user_id is null then null when   cu.user_type in ('OTT_MOBILE','BAND') then cu.login_name else nvl(cu.stb_id,'INSTALL') end user_name ,nvl(d.disct_name,ppt.tariff_name) tariff_name,p.prod_name, o.* ",
 				" from c_prod_order o,p_prod p,p_prod_tariff ppt ,p_prod_tariff_disct d,c_user cu ",
 			    " where p.prod_id=o.prod_id and ppt.tariff_id=o.tariff_id and d.disct_id(+)=o.disct_id and cu.user_id(+)=o.user_id ",
@@ -221,7 +221,7 @@ public class CProdOrderDao extends BaseEntityDao<CProdOrder> {
 	 */
 	public List<CProdOrderDto> queryProdOrderDtoByPackageSn(String package_sn)throws JDBCException{
 		String sql=StringHelper.append(
-				" select p.prod_type,p.serv_id, p.is_base,cu.protocol_date, nvl(d.billing_cycle,ppt.billing_cycle) billing_cycle,"
+				" select p.prod_type,p.serv_id, p.is_base,cu.protocol_date, nvl(d.billing_cycle,ppt.billing_cycle) billing_cycle,ppt.billing_type,"
 				," case when cu.user_id is null then null when   cu.user_type in ('OTT_MOBILE','BAND') then cu.login_name else nvl(cu.stb_id,'INSTALL') end user_name ,nvl(d.disct_name,ppt.tariff_name) tariff_name,p.prod_name, o.* ",
 				" from c_prod_order o,p_prod p,p_prod_tariff ppt ,p_prod_tariff_disct d,c_user cu ",
 			    " where p.prod_id=o.prod_id and ppt.tariff_id=o.tariff_id and d.disct_id(+)=o.disct_id and cu.user_id(+)=o.user_id ",

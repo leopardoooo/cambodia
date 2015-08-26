@@ -25,6 +25,7 @@ import com.ycsoft.beans.core.prod.CProdOrderFollowPay;
 import com.ycsoft.beans.core.user.CUser;
 import com.ycsoft.beans.prod.PPackageProd;
 import com.ycsoft.beans.prod.PProd;
+import com.ycsoft.beans.prod.PProdTariff;
 import com.ycsoft.beans.prod.PProdTariffDisct;
 import com.ycsoft.business.component.config.ExpressionUtil;
 import com.ycsoft.business.component.core.OrderComponent;
@@ -679,6 +680,10 @@ public class OrderService extends BaseBusiService implements IOrderService{
 				cust_id=orderProd.getCust_id();
 			}
 		}
+		if(!this.getBusiParam().getCust().getCust_id().equals(cust_id)){
+			throw new ServicesException(ErrorCode.CustDataException);
+		}
+		
 		doneCodeComponent.lockCust(cust_id);
 		Integer doneCode = doneCodeComponent.gDoneCode();	
 		List<String> prodSns=new ArrayList<>();
@@ -954,15 +959,24 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		//订购月数校检
 		String[] tmpTariff=orderProd.getTariff_id().split("_");
 		int billing_cycle=0;
+		PProdTariff tariff=pProdTariffDao.findByKey(tmpTariff[0]);
+		
 		if(tmpTariff.length==2){
 			billing_cycle=pProdTariffDisctDao.findByKey(tmpTariff[1]).getBilling_cycle();
 		}else{
-			billing_cycle=pProdTariffDao.findByKey(tmpTariff[0]).getBilling_cycle();
+			billing_cycle=tariff.getBilling_cycle();
 		}
+		//订购期数(包天=round(order_months*30))
+		int order_cycles=tariff.getBilling_type().equals(SystemConstants.BILLING_TYPE_DAY)?
+				Math.round(orderProd.getOrder_months()*30):orderProd.getOrder_months().intValue();
+		//记录资费计费类型和订购周期数（后面要使用）
+		orderProd.setBilling_type(tariff.getBilling_type());
+		orderProd.setOrder_cycle(order_cycles);
+		
 		if(orderProd.getOrder_months()==0&&!busi_code.equals(BusiCodeConstants.PROD_UPGRADE)){
 			throw new  ComponentException(ErrorCode.OrderDateOrderMonthError);
 		}
-		if(orderProd.getOrder_months()%billing_cycle!=0){
+		if(order_cycles%billing_cycle!=0){
 			throw new  ComponentException(ErrorCode.OrderDateOrderMonthError);
 		}
 		
@@ -973,11 +987,18 @@ public class OrderService extends BaseBusiService implements IOrderService{
 				throw new ServicesException(ErrorCode.OrderDateExpDateError);
 			}
 		}else{
-			//其他情况应该是 结束计费日=开始计费日+订购月数。
-			if(!DateHelper.getNextMonthByNum(orderProd.getEff_date(), orderProd.getOrder_months())
-					.equals(orderProd.getExp_date())){
+			//包月 结束计费日=开始计费日+订购月数 -1天。
+			if(tariff.getBilling_type().equals(SystemConstants.BILLING_TYPE_MONTH)
+					&& !DateHelper.getNextMonthPreviousDay(orderProd.getEff_date(), order_cycles)
+						.equals(orderProd.getExp_date())){
 				throw new ServicesException(ErrorCode.OrderDateExpDateError);
 			}
+			//包天 结束计费日=开始计费日+订购天数-1天
+			if(tariff.getBilling_type().equals(SystemConstants.BILLING_TYPE_DAY)
+				&& !DateHelper.addDate(orderProd.getEff_date(), order_cycles-1)
+				.equals(orderProd.getExp_date())){
+					throw new ServicesException(ErrorCode.OrderDateExpDateError);
+				}
 		}		
 		return lastOrder;
 	}

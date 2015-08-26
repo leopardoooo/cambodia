@@ -16,8 +16,8 @@ import java.util.GregorianCalendar;
  */
 public class DateHelper {
 
-	private static DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-	private static DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+	private static NewDateFormat df = new NewDateFormat("yyyy-MM-dd HH:mm:ss");
+	private static NewDateFormat sdf = new NewDateFormat("yyyy-MM-dd");
 
 	/**
 	* 获取指定日期,输出格式化为yyyy-MM-dd HH:mm:ss
@@ -276,6 +276,7 @@ public class DateHelper {
      */
     public static String GetDatePart(String date, int part) {
         try {
+        	SimpleDateFormat df=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             Date time =df.parse(date);
         	df.format(time);
             if (Calendar.MONTH == part)
@@ -366,4 +367,28 @@ public class DateHelper {
 			return false;
 	}
 
+}
+/**
+ * 新的时间类型格式工具
+ * 解决parse方法在并发下的错误
+ * @author new
+ *
+ */
+class NewDateFormat{
+	private  String format_str=null;
+	private  DateFormat format =null; 
+	public NewDateFormat(String format_str){
+		this.format_str=format_str;
+		this.format=new SimpleDateFormat(format_str);
+	}
+	public String format(Date date){
+		return this.format.format(date);
+	}
+	public Date parse(String date) throws ParseException{
+		return new SimpleDateFormat(format_str).parse(date);
+	}
+	public Date parse(String date,ParsePosition pos){
+		return new SimpleDateFormat(format_str).parse(date,pos);
+	}
+	
 }

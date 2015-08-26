@@ -19,7 +19,7 @@ public class OrderProd implements Serializable{
 	//上期订购SN
 	private String last_order_sn;
 	//订购月数
-	private Integer order_months;
+	private Float order_months;
 	// 实际支付金额（小计金额）
 	private Integer pay_fee;
 	//转移支付金额 (后台要验证是否一致，不一致要报错)
@@ -29,6 +29,22 @@ public class OrderProd implements Serializable{
 	//失效日期
 	private Date exp_date;
 	
+	private Integer order_cycle;//订购周期数（内部使用）
+	private String billing_type;//资费计费类型(内部使用)
+	
+	
+	public Integer getOrder_cycle() {
+		return order_cycle;
+	}
+	public void setOrder_cycle(Integer order_cycle) {
+		this.order_cycle = order_cycle;
+	}
+	public String getBilling_type() {
+		return billing_type;
+	}
+	public void setBilling_type(String billing_type) {
+		this.billing_type = billing_type;
+	}
 	public Date getExp_date() {
 		return exp_date;
 	}
@@ -71,10 +87,10 @@ public class OrderProd implements Serializable{
 	public void setLast_order_sn(String last_order_sn) {
 		this.last_order_sn = last_order_sn;
 	}
-	public Integer getOrder_months() {
+	public Float getOrder_months() {
 		return order_months;
 	}
-	public void setOrder_months(Integer order_months) {
+	public void setOrder_months(Float order_months) {
 		this.order_months = order_months;
 	}
 	public Integer getPay_fee() {

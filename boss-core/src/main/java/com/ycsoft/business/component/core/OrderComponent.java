@@ -27,6 +27,7 @@ import com.ycsoft.beans.core.prod.CProdPropChange;
 import com.ycsoft.beans.core.user.CUser;
 import com.ycsoft.beans.prod.PPackageProd;
 import com.ycsoft.beans.prod.PProd;
+import com.ycsoft.beans.prod.PProdTariff;
 import com.ycsoft.beans.prod.PProdTariffDisct;
 import com.ycsoft.business.commons.abstracts.BaseBusiComponent;
 import com.ycsoft.business.component.config.ExpressionUtil;
@@ -274,7 +275,17 @@ public class OrderComponent extends BaseBusiComponent {
 				||(!start.equals(today)&&!start.equals(order.getEff_date()))){
 				
 				Date eff_date=new Date(start.getTime());
-				Date exp_date=DateHelper.getNextMonthByNum(eff_date, order.getOrder_months());
+				PProdTariff tariff=pProdTariffDao.findByKey(order.getTariff_id());
+				Date exp_date=null;
+				if(tariff.getBilling_type().equals(SystemConstants.BILLING_TYPE_MONTH)){
+					exp_date=DateHelper.getNextMonthPreviousDay(eff_date, order.getOrder_months().intValue());
+				}else if(tariff.getBilling_type().equals(SystemConstants.BILLING_TYPE_DAY)){
+					int orderDays= Math.round(order.getOrder_months()*30);
+					exp_date=DateHelper.addDate(eff_date, orderDays-1);
+				}else{
+					continue;
+				}
+				
 				start=DateHelper.addDate(exp_date, 1);
 				
 				//记录异动
@@ -371,13 +382,23 @@ public class OrderComponent extends BaseBusiComponent {
 	 * 计算一个订单的可退金额（终止退订和销户退订）
 	 * @param order
 	 * @return
+	 * @throws Exception 
 	 */
-	public Integer getOrderCancelFee(CProdOrder cancelOrder,Date cancelDate){
+	public Integer getOrderCancelFee(CProdOrder cancelOrder,Date cancelDate) throws Exception{
 		if(StringHelper.isNotEmpty(cancelOrder.getPackage_sn())){
 			//套餐子产品可退金额=0;
 			return 0;
 		}
 		//Date cancelDate=DateHelper.today();
+		if(cancelOrder.getOrder_fee()==0||cancelOrder.getStatus().equals(StatusConstants.INSTALL)){
+			return cancelOrder.getOrder_fee();
+		}
+		
+		PProdTariff tariff=pProdTariffDao.findByKey(cancelOrder.getTariff_id());
+		if(!tariff.getBilling_type().equals(SystemConstants.BILLING_TYPE_MONTH)){
+			//非包月计费的订单不退款
+			return 0;
+		}
 		//1.退订日在订购计费完整区间之前
 		if(cancelDate.before(cancelOrder.getEff_date())||cancelDate.equals(cancelOrder.getEff_date())){
 			//覆盖退订在订购的生效日之前(含)
@@ -385,16 +406,17 @@ public class OrderComponent extends BaseBusiComponent {
 		}
 		//2.退订日在订购计费完整区间之间
 		//订购的停止计费日根据订购月数反推开始计费日
-		Date effDate= DateHelper.getNextMonthByNum(cancelOrder.getExp_date(),cancelOrder.getOrder_months()*-1);
+		Date expDate=DateHelper.addDate(cancelOrder.getExp_date(), 1);
+		Date effDate= DateHelper.getNextMonthByNum(expDate,-1*cancelOrder.getOrder_months().intValue());
 		if(cancelDate.equals(effDate)||cancelDate.before(effDate)){
 			//退订日包含了整个订单的订购期间
 			return cancelOrder.getOrder_fee();
 		}
 		
 		//3.退订日在 订购的计费区间内（按剩余使用天数折算）
-		int months=DateHelper.compareToMonthByDate(cancelDate, cancelOrder.getExp_date());
+		int months=DateHelper.compareToMonthByDate(cancelDate, expDate);
 		Date newExpDate=DateHelper.getNextMonthByNum(cancelDate,months);
-		if(newExpDate.after(cancelOrder.getExp_date())){
+		if(newExpDate.after(expDate)){
 			//新到期日大于实际到期日，则需要回退一个月再计算
 			months=months-1;
 		}
@@ -452,44 +474,80 @@ public class OrderComponent extends BaseBusiComponent {
 	 * @param cancelDate
 	 * @param cancelOrder
 	 * @return
+	 * @throws Exception 
 	 */
-	public Integer getTransCancelFee(Date cancelDate,CProdOrder cancelOrder){
-		
+	public Integer getTransCancelFee(Date cancelDate,CProdOrder cancelOrder) throws Exception{
+		//订单金额为0 或者 订单状态是施工中，直接返回订单金额
+		if(cancelOrder.getOrder_fee()==0||cancelOrder.getStatus().equals(StatusConstants.INSTALL)){
+			return cancelOrder.getOrder_fee();
+		}
 		//1.退订日在订购计费完整区间之前
 		if(cancelDate.before(cancelOrder.getEff_date())||cancelDate.equals(cancelOrder.getEff_date())){
 			//覆盖退订在订购的生效日之前(含)
 			return cancelOrder.getOrder_fee();
 		}
 		//2.退订日在订购计费完整区间之前
-		//订购的停止计费日根据订购月数反推开始计费日
-		Date effDate= DateHelper.getNextMonthByNum(cancelOrder.getExp_date(),cancelOrder.getOrder_months()*-1);
-		if(cancelDate.equals(effDate)||cancelDate.before(effDate)){
-			//退订日包含了整个订单的订购期间
-			return cancelOrder.getOrder_fee();
-		}
+		PProdTariff tariff=pProdTariffDao.findByKey(cancelOrder.getTariff_id());
 		
-		//3.退订日在 订购的计费区间内（按剩余使用天数折算）
-		int months=DateHelper.compareToMonthByDate(cancelDate, cancelOrder.getExp_date());
+		if(tariff.getBilling_type().equals(SystemConstants.BILLING_TYPE_MONTH)){
+			//包月的
+			//订购的停止计费日根据订购月数反推开始计费日
+			Date expDate=DateHelper.addDate(cancelOrder.getExp_date(), 1);
+			Date effDate=DateHelper.getNextMonthByNum(expDate,-1*cancelOrder.getOrder_months().intValue());
+			if(cancelDate.equals(effDate)||cancelDate.before(effDate)){
+				//退订日包含了整个订单的订购期间
+				return cancelOrder.getOrder_fee();
+			}
+			return this.getTransCancelFeeByBillingTypeMonth(cancelDate, cancelOrder.getOrder_months().intValue(), cancelOrder.getOrder_fee(), expDate);
+		
+		}else if(tariff.getBilling_type().equals(SystemConstants.BILLING_TYPE_DAY)){
+			//包天的
+			//订购的停止计费日根据订购天数反推开始计费日
+			Date expDate=DateHelper.addDate(cancelOrder.getExp_date(), 1);
+			Integer orderDays=Math.round(cancelOrder.getOrder_months()*30);
+			Date effDate=DateHelper.addDate(expDate,-1*orderDays);
+			if(cancelDate.equals(effDate)||cancelDate.before(effDate)){
+				//退订日包含了整个订单的订购期间
+				return cancelOrder.getOrder_fee();
+			}else{
+				//提取天数计算金额
+				int betweenDays=DateHelper.getDiffDays(cancelDate, expDate);
+				return Math.round(betweenDays*cancelOrder.getOrder_fee()*1.0f/orderDays);
+			}
+		}else{
+			//其他计费类型还没考虑怎么处理
+			throw new ComponentException(ErrorCode.UNKNOW_EXCEPTION);
+		}
+	}
+	/**
+	 * 包月计费的区间内转移支付金额计算
+	 * 退订日在 订购的计费区间内（按剩余使用天数折算）
+	 * @param cancelDate
+	 * @param order_months
+	 * @param order_fee
+	 * @param exp_date
+	 * @return
+	 */
+	private Integer getTransCancelFeeByBillingTypeMonth(Date cancelDate,Integer order_months,Integer order_fee,Date exp_date){
+		int months=DateHelper.compareToMonthByDate(cancelDate, exp_date);
 		Date newExpDate=DateHelper.getNextMonthByNum(cancelDate,months);
 		if(newExpDate.equals(cancelDate)){
 			//剩余整月的情况
-			return Math.round(months*1.0f*cancelOrder.getOrder_fee()/cancelOrder.getOrder_months());
-		}else if(newExpDate.after(cancelOrder.getExp_date())){
+			return Math.round(months*1.0f*order_fee/order_months);
+		}else if(newExpDate.after(exp_date)){
 			//新到期日大于实际到期日，则需要回退一个月再计算
 			newExpDate=DateHelper.getNextMonthByNum(cancelDate,months-1);
-			float months_fee=(months-1)*1.0f*cancelOrder.getOrder_fee()/cancelOrder.getOrder_months();
-			int days=DateHelper.getDiffDays(newExpDate, cancelOrder.getExp_date());
-			float days_fee= days* cancelOrder.getOrder_fee()/(cancelOrder.getOrder_months()*30.0f);
+			float months_fee=(months-1)*1.0f*order_fee/order_months;
+			int days=DateHelper.getDiffDays(newExpDate, exp_date);
+			float days_fee= days* order_fee/(order_months*30.0f);
 			return Math.round(months_fee+days_fee);
 		}else{
-			float months_fee=months*1.0f*cancelOrder.getOrder_fee()/cancelOrder.getOrder_months();
-			int days=DateHelper.getDiffDays(newExpDate, cancelOrder.getExp_date());
-			float days_fee= days* cancelOrder.getOrder_fee()/(cancelOrder.getOrder_months()*30.0f);
+			float months_fee=months*1.0f*order_fee/order_months;
+			int days=DateHelper.getDiffDays(newExpDate, exp_date);
+			float days_fee= days* order_fee/(order_months*30.0f);
 			return Math.round(months_fee+days_fee);
 		}
-	
 	}
-	
 	
 	/**
 	 * 套餐订购覆盖普通订购的情况提取被退的订单，并结算可退余额

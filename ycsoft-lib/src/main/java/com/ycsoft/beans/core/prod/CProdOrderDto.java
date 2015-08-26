@@ -20,6 +20,8 @@ public class CProdOrderDto extends CProdOrder {
 	private String user_name;
 	//nvl(折扣周期月数，资费周期月数)
 	private Integer billing_cycle;
+	//计费类型:包月，包天，按次，流量等
+	private String billing_type;
 	//用户协议期限
 	private Date protocol_date;
 	//用户类型
@@ -35,6 +37,12 @@ public class CProdOrderDto extends CProdOrder {
 	
 	
 	
+	public String getBilling_type() {
+		return billing_type;
+	}
+	public void setBilling_type(String billing_type) {
+		this.billing_type = billing_type;
+	}
 	public Integer getRent() {
 		return rent;
 	}

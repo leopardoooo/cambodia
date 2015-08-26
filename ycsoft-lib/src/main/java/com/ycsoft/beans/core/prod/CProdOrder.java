@@ -25,7 +25,7 @@ public class CProdOrder extends BusiBase implements Serializable {
     private Date exp_date;//display(7)
     private Integer active_fee;
     private Integer bill_fee;
-    private Integer order_months;
+    private Float order_months;
     private Integer order_fee;
     private Date order_time;//display(8)
     private String order_type;
@@ -134,10 +134,10 @@ public class CProdOrder extends BusiBase implements Serializable {
 		this.bill_fee = bill_fee;
 	}
 
-	public Integer getOrder_months() {
+	public Float getOrder_months() {
 		return order_months;
 	}
-	public void setOrder_months(Integer order_months) {
+	public void setOrder_months(Float order_months) {
 		this.order_months = order_months;
 	}
 	public Integer getOrder_fee() {

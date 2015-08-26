@@ -29,9 +29,28 @@ public class CDoneCode extends BusiBase implements Serializable {
 	private String status;
 	private String flag;
 
+	private String addr_id;
+	private String service_channel; 
+
 	private String status_text;
 
 	// done_date getter and setter
+	public String getAddr_id() {
+		return addr_id;
+	}
+
+	public void setAddr_id(String addr_id) {
+		this.addr_id = addr_id;
+	}
+
+	public String getService_channel() {
+		return service_channel;
+	}
+
+	public void setService_channel(String service_channel) {
+		this.service_channel = service_channel;
+	}
+	
 	public Date getDone_date() {
 		return done_date;
 	}

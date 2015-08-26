@@ -1041,11 +1041,23 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 			throw new ServicesException("找不到产品报停记录，请联系管理员");
 		if (startDate == null) {
 			//计算报停天数
-			int stopDays = DateHelper.getDiffDays(statusChange.getChange_time(), new Date());
+			int stopDays = DateHelper.getDiffDays(statusChange.getChange_time(), DateHelper.today());
 			expDate = DateHelper.addDate(order.getExp_date(), stopDays);
 		} else {
 			effDate =  DateHelper.addDate(startDate, 1);
-			expDate = DateHelper.getNextMonthByNum(effDate, order.getOrder_months());
+			if(order.getBilling_type().equals(SystemConstants.BILLING_TYPE_MONTH)){
+				//包月计费方式处理
+				expDate = DateHelper.getNextMonthPreviousDay(effDate, order.getOrder_months().intValue());
+			}else if(order.getBilling_type().equals(SystemConstants.BILLING_TYPE_DAY)){
+				//包天计费方式处理
+				int orderDays=Math.round(order.getOrder_months()*30);
+				expDate=DateHelper.addDate(effDate, orderDays-1);
+			}else{
+				//其他计费方式处理
+				int stopDays = DateHelper.getDiffDays(statusChange.getChange_time(), DateHelper.today());
+				expDate = DateHelper.addDate(order.getExp_date(), stopDays);
+			}
+			
 		}
 		
 		List<CProdPropChange> changeList = new ArrayList<CProdPropChange>();

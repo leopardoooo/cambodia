@@ -571,4 +571,11 @@ public class SystemConstants {
 	public static final String ADDR_TREE_LEVEL_THREE = "3";
 	public static final String ADDR_TREE_LEVEL_FOUR = "4";
 		
+	//服务渠道
+	public static final String SERVICE_CHANNEL_YYT="YYT";//营业厅
+	public static final String SERVICE_CHANNEL_HJZX="HJZX";//呼叫中心
+	public static final String SERVICE_CHANNEL_DSYYT="DSYYT";//电视营业厅
+	public static final String SERVICE_CHANNEL_MOBILE="MOBILE";//移动
+	public static final String SERVICE_CHANNEL_BANK="BANK";//银行
+	
  }

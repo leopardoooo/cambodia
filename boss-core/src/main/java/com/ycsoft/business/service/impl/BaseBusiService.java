@@ -1619,7 +1619,7 @@ public class BaseBusiService extends BaseService {
 		Integer doneCode = param.getDoneCode();//流水号
 		CCust cust = param.getCust();
 		doneCodeComponent.saveDoneCode(doneCode, busiCode, param.getRemark(),
-				cust.getCust_id(), param.getSelectedUserIds());
+				cust.getCust_id(), param.getSelectedUserIds(),cust.getAddr_id(),param.getService_channel());
 //		String info = processBusiConfirmInfo(busiCode, doneCode);
 //		
 //		if(StringHelper.isNotEmpty(info)){
@@ -1723,7 +1723,7 @@ public class BaseBusiService extends BaseService {
 	public void saveDoneCode(Integer doneCode, String busiCode,String custId)
 	throws Exception {
 		doneCodeComponent.saveDoneCode(doneCode, busiCode, "",
-			custId,null);
+			custId,null,null,null);
 	}
 	
 	/**
@@ -1736,7 +1736,7 @@ public class BaseBusiService extends BaseService {
 	public void saveDoneCode(Integer doneCode, String busiCode,String custId,String remark)
 	throws Exception {
 		doneCodeComponent.saveDoneCode(doneCode, busiCode, remark,
-			custId,null);
+			custId,null,null,null);
 	}
 	
 	//恢复长期欠费的用户状态为正常
