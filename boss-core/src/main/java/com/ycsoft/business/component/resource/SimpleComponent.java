@@ -74,6 +74,8 @@ public class SimpleComponent extends BaseBusiComponent {
 			}
 		}
 		
+		name = name.toLowerCase();
+		
 		
 		//2级 允许查询的addr
 		List<TAddressDto> twoLevelList = tAddressDao.queryAddrByAllowPids(SystemConstants.ADDR_TREE_LEVEL_TWO,addrIds);
@@ -89,18 +91,21 @@ public class SimpleComponent extends BaseBusiComponent {
 		}
 		
 		List<String> addTwoQueryPids = new ArrayList<String>();
-		for(String t : addPids){
-			if(!twoPidList.contains(t)){
+		for(String t : twoPidList){
+			if(!addPids.contains(t)){
 				addTwoQueryPids.add(t);
 			}
 		}
 		//2级允许的 并且 过滤 name
-		List<TAddressDto> twoAllowList = tAddressDao.queryAddrByaddrIds(name,addPids.toArray(new String[addPids.size()]));
+		List<TAddressDto> twoAllowList = new ArrayList<TAddressDto>();
+		if(addPids.size()>0){
+			twoAllowList = tAddressDao.queryAddrByAllowIds(SystemConstants.ADDR_TREE_LEVEL_TWO,addPids.toArray(new String[addPids.size()]));
+		}
 		List<TAddressDto> twoQueryList = null;
 		if(addTwoQueryPids.size()>0){
-			twoQueryList = tAddressDao.queryAddrByAllowIds(SystemConstants.ADDR_TREE_LEVEL_TWO,addTwoQueryPids.toArray(new String[addTwoQueryPids.size()]));
+			twoQueryList = tAddressDao.queryAddrByaddrIds(name,addTwoQueryPids.toArray(new String[addTwoQueryPids.size()]));
 		}
-		List<TAddressDto> oneAllowList = tAddressDao.queryAddrByAllowIds(SystemConstants.ADDR_TREE_LEVEL_ONE,null);
+		List<TAddressDto> oneAllowList = tAddressDao.queryAddrByAllowIds(SystemConstants.ADDR_TREE_LEVEL_ONE,addrIds);
 		
 		if(twoAllowList.size()>0){
 			oneAllowList.addAll(twoAllowList);

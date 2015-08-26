@@ -376,7 +376,7 @@ public class TAddressDao extends BaseEntityDao<TAddress> {
 		if(addrPids != null && addrPids.length>0){
 			src = " and "+getSqlGenerator().setWhereInArray("addr_pid",addrPids);
 		}
-		String sql = "SELECT * FROM t_address  where  addr_name like '%"+name+"%' and status='ACTIVE'  "+src;
+		String sql = "SELECT * FROM t_address  where  lower(addr_name) like '%"+name+"%' and status='ACTIVE'  "+src;
 		return createQuery(TAddressDto.class,sql).list();
 	}
 	
@@ -385,7 +385,7 @@ public class TAddressDao extends BaseEntityDao<TAddress> {
 		if(addrIds != null&& addrIds.length>0){
 			src = " and "+getSqlGenerator().setWhereInArray("addr_id",addrIds);
 		}
-		String sql = "SELECT * FROM t_address where  addr_name like '%"+name+"%' and status='ACTIVE'  "+src;
+		String sql = "SELECT * FROM t_address where  lower(addr_name) like '%"+name+"%' and status='ACTIVE'  "+src;
 		return createQuery(TAddressDto.class,sql).list();
 	}
 	public List<TAddressDto> queryAddrByIds(String[] addrIds) throws JDBCException {
