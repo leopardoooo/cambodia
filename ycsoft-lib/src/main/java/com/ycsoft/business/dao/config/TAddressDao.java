@@ -404,7 +404,7 @@ public class TAddressDao extends BaseEntityDao<TAddress> {
 	
 	public List<TAddressDto> queryAddrTreeByLvOneAndName(String[] lvOneAddrIds,String name) throws JDBCException{
 		String sql=StringHelper.append("select d.* from ",
-			" select distinct c.* ",
+			" (select distinct c.* ",
 			" from t_address c ",
 			" start with addr_id in ",
 			" (select a.addr_id ",
@@ -420,7 +420,7 @@ public class TAddressDao extends BaseEntityDao<TAddress> {
 			" where  ",getSqlGenerator().setWhereInArray("addr_pid",lvOneAddrIds),
 			" and  lower( t.addr_name) like '%?%' ",
 			") connect by prior c.addr_pid = c.addr_id)d ",
-			" where d.tree_level<>0");
+			" where d.tree_level<>0 ");
 		return createQuery(TAddressDto.class,sql,name,name,name).list();
 	}
 	
