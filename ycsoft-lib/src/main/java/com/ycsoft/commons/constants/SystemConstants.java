@@ -570,7 +570,8 @@ public class SystemConstants {
 	public static final String ADDR_TREE_LEVEL_TWO = "2";
 	public static final String ADDR_TREE_LEVEL_THREE = "3";
 	public static final String ADDR_TREE_LEVEL_FOUR = "4";
-		
+	//地址结点的根结点ID
+	public static final String ADDRESS_ROOT_ID="1";
 	//服务渠道
 	public static final String SERVICE_CHANNEL_YYT="YYT";//营业厅
 	public static final String SERVICE_CHANNEL_HJZX="HJZX";//呼叫中心
