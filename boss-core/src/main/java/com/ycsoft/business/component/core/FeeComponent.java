@@ -40,6 +40,8 @@ import com.ycsoft.beans.core.fee.CFeePropChange;
 import com.ycsoft.beans.core.fee.CFeeUnitpre;
 import com.ycsoft.beans.core.prod.CProd;
 import com.ycsoft.beans.core.prod.CProdMobileBill;
+import com.ycsoft.beans.core.prod.CProdOrderDto;
+import com.ycsoft.beans.core.prod.CProdOrderFee;
 import com.ycsoft.beans.core.promotion.CPromFee;
 import com.ycsoft.beans.core.promotion.CPromFeeProd;
 import com.ycsoft.beans.core.user.CUser;
@@ -97,6 +99,7 @@ import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.commons.store.TemplateConfig.Template;
 import com.ycsoft.daos.core.JDBCException;
 import com.ycsoft.daos.core.Pager;
+import com.ycsoft.daos.helper.BeanHelper;
 /**
  * 处理营业费、设备费、账户缴费
  *
@@ -138,6 +141,38 @@ public class FeeComponent extends BaseBusiComponent {
 	private CPromFeeProdDao cPromFeeProdDao;
 	
 	private ExpressionUtil expressionUtil;
+	
+	/**
+	 * 保存订单退款费用信息
+	 * @param cancelList
+	 * @param cust
+	 * @param doneCode
+	 * @param busi_code
+	 * @throws InvocationTargetException 
+	 * @throws Exception 
+	 */
+	public void saveCancelFee(List<CProdOrderDto> cancelList,List<CProdOrderFee> orderFees,CCust cust,Integer doneCode,String busi_code) throws Exception{
+		//按订单退款
+		for(CProdOrderDto order:cancelList){
+			if(order.getBalance_cfee()!=null&&order.getBalance_cfee()>0){
+				PayDto pay=new PayDto();
+				BeanHelper.copyProperties(pay, order);
+				pay.setProd_sn(order.getOrder_sn());
+				pay.setAcctitem_id(order.getProd_id());
+				pay.setBegin_date(DateHelper.dateToStr(DateHelper.today().before(order.getEff_date())? order.getEff_date():DateHelper.today()));
+				pay.setInvalid_date(DateHelper.dateToStr(order.getExp_date()));
+				pay.setPresent_fee(0);
+				pay.setFee(order.getBalance_cfee()*-1);
+				CFeeAcct cfeeacct=this.saveAcctFee(cust.getCust_id(), cust.getAddr_id(), pay, doneCode, busi_code, StatusConstants.UNPAY);
+				for(CProdOrderFee orderFee:orderFees){
+					if(orderFee.getOrder_sn().equals(order.getOrder_sn())
+							&&orderFee.getOutput_type().equals(SystemConstants.ORDER_FEE_TYPE_CFEE)){
+						orderFee.setOutput_sn(cfeeacct.getFee_sn());
+					}
+				}
+			}
+		}
+	}
 	
 	/**
 	 * 查询未支付详细信息

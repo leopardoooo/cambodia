@@ -2781,6 +2781,13 @@ public class UserService extends BaseBusiService implements IUserService {
 		// TODO Auto-generated method stub
 		
 	}
+
+	@Override
+	public void saveRemoveUser(String userId, String banlanceDealType, String reclaim, Integer cancelFee,
+			Integer refundFee, String transAcctId, String transAcctItemId) throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
 	
 	
 	

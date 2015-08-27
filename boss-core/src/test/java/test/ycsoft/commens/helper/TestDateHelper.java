@@ -3,10 +3,14 @@
  */
 package test.ycsoft.commens.helper;
 
-import static org.junit.Assert.*;
-import static com.ycsoft.commons.helper.DateHelper.*;
+import static com.ycsoft.commons.helper.DateHelper.dateToStr;
+import static com.ycsoft.commons.helper.DateHelper.getNextMonth;
+import static com.ycsoft.commons.helper.DateHelper.strToDate;
+import static org.junit.Assert.fail;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.Test;
 
@@ -16,6 +20,12 @@ import org.junit.Test;
  */
 public class TestDateHelper {
 
+	@Test
+	public void testaaa(){
+		Map<String,Integer> aa=new HashMap<>();
+		int bb=123+aa.get("aaa");
+		System.out.println("###############"+bb);
+	}
 	/**
 	 * Test method for {@link com.ycsoft.commons.helper.DateHelper#format(java.util.Date, java.lang.String)}.
 	 */

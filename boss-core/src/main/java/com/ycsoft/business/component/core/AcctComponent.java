@@ -52,6 +52,7 @@ import com.ycsoft.beans.core.cust.CCust;
 import com.ycsoft.beans.core.cust.CCustPropChange;
 import com.ycsoft.beans.core.prod.CProd;
 import com.ycsoft.beans.core.prod.CProdHis;
+import com.ycsoft.beans.core.prod.CProdOrderFee;
 import com.ycsoft.beans.prod.PProdTariff;
 import com.ycsoft.beans.record.CBandUpgradeRecord;
 import com.ycsoft.beans.system.SDept;
@@ -110,6 +111,7 @@ import com.ycsoft.commons.constants.DictKey;
 import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.exception.ComponentException;
+import com.ycsoft.commons.exception.ErrorCode;
 import com.ycsoft.commons.exception.ServicesException;
 import com.ycsoft.commons.helper.CollectionHelper;
 import com.ycsoft.commons.helper.DateHelper;
@@ -326,7 +328,57 @@ public class AcctComponent  extends BusiConfigComponent {
 		return cAcctAcctitemActiveDao.queryAcctItemActive(acctId, acctItemId, feeType, countyId);
 	}
 
-
+	/**
+	 * 退款转账到公用账目中
+	 * @param orderFees
+	 * @param cust_id
+	 * @param doneCode
+	 * @param busi_code
+	 * @throws Exception
+	 */
+	public void saveCancelFeeToAcct(List<CProdOrderFee> orderFees,String cust_id,Integer doneCode,String busi_code) throws Exception{
+		//账户
+		CAcct acct=queryCustAcctByCustId(cust_id);
+		//按订单转账到公用账目中
+		String acctItemId=SystemConstants.ACCTITEM_PUBLIC_ID;
+		String acctId=acct.getAcct_id();
+		
+		for(CProdOrderFee orderFee:orderFees){
+			if(orderFee.getOutput_type().equals(SystemConstants.ORDER_FEE_TYPE_ACCT)
+					&&orderFee.getOutput_fee()>0){
+				Integer fee=orderFee.getOutput_fee();
+				String feeType=orderFee.getFee_type();
+				int preFee=0;
+				String changeType=SystemConstants.ACCT_CHANGE_TRANS;
+				String acct_change_sn=null;
+				cAcctAcctitemDao.updateActiveBanlance(acctId, acctItemId, fee,0,0,0, getOptr().getCounty_id());
+				
+				CAcctAcctitemActive activeItem = cAcctAcctitemActiveDao.queryAcctItemActive(acctId, acctItemId, feeType, getOptr().getCounty_id());
+				if(activeItem==null){
+					activeItem = new CAcctAcctitemActive();
+					activeItem.setAcct_id(acctId);
+					activeItem.setAcctitem_id(acctItemId);
+					activeItem.setBalance(fee);
+					activeItem.setFee_type(feeType);
+					activeItem.setArea_id(getOptr().getArea_id());
+					activeItem.setCounty_id(getOptr().getCounty_id());
+					activeItem.setAcct_active_sn(cAcctAcctitemActiveDao.findSequence().toString());
+					cAcctAcctitemActiveDao.save(activeItem);
+					
+					acct_change_sn=saveAcctitemChange(activeItem.getAcct_active_sn(),doneCode, busi_code, cust_id, acctId,
+							SystemConstants.ACCTITEM_PUBLIC_ID, changeType, orderFee.getFee_type(), orderFee.getOutput_fee(), preFee, null);
+				}else{
+					preFee=activeItem.getBalance();
+					cAcctAcctitemActiveDao.updateBanlance(acctId, acctItemId,
+							feeType, fee, getOptr().getCounty_id());
+					acct_change_sn=saveAcctitemChange(doneCode, busi_code, cust_id, acctId,
+							acctItemId, changeType, feeType, fee, preFee, null);
+				}
+				
+				orderFee.setOutput_sn(acct_change_sn);
+			}
+		}
+	}
 
 	/**
 	 * 修改账目余额
@@ -426,7 +478,7 @@ public class AcctComponent  extends BusiConfigComponent {
 		}
 	}
 	
-	public void saveAcctitemChange(Integer doneCode, String busiCode,
+	public String saveAcctitemChange(Integer doneCode, String busiCode,
 			String custId, String acctId, String acctItemId, String changeType,
 			String feeType, int fee, int preFee, Integer inactiveDoneCode) throws Exception {
 		// 增加资金异动
@@ -445,8 +497,36 @@ public class AcctComponent  extends BusiConfigComponent {
 		change.setArea_id(getOptr().getArea_id());
 		change.setCounty_id(getOptr().getCounty_id());
 		change.setInactive_done_code(inactiveDoneCode);
-
+		change.setAcct_change_sn(cAcctAcctitemChangeDao.findSequence().toString());
+		
 		cAcctAcctitemChangeDao.save(change);
+		return change.getAcct_change_sn();
+	}
+	
+	public String saveAcctitemChange(String acct_active_sn,Integer doneCode, String busiCode,
+			String custId, String acctId, String acctItemId, String changeType,
+			String feeType, int fee, int preFee, Integer inactiveDoneCode) throws Exception {
+		// 增加资金异动
+		CAcctAcctitemChange change = new CAcctAcctitemChange();
+		change.setDone_code(doneCode);
+		change.setBusi_code(busiCode);
+		change.setCust_id(custId);
+		change.setAcct_id(acctId);
+		change.setAcctitem_id(acctItemId);
+		change.setChange_type(changeType);
+		change.setFee_type(feeType);
+		change.setFee(fee + preFee);
+		change.setPre_fee(preFee);
+		change.setChange_fee(fee);
+		change.setBilling_cycle_id(DateHelper.nowYearMonth());
+		change.setArea_id(getOptr().getArea_id());
+		change.setCounty_id(getOptr().getCounty_id());
+		change.setInactive_done_code(inactiveDoneCode);
+		change.setAcct_change_sn(cAcctAcctitemChangeDao.findSequence().toString());
+		change.setAcct_active_sn(acct_active_sn);
+		
+		cAcctAcctitemChangeDao.save(change);
+		return change.getAcct_change_sn();
 	}
 	
 	public void updateInactiveBanlance(String sn, String acctId, String acctItemId, int fee) throws Exception {
@@ -1460,7 +1540,7 @@ public class AcctComponent  extends BusiConfigComponent {
 	public CAcct queryCustAcctByCustId(String custId) throws Exception {
 		CAcct acct = cAcctDao.findCustAcctByCustId(custId,getOptr().getCounty_id());
 		if (acct == null)
-			throw new ComponentException("客户缺少对应的公共账户");
+			throw new ComponentException(ErrorCode.CustHasNoAcct);
 		return acct;
 	}
 	/**

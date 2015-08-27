@@ -31,6 +31,7 @@ public class ProdOrderAction extends BaseBusiAction {
 	private Integer cancelFee;
 	private String[] orderSns;
 	private String order_sn;
+	private Integer refundFee;
 	
 	private String payFeesData;
 	/**
@@ -59,7 +60,7 @@ public class ProdOrderAction extends BaseBusiAction {
 	 * @throws Exception 
 	 */
 	public String cancelProd() throws Exception{
-		orderService.saveCancelProd(orderSns, cancelFee);
+		orderService.saveCancelProd(orderSns, cancelFee,refundFee);
 		return JSON_SUCCESS;
 	}
 	/**
@@ -68,7 +69,7 @@ public class ProdOrderAction extends BaseBusiAction {
 	 * @throws Exception
 	 */
 	public String cancelTodayOrder() throws Exception{
-		orderService.saveCancelTodayOrder(order_sn, cancelFee);
+		orderService.saveCancelTodayOrder(order_sn, cancelFee,refundFee);
 		return JSON_SUCCESS;
 	}
 	
@@ -208,5 +209,14 @@ public class ProdOrderAction extends BaseBusiAction {
 	public void setPayFeesData(String payFeesData) {
 		this.payFeesData = payFeesData;
 	}
+
+	public Integer getRefundFee() {
+		return refundFee;
+	}
+
+	public void setRefundFee(Integer refundFee) {
+		this.refundFee = refundFee;
+	}
+	
 	
 }

@@ -46,6 +46,7 @@ public enum ErrorCode {
 	OrderDateOrderMonthError("订购月数不能填0或订购月数必须是资费周期的倍数"),
 	OrderPackageHasSingleUserParam("订购套餐时，单用户参数不能填"),
 	
+	OrderFeeDisagree("订单金额和明细不一致，请联系管理员！(order_sn=%s)"),
 	
 	
 	//depot
@@ -53,6 +54,8 @@ public enum ErrorCode {
 	DeviceNotExists("设备不存在"),
 	DeviceTotalNumIsNull("设备数量不够"),
 	DeviceTotalNumIsTooBig("设备入库数量超出了订货数量"),
+	
+	CustHasNoAcct("客户缺失公用账户，请联系管理员！"),
 	;
 
 	private ErrorCode(String desc){

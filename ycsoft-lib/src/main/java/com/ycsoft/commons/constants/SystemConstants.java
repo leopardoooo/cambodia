@@ -578,4 +578,8 @@ public class SystemConstants {
 	public static final String SERVICE_CHANNEL_MOBILE="MOBILE";//移动
 	public static final String SERVICE_CHANNEL_BANK="BANK";//银行
 	
+	//ORDER_FEE_TYPE订单费用转入（转出）类型
+	public static final String ORDER_FEE_TYPE_TRANSFEE="TRANSFEE";//覆盖转移
+	public static final String ORDER_FEE_TYPE_CFEE="CFEE";//缴费
+	public static final String ORDER_FEE_TYPE_ACCT="ACCT";//公用账目支付
  }

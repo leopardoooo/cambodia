@@ -16,10 +16,13 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.ycsoft.beans.config.TAcctFeeType;
 import com.ycsoft.beans.config.TRuleDefine;
+import com.ycsoft.beans.core.common.CDoneCodeUnpay;
 import com.ycsoft.beans.core.cust.CCust;
 import com.ycsoft.beans.core.prod.CProdOrder;
 import com.ycsoft.beans.core.prod.CProdOrderDto;
+import com.ycsoft.beans.core.prod.CProdOrderFee;
 import com.ycsoft.beans.core.prod.CProdOrderFollowPay;
 import com.ycsoft.beans.core.prod.CProdOrderHis;
 import com.ycsoft.beans.core.prod.CProdOrderTransfee;
@@ -31,9 +34,12 @@ import com.ycsoft.beans.prod.PProdTariff;
 import com.ycsoft.beans.prod.PProdTariffDisct;
 import com.ycsoft.business.commons.abstracts.BaseBusiComponent;
 import com.ycsoft.business.component.config.ExpressionUtil;
+import com.ycsoft.business.dao.config.TAcctFeeTypeDao;
+import com.ycsoft.business.dao.config.TPayTypeDao;
 import com.ycsoft.business.dao.config.TRuleDefineDao;
 import com.ycsoft.business.dao.core.cust.CCustDao;
 import com.ycsoft.business.dao.core.prod.CProdOrderDao;
+import com.ycsoft.business.dao.core.prod.CProdOrderFeeDao;
 import com.ycsoft.business.dao.core.prod.CProdOrderHisDao;
 import com.ycsoft.business.dao.core.prod.CProdOrderTransfeeDao;
 import com.ycsoft.business.dao.core.prod.CProdStatusChangeDao;
@@ -54,6 +60,7 @@ import com.ycsoft.commons.exception.ErrorCode;
 import com.ycsoft.commons.exception.ServicesException;
 import com.ycsoft.commons.helper.CollectionHelper;
 import com.ycsoft.commons.helper.DateHelper;
+import com.ycsoft.commons.helper.LoggerHelper;
 import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.commons.store.MemoryDict;
 import com.ycsoft.daos.core.JDBCException;
@@ -87,6 +94,12 @@ public class OrderComponent extends BaseBusiComponent {
 	private PProdTariffDisctDao pProdTariffDisctDao;
 	@Autowired
 	private BeanFactory beanFactory;
+	@Autowired
+	private CProdOrderFeeDao cProdOrderFeeDao;
+	@Autowired
+	private TAcctFeeTypeDao tAcctFeeTypeDao;
+	@Autowired
+	private TPayTypeDao tPayTypeDao;
 	/**
 	 * cust-user-prod
 	 * 客户套餐key=cust--
@@ -195,15 +208,18 @@ public class OrderComponent extends BaseBusiComponent {
 	 * @param isHigh
 	 * @throws Exception
 	 */
-	public Integer getLogoffOrderFee(List<CProdOrderDto> orderList,boolean isHigh) throws Exception{
-		int cancelFee=0;
+	public List<CProdOrderFee> getLogoffOrderFee(List<CProdOrderDto> orderList,boolean isHigh) throws Exception{
+	
+		List<CProdOrderFee> orderFees=new ArrayList<>();
 		for(CProdOrderDto order:orderList){
 			if(order.getIs_pay().equals(SystemConstants.BOOLEAN_FALSE)){
 				//未支付判断
 				throw new ServicesException(ErrorCode.NotCancleHasUnPay);
 			}
+			List<CProdOrderFee> cancelFeeList=new ArrayList<>();
 			if(isHigh){
-				order.setActive_fee(getOrderCancelFee(order,DateHelper.today()));
+				//order.setActive_fee(getOrderCancelFee(order,DateHelper.today()));
+				cancelFeeList=getOrderCacelFeeDetail(order,DateHelper.today());
 			}else if(StringHelper.isNotEmpty(order.getPackage_sn())
 					||order.getBilling_cycle()>1){
 				//套餐子产品和包多月产品，低权限人员退款金额=0
@@ -213,13 +229,26 @@ public class OrderComponent extends BaseBusiComponent {
 					&&order.getProtocol_date()!=null
 					&&DateHelper.today().before(order.getProtocol_date())){
 				//包1月产品在硬件协议期未到时计算退款余额
-				order.setActive_fee(getOrderCancelFee(order,DateHelper.getTruncDate(order.getProtocol_date())));
+				//order.setActive_fee(getOrderCancelFee(order,DateHelper.getTruncDate(order.getProtocol_date())));
+				cancelFeeList=getOrderCacelFeeDetail(order,DateHelper.getTruncDate(order.getProtocol_date()));				
 			}else {
-				order.setActive_fee(getOrderCancelFee(order,DateHelper.today()));
+				//order.setActive_fee(getOrderCancelFee(order,DateHelper.today()));
+				cancelFeeList=getOrderCacelFeeDetail(order,DateHelper.today());			
 			}
-			cancelFee=cancelFee+order.getActive_fee();
+			orderFees.addAll(cancelFeeList);
+			int outTotalFee=0;
+			int balanceCfee=0;
+			for(CProdOrderFee orderFee:cancelFeeList){
+				outTotalFee=outTotalFee+orderFee.getOutput_fee();
+				if(orderFee.getOutput_type().equals(SystemConstants.ORDER_FEE_TYPE_CFEE)){
+					balanceCfee=balanceCfee+orderFee.getOutput_fee();
+				}
+			}
+			order.setActive_fee(outTotalFee);
+			order.setBalance_cfee(balanceCfee);
+			order.setBalance_acct(outTotalFee-balanceCfee);
 		}
-		return cancelFee;
+		return orderFees;
 	}
 	/**
 	 * 是否高级退订或销户功能
@@ -379,12 +408,79 @@ public class OrderComponent extends BaseBusiComponent {
 	}
 	
 	/**
+	 * 计算一个订单的可退金额的资金明细（终止退订和销户退订）
+	 * @param cancelOrder
+	 * @param cancelDate
+	 * @return
+	 * @throws Exception
+	 */
+	public List<CProdOrderFee> getOrderCacelFeeDetail(CProdOrder cancelOrder,Date cancelDate) throws Exception{
+
+		//总退款金额(含可转部分)
+		int fee=getMainOrderCancelFee(cancelOrder,cancelDate);
+		if(fee>0){
+			List<CProdOrderFee> orderFees=cProdOrderFeeDao.queryByOrderSn(cancelOrder.getOrder_sn());
+			int totalOrderFee=0;
+			for(CProdOrderFee orderFee: orderFees){
+				totalOrderFee=totalOrderFee+orderFee.getInput_fee();
+			}
+			if(totalOrderFee!=cancelOrder.getOrder_fee()){
+				throw new ComponentException(ErrorCode.OrderFeeDisagree,cancelOrder.getOrder_sn());
+			}
+			
+			Map<String,TAcctFeeType> feeTypeMap=CollectionHelper.converToMapSingle( tAcctFeeTypeDao.findAll(), "fee_type");
+			int outTotalFee=fee;
+			for(CProdOrderFee orderFee: orderFees){
+				int outFee=Math.round(orderFee.getInput_fee()*fee*1.0f/totalOrderFee);
+				if(outFee>orderFee.getInput_fee()){
+					outFee=orderFee.getInput_fee();
+				}
+				if(outFee>outTotalFee){
+					outFee=outTotalFee;
+				}
+				outTotalFee=outTotalFee-outFee;
+				orderFee.setOutput_fee(outFee);
+				
+				if(feeTypeMap.get(orderFee.getFee_type()).getCan_refund().equals(SystemConstants.BOOLEAN_TRUE)){
+					orderFee.setOutput_type(SystemConstants.ORDER_FEE_TYPE_CFEE);
+				}else{
+					orderFee.setOutput_type(SystemConstants.ORDER_FEE_TYPE_ACCT);
+				}
+			}
+			if(outTotalFee!=0&&orderFees.size()>0){
+				CProdOrderFee orderFee=orderFees.get(orderFees.size()-1);
+				orderFee.setOutput_fee(orderFee.getOutput_fee()+outTotalFee);
+			}
+			return orderFees;
+		}else{
+			return new ArrayList<>();
+		}
+	}
+	
+	/**
+	 * 计算一个订单的可退金额（终止退订和销户退订）
+	 * 并计算出可退现金部分和可转公用账目部分
+	 * @param cancelOrder
+	 * @param cancelDate
+	 * @return
+	 * @throws Exception
+	 */
+	public Map<String,Integer> getOrderCancelFee(CProdOrder cancelOrder,Date cancelDate) throws Exception{
+		Map<String,Integer> cancelFeeMap=new HashMap<>();
+		cancelFeeMap.put(SystemConstants.ORDER_FEE_TYPE_CFEE, 0);
+		cancelFeeMap.put(SystemConstants.ORDER_FEE_TYPE_ACCT, 0);
+		for(CProdOrderFee orderFee:  getOrderCacelFeeDetail(cancelOrder,cancelDate)){
+			cancelFeeMap.put(orderFee.getOutput_type(), orderFee.getOutput_fee()  +cancelFeeMap.get(orderFee.getOutput_type()));
+		}
+		return cancelFeeMap;
+	}
+	/**
 	 * 计算一个订单的可退金额（终止退订和销户退订）
 	 * @param order
 	 * @return
 	 * @throws Exception 
 	 */
-	public Integer getOrderCancelFee(CProdOrder cancelOrder,Date cancelDate) throws Exception{
+	public Integer getMainOrderCancelFee(CProdOrder cancelOrder,Date cancelDate) throws Exception{
 		if(StringHelper.isNotEmpty(cancelOrder.getPackage_sn())){
 			//套餐子产品可退金额=0;
 			return 0;
@@ -470,13 +566,42 @@ public class OrderComponent extends BaseBusiComponent {
 	}
 	
 	/**
-	 * 计算覆盖退订的可退余额
+	 * 计算覆盖退订的可退余额(资金明细)
 	 * @param cancelDate
 	 * @param cancelOrder
 	 * @return
 	 * @throws Exception 
 	 */
 	public Integer getTransCancelFee(Date cancelDate,CProdOrder cancelOrder) throws Exception{
+		int fee=this.getMainTransCancelFee(cancelDate, cancelOrder);
+		//资金明细
+		int inputfee=this.getOrderFeeDetailSum(cancelOrder.getOrder_sn());
+		if(inputfee!=cancelOrder.getOrder_fee()){
+			throw new ComponentException(ErrorCode.OrderFeeDisagree,cancelOrder.getOrder_sn());
+		}
+		return fee;
+	}
+	/**
+	 * 查询一个订单的来源资金明细总额
+	 * @param order_sn
+	 * @return
+	 * @throws Exception 
+	 */
+	private Integer getOrderFeeDetailSum(String order_sn) throws Exception{
+		int total=0;
+		for(CProdOrderFee fee:cProdOrderFeeDao.queryByOrderSn(order_sn)){
+			total=fee.getInput_fee()+total;
+		}
+		return total;
+	}
+	/**
+	 * 计算订购主记录的覆盖退订的可退余额
+	 * @param cancelDate
+	 * @param cancelOrder
+	 * @return
+	 * @throws Exception 
+	 */
+	private Integer getMainTransCancelFee(Date cancelDate,CProdOrder cancelOrder) throws Exception{
 		//订单金额为0 或者 订单状态是施工中，直接返回订单金额
 		if(cancelOrder.getOrder_fee()==0||cancelOrder.getStatus().equals(StatusConstants.INSTALL)){
 			return cancelOrder.getOrder_fee();
@@ -709,30 +834,68 @@ public class OrderComponent extends BaseBusiComponent {
 	 */
 	private int saveTransCancelProd(CProdOrder cProdOrder,List<CProdOrder> cancelList,Date cancelDate) throws Exception{
 		int transFee=0;
-		List<CProdOrderTransfee>  transFeeList=new ArrayList<>();
+
+		List<CProdOrderFee> outputList=new ArrayList<>();
+		List<CProdOrderFee> inputList=new ArrayList<>();
 		for(CProdOrder cancelOrder:cancelList){
-			CProdOrderTransfee trans=new CProdOrderTransfee();
 			
-			trans.setDone_code(cProdOrder.getDone_code());
-			trans.setCust_id(cProdOrder.getCust_id());
-			trans.setOrder_sn(cProdOrder.getOrder_sn());
-			trans.setFrom_cust_id(cancelOrder.getCust_id());
-			trans.setFrom_order_sn(cancelOrder.getOrder_sn());
-			//TODO 有充值卡业务时要修改
-			trans.setFee_type(SystemConstants.ACCT_FEETYPE_CASH);
 			if(cancelOrder.getIs_pay().equals(SystemConstants.BOOLEAN_TRUE)){
 				int fee=this.getTransCancelFee(cancelDate, cancelOrder);
-				trans.setBalance(fee);
-				transFee=transFee+fee;
-				transFeeList.add(trans);
-				
 				cancelOrder.setActive_fee(fee);
+				transFee=transFee+fee;
+				if(fee>0){
+					int totalInputFee=0;
+					List<CProdOrderFee> outputOrderFees=cProdOrderFeeDao.queryByOrderSn(cancelOrder.getOrder_sn());
+					for(CProdOrderFee outputOrderFee:outputOrderFees){
+						totalInputFee=totalInputFee+outputOrderFee.getInput_fee();
+					}
+					int _tmpFee=fee;
+					for(CProdOrderFee outputOrderFee:outputOrderFees){
+						int outfee= Math.round(outputOrderFee.getInput_fee()*fee*1.0f/totalInputFee);
+						if(outfee>outputOrderFee.getInput_fee()){
+							outfee=outputOrderFee.getInput_fee();
+						}
+						if(outfee>_tmpFee){
+							outfee=_tmpFee;
+						}
+						_tmpFee=_tmpFee-outfee;
+						outputOrderFee.setOutput_fee(outfee);
+						outputOrderFee.setOutput_type(SystemConstants.ORDER_FEE_TYPE_TRANSFEE);	
+					}
+					if(_tmpFee!=0&&outputOrderFees.size()>0){
+						CProdOrderFee outputOrderFee=outputOrderFees.get(outputOrderFees.size()-1);
+						outputOrderFee.setOutput_fee(outputOrderFee.getOutput_fee()+_tmpFee);
+					}
+					
+					//新订购的转入记录
+					for(CProdOrderFee outputOrderFee:outputOrderFees){
+						CProdOrderFee inputOrderFee=new CProdOrderFee();
+						inputOrderFee.setOrder_fee_sn(cProdOrderFeeDao.findSequence().toString());
+						inputOrderFee.setOrder_sn(cProdOrder.getOrder_sn());
+						inputOrderFee.setDone_code(cProdOrder.getDone_code());
+						inputOrderFee.setInput_type(SystemConstants.ORDER_FEE_TYPE_TRANSFEE);
+						inputOrderFee.setInput_sn(outputOrderFee.getOrder_fee_sn());
+						inputOrderFee.setInput_fee(outputOrderFee.getOutput_fee());
+						inputOrderFee.setFee_type(outputOrderFee.getFee_type());
+						inputOrderFee.setCreate_time(new Date());
+						inputOrderFee.setArea_id(outputOrderFee.getArea_id());
+						inputOrderFee.setCounty_id(outputOrderFee.getCounty_id());
+						inputList.add(inputOrderFee);
+						
+						outputOrderFee.setOutput_sn(inputOrderFee.getOrder_fee_sn());
+					}
+					outputList.addAll(outputOrderFees);//装入被覆盖旧订购的转出记录
+				}
+			}else{
+				//TODO 是不是要干掉对应的未支付缴费记录 c_prod_order.order_sn=c_fee_acct.prod_sn
 			}
 			//退订订购记录
 			this.saveCancelProdOrder(cancelOrder,cProdOrder.getDone_code());
 		}
 		//保存转移支付记录
-		cProdOrderTransfeeDao.save(transFeeList.toArray(new CProdOrderTransfee[transFeeList.size()]));
+		cProdOrderFeeDao.save(inputList.toArray(new CProdOrderFee[inputList.size()]));
+		cProdOrderFeeDao.update(outputList.toArray(new CProdOrderFee[outputList.size()]));
+		
 		
 		return transFee;
 	}
@@ -1147,5 +1310,16 @@ public class OrderComponent extends BaseBusiComponent {
 		}
 		return lastOrder;
 	}
-		
+	/**
+	 * 更新订单费用缴费的资金类型
+	 * @param upPayDoneCodes
+	 * @param feeType
+	 * @throws Exception 
+	 */
+	public void updateOrderFeeTypeByPayType(List<CDoneCodeUnpay> upPayDoneCodes,String payType) throws Exception{
+		String feeType=tPayTypeDao.findByKey(payType).getAcct_feetype();
+		for(CDoneCodeUnpay unPay:upPayDoneCodes){
+			cProdOrderFeeDao.updateFeeType(unPay.getDone_code(), feeType);
+		}
+	}
 }
