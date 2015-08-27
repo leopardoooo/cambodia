@@ -2,11 +2,14 @@ package com.ycsoft.business.dao.core.prod;
 
 import java.util.List;
 
+import org.springframework.stereotype.Component;
+
 import com.ycsoft.beans.core.prod.CProdOrderFee;
 import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.daos.abstracts.BaseEntityDao;
 import com.ycsoft.daos.core.JDBCException;
 
+@Component
 public class CProdOrderFeeDao extends BaseEntityDao<CProdOrderFee>  {
 	
 	public List<CProdOrderFee> queryByOrderSn(String order_sn) throws JDBCException{
