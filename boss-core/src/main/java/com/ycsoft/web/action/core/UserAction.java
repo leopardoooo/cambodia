@@ -117,7 +117,8 @@ public class UserAction extends BaseBusiAction {
 	//柬埔寨
 	//是否回收设备T,F
 	private String reclaim;
-	private Integer cancelFee;
+	private Integer cancelFee;//退款总金额
+	private Integer refundFee;//退款现金总额
 	/**
 	 * 用户开户
 	 * @throws Exception
@@ -151,7 +152,7 @@ public class UserAction extends BaseBusiAction {
 	 * @throws Exception
 	 */
 	public String logoffUser() throws Exception{
-		userServiceSN.saveRemoveUser(userId,banlanceDealType,reclaim,cancelFee, transAcctId, transAcctItemId);
+		userServiceSN.saveRemoveUser(userId,banlanceDealType,reclaim,cancelFee,refundFee, transAcctId, transAcctItemId);
 		return JSON_SUCCESS;
 	}
 
@@ -1130,6 +1131,10 @@ public class UserAction extends BaseBusiAction {
 
 	public void setWorkBillAsignType(String workBillAsignType) {
 		this.workBillAsignType = workBillAsignType;
+	}
+
+	public void setRefundFee(Integer refundFee) {
+		this.refundFee = refundFee;
 	}
 	
 	

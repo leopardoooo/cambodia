@@ -15,7 +15,7 @@ import com.ycsoft.daos.config.POJO;
 /**
  * CAcctItemChange -> C_ACCT_ITEM_CHANGE mapping
  */
-@POJO(tn = "C_ACCT_ACCTITEM_CHANGE", sn = "", pk = "")
+@POJO(tn = "C_ACCT_ACCTITEM_CHANGE", sn = "SEQ_ACCT_CHANGE_SN", pk = "ACCT_CHANGE_SN")
 public class CAcctAcctitemChange extends BusiBase implements Serializable {
 
 	// CAcctItemChange all properties
@@ -36,6 +36,8 @@ public class CAcctAcctitemChange extends BusiBase implements Serializable {
 	private String billing_cycle_id;
 	private Integer inactive_done_code;
 	private String cometype;
+	private String acct_change_sn;
+	private String acct_active_sn;
 
 	private String fee_type_text;
 	private String change_type_text;
@@ -46,8 +48,25 @@ public class CAcctAcctitemChange extends BusiBase implements Serializable {
 	/**
 	 * @return the fee_type_text
 	 */
+	
 	public String getFee_type_text() {
 		return fee_type_text;
+	}
+
+	public String getAcct_change_sn() {
+		return acct_change_sn;
+	}
+
+	public void setAcct_change_sn(String acct_change_sn) {
+		this.acct_change_sn = acct_change_sn;
+	}
+
+	public String getAcct_active_sn() {
+		return acct_active_sn;
+	}
+
+	public void setAcct_active_sn(String acct_active_sn) {
+		this.acct_active_sn = acct_active_sn;
 	}
 
 	/**

@@ -35,6 +35,7 @@ import com.ycsoft.beans.prod.PProd;
 import com.ycsoft.beans.system.SItemvalue;
 import com.ycsoft.beans.system.SOptr;
 import com.ycsoft.business.commons.pojo.BusiParameter;
+import com.ycsoft.business.component.core.OrderComponent;
 import com.ycsoft.business.dao.config.TExchangeDao;
 import com.ycsoft.business.dao.core.bank.CBankGotodiskDao;
 import com.ycsoft.business.dao.core.bank.CBankReturnDao;
@@ -78,6 +79,8 @@ public class PayService extends BaseBusiService implements IPayService {
 	private PProdDao pProdDao;
 	@Autowired
 	private TExchangeDao tExchangeDao;
+	@Autowired
+	private OrderComponent orderComponent;
 	/**
 	 * 查询汇率
 	 * @return
@@ -130,6 +133,9 @@ public class PayService extends BaseBusiService implements IPayService {
 		
 		//更新缴费信息状态、支付方式和发票相关信息
 		feeComponent.updateCFeeToPay(upPayDoneCodes, pay);
+		
+		//更新订单费用的费用类型(新订购记录才有需要处理)
+		orderComponent.updateOrderFeeTypeByPayType(upPayDoneCodes, pay.getPay_type());
 		
 		//更新订单状体并给订单发授权
 		updateOrder(cust_id,done_code);

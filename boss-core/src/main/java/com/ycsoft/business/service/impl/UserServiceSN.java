@@ -2,7 +2,6 @@ package com.ycsoft.business.service.impl;
 
 import static com.ycsoft.commons.constants.SystemConstants.ACCT_TYPE_SPEC;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -19,6 +18,7 @@ import com.ycsoft.beans.core.cust.CCustDevice;
 import com.ycsoft.beans.core.job.JUserStop;
 import com.ycsoft.beans.core.prod.CProdOrder;
 import com.ycsoft.beans.core.prod.CProdOrderDto;
+import com.ycsoft.beans.core.prod.CProdOrderFee;
 import com.ycsoft.beans.core.prod.CProdPropChange;
 import com.ycsoft.beans.core.user.CUser;
 import com.ycsoft.beans.core.user.CUserPropChange;
@@ -29,7 +29,6 @@ import com.ycsoft.business.component.core.OrderComponent;
 import com.ycsoft.business.component.task.SnTaskComponent;
 import com.ycsoft.business.dao.core.prod.CProdOrderDao;
 import com.ycsoft.business.dao.core.prod.CProdPropChangeDao;
-import com.ycsoft.business.dto.core.acct.PayDto;
 import com.ycsoft.business.dto.core.fee.FeeInfoDto;
 import com.ycsoft.business.dto.core.prod.DisctFeeDto;
 import com.ycsoft.business.dto.core.prod.PromotionDto;
@@ -48,7 +47,6 @@ import com.ycsoft.commons.helper.CollectionHelper;
 import com.ycsoft.commons.helper.DateHelper;
 import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.daos.core.JDBCException;
-import com.ycsoft.daos.helper.BeanHelper;
 @Service
 public class UserServiceSN extends BaseBusiService implements IUserService {
 	@Autowired
@@ -297,7 +295,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 
 
 	@Override
-	public void saveRemoveUser(String userId,String banlanceDealType,String reclaim,Integer cancelFee, String transAcctId, String transAcctItemId) throws Exception {
+	public void saveRemoveUser(String userId,String banlanceDealType,String reclaim,Integer cancelFee,Integer refundFee, String transAcctId, String transAcctItemId) throws Exception {
 		// TODO Auto-generated method stub
 		//获取客户用户信息
 		CCust cust = getBusiParam().getCust();
@@ -378,14 +376,19 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		}
 		//是否高级权限
 		boolean isHigh=orderComponent.isHighCancel(busiCode);
+		List<CProdOrderFee> orderFees=new ArrayList<>();
 		//检查数据
-		List<CProdOrderDto> cancelList=checkCancelProdOrderParm(isHigh, userId, cancelFee);
+		List<CProdOrderDto> cancelList=checkCancelProdOrderParm(orderFees,isHigh, userId, cancelFee,refundFee);
 		
-		if(cancelFee<0){
+		if(refundFee<0){
 			//记录未支付业务
 			doneCodeComponent.saveDoneCodeUnPay(custId, doneCode, this.getOptr().getOptr_id());
 			//保存缴费信息
-			this.saveCancelFee(cancelList, this.getBusiParam().getCust(), doneCode, this.getBusiParam().getBusiCode());
+			feeComponent.saveCancelFee(cancelList,orderFees, this.getBusiParam().getCust(), doneCode, this.getBusiParam().getBusiCode());
+		}
+		if(cancelFee-refundFee!=0){
+			//余额转回公用账目
+			acctComponent.saveCancelFeeToAcct(orderFees, custId, doneCode, this.getBusiParam().getBusiCode());
 		}
 		
 		List<CProdOrder> cancelResultList=new ArrayList<>();
@@ -410,7 +413,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 
 	
 	
-	private List<CProdOrderDto> checkCancelProdOrderParm(boolean isHigh,String userId,Integer cancelFee) throws Exception{
+	private List<CProdOrderDto> checkCancelProdOrderParm(List<CProdOrderFee> orderFees,boolean isHigh,String userId,Integer cancelFee,Integer refundFee) throws Exception{
 		
 		if(StringHelper.isEmpty(userId)||cancelFee==null){
 			throw new ServicesException(ErrorCode.ParamIsNull);
@@ -418,39 +421,40 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 
 		List<CProdOrderDto> orderList = cProdOrderDao.queryProdOrderDtoByUserId(userId);
 		
-		int fee=orderComponent.getLogoffOrderFee(orderList, isHigh);
+		orderFees=orderComponent.getLogoffOrderFee(orderList, isHigh);
+		if(refundFee==0){
+			for(CProdOrderDto order:orderList){
+				if(order.getBalance_cfee()!=null&&order.getBalance_cfee()>0){
+					order.setBalance_acct(order.getBalance_acct()+order.getBalance_cfee());
+					order.setBalance_cfee(0);
+				}
+			}
+		}
+		int fee=0;
+		int balance_cfee=0;
+		for(CProdOrderFee orderFee:orderFees){
+			fee=fee+orderFee.getOutput_fee();
+			if(orderFee.getOutput_type().equals(SystemConstants.ORDER_FEE_TYPE_CFEE)){
+				if(refundFee<0){
+					balance_cfee=balance_cfee+orderFee.getOutput_fee();
+				}else{
+					//当实际退现金=0时，退现金明细改成转账到公用账目
+					orderFee.setOutput_type(SystemConstants.ORDER_FEE_TYPE_ACCT);
+				}
+			}
+		}
 		//金额核对
 		if(cancelFee!=fee*-1){
 			throw new ServicesException(ErrorCode.FeeDateException);
-		}		
+		}
+		if(refundFee!=balance_cfee*-1){
+			throw new ServicesException(ErrorCode.FeeDateException);
+		}
+		
 		return orderList;
 	}
 
-	/**
-	 * 保存订单退款费用信息
-	 * @param cancelList
-	 * @param cust
-	 * @param doneCode
-	 * @param busi_code
-	 * @throws InvocationTargetException 
-	 * @throws Exception 
-	 */
-	private void saveCancelFee(List<CProdOrderDto> cancelList,CCust cust,Integer doneCode,String busi_code) throws Exception{
-		//按订单退款
-		for(CProdOrderDto order:cancelList){
-			if(order.getActive_fee()>0){
-				PayDto pay=new PayDto();
-				BeanHelper.copyProperties(pay, order);
-				pay.setProd_sn(order.getOrder_sn());
-				pay.setAcctitem_id(order.getProd_id());
-				pay.setBegin_date(DateHelper.dateToStr(DateHelper.today().before(order.getEff_date())? order.getEff_date():DateHelper.today()));
-				pay.setInvalid_date(DateHelper.dateToStr(order.getExp_date()));
-				pay.setPresent_fee(0);
-				pay.setFee(order.getActive_fee()*-1);
-				feeComponent.saveAcctFee(cust.getCust_id(), cust.getAddr_id(), pay, doneCode, busi_code, StatusConstants.UNPAY);
-			}
-		}
-	}
+
 
 	@Override
 	public void saveOpenInteractive(String netType, String modemMac, String password, String vodUserType,
@@ -1036,7 +1040,10 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 	private Date openProd(Integer doneCode, CProdOrderDto order,Date startDate) throws Exception, ServicesException {
 		Date expDate = null;
 		Date effDate = null;
-		CProdPropChange statusChange = cProdPropChangeDao.queryLastStatus(order.getOrder_sn(), order.getCounty_id());
+		CProdPropChange statusChange =new CProdPropChange();
+		statusChange.setChange_time(new Date(order.getStatus_date().getTime()));
+		statusChange.setOld_value(order.getStatus());
+		//cProdPropChangeDao.queryLastStatus(order.getOrder_sn(), order.getCounty_id());
 		if (statusChange == null)
 			throw new ServicesException("找不到产品报停记录，请联系管理员");
 		if (startDate == null) {

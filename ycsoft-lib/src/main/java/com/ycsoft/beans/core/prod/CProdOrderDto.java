@@ -35,8 +35,24 @@ public class CProdOrderDto extends CProdOrder {
 
 	private Integer rent;
 	
+	//可退金额部分(退订和销户)
+	private Integer balance_cfee;
+	//可转金额部分(退订和销户)
+	private Integer balance_acct;
 	
 	
+	public Integer getBalance_cfee() {
+		return balance_cfee;
+	}
+	public void setBalance_cfee(Integer balance_cfee) {
+		this.balance_cfee = balance_cfee;
+	}
+	public Integer getBalance_acct() {
+		return balance_acct;
+	}
+	public void setBalance_acct(Integer balance_acct) {
+		this.balance_acct = balance_acct;
+	}
 	public String getBilling_type() {
 		return billing_type;
 	}
