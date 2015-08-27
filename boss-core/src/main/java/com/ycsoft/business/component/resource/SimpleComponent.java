@@ -4,15 +4,18 @@ package com.ycsoft.business.component.resource;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.ycsoft.beans.config.TAddress;
 import com.ycsoft.beans.config.TDistrict;
+import com.ycsoft.beans.system.SDept;
 import com.ycsoft.beans.system.SDeptAddr;
 import com.ycsoft.business.commons.abstracts.BaseBusiComponent;
 import com.ycsoft.business.dao.config.TAddressDao;
 import com.ycsoft.business.dao.config.TDistrictDao;
 import com.ycsoft.business.dao.system.SDeptAddrDao;
+import com.ycsoft.business.dao.system.SDeptDao;
 import com.ycsoft.business.dao.system.SParamDao;
 import com.ycsoft.business.dto.config.TAddressDto;
 import com.ycsoft.commons.constants.DataRight;
@@ -36,7 +39,8 @@ public class SimpleComponent extends BaseBusiComponent {
 	private SParamDao sParamDao;
 	private TDistrictDao tDistrictDao;
 	private SDeptAddrDao sDeptAddrDao;
-	
+	@Autowired
+	private SDeptDao sDeptDao;
 
 	public List<TAddressDto> queryAddrByName(String q,String pId) throws Exception{
 		String dataRight = "";
@@ -52,67 +56,36 @@ public class SimpleComponent extends BaseBusiComponent {
 	
 	public List<TAddressDto> queryAddrByLike(String name,String pId) throws Exception{
 		
+		if(StringHelper.isNotEmpty(pId)){
+			return tAddressDao.queryAddrById(pId);
+		}
+		
 		List<SDeptAddr> sList = sDeptAddrDao.getAddrByDept(getOptr().getDept_id());
 		String[] addrIds = null;
 		if(sList.size()>0){
 			addrIds = CollectionHelper.converValueToArray(sList, "addr_id");
+		}else{
+			SDept dept= sDeptDao.findByKey(getOptr().getDept_id());
+			if(StringHelper.isNotEmpty(dept.getAgent_id())){
+				throw new ComponentException(ErrorCode.DeptAddrIsNull,dept.getDept_name());
+			}
+			//tAddressDao.queryAddrByAllowPids(levelId, addrPid)
+			String[] pids={SystemConstants.ADDRESS_ROOT_ID};
+			addrIds= CollectionHelper.converValueToArray(tAddressDao.queryAddrByAllowPids(SystemConstants.ADDR_TREE_LEVEL_ONE,pids),"addr_id");
 		}
 		if(StringHelper.isEmpty(name)){
-			if(StringHelper.isEmpty(pId)){
-				return tAddressDao.queryAddrByIds(addrIds);
-			}else{
-				return tAddressDao.queryAddrById(pId);
-			}
+			return tAddressDao.queryAddrByIds(addrIds);
+		}else{
+			
 		}
-		
 		name = name.toLowerCase();
 		
+		List<TAddressDto> list=tAddressDao.queryAddrTreeByLvOneAndName(addrIds,name);
 		
-		//2级 允许查询的addr
-		List<TAddressDto> twoLevelList = tAddressDao.queryAddrByAllowPids(SystemConstants.ADDR_TREE_LEVEL_TWO,addrIds);
-		List<String> twoPidList =  CollectionHelper.converValueToList(twoLevelList, "addr_id");
-		
-		List<TAddressDto> threeList = tAddressDao.queryAddrByaddrPids(name,twoPidList.toArray(new String[twoPidList.size()]));
-		
-		List<String> addPids = new ArrayList<String>();
-		for(TAddressDto t: threeList){
-			if(!addPids.contains(t.getAddr_pid())){
-				addPids.add(t.getAddr_pid());
-			}
+		if(list.size()>2000){
+			throw new ComponentException(ErrorCode.DataNumTooMuch);
 		}
-		
-		List<String> addTwoQueryPids = new ArrayList<String>();
-		for(String t : twoPidList){
-			if(!addPids.contains(t)){
-				addTwoQueryPids.add(t);
-			}
-		}
-		//2级允许的 并且 过滤 name
-		List<TAddressDto> twoAllowList = new ArrayList<TAddressDto>();
-		if(addPids.size()>0){
-			twoAllowList = tAddressDao.queryAddrByAllowIds(SystemConstants.ADDR_TREE_LEVEL_TWO,addPids.toArray(new String[addPids.size()]));
-		}
-		List<TAddressDto> twoQueryList = null;
-		if(addTwoQueryPids.size()>0){
-			twoQueryList = tAddressDao.queryAddrByaddrIds(name,addTwoQueryPids.toArray(new String[addTwoQueryPids.size()]));
-		}
-		List<TAddressDto> oneAllowList = tAddressDao.queryAddrByAllowIds(SystemConstants.ADDR_TREE_LEVEL_ONE,addrIds);
-		
-		if(twoAllowList.size()>0){
-			oneAllowList.addAll(twoAllowList);
-		}
-		if(twoQueryList != null && twoQueryList.size()>0){
-			oneAllowList.addAll(twoQueryList);
-		}
-		if(threeList.size()>0){
-			oneAllowList.addAll(threeList);
-		}
-		System.out.println(oneAllowList.size());
-		if(oneAllowList.size()>2000){
-			throw new ComponentException(ErrorCode.DataNumTooMuch,oneAllowList.size());
-		}
-		
-		return oneAllowList;
+		return list;
 		
 //		TreeNode _t = null;  
 //		for(TAddress addr : oneList){
