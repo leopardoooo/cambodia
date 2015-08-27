@@ -51,6 +51,9 @@ public class RDeviceModelDao extends BaseEntityDao<RDeviceModel> {
 		
 	}
 	
-	
+	public RDeviceModel lockModel(String deviceModel) throws JDBCException{
+		String sql="select * from r_device_model where device_model=? for update ";
+		return this.createQuery(sql, deviceModel).first();
+	}
 	
 }

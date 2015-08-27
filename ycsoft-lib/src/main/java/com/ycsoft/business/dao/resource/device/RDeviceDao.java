@@ -822,10 +822,10 @@ public class RDeviceDao extends BaseEntityDao<RDevice> {
 	}
 	
 	public List<RDevice> queryMateralDeviceByDepotId(String depotId) throws Exception {
-		String sql = "select * from r_device where depot_id=? and device_type not in(?,?,?) and device_status=? "
+		String sql = "select * from r_device where depot_id=? and device_type =? and device_status=? "
 				+ "and depot_status=? and tran_status=?";
-		return createQuery(RDevice.class, sql,depotId,SystemConstants.DEVICE_TYPE_STB,SystemConstants.DEVICE_TYPE_CARD
-				,SystemConstants.DEVICE_TYPE_MODEM,StatusConstants.ACTIVE,StatusConstants.IDLE,StatusConstants.IDLE).list();
+		return createQuery(RDevice.class, sql,depotId,SystemConstants.DEVICE_TYPE_FITTING
+				,StatusConstants.ACTIVE,StatusConstants.IDLE,StatusConstants.IDLE).list();
 	}
 	
 	public List<RDevice> queryDeviceByIds(String[] deviceIds) throws Exception {
@@ -839,27 +839,25 @@ public class RDeviceDao extends BaseEntityDao<RDevice> {
 		return createQuery(RDevice.class, sql,doneCode).list();
 	}
 	
-	public void removeDeviceToHis(Integer doneCode) throws JDBCException {
+	public void removeDeviceToHis(String deviceId) throws JDBCException {
 		String sql = "insert into r_device_his"+
 				"    (device_id, device_type, device_status, depot_status, used, backup, freezed, diffence_type, depot_id, ownership, warranty_date, is_virtual, is_local, "+
 				"       is_new_stb, device_model, batch_num,total_num)"+
 				" select r.device_id, r.device_type, r.device_status, r.depot_status, r.used, r.backup, r.freezed, r.diffence_type, r.depot_id, r.ownership, r.warranty_date, r.is_virtual, r.is_local,"+
 				" r.is_new_stb,r.device_model,r.batch_num,r.total_num"+
 				" from r_device_done_deviceid d,r_device r"+
-				" where r.device_id=d.device_id "+
-				" and d.device_done_code=? ";
-		executeUpdate(sql, doneCode);
+				" where r.device_id=? ";
+		executeUpdate(sql, deviceId);	
 		
-		sql = "delete r_device where device_id IN ( SELECT device_id FROM r_device_done_deviceid t WHERE t.device_done_code=?)";
-		executeUpdate(sql, doneCode);
+		sql = "delete r_device where device_id=?";
+		executeUpdate(sql, deviceId);
 	}
 	
-	public void updateMateralTransferDepot(Integer doneCode, String depotOrder)
+	public void updateMateralTransferDepot(String deviceId, String depotOrder)
 			throws JDBCException {
-		String sql = "UPDATE r_device SET tran_status=?,depot_id=? WHERE device_id IN "
-				+ " (SELECT device_id FROM r_device_done_deviceid t WHERE t.device_done_code=?)";
+		String sql = "UPDATE r_device SET tran_status=?,depot_id=? WHERE device_id =? ";
 
-		executeUpdate(sql, StatusConstants.IDLE,depotOrder, doneCode);
+		executeUpdate(sql, StatusConstants.IDLE,depotOrder, deviceId);
 	}
 
 	public void removeMateralTransferDevice(String device_id, Integer total_num) throws JDBCException{

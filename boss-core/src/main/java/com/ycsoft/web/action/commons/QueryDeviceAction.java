@@ -190,6 +190,17 @@ public class QueryDeviceAction extends BaseBusiAction {
 		return JSON_RECORDS;
 	}
 	
+	/**
+	 * 可以购买的设备
+	 * @return
+	 * @throws Exception
+	 */
+	public String queryDeviceCanBuy() throws Exception{
+		getRoot().setRecords(custService.queryDeviceCanBuy(optr));
+		return JSON_RECORDS;
+	}
+	
+	
 	public String queryDeviceFee() throws Exception{
 		getRoot().setRecords(custService.queryDeviceFee(deviceType,deviceModel,buyMode));
 		return JSON_RECORDS;

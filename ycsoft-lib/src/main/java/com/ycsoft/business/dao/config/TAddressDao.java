@@ -393,7 +393,7 @@ public class TAddressDao extends BaseEntityDao<TAddress> {
 		if(addrIds != null && addrIds.length>0){
 			src = " and "+getSqlGenerator().setWhereInArray("addr_id",addrIds);
 		}
-		String sql = "SELECT * FROM t_address where status='ACTIVE'  "+ src;
+		String sql = "SELECT * FROM t_address where status='ACTIVE' and tree_level = '1' "+ src;
 		return createQuery(TAddressDto.class,sql).list();
 	}
 	

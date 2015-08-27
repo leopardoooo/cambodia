@@ -2138,5 +2138,11 @@ public class CustService extends BaseBusiService implements ICustService {
 	public void savetaskFinish(String taskId, int success,String failureCause, Date finishTime)throws Exception {
 		this.taskComponent.saveTaskFinish(taskId, success, failureCause, finishTime);
 	}
+
+	@Override
+	public List<?> queryDeviceCanBuy(SOptr optr) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
 	
 }

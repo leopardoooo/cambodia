@@ -80,6 +80,7 @@ import com.ycsoft.business.dto.core.fee.BbillingcycleCfgDto;
 import com.ycsoft.business.dto.core.fee.BusiFeeDto;
 import com.ycsoft.business.dto.core.fee.CFeePayDto;
 import com.ycsoft.business.dto.core.fee.FeeDto;
+import com.ycsoft.business.dto.core.fee.FeePayDto;
 import com.ycsoft.business.dto.core.fee.MergeFeeDto;
 import com.ycsoft.business.dto.core.fee.MergeFeeFormDto;
 import com.ycsoft.business.dto.core.fee.QueryFeeInfo;
@@ -90,7 +91,6 @@ import com.ycsoft.commons.constants.DataRight;
 import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.exception.ComponentException;
-import com.ycsoft.commons.exception.ServicesException;
 import com.ycsoft.commons.helper.CollectionHelper;
 import com.ycsoft.commons.helper.DateHelper;
 import com.ycsoft.commons.helper.StringHelper;
@@ -1011,6 +1011,23 @@ public class FeeComponent extends BaseBusiComponent {
 		}
 		return feePager;
 	}
+	
+	public Pager<FeePayDto> queryFeePay(String custId, QueryFeeInfo queryFeeInfo, Integer start, Integer limit) throws Exception {
+		String dataRight = null;
+		try {
+			dataRight = queryDataRightCon(getOptr(), DataRight.ACCTDATE_EDIT.toString());
+		} catch (Exception e) {
+		}
+		Pager<FeePayDto> feePager = cFeePayDao.queryFeePay(custId, queryFeeInfo,start, limit);
+		List<FeePayDto> feeList = feePager.getRecords();
+		if(dataRight != null){
+			for(FeePayDto fee : feeList){
+				fee.setData_right(dataRight);
+			}
+		}
+		return feePager;
+	}
+	
 	/**
 	 * 查询某客户下指定费用类型和状态的费用项，
 	 * @param custId 客户编号
@@ -1705,7 +1722,10 @@ public class FeeComponent extends BaseBusiComponent {
 		cPromFeeDao.removeWithHis(doneCode,feeDoneCode);
 	}
 
-
+	public List<FeeDto> queryFeePayDetail(String paySn) throws Exception {
+		List<FeeDto> list = cFeePayDao.queryFeePayDetail(paySn);
+		return list;
+	}
 
 	/**
 	 * @param docItemDao the cDocItemDao to set

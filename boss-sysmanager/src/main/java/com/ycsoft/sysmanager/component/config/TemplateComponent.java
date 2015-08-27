@@ -418,9 +418,9 @@ public class TemplateComponent  extends  BaseComponent {
 			}else if(deviceType.equals(SystemConstants.DEVICE_TYPE_MODEM)){
 				column.setItem_key("MODEM_MODEL");
 				column.setItem_key_text("MODEM型号");
-			}else if(deviceType.equals(SystemConstants.DEVICE_TYPE_CTL)){
-				column.setItem_key("TV_MODEL");
-				column.setItem_key_text("遥控器型号");
+			}else if(deviceType.equals(SystemConstants.DEVICE_TYPE_FITTING)){
+				column.setItem_key("FITTING_MODEL");
+				column.setItem_key_text("器材型号");
 			}
 			column.setSelect_value("ALL");
 			columnList.add(column);
