@@ -55,7 +55,12 @@ public enum ErrorCode {
 	DeviceTotalNumIsNull("设备数量不够"),
 	DeviceTotalNumIsTooBig("设备入库数量超出了订货数量"),
 	
-	CustHasNoAcct("客户缺失公用账户，请联系管理员！"),
+	AcctPublicNotExists("客户缺失公用账户，请联系管理员！"),
+	AcctItemNotExists("账目不存在，请联系管理员！"),
+	AcctFeeNotEnough("账户余额不足！"),
+	
+	TemplateNotConfigBuseFee("该地区费用模板未配置该费用项(%s)"),
+	CustUserIpAddressFeeCoinfigError("客户宽带IP收费存在多个费用项目，请联系管理员！"),
 	;
 
 	private ErrorCode(String desc){

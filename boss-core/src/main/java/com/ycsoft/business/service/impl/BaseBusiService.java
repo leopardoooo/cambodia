@@ -1635,7 +1635,7 @@ public class BaseBusiService extends BaseService {
 	public void saveAllPublic(Integer doneCode, BusiParameter busiParam)
 			throws Exception {
 		busiParam.setDoneCode(doneCode);
-		String custId = null;
+		//String custId = null;
 		CCust cust = busiParam.getCustFullInfo().getCust();
 		SOptr optr = getOptr();
 		if(null!= cust && StringHelper.isNotEmpty(cust.getCounty_id()) && !cust.getCounty_id().equals(optr.getCounty_id())){
@@ -1651,7 +1651,7 @@ public class BaseBusiService extends BaseService {
 				if(feeDto.getReal_pay() > 0){
 					feeComponent.saveBusiFee(cust.getCust_id(),cust!=null?cust.getAddr_id():null, feeDto.getFee_id(), feeDto.getCount(),SystemConstants.PAY_TYPE_UNPAY,feeDto
 							.getReal_pay(), busiParam.getDoneCode(),busiParam.getDoneCode(), busiParam.getBusiCode(),
-							busiParam.getSelectedUsers());
+							busiParam.getSelectedUsers(),feeDto.getDisct_info());
 					hasUnpay=true;
 				}
 			}

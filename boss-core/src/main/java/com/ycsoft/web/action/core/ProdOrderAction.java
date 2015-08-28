@@ -116,7 +116,11 @@ public class ProdOrderAction extends BaseBusiAction {
 		getRoot().setSimpleObj(orderService.queryCustEffOrder(cust_id));
 		return JSON_SIMPLEOBJ;
 	}
-	
+	/**
+	 * 缴费界面初始化
+	 * @return
+	 * @throws Exception
+	 */
 	public String queryFollowPayOrderDto() throws Exception{
 		getRoot().setRecords(orderService.queryFollowPayOrderDto(cust_id));
 		return JSON_RECORDS;

@@ -28,11 +28,19 @@ public class OrderProd implements Serializable{
 	private Date eff_date;
 	//失效日期
 	private Date exp_date;
+	//支付类型 :ACCT 账户支付，CFEE 缴费支付
+	private String order_fee_type;
 	
 	private Integer order_cycle;//订购周期数（内部使用）
 	private String billing_type;//资费计费类型(内部使用)
 	
 	
+	public String getOrder_fee_type() {
+		return order_fee_type;
+	}
+	public void setOrder_fee_type(String order_fee_type) {
+		this.order_fee_type = order_fee_type;
+	}
 	public Integer getOrder_cycle() {
 		return order_cycle;
 	}

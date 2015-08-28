@@ -8,6 +8,7 @@ import java.util.Map;
 import com.ycsoft.beans.core.prod.CProdOrder;
 import com.ycsoft.beans.prod.PProd;
 import com.ycsoft.beans.prod.PProdTariffDisct;
+import com.ycsoft.business.dto.core.fee.BusiFeeDto;
 /**
  * 订购界面产品查询返回结果
  * @author new
@@ -20,6 +21,8 @@ public class OrderProdPanel {
 	 * 其他情况，返回空字符
 	 */
 	private String userDesc;
+	//用户ID
+    private String userId;
 	//可用产品
 	private List<PProd> prodList;
 	//可用资费Map<prod_id,List<资费折扣定义>>
@@ -33,7 +36,24 @@ public class OrderProdPanel {
 	 *           c.套餐的上期订购记录是   exp_date>=今天，相同cust_id,prod_id=所有套餐的exp_date最大的订购记录。
 	**/
 	private Map<String,CProdOrder> lastOrderMap;
+	/**
+	 * Ip收费方案
+	 */
+	private BusiFeeDto busiFee;
 	
+	
+	public BusiFeeDto getBusiFee() {
+		return busiFee;
+	}
+	public void setBusiFee(BusiFeeDto busiFee) {
+		this.busiFee = busiFee;
+	}
+	public String getUserId() {
+		return userId;
+	}
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
 	public String getUserDesc() {
 		return userDesc;
 	}

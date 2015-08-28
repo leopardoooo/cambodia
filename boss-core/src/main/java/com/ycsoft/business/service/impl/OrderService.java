@@ -14,8 +14,6 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.ycsoft.beans.core.acct.CAcct;
-import com.ycsoft.beans.core.acct.CAcctAcctitemActive;
 import com.ycsoft.beans.core.common.CDoneCodeUnpay;
 import com.ycsoft.beans.core.cust.CCust;
 import com.ycsoft.beans.core.fee.CFee;
@@ -42,6 +40,7 @@ import com.ycsoft.business.dao.prod.PProdDao;
 import com.ycsoft.business.dao.prod.PProdTariffDao;
 import com.ycsoft.business.dao.prod.PProdTariffDisctDao;
 import com.ycsoft.business.dto.core.acct.PayDto;
+import com.ycsoft.business.dto.core.fee.BusiFeeDto;
 import com.ycsoft.business.dto.core.prod.OrderProd;
 import com.ycsoft.business.dto.core.prod.OrderProdPanel;
 import com.ycsoft.business.dto.core.prod.PackageGroupPanel;
@@ -471,13 +470,58 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		}
 	}
 	
-	
-	
 	@Override
 	public OrderProdPanel queryOrderableProd(String busiCode,String custId,String userId, String filterOrderSn)
 			throws Exception{
-		return orderComponent.queryOrderableProd(busiCode, custId, userId, filterOrderSn);
+		OrderProdPanel orderProdPanel=orderComponent.queryOrderableProd(busiCode, custId, userId, filterOrderSn);
+		//IP收费方案处理
+		if(orderProdPanel.getProdList()!=null&&orderProdPanel.getProdList().size()>0){
+			complateOrderableProdIpFee(orderProdPanel,custId);
+		}
+		
+		return orderProdPanel;
 	}
+	/**
+	 * 订购界面的IP收费方案
+	 * @param orderProdPanel
+	 * @throws Exception 
+	 */
+	private void complateOrderableProdIpFee(OrderProdPanel orderProdPanel,String custId) throws Exception{
+		Map<String,CUser> ipUserMap=userComponent.queryUserByIpAddresFee(custId);
+		if(ipUserMap.size()==0) return;
+		if(StringHelper.isNotEmpty(orderProdPanel.getUserId())&&ipUserMap.containsKey(orderProdPanel.getUserId())){
+			//单用户情况
+			orderProdPanel.setBusiFee(this.getUserBusiFee(ipUserMap.get(orderProdPanel.getUserId())));
+			return;
+		}
+		if(StringHelper.isEmpty(orderProdPanel.getUserId())
+				&&orderProdPanel.getProdList()!=null&&orderProdPanel.getProdList().size()>0){
+			//套餐情况
+			List<PPackageProd> pakList=pPackageProdDao.queryPackProdById(orderProdPanel.getProdList().get(0).getProd_id());
+			if(pakList==null||pakList.size()==0) return;
+			for(PPackageProd pakProd:pakList){
+				if(pakProd.getUser_type().equals(SystemConstants.USER_TYPE_BAND)){
+					BusiFeeDto busiFee=null;
+					for(CUser user: ipUserMap.values()){
+						if(busiFee==null){
+							busiFee=this.getUserBusiFee(user);
+						}else{
+							BusiFeeDto _bF=this.getUserBusiFee(user);
+							if(!busiFee.getFee_id().equals(_bF.getFee_id())){
+								throw new ServicesException(ErrorCode.CustUserIpAddressFeeCoinfigError);
+							}else{
+								busiFee.setFee_count(busiFee.getFee_count()+_bF.getFee_count());
+							}
+						}
+					}
+					orderProdPanel.setBusiFee(busiFee);
+					return;
+				}
+			}
+			return;
+		}
+	}
+	
 	@Override
 	public Map<String,List<CProdOrderDto>> queryCustEffOrder(String custId) throws Exception {
 		
@@ -657,17 +701,6 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		return list;
 	}
 	
-	public static void main(String args[]){
-		OrderProd orderProd=new OrderProd();
-		orderProd.setCust_id("1231");
-		orderProd.setEff_date(DateHelper.today());
-		try {
-			System.out.println(getOrderProdRemark(orderProd,"12"));
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
 	/**
 	 * 订单的业务参数
 	 */
@@ -733,7 +766,10 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		//支付总额
 		int payFeeSum=0;
 		for(OrderProd orderProd:orderProds){
-			payFeeSum=payFeeSum+orderProd.getPay_fee();
+			if(StringHelper.isEmpty(orderProd.getOrder_fee_type())
+					||orderProd.getOrder_fee_type().equals(SystemConstants.ORDER_FEE_TYPE_CFEE)){
+				payFeeSum=payFeeSum+orderProd.getPay_fee();
+			}
 		}
 		//支付状态判断
 		boolean isPay=this.saveDoneCodeUnPay(cust_id,payFeeSum, doneCode,this.getOptr().getOptr_id());
@@ -781,7 +817,14 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		
 		//费用信息
 		if(orderProd.getPay_fee()>0){
-			this.saveCFee(cProdOrder,orderProd.getPay_fee(),cust,doneCode,busi_code);
+			if(!SystemConstants.ORDER_FEE_TYPE_ACCT.equals(orderProd.getOrder_fee_type())){
+				//缴费支付
+				this.saveCFee(cProdOrder,orderProd.getPay_fee(),cust,doneCode,busi_code);
+			}else{
+				//账户支付
+				//TODO
+				acctComponent.savePayOrderByAcct();
+			}
 		}
 	
 		return cProdOrder.getOrder_sn();
@@ -1031,16 +1074,81 @@ public class OrderService extends BaseBusiService implements IOrderService{
 					throw new ServicesException(ErrorCode.OrderDateExpDateError);
 				}
 		}		
+		
+		if(orderProd.getOrder_fee_type()!=null){
+			if(!orderProd.getOrder_fee_type().equals(SystemConstants.ORDER_FEE_TYPE_ACCT)
+					&&!orderProd.getOrder_fee_type().equals(SystemConstants.ORDER_FEE_TYPE_CFEE)){
+				throw new ServicesException(ErrorCode.OrderDateException);
+			}
+		}
 		return lastOrder;
 	}
-	
+	/**
+	 * 缴费界面数据初始化
+	 * 过期产品的问题？怎么搞好？
+	 */
 	public List<CProdOrderFollowPay> queryFollowPayOrderDto(String custId) throws Exception{
 		doneCodeComponent.checkUnPayOtherLock(custId, this.getOptr().getOptr_id());
 		List<CProdOrderFollowPay> orderList  = orderComponent.queryFollowPayOrderDto(custId);
-		
+		if(orderList.size()>0){
+			//ip收费
+			complateFollowPayIpAddressFee(orderList,custId);
+		}
 		return orderList;
 		
 	}
 
+	/**
+	 * 补全缴费节目的IP收费方案
+	 * @param orderList
+	 * @param custId
+	 * @throws Exception
+	 */
+	private void complateFollowPayIpAddressFee(List<CProdOrderFollowPay> orderList,String custId) throws Exception{
+		//IP加挂收费处理
+		Map<String,CUser> ipUserMap=userComponent.queryUserByIpAddresFee(custId);
+		if(ipUserMap.size()==0) return;
+		
+		for(CProdOrderFollowPay fp:orderList){
+			if(StringHelper.isNotEmpty(fp.getUser_id())){
+				//单产品
+				if(ipUserMap.containsKey(fp.getUser_id())){
+					fp.setBusiFee(getUserBusiFee(ipUserMap.get(fp.getUser_id())));
+				}
+			}else if(fp.getGroupSelected()!=null&&fp.getGroupSelected().size()>0){
+				//套餐判断用户选择有
+				BusiFeeDto busiFee=null;
+				for(PackageGroupUser pgu: fp.getGroupSelected()){
+					if(pgu.getUserSelectList()!=null&&pgu.getUserSelectList().size()>0){
+						for(String userId:pgu.getUserSelectList()){
+							if(ipUserMap.containsKey(userId)){
+								BusiFeeDto _selectBusiFee=getUserBusiFee(ipUserMap.get(userId));
+								if(busiFee==null){
+									busiFee=_selectBusiFee;
+								}else{
+									if(!busiFee.getFee_id().equals(_selectBusiFee.getFee_id())){
+										throw new ServicesException(ErrorCode.CustUserIpAddressFeeCoinfigError);
+									}else{
+										busiFee.setFee_count(busiFee.getFee_count()+_selectBusiFee.getFee_count());
+									}
+								}
+							}
+						}
+					}
+				}
+				fp.setBusiFee(busiFee);
+			}
+		}
+		
+	}
+	private BusiFeeDto getUserBusiFee(CUser user) throws Exception{
+		BusiFeeDto busiFee= feeComponent.getBusiFee(user.getStr5());
+		if(busiFee==null){
+			throw new ServicesException(ErrorCode.TemplateNotConfigBuseFee,user.getStr5());
+		}
+		//收费数量
+		busiFee.setFee_count(Integer.valueOf(user.getStr6()));
+		return busiFee;
+	}
 	
 }

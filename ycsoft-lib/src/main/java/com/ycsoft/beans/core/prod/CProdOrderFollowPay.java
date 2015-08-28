@@ -3,6 +3,7 @@ package com.ycsoft.beans.core.prod;
 import java.util.List;
 
 import com.ycsoft.beans.prod.PProdTariffDisct;
+import com.ycsoft.business.dto.core.fee.BusiFeeDto;
 import com.ycsoft.business.dto.core.prod.PackageGroupUser;
 
 public class CProdOrderFollowPay extends CProdOrderDto {
@@ -18,7 +19,16 @@ public class CProdOrderFollowPay extends CProdOrderDto {
 	// 套餐内容组的用户选择情况和产品组选择情况
 	private List<PackageGroupUser> groupSelected;
 	
+	private BusiFeeDto busiFee;
 	
+	public BusiFeeDto getBusiFee() {
+		return busiFee;
+	}
+
+	public void setBusiFee(BusiFeeDto busiFee) {
+		this.busiFee = busiFee;
+	}
+
 	public List<PackageGroupUser> getGroupSelected() {
 		return groupSelected;
 	}

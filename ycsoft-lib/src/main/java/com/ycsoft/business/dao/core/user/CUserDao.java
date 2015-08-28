@@ -122,6 +122,16 @@ public class CUserDao extends BaseEntityDao<CUser> {
 		return createQuery(sql, custId).list();
 	}
 	/**
+	 * 查询有加挂杂费的用户
+	 * @param custId
+	 * @return
+	 * @throws JDBCException
+	 */
+	public List<CUser> queryUserByIpAddressFee(String custId)  throws JDBCException {
+		String sql = "select * from c_user  where str5 in (select fee_id from t_busi_fee) and str6<>'0' and cust_id=? ";
+		return createQuery(sql, custId).list();
+	}
+	/**
 	 * 查询正常和施工中的用户清单
 	 * @param custId
 	 * @return

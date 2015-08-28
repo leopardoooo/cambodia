@@ -409,7 +409,7 @@ public class PayService extends BaseBusiService implements IPayService {
 				
 				feeComponent.saveBusiFee(cust.getCust_id(), StringHelper.isEmpty(feeDto.getAddr_id())?getBusiParam().getCust().getAddr_id():feeDto.getAddr_id(),
 						feeDto.getFee_id(), 1,payType, feeDto.getReal_pay(),
-						doneCode, busiDoneCode, busiCode, userList);
+						doneCode, busiDoneCode, busiCode, userList,null);
 			} else {
 				//根据donecode和fee_id查找设备信息
 				List<CFeeDevice> devices = feeComponent.queryDeviceByDoneCode(busiDoneCode);

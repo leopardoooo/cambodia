@@ -1063,66 +1063,73 @@ public class OrderComponent extends BaseBusiComponent {
 		} else if (busiCode.equals(BusiCodeConstants.PROD_CONTINUE)){
 			queryOrderableGoon(cust,filterOrderSn,panel,orderList);
 		} else if (busiCode.equals(BusiCodeConstants.PROD_UPGRADE)){
-			CProdOrder order = cProdOrderDao.findByKey(filterOrderSn);
-			if (order == null)
-				return panel;
-			Map<String,Integer> prodBandWidthMap = pProdDao.queryProdBandWidth();
-			PProd prod= pProdDao.findByKey(order.getProd_id());
-			if (prod.getProd_type().equals(SystemConstants.PROD_TYPE_BASE) 
-					&& prod.getServ_id().equals(SystemConstants.USER_TYPE_BAND)){
-				//升级宽带产品
-				queryUserOrderableProd(cust,order.getUser_id(),panel,orderList);
-				//过滤掉带宽小于等于当前套餐的产品
-				for (Iterator<PProd> it = panel.getProdList().iterator();it.hasNext();){
-					PProd selectedProd = it.next();
-					if (prodBandWidthMap.get(selectedProd.getProd_id())==null ||
-							prodBandWidthMap.get(selectedProd.getProd_id())<= prodBandWidthMap.get(prod.getProd_id())){
-						it.remove();
-						panel.getTariffMap().remove(selectedProd.getProd_id());
-						panel.getLastOrderMap().remove(prod.getProd_id());
-					}
-				}
-			} else if (prod.getProd_type().equals(SystemConstants.PROD_TYPE_CUSTPKG)
-					&& prodBandWidthMap.get(prod.getProd_id()) != null){
-				//含宽带的普通套餐
-				queryCustOrderablePkg(cust,panel,orderList);
-				//过滤掉带宽小于等于当前套餐的产品
-				for (Iterator<PProd> it = panel.getProdList().iterator();it.hasNext();){
-					PProd selectedProd = it.next();
-					if (prod.getProd_type().equals(SystemConstants.PROD_TYPE_SPKG) ||
-							prodBandWidthMap.get(selectedProd.getProd_id())==null ||
-							prodBandWidthMap.get(selectedProd.getProd_id())<= prodBandWidthMap.get(prod.getProd_id())){
-						it.remove();
-						panel.getTariffMap().remove(selectedProd.getProd_id());
-						panel.getLastOrderMap().remove(prod.getProd_id());
-					}
-				}
-			} else if (prod.getProd_type().equals(SystemConstants.PROD_TYPE_SPKG)){
-				//协议套餐
-				queryCustOrderablePkg(cust,panel,orderList);
-				//过滤掉普通套餐
-				for (Iterator<PProd> it = panel.getProdList().iterator();it.hasNext();){
-					PProd selectedProd = it.next();
-					if (prod.getProd_type().equals(SystemConstants.PROD_TYPE_CUSTPKG)){
-						it.remove();
-						panel.getTariffMap().remove(selectedProd.getProd_id());
-						panel.getLastOrderMap().remove(prod.getProd_id());
-					}
-				}
-			} else {
-				throw new ServicesException(ErrorCode.OrderDateCanNotUp);
-			}
+			queryOrderableUpgrade(cust,filterOrderSn,panel,orderList);
 		} 
-		
-		
 		return panel;
 	}
-
+	/**
+	 * 升级情况
+	 * @throws Exception
+	 */
+	public void queryOrderableUpgrade(CCust cust,String filterOrderSn,OrderProdPanel panel,List<CProdOrderDto> orderList) throws Exception{
+		CProdOrder order = cProdOrderDao.findByKey(filterOrderSn);
+		if (order == null)
+			return ;
+		panel.setUserId(order.getUser_id());
+		Map<String,Integer> prodBandWidthMap = pProdDao.queryProdBandWidth();
+		PProd prod= pProdDao.findByKey(order.getProd_id());
+		if (prod.getProd_type().equals(SystemConstants.PROD_TYPE_BASE) 
+				&& prod.getServ_id().equals(SystemConstants.USER_TYPE_BAND)){
+			//升级宽带产品
+			queryUserOrderableProd(cust,order.getUser_id(),panel,orderList);
+			//过滤掉带宽小于等于当前套餐的产品
+			for (Iterator<PProd> it = panel.getProdList().iterator();it.hasNext();){
+				PProd selectedProd = it.next();
+				if (prodBandWidthMap.get(selectedProd.getProd_id())==null ||
+						prodBandWidthMap.get(selectedProd.getProd_id())<= prodBandWidthMap.get(prod.getProd_id())){
+					it.remove();
+					panel.getTariffMap().remove(selectedProd.getProd_id());
+					panel.getLastOrderMap().remove(prod.getProd_id());
+				}
+			}
+		} else if (prod.getProd_type().equals(SystemConstants.PROD_TYPE_CUSTPKG)
+				&& prodBandWidthMap.get(prod.getProd_id()) != null){
+			//含宽带的普通套餐
+			queryCustOrderablePkg(cust,panel,orderList);
+			//过滤掉带宽小于等于当前套餐的产品
+			for (Iterator<PProd> it = panel.getProdList().iterator();it.hasNext();){
+				PProd selectedProd = it.next();
+				if (prod.getProd_type().equals(SystemConstants.PROD_TYPE_SPKG) ||
+						prodBandWidthMap.get(selectedProd.getProd_id())==null ||
+						prodBandWidthMap.get(selectedProd.getProd_id())<= prodBandWidthMap.get(prod.getProd_id())){
+					it.remove();
+					panel.getTariffMap().remove(selectedProd.getProd_id());
+					panel.getLastOrderMap().remove(prod.getProd_id());
+				}
+			}
+		} else if (prod.getProd_type().equals(SystemConstants.PROD_TYPE_SPKG)){
+			//协议套餐
+			queryCustOrderablePkg(cust,panel,orderList);
+			//过滤掉普通套餐
+			for (Iterator<PProd> it = panel.getProdList().iterator();it.hasNext();){
+				PProd selectedProd = it.next();
+				if (prod.getProd_type().equals(SystemConstants.PROD_TYPE_CUSTPKG)){
+					it.remove();
+					panel.getTariffMap().remove(selectedProd.getProd_id());
+					panel.getLastOrderMap().remove(prod.getProd_id());
+				}
+			}
+		} else {
+			throw new ServicesException(ErrorCode.OrderDateCanNotUp);
+		}
+		
+	}
 	//查找用户能够订购的单产品
 	private void queryUserOrderableProd(CCust cust,String userId,OrderProdPanel panel,List<CProdOrderDto> orderList) throws Exception {
 		CUser user = cUserDao.findByKey(userId);
 		if (user == null)
 			return;
+		panel.setUserId(userId);
 		panel.setUserDesc(getUserDesc(user));
 		List<PProd> prodList = pProdDao.queryCanOrderUserProd(user.getUser_type(), user.getCounty_id(),
 				user.getCounty_id(), SystemConstants.DEFAULT_DATA_RIGHT);
@@ -1176,6 +1183,7 @@ public class OrderComponent extends BaseBusiComponent {
 		CProdOrder order = cProdOrderDao.findByKey(filterOrderSn);
 		if (order == null)
 			return;
+		panel.setUserId(order.getUser_id());
 		PProd prod= pProdDao.findByKey(order.getProd_id());
 		if (prod.getExp_date() != null && prod.getEff_date().before(new Date())){
 			throw new ServicesException(ErrorCode.ProdIsInvalid);

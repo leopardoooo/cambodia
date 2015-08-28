@@ -329,6 +329,61 @@ public class AcctComponent  extends BusiConfigComponent {
 	}
 
 	/**
+	 * 订单使用账目扣款
+	 */
+	public void savePayOrderByAcct(){
+		
+	}
+	/**
+	 * 账户扣款
+	 * @param acct_id
+	 * @param acctitem_id
+	 * @param fee
+	 * @param onlyRefoud 是否值使用可退资金扣款
+	 * @return
+	 * @throws Exception 
+	 */
+	public List<CAcctAcctitemChange> saveAcctDebitFee(String custId,String acctId,String acctItemId,String changeType,Integer fee,String busiCode,Integer doneCode,boolean onlyRefoud) throws Exception{
+		//TODO
+		List<CAcctAcctitemChange> changeList=new ArrayList<>();
+		if(fee==null||fee==0){
+			return changeList;
+		}
+		CAcctAcctitem acctItem=cAcctAcctitemDao.queryAcctItem(acctId, acctItemId);
+		if(acctItem==null){
+			throw new ServicesException(ErrorCode.AcctItemNotExists);
+		}
+		if(fee>acctItem.getActive_balance()){
+			throw new ServicesException(ErrorCode.AcctFeeNotEnough);
+		}
+		int debitTotalFee=fee;
+		for(AcctAcctitemActiveDto active:cAcctAcctitemActiveDao.queryByAcctitemId(acctId, acctItemId, this.getOptr().getCounty_id())){
+			
+			if(onlyRefoud&&!active.getCan_refund().equals(SystemConstants.BOOLEAN_TRUE)){
+				continue;
+			}
+				
+			int debitFee=0;
+			if(active.getBalance()>=debitTotalFee){
+				debitFee=debitTotalFee;
+			}else{
+				debitFee=active.getBalance();
+			}
+			debitTotalFee=debitTotalFee-debitFee;
+			
+			String feeType=active.getFee_type();
+			cAcctAcctitemActiveDao.updateBanlance(acctId, acctItemId,
+					feeType, fee, getOptr().getCounty_id());
+			acct_change_sn=saveAcctitemChange(doneCode, busiCode, custId, acctId,
+					acctItemId, changeType, feeType, fee, preFee, null);
+			
+			if(debitTotalFee==0) break;
+		}
+		
+		
+		return changeList;
+	}
+	/**
 	 * 退款转账到公用账目中
 	 * @param orderFees
 	 * @param cust_id
@@ -1540,7 +1595,7 @@ public class AcctComponent  extends BusiConfigComponent {
 	public CAcct queryCustAcctByCustId(String custId) throws Exception {
 		CAcct acct = cAcctDao.findCustAcctByCustId(custId,getOptr().getCounty_id());
 		if (acct == null)
-			throw new ComponentException(ErrorCode.CustHasNoAcct);
+			throw new ComponentException(ErrorCode.AcctPublicNotExists);
 		return acct;
 	}
 	/**

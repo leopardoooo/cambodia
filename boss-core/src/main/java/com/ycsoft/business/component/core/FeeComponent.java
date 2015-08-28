@@ -457,7 +457,7 @@ public class FeeComponent extends BaseBusiComponent {
 	 */
 	public String saveBusiFee(String custId,String addr_id,String feeId,int feeCount,String payType,
 			int realPay ,Integer createDoneCode,Integer busiDoneCode,
-			String busiCode, List<CUser> userList) throws Exception{
+			String busiCode, List<CUser> userList,String disctInfo) throws Exception{
 		CFee fee = new CFee();
 		fee.setCust_id(custId);
 		fee.setFee_id(feeId);
@@ -468,6 +468,7 @@ public class FeeComponent extends BaseBusiComponent {
 		fee.setFee_type(SystemConstants.FEE_TYPE_BUSI);
 		fee.setPay_type(payType);
 		fee.setAddr_id(addr_id);
+		fee.setDisct_info(disctInfo);
 		setBaseCFee(fee, custId, createDoneCode, busiDoneCode, busiCode);
 
 		cFeeDao.save(fee);
@@ -1425,6 +1426,14 @@ public class FeeComponent extends BaseBusiComponent {
 	 */
 	public List<BusiFeeDto> getBusiFeeItems() throws Exception {
 		return tBusiFeeStdDao.queryBusiFeeStd(queryTemplateId(SystemConstants.TEMPLATE_TYPE_FEE));
+	}
+	/**
+	 * 返回当前地区的指定业务费用项目
+	 * @param busiFeeId
+	 * @return
+	 */
+	public BusiFeeDto getBusiFee(String busiFeeId) throws Exception{
+		return tBusiFeeStdDao.queryBusiFeeStdByFeeId(queryTemplateId(SystemConstants.TEMPLATE_TYPE_FEE),busiFeeId);
 	}
 	
 	/**

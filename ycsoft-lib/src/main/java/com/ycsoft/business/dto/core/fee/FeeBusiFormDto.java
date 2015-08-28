@@ -19,6 +19,12 @@ public class FeeBusiFormDto implements DTO<CFeeBusi> {
 	private Integer real_pay ;	 //实收
 	private Integer buy_num;
 	private String addr_id;
+	/**
+	 * IP费的收费时间段 
+	 * 格式： 20150601-20150701
+	 * 存储：c_fee.disct_info
+	 */
+	private String disct_info;
 
 	/**
 	 * 将当前的DTO转换为CFeeBusi对象返回
@@ -33,6 +39,16 @@ public class FeeBusiFormDto implements DTO<CFeeBusi> {
 	}
 
 	
+	public String getDisct_info() {
+		return disct_info;
+	}
+
+
+	public void setDisct_info(String disct_info) {
+		this.disct_info = disct_info;
+	}
+
+
 	public String getFee_type() {
 		return fee_type;
 	}

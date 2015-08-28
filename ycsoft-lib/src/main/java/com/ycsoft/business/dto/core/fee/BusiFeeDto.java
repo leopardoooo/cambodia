@@ -14,6 +14,17 @@ public class BusiFeeDto extends TBusiFeeStd {
 	private String busi_name;
 	private Integer buy_num;
 	private String addr_id;
+	
+	private Integer fee_count;//费用倍数，IP加挂方案使用
+	
+	public Integer getFee_count() {
+		return fee_count;
+	}
+
+	public void setFee_count(Integer fee_count) {
+		this.fee_count = fee_count;
+	}
+
 	public String getAddr_id() {
 		return addr_id;
 	}

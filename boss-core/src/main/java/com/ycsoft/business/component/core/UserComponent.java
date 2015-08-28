@@ -2,6 +2,7 @@ package com.ycsoft.business.component.core;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -102,6 +103,24 @@ public class UserComponent extends BaseBusiComponent {
 	private TCustColonyCfgDao tCustColonyCfgDao;
 	private ExpressionUtil expressionUtil ;
 
+	/**
+	 * 查询挂载IP费用的用户清单
+	 * @param cust_id
+	 * @return
+	 * @throws Exception
+	 */
+	public Map<String,CUser> queryUserByIpAddresFee(String cust_id)throws Exception{
+		Map<String,CUser> map=new HashMap<String,CUser>();
+		for(CUser user:cUserDao.queryUserByIpAddressFee(cust_id)){
+			try{
+			 int fee_count= Integer.valueOf(user.getStr6());
+			 if(fee_count>0){
+				 map.put(user.getUser_id(), user);
+			 }
+			}catch(Exception e){}
+		}
+		return map;
+	}
 	public Map<String,CUser> queryUserMap(String cust_id) throws Exception{
 		return CollectionHelper.converToMapSingle(cUserDao.queryUserByCustId(cust_id), "user_id");
 	}

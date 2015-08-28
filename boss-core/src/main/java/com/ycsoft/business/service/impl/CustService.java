@@ -140,7 +140,7 @@ public class CustService extends BaseBusiService implements ICustService {
 					if(feeDto.getReal_pay() > 0){
 						feeComponent.saveBusiFee(custId,addrId, feeDto.getFee_id(), 1,payType,feeDto
 								.getReal_pay()/custCount, doneCode,doneCode, BusiCodeConstants.CUST_BATCH_OPEN,
-								null);
+								null,null);
 					}
 				}
 			}
