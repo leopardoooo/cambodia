@@ -1341,7 +1341,7 @@ public class BusiComponent {
 		
 		change.setDone_code(doneCode);
 		change.setBusi_code(BusiCodeConstants.ACCT_PAY);			//缴费
-		change.setChange_type(SystemConstants.ACCT_CHANGE_UNPAY);	//缴费冲正
+		change.setChange_type(SystemConstants.ACCT_CHANGE_UNCFEE);	//缴费冲正
 		change.setChange_fee(changeFee*-1);
 		change.setPre_fee(presentBalance);							//上次余额
 		change.setFee(presentBalance - changeFee);					//当前余额为上次余额减去变更金额

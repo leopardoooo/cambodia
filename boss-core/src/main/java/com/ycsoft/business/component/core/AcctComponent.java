@@ -328,12 +328,7 @@ public class AcctComponent  extends BusiConfigComponent {
 		return cAcctAcctitemActiveDao.queryAcctItemActive(acctId, acctItemId, feeType, countyId);
 	}
 
-	/**
-	 * 订单使用账目扣款
-	 */
-	public void savePayOrderByAcct(){
-		
-	}
+
 	/**
 	 * 账户扣款
 	 * @param acct_id
@@ -344,43 +339,62 @@ public class AcctComponent  extends BusiConfigComponent {
 	 * @throws Exception 
 	 */
 	public List<CAcctAcctitemChange> saveAcctDebitFee(String custId,String acctId,String acctItemId,String changeType,Integer fee,String busiCode,Integer doneCode,boolean onlyRefoud) throws Exception{
-		//TODO
 		List<CAcctAcctitemChange> changeList=new ArrayList<>();
-		if(fee==null||fee==0){
-			return changeList;
+		if(fee==null||fee>=0){
+			throw new ComponentException(ErrorCode.AcctDebitFeeIsPositive);
 		}
 		CAcctAcctitem acctItem=cAcctAcctitemDao.queryAcctItem(acctId, acctItemId);
 		if(acctItem==null){
 			throw new ServicesException(ErrorCode.AcctItemNotExists);
 		}
-		if(fee>acctItem.getActive_balance()){
+		if(fee*-1>acctItem.getActive_balance()){
 			throw new ServicesException(ErrorCode.AcctFeeNotEnough);
 		}
-		int debitTotalFee=fee;
+		cAcctAcctitemDao.updateActiveBanlance(acctId, acctItemId, fee,0,0,0, getOptr().getCounty_id());
+		int debitTotalFee=fee*-1;
+		int checkFee=0;//检查明细和主记录是否金额一致
 		for(AcctAcctitemActiveDto active:cAcctAcctitemActiveDao.queryByAcctitemId(acctId, acctItemId, this.getOptr().getCounty_id())){
-			
-			if(onlyRefoud&&!active.getCan_refund().equals(SystemConstants.BOOLEAN_TRUE)){
+			if(active.getBalance()<0){
+				throw new ComponentException(ErrorCode.AcctBalanceError);
+			}
+			if(active.getBalance()==0){
 				continue;
 			}
-				
+			checkFee=checkFee+active.getBalance();		
+			if(onlyRefoud&&!active.getCan_refund().equals(SystemConstants.BOOLEAN_TRUE)){
+				continue;//只用可退资金扣款
+			}
+
 			int debitFee=0;
 			if(active.getBalance()>=debitTotalFee){
 				debitFee=debitTotalFee;
 			}else{
 				debitFee=active.getBalance();
 			}
-			debitTotalFee=debitTotalFee-debitFee;
 			
 			String feeType=active.getFee_type();
 			cAcctAcctitemActiveDao.updateBanlance(acctId, acctItemId,
 					feeType, fee, getOptr().getCounty_id());
-			acct_change_sn=saveAcctitemChange(doneCode, busiCode, custId, acctId,
-					acctItemId, changeType, feeType, fee, preFee, null);
+			CAcctAcctitemChange change=saveAcctitemChange(doneCode, busiCode, custId, acctId,
+									acctItemId, changeType, feeType, debitFee*-1, active.getBalance(), null);
+			changeList.add(change);
 			
+			debitTotalFee=debitTotalFee-debitFee;
 			if(debitTotalFee==0) break;
 		}
-		
-		
+		//检查账户余额和资金明细是否一致
+		if(checkFee!=acctItem.getActive_balance()){
+			//重新查询账目余额
+			 if(checkFee!=cAcctAcctitemDao.queryAcctItem(acctId, acctItemId).getActive_balance()-fee){
+				 throw new ComponentException(ErrorCode.AcctItemAndActiveFeeDisagree);
+			 }
+			
+		}
+		//资金明细余额不足判断
+		if(debitTotalFee>0){
+			throw new ComponentException(ErrorCode.AcctFeeNotEnough);
+		}
+
 		return changeList;
 	}
 	/**
@@ -420,13 +434,14 @@ public class AcctComponent  extends BusiConfigComponent {
 					cAcctAcctitemActiveDao.save(activeItem);
 					
 					acct_change_sn=saveAcctitemChange(doneCode, busi_code, cust_id, acctId,
-							SystemConstants.ACCTITEM_PUBLIC_ID, changeType, orderFee.getFee_type(), orderFee.getOutput_fee(), preFee, null);
+							SystemConstants.ACCTITEM_PUBLIC_ID, changeType, orderFee.getFee_type(), orderFee.getOutput_fee(), preFee, null)
+							.getAcct_change_sn();
 				}else{
 					preFee=activeItem.getBalance();
 					cAcctAcctitemActiveDao.updateBanlance(acctId, acctItemId,
 							feeType, fee, getOptr().getCounty_id());
 					acct_change_sn=saveAcctitemChange(doneCode, busi_code, cust_id, acctId,
-							acctItemId, changeType, feeType, fee, preFee, null);
+							acctItemId, changeType, feeType, fee, preFee, null).getAcct_change_sn();
 				}
 				
 				orderFee.setOutput_sn(acct_change_sn);
@@ -532,7 +547,7 @@ public class AcctComponent  extends BusiConfigComponent {
 		}
 	}
 	
-	public String saveAcctitemChange(Integer doneCode, String busiCode,
+	public CAcctAcctitemChange saveAcctitemChange(Integer doneCode, String busiCode,
 			String custId, String acctId, String acctItemId, String changeType,
 			String feeType, int fee, int preFee, Integer inactiveDoneCode) throws Exception {
 		// 增加资金异动
@@ -554,7 +569,7 @@ public class AcctComponent  extends BusiConfigComponent {
 		change.setAcct_change_sn(cAcctAcctitemChangeDao.findSequence().toString());
 		
 		cAcctAcctitemChangeDao.save(change);
-		return change.getAcct_change_sn();
+		return change;
 	}
 	
 	
@@ -2682,7 +2697,7 @@ public class AcctComponent  extends BusiConfigComponent {
 			String receiptId, Integer doneCode, String custId,
 			String busiCode) throws Exception{
 		
-		String changeType=SystemConstants.ACCT_CHANGE_PAY;
+		String changeType=SystemConstants.ACCT_CHANGE_CFEE;
 		int preFee=0;
 		cAcctAcctitemDao.updateActiveBanlance(acctId, acctItemId, fee,0,0,0, getOptr().getCounty_id());
 		

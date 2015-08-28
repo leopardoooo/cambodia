@@ -14,7 +14,7 @@ public enum ErrorCode {
 	CustSeqIsNull("系统未正确配置客户序列号,客户前缀号=%s"),
 	UnPayLock("客户被锁定,请等待%s(%s)完成支付!"),
 	
-	AcctBalanceError("资金余额出现负数！"),
+	
 	
 	ExchangeConfigError("系统未正确配置汇率，请联系管理员"),
 	
@@ -60,7 +60,9 @@ public enum ErrorCode {
 	AcctPublicNotExists("客户缺失公用账户，请联系管理员！"),
 	AcctItemNotExists("账目不存在，请联系管理员！"),
 	AcctFeeNotEnough("账户余额不足！"),
-	
+	AcctBalanceError("资金余额出现负数！"),
+	AcctItemAndActiveFeeDisagree("账户数据异常，账户资金和明细金额不一致,请联系管理员！"),
+	AcctDebitFeeIsPositive("扣款金额不能是正数"),
 	TemplateNotConfigBuseFee("该地区费用模板未配置该费用项(%s)"),
 	CustUserIpAddressFeeCoinfigError("客户宽带IP收费存在多个费用项目，请联系管理员！"),
 	;

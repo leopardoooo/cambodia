@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import com.ycsoft.beans.core.acct.CAcct;
 import com.ycsoft.beans.core.acct.CAcctAcctitemActive;
+import com.ycsoft.beans.core.acct.CAcctAcctitemChange;
 import com.ycsoft.beans.core.common.CDoneCodeUnpay;
 import com.ycsoft.beans.core.cust.CCust;
 import com.ycsoft.beans.core.fee.CFee;
@@ -824,12 +825,39 @@ public class OrderService extends BaseBusiService implements IOrderService{
 				this.saveCFee(cProdOrder,orderProd.getPay_fee(),cust,doneCode,busi_code);
 			}else{
 				//账户支付
-				//TODO
-				acctComponent.savePayOrderByAcct();
+				this.savePayOrderByAcct(cProdOrder,orderProd.getPay_fee(),doneCode,busi_code);
 			}
 		}
 	
 		return cProdOrder.getOrder_sn();
+	}
+	/**
+	 * 使用账户支付订单金额
+	 * @throws Exception 
+	 */
+	private void savePayOrderByAcct(CProdOrder cProdorder,Integer payFee,Integer doneCode,String busiCode) throws Exception{
+		CAcct acct=acctComponent.queryCustAcctByCustId(cProdorder.getCust_id());
+		//扣款
+		List<CAcctAcctitemChange> changeList=
+				acctComponent.saveAcctDebitFee(acct.getCust_id(), acct.getAcct_id(), SystemConstants.ACCTITEM_PUBLIC_ID,
+						SystemConstants.ACCT_CHANGE_PAY, payFee*-1, busiCode, doneCode, false);
+		//订单资金明细
+		List<CProdOrderFee> orderFees=new ArrayList<>();
+		for(CAcctAcctitemChange change:changeList){
+			CProdOrderFee orderFee=new CProdOrderFee();
+			orderFees.add(orderFee);
+			orderFee.setOrder_fee_sn(cProdOrderFeeDao.findSequence().toString());
+			orderFee.setDone_code(doneCode);
+			orderFee.setOrder_sn(cProdorder.getOrder_sn());
+			orderFee.setInput_type(SystemConstants.ORDER_FEE_TYPE_ACCT);
+			orderFee.setInput_sn(change.getAcct_change_sn());
+			orderFee.setInput_fee(change.getFee());
+			orderFee.setFee_type(change.getFee_type());
+			orderFee.setCreate_time(new Date());
+			orderFee.setCounty_id(cProdorder.getCounty_id());
+			orderFee.setArea_id(cProdorder.getArea_id());
+		}
+		cProdOrderFeeDao.save(orderFees.toArray(new CProdOrderFee[orderFees.size()]));
 	}
 	/**
 	 * 激活产品

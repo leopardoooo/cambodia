@@ -412,7 +412,7 @@ public class JobComponent {
 			throws Exception {
 		return jobDao.queryAcctitemChangeByDoneCode(doneCode, acctId,
 				acctitemId, SystemConstants.ACCT_FEETYPE_PRESENT,
-				SystemConstants.ACCT_CHANGE_UNPAY);
+				SystemConstants.ACCT_CHANGE_UNCFEE);
 	}
 	
 	/**

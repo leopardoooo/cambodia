@@ -321,7 +321,7 @@ public class BaseBusiService extends BaseService {
 				//已经有返回
 				acctComponent.changeAcctItemBanlance(doneCode, busiCode, inactive.getCust_id(),
 						inactive.getAcct_id(), inactive.getAcctitem_id(),
-						SystemConstants.ACCT_CHANGE_UNPAY, SystemConstants.ACCT_FEETYPE_PRESENT, inactive.getUse_amount()*-1, null);
+						SystemConstants.ACCT_CHANGE_UNCFEE, SystemConstants.ACCT_FEETYPE_PRESENT, inactive.getUse_amount()*-1, null);
 			}
 			acctComponent.removeInactiveWithHis(inactive, doneCode);
 			
@@ -394,7 +394,7 @@ public class BaseBusiService extends BaseService {
 			//查询账目信息
 			acctComponent.changeAcctItemBanlance(doneCode, busiCode, fee.getCust_id(),
 					fee.getAcct_id(), fee.getAcctitem_id(),
-					SystemConstants.ACCT_CHANGE_UNPAY, acctFeeType, fee.getReal_pay()*-1, null);
+					SystemConstants.ACCT_CHANGE_UNCFEE, acctFeeType, fee.getReal_pay()*-1, null);
 			//判断是否有赠送，如果取消赠送金额
 			
 			//查找feesn对应的赠送记录
@@ -405,7 +405,7 @@ public class BaseBusiService extends BaseService {
 					//已经有返还
 					acctComponent.changeAcctItemBanlance(doneCode, busiCode, fee.getCust_id(),
 							acctInactive.getAcct_id(), acctInactive.getAcctitem_id(),
-							SystemConstants.ACCT_CHANGE_UNPAY, SystemConstants.ACCT_FEETYPE_PRESENT, acctInactive.getUse_amount()*-1, null);
+							SystemConstants.ACCT_CHANGE_UNCFEE, SystemConstants.ACCT_FEETYPE_PRESENT, acctInactive.getUse_amount()*-1, null);
 				}
 				acctComponent.removeInactiveWithHis(acctInactive, doneCode);
 			}
@@ -477,7 +477,7 @@ public class BaseBusiService extends BaseService {
 				//修改账目余额
 				acctComponent.changeAcctItemBanlance(doneCode, busiCode, fee.getCust_id(),
 						acctItem.getAcct_id(), acctItem.getAcctitem_id(),
-						SystemConstants.ACCT_CHANGE_UNPAY, acctFeeType, feeProd.getReal_pay()*-1,null);
+						SystemConstants.ACCT_CHANGE_UNCFEE, acctFeeType, feeProd.getReal_pay()*-1,null);
 				
 				//有赠送记录的
 				if(feeProd.getShould_pay() > feeProd.getReal_pay()){
@@ -488,7 +488,7 @@ public class BaseBusiService extends BaseService {
 							//已经有返还
 							acctComponent.changeAcctItemBanlance(doneCode, busiCode, fee.getCust_id(),
 									acctInactive.getAcct_id(), acctInactive.getAcctitem_id(),
-									SystemConstants.ACCT_CHANGE_UNPAY, SystemConstants.ACCT_FEETYPE_PRESENT, acctInactive.getUse_amount()*-1,null);
+									SystemConstants.ACCT_CHANGE_UNCFEE, SystemConstants.ACCT_FEETYPE_PRESENT, acctInactive.getUse_amount()*-1,null);
 						}
 						acctComponent.removeInactiveWithHis(acctInactive, doneCode);
 					}
@@ -1444,7 +1444,7 @@ public class BaseBusiService extends BaseService {
 			//缴费
 			acctComponent.changeAcctItemBanlance(doneCode, feeAcct.getBusi_code(),
 				feeAcct.getCust_id(), feeAcct.getAcct_id(), feeAcct.getAcctitem_id(),
-				SystemConstants.ACCT_CHANGE_PAY , acctFeeType, feeAcct.getReal_pay(), null);
+				SystemConstants.ACCT_CHANGE_CFEE , acctFeeType, feeAcct.getReal_pay(), null);
 //			//如果有免费期
 //			if (feeAcct.getProd_free_days()>0){
 //				userProdComponent.addProdRscAcct(doneCode, feeAcct.getProd_sn(), SystemConstants.PROD_FREE_TYPE_DAY, feeAcct.getProd_free_days());

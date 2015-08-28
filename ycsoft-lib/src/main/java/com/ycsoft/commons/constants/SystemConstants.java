@@ -321,9 +321,10 @@ public class SystemConstants {
 	 /**
 	  * 账户余额异动类型
 	  */
-	 public final static String ACCT_CHANGE_PAY = "JF";
+	 public final static String ACCT_CHANGE_PAY = "PAY";//支付
+	 public final static String ACCT_CHANGE_CFEE = "JF";//缴费
 	 public final static String ACCT_CHANGE_INIT = "INIT";
-	 public final static String ACCT_CHANGE_UNPAY = "JFCZ";
+	 public final static String ACCT_CHANGE_UNCFEE = "JFCZ";//缴费冲正
 	 public final static String ACCT_CHANGE_REFUND = "TK";
 	 public final static String ACCT_CHANGE_WRITEOFF = "XZ";
 	 public final static String ACCT_CHANGE_UNWRITEOFF = "FXZ";
