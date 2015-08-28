@@ -8,6 +8,8 @@ import java.io.Serializable;
 import java.util.Date;
 
 import com.ycsoft.beans.base.BusiBase;
+import com.ycsoft.commons.constants.DictKey;
+import com.ycsoft.commons.store.MemoryDict;
 import com.ycsoft.daos.config.POJO;
 
 /**
@@ -37,6 +39,36 @@ public class CFeePay extends BusiBase implements Serializable {
 	private Integer exchange;	
 	private Integer cos;
 	
+	private String pay_type_text;
+	private String is_valid_text;
+	private String invoice_mode_text;
+	
+	
+	
+	
+	public String getInvoice_mode_text() {
+		return invoice_mode_text;
+	}
+
+	public void setInvoice_mode_text(String invoice_mode_text) {
+		this.invoice_mode_text = invoice_mode_text;
+	}
+
+	public String getIs_valid_text() {
+		return is_valid_text;
+	}
+
+	public void setIs_valid_text(String is_valid_text) {
+		this.is_valid_text = is_valid_text;
+	}
+
+	public String getPay_type_text() {
+		return pay_type_text;
+	}
+
+	public void setPay_type_text(String pay_type_text) {
+		this.pay_type_text = pay_type_text;
+	}
 
 	public Integer getCos() {
 		return cos;
@@ -100,6 +132,7 @@ public class CFeePay extends BusiBase implements Serializable {
 	}
 
 	public void setPay_type(String pay_type) {
+		pay_type_text = MemoryDict.getDictName(DictKey.PAY_TYPE, pay_type);
 		this.pay_type = pay_type;
 	}
 
@@ -118,6 +151,7 @@ public class CFeePay extends BusiBase implements Serializable {
 	}
 
 	public void setIs_valid(String is_valid) {
+		is_valid_text = MemoryDict.getDictName(DictKey.BOOLEAN, is_valid);
 		this.is_valid = is_valid;
 	}
 
@@ -164,6 +198,7 @@ public class CFeePay extends BusiBase implements Serializable {
 	 * @param invoice_mode the invoice_mode to set
 	 */
 	public void setInvoice_mode(String invoice_mode) {
+		this.invoice_mode_text = MemoryDict.getDictName(DictKey.INVOICE_MODE, invoice_mode);
 		this.invoice_mode = invoice_mode;
 	}
 

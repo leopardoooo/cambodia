@@ -257,40 +257,229 @@ BusiFeeGrid = Ext.extend(Ext.ux.Grid, {
 
 });
 
+
+/**
+ * 订单金额明细
+ */
+CfeePayWindow = Ext.extend(Ext.Window, {
+	feeStore:null,
+	constructor: function(){
+		this.feeStore = new Ext.data.JsonStore({
+			url : Constant.ROOT_PATH+ "/commons/x/QueryCust!queryFeePayDetail.action",
+			fields: ["real_pay","fee_text"]
+		})
+		var columns = [
+       	    {header: "费用项目", width: 200,sortable:true, dataIndex: 'fee_text'},
+       	    {header: "金额", width: 70, sortable:true, dataIndex: 'real_pay',renderer:Ext.util.Format.formatFee}
+       	    ];
+		// Window Construct instance
+		return CfeePayWindow.superclass.constructor.call(this, {
+			layout:"fit",
+			title: "费用明细",
+			width: 450,
+			height: 200,
+			resizable: false,
+			maximizable: false,
+			closeAction: 'hide',
+			minimizable: false,
+			items: [{
+				xtype: 'grid',
+				stripeRows: true,
+				border: false,
+				store: this.feeStore,
+				columns: columns,
+		        stateful: true
+			}]
+		});
+	},
+	show: function(sn){
+		this.feeStore.baseParams = {
+			paySn: sn
+		};
+		this.feeStore.load();
+		return CfeePayWindow.superclass.show.call(this);
+	}
+});
+
+
+FeePayGrid = Ext.extend(Ext.ux.Grid, {
+	feePayStore : null,	
+	pageSize : 20,
+	cfeePayWindow:null,
+	feePayData: [],
+	constructor : function() {
+		this.feePayStore = new Ext.data.JsonStore({
+					url : Constant.ROOT_PATH+ "/commons/x/QueryCust!queryFeePay.action",
+					totalProperty:'totalProperty',
+					root:'records',
+					fields : ['pay_sn','reverse_done_code', 'pay_type', 'pay_type_text',
+							'done_code', {name : 'usd',type : 'int'},'receipt_id','is_valid_text',
+							'is_valid', 'payer', 'acct_date','dept_name','dept_id',
+							'invoice_mode', 'invoice_mode_text', 'remark',{name : 'exchange',type : 'int'},
+								{name : 'cos',type : 'int'}, 'optr_id','optr_name',
+							{name : 'khr',type : 'int'},'create_time','data_right']
+				});
+		var cm = new Ext.ux.grid.LockingColumnModel({ 
+    		columns : [
+    			{header:'支付编号',dataIndex:'pay_sn',width:80,renderer:function(value,metaData,record){
+						that = this;
+						if(value != ''){
+							return '<div style="text-decoration:underline;font-weight:bold"  onclick="Ext.getCmp(\'P_FEE_PAY\').doTransferFeeShow();"  ext:qtitle="" ext:qtip="' + value + '">' + value +'</div>';
+						}else{
+							return '<div ext:qtitle="" ext:qtip="' + value + '">' + value +'</div>';
+						}
+					}},
+				{header:'美元',dataIndex:'usd',width:60,renderer:Ext.util.Format.formatFee},
+				{header:'柬元',dataIndex:'khr',width:60,renderer:Ext.util.Format.formatFee},
+				{header:'汇率',dataIndex:'exchange',width:60},
+				{header:'柬元抹零',dataIndex:'cos',width:60,renderer:Ext.util.Format.formatFee},
+				{header:'有效',dataIndex:'is_valid_text',width:60,renderer:Ext.util.Format.statusShow},
+				{header:'付款方式',dataIndex:'pay_type_text',width:50},
+				{header:'付款人',dataIndex:'payer',width:60},
+				{header:'业务流水号',dataIndex:'done_code',width:80},
+				{header:'票据编号',dataIndex:'receipt_id',width:140},
+				{header:'出票方式',dataIndex:'invoice_mode_text',width:60},
+				{header:'受理日期',dataIndex:'create_time',width:125},
+				{header:'受理人',dataIndex:'optr_name',width:60},
+				{header:'受理部门',dataIndex:'dept_name',width:80}
+	        ]
+	      });
+		
+		FeePayGrid.superclass.constructor.call(this, {
+					id:'P_FEE_PAY',
+					title : '订单记录',
+					region:"west",
+					width:"30%",
+					split:true,
+					loadMask : true,
+					store : this.feePayStore,
+//					border : false,
+					bbar: new Ext.PagingToolbar({store: this.feePayStore ,pageSize : this.pageSize}),
+					sm : new Ext.grid.RowSelectionModel(),
+					view: new Ext.ux.grid.ColumnLockBufferView(),
+					cm : cm,
+					listeners:{
+						scope:this,
+						delay:10,
+						rowdblclick: this.doDblClickRecord,
+						afterrender: this.swapViews
+					},
+					tools:[{id:'search',qtip:'查询',cls:'tip-target',scope:this,handler:function(){
+							var comp = this.tools.search;
+							if(this.busiFeeStore.getCount()>0){
+								if(win)win.close();
+								win = FilterWindow.addComp(this,[									
+									{text:'状态',field:'status',showField:'is_valid_text',
+										data:[
+											{'text':'所有','value':''},
+											{'text':'有效','value':'T'},
+											{'text':'失效','value':'F'}
+										]
+									},
+									{text:'受理日期',field:'create_time',type:'datefield'},
+									{text:'受理人',field:'optr_name',type:'textfield'},
+									{text:'发票号',field:'invoice_id',type:'textfield'}
+								],800,null,true,"queryFeeInfo");
+								if(win){	
+									win.setPosition(comp.getX()-win.width, comp.getY()-50);//弹出框右对齐
+									win.show();
+								}
+							}else{
+								Alert('请先查询数据！');
+							}
+				    	}
+				    }]					
+				});
+	},
+	doDblClickRecord : function(grid, rowIndex, e) {
+		var record = grid.getStore().getAt(rowIndex);
+	},
+	remoteRefresh : function() {
+		this.refresh();
+	},
+	refresh:function(){
+		this.feePayStore.baseParams = {
+			residentCustId: App.getData().custFullInfo.cust.cust_id
+		};
+//		this.busiFeeStore.load({params:{start: 0,limit: this.pageSize}});
+		this.reloadCurrentPage();
+	},
+	localRefresh : function() {
+		unitRecords = this.getSelectionModel().getSelections();
+		for (var i in unitRecords) {
+			this.feePayStore.remove(unitRecords[i]);
+		}
+	},
+	doTransferFeeShow:function(){
+		if(!App.getApp().getCustId()){
+			Alert('请查询客户之后再做操作.');
+			return false;
+		}
+		var recs = this.selModel.getSelections();
+		if(!recs || recs.length !=1){
+			Alert('请选择且仅选择一条记录!');
+			return false;
+		}
+		var rec = recs[0];
+		
+		if(!this.cfeePayWindow){
+			this.cfeePayWindow = new CfeePayWindow();
+		}
+		this.cfeePayWindow.show(rec.get('pay_sn'));
+		
+	}
+
+});
+
 /**
  */
 PayfeePanel = Ext.extend(BaseInfoPanel, {
-
-			// 面板属性定义
-			acctFeeGrid : null,
-			busiFeeGrid : null,
-			// other property
-			mask : null,
-
-			constructor : function() {
-				// 子面板实例化
-				this.acctFeeGrid = new AcctFeeGrid();
-				this.busiFeeGrid = new BusiFeeGrid();
-				PayfeePanel.superclass.constructor.call(this, {
-							border : false,
-							layout : 'anchor',
-							items : [{
-										layout : 'fit',
-										border : false,
-										anchor : "100% 60%",
-										bodyStyle: 'border-bottom-width: 1px;',
-										items : [this.acctFeeGrid]
-									}, {
-										layout : 'fit',
-										border : false,
-										anchor : "100% 40%",
-										items : [this.busiFeeGrid]
-									}]
-						});
+	// 面板属性定义
+	acctFeeGrid : null,
+	busiFeeGrid : null,
+	feePayGrid	: null,
+	// other property
+	mask : null,
+	constructor : function() {
+		// 子面板实例化
+		this.acctFeeGrid = new AcctFeeGrid();
+		this.busiFeeGrid = new BusiFeeGrid();
+		this.feePayGrid = new FeePayGrid();
+		PayfeePanel.superclass.constructor.call(this, {
+					layout:"border",
+					border:false,
+					items:[{
+						region:"center",
+						layout:"anchor",
+//						border: false,
+						items : [{
+								layout : 'fit',
+								border : false,
+								anchor : "100% 60%",
+								bodyStyle: 'border-bottom-width: 1px;',
+								items : [this.acctFeeGrid]
+							}, {
+								layout : 'fit',
+								border : false,
+								anchor : "100% 40%",
+								items : [this.busiFeeGrid]
+							}]
+							
+						},this.feePayGrid
+//						{
+//							region:"west",
+//							split:true,
+//							width:"30%",
+//							border: false,
+//							items:[this.feePayGrid]
+//						}
+						]
+				});
 			},
 			refresh : function() {
 				this.acctFeeGrid.remoteRefresh();
 				this.busiFeeGrid.remoteRefresh();
+				this.feePayGrid.remoteRefresh();
 			}
 		});
 Ext.reg("payfeepanel", PayfeePanel);

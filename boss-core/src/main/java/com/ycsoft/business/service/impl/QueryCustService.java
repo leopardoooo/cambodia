@@ -1,7 +1,6 @@
 
 package com.ycsoft.business.service.impl;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +33,7 @@ import com.ycsoft.business.dto.core.cust.CustGeneralInfo;
 import com.ycsoft.business.dto.core.fee.BBillPrintDto;
 import com.ycsoft.business.dto.core.fee.BbillingcycleCfgDto;
 import com.ycsoft.business.dto.core.fee.FeeDto;
+import com.ycsoft.business.dto.core.fee.FeePayDto;
 import com.ycsoft.business.dto.core.fee.QueryFeeInfo;
 import com.ycsoft.business.dto.core.prod.CProdDto;
 import com.ycsoft.business.dto.core.prod.JBandCommandDto;
@@ -44,10 +44,8 @@ import com.ycsoft.business.service.IQueryCustService;
 import com.ycsoft.commons.constants.BusiCodeConstants;
 import com.ycsoft.commons.constants.DictKey;
 import com.ycsoft.commons.constants.StatusConstants;
-import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.exception.ServicesException;
 import com.ycsoft.commons.helper.CollectionHelper;
-import com.ycsoft.commons.helper.DateHelper;
 import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.commons.store.MemoryDict;
 import com.ycsoft.commons.store.MemoryPrintData;
@@ -452,6 +450,14 @@ public class QueryCustService extends BaseService implements IQueryCustService {
 		return billComponent.queryCustOweBill(custId);
 	}
 	
+	public Pager<FeePayDto> queryFeePay(String custId,QueryFeeInfo queryFeeInfo, Integer start,Integer limit) throws Exception {
+		return feeComponent.queryFeePay(custId, queryFeeInfo, start, limit);
+	}
+	
+	public List<FeeDto> queryFeePayDetail(String paySn) throws Exception {
+		return feeComponent.queryFeePayDetail(paySn);
+	}
+	
 	/**
 	 * @param custComponent the custComponent to set
 	 */
@@ -534,5 +540,6 @@ public class QueryCustService extends BaseService implements IQueryCustService {
 		// TODO Auto-generated method stub
 		return jobComponent.syncServerTime();
 	}
+
 	
 }

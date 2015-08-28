@@ -85,11 +85,7 @@ public class CustDeviceDto extends CCustDevice {
 	}
 
 	public String getDevice_model_text() {
-		String deviceType = getDevice_type();
-		if(!"STB".equals(deviceType) && !"CARD".equals(deviceType) && !"MODEM".equals(deviceType)){
-			deviceType = "CTL";
-		}
-		device_model_text = MemoryDict.getDictName(deviceType+"_MODEL", device_model);
+		device_model_text = MemoryDict.getDictName(getDevice_type()+"_MODEL", device_model);
 		return device_model_text;
 	}
 

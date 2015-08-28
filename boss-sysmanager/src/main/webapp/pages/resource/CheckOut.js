@@ -885,8 +885,7 @@ var MateralTransferDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 		this.parent = parent;
 		materalThat = this;
 		this.materalStore = new Ext.data.JsonStore({
-			fields:['device_model','device_type','device_model_text',
-				'device_type_text','total_num','num','device_id']
+			fields:['device_model','device_model_text','total_num','num','device_id']
 		});	
 		
 		doDel = function(){
@@ -895,29 +894,6 @@ var MateralTransferDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 			});
 		};
 		var cm = new Ext.grid.ColumnModel([
-				{id:'device_type_text_id',header:'设备类型',dataIndex:'device_type_text',width:80,editor:new Ext.form.ComboBox({
-					store:new Ext.data.JsonStore({
-						fields:['device_type_text','device_type','materialList']
-					}),displayField:'device_type_text',valueField:'device_type_text',triggerAction:'all',mode: 'local'
-					,listeners:{
-						scope:this,
-						select:function(combo,record){
-							this.getSelectionModel().getSelected().set('device_type',record.get('device_type'));
-							var model = record.get('materialList');
-							if(model.length == 1){
-								this.getSelectionModel().getSelected().set('device_model_text',model[0]['device_model_text']);
-								this.getSelectionModel().getSelected().set('device_model',model[0]['device_model']);
-								this.getSelectionModel().getSelected().set('total_num',model[0]['total_num']);
-								this.getSelectionModel().getSelected().set('device_id',model[0]['device_id']);
-							}else{
-								this.getSelectionModel().getSelected().set('device_model_text','');
-								this.getSelectionModel().getSelected().set('device_model','');
-								this.getSelectionModel().getSelected().set('total_num','');
-								this.getSelectionModel().getSelected().set('device_id','');
-							}
-						}
-					}
-				})},
 				{id:'device_model_text_id',header:'设备型号',dataIndex:'device_model_text',width:120,editor:new Ext.form.ComboBox({
 					store:new Ext.data.JsonStore({
 						fields:['device_model_text','device_model','total_num','device_id']
@@ -941,7 +917,6 @@ var MateralTransferDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 					})
 				},
 				{header:'设备编号',dataIndex:'device_id',hidden:true},
-				{header:'设备类型编号',dataIndex:'device_type',hidden:true},
 				{header:'操作',dataIndex:'',width:40,renderer:function(value,metavalue,record,i){
 					return "<a href='#' onclick=doDel()>删除</a>";
 				}}
@@ -964,7 +939,7 @@ var MateralTransferDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 	},//是否可编辑
 	cellEditable:function(colIndex,rowIndex){
 		var record = materalThat.getStore().getAt(rowIndex);//当前编辑行对应record
-		if(colIndex == this.getIndexById('device_type_text_id')){
+		if(colIndex == this.getIndexById('device_model_text_id')){
 			var store = this.getCellEditor(colIndex,rowIndex).field.getStore();
 			store.removeAll();//清空上一次选中行中 该列的数据
 			var data =  Ext.getCmp('MateralTransferDeviceGridId').remoteData;
@@ -973,10 +948,6 @@ var MateralTransferDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 				arr.push(data[i]);
 			}
 			store.loadData(arr);
-		}else if(colIndex == this.getIndexById('device_model_text_id')){
-			if(Ext.isEmpty(record.get('device_type_text'))){
-				return false;
-			}
 			
 		}else if(colIndex == this.getIndexById('num_id')){
 			if(Ext.isEmpty(record.get('device_model_text'))){
@@ -1016,17 +987,7 @@ var MateralTransferDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 		var record = obj.record;
 		var fieldName = obj.field;//编辑的column对应的dataIndex
 		var value = obj.value;
-		if(fieldName == 'device_type_text'){
-			var typeStore = this.getColumnModel().getColumnById('device_type_text_id').editor.getStore();
-			var indexe = typeStore.find('device_type',record.get('device_type'));
-			var data = typeStore.getAt(indexe).get('materialList');
-			var arr = [];
-			Ext.each(data,function(d){
-				arr.push(d);
-			});
-			var store = this.getColumnModel().getColumnById('device_model_text_id').editor.getStore();
-			store.loadData(arr);
-		}else if(fieldName == 'num'){
+		if(fieldName == 'num'){
 			if(value >record.get('total_num')){
 				record.set('num','');
 				Confirm('不能大于库存数量！',this,function(){
@@ -1039,7 +1000,7 @@ var MateralTransferDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 		var count = this.getStore().getCount();
 		var recordType = this.getStore().recordType;
 		var record = new recordType({
-			device_id:'',device_type_text:'',device_type:'',device_model:'',
+			device_id:'',device_model:'',
 			device_model_text:'',total_num:'',num:''
 		});
 		this.stopEditing();

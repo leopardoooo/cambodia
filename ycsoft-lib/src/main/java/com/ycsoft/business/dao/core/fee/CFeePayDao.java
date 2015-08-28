@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 
 import com.ycsoft.beans.core.fee.CFeePay;
 import com.ycsoft.business.dto.core.fee.FeeDto;
+import com.ycsoft.business.dto.core.fee.FeePayDto;
 import com.ycsoft.business.dto.core.fee.MergeFeeDto;
 import com.ycsoft.business.dto.core.fee.QueryFeeInfo;
 import com.ycsoft.commons.constants.BusiCodeConstants;
@@ -735,6 +736,31 @@ public class CFeePayDao extends BaseEntityDao<CFeePay> {
 		}
 	}
 	
+	
+	public Pager<FeePayDto> queryFeePay(String custId, QueryFeeInfo queryFeeInfo, 
+			Integer start, Integer limit) throws JDBCException {
+		String sql = null, str = "";
+		if(queryFeeInfo != null){
+			if(StringHelper.isNotEmpty(queryFeeInfo.getCreate_time1())){
+				str += " and t.create_time >= to_date('"+queryFeeInfo.getCreate_time1()+"','yyyy-MM-dd hh24:mi:ss')";
+			}
+			if(StringHelper.isNotEmpty(queryFeeInfo.getCreate_time2())){
+				str += " and t.create_time <= to_date('"+queryFeeInfo.getCreate_time2()+"','yyyy-MM-dd hh24:mi:ss')";
+			}
+			if(StringHelper.isNotEmpty(queryFeeInfo.getStatus())){
+				str += " and t.is_valid='" +queryFeeInfo.getStatus() +"'";
+			}
+			if(StringHelper.isNotEmpty(queryFeeInfo.getOptr_name())){
+				str += " and t.optr_id in (select optr_id from s_optr where  optr_name like '%"+queryFeeInfo.getOptr_name()+"%')";
+			}
+			if(StringHelper.isNotEmpty(queryFeeInfo.getInvoice_id())){
+				str += " and t.receipt_id='" +queryFeeInfo.getInvoice_id() + "'";
+			}			
+		}
+		sql = "select t.* from c_fee_pay t where  t.cust_id= ? "+str +" order by t.create_time desc";
+		return createQuery(FeePayDto.class, sql, custId).setStart(start).setLimit(limit).page();
+	}
+	
 	/**
 	 * 根据feeSn查询
 	 * @param feeSn
@@ -781,4 +807,13 @@ public class CFeePayDao extends BaseEntityDao<CFeePay> {
 				SystemConstants.FEE_TYPE_ACCT, optrId, unitCustId);
 	} 
 
+	public List<FeeDto> queryFeePayDetail(String paySn)throws Exception {
+		String sql = null;
+		sql = append(
+				" select t.real_pay,decode(t1.fee_name,null,t2.acctitem_name,t1.fee_name) fee_text " +
+				" from c_fee t, t_busi_Fee t1, vew_acctitem t2",				
+				" where t.fee_id = t1.fee_id(+) and t.acctitem_id = t2.acctitem_id(+) and t.pay_sn  = ? ");
+		return createQuery(FeeDto.class, sql,paySn).list();
+	}
+	
 }

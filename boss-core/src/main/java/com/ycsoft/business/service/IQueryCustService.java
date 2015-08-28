@@ -19,6 +19,7 @@ import com.ycsoft.business.dto.core.cust.CustGeneralInfo;
 import com.ycsoft.business.dto.core.fee.BBillPrintDto;
 import com.ycsoft.business.dto.core.fee.BbillingcycleCfgDto;
 import com.ycsoft.business.dto.core.fee.FeeDto;
+import com.ycsoft.business.dto.core.fee.FeePayDto;
 import com.ycsoft.business.dto.core.fee.QueryFeeInfo;
 import com.ycsoft.business.dto.core.prod.CProdDto;
 import com.ycsoft.business.dto.core.prod.JBandCommandDto;
@@ -400,6 +401,11 @@ public interface IQueryCustService extends IBaseService{
 	 * @return
 	 */
 	public String syncServerTime() throws JDBCException, Exception;
+
+	public Pager<FeePayDto> queryFeePay(String residentCustId,QueryFeeInfo queryFeeInfo, Integer start,
+			Integer limit)throws Exception ;
+
+	public List<FeeDto> queryFeePayDetail(String paySn) throws Exception;
 
 
 }

@@ -7,7 +7,6 @@ import java.util.Map;
 
 import org.springframework.stereotype.Controller;
 
-import com.ycsoft.beans.core.cust.CCustDevice;
 import com.ycsoft.business.dto.device.DeviceDto;
 import com.ycsoft.business.service.ICustService;
 import com.ycsoft.business.service.IValuableCardService;
@@ -189,6 +188,17 @@ public class QueryDeviceAction extends BaseBusiAction {
 		getRoot().setRecords(custService.queryDeviceBuyMode());
 		return JSON_RECORDS;
 	}
+	
+	/**
+	 * 可以购买的设备
+	 * @return
+	 * @throws Exception
+	 */
+	public String queryDeviceCanBuy() throws Exception{
+		getRoot().setRecords(custService.queryDeviceCanBuy(optr));
+		return JSON_RECORDS;
+	}
+	
 	
 	public String queryDeviceFee() throws Exception{
 		getRoot().setRecords(custService.queryDeviceFee(deviceType,deviceModel,buyMode));

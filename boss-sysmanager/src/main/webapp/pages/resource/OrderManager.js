@@ -347,19 +347,11 @@ var DeviceInfoGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 		}
 		return '';
 	},
-	remoteData: null,
 	initComponent:function(){
 		DeviceInfoGrid.superclass.initComponent.call(this);
 //		App.form.initComboData([this.deviceTypeCombo]);
 		var that = this;
-		App.form.initComboData([this.deviceTypeCombo], function(){
-			Ext.Ajax.request({
-				url:'resource/Device!queryDeviceModel.action',
-				success: function(res, ops){
-					that.remoteData = Ext.decode(res.responseText);
-				}
-			});
-		});
+		App.form.initComboData([this.deviceTypeCombo]);
 	},
 	initEvents:function(){
 		DeviceInfoGrid.superclass.initEvents.call(this);
@@ -370,8 +362,6 @@ var DeviceInfoGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 			if(fieldName == 'device_model_text'){
 				var deviceType = record.get('device_type');
 				if(Ext.isEmpty(deviceType))return false;
-//				this.deviceModelCombo.paramName = deviceType.concat('_MODEL');
-				if(deviceType == 'STB' || deviceType == 'CARD' || deviceType == 'MODEM'){
 					var paramName = deviceType+'_MODEL';
 					Ext.Ajax.request({
 						url:root + '/ps.action',
@@ -388,19 +378,7 @@ var DeviceInfoGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 							});
 							this.deviceModelCombo.getStore().loadData(arr);
 						}
-					});
-				}else{
-					var arr = [];
-					for(var i= 0;i < this.remoteData.length; i++){
-						if(this.remoteData[i]["device_type"] == deviceType){
-							var obj = {};
-							obj['item_name'] = this.remoteData[i]['model_name']+'('+this.remoteData[i]['device_model']+')';
-							obj['item_value'] = this.remoteData[i]['device_model'];
-							arr.push(obj);
-						}
-					}
-					this.deviceModelCombo.getStore().loadData(arr);
-				}
+					});	
 			}
 		},this);
 		this.on('afteredit',function(obj){

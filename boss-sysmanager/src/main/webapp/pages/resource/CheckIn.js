@@ -861,14 +861,9 @@ var HandCheckInWin = Ext.extend(Ext.Window,{
 
 var MateralHandForm = Ext.extend(Ext.form.FormPanel,{
 	parent:null,
-	deviceTypeData:[],
 	deviceModelData:[],
-	remoteData:null,
 	constructor:function(p){
 		this.parent = p;
-		this.deviceModelStore = new Ext.data.JsonStore({
-			fields : ['device_model','device_type',"model_name"]
-		});
 		MateralHandForm.superclass.constructor.call(this,{
 			id:'materalHandFormId',
 			labelWidth: 80,
@@ -883,38 +878,7 @@ var MateralHandForm = Ext.extend(Ext.form.FormPanel,{
 			items:[{
 					columnWidth:.5,layout:'form',defaults:{anchor:'95%'},
 					items:[
-						inputNo,{
-							fieldLabel: '设备类型',id:'materalDeviceTypeId',allowBlank : false,hiddenName:'device_type',
-							xtype:'paramcombo',typeAhead:false,paramName:'OTHER_DEVICE_TYPE',
-							forceSelection:true,selectOnFocus:true,editable:true,
-							listeners:{
-								scope:this,
-								select:function(combo){
-									Ext.getCmp("materalDeviceModelId").reset();
-									this.deviceModelData=[];
-									for(var i= 0;i < this.remoteData.length; i++){
-										if(this.remoteData[i]["device_type"] == combo.getValue()){
-											this.deviceModelData.push(this.remoteData[i]);
-										}
-									}												
-									this.deviceModelStore.loadData(this.deviceModelData);
-								},							
-								expand:function(combo){
-									var store = combo.getStore();
-									if(this.parent.deviceTypeArr.length>0){//如果选择了订单
-										store.removeAll();//下拉时清空数据 
-										Ext.each(this.deviceTypeData,function(deviceType){
-											Ext.each(this.parent.deviceTypeArr,function(data){
-												if(deviceType['item_value'] == data){
-													store.loadData([deviceType],true);
-												}
-											},this);
-										},this);
-									}
-								}
-							}
-						},
-						supplierCombo
+						inputNo,supplierCombo
 					]
 				},
 				{
@@ -934,9 +898,7 @@ var MateralHandForm = Ext.extend(Ext.form.FormPanel,{
 										supCombo.setValue(record.get('supplier_id'));
 										supCombo.setReadOnly(true);									
 										
-										Ext.getCmp("materalDeviceTypeId").reset();
 										Ext.getCmp("materalDeviceModelId").reset();
-										this.parent.deviceTypeArr = [];
 										this.parent.deviceModelArr = [];
 										
 										var doneCode = combo.getValue();
@@ -948,8 +910,6 @@ var MateralHandForm = Ext.extend(Ext.form.FormPanel,{
 												var data = Ext.decode(res.responseText);
 												if(data && data.length>0){
 													Ext.each(data,function(d){
-														if(this.parent.deviceTypeArr.indexOf(d['device_type'])==-1)
-															this.parent.deviceTypeArr.push(d['device_type']);
 														if(this.parent.deviceModelArr.indexOf(d['device_model'])==-1)
 															this.parent.deviceModelArr.push(d['device_model']);
 													},this);
@@ -963,26 +923,25 @@ var MateralHandForm = Ext.extend(Ext.form.FormPanel,{
 							fieldLabel : '设备型号',
 							allowBlank : false,
 							id : 'materalDeviceModelId',
-							xtype:'combo',
-							hiddenName : 'device_model',
+							xtype:'paramcombo',
+							paramName:'FITTING_MODEL',
+							name : 'device_model',
 							emptyText: '请选择',
-							store: this.deviceModelStore,
-							model: 'local',
-							displayField: 'model_name',
-							valueField: 'device_model',
 							listeners:{
 								scope:this,
 								expand:function(combo){
 									var store = combo.getStore();
+									var that = this;
 									if(this.parent.deviceModelArr.length>0){//如果选择了订单
-										store.removeAll();//下拉时清空数据 
-										Ext.each(this.deviceModelData,function(deviceType){
-											Ext.each(this.parent.deviceModelArr,function(data){
-												if(deviceType['device_model'] == data){
-													store.loadData([deviceType],true);
-												}
+										store.filterBy(function(record){
+											var key = false;
+											Ext.each(that.parent.deviceModelArr,function(data){
+												if(record.get('item_value').indexOf(data) > -1){
+													key = true;
+												};
 											},this);
-										},this);
+											return key;
+										});
 									}
 								}
 							}
@@ -999,15 +958,6 @@ var MateralHandForm = Ext.extend(Ext.form.FormPanel,{
 			            	value: 1
 						}
 					]				
-//				},{
-//					columnWidth:1,
-//					layout:'form',
-//					items:[{
-//						xtype: 'textfield',
-//						fieldLabel: '批号',
-//						name: 'batch_num',
-//						width: 240
-//					}]
 				},{
 					columnWidth:1,
 					layout:'form',
@@ -1020,22 +970,7 @@ var MateralHandForm = Ext.extend(Ext.form.FormPanel,{
 	},
 	initComponent:function(){
 		MateralHandForm.superclass.initComponent.call(this);
-		var that = this;
-		App.form.initComboData( this.findByType("paramcombo"), function(){
-			Ext.Ajax.request({
-				url:'resource/Device!queryDeviceModel.action',
-				success: function(res, ops){
-					that.remoteData = Ext.decode(res.responseText);
-				}
-			});
-			
-			var store = this.findById('materalDeviceTypeId').getStore();
-			that.deviceTypeData=[];
-			store.each(function(record){
-				that.deviceTypeData.push(record.data);
-			});
-			
-		},this);
+		App.form.initComboData(this.findByType("paramcombo"));
 		
 		this.getForm().findField('deviceInput.supplier_id').getStore().load();
 			

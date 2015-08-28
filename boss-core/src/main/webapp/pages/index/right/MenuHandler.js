@@ -454,8 +454,17 @@ Ext.apply(MenuHandler, {
 		if (!hasCust())
 			return false
 		return {
-			width : 540,
+			width : 450,
 			height : 300
+		};
+	},
+	//批量购买配件
+	BacthBuyMaterial:function(){
+		if (!hasCust())
+			return false
+		return {
+			width : 640,
+			height : 500
 		};
 	},
 	// 挂失
@@ -1355,7 +1364,7 @@ Ext.apply(MenuHandler, {
 		Confirm("确定要报开吗?", this, function() {
 			App.sendRequest(url, null, function(res, opt){
 				var data = Ext.decode(res.responseText);
-				if (data['success'] == true) {
+				if (data == true) {
 					App.getApp().main.infoPanel.getUserPanel().userGrid.remoteRefresh();
 				}
 			});

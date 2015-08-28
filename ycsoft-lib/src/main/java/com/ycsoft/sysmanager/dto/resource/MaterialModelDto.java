@@ -28,7 +28,7 @@ public class MaterialModelDto {
 	}
 
 	public String getDevice_model_text() {
-		device_model_text=MemoryDict.getDictName("CTL_MODEL", device_model);
+		device_model_text=MemoryDict.getDictName("FITTING_MODEL", device_model);
 		return device_model_text;
 	}
 

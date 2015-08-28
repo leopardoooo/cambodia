@@ -6,8 +6,6 @@ package com.ycsoft.business.dao.config;
 
 import java.util.List;
 
-import javax.net.ssl.SSLEngineResult.Status;
-
 import org.springframework.stereotype.Component;
 
 import com.ycsoft.beans.config.TBusiFee;
@@ -121,7 +119,7 @@ public class TBusiFeeStdDao extends BaseEntityDao<TBusiFeeStd> {
 			itemKey=DictKey.MODEM_MODEL.toString();
 			modelType = SystemConstants.DEVICE_TYPE_MODEM;
 		}else {
-			modelType = SystemConstants.DEVICE_TYPE_CTL;
+			modelType = SystemConstants.DEVICE_TYPE_FITTING;
 		}
 		
 		String condition="";
@@ -129,7 +127,7 @@ public class TBusiFeeStdDao extends BaseEntityDao<TBusiFeeStd> {
 			condition = "and a.fee_std_id <> '"+feeStdId+"'";
 		String sql = "";
 		
-		if(modelType.equals(SystemConstants.DEVICE_TYPE_CTL)){		
+		if(modelType.equals(SystemConstants.DEVICE_TYPE_FITTING)){		
 			sql =" select rm.device_model item_value,rm.model_name item_name from r_device_type rt,r_device_model rm " +
 					" where rt.device_type = rm.device_type and rt.device_type =?  " +
 					" and rm.device_model not in (select a.device_model from t_busi_fee_device a,t_busi_fee_std b where " +

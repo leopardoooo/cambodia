@@ -393,7 +393,7 @@ public class TAddressDao extends BaseEntityDao<TAddress> {
 		if(addrIds != null && addrIds.length>0){
 			src = " and "+getSqlGenerator().setWhereInArray("addr_id",addrIds);
 		}
-		String sql = "SELECT * FROM t_address where status='ACTIVE'  "+ src;
+		String sql = "SELECT * FROM t_address where status='ACTIVE' and tree_level = '1' "+ src;
 		return createQuery(TAddressDto.class,sql).list();
 	}
 	
@@ -411,16 +411,16 @@ public class TAddressDao extends BaseEntityDao<TAddress> {
 			" from t_address a ,(",
 			" select t.addr_id from t_address t ",
 			" where ",getSqlGenerator().setWhereInArray("addr_pid",lvOneAddrIds),
-			" and  lower( t.addr_name) not like '%?%' ",
+			" and  lower( t.addr_name) not like  '%'||?||'%' ",
 			" ) b  ",
 			" where a.addr_pid =b. addr_id ",
-			" and lower( a.addr_name) like '%?%' ",
+			" and lower( a.addr_name) like '%'||?||'%'",
 			" union all ",
 			" select t.addr_id from t_address t ",
 			" where  ",getSqlGenerator().setWhereInArray("addr_pid",lvOneAddrIds),
-			" and  lower( t.addr_name) like '%?%' ",
+			" and  lower( t.addr_name) like '%'||?||'%' ",
 			") connect by prior c.addr_pid = c.addr_id)d ",
-			" where d.tree_level<>0 ");
+			" where d.tree_level<>0 order by d.tree_level");
 		return createQuery(TAddressDto.class,sql,name,name,name).list();
 	}
 	

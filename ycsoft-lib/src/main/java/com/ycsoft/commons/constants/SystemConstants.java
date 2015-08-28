@@ -235,7 +235,7 @@ public class SystemConstants {
 	public final static String DEVICE_TYPE_STB = "STB";
 	public final static String DEVICE_TYPE_CARD = "CARD";
 	public final static String DEVICE_TYPE_MODEM = "MODEM";
-	public static final String DEVICE_TYPE_CTL = "CTL";
+	public static final String DEVICE_TYPE_FITTING = "FITTING";
 	
 	/**
 	 * 设备购买模式

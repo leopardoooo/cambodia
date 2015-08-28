@@ -869,7 +869,7 @@ public class DeviceAction extends BaseAction {
 	 */
 	public String saveMateralDeviceInput() throws Exception {
 		String batchNum = request.getParameter("batch_num");
-		String deviceType = request.getParameter("device_type");
+		String deviceType =  SystemConstants.DEVICE_TYPE_FITTING;
 		String deviceModel = request.getParameter("device_model");
 		String totalNum = request.getParameter("total_num");
 		deviceComponent.saveMateralDeviceInput(optr, deviceInput, batchNum,deviceType,deviceModel,totalNum);

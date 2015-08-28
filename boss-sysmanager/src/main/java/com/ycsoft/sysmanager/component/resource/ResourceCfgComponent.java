@@ -286,7 +286,7 @@ public class ResourceCfgComponent extends BaseComponent {
 			else
 				rDeviceModelDao.updateMateral(m.getDevice_type(),m.getDevice_model(),m.getModel_name());
 		}
-		memoryComponent.addDictSignal(DictKey.CTL_MODEL.toString());
+		memoryComponent.addDictSignal(DictKey.FITTING_MODEL.toString());
 	}
 	
 	/**
@@ -297,9 +297,7 @@ public class ResourceCfgComponent extends BaseComponent {
 	public void saveDeviceType(List<RDeviceType> list) throws Exception{
 		for(RDeviceType m: list){
 			if (rDeviceTypeDao.findByKey(m.getDevice_type())==null){
-				if(!m.getDevice_type().equals(SystemConstants.DEVICE_TYPE_STB) && 
-						!m.getDevice_type().equals(SystemConstants.DEVICE_TYPE_CARD) && 
-						!m.getDevice_type().equals(SystemConstants.DEVICE_TYPE_MODEM) ){
+				if(m.getDevice_type().equals(SystemConstants.DEVICE_TYPE_FITTING)){
 					m.setManage_detail(SystemConstants.BOOLEAN_FALSE);
 				}else{
 					m.setManage_detail(SystemConstants.BOOLEAN_TRUE);

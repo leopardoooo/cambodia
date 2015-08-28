@@ -39,7 +39,7 @@ public class CProdOrderDao extends BaseEntityDao<CProdOrder> {
 		
 	}
 	public List<CProdOrderDto> queryCustEffOrderDto(String custId) throws JDBCException{
-		String sql = "select c.billing_type, b.prod_name,b.prod_type,b.serv_id,b.is_base,e.prod_name package_name,c.tariff_name,d.disct_name, a.* "
+		String sql = "select c.billing_type, b.prod_name,b.prod_type,b.serv_id,b.is_base,e.prod_name package_name,nvl(d.disct_name,c.tariff_name) tariff_name,d.disct_name, a.* "
 				+ " from c_prod_order a,p_prod b,p_prod_tariff c,p_prod_tariff_disct d,p_prod e "
 				+ " where a.cust_id=? and a.prod_id=b.prod_id and a.package_id=e.prod_id(+) "
 				+ " and a.tariff_id=c.tariff_id(+) and a.disct_id= d.disct_id(+) "

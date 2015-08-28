@@ -63,6 +63,7 @@ public class QueryCustAction extends BaseBusiAction {
 	private String mnCustName;
 	private String promFeeSn;
 	private QueryFeeInfo queryFeeInfo;
+	private String paySn;
 	
 	/**
 	 * 所有账期
@@ -304,6 +305,22 @@ public class QueryCustAction extends BaseBusiAction {
 		return JSON_PAGE;
 	}
 
+	
+	/**
+	 * 查询订单
+	 * @return
+	 * @throws Exception
+	 */
+	public String queryFeePay() throws Exception{
+		getRoot().setPage(queryCustService.queryFeePay(residentCustId,queryFeeInfo, start, limit));
+		return JSON_PAGE;
+	}
+	
+	public String queryFeePayDetail() throws Exception{
+		getRoot().setRecords(queryCustService.queryFeePayDetail(paySn));
+		return JSON_RECORDS;
+	}
+	
 
 	/**
 	 * 根据居民客户的编号查找客户对应的单位信息
@@ -637,6 +654,10 @@ public class QueryCustAction extends BaseBusiAction {
 
 	public void setQueryFeeInfo(QueryFeeInfo queryFeeInfo) {
 		this.queryFeeInfo = queryFeeInfo;
+	}
+
+	public void setPaySn(String paySn) {
+		this.paySn = paySn;
 	}
 	
 }
