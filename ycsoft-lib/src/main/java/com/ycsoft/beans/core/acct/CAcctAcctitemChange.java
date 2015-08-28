@@ -37,7 +37,6 @@ public class CAcctAcctitemChange extends BusiBase implements Serializable {
 	private Integer inactive_done_code;
 	private String cometype;
 	private String acct_change_sn;
-	private String acct_active_sn;
 
 	private String fee_type_text;
 	private String change_type_text;
@@ -61,13 +60,6 @@ public class CAcctAcctitemChange extends BusiBase implements Serializable {
 		this.acct_change_sn = acct_change_sn;
 	}
 
-	public String getAcct_active_sn() {
-		return acct_active_sn;
-	}
-
-	public void setAcct_active_sn(String acct_active_sn) {
-		this.acct_active_sn = acct_active_sn;
-	}
 
 	/**
 	 * @return the change_type_text

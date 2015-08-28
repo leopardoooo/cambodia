@@ -1196,10 +1196,10 @@ public class DeviceComponent extends BaseDeviceComponent {
 		input.setBatch_num(batchNum);
 
 		String deviceId = null;
-		RDevice device = rDeviceDao.queryIdleMateralDevice(deviceType,deviceModel,depotId);
+		RDevice device = rDeviceDao.queryIdleMateralDevice(deviceModel,depotId);
 		if(device == null){
 			RDeviceModel model = rDeviceModelDao.lockModel(deviceModel);
-			device = rDeviceDao.queryIdleMateralDevice(deviceType,model.getDevice_model(),depotId);
+			device = rDeviceDao.queryIdleMateralDevice(model.getDevice_model(),depotId);
 			if(device != null){
 				deviceId = device.getDevice_id();
 			}
@@ -1582,10 +1582,10 @@ public class DeviceComponent extends BaseDeviceComponent {
 			String deviceModel = d.getDevice_model();
 			
 			String deviceId = null;
-			RDevice deviceChick = rDeviceDao.queryIdleMateralDevice(deviceType,deviceModel,depotId);
+			RDevice deviceChick = rDeviceDao.queryIdleMateralDevice(deviceModel,depotId);
 			if(deviceChick == null){
 				rDeviceModelDao.lockModel(deviceModel);
-				deviceChick = rDeviceDao.queryIdleMateralDevice(deviceType,deviceModel,depotId);
+				deviceChick = rDeviceDao.queryIdleMateralDevice(deviceModel,depotId);
 				if(deviceChick != null){
 					deviceId = deviceChick.getDevice_id();
 				}
@@ -1697,7 +1697,7 @@ public class DeviceComponent extends BaseDeviceComponent {
 			if(isMateral){
 				for(RDevice r : rList){
 					//原器材
-					RDevice device = rDeviceDao.queryIdleMateralDevice(r.getDevice_type(), r.getDevice_model(), r.getDepot_id());
+					RDevice device = rDeviceDao.queryIdleMateralDevice(r.getDevice_model(), r.getDepot_id());
 					Integer oldValue = device.getTotal_num();
 					Integer newValue = oldValue + r.getTotal_num();
 					//总数异动记录
@@ -1720,13 +1720,12 @@ public class DeviceComponent extends BaseDeviceComponent {
 				for(RDevice r : rList){
 					String deviceId = r.getDevice_id();
 					String deviceModel = r.getDevice_model();
-					String deviceType = r.getDevice_type();
 					//查询 是否已经存在该型号
-					RDevice deviceChick = rDeviceDao.queryIdleMateralDevice(deviceType,deviceModel,transfer.getDepot_order());
+					RDevice deviceChick = rDeviceDao.queryIdleMateralDevice(deviceModel,transfer.getDepot_order());
 					boolean key = false;
 					if(deviceChick == null){
 						rDeviceModelDao.lockModel(deviceModel);
-						deviceChick = rDeviceDao.queryIdleMateralDevice(deviceType,deviceModel,transfer.getDepot_order());
+						deviceChick = rDeviceDao.queryIdleMateralDevice(deviceModel,transfer.getDepot_order());
 						if(deviceChick == null){
 							//调拨成功 ，改成目标仓库，改状态
 							rDeviceDao.updateMateralTransferDepot(deviceId, transfer.getDepot_order());

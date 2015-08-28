@@ -376,7 +376,7 @@ Ext.apply( App, {
 				if(count > 0){
 					Ext.get('tool').insertHtml("beforeEnd",'<div id="payAllContainer">'
 							+'<div class="amount">您有<b>'+ count +'</b>笔待支付,共<b>'+ payfeeAmount/100.0 +'</b></div>' 
-							+'<div class="nowToPayBtn"><button onclick="App.openPay()">现在支付</button></div>'
+							+'<div class="nowToPayBtn"><button onclick="App.openPay()">现金支付</button></div>'
 						+'</div>');
 				}
 			}

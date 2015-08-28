@@ -869,9 +869,9 @@ public class DeviceComponent extends BaseBusiComponent {
 		}
 	}
 	
-	public RDevice queryTotalNumDevice(String deviceType, String deviceModel,String deptId) throws Exception{
+	public RDevice queryTotalNumDevice(String deviceModel,String deptId) throws Exception{
 		//原器材
-		RDevice device = rDeviceDao.queryIdleMateralDevice(deviceType, deviceModel, deptId);
+		RDevice device = rDeviceDao.queryIdleMateralDevice(deviceModel, deptId);
 		if(device == null){
 			throw new ComponentException(ErrorCode.DeviceNotExists);
 		}
@@ -900,6 +900,29 @@ public class DeviceComponent extends BaseBusiComponent {
 		}
 		return deviceList;
 	}
+	
+	public List<RDeviceModelTotalDto> queryDeviceCanBuy(String dept_id) throws Exception{		
+		List<RDeviceModelTotalDto> list = new ArrayList<RDeviceModelTotalDto>(); 
+		
+		List<RDevice>  deviceList=  rDeviceDao.queryMateralDeviceByDepotId(dept_id);
+		for(RDevice dto : deviceList){
+			RDeviceModelTotalDto f = new RDeviceModelTotalDto();
+			f.setDevice_model_text(dto.getDevice_model_text());
+			f.setDevice_model(dto.getDevice_model());
+			f.setTotal_num(dto.getTotal_num());
+			List<RDeviceFee> fList = queryDeviceFee(dto.getDevice_type(), dto.getDevice_model(), SystemConstants.BUSI_BUY_MODE_BUY);
+			if(fList.size()>0){
+				f.setFee_id(fList.get(0).getFee_id());
+				f.setFee_value(fList.get(0).getFee_value());
+				f.setFee_std_id(fList.get(0).getFee_std_id());
+			}else{
+				f.setFee_value(0);
+			}
+			list.add(f);
+		}
+		return list;
+	}
+	
 	
 	public void setCValuableCardHisDao(CValuableCardHisDao valuableCardHisDao) {
 		cValuableCardHisDao = valuableCardHisDao;
@@ -1021,6 +1044,8 @@ public class DeviceComponent extends BaseBusiComponent {
 	public void setRDeviceModelDao(RDeviceModelDao deviceModelDao) {
 		this.rDeviceModelDao = deviceModelDao;
 	}
+
+
 
 	
 }

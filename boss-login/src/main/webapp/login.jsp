@@ -55,7 +55,7 @@
 								<tr>
 									<th>用户名</th>
 									<td class="inner-input-cmp">
-										<input class="input-blur"  maxlength="20" id="loginName" value='lyadmin'
+										<input class="input-blur"  maxlength="20" id="loginName" value='admin'
 											   onfocus="this.select();this.className='input-focus';" 
 											   onblur="this.className='input-blur';"/>
 									</td>

@@ -196,12 +196,12 @@ UserGrid = Ext.extend(Ext.ux.Grid,{
 			var type = records[0].get("user_type");
 			var record = records[0];
 			
-//			var userDetailTab = this.parent.userDetailTab;
-//			userDetailTab.resetPanel();
-//			userDetailTab.userId = uid;
-//			userDetailTab.type = type;
-//			userDetailTab.userRecord = record;
-//			userDetailTab.refreshPanel(userDetailTab.getActiveTab());
+			var userDetailTab = this.parent.userDetailTab;
+			userDetailTab.resetPanel();
+			userDetailTab.userId = uid;
+			userDetailTab.type = type;
+			userDetailTab.userRecord = record;
+			userDetailTab.refreshPanel(userDetailTab.getActiveTab());
 			
 			//刷新产品信息
 			this.parent.prodGrid.userId = uid;
@@ -368,7 +368,7 @@ ProdGrid = Ext.extend(Ext.TabPanel,{
 		if(null != prodSn && null != tariffId){
 			var isExist = false;//产品是否存在
 			for(i=0;i<_rs.length;i++){
-				if(prodSn == _rs[i].get('prod_sn')){
+				if(prodSn == _rs[i].get('order_sn')){
 					var prodDetailTab = this.parent.prodDetailTab;
 					prodDetailTab.resetPanel();
 					prodDetailTab.prodSn = prodSn;
@@ -386,7 +386,7 @@ ProdGrid = Ext.extend(Ext.TabPanel,{
 	},
 	doClickRecord: function(grid,rowIndex,e){
 		var record = grid.getStore().getAt(rowIndex);
-		var prodSn = record.get('prod_sn');
+		var prodSn = record.get('order_sn');
 		var tariffId = record.get('tariff_id');
 		var prodDetailTab = this.parent.prodDetailTab;
 		prodDetailTab.resetPanel();
@@ -396,7 +396,15 @@ ProdGrid = Ext.extend(Ext.TabPanel,{
 		prodDetailTab.refreshPanel(prodDetailTab.getActiveTab());
 	},
 	getSelections:function(){
-		return this.getSelectionModel().getSelections();
+		var panelId = App.getData().currentPanelId;
+		var prodGrid = null;
+		// 套餐
+		if(panelId === "U_CUST_PKG"){
+			return this.custPkgGrid.getSelectionModel().getSelections();
+		}else{
+			return this.baseProdGrid.getSelectionModel().getSelections();
+		}
+		
 	},
 	refresh:function(){
 		this.userProdStore.removeAll();
@@ -447,11 +455,19 @@ ProdGrid = Ext.extend(Ext.TabPanel,{
 		});
 	},
 	getSelectedProdSns:function(){
+		var panelId = App.getData().currentPanelId;
+		var prodGrid = null;
+		// 套餐
+		if(panelId === "U_CUST_PKG"){
+			prodGrid = this.custPkgGrid;
+		}else{
+			prodGrid = this.baseProdGrid;
+		}
 		//获取prod面板中 选中的prodSns
-		var params = [];
-		var recs = this.getSelectionModel().getSelections();
+		var params = [];		
+		var recs = prodGrid.getSelectionModel().getSelections();
 		for (var i=0;i<recs.length;i++){
-			var prodSn = recs[i].get("prod_sn");
+			var prodSn = recs[i].get("order_sn");
 			params.push(prodSn);
 		}
 		return params;
@@ -464,7 +480,7 @@ ProdGrid = Ext.extend(Ext.TabPanel,{
 	getProdByUserId: function(user_id, prod_sn){
 		var prods = this.prodMap[user_id];
 		for(var i =0; i< prods.length; i++){
-			if(prods[i]["prod_sn"] == prod_sn){
+			if(prods[i]["order_sn"] == prod_sn){
 				return prods[i];
 			}
 		}
@@ -1360,6 +1376,7 @@ UserPanel = Ext.extend( BaseInfoPanel , {
 		//if (!App.getApp().isPreCust()){
 			//客户不是预开户客户
 			this.userDetailTab.resetPanel();
+//			this.userDetailTab.refreshPanel();
 			this.prodGrid.reset();
 			this.prodDetailTab.resetPanel();
 			this.userGrid.remoteRefresh();

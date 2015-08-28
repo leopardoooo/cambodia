@@ -636,6 +636,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 				}
 			}
 		}
+		saveAllPublic(doneCode,getBusiParam());
 		
 	}
 
@@ -1042,7 +1043,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		Date effDate = null;
 		CProdPropChange statusChange =new CProdPropChange();
 		statusChange.setChange_time(new Date(order.getStatus_date().getTime()));
-		statusChange.setOld_value(order.getStatus());
+		statusChange.setNew_value(StatusConstants.ACTIVE);
 		//cProdPropChangeDao.queryLastStatus(order.getOrder_sn(), order.getCounty_id());
 		if (statusChange == null)
 			throw new ServicesException("找不到产品报停记录，请联系管理员");
@@ -1069,7 +1070,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		
 		List<CProdPropChange> changeList = new ArrayList<CProdPropChange>();
 		changeList.add(new CProdPropChange("status",
-				order.getStatus(),statusChange.getOld_value()));
+				order.getStatus(),statusChange.getNew_value()));
 		changeList.add(new CProdPropChange("status_date",
 				DateHelper.dateToStr(order.getStatus_date()),DateHelper.dateToStr(new Date())));
 		changeList.add(new CProdPropChange("exp_date",DateHelper.dateToStr(order.getExp_date()),

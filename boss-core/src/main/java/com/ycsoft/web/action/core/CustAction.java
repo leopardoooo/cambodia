@@ -330,6 +330,20 @@ public class CustAction extends BaseBusiAction{
 		custService.saveBuyMaterial(deviceType, deviceModel, buyMode, feeInfoList,buyNum);
 		return JSON;
 	}
+	
+	
+	public String bacthBuyMaterial() throws Exception {
+		String feeInfo = request.getParameter("feeInfo");
+		List<FeeInfoDto> feeInfoList = new ArrayList<FeeInfoDto>();
+		if(StringHelper.isNotEmpty(feeInfo)){
+			Type type = new TypeToken<List<FeeInfoDto>>(){}.getType();
+			Gson gson = new Gson();
+			feeInfoList = gson.fromJson(feeInfo, type);
+		}
+		
+//		custService.saveBuyMaterial(deviceType, deviceModel, buyMode, feeInfoList,buyNum);
+		return JSON;
+	}
 
 	/**
 	 * 设备挂失

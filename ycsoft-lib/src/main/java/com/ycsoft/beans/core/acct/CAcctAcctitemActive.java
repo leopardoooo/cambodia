@@ -14,7 +14,7 @@ import com.ycsoft.daos.config.POJO;
 /**
  * CAcctAcctitemActive -> C_ACCT_ACCTITEM_ACTIVE mapping
  */
-@POJO(tn = "C_ACCT_ACCTITEM_ACTIVE", sn = "SEQ_ACCT_ACTIVE_SN", pk = "ACCT_ACTIVE_SN")
+@POJO(tn = "C_ACCT_ACCTITEM_ACTIVE", sn = "", pk = "")
 public class CAcctAcctitemActive extends CountyBase implements Serializable {
 
 	// CAcctAcctitemActive all properties
@@ -27,7 +27,6 @@ public class CAcctAcctitemActive extends CountyBase implements Serializable {
 	private String acctitem_id;
 	private String fee_type;
 	private Integer balance;
-	private String acct_active_sn;
 	
 	private String fee_type_text;
 
@@ -36,17 +35,6 @@ public class CAcctAcctitemActive extends CountyBase implements Serializable {
 	 */
 	public CAcctAcctitemActive() {
 	}
-
-	
-	public String getAcct_active_sn() {
-		return acct_active_sn;
-	}
-
-
-	public void setAcct_active_sn(String acct_active_sn) {
-		this.acct_active_sn = acct_active_sn;
-	}
-
 
 	// acct_id getter and setter
 	public String getAcct_id() {

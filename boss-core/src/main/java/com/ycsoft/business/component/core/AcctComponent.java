@@ -362,10 +362,9 @@ public class AcctComponent  extends BusiConfigComponent {
 					activeItem.setFee_type(feeType);
 					activeItem.setArea_id(getOptr().getArea_id());
 					activeItem.setCounty_id(getOptr().getCounty_id());
-					activeItem.setAcct_active_sn(cAcctAcctitemActiveDao.findSequence().toString());
 					cAcctAcctitemActiveDao.save(activeItem);
 					
-					acct_change_sn=saveAcctitemChange(activeItem.getAcct_active_sn(),doneCode, busi_code, cust_id, acctId,
+					acct_change_sn=saveAcctitemChange(doneCode, busi_code, cust_id, acctId,
 							SystemConstants.ACCTITEM_PUBLIC_ID, changeType, orderFee.getFee_type(), orderFee.getOutput_fee(), preFee, null);
 				}else{
 					preFee=activeItem.getBalance();
@@ -503,31 +502,6 @@ public class AcctComponent  extends BusiConfigComponent {
 		return change.getAcct_change_sn();
 	}
 	
-	public String saveAcctitemChange(String acct_active_sn,Integer doneCode, String busiCode,
-			String custId, String acctId, String acctItemId, String changeType,
-			String feeType, int fee, int preFee, Integer inactiveDoneCode) throws Exception {
-		// 增加资金异动
-		CAcctAcctitemChange change = new CAcctAcctitemChange();
-		change.setDone_code(doneCode);
-		change.setBusi_code(busiCode);
-		change.setCust_id(custId);
-		change.setAcct_id(acctId);
-		change.setAcctitem_id(acctItemId);
-		change.setChange_type(changeType);
-		change.setFee_type(feeType);
-		change.setFee(fee + preFee);
-		change.setPre_fee(preFee);
-		change.setChange_fee(fee);
-		change.setBilling_cycle_id(DateHelper.nowYearMonth());
-		change.setArea_id(getOptr().getArea_id());
-		change.setCounty_id(getOptr().getCounty_id());
-		change.setInactive_done_code(inactiveDoneCode);
-		change.setAcct_change_sn(cAcctAcctitemChangeDao.findSequence().toString());
-		change.setAcct_active_sn(acct_active_sn);
-		
-		cAcctAcctitemChangeDao.save(change);
-		return change.getAcct_change_sn();
-	}
 	
 	public void updateInactiveBanlance(String sn, String acctId, String acctItemId, int fee) throws Exception {
 		cAcctAcctitemInactiveDao.updateBanlance(sn, acctId, acctItemId,fee);

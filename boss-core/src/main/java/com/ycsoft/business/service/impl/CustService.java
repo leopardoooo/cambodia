@@ -519,7 +519,7 @@ public class CustService extends BaseBusiService implements ICustService {
 		// 获取业务流水
 		Integer doneCode = doneCodeComponent.gDoneCode();
 		//获取本地该器材的数量
-		RDevice device = deviceComponent.queryTotalNumDevice(deviceType, deviceModel, getOptr().getDept_id());
+		RDevice device = deviceComponent.queryTotalNumDevice(deviceModel, getOptr().getDept_id());
 		//本地器材数量减去已购数量
 		deviceComponent.removeTotalNumDevice(device.getDevice_id(), buyNum);
 		
@@ -2139,10 +2139,9 @@ public class CustService extends BaseBusiService implements ICustService {
 		this.taskComponent.saveTaskFinish(taskId, success, failureCause, finishTime);
 	}
 
-	@Override
-	public List<?> queryDeviceCanBuy(SOptr optr) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+	public List<RDeviceModelTotalDto> queryDeviceCanBuy(SOptr optr) throws Exception {
+		
+		return deviceComponent.queryDeviceCanBuy(optr.getDept_id());
 	}
 	
 }

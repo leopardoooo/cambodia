@@ -814,10 +814,10 @@ public class RDeviceDao extends BaseEntityDao<RDevice> {
 				.setStart(start).setLimit(limit).page();
 	}
 
-	public RDevice queryIdleMateralDevice(String deviceType, String deviceModel,String depotId) throws Exception {
+	public RDevice queryIdleMateralDevice(String deviceModel,String depotId) throws Exception {
 		String sql = "select * from r_device where depot_id=? and device_type=? and device_model=? and device_status=? "
 				+ "and depot_status=? and tran_status=?";
-		return createQuery(RDevice.class, sql,depotId,deviceType,deviceModel,
+		return createQuery(RDevice.class, sql,depotId,deviceModel,
 				StatusConstants.ACTIVE,StatusConstants.IDLE,StatusConstants.IDLE).first();
 	}
 	

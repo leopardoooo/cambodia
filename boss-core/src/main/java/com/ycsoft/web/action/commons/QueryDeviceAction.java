@@ -7,7 +7,6 @@ import java.util.Map;
 
 import org.springframework.stereotype.Controller;
 
-import com.ycsoft.beans.core.cust.CCustDevice;
 import com.ycsoft.business.dto.device.DeviceDto;
 import com.ycsoft.business.service.ICustService;
 import com.ycsoft.business.service.IValuableCardService;

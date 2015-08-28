@@ -464,6 +464,6 @@ public interface ICustService extends IBaseService{
 	 */
 	public RDeviceFee queryFeeByModel(String deviceType, String oldModel,String newModel) throws Exception;
 
-	public List<?> queryDeviceCanBuy(SOptr optr) throws Exception;
+	public List<RDeviceModelTotalDto> queryDeviceCanBuy(SOptr optr) throws Exception;
 
 }
