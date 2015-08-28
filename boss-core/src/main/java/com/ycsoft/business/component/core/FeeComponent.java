@@ -1770,6 +1770,8 @@ public class FeeComponent extends BaseBusiComponent {
 		List<FeeDto> list = cFeePayDao.queryFeePayDetail(paySn);
 		return list;
 	}
+	
+	
 
 	/**
 	 * @param docItemDao the cDocItemDao to set
@@ -1835,5 +1837,6 @@ public class FeeComponent extends BaseBusiComponent {
 			CAcctAcctitemInactiveDao acctAcctitemInactiveDao) {
 		cAcctAcctitemInactiveDao = acctAcctitemInactiveDao;
 	}
+
 
 }

@@ -2849,5 +2849,32 @@ Ext.apply(MenuHandler, {
 	  	}
 		App.getApp().openBusiPrint(true);
 	  	return false;
-	}	
+	},
+	PublicAcctRecharge:function(){
+		if (!hasCust())
+			return false;
+		var acctStore = App.getApp().main.infoPanel.getAcctPanel().acctItemGrid.getStore();
+		if (acctStore.getCount() > 1) {
+			Alert("目前只支持单个公用账目！");
+			return false;
+		}
+		return {
+			width : 450,
+			height : 300
+		};
+	},
+	PublicAcctRefund:function(){
+		if (!hasCust())
+			return false;
+		var acctStore = App.getApp().main.infoPanel.getAcctPanel().acctItemGrid.getStore();
+		if (acctStore.getCount() > 1) {
+			Alert("目前只支持单个公用账目！");
+			return false;
+		}
+		return {
+			width : 450,
+			height : 400
+		};
+	}
+	
 });

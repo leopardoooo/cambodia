@@ -31,4 +31,8 @@ public interface IOrderService extends IBaseService{
 
 	public List<CProdOrderFollowPay> queryFollowPayOrderDto(String custId) throws Exception;
 
+	public void savePublicRecharge(String pay_type, Integer fee, String receipt_id)throws Exception;
+
+	public void savePublicRefund(Integer fee)throws Exception;
+
 }

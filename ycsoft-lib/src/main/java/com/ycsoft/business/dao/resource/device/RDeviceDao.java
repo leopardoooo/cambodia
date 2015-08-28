@@ -817,7 +817,7 @@ public class RDeviceDao extends BaseEntityDao<RDevice> {
 	public RDevice queryIdleMateralDevice(String deviceModel,String depotId) throws Exception {
 		String sql = "select * from r_device where depot_id=? and device_type=? and device_model=? and device_status=? "
 				+ "and depot_status=? and tran_status=?";
-		return createQuery(RDevice.class, sql,depotId,deviceModel,
+		return createQuery(RDevice.class, sql,depotId,SystemConstants.DEVICE_TYPE_FITTING,deviceModel,
 				StatusConstants.ACTIVE,StatusConstants.IDLE,StatusConstants.IDLE).first();
 	}
 	

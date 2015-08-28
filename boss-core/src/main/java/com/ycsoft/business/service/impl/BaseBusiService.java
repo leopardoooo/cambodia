@@ -1350,7 +1350,7 @@ public class BaseBusiService extends BaseService {
 			custId = this.getBusiParam().getCust().getCust_id();
 		}
 		
-		String payType = SystemConstants.PAY_TYPE_CASH;
+		String payType = SystemConstants.PAY_TYPE_UNPAY;
 		if (this.getBusiParam().getPay()!= null && this.getBusiParam().getPay().getPay_type() !=null)
 			payType = this.getBusiParam().getPay().getPay_type();
 		String busiCode = this.getBusiParam().getBusiCode();

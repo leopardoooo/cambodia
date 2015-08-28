@@ -14,6 +14,8 @@ public enum ErrorCode {
 	CustSeqIsNull("系统未正确配置客户序列号,客户前缀号=%s"),
 	UnPayLock("客户被锁定,请等待%s(%s)完成支付!"),
 	
+	AcctBalanceError("资金余额出现负数！"),
+	
 	ExchangeConfigError("系统未正确配置汇率，请联系管理员"),
 	
 	NotCancleHasUnPay("产品含有未支付订单，不能退订"),

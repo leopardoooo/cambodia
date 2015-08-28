@@ -26,6 +26,7 @@ import com.ycsoft.commons.exception.ServicesException;
 import com.ycsoft.commons.helper.DateHelper;
 import com.ycsoft.commons.helper.FileHelper;
 import com.ycsoft.commons.helper.StringHelper;
+import com.ycsoft.sysmanager.dto.resource.RDeviceModelTotalDto;
 import com.ycsoft.web.commons.abstracts.BaseBusiAction;
 
 /**
@@ -332,16 +333,21 @@ public class CustAction extends BaseBusiAction{
 	}
 	
 	
+	/**
+	 * 批量购买器材
+	 * @return
+	 * @throws Exception
+	 */
 	public String bacthBuyMaterial() throws Exception {
 		String feeInfo = request.getParameter("feeInfo");
-		List<FeeInfoDto> feeInfoList = new ArrayList<FeeInfoDto>();
+		List<RDeviceModelTotalDto> feeInfoList = new ArrayList<RDeviceModelTotalDto>();
 		if(StringHelper.isNotEmpty(feeInfo)){
-			Type type = new TypeToken<List<FeeInfoDto>>(){}.getType();
+			Type type = new TypeToken<List<RDeviceModelTotalDto>>(){}.getType();
 			Gson gson = new Gson();
 			feeInfoList = gson.fromJson(feeInfo, type);
 		}
 		
-//		custService.saveBuyMaterial(deviceType, deviceModel, buyMode, feeInfoList,buyNum);
+		custService.saveBacthBuyMaterial(feeInfoList);
 		return JSON;
 	}
 

@@ -136,12 +136,4 @@ public class RDeviceModel {
 		return is_virtual_text;
 	}
 
-	public void setDevice_type_text(String device_type_text) {
-		this.device_type_text = device_type_text;
-	}
-
-	public void setDevice_model_text(String device_model_text) {
-		this.device_model_text = device_model_text;
-	}
-
 }

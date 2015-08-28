@@ -15,7 +15,7 @@ var MaterialDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 			columns : [
 				{header:'器材编号',dataIndex:'device_id',width:250,hidden:true},
 				{header:'器材型号',dataIndex:'device_model_text',width:250},
-				{header:'单价',dataIndex:'fee_value',width:100,renderer:Ext.util.Format.convertToYuan},
+				{header:'单价',dataIndex:'fee_value',width:100,renderer:Ext.util.Format.formatFee},
 				{header:'库存数量',dataIndex:'total_num',width:100,renderer:App.qtipValue},
 				{id:'buy_num_id',header:'购买数量',dataIndex:'buy_num',width:100,
 					scope:this
@@ -24,7 +24,8 @@ var MaterialDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 		    			allowNegative:false,
 		    			minValue:1//enableKeyEvents: true,
 					})
-				}
+				},
+				{header:'总价',dataIndex:'fee_back',width:100}
 			]
         });
 		cm.isCellEditable = this.cellEditable;
@@ -99,7 +100,7 @@ var MaterialDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 				//计算金额
 				var fee = value*record.get('fee_value');
 				record.set('fee', fee);
-				record.set('fee_back', Ext.util.Format.convertToYuan(fee));
+				record.set('fee_back', Ext.util.Format.formatFee(fee));
 			}else if(value == 0){
 				return false;
 			}
@@ -110,20 +111,23 @@ var MaterialDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 		var arr = [],data;
 		this.store.each(function(record){
 			data = record.data;
-			var obj = {};
-			obj["device_model"] = data['device_model'];
-			obj["fee_id"] = data['fee_id'];
-			obj["fee_std_id"] = data['fee_std_id'];
-			obj['buy_num'] = data['buy_num'];
-			obj['fee'] = data['fee_value']*data['buy_num'];
-			arr.push(obj);
+			if(data['buy_num']>0){
+				var obj = {};
+				obj["device_model"] = data['device_model'];
+				obj["fee_id"] = data['fee_id'];
+				obj["fee_std_id"] = data['fee_std_id'];
+				obj['buy_num'] = data['buy_num'];
+				obj['fee'] = data['fee'];
+				obj['fee_value'] = data['fee_value'];
+				arr.push(obj);
+			}
 		},this);
 		return arr;
 	}
 });
 
 BacthBuyMaterialForm = Ext.extend( BaseForm , {
-	url : Constant.ROOT_PATH + "/core/x/Cust!buyMaterial.action",
+	url : Constant.ROOT_PATH + "/core/x/Cust!bacthBuyMaterial.action",
 	success : function(){
 		App.getApp().refreshPayInfo(parent);
 		App.getApp().refreshPanel(App.getApp().getData().currentResource.busicode);
@@ -145,15 +149,15 @@ BacthBuyMaterialForm = Ext.extend( BaseForm , {
 		});
 	},
 	getValues: function(){
-		var all = {'payFeesData':Ext.encode(this.materialDeviceGrid.getValues())};
+		var all = {'feeInfo':Ext.encode(this.materialDeviceGrid.getValues())};
 		return all;
 	},
 	doValid: function(){
-		var data = this.panel.getValues();
 		
+		var data = this.materialDeviceGrid.getValues();
 		if(data.length==0){
 			var obj = {};
-			obj['msg'] = '器材不能为空';
+			obj['msg'] = '请输入购买数量';
 			obj['isValid'] = false;
 			return obj;
 		}
