@@ -2622,4 +2622,35 @@ public class AcctComponent  extends BusiConfigComponent {
 		
 		this.cAcctAcctitemInvalidDao.save(acctitemInvalid);
 	}
+
+	public void savePublicRecharge(String acctId, String acctItemId, String payType, Integer fee,
+			String receiptId, Integer doneCode, String custId,
+			String busiCode) throws Exception{
+		
+		String changeType=SystemConstants.ACCT_CHANGE_PAY;
+		int preFee=0;
+		cAcctAcctitemDao.updateActiveBanlance(acctId, acctItemId, fee,0,0,0, getOptr().getCounty_id());
+		
+		CAcctAcctitemActive activeItem = cAcctAcctitemActiveDao.queryAcctItemActive(acctId, acctItemId, payType, getOptr().getCounty_id());
+		if(activeItem==null){
+			activeItem = new CAcctAcctitemActive();
+			activeItem.setAcct_id(acctId);
+			activeItem.setAcctitem_id(acctItemId);
+			activeItem.setBalance(fee);
+			activeItem.setFee_type(payType);
+			activeItem.setArea_id(getOptr().getArea_id());
+			activeItem.setCounty_id(getOptr().getCounty_id());
+			cAcctAcctitemActiveDao.save(activeItem);
+		}else{
+			preFee=activeItem.getBalance();
+			cAcctAcctitemActiveDao.updateBanlance(acctId, acctItemId,
+					payType, fee, getOptr().getCounty_id());
+			
+		}
+		saveAcctitemChange(doneCode, busiCode, custId, acctId,
+				acctItemId, changeType, payType, fee, preFee, null);
+		
+	}
+	
+	
 }

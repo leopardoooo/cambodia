@@ -10,9 +10,27 @@ public class RDeviceModelTotalDto extends RDeviceModel{
 	private Integer fee_value;
 	private String fee_std_id;
 	private String fee_id;
+	private Integer fee;
+	private Integer buy_num;
 	
 	
+
 	
+	public Integer getBuy_num() {
+		return buy_num;
+	}
+
+	public void setBuy_num(Integer buy_num) {
+		this.buy_num = buy_num;
+	}
+
+	public Integer getFee() {
+		return fee;
+	}
+
+	public void setFee(Integer fee) {
+		this.fee = fee;
+	}
 
 	public String getFee_std_id() {
 		return fee_std_id;

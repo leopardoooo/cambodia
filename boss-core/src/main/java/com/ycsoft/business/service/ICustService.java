@@ -466,4 +466,6 @@ public interface ICustService extends IBaseService{
 
 	public List<RDeviceModelTotalDto> queryDeviceCanBuy(SOptr optr) throws Exception;
 
+	public void saveBacthBuyMaterial(List<RDeviceModelTotalDto> feeInfoList) throws Exception;
+
 }

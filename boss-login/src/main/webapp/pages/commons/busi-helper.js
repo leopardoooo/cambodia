@@ -448,7 +448,7 @@ Ext.apply( App, {
 			panel.getAcctPanel().acctGrid.remoteRefresh();
 		}
 /****************账户面板相关业务*************************/
-		else if(busiCode == '1040'){//缴费，刷新账户 、用户，费用
+		else if(busiCode == '1040' || busiCode == '1110' || busiCode == '1112'){//缴费，刷新账户 、用户，费用
 			panel.getAcctPanel().acctGrid.remoteRefresh();
 			if (!unitRefresh)
 				panel.getUserPanel().userGrid.remoteRefresh();

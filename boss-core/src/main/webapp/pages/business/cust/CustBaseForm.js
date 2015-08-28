@@ -252,6 +252,23 @@ LinkPanel = Ext.extend(Ext.Panel,{
 						name:'linkman.linkman_name',
 						xtype:'textfield'
 					},{
+						fieldLabel:'证件类型',
+						xtype:'paramcombo',
+						allowBlank:false,
+						hiddenName:'linkman.cert_type',
+						paramName:'CERT_TYPE',
+						defaultValue:'SFZ',
+						listeners:{
+							scope:this,
+							'select': function(){
+								var field = Ext.getCmp("linkman_cert_num_el");
+								var value = field.getValue();
+								if(value && this.doCertNumChange(field, value, value) === false){
+									field.reset();
+								}
+							}
+						}
+					},{
 						fieldLabel:'固定电话',
 						name:'linkman.tel',
 						xtype:'textfield',
@@ -277,6 +294,18 @@ LinkPanel = Ext.extend(Ext.Panel,{
 						hiddenName:'linkman.sex',
 						xtype:'paramcombo',
 						paramName:'SEX'
+					},{
+						fieldLabel:'证件号码',
+						xtype:'textfield',
+						vtype: 'alphanum',
+						width : 130,
+						allowBlank:false,
+						name:'linkman.cert_num',
+						id: 'linkman_cert_num_el',
+						listeners:{
+							scope:this,
+							'change':this.doCertNumChange
+						}
 					},{
 						fieldLabel:'手机',
 						name:'linkman.mobile',
@@ -313,6 +342,66 @@ LinkPanel = Ext.extend(Ext.Panel,{
 				xtype:'textarea'
 			}]
 		})
+	},
+	/**
+	 * 证件号码改变后，判断如果证件类型是身份证，则号码必须为15或者18位
+	 */
+	doCertNumChange:function(txt,value,oldValue){
+		var certType = this.find('hiddenName','linkman.cert_type')[0].getValue();
+		if (certType =="SFZ"){
+			if (!Ext.form.VTypes.IDNum(value)){
+				if(value.length != 18 && value.length != 15){
+					txt.setValue(oldValue);
+				}
+				Alert(Ext.form.VTypes.IDNumText);
+				return false
+			}else{
+				if(value.length == 18){//18位身份证
+					//设置生日
+					var dateStr = value.substring(6,14);
+					var year = dateStr.substring(0,4);
+					var month = dateStr.substring(4,6);
+					var day = dateStr.substring(6,8);
+					var date = Date.parseDate(year+"-"+month+"-"+day,'Y-m-d');
+					Ext.getCmp('linkmanBirthday').setValue(date);
+					
+					//设置性别
+					var num = value.substring(value.length -2 ,value.length-1);
+					var index = 0;
+					var sex = Ext.getCmp('linkmanSex');
+					if(num%2 == 0){
+						index = sex.getStore().find('item_value','FEMALE');
+					}else{
+						index = sex.getStore().find('item_value','MALE');
+					}
+					sex.setValue(sex.getStore().getAt(index).get('item_value'))
+				}else{//15位身份证
+					//设置生日
+					var dateStr = value.substring(6,12);
+					var year = '19' + dateStr.substring(0,2);
+					var month = dateStr.substring(2,4);
+					var day = dateStr.substring(4,6);
+					var date = Date.parseDate(year+"-"+month+"-"+day,'Y-m-d');
+					Ext.getCmp('linkmanBirthday').setValue(date);
+					
+					//设置性别
+					var num = value.substring(value.length -1 ,value.length);
+					var index = 0;
+					var sex = Ext.getCmp('linkmanSex');
+					if(num%2 == 0){
+						index = sex.getStore().find('item_value','FEMALE');
+					}else{
+						index = sex.getStore().find('item_value','MALE');
+					}
+					sex.setValue(sex.getStore().getAt(index).get('item_value'))
+				}
+				
+				
+				
+			}
+		}
+		
+		return true;
 	}
 });
 /**
@@ -422,50 +511,6 @@ CustBaseForm = Ext.extend( BaseForm , {
 			,{
 				xtype : 'hidden',
 				id : 'tempCustAddress'
-			},{
-				layout:'column',
-				baseCls: 'x-plain',
-				anchor: '100%',
-				defaults:{
-					baseCls: 'x-plain',
-					columnWidth:0.5,
-					layout: 'form',
-					labelWidth: 75
-				},
-				items: [{
-					items:[{
-						fieldLabel:'证件类型',
-						xtype:'paramcombo',
-						allowBlank:false,
-						hiddenName:'linkman.cert_type',
-						paramName:'CERT_TYPE',
-						defaultValue:'SFZ',
-						listeners:{
-							scope:this,
-							'select': function(){
-								var field = Ext.getCmp("linkman_cert_num_el");
-								var value = field.getValue();
-								if(value && this.doCertNumChange(field, value, value) === false){
-									field.reset();
-								}
-							}
-						}
-					}]
-				},{
-					items:[{
-						fieldLabel:'证件号码',
-						xtype:'textfield',
-						vtype: 'alphanum',
-						width : 130,
-						allowBlank:false,
-						name:'linkman.cert_num',
-						id: 'linkman_cert_num_el',
-						listeners:{
-							scope:this,
-							'change':this.doCertNumChange
-						}
-					}]
-				}]
 			},this.residentForm,this.linkPanel,this.extAttrForm]
 //            }]
 		});
@@ -562,66 +607,6 @@ CustBaseForm = Ext.extend( BaseForm , {
 		App.form.initComboData( this.linkPanel.findByType("paramcombo"));
 		this.doLayout();
 		this.oldCustType = custType;
-	},
-	/**
-	 * 证件号码改变后，判断如果证件类型是身份证，则号码必须为15或者18位
-	 */
-	doCertNumChange:function(txt,value,oldValue){
-		var certType = this.find('hiddenName','linkman.cert_type')[0].getValue();
-		if (certType =="SFZ"){
-			if (!Ext.form.VTypes.IDNum(value)){
-				if(value.length != 18 && value.length != 15){
-					txt.setValue(oldValue);
-				}
-				Alert(Ext.form.VTypes.IDNumText);
-				return false
-			}else{
-				if(value.length == 18){//18位身份证
-					//设置生日
-					var dateStr = value.substring(6,14);
-					var year = dateStr.substring(0,4);
-					var month = dateStr.substring(4,6);
-					var day = dateStr.substring(6,8);
-					var date = Date.parseDate(year+"-"+month+"-"+day,'Y-m-d');
-					Ext.getCmp('linkmanBirthday').setValue(date);
-					
-					//设置性别
-					var num = value.substring(value.length -2 ,value.length-1);
-					var index = 0;
-					var sex = Ext.getCmp('linkmanSex');
-					if(num%2 == 0){
-						index = sex.getStore().find('item_value','FEMALE');
-					}else{
-						index = sex.getStore().find('item_value','MALE');
-					}
-					sex.setValue(sex.getStore().getAt(index).get('item_value'))
-				}else{//15位身份证
-					//设置生日
-					var dateStr = value.substring(6,12);
-					var year = '19' + dateStr.substring(0,2);
-					var month = dateStr.substring(2,4);
-					var day = dateStr.substring(4,6);
-					var date = Date.parseDate(year+"-"+month+"-"+day,'Y-m-d');
-					Ext.getCmp('linkmanBirthday').setValue(date);
-					
-					//设置性别
-					var num = value.substring(value.length -1 ,value.length);
-					var index = 0;
-					var sex = Ext.getCmp('linkmanSex');
-					if(num%2 == 0){
-						index = sex.getStore().find('item_value','FEMALE');
-					}else{
-						index = sex.getStore().find('item_value','MALE');
-					}
-					sex.setValue(sex.getStore().getAt(index).get('item_value'))
-				}
-				
-				
-				
-			}
-		}
-		
-		return true;
 	},
 	//默认为新增的扩展信息
 	doInitAttrForm: function(group){

@@ -2143,5 +2143,42 @@ public class CustService extends BaseBusiService implements ICustService {
 		
 		return deviceComponent.queryDeviceCanBuy(optr.getDept_id());
 	}
+
+	public void saveBacthBuyMaterial(List<RDeviceModelTotalDto> feeInfoList)
+			throws Exception {
+		CCust cust = getBusiParam().getCustFullInfo().getCust();
+		doneCodeComponent.lockCust(cust.getCust_id());
+		String busiCode = getBusiParam().getBusiCode();
+		// 获取业务流水
+		Integer doneCode = doneCodeComponent.gDoneCode();
+		
+		
+		Integer isFee = 0;
+		for(RDeviceModelTotalDto dto : feeInfoList){
+			//获取本地该器材的数量
+			RDevice device = deviceComponent.queryTotalNumDevice(dto.getDevice_model(), getOptr().getDept_id());
+			//本地器材数量减去已购数量
+			deviceComponent.removeTotalNumDevice(device.getDevice_id(), dto.getBuy_num());
+			
+			//保存费用
+			String feeId = dto.getFee_id();
+			String feeStdId = dto.getFee_std_id();
+			Integer fee = dto.getFee();	
+			if(fee>0){
+				feeComponent.saveDeviceFee( cust.getCust_id(),cust.getAddr_id(), feeId,feeStdId,
+						StatusConstants.UNPAY,SystemConstants.DEVICE_TYPE_FITTING, 
+						device.getDevice_id(), null, null, null, null, null,dto.getDevice_model(),
+						fee, doneCode,doneCode, busiCode, dto.getBuy_num());
+				isFee = isFee + fee;
+			}
+		}
+		
+		if(isFee>0){
+			//记录未支付业务
+			doneCodeComponent.saveDoneCodeUnPay(cust.getCust_id(), doneCode, getOptr().getOptr_id());
+		}
+		
+		saveAllPublic(doneCode,getBusiParam());
+	}
 	
 }

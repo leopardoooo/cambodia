@@ -1042,5 +1042,63 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		
 	}
 
+
+	public void savePublicRecharge(String pay_type, Integer fee, String receipt_id) throws Exception {
+		if(fee == null || fee == 0){
+			throw new ServicesException(ErrorCode.ParamIsNull);
+		}
+		CCust cust=this.getBusiParam().getCust();
+		String custId = cust.getCust_id();
+		doneCodeComponent.lockCust(custId);		
+		Integer doneCode=doneCodeComponent.gDoneCode();
+		String busiCode = this.getBusiParam().getBusiCode();
+		if(fee >0){
+			//记录未支付业务
+			doneCodeComponent.saveDoneCodeUnPay(custId, doneCode, this.getOptr().getOptr_id());
+			
+			//查询公用账户
+			CAcct acct=acctComponent.queryCustAcctByCustId(cust.getCust_id());
+			String acctItemId=SystemConstants.ACCTITEM_PUBLIC_ID;
+			//保存退款记录
+			PayDto pay = new PayDto();
+			pay.setCust_id(custId);
+			pay.setAcct_id(acct.getAcct_id());
+			pay.setAcctitem_id(SystemConstants.ACCTITEM_PUBLIC_ID);
+			pay.setFee(fee);
+			feeComponent.saveAcctFee(custId, cust.getAddr_id(), pay, doneCode, busiCode, StatusConstants.UNPAY);
+			//保存缴费信息
+			acctComponent.savePublicRecharge(acct.getAcct_id(),acctItemId,pay_type,fee,receipt_id,doneCode,custId ,busiCode);
+		}
+		this.saveAllPublic(doneCode, this.getBusiParam());
+	}
+
+	public void savePublicRefund(Integer fee) throws Exception {
+		if(fee == null || fee == 0){
+			throw new ServicesException(ErrorCode.ParamIsNull);
+		}
+		
+		String custId=this.getBusiParam().getCust().getCust_id();
+		doneCodeComponent.lockCust(custId);		
+		Integer doneCode=doneCodeComponent.gDoneCode();
+		//记录未支付业务
+		doneCodeComponent.saveDoneCodeUnPay(custId, doneCode, this.getOptr().getOptr_id());
+		
+		
+		CAcct acct = acctComponent.queryCustAcctByCustId(custId);
+		//保存退款记录
+		PayDto pay = new PayDto();
+		pay.setCust_id(custId);
+		pay.setAcct_id(acct.getAcct_id());
+		pay.setAcctitem_id(SystemConstants.ACCTITEM_PUBLIC_ID);
+		pay.setFee(fee*-1);
+		this.saveAcctPay(doneCode, pay);
+		
+		//检查金额
+		List<CAcctAcctitemActive> list = acctComponent.queryActiveMinusByCustId(custId);
+		if(list.size()>0){
+			throw new ComponentException(ErrorCode.AcctBalanceError);
+		}
+		this.saveAllPublic(doneCode, this.getBusiParam());
+	}
 	
 }

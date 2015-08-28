@@ -34,6 +34,12 @@ public class ProdOrderAction extends BaseBusiAction {
 	private Integer refundFee;
 	
 	private String payFeesData;
+	private String acct_id;
+	private String acctitem_id;
+	private String pay_type;
+	private String receipt_id;
+	private Integer fee;
+	
 	/**
 	 * 退订界面数据初始化查询
 	 * @return
@@ -120,6 +126,17 @@ public class ProdOrderAction extends BaseBusiAction {
 	public String queryFollowPayOrderDto() throws Exception{
 		getRoot().setRecords(orderService.queryFollowPayOrderDto(cust_id));
 		return JSON_RECORDS;
+	}
+	
+	public String savePublicRecharge() throws Exception{
+		orderService.savePublicRecharge(pay_type,fee,receipt_id);
+		return JSON_SUCCESS;
+	}
+	
+	
+	public String savePublicRefund() throws Exception{
+		orderService.savePublicRefund(fee);
+		return JSON_SUCCESS;
 	}
 	
 	public String queryProdOrderInit(){
@@ -217,6 +234,28 @@ public class ProdOrderAction extends BaseBusiAction {
 	public void setRefundFee(Integer refundFee) {
 		this.refundFee = refundFee;
 	}
+
+	public void setAcct_id(String acct_id) {
+		this.acct_id = acct_id;
+	}
+
+	public void setAcctitem_id(String acctitem_id) {
+		this.acctitem_id = acctitem_id;
+	}
+
+	public void setPay_type(String pay_type) {
+		this.pay_type = pay_type;
+	}
+
+	public void setReceipt_id(String receipt_id) {
+		this.receipt_id = receipt_id;
+	}
+
+	public void setFee(Integer fee) {
+		this.fee = fee;
+	}
+
+	
 	
 	
 }

@@ -907,8 +907,8 @@ public class DeviceComponent extends BaseBusiComponent {
 		List<RDevice>  deviceList=  rDeviceDao.queryMateralDeviceByDepotId(dept_id);
 		for(RDevice dto : deviceList){
 			RDeviceModelTotalDto f = new RDeviceModelTotalDto();
-			f.setDevice_model_text(dto.getDevice_model_text());
 			f.setDevice_model(dto.getDevice_model());
+			f.setDevice_type(dto.getDevice_type());
 			f.setTotal_num(dto.getTotal_num());
 			List<RDeviceFee> fList = queryDeviceFee(dto.getDevice_type(), dto.getDevice_model(), SystemConstants.BUSI_BUY_MODE_BUY);
 			if(fList.size()>0){
