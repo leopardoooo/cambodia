@@ -141,15 +141,65 @@ ProdOrderForm = Ext.extend( BaseForm, {
 			            fieldLabel: '结束计费日'
 					}]
 				}]
-			},{
-				region: "south",
-				height: 40, 
-				bodyStyle: 'background-color: rgb(213,225,241);padding: 10px 0 10px 30px; color: red',
-				html: "* 实际应收$:<span id='totalAmount'>--</span>"
-					+"（新增订购:<b id='addAmount'>--</b> "
-					+" - "
-					+" <a id='transferHrefTag' href='#'>转移支付:<b id='transferAmount'>--</b></a>"
-					+" ）"
+			},{  
+		         region: "south",
+				 height: 80, 
+				 buttonAlign:'center',
+				 flex:1,
+       			 frame:true,  
+				 labelAlign:'right',  
+				 layout:'column',
+				 labelWidth:50,  
+				 border: false,
+		         items:[{ 
+		         	columnWidth:.70,
+		         	xtype:'fieldset',  
+				    height: 60, 
+				    title:'产品费',
+         			style:'margin-left:10px;padding: 10px 0 10px 10px; color: red',
+         			layout:'column',
+         			items:[{
+         				columnWidth:.64,
+         				layout : 'form',
+         				items:[{
+         						bodyStyle:'padding-top:4px',
+		         				html: "* 应收$:<span id='totalAmount'>--</span>"
+								+"（新增订购:<b id='addAmount'>--</b> "
+								+" - "
+								+" <a id='transferHrefTag' href='#'>转移支付:<b id='transferAmount'>--</b></a>"
+								+" ）"
+			         			}]
+         				},{
+         				columnWidth:.36,
+         				layout : 'form',
+         				items:[{
+								fieldLabel : '支付',
+								id : 'orderFeeTypeId',
+								name:'order_fee_type',
+								allowBlank : false,
+								xtype:'paramcombo',
+								width: 80,
+								emptyText: '请选择',
+								defaultValue:'CFEE',
+								paramName:'ORDER_FEE_TYPE',
+								listeners: {
+									scope: this,
+									'expand': function(combo){
+										var store = combo.getStore();
+										store.removeAt(store.find('item_value','TRANSFEE'));
+									}
+								}
+							}]
+         				}]
+		         },{  
+				    columnWidth:.30,
+		         	xtype:'fieldset',  
+		         	layout:'form',  
+		         	height: 60, 
+		         	title:'业务费',
+		         	style:'margin-left:10px;padding: 10px 0 10px 10px; color: red',
+					html: "* 应收$:<span id='totalAmount'>--</span>"
+		         }]  
 			}]
 		});
 	},
@@ -193,6 +243,7 @@ ProdOrderForm = Ext.extend( BaseForm, {
 	},
 	doInit:function(){
 		this.doLoadBaseData();
+		App.form.initComboData(this.findByType('paramcombo'));
 		ProdOrderForm.superclass.doInit.call(this);
 		//this.on("render",function(){
 		var that = this;
@@ -431,6 +482,8 @@ ProdOrderForm = Ext.extend( BaseForm, {
 		values["pay_fee"] = this.totalAmount;
 		// 转移支付
 		values["transfer_fee"] = this.transferAmount;
+		
+		values["order_fee_type"] = Ext.getCmp('orderFeeTypeId').getValue();
 		// 失效日期
 		values["exp_date"] = Ext.getCmp("dfExpDate").getValue() + " 00:00:00";
 		

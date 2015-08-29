@@ -1517,7 +1517,7 @@ Ext.apply(MenuHandler, {
 	OrderProd: function(){
 		if(!hasCust())return false;
 		var windowSize = {
-			width : 600,
+			width : 650,
 			height : 520
 		};
 		//套餐订购

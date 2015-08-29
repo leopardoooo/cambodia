@@ -1039,7 +1039,7 @@ CustPanel = Ext.extend( BaseInfoPanel , {
 			},{
 				region:"east",
 				split:true,
-				width:"40%",
+				width:"45%",
 				layout:"fit",
 				border: false,
 				layout: 'fit',
