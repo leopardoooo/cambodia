@@ -161,11 +161,20 @@ PayPanel = Ext.extend( Ext.Panel ,{
 	},
 	deletePay : function() {
 		var rec = this.feeGrid.getSelectionModel().getSelected();
+		var comomonParams = App.getValues();
+		comomonParams["busiCode"] = "1113";
+		var params ={};
+		params[CoreConstant.JSON_PARAMS] = Ext.encode(comomonParams);
+		Ext.apply(params,{
+			fee_sn : rec.get('fee_sn'),
+			fee_type : rec.get('fee_type'),
+			onlyShowInfo : false
+		});
 				// 请求后台的数据
 		Ext.Ajax.request({
 			scope: this,
 			url: Constant.ROOT_PATH + "/core/x/Pay!cancelUnPayFee.action",
-			params: {fee_sn: rec.get('fee_sn'),fee_type:rec.get('fee_type'),onlyShowInfo:false},
+			params: params,
 			success: function(res, ops){
 				var data = Ext.decode(res.responseText);
 				alert(data);
