@@ -198,12 +198,21 @@ public class CAcctAcctitemDao extends BaseEntityDao<CAcctAcctitem> {
 	 * @return
 	 */
 	public List <AcctitemDto> queryByCustId(String custId,String countyId) throws JDBCException {
-		String sql = "select c.*,t.acctitem_name,t.acctitem_type ,a.acct_type,p.serv_id"
-				+ " from "+this.getAcctItemTableByCust(custId, countyId)+" c,t_public_acctitem t ,C_ACCT a,p_prod p"
-				+ " where c.acctitem_id = t.acctitem_id(+) and C.ACCT_ID=a.acct_id "
-				+ " and a.cust_id=? AND a.county_id=? AND c.county_id=?  and c.acctitem_id=p.prod_id(+) " 
-				+ " and (c.acct_id,c.acctitem_id) not in (select acct_id,acctitem_id from j_cust_writeoff_acct) order by p.is_base desc";
-		return createQuery(AcctitemDto.class, sql, custId,countyId,countyId).list();
+		String sql =StringHelper.append( 
+				" select c.acct_id,c.acctitem_id,c.active_balance,c.owe_fee,c.real_fee,c.real_bill,c.order_balance,c.real_balance,c.inactive_balance,c.open_time,c.area_id,c.county_id, ",
+				" t.acctitem_name,t.acctitem_type ,a.acct_type, ",
+				" sum(case when af.can_refund='T' then ac.balance else 0 end) can_trans_balance, ",
+				" sum(case when af.can_trans='T' then ac.balance else 0 end) can_refund_balance ",
+				" from c_acct a  ",
+				" join c_acct_acctitem c on C.ACCT_ID=a.acct_id  AND a.county_id=c.county_id   ",
+				" left join  t_public_acctitem t on c.acctitem_id = t.acctitem_id ",
+				" left join c_acct_acctitem_active ac on ac.acct_id=c.acct_id and ac.acctitem_id=c.acctitem_id and ac.county_id=c.county_id ",
+				" left join t_acct_fee_type af on af.fee_type=ac.fee_type ",
+				"  where  a.cust_id=? and a.county_id=?   ",
+				" group by c.acct_id,c.acctitem_id,c.active_balance,c.owe_fee,c.real_fee,c.real_bill,c.order_balance,c.real_balance,c.inactive_balance,c.open_time,c.area_id,c.county_id ",
+				" ,t.acctitem_name,t.acctitem_type ,a.acct_type ");
+		 return  createQuery(AcctitemDto.class, sql, custId,countyId,countyId).list();
+		
 	}
 	
 	/**

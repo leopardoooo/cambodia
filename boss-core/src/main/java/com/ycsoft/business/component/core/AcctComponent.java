@@ -13,6 +13,7 @@ import java.util.Map;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -148,7 +149,7 @@ public class AcctComponent  extends BusiConfigComponent {
 	private CGeneralContractPayDao cGeneralContractPayDao;
 	private CGeneralContractHisDao cGeneralContractHisDao;
 	private CGeneralCredentialDao cGeneralCredentialDao;
-	private ExpressionUtil expressionUtil;
+	//private ExpressionUtil expressionUtil;
 	
 	private CAcctAcctitemHisDao cAcctAcctitemHisDao;
 	
@@ -168,7 +169,8 @@ public class AcctComponent  extends BusiConfigComponent {
 	private CBankRefundtodiskDao cBankRefundtodiskDao;
 	@Autowired
 	private CCustPropChangeDao cCustProdChangeDao;
-
+	@Autowired
+	private BeanFactory beanFactory;
 	/**
 	 * @param custId    客户id
 	 * @param acctType 账户类型
@@ -794,6 +796,11 @@ public class AcctComponent  extends BusiConfigComponent {
 		return cAcctAcctitemDao.queryByAcctId(acctId);
 	}
 
+	public CAcctAcctitem queryAcctItemEsayByAcctitemId(String acctId,String acctItemId) throws JDBCException{
+		return cAcctAcctitemDao.queryAcctItem(acctId, acctItemId);
+	}
+	
+	
 	public CAcctAcctitem queryAcctItemByAcctitemId(String acctId,String acctItemId) throws JDBCException {
 		CAcct acct = this.queryByAcctId(acctId);
 		CAcctAcctitem acctItem = cAcctAcctitemDao.queryByAcctItemId(acctId,acctItemId);
@@ -818,6 +825,12 @@ public class AcctComponent  extends BusiConfigComponent {
 		return acctItem;
 	}
 	
+	/**
+	 * 查询客户的所有账目信息
+	 */
+	public List<AcctitemDto> queryAcctItemEsayByCustId(String custId)throws Exception{
+		return  cAcctAcctitemDao.queryByCustId(custId,getOptr().getCounty_id());
+	}
 	/**
 	 * 查询客户的所有账目信息
 	 * @param custId
@@ -1491,6 +1504,7 @@ public class AcctComponent  extends BusiConfigComponent {
 	public List<AcctDto> queryAcctsByCustId(CCust cust) throws Exception {
 		List<AcctitemDto> acctItems = queryAcctItemByCustId(cust.getCust_id());
 		Map<String, List<AcctitemDto>> acctitemMap = CollectionHelper.converToMap(acctItems,"acct_id");
+		
 		List<CAcct> accts = cAcctDao.queryAcctByCustId(cust.getCust_id(),cust.getCounty_id());
 		
 		List<AcctDto> result = new ArrayList<AcctDto>();
@@ -1507,6 +1521,28 @@ public class AcctComponent  extends BusiConfigComponent {
 		
 		return result;
 	}
+	/**
+	 * 查询账户信息
+	 * @param cust
+	 * @return
+	 * @throws Exception
+	 */
+	public List<AcctDto> queryAcctsEsayByCustId(CCust cust) throws Exception {
+
+		CAcct c=queryCustAcctByCustId(cust.getCust_id());
+		Map<String, List<AcctitemDto>> acctitemMap = CollectionHelper.converToMap(queryAcctItemEsayByCustId(cust.getCust_id()),"acct_id");
+		
+		AcctDto acct = new AcctDto();
+		BeanUtils.copyProperties(c,acct);
+		acct.setAcctitems(acctitemMap.get(c.getAcct_id()));
+		fillAcctAllowPay(acct,cust);
+		
+		List<AcctDto> result = new ArrayList<AcctDto>();
+		result.add(acct);
+
+		return result;
+	}
+	
 	
 	/**
 	 * 查询基本包的账户信息
@@ -1577,7 +1613,8 @@ public class AcctComponent  extends BusiConfigComponent {
 		else {
 			Map<String,Object> varMap = new HashMap<String,Object>();
 			varMap.put("prod_id", prodId);
-			return this.expressionUtil.parseBoolean(ruleId, varMap);
+			ExpressionUtil expressionUtil=new ExpressionUtil(beanFactory);
+			return  expressionUtil.parseBoolean(ruleId, varMap);
 		}
 	}
 	
@@ -2535,9 +2572,6 @@ public class AcctComponent  extends BusiConfigComponent {
 		cGeneralContractHisDao = generalContractHisDao;
 	}
 
-	public void setExpressionUtil(ExpressionUtil expressionUtil) {
-		this.expressionUtil = expressionUtil;
-	}
 
 	public void setCAcctAcctitemThresholdPropDao(
 			CAcctAcctitemThresholdPropDao acctAcctitemThresholdPropDao) {

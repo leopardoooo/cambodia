@@ -1617,19 +1617,17 @@ public class AcctService extends BaseBusiService implements IAcctService {
 	 */
 	public List<AcctDto> queryAcctByCustId(String custId) throws Exception {
 		CCust cust = custComponent.queryCustById(custId);
-		Map<String, CUser> userMap = CollectionHelper.converToMapSingle(
-				userComponent.queryUserByCustId(custId), "user_id");
-		List<AcctDto> accts = acctComponent.queryAcctsByCustId(cust);
-
-		for (AcctDto c : accts) {
-			// 设置用户信息
-			if (StringHelper.isNotEmpty(c.getUser_id())) {
-				CUser user = userMap.get(c.getUser_id());
-				if (user != null)
-					PropertyUtils.copyProperties(c, user);
-			}
-		}
-		return accts;
+		return acctComponent.queryAcctsEsayByCustId(cust);
+	}
+	/**
+	 * 查询公用账目余额
+	 * @param custId
+	 * @return
+	 * @throws Exception 
+	 */
+	public CAcctAcctitem queryPublicAcctItemByCustId(String custId) throws Exception{
+		CAcct acct= acctComponent.queryCustAcctByCustId(custId);
+		return acctComponent.queryAcctItemEsayByAcctitemId(acct.getAcct_id(), SystemConstants.ACCTITEM_PUBLIC_ID);
 	}
 	
 	public List<AcctitemDto> queryAcctitemToCallCenter(Map<String,Object> params) throws Exception{

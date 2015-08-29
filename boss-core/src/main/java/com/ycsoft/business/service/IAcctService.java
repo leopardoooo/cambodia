@@ -156,6 +156,12 @@ public interface IAcctService extends IBaseService{
 	 * @return
 	 */
 	public List<AcctDto> queryAcctByCustId(String custId)throws Exception;
+	/**
+	 * 查询客户公用账目
+	 * @return
+	 * @throws Exception
+	 */
+	public CAcctAcctitem  queryPublicAcctItemByCustId(String custId) throws Exception;
 
 	/**
 	 * 查询账目下余额明细,不包括0余额

@@ -288,6 +288,15 @@ public class AcctAction extends BaseBusiAction {
 			getRoot().setRecords(new ArrayList());
 		return JSON_RECORDS;
 	}
+	/**
+	 * 查询客户的公用账目
+	 * @return
+	 * @throws Exception
+	 */
+	public String queryPublicAcctitem() throws Exception{
+		getRoot().setSimpleObj(acctService.queryPublicAcctItemByCustId(custId));
+		return JSON_SIMPLEOBJ;
+	}
 
 	/**
 	 * 查询账目下余额明细
