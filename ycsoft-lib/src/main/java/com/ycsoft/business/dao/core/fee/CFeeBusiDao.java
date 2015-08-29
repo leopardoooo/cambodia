@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 import com.ycsoft.beans.core.fee.CFeeBusi;
 import com.ycsoft.daos.abstracts.BaseEntityDao;
+import com.ycsoft.daos.core.JDBCException;
 
 
 /**
@@ -25,4 +26,10 @@ public class CFeeBusiDao extends BaseEntityDao<CFeeBusi> {
 	 * default empty constructor
 	 */
 	public CFeeBusiDao() {}
+	
+	public CFeeBusi queryCFeeBusi(String feeSn) throws JDBCException{
+		String sql="select * from c_fee c,c_fee_busi b where c.fee_sn=b.fee_sn and b.fee_sn=? ";
+		return this.createQuery(sql, feeSn).first();
+		
+	}
 }

@@ -69,17 +69,22 @@ public class DoneCodeComponent extends BaseBusiComponent {
 	 * @throws JDBCException
 	 */
 	public void saveDoneCodeUnPay(String cust_id,Integer done_code,String optr_id) throws Exception{
-		//检查未支付业务，只能一个营业员操作。
-		List<CDoneCodeUnpay>  otherLocks=cDoneCodeUnpayDao.queryUnPayOtherLock(cust_id,optr_id);
-		if(otherLocks!=null&&otherLocks.size()>0){
-			
-			String login_name = MemoryDict.getDictName(DictKey.OPTR_LOGIN, otherLocks.get(0).getOptr_id());
-			String optr_name=MemoryDict.getDictName(DictKey.OPTR, otherLocks.get(0).getOptr_id());
-			throw new ComponentException(ErrorCode.UnPayLock,optr_name,login_name);
-		}else{
+		boolean needSave=true;
+		for(CDoneCodeUnpay unPay: cDoneCodeUnpayDao.queryUnPay(cust_id)){
+			if(!unPay.getOptr_id().equals(optr_id)){
+				//检查未支付业务，只能一个营业员操作。
+				String login_name = MemoryDict.getDictName(DictKey.OPTR_LOGIN,unPay.getOptr_id());
+				String optr_name=MemoryDict.getDictName(DictKey.OPTR, unPay.getOptr_id());
+				throw new ComponentException(ErrorCode.UnPayLock,optr_name,login_name);
+			}
+			if(unPay.getDone_code().equals(done_code)){
+				//已经保存过，不需要重复保存
+				needSave=false;
+			}
+		}
+		if(needSave){
 			cDoneCodeUnpayDao.saveUnpay(cust_id, done_code,optr_id);
 		}
-		
 	}
 	/**
 	 * 业务被其他营业员锁定检查
@@ -500,6 +505,10 @@ public class DoneCodeComponent extends BaseBusiComponent {
 	
 	public void editRemark(int doneCode,String remark) throws Exception {
 		cDoneCodeDao.updateRemark(doneCode, remark);
+	}
+	
+	public void cancelDoneCode(Integer doneCode) throws Exception{
+		cDoneCodeDao.delete(doneCode);
 	}
 	
 	/**

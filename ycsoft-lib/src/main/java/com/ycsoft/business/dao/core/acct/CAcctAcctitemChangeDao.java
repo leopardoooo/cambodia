@@ -159,6 +159,11 @@ public class CAcctAcctitemChangeDao extends BaseEntityDao<CAcctAcctitemChange> {
 		return createQuery(sql,doneCode, BusiCodeConstants.ACCT_PAY, SystemConstants.ACCTITEM_PUBLIC_ID).list();
 	}
 	
+	public List<CAcctAcctitemChange> queryByBusiInfo(String acctId,String acctitemId,String busiCode,Integer doneCode) throws JDBCException{
+		String sql = " select * from c_acct_acctitem_change  where acct_id=? and acctitem_id=? and busi_code=? and done_code=? ";
+		return this.createQuery(sql, acctId,acctitemId,busiCode,doneCode).list();
+	}
+	
 	public List<Object[]> queryUnRefundByOptr(String optrId,String countyId) throws JDBCException {
 		String sql = "select  cd.cust_id , to_char(max(cd.done_code)) done_code "
 				+ " from c_acct_acctitem_adjust ad,c_acct_acctitem_active ac,c_done_code c,c_done_code_detail cd"

@@ -3,6 +3,7 @@ package com.ycsoft.commons.exception;
 public enum ErrorCode {
 	
 	UNKNOW_EXCEPTION("未知异常，请联系管理员"),
+	SystemNoOptr("缺失操作员信息"),
 	
 	ParamIsNull("参数为空！"),
 	DataNumTooMuch("结果集大于2000条，请增加关键字搜索！"),
@@ -25,10 +26,16 @@ public enum ErrorCode {
 	NotCancelOnlyTodayIsYou("只能取消当天自己操作的订单"),
 	NotCancelStatusException("订单状态异常，不能退订"),
 	
-	FeeDateException("前后台金额不一致"),
-	CFeeAndProdOrderIsNotOne("费用记录和订单信息不一致"),
 	UnPayOrderCancelBefor("请先取消订单号=%s的订单费用"),
 	UnPayOrderCancelUnsubscribe("不能取消退订费用"),
+	UnPayFeeTypeCanNotCancel("不支持此类型费用取消"),
+	UnPayFeeHasPay("费用已支付不能取消"),
+	UnPayAcctIsNotPublic("非公用账目不能取消充值、退款"),
+	UnPayAcctRefundFeeAndChangeIsDiffer("账户退款和资金异动明细不一致"),
+	
+	FeeDateException("前后台金额不一致"),
+	CFeeAndProdOrderIsNotOne("费用记录和订单信息不一致"),
+	
 	OrderNotExists("订单不存在"),
 	OrderTodayHasCancel("订单已取消，不能再次取消"),
 	
@@ -60,9 +67,11 @@ public enum ErrorCode {
 	AcctPublicNotExists("客户缺失公用账户，请联系管理员！"),
 	AcctItemNotExists("账目不存在，请联系管理员！"),
 	AcctFeeNotEnough("账户余额不足！"),
+	AcctCanRefoudFeeNotEnough("账户可退余额不足！"),
 	AcctBalanceError("资金余额出现负数！"),
 	AcctItemAndActiveFeeDisagree("账户数据异常，账户资金和明细金额不一致,请联系管理员！"),
 	AcctDebitFeeIsPositive("扣款金额不能是正数"),
+	AcctAddFeeIsNotPositive("扣款金额不能是负数"),
 	TemplateNotConfigBuseFee("该地区费用模板未配置该费用项(%s)"),
 	CustUserIpAddressFeeCoinfigError("客户宽带IP收费存在多个费用项目，请联系管理员！"),
 	;

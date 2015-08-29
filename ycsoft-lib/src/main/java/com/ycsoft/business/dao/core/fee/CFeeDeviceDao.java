@@ -34,5 +34,10 @@ public class CFeeDeviceDao extends BaseEntityDao<CFeeDevice> {
 				" AND cd.device_code=t.device_code AND t.device_code=?";
 		return createQuery(BuyDeviceDto.class,sql, stbId).first();
 	}
+	
+	public CFeeDevice queryCFeeDevice(String fee_sn) throws JDBCException {
+		String sql=" select * from c_fee c,c_fee_device d where c.fee_sn=d.fee_sn and d.fee_sn=? ";
+		return this.createQuery(sql, fee_sn).first();
+	}
 
 }

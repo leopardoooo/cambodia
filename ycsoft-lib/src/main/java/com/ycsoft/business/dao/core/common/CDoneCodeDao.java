@@ -137,7 +137,7 @@ public class CDoneCodeDao extends BaseEntityDao<CDoneCode> {
 	/**
 	 * @param doneCode
 	 */
-	public void delete(String doneCode) throws Exception{
+	public void delete(Integer doneCode) throws Exception{
 		String sql ="update c_done_code set status =? where done_code=?";
 		executeUpdate(sql, StatusConstants.INVALID,doneCode);
 	}

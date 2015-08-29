@@ -668,6 +668,14 @@ public class FeeComponent extends BaseBusiComponent {
 		if (StringHelper.isNotEmpty(fee.getInvoice_id()))
 			cancelInvoice(fee);
 	}
+	/**
+	 * 取消费用
+	 * @param fee_sn
+	 * @param doneCode
+	 */
+	public void saveCancelFeeUnPay(String fee_sn,Integer doneCode)throws Exception{
+		cFeeDao.saveCancelFee(fee_sn, StatusConstants.INVALID,doneCode);
+	}
 
 	/**
 	 * 取消费用的相关发票
@@ -1134,17 +1142,23 @@ public class FeeComponent extends BaseBusiComponent {
 	}
 
 	public CFeeAcct queryAcctFeeByFeeSn(String feeSn) throws Exception {
-		String[] feeSns = new String[1];
-		feeSns[0] = feeSn;
-		return cFeeDao.queryAcctFeeByFeeSns(feeSns).get(0);
+		return cFeeDao.queryAcctFee(feeSn);
 	}
 
 	public CFeeBusi queryFeeBusiBySn(String feeSn) throws Exception {
 		return cFeeBusiDao.findByKey(feeSn);
 	}
+	
+	public CFeeBusi queryFeeBusi(String feeSn)throws Exception {
+		return cFeeBusiDao.queryCFeeBusi(feeSn);
+	}
 
 	public CFeeDevice queryFeeDeviceBySn(String feeSn) throws Exception {
 		return cFeeDeviceDao.findByKey(feeSn);
+	}
+	
+	public CFeeDevice queryFeeDevice(String feeSn) throws Exception {
+		return cFeeDeviceDao.queryCFeeDevice(feeSn);
 	}
 
 	/**

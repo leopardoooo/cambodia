@@ -38,6 +38,8 @@ public enum DictKey {
 	/**工单类型*/
 	TASK_DETAIL_TYPE,
 	/**汇率*/
-	EXCHANGE
+	EXCHANGE,
+	/**未支付取消费用提示*/
+	UNPAY_CANCEL_PROMPT
 
 }

@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.ycsoft.beans.config.TBusiFee;
+import com.ycsoft.beans.core.acct.CAcctAcctitemChange;
 import com.ycsoft.beans.core.acct.CGeneralContractPay;
 import com.ycsoft.beans.core.bank.CBankGotodisk;
 import com.ycsoft.beans.core.bank.CBankReturn;
@@ -21,6 +22,7 @@ import com.ycsoft.beans.core.common.CDoneCodeDetail;
 import com.ycsoft.beans.core.common.CDoneCodeUnpay;
 import com.ycsoft.beans.core.cust.CCust;
 import com.ycsoft.beans.core.fee.CFee;
+import com.ycsoft.beans.core.fee.CFeeAcct;
 import com.ycsoft.beans.core.fee.CFeeBusi;
 import com.ycsoft.beans.core.fee.CFeeDevice;
 import com.ycsoft.beans.core.fee.CFeePay;
@@ -29,10 +31,10 @@ import com.ycsoft.beans.core.fee.CFeeUnitpre;
 import com.ycsoft.beans.core.job.JCustWriteoff;
 import com.ycsoft.beans.core.prod.CProdMobileBill;
 import com.ycsoft.beans.core.prod.CProdOrder;
+import com.ycsoft.beans.core.prod.CProdOrderFee;
 import com.ycsoft.beans.core.user.CUser;
 import com.ycsoft.beans.invoice.RInvoice;
 import com.ycsoft.beans.prod.PProd;
-import com.ycsoft.beans.system.SItemvalue;
 import com.ycsoft.beans.system.SOptr;
 import com.ycsoft.business.commons.pojo.BusiParameter;
 import com.ycsoft.business.component.core.OrderComponent;
@@ -41,6 +43,7 @@ import com.ycsoft.business.dao.core.bank.CBankGotodiskDao;
 import com.ycsoft.business.dao.core.bank.CBankReturnDao;
 import com.ycsoft.business.dao.core.bank.CBankReturnPayerrorDao;
 import com.ycsoft.business.dao.core.prod.CProdOrderDao;
+import com.ycsoft.business.dao.core.prod.CProdOrderFeeDao;
 import com.ycsoft.business.dao.prod.PProdDao;
 import com.ycsoft.business.dto.core.acct.PayDto;
 import com.ycsoft.business.dto.core.fee.CFeePayDto;
@@ -81,6 +84,8 @@ public class PayService extends BaseBusiService implements IPayService {
 	private TExchangeDao tExchangeDao;
 	@Autowired
 	private OrderComponent orderComponent;
+	@Autowired
+	private CProdOrderFeeDao cProdOrderFeeDao;
 	/**
 	 * 查询汇率
 	 * @return
@@ -113,6 +118,308 @@ public class PayService extends BaseBusiService implements IPayService {
 	public List<FeeDto> queryUnPayDetail(String cust_id)throws Exception{
 		return feeComponent.queryUnPay(cust_id,this.getOptr().getOptr_id());
 	}
+	
+	/**
+	 * 检查未支付退订数据
+	 * @param fee
+	 * @throws ServicesException
+	 */
+	private void checkCanclUpPayFeeParam(CFee fee,String cust_id) throws Exception{
+		if(fee==null){
+			throw new ServicesException(ErrorCode.ParamIsNull);
+		}
+		if(!fee.getCust_id().equals(cust_id)){
+			throw new ServicesException(ErrorCode.CustDataException);
+		}
+		
+		if(!StatusConstants.UNPAY.equals(fee.getStatus())|| 
+			SystemConstants.PAY_TYPE_UNPAY.equals(fee.getPay_type())){
+			throw new ServicesException(ErrorCode.UnPayFeeHasPay);
+		}
+		if(fee.getFee_type().equals(SystemConstants.FEE_TYPE_ACCT)
+				&&StringHelper.isEmpty(fee.getAcctitem_id())){
+			throw new ServicesException(ErrorCode.ParamIsNull);
+		}
+		if(!fee.getFee_type().equals(SystemConstants.FEE_TYPE_ACCT)
+				&&StringHelper.isEmpty(fee.getFee_id())){
+			throw new ServicesException(ErrorCode.ParamIsNull);
+		}
+		
+	}
+	/**
+	 * 取消未支付的费用项目
+	 * @param feeSn
+	 * @throws Exception
+	 */
+	public String saveCancelUnPayFee(String fee_sn,String fee_type,boolean onlyShowInfo) throws Exception{
+		
+		if(StringHelper.isEmpty(fee_sn)||StringHelper.isEmpty(fee_type)){
+			throw new ServicesException(ErrorCode.ParamIsNull);
+		}
+		String cust_id=this.getBusiParam().getCust().getCust_id();
+		doneCodeComponent.lockCust(cust_id);
+		Integer doneCode=doneCodeComponent.gDoneCode();
+		
+		String info="";//取消费用的业务提示
+		
+		if(fee_type.equals(SystemConstants.FEE_TYPE_ACCT)){
+			CFeeAcct fee=feeComponent.queryAcctFeeByFeeSn(fee_sn);
+			this.checkCanclUpPayFeeParam(fee, cust_id);
+
+			if(!fee.getAcctitem_id().equals(SystemConstants.ACCTITEM_PUBLIC_ID)){
+				if(fee.getReal_pay()>0){
+					//产品订购，业务回退
+					if(!onlyShowInfo){
+						this.cancelUnPayProdOrderPay(fee,doneCode);
+					}
+					info=SystemConstants.UNPAY_CANCEL_PROMPT_FEEANDBUSI;
+				}else{
+					//产品退订，退款转到账户，业务正常
+					if(!onlyShowInfo){
+						this.cancelUnPayProdUnsubscribePay(fee,doneCode);
+					}
+					info=SystemConstants.UNPAY_CANCEL_PROMPT_ONLYACCT;
+				}
+			}else{
+				if(fee.getReal_pay()>0){
+					//公用现金充值，业务回退
+					if(!onlyShowInfo){
+						this.cancelUnPayAcctPay(fee,doneCode);
+					}
+					info=SystemConstants.UNPAY_CANCEL_PROMPT_FEEANDBUSI;
+				}else{
+					//公用现金退款，业务回退
+					if(!onlyShowInfo){
+						this.cancelUnPayAcctRefund(fee,doneCode);
+					}
+					info=SystemConstants.UNPAY_CANCEL_PROMPT_FEEANDBUSI;
+				}
+			}
+		}else if(fee_type.equals(SystemConstants.FEE_TYPE_BUSI)){
+			CFeeBusi fee=feeComponent.queryFeeBusi(fee_sn);
+			this.checkCanclUpPayFeeParam(fee, cust_id);
+			//取消杂费，业务正常
+			if(!onlyShowInfo){
+				this.cancelUnPayBusiFee(fee_sn, doneCode);
+			}
+			info=SystemConstants.UNPAY_CANCEL_PROMPT_ONLYFEE;
+			
+		}else if(fee_type.equals(SystemConstants.FEE_TYPE_DEVICE)){
+			CFeeDevice fee=feeComponent.queryFeeDevice(fee_sn);
+			this.checkCanclUpPayFeeParam(fee, cust_id);
+			
+			if(SystemConstants.DEVICE_TYPE_FITTING.equals(fee.getDevice_type())
+				&&fee.getCreate_done_code().equals(fee.getBusi_done_code()) //非费用修改
+				&&fee.getReal_pay()>0){
+				//配件费取消,业务回退
+				if(!onlyShowInfo){
+					this.cancelUnPayFittingFee(fee, doneCode);
+				}
+				info=SystemConstants.UNPAY_CANCEL_PROMPT_FEEANDBUSI;
+			}else{
+				//取消费用，业务正常
+				if(!onlyShowInfo){
+					this.cancelUnPayDeviceFeePay(fee_sn, doneCode);
+				}
+				info=SystemConstants.UNPAY_CANCEL_PROMPT_ONLYFEE;
+			}
+			
+		}else {
+			throw new ServicesException(ErrorCode.UnPayFeeTypeCanNotCancel);
+		}
+		
+		//取消费用提示描述
+		String infoDesc=MemoryDict.getDictName(DictKey.UNPAY_CANCEL_PROMPT, info);
+		if(infoDesc==null){
+			infoDesc=info;
+		}
+		
+		this.saveAllPublic(doneCode, this.getBusiParam());
+	    return infoDesc;
+	}
+	/**
+	 * 取消公用充值
+	 * @param fee_sn
+	 * @throws Exception 
+	 */
+	private void cancelUnPayAcctPay(CFee fee,Integer doneCode) throws Exception{
+		
+		if(!fee.getAcctitem_id().equals(SystemConstants.ACCTITEM_PUBLIC_ID)){
+			throw new ServicesException(ErrorCode.UnPayAcctIsNotPublic);
+		}
+		//从账户扣回可退部分余额
+		acctComponent.saveAcctDebitFee(fee.getCust_id(), fee.getAcct_id(), fee.getAcctitem_id(),
+				SystemConstants.ACCT_CHANGE_UNCFEE, fee.getReal_pay()*-1, this.getBusiParam().getBusiCode(), doneCode, true);
+		//作废缴费信息
+		feeComponent.saveCancelFeeUnPay(fee.getFee_sn(), doneCode);
+		//作废业务
+		doneCodeComponent.cancelDoneCode(fee.getCreate_done_code());
+	}
+	/**
+	 * 取消公用退款
+	 * @param fee_sn
+	 */
+	private void cancelUnPayAcctRefund(CFee fee,Integer doneCode)throws Exception{
+
+		if(!fee.getAcctitem_id().equals(SystemConstants.ACCTITEM_PUBLIC_ID)){
+			throw new ServicesException(ErrorCode.UnPayAcctIsNotPublic);
+		}
+		//查找上次异动记录，并按异动记录资金明细恢复金额
+		List<CAcctAcctitemChange> changeList=acctComponent.queryAcctitemChangeByBusiInfo(fee.getAcct_id(), fee.getAcctitem_id(),fee.getBusi_code(),fee.getCreate_done_code());
+		int totalFee=0;
+		for(CAcctAcctitemChange change:changeList){
+			totalFee=totalFee+change.getFee();
+			if(!fee.getCust_id().equals(change.getCust_id())){
+				throw new ServicesException(ErrorCode.CustDataException);
+			}
+		}
+		if(totalFee!=fee.getReal_pay()){
+			throw new ServicesException(ErrorCode.UnPayAcctRefundFeeAndChangeIsDiffer);
+		}
+		//恢复账户金额
+		for(CAcctAcctitemChange change:changeList){
+			acctComponent.saveAcctAddFee(change.getCust_id(), fee.getAcct_id(), fee.getAcctitem_id(),
+					SystemConstants.ACCT_CHANGE_UNCFEE,change.getFee()*-1, change.getFee_type(), this.getBusiParam().getBusiCode(), doneCode);
+		}
+		//作废缴费信息
+		feeComponent.saveCancelFeeUnPay(fee.getFee_sn(), doneCode);
+		//作废业务
+		doneCodeComponent.cancelDoneCode(fee.getCreate_done_code());
+	}
+	/**
+	 * 取消未支付订单，业务回退
+	 * @param fee_sn
+	 * @throws Exception 
+	 */
+	private void cancelUnPayProdOrderPay(CFeeAcct fee,Integer doneCode) throws Exception{
+		
+		String order_sn=fee.getProd_sn();
+		
+		CProdOrder order=cProdOrderDao.findByKey(order_sn);
+		//检查套餐类要按订购顺序取消，同一个用户的宽带类单产品要按订购顺序取消，用户一个用户的非宽带单产品按相同产品订购顺序取消。
+		//目的是保证c_fee_acct中pre_invalid_date和begin_date准确
+		this.checkUnPayOrderCancel(order,fee);
+		//恢复被覆盖转移的订单
+		orderComponent.recoverTransCancelOrder(order.getDone_code(),order.getCust_id());
+		//删除c_prod_order_fee
+		cProdOrderFeeDao.deleteOrderFeeByOrderSn(order_sn);
+		//移除订单到历史表
+		orderComponent.saveCancelProdOrder(order, doneCode);
+
+		//作废缴费信息
+		feeComponent.saveCancelFeeUnPay(fee.getFee_sn(), doneCode);
+		//作废业务
+		doneCodeComponent.cancelDoneCode(fee.getCreate_done_code());
+	}
+	/**
+	 * 检查是否按顺序取消
+	 * 套餐类要按订购顺序取消，同一个用户的宽带类单产品要按订购顺序取消，用户一个用户的非宽带单产品按相同产品订购顺序取消。
+	 * 目的是保证c_fee_acct.pro_invalid_date begin_date准确
+	 * @param order
+	 * @throws Exception 
+	 */
+	private void checkUnPayOrderCancel(CProdOrder order,CFee cfee) throws Exception{
+		if(order==null||cfee==null){
+			throw new ServicesException(ErrorCode.ParamIsNull);
+		}
+		String fee_sn=cfee.getFee_sn();
+		String cust_id=cfee.getCust_id();
+		if(StringHelper.isEmpty(cust_id)||StringHelper.isEmpty(fee_sn)){
+			throw new ServicesException(ErrorCode.ParamIsNull);
+		}
+		if(!cust_id.equals(order.getCust_id())){
+			throw new ServicesException(ErrorCode.CustDataException);
+		}
+		if(cfee.getReal_pay()<0){
+			throw new ServicesException(ErrorCode.UnPayOrderCancelUnsubscribe);
+		}
+		
+		if(!order.getDone_code().equals(cfee.getCreate_done_code())||!order.getProd_id().equals(cfee.getAcctitem_id())){
+			throw new ServicesException(ErrorCode.CFeeAndProdOrderIsNotOne);
+		}
+		
+		PProd prod=pProdDao.findByKey(order.getProd_id());
+		//碰撞检测
+		if(!prod.getProd_type().equals(SystemConstants.PROD_TYPE_BASE)){	
+			//套餐处理
+			for(CProdOrder checkOrder: cProdOrderDao.queryNotExpPackageOrder(cust_id)){
+				if(order.getExp_date().before(checkOrder.getExp_date())){
+					throw new ServicesException(ErrorCode.UnPayOrderCancelBefor,checkOrder.getOrder_sn());
+				}
+			}
+			//跟单产品在套餐后续订碰撞
+			List<CProdOrder>  orderAfterPakList=cProdOrderDao.querySingleProdOrderAfterPak(order.getOrder_sn());
+			if(orderAfterPakList!=null&&orderAfterPakList.size()>0){
+				throw new ServicesException(ErrorCode.UnPayOrderCancelBefor,orderAfterPakList.get(0).getOrder_sn());
+			}
+			
+		}else{
+			//单产品直接碰撞处理
+			for(CProdOrder checkOrder: cProdOrderDao.queryProdOrderDtoByUserId(order.getUser_id())){
+				if(prod.getServ_id().equals(SystemConstants.PROD_SERV_ID_BAND)||order.getProd_id().equals(checkOrder.getProd_id())){
+					if(order.getExp_date().before(checkOrder.getExp_date())){
+						throw new ServicesException(ErrorCode.UnPayOrderCancelBefor,checkOrder.getOrder_sn());
+					}
+				}
+			}
+		}
+	}
+	/**
+	 * 取消订单退订金额：  退款转给账户，业务正常
+	 */
+	private void cancelUnPayProdUnsubscribePay(CFeeAcct fee,Integer doneCode) throws Exception{
+		
+		String order_sn=fee.getProd_sn();
+		String fee_sn=fee.getFee_sn();
+		if(StringHelper.isEmpty(order_sn)||StringHelper.isEmpty(fee_sn)){
+			throw new ServicesException(ErrorCode.ParamIsNull);
+		}
+		//提取资金转出到缴费的 订单金额明细
+		List<CProdOrderFee> orderFees=cProdOrderFeeDao.queryByOutPutInfo(order_sn, SystemConstants.ORDER_FEE_TYPE_CFEE, fee_sn);
+		for(CProdOrderFee orderFee:orderFees){
+			orderFee.setOutput_type(SystemConstants.ORDER_FEE_TYPE_ACCT);//更新转出类型为账户
+			orderFee.setOutput_sn(null);
+		}
+		//原来转给缴费的金额现在转给公用账目
+		acctComponent.saveCancelFeeToAcct(orderFees, fee.getCust_id(), doneCode, this.getBusiParam().getBusiCode());
+		//更新资金明细
+		cProdOrderFeeDao.update(orderFees.toArray(new CProdOrderFee[orderFees.size()]));
+		//作废缴费
+		feeComponent.saveCancelFeeUnPay(fee.getFee_sn(), doneCode);
+	}
+	
+	/**
+	 * 只取消设备费用,业务正常
+	 * @throws Exception 
+	 */
+	private void cancelUnPayDeviceFeePay(String fee_sn,Integer doneCode) throws Exception{
+		feeComponent.saveCancelFeeUnPay(fee_sn, doneCode);
+	}
+	
+	/**
+	 * 取消配件费，回退业务
+	 * @throws Exception 
+	 */
+	private void cancelUnPayFittingFee(CFeeDevice feeDevice,Integer doneCode) throws Exception{
+		//TODO 回退配件库存,叫小王实现
+		
+		//作废缴费
+		feeComponent.saveCancelFeeUnPay(feeDevice.getFee_sn(), doneCode);
+		//作废业务
+		doneCodeComponent.cancelDoneCode(feeDevice.getCreate_done_code());
+		
+	}
+	
+	/**
+	 * 取消营业费的收费，业务正常
+	 * @param fee_sn
+	 * @throws Exception 
+	 */
+	private void cancelUnPayBusiFee(String fee_sn,Integer doneCode) throws Exception{
+		feeComponent.saveCancelFeeUnPay(fee_sn, doneCode);
+	}
+	
+	
 	/**
 	 * 保存支付信息
 	 * @throws Exception 

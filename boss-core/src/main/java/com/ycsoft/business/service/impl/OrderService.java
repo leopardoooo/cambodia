@@ -395,83 +395,6 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		}
 	}
 	
-	/**
-	 * 取消未支付订单
-	 * @param order_sn
-	 * @throws Exception
-	 */
-	public void saveUnPayOrderCancel(String  cust_id,String order_sn,String fee_sn) throws Exception{
-		//锁定未支付业务，防止客户被多个营业员同时操作
-	    doneCodeComponent.lockCust(cust_id);
-	    doneCodeComponent.checkUnPayOtherLock(cust_id, this.getOptr().getOptr_id());
-		CProdOrder order=cProdOrderDao.findByKey(order_sn);
-		//检查套餐类要按订购顺序取消，同一个用户的宽带类单产品要按订购顺序取消，用户一个用户的非宽带单产品按相同产品订购顺序取消。
-		//退订不能取消
-		this.checkUnPayOrderCancel(order,cust_id,fee_sn);
-		
-		//恢复被覆盖转移的订单
-		orderComponent.recoverTransCancelOrder(order.getDone_code(),order.getCust_id());
-		
-		//移除订单到历史表
-		Integer doneCode=doneCodeComponent.gDoneCode();
-		orderComponent.saveCancelProdOrder(order, doneCode);
-		
-		//删除缴费信息
-		feeComponent.deleteUnPayCFee(fee_sn);
-		
-		this.saveAllPublic(doneCode, this.getBusiParam());
-	}
-	/**
-	 * 检查是否按顺序取消
-	 * 套餐类要按订购顺序取消，同一个用户的宽带类单产品要按订购顺序取消，用户一个用户的非宽带单产品按相同产品订购顺序取消。
-	 * @param order
-	 * @throws Exception 
-	 */
-	private void checkUnPayOrderCancel(CProdOrder order,String cust_id,String fee_sn) throws Exception{
-		if(StringHelper.isEmpty(cust_id)||StringHelper.isEmpty(fee_sn)||order==null){
-			throw new ServicesException(ErrorCode.ParamIsNull);
-		}
-		if(!cust_id.equals(order.getCust_id())){
-			throw new ServicesException(ErrorCode.CustDataException);
-		}
-		CFee cfee=cFeeDao.findByKey(fee_sn);
-		if(!cust_id.equals(cfee.getCust_id())){
-			throw new ServicesException(ErrorCode.CustDataException);
-		}
-		if(cfee.getReal_pay()<0){
-			throw new ServicesException(ErrorCode.UnPayOrderCancelUnsubscribe);
-		}
-		
-		if(!order.getDone_code().equals(cfee.getCreate_done_code())||!order.getProd_id().equals(cfee.getAcctitem_id())){
-			throw new ServicesException(ErrorCode.CFeeAndProdOrderIsNotOne);
-		}
-		
-		PProd prod=pProdDao.findByKey(order.getProd_id());
-		//碰撞检测
-		if(!prod.getProd_type().equals(SystemConstants.PROD_TYPE_BASE)){	
-			//套餐处理
-			for(CProdOrder checkOrder: cProdOrderDao.queryNotExpPackageOrder(cust_id)){
-				if(order.getExp_date().before(checkOrder.getExp_date())){
-					throw new ServicesException(ErrorCode.UnPayOrderCancelBefor,checkOrder.getOrder_sn());
-				}
-			}
-			//跟单产品在套餐后续订碰撞
-			List<CProdOrder>  orderAfterPakList=cProdOrderDao.querySingleProdOrderAfterPak(order.getOrder_sn());
-			if(orderAfterPakList!=null&&orderAfterPakList.size()>0){
-				throw new ServicesException(ErrorCode.UnPayOrderCancelBefor,orderAfterPakList.get(0).getOrder_sn());
-			}
-			
-		}else{
-			//单产品直接碰撞处理
-			for(CProdOrder checkOrder: cProdOrderDao.queryProdOrderDtoByUserId(order.getUser_id())){
-				if(prod.getServ_id().equals(SystemConstants.PROD_SERV_ID_BAND)||order.getProd_id().equals(checkOrder.getProd_id())){
-					if(order.getExp_date().before(checkOrder.getExp_date())){
-						throw new ServicesException(ErrorCode.UnPayOrderCancelBefor,checkOrder.getOrder_sn());
-					}
-				}
-			}
-		}
-	}
 	
 	@Override
 	public OrderProdPanel queryOrderableProd(String busiCode,String custId,String userId, String filterOrderSn)
@@ -766,19 +689,16 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		doneCodeComponent.lockCust(cust_id);
 		Integer doneCode = doneCodeComponent.gDoneCode();	
 		List<String> prodSns=new ArrayList<>();
-		//支付总额
-		int payFeeSum=0;
+		//保存未支付业务信息
 		for(OrderProd orderProd:orderProds){
-			if(StringHelper.isEmpty(orderProd.getOrder_fee_type())
-					||orderProd.getOrder_fee_type().equals(SystemConstants.ORDER_FEE_TYPE_CFEE)){
-				payFeeSum=payFeeSum+orderProd.getPay_fee();
+			if(orderProd.getPay_fee()>0&&!SystemConstants.ORDER_FEE_TYPE_ACCT.equals(orderProd.getOrder_fee_type())){
+				doneCodeComponent.saveDoneCodeUnPay(cust_id, doneCode,getOptr().getOptr_id());
+				break;
 			}
 		}
-		//支付状态判断
-		boolean isPay=this.saveDoneCodeUnPay(cust_id,payFeeSum, doneCode,this.getOptr().getOptr_id());
 		
 		for(OrderProd orderProd:orderProds){
-			prodSns.add(this.saveOrderProd(orderProd,busi_code,doneCode,isPay));
+			prodSns.add(this.saveOrderProd(orderProd,busi_code,doneCode));
 		}
 		
 		//业务流水
@@ -791,7 +711,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 	 * @throws Exception 
 	 */
 	//@Override
-	private String saveOrderProd(OrderProd orderProd,String busi_code,Integer doneCode,boolean isPay) throws Exception{
+	private String saveOrderProd(OrderProd orderProd,String busi_code,Integer doneCode) throws Exception{
 
 		//订单的业务参数
 		String remark=getOrderProdRemark(orderProd,busi_code);
@@ -810,7 +730,8 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		//产品状态设置
 		cProdOrder.setStatus(orderComponent.getNewOrderProdStatus(lastOrder,orderProd));
 		//业务是否需要支付判断                     
-		cProdOrder.setIs_pay(isPay?SystemConstants.BOOLEAN_TRUE:SystemConstants.BOOLEAN_FALSE);
+		cProdOrder.setIs_pay(orderProd.getPay_fee()>0&&!SystemConstants.ORDER_FEE_TYPE_ACCT.equals(orderProd.getOrder_fee_type())
+				?SystemConstants.BOOLEAN_FALSE:SystemConstants.BOOLEAN_TRUE);
 		cProdOrder.setRemark(remark);
 		//保存订购记录
 		orderComponent.saveCProdOrder(cProdOrder,orderProd,busi_code);

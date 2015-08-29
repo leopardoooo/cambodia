@@ -6,6 +6,7 @@ import com.ycsoft.business.commons.pojo.IParameter;
 import com.ycsoft.business.commons.pojo.Parameter;
 import com.ycsoft.business.component.core.DoneCodeComponent;
 import com.ycsoft.business.dto.config.ExtAttrFormDto;
+import com.ycsoft.commons.exception.ErrorCode;
 import com.ycsoft.commons.exception.ServicesException;
 
 /**
@@ -32,7 +33,7 @@ abstract public class BaseService implements IBaseService {
 	public static SOptr getOptr() throws ServicesException{
 		Parameter parameter = param.get();
 		if (parameter==null)
-			throw new ServicesException("缺少Optr信息");
+			throw new ServicesException(ErrorCode.SystemNoOptr);
 		return parameter.getOptr();
 	}
 	
