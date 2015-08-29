@@ -83,8 +83,6 @@ public class OrderComponent extends BaseBusiComponent {
 	@Autowired
 	private CProdOrderHisDao cProdOrderHisDao;
 	@Autowired
-	private CProdOrderTransfeeDao cProdOrderTransfeeDao;
-	@Autowired
 	private CProdStatusChangeDao cProdStatusChangeDao;
 	@Autowired
 	private TRuleDefineDao tRuleDefineDao;
@@ -532,18 +530,19 @@ public class OrderComponent extends BaseBusiComponent {
 		if(list!=null&&list.size()>0){
 			//移回正式表
 			cProdOrderDao.save(list.toArray(new CProdOrder[list.size()]));
+			//订单金额记录清除转出信息
+			for(CProdOrder order:list){
+				cProdOrderFeeDao.clearOutPutInfo(order.getOrder_sn(),SystemConstants.ORDER_FEE_TYPE_TRANSFEE);
+			}
 			String orderSns[]=new String[list.size()];
 			for(int i=0;i<list.size();i++){
 				orderSns[i]=list.get(i).getOrder_sn();
 			}
 			//历史记录表移除
 			cProdOrderHisDao.remove(orderSns);
-			//删除转移支付异动
-			cProdOrderTransfeeDao.deleteTransfeeChange(recoverDoneCode, cust_id);
 			//删除出账状态异动
 			cProdStatusChangeDao.deleteByDoneCode(recoverDoneCode);
 		}
-		
 	}
 	/**
 	 * 查询被覆盖取消的订单(套餐订购和升级的情况)
@@ -1330,4 +1329,5 @@ public class OrderComponent extends BaseBusiComponent {
 			cProdOrderFeeDao.updateFeeType(unPay.getDone_code(), feeType);
 		}
 	}
+	
 }

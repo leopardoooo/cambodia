@@ -35,6 +35,8 @@ public interface IPayService extends IBaseService{
 	
 	public void savePay(CFeePayDto pay) throws Exception;
 	
+	public String saveCancelUnPayFee(String fee_sn,String fee_type,boolean onlyShowInfo) throws Exception;
+	
 	public Integer queryExchage() throws Exception;
 	/**
 	 * 根据用户类型查询一次性费用信息

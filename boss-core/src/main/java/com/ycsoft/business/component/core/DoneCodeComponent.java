@@ -507,6 +507,10 @@ public class DoneCodeComponent extends BaseBusiComponent {
 		cDoneCodeDao.updateRemark(doneCode, remark);
 	}
 	
+	public void cancelDoneCode(Integer doneCode) throws Exception{
+		cDoneCodeDao.delete(doneCode);
+	}
+	
 	/**
 	 * @param doneCodeInfoDao the cDoneCodeInfoDao to set
 	 */

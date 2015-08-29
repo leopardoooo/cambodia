@@ -57,6 +57,9 @@ public class PayAction extends BaseBusiAction{
 	private String feeBusiListStr;
 	private int donecode;
 	
+	private String fee_type;
+	private boolean onlyShowInfo=false;
+	
 	private int newInvoiceFee;
 	private String remark;
 
@@ -130,7 +133,16 @@ public class PayAction extends BaseBusiAction{
 		payService.savePay(pay);
 		return JSON_SUCCESS;
 	}
-
+	/**
+	 * 取消一个费用
+	 * 当onlyShowInfo=true只返回提示，但不执行取消
+	 * @return
+	 * @throws Exception
+	 */
+	public String cancelUnPayFee() throws Exception{
+		getRoot().setSimpleObj(payService.saveCancelUnPayFee(fee_sn,fee_type,onlyShowInfo));
+		return JSON_SIMPLEOBJ;
+	}
 	
 	/**
 	 * 保存确认单打印
@@ -728,6 +740,9 @@ public class PayAction extends BaseBusiAction{
 		this.fee_sn = fee_sn;
 	}
 
+	public void setFee_type(String fee_type){
+		this.fee_type=fee_type;
+	}
 
 	/**
 	 * @return the invoice_code
@@ -927,5 +942,12 @@ public class PayAction extends BaseBusiAction{
 	public void setStatus(String status) {
 		this.status = status;
 	}
+	public void setOnlyShowInfo(boolean onlyShowInfo) {
+		this.onlyShowInfo = onlyShowInfo;
+	}
+	public void setPayFeesData(String payFeesData) {
+		this.payFeesData = payFeesData;
+	}
+	
 	
 }

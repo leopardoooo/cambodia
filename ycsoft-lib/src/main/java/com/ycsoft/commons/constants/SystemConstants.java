@@ -323,13 +323,13 @@ public class SystemConstants {
 	  */
 	 public final static String ACCT_CHANGE_PAY = "PAY";//支付
 	 public final static String ACCT_CHANGE_CFEE = "JF";//缴费
-	 public final static String ACCT_CHANGE_INIT = "INIT";
+	 public final static String ACCT_CHANGE_INIT = "INIT";//初始化
 	 public final static String ACCT_CHANGE_UNCFEE = "JFCZ";//缴费冲正
-	 public final static String ACCT_CHANGE_REFUND = "TK";
-	 public final static String ACCT_CHANGE_WRITEOFF = "XZ";
-	 public final static String ACCT_CHANGE_UNWRITEOFF = "FXZ";
-	 public final static String ACCT_CHANGE_UNFREEZE = "JD";
-	 public final static String ACCT_CHANGE_TRANS = "ZZ";
+	 public final static String ACCT_CHANGE_REFUND = "TK";//退款
+	 public final static String ACCT_CHANGE_WRITEOFF = "XZ";//销账
+	 public final static String ACCT_CHANGE_UNWRITEOFF = "FXZ";//反销账
+	 public final static String ACCT_CHANGE_UNFREEZE = "JD";//解冻
+	 public final static String ACCT_CHANGE_TRANS = "ZZ";//转账
 	 public final static String ACCT_CHANGE_PROMOTION = "CXZS";
 	 public final static String ACCT_CHANGE_PROMOTION_CANCEL = "CXQX";
 	 public final static String ACCT_CHANGE_ADJUST = "TZ";
@@ -584,4 +584,8 @@ public class SystemConstants {
 	public static final String ORDER_FEE_TYPE_TRANSFEE="TRANSFEE";//覆盖转移
 	public static final String ORDER_FEE_TYPE_CFEE="CFEE";//缴费
 	public static final String ORDER_FEE_TYPE_ACCT="ACCT";//公用账目支付
+	
+	public static final String UNPAY_CANCEL_PROMPT_FEEANDBUSI="FeeAndBusi";//回退业务并取消费用
+	public static final String UNPAY_CANCEL_PROMPT_ONLYFEE="OnlyFee";//业务正常，仅取消费用
+	public static final String UNPAY_CANCEL_PROMPT_ONLYACCT="OnlyAcct";//业务正常，仅退款转账户
  }

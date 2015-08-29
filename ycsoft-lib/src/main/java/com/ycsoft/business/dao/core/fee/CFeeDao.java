@@ -430,6 +430,16 @@ public class CFeeDao extends BaseEntityDao<CFee> {
 				+ sqlGenerator.in(feeSns) + ") and a.fee_sn=b.fee_sn and a.fee_type=?";
 		return createQuery(CFeeAcct.class,sql,SystemConstants.FEE_TYPE_ACCT).list();
 	}
+	/**
+	 * 查询账目费用
+	 * @param feeSn
+	 * @return
+	 * @throws JDBCException 
+	 */
+	public CFeeAcct queryAcctFee(String feeSn) throws JDBCException{
+		String sql = "select * from c_fee a,c_fee_acct b where a.fee_sn =? and a.fee_sn=b.fee_sn and a.fee_type=?";
+		return createQuery(CFeeAcct.class,sql,feeSn,SystemConstants.FEE_TYPE_ACCT).first();
+	}
 
 	/**
 	 * 统计所有费用
