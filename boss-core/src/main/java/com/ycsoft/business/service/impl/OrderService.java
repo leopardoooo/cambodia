@@ -1230,7 +1230,8 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		pay.setAcct_id(acct.getAcct_id());
 		pay.setAcctitem_id(SystemConstants.ACCTITEM_PUBLIC_ID);
 		pay.setFee(fee*-1);
-		this.saveAcctPay(doneCode, pay);
+		feeComponent.saveAcctFee(custId,this.getBusiParam().getCust().getAddr_id(), pay, doneCode, this.getBusiParam().getBusiCode(), SystemConstants.PAY_TYPE_UNPAY);
+		acctComponent.saveAcctDebitFee(custId, acct.getAcct_id(), SystemConstants.ACCTITEM_PUBLIC_ID, SystemConstants.ACCT_CHANGE_REFUND, fee*-1, this.getBusiParam().getBusiCode(), doneCode, true);
 		
 		//检查金额
 		List<CAcctAcctitemActive> list = acctComponent.queryActiveMinusByCustId(custId);
