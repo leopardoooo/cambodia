@@ -766,19 +766,16 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		doneCodeComponent.lockCust(cust_id);
 		Integer doneCode = doneCodeComponent.gDoneCode();	
 		List<String> prodSns=new ArrayList<>();
-		//支付总额
-		int payFeeSum=0;
+		//保存未支付业务信息
 		for(OrderProd orderProd:orderProds){
-			if(StringHelper.isEmpty(orderProd.getOrder_fee_type())
-					||orderProd.getOrder_fee_type().equals(SystemConstants.ORDER_FEE_TYPE_CFEE)){
-				payFeeSum=payFeeSum+orderProd.getPay_fee();
+			if(orderProd.getPay_fee()>0&&!SystemConstants.ORDER_FEE_TYPE_ACCT.equals(orderProd.getOrder_fee_type())){
+				doneCodeComponent.saveDoneCodeUnPay(cust_id, doneCode,getOptr().getOptr_id());
+				break;
 			}
 		}
-		//支付状态判断
-		boolean isPay=this.saveDoneCodeUnPay(cust_id,payFeeSum, doneCode,this.getOptr().getOptr_id());
 		
 		for(OrderProd orderProd:orderProds){
-			prodSns.add(this.saveOrderProd(orderProd,busi_code,doneCode,isPay));
+			prodSns.add(this.saveOrderProd(orderProd,busi_code,doneCode));
 		}
 		
 		//业务流水
@@ -791,7 +788,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 	 * @throws Exception 
 	 */
 	//@Override
-	private String saveOrderProd(OrderProd orderProd,String busi_code,Integer doneCode,boolean isPay) throws Exception{
+	private String saveOrderProd(OrderProd orderProd,String busi_code,Integer doneCode) throws Exception{
 
 		//订单的业务参数
 		String remark=getOrderProdRemark(orderProd,busi_code);
@@ -810,7 +807,8 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		//产品状态设置
 		cProdOrder.setStatus(orderComponent.getNewOrderProdStatus(lastOrder,orderProd));
 		//业务是否需要支付判断                     
-		cProdOrder.setIs_pay(isPay?SystemConstants.BOOLEAN_TRUE:SystemConstants.BOOLEAN_FALSE);
+		cProdOrder.setIs_pay(orderProd.getPay_fee()>0&&!SystemConstants.ORDER_FEE_TYPE_ACCT.equals(orderProd.getOrder_fee_type())
+				?SystemConstants.BOOLEAN_FALSE:SystemConstants.BOOLEAN_TRUE);
 		cProdOrder.setRemark(remark);
 		//保存订购记录
 		orderComponent.saveCProdOrder(cProdOrder,orderProd,busi_code);

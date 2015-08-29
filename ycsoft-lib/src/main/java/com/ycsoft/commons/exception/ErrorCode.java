@@ -3,6 +3,7 @@ package com.ycsoft.commons.exception;
 public enum ErrorCode {
 	
 	UNKNOW_EXCEPTION("未知异常，请联系管理员"),
+	SystemNoOptr("缺失操作员信息"),
 	
 	ParamIsNull("参数为空！"),
 	DataNumTooMuch("结果集大于2000条，请增加关键字搜索！"),
