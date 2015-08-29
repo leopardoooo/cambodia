@@ -136,6 +136,7 @@ public class PayAction extends BaseBusiAction{
 	/**
 	 * 取消一个费用
 	 * 当onlyShowInfo=true只返回提示，但不执行取消
+	 * fee_type = c_fee.fee_type
 	 * @return
 	 * @throws Exception
 	 */

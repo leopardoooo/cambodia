@@ -14,12 +14,12 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.ycsoft.beans.config.TPayType;
 import com.ycsoft.beans.core.acct.CAcct;
 import com.ycsoft.beans.core.acct.CAcctAcctitemActive;
 import com.ycsoft.beans.core.acct.CAcctAcctitemChange;
 import com.ycsoft.beans.core.common.CDoneCodeUnpay;
 import com.ycsoft.beans.core.cust.CCust;
-import com.ycsoft.beans.core.fee.CFee;
 import com.ycsoft.beans.core.fee.CFeeAcct;
 import com.ycsoft.beans.core.prod.CProdOrder;
 import com.ycsoft.beans.core.prod.CProdOrderDto;
@@ -30,6 +30,7 @@ import com.ycsoft.beans.prod.PPackageProd;
 import com.ycsoft.beans.prod.PProd;
 import com.ycsoft.beans.prod.PProdTariff;
 import com.ycsoft.business.component.core.OrderComponent;
+import com.ycsoft.business.dao.config.TPayTypeDao;
 import com.ycsoft.business.dao.config.TRuleDefineDao;
 import com.ycsoft.business.dao.core.acct.CAcctAcctitemActiveDao;
 import com.ycsoft.business.dao.core.acct.CAcctAcctitemDao;
@@ -92,6 +93,8 @@ public class OrderService extends BaseBusiService implements IOrderService{
 	private CAcctAcctitemActiveDao cAcctAcctitemActiveDao;
 	@Autowired
 	private CAcctAcctitemDao cAcctAcctitemDao;
+	@Autowired
+	private TPayTypeDao tPayTypeDao;
 
 	/**
 	 * 产品终止退订
@@ -1113,9 +1116,10 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		Integer doneCode=doneCodeComponent.gDoneCode();
 		String busiCode = this.getBusiParam().getBusiCode();
 		if(fee >0){
-			//记录未支付业务
-			doneCodeComponent.saveDoneCodeUnPay(custId, doneCode, this.getOptr().getOptr_id());
-			
+			if(pay_type.equals(SystemConstants.PAY_TYPE_CASH)){
+				//记录未支付业务
+				doneCodeComponent.saveDoneCodeUnPay(custId, doneCode, this.getOptr().getOptr_id());
+			}
 			//查询公用账户
 			CAcct acct=acctComponent.queryCustAcctByCustId(cust.getCust_id());
 			String acctItemId=SystemConstants.ACCTITEM_PUBLIC_ID;
@@ -1127,7 +1131,8 @@ public class OrderService extends BaseBusiService implements IOrderService{
 			pay.setFee(fee);
 			feeComponent.saveAcctFee(custId, cust.getAddr_id(), pay, doneCode, busiCode, StatusConstants.UNPAY);
 			//保存缴费信息
-			acctComponent.savePublicRecharge(acct.getAcct_id(),acctItemId,pay_type,fee,receipt_id,doneCode,custId ,busiCode);
+			TPayType type = tPayTypeDao.findByKey(pay_type);
+			acctComponent.saveAcctAddFee(custId, acct.getAcct_id(), acctItemId, SystemConstants.ACCT_CHANGE_CFEE, fee, type.getAcct_feetype(), busiCode, doneCode);
 		}
 		this.saveAllPublic(doneCode, this.getBusiParam());
 	}

@@ -95,7 +95,7 @@ PayPanel = Ext.extend( Ext.Panel ,{
 			fields: [
 				'fee_sn','busi_name','fee_text','count','optr_name','create_time',
 				{name: 'real_pay', type: 'int'},
-				'prod_sn', 'begin_date','prod_invalid_date'
+				'prod_sn', 'begin_date','prod_invalid_date','fee_type'
 			]
 		});
 		p = this.payForm ;
@@ -161,7 +161,16 @@ PayPanel = Ext.extend( Ext.Panel ,{
 	},
 	deletePay : function() {
 		var rec = this.feeGrid.getSelectionModel().getSelected();
-		alert(rec.get('prod_sn'));
+				// 请求后台的数据
+		Ext.Ajax.request({
+			scope: this,
+			url: Constant.ROOT_PATH + "/core/x/Pay!cancelUnPayFee.action",
+			params: {fee_sn: rec.get('fee_sn'),fee_type:rec.get('fee_type'),onlyShowInfo:false},
+			success: function(res, ops){
+				var data = Ext.decode(res.responseText);
+				alert(data);
+			}
+		});
 	},
 	feeData: null,
 	loadBaseData: function(){

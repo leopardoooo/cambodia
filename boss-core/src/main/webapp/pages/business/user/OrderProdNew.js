@@ -159,7 +159,7 @@ ProdOrderForm = Ext.extend( BaseForm, {
          			style:'margin-left:10px;padding: 10px 0 10px 10px; color: red',
          			layout:'column',
          			items:[{
-         				columnWidth:.64,
+         				columnWidth:.60,
          				items:[{
          						bodyStyle:'padding-top:4px',
 		         				html: "* 应收$:<span id='totalAmount'>--</span>"
@@ -169,8 +169,9 @@ ProdOrderForm = Ext.extend( BaseForm, {
 								+" ）"
 			         			}]
          				},{
-         				columnWidth:.36,
+         				columnWidth:.40,
          				layout : 'form',
+         				labelWidth:65,  
          				items:[{
 								fieldLabel : '处理方式',
 								id : 'orderFeeTypeId',
