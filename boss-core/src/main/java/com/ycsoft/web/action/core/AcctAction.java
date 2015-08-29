@@ -26,6 +26,7 @@ import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.helper.CollectionHelper;
 import com.ycsoft.commons.helper.LoggerHelper;
 import com.ycsoft.commons.helper.StringHelper;
+import com.ycsoft.daos.core.JDBCException;
 import com.ycsoft.daos.core.Pager;
 import com.ycsoft.web.commons.abstracts.BaseBusiAction;
 /**
@@ -294,8 +295,8 @@ public class AcctAction extends BaseBusiAction {
 	 * @throws Exception
 	 */
 	public String queryPublicAcctitem() throws Exception{
-		getRoot().setSimpleObj(acctService.queryPublicAcctItemByCustId(custId));
-		return JSON_SIMPLEOBJ;
+		getRoot().setRecords(acctService.queryPublicAcctItemByCustId(custId));
+		return JSON_RECORDS;
 	}
 
 	/**

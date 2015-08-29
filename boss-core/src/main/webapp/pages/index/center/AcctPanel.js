@@ -145,23 +145,23 @@ AcctGrid = Ext.extend(Ext.ux.Grid,{
 		this.fireEvent('afterrender',this);
 	},
 	remoteRefresh:function(){
-		//显示数据加载提示框
-		App.showTip();
-		this.acctStore.baseParams.custId=App.getApp().getCustId();
-		this.acctStore.baseParams.custStatus=App.data.custFullInfo.cust.status;
-		this.acctStore.load();
+//		//显示数据加载提示框
+//		App.showTip();
+//		this.acctStore.baseParams.custId=App.getApp().getCustId();
+//		this.acctStore.baseParams.custStatus=App.data.custFullInfo.cust.status;
+//		this.acctStore.load();
 		
-		this.parent.acctItemDetailTab.resetPanel();
-		
-			
-		//过滤tbar按钮
-		if(App.getCust().status == 'RELOCATE'){
-			App.getApp().disableBarByBusiCode(this.getTopToolbar(),['1040'],true);
-		}else if(App.getCust().status == 'DATACLOSE'){
-			App.getApp().disableBarByBusiCode(this.getTopToolbar(),['1040','1049'],true);
-		}else if(App.getCust().status == 'ACTIVE'){
-			App.getApp().disableBarByBusiCode(this.getTopToolbar(),['1040','1049'],false);
-		}
+//		this.parent.acctItemDetailTab.resetPanel();
+//		
+//			
+//		//过滤tbar按钮
+//		if(App.getCust().status == 'RELOCATE'){
+//			App.getApp().disableBarByBusiCode(this.getTopToolbar(),['1040'],true);
+//		}else if(App.getCust().status == 'DATACLOSE'){
+//			App.getApp().disableBarByBusiCode(this.getTopToolbar(),['1040','1049'],true);
+//		}else if(App.getCust().status == 'ACTIVE'){
+//			App.getApp().disableBarByBusiCode(this.getTopToolbar(),['1040','1049'],false);
+//		}
 	},
 	doClickRecord : function(grid,index,e){
 		var rec = grid.getStore().getAt(index);
@@ -183,6 +183,7 @@ AcctItemGrid = Ext.extend(Ext.ux.Grid,{
 	constructor:function(p){
 		this.parent = p;
 		this.acctItemStore = new Ext.data.JsonStore({
+			url:Constant.ROOT_PATH + "/core/x/Acct!queryPublicAcctitem.action",
 			fields : [
 			{name : 'acct_id'},
 			{name : 'acctitem_id'},
@@ -269,8 +270,13 @@ AcctItemGrid = Ext.extend(Ext.ux.Grid,{
 	initEvents: function(){
 		this.on("rowclick", this.doDbClickRecord, this );
 		AcctItemGrid.superclass.initEvents.call(this);
+		this.on("afterrender",function(){
+			this.swapViews();
+		},this,{delay:10});
 	},
 	doLoadResult : function(_store, _rs, ops){
+		//隐藏数据加载提示框
+		App.hideTip();
 		if(this.parent){
 			var acctId = this.parent.acctItemDetailTab.acctId;
 			var acctItemId = this.parent.acctItemDetailTab.acctItemId;
@@ -291,8 +297,13 @@ AcctItemGrid = Ext.extend(Ext.ux.Grid,{
 			}
 		}
 	},
-	remoteRefresh:function(acctstore){
-		this.doLoadAcctItem(acctstore,this.acctId);
+	remoteRefresh:function(){
+		//显示数据加载提示框
+		App.showTip();
+		this.acctItemStore.baseParams.custId=App.getApp().getCustId();
+		this.acctItemStore.load();
+		this.parent.acctItemDetailTab.resetPanel();
+//		this.doLoadAcctItem(acctstore,this.acctId);
 	},
 	doDbClickRecord : function(grid,index,e){
 		if(this.parent){
@@ -808,9 +819,9 @@ AcctPanel = Ext.extend(BaseInfoPanel,{
 		});
 	},
 	refresh:function(){
-		this.acctItemGrid.reset();
+//		this.acctItemGrid.reset();
 		this.acctItemDetailTab.resetPanel();
-		this.acctGrid.remoteRefresh();
+		this.acctItemGrid.remoteRefresh();
 	}
 });
 Ext.reg( "acctPanel" , AcctPanel );

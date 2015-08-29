@@ -424,7 +424,7 @@ public class OrderComponent extends BaseBusiComponent {
 			for(CProdOrderFee orderFee: orderFees){
 				totalOrderFee=totalOrderFee+orderFee.getInput_fee();
 			}
-			if(totalOrderFee!=cancelOrder.getOrder_fee()){
+			if(totalOrderFee!=cancelOrder.getOrder_fee().intValue()){
 				throw new ComponentException(ErrorCode.OrderFeeDisagree,cancelOrder.getOrder_sn());
 			}
 			

@@ -46,15 +46,8 @@ import com.ycsoft.beans.core.common.CDoneCode;
 import com.ycsoft.beans.core.cust.CCust;
 import com.ycsoft.beans.core.fee.CFee;
 import com.ycsoft.beans.core.prod.CProd;
-import com.ycsoft.beans.core.promotion.CPromFee;
 import com.ycsoft.beans.core.user.CUser;
-import com.ycsoft.beans.core.user.CUserAtv;
-import com.ycsoft.beans.core.user.CUserBroadband;
-import com.ycsoft.beans.core.user.CUserDtv;
-import com.ycsoft.beans.prod.PPackageProd;
-import com.ycsoft.beans.prod.PProd;
 import com.ycsoft.beans.prod.PProdTariff;
-import com.ycsoft.beans.prod.PProdUserRes;
 import com.ycsoft.beans.prod.PPromFee;
 import com.ycsoft.beans.system.SDept;
 import com.ycsoft.beans.system.SOptr;
@@ -73,13 +66,11 @@ import com.ycsoft.business.dto.core.acct.PayDto;
 import com.ycsoft.business.dto.core.acct.QueryAcctitemThresholdDto;
 import com.ycsoft.business.dto.core.acct.UnitPayDto;
 import com.ycsoft.business.dto.core.cust.CustFullInfoDto;
-import com.ycsoft.business.dto.core.cust.DoneInfoDto;
 import com.ycsoft.business.dto.core.fee.CFeePayDto;
 import com.ycsoft.business.dto.core.print.ConfirmPrintDto;
 import com.ycsoft.business.dto.core.print.ConfirmPrintDto.ConfirmPrint;
 import com.ycsoft.business.dto.core.prod.CProdDto;
 import com.ycsoft.business.dto.core.prod.PromFeeProdDto;
-import com.ycsoft.business.dto.core.user.UserDto;
 import com.ycsoft.business.service.IAcctService;
 import com.ycsoft.commons.constants.BusiCmdConstants;
 import com.ycsoft.commons.constants.BusiCodeConstants;
@@ -90,7 +81,6 @@ import com.ycsoft.commons.exception.ServicesException;
 import com.ycsoft.commons.helper.CollectionHelper;
 import com.ycsoft.commons.helper.DateHelper;
 import com.ycsoft.commons.helper.JsonHelper;
-import com.ycsoft.commons.helper.LoggerHelper;
 import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.commons.store.MemoryDict;
 import com.ycsoft.daos.core.JDBCException;
@@ -1625,9 +1615,13 @@ public class AcctService extends BaseBusiService implements IAcctService {
 	 * @return
 	 * @throws Exception 
 	 */
-	public CAcctAcctitem queryPublicAcctItemByCustId(String custId) throws Exception{
+	public List<CAcctAcctitem> queryPublicAcctItemByCustId(String custId) throws Exception{
 		CAcct acct= acctComponent.queryCustAcctByCustId(custId);
-		return acctComponent.queryAcctItemEsayByAcctitemId(acct.getAcct_id(), SystemConstants.ACCTITEM_PUBLIC_ID);
+		List<CAcctAcctitem> list = new ArrayList<CAcctAcctitem>();
+		CAcctAcctitem  t = acctComponent.queryAcctItemEsayByAcctitemId(acct.getAcct_id(), SystemConstants.ACCTITEM_PUBLIC_ID);
+		t.setAcctitem_name("公用账户");
+		list.add(t);
+		return list;
 	}
 	
 	public List<AcctitemDto> queryAcctitemToCallCenter(Map<String,Object> params) throws Exception{

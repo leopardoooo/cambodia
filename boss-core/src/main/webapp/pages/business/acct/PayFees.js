@@ -96,6 +96,62 @@ PayFeesForm = Ext.extend( BaseForm , {
 				region:'center',
 				layout : 'fit',
 				items:[this.panel]
+			},{
+				 region: "south",
+				 height: 80, 
+				 buttonAlign:'center',
+				 flex:1,
+       			 frame:true,  
+				 labelAlign:'right',  
+				 layout:'column',
+				 labelWidth:50,  
+				 border: false,
+		         items:[{ 
+		         	columnWidth:.55,
+		         	xtype:'fieldset',  
+				    height: 60, 
+				    title:'产品费',
+         			style:'margin-left:10px;padding: 10px 0 10px 10px; color: red',
+         			layout:'column',
+         			items:[{
+         				columnWidth:.50,
+         				items:[{
+         						bodyStyle:'padding-top:4px',
+		         				html: "* 应收$:<span id='totalAmount'>--</span>"
+			         			}]
+         				},{
+         				columnWidth:.50,
+         				layout : 'form',
+         				items:[{
+								fieldLabel : '处理方式',
+								id : 'payFeeTypeId',
+								name:'order_fee_type',
+								allowBlank : false,
+								xtype:'paramcombo',
+								width: 80,
+								emptyText: '请选择',
+								defaultValue:'CFEE',
+								paramName:'ORDER_FEE_TYPE',
+								listeners: {
+									scope: this,
+									'expand': function(combo){
+										var store = combo.getStore();
+										store.removeAt(store.find('item_value','TRANSFEE'));
+									}
+								}
+							}]
+         				}]
+		         },{  
+				    columnWidth:.45,
+		         	xtype:'fieldset',  
+		         	height: 60, 
+		         	title:'业务费',
+		         	style:'margin-left:10px;padding: 10px 0 10px 10px; color: red',
+		         	items:[{
+		         		bodyStyle:'padding-top:4px',
+						html: "* 应收$:<span id='totalAmount'>--</span>"
+		         	}]
+		         }] 
 			}]
 		});
 	},
@@ -189,7 +245,7 @@ TransferPayWindow = Ext.extend(Ext.Window, {
 	},
 	show: function(data, effDate){
 		this.store.loadData(data);
-		this.setTitle("转移明细（开始计费日：" + effDate.format("Y-m-d") + "）");
+		this.setTitle("转移明细（开始计费日：" + effDate + "）");
 		return TransferPayWindow.superclass.show.call(this);
 	}
 });

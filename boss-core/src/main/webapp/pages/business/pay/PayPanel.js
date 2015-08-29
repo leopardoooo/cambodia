@@ -84,7 +84,9 @@ MoreInfoTemplate = {
 PayPanel = Ext.extend( Ext.Panel ,{
 	feeStore: null ,
 	payForm: null,
+	feeGrid:null,
 	constructor: function(){
+		payPanelThis = this;
 		// 缴费信息的表单
 		this.payForm = new PayForm(this);
 		//实例化fee store
@@ -98,7 +100,7 @@ PayPanel = Ext.extend( Ext.Panel ,{
 		});
 		p = this.payForm ;
 		//费用表格
-		var feeGrid = new Ext.grid.GridPanel({
+		this.feeGrid = new Ext.grid.GridPanel({
 			title: '支付项目',
 			region: 'center',
 			border: false,
@@ -114,7 +116,7 @@ PayPanel = Ext.extend( Ext.Panel ,{
 				{ header: '操作时间', dataIndex: 'create_time', width: 80},
 				{ header: '订单号', dataIndex: 'prod_sn', width: 60,renderer: function(v , md, record , i  ){
 					if(v && record.get("real_pay") > 0){
-						return "<DIV><a href='#' onclick='more("+ i +");'>取消</a></DIV>";
+						return "<DIV><a href='#' onclick='payPanelThis.deletePay();'>取消</a></DIV>";
 					}
 					return "";
 				}}
@@ -139,7 +141,7 @@ PayPanel = Ext.extend( Ext.Panel ,{
 				{
 				region: 'center',
 				layout: 'border',
-				items: [feeGrid ]
+				items: [this.feeGrid ]
 			},
 				{
 				region: 'east',
@@ -156,6 +158,10 @@ PayPanel = Ext.extend( Ext.Panel ,{
 			}]
 		});
 		this.loadBaseData();
+	},
+	deletePay : function() {
+		var rec = this.feeGrid.getSelectionModel().getSelected();
+		alert(rec.get('prod_sn'));
 	},
 	feeData: null,
 	loadBaseData: function(){

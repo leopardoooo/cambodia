@@ -7,6 +7,7 @@ SinglePayFeesGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 	transferPayWindow: null,
 	//转移支付数据明细
 	transferPayData: [],
+	totalAmount: 0,
 	constructor:function(data){
 		this.payFeesStore = new Ext.data.GroupingStore({
 				url: Constant.ROOT_PATH + '/core/x/ProdOrder!queryFollowPayOrderDto.action', 
@@ -89,12 +90,13 @@ SinglePayFeesGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 								}
 							}})},
 					{header:'原到期日',dataIndex:'exp_date',width:110,renderer:Ext.util.Format.dateFormat},
+					{header:'计费期日',dataIndex:'eff_date',width:110,renderer:Ext.util.Format.dateFormat},		
 					{id:'pay_month_id',header:'缴费月数',dataIndex:'pay_month',width:100,
 						scope:this
 						,editor: new Ext.form.NumberField({
 							allowDecimals:false,//不允许输入小数 
 			    			allowNegative:false,
-			    			minValue:1,//enableKeyEvents: true,
+//			    			minValue:1,//enableKeyEvents: true,
 								scope:this,
 								listeners:{
 									specialKey : function(field, e) {
@@ -206,8 +208,15 @@ SinglePayFeesGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 		var value = obj.value;
 		if(fieldName=='pay_month'){
 			if(!this.doAfterFindDateFee(record,value)){
+				if(record.get('fee')){
+					this.totalAmount = this.totalAmount - record.get('fee');
+					Ext.get('totalAmount').update(Ext.util.Format.convertToYuan(this.totalAmount));
+				}
 				this.doIntNullValue(record);
 				this.startEditing(obj.row,obj.column);
+			}else{
+				this.totalAmount = this.totalAmount + record.get('fee');
+				Ext.get('totalAmount').update(Ext.util.Format.convertToYuan(this.totalAmount));
 			}
 		}else if(fieldName = 'tariff_name_next'){
 			
@@ -264,8 +273,7 @@ SinglePayFeesGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 			this.transferPayWindow = new TransferPayWindow();
 		}
 		if(this.transferPayData && this.transferPayData.length > 0){
-			var invalidDate = this.getNextBeginDate(rec.get('exp_date'));
-			this.transferPayWindow.show(this.transferPayData, invalidDate);
+			this.transferPayWindow.show(this.transferPayData, Date.parseDate(rec.get('eff_date'),"Y-m-d H:i:s").format('Y-m-d'));
 		}else{
 			Alert("没有转移支付项目!");
 		}
@@ -275,7 +283,9 @@ SinglePayFeesGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 			 Alert("原资费已经失效，请选新的资费!");  
 			 return false;  
 		}
-		
+		//计算开始计费期日
+		var startDate =  this.getNextBeginDate(record.get('exp_date'));
+		record.set('eff_date', startDate.format("Y-m-d H:i:s"));
 		if(value != null){
 			if(value >0 ){
 				//输入正整数
@@ -312,14 +322,9 @@ SinglePayFeesGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 					record.set('fee_back', Ext.util.Format.convertToYuan(payfee));
 				}
 				
-				//计算到期日
-				var invalidDate = this.getNextBeginDate(record.get('exp_date'));
-//				//原到期日小于当天的，到期日按当天算
-//				if(this.compareTodayDate(record.get('exp_date'))){
-//					invalidDate = Date.parseDate(record.get('exp_date'),  "Y-m-d H:i:s");
-//				}
-//				invalidDate.setDate(invalidDate.getDate()+1);
+				var invalidDate =  this.getNextBeginDate(record.get('exp_date'))
 				invalidDate.setMonth(invalidDate.getMonth() + value);
+				invalidDate.setDate(invalidDate.getDate()-1)
 				record.set('fee_month', invalidDate);
 				
 			}else if(value == 0){
@@ -350,6 +355,7 @@ SinglePayFeesGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 				values["transfer_fee"] = record.get('transfer_fee')?record.get('transfer_fee'):0;
 				// 失效日期
 				values["exp_date"] = record.get('fee_month');
+				values["order_fee_type"] = Ext.getCmp('payFeeTypeId').getValue();
 				arr.push(values);
 			}
 		},this);
@@ -360,8 +366,8 @@ SinglePayFeesGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 		//原到期日小于当天的，到期日按当天算
 		if(this.compareTodayDate(date)){
 			invalidDate = Date.parseDate(date,  "Y-m-d H:i:s");
+			invalidDate.setDate(invalidDate.getDate()+1);
 		}
-		invalidDate.setDate(invalidDate.getDate());
 		return invalidDate;
 	}
 	,
@@ -369,7 +375,7 @@ SinglePayFeesGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 		var invalidDate = Date.parseDate(date,  "Y-m-d H:i:s");
 		var nowDate = Date.parseDate(new Date().format('Y-m-d'),'Y-m-d');
 		//原到期日小于当天的，到期日按当天算
-		if(invalidDate.getTime() - nowDate.getTime() >0 ){
+		if(invalidDate.getTime() - nowDate >=0 ){
 			return true;
 		}else{
 			return false;
@@ -387,10 +393,8 @@ SinglePayFeesGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 		//原到期日小于当天的，到期日按当天算
 		if(this.compareTodayDate(record.get('exp_date'))){
 			values["last_order_sn"] = record.get('order_sn');
-			invalidDate = Date.parseDate(record.get('exp_date'),  "Y-m-d H:i:s");
 		}
-		invalidDate.setDate(invalidDate.getDate()+1);
-		values["eff_date"] = invalidDate.format("Y-m-d H:i:s");
+		values["eff_date"] = this.getNextBeginDate(record.get('exp_date')).format("Y-m-d H:i:s");
 		
 		// 产品信息
 		values["prod_id"] = record.get('prod_id');

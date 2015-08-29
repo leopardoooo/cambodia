@@ -160,7 +160,6 @@ ProdOrderForm = Ext.extend( BaseForm, {
          			layout:'column',
          			items:[{
          				columnWidth:.64,
-         				layout : 'form',
          				items:[{
          						bodyStyle:'padding-top:4px',
 		         				html: "* 应收$:<span id='totalAmount'>--</span>"
@@ -173,7 +172,7 @@ ProdOrderForm = Ext.extend( BaseForm, {
          				columnWidth:.36,
          				layout : 'form',
          				items:[{
-								fieldLabel : '支付',
+								fieldLabel : '处理方式',
 								id : 'orderFeeTypeId',
 								name:'order_fee_type',
 								allowBlank : false,
@@ -194,11 +193,13 @@ ProdOrderForm = Ext.extend( BaseForm, {
 		         },{  
 				    columnWidth:.30,
 		         	xtype:'fieldset',  
-		         	layout:'form',  
 		         	height: 60, 
 		         	title:'业务费',
 		         	style:'margin-left:10px;padding: 10px 0 10px 10px; color: red',
-					html: "* 应收$:<span id='totalAmount'>--</span>"
+					items:[{
+		         		bodyStyle:'padding-top:4px',
+						html: "* 应收$:<span id='totalAmount'>--</span>"
+		         	}]
 		         }]  
 			}]
 		});

@@ -411,8 +411,8 @@ Ext.apply( App, {
 		}else if(busiCode == '1015' || busiCode == '1027' || busiCode == '1127' || busiCode == '1034' || busiCode == '1028'|| busiCode == '1072' || busiCode == '1232' || busiCode == '1081'|| busiCode == '1983' || busiCode == '1984' || busiCode == '1036' || busiCode =='1304' || busiCode == '110'){//产品退订或套餐退订，刷新账户、产品和套餐, //资费变更、协议缴费,失效日期变更、取消变更资费,修改到期日,修改预开通时间,修改公用账目使用类型
 			panel.getUserPanel().prodGrid.remoteRefresh();
 			panel.getAcctPanel().acctGrid.remoteRefresh();
-			if(busiCode == '1015')
-				panel.getBillPanel().billGrid.remoteRefresh();
+//			if(busiCode == '1015')
+//				panel.getBillPanel().billGrid.remoteRefresh();
 //			if (unitRefresh)
 //				panel.getUnitPanel().packageGrid.remoteRefresh();
 //			else
@@ -449,13 +449,13 @@ Ext.apply( App, {
 		}
 /****************账户面板相关业务*************************/
 		else if(busiCode == '1040' || busiCode == '1110' || busiCode == '1112'){//缴费，刷新账户 、用户，费用
-			panel.getAcctPanel().acctGrid.remoteRefresh();
+			panel.getAcctPanel().acctItemGrid.remoteRefresh();
 			if (!unitRefresh)
 				panel.getUserPanel().userGrid.remoteRefresh();
 		}else if(busiCode == '1041' || busiCode == '1042' || busiCode == '1088' || busiCode == '1086' || busiCode == '1166' || busiCode == '1043' || busiCode == '1073' || busiCode == '1116'){//退款、减免费用、补收费用、转账，刷新账户,欠费抹零、各种调账 
 			panel.getAcctPanel().acctGrid.remoteRefresh();
 			panel.getUserPanel().prodGrid.remoteRefresh();
-			panel.getBillPanel().billGrid.remoteRefresh();
+//			panel.getBillPanel().billGrid.remoteRefresh();
 		}else if(busiCode == '1052' || busiCode == '1053'){//修改费用、修改备注
 			panel.getDoneCodePanel().doneCodeGrid.remoteRefresh();
 		}else if(busiCode == '1061' || busiCode == '1063' || busiCode == '1163'){
@@ -472,7 +472,7 @@ Ext.apply( App, {
 			panel.getAcctPanel().acctGrid.remoteRefresh();
 			panel.getUserPanel().prodGrid.remoteRefresh();
 			panel.getCustPanel().refreshPromFeeGrid();
-			panel.getBillPanel().billGrid.remoteRefresh();
+//			panel.getBillPanel().billGrid.remoteRefresh();
 		}
 		
 		App.getApp().refreshFeeView();

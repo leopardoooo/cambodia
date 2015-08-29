@@ -92,7 +92,7 @@ UserProdGrid = Ext.extend(Ext.grid.GridPanel,{
 			         "order_sn","package_sn","package_id","cust_id","user_id","prod_id","tariff_id","disct_id",
 			         "status","status_text","status_date","eff_date","exp_date","active_fee","bill_fee",
 			         "rent_fee","last_bill_date","next_bill_date","order_months","order_fee","order_time",
-			         "order_type","package_group_id","remark","public_acctitem_type"],
+			         "order_type","package_group_id","remark","public_acctitem_type","balance_cfee","balance_acct"],
 			sortInfo : {
 				field : 'order_time',
 				direction:'DESC'
@@ -114,6 +114,8 @@ UserProdGrid = Ext.extend(Ext.grid.GridPanel,{
 			{header:'所属套餐',dataIndex:'package_name',width:80},
 			{header:'当前资费',dataIndex:'tariff_name',	width:80},
 			{header:'订单余额',dataIndex:'active_fee',width:80,xtype: 'moneycolumn'},
+			{header:'可退金额',dataIndex:'balance_cfee',width:80,xtype: 'moneycolumn'},
+			{header:'可转金额',dataIndex:'balance_acct',width:80,xtype: 'moneycolumn'},
 			{header:'生效日期',dataIndex:'eff_date',width:80,renderer: Ext.util.Format.dateFormat},
 			{header:'失效日期',dataIndex:'exp_date',width:80,renderer: Ext.util.Format.dateFormat},
 			{header:'状态',dataIndex:'status_text',	width:60,renderer:Ext.util.Format.statusShow,hidden : true},				
@@ -121,7 +123,7 @@ UserProdGrid = Ext.extend(Ext.grid.GridPanel,{
 		]
 		UserProdGrid.superclass.constructor.call(this,{
 			title : '用户产品信息',
-			height : 300,
+			region:'center',
 			store : this.userProdStore,
 			columns : cm			
 		})
@@ -132,14 +134,25 @@ UserProdGrid = Ext.extend(Ext.grid.GridPanel,{
 	},
 	doLoadResult:function(store){
 		var fee = 0 ;
+		var feeTotalNum = 0 ;
+		var acctTotalNum = 0 ;
 		store.each(function(record){
 			fee = fee + record.get('active_fee');
+			if(record.get('balance_cfee')){
+				feeTotalNum = feeTotalNum + record.get('balance_cfee');
+			}
+			if(record.get('balance_acct')){
+				acctTotalNum = acctTotalNum + record.get('balance_acct');
+			}
 		})
 		userProdThis.totalFee = fee;
 		if(Ext.getCmp('refundFeeValue')){
 			Ext.getCmp('refundFeeValue').setValue(Ext.util.Format.formatFee(userProdThis.totalFee));
 			Ext.getCmp('refundFeeValue').maxValue = Ext.util.Format.formatFee(userProdThis.totalFee);
 		}
+		Ext.getCmp('cfeeTotalAmountId').setValue(Ext.util.Format.formatFee(feeTotalNum));
+		Ext.getCmp('acctTotalAmountId').setValue(Ext.util.Format.formatFee(acctTotalNum));
+		
 	}
 });
 
@@ -152,7 +165,7 @@ LogoffUserForm = Ext.extend(BaseForm,{
 	userId:null,
 	constructor: function(){
 		this.userProdGrid = new UserProdGrid();
-		this.userProdGrid["region"]='north';
+//		this.userProdGrid["region"]='north';
 		var record = App.getApp().main.infoPanel.getUserPanel().userGrid.getSelectionModel().getSelected();
 		this.userId = record.get('user_id');
 		var acctStore = App.getApp().main.infoPanel.acctPanel.acctGrid.getStore();
@@ -168,6 +181,8 @@ LogoffUserForm = Ext.extend(BaseForm,{
 			items:[this.userProdGrid,{
             	xtype : 'panel',
             	title : '业务处理',
+            	region: "south",
+            	height : 200,
             	bodyStyle: Constant.TAB_STYLE,
 				layout:'column',
 				defaults : {
@@ -177,7 +192,6 @@ LogoffUserForm = Ext.extend(BaseForm,{
 					columnWidth : 0.5,
 					labelWidth : 85
 				},
-				region:'center',
 				items : [{
 					items:[{xtype:'displayfield',fieldLabel:'用户名',style:Constant.TEXTFIELD_STYLE,
 					value:record.get('user_name')}]
@@ -203,8 +217,12 @@ LogoffUserForm = Ext.extend(BaseForm,{
 				width : 60,foreceSelection : true,id : 'reclaim',hiddenName : 'reclaimDevice'}]
 				}
 				,{
+					items:[{xtype:'displayfield',fieldLabel:'可退金额',style:Constant.TEXTFIELD_STYLE,id:'cfeeTotalAmountId'}]
+				},{
+					items:[{xtype:'displayfield',fieldLabel:'可转金额',style:Constant.TEXTFIELD_STYLE,id:'acctTotalAmountId'}]
+				},{
 					items : [{
-						fieldLabel:'余额处理',
+						fieldLabel:'处理方式',
 						xtype:'paramcombo',
 						id : 'banlanceDealType',
 						allowBlank:false,
@@ -212,7 +230,11 @@ LogoffUserForm = Ext.extend(BaseForm,{
 						paramName:'ACCT_BALANCE',
 						listeners : {
 							scope : this,
-							'select' : this.addTransAcctPanel
+							'expand': function(combo){
+										var store = combo.getStore();
+										store.removeAt(store.find('item_value','EXPIRE'));
+									}
+//							,'select' : this.addTransAcctPanel
 						}
 					}]
 				},{
@@ -221,7 +243,7 @@ LogoffUserForm = Ext.extend(BaseForm,{
 					items : [{
 						xtype : 'numberfield',
 						id : 'refundFeeValue',
-						fieldLabel : '退款金额',
+						fieldLabel : '退款总额',
 						width : 100,
 						readOnly: true,
 						style: Constant.TEXTFIELD_STYLE,
@@ -257,6 +279,7 @@ LogoffUserForm = Ext.extend(BaseForm,{
 				fieldLabel : '退款金额',
 				allowNegative : false,
 				allowBlank : false,
+				style: Constant.TEXTFIELD_STYLE,
 				value : Ext.util.Format.formatFee(this.userProdGrid.totalFee),
 				maxValue : Ext.util.Format.formatFee(this.userProdGrid.totalFee)
 			});
@@ -274,6 +297,9 @@ LogoffUserForm = Ext.extend(BaseForm,{
 		if(cmp){
 			all['cancelFee'] = -Ext.util.Format.formatToFen(cmp.getValue());
 		}
+		
+		all['refundFee'] =Ext.util.Format.formatToFen(Ext.getCmp('cfeeTotalAmountId').getValue());
+		
 		if(Ext.getCmp('newAcctItemId')){
 			all['transAcctId'] = this.publicAcctInfo.acct_id;
 			all['transAcctItemId'] = Ext.getCmp('newAcctItemId').getValue();
