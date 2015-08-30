@@ -313,7 +313,8 @@ public class CFeePayDao extends BaseEntityDao<CFeePay> {
 	 * @return
 	 */
 	public Pager<FeeDto> queryAcctPayFee(String custId, QueryFeeInfo queryFeeInfo, String countyId,Integer start,Integer limit) throws JDBCException {
-		String str = "", sql = "";
+		String str = "",deviceCodeJoin="";
+		
 		if(queryFeeInfo != null){
 			if(StringHelper.isNotEmpty(queryFeeInfo.getCreate_time1())){
 				str += " and t.create_time >= to_date('"+queryFeeInfo.getCreate_time1()+"','yyyy-MM-dd hh24:mi:ss')";
@@ -331,80 +332,25 @@ public class CFeePayDao extends BaseEntityDao<CFeePay> {
 				str += " and t.invoice_id='" +queryFeeInfo.getInvoice_id() +"'";
 			}
 			String deviceCode = queryFeeInfo.getDevice_code();
+		
 			if(StringHelper.isNotEmpty(deviceCode)){
-				sql = " select * from (SELECT t.*,t2.acctitem_name fee_text,t2.acctitem_name,ca.acct_type,t3.begin_date,"
-					+ " t3.prod_invalid_date,r.finance_status,r.invoice_type doc_type"
-					+ " FROM c_fee t,vew_acctitem t2,c_acct ca,c_fee_acct t3,r_invoice r,c_user u"
-					+ " WHERE ca.acct_id(+)=t.acct_id and t.fee_sn=t3.fee_sn"
-					+ " and t.invoice_id=r.invoice_id(+) and t.invoice_code=r.invoice_code(+)"
-					+ " and t.cust_id=? and t.county_id=? and t3.county_id=? and t.acctitem_id = t2.acctitem_id "
-					+ " and t.user_id=u.user_id and u.card_id like '%"+deviceCode+"%' "
-					+ " Union "
-					+ " SELECT t.*,t2.prom_fee_name fee_text,'' acctitem_name,'' acct_type,null begin_date,"
-					+ " null prod_invalid_date,r.finance_status,r.invoice_type doc_type"
-					+ " FROM c_fee t,p_prom_fee t2,r_invoice r,c_user u"
-					+ " where t.fee_type = ? and t.fee_id=t2.prom_fee_id"
-					+ " and t.invoice_id=r.invoice_id(+) and t.invoice_code=r.invoice_code(+)"
-					+ " and t.cust_id=? and t.county_id= ? " +str
-					+ " and t.user_id=u.user_id and u.card_id like '%"+deviceCode+"%' "
-					+ " union "
-					+ " select null fee_sn,t.fee_type,t.busi_done_code,t.create_done_code,t.reverse_done_code,"
-					+ " t.busi_code,null cust_id,null user_id,null acct_id,null acctitem_id,null fee_id,null count,"
-					+ " null status,sum(t.should_pay) should_pay,sum(t.real_pay) real_pay,t.pay_type,"
-					+ " cd.done_date create_time,t.acct_date,null disct_type,null disct_info,null promotion_sn,"
-					+ " null auto_promotion,t.is_doc,t.invoice_mode,t.invoice_id,t.invoice_book_id,t.invoice_code,"
-					+ " t.optr_id,t.dept_id,t.area_id,t.county_id,null busi_optr_id,null invoice_fee,null addr_id,"
-					+ " t2.acctitem_name fee_text,t2.acctitem_name,'UNIT' acct_type,null begin_date,"
-					+ " null prod_invalid_date,null finance_status,null doc_type"
-					+ " from c_fee t,vew_acctitem t2,c_done_code cd,c_done_code_detail cdc,c_user u"
-					+ " where t.create_done_code = cd.done_code and cd.done_code = cdc.done_code"
-					+ " and t.acctitem_id = t2.acctitem_id and cd.busi_code=?"
-					+ " and cdc.cust_id = ? and t.county_id=?"
-					+ " and cdc.county_id=? and cd.county_id=? " +str
-					+ " and t.user_id=u.user_id and u.card_id like '%"+deviceCode+"%' "
-					+ " group by t.fee_type,t.busi_done_code,t.create_done_code,t.reverse_done_code,"
-					+ " t.busi_code,t.should_pay,t.pay_type,cd.done_date,t.acct_date,t.is_doc,"
-					+ " t.invoice_mode,t.invoice_id,t.invoice_book_id,t.invoice_code,t.optr_id,t.dept_id,t.area_id,t.county_id,t2.acctitem_name"
-					+" ) order by create_time desc,fee_sn desc";
+				deviceCodeJoin=" join c_user u on t.user_id=u.user_id and t.county_id=u.county_id and u.card_id like '%"+deviceCode+"%' ";
 			}
 		}
-		if(StringHelper.isEmpty(sql)){
-			sql = " select * from (SELECT t.*,t2.acctitem_name fee_text,t2.acctitem_name,ca.acct_type,t3.begin_date,"
-				+ " t3.prod_invalid_date,r.finance_status,r.invoice_type doc_type,t3.prod_sn"
-				+ " FROM c_fee t,vew_acctitem t2,c_acct ca,c_fee_acct t3,r_invoice r"
-				+ " WHERE ca.acct_id(+)=t.acct_id and t.fee_sn=t3.fee_sn"
-				+ " and t.invoice_id=r.invoice_id(+) and t.invoice_code=r.invoice_code(+)"
-				+ " and t.cust_id=? and t.county_id=? and t3.county_id=? and t.acctitem_id = t2.acctitem_id " +str
-				+ " Union "
-				+ " SELECT t.*,t2.prom_fee_name fee_text,'' acctitem_name,'' acct_type,null begin_date,"
-				+ " null prod_invalid_date,r.finance_status,r.invoice_type doc_type,null prod_sn"
-				+ " FROM c_fee t,p_prom_fee t2,r_invoice r"
-				+ " where t.fee_type = ? and t.fee_id=t2.prom_fee_id"
-				+ " and t.invoice_id=r.invoice_id(+) and t.invoice_code=r.invoice_code(+)"
-				+ " and t.cust_id=? and t.county_id= ? " +str
-				+ " union "
-				+ " select null fee_sn,t.fee_type,t.busi_done_code,t.create_done_code,t.reverse_done_code,"
-				+ " t.busi_code,null cust_id,null user_id,null acct_id,null acctitem_id,null fee_id,null count,"
-				+ " null status,sum(t.should_pay) should_pay,sum(t.real_pay) real_pay,t.pay_type,"
-				+ " cd.done_date create_time,t.acct_date,null disct_type,null disct_info,null promotion_sn,"
-				+ " null auto_promotion,t.is_doc,t.invoice_mode,t.invoice_id,t.invoice_book_id,t.invoice_code,"
-				+ " t.optr_id,t.dept_id,t.area_id,t.county_id,null busi_optr_id,null invoice_fee,null addr_id,null pay_sn,"
-				+ " t2.acctitem_name fee_text,t2.acctitem_name,'UNIT' acct_type,null begin_date,"
-				+ " null prod_invalid_date,null finance_status,null doc_type,null prod_sn"
-				+ " from c_fee t,vew_acctitem t2,c_done_code cd,c_done_code_detail cdc"
-				+ " where t.create_done_code = cd.done_code and cd.done_code = cdc.done_code"
-				+ " and t.acctitem_id = t2.acctitem_id and cd.busi_code=?"
-				+ " and cdc.cust_id = ? and t.county_id=?"
-				+ " and cdc.county_id=? and cd.county_id=? " +str
-				+ " group by t.fee_type,t.busi_done_code,t.create_done_code,t.reverse_done_code,"
-				+ " t.busi_code,t.should_pay,t.pay_type,cd.done_date,t.acct_date,t.is_doc,"
-				+ " t.invoice_mode,t.invoice_id,t.invoice_book_id,t.invoice_code,t.optr_id,t.dept_id,t.area_id,t.county_id,t2.acctitem_name"
-				+" ) order by create_time desc,fee_sn desc";
-		}
-		return createQuery(FeeDto.class, sql, custId, countyId, countyId,
-				SystemConstants.FEE_TYPE_PROMACCT, custId, countyId,
-				BusiCodeConstants.Unit_ACCT_PAY, custId, countyId, countyId,
-				countyId).setStart(start).setLimit(limit).page();
+		String sql =StringHelper.append( 
+				" SELECT t.*,t2.acctitem_name fee_text,t2.acctitem_name,ca.acct_type,t3.begin_date, ",
+				"  t3.prod_invalid_date,r.finance_status,r.invoice_type doc_type,t3.prod_sn ",
+				"  FROM c_fee t  ",
+				"  join vew_acctitem t2 on  t.acctitem_id = t2.acctitem_id  ",
+				"  left join c_acct ca on ca.acct_id=t.acct_id and ca.county_id=t.county_id ",
+				"  join c_fee_acct t3 on t.fee_sn=t3.fee_sn and t.county_id=t3.county_id ",
+				"   left join r_invoice r on  t.invoice_id=r.invoice_id and t.invoice_code=r.invoice_code ",
+				deviceCodeJoin,
+				"  WHERE   t.cust_id=? and t.county_id=? ",
+				str,
+				"  order by t.create_time desc ");
+		
+		return createQuery(FeeDto.class, sql, custId, countyId).setStart(start).setLimit(limit).page();
 	}
 	
 	

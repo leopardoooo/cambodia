@@ -25,7 +25,19 @@ public class TProvince implements Serializable {
 	private String task_code ;	
 	private String cust_code ;	
 	private String remark ;	
+	private String domain_name;
 	
+	
+	public String getDomain_name() {
+		return domain_name;
+	}
+
+
+	public void setDomain_name(String domain_name) {
+		this.domain_name = domain_name;
+	}
+
+
 	/**
 	 * default empty constructor
 	 */

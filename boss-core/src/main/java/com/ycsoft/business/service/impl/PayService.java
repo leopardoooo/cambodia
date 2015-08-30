@@ -133,7 +133,7 @@ public class PayService extends BaseBusiService implements IPayService {
 		}
 		
 		if(!StatusConstants.UNPAY.equals(fee.getStatus())|| 
-			SystemConstants.PAY_TYPE_UNPAY.equals(fee.getPay_type())){
+			!SystemConstants.PAY_TYPE_UNPAY.equals(fee.getPay_type())){
 			throw new ServicesException(ErrorCode.UnPayFeeHasPay);
 		}
 		if(fee.getFee_type().equals(SystemConstants.FEE_TYPE_ACCT)
@@ -200,7 +200,7 @@ public class PayService extends BaseBusiService implements IPayService {
 			this.checkCanclUpPayFeeParam(fee, cust_id);
 			//取消杂费，业务正常
 			if(!onlyShowInfo){
-				this.cancelUnPayBusiFee(fee_sn, doneCode);
+				this.cancelUnPayBusiFee(fee, doneCode);
 			}
 			info=SystemConstants.UNPAY_CANCEL_PROMPT_ONLYFEE;
 			
@@ -219,7 +219,7 @@ public class PayService extends BaseBusiService implements IPayService {
 			}else{
 				//取消费用，业务正常
 				if(!onlyShowInfo){
-					this.cancelUnPayDeviceFeePay(fee_sn, doneCode);
+					this.cancelUnPayDeviceFeePay(fee, doneCode);
 				}
 				info=SystemConstants.UNPAY_CANCEL_PROMPT_ONLYFEE;
 			}
@@ -249,9 +249,9 @@ public class PayService extends BaseBusiService implements IPayService {
 		}
 		//从账户扣回可退部分余额
 		acctComponent.saveAcctDebitFee(fee.getCust_id(), fee.getAcct_id(), fee.getAcctitem_id(),
-				SystemConstants.ACCT_CHANGE_UNCFEE, fee.getReal_pay()*-1, this.getBusiParam().getBusiCode(), doneCode, true);
+				SystemConstants.ACCT_CHANGE_UNCFEE, fee.getReal_pay()*-1, this.getBusiParam().getBusiCode(), doneCode, true,null);
 		//作废缴费信息
-		feeComponent.saveCancelFeeUnPay(fee.getFee_sn(), doneCode);
+		feeComponent.saveCancelFeeUnPay(fee, doneCode);
 		//作废业务
 		doneCodeComponent.cancelDoneCode(fee.getCreate_done_code());
 	}
@@ -268,7 +268,7 @@ public class PayService extends BaseBusiService implements IPayService {
 		List<CAcctAcctitemChange> changeList=acctComponent.queryAcctitemChangeByBusiInfo(fee.getAcct_id(), fee.getAcctitem_id(),fee.getBusi_code(),fee.getCreate_done_code());
 		int totalFee=0;
 		for(CAcctAcctitemChange change:changeList){
-			totalFee=totalFee+change.getFee();
+			totalFee=totalFee+change.getChange_fee();
 			if(!fee.getCust_id().equals(change.getCust_id())){
 				throw new ServicesException(ErrorCode.CustDataException);
 			}
@@ -279,10 +279,10 @@ public class PayService extends BaseBusiService implements IPayService {
 		//恢复账户金额
 		for(CAcctAcctitemChange change:changeList){
 			acctComponent.saveAcctAddFee(change.getCust_id(), fee.getAcct_id(), fee.getAcctitem_id(),
-					SystemConstants.ACCT_CHANGE_UNCFEE,change.getFee()*-1, change.getFee_type(), this.getBusiParam().getBusiCode(), doneCode);
+					SystemConstants.ACCT_CHANGE_UNCFEE,change.getChange_fee()*-1, change.getFee_type(), this.getBusiParam().getBusiCode(), doneCode,null);
 		}
 		//作废缴费信息
-		feeComponent.saveCancelFeeUnPay(fee.getFee_sn(), doneCode);
+		feeComponent.saveCancelFeeUnPay(fee, doneCode);
 		//作废业务
 		doneCodeComponent.cancelDoneCode(fee.getCreate_done_code());
 	}
@@ -307,7 +307,7 @@ public class PayService extends BaseBusiService implements IPayService {
 		orderComponent.saveCancelProdOrder(order, doneCode);
 
 		//作废缴费信息
-		feeComponent.saveCancelFeeUnPay(fee.getFee_sn(), doneCode);
+		feeComponent.saveCancelFeeUnPay(fee, doneCode);
 		//作废业务
 		doneCodeComponent.cancelDoneCode(fee.getCreate_done_code());
 	}
@@ -374,26 +374,28 @@ public class PayService extends BaseBusiService implements IPayService {
 		if(StringHelper.isEmpty(order_sn)||StringHelper.isEmpty(fee_sn)){
 			throw new ServicesException(ErrorCode.ParamIsNull);
 		}
+		PProd prod=prodComponent.queryById(fee.getAcctitem_id());
 		//提取资金转出到缴费的 订单金额明细
 		List<CProdOrderFee> orderFees=cProdOrderFeeDao.queryByOutPutInfo(order_sn, SystemConstants.ORDER_FEE_TYPE_CFEE, fee_sn);
 		for(CProdOrderFee orderFee:orderFees){
 			orderFee.setOutput_type(SystemConstants.ORDER_FEE_TYPE_ACCT);//更新转出类型为账户
 			orderFee.setOutput_sn(null);
+			orderFee.setProd_name(prod.getProd_name());
 		}
 		//原来转给缴费的金额现在转给公用账目
 		acctComponent.saveCancelFeeToAcct(orderFees, fee.getCust_id(), doneCode, this.getBusiParam().getBusiCode());
 		//更新资金明细
 		cProdOrderFeeDao.update(orderFees.toArray(new CProdOrderFee[orderFees.size()]));
 		//作废缴费
-		feeComponent.saveCancelFeeUnPay(fee.getFee_sn(), doneCode);
+		feeComponent.saveCancelFeeUnPay(fee, doneCode);
 	}
 	
 	/**
 	 * 只取消设备费用,业务正常
 	 * @throws Exception 
 	 */
-	private void cancelUnPayDeviceFeePay(String fee_sn,Integer doneCode) throws Exception{
-		feeComponent.saveCancelFeeUnPay(fee_sn, doneCode);
+	private void cancelUnPayDeviceFeePay(CFeeDevice feeDevice,Integer doneCode) throws Exception{
+		feeComponent.saveCancelFeeUnPay(feeDevice, doneCode);
 	}
 	
 	/**
@@ -404,7 +406,7 @@ public class PayService extends BaseBusiService implements IPayService {
 		//TODO 回退配件库存,叫小王实现
 		
 		//作废缴费
-		feeComponent.saveCancelFeeUnPay(feeDevice.getFee_sn(), doneCode);
+		feeComponent.saveCancelFeeUnPay(feeDevice, doneCode);
 		//作废业务
 		doneCodeComponent.cancelDoneCode(feeDevice.getCreate_done_code());
 		
@@ -415,8 +417,8 @@ public class PayService extends BaseBusiService implements IPayService {
 	 * @param fee_sn
 	 * @throws Exception 
 	 */
-	private void cancelUnPayBusiFee(String fee_sn,Integer doneCode) throws Exception{
-		feeComponent.saveCancelFeeUnPay(fee_sn, doneCode);
+	private void cancelUnPayBusiFee(CFeeBusi feeBusi,Integer doneCode) throws Exception{
+		feeComponent.saveCancelFeeUnPay(feeBusi, doneCode);
 	}
 	
 	

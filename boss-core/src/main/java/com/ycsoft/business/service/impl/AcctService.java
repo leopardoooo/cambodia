@@ -1615,11 +1615,10 @@ public class AcctService extends BaseBusiService implements IAcctService {
 	 * @return
 	 * @throws Exception 
 	 */
-	public List<CAcctAcctitem> queryPublicAcctItemByCustId(String custId) throws Exception{
+	public List<AcctitemDto> queryPublicAcctItemByCustId(String custId) throws Exception{
 		CAcct acct= acctComponent.queryCustAcctByCustId(custId);
-		List<CAcctAcctitem> list = new ArrayList<CAcctAcctitem>();
-		CAcctAcctitem  t = acctComponent.queryAcctItemEsayByAcctitemId(acct.getAcct_id(), SystemConstants.ACCTITEM_PUBLIC_ID);
-		t.setAcctitem_name("公用账户");
+		List<AcctitemDto> list = new ArrayList<AcctitemDto>();
+		AcctitemDto  t = acctComponent.queryAcctItemDtoByAcctitemId(acct.getAcct_id(), SystemConstants.ACCTITEM_PUBLIC_ID);
 		list.add(t);
 		return list;
 	}

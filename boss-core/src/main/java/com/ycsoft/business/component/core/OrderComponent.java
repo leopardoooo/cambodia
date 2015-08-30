@@ -3,6 +3,7 @@ package com.ycsoft.business.component.core;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -25,7 +26,6 @@ import com.ycsoft.beans.core.prod.CProdOrderDto;
 import com.ycsoft.beans.core.prod.CProdOrderFee;
 import com.ycsoft.beans.core.prod.CProdOrderFollowPay;
 import com.ycsoft.beans.core.prod.CProdOrderHis;
-import com.ycsoft.beans.core.prod.CProdOrderTransfee;
 import com.ycsoft.beans.core.prod.CProdPropChange;
 import com.ycsoft.beans.core.user.CUser;
 import com.ycsoft.beans.prod.PPackageProd;
@@ -41,7 +41,6 @@ import com.ycsoft.business.dao.core.cust.CCustDao;
 import com.ycsoft.business.dao.core.prod.CProdOrderDao;
 import com.ycsoft.business.dao.core.prod.CProdOrderFeeDao;
 import com.ycsoft.business.dao.core.prod.CProdOrderHisDao;
-import com.ycsoft.business.dao.core.prod.CProdOrderTransfeeDao;
 import com.ycsoft.business.dao.core.prod.CProdStatusChangeDao;
 import com.ycsoft.business.dao.core.user.CUserDao;
 import com.ycsoft.business.dao.prod.PPackageProdDao;
@@ -60,7 +59,6 @@ import com.ycsoft.commons.exception.ErrorCode;
 import com.ycsoft.commons.exception.ServicesException;
 import com.ycsoft.commons.helper.CollectionHelper;
 import com.ycsoft.commons.helper.DateHelper;
-import com.ycsoft.commons.helper.LoggerHelper;
 import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.commons.store.MemoryDict;
 import com.ycsoft.daos.core.JDBCException;
@@ -110,6 +108,36 @@ public class OrderComponent extends BaseBusiComponent {
 				dto.getProd_type().equals(SystemConstants.PROD_TYPE_BASE)
 				&&!dto.getServ_id().equals(SystemConstants.PROD_SERV_ID_BAND)?dto.getProd_id():"");
 		return key;
+	}
+	/**
+	 * 查询一个客户有效的订单和最近的订单
+	 * @param custId
+	 * @throws Exception 
+	 */
+	public List<CProdOrderDto> queryCustEFFAndLastOrder(String custId) throws Exception{
+		List<CProdOrderDto> orderList=new ArrayList<>();
+		List<CProdOrderDto> list=cProdOrderDao.queryCustAllOrderDto(custId);
+		Collections.reverse(list);//倒序
+		//记录订单是否已存在
+		Set<String> existsSet=new HashSet<String>();
+		Date today=DateHelper.today();
+		for(CProdOrderDto order:list){
+			if(order.getStatus().equals(StatusConstants.REQSTOP)
+					||order.getStatus().equals(StatusConstants.LINKSTOP)
+					||order.getStatus().equals(StatusConstants.INSTALL)){
+				//报停和关联停且订单失效日期在状态
+				orderList.add(order);
+				existsSet.add(getOrderKey(order));
+			}else if(!order.getExp_date().before(today)){
+				orderList.add(order);
+				existsSet.add(getOrderKey(order));
+			}else if(!existsSet.contains(getOrderKey(order))){
+				orderList.add(order);
+				existsSet.add(getOrderKey(order));
+			}
+		}
+		Collections.reverse(orderList);
+		return orderList;
 	}
 	/**
 	 * 查询前 要做锁定判断doneCodeCom*t.checkUnPayOtherLock
@@ -406,13 +434,13 @@ public class OrderComponent extends BaseBusiComponent {
 	}
 	
 	/**
-	 * 计算一个订单的可退金额的资金明细（终止退订和销户退订）
+	 * 计算一个订单的可退金额的资金明细（产品退订和销户退订）
 	 * @param cancelOrder
 	 * @param cancelDate
 	 * @return
 	 * @throws Exception
 	 */
-	public List<CProdOrderFee> getOrderCacelFeeDetail(CProdOrder cancelOrder,Date cancelDate) throws Exception{
+	public List<CProdOrderFee> getOrderCacelFeeDetail(CProdOrderDto cancelOrder,Date cancelDate) throws Exception{
 
 		//总退款金额(含可转部分)
 		int fee=getMainOrderCancelFee(cancelOrder,cancelDate);
@@ -421,6 +449,7 @@ public class OrderComponent extends BaseBusiComponent {
 			int totalOrderFee=0;
 			for(CProdOrderFee orderFee: orderFees){
 				totalOrderFee=totalOrderFee+orderFee.getInput_fee();
+				orderFee.setProd_name(cancelOrder.getProd_name());
 			}
 			if(totalOrderFee!=cancelOrder.getOrder_fee().intValue()){
 				throw new ComponentException(ErrorCode.OrderFeeDisagree,cancelOrder.getOrder_sn());
@@ -463,7 +492,7 @@ public class OrderComponent extends BaseBusiComponent {
 	 * @return
 	 * @throws Exception
 	 */
-	public Map<String,Integer> getOrderCancelFee(CProdOrder cancelOrder,Date cancelDate) throws Exception{
+	public Map<String,Integer> getOrderCancelFee(CProdOrderDto cancelOrder,Date cancelDate) throws Exception{
 		Map<String,Integer> cancelFeeMap=new HashMap<>();
 		cancelFeeMap.put(SystemConstants.ORDER_FEE_TYPE_CFEE, 0);
 		cancelFeeMap.put(SystemConstants.ORDER_FEE_TYPE_ACCT, 0);
@@ -540,8 +569,8 @@ public class OrderComponent extends BaseBusiComponent {
 			}
 			//历史记录表移除
 			cProdOrderHisDao.remove(orderSns);
-			//删除出账状态异动
-			cProdStatusChangeDao.deleteByDoneCode(recoverDoneCode);
+			//删除出账状态异动（不能删因为如果非当天取消，可能会造成出账错误）
+			//cProdStatusChangeDao.deleteByDoneCode(recoverDoneCode);
 		}
 	}
 	/**
@@ -799,16 +828,6 @@ public class OrderComponent extends BaseBusiComponent {
 	 */
 	public String saveCProdOrder(CProdOrder cProdOrder,OrderProd orderProd,String busi_code) throws Exception{
 		
-		//保存订单
-		cProdOrderDao.save(cProdOrder);
-		
-		//记录创建订单的原始状态
-		cProdStatusChangeDao.saveStatusChange(cProdOrder.getDone_code(), cProdOrder.getOrder_sn(), cProdOrder.getStatus());
-		//保存套餐的子订单
-		if(orderProd.getGroupSelected()!=null&&orderProd.getGroupSelected().size()>0){
-			savePackageUserProd(cProdOrder,orderProd);
-		}
-		
 		//覆盖退订并转移支付余额到新订购记录
 		int transfee=0;
 		List<CProdOrder> cacleOrderList=this.queryTransCancelOrderList(orderProd, busi_code);
@@ -817,6 +836,15 @@ public class OrderComponent extends BaseBusiComponent {
 		}
 		if(transfee!=orderProd.getTransfer_fee().intValue()){
 			throw new ComponentException("转移支付金额不一致，请重新操作!");
+		}
+		
+		//保存订单
+		cProdOrderDao.save(cProdOrder);
+		//记录创建订单的原始状态
+		cProdStatusChangeDao.saveStatusChange(cProdOrder.getDone_code(), cProdOrder.getOrder_sn(), cProdOrder.getStatus());
+		//保存套餐的子订单
+		if(orderProd.getGroupSelected()!=null&&orderProd.getGroupSelected().size()>0){
+			savePackageUserProd(cProdOrder,orderProd);
 		}
 		
 		return cProdOrder.getOrder_sn();
@@ -838,56 +866,56 @@ public class OrderComponent extends BaseBusiComponent {
 		List<CProdOrderFee> inputList=new ArrayList<>();
 		for(CProdOrder cancelOrder:cancelList){
 			
-			if(cancelOrder.getIs_pay().equals(SystemConstants.BOOLEAN_TRUE)){
-				int fee=this.getTransCancelFee(cancelDate, cancelOrder);
-				cancelOrder.setActive_fee(fee);
-				transFee=transFee+fee;
-				if(fee>0){
-					int totalInputFee=0;
-					List<CProdOrderFee> outputOrderFees=cProdOrderFeeDao.queryByOrderSn(cancelOrder.getOrder_sn());
-					for(CProdOrderFee outputOrderFee:outputOrderFees){
-						totalInputFee=totalInputFee+outputOrderFee.getInput_fee();
-					}
-					int _tmpFee=fee;
-					for(CProdOrderFee outputOrderFee:outputOrderFees){
-						int outfee= Math.round(outputOrderFee.getInput_fee()*fee*1.0f/totalInputFee);
-						if(outfee>outputOrderFee.getInput_fee()){
-							outfee=outputOrderFee.getInput_fee();
-						}
-						if(outfee>_tmpFee){
-							outfee=_tmpFee;
-						}
-						_tmpFee=_tmpFee-outfee;
-						outputOrderFee.setOutput_fee(outfee);
-						outputOrderFee.setOutput_type(SystemConstants.ORDER_FEE_TYPE_TRANSFEE);	
-					}
-					if(_tmpFee!=0&&outputOrderFees.size()>0){
-						CProdOrderFee outputOrderFee=outputOrderFees.get(outputOrderFees.size()-1);
-						outputOrderFee.setOutput_fee(outputOrderFee.getOutput_fee()+_tmpFee);
-					}
-					
-					//新订购的转入记录
-					for(CProdOrderFee outputOrderFee:outputOrderFees){
-						CProdOrderFee inputOrderFee=new CProdOrderFee();
-						inputOrderFee.setOrder_fee_sn(cProdOrderFeeDao.findSequence().toString());
-						inputOrderFee.setOrder_sn(cProdOrder.getOrder_sn());
-						inputOrderFee.setDone_code(cProdOrder.getDone_code());
-						inputOrderFee.setInput_type(SystemConstants.ORDER_FEE_TYPE_TRANSFEE);
-						inputOrderFee.setInput_sn(outputOrderFee.getOrder_fee_sn());
-						inputOrderFee.setInput_fee(outputOrderFee.getOutput_fee());
-						inputOrderFee.setFee_type(outputOrderFee.getFee_type());
-						inputOrderFee.setCreate_time(new Date());
-						inputOrderFee.setArea_id(outputOrderFee.getArea_id());
-						inputOrderFee.setCounty_id(outputOrderFee.getCounty_id());
-						inputList.add(inputOrderFee);
-						
-						outputOrderFee.setOutput_sn(inputOrderFee.getOrder_fee_sn());
-					}
-					outputList.addAll(outputOrderFees);//装入被覆盖旧订购的转出记录
-				}
-			}else{
-				//TODO 是不是要干掉对应的未支付缴费记录 c_prod_order.order_sn=c_fee_acct.prod_sn
+			if(cancelOrder.getIs_pay().equals(SystemConstants.BOOLEAN_FALSE)){
+				throw new ComponentException(ErrorCode.OrderTransUnPayPleaseCancel,cancelOrder.getOrder_sn());
 			}
+			int fee=this.getTransCancelFee(cancelDate, cancelOrder);
+			cancelOrder.setActive_fee(fee);
+			transFee=transFee+fee;
+			if(fee>0){
+				int totalInputFee=0;
+				List<CProdOrderFee> outputOrderFees=cProdOrderFeeDao.queryByOrderSn(cancelOrder.getOrder_sn());
+				for(CProdOrderFee outputOrderFee:outputOrderFees){
+					totalInputFee=totalInputFee+outputOrderFee.getInput_fee();
+				}
+				int _tmpFee=fee;
+				for(CProdOrderFee outputOrderFee:outputOrderFees){
+					int outfee= Math.round(outputOrderFee.getInput_fee()*fee*1.0f/totalInputFee);
+					if(outfee>outputOrderFee.getInput_fee()){
+						outfee=outputOrderFee.getInput_fee();
+					}
+					if(outfee>_tmpFee){
+						outfee=_tmpFee;
+					}
+					_tmpFee=_tmpFee-outfee;
+					outputOrderFee.setOutput_fee(outfee);
+					outputOrderFee.setOutput_type(SystemConstants.ORDER_FEE_TYPE_TRANSFEE);	
+				}
+				if(_tmpFee!=0&&outputOrderFees.size()>0){
+					CProdOrderFee outputOrderFee=outputOrderFees.get(outputOrderFees.size()-1);
+					outputOrderFee.setOutput_fee(outputOrderFee.getOutput_fee()+_tmpFee);
+				}
+				
+				//新订购的转入记录
+				for(CProdOrderFee outputOrderFee:outputOrderFees){
+					CProdOrderFee inputOrderFee=new CProdOrderFee();
+					inputOrderFee.setOrder_fee_sn(cProdOrderFeeDao.findSequence().toString());
+					inputOrderFee.setOrder_sn(cProdOrder.getOrder_sn());
+					inputOrderFee.setDone_code(cProdOrder.getDone_code());
+					inputOrderFee.setInput_type(SystemConstants.ORDER_FEE_TYPE_TRANSFEE);
+					inputOrderFee.setInput_sn(outputOrderFee.getOrder_fee_sn());
+					inputOrderFee.setInput_fee(outputOrderFee.getOutput_fee());
+					inputOrderFee.setFee_type(outputOrderFee.getFee_type());
+					inputOrderFee.setCreate_time(new Date());
+					inputOrderFee.setArea_id(outputOrderFee.getArea_id());
+					inputOrderFee.setCounty_id(outputOrderFee.getCounty_id());
+					inputList.add(inputOrderFee);
+					
+					outputOrderFee.setOutput_sn(inputOrderFee.getOrder_fee_sn());
+				}
+				outputList.addAll(outputOrderFees);//装入被覆盖旧订购的转出记录
+			}
+			
 			//退订订购记录
 			this.saveCancelProdOrder(cancelOrder,cProdOrder.getDone_code());
 		}

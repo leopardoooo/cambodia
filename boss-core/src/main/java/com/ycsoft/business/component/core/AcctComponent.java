@@ -340,7 +340,8 @@ public class AcctComponent  extends BusiConfigComponent {
 	 * @return
 	 * @throws Exception 
 	 */
-	public List<CAcctAcctitemChange> saveAcctDebitFee(String custId,String acctId,String acctItemId,String changeType,Integer fee,String busiCode,Integer doneCode,boolean onlyRefoud) throws Exception{
+	public List<CAcctAcctitemChange> saveAcctDebitFee(String custId,String acctId,String acctItemId,
+			String changeType,Integer fee,String busiCode,Integer doneCode,boolean onlyRefoud,String debitRemark) throws Exception{
 		List<CAcctAcctitemChange> changeList=new ArrayList<>();
 		if(fee==null||fee>=0){
 			throw new ComponentException(ErrorCode.AcctDebitFeeIsPositive);
@@ -377,8 +378,8 @@ public class AcctComponent  extends BusiConfigComponent {
 			String feeType=active.getFee_type();
 			cAcctAcctitemActiveDao.updateBanlance(acctId, acctItemId,
 					feeType, fee, getOptr().getCounty_id());
-			CAcctAcctitemChange change=saveAcctitemChange(doneCode, busiCode, custId, acctId,
-									acctItemId, changeType, feeType, debitFee*-1, active.getBalance(), null);
+			CAcctAcctitemChange change=saveAcctitemNewChange(doneCode, busiCode, custId, acctId,
+									acctItemId, changeType, feeType, debitFee*-1, active.getBalance(), null,debitRemark);
 			changeList.add(change);
 			
 			debitTotalFee=debitTotalFee-debitFee;
@@ -408,7 +409,8 @@ public class AcctComponent  extends BusiConfigComponent {
 	 * @return
 	 * @throws Exception 
 	 */
-	public CAcctAcctitemChange saveAcctAddFee(String custId,String acctId,String acctItemId,String changeType,Integer fee,String feeType,String busiCode,Integer doneCode) throws Exception{
+	public CAcctAcctitemChange saveAcctAddFee(String custId,String acctId,String acctItemId,
+			String changeType,Integer fee,String feeType,String busiCode,Integer doneCode,String addRemark) throws Exception{
 		
 		if(fee==null||fee<=0){
 			throw new ComponentException(ErrorCode.AcctAddFeeIsNotPositive);
@@ -428,18 +430,14 @@ public class AcctComponent  extends BusiConfigComponent {
 			activeItem.setFee_type(feeType);
 			activeItem.setArea_id(getOptr().getArea_id());
 			activeItem.setCounty_id(getOptr().getCounty_id());
-			cAcctAcctitemActiveDao.save(activeItem);
-			
-			return saveAcctitemChange(doneCode, busiCode, custId, acctId,
-					acctItemId, changeType,feeType, fee, preFee, null);
-					
+			cAcctAcctitemActiveDao.save(activeItem);		
 		}else{
 			preFee=activeItem.getBalance();
 			cAcctAcctitemActiveDao.updateBanlance(acctId, acctItemId,
 					feeType, fee, getOptr().getCounty_id());
-			return saveAcctitemChange(doneCode, busiCode, custId, acctId,
-					acctItemId, changeType, feeType, fee, preFee, null);
 		}
+		return saveAcctitemNewChange(doneCode, busiCode, custId, acctId,
+				acctItemId, changeType,feeType, fee, preFee, null,addRemark);
 	}
 	
 	
@@ -464,7 +462,8 @@ public class AcctComponent  extends BusiConfigComponent {
 				Integer fee=orderFee.getOutput_fee();
 				String feeType=orderFee.getFee_type();
 				String changeType=SystemConstants.ACCT_CHANGE_TRANS;
-				String acct_change_sn=saveAcctAddFee(cust_id, acctId, acctItemId, changeType, fee, feeType, busi_code, doneCode)
+				String acct_change_sn=
+						saveAcctAddFee(cust_id, acctId, acctItemId, changeType, fee, feeType, busi_code, doneCode,orderFee.getProd_name())
 										.getAcct_change_sn();
 				orderFee.setOutput_sn(acct_change_sn);
 			}
@@ -569,29 +568,36 @@ public class AcctComponent  extends BusiConfigComponent {
 		}
 	}
 	
+	public CAcctAcctitemChange saveAcctitemNewChange(Integer doneCode, String busiCode,
+			String custId, String acctId, String acctItemId, String changeType,
+			String feeType, int fee, int preFee, Integer inactiveDoneCode,String remark) throws Exception{
+		// 增加资金异动
+				CAcctAcctitemChange change = new CAcctAcctitemChange();
+				change.setDone_code(doneCode);
+				change.setBusi_code(busiCode);
+				change.setCust_id(custId);
+				change.setAcct_id(acctId);
+				change.setAcctitem_id(acctItemId);
+				change.setChange_type(changeType);
+				change.setFee_type(feeType);
+				change.setFee(fee + preFee);
+				change.setPre_fee(preFee);
+				change.setChange_fee(fee);
+				change.setBilling_cycle_id(DateHelper.nowYearMonth());
+				change.setArea_id(getOptr().getArea_id());
+				change.setCounty_id(getOptr().getCounty_id());
+				change.setInactive_done_code(inactiveDoneCode);
+				change.setAcct_change_sn(cAcctAcctitemChangeDao.findSequence().toString());
+				change.setCometype(remark);
+				
+				cAcctAcctitemChangeDao.save(change);
+				return change;
+	}
+	
 	public CAcctAcctitemChange saveAcctitemChange(Integer doneCode, String busiCode,
 			String custId, String acctId, String acctItemId, String changeType,
 			String feeType, int fee, int preFee, Integer inactiveDoneCode) throws Exception {
-		// 增加资金异动
-		CAcctAcctitemChange change = new CAcctAcctitemChange();
-		change.setDone_code(doneCode);
-		change.setBusi_code(busiCode);
-		change.setCust_id(custId);
-		change.setAcct_id(acctId);
-		change.setAcctitem_id(acctItemId);
-		change.setChange_type(changeType);
-		change.setFee_type(feeType);
-		change.setFee(fee + preFee);
-		change.setPre_fee(preFee);
-		change.setChange_fee(fee);
-		change.setBilling_cycle_id(DateHelper.nowYearMonth());
-		change.setArea_id(getOptr().getArea_id());
-		change.setCounty_id(getOptr().getCounty_id());
-		change.setInactive_done_code(inactiveDoneCode);
-		change.setAcct_change_sn(cAcctAcctitemChangeDao.findSequence().toString());
-		
-		cAcctAcctitemChangeDao.save(change);
-		return change;
+		return saveAcctitemNewChange(doneCode, busiCode, custId, acctId, acctItemId, changeType, feeType, fee, preFee, inactiveDoneCode,null);
 	}
 	
 	
@@ -816,8 +822,8 @@ public class AcctComponent  extends BusiConfigComponent {
 		return cAcctAcctitemDao.queryByAcctId(acctId);
 	}
 
-	public CAcctAcctitem queryAcctItemEsayByAcctitemId(String acctId,String acctItemId) throws JDBCException{
-		return cAcctAcctitemDao.queryAcctItem(acctId, acctItemId);
+	public AcctitemDto queryAcctItemDtoByAcctitemId(String acctId,String acctItemId) throws JDBCException{
+		return cAcctAcctitemDao.queryAcctItemDto(acctId, acctItemId);
 	}
 	
 	

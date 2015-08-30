@@ -35,7 +35,7 @@ public class CProdOrderFeeDao extends BaseEntityDao<CProdOrderFee>  {
      * @throws JDBCException
      */
 	public void clearOutPutInfo(String order_sn,String output_type) throws JDBCException{
-		String sql="update c_prod_order_fee set output_type=null ,output_sn=null,output_fee=null"
+		String sql="update c_prod_order_fee set output_type=null ,output_sn=null,output_fee=0"
 				+ " where order_sn=? and output_type=? ";
 		this.executeUpdate(sql, order_sn,output_type);
 	}

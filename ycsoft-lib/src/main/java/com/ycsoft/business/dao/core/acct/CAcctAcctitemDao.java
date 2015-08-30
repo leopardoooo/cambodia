@@ -486,4 +486,22 @@ public class CAcctAcctitemDao extends BaseEntityDao<CAcctAcctitem> {
 	public CAcctAcctitem queryAcctItem(String acctId,String acctItemId) throws JDBCException{
 		return createQuery("SELECT * FROM c_acct_acctitem t where t.acct_id=? and t.acctitem_id=?",acctId,acctItemId).first();
 	}
+	
+	public AcctitemDto queryAcctItemDto(String acctId,String acctItemId) throws JDBCException{
+		
+		String sql =StringHelper.append( 
+				" select c.acct_id,c.acctitem_id,c.active_balance,c.owe_fee,c.real_fee,c.real_bill,c.order_balance,c.real_balance,c.inactive_balance,c.open_time,c.area_id,c.county_id, ",
+				" t.acctitem_name,t.acctitem_type , ",
+				" sum(case when af.can_refund='T' then ac.balance else 0 end) can_trans_balance, ",
+				" sum(case when af.can_trans='T' then ac.balance else 0 end) can_refund_balance ",
+				" from c_acct_acctitem c ",
+				" left join  t_public_acctitem t on c.acctitem_id = t.acctitem_id ",
+				" left join c_acct_acctitem_active ac on ac.acct_id=c.acct_id and ac.acctitem_id=c.acctitem_id and ac.county_id=c.county_id ",
+				" left join t_acct_fee_type af on af.fee_type=ac.fee_type ",
+				"  where  c.acct_id=? and c.acctitem_id=?   ",
+				" group by c.acct_id,c.acctitem_id,c.active_balance,c.owe_fee,c.real_fee,c.real_bill,c.order_balance,c.real_balance,c.inactive_balance,c.open_time,c.area_id,c.county_id ",
+				" ,t.acctitem_name,t.acctitem_type  ");
+				
+		return this.createQuery(AcctitemDto.class, sql, acctId,acctItemId).first();
+	}
 }

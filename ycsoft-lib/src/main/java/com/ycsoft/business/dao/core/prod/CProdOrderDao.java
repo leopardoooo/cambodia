@@ -38,17 +38,37 @@ public class CProdOrderDao extends BaseEntityDao<CProdOrder> {
 		return this.createQuery(CProdOrderFollowPay.class, sql, custId).list();
 		
 	}
+	/**
+	 * 查询一个客户有效的订单
+	 */
 	public List<CProdOrderDto> queryCustEffOrderDto(String custId) throws JDBCException{
 		String sql = "select c.billing_type, b.prod_name,b.prod_type,b.serv_id,b.is_base,e.prod_name package_name,nvl(d.disct_name,c.tariff_name) tariff_name,d.disct_name, a.* "
 				+ " from c_prod_order a,p_prod b,p_prod_tariff c,p_prod_tariff_disct d,p_prod e "
 				+ " where a.cust_id=? and a.prod_id=b.prod_id and a.package_id=e.prod_id(+) "
 				+ " and a.tariff_id=c.tariff_id(+) and a.disct_id= d.disct_id(+) "
-				+ " and (a.exp_date>=trunc(sysdate) or a.status in (?,?,?)) "
-				+ " order by a.cust_id,a.user_id,a.exp_date  ";
+				+ " and (a.exp_date>=trunc(sysdate) or a.status in (?,?,?) ) "
+				+ " order by a.cust_id,a.user_id,b.is_base desc,a.exp_date  ";
 		
 		return this.createQuery(CProdOrderDto.class, sql, custId,StatusConstants.REQSTOP,
 				StatusConstants.LINKSTOP,StatusConstants.INSTALL).list();
 	}
+	
+	/**
+	 * 查询一个客户所有的订单
+	 * @param custId
+	 * @return
+	 * @throws JDBCException
+	 */
+	public List<CProdOrderDto> queryCustAllOrderDto(String custId) throws JDBCException{
+		String sql = "select c.billing_type, b.prod_name,b.prod_type,b.serv_id,b.is_base,e.prod_name package_name,nvl(d.disct_name,c.tariff_name) tariff_name,d.disct_name, a.* "
+				+ " from c_prod_order a,p_prod b,p_prod_tariff c,p_prod_tariff_disct d,p_prod e "
+				+ " where a.cust_id=? and a.prod_id=b.prod_id and a.package_id=e.prod_id(+) "
+				+ " and a.tariff_id=c.tariff_id(+) and a.disct_id= d.disct_id(+) "
+				+ " order by a.cust_id,a.user_id,b.is_base desc,a.exp_date ";
+		return this.createQuery(CProdOrderDto.class, sql, custId).list();
+	}
+	
+	
 	
 	
 	public List<CProdOrder> queryCustEffOrder(String custId) throws JDBCException{

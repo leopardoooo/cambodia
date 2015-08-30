@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.ycsoft.beans.config.TBusiFee;
@@ -57,6 +58,7 @@ import com.ycsoft.business.dao.core.acct.CGeneralAcctDao;
 import com.ycsoft.business.dao.core.acct.CGeneralAcctDedailDao;
 import com.ycsoft.business.dao.core.acct.CGeneralCredentialDao;
 import com.ycsoft.business.dao.core.bank.CBankPayDao;
+import com.ycsoft.business.dao.core.common.CDoneCodeUnpayDao;
 import com.ycsoft.business.dao.core.cust.CCustDao;
 import com.ycsoft.business.dao.core.cust.CCustHisDao;
 import com.ycsoft.business.dao.core.fee.CFeeAcctDao;
@@ -141,7 +143,8 @@ public class FeeComponent extends BaseBusiComponent {
 	private CPromFeeProdDao cPromFeeProdDao;
 	
 	private ExpressionUtil expressionUtil;
-	
+	@Autowired
+	private CDoneCodeUnpayDao cDoneCodeUnpayDao;
 	/**
 	 * 保存订单退款费用信息
 	 * @param cancelList
@@ -183,6 +186,8 @@ public class FeeComponent extends BaseBusiComponent {
 	public List<FeeDto> queryUnPay(String cust_id,String optr_id) throws Exception{
 		return cFeeDao.queryUnPay(cust_id,optr_id);
 	}
+	
+	
 	/**
 	 * 查询未支付总额
 	 * @param cust_id
@@ -670,11 +675,18 @@ public class FeeComponent extends BaseBusiComponent {
 	}
 	/**
 	 * 取消费用
+	 * 判断是否删除未支付业务
 	 * @param fee_sn
 	 * @param doneCode
 	 */
-	public void saveCancelFeeUnPay(String fee_sn,Integer doneCode)throws Exception{
-		cFeeDao.saveCancelFee(fee_sn, StatusConstants.INVALID,doneCode);
+	public void saveCancelFeeUnPay(CFee fee,Integer doneCode)throws Exception{
+		cFeeDao.saveCancelFee(fee.getFee_sn(), StatusConstants.INVALID,doneCode);
+		//检查费用创建流水号是否还存在未支付费用
+		List<CFee> list=cFeeDao.queryUnPayByDoneCode(fee.getCreate_done_code());
+		if(list==null||list.size()==0){
+			//不存在未支付则删除未支付业务流水号
+			cDoneCodeUnpayDao.remove(fee.getCreate_done_code());
+		}
 	}
 
 	/**
@@ -955,16 +967,12 @@ public class FeeComponent extends BaseBusiComponent {
 		} catch (Exception e) {
 		}
 		//允许冲正的最大create_done_code，排除状态失效的、支付方式赠送的；
-		String maxDoneCode = cFeePayDao.queryMaxDoneCode(custId,  getOptr().getCounty_id());
+		//String maxDoneCode = cFeePayDao.queryMaxDoneCode(custId,  getOptr().getCounty_id());
 		Pager<FeeDto> feeList = cFeePayDao.queryAcctPayFee(custId, queryFeeInfo, getOptr().getCounty_id(),start,limit);
 		if(dataRight != null){
 			List<FeeDto> list = feeList.getRecords();
 			for(FeeDto fee : list){
-				if(!maxDoneCode.equals("-1") && StringHelper.isNotEmpty(maxDoneCode) && fee.getCreate_done_code().equals(Integer.parseInt(maxDoneCode))){
-					fee.setAllow_done_code("T");
-				}else{
-					fee.setAllow_done_code("F");
-				}
+				fee.setAllow_done_code("F");
 				fee.setData_right(dataRight);
 			}
 		}

@@ -39,6 +39,8 @@ public class ProdOrderAction extends BaseBusiAction {
 	private String pay_type;
 	private String receipt_id;
 	private Integer fee;
+	//客户订单清单加载类型: ALL(所有),EFF(有效订单),不填(取有效订单，无有效则取最近一条订单)
+	private String loadType;
 	
 	/**
 	 * 退订界面数据初始化查询
@@ -119,7 +121,7 @@ public class ProdOrderAction extends BaseBusiAction {
 	}
 	
 	public String queryCustEffOrder() throws Exception{
-		getRoot().setSimpleObj(orderService.queryCustEffOrder(cust_id));
+		getRoot().setSimpleObj(orderService.queryCustEffOrder(cust_id,loadType));
 		return JSON_SIMPLEOBJ;
 	}
 	/**
@@ -257,6 +259,10 @@ public class ProdOrderAction extends BaseBusiAction {
 
 	public void setFee(Integer fee) {
 		this.fee = fee;
+	}
+
+	public void setLoadType(String loadType) {
+		this.loadType = loadType;
 	}
 
 	

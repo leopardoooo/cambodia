@@ -19,6 +19,7 @@ public class FeeDto extends CFee {
 	private String acct_type_text;
 
 	private String fee_text ;//显示的费用名称或账目项名称
+	private String count_text;//费用订购数量描述
 
 	private String device_type;
 	private String device_type_text;
@@ -48,6 +49,12 @@ public class FeeDto extends CFee {
 	private String allow_done_code;
 
 	
+	public String getCount_text() {
+		return count_text;
+	}
+	public void setCount_text(String count_text) {
+		this.count_text = count_text;
+	}
 	public String getProd_sn() {
 		return prod_sn;
 	}

@@ -93,7 +93,7 @@ PayPanel = Ext.extend( Ext.Panel ,{
 		this.feeStore = new Ext.data.JsonStore({
 			data: [],
 			fields: [
-				'fee_sn','busi_name','fee_text','count','optr_name','create_time',
+				'fee_sn','busi_name','fee_text','count_text','optr_name','create_time',
 				{name: 'real_pay', type: 'int'},
 				'prod_sn', 'begin_date','prod_invalid_date','fee_type'
 			]
@@ -106,20 +106,16 @@ PayPanel = Ext.extend( Ext.Panel ,{
 			border: false,
 			autoExpandColumn: 'e',
 			columns: [
-				{ header: '业务名称', dataIndex: 'busi_name', width: 80},
-				{ id: 'e', header: '费用名称', dataIndex: 'fee_text'},
-				{ header: '数量', dataIndex: 'count', width: 80,renderer: function(v,md,record,i){
-					return v;
+			    { header: '操作', width: 50,renderer: function(v , md, record , i  ){
+					return "<DIV><a href='#' onclick='payPanelThis.deletePay();'>取消</a></DIV>";
 				}},
+				{ header: '业务名称', dataIndex: 'busi_name', width: 60},
+				{ id: 'e', header: '费用名称', dataIndex: 'fee_text',width: 100},
 				{ header: '实付金额', dataIndex: 'real_pay', width: 60, xtype: 'moneycolumn'},
-				{ header: '操作员', dataIndex: 'optr_name', width: 60},
+				{ header: '订单号', dataIndex: 'prod_sn', width: 60},
 				{ header: '操作时间', dataIndex: 'create_time', width: 80},
-				{ header: '订单号', dataIndex: 'prod_sn', width: 60,renderer: function(v , md, record , i  ){
-					if(v && record.get("real_pay") > 0){
-						return "<DIV><a href='#' onclick='payPanelThis.deletePay();'>取消</a></DIV>";
-					}
-					return "";
-				}}
+				{ header: '数量', dataIndex: 'count_text'}
+				
 			],
 			ds: this.feeStore
 		});

@@ -2,6 +2,7 @@ package com.ycsoft.business.service.impl;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -10,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,11 +31,7 @@ import com.ycsoft.beans.prod.PProd;
 import com.ycsoft.beans.prod.PProdTariff;
 import com.ycsoft.business.component.core.OrderComponent;
 import com.ycsoft.business.dao.config.TPayTypeDao;
-import com.ycsoft.business.dao.config.TRuleDefineDao;
-import com.ycsoft.business.dao.core.acct.CAcctAcctitemActiveDao;
-import com.ycsoft.business.dao.core.acct.CAcctAcctitemDao;
 import com.ycsoft.business.dao.core.cust.CCustDao;
-import com.ycsoft.business.dao.core.fee.CFeeDao;
 import com.ycsoft.business.dao.core.prod.CProdOrderDao;
 import com.ycsoft.business.dao.core.prod.CProdOrderFeeDao;
 import com.ycsoft.business.dao.core.user.CUserDao;
@@ -82,17 +78,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 	@Autowired
 	private CUserDao cUserDao;
 	@Autowired
-	private TRuleDefineDao tRuleDefineDao;
-	@Autowired
-	private BeanFactory beanFactory;
-	@Autowired
-	private CFeeDao cFeeDao;
-	@Autowired
 	private CProdOrderFeeDao cProdOrderFeeDao;
-	@Autowired
-	private CAcctAcctitemActiveDao cAcctAcctitemActiveDao;
-	@Autowired
-	private CAcctAcctitemDao cAcctAcctitemDao;
 	@Autowired
 	private TPayTypeDao tPayTypeDao;
 
@@ -279,7 +265,8 @@ public class OrderService extends BaseBusiService implements IOrderService{
 	 * @return
 	 * @throws Exception
 	 */
-	private List<CProdOrderDto> checkCancelProdOrderParm(boolean isHigh,String cust_id,String[] orderSns,Integer cancel_fee,Integer refund_fee,List<CProdOrderFee> orderFees) throws Exception{
+	private List<CProdOrderDto> checkCancelProdOrderParm(boolean isHigh,String cust_id,String[] orderSns
+			,Integer cancel_fee,Integer refund_fee,List<CProdOrderFee> orderFees) throws Exception{
 		
 		if(StringHelper.isEmpty(cust_id)||cancel_fee==null||orderSns==null||orderSns.length==0){
 			throw new ServicesException(ErrorCode.ParamIsNull);
@@ -313,6 +300,8 @@ public class OrderService extends BaseBusiService implements IOrderService{
 						orderFee.setOutput_type(SystemConstants.ORDER_FEE_TYPE_ACCT);
 					}
 				}
+				//后面账户扣款异动要使用
+				orderFee.setProd_name(order.getProd_name());
 			}
 			order.setActive_fee(outTotalFee);
 			order.setBalance_cfee(balanceCfee);
@@ -452,9 +441,23 @@ public class OrderService extends BaseBusiService implements IOrderService{
 	}
 	
 	@Override
-	public Map<String,List<CProdOrderDto>> queryCustEffOrder(String custId) throws Exception {
+	public Map<String,List<CProdOrderDto>> queryCustEffOrder(String custId,String loadType) throws Exception {
+		List<CProdOrderDto> orderList=null;
+
+	    if("EFF".equals(loadType)){
+	    	//提取有效的订购记录
+			orderList = cProdOrderDao.queryCustEffOrderDto(custId);
+		}else if("ALL".equals(loadType)){
+			//提取未退订的订购记录
+			orderList=cProdOrderDao.queryCustAllOrderDto(custId);
+		}else if("HIS".equals(loadType)) {
+			//TODO 已退订的订购记录
+			
+		}else{
+			//提取有效的订购记录,如果不存在有效的订购记录 则提取最近一条订购记录
+			orderList=orderComponent.queryCustEFFAndLastOrder(custId);
+		}
 		
-		List<CProdOrderDto> orderList = cProdOrderDao.queryCustEffOrderDto(custId);
 		for (CProdOrderDto order :orderList){
 			if (StringHelper.isEmpty(order.getUser_id()))
 				order.setUser_id("CUST");
@@ -625,6 +628,8 @@ public class OrderService extends BaseBusiService implements IOrderService{
 				//计算可退余额
 				dto.setActive_fee(orderComponent.getTransCancelFee(orderProd.getEff_date(), order));
 				list.add(dto);
+			}else{
+				throw new ServicesException(ErrorCode.OrderTransUnPayPleaseCancel,order.getOrder_sn());
 			}
 		}
 		return list;
@@ -646,6 +651,8 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		busiMap.put("transfer_fee", orderProd.getTransfer_fee());
 		busiMap.put("eff_date", orderProd.getEff_date());
 		busiMap.put("exp_date", orderProd.getExp_date());
+		busiMap.put("order_fee_type", orderProd.getOrder_fee_type());
+		
 	    if(orderProd.getGroupSelected()!=null&&orderProd.getGroupSelected().size()>0){
 	    	
 	    	for(PackageGroupUser pgu: orderProd.getGroupSelected()){
@@ -749,7 +756,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 				this.saveCFee(cProdOrder,orderProd.getPay_fee(),cust,doneCode,busi_code);
 			}else{
 				//账户支付
-				this.savePayOrderByAcct(cProdOrder,orderProd.getPay_fee(),doneCode,busi_code);
+				this.savePayOrderByAcct(cProdOrder,prodConfig,orderProd.getPay_fee(),doneCode,busi_code);
 			}
 		}
 	
@@ -759,14 +766,15 @@ public class OrderService extends BaseBusiService implements IOrderService{
 	 * 使用账户支付订单金额
 	 * @throws Exception 
 	 */
-	private void savePayOrderByAcct(CProdOrder cProdorder,Integer payFee,Integer doneCode,String busiCode) throws Exception{
+	private void savePayOrderByAcct(CProdOrder cProdorder,PProd prodConfig,Integer payFee,Integer doneCode,String busiCode) throws Exception{
 		CAcct acct=acctComponent.queryCustAcctByCustId(cProdorder.getCust_id());
 		//扣款
 		List<CAcctAcctitemChange> changeList=
 				acctComponent.saveAcctDebitFee(acct.getCust_id(), acct.getAcct_id(), SystemConstants.ACCTITEM_PUBLIC_ID,
-						SystemConstants.ACCT_CHANGE_PAY, payFee*-1, busiCode, doneCode, false);
+						SystemConstants.ACCT_CHANGE_PAY, payFee*-1, busiCode, doneCode, false,prodConfig.getProd_name());
 		//订单资金明细
 		List<CProdOrderFee> orderFees=new ArrayList<>();
+
 		for(CAcctAcctitemChange change:changeList){
 			CProdOrderFee orderFee=new CProdOrderFee();
 			orderFees.add(orderFee);
@@ -775,12 +783,13 @@ public class OrderService extends BaseBusiService implements IOrderService{
 			orderFee.setOrder_sn(cProdorder.getOrder_sn());
 			orderFee.setInput_type(SystemConstants.ORDER_FEE_TYPE_ACCT);
 			orderFee.setInput_sn(change.getAcct_change_sn());
-			orderFee.setInput_fee(change.getFee());
+			orderFee.setInput_fee(change.getChange_fee()*-1);
 			orderFee.setFee_type(change.getFee_type());
 			orderFee.setCreate_time(new Date());
 			orderFee.setCounty_id(cProdorder.getCounty_id());
 			orderFee.setArea_id(cProdorder.getArea_id());
 		}
+
 		cProdOrderFeeDao.save(orderFees.toArray(new CProdOrderFee[orderFees.size()]));
 	}
 	/**
@@ -1132,7 +1141,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 			feeComponent.saveAcctFee(custId, cust.getAddr_id(), pay, doneCode, busiCode, StatusConstants.UNPAY);
 			//保存缴费信息
 			TPayType type = tPayTypeDao.findByKey(pay_type);
-			acctComponent.saveAcctAddFee(custId, acct.getAcct_id(), acctItemId, SystemConstants.ACCT_CHANGE_CFEE, fee, type.getAcct_feetype(), busiCode, doneCode);
+			acctComponent.saveAcctAddFee(custId, acct.getAcct_id(), acctItemId, SystemConstants.ACCT_CHANGE_CFEE, fee, type.getAcct_feetype(), busiCode, doneCode,null);
 		}
 		this.saveAllPublic(doneCode, this.getBusiParam());
 	}
@@ -1157,7 +1166,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		pay.setAcctitem_id(SystemConstants.ACCTITEM_PUBLIC_ID);
 		pay.setFee(fee*-1);
 		feeComponent.saveAcctFee(custId,this.getBusiParam().getCust().getAddr_id(), pay, doneCode, this.getBusiParam().getBusiCode(), SystemConstants.PAY_TYPE_UNPAY);
-		acctComponent.saveAcctDebitFee(custId, acct.getAcct_id(), SystemConstants.ACCTITEM_PUBLIC_ID, SystemConstants.ACCT_CHANGE_REFUND, fee*-1, this.getBusiParam().getBusiCode(), doneCode, true);
+		acctComponent.saveAcctDebitFee(custId, acct.getAcct_id(), SystemConstants.ACCTITEM_PUBLIC_ID, SystemConstants.ACCT_CHANGE_REFUND, fee*-1, this.getBusiParam().getBusiCode(), doneCode, true,null);
 		
 		//检查金额
 		List<CAcctAcctitemActive> list = acctComponent.queryActiveMinusByCustId(custId);

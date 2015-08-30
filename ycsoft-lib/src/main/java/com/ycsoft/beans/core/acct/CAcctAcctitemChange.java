@@ -35,7 +35,7 @@ public class CAcctAcctitemChange extends BusiBase implements Serializable {
 	private Integer pre_fee;
 	private String billing_cycle_id;
 	private Integer inactive_done_code;
-	private String cometype;
+	private String cometype;//异动说明
 	private String acct_change_sn;
 
 	private String fee_type_text;

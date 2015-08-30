@@ -17,9 +17,18 @@ public class CProdOrderFee extends BusiBase implements Serializable {
 	private String output_type;
 	private String output_sn;
 	private Integer output_fee;
+	//额外信息 产品名称
+	private String prod_name;
 	
 	
-	
+	public String getProd_name() {
+		return prod_name;
+	}
+
+	public void setProd_name(String prod_name) {
+		this.prod_name = prod_name;
+	}
+
 	public String getInput_type() {
 		return input_type;
 	}

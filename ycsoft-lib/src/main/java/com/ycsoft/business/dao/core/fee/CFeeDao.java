@@ -69,7 +69,7 @@ public class CFeeDao extends BaseEntityDao<CFee> {
 				StatusConstants.PAY,pay.getPay_type(),
 				pay.getInvoice_mode(),pay.getInvoice_id(),pay.getInvoice_book_id(),pay.getInvoice_code(),
 				pay.getPay_sn(),pay.getAcct_date(),pay.getBusi_optr_id(),
-				(pay.getInvoice_mode().equals(SystemConstants.INVOICE_MODE_AUTO)?SystemConstants.BOOLEAN_FALSE:SystemConstants.BOOLEAN_TRUE),
+				(StringHelper.isEmpty(pay.getInvoice_id())?SystemConstants.BOOLEAN_FALSE:SystemConstants.BOOLEAN_TRUE),
 				unpay.getDone_code(),unpay.getCust_id());
 	}
 	/**
@@ -79,8 +79,8 @@ public class CFeeDao extends BaseEntityDao<CFee> {
 	 * @throws JDBCException
 	 */
 	public Map<String,Integer> queryUnPaySum(String cust_id,String optr_id) throws JDBCException{
-		String sql="select nvl(sum(cf.real_pay),0) fee,count(1) cnt from c_fee cf,c_done_code_unpay un where cf.create_done_code=un.done_code and un.cust_id=? and un.optr_id=? ";
-		List<Object[]> list=this.createSQLQuery(sql, cust_id,optr_id).list();
+		String sql="select nvl(sum(cf.real_pay),0) fee,count(1) cnt from c_fee cf,c_done_code_unpay un where cf.create_done_code=un.done_code and un.cust_id=? and un.optr_id=? and cf.status<>? ";
+		List<Object[]> list=this.createSQLQuery(sql, cust_id,optr_id,StatusConstants.INVALID).list();
 		Map<String,Integer> map=new HashMap<>();
 		if(list==null||list.size()==0){
 			map.put("FEE", 0);
@@ -99,16 +99,31 @@ public class CFeeDao extends BaseEntityDao<CFee> {
 	 * @throws JDBCException
 	 */
 	public List<FeeDto> queryUnPay(String cust_id,String optr_id) throws JDBCException{
-		String sql=StringHelper.append("select cf.*,nvl(atm.acctitem_name,bf.fee_name) fee_text,fa.prod_invalid_date,fa.begin_date,fa.prod_sn ",
+		String sql=StringHelper.append(
+				"select cf.*,nvl(atm.acctitem_name,bf.fee_name) fee_text,fa.prod_invalid_date,fa.begin_date,fa.prod_sn,",
+					" case when fa.begin_date is not null and fa.prod_invalid_date is not null ",
+					"          then to_char(fa.begin_date,'yymmdd')||'-'||to_char(fa.prod_invalid_date,'yymmdd') ",
+					"      when cf.fee_id is not null then nvl(cf.disct_info,cf.count) end count_text ",
 				" from c_fee cf,c_done_code_unpay un,c_fee_acct fa,vew_acctitem atm,busi.t_busi_fee bf ",
 				" where cf.create_done_code=un.done_code ",
 				" and  bf.fee_id(+)=cf.fee_id ",
 				" and atm.acctitem_id(+)=cf.acctitem_id ",
 				" and fa.fee_sn(+)=cf.fee_sn ",
-				" and un.cust_id=? and un.optr_id=? ",
+				" and un.cust_id=? and un.optr_id=? and cf.status<> ? ",
 				" order by cf.create_time ");
-		return this.createQuery(FeeDto.class, sql, cust_id,optr_id).list();
+		return this.createQuery(FeeDto.class, sql, cust_id,optr_id,StatusConstants.INVALID).list();
 	}
+	/**
+	 * 根据业务流水号查询未支付费用信息
+	 * @param doneCode
+	 * @return
+	 * @throws JDBCException
+	 */
+	public List<CFee> queryUnPayByDoneCode(Integer doneCode) throws JDBCException{
+		String sql=" select * from c_fee  where create_done_code=? and status=? ";
+		return this.createQuery(sql, doneCode,StatusConstants.UNPAY).list();
+	}
+	
 	//客户受理单打印获取收费
 	public List<PrintFeeitemDto> queryPrintFee(String custId,SOptr optr,String docSn)throws Exception{
 		String countyId = optr.getCounty_id();

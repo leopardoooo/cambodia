@@ -54,10 +54,9 @@ public enum ErrorCode {
 	OrderDateExpDateError("结束计费日错误"),
 	OrderDateOrderMonthError("订购月数不能填0或订购月数必须是资费周期的倍数"),
 	OrderPackageHasSingleUserParam("订购套餐时，单用户参数不能填"),
-	
 	OrderFeeDisagree("订单金额和明细不一致，请联系管理员！(order_sn=%s)"),
-	
-	
+	OrderTransUnPayPleaseCancel("被覆盖的订单存在未支付记录，请先取消订单号=%s的费用"),
+
 	//depot
 	DeviceRepeat("设备重复"),
 	DeviceNotExists("设备不存在"),
@@ -72,6 +71,8 @@ public enum ErrorCode {
 	AcctItemAndActiveFeeDisagree("账户数据异常，账户资金和明细金额不一致,请联系管理员！"),
 	AcctDebitFeeIsPositive("扣款金额不能是正数"),
 	AcctAddFeeIsNotPositive("扣款金额不能是负数"),
+	
+	
 	TemplateNotConfigBuseFee("该地区费用模板未配置该费用项(%s)"),
 	CustUserIpAddressFeeCoinfigError("客户宽带IP收费存在多个费用项目，请联系管理员！"),
 	;

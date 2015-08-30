@@ -443,7 +443,7 @@ ProdOrderForm = Ext.extend( BaseForm, {
 		if( lastOrderProdDate && this.busiCode == "100"){
 			var tmpDate = Date.parseDate(lastOrderProdDate, "Y-m-d");
 			// 如果失效日期小雨上期结束日，则不给于提交
-			if(Date.parseDate(Ext.getCmp("dfExpDate").getValue(), "Y-m-d").getTime() <= tmpDate.getTime()){
+			if(Date.parseDate(Ext.getCmp("dfExpDate").getValue(), "Y-m-d").getTime() < tmpDate.getTime()){
 				return {
 					isValid: false,
 					msg: '升级时，结束计费日必须大于上期订购结束日，请调整订购月数'
