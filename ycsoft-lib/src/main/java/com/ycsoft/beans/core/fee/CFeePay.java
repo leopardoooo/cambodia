@@ -38,6 +38,7 @@ public class CFeePay extends BusiBase implements Serializable {
 	private Integer khr;
 	private Integer exchange;	
 	private Integer cos;
+	private Integer fee;
 	
 	private String pay_type_text;
 	private String is_valid_text;
@@ -45,7 +46,20 @@ public class CFeePay extends BusiBase implements Serializable {
 	
 	
 	
-	
+	/**
+	 * @return the fee
+	 */
+	public Integer getFee() {
+		return fee;
+	}
+
+	/**
+	 * @param fee
+	 *            the fee to set
+	 */
+	public void setFee(Integer fee) {
+		this.fee = fee;
+	}
 	public String getInvoice_mode_text() {
 		return invoice_mode_text;
 	}

@@ -13,7 +13,7 @@ public enum ErrorCode {
 	DeptAddrIsNull("部门(%s)未配置管辖的城市"),
 	CustDataException("客户数据异常，请重新索搜客户！"),
 	CustSeqIsNull("系统未正确配置客户序列号,客户前缀号=%s"),
-	UnPayLock("客户被锁定,请等待%s(%s)完成支付!"),
+
 	
 	
 	
@@ -32,6 +32,8 @@ public enum ErrorCode {
 	UnPayFeeHasPay("费用已支付不能取消"),
 	UnPayAcctIsNotPublic("非公用账目不能取消充值、退款"),
 	UnPayAcctRefundFeeAndChangeIsDiffer("账户退款和资金异动明细不一致"),
+	UnPayLock("客户被锁定,请等待%s(%s)完成支付!"),
+	UnPayIsOld("待支付金额已失效，请重新打开待支付界面"),
 	
 	FeeDateException("前后台金额不一致"),
 	CFeeAndProdOrderIsNotOne("费用记录和订单信息不一致"),
