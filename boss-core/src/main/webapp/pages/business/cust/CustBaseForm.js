@@ -115,112 +115,78 @@ AddressTreeCombo = Ext.extend(Ext.ux.TreeCombo,{
 
 
 
-ResidentForm = Ext.extend( Ext.Panel , {
-	parent : null,
-	constructor: function(p){
-		this.parent = p;
-		ResidentForm.superclass.constructor.call(this, {
-			layout:'column',
-			border : false,
-			anchor: '100%',
-			defaults:{
-				baseCls: 'x-plain',
-				bodyStyle: "background:#F9F9F9",
-				columnWidth:1,
-				layout: 'form',
-				labelWidth: 75
-			},
-			items:[{
-				items:[{
-					id:'cust_colony_id',
-					fieldLabel:'客户群体',
-					xtype:'paramcombo',
-					allowBlank:false,
-					hiddenName:'cust.cust_colony',
-					paramName:'CUST_COLONY',
-					defaultValue:'YBKH',
-					listeners : {
-						scope : this,
-						select : function(combo){
-							this.parent.custColony = combo.getValue();
-						}
-					}
-				}]
-			}]
-		})
-	}
-});
 
-UnitForm = Ext.extend(Ext.Panel, {
-	parent : null,
-	constructor: function(p){
-		this.parent = p;
-		UnitForm.superclass.constructor.call(this, {
-			layout:'column',
-			border : false,
-			anchor: '100%',
-			bodyStyle: "background:#F9F9F9",
-			defaults:{
-				baseCls: 'x-plain',
-				columnWidth:0.5,
-				labelWidth: 75
-			},
-			items:[{
-				layout:'form',border:false,items:[{
-					id:'cust_colony_id',
-					fieldLabel:'客户群体',
-					xtype:'combo',
-					hiddenName:'cust.cust_colony',
-					store:new Ext.data.JsonStore({
-						fields:['text','value'],
-						data:[{text:'协议客户',value:'XYKH'},{text:'模拟大客户',value:'MNDKH'}]
-					}),displayField:'text',valueField:'value',editable:true,forceSelection:true,
-					listeners : {
-						scope : this,
-						select : function(combo){
-							var value = combo.getValue();
-							this.parent.custColony = value;
-							var custCountCmp = Ext.getCmp('custcount_itemId');
-							if(value){
-								custCountCmp.show();
-								Ext.getCmp('cust_count_id').allowBlank = false;
-							}else{
-								custCountCmp.hide();
-								Ext.getCmp('cust_count_id').allowBlank = true;
-							}
-					},
-					blur:function(combo){
-						var value = combo.getValue();
-						if(Ext.isEmpty(value)){
-							Ext.getCmp('custcount_itemId').hide();
-							Ext.getCmp('cust_count_id').allowBlank = true;
-						}
-					}
-				}
-			}]
-			},{
-				id:'custcount_itemId',
-				layout:'form',border:false,
-				items:[{
-					id:'cust_count_id',
-					fieldLabel:'容量',
-					xtype:'numberfield',
-					name:'cust.cust_count',
-					minValue:1,
-					allowDecimals:false,
-					allowNegative:false
-				}]
-			}]
-		})
-	},
-    initEvents: function () {
-        this.on('afterrender', function () {
-	        Ext.getCmp('custcount_itemId').hide();
-        });
-	    this.doLayout();
-        UnitForm.superclass.initEvents.call(this);
-    }
-});
+
+//UnitForm = Ext.extend(Ext.Panel, {
+//	parent : null,
+//	constructor: function(p){
+//		this.parent = p;
+//		UnitForm.superclass.constructor.call(this, {
+//			layout:'column',
+//			border : false,
+//			anchor: '100%',
+//			bodyStyle: "background:#F9F9F9",
+//			defaults:{
+//				baseCls: 'x-plain',
+//				columnWidth:0.5,
+//				labelWidth: 75
+//			},
+//			items:[{
+//				layout:'form',border:false,items:[{
+//					id:'cust_level_id',
+//					fieldLabel:'客户群体',
+//					xtype:'combo',
+//					hiddenName:'cust.cust_level',
+//					store:new Ext.data.JsonStore({
+//						fields:['text','value'],
+//						data:[{text:'协议客户',value:'XYKH'},{text:'模拟大客户',value:'MNDKH'}]
+//					}),displayField:'text',valueField:'value',editable:true,forceSelection:true,
+//					listeners : {
+//						scope : this,
+//						select : function(combo){
+//							var value = combo.getValue();
+//							this.parent.custLevel = value;
+//							var custCountCmp = Ext.getCmp('custcount_itemId');
+//							if(value){
+//								custCountCmp.show();
+//								Ext.getCmp('cust_count_id').allowBlank = false;
+//							}else{
+//								custCountCmp.hide();
+//								Ext.getCmp('cust_count_id').allowBlank = true;
+//							}
+//					},
+//					blur:function(combo){
+//						var value = combo.getValue();
+//						if(Ext.isEmpty(value)){
+//							Ext.getCmp('custcount_itemId').hide();
+//							Ext.getCmp('cust_count_id').allowBlank = true;
+//						}
+//					}
+//				}
+//			}]
+//			},{
+//				id:'custcount_itemId',
+//				layout:'form',border:false,
+//				items:[{
+//					id:'cust_count_id',
+//					fieldLabel:'容量',
+//					xtype:'numberfield',
+//					name:'cust.cust_count',
+//					minValue:1,
+//					allowDecimals:false,
+//					allowNegative:false
+//				}]
+//			}]
+//		})
+//	},
+//    initEvents: function () {
+//        this.on('afterrender', function () {
+//	        Ext.getCmp('custcount_itemId').hide();
+//        });
+//	    this.doLayout();
+//        UnitForm.superclass.initEvents.call(this);
+//    }
+//});
 
 /**
  * 联系人面板
@@ -246,7 +212,6 @@ LinkPanel = Ext.extend(Ext.Panel,{
 					labelWidth: 75
 				},
 				items: [{
-					id:'idCustAppCodeItems',
 					items:[{
 						fieldLabel:'联系人',
 						name:'linkman.linkman_name',
@@ -411,20 +376,18 @@ LinkPanel = Ext.extend(Ext.Panel,{
 CustBaseForm = Ext.extend( BaseForm , {
 	//扩展属性面板
 	extAttrForm: null,
-	residentForm :null,
-	unitForm :null,
+//	unitForm :null,
 	linkPanel : null,
 	oldCustType:'RESIDENT',
 	custAddress : null,//客户拼接后的地址
-	custColony : null,
+	custLevel : null,
 	navMenu:null,
 	constructor: function(config){
 		Ext.apply(this, config);
 		//居民信息扩展
 		this.doInitAttrForm(2);
 		this.linkPanel = new LinkPanel(this);
-		this.residentForm = new ResidentForm(this);
-		this.unitForm = new UnitForm(this);
+//		this.unitForm = new UnitForm(this);
 		CustBaseForm.superclass.constructor.call(this, {
 			trackResetOnLoad:true,
 			labelWidth: 75,
@@ -506,25 +469,64 @@ CustBaseForm = Ext.extend( BaseForm , {
 							}
 						}
 					})]
+				},{
+					id:'addCustItemsOne',
+					items:[{
+						id:'cust_level_id',
+						fieldLabel:'客户等级',
+						xtype:'paramcombo',
+						allowBlank:false,
+						hiddenName:'cust.cust_level',
+						paramName:'CUST_LEVEL',
+						defaultValue:'YBKH',
+						listeners : {
+							scope : this,
+							select : function(combo){
+								this.custLevel = combo.getValue();
+							}
+						}
+					},{
+						fieldLabel: '发展人',
+						xtype:'paramcombo',
+						hiddenName: 'cust.str9',
+						paramName:'OPTR',
+						editable:true
+					}]
+				},{
+					id:'addCustItemsTwo',
+					items:[{
+							fieldLabel:'密码',
+							allowBlank:false,
+							vtype : 'loginName',
+							xtype:'textfield',
+							name:'cust.password'
+						}]
 				}]
 			}
 			,{
 				xtype : 'hidden',
 				id : 'tempCustAddress'
-			},this.residentForm,this.linkPanel,this.extAttrForm]
+			},this.linkPanel,this.extAttrForm]
 //            }]
 		});
 	},
 	doInit:function(){
 		CustBaseForm.superclass.doInit.call(this);
-		this.removeCustColony();
+		this.removecustLevel();
 	},
-	removeCustColony:function(){
-		var store = this.residentForm.findById('cust_colony_id').getStore();
+	removecustLevel:function(){
+		var store = this.findById('cust_level_id').getStore();
 		store.each(function(record){
-			var value = record.get('item_value');
-			if(value == 'MNDKH' || value == 'XYKH'){
+			if(record.get('item_value') != 'YBKH'){
 				store.remove(record);
+			}
+		});
+		
+		var comp = this.find("hiddenName" ,'cust.cust_type')[0];
+		var typeStore = comp.getStore();
+		typeStore.each(function(record){
+			if(record.get('item_value') == 'UNIT'){
+				typeStore.remove(record);
 			}
 		});
 	},
@@ -537,71 +539,70 @@ CustBaseForm = Ext.extend( BaseForm , {
 	doCustTypeChange:function(custType){//客户类型修改
 		if (this.oldCustType == custType)
 			return ;
-		this.remove(this.residentForm,true);
 		this.remove(this.linkPanel,true);
 		this.remove(this.extAttrForm,true);
-		this.remove(this.unitForm,true);
+//		this.remove(this.unitForm,true);
 		
 		
-		var custToUserBtn = Ext.getCmp('newCustToUserId');
-		var custToDeviceBtn = Ext.getCmp('newCustToDeviceId');
-		if (custType != 'UNIT') {
-			if (custToUserBtn && custToUserBtn.isHidden)
-				custToUserBtn.hide();
-			if (custToDeviceBtn && custToDeviceBtn.isHidden)
-				custToDeviceBtn.hide();
-		} else {
-			if (custToUserBtn && !custToUserBtn.isHidden)
-				custToUserBtn.hide();
-			if (custToDeviceBtn && !custToDeviceBtn.isHidden)
-				custToDeviceBtn.hide();
-		}
+//		var custToUserBtn = Ext.getCmp('newCustToUserId');
+//		var custToDeviceBtn = Ext.getCmp('newCustToDeviceId');
+//		if (custType != 'UNIT') {
+//			if (custToUserBtn && custToUserBtn.isHidden)
+//				custToUserBtn.hide();
+//			if (custToDeviceBtn && custToDeviceBtn.isHidden)
+//				custToDeviceBtn.hide();
+//		} else {
+//			if (custToUserBtn && !custToUserBtn.isHidden)
+//				custToUserBtn.hide();
+//			if (custToDeviceBtn && !custToDeviceBtn.isHidden)
+//				custToDeviceBtn.hide();
+//		}
 		
 		this.linkPanel = new LinkPanel();
 		if (custType == 'RESIDENT'){
 			this.doInitAttrForm(2);
-			this.residentForm = new ResidentForm(this);
-			this.add(this.residentForm);
 			this.add(this.linkPanel);
 			this.add(this.extAttrForm);
-			App.form.initComboData(this.residentForm.findByType("paramcombo"),this.removeCustColony,this);
 		}else{
 			this.doInitAttrForm(1);
 			var countyId = App.getData().optr.county_id;
 			//单位，选择了客户群体，则为模拟大客户(武汉、直属)
-			if(custType == 'UNIT' && (countyId == '0101' || countyId == '0102') ){
-				this.unitForm = new UnitForm(this);
-				this.add(this.unitForm);
-			}
+//			if(custType == 'UNIT' && (countyId == '0101' || countyId == '0102') ){
+//				this.unitForm = new UnitForm(this);
+//				this.add(this.unitForm);
+//			}
 			this.add(this.linkPanel);
 			this.add(this.extAttrForm);
 		}
 		
-		//潜江开非居民客户，需要审批单，审批单功能在系统管理里面
-		if(custType == 'NONRES' && App.getData().optr.county_id == '9005'){
-			Ext.getCmp('idCustAppCodeItems').add({
-					id:'cust_app_code',
-					fieldLabel:'审批单号',
+		//非居民客户，需要营业执照,税号,协议编号
+		if(custType == 'NONRES'){
+			Ext.getCmp('addCustItemsOne').add({
+					id:'cust_str7_id',
+					fieldLabel:'营业执照',
 					xtype:'textfield',
-					name:'cust.app_code',
-					vtype:'invoiceId',
+					name:'cust.str7',
 					allowBlank:false
-					/*xtype:'combo',
-					hiddenName:'cust.app_code',
-					store:new Ext.data.JsonStore({
-						url:Constant.ROOT_PATH + "/core/x/Cust!queryNonresCustApp.action",
-						totalProperty:'totalProperty',
-						root:'records',
-						params:{start:0,limit:10},
-						fields:['app_id','app_code','app_name','status']
-					}),displayField:'app_name',valueField:'app_code',
-					forceSelection:true,editable:true,listWidth:400,
-					typeAhead: true,mode:'remote',minChars:4,pageSize:10*/
 				});
+			Ext.getCmp('addCustItemsTwo').add({
+					id:'cust_str8_id',
+					fieldLabel:'税号',
+					xtype:'textfield',
+					name:'cust.str8'
+				});
+			Ext.getCmp('addCustItemsTwo').add({
+					id:'cust_spkg_sn_id',
+					fieldLabel:'协议编号',
+					xtype:'textfield',
+					name:'cust.spkg_sn'
+				})
+			
 		}else{
-			var comp = Ext.getCmp('cust_app_code');
+			var comp = Ext.getCmp('cust_str7_id');
 			if(comp){
-				Ext.getCmp('idCustAppCodeItems').remove(comp,true);
+				Ext.getCmp('addCustItemsOne').remove(comp,true);
+				Ext.getCmp('addCustItemsTwo').remove(Ext.getCmp('cust_str8_id'),true);
+				Ext.getCmp('addCustItemsTwo').remove(Ext.getCmp('cust_spkg_sn_id'),true);
 			}
 		}
 		App.form.initComboData( this.linkPanel.findByType("paramcombo"));
@@ -633,7 +634,7 @@ CustBaseForm = Ext.extend( BaseForm , {
 	doCustNameChange:function(c,r,i){
 		var name = c.getValue();
 		var linkManName = this.find('name','linkman.linkman_name')[0];
-		if (name.length<=5){
+		if(this.oldCustType = 'RESIDENT'){
 			linkManName.setValue(name);
 		}
 	},

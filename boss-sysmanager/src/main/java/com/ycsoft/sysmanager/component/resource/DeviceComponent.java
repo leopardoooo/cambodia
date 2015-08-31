@@ -1221,7 +1221,7 @@ public class DeviceComponent extends BaseDeviceComponent {
 			rDeviceDao.save(device);
 		}else{
 			//更新器材原总数
-			rDeviceDao.addMateralTransferDevice(deviceId,num);
+			rDeviceDao.addMateralDevice(deviceId,num);
 			checkDeviceNum(deviceId);
 		}
 
@@ -1627,7 +1627,7 @@ public class DeviceComponent extends BaseDeviceComponent {
 			rDeviceChangeDao.saveMateralTransChange(doneCode,BusiCodeConstants.DEVICE_TRANSFER,deviceId,"total_num",oldValue
 					,newValue,transfer.getOptr_id(),transfer.getDepot_source(),optr.getCounty_id(), optr.getArea_id());
 	
-			rDeviceDao.removeMateralTransferDevice(deviceId, d.getTotal_num());
+			rDeviceDao.removeMateralDevice(deviceId, d.getTotal_num());
 			checkDeviceNum(deviceId);
 		}
 		
@@ -1704,10 +1704,10 @@ public class DeviceComponent extends BaseDeviceComponent {
 					rDeviceChangeDao.saveMateralTransChange(doneCode,BusiCodeConstants.DEVICE_CANCEL_CONFIRM,device.getDevice_id(),"total_num",oldValue
 							,newValue,transfer.getConfirm_optr_id(),transfer.getDepot_source(),optr.getCounty_id(), optr.getArea_id());
 					//减去调拨数量
-					rDeviceDao.removeMateralTransferDevice(r.getDevice_id(), r.getTotal_num());
+					rDeviceDao.removeMateralDevice(r.getDevice_id(), r.getTotal_num());
 					checkDeviceNum(r.getDevice_id());
 					//原器材总数+取消调拨的数量
-					rDeviceDao.addMateralTransferDevice(device.getDevice_id(),r.getTotal_num());
+					rDeviceDao.addMateralDevice(device.getDevice_id(),r.getTotal_num());
 				}
 		
 			}else{
@@ -1738,7 +1738,7 @@ public class DeviceComponent extends BaseDeviceComponent {
 					//已经存在了状态为正常的该型号设备，就加总数
 					if(key){
 						//原器材总数+调拨的数量
-						rDeviceDao.addMateralTransferDevice(deviceChick.getDevice_id(),r.getTotal_num());
+						rDeviceDao.addMateralDevice(deviceChick.getDevice_id(),r.getTotal_num());
 						//删除这条调拨的数据
 						rDeviceDao.removeDeviceToHis(deviceId);
 					}
@@ -2175,7 +2175,7 @@ public class DeviceComponent extends BaseDeviceComponent {
 			rDeviceChangeDao.saveMateralTransChange(doneCode,BusiCodeConstants.DEVICE_OUT,device.getDevice_id(),"total_num",oldValue
 					,newValue,output.getOptr_id(),output.getDepot_id(),optr.getCounty_id(), optr.getArea_id());
 	
-			rDeviceDao.removeMateralTransferDevice(d.getDevice_id(), d.getTotal_num());
+			rDeviceDao.removeMateralDevice(d.getDevice_id(), d.getTotal_num());
 			checkDeviceNum(d.getDevice_id());
 		}
 		

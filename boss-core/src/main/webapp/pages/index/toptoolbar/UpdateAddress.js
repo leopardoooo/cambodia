@@ -2,37 +2,119 @@
  * 修改地址
  */
  
- AddressTreeCombo = Ext.extend(Ext.ux.TreeCombo,{
-	onNodeClick : function(node, e) {
+QueryFilterTree = Ext.extend(Ext.ux.QueryFilterTreePanel,{
+	doSearch:function(){
+		var _v = this.searchT.getValue();
+		Ext.Ajax.request({
+			url: Constant.ROOT_PATH+"/commons/x/QueryParam!queryAddrTree.action",
+			scope : this,
+			params : {
+				comboQueryText : _v
+			},
+			success : function(res,opt){
+				var data = Ext.decode(res.responseText);
+				var root = new Ext.tree.AsyncTreeNode({
+						  text:'gen',
+						  id:'root',
+						  draggable:false,
+						  children:data
+						 });
+				this.setRootNode(root);
+			}
+		});				
+	}
+});
+
+AddressTreeCombo = Ext.extend(Ext.ux.TreeCombo,{
+	initList : function() {
+		var rootVisible = false;
+		if (this.rootNodeCfg) {
+			rootVisible = true;
+		} else {
+			this.rootNodeCfg = {
+				expanded : true
+			};
+		}
+		this.list = new QueryFilterTree({
+			root : new Ext.tree.AsyncTreeNode(this.rootNodeCfg),
+			loader : new Ext.tree.TreeLoader({
+						dataUrl : this.treeUrl,
+						baseParams : this.treeParams
+						,listeners : {
+							beforeload : this.onBeforeLoad,
+							scope : this
+						}
+					}),
+			floating : true,
+			height : this.treeHeight,
+			autoScroll : true,
+			animate : false,
+			searchFieldWidth : this.treeWidth - 80,
+			rootVisible : rootVisible,
+			listeners : {
+				click : this.onNodeClick,
+				checkchange : this.onCheckchange,
+				scope : this
+			},
+			alignTo : function(el, pos) {
+				this.setPagePosition(this.el.getAlignToXY(el, pos));
+			}
+		});
+		if (this.minChars == 0) {
+			this.doQuery("");
+		}
+	},
+	listeners:{
+		expand:function(thisCmp){
+			function getFocus(){
+				var search = thisCmp.list.searchT;//如果第一次获取焦点,list会为空
+				if(search){
+//					search.setValue('输入关键字搜索');
+					var dom = search.el.dom;
+					dom.select();
+				}
+			};
+			getFocus.defer(200,this);
+		}
+	},
+	onNodeClick : function(node, e) {		
 		if (!this.isCanClick(node)) {
 			return;
 		}
-		var attrs = this.dispAttr.split(".");
+		this.setRawValue('');
+		Ext.Ajax.request({
+			scope : this,
+			url: Constant.ROOT_PATH+"/commons/x/QueryParam!queryCustAddrName.action",
+			params : {
+				addrId : node.id
+			},
+			success : function(res,opt){
+				var rec = Ext.decode(res.responseText);
+				//		// 显示隐藏值
+				this.addOption(node.id, rec);
+				this.setValue(node.id);
+				this.setRawValue(rec);
+				this.collapse();
+				this.fireEvent('select', this, node, node.attributes);
+			}
+		});
 		
-		 var level = node.attributes.others.tree_level;
-		if(!Ext.isEmpty(level)){
-			this.level =level;
+	},
+	firstExpand: true,
+	doQuery : function(q, forceAll) {
+		if(!this.firstExpand){
+			this.firstExpand = true;
+			this.list.expandAll();
 		}
-		
-		var temp = null;
-		
-		//区域对应的文本
-		var temp = node.parentNode.attributes;
-		var addrText = temp[this.dispAttr];
-		
-		temp = node.attributes;
-		addrText = addrText + temp[this.dispAttr];
-		
-		
-		// 显示隐藏值
-		this.addOption(node.id, addrText);
-		this.setValue(node.id);
-		// 设置显示值
-		this.setRawValue(addrText);
-		this.collapse();
-		this.fireEvent('select', this, node, node.attributes);
+		this.expand();
+	},
+	onBeforeLoad:function(l,node){
+		l.on('beforeload',function(loader,node){
+  			l.baseParams.addrId=node.id; //通过这个传递参数，这样就可以点一个节点出来它的子节点来实现异步加载
+		},l);
 	}
-})
+	
+});
 
  
 QueryAddressForm = Ext.extend(Ext.form.FormPanel,{

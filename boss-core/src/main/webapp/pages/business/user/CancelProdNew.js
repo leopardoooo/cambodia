@@ -86,9 +86,9 @@ CancelProdGrid = Ext.extend(Ext.grid.GridPanel,{
 			Ext.get("acctTotalAmount").update(String(this.totalAcctNum/100));
 		}
 		this.totalFee = this.totalFeeNum + this.totalAcctNum;
-		if(this.totalFee>0){
-			Ext.get("totalFeeAmount").update(String(this.totalFee/100));
-		}
+//		if(this.totalFee>0){
+//			Ext.get("totalFeeAmount").update(String(this.totalFee/100));
+//		}
 	},
 	refresh:function(orderSn){
 		this.selectProdStore.load({
@@ -122,55 +122,133 @@ CancelProdNewForm = Ext.extend(BaseForm,{
             layout:'border', 
             items:[this.cancelProdGrid,{
 				region: "south",
-				height: 60, 
-				bodyStyle: 'background-color: rgb(213,225,241);padding: 10px 0 10px 30px; color: red',
+				height: 80, 
+//				bodyStyle: 'background-color: rgb(213,225,241);padding: 10px 0 10px 30px; color: red',
 				buttonAlign:'center',
 				 flex:1,
        			 frame:true,  
 				 labelAlign:'right',  
 				 layout:'column',
 				 border: false,
-		         items:[{ 
-		         		columnWidth:.15,
+		         items:[
+		         		{ 
+		         	columnWidth:.5,
+		         	xtype:'fieldset',  
+				    height: 60, 
+				    title:'可退',
+         			style:'margin-left:10px;padding: 10px 0 10px 10px; color: red',
+         			layout:'column',
+         			items:[{
+         				columnWidth:.50,
          				items:[{
          						bodyStyle:'padding-top:4px',
 		         				html: "* 可退总额$:<span id='cfeeTotalAmount'>--</span>"
 			         			}]
          				},{
-         					labelWidth:75, 
-	         				columnWidth:.30,
-	         				layout : 'form',
-	         				items:[{
-									fieldLabel : '处理方式',
-									id : 'CancelFeeTypeId',
-									name:'order_fee_type',
-									allowBlank : false,
-									xtype:'paramcombo',
-									width: 80,
-									emptyText: '请选择',
-									defaultValue:'REFUND',
-									paramName:'ACCT_BALANCE',
-									listeners: {
-										scope: this,
-										'expand': function(combo){
-											var store = combo.getStore();
-											store.removeAt(store.find('item_value','EXPIRE'));
-										}
+         				columnWidth:.50,
+         				layout : 'form',
+         				labelWidth:75,  
+         				items:[{
+								fieldLabel : '处理方式',
+								id : 'CancelFeeTypeId',
+								name:'order_fee_type',
+								allowBlank : false,
+								xtype:'paramcombo',
+								width: 80,
+								emptyText: '请选择',
+								defaultValue:'REFUND',
+								paramName:'ACCT_BALANCE',
+								listeners: {
+									scope: this,
+									'expand': function(combo){
+										var store = combo.getStore();
+										store.removeAt(store.find('item_value','EXPIRE'));
 									}
-								}]
-         				},{ 
-			         		columnWidth:.35,
-	         				items:[{
-	         						bodyStyle:'padding-top:4px',
-			         				html: "* 转公用总额$:<span id='acctTotalAmount'>--</span>"
-				         			}]
-	         			},{
-	         				columnWidth:.20,
-	         				items:[{
-	         						bodyStyle:'padding-top:4px',
-			         				html: "* 退款总额$:<span id='totalFeeAmount'>--</span>"
-				         			}]
-	         			}]
+								}
+							}]
+         				}]
+		         },{ 
+		         	columnWidth:.5,
+		         	xtype:'fieldset',  
+				    height: 60, 
+				    title:'可转',
+         			style:'margin-left:10px;padding: 10px 0 10px 10px; color: red',
+         			layout:'column',
+         			items:[{
+         				columnWidth:.50,
+         				items:[{
+         						bodyStyle:'padding-top:4px',
+		         				html: "* 可转总额$:<span id='acctTotalAmount'>--</span>"
+			         			}]
+         				},{
+         				columnWidth:.50,
+         				layout : 'form',
+         				labelWidth:75,  
+         				items:[{
+								fieldLabel : '处理方式',
+								name:'order_fee_type_id',
+								allowBlank : false,
+								xtype:'paramcombo',
+								width: 80,
+								disabled: true,
+								emptyText: '请选择',
+								defaultValue:'TRANS',
+								paramName:'ACCT_BALANCE',
+								listeners: {
+									scope: this,
+									'expand': function(combo){
+										var store = combo.getStore();
+										store.removeAt(store.find('item_value','EXPIRE'));
+										store.removeAt(store.find('item_value','REFUND'));
+									}
+								}
+							}]
+         				}]
+		         }
+		         
+		         
+//		         		{ 
+//		         		columnWidth:.15,
+//         				items:[{
+//         						bodyStyle:'padding-top:4px',
+//		         				html: "* 可退总额$:<span id='cfeeTotalAmount'>--</span>"
+//			         			}]
+//         				},{
+//         					labelWidth:75, 
+//	         				columnWidth:.30,
+//	         				layout : 'form',
+//	         				items:[{
+//									fieldLabel : '处理方式',
+//									id : 'CancelFeeTypeId',
+//									name:'order_fee_type',
+//									allowBlank : false,
+//									xtype:'paramcombo',
+//									width: 80,
+//									emptyText: '请选择',
+//									defaultValue:'REFUND',
+//									paramName:'ACCT_BALANCE',
+//									listeners: {
+//										scope: this,
+//										'expand': function(combo){
+//											var store = combo.getStore();
+//											store.removeAt(store.find('item_value','EXPIRE'));
+//										}
+//									}
+//								}]
+//         				},{ 
+//			         		columnWidth:.35,
+//	         				items:[{
+//	         						bodyStyle:'padding-top:4px',
+//			         				html: "* 转公用总额$:<span id='acctTotalAmount'>--</span>"
+//				         			}]
+//	         			},{
+//	         				columnWidth:.20,
+//	         				items:[{
+//	         						bodyStyle:'padding-top:4px',
+//			         				html: "* 退款总额$:<span id='totalFeeAmount'>--</span>"
+//				         			}]
+//	         			}
+	         			]
 		         
 				}]
 		})

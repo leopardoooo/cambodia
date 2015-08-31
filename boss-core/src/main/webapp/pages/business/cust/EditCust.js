@@ -123,11 +123,11 @@ EditCustForm = Ext.extend( CustBaseForm , {
 								}
 							}
 							if(fields[i].field_name == 'cust.addr_id'){//如果是地址，把剩余的放开允许修改
-								Ext.getCmp('cust.t1').enable();
-								Ext.getCmp('cust.t2').enable();
-								Ext.getCmp('cust.t3').enable();
-								Ext.getCmp('cust.t4').enable();
-								Ext.getCmp('cust.t5').enable();
+//								Ext.getCmp('cust.t1').enable();
+//								Ext.getCmp('cust.t2').enable();
+//								Ext.getCmp('cust.t3').enable();
+//								Ext.getCmp('cust.t4').enable();
+//								Ext.getCmp('cust.t5').enable();
 								Ext.getCmp('cust.note').enable();
 							}
 						}

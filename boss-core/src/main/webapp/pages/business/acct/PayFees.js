@@ -122,6 +122,7 @@ PayFeesForm = Ext.extend( BaseForm , {
          				},{
          				columnWidth:.50,
          				layout : 'form',
+         				labelWidth:75,  
          				items:[{
 								fieldLabel : '处理方式',
 								id : 'payFeeTypeId',

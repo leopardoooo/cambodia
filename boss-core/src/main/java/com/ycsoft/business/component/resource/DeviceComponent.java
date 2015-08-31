@@ -12,6 +12,7 @@ import com.google.gson.reflect.TypeToken;
 import com.ycsoft.beans.config.TBusiFeeDevice;
 import com.ycsoft.beans.config.TDeviceBuyMode;
 import com.ycsoft.beans.core.cust.CCustDevice;
+import com.ycsoft.beans.core.fee.CFeeDevice;
 import com.ycsoft.beans.core.valuable.CValuableCard;
 import com.ycsoft.beans.core.valuable.CValuableCardFee;
 import com.ycsoft.beans.core.valuable.CValuableCardHis;
@@ -853,7 +854,7 @@ public class DeviceComponent extends BaseBusiComponent {
 	}
 	
 	/**
-	 * 处理器材数量
+	 * 器材数量减去购买数量
 	 * @param deviceType
 	 * @param deviceModel
 	 * @param optr
@@ -861,13 +862,35 @@ public class DeviceComponent extends BaseBusiComponent {
 	 * @throws Exception
 	 */
 	public void removeTotalNumDevice(String deviceId, Integer buyNum) throws Exception{
-		//减去调拨数量
-		rDeviceDao.removeMateralTransferDevice(deviceId, buyNum);
+		//减去数量
+		rDeviceDao.removeMateralDevice(deviceId, buyNum);
 		RDevice nextRdevice = rDeviceDao.findByKey(deviceId);
 		if(nextRdevice.getTotal_num()<0){
 			throw new ComponentException(ErrorCode.DeviceTotalNumIsNull);
 		}
 	}
+	
+	
+	/**
+	 * 原器材加上购买数量
+	 * @param deviceId
+	 * @param buyNum
+	 * @throws Exception
+	 */
+	public void addTotalNumDevice(String deviceId, Integer buyNum) throws Exception{
+		//加上数量购买数量
+		rDeviceDao.addMateralDevice(deviceId, buyNum);
+	}
+	
+	public void updateDeviceNum(CFeeDevice feeDevice) throws Exception{
+		RDevice r = rDeviceDao.findByKey(feeDevice.getDevice_id());
+		if(r == null || !r.getDevice_model().equals(feeDevice.getDevice_model())){
+			throw new ComponentException(ErrorCode.DeviceDateException,feeDevice.getDevice_id());
+		}
+		addTotalNumDevice(feeDevice.getDevice_id(),feeDevice.getBuy_num());
+	}
+	
+	
 	
 	public RDevice queryTotalNumDevice(String deviceModel,String deptId) throws Exception{
 		//原器材
@@ -1044,7 +1067,6 @@ public class DeviceComponent extends BaseBusiComponent {
 	public void setRDeviceModelDao(RDeviceModelDao deviceModelDao) {
 		this.rDeviceModelDao = deviceModelDao;
 	}
-
 
 
 	

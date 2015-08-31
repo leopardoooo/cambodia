@@ -417,8 +417,8 @@ public class PayService extends BaseBusiService implements IPayService {
 	 * @throws Exception 
 	 */
 	private void cancelUnPayFittingFee(CFeeDevice feeDevice,Integer doneCode) throws Exception{
-		//TODO 回退配件库存,叫小王实现
-		
+		//回退配件库存
+		deviceComponent.updateDeviceNum(feeDevice);
 		//作废缴费
 		feeComponent.saveCancelFeeUnPay(feeDevice, doneCode);
 		//作废业务
