@@ -175,32 +175,40 @@ public class DocService extends BaseBusiService implements IDocService {
 
 		//查询单据的配置
 		TBusiDocTemplatefile busiDoc = busiConfigComponent.queryBusiDoc(doc.getDoc_type());
+		map.put("printType", busiDoc.getPrint_type());
+		map.put("docType", busiDoc.getDoc_type());
+		//map.put("data", {});
+		if(busiDoc.getPrint_type().equals("NOPRINT")&&StringHelper.isNotEmpty(busiDoc.getChange_doc_type())){
+			map.put("docType", busiDoc.getChange_doc_type());
+		}
 
-		//获取数据,包括单据的模板内容及模板对应的数据
-		String content = PrintContentConfiguration.getTemplate(suffix + busiDoc.getTemplate_filename());
-		
-		int balance = 0;//现金余额
-		List<InvoiceFromDto> list = feeComponent.queryInvoiceByDocSn(doc.getDoc_sn());
-		if(list != null && list.size() > 0){
-			InvoiceFromDto ifdto = list.get(0);
-			balance = ifdto.getBalance();
-			if(balance == 0 ){
+			//获取数据,包括单据的模板内容及模板对应的数据
+			String content = PrintContentConfiguration.getTemplate(suffix + busiDoc.getTemplate_filename());
+			
+			int balance = 0;//现金余额
+			List<InvoiceFromDto> list = feeComponent.queryInvoiceByDocSn(doc.getDoc_sn());
+			if(list != null && list.size() > 0){
+				InvoiceFromDto ifdto = list.get(0);
+				balance = ifdto.getBalance();
+				if(balance == 0 ){
+					balance = acctComponent.queryXJBalanceByCustId(custId);
+				}
+			}else{
 				balance = acctComponent.queryXJBalanceByCustId(custId);
 			}
-		}else{
-			balance = acctComponent.queryXJBalanceByCustId(custId);
-		}
+			
+			Map<String, Object> data = new HashMap<String, Object>();
+	
+			data.put("doc", doc);
+			data.put("custid", custId);
+			data.put("balance", balance);
+			printComponent.fillData(data,busiDoc.getMethod_name());
+	
+			//设置数据，返回
+			map.put("content", content);
+			map.put("data", data);
 		
-		Map<String, Object> data = new HashMap<String, Object>();
-
-		data.put("doc", doc);
-		data.put("custid", custId);
-		data.put("balance", balance);
-		printComponent.fillData(data,busiDoc.getMethod_name());
-
-		//设置数据，返回
-		map.put("content", content);
-		map.put("data", data);
+		
 		return map;
 	}
 	

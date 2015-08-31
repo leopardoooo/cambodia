@@ -25,6 +25,7 @@ public class TBusiDocTemplatefile implements Serializable {
 	private String print_type ;	
 	private String template_filename ;	
 	private String method_name ;	
+	private String change_doc_type;
 	
 	/**
 	 * default empty constructor
@@ -32,6 +33,19 @@ public class TBusiDocTemplatefile implements Serializable {
 	public TBusiDocTemplatefile() {}
 	
 	
+	
+	public String getChange_doc_type() {
+		return change_doc_type;
+	}
+
+
+
+	public void setChange_doc_type(String change_doc_type) {
+		this.change_doc_type = change_doc_type;
+	}
+
+
+
 	// temlate_id getter and setter
 	public String getTemlate_id(){
 		return this.temlate_id ;

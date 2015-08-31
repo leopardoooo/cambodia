@@ -311,6 +311,7 @@ var printdata = null;
  				
  				rs.set("printData", map);
  				callback.call(this, rs);
+ 				
  			}
  		}); 
 	},
@@ -337,10 +338,10 @@ var printdata = null;
 // 	},
  	//打印
  	doPrint: function(rs){
- 		var printType = rs.get("print_type");
  		var isInvoice = rs.get("is_invoice");
  		var map = rs.get("printData");
- 		var docType= rs.get("doc_type");
+ 		var printType = map.printType;
+ 		var docType= map.docType;
  		map.data.paytype=this.paytype;
 
 		if(PRINT_TYPE_WEB === printType){
@@ -359,7 +360,7 @@ var printdata = null;
 				if(null == this.winInvoice){
 					this.invoiceWindow = new InvoiceWindow();
 				}
-				this.invoiceWindow.show(rs ,docType,this );
+				this.invoiceWindow.show(rs ,docType,printType,this );
 			}else{
 				try{
 					var xmlStr = PrintTools.getContent(map["content"],
@@ -378,39 +379,46 @@ var printdata = null;
 
  	},
  	//发票打印，按照page count拆分数据
- 	doInvoicePrint: function(invoiceInfo , record){
+ 	doInvoicePrint: function(invoiceInfo , record,printType){
  		var map = record.get("printData"), xmlStr;
  		var data = map["data"];
  		
- 		//从已经发票信息获取对应的items,并重新生成xml文档
- 		var noIePrintObj = [];
- 		for(var i=0; i< invoiceInfo.length ;i++){
- 			// 设置总金额 及打印项
- 			data["total"] = invoiceInfo[i]["amount"];
- 			data["printItems"] = invoiceInfo[i]["docitem_data"];
- 			data["invoiceCode"] = invoiceInfo[i]["invoice_code"];
- 			data["invoiceId"] = invoiceInfo[i]["invoice_id"];
- 			try{
-	 			xmlStr = PrintTools.getContent( map["content"] , data );
- 			}catch(e){
-				alert("模板变量替换时出错! error:" + e.message);
-				throw new Error(e);
+ 		if(printType == 'NOPRINT'){
+ 		
+ 		}else{
+ 		
+	 		//从已经发票信息获取对应的items,并重新生成xml文档
+	 		var noIePrintObj = [];
+	 		for(var i=0; i< invoiceInfo.length ;i++){
+	 			// 设置总金额 及打印项
+	 			data["total"] = invoiceInfo[i]["amount"];
+	 			data["printItems"] = invoiceInfo[i]["docitem_data"];
+	 			data["invoiceCode"] = invoiceInfo[i]["invoice_code"];
+	 			data["invoiceId"] = invoiceInfo[i]["invoice_id"];
+	 			try{
+		 			xmlStr = PrintTools.getContent( map["content"] , data );
+	 			}catch(e){
+					alert("模板变量替换时出错! error:" + e.message);
+					throw new Error(e);
+				}
+				if(PrintTools.isIE){
+					try{
+						PrintTools.print(xmlStr);
+					}catch(e){
+						alert("打印控件调用异常，请检查是否安装了打印控件" + e.message);
+					}	
+				}else{
+					//noIePrintContent += '<div class="breakPage">' + xmlStr + "</div>";
+					noIePrintObj.push(PrintTools.parsePrintXML(xmlStr));
+				}
+	 		}
+	 		//非IE打印
+	 		if(!PrintTools.isIE){
+				PrintTools.appletPrint(noIePrintObj);
 			}
-			if(PrintTools.isIE){
-				try{
-					PrintTools.print(xmlStr);
-				}catch(e){
-					alert("打印控件调用异常，请检查是否安装了打印控件" + e.message);
-				}	
-			}else{
-				//noIePrintContent += '<div class="breakPage">' + xmlStr + "</div>";
-				noIePrintObj.push(PrintTools.parsePrintXML(xmlStr));
-			}
+		
  		}
- 		//非IE打印
- 		if(!PrintTools.isIE){
-			PrintTools.appletPrint(noIePrintObj);
-		}
+		
  		this.printStore.remove(record);
  		this.printItemStore.remove(this.printItemGrid.getSelectionModel().getSelections());
  		if (this.printItemStore.getCount()==0){
@@ -450,6 +458,7 @@ InvoiceWindow = Ext.extend( Ext.Window ,{
 	invoiceGrid: null,
 	invoiceStore: null,
 	docType : null,
+	printType:null,
 	//发票的张数
 	pageCount: 0 ,
 	invoiceEditStore : null,//发票下拉框编辑数据
@@ -535,7 +544,7 @@ InvoiceWindow = Ext.extend( Ext.Window ,{
 		Ext.Ajax.request({
 			scope : this,
 			url:Constant.ROOT_PATH + "/core/x/Pay!checkInvoice.action",
-			async: false,
+//			async: false,
 			params:{
 				invoice_id:invoiceId,
 				invoice_mode:'A',
@@ -609,11 +618,12 @@ InvoiceWindow = Ext.extend( Ext.Window ,{
 			}
 		}
 	},
-	show: function( record , docType, p ){
+	show: function( record , docType,printType, p ){
 		this.invoiceStore.removeAll(true);
 		this.printPanel = p;
 		this.record = record;
 		this.docType = docType;
+		this.printType = printType;
 		var map = this.record.get("printData");
 		var pis = map.data.printItems;
 		// 计算页数
@@ -789,7 +799,7 @@ InvoiceWindow = Ext.extend( Ext.Window ,{
 					}
 					
 					//	调用打印面板的发票打印信息
-					this.printPanel.doInvoicePrint(all ,this.record);
+					this.printPanel.doInvoicePrint(all ,this.record,this.printType);
 					
 					
 					var feeUnitpreGrid = App.getApp().main.feeUnitpreGrid;
