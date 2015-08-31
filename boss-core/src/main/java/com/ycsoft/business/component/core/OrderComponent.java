@@ -553,15 +553,19 @@ public class OrderComponent extends BaseBusiComponent {
 	 * @param recoverDoneCode
 	 * @throws JDBCException 
 	 */
-	public void recoverTransCancelOrder(Integer recoverDoneCode,String cust_id) throws JDBCException{
+	public void recoverTransCancelOrder(Integer recoverDoneCode,String cust_id,Integer doneCode) throws JDBCException{
 		//查询被覆盖移入历史表的订购记录
 		List<CProdOrder> list=cProdOrderHisDao.queryCProdOrderByDelete(recoverDoneCode, cust_id);
 		if(list!=null&&list.size()>0){
 			//移回正式表
 			cProdOrderDao.save(list.toArray(new CProdOrder[list.size()]));
-			//订单金额记录清除转出信息
+			
+			
 			for(CProdOrder order:list){
+				//订单金额记录清除转出信息
 				cProdOrderFeeDao.clearOutPutInfo(order.getOrder_sn(),SystemConstants.ORDER_FEE_TYPE_TRANSFEE);
+				//插入状态异动
+				cProdStatusChangeDao.saveStatusChange(doneCode, order.getOrder_sn(), order.getStatus());
 			}
 			String orderSns[]=new String[list.size()];
 			for(int i=0;i<list.size();i++){

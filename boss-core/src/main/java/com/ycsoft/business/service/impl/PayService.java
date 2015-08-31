@@ -300,7 +300,7 @@ public class PayService extends BaseBusiService implements IPayService {
 		//目的是保证c_fee_acct中pre_invalid_date和begin_date准确
 		this.checkUnPayOrderCancel(order,fee);
 		//恢复被覆盖转移的订单
-		orderComponent.recoverTransCancelOrder(order.getDone_code(),order.getCust_id());
+		orderComponent.recoverTransCancelOrder(order.getDone_code(),order.getCust_id(),doneCode);
 		//删除c_prod_order_fee
 		cProdOrderFeeDao.deleteOrderFeeByOrderSn(order_sn);
 		//移除订单到历史表
