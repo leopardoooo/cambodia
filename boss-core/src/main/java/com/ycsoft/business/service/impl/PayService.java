@@ -198,17 +198,31 @@ public class PayService extends BaseBusiService implements IPayService {
 		}else if(fee_type.equals(SystemConstants.FEE_TYPE_BUSI)){
 			CFeeBusi fee=feeComponent.queryFeeBusi(fee_sn);
 			this.checkCanclUpPayFeeParam(fee, cust_id);
-			//取消杂费，业务正常
-			if(!onlyShowInfo){
-				this.cancelUnPayBusiFee(fee, doneCode);
+			
+			if(fee.getBusi_code().equals(BusiCodeConstants.FEE_EDIT)){
+				if(!onlyShowInfo){
+					this.cancelUnPayFeeEdit(fee, doneCode);
+				}
+				info=SystemConstants.UNPAY_CANCEL_PROMPT_FEEANDBUSI;
+			}else{
+				//取消杂费，业务正常
+				if(!onlyShowInfo){
+					this.cancelUnPayBusiFee(fee, doneCode);
+				}
+				info=SystemConstants.UNPAY_CANCEL_PROMPT_ONLYFEE;
 			}
-			info=SystemConstants.UNPAY_CANCEL_PROMPT_ONLYFEE;
 			
 		}else if(fee_type.equals(SystemConstants.FEE_TYPE_DEVICE)){
 			CFeeDevice fee=feeComponent.queryFeeDevice(fee_sn);
 			this.checkCanclUpPayFeeParam(fee, cust_id);
 			
-			if(SystemConstants.DEVICE_TYPE_FITTING.equals(fee.getDevice_type())
+			if(fee.getBusi_code().equals(BusiCodeConstants.FEE_EDIT)){
+				if(!onlyShowInfo){
+					this.cancelUnPayFeeEdit(fee, doneCode);
+				}
+				info=SystemConstants.UNPAY_CANCEL_PROMPT_FEEANDBUSI;
+				
+			}else if(SystemConstants.DEVICE_TYPE_FITTING.equals(fee.getDevice_type())
 				&&fee.getCreate_done_code().equals(fee.getBusi_done_code()) //非费用修改
 				&&fee.getReal_pay()>0){
 				//配件费取消,业务回退
@@ -419,6 +433,18 @@ public class PayService extends BaseBusiService implements IPayService {
 	 */
 	private void cancelUnPayBusiFee(CFeeBusi feeBusi,Integer doneCode) throws Exception{
 		feeComponent.saveCancelFeeUnPay(feeBusi, doneCode);
+	}
+	/**
+	 * 取消费用修改
+	 * @param fee
+	 * @param doneCode
+	 * @throws Exception
+	 */
+	private void cancelUnPayFeeEdit(CFee fee,Integer doneCode) throws Exception{
+		//作废费用
+		feeComponent.saveCancelFeeUnPay(fee, doneCode);
+		//作废业务
+		doneCodeComponent.cancelDoneCode(fee.getCreate_done_code());
 	}
 	
 	
@@ -710,9 +736,14 @@ public class PayService extends BaseBusiService implements IPayService {
 				userList.remove(i);
 		}
 		
+		if(feeList.size()>0){
+			//出入未支付业务
+			doneCodeComponent.saveDoneCodeUnPay(cust.getCust_id(), doneCode, this.getOptr().getOptr_id());
+		}
 		for (FeeBusiFormDto feeDto:feeList){
+			
 			if (feeDto.getFee_type().equals(SystemConstants.FEE_TYPE_BUSI)){
-				String payType = SystemConstants.PAY_TYPE_CASH;
+				String payType = SystemConstants.PAY_TYPE_UNPAY;
 				if(null != getBusiParam().getPay()){
 					payType = getBusiParam().getPay().getPay_type();
 				}
@@ -728,7 +759,7 @@ public class PayService extends BaseBusiService implements IPayService {
 					device = devices.get(0);
 				else
 					device = new CFeeDevice();
-				String payType = SystemConstants.PAY_TYPE_CASH;
+				String payType = SystemConstants.PAY_TYPE_UNPAY;
 				if (this.getBusiParam().getPay()!= null && this.getBusiParam().getPay().getPay_type() !=null)
 					payType = this.getBusiParam().getPay().getPay_type();
 				feeComponent.saveDeviceFee(cust.getCust_id(),cust.getAddr_id(), feeDto.getFee_id(), device.getFee_std_id(),payType,

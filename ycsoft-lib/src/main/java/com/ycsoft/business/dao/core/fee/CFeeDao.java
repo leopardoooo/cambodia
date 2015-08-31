@@ -314,14 +314,14 @@ public class CFeeDao extends BaseEntityDao<CFee> {
 	}
 	
 	public List<CFee> querySumFeeByDoneCode(String custId,Integer doneCode, String countyId) throws Exception{
-		String sql = "select fee_id,null addr_id,sum(decode(status,'PAY',real_pay,0)) real_pay,sum(fd.buy_num) buy_num" +
+		String sql = "select fee_id,null addr_id,sum(decode(status,'PAY',real_pay,'UNPAY',real_pay,0)) real_pay,sum(fd.buy_num) buy_num" +
 				" from c_fee f,c_fee_device fd " +
 				" where f.fee_sn=fd.fee_sn and f.cust_id=?" +
 				" and f.busi_done_code=? and f.county_id=? and fd.county_id=?" +
 				" and f.fee_type<> ?" +
 				" group by f.fee_id" +
 				" union all " +
-				"select fee_id,max(f.addr_id) addr_id,sum(decode(status,'PAY',real_pay,0)) real_pay,1 buy_num" +
+				"select fee_id,max(f.addr_id) addr_id,sum(decode(status,'PAY',real_pay,'UNPAY',real_pay,0)) real_pay,1 buy_num" +
 				" from c_fee f,c_fee_busi fd " +
 				" where f.fee_sn=fd.fee_sn and f.cust_id=?" +
 				" and f.busi_done_code=? and f.county_id=? and fd.county_id=?" +
