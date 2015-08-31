@@ -860,12 +860,12 @@ public class RDeviceDao extends BaseEntityDao<RDevice> {
 		executeUpdate(sql, StatusConstants.IDLE,depotOrder, deviceId);
 	}
 
-	public void removeMateralTransferDevice(String device_id, Integer total_num) throws JDBCException{
+	public void removeMateralDevice(String device_id, Integer total_num) throws JDBCException{
 		String sql = "UPDATE r_device SET total_num= total_num-?  WHERE device_id=?";
 		executeUpdate(sql,total_num, device_id);
 	}
 	
-	public void addMateralTransferDevice(String device_id, Integer total_num) throws JDBCException{
+	public void addMateralDevice(String device_id, Integer total_num) throws JDBCException{
 		String sql = "UPDATE r_device SET total_num= total_num + ?  WHERE device_id=?";
 		executeUpdate(sql,total_num, device_id);
 	}

@@ -246,7 +246,7 @@ LinkPanel = Ext.extend(Ext.Panel,{
 					labelWidth: 75
 				},
 				items: [{
-					id:'idCustAppCodeItems',
+					id:'addCustItemsOne',
 					items:[{
 						fieldLabel:'联系人',
 						name:'linkman.linkman_name',
@@ -281,13 +281,20 @@ LinkPanel = Ext.extend(Ext.Panel,{
 						xtype:'textfield',
 						vtype:'email'
 					},{
-						fieldLabel:'邮编',
-						name:'linkman.postcode',
+						fieldLabel:'密码',
+						allowBlank:false,
+						vtype : 'loginName',
 						xtype:'textfield',
-						regex: /^[1-9]{1}[0-9]{5}$/,
-						invalidText : '请输入6位不以0开头的数字'
-					}]
+						name:'cust.password'
+					},{
+						fieldLabel: '发展人',
+						xtype:'paramcombo',
+						hiddenName: 'cust.str9',
+						paramName:'OPTR',
+						editable:true
+				}]
 				},{
+					id:'addCustItemsTwo',
 					items:[{
 						fieldLabel:'性别',
 						id : 'linkmanSex',
@@ -313,6 +320,12 @@ LinkPanel = Ext.extend(Ext.Panel,{
 						regex: /^1[\d]{10}$/,
 						id: 'linkmanMobile',
 						invalidText : '请输入11位数字'
+					},{
+						fieldLabel:'邮编',
+						name:'linkman.postcode',
+						xtype:'textfield',
+						regex: /^[1-9]{1}[0-9]{5}$/,
+						invalidText : '请输入6位不以0开头的数字'
 					},{
 						fieldLabel:'出生日期',
 						width : 125,
@@ -577,31 +590,35 @@ CustBaseForm = Ext.extend( BaseForm , {
 			this.add(this.extAttrForm);
 		}
 		
-		//潜江开非居民客户，需要审批单，审批单功能在系统管理里面
-		if(custType == 'NONRES' && App.getData().optr.county_id == '9005'){
-			Ext.getCmp('idCustAppCodeItems').add({
-					id:'cust_app_code',
-					fieldLabel:'审批单号',
+		//非居民客户，需要营业执照,税号,协议编号
+		if(custType == 'NONRES'){
+			Ext.getCmp('addCustItemsOne').add({
+					id:'cust_str7_id',
+					fieldLabel:'营业执照',
 					xtype:'textfield',
-					name:'cust.app_code',
-					vtype:'invoiceId',
+					name:'cust.str7',
 					allowBlank:false
-					/*xtype:'combo',
-					hiddenName:'cust.app_code',
-					store:new Ext.data.JsonStore({
-						url:Constant.ROOT_PATH + "/core/x/Cust!queryNonresCustApp.action",
-						totalProperty:'totalProperty',
-						root:'records',
-						params:{start:0,limit:10},
-						fields:['app_id','app_code','app_name','status']
-					}),displayField:'app_name',valueField:'app_code',
-					forceSelection:true,editable:true,listWidth:400,
-					typeAhead: true,mode:'remote',minChars:4,pageSize:10*/
 				});
+			Ext.getCmp('addCustItemsTwo').add(
+				{
+					id:'cust_spkg_sn_id',
+					fieldLabel:'协议编号',
+					xtype:'textfield',
+					name:'cust.spkg_sn'
+				},{
+					id:'cust_str8_id',
+					fieldLabel:'税号',
+					xtype:'textfield',
+					name:'cust.str8'
+				}
+			)
+			
 		}else{
-			var comp = Ext.getCmp('cust_app_code');
+			var comp = Ext.getCmp('cust_str7_id');
 			if(comp){
-				Ext.getCmp('idCustAppCodeItems').remove(comp,true);
+				Ext.getCmp('addCustItemsOne').remove(comp,true);
+				Ext.getCmp('addCustItemsTwo').remove(Ext.getCmp('cust_str8_id'),true);
+				Ext.getCmp('addCustItemsTwo').remove(Ext.getCmp('cust_spkg_sn_id'),true);
 			}
 		}
 		App.form.initComboData( this.linkPanel.findByType("paramcombo"));
@@ -633,7 +650,7 @@ CustBaseForm = Ext.extend( BaseForm , {
 	doCustNameChange:function(c,r,i){
 		var name = c.getValue();
 		var linkManName = this.find('name','linkman.linkman_name')[0];
-		if (name.length<=5){
+		if(this.oldCustType = 'RESIDENT'){
 			linkManName.setValue(name);
 		}
 	},
