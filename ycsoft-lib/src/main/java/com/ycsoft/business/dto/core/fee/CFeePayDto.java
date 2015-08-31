@@ -17,7 +17,7 @@ public class CFeePayDto extends CFeePay {
 	private String invoice_id;
 	private String invoice_code;
 	private String invoice_book_id;
-	private Integer fee;
+	
 	private String busi_optr_id;
 
 	/**
@@ -65,20 +65,7 @@ public class CFeePayDto extends CFeePay {
 		this.invoice_book_id = invoice_book_id;
 	}
 
-	/**
-	 * @return the fee
-	 */
-	public Integer getFee() {
-		return fee;
-	}
 
-	/**
-	 * @param fee
-	 *            the fee to set
-	 */
-	public void setFee(Integer fee) {
-		this.fee = fee;
-	}
 
 	public String getBusi_optr_id() {
 		return busi_optr_id;
