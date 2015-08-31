@@ -282,6 +282,9 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		Map<String,CProdOrderDto> unPayCheckMap=new HashMap<String,CProdOrderDto>();
 		for(String order_sn:orderSns){
 			CProdOrderDto order= cProdOrderDao.queryCProdOrderDtoByKey(order_sn);
+			if(order==null){
+				throw new ServicesException(ErrorCode.ParamIsNull);
+			}
 			cancelList.add(order);
 			this.checkOrderCanCancel(cust_id, isHigh, order);
 			//可退费用计算
