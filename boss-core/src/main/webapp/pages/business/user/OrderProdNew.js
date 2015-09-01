@@ -143,7 +143,7 @@ ProdOrderForm = Ext.extend( BaseForm, {
 				}]
 			},{  
 		         region: "south",
-				 height: 80, 
+				 height: 90, 
 				 buttonAlign:'center',
 				 flex:1,
        			 frame:true,  
@@ -154,7 +154,7 @@ ProdOrderForm = Ext.extend( BaseForm, {
 		         items:[{ 
 		         	columnWidth:.70,
 		         	xtype:'fieldset',  
-				    height: 60, 
+				    height: 75, 
 				    title:'产品费',
          			style:'margin-left:10px;padding: 10px 0 10px 10px; color: red',
          			layout:'column',
@@ -194,7 +194,7 @@ ProdOrderForm = Ext.extend( BaseForm, {
 		         },{  
 				    columnWidth:.30,
 		         	xtype:'fieldset',  
-		         	height: 60, 
+		         	height: 75, 
 		         	title:'业务费',
 		         	style:'margin-left:10px;padding: 10px 0 10px 10px; color: red',
 					items:[{

@@ -2522,7 +2522,7 @@ Ext.apply(MenuHandler, {
 		if (!hasCust())
 			return false;
 
-		var record = App.getApp().main.infoPanel.acctPanel.acctItemGrid
+		var record = App.getApp().main.infoPanel.custPanel.acctItemGrid
 				.getSelectionModel().getSelected();
 		if (record.get('can_refund_balance') === 0) {
 			Alert("账目退款余额不足！");
@@ -2544,7 +2544,7 @@ Ext.apply(MenuHandler, {
 	AcctTransfer : function() {
 		if (!hasCust())
 			return false;
-		var record = App.getApp().main.infoPanel.acctPanel.acctItemGrid
+		var record = App.getApp().main.infoPanel.custPanel.acctItemGrid
 				.getSelectionModel().getSelected();
 		if (record.get('can_trans_balance') === 0) {
 			Alert('账目可转金额不足！');
@@ -2853,7 +2853,7 @@ Ext.apply(MenuHandler, {
 	PublicAcctRecharge:function(){
 		if (!hasCust())
 			return false;
-		var acctStore = App.getApp().main.infoPanel.getAcctPanel().acctItemGrid.getStore();
+		var acctStore = App.getApp().main.infoPanel.getCustPanel().acctItemGrid.getStore();
 		if (acctStore.getCount() > 1) {
 			Alert("目前只支持单个公用账目！");
 			return false;
@@ -2866,7 +2866,7 @@ Ext.apply(MenuHandler, {
 	PublicAcctRefund:function(){
 		if (!hasCust())
 			return false;
-		var acctStore = App.getApp().main.infoPanel.getAcctPanel().acctItemGrid.getStore();
+		var acctStore = App.getApp().main.infoPanel.getCustPanel().acctItemGrid.getStore();
 		if (acctStore.getCount() > 1) {
 			Alert("目前只支持单个公用账目！");
 			return false;

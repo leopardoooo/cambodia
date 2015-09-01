@@ -18,7 +18,7 @@
 
 <script type="text/javascript" src="<%=root %>/pages/index/center/BaseInfoPanel.js" charset="UTF-8"></script>
 <script type="text/javascript" src="<%=root %>/pages/commons/CommonTab.js"></script>
-<script type="text/javascript" src="<%=root %>/pages/index/center/AcctPanel.js" charset="UTF-8"></script>
+
 
 <script type="text/javascript" src="<%=root %>/pages/business/common/BusiPanel.js"></script>
 <script type="text/javascript" src="<%=root %>/pages/business/common/TemplateFactory.js" charset="UTF-8"></script>

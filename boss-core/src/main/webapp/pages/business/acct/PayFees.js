@@ -31,9 +31,7 @@ PaymentPanel = Ext.extend(Ext.Panel,{
 	},
 	doInit:function(){
 		//用户选中的账户行
-		var records = App.getApp().main.infoPanel.acctPanel.acctGrid.getSelectionModel().getSelections();
-		
-
+//		var records = App.getApp().main.infoPanel.acctPanel.acctGrid.getSelectionModel().getSelections();
 		
 //		//账户面板store
 //		var acctstore = App.getApp().main.infoPanel.acctPanel.acctGrid.getStore();

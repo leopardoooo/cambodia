@@ -50,23 +50,10 @@ public class CAcctAcctitemChangeDao extends BaseEntityDao<CAcctAcctitemChange> {
 	 * @throws JDBCException
 	 */
 	public Pager<CAcctAcctitemChange> queryByAcctitemId(String acctId,String acctitemId, Integer start, Integer limit) throws JDBCException {
-		String sql = "select t.*, (select t2.acctitem_name from vew_acctitem  t2,B_BILL_WRITEOFF t3,B_BILL t4 "
-				+ "  where t.acct_id=t3.acct_id and t.acctitem_id=t3.acctitem_id and t.fee_type=t3.fee_type"
-				+ "  and t.done_code=t3.writeoff_sn and t3.bill_sn=t4.bill_sn and t4.acctitem_id = t2.acctitem_id and t.change_type='XZ') acctitem_name, "
-				+ " case when t.busi_code = ? AND T.CHANGE_FEE >0  "
-				+ "  then (select t6.acctitem_name from c_acct_acctitem_change t5, vew_acctitem t6 where t.busi_code = ? "
-				+ "  and t5.done_code = t.done_code and t5.acctitem_id <> t.acctitem_id and t6.acctitem_id = t5.acctitem_id "
-				+ " and t.cust_id=t5.cust_id and t.fee_type=t5.fee_type and t.change_type=t5.change_type) "
-				+ "  WHEN  t.busi_code = ? THEN t7.acctitem_name END start_acctitem,"
-				+ " case when t.busi_code = ? AND T.CHANGE_FEE<=0  "
-				+ "  then (select t6.acctitem_name from c_acct_acctitem_change t5, vew_acctitem t6 where t.busi_code = ? "
-				+ "  and t5.done_code = t.done_code  and t5.acctitem_id <> t.acctitem_id and t6.acctitem_id = t5.acctitem_id "
-				+ " and t.cust_id=t5.cust_id and t.fee_type=t5.fee_type and t.change_type=t5.change_type) "
-				+ "  WHEN  t.busi_code = ? THEN t7.acctitem_name end end_acctitem"
-				+ "  from c_acct_acctitem_change t,vew_acctitem t7 where t.acctitem_id = t7.acctitem_id and t.acct_id = ?  and t.acctitem_id = ? "
+		String sql = "select t.*  from c_acct_acctitem_change t "
+				+ " where t.acct_id = ?  and t.acctitem_id = ? "
 				+ " order by t.done_date desc";
-		Query<CAcctAcctitemChange> query = createQuery(sql,BusiCodeConstants.ACCT_TRANS,BusiCodeConstants.ACCT_TRANS,BusiCodeConstants.ACCT_TRANS,
-				BusiCodeConstants.ACCT_TRANS,BusiCodeConstants.ACCT_TRANS,BusiCodeConstants.ACCT_TRANS, acctId,acctitemId);
+		Query<CAcctAcctitemChange> query = createQuery(sql, acctId,acctitemId);
 		return query.setStart(start).setLimit(limit).page();
 	}
 

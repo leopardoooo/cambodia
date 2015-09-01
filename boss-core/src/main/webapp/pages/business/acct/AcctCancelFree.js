@@ -5,7 +5,7 @@ CancelFreeFrom = Ext.extend(BaseForm ,{
 	url: Constant.ROOT_PATH + "/core/x/Acct!cancelFree.action",
 	acctRecord: null,
 	constructor: function(){
-		this.acctRecord = App.getApp().main.infoPanel.acctPanel.acctItemGrid.getSelectionModel().getSelected();
+		this.acctRecord = App.getApp().main.infoPanel.custPanel.acctItemGrid.getSelectionModel().getSelected();
 		CancelFreeFrom.superclass.constructor.call(this,{
 			border: false,
 			labelWidth: 85,

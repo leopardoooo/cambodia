@@ -347,8 +347,8 @@ FeePayGrid = Ext.extend(Ext.ux.Grid, {
 		
 		FeePayGrid.superclass.constructor.call(this, {
 					id:'P_FEE_PAY',
-					title : '订单记录',
-					region:"west",
+					title : '支付记录',
+					region:"east",
 					width:"30%",
 					split:true,
 					loadMask : true,

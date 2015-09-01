@@ -611,7 +611,7 @@ CustBaseForm = Ext.extend( BaseForm , {
 						mode: 'local',
 						displayField : 'name',
 						valueField : 'cust_code',
-						emptyText: '请选择',
+						emptyText: '请选择省',
 						disabled:true,
 						editable : false,
 						listeners:{
