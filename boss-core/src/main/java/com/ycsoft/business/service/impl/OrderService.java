@@ -29,6 +29,7 @@ import com.ycsoft.beans.core.user.CUser;
 import com.ycsoft.beans.prod.PPackageProd;
 import com.ycsoft.beans.prod.PProd;
 import com.ycsoft.beans.prod.PProdTariff;
+import com.ycsoft.beans.prod.PProdTariffDisct;
 import com.ycsoft.business.component.core.OrderComponent;
 import com.ycsoft.business.dao.config.TPayTypeDao;
 import com.ycsoft.business.dao.core.cust.CCustDao;
@@ -574,10 +575,21 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		if(StringHelper.isEmpty(last_order_sn)) return;
 		CProdOrder mainorder=cProdOrderDao.findByKey(last_order_sn);
 		//上次订购不存在或产品不一致
-		if(mainorder==null||!mainorder.getProd_id().equals(prod_id)){
+		if(mainorder==null){
 			return;
+		}else if(prod_id.equals(mainorder.getProd_id())){
+			this.lastOrderSelectUserByPak(panel, last_order_sn);
+		}else{
+			this.lastOrderSelectUserSameProdList( panel, last_order_sn,mainorder.getProd_id());
 		}
 		
+	}
+	
+	/**
+	 * 相同套餐匹配
+	 * @throws JDBCException 
+	 */
+	private void lastOrderSelectUserByPak(PackageGroupPanel panel,String last_order_sn) throws Exception{
 		//提取原订购记录的套餐组用户选择情况,且适用现在的套餐产品限制条件
 		Map<String,Set<String>> selectUsers=new HashMap<String,Set<String>>();
 		for(CProdOrder order:cProdOrderDao.queryPakDetailOrder(last_order_sn)){
@@ -600,7 +612,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 						break;
 					}
 					CUser user=userMap.get(user_id);
-					if(user!=null){
+					if(user==null){
 						continue;
 					}
 					if(!user.getUser_type().equals(pgu.getUser_type())){
@@ -615,6 +627,64 @@ public class OrderService extends BaseBusiService implements IOrderService{
 			}
 		}
 	}
+	/**
+	 * 不同套餐，使用相同内容匹配
+	 * @throws Exception 
+	 */
+	private void lastOrderSelectUserSameProdList(PackageGroupPanel panel,String last_order_sn,String last_pak_id) throws Exception{
+		
+		Map<String,PPackageProd> lastPakProdMap=CollectionHelper.converToMapSingle(
+				pPackageProdDao.queryPackProdById(last_pak_id), "package_group_id"); 
+		//提取原订购记录的套餐组用户选择情况,且适用现在的套餐产品限制条件
+		//Map<prod_list,Set<user_id>> selectUsers 宽带内容组填BAND
+		Map<String,Set<String>> selectUsers=new HashMap<String,Set<String>>();
+		for(CProdOrder order:cProdOrderDao.queryPakDetailOrder(last_order_sn)){
+			if(StringHelper.isNotEmpty(order.getPackage_group_id())
+					&&StringHelper.isNotEmpty(order.getUser_id())
+					&&lastPakProdMap.containsKey(order.getPackage_group_id())){
+				PPackageProd pakProd=lastPakProdMap.get(order.getPackage_group_id());
+				String key=pakProd.getProd_list();
+				if(pakProd.getUser_type().equals(SystemConstants.USER_TYPE_BAND)){
+					key=SystemConstants.USER_TYPE_BAND;
+				}
+				if(selectUsers.get(key)==null){
+					selectUsers.put(key, new HashSet<String>());
+				}
+				selectUsers.get(key).add(order.getUser_id());
+			}
+		}
+		//装到新订购的套餐内容组用户选择中
+		Map<String,CUser> userMap=CollectionHelper.converToMapSingle(panel.getUserList(), "user_id"); 
+		for(PackageGroupUser pgu: panel.getGroupList()){
+			String key=pgu.getProd_list();
+			if(pgu.getUser_type().equals(SystemConstants.USER_TYPE_BAND)){
+				key=SystemConstants.USER_TYPE_BAND;
+			}
+			Set<String> userSet=selectUsers.get(key);
+			if(userSet!=null&&userSet.size()>0){
+				pgu.setUserSelectList(new ArrayList<String>());
+				for(String user_id:userSet){
+					if(pgu.getUserSelectList().size()>=pgu.getMax_user_cnt()){
+						break;
+					}
+					CUser user=userMap.get(user_id);
+					if(user==null){
+						continue;
+					}
+					if(!user.getUser_type().equals(pgu.getUser_type())){
+						continue;
+					}
+					if(StringHelper.isNotEmpty(pgu.getTerminal_type())
+							&&!pgu.getTerminal_type().equals(user.getTerminal_type())){
+						continue;
+					}
+					pgu.getUserSelectList().add(user_id);
+				}
+				userSet.removeAll(pgu.getUserSelectList());
+			}
+		}
+	}
+	
 	/**
 	 * 查询转移支付的被退的订单清单
 	 * 要排除未支付的订单
@@ -999,12 +1069,17 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		//订购月数校检
 		String[] tmpTariff=orderProd.getTariff_id().split("_");
 		int billing_cycle=0;
+		int rent=0;
 		PProdTariff tariff=pProdTariffDao.findByKey(tmpTariff[0]);
 		
 		if(tmpTariff.length==2){
-			billing_cycle=pProdTariffDisctDao.findByKey(tmpTariff[1]).getBilling_cycle();
+			
+			PProdTariffDisct disct= pProdTariffDisctDao.findByKey(tmpTariff[1]);
+			billing_cycle=disct.getBilling_cycle();
+			rent=disct.getDisct_rent();
 		}else{
 			billing_cycle=tariff.getBilling_cycle();
+			rent=tariff.getRent();
 		}
 		//订购期数(包天=round(order_months*30))
 		int order_cycles=tariff.getBilling_type().equals(SystemConstants.BILLING_TYPE_DAY)?
@@ -1018,6 +1093,11 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		}
 		if(order_cycles%billing_cycle!=0){
 			throw new  ComponentException(ErrorCode.OrderDateOrderMonthError);
+		}
+		
+		//订购支付金额验证
+		if( (rent*order_cycles/billing_cycle) !=(orderProd.getPay_fee()+orderProd.getTransfer_fee())){
+			throw new ComponentException(ErrorCode.OrderDateFeeError);
 		}
 		
 		//结束计费日校检
@@ -1040,13 +1120,14 @@ public class OrderService extends BaseBusiService implements IOrderService{
 					throw new ServicesException(ErrorCode.OrderDateExpDateError);
 				}
 		}		
-		
+		//支付类型判断
 		if(orderProd.getOrder_fee_type()!=null){
 			if(!orderProd.getOrder_fee_type().equals(SystemConstants.ORDER_FEE_TYPE_ACCT)
 					&&!orderProd.getOrder_fee_type().equals(SystemConstants.ORDER_FEE_TYPE_CFEE)){
 				throw new ServicesException(ErrorCode.OrderDateException);
 			}
 		}
+		
 		return lastOrder;
 	}
 	/**

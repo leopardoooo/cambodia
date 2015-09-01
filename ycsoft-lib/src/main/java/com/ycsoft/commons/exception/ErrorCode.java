@@ -55,9 +55,11 @@ public enum ErrorCode {
 	OrderDateEffDateError("开始计费日错误"),
 	OrderDateExpDateError("结束计费日错误"),
 	OrderDateOrderMonthError("订购月数不能填0或订购月数必须是资费周期的倍数"),
+	OrderDateFeeError("订单应支付金额错误"),
 	OrderPackageHasSingleUserParam("订购套餐时，单用户参数不能填"),
 	OrderFeeDisagree("订单金额和明细不一致，请联系管理员！(order_sn=%s)"),
 	OrderTransUnPayPleaseCancel("被覆盖的订单存在未支付记录，请先取消订单号=%s的费用"),
+
 
 	//depot
 	DeviceRepeat("设备重复"),

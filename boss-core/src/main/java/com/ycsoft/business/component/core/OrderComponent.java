@@ -587,12 +587,16 @@ public class OrderComponent extends BaseBusiComponent {
 	public List<CProdOrder> queryTransCancelOrderList(OrderProd orderProd,String busi_code) throws Exception{
 		List<CProdOrder> orderCancelList=new ArrayList<>(); 
 		//提取被取消的订购记录
-		if(orderProd.getGroupSelected()!=null&&orderProd.getGroupSelected().size()>0){
-			//套餐订购覆盖普通订购
-			orderCancelList= queryTransferFeeByPackage(orderProd);
-		}else if(busi_code.equals(BusiCodeConstants.PROD_UPGRADE)&&StringHelper.isNotEmpty(orderProd.getLast_order_sn())){
+		if(busi_code.equals(BusiCodeConstants.PROD_UPGRADE)){
+			if(StringHelper.isEmpty(orderProd.getLast_order_sn())){
+				throw new ComponentException(ErrorCode.ParamIsNull);
+			}
 			//升级的情况
 			orderCancelList=queryTransferFeeByUpProd(orderProd);
+			
+		}else if(orderProd.getGroupSelected()!=null&&orderProd.getGroupSelected().size()>0){
+			//套餐订购覆盖普通订购
+			orderCancelList= queryTransferFeeByPackage(orderProd);
 		}
 		return orderCancelList;
 	}
@@ -786,6 +790,9 @@ public class OrderComponent extends BaseBusiComponent {
 		prod.setCreate_time(new Date());
 		prod.setPublic_acctitem_type(SystemConstants.PUBLIC_ACCTITEM_TYPE_NONE);
 		prod.setOrder_type(SystemConstants.PROD_ORDER_TYPE_ORDER);
+		if(orderProd.getEff_date().equals(DateHelper.today())){
+			prod.setCheck_time(prod.getCreate_time());
+		}
 		return prod;
 	}
 	
