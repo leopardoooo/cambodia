@@ -3,6 +3,7 @@ package com.ycsoft.business.service;
 import java.util.List;
 import java.util.Map;
 
+import com.ycsoft.beans.config.TProvince;
 import com.ycsoft.beans.core.acct.CAcctAcctitem;
 import com.ycsoft.beans.core.bill.BBillWriteoff;
 import com.ycsoft.beans.core.bill.BillDto;
@@ -406,6 +407,8 @@ public interface IQueryCustService extends IBaseService{
 			Integer limit)throws Exception ;
 
 	public List<FeeDto> queryFeePayDetail(String paySn) throws Exception;
+
+	public List<TProvince> queryProvince()throws Exception;
 
 
 }

@@ -46,11 +46,12 @@ public interface ICustService extends IBaseService{
 	 * @param busiCode 业务编号
 	 * @param cust     客户基本信息
 	 * @param linkman  联系人信息
+	 * @param custCode 
 	 * @param resident 居民客户信息
 	 * @throws Exception
 	 *
 	 */
-	public void createCust(CCust cust, CCustLinkman linkman) throws Exception;
+	public void createCust(CCust cust, CCustLinkman linkman, String custCode) throws Exception;
 	
 	/**
 	 * 批量预开户

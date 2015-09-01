@@ -91,9 +91,9 @@ AddressTreeCombo = Ext.extend(Ext.ux.TreeCombo,{
 			success : function(res,opt){
 				var rec = Ext.decode(res.responseText);
 				//		// 显示隐藏值
-				this.addOption(node.id, rec);
+				this.addOption(node.id, rec.addrName);
 				this.setValue(node.id);
-				this.setRawValue(rec);
+				this.setRawValue(rec.addrName);
 				this.collapse();
 				this.fireEvent('select', this, node, node.attributes);
 			}

@@ -29,20 +29,20 @@ EditCustForm = Ext.extend( CustBaseForm , {
 		this.initField();
 		this.setCanUpdateField();
 		
-		//模拟大客户不能修改为普通客户，普通客户也不能修改为模拟大客户
-		var value = App.getData().custFullInfo.cust.cust_colony;
-		if(Ext.isEmpty(value)){
-			this.remove(this.unitForm);
-			this.doLayout();
-		}else{
-			var comp = Ext.getCmp('custcount_itemId');
-			comp.show();comp.enable();
-			Ext.getCmp('cust_count_id').allowBlank = false;
-		}
+//		//模拟大客户不能修改为普通客户，普通客户也不能修改为模拟大客户
+//		var value = App.getData().custFullInfo.cust.cust_colony;
+//		if(Ext.isEmpty(value)){
+//			this.remove(this.unitForm);
+//			this.doLayout();
+//		}else{
+//			var comp = Ext.getCmp('custcount_itemId');
+//			comp.show();comp.enable();
+//			Ext.getCmp('cust_count_id').allowBlank = false;
+//		}
 	},
 	initField:function(){
 		//初始化地址下拉框信息
-		var addrTreeCombo = Ext.getCmp('addrTreeCombo');
+//		var addrTreeCombo = Ext.getCmp('addrTreeCombo');
 		
 		var cust = App.getApp().getCust();
 		/**
@@ -50,26 +50,24 @@ EditCustForm = Ext.extend( CustBaseForm , {
 		 * cust.addr_id_text :　小区
 		 */
 		var custAddress = cust.address;
-		if(cust.address){//割接 无地址
+//		if(cust.address){//割接 无地址
 //			if(cust.t1 || cust.t2 || cust.t3 || cust.t4 || cust.t5 || cust.note){
 //				index = cust.address.indexOf(cust.addr_id_text);
 //				//index + index+cust.addr_id_text.length 客户地址前面部分
 //				custAddress = cust.address.substring(0,index+cust.addr_id_text.length);
 //			}
-			if(cust.note){
-				if(custAddress.substring(0,4)=='Room'){
-					var arr = custAddress.split(",");
-					if(arr.length>0){
-						var index = arr[0].length;
-						custAddress = custAddress.substring(index+1,custAddress.length);
-					}
-				}
-				
-			}
-			
-		}
-		addrTreeCombo.addOption(cust.addr_id,custAddress);
-		Ext.getCmp('tempCustAddress').setValue(custAddress);
+//			if(cust.note){
+//				if(custAddress.substring(0,4)=='Room'){
+//					var arr = custAddress.split(",");
+//					if(arr.length>0){
+//						var index = arr[0].length;
+//						custAddress = custAddress.substring(index+1,custAddress.length);
+//					}
+//				}
+//			}
+//		}
+//		addrTreeCombo.addOption(cust.addr_id,custAddress);
+//		Ext.getCmp('tempCustAddress').setValue(custAddress);
 		
 		//从app.data.cust,linkman,resident中初始化客户信息
 		var custFullInfo = {};
@@ -98,8 +96,16 @@ EditCustForm = Ext.extend( CustBaseForm , {
 			params:{busiCode:App.getData().currentResource.busicode},
 			success:function(response,opts){
 				this.getForm().loadRecord(new Ext.data.Record(this.custFullInfo));
+				var cust = App.getData().custFullInfo.cust;
 				//客户地址
-				this.custAddress = App.getData().custFullInfo.cust.address;
+				this.custAddress = cust.address;
+				
+//				if(Ext.getCmp('isCanToCustId')){
+//					if(cust.status == 'PREOPEN'){
+//						Ext.getCmp('isCanToCustId').enable();
+//						Ext.getCmp('isCanToCustId').checked = true;
+//					}
+//				};
 				
 				this.getForm().items.each(function(f){
 					if(f.label){
@@ -123,13 +129,18 @@ EditCustForm = Ext.extend( CustBaseForm , {
 								}
 							}
 							if(fields[i].field_name == 'cust.addr_id'){//如果是地址，把剩余的放开允许修改
+//								if(cust.status == 'PREOPEN'){
+//									Ext.getCmp('isCanToCustId').enable();
+//									Ext.getCmp('isCanToCustId').checked = true;
+//								}
 //								Ext.getCmp('cust.t1').enable();
 //								Ext.getCmp('cust.t2').enable();
 //								Ext.getCmp('cust.t3').enable();
 //								Ext.getCmp('cust.t4').enable();
 //								Ext.getCmp('cust.t5').enable();
-								Ext.getCmp('cust.note').enable();
+//								Ext.getCmp('cust.note').enable();
 							}
+							
 						}
 					}
 				
@@ -157,6 +168,7 @@ EditCustForm = Ext.extend( CustBaseForm , {
 		var oldAddress = App.getData().custFullInfo.cust.address;
 		
 		var custName = Ext.getCmp('cust.cust_name').getValue();
+		var custAddress = Ext.getCmp('tempCustAddress').getValue();
 		
 		var busiCode = App.getData().currentResource.busicode;
 		
@@ -168,7 +180,7 @@ EditCustForm = Ext.extend( CustBaseForm , {
 				return obj;
 			}
 		}else if(busiCode == '1010'){//移机
-			if(oldAddress == this.custAddress){
+			if(oldAddress == custAddress){
 				obj['isValid'] = false;
 				obj['msg'] = '移机请修改客户地址！';
 				return obj;
@@ -195,15 +207,38 @@ EditCustForm = Ext.extend( CustBaseForm , {
 				arr.push(vs[i]);
 			}
 		}
-		
-		if(this.custAddress){
+		var address = Ext.getCmp('tempCustAddress').getValue();
+		//地址变更
+		if(address){
 			var oldAddress = App.getApp().getData().custFullInfo.cust.address;
+			//地址变更后，如果原先是预开户PREOPEN的，改为正常ACTIVE
+			if(oldAddress != address){
+				if(Ext.getCmp('custStatusId').getValue() =='PREOPEN'){
+					Ext.getCmp('custStatusId').setValue('ACTIVE');
+					arr.push({
+						columnName : 'cust.status',
+						newValue : 'ACTIVE',
+						oldValue : 'PREOPEN'
+					});
+				}			
+			}
 			arr.push({
 				columnName : 'cust.address',
-				newValue : this.custAddress,
+				newValue : address,
 				oldValue : oldAddress
 			});
 		}
+		//ROOM变更
+		var oldNote = App.getApp().getData().custFullInfo.cust.note
+		if(Ext.getCmp('custNoteId').getValue() != oldNote){
+			arr.push({
+				columnName : 'cust.note',
+				newValue : Ext.getCmp('custNoteId').getValue(),
+				oldValue : oldNote
+			});
+		}
+		
+		
 		
 		Ext.apply( all , {
 			'custChangeInfo':Ext.encode(arr)

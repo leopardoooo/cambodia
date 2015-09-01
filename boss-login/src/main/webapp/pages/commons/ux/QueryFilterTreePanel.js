@@ -9,6 +9,7 @@ Ext.ux.QueryFilterTreePanel = Ext.extend( Ext.tree.TreePanel , {
 	searchFieldWidth: 120,
 	queryValue:null,
 	filterObj: null,
+	onlySelectLeaf : true,// 只能选择叶子节点
 	constructor: function( cfg ){
 		Ext.apply( this , cfg || {});
 		this.searchT = new Ext.form.TextField({
@@ -51,5 +52,13 @@ Ext.ux.QueryFilterTreePanel = Ext.extend( Ext.tree.TreePanel , {
 	     return str;
     },
     onBeforeLoad:function(loader,node){
-	}	
+	},
+	// 检查当前的节点是否能够被点击
+	isCanClick : function(node) {
+		if (this.onlySelectLeaf) {
+			if (!node.leaf || node.attributes['is_leaf'] == 'F')
+				return false;
+		}
+		return true;
+	}
 });

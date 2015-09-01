@@ -82,6 +82,7 @@ public class CustAction extends BaseBusiAction{
 	
 	private String virtualCard;
 	private String virtualModem;
+	private String custCode;
 
 	/**
 	 * 开户
@@ -89,7 +90,7 @@ public class CustAction extends BaseBusiAction{
 	 * @throws Exception
 	 */
 	public String createCust()throws Exception{
-		custService.createCust(cust, linkman);
+		custService.createCust(cust, linkman,custCode);
 		getRoot().setSimpleObj(cust);
 		return JSON;
 	}
@@ -807,4 +808,9 @@ public class CustAction extends BaseBusiAction{
 	public void setDevice_code(String device_code) {
 		this.device_code = device_code;
 	}
+
+	public void setCustCode(String custCode) {
+		this.custCode = custCode;
+	}
+	
 }
