@@ -45,6 +45,20 @@ public class PProdTariffDisct extends OptrBase implements Serializable {
 	private String rule_name;
 	private String rule_id_text;
 	private String disct_name_all;
+	/**
+	 * 废弃的属性
+	 */
+	@Deprecated
+	private Integer final_rent;
+	@Deprecated
+	public Integer getFinal_rent() {
+		return final_rent;
+	}
+	@Deprecated
+	public void setFinal_rent(Integer final_rent) {
+		this.final_rent = final_rent;
+	}
+
 	public String getRule_name() {
 		return rule_name;
 	}
