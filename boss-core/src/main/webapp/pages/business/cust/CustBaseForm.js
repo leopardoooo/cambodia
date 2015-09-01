@@ -205,7 +205,7 @@ AddrCustSelectWin = Ext.extend( Ext.Window , {
 				"note_status_type_text"
 			])
 		});
-		this.custStore.on('load',this.doLoadResult,this);
+		
 		var cm = [
 			{header: '房间号', dataIndex: 'note', width: 160},
 			{header: '房间状态', dataIndex: 'note_status_type_text',width: 80},
@@ -244,7 +244,7 @@ AddrCustSelectWin = Ext.extend( Ext.Window , {
             items:[
                 {xtype:'button',text:'新增房间',id:'addRoomNewBoxId',iconCls:'icon-add',disabled:true,scope:this,handler:this.doCheckedChangeRoom},
                 {xtype:'textfield',width:150 ,id:'newRoomBoxId',disabled:true},
-                {xtype:'button',text:'提交房间',iconCls:'icon-save',id:'saveRoomNewBoxId',disabled:true,scope:this,handler:this.doSaveNewRoom}
+                {xtype:'button',text:'提交',iconCls:'icon-save',id:'saveRoomNewBoxId',disabled:true,scope:this,handler:this.doSaveNewRoom}
             ]
            
 	    
@@ -301,6 +301,24 @@ AddrCustSelectWin = Ext.extend( Ext.Window , {
 			addrThat.custStore.load({
 				params: { start:0, limit: addrThat.pageSize}
 			});
+			
+			addrThat.custGrid.setTitle("房间信息");
+			Ext.Ajax.request({
+				scope : this,
+				url: Constant.ROOT_PATH+"/commons/x/QueryParam!queryCustAddrName.action",
+				params : {
+					addrId : addrThat.nodeId
+				},
+				success : function(res,opt){
+					var rec = Ext.decode(res.responseText);
+					// 显示隐藏值
+					addrThat.addrName = rec.addrName;
+					var title = "行政区域:"+rec.districtName+";  "
+					title = title + "服务类型:"+(Ext.isEmpty(rec.netType)?'':rec.netType);
+					addrThat.custGrid.setTitle(title);
+				}
+			});
+			
 		})
 		
 		AddrCustSelectWin.superclass.initEvents.call(this);
@@ -314,31 +332,7 @@ AddrCustSelectWin = Ext.extend( Ext.Window , {
 		Ext.getCmp('custNoteId').setValue(note);
 		Ext.getCmp('tempCustAddress').setValue(name);
 		Ext.getCmp('linkman.mail_address').setValue(name);
-	}
-	,
-	doLoadResult:function(s){
-		
-		Ext.Ajax.request({
-			scope : this,
-			url: Constant.ROOT_PATH+"/commons/x/QueryParam!queryCustAddrName.action",
-			params : {
-				addrId : addrThat.nodeId
-			},
-			success : function(res,opt){
-				var rec = Ext.decode(res.responseText);
-				// 显示隐藏值
-				addrThat.addrName = rec.addrName;
-				var title = "房间信息";
-				if(!Ext.isEmpty(rec.netType)){
-					title = title + "||小区网络:"+rec.netType+";"
-				}
-				if(!Ext.isEmpty(rec.districtName)){
-					title = title + "||行政区域:"+rec.districtName+";"
-				}
-				addrThat.custGrid.setTitle(title);
-			}
-		});
-	}
+	}	
 });
 
 
@@ -376,24 +370,12 @@ LinkPanel = Ext.extend(Ext.Panel,{
 						allowBlank:false,
 						hiddenName:'linkman.cert_type',
 						paramName:'CERT_TYPE',
-						defaultValue:'SFZ',
-						listeners:{
-							scope:this,
-							'select': function(){
-								var field = Ext.getCmp("linkman_cert_num_el");
-								var value = field.getValue();
-								if(value && this.doCertNumChange(field, value, value) === false){
-									field.reset();
-								}
-							}
-						}
+						defaultValue:'SFZ'
 					},{
 						fieldLabel:'固定电话',
 						name:'linkman.tel',
 						xtype:'textfield',
-						regex: /^(\d{7}|\d{8})$/,
-						id: 'linkmanTel',
-						invalidText : '请输入7位或8位电话号码'
+						id: 'linkmanTel'
 					},{
 						fieldLabel:'邮箱',
 						name:'linkman.email',
@@ -402,9 +384,7 @@ LinkPanel = Ext.extend(Ext.Panel,{
 					},{
 						fieldLabel:'邮编',
 						name:'linkman.postcode',
-						xtype:'textfield',
-						regex: /^[1-9]{1}[0-9]{5}$/,
-						invalidText : '请输入6位不以0开头的数字'
+						xtype:'textfield'
 					}]
 				},{
 					items:[{
@@ -420,18 +400,12 @@ LinkPanel = Ext.extend(Ext.Panel,{
 						width : 130,
 						allowBlank:false,
 						name:'linkman.cert_num',
-						id: 'linkman_cert_num_el',
-						listeners:{
-							scope:this,
-							'change':this.doCertNumChange
-						}
+						id: 'linkman_cert_num_el'
 					},{
 						fieldLabel:'手机',
 						name:'linkman.mobile',
-						xtype:'numberfield',
-						regex: /^1[\d]{10}$/,
-						id: 'linkmanMobile',
-						invalidText : '请输入11位数字'
+						xtype:'numberfield',						
+						id: 'linkmanMobile'
 					},{
 						fieldLabel:'出生日期',
 						width : 125,
