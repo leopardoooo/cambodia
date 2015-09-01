@@ -1,11 +1,9 @@
 
 package com.ycsoft.business.service.impl;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -15,13 +13,9 @@ import com.ycsoft.beans.config.TAddress;
 import com.ycsoft.beans.config.TNetType;
 import com.ycsoft.beans.config.TPayType;
 import com.ycsoft.beans.config.TUpdateCfg;
-import com.ycsoft.beans.core.cust.CCust;
+import com.ycsoft.beans.core.cust.CCustAddrNote;
 import com.ycsoft.beans.core.job.JOdscntRecord;
-import com.ycsoft.beans.core.user.CUser;
-import com.ycsoft.beans.core.user.CUserStb;
 import com.ycsoft.beans.core.voucher.CVoucher;
-import com.ycsoft.beans.prod.PPromFeeUser;
-import com.ycsoft.beans.prod.PRes;
 import com.ycsoft.beans.system.SDept;
 import com.ycsoft.beans.system.SDeptAddr;
 import com.ycsoft.beans.system.SDeptBusicode;
@@ -42,20 +36,14 @@ import com.ycsoft.business.dto.config.ExtendTableAttributeDto;
 import com.ycsoft.business.dto.config.TAddressDto;
 import com.ycsoft.business.dto.config.TaskWorkDto;
 import com.ycsoft.business.dto.core.fee.BusiFeeDto;
-import com.ycsoft.business.dto.core.prod.CProdDto;
-import com.ycsoft.business.dto.core.prod.PromFeeProdDto;
-import com.ycsoft.business.dto.core.prod.PromTreeDto;
 import com.ycsoft.business.service.IQueryCfgService;
 import com.ycsoft.commons.constants.DictKey;
-import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.helper.CollectionHelper;
-import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.commons.store.MemoryDict;
 import com.ycsoft.commons.store.TemplateConfig;
-import com.ycsoft.commons.tree.TreeNode;
 import com.ycsoft.daos.core.JDBCException;
-import com.ycsoft.sysmanager.dto.prod.ResGroupDto;
+import com.ycsoft.daos.core.Pager;
 import com.ycsoft.sysmanager.dto.system.SDeptDto;
 
 /**
@@ -229,6 +217,9 @@ public class QueryCfgService extends BaseService implements IQueryCfgService{
 			return simpleComponent.queryAddrByLike(name,pId);
 	}
 	
+	public Pager<CCustAddrNote> queryNoteCust(String addrId,Integer start, Integer limit) throws Exception {
+		return simpleComponent.queryNoteCust(addrId,start,limit);
+	}
 	
 	public List<TAddressDto> queryAddrDistrict() throws Exception{
 		return simpleComponent.queryAddrDistrict();
@@ -287,8 +278,7 @@ public class QueryCfgService extends BaseService implements IQueryCfgService{
 	}
 
 	
-	public String queryCustAddrName(String addrId) throws Exception {
-		// TODO Auto-generated method stub
+	public Map<String , Object> queryCustAddrName(String addrId)throws Exception{
 		return simpleComponent.queryCustAddrName(addrId);
 	}
 	
@@ -340,5 +330,6 @@ public class QueryCfgService extends BaseService implements IQueryCfgService{
 	public void setMemoryComponent(MemoryComponent memoryComponent) {
 		this.memoryComponent = memoryComponent;
 	}
+
 
 }

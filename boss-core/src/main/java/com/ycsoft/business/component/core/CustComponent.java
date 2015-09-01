@@ -121,28 +121,32 @@ public class CustComponent extends BaseBusiComponent {
 	 *
 	 * @param cust 客户基本信息
 	 * @param linkMan 联系人
+	 * @param custCode 
 	 * @param resident 居民信息
 	 * @throws Exception
 	 */
-	public String createCust(CCust cust,CCustLinkman linkMan) throws Exception{
+	public String createCust(CCust cust,CCustLinkman linkMan, String custCode) throws Exception{
 		
-		String appCode = cust.getApp_code();	//潜江非居民 审批单号
-		if(StringHelper.isNotEmpty(appCode)){	//修改审批单号状态已使用
-			TNonresCustApproval nca = tNonresCustApprovalDao.queryByAppCode(appCode);
-			if(nca == null)
-				throw new ComponentException("该审批单号不存在!");
-			if(nca.getStatus().equals(StatusConstants.USE))
-				throw new ComponentException("该审批单号已使用!");
-			tNonresCustApprovalDao.updateStatus(appCode, StatusConstants.USE);
-		}
+//		String appCode = cust.getApp_code();	//潜江非居民 审批单号
+//		if(StringHelper.isNotEmpty(appCode)){	//修改审批单号状态已使用
+//			TNonresCustApproval nca = tNonresCustApprovalDao.queryByAppCode(appCode);
+//			if(nca == null)
+//				throw new ComponentException("该审批单号不存在!");
+//			if(nca.getStatus().equals(StatusConstants.USE))
+//				throw new ComponentException("该审批单号已使用!");
+//			tNonresCustApprovalDao.updateStatus(appCode, StatusConstants.USE);
+//		}
 		
 		//保存客户基本信息
 		cust.setCust_id(gCustId());
-		cust.setCust_no(gCustNoByAddr(cust.getAddr_id()));
+		cust.setCust_no(gCustNoByAddr(cust.getAddr_id(),custCode));
 
 		//设置默认信息:密码为证件号的后6位
-		cust.setPassword(linkMan.getCert_num().length()>6?linkMan.getCert_num().substring(0, 6):linkMan.getCert_num());
-		cust.setStatus(StatusConstants.ACTIVE);
+//		cust.setPassword(linkMan.getCert_num().length()>6?linkMan.getCert_num().substring(0, 6):linkMan.getCert_num());
+		
+		if(StringHelper.isEmpty(cust.getStatus())){
+			cust.setStatus(StatusConstants.ACTIVE);
+		}
 		
 		cust.setIs_black(SystemConstants.BOOLEAN_FALSE);
 		if(StringHelper.isEmpty(cust.getCust_class())){
@@ -1191,28 +1195,36 @@ public class CustComponent extends BaseBusiComponent {
 	
 	/**
 	 * 根据地址码产生客户编号
+	 * @param custCode 
 	 * @param cust
 	 * @return
 	 */
-	private String gCustNoByAddr(String addrId ) throws Exception {
-		TAddress adr = tAddressDao.findByKey(addrId);
-		if(adr == null){
-			throw new ComponentException(ErrorCode.CustAddressIsNull);
-		}
-		TDistrict district = tDistrictDao.findByKey(adr.getDistrict_id());
-		if(district == null){
-			throw new ComponentException(ErrorCode.CustDistrictIsNull,addrId);
-		}
-		TProvince province = tProvinceDao.findByKey(district.getProvince_id());
-		if(province == null || StringHelper.isEmpty(province.getCust_code())){
-			throw new ComponentException(ErrorCode.CustProvinceIsNull,adr.getDistrict_id());
+	private String gCustNoByAddr(String addrId, String custCode ) throws Exception {
+		String custNo = "";
+		if(StringHelper.isNotEmpty(custCode)){
+			custNo = custCode;
+		}else{
+			TAddress adr = tAddressDao.findByKey(addrId);
+			if(adr == null){
+				throw new ComponentException(ErrorCode.CustAddressIsNull);
+			}
+			TDistrict district = tDistrictDao.findByKey(adr.getDistrict_id());
+			if(district == null){
+				throw new ComponentException(ErrorCode.CustDistrictIsNull,addrId);
+			}
+			TProvince province = tProvinceDao.findByKey(district.getProvince_id());
+			if(province == null || StringHelper.isEmpty(province.getCust_code())){
+				throw new ComponentException(ErrorCode.CustProvinceIsNull,adr.getDistrict_id());
+			}
+			
+			custNo = province.getCust_code();
 		}
 		
-		String seq=cCustDao.findSequence(SequenceConstants.SEQ_CUST_NO+"_"+province.getCust_code()).toString();
+		String seq=cCustDao.findSequence(SequenceConstants.SEQ_CUST_NO+"_"+custNo).toString();
 		if(seq == null){
-			throw new ComponentException(ErrorCode.CustSeqIsNull,province.getCust_code());
+			throw new ComponentException(ErrorCode.CustSeqIsNull,custNo);
 		}
-		seq = province.getCust_code()+seq;
+		seq = custNo+seq;
 		
 //		while(seq.length()<6){
 //			seq ="0"+seq;
@@ -1660,6 +1672,10 @@ public class CustComponent extends BaseBusiComponent {
 	}
 	
 	
+	public List<TProvince> queryProvince() throws Exception{
+		return tProvinceDao.queryProvince();
+	}
+	
 	public void setCCustDao(CCustDao custDao) {
 		cCustDao = custDao;
 	}
@@ -1744,6 +1760,8 @@ public class CustComponent extends BaseBusiComponent {
 	public void setTProvinceDao(TProvinceDao provinceDao) {
 		this.tProvinceDao = provinceDao;
 	}
+
+
 
 
 }

@@ -10,6 +10,7 @@ import java.util.Map;
 import com.ycsoft.beans.config.TAddress;
 import com.ycsoft.beans.config.TPayType;
 import com.ycsoft.beans.config.TUpdateCfg;
+import com.ycsoft.beans.core.cust.CCustAddrNote;
 import com.ycsoft.beans.core.job.JOdscntRecord;
 import com.ycsoft.beans.core.voucher.CVoucher;
 import com.ycsoft.beans.system.SDept;
@@ -22,6 +23,7 @@ import com.ycsoft.business.commons.abstracts.IBaseService;
 import com.ycsoft.business.dto.config.ExtendTableAttributeDto;
 import com.ycsoft.business.dto.config.TAddressDto;
 import com.ycsoft.daos.core.JDBCException;
+import com.ycsoft.daos.core.Pager;
 import com.ycsoft.sysmanager.dto.system.SDeptDto;
 
 /**
@@ -103,7 +105,7 @@ public interface IQueryCfgService extends IBaseService {
 	 */
 	public List<TAddressDto> queryAddrByName(String name,String addrId) throws Exception;
 	
-	public String queryCustAddrName(String addrId) throws Exception;
+	public Map<String, Object> queryCustAddrName(String addrId) throws Exception;
 
 	/**
 	 * 返回当前地区的部门
@@ -244,4 +246,6 @@ public interface IQueryCfgService extends IBaseService {
 	 * @return
 	 */
 	public Map<String, String> queryProdFreeDay() throws Exception;
+
+	public Pager<CCustAddrNote> queryNoteCust(String addrId, Integer start, Integer limit)throws Exception;
 }

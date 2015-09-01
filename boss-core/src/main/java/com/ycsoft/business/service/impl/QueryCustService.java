@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
+import com.ycsoft.beans.config.TProvince;
 import com.ycsoft.beans.core.acct.CAcctAcctitem;
 import com.ycsoft.beans.core.bill.BBillWriteoff;
 import com.ycsoft.beans.core.bill.BillDto;
@@ -458,6 +459,10 @@ public class QueryCustService extends BaseService implements IQueryCustService {
 		return feeComponent.queryFeePayDetail(paySn);
 	}
 	
+	public List<TProvince> queryProvince() throws Exception {
+		return custComponent.queryProvince();
+	}
+	
 	/**
 	 * @param custComponent the custComponent to set
 	 */
@@ -540,6 +545,8 @@ public class QueryCustService extends BaseService implements IQueryCustService {
 		// TODO Auto-generated method stub
 		return jobComponent.syncServerTime();
 	}
+
+
 
 	
 }

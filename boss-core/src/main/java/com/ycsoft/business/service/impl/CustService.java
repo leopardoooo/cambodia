@@ -74,11 +74,11 @@ public class CustService extends BaseBusiService implements ICustService {
 	 * @param resident
 	 * @throws Exception
 	 */
-	public void createCust(CCust cust, CCustLinkman linkman) throws Exception {
+	public void createCust(CCust cust, CCustLinkman linkman,String custCode) throws Exception {
 		//获取业务流水
 		Integer doneCode = doneCodeComponent.gDoneCode();
 		//保存客户信息
-		String custId = custComponent.createCust(cust,linkman);
+		String custId = custComponent.createCust(cust,linkman,custCode);
 		//为客户创建公用账户
 		acctComponent.createAcct(custId,null, SystemConstants.ACCT_TYPE_PUBLIC, null);
 		//设置拦截器所需要的参数
@@ -122,7 +122,7 @@ public class CustService extends BaseBusiService implements ICustService {
 				cust.setAddress(address);
 				linkman.setMail_address(address);
 			}
-			String custId = custComponent.createCust(cust,linkman);
+			String custId = custComponent.createCust(cust,linkman,null);
 			//为客户创建公用账户
 			acctComponent.createAcct(custId,null, SystemConstants.ACCT_TYPE_PUBLIC, null);
 			
@@ -684,7 +684,7 @@ public class CustService extends BaseBusiService implements ICustService {
 		String nonresCustId = nonresCust.getCust_id();
 		//非居民不存在，需开户
 		if(StringHelper.isEmpty(nonresCustId)){
-			custComponent.createCust(nonresCust, linkman);
+			custComponent.createCust(nonresCust, linkman,null);
 			nonresCustId = nonresCust.getCust_id();
 			acctComponent.createAcct(nonresCustId,null, SystemConstants.ACCT_TYPE_PUBLIC, null);
 		}else{

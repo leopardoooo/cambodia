@@ -1,19 +1,22 @@
 package com.ycsoft.business.component.resource;
 
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.ycsoft.beans.config.TAddress;
 import com.ycsoft.beans.config.TDistrict;
+import com.ycsoft.beans.core.cust.CCustAddrNote;
 import com.ycsoft.beans.system.SDept;
 import com.ycsoft.beans.system.SDeptAddr;
 import com.ycsoft.business.commons.abstracts.BaseBusiComponent;
 import com.ycsoft.business.dao.config.TAddressDao;
 import com.ycsoft.business.dao.config.TDistrictDao;
+import com.ycsoft.business.dao.core.cust.CCustAddrDao;
 import com.ycsoft.business.dao.system.SDeptAddrDao;
 import com.ycsoft.business.dao.system.SDeptDao;
 import com.ycsoft.business.dao.system.SParamDao;
@@ -25,6 +28,7 @@ import com.ycsoft.commons.exception.ErrorCode;
 import com.ycsoft.commons.helper.CollectionHelper;
 import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.daos.core.JDBCException;
+import com.ycsoft.daos.core.Pager;
 /**
  * 简单资源操作：安装地址、ip地址等
  *
@@ -41,6 +45,8 @@ public class SimpleComponent extends BaseBusiComponent {
 	private SDeptAddrDao sDeptAddrDao;
 	@Autowired
 	private SDeptDao sDeptDao;
+	@Autowired
+	private CCustAddrDao cCustAddrDao;
 
 	public List<TAddressDto> queryAddrByName(String q,String pId) throws Exception{
 		String dataRight = "";
@@ -91,7 +97,7 @@ public class SimpleComponent extends BaseBusiComponent {
 	}
 	
 
-	public String queryCustAddrName(String addrId) throws Exception{
+	public Map<String , Object> queryCustAddrName(String addrId)throws Exception{
 		TAddress addr = tAddressDao.findByKey(addrId);
 		TAddress paddr = tAddressDao.findByKey(addr.getAddr_pid());
 		List<TDistrict> districtList = tDistrictDao.queryDistrictListById(addr.getDistrict_id());
@@ -99,12 +105,18 @@ public class SimpleComponent extends BaseBusiComponent {
 			throw new ComponentException(ErrorCode.CustDistrictIsNull,addr.getAddr_name());
 		}
 		String addrName = "No."+addr.getAddr_name()+",St."+paddr.getAddr_name()+",";
+		String districtName = "";
 		for(TDistrict t : districtList){
 			if(t.getDistrict_level() != 0){
-				addrName = addrName+t.getDistrict_name();
+				districtName = districtName+t.getDistrict_name();
 			}
 		}
-		return addrName;
+		
+		Map<String , Object> map = new HashMap<String, Object>();
+		map.put("netType", addr.getNet_type()); //小区网络
+		map.put("districtName", districtName); //行政区域
+		map.put("addrName", addrName+ (StringHelper.isNotEmpty(districtName)?","+districtName:"")); //详细地址
+		return map;
 	}
 	
 	
@@ -159,6 +171,11 @@ public class SimpleComponent extends BaseBusiComponent {
 
 	public void setSDeptAddrDao(SDeptAddrDao deptAddrDao) {
 		this.sDeptAddrDao = deptAddrDao;
+	}
+
+
+	public Pager<CCustAddrNote> queryNoteCust(String addrId, Integer start, Integer limit) throws Exception{
+		return cCustAddrDao.queryNoteCust(addrId,start,limit);
 	}
 
 

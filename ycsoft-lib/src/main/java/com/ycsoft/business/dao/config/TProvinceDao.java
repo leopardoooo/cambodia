@@ -4,6 +4,8 @@
  
 package com.ycsoft.business.dao.config; 
 
+import java.util.List;
+
 import org.springframework.stereotype.Component;
 
 import com.ycsoft.beans.config.TProvince;
@@ -20,5 +22,11 @@ public class TProvinceDao extends BaseEntityDao<TProvince> {
 	 * default empty constructor
 	 */
 	public TProvinceDao() {}
+	
+	
+	public List<TProvince> queryProvince() throws Exception{
+		String sql = "select * from t_province where cust_code is not null ";
+		return createQuery(sql).list();
+	}
 
 }

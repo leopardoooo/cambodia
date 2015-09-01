@@ -47,10 +47,15 @@ public class QueryParamAction extends BaseBusiAction {
 	
 	
 	public String queryCustAddrName() throws Exception{
-		String name = queryCfgService.queryCustAddrName(addrId);
-		getRoot().setSimpleObj(name);
-		return JSON_SIMPLEOBJ;
+		getRoot().setOthers(queryCfgService.queryCustAddrName(addrId));
+		return JSON_OTHER;
 	}
+	
+	public String queryNoteCust() throws Exception{
+		getRoot().setPage(queryCfgService.queryNoteCust(addrId,start,limit));
+		return JSON_PAGE;
+	}
+	
 	
 	public String querySingleAddress() throws Exception {
 		TAddress add = queryCfgService.querySingleAddress(addrId);

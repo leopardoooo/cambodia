@@ -7,7 +7,7 @@
  PRINT_TYPE_ACTIVE = "ACTIVEX";
  
  //打印的条数
- PRINT_PAGE_SIZE = 6 ;
+ PRINT_PAGE_SIZE = 5 ;
  
 var oldInvoiceId= "";
 var oldInvoiceCode="";

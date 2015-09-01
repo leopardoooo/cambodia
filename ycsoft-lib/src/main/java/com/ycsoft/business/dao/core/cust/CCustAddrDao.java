@@ -7,6 +7,8 @@ import java.util.List;
  */
 
 
+
+
 import org.springframework.stereotype.Component;
 
 import com.ycsoft.beans.core.cust.CCustAddr;
@@ -14,6 +16,7 @@ import com.ycsoft.beans.core.cust.CCustAddrNote;
 import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.daos.abstracts.BaseEntityDao;
 import com.ycsoft.daos.core.JDBCException;
+import com.ycsoft.daos.core.Pager;
 
 
 /**
@@ -32,7 +35,7 @@ public class CCustAddrDao extends BaseEntityDao<CCustAddr> {
 	 */
 	public CCustAddrDao() {}
 	
-	public List<CCustAddrNote> queryNoteCust(String addrId) throws JDBCException{
+	public Pager<CCustAddrNote> queryNoteCust(String addrId, Integer start, Integer limit) throws JDBCException{
 		String sql=StringHelper.append(
 				" select note,cust_name,cust_no, ",
 				" case when user_cnt=0 then 'NOUSER' ",
@@ -55,7 +58,7 @@ public class CCustAddrDao extends BaseEntityDao<CCustAddr> {
 				" where c.addr_id=? ",
 				" group by  a.note,c.cust_name,c.cust_no ",
 				" ) order by note "	);
-		return this.createQuery(CCustAddrNote.class, sql, addrId).list();
+		return this.createQuery(CCustAddrNote.class, sql, addrId).setStart(start).setLimit(limit).page();
 	}
 
 }
