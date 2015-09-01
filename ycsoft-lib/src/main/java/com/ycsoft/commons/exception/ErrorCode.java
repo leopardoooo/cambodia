@@ -39,7 +39,7 @@ public enum ErrorCode {
 	CFeeAndProdOrderIsNotOne("费用记录和订单信息不一致"),
 	
 	OrderNotExists("订单不存在"),
-	OrderTodayHasCancel("订单已取消，不能再次取消"),
+	OrderTodayHasCancel("订单已退订，不能再次退订"),
 	
 	ProdNotExists("产品不存在"),
 	ProdIsInvalid("产品已失效"),

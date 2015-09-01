@@ -76,8 +76,9 @@ public class ProdOrderAction extends BaseBusiAction {
 	 * @return
 	 * @throws Exception
 	 */
+	@Deprecated
 	public String cancelTodayOrder() throws Exception{
-		orderService.saveCancelTodayOrder(order_sn, cancelFee,refundFee);
+		//orderService.saveCancelTodayOrder(order_sn, cancelFee,refundFee);
 		return JSON_SUCCESS;
 	}
 	
