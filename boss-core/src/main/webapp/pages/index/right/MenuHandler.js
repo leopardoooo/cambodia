@@ -765,9 +765,9 @@ Ext.apply(MenuHandler, {
 	// ----------------------用户信息---------------------------------------------------
 	// 用户开户
 	NewUser : function() {
-//		if (!hasCust()) {
-//			return false;
-//		}
+		if (!hasCust()) {
+			return false;
+		}
 		return {
 			width : 550,
 			height : 360
@@ -1538,7 +1538,7 @@ Ext.apply(MenuHandler, {
 			return false;
 		}
 		for (var i = 0; i < len; i++) {
-			if (userRecords[i].get("status") != "ACTIVE" && userRecords[i].get("status") != "OWELONG" ) {
+			if (userRecords[i].get("status") != "ACTIVE" && userRecords[i].get("status") != "OWELONG" && userRecords[i].get("status") != "INSTALL" ) {
 				Alert("所选用户的状态必须是正常");
 				return false;
 			}
