@@ -1253,7 +1253,7 @@ ProdDetailTab = Ext.extend(CommonTab,{
 				title:'资费信息',
 				items:[this.prodExpensesGrid]
 			},*/{
-				title:'状态异动',
+				title:'异动信息',
 				items:[this.prodPropChangeGrid]
 			}/*,{
 				title:'资费变更',
