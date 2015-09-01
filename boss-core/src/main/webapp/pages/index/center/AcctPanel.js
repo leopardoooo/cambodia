@@ -274,6 +274,18 @@ AcctItemGrid = Ext.extend(Ext.ux.Grid,{
 			this.swapViews();
 		},this,{delay:10});
 	},
+	swapViews : function(){
+		if(this.view.lockedWrap){
+			this.view.lockedWrap.dom.style.right = "0px";
+		}
+        this.view.mainWrap.dom.style.left = "0px"; 
+        if(this.view.updateLockedWidth){
+        	this.view.updateLockedWidth = this.view.updateLockedWidth.createSequence(function(){ 
+	            this.view.mainWrap.dom.style.left = "0px"; 
+	        }, this); 
+        }
+          
+	},
 	doLoadResult : function(_store, _rs, ops){
 		//隐藏数据加载提示框
 		App.hideTip();
@@ -299,10 +311,10 @@ AcctItemGrid = Ext.extend(Ext.ux.Grid,{
 	},
 	remoteRefresh:function(){
 		//显示数据加载提示框
-		App.showTip();
-		this.acctItemStore.baseParams.custId=App.getApp().getCustId();
-		this.acctItemStore.load();
-		this.parent.acctItemDetailTab.resetPanel();
+//		App.showTip();
+//		this.acctItemStore.baseParams.custId=App.getApp().getCustId();
+//		this.acctItemStore.load();
+//		this.parent.acctItemDetailTab.resetPanel();
 //		this.doLoadAcctItem(acctstore,this.acctId);
 	},
 	doDbClickRecord : function(grid,index,e){
@@ -790,13 +802,13 @@ AcctItemDetailTab = Ext.extend(CommonTab,{
  */
 AcctPanel = Ext.extend(BaseInfoPanel,{
 		// 面板属性定义
-	acctGrid: null,
+//	acctGrid: null,
 	acctItemGrid: null,
 	acctItemDetailTab:null,
 	constructor: function(){
-		this.acctGrid = new AcctGrid(this);
-		this.acctItemGrid = new AcctItemGrid(this);
-		this.acctItemDetailTab = new AcctItemDetailTab();
+//		this.acctGrid = new AcctGrid(this);
+//		this.acctItemGrid = new AcctItemGrid(this);
+//		this.acctItemDetailTab = new AcctItemDetailTab();
 		AcctPanel.superclass.constructor.call(this, {
 			id : 'acctPanel',
 			layout:"anchor",
@@ -804,7 +816,6 @@ AcctPanel = Ext.extend(BaseInfoPanel,{
 			items:[{
 				anchor:"100% 62.3%",
 				layout:'fit',
-				layout:"fit",
 				border: true,
 				bodyStyle: 'border-top-width: 0;border-right-width: 0;',
 				items:[this.acctItemGrid]
@@ -820,8 +831,8 @@ AcctPanel = Ext.extend(BaseInfoPanel,{
 	},
 	refresh:function(){
 //		this.acctItemGrid.reset();
-		this.acctItemDetailTab.resetPanel();
-		this.acctItemGrid.remoteRefresh();
+//		this.acctItemDetailTab.resetPanel();
+//		this.acctItemGrid.remoteRefresh();
 	}
 });
 Ext.reg( "acctPanel" , AcctPanel );

@@ -4,7 +4,7 @@
 AcctEasyAdjustFrom = Ext.extend(AdjustFrom ,{
 	doInit: function(){
 		AcctEasyAdjustFrom.superclass.doInit.call(this);
-		var acctRecord = App.getApp().main.infoPanel.acctPanel.acctItemGrid.getSelectionModel().getSelected();
+		var acctRecord = App.getApp().main.infoPanel.custPanel.acctItemGrid.getSelectionModel().getSelected();
 		var value = App.getApp().findCfgData('BASE_EASY_ADJUST_DAYS').config_value;
 		var maxValue = Ext.util.Format.formatFee((acctRecord.get('tariff_rent')*value)/(acctRecord.get('billing_cycle')*30));
 		this.getForm().findField('adjust_fee').setMinValue(0);

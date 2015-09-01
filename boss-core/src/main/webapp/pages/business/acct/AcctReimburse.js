@@ -86,8 +86,8 @@ AcctReimbursePanel = Ext.extend(BaseForm,{
 	initEvents:function(){
 		this.on('afterrender',function(){
 			this.items.itemAt(0).items.itemAt(0).getEl().dom.innerHTML = 
-				AcctItemTemplate.applyTemplate(App.getApp().main.infoPanel.acctPanel.acctItemGrid.getSelectionModel().getSelected().data);
-			var acctItemRecord = App.getApp().main.infoPanel.acctPanel.acctItemGrid.getSelectionModel().getSelected();
+				AcctItemTemplate.applyTemplate(App.getApp().main.infoPanel.custPanel.acctItemGrid.getSelectionModel().getSelected().data);
+			var acctItemRecord = App.getApp().main.infoPanel.custPanel.acctItemGrid.getSelectionModel().getSelected();
 			Ext.Ajax.request({
 				scope : this,
 				url: Constant.ROOT_PATH + "/core/x/Acct!queryIsPromFee.action",
@@ -105,8 +105,8 @@ AcctReimbursePanel = Ext.extend(BaseForm,{
 		},this,{delay:10});
 	},
 	doInit:function(){
-		var acctItemRecord = App.getApp().main.infoPanel.acctPanel.acctItemGrid.getSelectionModel().getSelected();
-		var userId = App.getApp().main.infoPanel.acctPanel.acctItemGrid.userId;
+		var acctItemRecord = App.getApp().main.infoPanel.custPanel.acctItemGrid.getSelectionModel().getSelected();
+		var userId = App.getApp().main.infoPanel.custPanel.acctItemGrid.userId;
 		
 		Ext.getCmp('userId').setValue(userId);
 		Ext.getCmp('acctId').setValue(acctItemRecord.get('acct_id'));

@@ -354,12 +354,26 @@ public class AcctComponent  extends BusiConfigComponent {
 			throw new ServicesException(ErrorCode.AcctFeeNotEnough);
 		}
 		cAcctAcctitemDao.updateActiveBanlance(acctId, acctItemId, fee,0,0,0, getOptr().getCounty_id());
-		int debitTotalFee=fee*-1;
+		
 		int checkFee=0;//检查明细和主记录是否金额一致
-		for(AcctAcctitemActiveDto active:cAcctAcctitemActiveDao.queryByAcctitemId(acctId, acctItemId, this.getOptr().getCounty_id())){
+		List<AcctAcctitemActiveDto> actives=cAcctAcctitemActiveDao.queryByAcctitemId(acctId, acctItemId, this.getOptr().getCounty_id());
+		for(AcctAcctitemActiveDto active:actives){
 			if(active.getBalance()<0){
 				throw new ComponentException(ErrorCode.AcctBalanceError);
 			}
+			checkFee=checkFee+active.getBalance();	
+		}
+		//检查账户余额和资金明细是否一致
+		if(checkFee!=acctItem.getActive_balance()){
+			//重新查询账目余额
+			 if(checkFee!=cAcctAcctitemDao.queryAcctItem(acctId, acctItemId).getActive_balance()-fee){
+				 throw new ComponentException(ErrorCode.AcctItemAndActiveFeeDisagree);
+			 }
+		}
+		
+		int debitTotalFee=fee*-1;
+		for(AcctAcctitemActiveDto active:actives){
+			
 			if(active.getBalance()==0){
 				continue;
 			}
@@ -385,14 +399,7 @@ public class AcctComponent  extends BusiConfigComponent {
 			debitTotalFee=debitTotalFee-debitFee;
 			if(debitTotalFee==0) break;
 		}
-		//检查账户余额和资金明细是否一致
-		if(checkFee!=acctItem.getActive_balance()){
-			//重新查询账目余额
-			 if(checkFee!=cAcctAcctitemDao.queryAcctItem(acctId, acctItemId).getActive_balance()-fee){
-				 throw new ComponentException(ErrorCode.AcctItemAndActiveFeeDisagree);
-			 }
-			
-		}
+		
 		//资金明细余额不足判断
 		if(debitTotalFee>0){
 			if(onlyRefoud){

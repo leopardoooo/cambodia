@@ -5,7 +5,7 @@
 PublicRechargeForm = Ext.extend(BaseForm,{
 	url:Constant.ROOT_PATH+"/core/x/ProdOrder!savePublicRecharge.action",
 	constructor:function(){
-		var acctStore = App.getApp().main.infoPanel.getAcctPanel().acctItemGrid.getStore();
+		var acctStore = App.getApp().main.infoPanel.getCustPanel().acctItemGrid.getStore();
 		var record = acctStore.getAt(0);
 		
 		var acctId = record.get('acct_id');
