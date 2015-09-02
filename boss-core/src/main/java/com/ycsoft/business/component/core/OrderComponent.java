@@ -282,7 +282,9 @@ public class OrderComponent extends BaseBusiComponent {
 	 * @return
 	 */
 	public boolean isHighCancel(String busi_code){
-		return BusiCodeConstants.PROD_HIGH_TERMINATE.equals(busi_code)||BusiCodeConstants.USER_HIGH_WRITE_OFF.equals(busi_code)
+		return BusiCodeConstants.PROD_HIGH_TERMINATE.equals(busi_code)
+				||BusiCodeConstants.USER_HIGH_WRITE_OFF.equals(busi_code)
+				||BusiCodeConstants.PROD_SUPER_TERMINATE.equals(busi_code)
 				?true:false;
 	}
 	
@@ -432,7 +434,33 @@ public class OrderComponent extends BaseBusiComponent {
 		}
 		return list;
 	}
-	
+	/**
+	 * 退出一个所有资金（含已使用部分）明细
+	 * @param cancelOrder
+	 * @return
+	 * @throws Exception
+	 */
+	public List<CProdOrderFee> getOrderCancelAllFeeDetail(CProdOrderDto cancelOrder) throws Exception{
+		List<CProdOrderFee> orderFees=cProdOrderFeeDao.queryByOrderSn(cancelOrder.getOrder_sn());
+		
+		Map<String,TAcctFeeType> feeTypeMap=CollectionHelper.converToMapSingle( tAcctFeeTypeDao.findAll(), "fee_type");
+		int feeTotal=0;
+		for(CProdOrderFee orderFee: orderFees){
+			feeTotal+=orderFee.getInput_fee();
+			orderFee.setProd_name(cancelOrder.getProd_name());
+			orderFee.setOutput_fee(orderFee.getInput_fee());
+			
+			if(feeTypeMap.get(orderFee.getFee_type()).getCan_refund().equals(SystemConstants.BOOLEAN_TRUE)){
+				orderFee.setOutput_type(SystemConstants.ORDER_FEE_TYPE_CFEE);
+			}else{
+				orderFee.setOutput_type(SystemConstants.ORDER_FEE_TYPE_ACCT);
+			}
+		}
+		if(feeTotal!=cancelOrder.getOrder_fee().intValue()){
+			throw new ComponentException(ErrorCode.OrderFeeDisagree,cancelOrder.getOrder_sn());
+		}
+		return orderFees;
+	}
 	/**
 	 * 计算一个订单的可退金额的资金明细（产品退订和销户退订）
 	 * @param cancelOrder
@@ -492,11 +520,17 @@ public class OrderComponent extends BaseBusiComponent {
 	 * @return
 	 * @throws Exception
 	 */
-	public Map<String,Integer> getOrderCancelFee(CProdOrderDto cancelOrder,Date cancelDate) throws Exception{
+	public Map<String,Integer> getOrderCancelFee(CProdOrderDto cancelOrder,String busi_code,Date cancelDate) throws Exception{
 		Map<String,Integer> cancelFeeMap=new HashMap<>();
 		cancelFeeMap.put(SystemConstants.ORDER_FEE_TYPE_CFEE, 0);
 		cancelFeeMap.put(SystemConstants.ORDER_FEE_TYPE_ACCT, 0);
-		for(CProdOrderFee orderFee:  getOrderCacelFeeDetail(cancelOrder,cancelDate)){
+		List<CProdOrderFee> orderFees=null;
+		if(busi_code.equals(BusiCodeConstants.PROD_SUPER_TERMINATE)){
+			orderFees=getOrderCancelAllFeeDetail(cancelOrder);
+		}else{
+			orderFees=getOrderCacelFeeDetail(cancelOrder,cancelDate);
+		}
+		for(CProdOrderFee orderFee: orderFees){
 			cancelFeeMap.put(orderFee.getOutput_type(), orderFee.getOutput_fee()  +cancelFeeMap.get(orderFee.getOutput_type()));
 		}
 		return cancelFeeMap;
@@ -508,12 +542,14 @@ public class OrderComponent extends BaseBusiComponent {
 	 * @throws Exception 
 	 */
 	public Integer getMainOrderCancelFee(CProdOrder cancelOrder,Date cancelDate) throws Exception{
-		if(StringHelper.isNotEmpty(cancelOrder.getPackage_sn())){
+		if(StringHelper.isNotEmpty(cancelOrder.getPackage_sn())||cancelOrder.getOrder_fee()==0){
 			//套餐子产品可退金额=0;
 			return 0;
 		}
 		//Date cancelDate=DateHelper.today();
-		if(cancelOrder.getOrder_fee()==0||cancelOrder.getStatus().equals(StatusConstants.INSTALL)){
+		//当天订购或订单状态是施工中
+		if(cancelOrder.getStatus().equals(StatusConstants.INSTALL)
+				||DateHelper.isToday(cancelOrder.getCreate_time())){
 			return cancelOrder.getOrder_fee();
 		}
 		

@@ -103,16 +103,20 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		if(cancelOrder==null||StringHelper.isEmpty(busi_code)){
 			throw new ServicesException(ErrorCode.ParamIsNull);
 		}
-
-		List<CProdOrderDto> orderList=orderComponent.queryOrderByCancelOrder(cancelOrder);
-		//是否高级权限
-		boolean isHigh=orderComponent.isHighCancel(busi_code);
+		List<CProdOrderDto> orderList=null;
+		if(busi_code.equals(BusiCodeConstants.PROD_TERMINATE)){
+			orderList=new ArrayList<>();
+			orderList.add(cancelOrder);
+		}else{
+			orderList=orderComponent.queryOrderByCancelOrder(cancelOrder);
+		}
+	
 		//参数检查		
 		for(CProdOrderDto order:orderList){
 			//检查能否退订
-			this.checkOrderCanCancel(cust_id, isHigh, order);
+			this.checkOrderCanCancel(cust_id, busi_code, order);
 			//费用计算
-			Map<String,Integer> cancelFeeMap=orderComponent.getOrderCancelFee(order,DateHelper.today());
+			Map<String,Integer> cancelFeeMap=orderComponent.getOrderCancelFee(order,busi_code,DateHelper.today());
 			order.setBalance_cfee(cancelFeeMap.get(SystemConstants.ORDER_FEE_TYPE_CFEE));
 			order.setBalance_acct(cancelFeeMap.get(SystemConstants.ORDER_FEE_TYPE_ACCT));
 			order.setActive_fee(order.getBalance_acct()+order.getBalance_cfee());
@@ -135,35 +139,31 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		return orderList;
 	}
 	
-	/**
-	 * 退订产品(高级和普通退订)
-	 */
-	public void saveCancelProd(String[] orderSns,Integer cancelFee,Integer refundFee) throws Exception{
-		this.saveCancelProdOrder(orderComponent.isHighCancel(this.getBusiParam().getBusiCode()), cancelFee,refundFee,orderSns);
-	}
+
 		
 	/**
-	 * 终止产品
-	 * @param isHigh 是否高级权限 orderSns 退订的订单  cancel_fee 退订的总金额  refund_fee 退现金金额
+	 * 退订产品
+	 * @param 
 	 * @throws Exception 
 	 */
-	public void saveCancelProdOrder(boolean  isHigh,Integer cancel_fee,Integer refund_fee,String... orderSns) throws Exception{
+	public void saveCancelProd(String[] orderSns,Integer cancelFee,Integer refundFee) throws Exception{
 		
 		String cust_id=this.getBusiParam().getCust().getCust_id();
 		doneCodeComponent.lockCust(cust_id);
+		
 		//退订的费用明细
 		List<CProdOrderFee> orderFees=new ArrayList<>();
 		//参数检查，返回退订订单详细信息列表
-		List<CProdOrderDto> cancelList=checkCancelProdOrderParm(isHigh, cust_id, orderSns, cancel_fee,refund_fee,orderFees);
+		List<CProdOrderDto> cancelList=checkCancelProdOrderParm(cust_id, orderSns, cancelFee,refundFee,orderFees);
 		
 		Integer done_code=doneCodeComponent.gDoneCode();
-		if(refund_fee<0){
+		if(refundFee<0){
 			//记录未支付业务
 			doneCodeComponent.saveDoneCodeUnPay(cust_id, done_code, this.getOptr().getOptr_id());
 			//保存缴费信息
 			feeComponent.saveCancelFee(cancelList,orderFees, this.getBusiParam().getCust(), done_code, this.getBusiParam().getBusiCode());
 		}
-		if(cancel_fee-refund_fee!=0){
+		if(cancelFee-refundFee!=0){
 			//余额转回公用账目
 			acctComponent.saveCancelFeeToAcct(orderFees, cust_id, done_code, this.getBusiParam().getBusiCode());
 		}
@@ -187,25 +187,6 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		this.saveAllPublic(done_code, this.getBusiParam());
 	}
 	
-	/**
-	 * 缴费入口的订单当天取消
-	 */
-	public void saveCancelTodayOrder(String orderSn,Integer cancelFee,Integer refundFee) throws Exception{
-		checkTodayCancelOrder(orderSn);
-		this.saveCancelProdOrder(true, cancelFee,refundFee,orderSn);
-	}
-	private void checkTodayCancelOrder(String orderSn)throws Exception{
-		if(StringHelper.isEmpty(orderSn)){
-			throw new ServicesException(ErrorCode.ParamIsNull);
-		}
-		CProdOrder order=cProdOrderDao.findByKey(orderSn);
-		if(order==null){
-			throw new ServicesException(ErrorCode.OrderTodayHasCancel);
-		}
-		if(!DateHelper.isToday(order.getOrder_time())||!order.getOptr_id().equals(this.getOptr().getOptr_id())){
-			throw new ServicesException(ErrorCode.NotCancelOnlyTodayIsYou);
-		}
-	}
 	/**
 	 * 整体移动剩下订单的开始和结束计算日期
 	 * @param cancelResultList
@@ -266,13 +247,13 @@ public class OrderService extends BaseBusiService implements IOrderService{
 	 * @return
 	 * @throws Exception
 	 */
-	private List<CProdOrderDto> checkCancelProdOrderParm(boolean isHigh,String cust_id,String[] orderSns
+	private List<CProdOrderDto> checkCancelProdOrderParm(String cust_id,String[] orderSns
 			,Integer cancel_fee,Integer refund_fee,List<CProdOrderFee> orderFees) throws Exception{
 		
 		if(StringHelper.isEmpty(cust_id)||cancel_fee==null||orderSns==null||orderSns.length==0){
 			throw new ServicesException(ErrorCode.ParamIsNull);
 		}
-
+		String busi_code=this.getBusiParam().getBusiCode();
 		List<CProdOrderDto> cancelList=new ArrayList<>();
 		//参数检查
 		//退款总额核对
@@ -284,14 +265,19 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		for(String order_sn:orderSns){
 			CProdOrderDto order= cProdOrderDao.queryCProdOrderDtoByKey(order_sn);
 			if(order==null){
-				throw new ServicesException(ErrorCode.ParamIsNull);
+				throw new ServicesException(ErrorCode.OrderTodayHasCancel);
 			}
 			cancelList.add(order);
-			this.checkOrderCanCancel(cust_id, isHigh, order);
+			this.checkOrderCanCancel(cust_id, busi_code, order);
 			//可退费用计算
-			//order.setActive_fee(orderComponent.getOrderCancelFee(order,DateHelper.today()));
+			List<CProdOrderFee> cancelFeeList=null;
+			if(busi_code.equals(BusiCodeConstants.PROD_SUPER_TERMINATE)){
+				//超级退订，退所有钱
+				cancelFeeList=orderComponent.getOrderCancelAllFeeDetail(order);
+			}else{
+				cancelFeeList=orderComponent.getOrderCacelFeeDetail(order,DateHelper.today());
+			}
 			
-			List<CProdOrderFee> cancelFeeList=orderComponent.getOrderCacelFeeDetail(order,DateHelper.today());
 			orderFees.addAll(cancelFeeList);
 			int outTotalFee=0;
 			int balanceCfee=0;
@@ -348,7 +334,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 	 * @param prodConfig
 	 * @throws Exception
 	 */
-	private void checkOrderCanCancel(String cust_id,boolean isHigh,CProdOrderDto order) throws Exception{
+	private void checkOrderCanCancel(String cust_id,String busi_code,CProdOrderDto order) throws Exception{
 		
 		if(order==null){
 			throw new ServicesException(ErrorCode.OrderNotExists);
@@ -368,6 +354,18 @@ public class OrderService extends BaseBusiService implements IOrderService{
 				&&!order.getStatus().equals(StatusConstants.INSTALL)){
 			throw new ServicesException(ErrorCode.NotCancelStatusException);
 		}
+		//时间判断，exp_date 小于今天不能退订
+		if(order.getExp_date().before(DateHelper.today())){
+			throw new ServicesException(ErrorCode.NotCancelStatusException);
+		}
+		//订购时间=今天，都可以退订
+		if(DateHelper.isToday(order.getCreate_time())){
+			return;
+		}
+		
+		
+		boolean isHigh=orderComponent.isHighCancel(busi_code);
+		
 		if(!isHigh&&order.getBilling_cycle()>1){
 			//包多月判断
 			throw new ServicesException(ErrorCode.NotCancelHasMoreBillingCycle);
