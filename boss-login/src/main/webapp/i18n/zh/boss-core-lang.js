@@ -11,8 +11,11 @@ BCLang.home = {
 		cust: {
 			base: {_title: "基本信息",name: "客户名称",busiId: "受理编号",openDate: "开户日期",addr: "地址",status: "客户状态",
 				type: "客户类型",certType: "证件类型",certNum: "证件号码",linkMan: "联系人",tel: "固定电话",barthday: "出生日期",
-				mobile: "手机号码",areaCateory: "区域小区",houseNetType: "小区网络类型",houseManager: "小区客户经理",
-				houseOptr: "小区运维人员",postalAddr: "邮寄地址", remark: "备注"
+				mobile: "手机号码",areaCateory: "区域小区",houseNetType: "服务类型",houseManager: "小区客户经理",
+				houseOptr: "小区运维人员",postalAddr: "邮寄地址", remark: "备注",
+				email: "邮箱", sex: "性别",
+				agentName: "代理商", deptName: "开户部门", developName: "发展人", businessLicence: "营业执照", unitNumber: "单位税号",
+				spkgSn: "协议编号"
 			},
 			device: {
 				_title: "设备信息"
