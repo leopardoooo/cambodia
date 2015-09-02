@@ -391,12 +391,11 @@ Ext.apply( App, {
 		else if(busiCode == '1021' || busiCode == '111'){//销户，高级销户
 			panel.getUserPanel().userGrid.remoteRefresh();
 		}else if(busiCode == '1020'){//用户开户、刷新用户和设备，账户
-			//panel.getCustPanel().custInfoPanel.remoteRefresh();
-			//panel.getCustPanel().refreshPropChangeGrid();
 			//panel.getCustPanel().custDeviceGrid.remoteRefresh();
 			panel.getUserPanel().userGrid.remoteRefresh();
 			panel.getCustPanel().acctItemGrid.remoteRefresh();
-		}else if(busiCode == '102' || busiCode == '101' || busiCode == '100' ||busiCode == '1015' ||busiCode =='1040'){//订购，续订，升级,套餐订购,缴费
+		}else if(busiCode == '102' || busiCode == '101' || busiCode == '100' ||busiCode == '1015' ||busiCode =='1040'
+			|| busiCode == '110' ||busiCode == '109' || busiCode == '1027'){//订购，续订，升级,套餐订购,缴费,高级退订,超级退订，退订
 			panel.getUserPanel().prodGrid.remoteRefresh();
 			panel.getCustPanel().acctItemGrid.remoteRefresh();
 		}else if(busiCode == '1023' || busiCode == '1018' ||busiCode == '1118' || busiCode == '1074'||busiCode == '1075'||busiCode == '1078'||busiCode == '1079'){//用户修改资料，刷新用户，修改宽带密码，修改最大连接数,取消预报停,修改最大用户数
@@ -410,7 +409,7 @@ Ext.apply( App, {
 		}else if(busiCode == '1500'){
 			panel.getUserPanel().prodGrid.remoteRefresh();
 			panel.getCustPanel().acctItemGrid.remoteRefresh();
-		}else if( busiCode == '1027' || busiCode == '1127' || busiCode == '1034' || busiCode == '1028'|| busiCode == '1072' || busiCode == '1232' || busiCode == '1081'|| busiCode == '1983' || busiCode == '1984' || busiCode == '1036' || busiCode =='1304' || busiCode == '110'){//产品退订或套餐退订，刷新账户、产品和套餐, //资费变更、协议缴费,失效日期变更、取消变更资费,修改到期日,修改预开通时间,修改公用账目使用类型
+		}else if( busiCode == '1127' || busiCode == '1034' || busiCode == '1028'|| busiCode == '1072' || busiCode == '1232' || busiCode == '1081'|| busiCode == '1983' || busiCode == '1984' || busiCode == '1036' || busiCode =='1304' ){//产品退订或套餐退订，刷新账户、产品和套餐, //资费变更、协议缴费,失效日期变更、取消变更资费,修改到期日,修改预开通时间,修改公用账目使用类型
 			panel.getUserPanel().prodGrid.remoteRefresh();
 //			panel.getAcctPanel().acctGrid.remoteRefresh();
 //			if(busiCode == '1015')
