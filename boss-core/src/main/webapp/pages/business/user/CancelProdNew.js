@@ -204,53 +204,8 @@ CancelProdNewForm = Ext.extend(BaseForm,{
 								}
 							}]
          				}]
-		         }
-		         
-		         
-//		         		{ 
-//		         		columnWidth:.15,
-//         				items:[{
-//         						bodyStyle:'padding-top:4px',
-//		         				html: "* 可退总额$:<span id='cfeeTotalAmount'>--</span>"
-//			         			}]
-//         				},{
-//         					labelWidth:75, 
-//	         				columnWidth:.30,
-//	         				layout : 'form',
-//	         				items:[{
-//									fieldLabel : '处理方式',
-//									id : 'CancelFeeTypeId',
-//									name:'order_fee_type',
-//									allowBlank : false,
-//									xtype:'paramcombo',
-//									width: 80,
-//									emptyText: '请选择',
-//									defaultValue:'REFUND',
-//									paramName:'ACCT_BALANCE',
-//									listeners: {
-//										scope: this,
-//										'expand': function(combo){
-//											var store = combo.getStore();
-//											store.removeAt(store.find('item_value','EXPIRE'));
-//										}
-//									}
-//								}]
-//         				},{ 
-//			         		columnWidth:.35,
-//	         				items:[{
-//	         						bodyStyle:'padding-top:4px',
-//			         				html: "* 转公用总额$:<span id='acctTotalAmount'>--</span>"
-//				         			}]
-//	         			},{
-//	         				columnWidth:.20,
-//	         				items:[{
-//	         						bodyStyle:'padding-top:4px',
-//			         				html: "* 退款总额$:<span id='totalFeeAmount'>--</span>"
-//				         			}]
-//	         			}
-	         			]
-		         
-				}]
+		         }]
+			}]
 		})
 	},
 	doInit:function(){
@@ -266,6 +221,16 @@ CancelProdNewForm = Ext.extend(BaseForm,{
 		this.cancelProdGrid.refresh(record["order_sn"]);
 		
 		CancelProdNewForm.superclass.doInit.call(this);
+	},
+	doValid : function(){
+		var obj = {};
+		var prodSn = this.cancelProdGrid.checkSm.orderSns;
+		if(!prodSn ||prodSn.length == 0){
+			obj["isValid"] = false;
+			obj["msg"] = "请输入选择一项进行退订";
+			return obj;
+		}
+		return CancelProdNewForm.superclass.doValid.call(this);
 	},
 	getValues:function(){
 		var obj = {};
