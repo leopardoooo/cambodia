@@ -20,10 +20,30 @@ public class OptrBase extends CountyBase  implements Serializable {
 	private static final long serialVersionUID = -5118191800720091364L;
 	private String optr_id;
 	private String dept_id;
+	private String agent_id;
 
+	private String agent_name;
 	private String dept_name;
 	private String optr_name;
 	private String login_name;
+	
+	public String getAgent_id() {
+		return agent_id;
+	}
+
+	public void setAgent_id(String agent_id) {
+		agent_name = MemoryDict.getDictName(DictKey.AGENT, agent_id);
+		this.agent_id = agent_id;
+	}
+
+	public String getAgent_name() {
+		return agent_name;
+	}
+
+	public void setAgent_name(String agent_name) {
+		this.agent_name = agent_name;
+	}
+
 
 	public void setDept_id(String dept_id) {
 		dept_name = MemoryDict.getDictName(DictKey.DEPT, dept_id);

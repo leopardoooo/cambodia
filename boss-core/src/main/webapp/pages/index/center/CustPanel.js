@@ -19,82 +19,61 @@ var custInfoHTML =
 		'<td class="input">&nbsp;{[values.cust.cust_type_text || ""]}</td>'+
 	'</tr>' +
 	'<tr height=24>'+
+		'<td class="label">'+ langUtils.main("cust.base.linkMan") +':</td>' +
+		'<td class="input">&nbsp;{[values.linkman.linkman_name ? (values.linkman.linkman_name+" "+(values.linkman.sex_text ? "("+values.linkman.sex_text+")" : "" )+" "+(values.linkman.birthday ? "("+fm.dateFormat(values.linkman.birthday)+")" : "" )) : "" ]}</td>'+
+		'<td class="label">'+ langUtils.main("cust.base.email") +':</td>' +
+		'<td class="input">&nbsp;{[values.linkman.email || ""]}</td>'+
+	'</tr>'+
+	'<tr height=24>'+
+	'<td class="label">'+ langUtils.main("cust.base.tel") +':</td>' +
+	'<td class="input">&nbsp;{[values.linkman.tel || ""]}</td>'+
+		'<td class="label">'+ langUtils.main("cust.base.mobile") +':</td>' +
+		'<td class="input">&nbsp;{[values.linkman.mobile || ""]}</td>'+
+	'</tr>'+
+	'<tr height=24>'+
 		'<td class="label">'+ langUtils.main("cust.base.certType") +':</td>' +
 		'<td class="input">&nbsp;{[values.linkman.cert_type_text || ""]}</td>'+
 		'<td class="label">'+ langUtils.main("cust.base.certNum") +':</td>' +
 		'<td class="input">&nbsp;{[values.linkman.cert_num || ""]}</td>'+
 	'</tr>' +
-	'<tpl if="values.cust.cust_type == \'RESIDENT\'">' +
-		'<tr height=24>'+
-			'<td class="label">优惠类型:</td>' +
-			'<td class="input">&nbsp;{[values.cust.cust_class_text || ""]}&nbsp;&nbsp;{[values.cust.cust_class_date || ""]}</td>'+
-			'<td class="label">客户群体:</td>' +
-			'<td class="input">&nbsp;{[values.cust.cust_colony_text || ""]}</td>'+
-		'</tr>' + 
-	'</tpl>' +
-	'<tpl if="values.cust.cust_type == \'UNIT\' && !Ext.isEmpty(values.cust.cust_colony)">' +
-		'<tr height=24>'+
-			'<td class="label">客户群体:</td>' +
-			'<td class="input">&nbsp;{[values.cust.cust_colony_text || ""]}</td>'+
-		'</tr>' + 
-	'</tpl>' +
 	'<tr height=24>'+
-		'<td class="label">'+ langUtils.main("cust.base.linkMan") +':</td>' +
-		'<td class="input">&nbsp;{[values.linkman.linkman_name || ""]}</td>'+
-		'<td class="label">'+ langUtils.main("cust.base.tel") +':</td>' +
-		'<td class="input">&nbsp;{[values.linkman.tel || ""]}</td>'+	
-	'</tr>' +'<tr height=24>'+
-		'<td class="label">'+ langUtils.main("cust.base.barthday") +':</td>' +
-		'<td class="input">&nbsp;{[fm.dateFormat(values.linkman.birthday) || ""]}</td>'+
-		'<td class="label">'+ langUtils.main("cust.base.mobile") +':</td>' +
-		'<td class="input">&nbsp;{[values.linkman.mobile || ""]}</td>'+
+		'<td class="label">'+ langUtils.main("cust.base.deptName") +':</td>' +
+		'<td class="input">&nbsp;{[values.cust.dept_name || ""]}</td>'+
+		'<td class="label">'+ langUtils.main("cust.base.agentName") +':</td>' +
+		'<td class="input">&nbsp;{[values.cust.agent_name || ""]}</td>'+
 	'</tr>'+'<tr height=24>'+
-	'<td class="label">'+ langUtils.main("cust.base.areaCateory") +':</td>' +
-		'<td class="input">&nbsp;{[values.cust.addr_id_text || ""]}</td>'+
 		'<td class="label">'+ langUtils.main("cust.base.houseNetType") +':</td>' +
 		'<td class="input">&nbsp;{[values.cust.add_net_type_text || ""]}</td>'+
-	'</tr>'+'<tr height=24>'+
-	'<td class="label">'+ langUtils.main("cust.base.houseManager") +':</td>' +
-		'<td class="input">&nbsp;{[values.cust.busi_optr_name || ""]}</td>'+
-		'<td class="label">'+ langUtils.main("cust.base.houseOptr") +':</td>' +
-		'<td class="input">&nbsp;{[values.cust.serv_optr_name || ""]}</td>'+
-	'</tr>' +
-		'<tr height=24>'+
-		'<td class="label">'+ langUtils.main("cust.base.postalAddr") +':</td>' +
-		'<td class="input" colspan="3">&nbsp;{[values.linkman.mail_address ? values.linkman.mail_address + "&nbsp;&nbsp;&nbsp;&nbsp;postal:&nbsp;" + [values.linkman.postcode || ""] : "" ]}</td>'+
-	'</tr>' +	
-	'<tpl if="values.cust.cust_colony == \'MNDKH\' || values.cust.cust_colony == \'XYKH\' ">' +
-	'<tr height=24>'+
-		'<td class="label">容量:</td>' +
-		'<td class="input">&nbsp;{[values.cust.cust_count || 0]}</td>'+
-		'<td class="label">实际数量:</td>' +
-		'<td class="input">&nbsp;{[values.cust.real_cust_count || 0]}</td>'+
-	'</tr>' +
-	'</tpl>' +
+		'<td class="label">'+ langUtils.main("cust.base.developName") +':</td>' +
+		'<td class="input">&nbsp;{[values.cust.develop_optr_name || ""]}</td>'+
+	'</tr>'+
+	'</tr>'+
 	'<tpl if="values.cust.unit_name">' +
-	'<tr height=24>'+
-		'<td class="label">单位名称:</td>' +
-		'<td class="input"%>&nbsp;{[values.cust.unit_name || ""]}</td>'+
-	'</tr>' +
+		'<tr height=24>'+
+			'<td class="label">单位名称:</td>' +
+			'<td class="input"%>&nbsp;{[values.cust.unit_name || ""]}</td>'+
+		'</tr>' +
 	'</tpl>' +
+	'<tpl if="values.cust.cust_type==\'NONRES\'">'+
+		'<tr height=24>'+
+			'<td class="label">'+ langUtils.main("cust.base.businessLicence") +':</td>' +
+			'<td class="input">&nbsp;{[values.cust.str7 || ""]}</td>'+
+			'<td class="label">'+ langUtils.main("cust.base.unitNumber") +':</td>' +
+			'<td class="input">&nbsp;{[values.cust.str8 || ""]}</td>'+
+		'</tr>' + 
+		'<tr height=24>'+
+			'<td class="label">'+ langUtils.main("cust.base.spkgSn") +':</td>' +
+			'<td class="input">&nbsp;{[values.cust.spkg_sn || ""]}</td>'+
+		'</tr>' + 
+	'</tpl>'+
+	'<tr height=24>'+
+		'<td class="label">'+ langUtils.main("cust.base.postalAddr") +':</td>' +
+		'<td class="input" colspan="3">&nbsp;{[values.linkman.mail_address || "" ]}</td>'+
+	'</tr>' +	
 	'<tr height=24>'+
 		'<td class="label">'+ langUtils.main("cust.base.remark") +':</td>' +
 		'<td class="input" colspan="3">&nbsp;{[values.cust.remark || ""]}</td>'+
-	'</tr>' +	
-	'<tpl if="values.acctBank && values.acctBank.bank_account && (values.acctBank.status==\'ACTIVE\' || values.acctBank.status==\'STOP\')">' +
-	'<tr height=24>'+
-		'<td class="label">签约银行:</td>' +
-		'<td class="input">&nbsp;{[values.acctBank.bank_code_text || ""]}</td>'+
-		'<td class="label">银行账号:</td>' +
-		'<td class="input">&nbsp;{[values.acctBank.bank_account || ""]}</td>'+
-	'</tr>' + 
-	'<tr height=24>'+ 
-		'<td class="label">签约状态:</td>' +
-		'<td class="input">&nbsp;{[values.acctBank.status=="STOP"?"暂停":"正常"]}</td>'+
-		'<td class="label">账户名称:</td>' +
-		'<td class="input">&nbsp;{[values.acctBank.account_name || ""]}</td>'+
-	'</tr>' + 
-	'</tpl>' +
+	'</tr>' +
 '</table>';
 
 /**
@@ -145,6 +124,7 @@ CustInfoPanel = Ext.extend( Ext.ux.Gpanel , {
 				},
 				success: function(res,ops){
 					var data = Ext.decode(res.responseText);
+					console.log(data);
 					if(data){
 						App.data.custFullInfo = data;
 					}else{

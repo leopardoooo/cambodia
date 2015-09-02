@@ -36,6 +36,7 @@ import com.ycsoft.beans.core.cust.CCustLinkman;
 import com.ycsoft.beans.core.cust.CCustLinkmanHis;
 import com.ycsoft.beans.core.cust.CCustPropChange;
 import com.ycsoft.beans.core.cust.CCustUnitToResident;
+import com.ycsoft.beans.system.SAgent;
 import com.ycsoft.beans.system.SOptr;
 import com.ycsoft.business.commons.abstracts.BaseBusiComponent;
 import com.ycsoft.business.dao.config.TAddressDao;
@@ -988,6 +989,12 @@ public class CustComponent extends BaseBusiComponent {
 		}
 		if(null == acctBank)
 			acctBank = new CAcctBank();
+		
+		SAgent agent = this.sAgentDao.queryAgentByDeptId(cust.getDept_id());
+		if(agent != null){
+			cust.setAgent_id(agent.getId());
+			cust.setAgent_name(agent.getName());
+		}
 		
 		custInfoDto.setCust(cust);
 		custInfoDto.setLinkman(linkman);
