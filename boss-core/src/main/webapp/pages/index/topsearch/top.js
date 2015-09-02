@@ -117,7 +117,11 @@ Ext.apply(TopSearch.prototype , {
 			ps['search_type'] = 'MULTIPLE';
 		}else{
 			if(t == 'cust'){
-				if(Ext.form.VTypes.IDNum(searchValue)){//搜索值为身份证
+				
+//				if(/[^0-9]/.test(searchValue.charAt(i)))
+				//全数字
+				
+				/*if(Ext.form.VTypes.IDNum(searchValue)){//搜索值为身份证
 					t = Constant.IDCARD;
 				}else if (searchValue.length>=15){
 					t = 'BANKNUM';
@@ -126,11 +130,16 @@ Ext.apply(TopSearch.prototype , {
 					var flag = true;
 					for(var i=0;i<searchValue.length;i++){
 						flag = /[^\u4E00-\u9FA5]/.test(searchValue.charAt(i));
-						if(!flag){
+						if(!flag || /[^a-zA-Z]/.test(searchValue.charAt(i))){
 							t = 'cust_name';
 							break;
 						}
 					}
+				}*/
+				if(/[0-9]/.test(searchValue)){
+					t = 'cust_no';
+				}else{
+					t = 'cust_name'
 				}
 			}
 			
