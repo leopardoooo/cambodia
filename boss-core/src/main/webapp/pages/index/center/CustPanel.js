@@ -1410,13 +1410,13 @@ CustPanel = Ext.extend( BaseInfoPanel , {
 				border: false,
 				layout:"anchor",
 				items: [{
-					anchor:"100% 62.3%",
+					anchor:"100% 64%",
 					layout:'fit',
 					border: true,
 					bodyStyle: 'border-top-width: 0;border-right-width: 0;',
 					items:[this.acctItemGrid]
 				},{
-					anchor:"100% 38.1%",
+					anchor:"100% 36.2%",
 					layout:'fit',
 					height: 200,
 					border: false,

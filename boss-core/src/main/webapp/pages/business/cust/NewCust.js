@@ -41,6 +41,7 @@ NewCustForm = Ext.extend( CustBaseForm , {
 	},
 	getValues : function(){
 		var all = this.getForm().getValues();
+		all['cust.address'] = Ext.getCmp('tempCustAddress').getValue();
 		if(this.custLevel){
 			all['cust.cust_level'] = this.custLevel;
 		}
