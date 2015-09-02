@@ -178,7 +178,7 @@ public class TBusiFeeStdDao extends BaseEntityDao<TBusiFeeStd> {
 				+ " AND bfs.fee_id=tf.fee_id AND tf.fee_type=? AND tf.status=? and bf.fee_id=? ";
 
 		return createQuery(BusiFeeDto.class, sql, templteId,
-				SystemConstants.FEE_TYPE_BUSI,StatusConstants.ACTIVE,busiFeeId).first();
+				SystemConstants.FEE_TYPE_CONTRACT,StatusConstants.ACTIVE,busiFeeId).first();
 	}
 	/**
 	 * 返回设备费用信息

@@ -210,7 +210,10 @@ AddrCustSelectWin = Ext.extend( Ext.Window , {
 			{header: '房间号', dataIndex: 'note', width: 160},
 			{header: '房间状态', dataIndex: 'note_status_type_text',width: 80},
 			{header: '客户名称', dataIndex: 'cust_name'},
-			{header: '受理编号', dataIndex: 'cust_no'}
+			{header: '受理编号', dataIndex: 'cust_no'},
+		    { header: '操作', width: 50,renderer: function(v , md, record , i  ){
+				return "<DIV><a href='#' onclick='addrThat.doGridCheckRoom();'>确认</a></DIV>";
+			}}
 		];
 		
 		//实例化cust grid panel
@@ -267,12 +270,17 @@ AddrCustSelectWin = Ext.extend( Ext.Window , {
 		});
 	},
 	doSaveNewRoom:function(){
-		var room = Ext.getCmp('newRoomBoxId').getValue();
-		if(Ext.isEmpty(room)){
+		var note = Ext.getCmp('newRoomBoxId').getValue();
+		if(Ext.isEmpty(note)){
 			Alert("房间号不能为空");
 			return;
 		}
-		this.setData(Ext.getCmp('newRoomBoxId').getValue());
+		this.setData(note);
+		this.close();
+	},
+	doGridCheckRoom:function(){
+		var rec = this.custGrid.getSelectionModel().getSelected();
+		this.setData(rec.get('note'));
 		this.close();
 	},
 	doCheckedChangeRoom:function(){
