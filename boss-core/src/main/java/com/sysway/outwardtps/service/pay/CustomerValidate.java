@@ -15,7 +15,7 @@ package com.sysway.outwardtps.service.pay;
 })
 public class CustomerValidate implements org.apache.axis2.databinding.ADBBean {
     /* This type was generated from the piece of schema that had
-       name = customerValidate
+       name = customerValidate  
        Namespace URI = http://pay.service.outwardtps.sysway.com/
        Namespace Prefix = ns1
      */
