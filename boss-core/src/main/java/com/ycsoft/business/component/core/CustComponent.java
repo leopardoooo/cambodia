@@ -1206,7 +1206,7 @@ public class CustComponent extends BaseBusiComponent {
 	 * @param cust
 	 * @return
 	 */
-	private String gCustNoByAddr(String addrId, String custCode ) throws Exception {
+	public String gCustNoByAddr(String addrId, String custCode ) throws Exception {
 		String custNo = "";
 		if(StringHelper.isNotEmpty(custCode)){
 			custNo = custCode;

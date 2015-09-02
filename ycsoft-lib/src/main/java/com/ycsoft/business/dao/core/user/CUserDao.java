@@ -484,4 +484,14 @@ public class CUserDao extends BaseEntityDao<CUser> {
 				+ " where b.res_id= c.boss_res_id and user_id=? and a.is_pay='T' and exp_date>sysdate and a.prod_id=b.prod_id";
 		return this.createQuery(UserResExpDate.class, sql, userId).list();
 	}
+	
+	public boolean validAccount(String name) throws Exception {
+		String sql = "select count(1) from c_user t where t.login_name=?";
+		return this.count(sql, name) > 0;
+	}
+	
+	public int countUserType(String custId, String userType) throws Exception {
+		String sql = "select count(1) from c_user t where t.cust_id=? and user_type=?";
+		return this.count(sql, custId, userType);
+	}
 }

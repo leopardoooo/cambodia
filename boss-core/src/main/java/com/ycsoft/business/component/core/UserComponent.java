@@ -1266,6 +1266,15 @@ public class UserComponent extends BaseBusiComponent {
 //		}
 //		return flag;
 //	}
+	
+	public int countUserType(String custId, String userType) throws Exception {
+		return cUserDao.countUserType(custId, userType);
+	}
+	
+	public boolean validAccount(String name) throws Exception{
+		return cUserDao.validAccount(name);
+	}
+	
 
 	public void setExpressionUtil(ExpressionUtil expressionUtil) {
 		this.expressionUtil = expressionUtil;

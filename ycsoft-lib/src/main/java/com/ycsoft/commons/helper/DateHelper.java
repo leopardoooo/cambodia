@@ -281,6 +281,19 @@ public class DateHelper {
 		c.add(Calendar.DATE, day);
 		return c.getTime();
 	}
+	
+	public static java.util.Date addTypeDate(java.util.Date date, String type, int num){
+		java.util.Calendar c = java.util.Calendar.getInstance();
+		c.setTime(date);
+		if(type.equals("DATE")){
+			c.add(Calendar.DATE, num);
+		}else if(type.equals("MONTH")){
+			c.add(Calendar.MONTH, num);
+		}else if(type.equals("DAY")){
+			c.add(Calendar.DAY_OF_MONTH, num);
+		}
+		return c.getTime();
+	}
 	/**
 	* 获取两个日期之间的间隔天数(1)
 	* @return
