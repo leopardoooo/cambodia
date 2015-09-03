@@ -268,15 +268,17 @@ ProdGrid = Ext.extend(Ext.TabPanel,{
 		// 列定义
 		this.baseProdCm = new Ext.ux.grid.LockingColumnModel({ 
     		columns : [
-    		{header:'订购SN',dataIndex:'order_sn',width:40},
+    		{header:'订购SN',dataIndex:'order_sn',width:60},
 			{header:'产品名称',dataIndex:'prod_name',width:120},
 			{header:'所属套餐',dataIndex:'package_name',width:80},
 			{header:'当前资费',dataIndex:'tariff_name',	width:80},
 			{header:'生效日期',dataIndex:'eff_date',width:80,renderer: Ext.util.Format.dateFormat},
 			{header:'失效日期',dataIndex:'exp_date',width:80,renderer: Ext.util.Format.dateFormat},
+			{header:'创建流水号',dataIndex:'done_code',width:80},
 			{header:'状态',dataIndex:'status_text',	width:60,renderer:Ext.util.Format.statusShow},
-			//{header:'产品类型',dataIndex:'prod_type_text',width:100},
-			{header:'订购时间',dataIndex:'order_time',width:80}
+			{header:'状态变更时间',dataIndex:'status_date',width:100,renderer: Ext.util.Format.dateFormat},
+			{header:'订购时间',dataIndex:'order_time',width:80,renderer: Ext.util.Format.dateFormat},
+			{header:'订购月数',dataIndex:'order_months',width:80}
 	        ]
 	      });
 		
@@ -287,7 +289,7 @@ ProdGrid = Ext.extend(Ext.TabPanel,{
 			         "order_sn","package_sn","package_id","cust_id","user_id","prod_id","tariff_id","disct_id",
 			         "status","status_text","status_date","eff_date","exp_date","active_fee","bill_fee",
 			         "rent_fee","last_bill_date","next_bill_date","order_months","order_fee","order_time",
-			         "order_type","package_group_id","remark","public_acctitem_type"],			
+			         "order_type","package_group_id","remark","public_acctitem_type","done_code"],			
 			sortInfo : {
 				field : 'prod_name',
 				direction:'DESC'
