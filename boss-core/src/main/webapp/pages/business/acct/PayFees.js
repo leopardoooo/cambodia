@@ -96,7 +96,7 @@ PayFeesForm = Ext.extend( BaseForm , {
 				items:[this.panel]
 			},{
 				 region: "south",
-				 height: 80, 
+				 height: 100, 
 				 buttonAlign:'center',
 				 flex:1,
        			 frame:true,  
@@ -109,7 +109,7 @@ PayFeesForm = Ext.extend( BaseForm , {
 		         	columnWidth:.99,
 		         	xtype:'fieldset',
 		         	id:'orderFeeItemId',
-				    height: 60, 
+				    height: 75, 
 				    title:'产品费',
          			style:'margin-left:10px;padding: 10px 0 10px 10px; color: red',
          			layout:'column',
@@ -154,7 +154,13 @@ PayFeesForm = Ext.extend( BaseForm , {
 		delete this.data;
 	},
 	getValues: function(){
-		var all = {'payFeesData':Ext.encode(this.data),'busi_code':App.getData().currentResource.busicode};
+		var p = this.panel,busiFee;
+		if(p.grid.colModel || p.grid.specGrid){
+			busiFee = p.grid.getBusiValues();
+		}
+		
+		var all = {'payFeesData':Ext.encode(this.data),'busi_code':App.getData().currentResource.busicode,
+		'busiFeesData':busiFee};
 		return all;
 	},
 	doValid: function(){
@@ -180,6 +186,7 @@ PayFeesForm = Ext.extend( BaseForm , {
 		//是批量缴费，p.grid为Panel
 		if(p.grid.colModel || p.grid.specGrid){
 			specFee = p.grid.getValues();
+			
 		}
 		
 		if(publicFee && publicFee.length > 0){

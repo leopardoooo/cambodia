@@ -169,10 +169,12 @@ public class FeeComponent extends BaseBusiComponent {
 			if(busiFee==null){
 				throw new ComponentException(ErrorCode.TemplateNotConfigBuseFee,user.getStr5());
 			}
+			busiFee.setFee_count(fee_count);
 			List<CProdOrder> orders= cProdOrderDao.queryNotExpAllOrderByUser(user.getUser_id());
 			
 			if(orders!=null&&orders.size()>0){
-				busiFee.setLast_prod_exp(orders.get(orders.size()-1).getExp_date());
+				//开始计费日期=上次到期日+1天
+				busiFee.setLast_prod_exp(DateHelper.addDate(orders.get(orders.size()-1).getExp_date(),1));
 			}else{
 				busiFee.setLast_prod_exp(DateHelper.today());
 			}

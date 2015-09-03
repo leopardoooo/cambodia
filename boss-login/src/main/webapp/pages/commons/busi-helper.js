@@ -396,7 +396,7 @@ Ext.apply( App, {
 			panel.getCustPanel().acctItemGrid.remoteRefresh();
 		}else if(busiCode == '102' || busiCode == '101' || busiCode == '100' ||busiCode == '1015' ||busiCode =='1040'
 			|| busiCode == '110' ||busiCode == '109' || busiCode == '1027'){//订购，续订，升级,套餐订购,缴费,高级退订,超级退订，退订
-			panel.getUserPanel.userGrid.remoteRefresh();
+//			panel.getUserPanel.userGrid.remoteRefresh();
 			panel.getUserPanel().prodGrid.remoteRefresh();
 			panel.getCustPanel().acctItemGrid.remoteRefresh();
 		}else if(busiCode == '1023' || busiCode == '1018' ||busiCode == '1118' || busiCode == '1074'||busiCode == '1075'||busiCode == '1078'||busiCode == '1079'){//用户修改资料，刷新用户，修改宽带密码，修改最大连接数,取消预报停,修改最大用户数

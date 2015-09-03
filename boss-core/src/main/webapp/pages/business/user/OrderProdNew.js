@@ -19,6 +19,7 @@ ProdOrderForm = Ext.extend( BaseForm, {
 	packageGroups: null,
 	busiFeeTime:null,
 	prodId:null,
+	isBusiFee:false,
 	constructor: function(p){
 		this.selectUserPanel = new SelectUserPanel(this);
 		
@@ -289,15 +290,16 @@ ProdOrderForm = Ext.extend( BaseForm, {
 		this.prodId = prodId;
 		Ext.getCmp("dfProdDesc").setValue(record.get("prod_desc"));
 		var boxProdTariff = Ext.getCmp("boxProdTariff");
+		boxProdTariff.reset();
 		var tariffs = this.baseData["tariffMap"][prodId] || [];
 		boxProdTariff.getStore().loadData(tariffs);
 		// 如果只有一个默认选中, 
 		// Update: 尽管只有1个资费，也不选中，因为转移支付的初始化问题
-		if(tariffs.length == 1){
-			boxProdTariff.setValue(tariffs[0]["tariff_id"]);
-		}else{
-			boxProdTariff.setRawValue("");
-		}
+//		if(tariffs.length == 1){
+//			boxProdTariff.setValue(tariffs[0]["tariff_id"]);
+//		}else{
+//			boxProdTariff.setRawValue("");
+//		}
 		// 上期结束日期
 		var lastOrderProdDate = this.getLastProdEndDate(prodId);
 		Ext.get("lastOrderProdExtDate").update(lastOrderProdDate || "--");
@@ -320,38 +322,86 @@ ProdOrderForm = Ext.extend( BaseForm, {
 		var busiFee = this.baseData["busiFee"];
 		//ip外挂费用
 		if(busiFee){
-			if(this.busiCode === "102" || this.busiCode === "101"){
-				this.busiFeeAmount = Ext.getCmp("sfOrderCycle").getValue()*busiFee.fee_count*busiFee.min_value;
-				Ext.get("busiFeeAmount").update(String(this.busiFeeAmount/100));
-				
-				this.busiFeeTime =  Ext.getCmp("dfStartDate").getValue().format("Ymd")+"-"+Date.parseDate(Ext.getCmp("dfExpDate").getValue(), "Y-m-d").format("Ymd");
-				Ext.get('busiFeeTime').update(this.busiFeeTime);
-			}else if(this.busiCode === "100" ){
-				var lastOrderProdDate = this.getLastProdEndDate(this.prodId);
-//				var lastDate = Date.parseDate(lastOrderProdDate, "Y-m-d")
-//				lastDate.setDate(lastDate.getDate() + 1);
-//				
-				var dfExpDate = Ext.getCmp("dfExpDate").getValue(); 
-//				var endDate = Date.parseDate(dfExpDate, "Y-m-d");
-//				endDate.setDate(endDate.getDate() + 1);
-
-				var lastDate = new Date(lastOrderProdDate);
-				lastDate.setDate(lastDate.getDate() + 1);
-				
-				var endDate = new Date(dfExpDate); 
-				endDate.setDate(endDate.getDate() + 1);
-				
-				var month = Ext.util.Format.getMonths(lastDate.format("Y-m-d"),endDate.format("Y-m-d"));
-				Alert(month);
+			var months = Ext.getCmp("sfOrderCycle").getValue();
+			if(Ext.isEmpty(months)){
+				return;
 			}
+			var startDate ;
+			var feeCount=0;
+			if(this.isPkg){
+				//所有的用户
+				var allUserList=this.selectUserPanel.selectUserData.userList;
+				var ipUserList=[];
+				var ipUserMap = {};
+				//选中的用户
+				this.selectUserPanel.store.each(function(rs){
+					var key = rs.get('user_id');
+					if(!ipUserMap[key]){
+						ipUserMap[key] = [];
+					}
+					ipUserMap[key].push(rs.get('user_id'));
+				});
+				//满足条件的用户
+				for(var i=0 ;i<allUserList.length;i++){
+					if(!Ext.isEmpty(allUserList[i].str5)
+						&&!Ext.isEmpty(allUserList[i].str6)
+						&&!Ext.isEmpty(allUserList[i].prod_exp_date)){
+							if(ipUserMap[allUserList[i].user_id]){
+								ipUserList.push(allUserList[i]);
+							}
+					}
+				}
+				
+				if(ipUserList.length == 0){
+					return ;				
+				}
+				for(var i=0 ;i<ipUserList.length;i++){
+					var ipTime = Date.parseDate(Ext.util.Format.subStringLength(ipUserList[i].prod_exp_date,10), "Y-m-d");
+					if(startDate == null){
+						startDate = ipTime;
+					}else{
+						if(startDate.getTime()<ipTime.getTime()){
+							startDate = ipTime;
+						}
+					}
+					//多个用户满足条件时候，ip数量相加
+					feeCount = feeCount + parseInt(ipUserList[i].str6);
+				}
+				
+				//满足条件的用户中选出最晚的到期日
+				startDate = startDate.format("Y-m-d");
+				
+			}else{
+				 startDate = Ext.util.Format.subStringLength(busiFee.last_prod_exp,10);
+			     feeCount=busiFee.fee_count;
+			}
+			
+			var feeMonths = 0;//月份数
+			var days = 0;//结束时间和开始计费时间相差天数
+			//业务费开始计费日期=产品开始计费日期
+			var dfExpDate = Ext.getCmp("dfExpDate").getValue();
+			if(startDate == Ext.getCmp("dfStartDate").getValue().format("Y-m-d")){
+				feeMonths = months;
+			}else{
+				//2个时间之间相差的月数
+				var bmonth = Ext.util.Format.getMonths(startDate,dfExpDate);
+				//业务费开始计费日期与产品开始计费日期，相差整数月数
+				if(Ext.util.Format.addMoth(startDate,bmonth) == dfExpDate){
+					feeMonths = bmonth;
+				}else{
+					days = Ext.util.Format.getDays(startDate,dfExpDate)
+				}
+			}
+			if(days != 0){
+				var v = parseInt(days/30*100)/100;
+				this.busiFeeAmount = (v*feeCount*busiFee.min_value);
+			}else{
+				this.busiFeeAmount = feeMonths*feeCount*busiFee.min_value;
+			}
+			Ext.get("busiFeeAmount").update(Ext.util.Format.convertToYuan(this.busiFeeAmount));
+			this.busiFeeTime =  Date.parseDate(startDate,"Y-m-d").format("Ymd")+"-"+Date.parseDate(dfExpDate, "Y-m-d").format("Ymd");
+			Ext.get('busiFeeTime').update(this.busiFeeTime);
 		}
-	},
-	addMoth:function(d,m){
-	   var ds=d.split('-'),_d=ds[2]-0;
-	   var nextM=new Date( ds[0],ds[1]-1+m+1, 0 );
-	   var max=nextM.getDate();
-	   d=new Date( ds[0],ds[1]-1+m,_d>max? max:_d );
-	   return d.toLocaleDateString().match(/\d+/g).join('-')
 	},
 	// 加载终端用户
 	doLoadUsers: function(selectProdRecord){
@@ -404,14 +454,12 @@ ProdOrderForm = Ext.extend( BaseForm, {
 			return;
 		}
 		
-		Alert(this.addMoth(startDate.format("Y-m-d"),months) );
-		
 		// 其它根据周期进行计算
 		if(startDate){
 			// 计算结束日
-			startDate.setMonth(startDate.getMonth() + months);
-			startDate.setDate(startDate.getDate() - 1);
-			Ext.getCmp("dfExpDate").setValue(startDate.format("Y-m-d"));
+			var endDate = Date.parseDate(Ext.util.Format.addMoth(startDate.format("Y-m-d"),months),"Y-m-d");
+			endDate.setDate(endDate.getDate()-1);
+			Ext.getCmp("dfExpDate").setValue(endDate.format("Y-m-d"));
 		}else{ 
 			Ext.getCmp("dfExpDate").setValue(null);
 		}
@@ -422,7 +470,7 @@ ProdOrderForm = Ext.extend( BaseForm, {
 	doLoadTransferAmount: function(){
 		var validObj = this.doBaseValid(); 
 		if(validObj["isValid"] !== true){
-			// Alert(validObj["msg"]);
+//			Alert(validObj["msg"]);
 			return ;
 		}
 		Ext.Ajax.request({
@@ -445,6 +493,10 @@ ProdOrderForm = Ext.extend( BaseForm, {
 				this.transferAmount = sumAmount;
 				// 修改小计信息
 				this.doChangeAmount();
+			},
+			clearData:function(){
+				//清空组件
+				Ext.getCmp('boxProdTariff').reset();				
 			}
 		});
 	},
@@ -461,9 +513,13 @@ ProdOrderForm = Ext.extend( BaseForm, {
 		//计算新增金额
 		var boxProdTariff = Ext.getCmp("boxProdTariff");
 		var disctId = boxProdTariff.getValue();
+		if(Ext.isEmpty(disctId)){
+			Alert("请先选择资费!");
+			return false;
+		}
 		var index = boxProdTariff.getStore().find("tariff_id", disctId);
 		var tariffRecord = boxProdTariff.getStore().getAt(index);
-		this.addAmount = Ext.getCmp("sfOrderCycle").getValue() * tariffRecord.get("disct_rent");
+		this.addAmount = Ext.getCmp("sfOrderCycle").getValue() * tariffRecord.get("disct_rent")/tariffRecord.get("billing_cycle");
 		Ext.get("addAmount").update(String(this.addAmount/100));
 		// 实付
 		this.totalAmount = this.addAmount - this.transferAmount;
@@ -557,7 +613,7 @@ ProdOrderForm = Ext.extend( BaseForm, {
 		
 		var feeInfo = "";
 		var busiFee = this.baseData["busiFee"];
-		if(busiFee){
+		if(busiFee>0){
 			var obj = {};
 			obj['fee_id'] = busiFee.fee_id;
 			obj['fee_std_id'] = busiFee.fee_std_id;
@@ -593,7 +649,7 @@ ProdOrderForm = Ext.extend( BaseForm, {
 		// 如果当前是套餐，则封装分组用户
 		if(this.isPkg()){
 			// 获得选中的用户
-			var groupUserMap = {};
+			/**var groupUserMap = {};
 			this.selectUserPanel.store.each(function(rs){
 				var gid = rs.get("package_group_id");
 				if(!groupUserMap[gid]){
@@ -609,7 +665,8 @@ ProdOrderForm = Ext.extend( BaseForm, {
 					"userSelectList": groupUserMap[key]
 				})
 			}
-			values["groupSelected"] = groupSelected;
+			values["groupSelected"] = groupSelected;**/
+			values["groupSelected"]=this.getGroupSelected();
 		}
 		
 		// 产品信息
@@ -619,6 +676,30 @@ ProdOrderForm = Ext.extend( BaseForm, {
 		
 		return values;
 	},
+	getGroupSelected:function(){
+		if(this.isPkg()){
+			// 获得选中的用户
+		var groupUserMap = {};
+			this.selectUserPanel.store.each(function(rs){
+				var gid = rs.get("package_group_id");
+				if(!groupUserMap[gid]){
+					groupUserMap[gid] = [];
+				}
+				groupUserMap[gid].push(rs.get("user_id"));
+			}, this);
+			// 封装后台数据结构
+			var groupSelected = [];
+			for(var key in groupUserMap){
+				groupSelected.push({
+					"package_group_id": key,
+					"userSelectList": groupUserMap[key]
+				})
+			}
+			return groupSelected;
+		}
+		return null;
+	}
+	,
 	success : function(form,res){
 		var userId = res.simpleObj;
 		App.getApp().refreshPayInfo(parent);

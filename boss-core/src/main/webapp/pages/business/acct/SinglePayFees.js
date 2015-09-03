@@ -10,6 +10,8 @@ SinglePayFeesGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 	totalAmount: 0,
 	busiFeeAmount:0,	
 	feeName:null,
+	busiFeeDate:null,
+	busiFee:null,
 	constructor:function(data){
 		payFeeThis = this;
 		this.payFeesStore = new Ext.data.GroupingStore({
@@ -57,7 +59,9 @@ SinglePayFeesGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 						{name:'prod_name',mapping:'prod_name'},
 						{name:'tariff_name_next',mapping:'tariff_name'},
 						{name:'tariff_id_next',mapping:'tariff_id'},
-						{name:'busiFee',mapping:'busiFee'}
+						{name:'busiFee',mapping:'busiFee'},
+						{name:'busiFeeAmount',mapping:'busiFeeAmount'},
+						{name:'busiFeeDate',mapping:'busiFeeDate'}
 				//实际支付金额字段，转移支付字段
 				,{name:'fee_back'},{name:'transfer_fee'},{name:'transfer_fee_back'},{name:'groupSelected',mapping:'groupSelected'}
 				]}),
@@ -170,13 +174,16 @@ SinglePayFeesGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 			Ext.getCmp('feesItemId').add({  
 					    columnWidth:.6,
 			         	xtype:'fieldset',  
-			         	height: 60,
+			         	height: 75,
 			         	id:'busiFeesItemId',
 			         	title:'-',
 			         	style:'margin-left:10px;padding: 10px 0 10px 10px; color: red',
 			         	items:[{
 			         		bodyStyle:'padding-top:4px',
 							html: "* 应收$:<span id='busiFeeAmount'>--</span>"
+			         	},{
+			         		bodyStyle:'padding-top:4px',
+							html: "时间段:<span id='busiFeeTime'>--</span>"
 			         	}]
 			         });
 			Ext.getCmp('busiFeesItemId').setTitle(this.feeName);
@@ -200,9 +207,12 @@ SinglePayFeesGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 				var store = this.getCellEditor(colIndex,rowIndex).field.getStore();
 				store.removeAll();//清空上一次选中行中 该列的数据
 				var tariff = record.get('tariffList');
-				if(tariff.length>0){
-					store.loadData(tariff);
+				if(tariff !=null){ 
+					if(tariff.length>0){
+						store.loadData(tariff);
+					}
 				}
+				return false;
 			}else{
 				return false;
 			}
@@ -236,20 +246,78 @@ SinglePayFeesGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 		var value = obj.value;
 		if(fieldName=='pay_month'){
 			if(!this.doAfterFindDateFee(record,value)){
-				if(record.get('fee')){
-					this.totalAmount = this.totalAmount - record.get('fee');
-					Ext.get('totalAmount').update(Ext.util.Format.convertToYuan(this.totalAmount));
-				}
 				this.doIntNullValue(record);
 				this.startEditing(obj.row,obj.column);
 			}else{
-				this.totalAmount = this.totalAmount + record.get('fee');
-				Ext.get('totalAmount').update(Ext.util.Format.convertToYuan(this.totalAmount));
 			}
+			
+			
+			if(record.get('busiFee')){
+				this.busiFee = record.get('busiFee');
+				this.doBusiFeeDate(record,value);
+			}
+			this.doAmountDate();
+			
 		}else if(fieldName = 'tariff_name_next'){
 			
 			
 		}
+	},
+	doBusiFeeDate:function(record,value){
+		var busiFee = record.get('busiFee');
+	 	var startDate = Ext.util.Format.subStringLength(busiFee.last_prod_exp,10);
+	 	var feeCount=busiFee.fee_count;
+		var feeMonths = 0;//月份数
+		var days = 0;//结束时间和开始计费时间相差天数
+		//业务费开始计费日期=产品开始计费日期
+		var dfExpDate = record.get('fee_month').format("Y-m-d");
+		if(startDate == Ext.util.Format.subStringLength(record.get('eff_date'),10)){
+			feeMonths = value;
+		}else{
+			//2个时间之间相差的月数
+			var bmonth = Ext.util.Format.getMonths(startDate,dfExpDate);
+			//业务费开始计费日期与产品开始计费日期，相差整数月数
+			if(Ext.util.Format.addMoth(startDate,bmonth) == dfExpDate){
+				feeMonths = bmonth;
+			}else{
+				days = Ext.util.Format.getDays(startDate,dfExpDate)
+			}
+		}
+		var amount = 0
+		if(days != 0){
+			var v = parseInt(days/30*100)/100;
+			busiFeeAmount = v*feeCount*busiFee.min_value;
+		}else{
+			busiFeeAmount = feeMonths*feeCount*busiFee.min_value;
+		}
+		record.set('busiFeeAmount',busiFeeAmount);
+		record.set('busiFeeDate',Date.parseDate(startDate,"Y-m-d").format("Ymd")+"-"+Date.parseDate(dfExpDate, "Y-m-d").format("Ymd"));
+		
+	},
+	doAmountDate:function(record,value){
+		var amount = 0,busiAmount = 0,busiDate="";
+		this.getStore().each(function(record){
+			if(!Ext.isEmpty(record.get('fee'))){
+				amount = amount + parseInt(record.get('fee'));
+			}
+			if(!Ext.isEmpty(record.get('busiFeeAmount'))){
+				busiAmount = busiAmount + parseInt(record.get('busiFeeAmount'));
+			}
+			if(!Ext.isEmpty(record.get('busiFeeDate'))){
+				if(Ext.isEmpty(busiDate)){
+					busiDate = record.get('busiFeeDate');
+				}else{
+					busiDate = busiDate+"," + record.get('busiFeeDate');
+				}
+			}
+			
+		})
+		this.totalAmount = amount;
+		this.busiFeeAmount = busiAmount;
+		this.busiFeeDate = busiDate;
+		Ext.get('totalAmount').update(Ext.util.Format.convertToYuan(this.totalAmount));
+		Ext.get('busiFeeAmount').update(Ext.util.Format.convertToYuan(this.busiFeeAmount));
+		Ext.get('busiFeeTime').update(this.busiFeeDate);
 	},
 	beforeedit:function(obj){
 		var record = obj.record;
@@ -351,7 +419,8 @@ SinglePayFeesGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 				}
 				
 				var invalidDate =  this.getNextBeginDate(record.get('exp_date'))
-				invalidDate.setMonth(invalidDate.getMonth() + value);
+				invalidDate = Date.parseDate(Ext.util.Format.addMoth(invalidDate.format("Y-m-d"),value),"Y-m-d");
+				
 				invalidDate.setDate(invalidDate.getDate()-1)
 				record.set('fee_month', invalidDate);
 				
@@ -388,6 +457,20 @@ SinglePayFeesGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 			}
 		},this);
 		return arr;
+	},
+	getBusiValues:function(){
+		var feeInfo = "";
+		if(this.busiFee && this.busiFeeAmount != 0){
+			var obj = {};
+			obj['fee_id'] = this.busiFee.fee_id;
+			obj['fee_std_id'] = this.busiFee.fee_std_id;
+			obj['count'] = this.busiFee.fee_count;
+			obj['should_pay'] = this.busiFeeAmount;
+			obj['real_pay'] = this.busiFeeAmount;
+			obj['disct_info'] = this.busiFeeDate;
+			feeInfo = Ext.encode(obj);
+		}
+		return feeInfo;
 	},
 	getNextBeginDate:function(date){
 		var invalidDate = new Date();
