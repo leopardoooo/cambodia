@@ -1,5 +1,7 @@
 package com.ycsoft.business.dto.core.fee;
 
+import java.util.Date;
+
 import com.ycsoft.beans.config.TBusiFeeStd;
 
 public class BusiFeeDto extends TBusiFeeStd {
@@ -16,7 +18,26 @@ public class BusiFeeDto extends TBusiFeeStd {
 	private String addr_id;
 	
 	private Integer fee_count;//费用倍数，IP加挂方案使用
+	private Date last_prod_exp;//上期产品截止日
+	private String user_id;//有加挂IP的用户
 	
+	
+	public String getUser_id() {
+		return user_id;
+	}
+
+	public void setUser_id(String user_id) {
+		this.user_id = user_id;
+	}
+
+	public Date getLast_prod_exp() {
+		return last_prod_exp;
+	}
+
+	public void setLast_prod_exp(Date last_prod_exp) {
+		this.last_prod_exp = last_prod_exp;
+	}
+
 	public Integer getFee_count() {
 		return fee_count;
 	}

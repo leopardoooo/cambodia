@@ -45,13 +45,10 @@ UserBaseForm = Ext.extend( BaseForm , {
 					},]
 				},{
 					items:[{
-						fieldLabel:'停机类型',
-						xtype:'paramcombo',
-						allowBlank:false,
-						width:150,
-						id:'boxStopType',
-						paramName:'STOP_TYPE',
-						defaultValue:'KCKT'
+						id:'userNameId',
+						fieldLabel:'用户名称',
+						xtype:'textfield',
+						name:'user_name'
 					}]
 				}]
 			},{
@@ -115,6 +112,7 @@ UserBaseForm = Ext.extend( BaseForm , {
 						paramName:'DEVICE_MODEL',
 						id: 'deviceCategoryEl',
 						name:'device_model_text',
+						allowBlank:false,
 						listeners: {
 							scope: this,
 							change: this.doBuyModeSelect
@@ -139,6 +137,7 @@ UserBaseForm = Ext.extend( BaseForm , {
 						valueField : 'buy_mode',
 						emptyText: '请选择',
 						editable : false,
+						allowBlank:false,
 						listeners: {
 							scope: this,
 							select: this.doBuyModeSelect
@@ -147,7 +146,18 @@ UserBaseForm = Ext.extend( BaseForm , {
 						fieldLabel:'收费金额$',
 						xtype:'numberfield',
 						width:150,
+						allowBlank:false,
 						id: 'txtFeeEl'
+					}]
+				},{
+					items:[{
+						fieldLabel:'催费类型',
+						xtype:'paramcombo',
+						allowBlank:false,
+						width:150,
+						id:'boxStopType',
+						paramName:'STOP_TYPE',
+						defaultValue:'KCKT'
 					}]
 				}]
 			},{
@@ -174,13 +184,18 @@ UserBaseForm = Ext.extend( BaseForm , {
 			        items :[{
 			        	xtype: "textfield",
 			        	id: "txtLoginName",
-		                fieldLabel: '账号'
+		                fieldLabel: '账号',
+		                allowBlank:false,
+		                listeners: {
+		                	change: this.validAccount
+		                }
 		            }]
 			    },{
 			    	style: 'margin-left: 38px;',
 			    	items :[{
 			    		xtype: 'textfield',
 			    		id: "txtLoginPswd",
+			    		allowBlank:false,
 		                fieldLabel: '密码'
 		            }]
 			    }]
@@ -205,6 +220,17 @@ UserBaseForm = Ext.extend( BaseForm , {
 		var type = c.getValue();
 		var fs = Ext.getCmp("tmpFieldSet");
 		fs.setTitle(type);
+		
+		var isAllowBlank = function(flag){
+			Ext.getCmp('txtLoginName').allowBlank = !flag;
+			Ext.getCmp('txtLoginPswd').allowBlank = !flag;
+			
+			Ext.getCmp('deviceCategoryEl').allowBlank = flag;
+			Ext.getCmp('deviceBuyMode').allowBlank = flag;
+			Ext.getCmp('txtFeeEl').allowBlank = flag;
+			Ext.getCmp('boxStopType').allowBlank = flag;
+		}
+		
 		if(type === "BAND"){
 			// 账号规则，受理号 + 两位序号，不够补零
 			var users = App.getApp().data.users||[];
@@ -227,8 +253,10 @@ UserBaseForm = Ext.extend( BaseForm , {
 			fs.setVisible(true);
 		}else if(type === "OTT_MOBILE"){
 			fs.setVisible(true);
+			isAllowBlank(true);
 		}else{
 			fs.setVisible(false);
+			isAllowBlank(false);
 		}
 		
 		// 手机终端
@@ -245,6 +273,9 @@ UserBaseForm = Ext.extend( BaseForm , {
 		Ext.getCmp("deviceBuyMode").setRawValue("");
 		Ext.getCmp("txtFeeEl").setRawValue("");
 		Ext.getCmp("dfFeeNameEl").setRawValue("");
+		Ext.getCmp('txtLoginName').setValue('');
+		Ext.getCmp('txtLoginPswd').setValue('');
+		
 	},
 	setDisplayItems: function(bool){
 		var elArr = [ "boxTaskEl", "deviceCodeEl", "deviceCategoryEl", "dfFeeNameEl",
@@ -257,7 +288,7 @@ UserBaseForm = Ext.extend( BaseForm , {
 	// 于是将OTT=1，DTT=2,BAND = 3
 	deviceDataBak: null,
 	doFilterDeviceModel: function(userType){
-		var REF = {"OTT": "1", "DTT": "2", "BAND": "3" }
+		var REF = {"DTT": "1", "OTT": "2", "BAND": "3" }
 		var type = REF[userType] || "";
 		var cmb = Ext.getCmp("deviceCategoryEl");
 		cmb.setRawValue("");
@@ -271,6 +302,7 @@ UserBaseForm = Ext.extend( BaseForm , {
 				this.deviceDataBak.push(rs.data);
 			}, this);
 		}
+		
 		var data = [];
 		// 开始过滤
 		for(var i = 0; i < this.deviceDataBak.length; i++){
@@ -278,6 +310,7 @@ UserBaseForm = Ext.extend( BaseForm , {
 				data.push(this.deviceDataBak[i]);
 			}
 		}
+		store.removeAll();
 		store.loadData(data);
 	},
 	//设备号发生变化
@@ -387,6 +420,17 @@ UserBaseForm = Ext.extend( BaseForm , {
 		*/
 		
 	},
+	validAccount: function(field){
+		var loginName = field.getValue();
+		Ext.Ajax.request({
+			url: root + '/core/x/User!validAccount.action',
+			params: {
+				loginName: loginName
+			},
+			success: function(res,opt){
+			}
+		});
+	},
 	doValid : function(){
 		var formValid =  UserBaseForm.superclass.doValid.call(this);
 		if(formValid !== true){
@@ -427,10 +471,11 @@ UserBaseForm = Ext.extend( BaseForm , {
 	getValues : function(){
 		var values = {};
 		// 基本参数
-		values["user.user_type"] = Ext.getCmp("boxUserType").getValue(),
-		values["user.stop_type"] = Ext.getCmp("boxStopType").getValue(),
-		values["user.login_name"] = Ext.getCmp("txtLoginName").getValue(),
-		values["user.password"] = Ext.getCmp("txtLoginPswd").getValue(),
+		values["user.user_name"] = Ext.getCmp("userNameId").getValue();
+		values["user.user_type"] = Ext.getCmp("boxUserType").getValue();
+		values["user.stop_type"] = Ext.getCmp("boxStopType").getValue();
+		values["user.login_name"] = Ext.getCmp("txtLoginName").getValue();
+		values["user.password"] = Ext.getCmp("txtLoginPswd").getValue();
 		
 		// 设备信息
 		values["deviceId"] = Ext.getCmp("deviceCodeEl").getValue();

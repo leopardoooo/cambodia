@@ -11,9 +11,9 @@ UserBaseBatchForm = Ext.extend( BaseForm , {
 		});
 		
 		var sm = new Ext.grid.CheckboxSelectionModel();
-		this.newUserRecordFields = ['user_type','buy_mode','buy_mode_text',
+		this.newUserRecordFields = ['user_type', 'device_model','buy_mode','buy_mode_text',
 		                            'open_amount','fee_id','fee','sub_total',
-		                            'device_type'];
+		                            'device_type', 'device_type_text'];
 		this.newUserStore = new Ext.data.JsonStore({
 			fields: this.newUserRecordFields
 		});
@@ -24,10 +24,11 @@ UserBaseBatchForm = Ext.extend( BaseForm , {
 	        columns: [
 	            sm,
 	            {id: 'aecid',menuDisabled: true, header: "用户类型", sortable: false, dataIndex: 'user_type'},
-	            {menuDisabled: true, width: 100, header: "购买方式", sortable: false, dataIndex: 'buy_mode_text'},
-	            {menuDisabled: true, width: 100, header: "数量", sortable: false, dataIndex: 'open_amount'},
-	            {menuDisabled: true, width: 100, header: "单价$", sortable: false, dataIndex: 'fee'},
-	            {menuDisabled: true, width: 100, header: "小计", sortable: false, dataIndex: 'sub_total'}
+	            {menuDisabled: true, header: "设备类型", sortable: false, dataIndex: 'device_type_text'},
+	            {menuDisabled: true, width: 90, header: "购买方式", sortable: false, dataIndex: 'buy_mode_text'},
+	            {menuDisabled: true, width: 90, header: "数量", sortable: false, dataIndex: 'open_amount'},
+	            {menuDisabled: true, width: 90, header: "单价$", sortable: false, dataIndex: 'fee'},
+	            {menuDisabled: true, width: 90, header: "小计", sortable: false, dataIndex: 'sub_total'}
 	        ],
 	        sm: sm,
 	        autoExpandColumn: 'aecid',
@@ -147,6 +148,7 @@ UserBaseBatchForm = Ext.extend( BaseForm , {
 				region: 'south',
 				height: 60,
 				layout: 'column',
+				anchor:'100%',
 				bodyStyle:'background:#F9F9F9;padding-top:15px;border-top-width: 0;',
 				defaults: {
 					layout: 'form',
@@ -154,36 +156,25 @@ UserBaseBatchForm = Ext.extend( BaseForm , {
 					labelWidth:80
 				},
 				items: [{
-					columnWidth: .70,
-					items: [{
-						xtype: 'radiogroup',
-			            fieldLabel: '派单方式',
-			            anchor: '100%',
-			            id: 'radioAssignWay',
-			            columns: [70, 90, 120],
-			            items: [{
-			            	boxLabel: 'CFOCN',
-			            	name: 'assignWay',
-			            	inputValue: 'CFOCN'
-			            },{
-			            	boxLabel: 'SUPERNET',
-			            	name: 'assignWay',
-			            	inputValue: 'SUPERNET'
-			            },{
-			            	boxLabel: 'CFOCN+SUPERNET',
-			            	name: 'assignWay',
-			            	inputValue: 'CFOCN+SUPERNET'
-			            }]
+					columnWidth: .5,
+					items:[{
+						fieldLabel:'催费类型',
+						xtype:'paramcombo',
+						allowBlank:false,
+						width:150,
+						id:'boxStopType',
+						paramName:'STOP_TYPE',
+						defaultValue:'KCKT'
 					}]
 				},{
-					columnWidth: .3,
+					columnWidth: .5,
 					items:[{
 						xtype: 'textfield',
 						id: 'tfTotal',
 			            fieldLabel: '费用总额$',
 			            labelWidth: 60,
 			            readOnly: true,
-			            width: 60
+			            width: 120
 					}]
 				}]
 			}]
@@ -237,7 +228,8 @@ UserBaseBatchForm = Ext.extend( BaseForm , {
 			fee_id: (fd ? fd["fee_id"] : 0),
 			fee: fee,
 			sub_total: amount * (fee || 0),
-			device_type: Ext.getCmp("boxDeviceCategory").getValue()
+			device_type: Ext.getCmp("boxDeviceCategory").getValue(),
+			device_type_text: Ext.getCmp("boxDeviceCategory").getRawValue()
 		})]);
 		
 		// 计算费用总额
@@ -288,13 +280,6 @@ UserBaseBatchForm = Ext.extend( BaseForm , {
 				msg: "请将需要保存的用户添加至暂存表"
 			};
 		}
-		var assignWay = Ext.getCmp("radioAssignWay").getValue();
-		if(!assignWay){
-			return {
-				isValid: false,
-				msg: "请选择派单方式"
-			};
-		}
 		return true;
 	},
 	getValues : function(){
@@ -311,7 +296,7 @@ UserBaseBatchForm = Ext.extend( BaseForm , {
 		});
 		return {
 			openUserList: Ext.encode(userData),
-			workBillAsignType: Ext.getCmp("radioAssignWay").getValue().inputValue
+			stopType: Ext.getCmp("boxStopType").getValue()
 		};
 	},
 	getFee: function(){

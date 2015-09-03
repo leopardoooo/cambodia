@@ -35,6 +35,37 @@ public class CCustAddrDao extends BaseEntityDao<CCustAddr> {
 	 */
 	public CCustAddrDao() {}
 	
+	/**
+	 * 查询一个的客户的房间状态
+	 * @param custId
+	 * @return
+	 * @throws JDBCException
+	 */
+	public String queryNoteStatusType(String custId) throws JDBCException{
+		String sql=StringHelper.append(
+				" select ",
+				" case when user_cnt=0 then 'NOUSER' ",
+				"      when user_cnt=install_cnt then 'INSTALL' ",
+				"      when user_cnt=reqstop_cnt then 'REQSTOP' ",
+				"      when order_cnt=0 then 'NOORDER' ",
+				" when order_cnt=order_stop_cnt then 'FORSTOP' ",
+				" else 'ACTIVE' end note_status_type ",
+				" from ( ",
+				" select c.cust_id , ",
+				" count(distinct cu.user_id) user_cnt, ",
+				" count(distinct case when cu.status='INSTALL' then cu.user_id end) install_cnt, ",
+				" count(distinct case when cu.status='REQSTOP' then cu.user_id end) reqstop_cnt, ",
+				" count(distinct cp.order_sn) order_cnt, ",
+				" count(distinct case when cp.status in ('FORSTOP','LINKSTOP','OWESTOP') then cp.order_sn end) order_stop_cnt ",
+				" from c_cust c  ",
+				" left join c_user cu on cu.cust_id=c.cust_id ",
+				" left join c_prod_order cp on cu.user_id=cp.user_id ",
+				" where c.cust_id=? ",
+				" group by  c.cust_id ",
+				" ) "	);
+		return this.findUnique(sql, custId);
+	}
+	
 	public Pager<CCustAddrNote> queryNoteCust(String addrId, Integer start, Integer limit) throws JDBCException{
 		String sql=StringHelper.append(
 				" select note,cust_name,cust_no, ",

@@ -117,7 +117,7 @@ public class UserService extends BaseBusiService implements IUserService {
 	
 
 	@Override
-	public void createUserBatch(List<UserInfo> userList) throws Exception {
+	public void createUserBatch(List<UserInfo> userList, String stopType) throws Exception {
 		// TODO Auto-generated method stub
 		
 	}
@@ -2785,6 +2785,12 @@ public class UserService extends BaseBusiService implements IUserService {
 	@Override
 	public void saveRemoveUser(String userId, String banlanceDealType, String reclaim, Integer cancelFee,
 			Integer refundFee, String transAcctId, String transAcctItemId) throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void validAccount(String name) throws Exception {
 		// TODO Auto-generated method stub
 		
 	}

@@ -8,7 +8,6 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
-import com.ycsoft.beans.device.RCardModel;
 import com.ycsoft.beans.device.RModemModel;
 import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.daos.abstracts.BaseEntityDao;
@@ -59,5 +58,10 @@ public class RModemModelDao extends BaseEntityDao<RModemModel> {
 	public List<RModemModel> queryModemModel() throws Exception{
 		String sql = "select t.* from r_modem_model t";
 		return this.createQuery(sql).list();
+	}
+	
+	public RModemModel queryByModemMac(String modemMac) throws JDBCException{
+		String sql = "select b.* from r_modem a,r_modem_model b where a.modem_mac=? and a.device_model= b.device_model";
+		return createQuery(sql, modemMac).first();
 	}
 }

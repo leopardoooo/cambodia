@@ -41,6 +41,7 @@ import com.ycsoft.beans.core.fee.CFeePropChange;
 import com.ycsoft.beans.core.fee.CFeeUnitpre;
 import com.ycsoft.beans.core.prod.CProd;
 import com.ycsoft.beans.core.prod.CProdMobileBill;
+import com.ycsoft.beans.core.prod.CProdOrder;
 import com.ycsoft.beans.core.prod.CProdOrderDto;
 import com.ycsoft.beans.core.prod.CProdOrderFee;
 import com.ycsoft.beans.core.promotion.CPromFee;
@@ -95,6 +96,7 @@ import com.ycsoft.commons.constants.DataRight;
 import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.exception.ComponentException;
+import com.ycsoft.commons.exception.ErrorCode;
 import com.ycsoft.commons.helper.CollectionHelper;
 import com.ycsoft.commons.helper.DateHelper;
 import com.ycsoft.commons.helper.StringHelper;
@@ -145,6 +147,40 @@ public class FeeComponent extends BaseBusiComponent {
 	private ExpressionUtil expressionUtil;
 	@Autowired
 	private CDoneCodeUnpayDao cDoneCodeUnpayDao;
+	
+	
+	/**
+	 * 查询挂载IP费用的用户费用清单
+	 * @param cust_id
+	 * @return
+	 * @throws Exception
+	 */
+	public Map<String,BusiFeeDto> queryUserIpAddresFee(String cust_id)throws Exception{
+		Map<String,BusiFeeDto> map=new HashMap<String,BusiFeeDto>();
+		for(CUser user:cUserDao.queryUserByIpAddressFee(cust_id)){
+			int fee_count=0;
+			try{
+			   fee_count= Integer.valueOf(user.getStr6());
+			}catch(Exception e){}
+			if(fee_count<=0){
+				continue;
+			}
+			BusiFeeDto busiFee= getBusiFee(user.getStr5());
+			if(busiFee==null){
+				throw new ComponentException(ErrorCode.TemplateNotConfigBuseFee,user.getStr5());
+			}
+			List<CProdOrder> orders= cProdOrderDao.queryNotExpAllOrderByUser(user.getUser_id());
+			
+			if(orders!=null&&orders.size()>0){
+				busiFee.setLast_prod_exp(orders.get(orders.size()-1).getExp_date());
+			}else{
+				busiFee.setLast_prod_exp(DateHelper.today());
+			}
+			map.put(user.getUser_id(), busiFee);	
+		}
+		return map;
+	}
+	
 	/**
 	 * 保存订单退款费用信息
 	 * @param cancelList

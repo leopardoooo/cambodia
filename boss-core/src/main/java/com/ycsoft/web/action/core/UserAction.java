@@ -143,7 +143,7 @@ public class UserAction extends BaseBusiAction {
 	public String createUserBatch() throws Exception{
 		Type type = new TypeToken<List<UserInfo>>(){}.getType();
 		List<UserInfo> rs = new Gson().fromJson(openUserList,type);
-		userServiceSN.createUserBatch(rs);
+		userServiceSN.createUserBatch(rs, stopType);
 		return JSON_SUCCESS;
 	}
 
@@ -822,6 +822,11 @@ public class UserAction extends BaseBusiAction {
 		return JSON;
 	}
 	
+	public String validAccount() throws Exception {
+		userServiceSN.validAccount(loginName);
+		return JSON;
+	}
+	
 
 	/**
 	 * @param userService
@@ -1136,10 +1141,5 @@ public class UserAction extends BaseBusiAction {
 	public void setRefundFee(Integer refundFee) {
 		this.refundFee = refundFee;
 	}
-	
-	
-	
-	
-	
 	
 }

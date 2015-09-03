@@ -65,7 +65,9 @@ public class TemplateConfigDto extends TTemplate {
 		/**欠费后自动改为长期欠费天数**/
 		OWN_LONG_DAYS,
 		/**自动退订天数**/
-		PROD_CANCEL_DAYS
+		PROD_CANCEL_DAYS,
+		/**在网协议截止日期月份数**/
+		PROTOCOL_DATE_MONTHS
 	};
 
 	private List<TConfigTemplate> configList = null;

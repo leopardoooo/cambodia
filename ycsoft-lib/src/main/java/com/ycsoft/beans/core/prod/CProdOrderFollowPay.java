@@ -1,5 +1,6 @@
 package com.ycsoft.beans.core.prod;
 
+import java.util.Date;
 import java.util.List;
 
 import com.ycsoft.beans.prod.PProdTariffDisct;
@@ -20,7 +21,7 @@ public class CProdOrderFollowPay extends CProdOrderDto {
 	private List<PackageGroupUser> groupSelected;
 	
 	private BusiFeeDto busiFee;
-	
+
 	public BusiFeeDto getBusiFee() {
 		return busiFee;
 	}

@@ -48,6 +48,43 @@ public class UserDto extends CUser {
 	
 	private String newPassword;
 	private Date stop_date;
+	
+	private String device_model;
+	private String device_model_text;
+	private String buy_model;
+	private String buy_model_text;
+
+	public String getDevice_model() {
+		return device_model;
+	}
+
+	public void setDevice_model(String device_model) {
+		this.device_model = device_model;
+	}
+
+	public String getBuy_model() {
+		return buy_model;
+	}
+	
+	public void setDevice_model_text(String device_model_text) {
+		this.device_model_text = device_model_text;
+	}
+
+	public void setBuy_model(String buy_model) {
+		this.buy_model = buy_model;
+	}
+	
+	public String getDevice_model_text() {
+		return device_model_text;
+	}
+
+	public void setBuy_model_text(String buy_model_text) {
+		this.buy_model_text = buy_model_text;
+	}
+	
+	public String getBuy_model_text() {
+		return buy_model_text;
+	}
 
 	/**
 	 * @return the prods

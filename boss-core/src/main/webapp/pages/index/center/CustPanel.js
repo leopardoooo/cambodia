@@ -48,12 +48,6 @@ var custInfoHTML =
 		'<td class="input">&nbsp;{[values.cust.develop_optr_name || ""]}</td>'+
 	'</tr>'+
 	'</tr>'+
-	'<tpl if="values.cust.unit_name">' +
-		'<tr height=24>'+
-			'<td class="label">单位名称:</td>' +
-			'<td class="input"%>&nbsp;{[values.cust.unit_name || ""]}</td>'+
-		'</tr>' +
-	'</tpl>' +
 	'<tpl if="values.cust.cust_type==\'NONRES\'">'+
 		'<tr height=24>'+
 			'<td class="label">'+ langUtils.main("cust.base.businessLicence") +':</td>' +
