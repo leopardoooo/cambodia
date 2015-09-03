@@ -103,31 +103,33 @@ PayFeesForm = Ext.extend( BaseForm , {
 				 labelAlign:'right',  
 				 layout:'column',
 				 labelWidth:50,  
+				 id:'feesItemId',
 				 border: false,
 		         items:[{ 
-		         	columnWidth:.55,
-		         	xtype:'fieldset',  
+		         	columnWidth:.99,
+		         	xtype:'fieldset',
+		         	id:'orderFeeItemId',
 				    height: 60, 
 				    title:'产品费',
          			style:'margin-left:10px;padding: 10px 0 10px 10px; color: red',
          			layout:'column',
          			items:[{
-         				columnWidth:.50,
+         				columnWidth:.40,
          				items:[{
          						bodyStyle:'padding-top:4px',
 		         				html: "* 应收$:<span id='totalAmount'>--</span>"
 			         			}]
          				},{
-         				columnWidth:.50,
+         				columnWidth:.60,
          				layout : 'form',
-         				labelWidth:75,  
+         				labelWidth:60,  
          				items:[{
-								fieldLabel : '处理方式',
+								fieldLabel : '支付',
 								id : 'payFeeTypeId',
 								name:'order_fee_type',
 								allowBlank : false,
 								xtype:'paramcombo',
-								width: 80,
+								width: 60,
 								emptyText: '请选择',
 								defaultValue:'CFEE',
 								paramName:'ORDER_FEE_TYPE',
@@ -140,16 +142,6 @@ PayFeesForm = Ext.extend( BaseForm , {
 								}
 							}]
          				}]
-		         },{  
-				    columnWidth:.45,
-		         	xtype:'fieldset',  
-		         	height: 60, 
-		         	title:'业务费',
-		         	style:'margin-left:10px;padding: 10px 0 10px 10px; color: red',
-		         	items:[{
-		         		bodyStyle:'padding-top:4px',
-						html: "* 应收$:<span id='totalAmount'>--</span>"
-		         	}]
 		         }] 
 			}]
 		});

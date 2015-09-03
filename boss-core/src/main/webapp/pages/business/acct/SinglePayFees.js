@@ -8,7 +8,10 @@ SinglePayFeesGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 	//转移支付数据明细
 	transferPayData: [],
 	totalAmount: 0,
+	busiFeeAmount:0,	
+	feeName:null,
 	constructor:function(data){
+		payFeeThis = this;
 		this.payFeesStore = new Ext.data.GroupingStore({
 				url: Constant.ROOT_PATH + '/core/x/ProdOrder!queryFollowPayOrderDto.action', 
 				reader: new Ext.data.JsonReader({ 
@@ -53,7 +56,8 @@ SinglePayFeesGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 						{name:'protocol_date',dataFormat:'Y-m-d',mapping:'protocol_date'},
 						{name:'prod_name',mapping:'prod_name'},
 						{name:'tariff_name_next',mapping:'tariff_name'},
-						{name:'tariff_id_next',mapping:'tariff_id'}
+						{name:'tariff_id_next',mapping:'tariff_id'},
+						{name:'busiFee',mapping:'busiFee'}
 				//实际支付金额字段，转移支付字段
 				,{name:'fee_back'},{name:'transfer_fee'},{name:'transfer_fee_back'},{name:'groupSelected',mapping:'groupSelected'}
 				]}),
@@ -155,8 +159,32 @@ SinglePayFeesGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 				record.set('tariff_name_next','');
 				record.set('tariff_id_next','');
 			}
+			var fee = record.get('busiFee');
+			if(fee && payFeeThis.feeName == null){
+				payFeeThis.feeName = fee.fee_name
+			}
+			
 		})
-		
+		if(this.feeName){
+			Ext.getCmp('orderFeeItemId').columnWidth = 0.40;
+			Ext.getCmp('feesItemId').add({  
+					    columnWidth:.6,
+			         	xtype:'fieldset',  
+			         	height: 60,
+			         	id:'busiFeesItemId',
+			         	title:'-',
+			         	style:'margin-left:10px;padding: 10px 0 10px 10px; color: red',
+			         	items:[{
+			         		bodyStyle:'padding-top:4px',
+							html: "* 应收$:<span id='busiFeeAmount'>--</span>"
+			         	}]
+			         });
+			Ext.getCmp('busiFeesItemId').setTitle(this.feeName);
+			
+		}else{
+			Ext.getCmp('orderFeeItemId').columnWidth = 0.99;
+		}
+		Ext.getCmp('feesItemId').doLayout();
 	},
 	//是否可编辑
 	isCellEditable:function(colIndex,rowIndex){
@@ -316,7 +344,7 @@ SinglePayFeesGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 				var payfee = fee - transferFee;
 				if(payfee<0){
 					Alert("缴费金额"+Ext.util.Format.convertToYuan(fee)+"必须大于等于转移支付金额"+Ext.util.Format.convertToYuan(transferFee)+"！请重新输入月数！");
-					return false;s
+					return false;
 				}else{
 					record.set('fee', payfee);
 					record.set('fee_back', Ext.util.Format.convertToYuan(payfee));
