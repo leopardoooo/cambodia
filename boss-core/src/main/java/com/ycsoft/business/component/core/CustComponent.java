@@ -65,6 +65,7 @@ import com.ycsoft.business.dto.core.cust.CustFullInfoDto;
 import com.ycsoft.business.dto.core.cust.CustGeneralInfo;
 import com.ycsoft.business.dto.device.DeviceDto;
 import com.ycsoft.commons.constants.DataRight;
+import com.ycsoft.commons.constants.DictKey;
 import com.ycsoft.commons.constants.SequenceConstants;
 import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.constants.SystemConstants;
@@ -1011,8 +1012,23 @@ public class CustComponent extends BaseBusiComponent {
 	 */
 	public Pager<CCust> queryCust(Pager<Map<String ,Object>> p)throws Exception{
 		String dataType = this.queryDataRightCon();
-		return cCustDao.searchCust(p, dataType ,getOptr().getCounty_id());
-
+		 Pager<CCust> page = cCustDao.searchCust(p, dataType ,getOptr().getCounty_id());
+		 if(page.getTotalProperty()<=1){
+			 return page;
+		 }
+		 //修改正常客户的状态为房间状态
+		 for(CCust cust: page.getRecords()){
+			 if(cust.getStatus().equals(StatusConstants.ACTIVE)){
+				 String note_status_type=cCustAddrDao.queryNoteStatusType(cust.getCust_id());
+				 if(StringHelper.isNotEmpty(note_status_type)){
+					 String note_desc=MemoryDict.getDictName(DictKey.NOTE_STATUS_TYPE, note_status_type);
+					if( StringHelper.isNotEmpty(note_desc)){
+						 cust.setStatus_text(note_desc);
+					}
+				 }
+			 }
+		 }
+		 return page;
 	}
 	
 	/**

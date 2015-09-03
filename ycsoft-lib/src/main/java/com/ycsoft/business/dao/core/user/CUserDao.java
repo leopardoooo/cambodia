@@ -138,7 +138,7 @@ public class CUserDao extends BaseEntityDao<CUser> {
 	 * @throws JDBCException
 	 */
 	public List<CUser> queryCanSelectUserByCustId(String custId) throws JDBCException {
-		if (custId == null) return new ArrayList<CUser>();
+		if (custId == null) return new ArrayList<>();
 		
 		String sql = "select * from c_user where cust_id=? and status in (?,?)";
 		return createQuery(sql, custId,StatusConstants.ACTIVE,StatusConstants.INSTALL).list();

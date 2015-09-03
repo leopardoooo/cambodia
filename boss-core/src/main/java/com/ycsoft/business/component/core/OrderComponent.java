@@ -628,11 +628,12 @@ public class OrderComponent extends BaseBusiComponent {
 				throw new ComponentException(ErrorCode.ParamIsNull);
 			}
 			//升级的情况
-			orderCancelList=queryTransferFeeByUpProd(orderProd);
-			
-		}else if(orderProd.getGroupSelected()!=null&&orderProd.getGroupSelected().size()>0){
+			orderCancelList.addAll(queryTransferFeeByUpProd(orderProd));
+		}
+
+		if(orderProd.getGroupSelected()!=null&&orderProd.getGroupSelected().size()>0){
 			//套餐订购覆盖普通订购
-			orderCancelList= queryTransferFeeByPackage(orderProd);
+			orderCancelList.addAll(queryTransferFeeByPackage(orderProd));
 		}
 		return orderCancelList;
 	}
@@ -782,9 +783,15 @@ public class OrderComponent extends BaseBusiComponent {
 			//宽带升级
 			if(SystemConstants.PROD_SERV_ID_BAND.equals(prod.getServ_id())){
 				CProdOrder prodOrder=cProdOrderDao.findByKey(orderProd.getLast_order_sn());
-				return cProdOrderDao.queryNotExpOrderByBand(prodOrder.getUser_id());
+				List<CProdOrder> transferList=cProdOrderDao.queryNotExpAllOrderByUser(prodOrder.getUser_id());
+				for(CProdOrder order:transferList){
+					if(StringHelper.isNotEmpty(order.getPackage_sn())){
+						throw new ServicesException(ErrorCode.OrderDateCanNotUpWhyPak);
+					}
+				}
+				return transferList;
 			}else{
-				throw new ServicesException("非宽带单产品不能升级");
+				throw new ServicesException(ErrorCode.OrderDateCanNotUp);
 			}
 		}else{
 			//套餐升级

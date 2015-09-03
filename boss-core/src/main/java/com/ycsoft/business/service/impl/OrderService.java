@@ -2,7 +2,6 @@ package com.ycsoft.business.service.impl;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -358,27 +357,27 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		if(order.getExp_date().before(DateHelper.today())){
 			throw new ServicesException(ErrorCode.NotCancelStatusException);
 		}
-		//订购时间=今天，都可以退订
-		if(DateHelper.isToday(order.getCreate_time())){
+		//订购时间=今天或状态是施工中的或高级权限，都可以退订
+		if(DateHelper.isToday(order.getCreate_time())
+				||order.getStatus().equals(StatusConstants.INSTALL)
+				||orderComponent.isHighCancel(busi_code)){
 			return;
 		}
 		
-		
-		boolean isHigh=orderComponent.isHighCancel(busi_code);
-		
-		if(!isHigh&&order.getBilling_cycle()>1){
-			//包多月判断
+	    //普通退订限制判断
+		//包多月判断
+		if(order.getBilling_cycle()>1){
 			throw new ServicesException(ErrorCode.NotCancelHasMoreBillingCycle);
 		}
-		if(!isHigh&&order.getProd_type().equals(SystemConstants.PROD_TYPE_BASE)
+		//基础单产品的硬件协议期未到不能终止
+		if(order.getProd_type().equals(SystemConstants.PROD_TYPE_BASE)
 				&& order.getIs_base().equals(SystemConstants.BOOLEAN_TRUE)
 				&&order.getProtocol_date()!=null
 				&&DateHelper.today().before(order.getProtocol_date())){
-			//基础单产品协议期未到不能终止
 			throw new ServicesException(ErrorCode.NotCancelUserProtocol);
 		}
-		if(!isHigh&&!order.getProd_type().equals(SystemConstants.PROD_TYPE_BASE)){
-			//套餐子产品的硬件协议期判断
+		//套餐的情况,判断子产品的硬件协议期
+		if(!order.getProd_type().equals(SystemConstants.PROD_TYPE_BASE)){
 			for(CProdOrderDto son:  cProdOrderDao.queryProdOrderDtoByPackageSn(order.getOrder_sn())){
 				if(son.getIs_base().equals(SystemConstants.BOOLEAN_TRUE)
 						&&son.getProtocol_date()!=null
@@ -407,38 +406,21 @@ public class OrderService extends BaseBusiService implements IOrderService{
 	 * @throws Exception 
 	 */
 	private void complateOrderableProdIpFee(OrderProdPanel orderProdPanel,String custId) throws Exception{
-		Map<String,CUser> ipUserMap=userComponent.queryUserByIpAddresFee(custId);
-		if(ipUserMap.size()==0) return;
-		if(StringHelper.isNotEmpty(orderProdPanel.getUserId())&&ipUserMap.containsKey(orderProdPanel.getUserId())){
+		Map<String,BusiFeeDto> ipUserFeeMap=feeComponent.queryUserIpAddresFee(custId);
+		if(ipUserFeeMap.size()==0) return;
+		if(StringHelper.isNotEmpty(orderProdPanel.getUserId())&&ipUserFeeMap.containsKey(orderProdPanel.getUserId())){
 			//单用户情况
-			orderProdPanel.setBusiFee(this.getUserBusiFee(ipUserMap.get(orderProdPanel.getUserId())));
-			return;
-		}
-		if(StringHelper.isEmpty(orderProdPanel.getUserId())
+			orderProdPanel.setBusiFee(ipUserFeeMap.get(orderProdPanel.getUserId()));
+		}else if(StringHelper.isEmpty(orderProdPanel.getUserId())
 				&&orderProdPanel.getProdList()!=null&&orderProdPanel.getProdList().size()>0){
 			//套餐情况
 			List<PPackageProd> pakList=pPackageProdDao.queryPackProdById(orderProdPanel.getProdList().get(0).getProd_id());
 			if(pakList==null||pakList.size()==0) return;
-			for(PPackageProd pakProd:pakList){
-				if(pakProd.getUser_type().equals(SystemConstants.USER_TYPE_BAND)){
-					BusiFeeDto busiFee=null;
-					for(CUser user: ipUserMap.values()){
-						if(busiFee==null){
-							busiFee=this.getUserBusiFee(user);
-						}else{
-							BusiFeeDto _bF=this.getUserBusiFee(user);
-							if(!busiFee.getFee_id().equals(_bF.getFee_id())){
-								throw new ServicesException(ErrorCode.CustUserIpAddressFeeCoinfigError);
-							}else{
-								busiFee.setFee_count(busiFee.getFee_count()+_bF.getFee_count());
-							}
-						}
-					}
-					orderProdPanel.setBusiFee(busiFee);
-					return;
-				}
+			//随便取一个用户获得IPFee配置
+			for(BusiFeeDto busiFee: ipUserFeeMap.values()){
+				orderProdPanel.setBusiFee(busiFee);
+				break;
 			}
-			return;
 		}
 	}
 	
@@ -482,6 +464,13 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		//装入用户清单
 		//要装入施工中和正常的状态终端用户
 		panel.setUserList(userComponent.queryCanSelectByCustId(cust_id));
+		//有ip费用的用户产品到期日处理
+		Map<String,BusiFeeDto> ipFeeMap=feeComponent.queryUserIpAddresFee(cust_id);
+		for(CUser user:panel.getUserList()){
+			if(ipFeeMap.containsKey(user.getUser_id())){
+				user.setProd_exp_date(ipFeeMap.get(user.getUser_id()).getLast_prod_exp());
+			}
+		}
 		//装入内容配置信息
 		fillPackageProdConfig(panel,pPackageProdDao.queryPackProdById(prod_id));
 		
@@ -1152,14 +1141,14 @@ public class OrderService extends BaseBusiService implements IOrderService{
 	 */
 	private void complateFollowPayIpAddressFee(List<CProdOrderFollowPay> orderList,String custId) throws Exception{
 		//IP加挂收费处理
-		Map<String,CUser> ipUserMap=userComponent.queryUserByIpAddresFee(custId);
-		if(ipUserMap.size()==0) return;
+		Map<String,BusiFeeDto> ipUserFeeMap=feeComponent.queryUserIpAddresFee(custId);
+		if(ipUserFeeMap.size()==0) return;
 		
 		for(CProdOrderFollowPay fp:orderList){
 			if(StringHelper.isNotEmpty(fp.getUser_id())){
 				//单产品
-				if(ipUserMap.containsKey(fp.getUser_id())){
-					fp.setBusiFee(getUserBusiFee(ipUserMap.get(fp.getUser_id())));
+				if(ipUserFeeMap.containsKey(fp.getUser_id())){
+					fp.setBusiFee(ipUserFeeMap.get(fp.getUser_id()));
 				}
 			}else if(fp.getGroupSelected()!=null&&fp.getGroupSelected().size()>0){
 				//套餐判断用户选择有
@@ -1167,16 +1156,19 @@ public class OrderService extends BaseBusiService implements IOrderService{
 				for(PackageGroupUser pgu: fp.getGroupSelected()){
 					if(pgu.getUserSelectList()!=null&&pgu.getUserSelectList().size()>0){
 						for(String userId:pgu.getUserSelectList()){
-							if(ipUserMap.containsKey(userId)){
-								BusiFeeDto _selectBusiFee=getUserBusiFee(ipUserMap.get(userId));
+							if(ipUserFeeMap.containsKey(userId)){
+								BusiFeeDto _selectBusiFee=ipUserFeeMap.get(userId);
 								if(busiFee==null){
 									busiFee=_selectBusiFee;
 								}else{
 									if(!busiFee.getFee_id().equals(_selectBusiFee.getFee_id())){
 										throw new ServicesException(ErrorCode.CustUserIpAddressFeeCoinfigError);
-									}else{
-										busiFee.setFee_count(busiFee.getFee_count()+_selectBusiFee.getFee_count());
 									}
+									busiFee.setFee_count(busiFee.getFee_count()+_selectBusiFee.getFee_count());
+									if(_selectBusiFee.getLast_prod_exp().after(busiFee.getLast_prod_exp())){
+										busiFee.setLast_prod_exp(_selectBusiFee.getLast_prod_exp());
+									}
+									
 								}
 							}
 						}
@@ -1185,17 +1177,8 @@ public class OrderService extends BaseBusiService implements IOrderService{
 				fp.setBusiFee(busiFee);
 			}
 		}
-		
 	}
-	private BusiFeeDto getUserBusiFee(CUser user) throws Exception{
-		BusiFeeDto busiFee= feeComponent.getBusiFee(user.getStr5());
-		if(busiFee==null){
-			throw new ServicesException(ErrorCode.TemplateNotConfigBuseFee,user.getStr5());
-		}
-		//收费数量
-		busiFee.setFee_count(Integer.valueOf(user.getStr6()));
-		return busiFee;
-	}
+
 
 	public void savePublicRecharge(String pay_type, Integer fee, String receipt_id) throws Exception {
 		if(fee == null || fee == 0){

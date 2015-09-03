@@ -14,6 +14,7 @@ import com.ycsoft.beans.core.common.CDoneCode;
 import com.ycsoft.beans.core.common.CDoneCodeDetail;
 import com.ycsoft.beans.core.cust.CCust;
 import com.ycsoft.beans.core.job.JUserStop;
+import com.ycsoft.beans.core.prod.CProdOrder;
 import com.ycsoft.beans.core.promotion.CPromFee;
 import com.ycsoft.beans.core.promotion.CPromProdRefund;
 import com.ycsoft.beans.core.user.CRejectRes;
@@ -53,6 +54,7 @@ import com.ycsoft.business.dao.prod.PPromFeeUserDao;
 import com.ycsoft.business.dao.resource.device.RDeviceDao;
 import com.ycsoft.business.dao.system.SOptrDao;
 import com.ycsoft.business.dto.core.bill.UserBillDto;
+import com.ycsoft.business.dto.core.fee.BusiFeeDto;
 import com.ycsoft.business.dto.core.prod.CPromotionDto;
 import com.ycsoft.business.dto.core.prod.PromFeeProdDto;
 import com.ycsoft.business.dto.core.user.ChangedUser;
@@ -62,6 +64,7 @@ import com.ycsoft.commons.constants.DictKey;
 import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.exception.ComponentException;
+import com.ycsoft.commons.exception.ErrorCode;
 import com.ycsoft.commons.exception.ServicesException;
 import com.ycsoft.commons.helper.BeanHelper;
 import com.ycsoft.commons.helper.CollectionHelper;
@@ -103,24 +106,7 @@ public class UserComponent extends BaseBusiComponent {
 	private TCustColonyCfgDao tCustColonyCfgDao;
 	private ExpressionUtil expressionUtil ;
 
-	/**
-	 * 查询挂载IP费用的用户清单
-	 * @param cust_id
-	 * @return
-	 * @throws Exception
-	 */
-	public Map<String,CUser> queryUserByIpAddresFee(String cust_id)throws Exception{
-		Map<String,CUser> map=new HashMap<String,CUser>();
-		for(CUser user:cUserDao.queryUserByIpAddressFee(cust_id)){
-			try{
-			 int fee_count= Integer.valueOf(user.getStr6());
-			 if(fee_count>0){
-				 map.put(user.getUser_id(), user);
-			 }
-			}catch(Exception e){}
-		}
-		return map;
-	}
+	
 	public Map<String,CUser> queryUserMap(String cust_id) throws Exception{
 		return CollectionHelper.converToMapSingle(cUserDao.queryUserByCustId(cust_id), "user_id");
 	}
@@ -301,22 +287,32 @@ public class UserComponent extends BaseBusiComponent {
 	}
 	/**
 	 * 查询正常和施工中的用户清单
+	 * 包含IP费对应的最大到期日
 	 * @param custId
 	 * @return
 	 */
-	public List<CUser> queryCanSelectByCustId(String custId)throws JDBCException {
+	public List<CUser> queryCanSelectByCustId(String custId)throws Exception {
 		List<CUser> users=cUserDao.queryCanSelectUserByCustId(custId);
-		
 		for( CUser user :users){
-			if(SystemConstants.USER_TYPE_BAND.equals(user.getUser_type()) 
-					|| SystemConstants.USER_TYPE_OTT_MOBILE.equals(user.getUser_type())){
-				user.setUser_name(user.getLogin_name());
-			} else if(SystemConstants.USER_TYPE_OTT.equals(user.getUser_type()) 
-					|| SystemConstants.USER_TYPE_DTT.equals(user.getUser_type())){
-				user.setUser_name(StringHelper.isEmpty(user.getStb_id())?"unknow":user.getStb_id());
-			}
+			//用户名转换处理
+			user.setUser_name(getUserNameShow(user));
 		}
 		return users;
+	}
+	/**
+	 * 用户名转换显示处理
+	 * @param user
+	 * @return
+	 */
+	public String getUserNameShow(CUser user){
+		if(StringHelper.isNotEmpty(user.getUser_name())&&!user.getUser_name().trim().equals("")){
+			return user.getUser_name();
+		}
+		if(StringHelper.isNotEmpty(user.getLogin_name())){
+			return user.getLogin_name();
+		}
+		
+		return user.getUser_type_text()+user.getStb_id();
 	}
 	
 	/**

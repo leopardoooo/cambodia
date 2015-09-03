@@ -702,4 +702,7 @@ public class CCust extends BusiBase implements Serializable {
 		return serv_optr_name;
 	}
 	
+	public void setStatus_text(String status_text) {
+		this.status_text = status_text;
+	}
 }
