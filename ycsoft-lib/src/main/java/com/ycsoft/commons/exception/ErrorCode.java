@@ -58,8 +58,8 @@ public enum ErrorCode {
 	OrderDateFeeError("订单应支付金额错误"),
 	OrderPackageHasSingleUserParam("订购套餐时，单用户参数不能填"),
 	OrderFeeDisagree("订单金额和明细不一致，请联系管理员！(order_sn=%s)"),
-	OrderTransUnPayPleaseCancel("被覆盖的订单存在未支付记录，请先取消订单号=%s的费用"),
-
+	OrderTransUnPayPleaseCancel("被覆盖的订单存在未支付记录，请先取消订单号=%s的费用才能升级"),
+	OrderDateCanNotUpWhyPak("产品不能升级,因为存在有效的套餐子产品"),
 
 	//depot
 	DeviceRepeat("设备重复"),

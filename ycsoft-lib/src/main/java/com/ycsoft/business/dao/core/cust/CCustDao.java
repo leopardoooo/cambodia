@@ -63,88 +63,100 @@ public class CCustDao extends BaseEntityDao<CCust> {
 		Iterator<?> it=p.getParams().keySet().iterator();
 		String key = it.next().toString();
 		String value = p.getParams().get(key).toString();
-		String deviceId = value.replace(":","").replace("：", "");
-		//客户编号或宽带用户名查询
-		String newValue = StringHelper.leftWithZero(value, 4);
+		
+		Pager<CCust> resultPager =null;
 		if(key.equals("device_id")){
+			String deviceId = value.replace(":","").replace("：", "");
 			sql = append(
 					" SELECT t1.* FROM c_cust t1,c_cust_device t2",
 					" where t1.cust_id = t2.cust_id and t1.county_id=? ",
-					" and (t2.device_code = '",deviceId,"')"
+					" and t2.device_code = ? ",
+					dataType.trim().equals("1=1")?"":" and t1."+dataType.trim(),
+					" order by cust_no"		
 			);
+			resultPager = createQuery(sql, countyId,deviceId).setStart(p.getStart()).setLimit(p.getLimit()).page();	
 		}else if(key.equals("addr_name")){
-			sql = append("SELECT t1.* FROM c_cust t1, t_address t2",
-					" where t1.addr_id = t2.addr_id and t1.county_id=? ",
-					" and (t1.address like '%",value,"%')");
+			sql = append("SELECT t1.* FROM c_cust t1 ",
+					" where  t1.county_id=? ",
+					" and  t1.address like '%'||?||'%' ",
+					dataType.trim().equals("1=1")?"":" and t1."+dataType.trim(),
+					" order by cust_no"		);	
+			
+			resultPager = createQuery(sql, countyId,value).setStart(p.getStart()).setLimit(p.getLimit()).page();	
+			
 		}else if(key.equals("tel")){
 			sql = append("SELECT t1.* FROM c_cust t1, c_cust_linkman t2",
 					" where t1.cust_id = t2.cust_id and t1.county_id=? ",
-					" and (t2.tel='"+value+"' or t2.mobile='"+value+"')");
+					" and (t2.tel=? or t2.mobile=? )",
+					dataType.trim().equals("1=1")?"":" and t1."+dataType.trim(),
+					" order by cust_no"		);
+			resultPager = createQuery(sql, countyId,value,value).setStart(p.getStart()).setLimit(p.getLimit()).page();	
 		}else if(key.equals("cust_no")){
-//			sql = append("SELECT t1.* FROM c_cust t1",
-//					" where t1.county_id=? ",
-//					" and (cust_no='"+value+"' or old_cust_no='"+value+"')");
-			sql = append(" select t1.* from ( SELECT t3.* FROM c_cust t3 " +
-					" where t3.county_id = ? and (t3.cust_no = '"+value+"' or t3.old_cust_no = '"+value+"' or t3.cust_no like '%"+newValue+"' ) " +
-					" union all select t2.* from c_cust t2, c_user u, c_user_broadband t " +
-					" where t2.county_id = '"+countyId+"' and t.user_id = u.user_id and u.cust_id = t2.cust_id " +
-					" and t.login_name = '"+value+"') t1 where t1.county_id = '"+countyId+"' ");
+//		
+			sql = append("  SELECT t1.* FROM c_cust t1 " ,
+					" where t1.county_id = ? and t1.cust_no =? ",
+					dataType.trim().equals("1=1")?"":" and t1."+dataType.trim(),
+					" order by cust_no"		);
+			resultPager = createQuery(sql, countyId,value).setStart(p.getStart()).setLimit(p.getLimit()).page();	
 					
 		}else if(key.equals("cust_name")){
 			sql = append("SELECT t1.* FROM c_cust t1",
 					" where t1.county_id=? ",
-					" and cust_name like '%"+value+"%'");
-		}else if(key.equals("BANKNUM")){
-			sql = append("SELECT t1.* FROM c_cust t1 ,c_acct_bank t2 where t1.cust_id=t2.cust_id and t2.status in('ACTIVE','STOP') and t2.bank_account='"+value+"' and t1.county_id=?");
+					"  and(  t1.cust_name like '%'||?||'%' ",
+					"  or  lower( replace(t1.cust_name,' '))  like '%'||?||'%' )",
+					dataType.trim().equals("1=1")?"":" and t1."+dataType.trim(),
+					" order by cust_no"		);
+			resultPager = createQuery(sql, countyId,value,value).setStart(p.getStart()).setLimit(p.getLimit()).page();	
+	
 		}else{
-			sql = append("SELECT t1.* FROM c_cust t1 where t1.county_id=? ");
-			sql += " and " + getSqlGenerator().and( p.getParams());
+			sql = append("SELECT t1.* FROM c_cust t1 where t1.county_id=? ",
+					"and ", getSqlGenerator().and( p.getParams()),
+					 dataType.trim().equals("1=1")?"":" and t1."+dataType.trim(),
+					" order by cust_no"		 
+					);
+			resultPager = createQuery(sql, countyId).setStart(p.getStart()).setLimit(p.getLimit()).page();
 		}
-		String addData ="";
-		if(dataType.trim().equals("1=1")){
-			addData = " 1=1 ";
-		}else{
-			addData =" t1."+dataType.trim();
-		}
-		
-		sql = StringHelper.append(sql, " and ", addData," order by cust_no");
-		Pager<CCust> resultPager = createQuery(sql, countyId).setStart(p.getStart()).setLimit(p.getLimit()).page();
-		
+		//销户客户查询
 		if(resultPager.getRecords() == null || resultPager.getRecords().size() == 0){
-			boolean isquery = true;
-			sql = "SELECT distinct t1.cust_id, cust_name, cust_no, old_cust_no, t1.addr_id, address, 'INVALID' status, PASSWORD, cust_type, cust_level, cust_class, cust_colony, t1.net_type, is_black, open_time, t1.area_id, t1.county_id, remark, str1, str2, str3, str4, str5, str6, str7, str8, str9, str10 ";
-			if(key.equals("device_id")){
-				sql += append(" FROM c_cust_his t1,c_cust_device_his t2,r_device r",
-					" where t1.cust_id = t2.cust_id and t2.device_id=r.device_id",
-					" and r.depot_status='USE' and t1.county_id=? ",
-					" and (t2.device_code = '",deviceId,"')");
-			}else if(key.equals("addr_name")){
-				sql += append(" FROM c_cust_his t1, t_address t2",
-						" where t1.addr_id = t2.addr_id and t1.county_id=? ",
-						" and (t1.address like '%",value,"%')");
+			
+			if(key.equals("addr_name")){
+				sql = append("SELECT t1.* FROM c_cust_his t1 ",
+						" where  t1.county_id=? ",
+						" and  t1.address like '%'||?||'%' ",
+						dataType.trim().equals("1=1")?"":" and t1."+dataType.trim(),
+						" order by cust_no"		);	
+				resultPager = createQuery(sql, countyId,value).setStart(p.getStart()).setLimit(p.getLimit()).page();	
+				
 			}else if(key.equals("tel")){
-				sql += append(" FROM c_cust_his t1, c_cust_linkman_his t2",
+				sql = append("SELECT t1.* FROM c_cust_his t1, c_cust_linkman_his t2",
 						" where t1.cust_id = t2.cust_id and t1.county_id=? ",
-						" and (t2.tel='"+value+"' or t2.mobile='"+value+"')");
+						" and (t2.tel=? or t2.mobile=? )",
+						dataType.trim().equals("1=1")?"":" and t1."+dataType.trim(),
+						" order by cust_no"		);
+				resultPager = createQuery(sql, countyId,value,value).setStart(p.getStart()).setLimit(p.getLimit()).page();	
 			}else if(key.equals("cust_no")){
-				sql += append(" FROM c_cust_his t1",
-						" where t1.county_id=? ",
-						" and (cust_no='"+value+"' or old_cust_no='"+value+"' or cust_no like '%"+newValue+"' )");
+				sql = append("  SELECT t3.* FROM c_cust_his t1 " ,
+						" where t1.county_id = ? and t1.cust_no =? ",
+						dataType.trim().equals("1=1")?"":" and t1."+dataType.trim(),
+						" order by cust_no"		);
+				resultPager = createQuery(sql, countyId,value).setStart(p.getStart()).setLimit(p.getLimit()).page();	
+						
 			}else if(key.equals("cust_name")){
-				sql += append(" FROM c_cust_his t1",
+				sql = append("SELECT t1.* FROM c_cust_his t1",
 						" where t1.county_id=? ",
-						" and cust_name like '%"+value+"%'");
-			}else if(key.equals("BANKNUM")){
-				sql += append("FROM c_cust_his t1 ,c_acct_bank_his t2 where t1.county_id=? and t1.cust_id=t2.cust_id and t2.status in('ACTIVE','STOP') and t2.bank_account='"+value+"'");
-			}else{
-				isquery = false;
+						"  and(  t1.cust_name like '%'||?||'%' ",
+						"  or  lower( replace(t1.cust_name,' '))  like '%'||?||'%' )",
+						dataType.trim().equals("1=1")?"":" and t1."+dataType.trim(),
+						" order by cust_no"		);
+				resultPager = createQuery(sql, countyId,value,value).setStart(p.getStart()).setLimit(p.getLimit()).page();	
 			}
-			if (isquery){
-				sql += " and "+addData;
-				resultPager = createQuery(sql, countyId).setStart(p.getStart()).setLimit(p.getLimit()).page();
+			
+			if(resultPager.getRecords() != null && resultPager.getRecords().size() > 0){
+				for(CCust his: resultPager.getRecords()){
+					his.setStatus(StatusConstants.INVALID);
+				}
 			}
-		}
-		
+		}	
 		return resultPager;
 	}
 	
