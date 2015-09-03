@@ -531,7 +531,19 @@ Ext.util.Format.formatFee = function(value){
 		return parseFloat(Ext.util.Format.convertToYuan(value));
 	}
 }
-
+Ext.util.Format.getMonths = function(date1 , date2){
+    //用-分成数组
+    date1 = date1.split("-");
+    date2 = date2.split("-");
+    //获取年,月数
+    var year1 = parseInt(date1[0]) , 
+        month1 = parseInt(date1[1]) , 
+        year2 = parseInt(date2[0]) , 
+        month2 = parseInt(date2[1]) , 
+        //通过年,月差计算月份差
+        months = (year2 - year1) * 12 + (month2-month1);
+    return months;    
+}
 Ext.util.Format.formatToFen = function(value){
 	var finalFee = 0;
 	if(Ext.isEmpty(value)){

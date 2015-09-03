@@ -17,6 +17,8 @@ ProdOrderForm = Ext.extend( BaseForm, {
 	transferPayData: [],
 	//  套餐订购用户
 	packageGroups: null,
+	busiFeeTime:null,
+	prodId:null,
 	constructor: function(p){
 		this.selectUserPanel = new SelectUserPanel(this);
 		
@@ -149,36 +151,38 @@ ProdOrderForm = Ext.extend( BaseForm, {
        			 frame:true,  
 				 labelAlign:'right',  
 				 layout:'column',
-				 labelWidth:50,  
+				 id:'feeItemId',
+				 labelWidth:50,
 				 border: false,
 		         items:[{ 
-		         	columnWidth:.70,
+		         	columnWidth:0.99,
 		         	xtype:'fieldset',  
+		         	id:'orderFeeItemId',
 				    height: 75, 
 				    title:'产品费',
-         			style:'margin-left:10px;padding: 10px 0 10px 10px; color: red',
+         			style:'margin-left:2px;padding: 10px 0 10px 10px; color: red',
          			layout:'column',
          			items:[{
-         				columnWidth:.60,
+         				columnWidth:.65,
          				items:[{
          						bodyStyle:'padding-top:4px',
-		         				html: "* 应收$:<span id='totalAmount'>--</span>"
+		         				html: "*应收$:<span id='totalAmount'>--</span>"
 								+"（新增订购:<b id='addAmount'>--</b> "
 								+" - "
 								+" <a id='transferHrefTag' href='#'>转移支付:<b id='transferAmount'>--</b></a>"
 								+" ）"
 			         			}]
          				},{
-         				columnWidth:.40,
+         				columnWidth:.35,
          				layout : 'form',
-         				labelWidth:65,  
+         				labelWidth:40,  
          				items:[{
-								fieldLabel : '处理方式',
+								fieldLabel : '支付',
 								id : 'orderFeeTypeId',
 								name:'order_fee_type',
 								allowBlank : false,
 								xtype:'paramcombo',
-								width: 80,
+								width: 60,
 								emptyText: '请选择',
 								defaultValue:'CFEE',
 								paramName:'ORDER_FEE_TYPE',
@@ -191,16 +195,6 @@ ProdOrderForm = Ext.extend( BaseForm, {
 								}
 							}]
          				}]
-		         },{  
-				    columnWidth:.30,
-		         	xtype:'fieldset',  
-		         	height: 75, 
-		         	title:'业务费',
-		         	style:'margin-left:10px;padding: 10px 0 10px 10px; color: red',
-					items:[{
-		         		bodyStyle:'padding-top:4px',
-						html: "* 应收$:<span id='totalAmount'>--</span>"
-		         	}]
 		         }]  
 			}]
 		});
@@ -240,6 +234,30 @@ ProdOrderForm = Ext.extend( BaseForm, {
 				var responseObj = Ext.decode(response.responseText);
 				this.baseData = responseObj;
 				Ext.getCmp("boxProdId").getStore().loadData(this.baseData["prodList"]);
+				//ip外挂费用
+				var busiFee = this.baseData["busiFee"];
+				if(busiFee){
+					Ext.getCmp('orderFeeItemId').columnWidth = 0.6;
+					Ext.getCmp('feeItemId').add({ 
+			         	id:'busiFeeItemId',
+					    columnWidth:.4,
+			         	xtype:'fieldset',
+			         	height: 75, 
+			         	title:'IP费',
+			         	style:'margin-left:10px;padding: 10px 0 10px 10px; color: red',
+						items:[{
+			         		bodyStyle:'padding-top:4px',
+							html: "*应收$:<span id='busiFeeAmount'>--</span>"
+			         	},{
+			         		bodyStyle:'padding-top:4px',
+							html: "时间段:<span id='busiFeeTime'>--</span>"
+			         	}]
+			         });
+					Ext.getCmp('busiFeeItemId').setTitle(busiFee.fee_name);
+				}else{
+					Ext.getCmp('orderFeeItemId').columnWidth = 0.99
+				}
+				this.doLayout();
 			}
 		});
 	},
@@ -268,6 +286,7 @@ ProdOrderForm = Ext.extend( BaseForm, {
 		// 当前选中的产品
 		this.currentSelectedProd = record;
 		var prodId = record.get("prod_id");
+		this.prodId = prodId;
 		Ext.getCmp("dfProdDesc").setValue(record.get("prod_desc"));
 		var boxProdTariff = Ext.getCmp("boxProdTariff");
 		var tariffs = this.baseData["tariffMap"][prodId] || [];
@@ -296,6 +315,43 @@ ProdOrderForm = Ext.extend( BaseForm, {
 		this.doChangeEndDate();
 		// 加载终端用户
 		this.doLoadUsers(record);
+	},
+	doBusiFeeTime:function(){
+		var busiFee = this.baseData["busiFee"];
+		//ip外挂费用
+		if(busiFee){
+			if(this.busiCode === "102" || this.busiCode === "101"){
+				this.busiFeeAmount = Ext.getCmp("sfOrderCycle").getValue()*busiFee.fee_count*busiFee.min_value;
+				Ext.get("busiFeeAmount").update(String(this.busiFeeAmount/100));
+				
+				this.busiFeeTime =  Ext.getCmp("dfStartDate").getValue().format("Ymd")+"-"+Date.parseDate(Ext.getCmp("dfExpDate").getValue(), "Y-m-d").format("Ymd");
+				Ext.get('busiFeeTime').update(this.busiFeeTime);
+			}else if(this.busiCode === "100" ){
+				var lastOrderProdDate = this.getLastProdEndDate(this.prodId);
+//				var lastDate = Date.parseDate(lastOrderProdDate, "Y-m-d")
+//				lastDate.setDate(lastDate.getDate() + 1);
+//				
+				var dfExpDate = Ext.getCmp("dfExpDate").getValue(); 
+//				var endDate = Date.parseDate(dfExpDate, "Y-m-d");
+//				endDate.setDate(endDate.getDate() + 1);
+
+				var lastDate = new Date(lastOrderProdDate);
+				lastDate.setDate(lastDate.getDate() + 1);
+				
+				var endDate = new Date(dfExpDate); 
+				endDate.setDate(endDate.getDate() + 1);
+				
+				var month = Ext.util.Format.getMonths(lastDate.format("Y-m-d"),endDate.format("Y-m-d"));
+				Alert(month);
+			}
+		}
+	},
+	addMoth:function(d,m){
+	   var ds=d.split('-'),_d=ds[2]-0;
+	   var nextM=new Date( ds[0],ds[1]-1+m+1, 0 );
+	   var max=nextM.getDate();
+	   d=new Date( ds[0],ds[1]-1+m,_d>max? max:_d );
+	   return d.toLocaleDateString().match(/\d+/g).join('-')
 	},
 	// 加载终端用户
 	doLoadUsers: function(selectProdRecord){
@@ -347,6 +403,9 @@ ProdOrderForm = Ext.extend( BaseForm, {
 			Ext.getCmp("dfExpDate").setValue(lastOrderProdDate);
 			return;
 		}
+		
+		Alert(this.addMoth(startDate.format("Y-m-d"),months) );
+		
 		// 其它根据周期进行计算
 		if(startDate){
 			// 计算结束日
@@ -356,6 +415,9 @@ ProdOrderForm = Ext.extend( BaseForm, {
 		}else{ 
 			Ext.getCmp("dfExpDate").setValue(null);
 		}
+		
+		//加挂IP费
+		this.doBusiFeeTime();
 	},
 	doLoadTransferAmount: function(){
 		var validObj = this.doBaseValid(); 
@@ -394,6 +456,7 @@ ProdOrderForm = Ext.extend( BaseForm, {
 	addAmount: -1,
 	//当前选中的产品
 	currentSelectedProd: null,
+	busiFeeAmount:0,
 	doChangeAmount: function(){
 		//计算新增金额
 		var boxProdTariff = Ext.getCmp("boxProdTariff");
@@ -407,6 +470,8 @@ ProdOrderForm = Ext.extend( BaseForm, {
 		Ext.get("totalAmount").update(String(this.totalAmount/100));
 		// 转移支付
 		Ext.get("transferAmount").update(String(this.transferAmount/100));
+
+		
 	},
 	// 是否为套餐
 	isPkg: function(){
@@ -489,9 +554,24 @@ ProdOrderForm = Ext.extend( BaseForm, {
 		// 失效日期
 		values["exp_date"] = Ext.getCmp("dfExpDate").getValue() + " 00:00:00";
 		
+		
+		var feeInfo = "";
+		var busiFee = this.baseData["busiFee"];
+		if(busiFee){
+			var obj = {};
+			obj['fee_id'] = busiFee.fee_id;
+			obj['fee_std_id'] = busiFee.fee_std_id;
+			obj['count'] = busiFee.fee_count;
+			obj['should_pay'] = this.busiFeeAmount;
+			obj['real_pay'] = this.busiFeeAmount;
+			obj['disct_info'] = this.busiFeeTime;
+			feeInfo = Ext.encode(obj);
+		}
+			
 		return {
 			"busi_code": this.busiCode,
-			"orderProd": Ext.encode(values)
+			"orderProd": Ext.encode(values),
+			"busiFeesData":feeInfo
 		};
 	},
 	getTransferValues: function(){
