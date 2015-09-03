@@ -13,6 +13,7 @@ import com.ycsoft.beans.core.common.CDoneCode;
 import com.ycsoft.beans.core.cust.CCust;
 import com.ycsoft.beans.core.prod.CProd;
 import com.ycsoft.beans.core.prod.CProdInvalidTariff;
+import com.ycsoft.beans.core.prod.CProdOrderFee;
 import com.ycsoft.beans.core.prod.CProdPropChange;
 import com.ycsoft.beans.core.promotion.CPromFee;
 import com.ycsoft.beans.core.promotion.CPromProdRefund;
@@ -158,6 +159,10 @@ public class QueryUserService extends BaseService implements IQueryUserService {
 
 	public List<CUserPropChange> queryUserPropChange(String userId,String userType) throws Exception {
 		return userComponent.queryUserPropChange(userId,userType);
+	}
+	
+	public Pager<CProdOrderFee> queryOrderFeeDetail(String orderSn, Integer start, Integer limit) throws Exception {
+		return userComponent.queryOrderFeeDetail(orderSn, start, limit);
 	}
 	
 	public List<CPromotionDto> queryUserPromotion(String userId) throws Exception{

@@ -43,6 +43,8 @@ public enum DictKey {
 	UNPAY_CANCEL_PROMPT,
 	/**地址门牌号的客户状态**/
 	NOTE_STATUS_TYPE, AGENT,
-	DEVICE_MODEL
+	DEVICE_MODEL,
+	/**订单支付类型**/
+	ORDER_FEE_TYPE
 
 }

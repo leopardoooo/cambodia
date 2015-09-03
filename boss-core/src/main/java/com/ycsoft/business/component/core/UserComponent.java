@@ -2,7 +2,6 @@ package com.ycsoft.business.component.core;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -16,6 +15,7 @@ import com.ycsoft.beans.core.common.CDoneCodeDetail;
 import com.ycsoft.beans.core.cust.CCust;
 import com.ycsoft.beans.core.cust.CCustDevice;
 import com.ycsoft.beans.core.job.JUserStop;
+import com.ycsoft.beans.core.prod.CProdOrderFee;
 import com.ycsoft.beans.core.promotion.CPromFee;
 import com.ycsoft.beans.core.promotion.CPromProdRefund;
 import com.ycsoft.beans.core.user.CRejectRes;
@@ -39,6 +39,7 @@ import com.ycsoft.business.dao.core.cust.CCustDao;
 import com.ycsoft.business.dao.core.cust.CCustDeviceDao;
 import com.ycsoft.business.dao.core.fee.CFeeDao;
 import com.ycsoft.business.dao.core.job.JUserStopDao;
+import com.ycsoft.business.dao.core.prod.CProdOrderFeeDao;
 import com.ycsoft.business.dao.core.promotion.CPromFeeDao;
 import com.ycsoft.business.dao.core.promotion.CPromProdRefundDao;
 import com.ycsoft.business.dao.core.promotion.CPromotionDao;
@@ -115,6 +116,8 @@ public class UserComponent extends BaseBusiComponent {
 	private RModemModelDao rModemModelDao;
 	@Autowired
 	private CCustDeviceDao cCustDeviceDao;
+	@Autowired
+	private CProdOrderFeeDao cProdOrderFeeDao;
 
 	public Map<String,CUser> queryUserMap(String cust_id) throws Exception{
 		return CollectionHelper.converToMapSingle(cUserDao.queryUserByCustId(cust_id), "user_id");
@@ -535,6 +538,10 @@ public class UserComponent extends BaseBusiComponent {
 			 }
 		 }
 		 return propChangelist;
+	}
+	
+	public Pager<CProdOrderFee> queryOrderFeeDetail(String orderSn, Integer start, Integer limit) throws Exception {
+		return cProdOrderFeeDao.queryOrderFeeDetail(orderSn, start, limit);
 	}
 
 	/**

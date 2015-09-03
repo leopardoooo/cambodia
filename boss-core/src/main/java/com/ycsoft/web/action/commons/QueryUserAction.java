@@ -41,28 +41,8 @@ public class QueryUserAction extends BaseAction{
 	private String promotion_id;
 	
 	private String promFeeId;
+	private String orderSn;
 	
-	private String loginName;
-	private String resName;
-	private String startDate;
-	private String endDate;
-
-	public void setLoginName(String loginName) {
-		this.loginName = loginName;
-	}
-
-	public void setResName(String resName) {
-		this.resName = resName;
-	}
-
-	public void setStartDate(String startDate) {
-		this.startDate = startDate;
-	}
-
-	public void setEndDate(String endDate) {
-		this.endDate = endDate;
-	}
-
 	/**
 	 * 根据客户Id查询对应用户信息
 	 * @return
@@ -140,6 +120,16 @@ public class QueryUserAction extends BaseAction{
 		List<CUserPropChange> propChangeList = queryUserService.queryUserPropChange(userId,userType);
 		getRoot().setRecords(propChangeList);
 		return JSON_RECORDS;
+	}
+	
+	/**
+	 * 根据订单号查询订单金额明细
+	 * @return
+	 * @throws Exception
+	 */
+	public String queryOrderFeeDetail() throws Exception {
+		getRoot().setPage(queryUserService.queryOrderFeeDetail(orderSn, start, limit));
+		return JSON_PAGE;
 	}
 	
 	/**
@@ -365,6 +355,10 @@ public class QueryUserAction extends BaseAction{
 
 	public void setPromFeeId(String promFeeId) {
 		this.promFeeId = promFeeId;
+	}
+	
+	public void setOrderSn(String orderSn) {
+		this.orderSn = orderSn;
 	}
 
 }
