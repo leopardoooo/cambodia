@@ -55,7 +55,11 @@ App.userRecord = Ext.data.Record.create([
 	{name: 'user_count'},
 	{name: 'rejectRes'},//排斥资源
 	{name: 'stop_date'},
-	{name: 'tv_model_text'}
+	{name: 'tv_model_text'},
+	{name: 'device_model'},
+	{name: 'device_model_text'},
+	{name: 'buy_model_text'},
+	{name: 'protocol_date'}
 ]);
 UserGrid = Ext.extend(Ext.ux.Grid,{
 	border:false,
@@ -491,43 +495,37 @@ ProdGrid = Ext.extend(Ext.TabPanel,{
  * 用户详细信息
  * @class UserDetailTemplate
  */
-UserAtvTemplate = new Ext.XTemplate(
+UserTemplate = new Ext.XTemplate(
 	'<table width="100%" border="0" cellpadding="0" cellspacing="0">',
 		'<tr height=24>',
 			'<td class="label" width=20%>用户类型：</td>',
 			'<td class="input_bold" width=30%>&nbsp;{[values.user_type_text ||""]}</td>',
 			'<td class="label" width=20%>用户名：</td>',
-			'<td class="input_bold" width=30%>&nbsp;{[values.user_name ||""]}</td>',
+			'<td class="input_bold" width=30%>&nbsp;{[values.user_name || values.login_name ||""]}</td>',
 		'</tr>',
 		'<tr height=24>',
-			'<td class="label" width=20%>服务类型：</td>',
-			'<td class="input" width=30%>&nbsp;{[values.serv_type_text ||""]}</td>',
-			'<td class="label" width=20%>终端类型：</td>',
-			'<td class="input" width=30%>&nbsp;{[values.terminal_type_text ||""]}</td>',
+		'<td class="label" width=20%>设备型号：</td>',
+		'<td class="input" width=30%>&nbsp;{[values.device_model_text ||""]}</td>',
+		'<td class="label" width=20%>购买方式：</td>',
+		'<td class="input" width=30%>&nbsp;{[values.buy_model_text ||""]}</td>',
+	'</tr>',
+		'<tr height=24>',
+		'<td class="label" width=20%>状态：</td>',
+		'<td class="input" width=30%>&nbsp;{[values.status_text ||""]}</td>',
+			'<td class="label" width=20%>状态变更时间：</td>',
+			'<td class="input" width=30%>&nbsp;{[fm.dateFormat(values.status_date) ||""]}</td>',
 		'</tr>',
 		'<tr height=24>',
-			'<td class="label" width=20%>状态：</td>',
-			'<td class="input_bold" width=30%>&nbsp;{[values.status_text ||""]}</td>',
-			'<tpl if="values.status == \'REQSTOP\'">' +
-			'<td class="label" width=20%>停机天数：</td>',
-			'<td class="input" width=30%>&nbsp;{[fm.DateDiffToday(values.status_date) ||""]}</td>',
-			'</tpl>',
-		'</tr>',
-		'<tr height=24>',
-			'<td class="label" width=20%>网络类型：</td>',
-			'<td class="input" width=30%>&nbsp;{[values.net_type_text ||""]}</td>',
-			'<td class="label" width=20%>开户时间：</td>',
+			'<td class="label" width=20%>创建时间：</td>',
 			'<td class="input" width=30%>&nbsp;{[fm.dateFormat(values.open_time) ||""]}</td>',
-		'</tr>',
-		'<tr height=24>',
-			'<td class="label" width=20%>用户地址：</td>',
-			'<td class="input" width=30%>&nbsp;{[values.user_addr ||""]}</td>',
 			'<td class="label" width=20%>预报停时间：</td>',
-			'<td class="input" width=30%>&nbsp;{[fm.DateWithToday(values.status,values.status_date,values.stop_date) ||""]}</td>',		
+			'<td class="input_bold" width=30%>&nbsp;{[fm.dateFormat(values.stop_date) ||""]}</td>',
 		'</tr>',
 		'<tr height=24>',
-			'<td class="label" width=20%>用户类别：</td>',
-			'<td class="input_bold" width=30%>&nbsp;{[values.str7_text ||""]}</td>',
+			'<td class="label" width=20%>催费类型：</td>',
+			'<td class="input" width=30%>&nbsp;{[values.stop_type_text ||""]}</td>',
+			'<td class="label" width=20%>在网协议截止日：</td>',
+			'<td class="input" width=30%>&nbsp;{[fm.dateFormat(values.protocol_date) ||""]}</td>',
 		'</tr>',
 	'</table>'
 );
@@ -600,69 +598,84 @@ UserDtvTemplate = new Ext.XTemplate(
 	'</table>'
 );
 UserBroadbandTemplate = new Ext.XTemplate(
-	'<table width="100%" border="0" cellpadding="0" cellspacing="0">',
+		'<table width="100%" border="0" cellpadding="0" cellspacing="0">',
 		'<tr height=24>',
 			'<td class="label" width=20%>用户类型：</td>',
 			'<td class="input_bold" width=30%>&nbsp;{[values.user_type_text ||""]}</td>',
 			'<td class="label" width=20%>用户名：</td>',
-			'<td class="input_bold" width=30%>&nbsp;{[values.user_name ||""]}</td>',
+			'<td class="input_bold" width=30%>&nbsp;{[values.user_name || values.login_name ||""]}</td>',
 		'</tr>',
 		'<tr height=24>',
-			'<td class="label" width=20%>认证方式：</td>',
-			'<td class="input" width=30%>&nbsp;{[values.check_type_text ||""]}</td>',
-			'<td class="label" width=20%>绑定方式：</td>',
-			'<td class="input" width=30%>&nbsp;{[values.bind_type_text ||""]}</td>',
+			'<td class="label" width=20%>设备型号：</td>',
+			'<td class="input" width=30%>&nbsp;{[values.device_model_text ||""]}</td>',
+			'<td class="label" width=20%>购买方式：</td>',
+			'<td class="input" width=30%>&nbsp;{[values.buy_model_text ||""]}</td>',
 		'</tr>',
 		'<tr height=24>',
-			'<td class="label" width=20%>登录名：</td>',
-			'<td class="input_bold" width=30%>&nbsp;{[values.login_name ||"" ]}</td>',
-			'<td class="label" width=20%>密码：</td>',
-			'<td class="input" width=30%>******</td>',
+		'<td class="label" width=20%>状态：</td>',
+		'<td class="input" width=30%>&nbsp;{[values.status_text ||""]}</td>',
+			'<td class="label" width=20%>状态变更时间：</td>',
+			'<td class="input" width=30%>&nbsp;{[fm.dateFormat(values.status_date) ||""]}</td>',
 		'</tr>',
 		'<tr height=24>',
-			'<td class="label" width=20%>Modem号：</td>',
-			'<td class="input" width=30%>&nbsp;{[values.modem_mac ||""]}</td>',
-			'<td class="label" width=20%>最大连接数：</td>',
-			'<td class="input" width=30%>&nbsp;{[values.max_connection ||""]}</td>',
-		'</tr>',
-		
-		'<tr height=24>',
-			'<td class="label" width=20%>状态：</td>',
-			'<td class="input_bold" width=30%>&nbsp;{[values.status_text ||""]}</td>',
-			'<tpl if="values.status == \'REQSTOP\'">' +
-			'<td class="label" width=20%>停机天数：</td>',
-			'<td class="input" width=30%>&nbsp;{[fm.DateDiffToday(values.status_date) ||""]}</td>',
-			'</tpl>',
-		'</tr>',
-		'<tr height=24>',
-			'<td class="label" width=20%>网络类型：</td>',
-			'<td class="input_bold" width=30%>&nbsp;{[values.net_type_text ||""]}</td>',
-			'<td class="label" width=20%>开户时间：</td>',
+			'<td class="label" width=20%>创建时间：</td>',
 			'<td class="input" width=30%>&nbsp;{[fm.dateFormat(values.open_time) ||""]}</td>',
-		'</tr>',
-		'<tr height=24>',
-			'<td class="label" width=20%>优惠类型：</td>',
-			'<td class="input" width=30%>&nbsp;{[values.user_class_text ||""]}</td>',		
-			'<td class="label" width=20%>用户地址：</td>',
-			'<td class="input" width=30%>&nbsp;{[values.user_addr ||""]}</td>',
-		'</tr>',
-		'<tr height=24>',
 			'<td class="label" width=20%>预报停时间：</td>',
-			'<td class="input" width=30%>&nbsp;{[fm.DateWithToday(values.status,values.status_date,values.stop_date) ||""]}</td>',	
-			'<td class="label" width=20%>最大用户数：</td>',
-			'<td class="input" width=30%>&nbsp;{[values.max_user_num ||""]}</td>',
+			'<td class="input_bold" width=30%>&nbsp;{[fm.dateFormat(values.stop_date) ||""]}</td>',
 		'</tr>',
 		'<tr height=24>',
-			'<td class="label" width=20%>用户类别：</td>',
-			'<td class="input_bold" width=30%>&nbsp;{[values.str7_text ||""]}</td>',
+			'<td class="label" width=20%>宽带POE号：</td>',
+			'<td class="input" width=30%>&nbsp;{[values.str8 ||""]}</td>',
+			'<td class="label" width=20%>宽带OLT号：</td>',
+			'<td class="input_bold" width=30%>&nbsp;{[values.str7 ||""]}</td>',
+		'</tr>',
+		'<tr height=24>',
+			'<td class="label" width=20%>宽带IP信息：</td>',
+			'<td class="input" width=30%>&nbsp;{[values.str4 ||""]}</td>',
+			'<td class="label" width=20%>宽带IP收费数量：</td>',
+			'<td class="input_bold" width=30%>&nbsp;{[values.str6 ||""]}</td>',
+		'</tr>',
+		'<tr height=24>',
+			'<td class="label" width=20%>催费类型：</td>',
+			'<td class="input" width=30%>&nbsp;{[values.stop_type_text ||""]}</td>',
+			'<td class="label" width=20%>在网协议截止日：</td>',
+			'<td class="input" width=30%>&nbsp;{[fm.dateFormat(values.protocol_date) ||""]}</td>',
 		'</tr>',
 	'</table>'
 );
+
+UserOTTMobileTemplate = new Ext.XTemplate(
+		'<table width="100%" border="0" cellpadding="0" cellspacing="0">',
+		'<tr height=24>',
+			'<td class="label" width=20%>用户类型：</td>',
+			'<td class="input_bold" width=30%>&nbsp;{[values.user_type_text ||""]}</td>',
+			'<td class="label" width=20%>用户名：</td>',
+			'<td class="input_bold" width=30%>&nbsp;{[values.user_name || " " || values.login_name ||""]}</td>',
+		'</tr>',
+		'<tr height=24>',
+		'<td class="label" width=20%>状态：</td>',
+		'<td class="input" width=30%>&nbsp;{[values.status_text ||""]}</td>',
+			'<td class="label" width=20%>状态变更时间：</td>',
+			'<td class="input" width=30%>&nbsp;{[fm.dateFormat(values.status_date) ||""]}</td>',
+		'</tr>',
+		'<tr height=24>',
+			'<td class="label" width=20%>创建时间：</td>',
+			'<td class="input" width=30%>&nbsp;{[fm.dateFormat(values.open_time) ||""]}</td>',
+			'<td class="label" width=20%>预报停时间：</td>',
+			'<td class="input_bold" width=30%>&nbsp;{[fm.dateFormat(values.stop_date) ||""]}</td>',
+		'</tr>',
+		'<tr height=24>',
+			'<td class="label" width=20%>催费类型：</td>',
+			'<td class="input" width=30%>&nbsp;{[values.stop_type_text ||""]}</td>',
+		'</tr>',
+	'</table>'
+);
+
 UserDetailTemplate = {
-	"OTT": UserAtvTemplate,
-	"DTT": UserDtvTemplate,
+	"DTT": UserTemplate,
+	"OTT": UserTemplate,
 	"BAND": UserBroadbandTemplate,
-	"OTT_MOBILE": UserAtvTemplate
+	"OTT_MOBILE": UserOTTMobileTemplate
 };
 
 /**
@@ -884,7 +897,7 @@ UserDetailTab = Ext.extend(CommonTab,{
 	constructor:function(p){
 		this.parent = p;
 		this.userPropChangeGrid = new UserPropChangeGrid();
-//		this.userDetailInfo = new UserDetailInfo();
+		this.userDetailInfo = new UserDetailInfo();
 //		this.userValidResGrid = new UserValidResGrid();
 //		this.promotionGrid = new PromotionGrid();
 		UserDetailTab.superclass.constructor.call(this, {
@@ -894,11 +907,11 @@ UserDetailTab = Ext.extend(CommonTab,{
 				layout: 'fit',
 				border:false
 			},
-			items:[/*{
+			items:[{
 				title:'详细信息',
 //				id : 'test',
 				items:[this.userDetailInfo]
-			},*/{
+			},{
 				title:'异动信息',
 				items:[this.userPropChangeGrid]
 			}/*,{
@@ -925,8 +938,8 @@ UserDetailTab = Ext.extend(CommonTab,{
 		}
 	},
 	refreshUserDetail: function(type,record){
-//		this.userDetailInfo.refresh(type,record);
-//		this.parent.prodDetailTab.resetPanel();
+		this.userDetailInfo.refresh(type,record);
+		this.parent.prodDetailTab.resetPanel();
 		
 	},
 	resetPanel : function(){//重置TAB面板

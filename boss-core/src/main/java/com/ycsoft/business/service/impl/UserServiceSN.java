@@ -66,7 +66,8 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		Integer doneCode = doneCodeComponent.gDoneCode();
 		// 获取客户信息
 		
-		openSingle(cust, user, doneCode, deviceCode, deviceType, deviceModel, deviceBuyMode, deviceFee, 0);
+		int num = getUserCount(cust.getCust_id(), user.getUser_type());
+		openSingle(cust, user, doneCode, deviceCode, deviceType, deviceModel, deviceBuyMode, deviceFee, num);
 		
 		// 设置拦截器所需要的参数
 		getBusiParam().resetUser();
@@ -107,13 +108,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 				
 				user.setStop_type(stopType);
 				
-				String userType = user.getUser_type();
-				int num = userComponent.countUserType(cust.getCust_id(), userType);
-				if(userType.equals(SystemConstants.USER_TYPE_BAND)){
-					num += SystemConstants.USER_TYPE_BAND_NUM;
-				}else if(userType.equals(SystemConstants.USER_TYPE_OTT)){
-					num += SystemConstants.USER_TYPE_OTT_NUM;
-				}
+				int num = getUserCount(cust.getCust_id(), user.getUser_type());
 				this.openSingle(cust, user, doneCode, null, deviceType, deviceModel, deviceBuyMode, deviceFee, num);
 				
 			}
@@ -121,7 +116,15 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		saveAllPublic(doneCode, getBusiParam());
 	}
 
-
+	private int getUserCount(String custId, String userType) throws Exception {
+		int num = userComponent.countUserType(custId, userType);
+		if(userType.equals(SystemConstants.USER_TYPE_BAND)){
+			num += SystemConstants.USER_TYPE_BAND_NUM;
+		}else if(userType.equals(SystemConstants.USER_TYPE_OTT)){
+			num += SystemConstants.USER_TYPE_OTT_NUM;
+		}
+		return num;
+	}
 
 	private void openSingle(CCust cust, CUser user, Integer doneCode, String deviceCode, String deviceType,
 			String deviceModel, String deviceBuyMode, FeeInfoDto deviceFee, int num) throws Exception, JDBCException {
@@ -175,21 +178,24 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 			user.setPassword(cust.getPassword());
 		}
 		
+		TDeviceBuyMode buyModeCfg = busiConfigComponent.queryBuyMode(deviceBuyMode);
 		//处理设备和授权
 		if (!user.getUser_type().equals(SystemConstants.USER_TYPE_OTT_MOBILE)){
-			TDeviceBuyMode buyModeCfg = busiConfigComponent.queryBuyMode(deviceBuyMode);
 			String ownership = SystemConstants.OWNERSHIP_GD;
-			if (buyModeCfg.getChange_ownship().equals(SystemConstants.BOOLEAN_TRUE))
+			if (buyModeCfg!= null && buyModeCfg.getChange_ownship().equals(SystemConstants.BOOLEAN_TRUE))
 				ownership = SystemConstants.OWNERSHIP_CUST;
 			this.buyDevice(device, deviceBuyMode,ownership, deviceFee, getBusiParam().getBusiCode(), cust, doneCode);
 			
 			//非自购模式 设置协议截止日期，读取模板配置数据
-			if(!buyModeCfg.getBuy_mode().equals(SystemConstants.BUSI_BUY_MODE_BUY)){
+			if(buyModeCfg!= null && !buyModeCfg.getBuy_mode().equals(SystemConstants.BUSI_BUY_MODE_BUY) && StringHelper.isNotEmpty(deviceModel)){
 				Integer months = Integer.parseInt( userComponent.queryTemplateConfig(TemplateConfigDto.Config.PROTOCOL_DATE_MONTHS.toString()) );
 				user.setProtocol_date( DateHelper.addTypeDate(DateHelper.now(), "MONTH", months) );
 			}
-			
+//			if(buyModeCfg != null){
+//				user.setStr9(buyModeCfg.getBuy_mode());
+//			}
 		}
+		
 		userComponent.createUser(user);
 		
 		
@@ -1015,7 +1021,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 			String busiCode,CCust cust,Integer doneCode) throws Exception {
 		//增加客户设备
 		custComponent.addDevice(doneCode, cust.getCust_id(),
-				device.getDevice_id(), device.getDevice_type(), device.getDevice_model(), 
+				device.getDevice_id(), device.getDevice_type(), device.getDevice_code(), 
 				device.getPairCard() ==null?null:device.getPairCard().getDevice_id(),
 				device.getPairCard() ==null?null:device.getPairCard().getCard_id(), 
 				null, null,buyMode);

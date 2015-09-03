@@ -7,12 +7,14 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.ycsoft.beans.config.TCustColonyCfg;
 import com.ycsoft.beans.core.common.CDoneCode;
 import com.ycsoft.beans.core.common.CDoneCodeDetail;
 import com.ycsoft.beans.core.cust.CCust;
+import com.ycsoft.beans.core.cust.CCustDevice;
 import com.ycsoft.beans.core.job.JUserStop;
 import com.ycsoft.beans.core.promotion.CPromFee;
 import com.ycsoft.beans.core.promotion.CPromProdRefund;
@@ -24,6 +26,8 @@ import com.ycsoft.beans.core.user.CUserDtv;
 import com.ycsoft.beans.core.user.CUserHis;
 import com.ycsoft.beans.core.user.CUserPropChange;
 import com.ycsoft.beans.core.user.CUserStb;
+import com.ycsoft.beans.device.RModemModel;
+import com.ycsoft.beans.device.RStbModel;
 import com.ycsoft.beans.prod.PPromFee;
 import com.ycsoft.beans.prod.PPromFeeUser;
 import com.ycsoft.beans.prod.PRes;
@@ -32,6 +36,7 @@ import com.ycsoft.business.commons.abstracts.BaseBusiComponent;
 import com.ycsoft.business.component.config.ExpressionUtil;
 import com.ycsoft.business.dao.config.TCustColonyCfgDao;
 import com.ycsoft.business.dao.core.cust.CCustDao;
+import com.ycsoft.business.dao.core.cust.CCustDeviceDao;
 import com.ycsoft.business.dao.core.fee.CFeeDao;
 import com.ycsoft.business.dao.core.job.JUserStopDao;
 import com.ycsoft.business.dao.core.promotion.CPromFeeDao;
@@ -51,6 +56,8 @@ import com.ycsoft.business.dao.prod.PPromFeeDao;
 import com.ycsoft.business.dao.prod.PPromFeeProdDao;
 import com.ycsoft.business.dao.prod.PPromFeeUserDao;
 import com.ycsoft.business.dao.resource.device.RDeviceDao;
+import com.ycsoft.business.dao.resource.device.RModemModelDao;
+import com.ycsoft.business.dao.resource.device.RStbModelDao;
 import com.ycsoft.business.dao.system.SOptrDao;
 import com.ycsoft.business.dto.core.bill.UserBillDto;
 import com.ycsoft.business.dto.core.prod.CPromotionDto;
@@ -102,6 +109,12 @@ public class UserComponent extends BaseBusiComponent {
 	private CPromFeeDao cPromFeeDao;
 	private TCustColonyCfgDao tCustColonyCfgDao;
 	private ExpressionUtil expressionUtil ;
+	@Autowired
+	private RStbModelDao rStbModelDao;
+	@Autowired
+	private RModemModelDao rModemModelDao;
+	@Autowired
+	private CCustDeviceDao cCustDeviceDao;
 
 	/**
 	 * 查询挂载IP费用的用户清单
@@ -378,6 +391,39 @@ public class UserComponent extends BaseBusiComponent {
 			}
 			if(StringHelper.isNotEmpty(rejectRes))
 				userdto.setRejectRes(rejectRes);
+			
+			if(userdto.getUser_type().equals(SystemConstants.USER_TYPE_BAND)){
+				if(StringHelper.isNotEmpty(userdto.getModem_mac())){
+					RModemModel modemModel = rModemModelDao.queryByModemMac(userdto.getModem_mac());
+					if(modemModel != null){
+						userdto.setDevice_model(modemModel.getDevice_model());
+						userdto.setDevice_model_text(modemModel.getModel_name());
+					}
+					
+					CCustDevice custDevice = cCustDeviceDao.queryCustDeviceByDeviceCode(userdto.getCust_id(), userdto.getModem_mac());
+					if(custDevice != null){
+						userdto.setBuy_model(custDevice.getBuy_mode());
+						userdto.setBuy_model_text(custDevice.getBuy_mode_text());
+					}
+				}
+			}else{
+				if(StringHelper.isNotEmpty(userdto.getStb_id())){
+					RStbModel stbModel = rStbModelDao.queryByStbId(userdto.getStb_id());
+					if(stbModel != null){
+						userdto.setDevice_model(stbModel.getDevice_model());
+						userdto.setDevice_model_text(stbModel.getModel_name());
+					}
+					
+					CCustDevice custDevice = cCustDeviceDao.queryCustDeviceByDeviceCode(userdto.getCust_id(), userdto.getStb_id());
+					if(custDevice != null){
+						userdto.setBuy_model(custDevice.getBuy_mode());
+						userdto.setBuy_model_text(custDevice.getBuy_mode_text());
+					}
+				}
+			}
+			
+			
+			
 			result.add(userdto);
 		}
 		return result;
