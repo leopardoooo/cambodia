@@ -45,7 +45,6 @@ public enum ErrorCode {
 	ProdIsInvalid("产品已失效"),
 	
 	OrderDateCanNotUp("产品不能升级"),
-	OrderDateCanNotUpWhyPak("产品不能升级,因为存在有效的套餐子产品"),
 	OrderDateException("订单数据异常，请联系管理员!(order_sn=%s)"),
 	OrderDatePackageConfig("订单的套餐配置数据错误，请联系管理员!"),
 	OrderDateUserNotCust("订单的存在异常终端数据，请联系管理员!(user_id=%s)"),
@@ -60,7 +59,7 @@ public enum ErrorCode {
 	OrderPackageHasSingleUserParam("订购套餐时，单用户参数不能填"),
 	OrderFeeDisagree("订单金额和明细不一致，请联系管理员！(order_sn=%s)"),
 	OrderTransUnPayPleaseCancel("被覆盖的订单存在未支付记录，请先取消订单号=%s的费用才能升级"),
-
+	OrderDateCanNotUpWhyPak("产品不能升级,因为存在有效的套餐子产品"),
 
 	//depot
 	DeviceRepeat("设备重复"),
@@ -81,6 +80,8 @@ public enum ErrorCode {
 	
 	TemplateNotConfigBuseFee("该地区费用模板未配置该费用项(%s)"),
 	CustUserIpAddressFeeCoinfigError("客户宽带IP收费存在多个费用项目，请联系管理员！"),
+	UserLoginNameIsExists("账号名称已存在!"),
+	CustStatusIsNotOpenUser("预开户客户不能开用户!")
 	;
 
 	private ErrorCode(String desc){

@@ -44,7 +44,7 @@ public interface IUserService extends IBaseService{
 	public void createUser(CUser user, String deviceId, String deviceType, String deviceModel, String deviceBuyMode,
 			FeeInfoDto deviceFee)  throws Exception;
 	
-	public void createUserBatch(List<UserInfo> userList) throws Exception;
+	public void createUserBatch(List<UserInfo> userList, String stopType) throws Exception;
 	
 	public void saveChangeDevice(String userId,String deviceId,String devcieBuyMode,FeeInfoDto deviceFee, boolean reclaim)  throws Exception;
 
@@ -368,5 +368,6 @@ public interface IUserService extends IBaseService{
 
 	public void editFreeUser(String userId, String prodId, String tariffId,String type,Date tariffStartDate )throws Exception;
 	public void transferUsers(String toCustId) throws Exception  ;
+	public void validAccount(String name) throws Exception;
 
 }
