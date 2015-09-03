@@ -81,7 +81,27 @@ public enum ErrorCode {
 	TemplateNotConfigBuseFee("该地区费用模板未配置该费用项(%s)"),
 	CustUserIpAddressFeeCoinfigError("客户宽带IP收费存在多个费用项目，请联系管理员！"),
 	UserLoginNameIsExists("账号名称已存在!"),
-	CustStatusIsNotOpenUser("预开户客户不能开用户!")
+	CustStatusIsNotOpenUser("预开户客户不能开用户!"),
+	
+	/**OTT接口相关错误码**/
+	E40001("Mac地址认证失败（提示用户，不能进入）"),
+	E40002("EPG认证失败，返回Guest帐号"),
+	E40003("token认证失败，返回Guest帐号"),
+	E40004("token 认证成功，用户认证成功。"),
+	E40005("无产品绑定免费"),
+	E40006("参数错误"),
+	E40007("IP地址非法"),
+	E40009("其它错误"),
+	E40010("有产品绑定，且用户已经购买，当前时间有效"),
+	E40011("续订/取消续订操作失败"),
+	E40012("IP地址认证失败（提示用户，不能进入）针对运营商的需求限制IP"),
+	E40013("设备被禁止"),
+	E20000("成功"),
+	E20001("用户或密码错误"),
+	E20002("充值失败,充值码错误"),
+	E20003("请求超时,请返回重试"),
+	E20004("产品鉴权失败"),
+	E20005("余额不足"),
 	;
 
 	private ErrorCode(String desc){
@@ -90,6 +110,22 @@ public enum ErrorCode {
 	private String desc;
 	public String getDesc(){
 		return this.desc;
+	}
+	/**
+	 * 获得OTT接口的状态码
+	 * @return
+	 */
+	public String getOttStatusCode(){
+		String name=this.name();
+		Integer statueCode=null;
+		try{
+			statueCode=Integer.valueOf(name.substring(1));
+		}catch(Exception e){}
+		if(statueCode!=null){
+			return statueCode.toString();
+		}else{
+			return "40009";
+		}
 	}
 	
 }

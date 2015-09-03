@@ -10,6 +10,7 @@ import com.ycsoft.beans.config.TServerRes;
 import com.ycsoft.beans.core.common.CDoneCode;
 import com.ycsoft.beans.core.prod.CProd;
 import com.ycsoft.beans.core.prod.CProdInvalidTariff;
+import com.ycsoft.beans.core.prod.CProdOrderFee;
 import com.ycsoft.beans.core.prod.CProdPropChange;
 import com.ycsoft.beans.core.promotion.CPromProdRefund;
 import com.ycsoft.beans.core.user.CUser;
@@ -125,6 +126,8 @@ public interface IQueryUserService extends IBaseService{
 	 * @return
 	 */
 	List<CUserPropChange> queryUserPropChange(String userId,String userType) throws Exception;
+	
+	Pager<CProdOrderFee> queryOrderFeeDetail(String orderSn, Integer start, Integer limit) throws Exception;
 	
 	/**
 	 * 根据用户id查询用户促销信息

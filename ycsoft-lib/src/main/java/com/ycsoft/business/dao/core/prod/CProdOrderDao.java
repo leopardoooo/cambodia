@@ -68,8 +68,22 @@ public class CProdOrderDao extends BaseEntityDao<CProdOrder> {
 		return this.createQuery(CProdOrderDto.class, sql, custId).list();
 	}
 	
-	
-	
+	public List<CProdOrderDto> queryCustOrderALLAndHisDto(String custId) throws JDBCException{
+		String sql = "select c.billing_type, b.prod_name,b.prod_type,b.serv_id,b.is_base,e.prod_name package_name,nvl(d.disct_name,c.tariff_name) tariff_name,d.disct_name, "
+				+ " a.order_sn, a.done_code, a.package_sn, a.package_id, a.cust_id, a.user_id, a.prod_id, a.tariff_id, a.disct_id, a.status, a.status_date, a.eff_date, a.exp_date, a.active_fee, a.bill_fee, a.order_months, a.order_fee, order_time, a.order_type, a.package_group_id, a.area_id, a.county_id, a.optr_id, a.remark, a.public_acctitem_type, a.is_pay  "
+				+ " from c_prod_order a,p_prod b,p_prod_tariff c,p_prod_tariff_disct d,p_prod e "
+				+ " where a.cust_id=? and a.prod_id=b.prod_id and a.package_id=e.prod_id(+) "
+				+ " and a.tariff_id=c.tariff_id(+) and a.disct_id= d.disct_id(+) "
+				+ " union all "
+				+ " select c.billing_type, b.prod_name,b.prod_type,b.serv_id,b.is_base,e.prod_name package_name,nvl(d.disct_name,c.tariff_name) tariff_name,d.disct_name, "
+				+ " a.order_sn, a.done_code, a.package_sn, a.package_id, a.cust_id, a.user_id, a.prod_id, a.tariff_id, a.disct_id, 'INVALID' status, a.status_date, a.eff_date, a.exp_date, a.active_fee, a.bill_fee, a.order_months, a.order_fee, order_time, a.order_type, a.package_group_id, a.area_id, a.county_id, a.optr_id, a.remark, a.public_acctitem_type, a.is_pay  "
+						+ " from c_prod_order_his a,p_prod b,p_prod_tariff c,p_prod_tariff_disct d,p_prod e "
+						+ " where a.cust_id=? and a.prod_id=b.prod_id and a.package_id=e.prod_id(+) "
+						+ " and a.tariff_id=c.tariff_id(+) and a.disct_id= d.disct_id(+) "
+						
+				+ " order by cust_id,user_id,is_base desc,exp_date ";
+		return this.createQuery(CProdOrderDto.class, sql, custId, custId).list();
+	}
 	
 	public List<CProdOrder> queryCustEffOrder(String custId) throws JDBCException{
 		String sql = "select * from c_prod_order where cust_id=? "

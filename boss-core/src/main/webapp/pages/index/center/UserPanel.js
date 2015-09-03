@@ -81,8 +81,9 @@ UserGrid = Ext.extend(Ext.ux.Grid,{
     		columns : [
             sm,
 			{header:'用户类型',dataIndex:'user_type_text',width:80},
-			{header:'用户名',dataIndex:'user_name',	width:80},
+			{header:'用户名',dataIndex:'user_name',	width:80, renderer:App.qtipValue},
 			{header:'状态',dataIndex:'status_text',	width:60,renderer:Ext.util.Format.statusShow},
+			{header:'状态时间',dataIndex:'status_date',	width:100,renderer:Ext.util.Format.dateFormat},
 			{header:'机顶盒',dataIndex:'stb_id',	width:130,renderer:App.qtipValue},
 			{header:'智能卡',dataIndex:'card_id',width:110,renderer:App.qtipValue},
 			{header:'Modem号',dataIndex:'modem_mac',width:90,renderer:App.qtipValue}
@@ -96,7 +97,14 @@ UserGrid = Ext.extend(Ext.ux.Grid,{
 			sm:sm,
 			cm:cm,
 			view: new Ext.ux.grid.ColumnLockBufferView()
-			,tools:[{id:'search',qtip:'查询',cls:'tip-target',scope:this,handler:function(){
+			,tools:[{id:'gear', qtip:'有效产品', handler:function(){
+					this.parent.prodGrid.remoteRefresh('EFF');
+				}},/*{id:'gear', qtip:'有效产品', handler:function(){
+					this.parent.prodGrid.remoteRefresh('EFF');
+				}},{id:'gear', qtip:'有效产品', handler:function(){
+					this.parent.prodGrid.remoteRefresh('EFF');
+				}},*/
+			        {id:'search',qtip:'查询',cls:'tip-target',scope:this,handler:function(){
 				
 					var comp = this.tools.search;
 					if(this.userStore.getCount()>0){
@@ -268,15 +276,17 @@ ProdGrid = Ext.extend(Ext.TabPanel,{
 		// 列定义
 		this.baseProdCm = new Ext.ux.grid.LockingColumnModel({ 
     		columns : [
-    		{header:'订购SN',dataIndex:'order_sn',width:40},
+    		{header:'订购SN',dataIndex:'order_sn',width:60},
 			{header:'产品名称',dataIndex:'prod_name',width:120},
 			{header:'所属套餐',dataIndex:'package_name',width:80},
 			{header:'当前资费',dataIndex:'tariff_name',	width:80},
 			{header:'生效日期',dataIndex:'eff_date',width:80,renderer: Ext.util.Format.dateFormat},
 			{header:'失效日期',dataIndex:'exp_date',width:80,renderer: Ext.util.Format.dateFormat},
+			{header:'创建流水号',dataIndex:'done_code',width:80},
 			{header:'状态',dataIndex:'status_text',	width:60,renderer:Ext.util.Format.statusShow},
-			//{header:'产品类型',dataIndex:'prod_type_text',width:100},
-			{header:'订购时间',dataIndex:'order_time',width:80}
+			{header:'状态变更时间',dataIndex:'status_date',width:100,renderer: Ext.util.Format.dateFormat},
+			{header:'订购时间',dataIndex:'order_time',width:80,renderer: Ext.util.Format.dateFormat},
+			{header:'订购月数',dataIndex:'order_months',width:80}
 	        ]
 	      });
 		
@@ -287,7 +297,7 @@ ProdGrid = Ext.extend(Ext.TabPanel,{
 			         "order_sn","package_sn","package_id","cust_id","user_id","prod_id","tariff_id","disct_id",
 			         "status","status_text","status_date","eff_date","exp_date","active_fee","bill_fee",
 			         "rent_fee","last_bill_date","next_bill_date","order_months","order_fee","order_time",
-			         "order_type","package_group_id","remark","public_acctitem_type"],			
+			         "order_type","package_group_id","remark","public_acctitem_type","done_code"],			
 			sortInfo : {
 				field : 'prod_name',
 				direction:'DESC'
@@ -350,7 +360,15 @@ ProdGrid = Ext.extend(Ext.TabPanel,{
 				border: false,
 				layout: 'fit',
 				items: [this.custPkgGrid]
-			}]
+			}],
+			tbar:[
+			      '->', '-', {text:'默认订单', scope:this, handler:function(){
+			    	  this.remoteRefresh();
+			      }}, '-',
+			      {text:'历史订单', scope:this, handler:function(){
+			    	  this.remoteRefresh('ALL');
+			      }},'-'
+			]
 		})
 	},
 	initEvents: function(){
@@ -430,14 +448,17 @@ ProdGrid = Ext.extend(Ext.TabPanel,{
 			}
 		}
 	},
-	remoteRefresh:function(){
+	remoteRefresh:function(loadType){
 		var cust = App.getData().custFullInfo.cust;
 		//显示数据加载提示框
 		App.showTip();
 		Ext.Ajax.request({
 			scope : this,
 			url : Constant.ROOT_PATH + "/core/x/ProdOrder!queryCustEffOrder.action",
-			params : {cust_id : App.getCustId()},
+			params : {
+				cust_id : App.getCustId(),
+				loadType:loadType
+			},
 			success : function(res,opt){
 				var data = Ext.decode(res.responseText);
 				// 过滤出客户套餐及用户产品
@@ -454,7 +475,7 @@ ProdGrid = Ext.extend(Ext.TabPanel,{
 				if(data["CUST"]){
 					this.custPkgGrid.getStore().loadData(data["CUST"]);
 				}
-				this.setActiveTab(1);
+//				this.setActiveTab(0);
 			}
 		});
 	},
@@ -512,19 +533,19 @@ UserTemplate = new Ext.XTemplate(
 		'<tr height=24>',
 		'<td class="label" width=20%>状态：</td>',
 		'<td class="input" width=30%>&nbsp;{[values.status_text ||""]}</td>',
-			'<td class="label" width=20%>状态变更时间：</td>',
+			'<td class="label" width=20%>状态时间：</td>',
 			'<td class="input" width=30%>&nbsp;{[fm.dateFormat(values.status_date) ||""]}</td>',
 		'</tr>',
 		'<tr height=24>',
+			'<td class="label" width=20%>预报停时间：</td>',
+			'<td class="input_bold" width=30%>&nbsp;{[fm.dateFormat(values.stop_date) ||""]}</td>',	
 			'<td class="label" width=20%>创建时间：</td>',
 			'<td class="input" width=30%>&nbsp;{[fm.dateFormat(values.open_time) ||""]}</td>',
-			'<td class="label" width=20%>预报停时间：</td>',
-			'<td class="input_bold" width=30%>&nbsp;{[fm.dateFormat(values.stop_date) ||""]}</td>',
 		'</tr>',
 		'<tr height=24>',
 			'<td class="label" width=20%>催费类型：</td>',
 			'<td class="input" width=30%>&nbsp;{[values.stop_type_text ||""]}</td>',
-			'<td class="label" width=20%>在网协议截止日：</td>',
+			'<td class="label" width=20%>在网协议期：</td>',
 			'<td class="input" width=30%>&nbsp;{[fm.dateFormat(values.protocol_date) ||""]}</td>',
 		'</tr>',
 	'</table>'
@@ -614,31 +635,31 @@ UserBroadbandTemplate = new Ext.XTemplate(
 		'<tr height=24>',
 		'<td class="label" width=20%>状态：</td>',
 		'<td class="input" width=30%>&nbsp;{[values.status_text ||""]}</td>',
-			'<td class="label" width=20%>状态变更时间：</td>',
+			'<td class="label" width=20%>状态时间：</td>',
 			'<td class="input" width=30%>&nbsp;{[fm.dateFormat(values.status_date) ||""]}</td>',
 		'</tr>',
 		'<tr height=24>',
-			'<td class="label" width=20%>创建时间：</td>',
-			'<td class="input" width=30%>&nbsp;{[fm.dateFormat(values.open_time) ||""]}</td>',
 			'<td class="label" width=20%>预报停时间：</td>',
 			'<td class="input_bold" width=30%>&nbsp;{[fm.dateFormat(values.stop_date) ||""]}</td>',
+			'<td class="label" width=20%>创建时间：</td>',
+			'<td class="input" width=30%>&nbsp;{[fm.dateFormat(values.open_time) ||""]}</td>',
 		'</tr>',
 		'<tr height=24>',
-			'<td class="label" width=20%>宽带POE号：</td>',
+			'<td class="label" width=20%>POE：</td>',
 			'<td class="input" width=30%>&nbsp;{[values.str8 ||""]}</td>',
-			'<td class="label" width=20%>宽带OLT号：</td>',
+			'<td class="label" width=20%>OLT：</td>',
 			'<td class="input_bold" width=30%>&nbsp;{[values.str7 ||""]}</td>',
 		'</tr>',
 		'<tr height=24>',
-			'<td class="label" width=20%>宽带IP信息：</td>',
+			'<td class="label" width=20%>IP信息：</td>',
 			'<td class="input" width=30%>&nbsp;{[values.str4 ||""]}</td>',
-			'<td class="label" width=20%>宽带IP收费数量：</td>',
+			'<td class="label" width=20%>IP收费数：</td>',
 			'<td class="input_bold" width=30%>&nbsp;{[values.str6 ||""]}</td>',
 		'</tr>',
 		'<tr height=24>',
 			'<td class="label" width=20%>催费类型：</td>',
 			'<td class="input" width=30%>&nbsp;{[values.stop_type_text ||""]}</td>',
-			'<td class="label" width=20%>在网协议截止日：</td>',
+			'<td class="label" width=20%>在网协议期：</td>',
 			'<td class="input" width=30%>&nbsp;{[fm.dateFormat(values.protocol_date) ||""]}</td>',
 		'</tr>',
 	'</table>'
@@ -655,14 +676,14 @@ UserOTTMobileTemplate = new Ext.XTemplate(
 		'<tr height=24>',
 		'<td class="label" width=20%>状态：</td>',
 		'<td class="input" width=30%>&nbsp;{[values.status_text ||""]}</td>',
-			'<td class="label" width=20%>状态变更时间：</td>',
+			'<td class="label" width=20%>状态时间：</td>',
 			'<td class="input" width=30%>&nbsp;{[fm.dateFormat(values.status_date) ||""]}</td>',
 		'</tr>',
 		'<tr height=24>',
-			'<td class="label" width=20%>创建时间：</td>',
-			'<td class="input" width=30%>&nbsp;{[fm.dateFormat(values.open_time) ||""]}</td>',
 			'<td class="label" width=20%>预报停时间：</td>',
 			'<td class="input_bold" width=30%>&nbsp;{[fm.dateFormat(values.stop_date) ||""]}</td>',
+			'<td class="label" width=20%>创建时间：</td>',
+			'<td class="input" width=30%>&nbsp;{[fm.dateFormat(values.open_time) ||""]}</td>',
 		'</tr>',
 		'<tr height=24>',
 			'<td class="label" width=20%>催费类型：</td>',
@@ -1158,6 +1179,62 @@ ProdPropChangeGrid = Ext.extend(Ext.grid.GridPanel,{
 });
 
 /**
+ * 订单金额明细
+ */
+OrderFeeDetailGrid = Ext.extend(Ext.grid.GridPanel,{
+	region:'center',
+	border:false,
+	changeStore:null,
+	isReload : true,
+	constructor:function(){
+		this.changeStore = new Ext.data.JsonStore({
+			url:Constant.ROOT_PATH + "/commons/x/QueryUser!queryOrderFeeDetail.action",
+			fields: ['order_fee_sn', 'order_sn', 'done_code', 'input_type', 'input_type_text', 'output_type', 'output_type_text', 'fee_type', 'fee_type_text',
+			         'input_fee', 'writeoff_fee', 'create_time', 'output_fee', 'input_prod_id', 'input_prod_name', 'ouput_prod_id', 'output_prod_name'],
+			root: 'records',
+			totalProperty: 'totalProperty',
+			params:{start:0,limit:20},
+			sortInfo:{
+				field:'change_time',
+				direction:'DESC'
+			}
+		}); 
+		
+		var cm = [
+			{header:'编号',dataIndex:'order_fee_sn', width:60},
+			{header:'资金类型',dataIndex:'fee_type_text',width:70},
+			{header:'转入产品',dataIndex:'input_prod_name',width:150, renderer: App.qtipValue},
+			{header:'转入类型',dataIndex:'input_type_text', width:80},
+			{header:'转入金额',dataIndex:'input_fee',width:80, renderer: Ext.util.Format.formatFee},
+			{header:'转出产品',dataIndex:'output_prod_name',width:150, renderer: App.qtipValue},
+			{header:'转出类型',dataIndex:'output_type_text',width:80},
+			{header:'转出金额',dataIndex:'output_fee',width:80, renderer: Ext.util.Format.formatFee},
+			{header:'流水号',dataIndex:'done_code', width:80}
+		];
+				  
+		OrderFeeDetailGrid.superclass.constructor.call(this,{
+			region: 'center',
+			store:this.changeStore,
+			columns:cm,
+			bbar: new Ext.PagingToolbar({
+	        	pageSize: 20,
+				store: this.changeStore
+			})
+		})
+	},
+	remoteRefresh:function(orderSn){
+		this.changeStore.baseParams.orderSn = orderSn;
+		this.changeStore.baseParams.start = 0;
+		this.changeStore.baseParams.limit = 20;
+		this.changeStore.load();
+	},
+	reset : function(){
+		this.getStore().removeAll();
+		this.isReload = true;
+	}
+});
+
+/**
  * 产品资源信息
  * @class ProdResPanel
  * @extends Ext.Panel
@@ -1246,6 +1323,7 @@ ProdDetailTab = Ext.extend(CommonTab,{
 	constructor:function(){
 //		this.prodExpensesGrid = new ProdExpensesGrid();
 		this.prodPropChangeGrid = new ProdPropChangeGrid();
+		this.orderFeeDetailGrid = new OrderFeeDetailGrid();
 //		this.tariffChangeGrid = new TariffChangeGrid();
 //		this.prodResGrid = new ProdResGrid();
 //		this.prodDetailInfo = new ProdDetailInfo();
@@ -1266,6 +1344,10 @@ ProdDetailTab = Ext.extend(CommonTab,{
 				title:'资费信息',
 				items:[this.prodExpensesGrid]
 			},*/{
+				title: '订单金额明细',
+				items: [this.orderFeeDetailGrid]
+			},
+			{
 				title:'异动信息',
 				items:[this.prodPropChangeGrid]
 			}/*,{
@@ -1316,6 +1398,7 @@ ProdDetailTab = Ext.extend(CommonTab,{
 	resetPanel : function(){//重置Tab面板的子面板信息
 //		this.prodDetailInfo.reset();
 		//this.prodExpensesGrid.reset();
+		this.orderFeeDetailGrid.reset();
 		this.prodPropChangeGrid.reset();
 		//this.prodResGrid.reset();
 		//this.tariffChangeGrid.reset();

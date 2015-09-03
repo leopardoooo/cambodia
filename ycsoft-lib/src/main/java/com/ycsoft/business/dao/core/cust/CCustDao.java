@@ -135,7 +135,7 @@ public class CCustDao extends BaseEntityDao<CCust> {
 						" order by cust_no"		);
 				resultPager = createQuery(sql, countyId,value,value).setStart(p.getStart()).setLimit(p.getLimit()).page();	
 			}else if(key.equals("cust_no")){
-				sql = append("  SELECT t3.* FROM c_cust_his t1 " ,
+				sql = append("  SELECT t1.* FROM c_cust_his t1 " ,
 						" where t1.county_id = ? and t1.cust_no =? ",
 						dataType.trim().equals("1=1")?"":" and t1."+dataType.trim(),
 						" order by cust_no"		);
