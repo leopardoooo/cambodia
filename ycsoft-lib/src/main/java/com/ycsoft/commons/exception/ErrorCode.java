@@ -81,7 +81,9 @@ public enum ErrorCode {
 	TemplateNotConfigBuseFee("该地区费用模板未配置该费用项(%s)"),
 	CustUserIpAddressFeeCoinfigError("客户宽带IP收费存在多个费用项目，请联系管理员！"),
 	UserLoginNameIsExists("账号名称已存在!"),
-	CustStatusIsNotOpenUser("预开户客户不能开用户!")
+	CustStatusIsNotOpenUser("预开户客户不能开用户!"),
+	OTTIsNotSingle("OTT用户不能使用单向设备!"),
+	DTTIsNotDouble("DTT用户不能使用双向设备!")
 	;
 
 	private ErrorCode(String desc){

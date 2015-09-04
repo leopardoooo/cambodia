@@ -83,6 +83,8 @@ public class CustAction extends BaseBusiAction{
 	private String virtualCard;
 	private String virtualModem;
 	private String custCode;
+	
+	private FeeInfoDto deviceFee;
 
 	/**
 	 * 开户
@@ -490,7 +492,7 @@ public class CustAction extends BaseBusiAction{
 				buyMode, feeInfoList, Integer.parseInt(modemZjFee),reclaim,deviceStatus );
 		return JSON;
 	}
-
+	
 	/**
 	 * 根据device_code查询设备是否可用
 	 * @return
@@ -811,6 +813,14 @@ public class CustAction extends BaseBusiAction{
 
 	public void setCustCode(String custCode) {
 		this.custCode = custCode;
+	}
+
+	public FeeInfoDto getDeviceFee() {
+		return deviceFee;
+	}
+
+	public void setDeviceFee(FeeInfoDto deviceFee) {
+		this.deviceFee = deviceFee;
 	}
 	
 }

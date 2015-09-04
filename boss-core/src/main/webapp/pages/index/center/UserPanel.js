@@ -717,9 +717,9 @@ UserPropChangeGrid = Ext.extend(Ext.grid.GridPanel,{
 		var cm = [
 			{header:'业务',dataIndex:'busi_name',width:80,renderer:App.qtipValue},
 			{header:'属性',dataIndex:'column_name_text',width:80},
-			{header:'修改前',dataIndex:'old_value_text',	width:80,renderer:App.qtipValue},
-			{header:'修改后',dataIndex:'new_value_text',	width:80,renderer:App.qtipValue},
-			{header:'修改时间',dataIndex:'change_time',	width:100,renderer:App.qtipValue},
+			{header:'修改前',dataIndex:'old_value_text',	width:120,renderer:App.qtipValue},
+			{header:'修改后',dataIndex:'new_value_text',	width:120,renderer:App.qtipValue},
+			{header:'修改时间',dataIndex:'change_time',	width:130,renderer:App.qtipValue},
 			{header:'操作员',dataIndex:'optr_name'}
 		];
 		var pageTbar = new Ext.PagingToolbar({store: this.changeStore ,pageSize : App.pageSize});

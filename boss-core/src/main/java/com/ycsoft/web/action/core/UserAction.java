@@ -119,6 +119,10 @@ public class UserAction extends BaseBusiAction {
 	private String reclaim;
 	private Integer cancelFee;//退款总金额
 	private Integer refundFee;//退款现金总额
+	
+	private String deviceCode;
+	private String reasonType;
+	
 	/**
 	 * 用户开户
 	 * @throws Exception
@@ -145,6 +149,21 @@ public class UserAction extends BaseBusiAction {
 		List<UserInfo> rs = new Gson().fromJson(openUserList,type);
 		userServiceSN.createUserBatch(rs, stopType);
 		return JSON_SUCCESS;
+	}
+	
+	/**
+	 * 设备更换
+	 * @return
+	 * @throws Exception
+	 */
+	public String changeDevice() throws Exception {
+		userServiceSN.saveChangeDevice(userId, deviceCode, reasonType);
+		return JSON_SUCCESS;
+	}
+	
+	public String queryDeviceChangeReason() throws Exception {
+		getRoot().setRecords(userServiceSN.queryDeviceChangeReason());
+		return JSON_RECORDS;
 	}
 
 	/**
@@ -475,14 +494,6 @@ public class UserAction extends BaseBusiAction {
 		}
 		
 		return retrunNone(msg);
-	}
-
-	/**
-	 * 设备变更
-	 * @throws Exception
-	 */
-	public String changeDevice() throws Exception{
-		return JSON_SUCCESS;
 	}
 
 	/**
@@ -1140,6 +1151,14 @@ public class UserAction extends BaseBusiAction {
 
 	public void setRefundFee(Integer refundFee) {
 		this.refundFee = refundFee;
+	}
+	
+	public void setDeviceCode(String deviceCode) {
+		this.deviceCode = deviceCode;
+	}
+
+	public void setReasonType(String reasonType) {
+		this.reasonType = reasonType;
 	}
 	
 }

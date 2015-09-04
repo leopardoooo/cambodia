@@ -136,7 +136,7 @@ Ext.apply(TopSearch.prototype , {
 						}
 					}
 				}*/
-				if(/[0-9]/.test(searchValue)){
+				if(/^[0-9]*$/.test(searchValue)){
 					t = 'cust_no';
 				}else{
 					t = 'cust_name'

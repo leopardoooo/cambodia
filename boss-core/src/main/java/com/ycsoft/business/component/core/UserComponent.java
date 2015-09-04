@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.ycsoft.beans.config.TCustColonyCfg;
+import com.ycsoft.beans.config.TDeviceChangeReason;
 import com.ycsoft.beans.core.common.CDoneCode;
 import com.ycsoft.beans.core.common.CDoneCodeDetail;
 import com.ycsoft.beans.core.cust.CCust;
@@ -35,6 +36,7 @@ import com.ycsoft.beans.system.SOptr;
 import com.ycsoft.business.commons.abstracts.BaseBusiComponent;
 import com.ycsoft.business.component.config.ExpressionUtil;
 import com.ycsoft.business.dao.config.TCustColonyCfgDao;
+import com.ycsoft.business.dao.config.TDeviceChangeReasonDao;
 import com.ycsoft.business.dao.core.cust.CCustDao;
 import com.ycsoft.business.dao.core.cust.CCustDeviceDao;
 import com.ycsoft.business.dao.core.fee.CFeeDao;
@@ -118,6 +120,12 @@ public class UserComponent extends BaseBusiComponent {
 	private CCustDeviceDao cCustDeviceDao;
 	@Autowired
 	private CProdOrderFeeDao cProdOrderFeeDao;
+	@Autowired
+	private TDeviceChangeReasonDao tDeviceChangeReasonDao;
+	
+	public List<TDeviceChangeReason> queryDeviceChangeReason() throws Exception{
+		return tDeviceChangeReasonDao.findAll();
+	}
 
 	public Map<String,CUser> queryUserMap(String cust_id) throws Exception{
 		return CollectionHelper.converToMapSingle(cUserDao.queryUserByCustId(cust_id), "user_id");
@@ -562,7 +570,11 @@ public class UserComponent extends BaseBusiComponent {
 		String[] propNames = {"stb_id","card_id","modem_mac"};
 		List<CUserPropChange> upcList = new ArrayList<CUserPropChange>();
 		for (String propName:propNames){
-			if (!BeanHelper.getPropertyString(oldUser, propName).equals(BeanHelper.getPropertyString(user, propName))){
+			String oldValue = BeanHelper.getPropertyString(oldUser, propName);
+			String newValue = BeanHelper.getPropertyString(user, propName);
+			oldValue = (oldValue == null) ? "" : oldValue;
+			newValue = (newValue == null) ? "" : newValue;
+			if (!oldValue.equals(newValue)){
 				CUserPropChange upc = new CUserPropChange();
 				upc.setUser_id(user.getUser_id());
 				upc.setDone_code(doneCode);
@@ -580,7 +592,7 @@ public class UserComponent extends BaseBusiComponent {
 			
 		}
 		//记录异动
-		cUserPropChangeDao.update(upcList.toArray(new CUserPropChange[upcList.size()]));
+		cUserPropChangeDao.save(upcList.toArray(new CUserPropChange[upcList.size()]));
 	}
 
 	/**
@@ -1247,6 +1259,9 @@ public class UserComponent extends BaseBusiComponent {
 		return cUserDao.queryUserCount(custId);
 	}
 	
+	public TDeviceChangeReason queryChangeReasonByType(String reasonType) throws Exception {
+		return tDeviceChangeReasonDao.queryChangeReasonByType(reasonType);
+	}
 	
 
 	/**
