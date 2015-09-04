@@ -256,7 +256,7 @@ ProdOrderForm = Ext.extend( BaseForm, {
 			         });
 					Ext.getCmp('busiFeeItemId').setTitle(busiFee.fee_name);
 				}else{
-					Ext.getCmp('orderFeeItemId').columnWidth = 0.99
+					Ext.getCmp('orderFeeItemId').columnWidth = 0.99;
 				}
 				this.doLayout();
 			}
@@ -328,7 +328,7 @@ ProdOrderForm = Ext.extend( BaseForm, {
 			}
 			var startDate ;
 			var feeCount=0;
-			if(this.isPkg){
+			if(this.isPkg()){
 				//所有的用户
 				var allUserList=this.selectUserPanel.selectUserData.userList;
 				var ipUserList=[];
@@ -596,7 +596,7 @@ ProdOrderForm = Ext.extend( BaseForm, {
 		return {
 			isValid: true
 		};
-	},
+	},	
 	getValues : function(){
 		var values = this.getTransferValues();
 		values["order_months"] = Ext.getCmp("sfOrderCycle").getValue();
@@ -610,25 +610,26 @@ ProdOrderForm = Ext.extend( BaseForm, {
 		// 失效日期
 		values["exp_date"] = Ext.getCmp("dfExpDate").getValue() + " 00:00:00";
 		
-		
-		var feeInfo = "";
-		var busiFee = this.baseData["busiFee"];
-		if(busiFee>0){
-			var obj = {};
-			obj['fee_id'] = busiFee.fee_id;
-			obj['fee_std_id'] = busiFee.fee_std_id;
-			obj['count'] = busiFee.fee_count;
-			obj['should_pay'] = this.busiFeeAmount;
-			obj['real_pay'] = this.busiFeeAmount;
-			obj['disct_info'] = this.busiFeeTime;
-			feeInfo = Ext.encode(obj);
-		}
-			
-		return {
+	
+		var all = {
 			"busi_code": this.busiCode,
-			"orderProd": Ext.encode(values),
-			"busiFeesData":feeInfo
+			"orderProd": Ext.encode(values)
 		};
+		
+		var data = [];
+		var obj = {};
+		var busiFee = this.baseData["busiFee"];
+		obj['fee_id'] = busiFee.fee_id;
+		obj['fee_std_id'] = busiFee.fee_std_id;
+		obj['count'] = busiFee.fee_count;
+		obj['should_pay'] = this.busiFeeAmount;
+		obj['real_pay'] = this.busiFeeAmount;
+		obj['disct_info'] = this.busiFeeTime;
+		data.push(obj);		
+		//其他杂费busiFees 专用
+		all["busiFees"] = data;
+		
+		return all;
 	},
 	getTransferValues: function(){
 		var values = {};

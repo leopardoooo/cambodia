@@ -459,7 +459,7 @@ SinglePayFeesGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 		return arr;
 	},
 	getBusiValues:function(){
-		var feeInfo = "";
+		var feeInfo = [];
 		if(this.busiFee && this.busiFeeAmount != 0){
 			var obj = {};
 			obj['fee_id'] = this.busiFee.fee_id;
@@ -468,7 +468,7 @@ SinglePayFeesGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 			obj['should_pay'] = this.busiFeeAmount;
 			obj['real_pay'] = this.busiFeeAmount;
 			obj['disct_info'] = this.busiFeeDate;
-			feeInfo = Ext.encode(obj);
+			feeInfo.push(obj);
 		}
 		return feeInfo;
 	},

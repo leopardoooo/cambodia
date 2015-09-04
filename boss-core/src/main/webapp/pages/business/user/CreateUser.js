@@ -487,7 +487,7 @@ UserBaseForm = Ext.extend( BaseForm , {
 		if(fee){
 			values["deviceFee.fee_id"] = fee["fee_id"];
 			values["deviceFee.fee_std_id"] = fee["fee_std_id"];
-			values["deviceFee.fee"] = Ext.getCmp("txtFeeEl").getValue();
+			values["deviceFee.fee"] =Ext.util.Format.formatToFen(Ext.getCmp("txtFeeEl").getValue());
 		}
 		return values;
 	},

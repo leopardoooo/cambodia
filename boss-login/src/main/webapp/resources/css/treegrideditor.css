@@ -92,6 +92,16 @@ input.x-treegrideditor-node-cb {
     padding-top: 3px;
 }
 
+.x-treegrideditor-obar .x-treegrideditor-obar-leveladd {
+    background: url(./../images/add.png) no-repeat;
+    padding-top: 1px;
+    padding-left: 18px;
+}
+
+.ext-ie .x-treegrideditor-obar .x-treegrideditor-obar-leveladd {
+    padding-top: 3px;
+}
+
 .x-treegrideditor-obar .x-treegrideditor-obar-batchAdd {
     background: url(./../images/add.png) no-repeat;
     padding-top: 1px;

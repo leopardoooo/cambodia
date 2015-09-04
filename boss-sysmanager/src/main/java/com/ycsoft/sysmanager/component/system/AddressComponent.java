@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.ycsoft.beans.config.TAddress;
@@ -13,6 +14,7 @@ import com.ycsoft.beans.config.TSpell;
 import com.ycsoft.beans.core.cust.CCust;
 import com.ycsoft.beans.system.SCounty;
 import com.ycsoft.beans.system.SDept;
+import com.ycsoft.beans.system.SDeptAddr;
 import com.ycsoft.beans.system.SItemvalue;
 import com.ycsoft.beans.system.SOptr;
 import com.ycsoft.business.commons.pojo.BusiParameter;
@@ -21,6 +23,7 @@ import com.ycsoft.business.dao.config.TCustColonyCfgDao;
 import com.ycsoft.business.dao.config.TNonresCustApprovalDao;
 import com.ycsoft.business.dao.config.TSpellDao;
 import com.ycsoft.business.dao.system.SCountyDao;
+import com.ycsoft.business.dao.system.SDeptAddrDao;
 import com.ycsoft.business.dao.system.SDeptDao;
 import com.ycsoft.business.dao.system.SOptrDao;
 import com.ycsoft.business.dto.config.TAddressDto;
@@ -28,10 +31,13 @@ import com.ycsoft.business.dto.system.OptrDto;
 import com.ycsoft.business.service.externalImpl.ICustServiceExternal;
 import com.ycsoft.commons.abstracts.BaseComponent;
 import com.ycsoft.commons.constants.BusiCodeConstants;
+import com.ycsoft.commons.constants.SequenceConstants;
 import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.exception.ComponentException;
+import com.ycsoft.commons.exception.ErrorCode;
 import com.ycsoft.commons.helper.CnToSpell;
+import com.ycsoft.commons.helper.CollectionHelper;
 import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.daos.core.JDBCException;
 import com.ycsoft.daos.core.Pager;
@@ -47,6 +53,8 @@ public class AddressComponent extends BaseComponent {
 	private TCustColonyCfgDao tCustColonyCfgDao;
 	private SOptrDao sOptrDao;
 	private TNonresCustApprovalDao tNonresCustApprovalDao;
+	@Autowired
+	private SDeptAddrDao sDeptAddrDao;
 
 	public void setTNonresCustApprovalDao(
 			TNonresCustApprovalDao nonresCustApprovalDao) {
@@ -172,7 +180,7 @@ public class AddressComponent extends BaseComponent {
 	 * @throws Exception
 	 */
 	public TAddress saveAddress(TAddress addr) throws Exception{
-		addr.setAddr_id(nextAddr(addr));
+		addr.setAddr_id(getNextAddrId());
 		addr.setIs_leaf(SystemConstants.BOOLEAN_TRUE);
 		tAddressDao.save(addr);
 		
@@ -193,10 +201,14 @@ public class AddressComponent extends BaseComponent {
 		String nextAddrId = tAddressDao.getAddrId(addr.getAddr_pid());
 		if (addr.getTree_level()==2) {
 			nextAddrId = StringHelper.leftWithZero(nextAddrId, 2);
-		} else {
+		} else if(addr.getTree_level()>2){
 			nextAddrId = StringHelper.leftWithZero(nextAddrId, 5);
 		}
 		return nextAddrId;
+	}
+	
+	private String getNextAddrId() throws JDBCException{
+		return tAddressDao.findSequence(SequenceConstants.SEQ_ADDR_ID).toString();
 	}
 	
 	public List<OptrDto> queryOptrByCountyId(String countyId) throws Exception {
@@ -430,4 +442,40 @@ public class AddressComponent extends BaseComponent {
 	public void setSOptrDao(SOptrDao optrDao) {
 		sOptrDao = optrDao;
 	}
+
+	public List queryAddrByName(String name, String pId, SOptr optr) throws Exception{
+		List<TAddressDto> list = new ArrayList<TAddressDto>();
+		if(StringHelper.isNotEmpty(pId)){
+			list = tAddressDao.queryAddrById(pId);
+		}else{
+		
+			List<SDeptAddr> sList = sDeptAddrDao.getAddrByDept(optr.getDept_id());
+			String[] addrIds = null;
+			if(sList.size()>0){
+				addrIds = CollectionHelper.converValueToArray(sList, "addr_id");
+			}else{
+				SDept dept= sDeptDao.findByKey(optr.getDept_id());
+				if(StringHelper.isNotEmpty(dept.getAgent_id())){
+					throw new ComponentException(ErrorCode.DeptAddrIsNull,dept.getDept_name());
+				}
+				//tAddressDao.queryAddrByAllowPids(levelId, addrPid)
+				String[] pids={SystemConstants.ADDRESS_ROOT_ID};
+				addrIds= CollectionHelper.converValueToArray(tAddressDao.queryAddrByAllowPids(SystemConstants.ADDR_TREE_LEVEL_ONE,pids),"addr_id");
+			}
+			if(StringHelper.isEmpty(name)){
+				list = tAddressDao.queryAddrByIds(addrIds);
+			}else{
+				name = name.toLowerCase();
+				
+				list=tAddressDao.queryAddrTreeByLvOneAndName(addrIds,name);
+				
+			}
+		}
+		if(list.size()>2000){
+			throw new ComponentException(ErrorCode.DataNumTooMuch);
+		}
+		return list;
+	}
+	
+	
 }

@@ -67,7 +67,7 @@ Ext.ux.tree.TreeGridEditor = Ext.extend(Ext.ux.tree.TreeGrid, {
     obarBtnText: {
         add: '新增下级',
         synch:'同步',
-        copy:'复制',
+        leveladd:'新增平级',
         batchAdd: '批量新增下级',
         edit: '修改',
         remove: '删除',
@@ -1175,23 +1175,23 @@ Ext.ux.tree.TreeGridEditor = Ext.extend(Ext.ux.tree.TreeGrid, {
         
         }
     },
-    copyNode:function(n){
+    leveladdNode:function(n){
      	n = Ext.isObject(n) ? n : this.getNodeById(n);
         if (n.getEditMode()) {
             return;
         }
         
-        if (n.attributes['disableObarCopy']) {
+        if (n.attributes['disableObarLeveladd']) {
             return;
         }
         
-        if (this.obar.fireEvent('beforecopynode', this, n) !== false) {
-            if (!this.editValidator(n, Ext.ux.tree.TreeGridEditor.Obar.Api.copy)) {
+        if (this.obar.fireEvent('beforeleveladdnode', this, n) !== false) {
+            if (!this.editValidator(n, Ext.ux.tree.TreeGridEditor.Obar.Api.leveladd)) {
                 return;
             }
         
 	        for(var i=0;i<this.obarCfg.btns.length;i++){
-	        	if(this.obarCfg.btns[i].id == 'copy'){
+	        	if(this.obarCfg.btns[i].id == 'leveladd'){
 	        		this.obarCfg.btns[i].handler(n);
 	        	}
 	        }
@@ -1674,8 +1674,8 @@ Ext.extend(Ext.ux.tree.TreeGridEditor.Obar, Ext.util.Observable, {
     synch:function(n){
     	this.tge.synchNode.call(this.tge,n);
     },
-    copy:function(n){
-    	this.tge.copyNode.call(this.tge,n);
+    leveladd:function(n){
+    	this.tge.leveladdNode.call(this.tge,n);
     }
 });
 
@@ -1689,5 +1689,5 @@ Ext.ux.tree.TreeGridEditor.Obar.Api = {
     update: 'yes',
     cancel: 'no',
     synch:'synch',
-    copy:'copy'
+    leveladd:'leveladd'
 };

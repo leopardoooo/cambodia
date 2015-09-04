@@ -59,7 +59,11 @@ public class AddressAction extends BaseAction {
 		return JSON_RECORDS;
 	}
 
-
+	public String queryAddrTree() throws Exception{
+		List addrs =  addressComponent.queryAddrByName(queryText,addrId,optr);
+		getRoot().setRecords(TreeBuilder.createSysAdreeTree(addrs));
+		return JSON_RECORDS;
+	}
 	
 	/**
 	 * 增加地区

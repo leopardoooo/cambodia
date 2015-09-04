@@ -242,9 +242,10 @@ PayPanel = Ext.extend( Ext.Panel ,{
 					if(o["exception"]){
 						new DebugWindow( o , "btnBusiSave").show();
 					} else {
-						Alert('支付成功!');
-						App.getApp().refreshPayInfo(parent);
-						App.getApp().menu.bigWindow.hide();
+						Alert('支付成功!',function(){
+								App.getApp().refreshPayInfo(parent);
+								this.success();
+							},this);
 					}
 				}
 			});
@@ -260,6 +261,10 @@ PayPanel = Ext.extend( Ext.Panel ,{
 	},
 	getFee: function(){
 		return 0;
+	},
+	success:function(){
+		App.getApp().menu.bigWindow.show({ text: '发票打印',  attrs: {busiCode:'1068',
+					url: 'pages/business/pay/Print.jsp?type=through'}} ,{width: 710, height: 460});
 	}
 });
 
