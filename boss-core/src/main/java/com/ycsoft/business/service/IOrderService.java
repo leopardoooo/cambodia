@@ -6,6 +6,7 @@ import java.util.Map;
 import com.ycsoft.beans.core.prod.CProdOrderDto;
 import com.ycsoft.beans.core.prod.CProdOrderFollowPay;
 import com.ycsoft.business.commons.abstracts.IBaseService;
+import com.ycsoft.business.dto.core.fee.FeeBusiFormDto;
 import com.ycsoft.business.dto.core.prod.OrderProd;
 import com.ycsoft.business.dto.core.prod.OrderProdPanel;
 import com.ycsoft.business.dto.core.prod.PackageGroupPanel;
@@ -20,7 +21,7 @@ public interface IOrderService extends IBaseService{
 	public Map<String,List<CProdOrderDto>> queryCustEffOrder(String cust_id,String loadType) throws Exception;
 	
 	
-	public List<String> saveOrderProdList(String busi_code,OrderProd...orderProds) throws Exception;
+	public List<String> saveOrderProdList(String busi_code,FeeBusiFormDto busiFee,OrderProd...orderProds) throws Exception;
 	//public String saveOrderProd(OrderProd orderProd,String busi_code) throws Exception;
 	
 	

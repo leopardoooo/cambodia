@@ -45,13 +45,13 @@ CancelProdGrid = Ext.extend(Ext.grid.GridPanel,{
 				{header:'产品名称',dataIndex:'prod_name',width:120},
 				{header:'所属套餐',dataIndex:'package_name',width:80},
 				{header:'当前资费',dataIndex:'tariff_name',	width:80},
+				{header:'订单余额',dataIndex:'active_fee',width:80,xtype: 'moneycolumn'},
+				{header:'可退金额',dataIndex:'balance_cfee',width:80,xtype: 'moneycolumn'},
+				{header:'可转金额',dataIndex:'balance_acct',width:80,xtype: 'moneycolumn'},
 				{header:'生效日期',dataIndex:'eff_date',width:80,renderer: Ext.util.Format.dateFormat},
 				{header:'失效日期',dataIndex:'exp_date',width:80,renderer: Ext.util.Format.dateFormat},
 				{header:'状态',dataIndex:'status_text',	width:60,renderer:Ext.util.Format.statusShow},				
-				{header:'订购时间',dataIndex:'order_time',width:80},
-				{header:'订单余额',dataIndex:'active_fee',width:80,xtype: 'moneycolumn'},
-				{header:'可退金额',dataIndex:'balance_cfee',width:80,xtype: 'moneycolumn'},
-				{header:'可转金额',dataIndex:'balance_acct',width:80,xtype: 'moneycolumn'}
+				{header:'订购时间',dataIndex:'order_time',width:80}
 		        
 	        ]})
 		CancelProdGrid.superclass.constructor.call(this,{

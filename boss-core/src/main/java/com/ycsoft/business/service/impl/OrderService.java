@@ -41,6 +41,7 @@ import com.ycsoft.business.dao.prod.PProdTariffDao;
 import com.ycsoft.business.dao.prod.PProdTariffDisctDao;
 import com.ycsoft.business.dto.core.acct.PayDto;
 import com.ycsoft.business.dto.core.fee.BusiFeeDto;
+import com.ycsoft.business.dto.core.fee.FeeBusiFormDto;
 import com.ycsoft.business.dto.core.prod.OrderProd;
 import com.ycsoft.business.dto.core.prod.OrderProdPanel;
 import com.ycsoft.business.dto.core.prod.PackageGroupPanel;
@@ -428,15 +429,14 @@ public class OrderService extends BaseBusiService implements IOrderService{
 	public Map<String,List<CProdOrderDto>> queryCustEffOrder(String custId,String loadType) throws Exception {
 		List<CProdOrderDto> orderList=null;
 
-	    if(StringHelper.isEmpty(loadType) || "EFF".equals(loadType)){
+	    if("EFF".equals(loadType)){
 	    	//提取有效的订购记录
 			orderList = cProdOrderDao.queryCustEffOrderDto(custId);
-		}else if("UNTD".equals(loadType)){
+		}else if("ALL".equals(loadType)){
 			//提取未退订的订购记录
 			orderList=cProdOrderDao.queryCustAllOrderDto(custId);
-		}else if("ALL".equals(loadType)) {
+		}else if("HIS".equals(loadType)) {
 			//TODO 已退订的订购记录
-			orderList = cProdOrderDao.queryCustOrderALLAndHisDto(custId);
 			
 		}else{
 			//提取有效的订购记录,如果不存在有效的订购记录 则提取最近一条订购记录
@@ -740,7 +740,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		return JsonHelper.fromObject(busiMap);
 	}
 	
-	public List<String> saveOrderProdList(String busi_code,OrderProd...orderProds) throws Exception{
+	public List<String> saveOrderProdList(String busi_code,FeeBusiFormDto busiFee,OrderProd...orderProds) throws Exception{
 		//锁定未支付业务,防止同一个客户被多个操作员操作订购产品
 		if(orderProds==null||orderProds.length==0){
 			throw new ServicesException(ErrorCode.OrderNotExists);
@@ -768,6 +768,17 @@ public class OrderService extends BaseBusiService implements IOrderService{
 			}
 		}
 		
+		if(busiFee != null){
+			//ip加挂费用
+			List<FeeBusiFormDto> feeslist = new ArrayList<FeeBusiFormDto>();
+			FeeBusiFormDto fees = new FeeBusiFormDto();
+			fees.setFee_id(busiFee.getFee_id());
+			fees.setReal_pay(busiFee.getReal_pay());
+			fees.setCount(busiFee.getCount());
+			fees.setDisct_info(busiFee.getDisct_info());
+			feeslist.add(fees);
+			getBusiParam().setFees(feeslist);
+		}
 		for(OrderProd orderProd:orderProds){
 			prodSns.add(this.saveOrderProd(orderProd,busi_code,doneCode));
 		}

@@ -244,7 +244,7 @@ public class PayService extends BaseBusiService implements IPayService {
 		
 		//取消费用提示描述
 		String infoDesc=MemoryDict.getDictName(DictKey.UNPAY_CANCEL_PROMPT, info);
-		if(infoDesc==null){
+		if(StringHelper.isEmpty(infoDesc)){
 			infoDesc=info;
 		}
 		

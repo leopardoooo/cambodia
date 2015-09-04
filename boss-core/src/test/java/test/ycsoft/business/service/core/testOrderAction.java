@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.ycsoft.beans.system.SOptr;
 import com.ycsoft.business.commons.pojo.BusiParameter;
+import com.ycsoft.business.dto.core.fee.FeeBusiFormDto;
 import com.ycsoft.business.dto.core.prod.OrderProd;
 import com.ycsoft.business.dto.core.prod.PackageGroupPanel;
 import com.ycsoft.business.dto.core.prod.PackageGroupUser;
@@ -55,9 +56,9 @@ public class testOrderAction extends JunitSpringBase {
 		BusiParameter parm=new BusiParameter();
 		parm.setOptr(soptr);
 		orderService.setParam(parm);
+		FeeBusiFormDto busiFee = new FeeBusiFormDto();
 		
-		
-		orderService.saveOrderProdList(BusiCodeConstants.PROD_SINGLE_ORDER,order);
+		orderService.saveOrderProdList(BusiCodeConstants.PROD_SINGLE_ORDER,busiFee,order);
 		
 		//订购一个套餐
 		order.setProd_id("101");
@@ -75,7 +76,7 @@ public class testOrderAction extends JunitSpringBase {
 		u.setUserSelectList(Arrays.asList("1302300"));
 		order.setGroupSelected(groupSe);
 		
-		orderService.saveOrderProdList(BusiCodeConstants.PROD_PACKAGE_ORDER,order);
+		orderService.saveOrderProdList(BusiCodeConstants.PROD_PACKAGE_ORDER,busiFee,order);
 	}
 	/**
 	 * 用户终端用户选择界面

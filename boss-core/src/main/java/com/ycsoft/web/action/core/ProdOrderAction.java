@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import com.ycsoft.business.dto.core.fee.FeeBusiFormDto;
 import com.ycsoft.business.dto.core.prod.OrderProd;
 import com.ycsoft.business.service.IOrderService;
 import com.ycsoft.commons.helper.JsonHelper;
@@ -41,6 +42,7 @@ public class ProdOrderAction extends BaseBusiAction {
 	private Integer fee;
 	//客户订单清单加载类型: ALL(所有),EFF(有效订单),不填(取有效订单，无有效则取最近一条订单)
 	private String loadType;
+	private String busiFeesData;
 	
 	/**
 	 * 退订界面数据初始化查询
@@ -101,7 +103,9 @@ public class ProdOrderAction extends BaseBusiAction {
 	
 	public String saveOrderProd()throws Exception{
 		OrderProd order=JsonHelper.toObject(orderProd, OrderProd.class);
-		orderService.saveOrderProdList(busi_code,order);
+		FeeBusiFormDto busiFee=JsonHelper.toObject(busiFeesData, FeeBusiFormDto.class);
+		
+		orderService.saveOrderProdList(busi_code,busiFee,order);
 		return JSON_SUCCESS;
 	}
 	
@@ -117,7 +121,9 @@ public class ProdOrderAction extends BaseBusiAction {
 			Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd").create();
 			orderList = gson.fromJson(payFeesData,type);
 		}
-		orderService.saveOrderProdList(busi_code,orderList.toArray(new OrderProd[orderList.size()]));
+		
+		FeeBusiFormDto busiFee=JsonHelper.toObject(busiFeesData, FeeBusiFormDto.class);
+		orderService.saveOrderProdList(busi_code,busiFee,orderList.toArray(new OrderProd[orderList.size()]));
 		return JSON_SUCCESS;
 	}
 	
@@ -264,6 +270,10 @@ public class ProdOrderAction extends BaseBusiAction {
 
 	public void setLoadType(String loadType) {
 		this.loadType = loadType;
+	}
+
+	public void setBusiFeesData(String busiFeesData) {
+		this.busiFeesData = busiFeesData;
 	}
 
 	
