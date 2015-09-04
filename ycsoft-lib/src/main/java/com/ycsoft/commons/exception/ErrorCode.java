@@ -82,6 +82,8 @@ public enum ErrorCode {
 	CustUserIpAddressFeeCoinfigError("客户宽带IP收费存在多个费用项目，请联系管理员！"),
 	UserLoginNameIsExists("账号名称已存在!"),
 	CustStatusIsNotOpenUser("预开户客户不能开用户!"),
+	OTTIsNotSingle("OTT用户不能使用单向设备!"),
+	DTTIsNotDouble("DTT用户不能使用双向设备!"),
 	
 	/**OTT接口相关错误码**/
 	E40001("Mac地址认证失败（提示用户，不能进入）"),

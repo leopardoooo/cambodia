@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.ycsoft.beans.config.TDeviceBuyMode;
@@ -25,6 +26,8 @@ import com.ycsoft.beans.core.cust.CCustLinkman;
 import com.ycsoft.beans.core.cust.CCustPropChange;
 import com.ycsoft.beans.core.fee.CFee;
 import com.ycsoft.beans.core.prod.CProd;
+import com.ycsoft.beans.core.prod.CProdOrder;
+import com.ycsoft.beans.core.prod.CProdOrderDto;
 import com.ycsoft.beans.core.prod.CProdPropChange;
 import com.ycsoft.beans.core.user.CUser;
 import com.ycsoft.beans.device.RDevice;
@@ -35,6 +38,7 @@ import com.ycsoft.beans.device.RStb;
 import com.ycsoft.beans.device.RStbModel;
 import com.ycsoft.beans.system.SOptr;
 import com.ycsoft.business.commons.pojo.BusiParameter;
+import com.ycsoft.business.component.core.OrderComponent;
 import com.ycsoft.business.dto.config.TAddressDto;
 import com.ycsoft.business.dto.core.acct.AcctAcctitemActiveDto;
 import com.ycsoft.business.dto.core.acct.AcctitemDto;
@@ -57,6 +61,7 @@ import com.ycsoft.commons.exception.ComponentException;
 import com.ycsoft.commons.exception.ServicesException;
 import com.ycsoft.commons.helper.CollectionHelper;
 import com.ycsoft.commons.helper.DateHelper;
+import com.ycsoft.commons.helper.JsonHelper;
 import com.ycsoft.commons.helper.NumericHelper;
 import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.commons.store.MemoryDict;
@@ -66,6 +71,8 @@ import com.ycsoft.sysmanager.dto.resource.RDeviceModelTotalDto;
 
 @Service
 public class CustService extends BaseBusiService implements ICustService {
+	@Autowired
+	private OrderComponent orderComponent;
 	/**
 	 * 创建新客户
 	 * @param busiCode
@@ -1571,7 +1578,7 @@ public class CustService extends BaseBusiService implements ICustService {
 //		saveAllPublic(doneCode,getBusiParam(),busiInfo);
 		saveAllPublic(doneCode,getBusiParam());
 	}
-
+	
 	/**
 	 * 设备挂失
 	 */
@@ -1747,6 +1754,10 @@ public class CustService extends BaseBusiService implements ICustService {
 
 	public DeviceDto querySaleableDevice(String deviceCode) throws Exception {
 		return deviceComponent.querySaleableDevice(deviceCode);
+	}
+	
+	public DeviceDto queryChangeDevice(String userType, String deviceCode) throws Exception {
+		return deviceComponent.queryChangeDevice(userType, deviceCode);
 	}
 	
 	public Map<String, Object> queryDeviceForSwitch(String deviceCode,String deviceType, String custId) throws Exception{

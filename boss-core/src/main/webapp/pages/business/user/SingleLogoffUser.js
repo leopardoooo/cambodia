@@ -1,84 +1,7 @@
 /**
  * 【用户销户】
  */
-NewAcctItemGrid = Ext.extend(AcctItemGrid,{
-	singleSelect : true,
-	constructor : function(){
-		NewAcctItemGrid.superclass.constructor.call(this);
-	},
-	initEvents : function(){
-		this.on("rowclick", function(grid ,index, e){
-			Confirm("确定要选择该账目吗?", this ,function(){
-				var record = grid.getStore().getAt(index);
-				Ext.getCmp('newAcctItemId').setValue(record.get('acctitem_id'));
-				Ext.getCmp('newAcctItemName').setValue(record.get('acctitem_name'));
-				Ext.getCmp('acctItemSelectWin').hide();
-			});
-		}, this );
-	}
-});
 
-/**
- * 转账面板
- * @class TransAcctPanel
- * @extends Ext.Panel
- */
-TransAcctPanel = Ext.extend(Ext.Panel,{
-	constructor : function(acctInfo){
-		var grid = new NewAcctItemGrid();
-		
-		if(acctInfo.acctitems){
-			var data = [];
-			for(var i=0;i<acctInfo.acctitems.length;i++){
-				if(acctInfo.acctitems[i].acctitem_type != 'SPEC_FEE'){//去除报停费公用账目
-					data.push(acctInfo.acctitems[i])
-				}
-			}
-			grid.getStore().loadData(data);
-		}
-		grid.getColumnModel().setHidden(10,true);
-		grid.getColumnModel().setHidden(9,true);
-		grid.getColumnModel().setHidden(8,true);
-		grid.getColumnModel().setHidden(7,true);
-		
-		TransAcctPanel.superclass.constructor.call(this,{
-			baseCls:'x-plain',
-			layout:'form',
-			items : [{
-					xtype : 'textfield',
-					id : 'newAcctItemName',
-					allowBlank : false,
-					editable : false,
-					name : 'newAcctItemName',
-					fieldLabel : '新账目',
-					listeners : {
-						scope : this,
-						'focus' : function(){
-							if(Ext.getCmp('acctItemSelectWin')){
-								Ext.getCmp('acctItemSelectWin').show();
-							}else{
-								new Ext.Window({
-									title : '账目信息',
-									id : 'acctItemSelectWin',
-									closeAction: 'hide',
-									width: 520,
-									height: 400,
-									layout: 'fit',
-									border: false,
-									items: grid 
-								}).show();
-							}
-							
-						}
-					}
-				},{
-					xtype : 'hidden',
-					id : 'newAcctItemId',
-					name : 'newAcctItemId'
-				}]
-		})
-	}
-});
 //选中用户产品的账户信息
 UserProdGrid = Ext.extend(Ext.grid.GridPanel,{
 	userProdStore : null,
@@ -168,13 +91,6 @@ LogoffUserForm = Ext.extend(BaseForm,{
 //		this.userProdGrid["region"]='north';
 		var record = App.getApp().main.infoPanel.getUserPanel().userGrid.getSelectionModel().getSelected();
 		this.userId = record.get('user_id');
-		var acctStore = App.getApp().main.infoPanel.acctPanel.acctGrid.getStore();
-		for(var i=0;i<acctStore.getCount();i++){
-			if(acctStore.getAt(i).get('acct_type') == 'PUBLIC'){
-				this.publicAcctInfo = acctStore.getAt(i).data;
-				break;
-			}
-		}
 		LogoffUserForm.superclass.constructor.call(this,{
             border: false,
             layout: 'border',

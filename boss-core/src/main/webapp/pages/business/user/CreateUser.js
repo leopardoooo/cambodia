@@ -42,7 +42,7 @@ UserBaseForm = Ext.extend( BaseForm , {
 							scope:this,
 							select:this.doSelectUserType
 						}
-					},]
+					}]
 				},{
 					items:[{
 						id:'userNameId',
@@ -75,7 +75,7 @@ UserBaseForm = Ext.extend( BaseForm , {
 			            	scope: this,
 			            	check: this.doCheckedChangeTask
 			            }
-					},]
+					}]
 				},{
 					items:[{
 			            xtype: 'textfield',
@@ -511,4 +511,4 @@ NewUserForm = Ext.extend(UserBaseForm , {
 Ext.onReady(function(){
 	var nup = new NewUserForm();
 	var box = TemplateFactory.gTemplate(nup);
-});
+})
