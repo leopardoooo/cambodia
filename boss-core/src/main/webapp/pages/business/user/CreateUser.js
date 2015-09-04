@@ -490,6 +490,7 @@ UserBaseForm = Ext.extend( BaseForm , {
 			values["deviceFee.fee_std_id"] = fee["fee_std_id"];
 			values["deviceFee.fee"] = Ext.getCmp("txtFeeEl").getValue()*100;
 		}
+		console.log(values);
 		return values;
 	},
 	getFee: function(){

@@ -65,9 +65,30 @@ ExchangeDevicePanel = Ext.extend(BaseForm,{
                  {xtype:'combo',fieldLabel:'更换原因',allowBlank:false,hiddenName:'change_reason', id:'reasonId',
                 	 store: this.changeReasonStore, displayField:'reason_text', valueField:'reason_type',
                 	 forceSelection : true, triggerAction : 'all', mode: 'local',
-                 }
+                	 listeners:{
+                		 scope:this,
+                		 select: this.doSelectReason
+                	 }
+                 },{
+    				xtype: 'displayfield',
+    			    id: 'promptInfoId',
+    			    fieldLabel: "提示信息"
+    			}
             ]}
 		]});
+	},
+	doSelectReason: function(combo, record){
+		var comp = Ext.getCmp('promptInfoId'), str='本次更换需要';
+		if(record.get('is_charge') == 'T'){
+			str += ' 收自购费用';
+		}
+		if(record.get('is_reclaim') == 'T'){
+			str += ' 回收设备';
+		}
+		if(record.get('is_lost') == 'T'){
+			str += ' 挂失设备';
+		}
+		comp.setValue("<font color='red'>"+str+"</font>");
 	},
 	doInit: function(){
 		ExchangeDevicePanel.superclass.doInit.call(this);

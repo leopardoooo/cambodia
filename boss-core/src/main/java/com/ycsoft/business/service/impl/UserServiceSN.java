@@ -70,7 +70,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		Integer doneCode = doneCodeComponent.gDoneCode();
 		// 获取客户信息
 		
-		int num = getUserCount(cust.getCust_id(), user.getUser_type());
+		int num = getUserCount(cust, user.getUser_type());
 		openSingle(cust, user, doneCode, deviceCode, deviceType, deviceModel, deviceBuyMode, deviceFee, num);
 		
 		// 设置拦截器所需要的参数
@@ -112,7 +112,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 				
 				user.setStop_type(stopType);
 				
-				int num = getUserCount(cust.getCust_id(), user.getUser_type());
+				int num = getUserCount(cust, user.getUser_type());
 				this.openSingle(cust, user, doneCode, null, deviceType, deviceModel, deviceBuyMode, deviceFee, num);
 				
 			}
@@ -120,12 +120,16 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		saveAllPublic(doneCode, getBusiParam());
 	}
 
-	private int getUserCount(String custId, String userType) throws Exception {
-		int num = userComponent.countUserType(custId, userType);
+	private int getUserCount(CCust cust, String userType) throws Exception {
+		int num = userComponent.queryMaxNumByLoginName(cust.getCust_id(), cust.getCust_no(), userType);
 		if(userType.equals(SystemConstants.USER_TYPE_BAND)){
 			num += SystemConstants.USER_TYPE_BAND_NUM;
 		}else if(userType.equals(SystemConstants.USER_TYPE_OTT)){
-			num += SystemConstants.USER_TYPE_OTT_NUM;
+			if(num == 0){
+				num += SystemConstants.USER_TYPE_OTT_NUM;
+			}else{
+				num += 1;
+			}
 		}
 		return num;
 	}
@@ -175,10 +179,10 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 			
 			/*if (StringHelper.isEmpty(user.getLogin_name()))
 				user.setLogin_name("supertv"+user.getUser_id());*/
-			user.setLogin_name(cust.getCust_no()+""+(num+61));
+			user.setLogin_name(cust.getCust_no()+""+num);
 		}else if(userType.equals(SystemConstants.USER_TYPE_BAND)){
 			String domainName = custComponent.gCustNoByAddr(cust.getAddr_id(), null);
-			user.setLogin_name(cust.getCust_no()+"0"+(num+1)+"@"+domainName);
+			user.setLogin_name(cust.getCust_no()+"0"+num+"@"+domainName);
 			user.setPassword(cust.getPassword());
 		}
 		
@@ -433,11 +437,11 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 				stbDevice = deviceComponent.queryDeviceByDeviceCode(user.getStb_id());
 				reclaimDevice(stbDevice.getDevice_id(), null,SystemConstants.RECLAIM_REASON_XHTH, 0, cust, doneCode, busiCode);
 			}
-			if(StringHelper.isNotEmpty(user.getCard_id()) && (stbDevice.getPairCard() == null  || !user.getCard_id().equals(stbDevice.getPairCard().getCard_id()))){
+			if(StringHelper.isNotEmpty(user.getCard_id()) && (stbDevice != null && (stbDevice.getPairCard() == null  || !user.getCard_id().equals(stbDevice.getPairCard().getCard_id())))){
 				DeviceDto device = deviceComponent.queryDeviceByDeviceCode(user.getCard_id());
 				reclaimDevice(device.getDevice_id(), null,SystemConstants.RECLAIM_REASON_XHTH, 0, cust, doneCode, busiCode);
 			}
-			if(StringHelper.isNotEmpty(user.getModem_mac()) && (stbDevice.getPairModem() == null  || !user.getModem_mac().equals(stbDevice.getPairModem().getModem_mac()))){
+			if(StringHelper.isNotEmpty(user.getModem_mac()) && (stbDevice != null && (stbDevice.getPairModem() == null  || !user.getModem_mac().equals(stbDevice.getPairModem().getModem_mac())))){
 				DeviceDto device = deviceComponent.queryDeviceByDeviceCode(user.getModem_mac());
 				reclaimDevice(device.getDevice_id(), null,SystemConstants.RECLAIM_REASON_XHTH, 0, cust, doneCode, busiCode);
 			}

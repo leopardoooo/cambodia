@@ -1317,8 +1317,8 @@ public class UserComponent extends BaseBusiComponent {
 //		return flag;
 //	}
 	
-	public int countUserType(String custId, String userType) throws Exception {
-		return cUserDao.countUserType(custId, userType);
+	public int queryMaxNumByLoginName(String custId, String custNo, String userType) throws Exception {
+		return cUserDao.queryMaxNumByLoginName(custId, custNo, userType);
 	}
 	
 	public boolean validAccount(String name) throws Exception{
