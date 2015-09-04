@@ -113,7 +113,6 @@ ExchangeDevicePanel = Ext.extend(BaseForm,{
 			scope:this,
 			success:function(res,ops){
 				var data = Ext.decode(res.responseText);
-				console.log(data);
 				
 				//新更换设备型号保存，购买方式需要使用
 				this.userData['new_deviec_model'] = data['device_model'];
