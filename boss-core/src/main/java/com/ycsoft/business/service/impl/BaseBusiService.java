@@ -552,13 +552,14 @@ public class BaseBusiService extends BaseService {
 	 * @param status
 	 * @return
 	 */
-	protected boolean isProdOpen(String status){
-		if (status.equals(StatusConstants.ACTIVE) || status.equals(StatusConstants.OWENOTSTOP) 
+	protected boolean isProdOpen(String status) throws Exception {
+		/*if (status.equals(StatusConstants.ACTIVE) || status.equals(StatusConstants.OWENOTSTOP) 
 				|| status.equals(StatusConstants.TMPOPEN) || status.equals(StatusConstants.LNKUSTOP) 
 				|| status.equals(StatusConstants.PAUSE) )
 			return true;
 		else
-			return false;
+			return false;*/
+		return userProdComponent.isProdOpen(status);
 	}
 	
 	/**

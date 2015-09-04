@@ -2138,4 +2138,8 @@ public class UserProdComponent extends BaseBusiComponent {
 	public CProd queryBaseProdByCustId(String cust_id)throws Exception {
 		return cProdDao.queryBaseProdByCustId(cust_id, getOptr().getCounty_id());
 	}
+	
+	public boolean isProdOpen(String status) throws Exception {
+		return cProdDao.isProdOpen(status);
+	}
 }

@@ -39,7 +39,7 @@ public class BusiCmdConstants {
 	public static final String CHG_SERVICE="CHG_SERVICE";//宽带修改服务
 	public static final String BAND_EDIT_EXPIREDATE="BAND_EDIT_EXPIREDATE";//亚信宽带修改失效日期
 	public static final String BAND_CLEAR_AUTH="BAND_CLEAR_AUTH";//清除授权
-	public static final String BAND_ADD_AUTH="BAND_ADD_AUTH";//清除授权
+	public static final String BAND_ADD_AUTH="BAND_ADD_AUTH";//宽带加授权
 	
 	public static final String ACCTIVATE_INTERFACE="AVT_FACE";//激活界面
 }

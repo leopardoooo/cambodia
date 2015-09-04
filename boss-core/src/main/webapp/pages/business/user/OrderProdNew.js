@@ -234,6 +234,7 @@ ProdOrderForm = Ext.extend( BaseForm, {
 			success : function(response,opts){
 				var responseObj = Ext.decode(response.responseText);
 				this.baseData = responseObj;
+				console.log(this.baseData);
 				Ext.getCmp("boxProdId").getStore().loadData(this.baseData["prodList"]);
 				//ip外挂费用
 				var busiFee = this.baseData["busiFee"];
