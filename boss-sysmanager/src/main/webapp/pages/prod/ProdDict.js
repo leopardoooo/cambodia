@@ -258,7 +258,7 @@ ProdDictWin = Ext.extend(Ext.Window,{
 
 ProdDictView = Ext.extend(Ext.Panel,{
 	constructor : function(){
-		AddressView.superclass.constructor.call(this,{
+		ProdDictView.superclass.constructor.call(this,{
 			id : 'ProdDictView',
 			layout : 'fit',
 			title : '目录管理',
