@@ -73,6 +73,8 @@ public class AuthComponent extends BaseComponent{
 		} else if (authCmdType.equals(BusiCmdConstants.REFRESH_TERMINAL)){
 			this.refreshOttUserAuth(user, doneCode);
 			
+		} else if(authCmdType.equals(BusiCmdConstants.ACCTIVATE_TERMINAL)){
+			this.openOttTerminal(user, doneCode);
 		}
 		
 	}
@@ -108,6 +110,21 @@ public class AuthComponent extends BaseComponent{
 	}
 
 	/**===================================FOR OTT USER=========================================**/
+	
+	//开户
+	private void openOttTerminal(CUser user,Integer doneCode) throws Exception{
+		JVodCommand ottCmd = gOttCmd(user,doneCode);
+		ottCmd.setCmd_type(SmsxCmd.OpenICC.name());
+		JsonObject params = new JsonObject();
+		params.addProperty(BusiCmdParam.login_name.name(), user.getLogin_name());
+		params.addProperty(BusiCmdParam.login_password.name(), user.getPassword());
+		params.addProperty(BusiCmdParam.stb_id.name(), user.getStb_id());
+		params.addProperty(BusiCmdParam.stb_mac.name(), user.getModem_mac());
+		params.addProperty(BusiCmdParam.user_status.name(), user.getStatus());
+		ottCmd.setDetail_param(params.toString());
+		jVodCommandDao.save(ottCmd);
+	}
+	
 	/**
 	 * 创建修改OTT用户
 	 * @param user
