@@ -42,7 +42,7 @@ UserBaseForm = Ext.extend( BaseForm , {
 							scope:this,
 							select:this.doSelectUserType
 						}
-					},]
+					}]
 				},{
 					items:[{
 						id:'userNameId',
@@ -75,7 +75,7 @@ UserBaseForm = Ext.extend( BaseForm , {
 			            	scope: this,
 			            	check: this.doCheckedChangeTask
 			            }
-					},]
+					}]
 				},{
 					items:[{
 			            xtype: 'textfield',
@@ -369,7 +369,7 @@ UserBaseForm = Ext.extend( BaseForm , {
 					item_name: data["device_model_text"],
 					item_value: data["device_model"]
 				}]);
-				box.setValue(data["device_model"]);
+				box.setValue(data["device_model_text"]);
 			}
 		});
 	},
@@ -391,7 +391,6 @@ UserBaseForm = Ext.extend( BaseForm , {
 			},
 			success : function(res,opt){
 				var data = Ext.decode(res.responseText);
-
 				var dfFeeName = Ext.getCmp("dfFeeNameEl");
 				var txtFee = Ext.getCmp("txtFeeEl");
 				if(data && data.length > 0 ){
@@ -488,9 +487,8 @@ UserBaseForm = Ext.extend( BaseForm , {
 		if(fee){
 			values["deviceFee.fee_id"] = fee["fee_id"];
 			values["deviceFee.fee_std_id"] = fee["fee_std_id"];
-			values["deviceFee.fee"] = Ext.getCmp("txtFeeEl").getValue()*100;
+			values["deviceFee.fee"] =Ext.util.Format.formatToFen(Ext.getCmp("txtFeeEl").getValue());
 		}
-		console.log(values);
 		return values;
 	},
 	getFee: function(){
@@ -513,4 +511,4 @@ NewUserForm = Ext.extend(UserBaseForm , {
 Ext.onReady(function(){
 	var nup = new NewUserForm();
 	var box = TemplateFactory.gTemplate(nup);
-});
+})

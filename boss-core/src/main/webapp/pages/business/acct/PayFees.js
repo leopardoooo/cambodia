@@ -160,7 +160,7 @@ PayFeesForm = Ext.extend( BaseForm , {
 		}
 		
 		var all = {'payFeesData':Ext.encode(this.data),'busi_code':App.getData().currentResource.busicode,
-		'busiFeesData':busiFee};
+		'busiFees':busiFee};
 		return all;
 	},
 	doValid: function(){

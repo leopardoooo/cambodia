@@ -21,7 +21,7 @@ public interface IOrderService extends IBaseService{
 	public Map<String,List<CProdOrderDto>> queryCustEffOrder(String cust_id,String loadType) throws Exception;
 	
 	
-	public List<String> saveOrderProdList(String busi_code,FeeBusiFormDto busiFee,OrderProd...orderProds) throws Exception;
+	public List<String> saveOrderProdList(String busi_code,OrderProd...orderProds) throws Exception;
 	//public String saveOrderProd(OrderProd orderProd,String busi_code) throws Exception;
 	
 	

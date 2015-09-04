@@ -221,17 +221,34 @@ BusiPanel = Ext.extend( Ext.Panel , {
 			ownForm = this.getForm(CoreConstant.BOX_FORMS_OWN),
 			busiExtForm = this.getForm(CoreConstant.BOX_FORMS_BUSIEXT);
 			docForm = this.getForm(CoreConstant.BOX_FORMS_DOC);
+		//获取通用的参数
+		var commons = App.getValues();
+		var busiFees = [];
 		//获取业务表单的参数值
 		if(ownForm){
 			Ext.apply( all , ownForm.getValues() );
+			//存在其他杂费busiFees
+			for(var p in all){
+				if(p == 'busiFees'){
+					busiFees = all[p];
+					delete all[p];
+					if(busiFees && busiFees.length>0){
+						commons["fees"] = busiFees;
+					}
+				}
+			}
 		}
-		//获取通用的参数
-		var commons = App.getValues();
-			
 			
 		//获取杂费信息
 		if(feeForm){
-			commons["fees"] = feeForm.getValues();
+			var fees = feeForm.getValues();
+			//合并其他杂费
+			if(busiFees.length>0){
+				for(var i=0;i<busiFees.length;i++){
+					fees.push(busiFees[i]);
+				}
+			}
+			commons["fees"] = fees;
 		}
 		if (docForm){
 			Ext.apply(commons,docForm.getValues());

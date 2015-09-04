@@ -729,7 +729,7 @@ DeptWin = Ext.extend(Ext.Window,{
 
 DeptView = Ext.extend(Ext.Panel,{
 	constructor : function(){
-		AddressView.superclass.constructor.call(this,{
+		DeptView.superclass.constructor.call(this,{
 			id : 'DeptView',
 			layout : 'fit',
 			title : '机构管理',
