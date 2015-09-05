@@ -41,6 +41,7 @@ import com.ycsoft.business.dao.prod.PProdTariffDao;
 import com.ycsoft.business.dao.prod.PProdTariffDisctDao;
 import com.ycsoft.business.dto.core.acct.PayDto;
 import com.ycsoft.business.dto.core.fee.BusiFeeDto;
+import com.ycsoft.business.dto.core.fee.FeeBusiFormDto;
 import com.ycsoft.business.dto.core.prod.OrderProd;
 import com.ycsoft.business.dto.core.prod.OrderProdPanel;
 import com.ycsoft.business.dto.core.prod.PackageGroupPanel;
@@ -428,15 +429,14 @@ public class OrderService extends BaseBusiService implements IOrderService{
 	public Map<String,List<CProdOrderDto>> queryCustEffOrder(String custId,String loadType) throws Exception {
 		List<CProdOrderDto> orderList=null;
 
-	    if(StringHelper.isEmpty(loadType) || "EFF".equals(loadType)){
+	    if("EFF".equals(loadType)){
 	    	//提取有效的订购记录
 			orderList = cProdOrderDao.queryCustEffOrderDto(custId);
-		}else if("UNTD".equals(loadType)){
+		}else if("ALL".equals(loadType)){
 			//提取未退订的订购记录
 			orderList=cProdOrderDao.queryCustAllOrderDto(custId);
-		}else if("ALL".equals(loadType)) {
+		}else if("HIS".equals(loadType)) {
 			//TODO 已退订的订购记录
-			orderList = cProdOrderDao.queryCustOrderALLAndHisDto(custId);
 			
 		}else{
 			//提取有效的订购记录,如果不存在有效的订购记录 则提取最近一条订购记录

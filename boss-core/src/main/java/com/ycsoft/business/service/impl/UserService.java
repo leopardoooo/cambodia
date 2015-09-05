@@ -38,6 +38,7 @@ import org.springframework.stereotype.Service;
 import com.google.gson.reflect.TypeToken;
 import com.ycsoft.beans.config.TBusiFee;
 import com.ycsoft.beans.config.TDeviceBuyMode;
+import com.ycsoft.beans.config.TDeviceChangeReason;
 import com.ycsoft.beans.config.TOpenTemp;
 import com.ycsoft.beans.core.acct.CAcct;
 import com.ycsoft.beans.core.acct.CAcctAcctitem;
@@ -124,13 +125,6 @@ public class UserService extends BaseBusiService implements IUserService {
 
 	@Override
 	public void saveFillDevice(List<FillUSerDeviceDto> deviceList) throws Exception {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void saveChangeDevice(String userId, String deviceId, String devcieBuyMode, FeeInfoDto deviceFee,boolean reclaim)
-			throws Exception {
 		// TODO Auto-generated method stub
 		
 	}
@@ -2793,6 +2787,18 @@ public class UserService extends BaseBusiService implements IUserService {
 	public void validAccount(String name) throws Exception {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public void saveChangeDevice(String userId, String deviceCode, String changeReason) throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public List<TDeviceChangeReason> queryDeviceChangeReason() throws Exception {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 	

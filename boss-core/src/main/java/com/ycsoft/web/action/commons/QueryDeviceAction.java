@@ -124,6 +124,16 @@ public class QueryDeviceAction extends BaseBusiAction {
 	}
 	
 	/**
+	 * 设备更换 检查设备是否符合
+	 * @return
+	 * @throws Exception
+	 */
+	public String queryChangeDevice() throws Exception {
+		getRoot().setSimpleObj(custService.queryChangeDevice(userType, deviceCode));
+		return JSON_SIMPLEOBJ;
+	}
+	
+	/**
 	 * 查询可以用于机卡互换的设备.
 	 * @return
 	 * @throws Exception

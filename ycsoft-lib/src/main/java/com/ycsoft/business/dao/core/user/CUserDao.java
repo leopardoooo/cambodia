@@ -480,20 +480,43 @@ public class CUserDao extends BaseEntityDao<CUser> {
 	 * 查找一个用户下所有有效资源的到期日
 	 */
 	public List<UserResExpDate> queryUserProdResExpDate(String userId) throws Exception{
-		String sql = "select c.external_res_id,exp_date from c_prod_order a,p_prod_static_res b,t_server_res c "
-				+ " where b.res_id= c.boss_res_id and a.user_id=? and a.is_pay='T' and a.exp_date>trunc(sysdate) and a.prod_id=b.prod_id";
+		String sql = "select c.external_res_id res_id,exp_date from c_prod_order a,p_prod_static_res b,t_server_res c "
+				+ " where b.res_id= c.boss_res_id and user_id=? and a.is_pay='T' and exp_date>trunc(sysdate) and a.prod_id=b.prod_id";
 		return this.createQuery(UserResExpDate.class, sql, userId).list();
 	}
 	
 	public boolean validAccount(String name) throws Exception {
-		String sql = "select count(1) from c_user t where t.login_name=?";
+		String sql = "select 1 from c_user t where t.login_name=?";
 		return this.count(sql, name) > 0;
 	}
 	
-	public int countUserType(String custId, String userType) throws Exception {
-		String sql = "select count(1) from c_user t where t.cust_id=? and user_type=?";
-		return this.count(sql, custId, userType);
+	public int queryMaxNumByLoginName(String custId, String custNo, String userType) throws Exception {
+		/**
+		 * ".用户开户和批量用户开户修改
+			开宽带用户时，自动生成的宽带账号。密码默认 c_cust.password
+			       生成规则 第一个宽带  cust_no+01+@+域名
+			                     第二个宽带  cust_no+02+@+域名
+			域名提取方法跟  cust_no的序列号一致。
+			OTT用户 账号生成规则  : 第一个OTT cust_no+61
+			                                     第二个OTT cust_no+62"
+
+		 */
+		String sql = "";
+		if(userType.equals(SystemConstants.USER_TYPE_BAND)) {
+			sql = "select nvl(max(num),0) from ("
+				+ " select to_number(substr(t.login_name, length(?)+2, instr(t.login_name, '@')-length(?)-2)) num from c_user t where t.cust_id=? and user_type=?"
+				+ " union all "
+				+ " select to_number(substr(t.login_name, length(?)+2, instr(t.login_name, '@')-length(?)-2)) num from c_user_his t where t.cust_id=? and user_type=?)";
+			return Integer.parseInt( this.findUnique(sql, custNo, custNo, custId, userType, custNo, custNo, custId, userType) );
+		}else{
+			sql = "select nvl(max(num),0) from ("
+					+ " select to_number(substr(t.login_name, length(?)+1,length(t.login_name)-length(?))) num from c_user t where t.cust_id=? and user_type=?"
+					+ " union all "
+					+ " select to_number(substr(t.login_name, length(?)+1,length(t.login_name)-length(?))) num from c_user_his t where t.cust_id=? and user_type=?)";
+			return Integer.parseInt( this.findUnique(sql, custNo, custNo, custId, userType, custNo, custNo, custId, userType) );
+		}
 	}
+	
 	/**
 	 * 通过账户查用户
 	 * @param loginName

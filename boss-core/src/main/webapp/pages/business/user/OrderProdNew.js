@@ -17,6 +17,9 @@ ProdOrderForm = Ext.extend( BaseForm, {
 	transferPayData: [],
 	//  套餐订购用户
 	packageGroups: null,
+	busiFeeTime:null,
+	prodId:null,
+	isBusiFee:false,
 	constructor: function(p){
 		this.selectUserPanel = new SelectUserPanel(this);
 		
@@ -149,36 +152,38 @@ ProdOrderForm = Ext.extend( BaseForm, {
        			 frame:true,  
 				 labelAlign:'right',  
 				 layout:'column',
-				 labelWidth:50,  
+				 id:'feeItemId',
+				 labelWidth:50,
 				 border: false,
 		         items:[{ 
-		         	columnWidth:.70,
+		         	columnWidth:0.99,
 		         	xtype:'fieldset',  
+		         	id:'orderFeeItemId',
 				    height: 75, 
 				    title:'产品费',
-         			style:'margin-left:10px;padding: 10px 0 10px 10px; color: red',
+         			style:'margin-left:2px;padding: 10px 0 10px 10px; color: red',
          			layout:'column',
          			items:[{
-         				columnWidth:.60,
+         				columnWidth:.65,
          				items:[{
          						bodyStyle:'padding-top:4px',
-		         				html: "* 应收$:<span id='totalAmount'>--</span>"
+		         				html: "*应收$:<span id='totalAmount'>--</span>"
 								+"（新增订购:<b id='addAmount'>--</b> "
 								+" - "
 								+" <a id='transferHrefTag' href='#'>转移支付:<b id='transferAmount'>--</b></a>"
 								+" ）"
 			         			}]
          				},{
-         				columnWidth:.40,
+         				columnWidth:.35,
          				layout : 'form',
-         				labelWidth:65,  
+         				labelWidth:40,  
          				items:[{
-								fieldLabel : '处理方式',
+								fieldLabel : '支付',
 								id : 'orderFeeTypeId',
 								name:'order_fee_type',
 								allowBlank : false,
 								xtype:'paramcombo',
-								width: 80,
+								width: 60,
 								emptyText: '请选择',
 								defaultValue:'CFEE',
 								paramName:'ORDER_FEE_TYPE',
@@ -191,16 +196,6 @@ ProdOrderForm = Ext.extend( BaseForm, {
 								}
 							}]
          				}]
-		         },{  
-				    columnWidth:.30,
-		         	xtype:'fieldset',  
-		         	height: 75, 
-		         	title:'业务费',
-		         	style:'margin-left:10px;padding: 10px 0 10px 10px; color: red',
-					items:[{
-		         		bodyStyle:'padding-top:4px',
-						html: "* 应收$:<span id='totalAmount'>--</span>"
-		         	}]
 		         }]  
 			}]
 		});
@@ -240,6 +235,30 @@ ProdOrderForm = Ext.extend( BaseForm, {
 				var responseObj = Ext.decode(response.responseText);
 				this.baseData = responseObj;
 				Ext.getCmp("boxProdId").getStore().loadData(this.baseData["prodList"]);
+				//ip外挂费用
+				var busiFee = this.baseData["busiFee"];
+				if(busiFee){
+					Ext.getCmp('orderFeeItemId').columnWidth = 0.6;
+					Ext.getCmp('feeItemId').add({ 
+			         	id:'busiFeeItemId',
+					    columnWidth:.4,
+			         	xtype:'fieldset',
+			         	height: 75, 
+			         	title:'IP费',
+			         	style:'margin-left:10px;padding: 10px 0 10px 10px; color: red',
+						items:[{
+			         		bodyStyle:'padding-top:4px',
+							html: "*应收$:<span id='busiFeeAmount'>--</span>"
+			         	},{
+			         		bodyStyle:'padding-top:4px',
+							html: "时间段:<span id='busiFeeTime'>--</span>"
+			         	}]
+			         });
+					Ext.getCmp('busiFeeItemId').setTitle(busiFee.fee_name);
+				}else{
+					Ext.getCmp('orderFeeItemId').columnWidth = 0.99;
+				}
+				this.doLayout();
 			}
 		});
 	},
@@ -268,17 +287,19 @@ ProdOrderForm = Ext.extend( BaseForm, {
 		// 当前选中的产品
 		this.currentSelectedProd = record;
 		var prodId = record.get("prod_id");
+		this.prodId = prodId;
 		Ext.getCmp("dfProdDesc").setValue(record.get("prod_desc"));
 		var boxProdTariff = Ext.getCmp("boxProdTariff");
+		boxProdTariff.reset();
 		var tariffs = this.baseData["tariffMap"][prodId] || [];
 		boxProdTariff.getStore().loadData(tariffs);
 		// 如果只有一个默认选中, 
 		// Update: 尽管只有1个资费，也不选中，因为转移支付的初始化问题
-		if(tariffs.length == 1){
-			boxProdTariff.setValue(tariffs[0]["tariff_id"]);
-		}else{
-			boxProdTariff.setRawValue("");
-		}
+//		if(tariffs.length == 1){
+//			boxProdTariff.setValue(tariffs[0]["tariff_id"]);
+//		}else{
+//			boxProdTariff.setRawValue("");
+//		}
 		// 上期结束日期
 		var lastOrderProdDate = this.getLastProdEndDate(prodId);
 		Ext.get("lastOrderProdExtDate").update(lastOrderProdDate || "--");
@@ -296,6 +317,91 @@ ProdOrderForm = Ext.extend( BaseForm, {
 		this.doChangeEndDate();
 		// 加载终端用户
 		this.doLoadUsers(record);
+	},
+	doBusiFeeTime:function(){
+		var busiFee = this.baseData["busiFee"];
+		//ip外挂费用
+		if(busiFee){
+			var months = Ext.getCmp("sfOrderCycle").getValue();
+			if(Ext.isEmpty(months)){
+				return;
+			}
+			var startDate ;
+			var feeCount=0;
+			if(this.isPkg()){
+				//所有的用户
+				var allUserList=this.selectUserPanel.selectUserData.userList;
+				var ipUserList=[];
+				var ipUserMap = {};
+				//选中的用户
+				this.selectUserPanel.store.each(function(rs){
+					var key = rs.get('user_id');
+					if(!ipUserMap[key]){
+						ipUserMap[key] = [];
+					}
+					ipUserMap[key].push(rs.get('user_id'));
+				});
+				//满足条件的用户
+				for(var i=0 ;i<allUserList.length;i++){
+					if(!Ext.isEmpty(allUserList[i].str5)
+						&&!Ext.isEmpty(allUserList[i].str6)
+						&&!Ext.isEmpty(allUserList[i].prod_exp_date)){
+							if(ipUserMap[allUserList[i].user_id]){
+								ipUserList.push(allUserList[i]);
+							}
+					}
+				}
+				
+				if(ipUserList.length == 0){
+					return ;				
+				}
+				for(var i=0 ;i<ipUserList.length;i++){
+					var ipTime = Date.parseDate(Ext.util.Format.subStringLength(ipUserList[i].prod_exp_date,10), "Y-m-d");
+					if(startDate == null){
+						startDate = ipTime;
+					}else{
+						if(startDate.getTime()<ipTime.getTime()){
+							startDate = ipTime;
+						}
+					}
+					//多个用户满足条件时候，ip数量相加
+					feeCount = feeCount + parseInt(ipUserList[i].str6);
+				}
+				
+				//满足条件的用户中选出最晚的到期日
+				startDate = startDate.format("Y-m-d");
+				
+			}else{
+				 startDate = Ext.util.Format.subStringLength(busiFee.last_prod_exp,10);
+			     feeCount=busiFee.fee_count;
+			}
+			
+			var feeMonths = 0;//月份数
+			var days = 0;//结束时间和开始计费时间相差天数
+			//业务费开始计费日期=产品开始计费日期
+			var dfExpDate = Ext.getCmp("dfExpDate").getValue();
+			if(startDate == Ext.getCmp("dfStartDate").getValue().format("Y-m-d")){
+				feeMonths = months;
+			}else{
+				//2个时间之间相差的月数
+				var bmonth = Ext.util.Format.getMonths(startDate,dfExpDate);
+				//业务费开始计费日期与产品开始计费日期，相差整数月数
+				if(Ext.util.Format.addMoth(startDate,bmonth) == dfExpDate){
+					feeMonths = bmonth;
+				}else{
+					days = Ext.util.Format.getDays(startDate,dfExpDate)
+				}
+			}
+			if(days != 0){
+				var v = parseInt(days/30*100)/100;
+				this.busiFeeAmount = (v*feeCount*busiFee.min_value);
+			}else{
+				this.busiFeeAmount = feeMonths*feeCount*busiFee.min_value;
+			}
+			Ext.get("busiFeeAmount").update(Ext.util.Format.convertToYuan(this.busiFeeAmount));
+			this.busiFeeTime =  Date.parseDate(startDate,"Y-m-d").format("Ymd")+"-"+Date.parseDate(dfExpDate, "Y-m-d").format("Ymd");
+			Ext.get('busiFeeTime').update(this.busiFeeTime);
+		}
 	},
 	// 加载终端用户
 	doLoadUsers: function(selectProdRecord){
@@ -347,20 +453,24 @@ ProdOrderForm = Ext.extend( BaseForm, {
 			Ext.getCmp("dfExpDate").setValue(lastOrderProdDate);
 			return;
 		}
+		
 		// 其它根据周期进行计算
 		if(startDate){
 			// 计算结束日
-			startDate.setMonth(startDate.getMonth() + months);
-			startDate.setDate(startDate.getDate() - 1);
-			Ext.getCmp("dfExpDate").setValue(startDate.format("Y-m-d"));
+			var endDate = Date.parseDate(Ext.util.Format.addMoth(startDate.format("Y-m-d"),months),"Y-m-d");
+			endDate.setDate(endDate.getDate()-1);
+			Ext.getCmp("dfExpDate").setValue(endDate.format("Y-m-d"));
 		}else{ 
 			Ext.getCmp("dfExpDate").setValue(null);
 		}
+		
+		//加挂IP费
+		this.doBusiFeeTime();
 	},
 	doLoadTransferAmount: function(){
 		var validObj = this.doBaseValid(); 
 		if(validObj["isValid"] !== true){
-			// Alert(validObj["msg"]);
+//			Alert(validObj["msg"]);
 			return ;
 		}
 		Ext.Ajax.request({
@@ -383,6 +493,10 @@ ProdOrderForm = Ext.extend( BaseForm, {
 				this.transferAmount = sumAmount;
 				// 修改小计信息
 				this.doChangeAmount();
+			},
+			clearData:function(){
+				//清空组件
+				Ext.getCmp('boxProdTariff').reset();				
 			}
 		});
 	},
@@ -394,19 +508,26 @@ ProdOrderForm = Ext.extend( BaseForm, {
 	addAmount: -1,
 	//当前选中的产品
 	currentSelectedProd: null,
+	busiFeeAmount:0,
 	doChangeAmount: function(){
 		//计算新增金额
 		var boxProdTariff = Ext.getCmp("boxProdTariff");
 		var disctId = boxProdTariff.getValue();
+		if(Ext.isEmpty(disctId)){
+			Alert("请先选择资费!");
+			return false;
+		}
 		var index = boxProdTariff.getStore().find("tariff_id", disctId);
 		var tariffRecord = boxProdTariff.getStore().getAt(index);
-		this.addAmount = Ext.getCmp("sfOrderCycle").getValue() * tariffRecord.get("disct_rent");
+		this.addAmount = Ext.getCmp("sfOrderCycle").getValue() * tariffRecord.get("disct_rent")/tariffRecord.get("billing_cycle");
 		Ext.get("addAmount").update(String(this.addAmount/100));
 		// 实付
 		this.totalAmount = this.addAmount - this.transferAmount;
 		Ext.get("totalAmount").update(String(this.totalAmount/100));
 		// 转移支付
 		Ext.get("transferAmount").update(String(this.transferAmount/100));
+
+		
 	},
 	// 是否为套餐
 	isPkg: function(){
@@ -475,7 +596,7 @@ ProdOrderForm = Ext.extend( BaseForm, {
 		return {
 			isValid: true
 		};
-	},
+	},	
 	getValues : function(){
 		var values = this.getTransferValues();
 		values["order_months"] = Ext.getCmp("sfOrderCycle").getValue();
@@ -489,10 +610,26 @@ ProdOrderForm = Ext.extend( BaseForm, {
 		// 失效日期
 		values["exp_date"] = Ext.getCmp("dfExpDate").getValue() + " 00:00:00";
 		
-		return {
+	
+		var all = {
 			"busi_code": this.busiCode,
 			"orderProd": Ext.encode(values)
 		};
+		
+		var data = [];
+		var obj = {};
+		var busiFee = this.baseData["busiFee"];
+		obj['fee_id'] = busiFee.fee_id;
+		obj['fee_std_id'] = busiFee.fee_std_id;
+		obj['count'] = busiFee.fee_count;
+		obj['should_pay'] = this.busiFeeAmount;
+		obj['real_pay'] = this.busiFeeAmount;
+		obj['disct_info'] = this.busiFeeTime;
+		data.push(obj);		
+		//其他杂费busiFees 专用
+		all["busiFees"] = data;
+		
+		return all;
 	},
 	getTransferValues: function(){
 		var values = {};
@@ -513,7 +650,7 @@ ProdOrderForm = Ext.extend( BaseForm, {
 		// 如果当前是套餐，则封装分组用户
 		if(this.isPkg()){
 			// 获得选中的用户
-			var groupUserMap = {};
+			/**var groupUserMap = {};
 			this.selectUserPanel.store.each(function(rs){
 				var gid = rs.get("package_group_id");
 				if(!groupUserMap[gid]){
@@ -529,7 +666,8 @@ ProdOrderForm = Ext.extend( BaseForm, {
 					"userSelectList": groupUserMap[key]
 				})
 			}
-			values["groupSelected"] = groupSelected;
+			values["groupSelected"] = groupSelected;**/
+			values["groupSelected"]=this.getGroupSelected();
 		}
 		
 		// 产品信息
@@ -539,6 +677,30 @@ ProdOrderForm = Ext.extend( BaseForm, {
 		
 		return values;
 	},
+	getGroupSelected:function(){
+		if(this.isPkg()){
+			// 获得选中的用户
+		var groupUserMap = {};
+			this.selectUserPanel.store.each(function(rs){
+				var gid = rs.get("package_group_id");
+				if(!groupUserMap[gid]){
+					groupUserMap[gid] = [];
+				}
+				groupUserMap[gid].push(rs.get("user_id"));
+			}, this);
+			// 封装后台数据结构
+			var groupSelected = [];
+			for(var key in groupUserMap){
+				groupSelected.push({
+					"package_group_id": key,
+					"userSelectList": groupUserMap[key]
+				})
+			}
+			return groupSelected;
+		}
+		return null;
+	}
+	,
 	success : function(form,res){
 		var userId = res.simpleObj;
 		App.getApp().refreshPayInfo(parent);

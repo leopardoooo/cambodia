@@ -64,7 +64,8 @@ public class AuthComponent extends BaseComponent{
 		if (authCmdType.equals(BusiCmdConstants.CREAT_USER) || 
 				authCmdType.equals(BusiCmdConstants.CHANGE_USER) || 
 				authCmdType.equals(BusiCmdConstants.PASSVATE_USER) ||
-				authCmdType.equals(BusiCmdConstants.ACCTIVATE_USER)){
+				authCmdType.equals(BusiCmdConstants.ACCTIVATE_USER)||
+				authCmdType.equals(BusiCmdConstants.ACCTIVATE_TERMINAL)){
 			this.editOttUser(user, doneCode);
 		} else if (authCmdType.equals(BusiCmdConstants.DEL_USER)){
 			this.deleteOttUser(user,orderList, doneCode);
@@ -73,7 +74,6 @@ public class AuthComponent extends BaseComponent{
 			this.authOttProd(user, orderList, doneCode);
 		} else if (authCmdType.equals(BusiCmdConstants.REFRESH_TERMINAL)){
 			this.refreshOttUserAuth(user, doneCode);
-			
 		}
 		
 	}

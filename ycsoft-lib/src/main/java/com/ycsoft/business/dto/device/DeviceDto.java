@@ -30,9 +30,16 @@ public class DeviceDto extends RDevice{
 	private Integer price;				//价格
 	private Integer fee;			    //实收金额
 	private String isPairModem;
+	private String stbMac;
 	
 
 
+	public String getStbMac() {
+		return stbMac;
+	}
+	public void setStbMac(String stbMac) {
+		this.stbMac = stbMac;
+	}
 	public String getIsPairModem() {
 		return isPairModem;
 	}

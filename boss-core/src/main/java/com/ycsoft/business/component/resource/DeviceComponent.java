@@ -51,6 +51,7 @@ import com.ycsoft.business.dao.system.SDeptDao;
 import com.ycsoft.business.dto.config.TemplateConfigDto;
 import com.ycsoft.business.dto.device.DeviceDto;
 import com.ycsoft.business.dto.device.ValuableCardDto;
+import com.ycsoft.commons.constants.BusiCodeConstants;
 import com.ycsoft.commons.constants.DataRight;
 import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.constants.SystemConstants;
@@ -156,6 +157,17 @@ public class DeviceComponent extends BaseBusiComponent {
 		rd.setCust_id(custId);
 		rd.setReclaim_reason(reclaimReason);
 		rDeviceReclaimDao.save(rd);
+	}
+	
+	public void saveLossDevice(Integer doneCode, String busiCode, String deviceCode) throws Exception {
+		RDevice rd = rDeviceDao.findByDeviceCode(deviceCode);
+		if(rd.getIs_loss().equals(SystemConstants.BOOLEAN_FALSE)){
+		
+			rDeviceDao.updateDeviceLoss(rd.getDevice_id(), SystemConstants.BOOLEAN_TRUE);
+			
+			saveDeviceChange(doneCode, busiCode, rd.getDevice_id(), "is_loss", rd.getIs_loss(),
+					SystemConstants.BOOLEAN_TRUE);
+		}
 	}
 	
 	/**
@@ -441,10 +453,12 @@ public class DeviceComponent extends BaseBusiComponent {
 
 		if (rd.getDevice_type().equals(SystemConstants.DEVICE_TYPE_STB)) {
 			deviceModel = rStbModelDao.findByDeviceId(rd.getDevice_id());
-			deviceCode = rStbDao.findByKey(rd.getDevice_id()).getStb_id();
+			RStb stb = rStbDao.findByKey(rd.getDevice_id());
+			deviceCode = stb.getStb_id();
 			// 设置配对信息
 			dto.setPairCard(rCardDao.findPairCardByStbDeviceId(rd.getDevice_id()));
 			dto.setPairModem(rModemDao.findPairModemByStbDeviceId(rd.getDevice_id()));
+			dto.setStbMac(stb.getMac());
 		} else if (rd.getDevice_type().equals(SystemConstants.DEVICE_TYPE_CARD)) {
 			deviceModel = rCardModelDao.findByDeviceId(rd.getDevice_id());
 			deviceCode = rCardDao.findByKey(rd.getDevice_id()).getCard_id();
@@ -479,6 +493,10 @@ public class DeviceComponent extends BaseBusiComponent {
 	public RStb findPairStbByCardDeviceId(String deviceId) throws Exception {
 		return rStbDao.findPairStbByCardDeviceId(deviceId);
 	}
+	
+	public RStb queryStbById(String stbId) throws Exception {
+		return rStbDao.queryStbById(stbId);
+	}
 
 	/**
 	 * 根据设备编号查找可以销售的设备信息
@@ -488,6 +506,22 @@ public class DeviceComponent extends BaseBusiComponent {
 	 */
 	public DeviceDto querySaleableDevice(String deviceCode) throws Exception{
 		DeviceDto rd = queryDevice(deviceCode);
+		if(isDeviceSaleable(rd))
+			return rd;
+		else
+			return null;
+	}
+	
+	public DeviceDto queryChangeDevice(String userType, String deviceCode) throws Exception {
+		DeviceDto rd = queryDevice(deviceCode);
+		if(rd.getDevice_type().equals(SystemConstants.DEVICE_TYPE_STB)){
+			RStbModel stbModel = rStbModelDao.findByDeviceId(rd.getDevice_id());
+			if(userType.equals(SystemConstants.USER_TYPE_OTT) && stbModel.getInteractive_type().equals(SystemConstants.DTV_SERV_TYPE_SINGLE)){
+				throw new ComponentException(ErrorCode.OTTIsNotSingle);
+			}else if(userType.equals(SystemConstants.USER_TYPE_DTT) && stbModel.getInteractive_type().equals(SystemConstants.DTV_SERV_TYPE_DOUBLE)){
+				throw new ComponentException(ErrorCode.DTTIsNotDouble);
+			}
+		}
 		if(isDeviceSaleable(rd))
 			return rd;
 		else
@@ -562,9 +596,9 @@ public class DeviceComponent extends BaseBusiComponent {
 			ComponentException {
 		DeviceDto rd = queryDeviceByDeviceCode(deviceCode);
 		if (rd == null)
-			throw new ComponentException("设备不存在");
+			throw new ComponentException(ErrorCode.DeviceNotExists);
 
-		if (rd.getDevice_type().equals(SystemConstants.DEVICE_TYPE_CARD)) {
+		/*if (rd.getDevice_type().equals(SystemConstants.DEVICE_TYPE_CARD)) {
 			RStb stb = rStbDao.findPairStbByCardDeviceId(rd.getDevice_id());
 			if (stb != null) {
 				rd = queryDeviceByDeviceId(stb.getDevice_id());
@@ -575,7 +609,7 @@ public class DeviceComponent extends BaseBusiComponent {
 			if (stb != null) {
 				rd = queryDeviceByDeviceId(stb.getDevice_id());
 			}
-		}
+		}*/
 		return rd;
 	}
 
@@ -634,7 +668,7 @@ public class DeviceComponent extends BaseBusiComponent {
 			throw new ComponentException("该设备为虚拟"+device.getDevice_type_text());
 		}
 		
-		String scopeDevice = queryTemplateConfig(TemplateConfigDto.Config.SCOPE_DEVICE.toString());
+		/*String scopeDevice = queryTemplateConfig(TemplateConfigDto.Config.SCOPE_DEVICE.toString());
 		if (SystemConstants.SYS_LEVEL_DEPT.equals(scopeDevice)) {
 			//按营业厅
 			if (!getOptr().getDept_id().equals(device.getDepot_id())) {
@@ -653,7 +687,7 @@ public class DeviceComponent extends BaseBusiComponent {
 				throw new ComponentException("设备在" + dept.getCounty_name()
 						+ ",不在当前仓库");
 			}
-		}
+		}*/
 		
 		
 		return true;

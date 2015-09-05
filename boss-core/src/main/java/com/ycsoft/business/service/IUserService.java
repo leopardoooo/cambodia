@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.ycsoft.beans.config.TBusiFee;
+import com.ycsoft.beans.config.TDeviceChangeReason;
 import com.ycsoft.beans.core.user.CUser;
 import com.ycsoft.beans.core.user.CUserPropChange;
 import com.ycsoft.beans.core.user.FillUSerDeviceDto;
@@ -46,7 +47,8 @@ public interface IUserService extends IBaseService{
 	
 	public void createUserBatch(List<UserInfo> userList, String stopType) throws Exception;
 	
-	public void saveChangeDevice(String userId,String deviceId,String devcieBuyMode,FeeInfoDto deviceFee, boolean reclaim)  throws Exception;
+//	public void saveChangeDevice(String userId,String deviceId,String devcieBuyMode,FeeInfoDto deviceFee, String changeReason, boolean reclaim)  throws Exception;
+	public void saveChangeDevice(String userId, String deviceCode, String changeReason) throws Exception;
 
 	public void saveFillDevice(List<FillUSerDeviceDto> deviceList) throws Exception;
 	/**
@@ -369,5 +371,6 @@ public interface IUserService extends IBaseService{
 	public void editFreeUser(String userId, String prodId, String tariffId,String type,Date tariffStartDate )throws Exception;
 	public void transferUsers(String toCustId) throws Exception  ;
 	public void validAccount(String name) throws Exception;
+	public List<TDeviceChangeReason> queryDeviceChangeReason() throws Exception;
 
 }

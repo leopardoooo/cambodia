@@ -42,7 +42,7 @@ UserBaseForm = Ext.extend( BaseForm , {
 							scope:this,
 							select:this.doSelectUserType
 						}
-					},]
+					}]
 				},{
 					items:[{
 						id:'userNameId',
@@ -75,7 +75,7 @@ UserBaseForm = Ext.extend( BaseForm , {
 			            	scope: this,
 			            	check: this.doCheckedChangeTask
 			            }
-					},]
+					}]
 				},{
 					items:[{
 			            xtype: 'textfield',
@@ -487,7 +487,7 @@ UserBaseForm = Ext.extend( BaseForm , {
 		if(fee){
 			values["deviceFee.fee_id"] = fee["fee_id"];
 			values["deviceFee.fee_std_id"] = fee["fee_std_id"];
-			values["deviceFee.fee"] = Ext.getCmp("txtFeeEl").getValue();
+			values["deviceFee.fee"] =Ext.util.Format.formatToFen(Ext.getCmp("txtFeeEl").getValue());
 		}
 		return values;
 	},
@@ -511,4 +511,4 @@ NewUserForm = Ext.extend(UserBaseForm , {
 Ext.onReady(function(){
 	var nup = new NewUserForm();
 	var box = TemplateFactory.gTemplate(nup);
-});
+})

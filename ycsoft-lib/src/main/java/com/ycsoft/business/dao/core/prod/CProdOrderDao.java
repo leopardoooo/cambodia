@@ -263,5 +263,10 @@ public class CProdOrderDao extends BaseEntityDao<CProdOrder> {
 		return this.createQuery(CProdOrderDto.class,sql, package_sn).list();
 		
 	}
+	
+	public List<CProdOrder> queryOrderProdByUserId(String user_id) throws JDBCException{
+		String sql = "select * from c_prod_order where user_id=?";
+		return this.createQuery(sql, user_id).list();
+	}
 
 }

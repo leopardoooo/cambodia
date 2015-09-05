@@ -13,7 +13,7 @@ PayForm = Ext.extend( Ext.form.FormPanel , {
 			fields : ['pay_type','pay_type_name']
 		});
 		this.payTypeStore.load();
-		
+		this.payTypeStore.on("load",this.loadData,this);
 		PayForm.superclass.constructor.call(this, {
 			border: false,
 //			iconCls: 'icon-pay',
@@ -53,10 +53,15 @@ PayForm = Ext.extend( Ext.form.FormPanel , {
 				displayField : "pay_type_name",					
 				allowBlank: false,
 				hiddenName: 'pay.pay_type',
-				defaultValue: 'XJ',
 				listeners: {
 					scope: this,
-					select: this.doChangePayType
+					select: this.doChangePayType,
+					'expand': function(combo){
+						var store = combo.getStore();
+						store.filterBy(function(record){
+							return record.get('pay_type') == 'XJ';
+						})
+					}
 				}
 			},{
 				fieldLabel: '票据编号',
@@ -70,14 +75,14 @@ PayForm = Ext.extend( Ext.form.FormPanel , {
 				xtype:'datefield',
 				format:'Y-m-d',
 				name: 'pay.acct_date'
-			},{
-				name: 'invoice_mode',
-				fieldLabel: '出票方式',
-				maxLength: 18,
-				xtype: 'paramcombo',
-				paramName: 'INVOICE_MODE',
-				defaultValue: 'A',
-				hiddenName: 'pay.invoice_mode'
+//			},{
+//				name: 'invoice_mode',
+//				fieldLabel: '出票方式',
+//				maxLength: 18,
+//				xtype: 'paramcombo',
+//				paramName: 'INVOICE_MODE',
+//				defaultValue: 'A',
+//				hiddenName: 'pay.invoice_mode'
 			},{
 				fieldLabel: '实收USD',
 				xtype: 'numberfield',
@@ -144,5 +149,9 @@ PayForm = Ext.extend( Ext.form.FormPanel , {
 		var all = this.getForm().getValues();
 		
 		return all;
+	},
+	loadData:function(store){
+		var payType = this.find("hiddenName","pay.pay_type")[0];
+		payType.setValue("XJ");		
 	}
 });
