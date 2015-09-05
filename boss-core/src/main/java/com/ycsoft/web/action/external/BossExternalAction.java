@@ -59,7 +59,7 @@ public class BossExternalAction extends AbstractAction{
 			@Override
 			public Object doCallback() throws Throwable {
 				// TODO get_account_info
-				return null;
+				return "你好";
 			}
 		}, null);
 		

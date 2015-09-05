@@ -30,6 +30,7 @@ import com.ycsoft.commons.abstracts.BaseComponent;
 import com.ycsoft.commons.constants.BusiCmdConstants;
 import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.helper.DateHelper;
+import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.daos.core.JDBCException;
 
 @Component
@@ -147,11 +148,15 @@ public class AuthComponent extends BaseComponent{
 			Date expDate = userResMap.get(orderResId);
 			if (expDate == null || expDate.before(new Date())){
 				//发送减授权
+				JsonObject params = new JsonObject();
+				params.addProperty(BusiCmdParam.login_name.name(), user.getLogin_name());
+				ottCmd.setDetail_param(params.toString());
 				ottCmd.setCmd_type(BusiCmdConstants.PASSVATE_PROD);
 			} else {
 				ottCmd.setCmd_type(BusiCmdConstants.ACCTIVATE_PROD);
 				JsonObject params = new JsonObject();
-				params.addProperty(BusiCmdParam.prod_exp_date.name(), DateHelper.format(expDate, DateHelper.FORMAT_TIME));
+				params.addProperty(BusiCmdParam.login_name.name(), user.getLogin_name());
+				params.addProperty(BusiCmdParam.prod_exp_date.name(), StringHelper.append(DateHelper.format(expDate, DateHelper.FORMAT_YMD),"23:59:59"));
 				ottCmd.setDetail_param(params.toString());
 			}
 			jVodCommandDao.save(ottCmd);
@@ -404,7 +409,7 @@ public class AuthComponent extends BaseComponent{
 		return Integer.parseInt(jCaCommandDao.findSequence().toString());
 	}
 	
-	private Map<String,Date> getUserResExpDate(String userId) throws Exception{
+	public Map<String,Date> getUserResExpDate(String userId) throws Exception{
 		List<UserResExpDate> resList = cUserDao.queryUserProdResExpDate(userId);
 		Map<String,Date> resMap = new HashMap<>();
 		for (UserResExpDate res :resList){

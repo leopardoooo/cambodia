@@ -504,4 +504,14 @@ public class CAcctAcctitemDao extends BaseEntityDao<CAcctAcctitem> {
 				
 		return this.createQuery(AcctitemDto.class, sql, acctId,acctItemId).first();
 	}
+	/**
+	 * 查询客户的公用账目
+	 * @param cust_id
+	 * @return
+	 * @throws JDBCException
+	 */
+	public CAcctAcctitem queryPublicAcctItem(String cust_id) throws JDBCException{
+		String sql="select caa.* from c_acct ca,c_acct_acctitem caa where ca.acct_id=caa.acct_id and caa.acctitem_id=? and ca.cust_id=?";
+		return this.createQuery(sql, SystemConstants.ACCTITEM_PUBLIC_ID,cust_id).first();
+	}
 }

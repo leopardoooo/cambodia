@@ -12,31 +12,27 @@ public class ServicesException extends Exception {
 	 */
 	private static final long serialVersionUID = 2758171495592228753L;
 
-	private int statusCode;
-	private String reason;
+
+	private ErrorCode errorCode;
 	
 	public ServicesException(ErrorCode errorCode){
 		super(errorCode.getDesc());
-		this.statusCode = errorCode.ordinal();
-		this.reason = errorCode.getDesc();
+		this.errorCode=errorCode;
 	}
 	
 	public ServicesException(ErrorCode errorCode,Object ... args){
 		super(String.format(errorCode.getDesc(), args));
-		this.statusCode = errorCode.ordinal();
-		this.reason = String.format(errorCode.getDesc(), args);
+		this.errorCode=errorCode;
 	}
 	
 	public ServicesException(ErrorCode errorCode ,Exception e){
 		super( errorCode.getDesc() , e );
-		this.statusCode = errorCode.ordinal();
-		this.reason = errorCode.getDesc();
+		this.errorCode=errorCode;
 	}
 	
 	public ServicesException(ErrorCode errorCode ,Exception e,Object ... args){
 		super( String.format(errorCode.getDesc(),args) , e );
-		this.statusCode = errorCode.ordinal();
-		this.reason = String.format(errorCode.getDesc(), args);
+		this.errorCode=errorCode;
 	}
 	
 	public ServicesException( String msg ){
@@ -51,12 +47,8 @@ public class ServicesException extends Exception {
 		super( msg , e ) ;
 	}
 
-	public int getStatusCode() {
-		return statusCode;
+	public ErrorCode getErrorCode(){
+		return errorCode;
 	}
 
-	public String getReason() {
-		return reason;
-	}
-	
 }

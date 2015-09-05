@@ -102,6 +102,11 @@ public enum ErrorCode {
 	E20003("请求超时,请返回重试"),
 	E20004("产品鉴权失败"),
 	E20005("余额不足"),
+	
+	//OTT授权相关错误
+	ResIsNull("控制字为空"),
+	ResOttIsError("OTT控制字格式错误"),
+	
 	;
 
 	private ErrorCode(String desc){
