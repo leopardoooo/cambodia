@@ -84,7 +84,9 @@ AddressTree = Ext.extend(Ext.ux.tree.TreeGridEditor,{
 	            	beforeload : this.onBeforeLoad
 	            }
 	        }),
-	        maxDepth: 3,
+	        maxDepth: 4,
+	        columnResize:true,
+	        enableHdMenu:true,
 	        // 超出最大深度，提示信息
     		maxDepthText: '不能再往下添加地区',
 	        mouseoverShowObar: true,// mouseover事件触发显示Obar
@@ -158,7 +160,7 @@ AddressTree = Ext.extend(Ext.ux.tree.TreeGridEditor,{
 								var data = Ext.decode(res.responseText);
 								var root = new Ext.tree.AsyncTreeNode({
 										  text:'gen',
-										  id:'root',
+//										  id:'root',
 										  draggable:false,
 										  children:data
 										 });
@@ -322,7 +324,7 @@ BatchAddGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 	        	iconCls : 'icon-add',
 	        	handler : this.addRecord
 	        }]
-		})
+		});
 	},
 	deleteRow : function(){//删除行
 		Confirm("确定要删除该数据吗?", this ,function(){
@@ -485,12 +487,24 @@ AddressWin = Ext.extend(Ext.Window,{
 			this.item = new BatchAddGrid(this.node);
 			width = 500;
 		}else if(type == 'leveladd'){
-			this.title = '增加城市';
+			if(level == 1){
+				this.title = '平级新增城市';
+			}else if(level == 2){
+				this.title = '平级新增街道';
+			}else{
+				this.title = '平级新增路号';
+			}
 			this.item = form;
 			Ext.getCmp('treeLevel').setValue(level);
 			Ext.getCmp('areaId').setValue(node.attributes.others.area_id);
 			Ext.getCmp('countyId').setValue(node.attributes.others.county_id);
 		}
+		var nextNode = this.node.nextSibling;
+		if(nextNode){
+			alert(nextNode.attributes.others.sort_num);
+		}
+		
+		
 		
 		App.form.initComboData(form.findByType("lovcombo"), function(){
 			if(type =='edit' && node && node.attributes && node.attributes.others){
@@ -561,6 +575,8 @@ AddressWin = Ext.extend(Ext.Window,{
 								Alert('操作成功!');
 								if(this.type == 'add'){
 									this.addNode(rs.simpleObj);	
+								}else if( this.type == 'leveladd'){
+									this.addLevelNode(rs.simpleObj);	
 								}else{
 									this.node.setText(Ext.getCmp('addrName').getValue());
 									this.node.attributes.others.net_type = Ext.getCmp('net_type').getValue();
@@ -600,8 +616,33 @@ AddressWin = Ext.extend(Ext.Window,{
 		this.node.editing = false;
         this.node.editMode = false;
         
-        Ext.DomHelper.overwrite(Ext.fly(this.node.getUI().elNode).child('.x-treegrideditor-obar'), Ext.getCmp('AddressTree').editBtnsHtml(this.node))
+        Ext.DomHelper.overwrite(Ext.fly(this.node.getUI().elNode).child('.x-treegrideditor-obar'), Ext.getCmp('AddressTree').editBtnsHtml(this.node));
         Ext.getCmp('AddressTree').activeObar(this.node);
+        
+//        Ext.getCmp('AddressTree').hideObar(nn, 'statusActive');
+//		Ext.getCmp('AddressTree').showObar(nn, 'statusInvalid');
+	},
+	addLevelNode : function(newNode){
+		var nc = {
+            id: newNode.addr_id,
+            cls : 'file',
+            text : newNode.addr_name,
+			others : {
+				tree_level : newNode.tree_level,
+				net_type : newNode.net_type,
+				county_id : newNode.county_id,
+				area_id:newNode.area_id
+			},
+            leaf: true
+        };
+        var nn = new Ext.ux.tree.TreeGridEditorNode(nc);
+        nn.ui = new Ext.ux.tree.TreeGridEditorNodeUI(nn);
+        
+        this.node.parentNode.appendChild(nn);
+		
+        
+//        Ext.DomHelper.overwrite(Ext.fly(this.node.parentNode.getUI().elNode).child('.x-treegrideditor-obar'), Ext.getCmp('AddressTree').editBtnsHtml(this.node.parentNode));
+//        Ext.getCmp('AddressTree').activeObar(this.node.parentNode);
         
 //        Ext.getCmp('AddressTree').hideObar(nn, 'statusActive');
 //		Ext.getCmp('AddressTree').showObar(nn, 'statusInvalid');
@@ -619,6 +660,6 @@ AddressView = Ext.extend(Ext.Panel,{
 			border : false ,
 			baseCls: "x-plain",
 			items : [new AddressTree()]
-		})
+		});
 	}
-})
+});

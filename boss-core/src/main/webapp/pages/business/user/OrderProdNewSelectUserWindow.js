@@ -158,6 +158,7 @@ OpenDispatchUserWindow = Ext.extend(Ext.Window, {
 			maximizable: false,
 			closeAction: 'hide',
 			minimizable: false,
+			closable: false,
 			border: false,
 			items: [{
 				region: "north",
@@ -165,6 +166,7 @@ OpenDispatchUserWindow = Ext.extend(Ext.Window, {
 				layout: 'fit',
 				bodyStyle: 'border-bottom: none',
 				items: {
+					id:'datViewId',
 					xtype: 'dataview',
 					store: this.subProdStore,
 				    autoScroll: true,
@@ -210,7 +212,11 @@ OpenDispatchUserWindow = Ext.extend(Ext.Window, {
 			        	iconCls: 'icon-add',
 			        	scope: this,
 			        	handler: this.doAddSelected
-			        }]
+			        }],
+			        listeners:{
+			        	scope: this,
+			        	dblclick: this.doAddSelected
+			        }
 				},{
 					title: '已选',
 					region: 'east',
@@ -243,22 +249,36 @@ OpenDispatchUserWindow = Ext.extend(Ext.Window, {
 			        	        }
 			        		}
 			        	}
-			        }]
+			        }],
+			        listeners:{
+			        	scope: this,
+			        	dblclick: this.doRemoveSelected
+			        }
 				}]
 			}],
-			// window hide事件
-			listeners: {
-				scope: this,
-				hide: this.doPassResultToParent
-			}
+			buttons:[
+			         {text:'保存', iconCls:'icon-save', scope:this, handler: this.doPassResultToParent},
+			         {text:'关闭', iconCls:'icon-close', scope:this, handler: this.hide},
+			]
 		});
 	},
 	//父页面加载数据
 	doPassResultToParent: function(){
 		var targetData = []; 
+		var alertInfo = null;
 		for(var gid in this.selectedDataMap){
 			var group = this.allUserGroup[gid]["group"];
 			var users = this.selectedDataMap[gid];
+			
+			if(group['prod_type'] == 'CPKG' && users.length != group['max_user_cnt']){
+				Alert('客户套餐已选用户必须等于套餐最大用户数!');
+				return;
+			}
+			
+			if(group['prod_type'] == "SPKG" && users.length < group['max_user_cnt']){
+				alertInfo = '协议套餐已选用户小于套餐内容最大用户数，可继续选择用户!';
+			}
+			
 			for(var i = 0; i< users.length; i++){
 				var user = users[i];
 				targetData.push({
@@ -269,8 +289,18 @@ OpenDispatchUserWindow = Ext.extend(Ext.Window, {
 				});
 			}
 		}
-		// 父面板加载数据
-		this.parent.store.loadData(targetData);
+		if(alertInfo){
+			Alert(alertInfo, function(){
+				if(targetData.length>0){
+					this.parent.store.loadData(targetData);
+					this.hide();
+				}
+			});
+		}else if(targetData.length>0){
+			// 父面板加载数据
+			this.parent.store.loadData(targetData);
+			this.hide();
+		}
 	},
 	// 如果已经有默认值了，就不需要显示窗口，跳过选择的步骤
 	saveDefaultUsersWithNoShow: function(data){
@@ -357,6 +387,12 @@ OpenDispatchUserWindow = Ext.extend(Ext.Window, {
 	},
 	// left -> right
 	doAddSelected: function(){
+		var selectedRecord = Ext.getCmp('datViewId').getSelectedRecords()[0];
+		if(this.toUserStore.getCount() >= selectedRecord.get('max_user_cnt')){
+			Alert('已超过套餐最大用户数限制!');
+			return;
+		}
+		
 		var records = this.fromSm.getSelections();
 		this.fromUserStore.remove(records);
 		this.toUserStore.add(records);

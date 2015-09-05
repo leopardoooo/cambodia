@@ -108,7 +108,6 @@ public enum ErrorCode {
 	//OTT授权相关错误
 	ResIsNull("控制字为空"),
 	ResOttIsError("OTT控制字格式错误"),
-	CmdTypeUnDefined("授权类型未定义,请联系管理员(s%)"),
 	
 	;
 
