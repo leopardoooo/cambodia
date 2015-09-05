@@ -513,6 +513,8 @@ public class SystemConstants {
 	
 	public static final String CUST_CLASS_YBKH = "YBKH";
 	
+	public static final String CUST_LEVEL_YBKH="YBKH";
+	public static final String CUST_LEVEL_VIP="VIPKH";
 	/**
 	 * 充值卡充值用户名和密码
 	 */
@@ -591,4 +593,10 @@ public class SystemConstants {
 	
 	public static final int USER_TYPE_OTT_NUM = 61;		//ott用户账户名生成规则数字
 	public static final int USER_TYPE_BAND_NUM = 1;		//band用户账户名生成规则数字
+	
+	public static final String OTT_MOBILE_CUSTCODE="90";//移动端客户cust_no取值
+	public static final String OTT_MOBILE_ADDR_ID="625";   //移动端固定的地址码
+	public static final String OTT_MOBILE_ADDRESS="Room #, No.Register, St.Mobile,Special";   //移动端固定的开户地址
+	
+	
  }

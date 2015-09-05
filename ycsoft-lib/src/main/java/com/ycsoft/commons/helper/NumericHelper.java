@@ -106,7 +106,7 @@ public class NumericHelper {
     public static void main(String[] args) {  
         System.out.println(changeY2F("1.33"));  
         try {
-			System.out.println(changeF2Y("1322"));
+			System.out.println(changeF2Y("1323332"));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

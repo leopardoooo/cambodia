@@ -721,8 +721,27 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 
 	@Override
 	public void saveResendCa() throws Exception {
-		// TODO Auto-generated method stub
-		
+		List<CUser> userList = getBusiParam().getSelectedUsers();
+		//获取业务流水
+		Integer doneCode = doneCodeComponent.gDoneCode();
+		for (CUser user:userList){
+			//重发加授权指令
+			List<CProdOrder> prodList = orderComponent.queryOrderProdByUserId(user.getUser_id());
+			for (CProdOrder prod:prodList){
+				//正常状态的产品,重复指令
+				List<CProdOrder> orderList = new ArrayList<CProdOrder>();
+				orderList.add(prod);
+				String authCmdType = "";
+				if (isProdOpen(prod.getStatus())){
+					authCmdType = BusiCmdConstants.ACCTIVATE_PROD;
+				}else{
+					authCmdType = BusiCmdConstants.PASSVATE_PROD;
+				}
+				authComponent.sendAuth(user, orderList, authCmdType, doneCode);
+			}
+		}
+
+		saveAllPublic(doneCode,getBusiParam());
 	}
 
 
@@ -730,8 +749,19 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 
 	@Override
 	public void saveRefreshCa(String refreshType) throws Exception {
-		// TODO Auto-generated method stub
-		
+		List<CUser> userList = getBusiParam().getSelectedUsers();
+		//获取业务流水
+		Integer doneCode = doneCodeComponent.gDoneCode();
+		for (CUser user:userList){
+			if (SystemConstants.REFRESH_TYPE_TERMINAL.equals(refreshType)){
+				authComponent.sendAuth(user, null, BusiCmdConstants.ACCTIVATE_TERMINAL, doneCode);
+			} else {
+				authComponent.sendAuth(user, null, BusiCmdConstants.REFRESH_TERMINAL, doneCode);
+			}
+				
+		}
+
+		saveAllPublic(doneCode,getBusiParam());
 	}
 
 

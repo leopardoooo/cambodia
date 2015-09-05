@@ -3,6 +3,7 @@
  */
 package com.ycsoft.web.action.external;
 
+import com.ycsoft.commons.exception.ErrorCode;
 import com.ycsoft.commons.exception.ServicesException;
 
 /**
@@ -33,6 +34,7 @@ public class ResultBody {
 		ResultBody rb = new ResultBody();
 		rb.err = Err.SUCCESS;
 		rb.status = rb.err.getStatus();
+		rb.reason="成功";
 		rb.msg = msg;
 		
 		return rb;
@@ -45,8 +47,9 @@ public class ResultBody {
 	public static ResultBody createWithException(ServicesException ex) {
 		ResultBody rb = new ResultBody();
 		rb.err = Err.FAILURE;
-		rb.status = String.valueOf(ex.getStatusCode());
-		rb.reason = ex.getReason();
+		ErrorCode ec=ex.getErrorCode();
+		rb.status = ec.getOttStatusCode();
+		rb.reason = ec.getDesc();
 		return rb;
 	}
 	/**
