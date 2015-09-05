@@ -57,4 +57,20 @@ public class JVodCommandDao extends BaseEntityDao<JVodCommand> {
 		String sql = "select * from j_vod_command where is_send='F' and rownum<500 order by transnum";
 		return this.createQuery(sql).list();
 	}
+	
+	public int updateByCmd(Long transnum,String isSent,String isSuccess,String errorInfo,Integer returnCode) throws JDBCException{
+		//cmd.setIs_send(SystemConstants.BOOLEAN_TRUE);
+		if(isSent==null){
+			isSent="F";
+		}
+		if(isSuccess==null){
+			isSuccess="F";
+		}
+		if(errorInfo!=null&&errorInfo.length()>100){
+			errorInfo=errorInfo.substring(0,100);
+		}
+		String sql="update j_vod_command set is_send=?,send_time=sysdate,is_success=?,error_info=?,return_code=? where transnum=? ";
+		return this.executeUpdate(sql, isSent,isSuccess,errorInfo,returnCode,transnum);
+	}
+	
 }

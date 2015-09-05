@@ -39,41 +39,50 @@ public class OttAuthJob implements Job2 {
 		OttClient client = new OttClient();
 		for (JVodCommand cmd:cmdList){
 			Result result = null;
-			JsonObject params =new JsonParser().parse(cmd.getDetail_param()).getAsJsonObject();
-			if ((cmd.getCmd_type().equals(BusiCmdConstants.CHANGE_USER))){
-				
-				result = client.editUser(cmd.getLogin_name(), 
-						getJsonValue(params,BusiCmdParam.login_name.name()), 
-						getJsonValue(params,BusiCmdParam.login_password.name()),
-						null, null,null,
-						getJsonValue(params,BusiCmdParam.stb_id.name()),
-						getJsonValue(params,BusiCmdParam.stb_mac.name()),
-						getJsonValue(params,BusiCmdParam.user_status.name()));
-			} else if ((cmd.getCmd_type().equals(BusiCmdConstants.DEL_USER))){
-				result = client.deleteUser(cmd.getUser_id());
-			} else if ((cmd.getCmd_type().equals(BusiCmdConstants.PASSVATE_PROD))){
-				result = client.stopUserProduct(cmd.getUser_id(), cmd.getRes_id());
-			} else if  ((cmd.getCmd_type().equals(BusiCmdConstants.ACCTIVATE_PROD))){
-				result = client.openUserProduct(cmd.getUser_id(), cmd.getRes_id(),
-						getJsonValue(params,BusiCmdParam.prod_exp_date.name()));
+			try{
+				JsonObject params =new JsonParser().parse(cmd.getDetail_param()).getAsJsonObject();
+				if ((cmd.getCmd_type().equals(BusiCmdConstants.CHANGE_USER))){
+					
+					result = client.editUser(cmd.getLogin_name(), 
+							getJsonValue(params,BusiCmdParam.login_name.name()), 
+							getJsonValue(params,BusiCmdParam.login_password.name()),
+							null, null,null,
+							getJsonValue(params,BusiCmdParam.stb_id.name()),
+							getJsonValue(params,BusiCmdParam.stb_mac.name()),
+							getJsonValue(params,BusiCmdParam.user_status.name()));
+				} else if ((cmd.getCmd_type().equals(BusiCmdConstants.DEL_USER))){
+					
+					result = client.deleteUser(getJsonValue(params,BusiCmdParam.login_name.name()));
+				} else if ((cmd.getCmd_type().equals(BusiCmdConstants.PASSVATE_PROD))){
+					result = client.stopUserProduct(getJsonValue(params,BusiCmdParam.login_name.name()), cmd.getRes_id());
+				} else if  ((cmd.getCmd_type().equals(BusiCmdConstants.ACCTIVATE_PROD))){
+					result = client.openUserProduct(getJsonValue(params,BusiCmdParam.login_name.name()), cmd.getRes_id(),
+							getJsonValue(params,BusiCmdParam.prod_exp_date.name()));
+				}else{
+					result=client.getBossErrorResult("未定义的指令类型");
+				}
+			}catch(Exception e){
+				result = new Result();
+				result.setErr("1");
+				result.setStatus(Result.UNDEFINED_ERROR_STATUS);
+				result.setReason(e.getMessage());
+				logger.error("OTT指令发送失败",e);
 			}
 			
-			if (result.isConnectionError()){
-				logger.error("网络无法连接，暂停发送!"+result.getReason());
-				break; 
-			} else if (result.isUndefinedError()){
-				logger.error("未知严重错误，暂停发送!"+result.getReason());
-				break;
-			} else {
-				//保存发送结果
-				try{
-					authComponent.saveOttSendResult(cmd, result);
-				} catch(Exception e){
-					e.printStackTrace();
-					logger.error("保存指令发送结果失败"+e.getMessage());
-					return;
+			if (!result.isSuccess()&&(result.isUndefinedError()||result.isConnectionError())){
+				try {
+					Thread.sleep(1000*5);
+				} catch (Exception e) {
+					logger.error("OTT发送线程休眠失败",e);
 				}
-				
+			} 
+			//保存发送结果
+			try{
+				authComponent.saveOttSendResult(cmd, result);
+			} catch(Exception e){
+				e.printStackTrace();
+				logger.error("保存指令发送结果失败",e);
+				return;
 			}
 		}
 	}

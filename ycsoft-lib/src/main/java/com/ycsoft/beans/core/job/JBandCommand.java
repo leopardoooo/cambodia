@@ -27,7 +27,7 @@ public class JBandCommand implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 8914092755631544635L;
-	private Integer transnum ;	
+	private Long transnum ;	
 	private Integer job_id ;	
 	private String supplyier_id ;	
 	private String server_id ;	
@@ -56,11 +56,11 @@ public class JBandCommand implements Serializable {
 	
 	
 	// transnum getter and setter
-	public Integer getTransnum(){
+	public Long getTransnum(){
 		return this.transnum ;
 	}
 	
-	public void setTransnum(Integer transnum){
+	public void setTransnum(Long transnum){
 		this.transnum = transnum ;
 	}
 	

@@ -130,7 +130,7 @@ public class BOSSBandServiceAdapterTest {
 	//加授权
 	public void testAddProd() {
 		try {
-			boolean success = bandService.orderService(0l, "0120433901@vip", 1239, "20150822000000", "20160825000000");
+			boolean success = bandService.orderService(0l, "0120433901@vip", 637, "20150822000000", "20160825000000");
 			//assertTrue(success);
 			System.out.println("加授权：" + success);
 		} catch (AAAException e) {
@@ -140,7 +140,7 @@ public class BOSSBandServiceAdapterTest {
 	
 	public void testEditProd() {
 		try {
-			boolean success = bandService.modifyOrderService(0l, "0120433901@vip", 637, null, "20150823000000");
+			boolean success = bandService.modifyOrderService(0l, "0120433901@vip", 637, null, "20151005000000");
 			//assertTrue(success);
 			System.out.println("加授权：" + success);
 		} catch (AAAException e) {
@@ -157,6 +157,7 @@ public class BOSSBandServiceAdapterTest {
 		
 		} catch (AAAException e) {
 			System.out.println(e.getMessage());
+			e.printStackTrace();
 		}
 	}
 }

@@ -3,8 +3,8 @@ package com.ycsoft.commons.constants;
 public class BusiCmdConstants {
 	public static final String CREAT_USER="CRT_USER";//	创建新用户
 	public static final String DEL_USER="DEL_USER";//		删除用户
-	public static final String ACCTIVATE_USER="AVT_USER";//		激活用户
-	public static final String PASSVATE_USER="PST_USER";//		钝化用户
+	public static final String ACCTIVATE_USER="AVT_USER";//		激活用户(报开)
+	public static final String PASSVATE_USER="PST_USER";//		钝化用户(报停)
 	public static final String CHANGE_USER="CHG_USER";//		用户信息变更
 	public static final String ACCTIVATE_TERMINAL="AVT_TERMINAL";//		激活终端设备
 	public static final String PASSVATE_TERMINAL="PST_TERMINAL";//		钝化终端设备

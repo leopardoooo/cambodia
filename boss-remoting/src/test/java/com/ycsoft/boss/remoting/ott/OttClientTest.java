@@ -6,6 +6,8 @@ import java.util.Date;
 
 import org.junit.Test;
 
+import com.ycsoft.commons.helper.DateHelper;
+
 public class OttClientTest {
 	OttClient client = new OttClient();
 
@@ -18,20 +20,37 @@ public class OttClientTest {
 	
 	//01201342
 	
-//	@Test
-//	public void testDeleteUser() {
-//		Result result = client.deleteUser("0120134264");
-//		assertEquals("0",result.getErr());
-//	}
-//	
+	@Test
+	public void testDeleteUser() {
+		Result result = client.deleteUser("0120134264");
+		assertEquals("0",result.getErr());
+	}
 	
-//	BasePO_SuperTV_Basic
-//	PO_SuperTV_BASE_Internet_1M
-//	@Test
-//	public void stopUserProduct() {
-//		Result result = client.stopUserProduct("0120134264", "PO_SuperTV_BASE_Internet_1M");
-//		assertEquals("0",result.getErr());
-//	}
+	/**
+	 * 加授权测试
+	 * 产品ID: BasePO_SuperTV_Basic
+	 * 产品名称:SuperTV Basic Combo
+	 * 资费ID: 9223372028806824119
+	 * 
+	 */
+	@Test 
+	public void addUserProduct(){
+		
+		Result result=client.openUserProduct("0120134264", 
+				"PO_SuperTV_BASE_Internet_1M", "2015-11-13");
+		System.out.println(result.getStatus()+":"+result.getReason());
+		assertEquals("0",result.getErr());
+	}
+	/**
+	 * BasePO_SuperTV_Basic
+	* PO_SuperTV_BASE_Internet_1M
+	 */
+	@Test
+	public void stopUserProduct() {
+		Result result = client.stopUserProduct("0120134264", "BasePO_SuperTV_Basic");
+		System.out.println(result.getStatus()+":"+result.getReason());
+		assertEquals("0",result.getErr());
+	}
 	
 	
 }

@@ -2,7 +2,7 @@ package com.ycsoft.boss.remoting.ott;
 
 public class Result {
 	public static String UNDEFINED_ERROR_STATUS="10000";
-	
+	public static String BOSS_ERROR_STATUS="-1";
 	private String err;
 	private String status;
 	private String reason;
@@ -30,7 +30,11 @@ public class Result {
 	}
 	
 	public boolean isUndefinedError(){
-		return status.equals(UNDEFINED_ERROR_STATUS);
+		return UNDEFINED_ERROR_STATUS.equals(status);
+	}
+	
+	public boolean isBossError(){
+		return BOSS_ERROR_STATUS.equals(status);
 	}
 	
 	public boolean isConnectionError(){

@@ -24,7 +24,7 @@ public class JCaCommand extends BusiBase implements Serializable {
 	 *
 	 */
 	private static final long serialVersionUID = -2766430818806493825L;
-	private Integer transnum;
+	private Long transnum;
 	private Integer job_id;
 	private String cas_id;
 	private String cas_type;
@@ -242,7 +242,7 @@ public class JCaCommand extends BusiBase implements Serializable {
 	/**
 	 * @return the transnum
 	 */
-	public Integer getTransnum() {
+	public Long getTransnum() {
 		return transnum;
 	}
 
@@ -250,7 +250,7 @@ public class JCaCommand extends BusiBase implements Serializable {
 	 * @param transnum
 	 *            the transnum to set
 	 */
-	public void setTransnum(Integer transnum) {
+	public void setTransnum(Long transnum) {
 		this.transnum = transnum;
 	}
 
