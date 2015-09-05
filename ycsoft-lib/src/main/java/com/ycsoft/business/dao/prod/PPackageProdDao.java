@@ -31,7 +31,7 @@ public class PPackageProdDao extends BaseEntityDao<PPackageProd> {
 	public PPackageProdDao() {}
 	
 	public List<PPackageProd> queryPackProdById(String prodId)  throws Exception{
-		String sql = "select p.* from p_package_prod p where p.package_id=? ";
+		String sql = "select pp.*, p.prod_type from p_package_prod pp,p_prod p where pp.package_id=p.prod_id and pp.package_id=? ";
 		List<PPackageProd> tariffList = this.createQuery(PPackageProd.class,sql, prodId).list();
 		return tariffList;
 	}

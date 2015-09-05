@@ -619,15 +619,17 @@ ProdOrderForm = Ext.extend( BaseForm, {
 		var data = [];
 		var obj = {};
 		var busiFee = this.baseData["busiFee"];
-		obj['fee_id'] = busiFee.fee_id;
-		obj['fee_std_id'] = busiFee.fee_std_id;
-		obj['count'] = busiFee.fee_count;
-		obj['should_pay'] = this.busiFeeAmount;
-		obj['real_pay'] = this.busiFeeAmount;
-		obj['disct_info'] = this.busiFeeTime;
-		data.push(obj);		
-		//其他杂费busiFees 专用
-		all["busiFees"] = data;
+		if(busiFee){
+			obj['fee_id'] = busiFee.fee_id;
+			obj['fee_std_id'] = busiFee.fee_std_id;
+			obj['count'] = busiFee.fee_count;
+			obj['should_pay'] = this.busiFeeAmount;
+			obj['real_pay'] = this.busiFeeAmount;
+			obj['disct_info'] = this.busiFeeTime;
+			data.push(obj);		
+			//其他杂费busiFees 专用
+			all["busiFees"] = data;
+		}
 		
 		return all;
 	},
