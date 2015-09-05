@@ -1,5 +1,7 @@
 package com.ycsoft.boss.remoting.ott;
 
+import java.util.Date;
+
 import com.ycsoft.commons.helper.DateHelper;
 
 public class Auth {
@@ -60,7 +62,7 @@ public class Auth {
 		
 		this.state = "0";
 		
-		this.begin_time = DateHelper.formatNow();
+		this.begin_time = DateHelper.format(new Date(), DateHelper.FORMAT_TIME_START);
 		this.end_time ="2050-06-19 08:59:59";
 		
 		this.ott_data = new String[0];
