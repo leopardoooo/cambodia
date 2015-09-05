@@ -21,6 +21,7 @@ public class AddrTreeNode {
 	private boolean hideObarStatusactive = false;
 	private boolean hideObarStatusinvalid = false;
 	private boolean hideObarLeveladd = false;
+	private boolean hideObarAdd = false;
 	
 	private boolean expanded = false;
 	private boolean singleClickExpand = true;
@@ -31,6 +32,12 @@ public class AddrTreeNode {
 	
 
 
+	public boolean isHideObarAdd() {
+		return hideObarAdd;
+	}
+	public void setHideObarAdd(boolean hideObarAdd) {
+		this.hideObarAdd = hideObarAdd;
+	}
 	public boolean isHideObarEdit() {
 		return hideObarEdit;
 	}

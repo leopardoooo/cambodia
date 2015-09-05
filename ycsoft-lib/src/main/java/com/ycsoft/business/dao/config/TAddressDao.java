@@ -420,7 +420,7 @@ public class TAddressDao extends BaseEntityDao<TAddress> {
 			" where  ",getSqlGenerator().setWhereInArray("addr_pid",lvOneAddrIds),
 			" and  lower( t.addr_name) like '%'||?||'%' ",
 			") connect by prior c.addr_pid = c.addr_id)d ",
-			" where d.tree_level<>0 order by d.tree_level");
+			" where d.tree_level<>0 order by d.tree_level,d.sort_num");
 		return createQuery(TAddressDto.class,sql,name,name,name).list();
 	}
 	
