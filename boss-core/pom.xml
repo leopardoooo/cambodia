@@ -67,5 +67,10 @@
 			<artifactId>axis2-transport-local</artifactId>
 			<version>1.6.3</version>
 		</dependency>
+		<dependency>
+			<groupId>com.yaochen.cambodia</groupId>
+			<artifactId>boss-remoting</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 	</dependencies>
 </project>
