@@ -11,7 +11,7 @@ public class OttClientTest {
 	@BeforeClass
 	public static void setUp(){
 		URLBuilder b = new URLBuilder();
-		b.setIP("172.18.21.56");
+		b.setIp("172.18.21.56");
 		b.setPort(80);
 		
 		client.setBuilder(b);
