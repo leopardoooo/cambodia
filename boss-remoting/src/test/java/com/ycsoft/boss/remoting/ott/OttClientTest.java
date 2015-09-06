@@ -2,15 +2,21 @@ package com.ycsoft.boss.remoting.ott;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.Date;
-
+import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.ycsoft.commons.helper.DateHelper;
-
 public class OttClientTest {
-	OttClient client = new OttClient();
-
+	static OttClient client = new OttClient();
+	
+	@BeforeClass
+	public static void setUp(){
+		URLBuilder b = new URLBuilder();
+		b.setIP("172.18.21.56");
+		b.setPort(80);
+		
+		client.setBuilder(b);
+	}
+	
 	@Test
 	public void testCreateUser() {
 		Result result = client.createUser("0120134264", "123456", "pybtest1", "moniwang",

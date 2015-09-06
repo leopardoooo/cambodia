@@ -1,9 +1,8 @@
 package com.ycsoft.boss.remoting.ott;
 
 public class URLBuilder {
-	private static String IP="172.18.21.56";
-	private static int port=80;
-	
+	private String IP="172.18.21.56";
+	private int port=80;
 	
 	public enum Method{
 		CREATE_USER,
@@ -15,7 +14,7 @@ public class URLBuilder {
 		DELETE_PRODUCT
 	}
 	
-	public static String getUrl(Method method){
+	public String getUrl(Method method){
 		String url = "http://"+IP;
 		if (port !=80)
 			url = url +":"+port+"/";
@@ -53,27 +52,15 @@ public class URLBuilder {
 	}
 
 
-	public String getIP() {
-		return IP;
-	}
-
 
 	public void setIP(String iP) {
 		IP = iP;
 	}
 
 
-	public int getPort() {
-		return port;
-	}
-
-
 	public void setPort(int port) {
 		this.port = port;
 	}
-	
-	
-	
 	
 
 }

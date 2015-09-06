@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.ycsoft.commons.constants.StatusConstants;
@@ -12,8 +14,14 @@ import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.http.HttpUtils;
 import com.ycsoft.http.ResponseBody;
 
+/**
+ * 
+ * 该类只能通过spring容器获得实例，因为需要依赖注入Builder
+ */
 public class OttClient {
 	
+	@Autowired
+	private URLBuilder builder;
 	
 	/**
 	 * 创建用户
@@ -28,7 +36,7 @@ public class OttClient {
 			return this.getBossErrorResult("密码为空");
 		}
 		User user = generateUser(loginName,password,userName,address,email,telephone,stbId,deviceMac,status);
-		String url = URLBuilder.getUrl(URLBuilder.Method.CREATE_USER); 
+		String url = builder.getUrl(URLBuilder.Method.CREATE_USER); 
 		String jsonData = new Gson().toJson(user);
 		//System.out.println(jsonData);
 		return sendOttCmdOnHttp(url, jsonData);
@@ -52,7 +60,7 @@ public class OttClient {
 		if(StringHelper.isEmpty(loginName)){
 			return this.getBossErrorResult("loginName账户为空");
 		}
-		String url = URLBuilder.getUrl(URLBuilder.Method.DELETE_USER); 
+		String url = builder.getUrl(URLBuilder.Method.DELETE_USER); 
 		JsonObject jsonData = new JsonObject();
 		jsonData.addProperty("user_id", loginName);
 		return sendOttCmdOnHttp(url, jsonData.toString());
@@ -71,7 +79,7 @@ public class OttClient {
 	 * @throws ComponentException 
 	 */
 	public Result openUserProduct(String loginName,String externalResId,String expDate) {
-		String url = URLBuilder.getUrl(URLBuilder.Method.OPEN_USER_PRODCT); 
+		String url = builder.getUrl(URLBuilder.Method.OPEN_USER_PRODCT); 
 		
 		if(StringHelper.isEmpty(loginName)){
 			return this.getBossErrorResult("loginName账户为空");
@@ -101,7 +109,7 @@ public class OttClient {
 	 */
 	
 	public Result stopUserProduct(String loginName,String externalResId){
-		String url = URLBuilder.getUrl(URLBuilder.Method.STOP_USER_PRODCT); 
+		String url = builder.getUrl(URLBuilder.Method.STOP_USER_PRODCT); 
 		if(StringHelper.isEmpty(loginName)){
 			return this.getBossErrorResult("loginName账户为空");
 		}
@@ -130,7 +138,7 @@ public class OttClient {
 	 * @return
 	 */
 	public Result addOrUpdateProduct(String productId,String productName){
-		String url = URLBuilder.getUrl(URLBuilder.Method.ADD_UPDATE_PRODUCT); 
+		String url = builder.getUrl(URLBuilder.Method.ADD_UPDATE_PRODUCT); 
 		Product product = new Product(productId,productName);
 		return sendOttCmdOnHttp(url, new Gson().toJson(product));
 	}
@@ -140,7 +148,7 @@ public class OttClient {
 	 * @return
 	 */
 	public Result deleteProduct(String productId){
-		String url = URLBuilder.getUrl(URLBuilder.Method.DELETE_PRODUCT); 
+		String url = builder.getUrl(URLBuilder.Method.DELETE_PRODUCT); 
 		JsonObject jsonData = new JsonObject();
 		jsonData.addProperty("ids", productId);
 		
@@ -203,6 +211,8 @@ public class OttClient {
 		
 		return user;
 	}
-	
 
+	public void setBuilder(URLBuilder builder) {
+		this.builder = builder;
+	}
 }
