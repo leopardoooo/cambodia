@@ -20,7 +20,6 @@ import com.ycsoft.http.ResponseBody;
  */
 public class OttClient {
 	
-	@Autowired
 	private URLBuilder builder;
 	
 	/**
