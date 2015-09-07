@@ -4,7 +4,9 @@ import java.io.File;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Controller;
 
@@ -25,7 +27,6 @@ import com.ycsoft.business.service.impl.UserServiceSN;
 import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.helper.DateHelper;
 import com.ycsoft.commons.helper.FileHelper;
-import com.ycsoft.commons.helper.JsonHelper;
 import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.daos.core.JDBCException;
 import com.ycsoft.web.commons.abstracts.BaseBusiAction;
@@ -111,8 +112,7 @@ public class UserAction extends BaseBusiAction {
 	
 	private String openUserList;
 	private String workBillAsignType;
-	
-	
+	private String isHand;	//批量开户，是否手动开户 T， 自动配置开户 F
 	
 	//柬埔寨
 	//是否回收设备T,F
@@ -122,6 +122,9 @@ public class UserAction extends BaseBusiAction {
 	
 	private String deviceCode;
 	private String reasonType;
+	
+	private String spkgSn;
+	private String spId;
 	
 	/**
 	 * 用户开户
@@ -147,7 +150,7 @@ public class UserAction extends BaseBusiAction {
 	public String createUserBatch() throws Exception{
 		Type type = new TypeToken<List<UserInfo>>(){}.getType();
 		List<UserInfo> rs = new Gson().fromJson(openUserList,type);
-		userServiceSN.createUserBatch(rs, stopType);
+		userServiceSN.createUserBatch(rs, stopType, isHand);
 		return JSON_SUCCESS;
 	}
 	
@@ -838,7 +841,14 @@ public class UserAction extends BaseBusiAction {
 		return JSON;
 	}
 	
-
+	public String querySpkgUserInfo() throws Exception {
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("spkgUser", userServiceSN.querySpkgUser(spkgSn));
+		map.put("busiFee", userServiceSN.querySpkgOpenFee(spkgSn));
+		getRoot().setSimpleObj(map);
+		return JSON_SIMPLEOBJ;
+	}
+	
 	/**
 	 * @param userService
 	 *            the userService to set
@@ -1159,6 +1169,18 @@ public class UserAction extends BaseBusiAction {
 
 	public void setReasonType(String reasonType) {
 		this.reasonType = reasonType;
+	}
+	
+	public void setSpkgSn(String spkgSn) {
+		this.spkgSn = spkgSn;
+	}
+	
+	public void setSpId(String spId) {
+		this.spId = spId;
+	}
+	
+	public void setIsHand(String isHand) {
+		this.isHand = isHand;
 	}
 	
 }
