@@ -226,6 +226,16 @@ public class CustAction extends BaseBusiAction{
 		return JSON;
 	}
 	
+	/**
+	 * 修改优惠类型
+	 * @return
+	 * @throws Exception
+	 */
+	public String editCustLevel() throws Exception{
+		custService.editCustLevel(request.getParameter("cust_level"));
+		return JSON;
+	}
+	
 	public String changeNonresCust() throws Exception {
 		custService.changeNonresCust(cust, linkman);
 		return JSON;

@@ -199,6 +199,16 @@ public class CustService extends BaseBusiService implements ICustService {
 		saveAllPublic(doneCode, getBusiParam());
 	}
 	
+	public void editCustLevel(String cust_level) throws Exception{
+		List<CCustPropChange> propChangeList = new ArrayList<CCustPropChange>();
+		CCustPropChange propChange = new CCustPropChange();
+		propChange.setColumn_name("cust_level");
+		propChange.setOld_value(this.getBusiParam().getCust().getCust_level());
+		propChange.setNew_value(cust_level);
+		propChangeList.add(propChange);
+		editCust(propChangeList);
+	}
+	
 	public void editCust(List<CCustPropChange> propChangeList) throws Exception {
 		// 获取业务流水
 		Integer doneCode = doneCodeComponent.gDoneCode();
