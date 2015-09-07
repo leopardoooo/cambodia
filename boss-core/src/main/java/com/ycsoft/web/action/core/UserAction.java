@@ -122,7 +122,7 @@ public class UserAction extends BaseBusiAction {
 	
 	private String deviceCode;
 	private String reasonType;
-	
+	private File files;
 	private String spkgSn;
 	private String spId;
 	
@@ -283,11 +283,32 @@ public class UserAction extends BaseBusiAction {
 		return JSON_SUCCESS;
 	}
 	
-	public String saveEditPwd() throws Exception{
+	public String saveEditPwd() throws Exception {
 		String pwd = request.getParameter("login_password");
 		userServiceSN.saveEditPwd(pwd);
-	return JSON_SUCCESS;
-}
+		return JSON_SUCCESS;
+	}
+	
+	/**
+	 * 批量修改用户名
+	 * @return
+	 * @throws Exception
+	 */
+	public String batchModifyUserName() throws Exception {
+		String custId = request.getParameter("custId");
+		
+		String[] colName = new String[]{"user_name","stb_id"};
+		List<CUser> userList = FileHelper.fileToBean(files, colName, CUser.class);
+		userList.remove(0);
+		String result = "操作成功!";
+		try {
+			userServiceSN.saveBatchUpdateUserName(userList,custId);
+		} catch (Exception e) {
+			result = e.getMessage();
+		}
+		
+		return retrunNone(result);
+	}
 	
 	/**
 	 * 取消双向
@@ -1169,6 +1190,10 @@ public class UserAction extends BaseBusiAction {
 
 	public void setReasonType(String reasonType) {
 		this.reasonType = reasonType;
+	}
+
+	public void setFiles(File files) {
+		this.files = files;
 	}
 	
 	public void setSpkgSn(String spkgSn) {

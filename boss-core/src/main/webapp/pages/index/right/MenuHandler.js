@@ -355,6 +355,24 @@ Ext.apply(MenuHandler, {
 			height : 370
 		};
 	},
+	BatchModifyUserName:function(){//批量修改用户名
+		if (!hasCust()) {
+			return false;
+		}
+		return {
+			width : 590,
+			height : 180
+		};
+	},
+	ResetUserPassword:function(){//重置密码
+		if (!hasCust()) {
+			return false;
+		}
+		return {
+			width : 590,
+			height : 370
+		};
+	},
 	BatchNewCust : function() {
 		return {
 			width : 540,

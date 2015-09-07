@@ -56,6 +56,7 @@
     <script type="text/javascript" src="<%=boss_res%>/i18n/<%=lang %>/ext-lang.js"></script>
 	<script type="text/javascript" src="<%=boss_res%>/i18n/<%=lang %>/resouces-lang.js"></script>
 	<script type="text/javascript" src="<%=boss_res%>/i18n/<%=lang %>/boss-core-lang.js"></script>
+	<script type="text/javascript" src="<%=boss_res%>/i18n/<%=lang %>/boss-sysmanager-lang.js"></script>
 	<script type="text/javascript" src="<%=boss_res%>/i18n/langUtils.js"></script>
      
 	<script type="text/javascript" src="<%=boss_res %>/components/ext3/ux/CheckColumn.js"></script>

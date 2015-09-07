@@ -38,42 +38,15 @@ public class JCaCommandDao extends BaseEntityDao<JCaCommand> {
 	 * @throws JDBCException
 	 */
 	public Pager<JCaCommand> queryByCustId(String type ,String custId,Integer start,Integer limit) throws JDBCException{
-		String sql = "";
-		if(SystemConstants.J_CA_COMMAND_HIS.equals(type)){
-			//历史查询
-			sql = "  SELECT t.*,s.supplier_cmd_name cmd_type_text FROM j_ca_command_his t," +
-					"(select max(supplier_cmd_name) supplier_cmd_name,supplier_id,supplier_cmd_id from  t_busi_cmd_supplier  group by supplier_id,supplier_cmd_id) s " +
-			" WHERE  t.cas_type=s.supplier_id AND s.supplier_cmd_id=t.cmd_type AND t.cust_id=? ORDER BY transnum DESC";
-			return createQuery(sql, custId).setStart(start).setLimit(limit).page();
-		}else if("J_CA_COMMAND_OUT_BAK".equals(type)){
-			//优化指令查询
-			sql = StringHelper.append("  SELECT  t.TRANSNUM,t.JOB_ID,t.CAS_ID,t.CAS_TYPE,t.USER_ID,t.CUST_ID,t.DONE_CODE,t.CMD_TYPE,t.STB_ID,t.CARD_ID,t.PRG_NAME,t.BOSS_RES_ID "
-		       ,",nvl(t.CONTROL_ID,t.DETAIL_PARAMS) CONTROL_ID,t.AUTH_BEGIN_DATE,t.AUTH_END_DATE,decode(t.is_sent,'Y','已发_','S','调度待发','')||t.result_flag RESULT_FLAG,t.ERROR_INFO,t.AREA_ID,IS_SENT,t.RECORD_DATE,SEND_DATE,RET_DATE  "
-		       ,",t.DETAIL_PARAMS,t.PRIORITY ,s.supplier_cmd_name cmd_type_text FROM j_ca_command_out t," +
-		       		"(select max(supplier_cmd_name) supplier_cmd_name,supplier_id,supplier_cmd_id from  t_busi_cmd_supplier  group by supplier_id,supplier_cmd_id) s "
-			     ," WHERE  t.cas_type=s.supplier_id AND s.supplier_cmd_id=t.cmd_type AND t.cust_id=? "
-			     ," union all select t.TRANSNUM,t.JOB_ID,t.CAS_ID,t.CAS_TYPE,t.USER_ID,t.CUST_ID,t.DONE_CODE,t.CMD_TYPE,t.STB_ID,t.CARD_ID,t.PRG_NAME,t.BOSS_RES_ID "
-		       ,",nvl(t.CONTROL_ID,t.DETAIL_PARAMS) CONTROL_ID,t.AUTH_BEGIN_DATE,t.AUTH_END_DATE,decode(t.is_sent,'Y','已发_','S','调度待发','')||t.result_flag RESULT_FLAG,t.ERROR_INFO,t.AREA_ID,IS_SENT,t.RECORD_DATE,SEND_DATE,RET_DATE "
-		       ,",t.DETAIL_PARAMS,t.PRIORITY ,s.supplier_cmd_name cmd_type_text FROM j_ca_command_out_bak t," +
-		       		"(select max(supplier_cmd_name) supplier_cmd_name,supplier_id,supplier_cmd_id from  t_busi_cmd_supplier  group by supplier_id,supplier_cmd_id) s "
-			     ," WHERE  t.cas_type=s.supplier_id AND s.supplier_cmd_id=t.cmd_type AND t.cust_id=? ORDER BY transnum DESC");
-			return createQuery(sql, custId,custId).setStart(start).setLimit(limit).page();
-		}else{
-			//业务指令和默认查询
-			sql = StringHelper.append("select t.TRANSNUM,t.JOB_ID,t.CAS_ID,t.CAS_TYPE,t.USER_ID,t.CUST_ID,t.DONE_CODE,t.CMD_TYPE,t.STB_ID,t.CARD_ID,t.PRG_NAME,t.BOSS_RES_ID "
-		       ,",t.CONTROL_ID,t.AUTH_BEGIN_DATE,t.AUTH_END_DATE,decode(t.is_sent,'Y','已发_','S','调度待发','')||t.result_flag RESULT_FLAG,t.ERROR_INFO,t.AREA_ID,IS_SENT,t.RECORD_DATE,SEND_DATE,RET_DATE "
-		       ,",t.DETAIL_PARAMS,t.PRIORITY ,s.supplier_cmd_name cmd_type_text "
-		       ,"from  busi.j_ca_command t ,(select max(supplier_cmd_name) supplier_cmd_name,supplier_id,supplier_cmd_id from  t_busi_cmd_supplier  group by supplier_id,supplier_cmd_id) s "
-		       ,"WHERE  t.cas_type=s.supplier_id AND s.supplier_cmd_id=t.cmd_type AND t.cust_id=? "
-		       ,"	union all "
-		       ,"select t.TRANSNUM,t.JOB_ID,t.CAS_ID,t.CAS_TYPE,t.USER_ID,t.CUST_ID,t.DONE_CODE,t.CMD_TYPE,t.STB_ID,t.CARD_ID,t.PRG_NAME,t.BOSS_RES_ID  "
-		       ,",t.CONTROL_ID,t.AUTH_BEGIN_DATE,t.AUTH_END_DATE,decode(t.is_sent,'Y','已发_','S','调度待发','')||t.result_flag RESULT_FLAG,t.ERROR_INFO,t.AREA_ID,IS_SENT,t.RECORD_DATE,SEND_DATE,RET_DATE "
-		       ,",t.DETAIL_PARAMS,t.PRIORITY ,s.supplier_cmd_name cmd_type_text "
-		       ,"from  busi.j_ca_command_day t ,(select max(supplier_cmd_name) supplier_cmd_name,supplier_id,supplier_cmd_id from  t_busi_cmd_supplier  group by supplier_id,supplier_cmd_id) s "
-		       ,"WHERE  t.cas_type=s.supplier_id AND s.supplier_cmd_id=t.cmd_type AND t.cust_id=? "
-		       ,"ORDER BY transnum DESC  ");
-			return createQuery(sql, custId,custId).setStart(start).setLimit(limit).page();
-		}
+		String sql = " select *"  
+				+ " from ("
+				+ " select transnum, job_id, cas_id, cas_type, user_id, cust_id, done_code, cmd_type, stb_id, card_id, prg_name, boss_res_id, control_id, auth_begin_date, auth_end_date, result_flag, error_info, area_id, is_sent, record_date, send_date, detail_params, priority, ret_date" 
+				+ " from j_ca_command where cust_id=?"
+				+ " union all"
+			    + " select transnum, job_id, cas_id, cas_type, user_id, cust_id, done_code, cmd_type, stb_id, card_id, prg_name, boss_res_id, control_id, auth_begin_date, auth_end_date, result_flag, error_info, area_id, is_sent, record_date, send_date, detail_params, priority, ret_date" 
+			    + " from j_ca_command_his where cust_id=?"
+			    + " ) order by  transnum desc";
+			return createQuery(sql, custId, custId).setStart(start).setLimit(limit).page();
 	}
 
 	public Pager<JCaCommand> queryCaByCardId(String[] cardIds,Integer start,Integer limit) throws JDBCException{

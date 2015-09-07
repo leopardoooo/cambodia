@@ -78,6 +78,9 @@ langUtils = function(DOC){
 		main: function(mainLangKeys, dom){
 			return set(findLangString.apply(BCLang.home.main, [mainLangKeys]), dom);
 		},
+		sys: function(mainLangKeys, dom){
+			return set(findLangString.apply(Sys, [mainLangKeys]), dom);
+		},
 		/**
 		 * 获取resource-lang.js资源菜单的属性值
 		 * 方法实现同fn: bc是一致的
