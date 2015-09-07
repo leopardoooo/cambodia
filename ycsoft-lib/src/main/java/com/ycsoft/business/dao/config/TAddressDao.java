@@ -414,7 +414,7 @@ public class TAddressDao extends BaseEntityDao<TAddress> {
 	}
 	
 	public List<TAddressSysDto> queryAllAddrById(String addrId) throws JDBCException {
-		String sql = "SELECT * FROM t_address where addr_pid = ? order by sort_num ";
+		String sql = "SELECT * FROM t_address where addr_pid = ?  order by sort_num ";
 		return createQuery(TAddressSysDto.class,sql,addrId).list();
 	}
 	public List<TAddressSysDto> queryAddrSysTreeByLvOneAndName(String[] lvOneAddrIds,String name) throws JDBCException{
@@ -472,5 +472,6 @@ public class TAddressDao extends BaseEntityDao<TAddress> {
 		String sql = " select  decode(max(t.sort_num),null,0,max(t.sort_num)) sort_num from t_address t where t.addr_pid=? ";
 		return this.findUnique(sql,addrPId);
 	}
+	
 	
 }

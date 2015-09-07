@@ -2,7 +2,6 @@ package com.ycsoft.business.dto.config;
 
 import com.ycsoft.beans.config.TAddress;
 import com.ycsoft.commons.constants.StatusConstants;
-import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.tree.AddrTree;
 import com.ycsoft.commons.tree.AddrTreeNode;
 
@@ -21,6 +20,7 @@ public class TAddressSysDto extends TAddress implements AddrTree {
 	private Integer num;
 	private String addr_p_name;
 	private String addr_last_id;
+	private String district_name;
 	
 	public void transform(AddrTreeNode node){
 		node.setId( getAddr_id());
@@ -34,19 +34,36 @@ public class TAddressSysDto extends TAddress implements AddrTree {
 		if(getStatus().equals(StatusConstants.ACTIVE)){
 			node.setHideObarStatusactive(true);
 		}else{
+			node.setHideObarAdd(true);
+			node.setHideObarEdit(true);
+			node.setHideObarLeveladd(true);
 			node.setHideObarStatusinvalid(true);
 		}
 		node.setIs_leaf( getIs_leaf());
 		node.getOthers().put("tree_level", String.valueOf(getTree_level()));
 		node.getOthers().put("area_id", getArea_id());
 		node.getOthers().put("sort_num", String.valueOf(getSort_num()));
-		node.getOthers().put("district_id", String.valueOf(getDistrict_id()));
+		node.getOthers().put("district_id", getDistrict_id());
+		node.getOthers().put("district_name", getDistrict_name());
 		node.getOthers().put("county_id", getCounty_id());
 		node.getOthers().put("status", getStatus());
 		node.getOthers().put("net_type", getNet_type());
 	}
 
 	
+	
+	public String getDistrict_name() {
+		return district_name;
+	}
+
+
+
+	public void setDistrict_name(String district_name) {
+		this.district_name = district_name;
+	}
+
+
+
 	public String getAddr_last_id() {
 		return addr_last_id;
 	}

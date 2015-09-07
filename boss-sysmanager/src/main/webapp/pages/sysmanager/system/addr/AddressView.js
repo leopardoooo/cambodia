@@ -63,18 +63,54 @@ SearchField = Ext.extend(Ext.form.TwinTriggerField, {
 
 Ext.reg('searchfield', SearchField);
 
+AddressTreeLoader = Ext.extend(Ext.tree.TreeLoader,{
+	load : function(node, callback, scope){
+        if(this.clearOnLoad){
+            while(node.firstChild){
+                node.removeChild(node.firstChild);
+            }
+        }
+        if(this.doPreload(node)){ // preloaded json children
+            this.runCallback(callback, scope || node, [node]);
+        }else if(this.directFn || this.dataUrl || this.url){
+            this.requestData(node, callback, scope || node);
+        }
+    },
+    doPreload : function(node){//新增is_refresh 为了刷新父节点
+        if(node.attributes.children && node.attributes.is_refresh){
+            if(node.childNodes.length < 1){ // preloaded?
+                var cs = node.attributes.children;
+                node.beginUpdate();
+                for(var i = 0, len = cs.length; i < len; i++){
+                    var cn = node.appendChild(this.createNode(cs[i]));
+                    if(this.preloadChildren){
+                        this.doPreload(cn);
+                    }
+                }
+                node.endUpdate();
+            }
+            return true;
+        }
+        return false;
+    }
+
+
+})
+
+
 /**
  * 地址表格编辑树
  * @class AddressTree
  * @extends Ext.ux.tree.TreeGridEditor
  */
 AddressTree = Ext.extend(Ext.ux.tree.TreeGridEditor,{
+	queryText : null,
 	constructor : function(){
 		var addressThiz = this;
 		AddressTree.superclass.constructor.call(this,{
 			id : 'AddressTree',
-			root : new Ext.tree.AsyncTreeNode({expanded : true,id:'root'}),
-			loader: new Ext.tree.TreeLoader({
+			root : new Ext.tree.AsyncTreeNode({expanded : true,id:'-1'}),
+			loader: new AddressTreeLoader({
 	            dataUrl: root+"/system/Address!queryAddrTree.action",
 	            listeners:{
 	            	scope:this,
@@ -85,13 +121,14 @@ AddressTree = Ext.extend(Ext.ux.tree.TreeGridEditor,{
 	        maxDepth: 4,
 	        columnResize:true,
 	        enableHdMenu:true,
+	        rootNodeId: 'tge-root',
 	        // 超出最大深度，提示信息
-    		maxDepthText: '不能再往下添加地区',
+    		maxDepthText: '不能再往下添加',
 	        mouseoverShowObar: true,// mouseover事件触发显示Obar
 	        singleEdit: true,// 只允许同时编辑一条记录
 	        // 显示列
 	        columns: [{
-	            header: '地区名称',
+	            header: '地址树',
 	            dataIndex: 'text',
 //	            autoWidth: true,
 	            width:150,
@@ -148,6 +185,7 @@ AddressTree = Ext.extend(Ext.ux.tree.TreeGridEditor,{
 	            listeners: {
 	            	scope : this,
 	                search: function(text) {
+	                	addressThiz.queryText = text;
 	                	Ext.Ajax.request({
 							url: root+"/system/Address!queryAddrTree.action",
 							scope : this,
@@ -158,8 +196,9 @@ AddressTree = Ext.extend(Ext.ux.tree.TreeGridEditor,{
 								var data = Ext.decode(res.responseText);
 								var root = new Ext.tree.AsyncTreeNode({
 										  text:'gen',
-										  id:'root',
+										  id:'-1',
 										  draggable:false,
+										  is_refresh:true,
 										  children:data
 										 });
 								addressThiz.getRootNode().removeAll();									 
@@ -194,7 +233,11 @@ AddressTree = Ext.extend(Ext.ux.tree.TreeGridEditor,{
 	},
 	onBeforeLoad:function(l,node){
 		l.on('beforeload',function(loader,node){
-  			l.baseParams.addrId=node.id; //通过这个传递参数，这样就可以点一个节点出来它的子节点来实现异步加载
+			var id = node.id;
+			if(id == 'tge-root'){
+				id = "";
+			}
+  			l.baseParams = {addrId:id}; //通过这个传递参数，这样就可以点一个节点出来它的子节点来实现异步加载
 		},l);
 	},
 	doLoad: function(treeLoader,rootNode){
@@ -206,8 +249,6 @@ AddressTree = Ext.extend(Ext.ux.tree.TreeGridEditor,{
 					if(attrs && attrs.others){
 						var status = node.attributes.others['status'];
 						if(status == 'INVALID'){
-//							thiz.hideObar(node, 'statusInvalid');
-//							thiz.showObar(node, 'statusActive');
 							node.getUI().getTextEl().style.color = "red";
 						}
 					}
@@ -219,7 +260,7 @@ AddressTree = Ext.extend(Ext.ux.tree.TreeGridEditor,{
 	},
 	checkRemove : function(n){
 		if (!n.leaf) {
-            Alert('地区下有子级别!');
+            Alert('存在子级别,无法禁用!');
             return false;
         }
         return true;
@@ -249,7 +290,7 @@ AddressTree = Ext.extend(Ext.ux.tree.TreeGridEditor,{
 		});
 	},
 	doStatusActive: function(node){
-		Confirm("确定要激活小区吗?", Ext.getCmp('AddressTree') ,function(){
+		Confirm("确定要激活吗?", Ext.getCmp('AddressTree') ,function(){
 			Ext.Ajax.request({
 				scope : this,
 				url : root + '/system/Address!updateAddressStatus.action',
@@ -261,16 +302,15 @@ AddressTree = Ext.extend(Ext.ux.tree.TreeGridEditor,{
 					var res = Ext.decode(res.responseText);
 					if(res === true){
 						Alert('操作成功!');
-						this.hideObar(node, 'statusActive');
-						this.showObar(node, 'statusInvalid');
-						node.getUI().getTextEl().style.color = "";
+						node.parentNode.attributes.is_refresh = false;
+						node.parentNode.reload();
 					}
 				}
 			});
 		});
 	},
 	doStatusInvalid: function(node){
-		Confirm("确定要禁用小区吗?", Ext.getCmp('AddressTree') ,function(){
+		Confirm("确定要禁用吗?", Ext.getCmp('AddressTree') ,function(){
 			Ext.Ajax.request({
 				scope : this,
 				url : root + '/system/Address!updateAddressStatus.action',
@@ -282,9 +322,8 @@ AddressTree = Ext.extend(Ext.ux.tree.TreeGridEditor,{
 					var res = Ext.decode(res.responseText);
 					if(res === true){
 						Alert('操作成功!');
-						this.hideObar(node, 'statusInvalid');
-						this.showObar(node, 'statusActive');
-						node.getUI().getTextEl().style.color = "red";
+						node.parentNode.attributes.is_refresh = false;
+						node.parentNode.reload();
 					}
 				}
 			});
@@ -292,134 +331,29 @@ AddressTree = Ext.extend(Ext.ux.tree.TreeGridEditor,{
 	}
 });
 
-/**
- * 批量添加子级
- * @class BatchAddGrid
- * @extends Ext.grid.EditorGridPanel
- */
-BatchAddGrid = Ext.extend(Ext.grid.EditorGridPanel,{
-	addrStore : null,
-	node : null,
-	constructor : function(node){
-		this.node = node;
-		
-		this.addrStore = new Ext.data.JsonStore({
-			fields : ['addr_name','addr_full_name','addr_pid',
-			'tree_level','net_type','area_id','county_id']
-		});
-		
-		var cm = [{
-			header : '显示名称',
-			dataIndex :'addr_name',
-			editor : new Ext.form.TextField({
-				allowBlank : false
-			})
-		},{
-			header : '网络类型',
-			dataIndex : 'net_type',
-			editor : new Ext.form.TextField()		
-		},{
-			header : '操作',
-			dataIndex : 'addr_pid',
-			renderer : function(){
-				return "<a href='#' onclick=Ext.getCmp(\'"+"BatchAddGrid"+"\').deleteRow(); style='color:blue'> 删除 </a>";
-			}
-		}];
-		BatchAddGrid.superclass.constructor.call(this,{
-			id : 'BatchAddGrid',
-			border : false,
-			store : this.addrStore,
-			columns : cm,
-			sm:new Ext.grid.RowSelectionModel(),
-			enableColumnMove : false,
-			forceValidation: true,
-	        clicksToEdit: 1,
-			viewConfig:{
-	        	forceFit : true
-	        },
-	        tbar : [{
-	        	text : '添加',
-	        	scope : this,
-	        	iconCls : 'icon-add',
-	        	handler : this.addRecord
-	        }]
-		});
-	},
-	deleteRow : function(){//删除行
-		Confirm("确定要删除该数据吗?", this ,function(){
-			var record= this.getSelectionModel().getSelected();
-			this.getStore().remove(record);
-		});
-	},
-	addRecord : function(){
-		var others = this.node.attributes.others;
-		var obj = {
-			'area_id' : others.area_id,
-			'county_id' : others.county_id,
-			'tree_level' : parseFloat(others.tree_level)+1,
-			'addr_pid' : this.node.id,			
-			'addr_name' : '',
-			'net_type' : ''
-		};
-		var Plant= this.getStore().recordType;
-		var p = new Plant(obj);
-		this.stopEditing();
-		this.getStore().insert(0,p);
-		this.startEditing(0,0);
-		this.getSelectionModel().selectRow(0);
-	},
-	doValid : function(){
-		if(this.getStore().getCount() == 0){
-			return "没有数据，无需保存";
-		}
-		
-		for(var i=0;i<this.getStore().getCount();i++){
-			var rec = this.getStore().getAt(i).data;
-			for(var key in rec){
-				if(Ext.isEmpty(rec[key])){
-					return "请编辑完所有数据";
+AddressDistrictTreeCombo = Ext.extend(Ext.ux.TreeCombo,{
+	listeners:{
+		expand:function(thisCmp){
+			function getFocus(){
+				var search = thisCmp.list.searchT;//如果第一次获取焦点,list会为空
+				if(search){
+//					search.setValue('输入关键字搜索');
+					var dom = search.el.dom;
+					dom.select();
 				}
-			}
+			};
+			getFocus.defer(200,this);
 		}
-		return true;
 	},
-	doSave : function(){
-		var msg = this.doValid();
-		if(msg != true){
-			Alert(msg);
-			return;
+	firstExpand: false,
+	doQuery : function(q, forceAll) {
+		if(!this.firstExpand){
+			this.firstExpand = true;
+			this.list.expandAll();
 		}
-		
-		Confirm('确定保存吗',this,function(){
-			mb = Show();//显示正在提交
-			var all = {};
-			var addrList = [];
-			this.getStore().each(function(item){
-				addrList.push(item.data);
-			});
-			all['addrListStr'] = Ext.encode(addrList);
-			
-			Ext.Ajax.request({
-				scope : this,
-				url :  root + '/system/Address!saveAddrList.action',
-				params : all,
-				success : function(res,opt){
-					mb.hide();//隐藏提示框
-					mb = null;
-					var rs = Ext.decode(res.responseText);
-					if(true === rs.success){
-						Alert('操作成功!');
-						for(var i=0;i<rs.records.length;i++){
-							Ext.getCmp('AddressWin').addNode(rs.records[i]);
-						}
-						Ext.getCmp('AddressWin').close();
-					}else{
-						Alert('操作失败');
-			 		}
-				}
-			})
-		});
+		this.expand();
 	}
+	
 })
 
 /**
@@ -452,10 +386,14 @@ AddressWin = Ext.extend(Ext.Window,{
 				name : 'county_id'
 			},{
 				xtype : 'hidden',
+				id : 'addressDistrictId',
+				name : 'district_id'
+			},{
+				xtype : 'hidden',
 				id : 'areaId',
 				name : 'area_id'
 			},{
-				xtype : 'displayfield',
+				xtype : 'hidden',
 				id : 'treeLevel',
 				name : 'tree_level'
 			},{
@@ -463,11 +401,6 @@ AddressWin = Ext.extend(Ext.Window,{
 				id : 'parentName',
 				name : 'parent_name',
 				fieldLabel : '上级名称'
-			},{
-				xtype : 'displayfield',
-				id : 'sortNum',
-				name : 'sort_num',
-				fieldLabel : '序号'
 			},{
 				xtype : 'textfield',
 				id : 'addrName',
@@ -528,13 +461,12 @@ AddressWin = Ext.extend(Ext.Window,{
 		}
 		Ext.getCmp('addrName').fieldLabel =fieldLabel;
 		Ext.getCmp('parentName').setValue(node.text);
-		Ext.getCmp('sortNum').setValue(node.attributes.others.sort_num);
 		
 		AddressWin.superclass.constructor.call(this,{
 			id :'AddressWin',
 			title : this.title,
 			layout : 'fit',
-			height : 400,
+			height : 300,
 			width : width,
 			closeAction : 'close',
 			items : [this.itemForm],
@@ -551,6 +483,7 @@ AddressWin = Ext.extend(Ext.Window,{
 				}
 			}]
 		});
+		this.doLayout();
 	},
 	initComponent : function(){
 		if((this.level == 2 && this.type =='add') || this.level == 3){
@@ -572,6 +505,39 @@ AddressWin = Ext.extend(Ext.Window,{
 					Ext.getCmp('netType').setValue(this.node.attributes.others.net_type);
 				}
 			}, this);
+			
+			var provinceId;
+			if(this.level == 3){
+				provinceId = this.node.parentNode.parentNode.attributes.others.district_id;
+			}else{
+				provinceId = this.node.parentNode.attributes.others.district_id;
+			}
+			
+			this.itemForm.add(new AddressDistrictTreeCombo({
+		    	width:200,
+		    	id : 'addressDistrictItemId',
+				treeWidth:300,
+				allowBlank : false,
+				minChars:2,
+				height: 22,
+				fieldLabel : '行政区域',
+				treeUrl: root + '/system/Address!queryDistrictByPid.action',
+				treeParams : {addrId:provinceId},
+				hiddenName:'addrId',
+				editable:false,
+				onlySelectLeaf:false,
+				listeners:{
+					scope: this,
+					'select': function(combo){
+						Ext.getCmp('addressDistrictId').setValue(combo.getValue());
+					}
+				}
+			}));
+			
+			if( this.level == 3 && this.type =='edit'){
+				Ext.getCmp('addressDistrictItemId').setValue(this.node.attributes.others.district_name);
+				Ext.getCmp('addressDistrictId').setValue(this.node.attributes.others.district_id);
+			}
 		}
 		
 		
@@ -592,144 +558,103 @@ AddressWin = Ext.extend(Ext.Window,{
 					
 			this.provinceStore.on("load",this.doLoadProvince,this);
 			this.provinceStore.load();						
+		}else{
+			var comp =  Ext.getCmp('provinceId');
+			if(comp){
+				this.itemForm.remove(comp,true);
+			}
+		}
+
+		if(this.type == 'edit'){
+			this.itemForm.add({
+				xtype : 'numberfield',
+				id : 'sortNum',
+				name : 'sort_num',
+				fieldLabel : '序号'
+			});
+			Ext.getCmp('sortNum').setValue(this.node.attributes.others.sort_num);
 		}
 		
 		this.doLayout();						
 		AddressWin.superclass.initComponent.call(this);
 	},
 	doLoadProvince:function(s){
-		Ext.getCmp('provinceId').setValue(this.node.attributes.others.district_id);
-	},
-	doSave : function(){
-		if(this.title == '批量添加地区'){//批量添加
-			this.itemForm.doSave();
-		}else{//添加和修改
-			if(this.itemForm.getForm().isValid()){
-				Confirm("确定保存吗?", this ,function(){
-					mb = Show();//显示正在提交
-					var params = {};
-					params['addrDto.addr_name'] = Ext.getCmp('addrName').getValue();
-					if((this.level == 2 && this.type =='add') || this.level == 3){
-						params['addrDto.net_type'] = Ext.getCmp('netType').getValue();
-					}
-					
-					var url = '';
-					if(this.type == 'add'){
-						url = root + '/system/Address!saveAddress.action';
-						params['addrDto.addr_pid'] = this.node.id;
-						params['addrDto.addr_last_id'] = this.node.id;
-						params['addrDto.tree_level'] = Ext.getCmp('treeLevel').getValue();
-						params['addrDto.county_id'] = Ext.getCmp('countyId').getValue();
-						params['addrDto.area_id'] = Ext.getCmp('areaId').getValue();
-					}else if(this.type == 'edit'){
-						url = root + '/system/Address!editAddress.action';
-						params['addrDto.addr_id'] = this.node.id;
-						if(this.level == 1 || this.level == 3){
-							params['addrDto.district_id'] = Ext.getCmp('provinceId').getValue();
-						}
-						
-					}else if(this.type == 'leveladd'){
-						url = root + '/system/Address!saveAddress.action';
-						var pId = this.node.parentNode.id;
-						if(pId == 'root'){
-							pId = 1;
-						}
-						params['addrDto.addr_pid'] = pId;
-						params['addrDto.addr_last_id'] = this.node.id;
-						params['addrDto.tree_level'] = Ext.getCmp('treeLevel').getValue();
-						params['addrDto.county_id'] = Ext.getCmp('countyId').getValue();
-						params['addrDto.area_id'] = Ext.getCmp('areaId').getValue();
-						if(this.level == 1 || this.level == 3){
-							params['addrDto.district_id'] = Ext.getCmp('provinceId').getValue();
-						}
-					}
-					params['type'] = this.type;
-					Ext.Ajax.request({
-						url : url,
-						params : params,
-						scope : this,
-						success : function(res,opt){
-							mb.hide();//隐藏提示框
-							mb = null;
-							var rs = Ext.decode(res.responseText);
-							if(true === rs.success){
-								Alert('操作成功!');
-								if(this.type == 'add'){
-									this.addNode(rs.simpleObj);	
-								}else if( this.type == 'leveladd'){
-									this.addLevelNode(rs.simpleObj);	
-								}else{
-									this.node.setText(Ext.getCmp('addrName').getValue());
-									if(Ext.getCmp('netType')){
-										this.node.attributes.others.net_type = Ext.getCmp('netType').getValue();
-									}
-									this.node.attributes.others.area_id = Ext.getCmp('areaId').getValue();
-									this.node.attributes.others.county_id = Ext.getCmp('countyId').getValue();
-								}
-								this.close();
-							}else{
-								Alert('操作失败');
-					 		}
-						}
-					})
-				})
-			}
+		if(!Ext.isEmpty(this.node.attributes.others.district_id)){
+			Ext.getCmp('provinceId').setValue(this.node.attributes.others.district_id);
 		}
 	},
-	addNode : function(newNode){
-		var nc = {
-            id: newNode.addr_id,
-            cls : 'file',
-            text : newNode.addr_name,
-			others : {
-				tree_level : newNode.tree_level,
-				net_type : newNode.net_type,
-				county_id : newNode.county_id,
-				area_id:newNode.area_id,
-				sort_num:newNode.sort_num
-			},
-            leaf: true
-        };
-        var nn = new Ext.ux.tree.TreeGridEditorNode(nc);
-        nn.ui = new Ext.ux.tree.TreeGridEditorNodeUI(nn);
-        
-        this.node.leaf = false;
-		this.node.attributes.leaf = false;
-        this.node.appendChild(nn);
-		
-		this.node.editing = false;
-        this.node.editMode = false;
-        
-        Ext.DomHelper.overwrite(Ext.fly(this.node.getUI().elNode).child('.x-treegrideditor-obar'), Ext.getCmp('AddressTree').editBtnsHtml(this.node));
-        Ext.getCmp('AddressTree').activeObar(this.node);
-        
-//        Ext.getCmp('AddressTree').hideObar(nn, 'statusActive');
-//		Ext.getCmp('AddressTree').showObar(nn, 'statusInvalid');
-	},
-	addLevelNode : function(newNode){
-		var nc = {
-            id: newNode.addr_id,
-            cls : 'file',
-            text : newNode.addr_name,
-			others : {
-				tree_level : newNode.tree_level,
-				net_type : newNode.net_type,
-				county_id : newNode.county_id,
-				area_id:newNode.area_id,
-				sort_num:newNode.sort_num				
-			},
-            leaf: true
-        };
-        var nn = new Ext.ux.tree.TreeGridEditorNode(nc);
-        nn.ui = new Ext.ux.tree.TreeGridEditorNodeUI(nn);
-        var papa = this.node.parentNode;
-        var nextNode = this.node.nextSibling;
-        if(nextNode){
-        	papa.insertBefore( nn, this.node.nextSibling);
-        }else{
-        	papa.appendChild(nn);
-        }
-       
+	doSave : function(){
+		//添加和修改
+		if(this.itemForm.getForm().isValid()){
+			Confirm("确定保存吗?", this ,function(){
+				mb = Show();//显示正在提交
+				var params = {};
+				
+				var url = '';
+				if(this.type == 'add'){
+					url = root + '/system/Address!saveAddress.action';
+					params['addrDto.addr_pid'] = this.node.id;
+					params['addrDto.addr_last_id'] = this.node.id;
+					params['addrDto.tree_level'] = Ext.getCmp('treeLevel').getValue();
+					params['addrDto.county_id'] = Ext.getCmp('countyId').getValue();
+					params['addrDto.area_id'] = Ext.getCmp('areaId').getValue();
+				}else if(this.type == 'edit'){
+					url = root + '/system/Address!editAddress.action';
+					params['addrDto.addr_id'] = this.node.id;
+					
+				}else if(this.type == 'leveladd'){
+					url = root + '/system/Address!saveAddress.action';
+					var pId = this.node.parentNode.id;
+					if(pId == 'tge-root'){
+						pId = 1;
+					}
+					params['addrDto.addr_pid'] = pId;
+					params['addrDto.addr_last_id'] = this.node.id;
+					params['addrDto.tree_level'] = Ext.getCmp('treeLevel').getValue();
+					params['addrDto.county_id'] = Ext.getCmp('countyId').getValue();
+					params['addrDto.area_id'] = Ext.getCmp('areaId').getValue();
+				}
+				
+				params['addrDto.addr_name'] = Ext.getCmp('addrName').getValue();
+				if((this.level == 2 && this.type =='add') || this.level == 3){
+					params['addrDto.net_type'] = Ext.getCmp('netType').getValue();
+				}
+				if(this.level == 1 && (this.type =='leveladd' || this.type == 'edit')){
+					params['addrDto.district_id'] = Ext.getCmp('provinceId').getValue();
+				}
+				if((this.level == 2 && this.type =='add') || this.level == 3){
+					params['addrDto.district_id'] = Ext.getCmp('addressDistrictId').getValue();
+				}
+				if(Ext.getCmp('sortNum')){
+					params['addrDto.sort_num'] = Ext.getCmp('sortNum').getValue();
+				}
+				params['type'] = this.type;
+				Ext.Ajax.request({
+					url : url,
+					params : params,
+					scope : this,
+					success : function(res,opt){
+						mb.hide();//隐藏提示框
+						mb = null;
+						var rs = Ext.decode(res.responseText);
+						if(true === rs.success){
+							Alert('操作成功!');
+							if(this.type == 'add'){
+								this.node.attributes.is_refresh = false;
+								this.node.reload();
+							}else{
+								this.node.parentNode.attributes.is_refresh = false;
+								this.node.parentNode.reload();
+							}
+
+							this.close();
+						}else{
+							Alert('操作失败');
+				 		}
+					}
+				})
+			})
+		}
 	}
 })
 
@@ -739,7 +664,7 @@ AddressView = Ext.extend(Ext.Panel,{
 		AddressView.superclass.constructor.call(this,{
 			id : 'AddressView',
 			layout : 'fit',
-			title : '地区管理',
+			title : '地址管理',
 			closable: true,
 			border : false ,
 			baseCls: "x-plain",

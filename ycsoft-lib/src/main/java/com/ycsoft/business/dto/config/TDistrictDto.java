@@ -2,15 +2,15 @@ package com.ycsoft.business.dto.config;
 
 import com.ycsoft.beans.config.TDistrict;
 import com.ycsoft.commons.constants.SystemConstants;
-import com.ycsoft.commons.tree.AddrTree;
-import com.ycsoft.commons.tree.AddrTreeNode;
+import com.ycsoft.commons.tree.Tree;
+import com.ycsoft.commons.tree.TreeNode;
 
 /**
  * <p> 扩展地址实体类 </p>
  * @author hh
  * @date Dec 29, 2009 3:52:34 PM
  */
-public class TDistrictDto extends TDistrict implements AddrTree {
+public class TDistrictDto extends TDistrict implements Tree {
 
 	/**
 	 *
@@ -21,7 +21,7 @@ public class TDistrictDto extends TDistrict implements AddrTree {
 	private String addr_p_name;
 	private String addr_last_id;
 	
-	public void transform(AddrTreeNode node){
+	public void transform(TreeNode node){
 		node.setId( getDistrict_id());
 		node.setPid( getParent_id());
 		node.setText( getDistrict_name());
@@ -29,6 +29,8 @@ public class TDistrictDto extends TDistrict implements AddrTree {
 		node.setCls("file");
 		if(getDistrict_level()==4){
 			node.setIs_leaf(SystemConstants.BOOLEAN_TRUE);
+		}else{
+			node.setIs_leaf(SystemConstants.BOOLEAN_FALSE);
 		}
 		node.getOthers().put("tree_level", String.valueOf(getDistrict_level()));
 		node.getOthers().put("province_id", getProvince_id());
