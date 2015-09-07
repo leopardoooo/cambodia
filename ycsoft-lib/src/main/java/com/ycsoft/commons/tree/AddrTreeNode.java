@@ -13,10 +13,12 @@ public class AddrTreeNode {
 	private boolean leaf;
 	private Boolean checked;
 	private String cls;
+	private String iconCls;
 	private String is_leaf;//在表中是否是叶子节点
 	private String attr;
 	private String attr_src;
 	private String attr_src_id;
+	private boolean is_refresh = true;
 	private boolean hideObarEdit = false;
 	private boolean hideObarStatusactive = false;
 	private boolean hideObarStatusinvalid = false;
@@ -32,6 +34,18 @@ public class AddrTreeNode {
 	
 
 
+	public boolean isIs_refresh() {
+		return is_refresh;
+	}
+	public void setIs_refresh(boolean is_refresh) {
+		this.is_refresh = is_refresh;
+	}
+	public String getIconCls() {
+		return iconCls;
+	}
+	public void setIconCls(String iconCls) {
+		this.iconCls = iconCls;
+	}
 	public boolean isHideObarAdd() {
 		return hideObarAdd;
 	}

@@ -14,15 +14,16 @@ var CaGrid = Ext.extend(Ext.grid.GridPanel,{
 				'error_info','record_date','send_date','ret_date','cmd_type_text']
 		});
 		var cm = [
-			{header:'业务流水号',dataIndex:'done_code',width:100,sortable:true,renderer:App.qtipValue},
-			{header:'智能卡号',dataIndex:'card_id',width:150,sortable:true,renderer:App.qtipValue},
+			{header:'业务流水号',dataIndex:'done_code',width:90,sortable:true,renderer:App.qtipValue},
+			{header:'机顶盒号',dataIndex:'stb_id',width:130,sortable:true,renderer:App.qtipValue},
+			{header:'智能卡号',dataIndex:'card_id',width:90,sortable:true,renderer:App.qtipValue},
 			{header:'控制字',dataIndex:'control_id',width:80,sortable:true},
-			{header:'节目名称',dataIndex:'prg_name',width:150,sortable:true,renderer:App.qtipValue},
-			{header:'指令类型',dataIndex:'cmd_type_text',width:100,sortable:true,renderer:App.qtipValue},
+			{header:'节目名称',dataIndex:'prg_name',width:100,sortable:true,renderer:App.qtipValue},
+			{header:'指令类型',dataIndex:'cmd_type_text',width:80,sortable:true,renderer:App.qtipValue},
 			{header:'结果标记',dataIndex:'result_flag',width:100,sortable:true,renderer:App.qtipValue},
-			{header:'生成时间',dataIndex:'record_date',width:100,sortable:true,renderer:App.qtipValue},
-			{header:'发送时间',dataIndex:'send_date',width:100,sortable:true,renderer:App.qtipValue},
-			{header:'CA回传时间',dataIndex:'ret_date',width:100,sortable:true,renderer:App.qtipValue},
+			{header:'生成时间',dataIndex:'record_date',width:120,sortable:true,renderer:App.qtipValue},
+			{header:'发送时间',dataIndex:'send_date',width:120,sortable:true,renderer:App.qtipValue},
+			{header:'CA回传时间',dataIndex:'ret_date',width:120,sortable:true,renderer:App.qtipValue},
 			{header:'错误信息',dataIndex:'error_info',width:100,sortable:true,renderer:App.qtipValue},
 			{header:'授权结束日期',dataIndex:'auth_end_date',width:100,sortable:true,renderer:function(val){
 				return Ext.isEmpty(val)?val:val.substr(0,4) +'-' + val.substr(4,2)+'-' + val.substr(6,2);
@@ -31,12 +32,12 @@ var CaGrid = Ext.extend(Ext.grid.GridPanel,{
 		];
 		CaGrid.superclass.constructor.call(this,{
 			id:'caGridId',
-			title:'CA指令信息',
+			title:'DTT指令信息',
 			region:'center',
 			autoScroll:true,
 			ds:this.caStore,
 			columns:cm,
-			tbar : [{
+			/*tbar : [{
 				text : '业务指令',iconCls:'ca_1',scope : this,handler : function(){
 					this.doLoad('J_CA_COMMAND_DAY');
 				}
@@ -48,7 +49,7 @@ var CaGrid = Ext.extend(Ext.grid.GridPanel,{
 				text : '历史指令',iconCls:'ca_3',scope : this,handler : function(){
 					this.doLoad('J_CA_COMMAND_HIS');
 				}
-			}],
+			}],*/
 			bbar: new Ext.PagingToolbar({store: this.caStore ,pageSize : App.pageSize})
 		});
 	},
@@ -83,14 +84,16 @@ var VodGrid = Ext.extend(Ext.grid.GridPanel,{
 			url:  root + '/commons/x/QueryCust!queryVodCommand.action',
 			root:'records',
 			totalProperty:'totalProperty',
-			fields:['done_code','card_id','is_success','transnum',
+			fields:['done_code','stb_id','card_id','modem_mac','is_success','transnum',
 				'error_info','send_time','cmd_type_text']
 		});
 		var cm = [
 			{header:'指令编号',dataIndex:'transnum',width:70,sortable:true},
 			{header:'业务流水号',dataIndex:'done_code',width:70,sortable:true,renderer:App.qtipValue},
 			{header:'指令类型',dataIndex:'cmd_type_text',width:80,sortable:true,renderer:App.qtipValue},
-			{header:'智能卡号',dataIndex:'card_id',width:130,sortable:true,renderer:App.qtipValue},
+			{header:'机顶盒号',dataIndex:'stb_id',width:130,sortable:true,renderer:App.qtipValue},
+//			{header:'智能卡号',dataIndex:'card_id',width:130,sortable:true,renderer:App.qtipValue},
+			{header:'MAC',dataIndex:'modem_mac',width:130,sortable:true,renderer:App.qtipValue},
 			{header:'是否成功',dataIndex:'is_success',width:65,sortable:true,renderer:this.showResult},
 			{header:'错误信息',dataIndex:'error_info',width:70,sortable:true,renderer:App.qtipValue},
 			{header:'发送时间',dataIndex:'send_time',width:120,sortable:true,renderer:App.qtipValue}
@@ -98,11 +101,11 @@ var VodGrid = Ext.extend(Ext.grid.GridPanel,{
 		VodGrid.superclass.constructor.call(this,{
 			id:'vodGridId',
 			region:'center',
-			title:'VOD指令信息',
+			title:'OTT指令信息',
 			autoScroll:true,
 			ds:this.store,
 			columns:cm,
-			tbar : [{
+			/*tbar : [{
 				text : '业务指令',iconCls:'ca_1',scope : this,handler : function(){
 					this.doLoad('J_VOD_COMMAND');
 				}
@@ -110,7 +113,7 @@ var VodGrid = Ext.extend(Ext.grid.GridPanel,{
 				text : '历史指令',iconCls:'ca_2',scope : this,handler : function(){
 					this.doLoad('J_VOD_COMMAND_HIS');
 				}
-			}],
+			}],*/
 			bbar: new Ext.PagingToolbar({store: this.store ,pageSize : App.pageSize})
 		});
 	},
@@ -155,13 +158,14 @@ var BandGrid = Ext.extend(Ext.grid.GridPanel,{
 			url:  root + '/commons/x/QueryCust!queryBandCommand.action',
 			root:'records',
 			totalProperty:'totalProperty',
-			fields:['done_code','modem_mac','is_success','transnum',
+			fields:['done_code','stb_id','modem_mac','is_success','transnum',
 				'error_info','send_time','cmd_type_text']
 		});
 		var cm = [
 			{header:'指令编号',dataIndex:'transnum',width:70,sortable:true},
 			{header:'业务流水号',dataIndex:'done_code',width:70,sortable:true,renderer:App.qtipValue},
 			{header:'指令类型',dataIndex:'cmd_type_text',width:80,sortable:true,renderer:App.qtipValue},
+//			{header:'机顶盒号',dataIndex:'stb_id',width:130,sortable:true,renderer:App.qtipValue},
 			{header:'Modem号',dataIndex:'modem_mac',width:130,sortable:true,renderer:App.qtipValue},
 			{header:'是否成功',dataIndex:'is_success',width:65,sortable:true,renderer:this.showResult},
 			{header:'错误信息',dataIndex:'error_info',width:70,sortable:true,renderer:App.qtipValue},
@@ -170,11 +174,11 @@ var BandGrid = Ext.extend(Ext.grid.GridPanel,{
 		BandGrid.superclass.constructor.call(this,{
 			id:'bandGridId',
 			region:'center',
-			title:'宽带指令信息',
+			title:'BAND指令信息',
 			ds:this.bandStore,
 			autoScroll:true,
 			columns:cm,		
-			tbar : [{text : '业务指令',iconCls:'ca_1',scope : this,handler : function(){this.doLoad();}}],
+//			tbar : [{text : '业务指令',iconCls:'ca_1',scope : this,handler : function(){this.doLoad();}}],
 			bbar: new Ext.PagingToolbar({store: this.bandStore ,pageSize : App.pageSize})
 		});
 	},
@@ -224,7 +228,7 @@ CommandInfoPanel = Ext.extend(BaseInfoPanel,{
 				defaults: {border: false},
 				items:[this.caGrid]
 			},{
-				width:'40%',
+				width:'45%',
 				split:true,
 				region:'east',
 				layout:'anchor',

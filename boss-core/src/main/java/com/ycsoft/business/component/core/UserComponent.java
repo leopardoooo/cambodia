@@ -1358,6 +1358,17 @@ public class UserComponent extends BaseBusiComponent {
 	public void setCFeeDao(CFeeDao feeDao) {
 		cFeeDao = feeDao;
 	}
+
+	/**
+	 * 变更用户名,需要 设备号 和新的用户名.
+	 * @param user
+	 * @param custId 
+	 * @return 
+	 * @throws Exception 
+	 */
+	public int updateUserNameByDeviceCode(CUser user, String custId) throws Exception {
+		return cUserDao.updateUserNameByDeviceCode(user,custId);
+	}
 	
 	
 	

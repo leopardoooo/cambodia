@@ -14,7 +14,7 @@ public enum ErrorCode {
 	CustDataException("客户数据异常，请重新索搜客户！"),
 	CustSeqIsNull("系统未正确配置客户序列号,客户前缀号=%s"),
 
-	
+	NoUserExistsOrBelong2CurrentCust("用户不存在,或者不在当前客户名下"),
 	
 	
 	ExchangeConfigError("系统未正确配置汇率，请联系管理员"),
@@ -136,5 +136,4 @@ public enum ErrorCode {
 			return "40009";
 		}
 	}
-	
 }
