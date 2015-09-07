@@ -1,5 +1,6 @@
 ExchangeFormWin = Ext.extend(Ext.Window,{
 	width:300,height:140,closeAction:'hide',
+	title:langUtils.sys('ExchangeRateManage.commons.addNewOne'),
 	parent:null,form:null,
 	loadRecord:function(rec){
 		this.recordModify = rec.data;
@@ -59,15 +60,6 @@ ExchangeRateManageGrid = Ext.extend(Ext.grid.GridPanel,{
 		this.exchangeStore.reload();
 	},
 	exchangeStore : null,
-	initEvents : function(){
-		this.on('celldblclick',this.cellDblClick,this);
-		ExchangeRateManageGrid.superclass.initEvents.call(this);
-	},
-	cellDblClick:function(grid,rowIndex,columnIndex,e){
-		var grid = new Ext.grid.GridPanel();
-		var record = this.exchangeStore.getAt(rowIndex);
-		new ChangeDetailWin(record.data).show();
-	},
 	constructor: function(){
 		this.exchangeStore = new Ext.data.JsonStore({
 			autoLoad : true,
@@ -110,13 +102,7 @@ ExchangeRateManageGrid = Ext.extend(Ext.grid.GridPanel,{
 							{key:'INVALID',value:langUtils.sys('ExchangeRateManage.status.INVALID')}
 					]
 				}),displayField:'value',valueField:'key',triggerAction:'all',
-				scope:this,
-				listeners:{
-					scope:this,
-					select:function(combo,record){
-						this.getSelectionModel().getSelected().set('tariff_id_next',record.get('tariff_id'));
-					}
-				}
+				scope:this
 		});
 		
 		ExchangeRateManageGrid.superclass.constructor.call(this, {
@@ -157,6 +143,7 @@ ExchangeRateManageGrid = Ext.extend(Ext.grid.GridPanel,{
 			this.win = new ExchangeFormWin(this);
 		}
 		this.win.resetForm();
+		this.win.setTitle(langUtils.sys('ExchangeRateManage.commons.addNewOne'));
 		this.win.show();
 	},
 	doUpdate:function(){
@@ -169,6 +156,7 @@ ExchangeRateManageGrid = Ext.extend(Ext.grid.GridPanel,{
 			return false;
 		}
 		this.win.loadRecord(recs[0]);
+		this.win.setTitle(langUtils.sys('ExchangeRateManage.commons.update'));
 		this.win.show();
 	},
 	doInvalid:function(){
