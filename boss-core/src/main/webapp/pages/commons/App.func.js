@@ -1,5 +1,5 @@
 Ext.ns("App.func");
-
+abcd
 /**
  * 面板中行内操作列下的系列功能操作图标是否能显示
  * @param data 当前行record.data
