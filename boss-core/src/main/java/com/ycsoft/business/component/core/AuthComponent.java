@@ -32,7 +32,6 @@ import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.exception.ComponentException;
 import com.ycsoft.commons.exception.ErrorCode;
 import com.ycsoft.commons.helper.DateHelper;
-import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.daos.core.JDBCException;
 
 @Component
@@ -114,10 +113,23 @@ public class AuthComponent extends BaseComponent{
 			this.deleteBandUser(user, doneCode);
 			this.openBandUser(user, doneCode);
 			this.refreshBandUserAuth(user, doneCode);
+		}else if(authCmdType.equals(BusiCmdConstants.CHANGE_USER)){//修改密码...
+			this.updatePassword(user,doneCode);
 		}else {
 			throw new ComponentException(ErrorCode.CmdTypeUnDefined,authCmdType);
 		} 
 	}
+
+	private void updatePassword(CUser user, Integer doneCode) throws Exception {
+		JBandCommand bandCmd = gBandCmd(user,doneCode);
+		bandCmd.setCmd_type(BusiCmdConstants.BAND_EDIT_PWD);	
+		JsonObject params = new JsonObject();
+		params.addProperty(BusiCmdParam.login_name.name(), user.getLogin_name());
+		params.addProperty(BusiCmdParam.login_password.name(), user.getPassword());
+		bandCmd.setDetail_param(params.toString());
+		jBandCommandDao.save(bandCmd);
+	}
+
 
 	/**===================================FOR OTT USER=========================================**/
 	/**

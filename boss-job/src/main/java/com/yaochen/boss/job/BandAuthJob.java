@@ -48,7 +48,7 @@ public class BandAuthJob implements Job2 {
 			try {
 				if ((cmd.getCmd_type().equals(BusiCmdConstants.CREAT_USER))){
 					//开户
-					String loginPassword = getJsonValue(params,BusiCmdParam.login_name.name());
+					String loginPassword = getJsonValue(params,BusiCmdParam.login_password.name());
 					bandClient.create(cmd.getDone_code(), loginName, loginPassword, null);
 				} else if ((cmd.getCmd_type().equals(BusiCmdConstants.DEL_USER))) {
 					//销户
@@ -61,6 +61,9 @@ public class BandAuthJob implements Job2 {
 					bandClient.resume(cmd.getDone_code(), loginName);
 				} else if ((cmd.getCmd_type().equals(BusiCmdConstants.BAND_CLEAR_AUTH))) {
 					bandClient.cancelOrder(cmd.getDone_code(), loginName);
+				} else if ((cmd.getCmd_type().equals(BusiCmdConstants.BAND_EDIT_PWD))) {
+					String loginPassword = getJsonValue(params,BusiCmdParam.login_password.name());
+					bandClient.resetPswd(cmd.getDone_code(), loginName, loginPassword);
 				} else if ((cmd.getCmd_type().equals(BusiCmdConstants.BAND_ADD_AUTH))) {
 					Integer policyId = Integer.parseInt(getJsonValue(params,BusiCmdParam.band_policy_id.name()));
 					String effDate = getJsonValue(params,BusiCmdParam.prod_eff_date.name());

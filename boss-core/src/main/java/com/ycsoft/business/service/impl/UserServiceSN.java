@@ -28,9 +28,9 @@ import com.ycsoft.beans.core.user.FillUSerDeviceDto;
 import com.ycsoft.beans.device.RDeviceFee;
 import com.ycsoft.beans.prod.PPromotionAcct;
 import com.ycsoft.beans.system.SOptr;
+import com.ycsoft.business.commons.pojo.BusiParameter;
 import com.ycsoft.business.component.core.OrderComponent;
 import com.ycsoft.business.component.task.SnTaskComponent;
-import com.ycsoft.business.dao.config.TDeviceChangeReasonDao;
 import com.ycsoft.business.dao.core.prod.CProdOrderDao;
 import com.ycsoft.business.dto.config.TemplateConfigDto;
 import com.ycsoft.business.dto.core.fee.FeeInfoDto;
@@ -49,6 +49,7 @@ import com.ycsoft.commons.exception.ErrorCode;
 import com.ycsoft.commons.exception.ServicesException;
 import com.ycsoft.commons.helper.CollectionHelper;
 import com.ycsoft.commons.helper.DateHelper;
+import com.ycsoft.commons.helper.JsonHelper;
 import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.daos.core.JDBCException;
 @Service
@@ -765,12 +766,52 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 	}
 
 
+	public void saveBatchUpdateUserName(List<CUser> userList, String custId) throws Exception {
+
+		if(CollectionHelper.isEmpty(userList)){
+			return ;
+		}
+		Integer doneCode = this.doneCodeComponent.gDoneCode();
+		
+		BusiParameter busiParam = getBusiParam();
+		for (CUser user : userList) {
+			int result = userComponent.updateUserNameByDeviceCode(user,custId);
+			if(result < 1){
+				throw new ServicesException(ErrorCode.NoUserExistsOrBelong2CurrentCust);
+			}
+		}
+		busiParam.setBusiCode(BusiCodeConstants.BATCH_MOD_USER_NAME);//其他参数不需要
+		saveAllPublic(doneCode,busiParam);
+	}
 
 
 	@Override
 	public void saveEditPwd(String newPwd) throws Exception {
-		// TODO Auto-generated method stub
+
+		//获取客户用户信息
+		String  custId = getBusiParam().getCust().getCust_id();
+		CUser user = getBusiParam().getSelectedUsers().get(0);
+		//获取业务流水
+		Integer doneCode = doneCodeComponent.gDoneCode();
+		//生成计算用户信用度的JOB
+		jobComponent.createCreditCalJob(doneCode, custId, null,SystemConstants.BOOLEAN_TRUE);
+		List<CUserPropChange> propChangeList = new ArrayList<CUserPropChange>();
+		CUser userDto = queryUserById(user.getUser_id());
+
+		userDto.setNewPassword(newPwd);
+		jobComponent.createBusiCmdJob(doneCode, BusiCmdConstants.BAND_EDIT_PWD, custId, user.getUser_id(), null, null, user.getModem_mac(), null, null, JsonHelper.fromObject(userDto));
+	
 		
+		CUserPropChange propChange = new CUserPropChange();
+		propChange.setColumn_name("password");
+		propChange.setOld_value(userDto.getPassword());
+		propChange.setNew_value(newPwd);
+		propChangeList.add(propChange);
+		userComponent.editUser(doneCode, getBusiParam().getSelectedUserIds().get(0), propChangeList);
+		
+		authComponent.sendAuth(user, null, BusiCmdConstants.CHANGE_USER, doneCode);
+		
+		saveAllPublic(doneCode,getBusiParam());
 	}
 
 
