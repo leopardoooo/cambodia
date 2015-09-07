@@ -44,7 +44,9 @@ public class JVodCommand extends BusiBase implements Serializable {
 	private String area_id;
 	private Integer return_code;
 	
+	private String stb_id;
 	private String card_id;
+	private String modem_mac;
 	private String cmd_type_text;
 	private String is_success_text;
 
@@ -246,5 +248,20 @@ public class JVodCommand extends BusiBase implements Serializable {
 		this.return_code = return_code;
 	}
 
+	public String getStb_id() {
+		return stb_id;
+	}
+
+	public void setStb_id(String stb_id) {
+		this.stb_id = stb_id;
+	}
+
+	public String getModem_mac() {
+		return modem_mac;
+	}
+
+	public void setModem_mac(String modem_mac) {
+		this.modem_mac = modem_mac;
+	}
 
 }

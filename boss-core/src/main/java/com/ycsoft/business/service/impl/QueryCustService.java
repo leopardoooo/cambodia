@@ -45,6 +45,7 @@ import com.ycsoft.business.service.IQueryCustService;
 import com.ycsoft.commons.constants.BusiCodeConstants;
 import com.ycsoft.commons.constants.DictKey;
 import com.ycsoft.commons.constants.StatusConstants;
+import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.exception.ServicesException;
 import com.ycsoft.commons.helper.CollectionHelper;
 import com.ycsoft.commons.helper.StringHelper;
@@ -319,7 +320,11 @@ public class QueryCustService extends BaseService implements IQueryCustService {
 				if (user!=null){
 					pf.setUser_name(user.getUser_name());
 					pf.setUser_type_text(user.getUser_type_text());
-					pf.setDevice_code(user.getCard_id());
+					if(user.getUser_type().equals(SystemConstants.USER_TYPE_BAND)){
+						pf.setDevice_code(user.getModem_mac());
+					}else{
+						pf.setDevice_code(user.getStb_id());
+					}
 				}else{
 					pf.setIs_logoff("T");
 				}
