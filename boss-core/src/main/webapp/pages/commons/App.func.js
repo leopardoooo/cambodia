@@ -126,6 +126,14 @@ Ext.apply(App.func,{
 			}else if(busicode == '1074'){//修改宽带密码
 				if(data['user_type'] != 'BAND')
 					return false;
+			}else if(busicode == '2123'){//重置密码
+				//只有user_type = BAND和OTT_MOBILE用户显示, 且用户状态 是 正常 和施工 
+				if( (data['user_type'] == 'BAND' || data['user_type'] == 'OTT_MOBILE') 
+							&& ( data.status == 'ACTIVE' || data.status == 'INIT' ) ){
+					return true;
+				}else{
+					return false;
+				}
 			}else if(busicode == '1075'){//修改最大连接数
 				if(data['user_type'] != 'BAND')
 					return false;
