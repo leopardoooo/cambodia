@@ -10,6 +10,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.exception.ComponentException;
+import com.ycsoft.commons.helper.DateHelper;
 import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.http.HttpUtils;
 import com.ycsoft.http.ResponseBody;
@@ -206,7 +207,7 @@ public class OttClient {
 		}
 		user.setUser_rank("0");
 		user.setUser_permission("0");
-		user.setBegin_time(new Date());
+		user.setBegin_time(DateHelper.today());
 		
 		return user;
 	}
