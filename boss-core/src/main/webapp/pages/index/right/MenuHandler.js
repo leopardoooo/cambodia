@@ -793,9 +793,12 @@ Ext.apply(MenuHandler, {
 	},
 	//派单开户
 	NewUserBatch: function(){
+		if (!hasCust()) {
+			return false;
+		}
 		return {
 			width: 580,
-			height: 460
+			height: 550
 		}
 	},
 	// 用户销户

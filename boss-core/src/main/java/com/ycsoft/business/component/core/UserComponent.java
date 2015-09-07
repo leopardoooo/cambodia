@@ -32,6 +32,9 @@ import com.ycsoft.beans.device.RStbModel;
 import com.ycsoft.beans.prod.PPromFee;
 import com.ycsoft.beans.prod.PPromFeeUser;
 import com.ycsoft.beans.prod.PRes;
+import com.ycsoft.beans.prod.PSpkg;
+import com.ycsoft.beans.prod.PSpkgOpenbusifee;
+import com.ycsoft.beans.prod.PSpkgOpenuser;
 import com.ycsoft.beans.system.SOptr;
 import com.ycsoft.business.commons.abstracts.BaseBusiComponent;
 import com.ycsoft.business.component.config.ExpressionUtil;
@@ -58,6 +61,9 @@ import com.ycsoft.business.dao.core.user.CUserPropChangeDao;
 import com.ycsoft.business.dao.prod.PPromFeeDao;
 import com.ycsoft.business.dao.prod.PPromFeeProdDao;
 import com.ycsoft.business.dao.prod.PPromFeeUserDao;
+import com.ycsoft.business.dao.prod.PSpkgDao;
+import com.ycsoft.business.dao.prod.PSpkgOpenbusifeeDao;
+import com.ycsoft.business.dao.prod.PSpkgOpenuserDao;
 import com.ycsoft.business.dao.resource.device.RDeviceDao;
 import com.ycsoft.business.dao.resource.device.RModemModelDao;
 import com.ycsoft.business.dao.resource.device.RStbModelDao;
@@ -122,6 +128,12 @@ public class UserComponent extends BaseBusiComponent {
 	private CProdOrderFeeDao cProdOrderFeeDao;
 	@Autowired
 	private TDeviceChangeReasonDao tDeviceChangeReasonDao;
+	@Autowired
+	private PSpkgDao pSpkgDao;
+	@Autowired
+	private PSpkgOpenuserDao pSpkgOpenuserDao;
+	@Autowired
+	private PSpkgOpenbusifeeDao pSpkgOpenbusifeeDao;
 	
 	public List<TDeviceChangeReason> queryDeviceChangeReason() throws Exception{
 		return tDeviceChangeReasonDao.findAll();
@@ -1271,6 +1283,19 @@ public class UserComponent extends BaseBusiComponent {
 	public SOptr queryOptrById(String optr_id) throws Exception{
 		return sOptrDao.findByKey(optr_id);
 	}
+	
+	public List<PSpkgOpenuser> querySpkgUser(String spkgSn) throws Exception {
+		return pSpkgOpenuserDao.querySpkgUser(spkgSn);
+	}
+	
+	public List<PSpkgOpenbusifee> querySpkgOpenFee(String spkgSn) throws Exception {
+		return pSpkgOpenbusifeeDao.querySpkgOpenFee(spkgSn);
+	}
+	
+	public void updateOpenUserDoneCode(String spkgSn, Integer doneCode) throws Exception{
+		pSpkgOpenuserDao.updateOpenUserDoneCode(spkgSn, doneCode);
+	}
+	
 //	public String toUtilValue(String custId,String userId,String tariffId,List<ProdTariffDto> tariffList) throws Exception{
 //		//查找用户基本信息
 //		CUser user = cUserDao.findByKey(userId);

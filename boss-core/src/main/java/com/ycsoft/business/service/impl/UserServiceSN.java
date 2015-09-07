@@ -27,6 +27,9 @@ import com.ycsoft.beans.core.user.CUserPropChange;
 import com.ycsoft.beans.core.user.FillUSerDeviceDto;
 import com.ycsoft.beans.device.RDeviceFee;
 import com.ycsoft.beans.prod.PPromotionAcct;
+import com.ycsoft.beans.prod.PSpkg;
+import com.ycsoft.beans.prod.PSpkgOpenbusifee;
+import com.ycsoft.beans.prod.PSpkgOpenuser;
 import com.ycsoft.beans.system.SOptr;
 import com.ycsoft.business.commons.pojo.BusiParameter;
 import com.ycsoft.business.component.core.OrderComponent;
@@ -88,35 +91,71 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 	}
 	
 	@Override
-	public void createUserBatch(List<UserInfo> userList, String stopType) throws Exception {
+	public void createUserBatch(List<UserInfo> userList, String stopType, String isHand) throws Exception {
 		CCust cust = getBusiParam().getCust();
 		this.canOpenUser(cust);
 		doneCodeComponent.lockCust(cust.getCust_id());
 		Integer doneCode = doneCodeComponent.gDoneCode();
-		// 获取客户信息
-		for (UserInfo userInfo:userList){
-			for (int i=0;i<userInfo.getUser_count();i++){
-				CUser user = new CUser();
-				user.setUser_type(userInfo.getUser_type());
-				String deviceType;
-				if (user.getUser_type().equals(SystemConstants.USER_TYPE_BAND)){
-					deviceType = SystemConstants.DEVICE_TYPE_MODEM;
-				} else {
-					deviceType = SystemConstants.DEVICE_TYPE_STB;
+		
+		if(SystemConstants.BOOLEAN_TRUE.equals(isHand)){
+			// 获取客户信息
+			for (UserInfo userInfo:userList){
+				for (int i=0;i<userInfo.getUser_count();i++){
+					CUser user = new CUser();
+					user.setUser_type(userInfo.getUser_type());
+					String deviceType;
+					if (user.getUser_type().equals(SystemConstants.USER_TYPE_BAND)){
+						deviceType = SystemConstants.DEVICE_TYPE_MODEM;
+					} else {
+						deviceType = SystemConstants.DEVICE_TYPE_STB;
+					}
+					
+					String deviceModel = userInfo.getDevice_model();
+					String deviceBuyMode = userInfo.getDevice_buy_mode();
+					FeeInfoDto deviceFee = new FeeInfoDto();
+					deviceFee.setFee_id(userInfo.getFee_id());
+					deviceFee.setFee(userInfo.getFee());
+					
+					user.setStop_type(stopType);
+					
+					int num = getUserCount(cust, user.getUser_type());
+					this.openSingle(cust, user, doneCode, null, deviceType, deviceModel, deviceBuyMode, deviceFee, num);
+					
 				}
-				
-				String deviceModel = userInfo.getDevice_model();
-				String deviceBuyMode = userInfo.getDevice_buy_mode();
-				FeeInfoDto deviceFee = new FeeInfoDto();
-				deviceFee.setFee_id(userInfo.getFee_id());
-				deviceFee.setFee(userInfo.getFee());
-				
-				user.setStop_type(stopType);
-				
-				int num = getUserCount(cust, user.getUser_type());
-				this.openSingle(cust, user, doneCode, null, deviceType, deviceModel, deviceBuyMode, deviceFee, num);
-				
 			}
+		}else{
+			List<PSpkgOpenuser> spkgUserList = this.querySpkgUser(cust.getSpkg_sn());
+			List<PSpkgOpenbusifee> spkgBusiFeeList = this.querySpkgOpenFee(cust.getSpkg_sn());
+			if(spkgUserList.size() > 0){
+				for(PSpkgOpenuser openUser : spkgUserList){
+					CUser user = new CUser();
+					user.setUser_type(openUser.getUser_type());
+					String deviceType;
+					if (user.getUser_type().equals(SystemConstants.USER_TYPE_BAND)){
+						deviceType = SystemConstants.DEVICE_TYPE_MODEM;
+					} else {
+						deviceType = SystemConstants.DEVICE_TYPE_STB;
+					}
+					
+					String deviceModel = openUser.getDevice_model();
+					String deviceBuyMode = openUser.getBuy_type();
+					FeeInfoDto deviceFee = new FeeInfoDto();
+					deviceFee.setFee_id(openUser.getFee_id());
+					deviceFee.setFee(openUser.getFee());
+					
+					user.setStop_type(stopType);
+					
+					int num = getUserCount(cust, user.getUser_type());
+					this.openSingle(cust, user, doneCode, null, deviceType, deviceModel, deviceBuyMode, deviceFee, num);
+				}
+			}
+			if(spkgBusiFeeList.size() > 0){
+				for(PSpkgOpenbusifee busiFee : spkgBusiFeeList){
+					feeComponent.saveBusiFee(cust.getCust_id(), cust != null ? cust.getAddr_id() : null, busiFee.getFee_id(), 1, 
+							SystemConstants.PAY_TYPE_UNPAY, busiFee.getFee(), doneCode, doneCode, getBusiParam().getBusiCode(), null, "");
+				}
+			}
+			userComponent.updateOpenUserDoneCode(cust.getSpkg_sn(), doneCode);
 		}
 		saveAllPublic(doneCode, getBusiParam());
 	}
@@ -1130,6 +1169,16 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		if(userList.size()>0){
 			jobComponent.removeByUserId(userId);
 		}
+	}
+	
+	@Override
+	public List<PSpkgOpenuser> querySpkgUser(String spkgSn) throws Exception {
+		return userComponent.querySpkgUser(spkgSn);
+	}
+	
+	@Override
+	public List<PSpkgOpenbusifee> querySpkgOpenFee(String spkgSn) throws Exception {
+		return userComponent.querySpkgOpenFee(spkgSn);
 	}
 	
 	private void stopProd(Integer doneCode, CProdOrderDto order) throws Exception {

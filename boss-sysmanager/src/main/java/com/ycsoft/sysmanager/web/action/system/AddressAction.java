@@ -11,8 +11,11 @@ import org.springframework.stereotype.Controller;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.ycsoft.beans.config.TAddress;
+import com.ycsoft.beans.config.TProvince;
 import com.ycsoft.beans.core.cust.CCust;
 import com.ycsoft.beans.system.SSysChange;
+import com.ycsoft.business.dto.config.TAddressDto;
+import com.ycsoft.business.dto.config.TAddressSysDto;
 import com.ycsoft.commons.abstracts.BaseAction;
 import com.ycsoft.commons.constants.SysChangeType;
 import com.ycsoft.commons.constants.SystemConstants;
@@ -38,7 +41,8 @@ public class AddressAction extends BaseAction {
 	private String addrListStr;
 	private String custId;
 	private String status;
-	
+	private TAddressSysDto addrDto;
+	private String districtId;
 	private File file;
 
 	/**
@@ -65,6 +69,12 @@ public class AddressAction extends BaseAction {
 		return JSON_RECORDS;
 	}
 	
+	public String queryDistrictTree() throws Exception{
+		List addrs =  addressComponent.queryDistrictByPid(districtId);
+		getRoot().setRecords(TreeBuilder.createSysAdreeTree(addrs));
+		return JSON_RECORDS;
+	}
+	
 	/**
 	 * 增加地区
 	 * @return
@@ -73,12 +83,20 @@ public class AddressAction extends BaseAction {
 	public String saveAddress() throws Exception{
 		//TODO 记录异动
 		List<TAddress> oldList = new ArrayList<TAddress>();
-		getRoot().setSimpleObj(addressComponent.saveAddress(addr));
-		TAddress newAdd = addressComponent.queryAddrByaddrId(addr.getAddr_id());
+		String type = request.getParameter("type");
+		TAddress  addr = addressComponent.saveAddress(addrDto,type);
+		getRoot().setSimpleObj(addr);
+//		TAddress newAdd = addressComponent.queryAddrByaddrId(addrDto.getAddr_id());
 		List<TAddress> newList = new ArrayList<TAddress>();
-		newList.add(newAdd);
+		newList.add(addr);
 		saveChanges(oldList, newList);
 		return JSON;
+	}
+	
+	public String queryProvince() throws Exception{
+		List<TProvince> list = addressComponent.queryProvince();
+		getRoot().setRecords(list);
+		return JSON_RECORDS;
 	}
 
 	public String queryOptrByCountyId() throws Exception {
@@ -153,10 +171,10 @@ public class AddressAction extends BaseAction {
 	 */
 	public String editAddress() throws Exception{
 		List<TAddress> oldList = new ArrayList<TAddress>();
-		oldList.add(addressComponent.queryAddrByaddrId(addr.getAddr_id()));
-		addressComponent.editAddress(addr);
+		oldList.add(addressComponent.queryAddrByaddrId(addrDto.getAddr_id()));
+		addressComponent.editAddress(addrDto);
 		List<TAddress> newList = new ArrayList<TAddress>();
-		newList.add(addressComponent.queryAddrByaddrId(addr.getAddr_id()));
+		newList.add(addressComponent.queryAddrByaddrId(addrDto.getAddr_id()));
 		saveChanges(oldList, newList);
 		return JSON;
 	}
@@ -334,5 +352,19 @@ public class AddressAction extends BaseAction {
 	public void setFile(File file) {
 		this.file = file;
 	}
+
+	public TAddressSysDto getAddrDto() {
+		return addrDto;
+	}
+
+	public void setAddrDto(TAddressSysDto addrDto) {
+		this.addrDto = addrDto;
+	}
+
+	public void setDistrictId(String districtId) {
+		this.districtId = districtId;
+	}
+
+
 
 }
