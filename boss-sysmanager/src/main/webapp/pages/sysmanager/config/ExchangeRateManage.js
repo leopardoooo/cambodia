@@ -14,16 +14,16 @@ ExchangeFormWin = Ext.extend(Ext.Window,{
 		this.parent = p;
 		this.form = new Ext.FormPanel({
 			items:[
-			{xtype:'datefield',name:'eff_date',minValue:Date.parseDate(new Date().format('Y-m-d'),'Y-m-d'),fieldLabel:'生效日期',allowBlank:false,editable:false},
-			{xtype:'numberfield',allowDecimals:false,allowNegative: false,name:'exchange',minValue:1,fieldLabel:'汇率',allowBlank:false}
+			{xtype:'datefield',name:'eff_date',minValue:Date.parseDate(new Date().format('Y-m-d'),'Y-m-d'),fieldLabel:langUtils.sys('ExchangeRateManage.commons.effective_time'),allowBlank:false,editable:false},
+			{xtype:'numberfield',allowDecimals:false,allowNegative: false,name:'exchange',minValue:1,fieldLabel:langUtils.sys('ExchangeRateManage.commons.exchange_rate'),allowBlank:false}
 			]
 		});
 		ExchangeFormWin.superclass.constructor.call(this,{
 			items:this.form,
 			buttonAlign:'center',
 			buttons:[
-			{text:'保存',scope:this,handler:this.doSave},
-			{text:'取消',scope:this,handler:this.doCancel}
+			{text:langUtils.sys('ExchangeRateManage.commons.saveBtn'),scope:this,handler:this.doSave},
+			{text:langUtils.sys('ExchangeRateManage.commons.cancelBtn'),scope:this,handler:this.doCancel}
 			]
 		});
 	},
@@ -39,7 +39,7 @@ ExchangeFormWin = Ext.extend(Ext.Window,{
 				url:root+'/config/Exchange!saveOrUpdate.action',
 				success: function( res, ops){
 //					var data = Ext.decode(res.responseText );
-					Alert('操作成功',function(){
+					Alert(langUtils.sys('ExchangeRateManage.msg.successMsg'),function(){
 						this.parent.reloadGrid();
 						this.doCancel();
 					},this);
@@ -86,14 +86,14 @@ ExchangeRateManageGrid = Ext.extend(Ext.grid.GridPanel,{
 			}
 		});
 		var cm =[
-			{header:'生效日期',width:160,dataIndex:'eff_date',renderer:function(v){
+			{header:langUtils.sys('ExchangeRateManage.commons.effective_time'),width:160,dataIndex:'eff_date',renderer:function(v){
 				if(null == v ) return '';
 				return Date.parseDate(v,'Y-m-d H:i:s').format('Y-m-d');
 			}},
-			{header:'状态',width:160,dataIndex:'status'},
-			{header:'汇率值',width:160,dataIndex:'exchange'},
-			{header:'操作员',width:160,dataIndex:'optr_name'},
-			{header:'创建日期',width:160,dataIndex:'create_time'}
+			{header:langUtils.sys('ExchangeRateManage.commons.status'),width:160,dataIndex:'status'},
+			{header:langUtils.sys('ExchangeRateManage.commons.exchange_rate'),width:160,dataIndex:'exchange'},
+			{header:langUtils.sys('ExchangeRateManage.commons.optr'),width:160,dataIndex:'optr_name'},
+			{header:langUtils.sys('ExchangeRateManage.commons.create_time'),width:160,dataIndex:'create_time'}
 		];
 		
 		this.effDateCmp = new Ext.form.DateField({});
@@ -105,7 +105,9 @@ ExchangeRateManageGrid = Ext.extend(Ext.grid.GridPanel,{
 				store:new Ext.data.JsonStore({
 					fields:['key','value'],
 					data:[
-					{key:'',value:'所有'},{key:'ACTIVE',value:'正常'},{key:'INVALID',value:'失效'}
+					{key:'',value:langUtils.sys('ExchangeRateManage.status.empty')},
+						{key:'ACTIVE',value:langUtils.sys('ExchangeRateManage.status.ACTIVE')},
+							{key:'INVALID',value:langUtils.sys('ExchangeRateManage.status.INVALID')}
 					]
 				}),displayField:'value',valueField:'key',triggerAction:'all',
 				scope:this,
@@ -128,11 +130,14 @@ ExchangeRateManageGrid = Ext.extend(Ext.grid.GridPanel,{
 			},
 			bbar:new Ext.PagingToolbar({store:this.exchangeStore,pageSize:20})
 			,
-			tbar : [' ', '生效时间：',this.effDateCmp,'-','汇率：',this.exchangeCmp,'-' ,'状态：',this.statusCmp,'-' ,
-					{text:'&nbsp;&nbsp;查询',scope:this,handler:this.doQuery},'->',
-					{text:'新增',scope:this,handler:this.doAdd},'-',
-					{text:'修改',scope:this,handler:this.doUpdate},'-',
-					{text:'作废',scope:this,handler:this.doInvalid},'-'
+			tbar : [' ', langUtils.sys('ExchangeRateManage.commons.effective_time')+' :',this.effDateCmp,
+					'-',langUtils.sys('ExchangeRateManage.commons.exchange_rate')+' :',this.exchangeCmp,'-' ,
+					langUtils.sys('ExchangeRateManage.commons.status')+' :',this.statusCmp,'-' ,
+					{text:'&nbsp;&nbsp;' +
+							langUtils.sys('ExchangeRateManage.commons.query') ,scope:this,handler:this.doQuery},'->',
+					{text:langUtils.sys('ExchangeRateManage.commons.addNewOne') ,scope:this,handler:this.doAdd},'-',
+					{text:langUtils.sys('ExchangeRateManage.commons.update') ,scope:this,handler:this.doUpdate},'-',
+					{text:langUtils.sys('ExchangeRateManage.commons.invalid') ,scope:this,handler:this.doInvalid},'-'
 					]
 					
 		});
@@ -160,7 +165,7 @@ ExchangeRateManageGrid = Ext.extend(Ext.grid.GridPanel,{
 		}
 		var recs = this.selModel.getSelections();
 		if(recs.length != 1){
-			Alert('请选择且仅选择一条记录.');
+			Alert(langUtils.sys('ExchangeRateManage.msg.onlyOne'));
 			return false;
 		}
 		this.win.loadRecord(recs[0]);
@@ -169,17 +174,17 @@ ExchangeRateManageGrid = Ext.extend(Ext.grid.GridPanel,{
 	doInvalid:function(){
 		var recs = this.selModel.getSelections();
 		if(recs.length != 1){
-			Alert('请选择且仅选择一条记录.');
+			Alert(langUtils.sys('ExchangeRateManage.msg.onlyOne'));
 			return false;
 		}
 		var data = recs[0].data;
 		var params = {effDate:Date.parseDate(data.eff_date,'Y-m-d H:i:s').format('Y-m-d'),oldExchange:data.exchange};
-		Confirm('是否确认作废？' , this , function(){
+		Confirm(langUtils.sys('ExchangeRateManage.msg.areYouSure') , this , function(){
 			Ext.Ajax.request({
 				params: params,scope:this,
 				url:root+'/config/Exchange!invalid.action',
 				success: function( res, ops){
-					Alert('操作成功',function(){
+					Alert(langUtils.sys('ExchangeRateManage.msg.successMsg'),function(){
 						this.reloadGrid();
 					},this);
 				}
@@ -195,7 +200,7 @@ ExchangeRateManage = Ext.extend(Ext.Panel,{
 		this.grid  = new ExchangeRateManageGrid();		
 		ExchangeRateManage.superclass.constructor.call(this,{
 			id:'ExchangeRateManage',
-			title:'汇率管理',
+			title:langUtils.sys('ExchangeRateManage.title'),
 			closable:true,
 			border:false,
 			layout:'border',
