@@ -27,7 +27,12 @@ public class DateHelper {
 	public final static String FORMAT_YMD_STR="yyyyMMdd";
 	public final static String FORMAT_YMD="yyyy-MM-dd";
 	public final static String FORMAT_TIME="yyyy-MM-dd HH:mm:ss";
+	public final static String FORMAT_TIME_START="yyyy-MM-dd 00:00:00";
+	public final static String FORMAT_TIME_END="yyyy-MM-dd 23:59:59";
 	public final static String FORMAT_TIME_VOD="yyyyMMdd000000";
+	
+	public final static String FORMAT_TIME_VOD_END="yyyyMMdd235959";
+	
 	
 	private final static NewDateFormat df = new NewDateFormat(FORMAT_TIME);
 	
@@ -699,6 +704,12 @@ public class DateHelper {
 	}
 	
 	public static void main(String[] args){
+		
+		System.out.println(DateHelper.FORMAT_TIME+DateHelper.format(new Date(), DateHelper.FORMAT_TIME));
+		System.out.println(DateHelper.FORMAT_TIME_START+DateHelper.format(new Date(), DateHelper.FORMAT_TIME_START));
+		System.out.println(DateHelper.FORMAT_TIME_END+DateHelper.format(new Date(), DateHelper.FORMAT_TIME_END));
+		System.out.println(DateHelper.FORMAT_TIME_VOD+DateHelper.format(new Date(), DateHelper.FORMAT_TIME_VOD));
+		System.out.println(DateHelper.FORMAT_TIME_VOD_END+DateHelper.format(new Date(), DateHelper.FORMAT_TIME_VOD_END));
 //		System.out.println(DateHelper.dateToStr(DateHelper.addDate(new Date(), 2)));
 //		
 //		System.out.println(DateHelper.getDiffDays(new Date(),DateHelper.addDate(new Date(), 3)));

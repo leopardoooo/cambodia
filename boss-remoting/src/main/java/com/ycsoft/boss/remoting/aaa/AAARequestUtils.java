@@ -37,6 +37,8 @@ public final class AAARequestUtils {
 	// 默认的业务流水号
 	private static final long DEFAULT_DONE_CODE = 0L;
 	
+	private static final String  DEFAULT_LIMIT_PORT_GROUP_ID="1";
+	
 	// 华为AAA接入方式支持很多种，但目前boss系统仅支持1090204:FBB&WiFi
 	private static final Integer DEFAULT_ACCESS_TYPE = 1090204;
 	
@@ -90,6 +92,7 @@ public final class AAARequestUtils {
 	}
 	
 	/**
+	 * TODO 查询订购有问题没有实现
 	 * 构建查询订购业务的请求数据结构
 	 * @param doneCode 流水号用于生成请求头信息
 	 * @param userId boss系统的userId
@@ -102,7 +105,11 @@ public final class AAARequestUtils {
 		body.setSubscriberID(userId);
 		// 接入方式 1090204:FBB&WiFi
 		body.setAccessType(DEFAULT_ACCESS_TYPE);
-		
+		System.out.println(body.getSubscriberIDType());
+		body.setSubscriberIDType(3);
+
+	
+		System.out.println(body.getSubscriberIDType());
 		
 		request.setQuerySubscriberServiceRequest(body);
 		request.setRequestHeader(buildReqeustHeader(CommandId.QuerySubscriberService, doneCode));
@@ -280,10 +287,13 @@ public final class AAARequestUtils {
 		AAASubscriberInfo basic = new AAASubscriberInfo();
 		// 密码
 		basic.setPassword(pswd);
-		AAASubscriberServiceInfo serviceInfo = createServiceInfo(policyId, null, null);
 		
 		body.setAAASubscriberInfo(basic);
-		body.setAAASubscriberServiceInfo(new AAASubscriberServiceInfo[]{serviceInfo});
+		//开户时订购策略
+		if(policyId!=null){
+			AAASubscriberServiceInfo serviceInfo = createServiceInfo(policyId, null, null);
+			body.setAAASubscriberServiceInfo(new AAASubscriberServiceInfo[]{serviceInfo});
+		}
 		
 		request.setRequestHeader(buildReqeustHeader(CommandId.NewSubscriber, doneCode));
 		request.setNewAAASubscriberRequest(body);
@@ -311,6 +321,7 @@ public final class AAARequestUtils {
 		serviceInfo.setMaxSessNumber(0);
 		serviceInfo.setCancelBinding(0);
 		serviceInfo.setPortBindingType(0);
+		serviceInfo.setLimitPortGroupID(DEFAULT_LIMIT_PORT_GROUP_ID);
 		// 开始日期
 		if(null != effectTime){
 			serviceInfo.setEffectTime(effectTime);

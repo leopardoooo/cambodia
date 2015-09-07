@@ -477,11 +477,15 @@ public class CUserDao extends BaseEntityDao<CUser> {
 	}
 	
 	/**
-	 * 查找一个用户下所有有效资源的到期日
+	 * 查找一个用户下所有有效资源的到期日(产品状态是开通状态的)
 	 */
 	public List<UserResExpDate> queryUserProdResExpDate(String userId) throws Exception{
-		String sql = "select c.external_res_id res_id,exp_date from c_prod_order a,p_prod_static_res b,t_server_res c "
-				+ " where b.res_id= c.boss_res_id and user_id=? and a.is_pay='T' and exp_date>trunc(sysdate) and a.prod_id=b.prod_id";
+		String sql =
+				StringHelper.append("select c.external_res_id res_id,exp_date ",
+						" from c_prod_order a,p_prod_static_res b,t_server_res c ,t_prod_status_openstop op ",
+				        " where a.status=op.status_id and  op.open_or_stop=1 ",
+				        " and  b.res_id= c.boss_res_id and a.prod_id=b.prod_id ",
+				        " and a.user_id=? and a.is_pay='T' and a.exp_date>trunc(sysdate) ");
 		return this.createQuery(UserResExpDate.class, sql, userId).list();
 	}
 	

@@ -47,13 +47,17 @@ public class BandAuthJob implements Job2 {
 			String loginName = getJsonValue(params,BusiCmdParam.login_name.name());
 			try {
 				if ((cmd.getCmd_type().equals(BusiCmdConstants.CREAT_USER))){
+					//开户
 					String loginPassword = getJsonValue(params,BusiCmdParam.login_name.name());
 					bandClient.create(cmd.getDone_code(), loginName, loginPassword, null);
 				} else if ((cmd.getCmd_type().equals(BusiCmdConstants.DEL_USER))) {
+					//销户
 					bandClient.delete(cmd.getDone_code(), loginName);
 				} else if ((cmd.getCmd_type().equals(BusiCmdConstants.PASSVATE_USER))) {
+					//暂停用户
 					bandClient.pause(cmd.getDone_code(), loginName);
-				} else if ((cmd.getCmd_type().equals(BusiCmdConstants.ACCTIVATE_PROD))) {
+				} else if ((cmd.getCmd_type().equals(BusiCmdConstants.ACCTIVATE_USER))) {
+					//恢复用户
 					bandClient.resume(cmd.getDone_code(), loginName);
 				} else if ((cmd.getCmd_type().equals(BusiCmdConstants.BAND_CLEAR_AUTH))) {
 					bandClient.cancelOrder(cmd.getDone_code(), loginName);
@@ -61,38 +65,54 @@ public class BandAuthJob implements Job2 {
 					Integer policyId = Integer.parseInt(getJsonValue(params,BusiCmdParam.band_policy_id.name()));
 					String effDate = getJsonValue(params,BusiCmdParam.prod_eff_date.name());
 					String expDate = getJsonValue(params,BusiCmdParam.prod_exp_date.name());
-					bandClient.orderService(cmd.getDone_code(), loginName, policyId, effDate, expDate);
-				} 
-				result.setStatus("0");
+					//先修改订购然后订购
+					try{
+						//无订购的情况下，修改订购会失败。失败后使用订购功能订购
+						bandClient.modifyOrderService(cmd.getDone_code(), loginName, policyId,null, expDate);						
+					}catch(Exception e1){
+						bandClient.orderService(cmd.getDone_code(), loginName, policyId, effDate, expDate);
+					}
+				}else{
+					result.setStatus(Result.BOSS_ERROR_STATUS);
+					result.setReason("未定义的指令类型");
+				}
+				if(result.getStatus()==null){
+					result.setStatus("0");
+					result.setReason("成功");
+				}
 			} catch (AAAException e){
 				ResultHeader rh = e.getResult();
 				if (rh == null){
 					//系统异常
 					result.setErr(Result.UNDEFINED_ERROR_STATUS);
 					result.setReason(e.getMessage());
+					logger.error("未知严重错误，暂停发送!",e);
 				} else {
 					result.setErr(rh.getResultCode());
 					result.setReason(rh.getResultDesc());
 				}
+			}catch(Exception e){
+				result.setErr(Result.UNDEFINED_ERROR_STATUS);
+				result.setReason(e.getMessage());
+				logger.error("未知严重错误，暂停发送!",e);
+			}
+			//网络错误或系统未知错误额外休眠5秒
+			if (!result.isSuccess()&&(result.isConnectionError()||result.isUndefinedError())){
+				try {
+					Thread.sleep(1000*5);
+				} catch (Exception e) {
+					logger.error("网络错误和未知错误休眠失败",e);
+				}
+			}
+				//保存发送结果
+			try{
+				authComponent.saveBandSendResult(cmd, result);
+			} catch(Exception e){
+				e.printStackTrace();
+				logger.error("保存指令发送结果失败",e);
+				return;
 			}
 			
-			if (result.isConnectionError()){
-				logger.error("网络无法连接，暂停发送!"+result.getReason());
-				break; 
-			} else if (result.isUndefinedError()){
-				logger.error("未知严重错误，暂停发送!"+result.getReason());
-				break;
-			} else {
-				//保存发送结果
-				try{
-					authComponent.saveBandSendResult(cmd, result);
-				} catch(Exception e){
-					e.printStackTrace();
-					logger.error("保存指令发送结果失败"+e.getMessage());
-					return;
-				}
-				
-			}
 			
 		}
 		

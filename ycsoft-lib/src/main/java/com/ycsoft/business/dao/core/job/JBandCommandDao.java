@@ -4,6 +4,7 @@
  
 package com.ycsoft.business.dao.core.job; 
 
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +15,7 @@ import com.ycsoft.beans.core.job.JBandCommand;
 import com.ycsoft.beans.core.job.JVodCommand;
 import com.ycsoft.business.dto.core.prod.JBandCommandDto;
 import com.ycsoft.commons.constants.BusiCmdConstants;
+import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.daos.abstracts.BaseEntityDao;
 import com.ycsoft.daos.core.JDBCException;
@@ -75,5 +77,20 @@ public class JBandCommandDao extends BaseEntityDao<JBandCommand> {
 	public List<JBandCommand> queryCmd() throws JDBCException{
 		String sql = "select * from j_band_command where is_send='F' and rownum<500 order by transnum";
 		return this.createQuery(sql).list();
+	}
+	
+	public int updateByCmd(Long transnum,String isSent,String isSuccess,String errorInfo,Integer returnCode) throws JDBCException{
+		//cmd.setIs_send(SystemConstants.BOOLEAN_TRUE);
+		if(isSent==null){
+			isSent="F";
+		}
+		if(isSuccess==null){
+			isSuccess="F";
+		}
+		if(errorInfo!=null&&errorInfo.length()>100){
+			errorInfo=errorInfo.substring(0,100);
+		}
+		String sql="update j_band_command set is_send=?,send_time=sysdate,is_success=?,error_info=?,return_code=? where transnum=? ";
+		return this.executeUpdate(sql, isSent,isSuccess,errorInfo,returnCode,transnum);
 	}
 }
