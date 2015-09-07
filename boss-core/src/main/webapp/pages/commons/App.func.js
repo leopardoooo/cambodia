@@ -1,11 +1,11 @@
 Ext.ns("App.func");
+
 /**
  * 面板中行内操作列下的系列功能操作图标是否能显示
  * @param data 当前行record.data
  * @param busicode 功能操作对应的busicode,见s_resource表
  * @param gridpanel的id
  */
-
 Ext.apply(App.func,{
 	
 	FilterOperteBtn : function(data,busicode,panelName){
@@ -639,5 +639,3 @@ Ext.apply(App.func,{
 		return true;
 	}
 });
-
-lmnlmlml l
