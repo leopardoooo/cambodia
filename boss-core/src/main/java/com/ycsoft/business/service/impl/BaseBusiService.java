@@ -57,6 +57,7 @@ import com.ycsoft.business.component.resource.ProdComponent;
 import com.ycsoft.business.component.task.TaskComponent;
 import com.ycsoft.business.dto.core.acct.AcctAcctitemActiveDto;
 import com.ycsoft.business.dto.core.acct.PayDto;
+import com.ycsoft.business.dto.core.cust.CustFullInfoDto;
 import com.ycsoft.business.dto.core.fee.CFeePayDto;
 import com.ycsoft.business.dto.core.fee.FeeBusiFormDto;
 import com.ycsoft.business.dto.core.fee.FeeInfoDto;
@@ -103,7 +104,31 @@ public class BaseBusiService extends BaseService {
 	@Autowired
 	protected AuthComponent authComponent;
 	
-	
+	/**
+	 * 初始化接口的业务参数
+	 * @param busiCode
+	 * @throws Exception 
+	 */
+	protected Integer initExternalBusiParam(String busiCode,String  custId) throws Exception{
+		BusiParameter param=new BusiParameter();
+		SOptr optr=new SOptr();
+		optr.setOptr_id("0");
+		optr.setDept_id("4501");
+		optr.setLogin_name("admin");
+		optr.setArea_id("4500");
+		optr.setCounty_id("4501");
+		CustFullInfoDto custFullInfo = new CustFullInfoDto();
+		if(custId!=null){
+			custFullInfo.setCust(custComponent.queryCustById(custId));
+		}
+		param.setOptr(optr);
+		param.setBusiCode(busiCode);
+		param.setCustFullInfo(custFullInfo);
+		param.setService_channel(SystemConstants.SERVICE_CHANNEL_MOBILE);
+		param.setDoneCode(doneCodeComponent.gDoneCode());
+		this.setParam(param);
+		return param.getDoneCode();
+	}
 	/**
 	 * 保存订购产品受理单
 	 * @param doneCode

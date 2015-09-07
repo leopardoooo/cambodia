@@ -3,8 +3,10 @@ package com.ycsoft.business.service.impl;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,13 +15,18 @@ import com.ycsoft.beans.core.acct.CAcctAcctitem;
 import com.ycsoft.beans.core.cust.CCust;
 import com.ycsoft.beans.core.cust.CCustLinkman;
 import com.ycsoft.beans.core.cust.CCustPropChange;
+import com.ycsoft.beans.core.prod.CProdOrder;
 import com.ycsoft.beans.core.prod.CProdOrderDto;
 import com.ycsoft.beans.core.user.CUser;
 import com.ycsoft.beans.ott.OttAccount;
-import com.ycsoft.beans.system.SOptr;
+import com.ycsoft.beans.ott.OttProdTariff;
+import com.ycsoft.beans.ott.OttUserOrder;
+import com.ycsoft.beans.ott.OttUserProd;
+import com.ycsoft.beans.prod.PProd;
+import com.ycsoft.beans.prod.PProdTariff;
+import com.ycsoft.beans.prod.PProdTariffDisct;
 import com.ycsoft.boss.remoting.ott.OttClient;
 import com.ycsoft.boss.remoting.ott.Result;
-import com.ycsoft.business.commons.pojo.BusiParameter;
 import com.ycsoft.business.component.core.OrderComponent;
 import com.ycsoft.business.dao.core.acct.CAcctAcctitemDao;
 import com.ycsoft.business.dao.core.cust.CCustDao;
@@ -27,7 +34,10 @@ import com.ycsoft.business.dao.core.cust.CCustLinkmanDao;
 import com.ycsoft.business.dao.core.cust.CCustPropChangeDao;
 import com.ycsoft.business.dao.core.prod.CProdOrderDao;
 import com.ycsoft.business.dao.core.user.CUserDao;
-import com.ycsoft.business.dto.core.cust.CustFullInfoDto;
+import com.ycsoft.business.dao.prod.PProdTariffDao;
+import com.ycsoft.business.dao.prod.PProdTariffDisctDao;
+import com.ycsoft.business.dto.core.prod.OrderProd;
+import com.ycsoft.business.dto.core.prod.OrderProdPanel;
 import com.ycsoft.commons.constants.BusiCodeConstants;
 import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.constants.SystemConstants;
@@ -42,7 +52,7 @@ import com.ycsoft.commons.helper.StringHelper;
  *
  */
 @Service
-public class OttExternalService extends BaseBusiService {
+public class OttExternalService extends OrderService {
 	@Autowired
 	private CUserDao cUserDao;
 	@Autowired
@@ -59,6 +69,11 @@ public class OttExternalService extends BaseBusiService {
 	private CProdOrderDao cProdOrderDao;
 	@Autowired
 	private OrderComponent orderComponent;
+	@Autowired
+	private PProdTariffDao pProdTariffDao;
+	@Autowired
+	private PProdTariffDisctDao pProdTariffDisctDao;
+	
 	/**
 	 * 获得用户账户
 	 * @param login_name
@@ -67,6 +82,9 @@ public class OttExternalService extends BaseBusiService {
 
 			OttAccount ottAcct=new OttAccount();
 			CUser user=cUserDao.queryUserByLoginName(loginName);
+			if(user==null||!user.getUser_type().equals(SystemConstants.USER_TYPE_OTT_MOBILE)){
+				throw new ServicesException(ErrorCode.UserLoginNameIsNotExistsOrIsNotOttMobile);
+			}
 			CCust cust=custComponent.queryCustById(user.getCust_id());
 			CCustLinkman linkman= custComponent.queryCustLinkmanById(cust.getCust_id());
 			CAcctAcctitem acctItem=cAcctAcctitemDao.queryPublicAcctItem(cust.getCust_id());
@@ -86,36 +104,7 @@ public class OttExternalService extends BaseBusiService {
 			return ottAcct;
 
 	}
-	/**
-	 * 初始化业务参数
-	 * @param busiCode
-	 * @throws Exception 
-	 */
-	private Integer initBusiParam(String busiCode,String  custId) throws Exception{
-		
-		BusiParameter param=new BusiParameter();
-		
-		SOptr optr=new SOptr();
-		optr.setOptr_id("0");
-		optr.setDept_id("4501");
-		optr.setLogin_name("admin");
-		optr.setArea_id("4500");
-		optr.setCounty_id("4501");
-		
-		CustFullInfoDto custFullInfo = new CustFullInfoDto();
-		if(custId!=null){
-			custFullInfo.setCust(custComponent.queryCustById(custId));
-		}
-		param.setOptr(optr);
-		param.setBusiCode(busiCode);
-		param.setCustFullInfo(custFullInfo);
-		param.setService_channel(SystemConstants.SERVICE_CHANNEL_MOBILE);
-		param.setDoneCode(doneCodeComponent.gDoneCode());
-
-		this.setParam(param);
-		
-		return param.getDoneCode();
-	}
+	
 	/**
 	 * 修改用户帐户信息接口
 	 * @param user_id 用户ID
@@ -128,7 +117,10 @@ public class OttExternalService extends BaseBusiService {
 	public void  modifyAccountInfo(String loginName,String user_passwd,String user_rank,String user_name,String telephone) throws Exception{
 	
 			CUser user=cUserDao.queryUserByLoginName(loginName);
-			Integer doneCode=this.initBusiParam(BusiCodeConstants.CUST_EDIT, user.getCust_id());
+			if(user==null||!user.getUser_type().equals(SystemConstants.USER_TYPE_OTT_MOBILE)){
+				throw new ServicesException(ErrorCode.UserLoginNameIsNotExistsOrIsNotOttMobile);
+			}
+			Integer doneCode=this.initExternalBusiParam(BusiCodeConstants.CUST_EDIT, user.getCust_id());
 			CCust cust=this.getBusiParam().getCust();
 			CCustLinkman linkman=cCustLinkmanDao.findByKey(user.getCust_id());
 			
@@ -237,7 +229,7 @@ public class OttExternalService extends BaseBusiService {
 	public Map<String,String> RegisterAccount(String loginName,String user_passwd,
 			String user_name,String user_rank,String telephone,String email) throws Exception{
 		
-		Integer doneCode=this.initBusiParam(BusiCodeConstants.CUST_OPEN, null);
+		Integer doneCode=this.initExternalBusiParam(BusiCodeConstants.CUST_OPEN, null);
 		
 		if(userComponent.queryUserByLoginName(loginName)!=null){
 			throw new ServicesException(ErrorCode.E40009);
@@ -325,8 +317,11 @@ public class OttExternalService extends BaseBusiService {
 	 * @param user_ip 来源IP
 	 * @throws Exception 
 	 */
-	public List<Map<String, String>> getOrderedProductList(String loginName) throws Exception{
+	public List<OttUserProd> getOrderedProductList(String loginName) throws Exception{
 		CUser user=userComponent.queryUserByLoginName(loginName);
+		if(user==null||!user.getUser_type().equals(SystemConstants.USER_TYPE_OTT_MOBILE)){
+			throw new ServicesException(ErrorCode.UserLoginNameIsNotExistsOrIsNotOttMobile);
+		}
 		//map<prod_id,CProdOrderDto>
 		Map<String,CProdOrderDto> unExpOrderMap=new HashMap<>();
 		for(CProdOrderDto order: cProdOrderDao.queryProdOrderDtoByUserId(user.getUser_id())){
@@ -344,36 +339,21 @@ public class OttExternalService extends BaseBusiService {
 				}
 			}
 		}
-		List<Map<String,String>> resutls=new ArrayList<>();
+		List<OttUserProd> resutls=new ArrayList<>();
 		for(CProdOrderDto order: unExpOrderMap.values()){
-			Map<String,String> re=new HashMap<>();
-			re.put("id", order.getProd_id());
-			re.put("name", order.getProd_name());
-			re.put("continue_buy", "1");
-			re.put("update", "0");
-			re.put("begin_time", DateHelper.format(order.getEff_date(),DateHelper.FORMAT_TIME));
-			re.put("end_time", DateHelper.format(order.getExp_date(),DateHelper.FORMAT_TIME));
+			OttUserProd re=new OttUserProd();
+			re.setId(order.getProd_id());
+			re.setName(order.getProd_name());
+			re.setContinue_buy("1");
+			re.setBegin_time( DateHelper.format(order.getEff_date(),DateHelper.FORMAT_TIME));
+			re.setEnd_time( DateHelper.format(order.getExp_date(),DateHelper.FORMAT_TIME));
 			resutls.add(re);
 		}
 		return resutls;
 	}
 	
-	
 	/**
-	 * 根据用户ID获取用户的可订购产品列表；产品ID列表不为空时，
-	 * 返回包含该产品列表的组合产品列表
-	 * 
-	 * @param user_id 用户ID
-	 * @param version OTT业务版本号
-	 * @param user_ip 来源IP
-	 * @param product_ids 产品ID列表, 可以为空,多产品以逗号分隔
-	 */
-	public String getProductList(){
-		return "";
-	}
-	
-	/**
-	 * 用户购买产品，购买指定产品包下的指定资费。
+	 * OTT_MOBILE用户购买产品，购买指定产品包下的指定资费。
 	 * @param user_id 用户ID
 	 * @param version OTT业务版本号
 	 * @param product_id 产品ID	
@@ -382,22 +362,186 @@ public class OttExternalService extends BaseBusiService {
 	 * @param film_name 影片名称,可以为空，针对单片有效
 	 * @param boss_data BOSS扩展参数,从可订购产品列表中获取，订购产品透传BOSS
 	 * @param ott_data OTT扩展参数,同步产品授权时回传CMS
+	 * @throws Exception 
 	 */
-	public void buyProduct(){
-		// TODO buy_product
+	public void saveOttMobileBuyProduct(String loginName,String product_id,String product_fee_id,Integer amount,String file_name,String boss_data,String ott_date) throws Exception{
+		if(StringHelper.isEmpty(loginName)||
+			StringHelper.isEmpty(product_id)||
+			StringHelper.isEmpty(product_fee_id)||
+			amount==null){
+			throw new ServicesException(ErrorCode.E40006);
+		}
+		CUser user=userComponent.queryUserByLoginName(loginName);
 		
-	}
+		if(user==null||!user.getUser_type().equals(SystemConstants.USER_TYPE_OTT_MOBILE)){
+			throw new ServicesException(ErrorCode.UserLoginNameIsNotExistsOrIsNotOttMobile);
+		}
+		String busi_code=BusiCodeConstants.PROD_SINGLE_ORDER;
+		this.initExternalBusiParam(busi_code, user.getCust_id());
+		doneCodeComponent.lockCust(user.getCust_id());
+		
+		OrderProd orderProd=new OrderProd();
+		orderProd.setCust_id(user.getCust_id());
+		orderProd.setUser_id(user.getUser_id());
+		orderProd.setProd_id(product_id);
+		orderProd.setTariff_id(product_fee_id);
+		orderProd.setTransfer_fee(0);
+		orderProd.setOrder_fee_type(SystemConstants.ORDER_FEE_TYPE_ACCT);
+		
+		List<CProdOrder> orderAlllist=cProdOrderDao.queryNotExpAllOrderByProd(user.getUser_id(),product_id);
+		Date eff_date=DateHelper.today();
+		String last_order_sn=null;
+		if(orderAlllist.size()>0){
+			last_order_sn=orderAlllist.get(orderAlllist.size()-1).getOrder_sn();
+			CProdOrderDto dto=cProdOrderDao.queryCProdOrderDtoByKey(last_order_sn);
+			eff_date=DateHelper.addDate(dto.getExp_date(), 1);	
+		}
+		String[] tmpTariff=orderProd.getTariff_id().split("_");
+		PProdTariff tariff=pProdTariffDao.findByKey(tmpTariff[0]);
+		int billing_cycle=0;
+		int rent=0;
+		if(tmpTariff.length==2){
+			PProdTariffDisct disct= pProdTariffDisctDao.findByKey(tmpTariff[1]);
+			billing_cycle=disct.getBilling_cycle();
+			rent=disct.getDisct_rent();
+		}else{
+			billing_cycle=tariff.getBilling_cycle();
+			rent=tariff.getRent();
+		}
+		//订购月数 order_months
+		float order_months=0f;
+		// 实际支付金额（小计金额）pay_fee
+		int pay_fee=0;
+		//失效日期exp_date
+		Date exp_date=null;
+		if(tariff.getBilling_type().equals(SystemConstants.BILLING_TYPE_DAY)){
+			pay_fee=rent*amount/billing_cycle;
+			order_months=amount*1.0f/30;
+			exp_date=DateHelper.addDate(eff_date, amount-1);
+		}else{
+			if(billing_cycle==12){
+				pay_fee=rent*amount;
+				order_months=billing_cycle*amount;
+				exp_date=DateHelper.getNextMonthPreviousDay(eff_date, billing_cycle*amount);
+			}else{
+				pay_fee=rent*amount/billing_cycle;
+				order_months=billing_cycle*amount/billing_cycle;
+				exp_date=DateHelper.getNextMonthPreviousDay(eff_date, billing_cycle*amount/billing_cycle);
+			}
+		}
+		orderProd.setEff_date(eff_date);
+		orderProd.setPay_fee(pay_fee);
+		orderProd.setOrder_months(order_months);
+		orderProd.setExp_date(exp_date);
 	
+		try{
+		   saveOrderProd(orderProd, busi_code, this.getBusiParam().getDoneCode());
+		}catch(ServicesException e){
+			if(ErrorCode.AcctFeeNotEnough.equals(e.getErrorCode())){
+				throw new ServicesException(ErrorCode.E20005);
+			}else{
+				throw e;
+			}
+		}
+		this.saveAllPublic(this.getBusiParam().getDoneCode(), this.getBusiParam());
+		//处理实时指令
+		Map<String,Date> userResMap = authComponent.getUserResExpDate(user.getUser_id());
+		for(String externalResId: userResMap.keySet()){
+			String resDate=DateHelper.format( userResMap.get(externalResId), DateHelper.FORMAT_TIME_END);
+			Result resutl=ottClient.openUserProduct(user.getLogin_name(), externalResId,resDate);
+			if(!resutl.isSuccess()){
+				throw new ServicesException(ErrorCode.E40009);
+			}
+		}
+	}
 	/**
 	 * 根据用户ID获取用户购买产品记录
 	 * @param user_id 用户ID
 	 * @param version OTT业务版本号
 	 * @param user_ip 来源IP
+	 * @throws Exception 
 	 */
-	public String getBuyProductHistory(){
-		// TODO get_buy_product_history
+	public List<OttUserOrder> getBuyProductHistory(String loginName) throws Exception{
+		CUser user=userComponent.queryUserByLoginName(loginName);
+		if(user==null||!user.getUser_type().equals(SystemConstants.USER_TYPE_OTT_MOBILE)){
+			throw new ServicesException(ErrorCode.UserLoginNameIsNotExistsOrIsNotOttMobile);
+		}
+		//map<prod_id,CProdOrderDto>
+		List<OttUserOrder> resutls=new ArrayList<>();
+		for(CProdOrderDto order: cProdOrderDao.queryProdOrderDtoByUserId(user.getUser_id())){
+			OttUserOrder re=new OttUserOrder();
+			re.setMoney(NumericHelper.changeF2Y(order.getOrder_fee().toString()));
+			re.setProduct_id(order.getProd_id());
+			re.setProduct_name(order.getProd_name());
+			re.setProduct_fee_id(order.getTariff_id());
+			re.setTime(DateHelper.format(order.getOrder_time(), DateHelper.FORMAT_TIME));
+			resutls.add(re);
+		}
+		return resutls;
+	}
+	
+	/**
+	 * OTT_MOBILE接口使用
+	 * 根据用户ID获取用户的可订购产品列表；产品ID列表不为空时，
+	 * 返回包含该产品列表的组合产品列表
+	 * 
+	 * @param user_id 用户ID
+	 * @param version OTT业务版本号
+	 * @param user_ip 来源IP
+	 * @param product_ids 产品ID列表, 可以为空,多产品以逗号分隔
+	 * @throws Exception 
+	 */
+	public List<OttProdTariff> getProductList(String loginName,String product_ids) throws Exception{
+		CUser user=userComponent.queryUserByLoginName(loginName);
+		if(user==null||!user.getUser_type().equals(SystemConstants.USER_TYPE_OTT_MOBILE)){
+			throw new ServicesException(ErrorCode.UserLoginNameIsNotExistsOrIsNotOttMobile);
+		}
+		List<OttProdTariff> prodTariffList=new ArrayList<>();
 		
-		return "";
+		OrderProdPanel prodPanel=orderComponent.queryOrderableProd(BusiCodeConstants.PROD_SINGLE_ORDER,user.getCust_id(),user.getUser_id(),null);
+		
+		List<PProd> prodList=new ArrayList<>();
+		if(StringHelper.isEmpty(product_ids)){
+			prodList=prodPanel.getProdList();
+		}else{
+			Set<String> _set=new HashSet<String>();
+			for(String product_id:product_ids.split(",")){
+				_set.add(product_id);
+			}
+			for(PProd prod:prodPanel.getProdList()){
+				if(_set.contains(prod.getProd_id())){
+					prodList.add(prod);
+				}
+			}
+		}
+		
+		for(PProd prod:prodList){
+			for(PProdTariffDisct _d:prodPanel.getTariffMap().get(prod.getProd_id())){
+				OttProdTariff tf=new OttProdTariff();
+				prodTariffList.add(tf);
+				
+				tf.setId(prod.getProd_id());
+				tf.setName(prod.getProd_name());
+				tf.setType("0");
+				tf.setProduct_fee_id(_d.getTariff_id());
+				tf.setPrice(NumericHelper.changeF2Y(_d.getDisct_rent().toString()));
+				if(_d.getBilling_type().equals(SystemConstants.BILLING_TYPE_DAY)){
+					//按天
+					tf.setUnit("day");
+					tf.setAmount(_d.getBilling_cycle().toString());
+				}else{
+					if(_d.getBilling_cycle().equals(12)){
+						tf.setUnit("year");
+						tf.setAmount("1");
+					}else{
+						tf.setUnit("month");
+						tf.setAmount(_d.getBilling_cycle().toString());
+					}
+				}
+			}
+		}
+		
+		return prodTariffList;
 	}
 	
 	/**
@@ -409,9 +553,9 @@ public class OttExternalService extends BaseBusiService {
 	 * @param user_ip 来源IP
 	 * @param product_ids 产品ID列表, 可以为空,多产品以逗号分隔
 	 */
-	public List getProductListByUpdate(){
-		// TODO 没有升级业务
-		return new ArrayList();
+	public List<Object> getProductListByUpdate(){
+		//没有升级业务
+		return new ArrayList<Object>();
 	}
 	
 	/**

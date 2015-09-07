@@ -55,9 +55,11 @@
 		<!--
 			<aop:advisor pointcut="execution(*
 			javacommon.base.BaseManager.*(..))" advice-ref="txAdvice"/>
-		-->
+		
 		<aop:advisor pointcut="execution(* com.ycsoft.web.action..*.*(..))"
 			advice-ref="txAdvice" />
+		-->
+		
 		<aop:advisor pointcut="execution(* com.ycsoft.business.service.impl.*.*(..))"
 			advice-ref="txAdvice" />
 	</aop:config>
