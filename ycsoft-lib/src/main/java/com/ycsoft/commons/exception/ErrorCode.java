@@ -1,5 +1,6 @@
 package com.ycsoft.commons.exception;
 
+// aaa
 public enum ErrorCode {
 	
 	UNKNOW_EXCEPTION("未知异常，请联系管理员"),
