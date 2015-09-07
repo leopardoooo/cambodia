@@ -73,11 +73,9 @@ AddressTree = Ext.extend(Ext.ux.tree.TreeGridEditor,{
 		var addressThiz = this;
 		AddressTree.superclass.constructor.call(this,{
 			id : 'AddressTree',
+			root : new Ext.tree.AsyncTreeNode({expanded : true,id:'root'}),
 			loader: new Ext.tree.TreeLoader({
 	            dataUrl: root+"/system/Address!queryAddrTree.action",
-//	            baseParams: {
-//	                method: 'load'
-//	            },
 	            listeners:{
 	            	scope:this,
 	            	load: this.doLoad,
@@ -160,11 +158,13 @@ AddressTree = Ext.extend(Ext.ux.tree.TreeGridEditor,{
 								var data = Ext.decode(res.responseText);
 								var root = new Ext.tree.AsyncTreeNode({
 										  text:'gen',
-//										  id:'root',
+										  id:'root',
 										  draggable:false,
 										  children:data
 										 });
+								addressThiz.getRootNode().removeAll();									 
 								addressThiz.setRootNode(root);
+								addressThiz.doExpandnode();
 							}
 						});
 	                }
@@ -172,6 +172,25 @@ AddressTree = Ext.extend(Ext.ux.tree.TreeGridEditor,{
 	        }]
 		});
 		
+	},
+	doExpandnode:function(){
+		var node = this.getRootNode();
+		var thiz = this;
+		var handlerStatus = function(childNodes){
+			if(childNodes && childNodes.length > 0){
+				Ext.each(childNodes, function(node){
+					var attrs = node.attributes;
+					if(attrs && attrs.others){
+						var status = node.attributes.others['status'];
+						if(status == 'INVALID'){
+							node.getUI().getTextEl().style.color = "red";
+						}
+					}
+					handlerStatus(thiz.getChildNodes(node));
+				});
+			}
+		};
+		handlerStatus(thiz.getChildNodes(node));
 	},
 	onBeforeLoad:function(l,node){
 		l.on('beforeload',function(loader,node){
@@ -411,14 +430,18 @@ BatchAddGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 AddressWin = Ext.extend(Ext.Window,{
 	node : null,
 	title : null,
-	item : null,
+	itemForm : null,
 	type : null,
-	initComponent : function(){
-		AddressWin.superclass.initComponent.call(this);
-	},
+	provinceStore:null,
+	level : null,
 	constructor : function(type,node){
 		this.type = type;
-		var form = new Ext.form.FormPanel({
+		this.node = node;
+		this.provinceStore = new Ext.data.JsonStore({
+				url : root + '/system/Address!queryProvince.action',
+ 				fields : ['name','id']
+ 		});
+		this.itemForm = new Ext.form.FormPanel({
 			layout : 'form',
 			border : false,
 			labelWidth : 85,
@@ -432,9 +455,19 @@ AddressWin = Ext.extend(Ext.Window,{
 				id : 'areaId',
 				name : 'area_id'
 			},{
-				xtype : 'hidden',
+				xtype : 'displayfield',
 				id : 'treeLevel',
 				name : 'tree_level'
+			},{
+				xtype : 'displayfield',
+				id : 'parentName',
+				name : 'parent_name',
+				fieldLabel : '上级名称'
+			},{
+				xtype : 'displayfield',
+				id : 'sortNum',
+				name : 'sort_num',
+				fieldLabel : '序号'
 			},{
 				xtype : 'textfield',
 				id : 'addrName',
@@ -442,85 +475,69 @@ AddressWin = Ext.extend(Ext.Window,{
 				allowBlank : false,
 				width:250,
 				fieldLabel : '显示名称'
-			},{
-				xtype : 'lovcombo',
-				id : 'netType',
-				paramName:'USER_TYPE',//SERV_ID
-				hiddenName : 'net_type',
-				typeAhead:true,editable:true,
-				store:new Ext.data.JsonStore({
-					fields:['item_value','item_name']
-				}),displayField:'item_name',valueField:'item_value',
-				triggerAction:'all',mode:'local',
-				fieldLabel : '网络类型'
 			}]
 		});
 		
 		var width = 400;
 		//操作节点
 		this.node = node;
-		var level = parseFloat(node.attributes.others.tree_level);
-		if(type == 'add'){
-			if(level == 1){
-				this.title = '新增街道';
+		var fieldLabel = '显示名称';
+		this.level = parseFloat(node.attributes.others.tree_level);
+		if(this.type == 'add'){
+			if(this.level == 1){
+				this.title = "新增街道";
+				fieldLabel = "街道名称";
 			}else{
 				this.title = '新增路号';
+				fieldLabel = "路号名称";
 			}
-			this.item = form;
-			Ext.getCmp('treeLevel').setValue(level+1);
+			Ext.getCmp('treeLevel').setValue(this.level+1);
 			Ext.getCmp('areaId').setValue(node.attributes.others.area_id);
 			Ext.getCmp('countyId').setValue(node.attributes.others.county_id);
-		}else if(type == 'edit'){
-			if(level == 1){
+		}else if(this.type == 'edit'){
+			if(this.level == 1){
 				this.title = '修改城市';
-			}else if(level == 2){
+				fieldLabel ="城市名称";
+			}else if(this.level == 2){
 				this.title = '修改街道';
-			}else if(level == 3){
+				fieldLabel ="街道名称";
+			}else if(this.level == 3){
 				this.title = '修改路号';
+				fieldLabel ="路号名称";
 			}
-			this.item = form;
 			Ext.getCmp('addrName').setValue(node.text);
-			Ext.getCmp('treeLevel').setValue(level);
-			Ext.getCmp('netType').setValue(node.attributes.others.net_type);
-		}else if(type == 'batchAdd'){
+			Ext.getCmp('treeLevel').setValue(this.level);
+		}else if(this.type == 'batchAdd'){
 			this.title = '批量添加地区';
 			this.item = new BatchAddGrid(this.node);
 			width = 500;
-		}else if(type == 'leveladd'){
-			if(level == 1){
+		}else if(this.type == 'leveladd'){
+			if(this.level == 1){
 				this.title = '平级新增城市';
-			}else if(level == 2){
+				fieldLabel ="城市名称";
+			}else if(this.level == 2){
 				this.title = '平级新增街道';
+				fieldLabel ="街道名称";
 			}else{
 				this.title = '平级新增路号';
+				fieldLabel ="路号名称";
 			}
-			this.item = form;
-			Ext.getCmp('treeLevel').setValue(level);
+			Ext.getCmp('treeLevel').setValue(this.level);
 			Ext.getCmp('areaId').setValue(node.attributes.others.area_id);
 			Ext.getCmp('countyId').setValue(node.attributes.others.county_id);
 		}
-		var nextNode = this.node.nextSibling;
-		if(nextNode){
-			alert(nextNode.attributes.others.sort_num);
-		}
-		
-		
-		
-		App.form.initComboData(form.findByType("lovcombo"), function(){
-			if(type =='edit' && node && node.attributes && node.attributes.others){
-				Ext.getCmp('netType').setValue(node.attributes.others.net_type);
-			}
-		}, this);
-		
+		Ext.getCmp('addrName').fieldLabel =fieldLabel;
+		Ext.getCmp('parentName').setValue(node.text);
+		Ext.getCmp('sortNum').setValue(node.attributes.others.sort_num);
 		
 		AddressWin.superclass.constructor.call(this,{
 			id :'AddressWin',
 			title : this.title,
 			layout : 'fit',
-			height : 200,
+			height : 400,
 			width : width,
 			closeAction : 'close',
-			items : [this.item],
+			items : [this.itemForm],
 			buttons : [{
 				text : '保存',
 				scope : this,
@@ -535,34 +552,98 @@ AddressWin = Ext.extend(Ext.Window,{
 			}]
 		});
 	},
+	initComponent : function(){
+		if((this.level == 2 && this.type =='add') || this.level == 3){
+			this.itemForm.add({
+				xtype : 'lovcombo',
+				id : 'netType',
+				paramName:'USER_TYPE',//SERV_ID
+				hiddenName : 'net_type',
+				typeAhead:true,editable:true,
+				store:new Ext.data.JsonStore({
+					fields:['item_value','item_name']
+				}),displayField:'item_name',valueField:'item_value',
+				triggerAction:'all',mode:'local',
+				fieldLabel : '网络类型'
+			});
+			
+			App.form.initComboData(this.itemForm.findByType("lovcombo"), function(){
+				if(this.level == 3 && this.node && this.node.attributes && this.node.attributes.others){
+					Ext.getCmp('netType').setValue(this.node.attributes.others.net_type);
+				}
+			}, this);
+		}
+		
+		
+		if(this.level == 1 && (this.type =='leveladd' || this.type == 'edit')){
+			this.itemForm.add({
+				xtype:'combo',
+				id : 'provinceId',
+				fieldLabel : '省',
+				forceSelection : true,
+				store : this.provinceStore,
+				triggerAction : 'all',
+				mode: 'local',
+				displayField : 'name',
+				valueField : 'id',
+				emptyText: '请选择省',
+				editable : false
+			});
+					
+			this.provinceStore.on("load",this.doLoadProvince,this);
+			this.provinceStore.load();						
+		}
+		
+		this.doLayout();						
+		AddressWin.superclass.initComponent.call(this);
+	},
+	doLoadProvince:function(s){
+		Ext.getCmp('provinceId').setValue(this.node.attributes.others.district_id);
+	},
 	doSave : function(){
 		if(this.title == '批量添加地区'){//批量添加
-			this.item.doSave();
+			this.itemForm.doSave();
 		}else{//添加和修改
-			if(this.item.getForm().isValid()){
+			if(this.itemForm.getForm().isValid()){
 				Confirm("确定保存吗?", this ,function(){
 					mb = Show();//显示正在提交
 					var params = {};
-					params['addr.addr_name'] = Ext.getCmp('addrName').getValue();
-					params['addr.net_type'] = Ext.getCmp('netType').getValue();
+					params['addrDto.addr_name'] = Ext.getCmp('addrName').getValue();
+					if((this.level == 2 && this.type =='add') || this.level == 3){
+						params['addrDto.net_type'] = Ext.getCmp('netType').getValue();
+					}
 					
 					var url = '';
 					if(this.type == 'add'){
 						url = root + '/system/Address!saveAddress.action';
-						params['addr.addr_pid'] = this.node.id;
-						params['addr.tree_level'] = Ext.getCmp('treeLevel').getValue();
-						params['addr.county_id'] = Ext.getCmp('countyId').getValue();
-						params['addr.area_id'] = Ext.getCmp('areaId').getValue();
+						params['addrDto.addr_pid'] = this.node.id;
+						params['addrDto.addr_last_id'] = this.node.id;
+						params['addrDto.tree_level'] = Ext.getCmp('treeLevel').getValue();
+						params['addrDto.county_id'] = Ext.getCmp('countyId').getValue();
+						params['addrDto.area_id'] = Ext.getCmp('areaId').getValue();
 					}else if(this.type == 'edit'){
 						url = root + '/system/Address!editAddress.action';
-						params['addr.addr_id'] = this.node.id;
+						params['addrDto.addr_id'] = this.node.id;
+						if(this.level == 1 || this.level == 3){
+							params['addrDto.district_id'] = Ext.getCmp('provinceId').getValue();
+						}
+						
 					}else if(this.type == 'leveladd'){
 						url = root + '/system/Address!saveAddress.action';
-						params['addr.addr_pid'] = 1;
-						params['addr.tree_level'] = Ext.getCmp('treeLevel').getValue();
-						params['addr.county_id'] = Ext.getCmp('countyId').getValue();
-						params['addr.area_id'] = Ext.getCmp('areaId').getValue();
+						var pId = this.node.parentNode.id;
+						if(pId == 'root'){
+							pId = 1;
+						}
+						params['addrDto.addr_pid'] = pId;
+						params['addrDto.addr_last_id'] = this.node.id;
+						params['addrDto.tree_level'] = Ext.getCmp('treeLevel').getValue();
+						params['addrDto.county_id'] = Ext.getCmp('countyId').getValue();
+						params['addrDto.area_id'] = Ext.getCmp('areaId').getValue();
+						if(this.level == 1 || this.level == 3){
+							params['addrDto.district_id'] = Ext.getCmp('provinceId').getValue();
+						}
 					}
+					params['type'] = this.type;
 					Ext.Ajax.request({
 						url : url,
 						params : params,
@@ -579,7 +660,9 @@ AddressWin = Ext.extend(Ext.Window,{
 									this.addLevelNode(rs.simpleObj);	
 								}else{
 									this.node.setText(Ext.getCmp('addrName').getValue());
-									this.node.attributes.others.net_type = Ext.getCmp('net_type').getValue();
+									if(Ext.getCmp('netType')){
+										this.node.attributes.others.net_type = Ext.getCmp('netType').getValue();
+									}
 									this.node.attributes.others.area_id = Ext.getCmp('areaId').getValue();
 									this.node.attributes.others.county_id = Ext.getCmp('countyId').getValue();
 								}
@@ -602,7 +685,8 @@ AddressWin = Ext.extend(Ext.Window,{
 				tree_level : newNode.tree_level,
 				net_type : newNode.net_type,
 				county_id : newNode.county_id,
-				area_id:newNode.area_id
+				area_id:newNode.area_id,
+				sort_num:newNode.sort_num
 			},
             leaf: true
         };
@@ -631,21 +715,21 @@ AddressWin = Ext.extend(Ext.Window,{
 				tree_level : newNode.tree_level,
 				net_type : newNode.net_type,
 				county_id : newNode.county_id,
-				area_id:newNode.area_id
+				area_id:newNode.area_id,
+				sort_num:newNode.sort_num				
 			},
             leaf: true
         };
         var nn = new Ext.ux.tree.TreeGridEditorNode(nc);
         nn.ui = new Ext.ux.tree.TreeGridEditorNodeUI(nn);
-        
-        this.node.parentNode.appendChild(nn);
-		
-        
-//        Ext.DomHelper.overwrite(Ext.fly(this.node.parentNode.getUI().elNode).child('.x-treegrideditor-obar'), Ext.getCmp('AddressTree').editBtnsHtml(this.node.parentNode));
-//        Ext.getCmp('AddressTree').activeObar(this.node.parentNode);
-        
-//        Ext.getCmp('AddressTree').hideObar(nn, 'statusActive');
-//		Ext.getCmp('AddressTree').showObar(nn, 'statusInvalid');
+        var papa = this.node.parentNode;
+        var nextNode = this.node.nextSibling;
+        if(nextNode){
+        	papa.insertBefore( nn, this.node.nextSibling);
+        }else{
+        	papa.appendChild(nn);
+        }
+       
 	}
 })
 

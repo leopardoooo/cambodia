@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import com.ycsoft.beans.config.TAddress;
 import com.ycsoft.beans.config.TCustColonyCfg;
 import com.ycsoft.beans.config.TNonresCustApproval;
+import com.ycsoft.beans.config.TProvince;
 import com.ycsoft.beans.config.TSpell;
 import com.ycsoft.beans.core.cust.CCust;
 import com.ycsoft.beans.system.SCounty;
@@ -20,13 +21,16 @@ import com.ycsoft.beans.system.SOptr;
 import com.ycsoft.business.commons.pojo.BusiParameter;
 import com.ycsoft.business.dao.config.TAddressDao;
 import com.ycsoft.business.dao.config.TCustColonyCfgDao;
+import com.ycsoft.business.dao.config.TDistrictDao;
 import com.ycsoft.business.dao.config.TNonresCustApprovalDao;
+import com.ycsoft.business.dao.config.TProvinceDao;
 import com.ycsoft.business.dao.config.TSpellDao;
 import com.ycsoft.business.dao.system.SCountyDao;
 import com.ycsoft.business.dao.system.SDeptAddrDao;
 import com.ycsoft.business.dao.system.SDeptDao;
 import com.ycsoft.business.dao.system.SOptrDao;
 import com.ycsoft.business.dto.config.TAddressDto;
+import com.ycsoft.business.dto.config.TAddressSysDto;
 import com.ycsoft.business.dto.system.OptrDto;
 import com.ycsoft.business.service.externalImpl.ICustServiceExternal;
 import com.ycsoft.commons.abstracts.BaseComponent;
@@ -55,6 +59,10 @@ public class AddressComponent extends BaseComponent {
 	private TNonresCustApprovalDao tNonresCustApprovalDao;
 	@Autowired
 	private SDeptAddrDao sDeptAddrDao;
+	@Autowired
+	private TProvinceDao tProvinceDao;
+	@Autowired
+	private TDistrictDao tDistrictDao;
 
 	public void setTNonresCustApprovalDao(
 			TNonresCustApprovalDao nonresCustApprovalDao) {
@@ -179,22 +187,38 @@ public class AddressComponent extends BaseComponent {
 	 * @return
 	 * @throws Exception
 	 */
-	public TAddress saveAddress(TAddress addr) throws Exception{
-		addr.setAddr_id(getNextAddrId());
-		addr.setIs_leaf(SystemConstants.BOOLEAN_TRUE);
-		tAddressDao.save(addr);
+	public TAddress saveAddress(TAddressSysDto addr,String type) throws Exception{
+		TAddress  newAddr = new TAddress();
+		newAddr.setAddr_pid(addr.getAddr_pid());
+		newAddr.setArea_id(addr.getArea_id());
+		newAddr.setTree_level(addr.getTree_level());
+		newAddr.setCounty_id(addr.getCounty_id());
+		newAddr.setAddr_name(addr.getAddr_name());
+		newAddr.setAddr_id(getNextAddrId());
+		newAddr.setIs_leaf(SystemConstants.BOOLEAN_TRUE);
+		float  b = (float) 0.00;
+		//新增平级
+		if("leveladd".equals(type)){
+			TAddress lastAddr = tAddressDao.findByKey(addr.getAddr_last_id());
+			TAddress nextAddr = tAddressDao.querySortNumByNextId(lastAddr.getAddr_pid(), lastAddr.getSort_num());
+			if(nextAddr == null){
+				b = lastAddr.getSort_num()+1000;
+			}else{
+				b  = (float)(Math.round((lastAddr.getSort_num()+nextAddr.getSort_num())/2*100))/100;
+			}
+		}else if("add".equals(type)){//新增下级
+			String maxSortNum =	tAddressDao.queryMaxSortNumByPid(addr.getAddr_pid());
+			b = Float.parseFloat(maxSortNum)  + 1000;
+		}
+
+		newAddr.setSort_num(b);
+		tAddressDao.save(newAddr);
 		
-//		//保存地区拼音
-//		TSpell sp = new TSpell();
-//		sp.setData_id(addr.getAddr_id());
-//		sp.setData_type(SystemConstants.DATA_TYPE_ADDRESS);
-//		sp.setFull_sepll(CnToSpell.getPinYin(addr.getAddr_name()));
-//		sp.setSeq_sepll(CnToSpell.getPinYinHeadChar(addr.getAddr_name()));
-//		tSpellDao.save(sp);
 		
 		//修改父节点is_leaf为F
 		updateAddress(addr.getAddr_pid(), SystemConstants.BOOLEAN_FALSE);
-		return addr;
+		
+		return newAddr;
 	}
 
 	private String nextAddr(TAddress addr) throws JDBCException {
@@ -253,11 +277,16 @@ public class AddressComponent extends BaseComponent {
 	 * @return
 	 * @throws Exception
 	 */
-	public void editAddress(TAddress addr) throws JDBCException{
-		tAddressDao.update(addr);
+	public void editAddress(TAddressSysDto addr) throws JDBCException{
+		TAddress  newAddr = new TAddress();
+		newAddr.setAddr_id(addr.getAddr_id());
+		newAddr.setAddr_name(addr.getAddr_name());
+		newAddr.setNet_type(addr.getNet_type());
+		newAddr.setDistrict_id(addr.getDistrict_id());
+		tAddressDao.update(newAddr);
 		
 		//修改地区拼音
-		tSpellDao.updateAddrName(addr.getAddr_id(), CnToSpell.getPinYin(addr.getAddr_name()), CnToSpell.getPinYinHeadChar(addr.getAddr_name()));
+//		tSpellDao.updateAddrName(addr.getAddr_id(), CnToSpell.getPinYin(addr.getAddr_name()), CnToSpell.getPinYinHeadChar(addr.getAddr_name()));
 	}
 
 	/**
@@ -444,9 +473,9 @@ public class AddressComponent extends BaseComponent {
 	}
 
 	public List queryAddrByName(String name, String pId, SOptr optr) throws Exception{
-		List<TAddressDto> list = new ArrayList<TAddressDto>();
+		List<TAddressSysDto> list = new ArrayList<TAddressSysDto>();
 		if(StringHelper.isNotEmpty(pId)){
-			list = tAddressDao.queryAddrById(pId);
+			list = tAddressDao.queryAllAddrById(pId);
 		}else{
 		
 			List<SDeptAddr> sList = sDeptAddrDao.getAddrByDept(optr.getDept_id());
@@ -463,11 +492,11 @@ public class AddressComponent extends BaseComponent {
 				addrIds= CollectionHelper.converValueToArray(tAddressDao.queryAddrByAllowPids(SystemConstants.ADDR_TREE_LEVEL_ONE,pids),"addr_id");
 			}
 			if(StringHelper.isEmpty(name)){
-				list = tAddressDao.queryAddrByIds(addrIds);
+				list = tAddressDao.queryAllAddrByIds(addrIds);
 			}else{
 				name = name.toLowerCase();
 				
-				list=tAddressDao.queryAddrTreeByLvOneAndName(addrIds,name);
+				list=tAddressDao.queryAddrSysTreeByLvOneAndName(addrIds,name);
 				
 			}
 		}
@@ -477,5 +506,14 @@ public class AddressComponent extends BaseComponent {
 		return list;
 	}
 	
+	public List<TProvince> queryProvince() throws Exception{
+		return tProvinceDao.queryProvince();
+	}
 	
+	public List queryDistrictByPid(String pId) throws Exception{
+		if(StringHelper.isEmpty(pId)){
+			throw new ComponentException(ErrorCode.ParamIsNull);
+		}
+		return tDistrictDao.queryDistrictListByPid(pId);
+	}
 }

@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import com.ycsoft.beans.config.TAddress;
 import com.ycsoft.beans.core.cust.CCust;
 import com.ycsoft.business.dto.config.TAddressDto;
+import com.ycsoft.business.dto.config.TAddressSysDto;
 import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.helper.StringHelper;
@@ -398,9 +399,46 @@ public class TAddressDao extends BaseEntityDao<TAddress> {
 	}
 	
 	public List<TAddressDto> queryAddrById(String addrId) throws JDBCException {
-		String sql = "SELECT * FROM t_address where status='ACTIVE'  and addr_pid = ? ";
+		String sql = "SELECT * FROM t_address where status='ACTIVE'  and addr_pid = ? order by sort_num ";
 		return createQuery(TAddressDto.class,sql,addrId).list();
 	}
+	
+	
+	public List<TAddressSysDto> queryAllAddrByIds(String[] addrIds) throws JDBCException {
+		String src = "";
+		if(addrIds != null && addrIds.length>0){
+			src = " and "+getSqlGenerator().setWhereInArray("addr_id",addrIds);
+		}
+		String sql = "SELECT * FROM t_address where  tree_level = '1' "+ src;
+		return createQuery(TAddressSysDto.class,sql).list();
+	}
+	
+	public List<TAddressSysDto> queryAllAddrById(String addrId) throws JDBCException {
+		String sql = "SELECT * FROM t_address where addr_pid = ? order by sort_num ";
+		return createQuery(TAddressSysDto.class,sql,addrId).list();
+	}
+	public List<TAddressSysDto> queryAddrSysTreeByLvOneAndName(String[] lvOneAddrIds,String name) throws JDBCException{
+		String sql=StringHelper.append("select d.* from ",
+			" (select distinct c.* ",
+			" from t_address c ",
+			" start with addr_id in ",
+			" (select a.addr_id ",
+			" from t_address a ,(",
+			" select t.addr_id from t_address t ",
+			" where ",getSqlGenerator().setWhereInArray("addr_pid",lvOneAddrIds),
+			" and  lower( t.addr_name) not like  '%'||?||'%' ",
+			" ) b  ",
+			" where a.addr_pid =b. addr_id ",
+			" and lower( a.addr_name) like '%'||?||'%'",
+			" union all ",
+			" select t.addr_id from t_address t ",
+			" where  ",getSqlGenerator().setWhereInArray("addr_pid",lvOneAddrIds),
+			" and  lower( t.addr_name) like '%'||?||'%' ",
+			") connect by prior c.addr_pid = c.addr_id)d ",
+			" where d.tree_level<>0 order by d.tree_level,d.sort_num");
+		return createQuery(TAddressSysDto.class,sql,name,name,name).list();
+	}
+	
 	
 	public List<TAddressDto> queryAddrTreeByLvOneAndName(String[] lvOneAddrIds,String name) throws JDBCException{
 		String sql=StringHelper.append("select d.* from ",
@@ -422,6 +460,17 @@ public class TAddressDao extends BaseEntityDao<TAddress> {
 			") connect by prior c.addr_pid = c.addr_id)d ",
 			" where d.tree_level<>0 order by d.tree_level,d.sort_num");
 		return createQuery(TAddressDto.class,sql,name,name,name).list();
+	}
+	
+	public TAddress querySortNumByNextId(String addrPId,float sortNum) throws JDBCException {
+		String sql = "select * from ( select * from t_address t where t.addr_pid=? and t.sort_num> ?  "
+				+ " order by t.sort_num ) where  rownum<2 ";
+		return createQuery(sql,addrPId,sortNum).first();
+	}
+	
+	public String queryMaxSortNumByPid(String addrPId) throws JDBCException {
+		String sql = " select  decode(max(t.sort_num),null,0,max(t.sort_num)) sort_num from t_address t where t.addr_pid=? ";
+		return this.findUnique(sql,addrPId);
 	}
 	
 }

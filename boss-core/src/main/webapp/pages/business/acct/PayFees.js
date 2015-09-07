@@ -154,13 +154,12 @@ PayFeesForm = Ext.extend( BaseForm , {
 		delete this.data;
 	},
 	getValues: function(){
-		var p = this.panel,busiFee;
+		var p = this.panel,busiFee=[];
+		var all = {'payFeesData':Ext.encode(this.data),'busi_code':App.getData().currentResource.busicode};
 		if(p.grid.colModel || p.grid.specGrid){
 			busiFee = p.grid.getBusiValues();
+			all['busiFees'] = busiFee;
 		}
-		
-		var all = {'payFeesData':Ext.encode(this.data),'busi_code':App.getData().currentResource.busicode,
-		'busiFees':busiFee};
 		return all;
 	},
 	doValid: function(){

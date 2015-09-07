@@ -9,6 +9,7 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 
 import com.ycsoft.beans.config.TDistrict;
+import com.ycsoft.business.dto.config.TDistrictDto;
 import com.ycsoft.daos.abstracts.BaseEntityDao;
 import com.ycsoft.daos.core.JDBCException;
 
@@ -35,6 +36,12 @@ public class TDistrictDao extends BaseEntityDao<TDistrict> {
 		String sql = "  select level lv,t.* from t_district t start with t.district_id= ? "
 				+ " connect by prior t.parent_id=t.district_id order by t.district_level desc" ;
 		return createQuery(sql, Id).list();
+	}
+	
+	public List<TDistrictDto> queryDistrictListByPid(String pId) throws JDBCException {
+		String sql = "  select level lv,t.* from t_district t start with t.parent_id = ? "
+				+ " connect by prior t.district_id = t.parent_id order by level asc " ;
+		return createQuery(TDistrictDto.class,sql, pId).list();
 	}
 
 }
