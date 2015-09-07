@@ -70,6 +70,9 @@ import com.ycsoft.beans.prod.PProdTariff;
 import com.ycsoft.beans.prod.PProdUserRes;
 import com.ycsoft.beans.prod.PPromotionAcct;
 import com.ycsoft.beans.prod.PRes;
+import com.ycsoft.beans.prod.PSpkg;
+import com.ycsoft.beans.prod.PSpkgOpenbusifee;
+import com.ycsoft.beans.prod.PSpkgOpenuser;
 import com.ycsoft.beans.system.SOptr;
 import com.ycsoft.business.commons.pojo.BusiParameter;
 import com.ycsoft.business.component.config.BusiConfigComponent;
@@ -118,7 +121,7 @@ public class UserService extends BaseBusiService implements IUserService {
 	
 
 	@Override
-	public void createUserBatch(List<UserInfo> userList, String stopType) throws Exception {
+	public void createUserBatch(List<UserInfo> userList, String stopType, String isHand) throws Exception {
 		// TODO Auto-generated method stub
 		
 	}
@@ -2797,6 +2800,18 @@ public class UserService extends BaseBusiService implements IUserService {
 
 	@Override
 	public List<TDeviceChangeReason> queryDeviceChangeReason() throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<PSpkgOpenuser> querySpkgUser(String custId) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<PSpkgOpenbusifee> querySpkgOpenFee(String custId) throws Exception {
 		// TODO Auto-generated method stub
 		return null;
 	}

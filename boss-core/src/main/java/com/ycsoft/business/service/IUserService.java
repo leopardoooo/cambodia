@@ -10,6 +10,9 @@ import com.ycsoft.beans.core.user.CUser;
 import com.ycsoft.beans.core.user.CUserPropChange;
 import com.ycsoft.beans.core.user.FillUSerDeviceDto;
 import com.ycsoft.beans.prod.PPromotionAcct;
+import com.ycsoft.beans.prod.PSpkg;
+import com.ycsoft.beans.prod.PSpkgOpenbusifee;
+import com.ycsoft.beans.prod.PSpkgOpenuser;
 import com.ycsoft.beans.system.SOptr;
 import com.ycsoft.business.commons.abstracts.IBaseService;
 import com.ycsoft.business.dto.core.fee.FeeInfoDto;
@@ -45,7 +48,7 @@ public interface IUserService extends IBaseService{
 	public void createUser(CUser user, String deviceId, String deviceType, String deviceModel, String deviceBuyMode,
 			FeeInfoDto deviceFee)  throws Exception;
 	
-	public void createUserBatch(List<UserInfo> userList, String stopType) throws Exception;
+	public void createUserBatch(List<UserInfo> userList, String stopType, String isHand) throws Exception;
 	
 //	public void saveChangeDevice(String userId,String deviceId,String devcieBuyMode,FeeInfoDto deviceFee, String changeReason, boolean reclaim)  throws Exception;
 	public void saveChangeDevice(String userId, String deviceCode, String changeReason) throws Exception;
@@ -372,5 +375,9 @@ public interface IUserService extends IBaseService{
 	public void transferUsers(String toCustId) throws Exception  ;
 	public void validAccount(String name) throws Exception;
 	public List<TDeviceChangeReason> queryDeviceChangeReason() throws Exception;
+
+	List<PSpkgOpenuser> querySpkgUser(String custId) throws Exception;
+
+	List<PSpkgOpenbusifee> querySpkgOpenFee(String custId) throws Exception;
 
 }
