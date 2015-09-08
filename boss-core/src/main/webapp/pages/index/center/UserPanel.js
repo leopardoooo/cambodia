@@ -283,11 +283,11 @@ ProdGrid = Ext.extend(Ext.TabPanel,{
 			{header:lc[3],dataIndex:'tariff_name',	width:80},
 			{header:lc[4],dataIndex:'eff_date',width:80,renderer: Ext.util.Format.dateFormat},
 			{header:lc[5],dataIndex:'exp_date',width:80,renderer: Ext.util.Format.dateFormat},
-			{header:lc[6],dataIndex:'done_code',width:80},
-			{header:lc[7],dataIndex:'status_text',	width:60,renderer:Ext.util.Format.statusShow},
-			{header:lc[8],dataIndex:'status_date',width:100,renderer: Ext.util.Format.dateFormat},
-			{header:lc[9],dataIndex:'order_time',width:80,renderer: Ext.util.Format.dateFormat},
-			{header:lc[10],dataIndex:'order_months',width:80}
+			{header:lc[6],dataIndex:'status_text',	width:60,renderer:Ext.util.Format.statusShow},
+			{header:lc[7],dataIndex:'status_date',width:100,renderer: Ext.util.Format.dateFormat},
+			{header:lc[8],dataIndex:'order_time',width:80,renderer: Ext.util.Format.dateFormat},
+			{header:lc[9],dataIndex:'order_months',width:80},
+			{header:lc[10],dataIndex:'done_code',width:80}
 	        ]
 	      });
 		
