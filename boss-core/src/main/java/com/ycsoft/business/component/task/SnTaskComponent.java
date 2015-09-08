@@ -2,8 +2,12 @@ package com.ycsoft.business.component.task;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+
+import javax.transaction.SystemException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -12,13 +16,14 @@ import com.google.gson.JsonObject;
 import com.ycsoft.beans.core.cust.CCust;
 import com.ycsoft.beans.core.cust.CCustLinkman;
 import com.ycsoft.beans.core.user.CUser;
-import com.ycsoft.beans.device.RDevice;
+import com.ycsoft.beans.task.TaskFillDevice;
 import com.ycsoft.beans.task.WTaskBaseInfo;
 import com.ycsoft.beans.task.WTaskLog;
 import com.ycsoft.beans.task.WTaskUser;
 import com.ycsoft.beans.task.WTeam;
 import com.ycsoft.business.commons.abstracts.BaseBusiComponent;
 import com.ycsoft.business.dao.core.cust.CCustLinkmanDao;
+import com.ycsoft.business.dao.core.user.CUserDao;
 import com.ycsoft.business.dao.task.WTaskBaseInfoDao;
 import com.ycsoft.business.dao.task.WTaskLogDao;
 import com.ycsoft.business.dao.task.WTaskUserDao;
@@ -46,6 +51,8 @@ public class SnTaskComponent extends BaseBusiComponent{
 	private WTeamDao wTeamDao;
 	@Autowired
 	private WTaskLogDao wTaskLogDao;
+	@Autowired
+	private CUserDao cUserDao;
 	
 	//创建开户工单
 	public void createOpenTask(int doneCode,CCust cust,List<CUser> userList,String assignType) throws Exception{
@@ -80,19 +87,37 @@ public class SnTaskComponent extends BaseBusiComponent{
 			String taskId = createSingleTaskWithUser(doneCode, cust, tvUserList, 
 					getTeamId(SystemConstants.TEAM_TYPE_SUPERNET), taskType);
 			createTaskLog(taskId, BusiCodeConstants.TASK_INIT, doneCode, null, StatusConstants.NOT_EXEC);
-			
-			taskId = createSingleTaskWithUser(doneCode, cust, bandList, 
-					getTeamId(SystemConstants.TEAM_TYPE_CFOCN), taskType);
-			createTaskLog(taskId, BusiCodeConstants.TASK_INIT, doneCode, null, StatusConstants.NONE);
+			//一个宽带用户一个工单
+			for (CUser user:bandList){
+				List<CUser> l = new ArrayList<CUser>();
+				l.add(user);
+				taskId = createSingleTaskWithUser(doneCode, cust, l, 
+						getTeamId(SystemConstants.TEAM_TYPE_CFOCN), taskType);
+				createTaskLog(taskId, BusiCodeConstants.TASK_INIT, doneCode, null, StatusConstants.NONE);
+			}
 		} else {
 			String teamType = SystemConstants.TEAM_TYPE_SUPERNET;
 			if(assignType.equals(SystemConstants.TASK_ASSIGN_CFOCN))
 				teamType = SystemConstants.TEAM_TYPE_CFOCN;
-			String taskId = createSingleTaskWithUser(doneCode, cust, userList, getTeamId(teamType),taskType);
-			if (teamType.equals(SystemConstants.TEAM_TYPE_CFOCN))
-				this.createTaskLog(taskId, BusiCodeConstants.TASK_INIT, doneCode, null, StatusConstants.NOT_EXEC);
-			else 
-				this.createTaskLog(taskId, BusiCodeConstants.TASK_INIT, doneCode, null, StatusConstants.NONE);
+			if (bandList.size()<=1){
+				String taskId = createSingleTaskWithUser(doneCode, cust, userList, getTeamId(teamType),taskType);
+				if (teamType.equals(SystemConstants.TEAM_TYPE_CFOCN))
+					this.createTaskLog(taskId, BusiCodeConstants.TASK_INIT, doneCode, null, StatusConstants.NOT_EXEC);
+				else 
+					this.createTaskLog(taskId, BusiCodeConstants.TASK_INIT, doneCode, null, StatusConstants.NONE);
+			} else {
+				int i=1;
+				for (CUser user:bandList){
+					List<CUser> l = new ArrayList<CUser>();
+					l.add(user);
+					//把所有ott用户和第一个宽带用户归为第一个工单
+					if (i ==1)
+						l.addAll(tvUserList);
+					String taskId = createSingleTaskWithUser(doneCode, cust, l, 
+							getTeamId(SystemConstants.TEAM_TYPE_CFOCN), taskType);
+					createTaskLog(taskId, BusiCodeConstants.TASK_INIT, doneCode, null, StatusConstants.NONE);
+				}
+			}
 		}
 		
 	}
@@ -133,24 +158,82 @@ public class SnTaskComponent extends BaseBusiComponent{
 	
 	//作废工单
 	public void cancelTask(int doneCode,String taskId) throws Exception{
-		
+		WTaskBaseInfo task = new WTaskBaseInfo();
+		task.setTask_id(gTaskId());
+		task.setTask_status(StatusConstants.CANCEL);
+		wTaskBaseInfoDao.save(task);
+		//如果是CFON的工单需要同步
+		task = wTaskBaseInfoDao.findByKey(taskId);
+		String synStatus=StatusConstants.NONE;
+		if (task.getTeam_id().equals(getTeamId(SystemConstants.TEAM_TYPE_CFOCN)))
+			synStatus = StatusConstants.NOT_EXEC;
+		createTaskLog(taskId,BusiCodeConstants.TASK_CANCEL, doneCode,null, synStatus);
 	}
 	
-	//回填移机工单
-	public void fillMoveTaskInfo(int doneCode,String taskId,String otlNo,String ponNo) throws Exception{
+	//回填工单
+	public List<WTaskUser> fillOpenTaskInfo(int doneCode,String taskId,String otlNo,String ponNo,List<TaskFillDevice> deviceList) throws Exception{
+		WTaskBaseInfo task = wTaskBaseInfoDao.findByKey(taskId);
+		if (task.getTask_status().equals(StatusConstants.CANCEL)){
+			throw new SystemException("工单已经被取消，不能回填");
+		}
 		
+		task.setTask_id(gTaskId());
+		List<WTaskUser> userList = wTaskUserDao.queryByTaskId(taskId);
+		if (StringHelper.isNotEmpty(otlNo)){
+			//判断工单是否有对应的宽带用户
+			CUser band = null;
+			for (WTaskUser tu:userList){
+				if (tu.getUser_type().equals(SystemConstants.USER_TYPE_BAND)){
+					band = cUserDao.findByKey(tu.getUser_id());
+				}
+			}
+			
+			if (band != null){
+				//更新用户信息
+				band.setStr7(otlNo);
+				band.setStr8(ponNo);
+				
+				cUserDao.update(band);
+				//更新工单修改中兴配置的状态
+				task.setZte_status(StatusConstants.NOT_EXEC);
+				wTaskBaseInfoDao.update(task);
+			}
+		}
+		for (TaskFillDevice device:deviceList){
+			updateUSerDevice(device,userList);
+		}
+		
+		return userList;
 	}
 	
-	//回填开户工单
-	public void fillOpenTaskInfo(int doneCode,String taskId,String otlNo,String ponNo,List<RDevice> deviceList) throws Exception{
-		
-	}
 	
-	//修改回填的设备
-	public void updateFillDeviceInfo(int doneCode,String taskId,String oldDeviceId,String newDeviceId) throws Exception{
+
+	private void updateUSerDevice(TaskFillDevice device, List<WTaskUser> userList) throws Exception{
+		WTaskUser user = null;
+		if (StringHelper.isNotEmpty(device.getOldDeviceCode())){
+			for (WTaskUser tu:userList){
+				if (device.getOldDeviceCode().equals(tu.getDevice_id())){
+					user = tu;
+					break;
+				}
+			}
+		} else {
+			for (WTaskUser tu:userList){
+				if (StringHelper.isEmpty(tu.getDevice_id())){
+					if (tu.getDivice_model().equals(device.getDeviceModel())){
+						user = tu;
+						break;
+					}
+				}
+			}
+		}
 		
+		if (user != null){
+			user.setDevice_id(device.getDeviceId());
+			wTaskUserDao.update(user);
+		}
 	}
-	
+
 	//完工
 	public void finishTask(int doneCode,String taskId,String resultType) throws Exception{
 		WTaskBaseInfo task = new WTaskBaseInfo();

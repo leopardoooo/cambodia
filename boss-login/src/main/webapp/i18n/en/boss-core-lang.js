@@ -17,8 +17,8 @@ BCLang.home = {
 				agentName: "Agent Name", deptName: "Account Department", developName: "Develop Man", businessLicence: "Business Licence", unitNumber: "Unit Number",
 				spkgSn: "Agreenment Number", cust_level: "Cust Level"
 			},
-			device: {
-				_title: "Device Infomation"
+			acct: {
+				_title: "AcctItem Infomation"
 			}
 		}
 	}

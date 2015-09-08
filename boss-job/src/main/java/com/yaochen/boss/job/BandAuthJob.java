@@ -1,3 +1,4 @@
+
 package com.yaochen.boss.job;
 
 import java.util.List;
@@ -126,3 +127,4 @@ public class BandAuthJob implements Job2 {
 	}
 
 }
+
