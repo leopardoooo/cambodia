@@ -25,10 +25,13 @@ import com.ycsoft.beans.core.prod.CProdOrderDto;
 import com.ycsoft.beans.core.prod.CProdOrderFee;
 import com.ycsoft.beans.core.prod.CProdOrderFollowPay;
 import com.ycsoft.beans.core.user.CUser;
+import com.ycsoft.beans.ott.OttProdTariff;
 import com.ycsoft.beans.prod.PPackageProd;
 import com.ycsoft.beans.prod.PProd;
 import com.ycsoft.beans.prod.PProdTariff;
 import com.ycsoft.beans.prod.PProdTariffDisct;
+import com.ycsoft.boss.remoting.ott.OttClient;
+import com.ycsoft.boss.remoting.ott.Result;
 import com.ycsoft.business.component.core.OrderComponent;
 import com.ycsoft.business.dao.config.TPayTypeDao;
 import com.ycsoft.business.dao.core.cust.CCustDao;
@@ -388,6 +391,8 @@ public class OrderService extends BaseBusiService implements IOrderService{
 			}
 		}
 	}
+	
+	
 	
 	
 	@Override
@@ -781,8 +786,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 	 * @return
 	 * @throws Exception 
 	 */
-	//@Override
-	private String saveOrderProd(OrderProd orderProd,String busi_code,Integer doneCode) throws Exception{
+	protected String saveOrderProd(OrderProd orderProd,String busi_code,Integer doneCode) throws Exception{
 
 		//订单的业务参数
 		String remark=getOrderProdRemark(orderProd,busi_code);

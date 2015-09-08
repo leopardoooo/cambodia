@@ -3,6 +3,7 @@ package com.ycsoft.web.action.core;
 import java.io.File;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -122,6 +123,12 @@ public class PayAction extends BaseBusiAction{
 		//汇率
 		getRoot().setSimpleObj(feeMap);
 		return JSON;
+	}
+	
+	public String queryBaseFeeData() throws Exception {
+		//汇率
+		getRoot().setSimpleObj(payService.queryExchage());
+		return JSON_SIMPLEOBJ;
 	}
 	/**
 	 * 保存支付

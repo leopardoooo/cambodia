@@ -1759,7 +1759,7 @@ public class AcctComponent  extends BusiConfigComponent {
 	 * @return
 	 * @throws Exception
 	 */
-	private String gAcctId() throws Exception{
+	public String gAcctId() throws Exception{
 		return cAcctDao.findSequence().toString();
 	}
 	/**

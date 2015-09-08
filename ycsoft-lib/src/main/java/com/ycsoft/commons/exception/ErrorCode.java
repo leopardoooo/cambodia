@@ -14,8 +14,8 @@ public enum ErrorCode {
 	CustDataException("客户数据异常，请重新索搜客户！"),
 	CustSeqIsNull("系统未正确配置客户序列号,客户前缀号=%s"),
 
-	
 	NoUserExistsOrBelong2CurrentCust("用户不存在,或者不在当前客户名下"),
+	
 	
 	ExchangeConfigError("系统未正确配置汇率，请联系管理员"),
 	
@@ -81,9 +81,11 @@ public enum ErrorCode {
 	TemplateNotConfigBuseFee("该地区费用模板未配置该费用项(%s)"),
 	CustUserIpAddressFeeCoinfigError("客户宽带IP收费存在多个费用项目，请联系管理员！"),
 	UserLoginNameIsExists("账号名称已存在!"),
-	CustStatusIsNotOpenUser("预开户客户不能开用户!"),
+	CustStatusIsNotOpenUser("意向客户不能直接开用户，请先修改地址!"),
 	OTTIsNotSingle("OTT用户不能使用单向设备!"),
 	DTTIsNotDouble("DTT用户不能使用双向设备!"),
+	
+	UserLoginNameIsNotExistsOrIsNotOttMobile("账号不存在或不是ott_mobile用户"),
 	
 	/**OTT接口相关错误码**/
 	E40001("Mac地址认证失败（提示用户，不能进入）"),
@@ -134,5 +136,4 @@ public enum ErrorCode {
 			return "40009";
 		}
 	}
-	
 }

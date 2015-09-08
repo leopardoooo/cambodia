@@ -1321,6 +1321,7 @@ public class OrderComponent extends BaseBusiComponent {
 			tariff.setBilling_cycle(pt.getBilling_cycle());
 			tariff.setDisct_rent(pt.getRent());
 			tariff.setDisct_name(pt.getTariff_name());
+			tariff.setBilling_type(pt.getBilling_type());
 			tariffList.add(tariff);
 			// 查找资费所有的优惠
 			List<PProdTariffDisct> disctList = pProdTariffDisctDao.queryDisctByTariffId(pt.getTariff_id(),
@@ -1334,6 +1335,8 @@ public class OrderComponent extends BaseBusiComponent {
 					}
 					if (flag) {
 						disct.setTariff_id(disct.getTariff_id() + "_" + disct.getDisct_id());
+						
+						disct.setBilling_type(pt.getBilling_type());
 						//disct.setDisct_id(disct.getTariff_id() + "-" + disct.getDisct_id());
 						tariffList.add(disct);
 					}

@@ -150,10 +150,10 @@ public class UserService extends BaseBusiService implements IUserService {
 		Integer doneCode = doneCodeComponent.gDoneCode();
 		String user_id = userComponent.gUserId();
 		//创建账户信息
-		String acctId = acctComponent.createAcct(custId,user_id,  ACCT_TYPE_SPEC, null);
+		//String acctId = acctComponent.createAcct(custId,user_id,  ACCT_TYPE_SPEC, null);
 		//创建用户信息
 		user.setUser_id(user_id);
-		user.setAcct_id(acctId);
+		user.setAcct_id(acctComponent.gAcctId());
 		user.setCust_id(custId);		
 		userComponent.createUser(user);
 		

@@ -11,6 +11,7 @@ import org.springframework.aop.MethodBeforeAdvice;
 import com.ycsoft.beans.system.SOptr;
 import com.ycsoft.business.commons.abstracts.BaseService;
 import com.ycsoft.business.commons.pojo.Parameter;
+import com.ycsoft.business.service.impl.OttExternalService;
 import com.ycsoft.commons.constants.Environment;
 import com.ycsoft.commons.helper.JsonHelper;
 
@@ -32,6 +33,10 @@ public class SetterParameterInterceptor implements MethodBeforeAdvice {
 	Object[] params, Object scope) throws Throwable {
 		if(!(scope instanceof BaseService)){
 			throw new Exception("该拦截器只适用于Service层...");
+		}
+		if(scope instanceof  OttExternalService ){
+			//接口不拦截
+			return ;
 		}
 		try{
 			HttpServletRequest request = ServletActionContext.getRequest();

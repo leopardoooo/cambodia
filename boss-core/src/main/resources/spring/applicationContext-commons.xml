@@ -43,8 +43,8 @@
 	<bean id="ottClient" class="com.ycsoft.boss.remoting.ott.OttClient">
 		<property name="builder">
 			<bean class="com.ycsoft.boss.remoting.ott.URLBuilder">
-				<property name="ip" value="172.18.21.56" />
-				<property name="port" value="80" />
+				<property name="ip" value="${ott.ip}" />
+				<property name="port" value="${ott.port}" />
 			</bean>	
 		</property>
 	</bean>

@@ -47,6 +47,7 @@ import com.ycsoft.beans.core.cust.CCust;
 import com.ycsoft.beans.core.fee.CFee;
 import com.ycsoft.beans.core.prod.CProd;
 import com.ycsoft.beans.core.user.CUser;
+import com.ycsoft.beans.invoice.RInvoice;
 import com.ycsoft.beans.prod.PProdTariff;
 import com.ycsoft.beans.prod.PPromFee;
 import com.ycsoft.beans.system.SDept;
@@ -2082,12 +2083,12 @@ public class AcctService extends BaseBusiService implements IAcctService {
 	/* (non-Javadoc)
 	 * @see com.ycsoft.business.service.IAcctService#saveGeneralContract(com.ycsoft.beans.core.acct.CGeneralContract)
 	 */
-	public void saveGeneralContract(CGeneralContract generalContract,
+	public void saveGeneralContract(CGeneralContract generalContract, CFeePayDto pay,
 			SOptr optr, Integer credentialStartNo, Integer credentialEndNo,
 			Integer credentialAmount, Integer presentAmount) throws Exception {
 		Integer doneCode = doneCodeComponent.gDoneCode();
 		
-		String payType = this.getBusiParam().getPay().getPay_type();
+		String payType = pay.getPay_type();
 		
 		//验证合同号不重复
 		String contractNo = generalContract.getContract_no();
@@ -2097,13 +2098,20 @@ public class AcctService extends BaseBusiService implements IAcctService {
 		}
 		
 		String busiCode = getBusiParam().getBusiCode();
+		//非营业收费 无cust，默认cust_id=111
+		String custId = "111";
+		pay.setFee(generalContract.getNominal_amount());
+		CFeePayDto feePay = feeComponent.savePayFeeNew(pay, custId, doneCode);
+		RInvoice invoice = invoiceComponent.queryInvoiceById(pay.getInvoice_id()).get(0);
 		CFee fee = feeComponent.saveFeeUnitpre(payType, generalContract
 				.getFee_id(), generalContract.getFee_type(), generalContract
 				.getNominal_amount(), doneCode, doneCode, busiCode,
-				SystemConstants.BOOLEAN_FALSE,generalContract.getAddr_community());
+				SystemConstants.BOOLEAN_FALSE,generalContract.getAddr_district(), feePay.getPay_sn(), custId, invoice);
 		String[] feeSns = {fee.getFee_sn()};
+		invoiceComponent.useInvoice(invoice.getInvoice_code(), invoice.getInvoice_id(), invoice.getInvoice_mode(), generalContract.getNominal_amount());
 		printComponent.saveDoc(feeComponent.queryAutoMergeFees(feeSns), null,
 				doneCode, getBusiParam().getBusiCode());
+		
 		
 		int total = 0;
 		if(null != credentialEndNo && credentialEndNo > 0){
@@ -2161,7 +2169,6 @@ public class AcctService extends BaseBusiService implements IAcctService {
 		}
 		
 		saveAllPublic(doneCode,getBusiParam());
-//		saveDoneCode(doneCode, busiCode, null);
 	}
 	
 	/**
@@ -2314,10 +2321,14 @@ public class AcctService extends BaseBusiService implements IAcctService {
 		acctComponent.removeContractWithHis(contract, doneCode);
 		
 		CFee fee = feeComponent.queryBySn(contract.getFee_sn());
-		List<CFee> feeList = feeComponent.queryContractPay(contract.getContract_id());
+		/*List<CFee> feeList = feeComponent.queryContractPay(contract.getContract_id());
 		feeList.add(fee);
 		for(CFee cFee : feeList){
 			cancelFee(doneCode, null, cFee);
+		}*/
+		if(fee != null){
+			feeComponent.saveCancelFee(fee, doneCode);
+			feeComponent.saveCancelPayFee(fee.getPay_sn(), doneCode);
 		}
 		
 		saveAllPublic(doneCode,getBusiParam());
