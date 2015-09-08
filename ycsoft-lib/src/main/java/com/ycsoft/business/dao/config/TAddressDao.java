@@ -419,7 +419,7 @@ public class TAddressDao extends BaseEntityDao<TAddress> {
 			src = " and "+getSqlGenerator().setWhereInArray("addr_pid",addrPids);
 		}
 		String sql = "SELECT * FROM t_address where  tree_level = ? "+ src;
-		return createQuery(TAddressSysDto.class,level,sql).list();
+		return createQuery(TAddressSysDto.class,sql,level).list();
 	}
 	
 	public List<TAddressSysDto> queryAllAddrById(String addrId) throws JDBCException {
@@ -438,7 +438,7 @@ public class TAddressDao extends BaseEntityDao<TAddress> {
 			" and  replace(lower( t.addr_name),' ','') not like  '%'||?||'%' ",
 			" ) b  ",
 			" where a.addr_pid =b. addr_id ",
-			" and replace(lower( t.addr_name),' ','') like '%'||?||'%'",
+			" and replace(lower( a.addr_name),' ','') like '%'||?||'%'",
 			" union all ",
 			" select t.addr_id from t_address t ",
 			" where  ",getSqlGenerator().setWhereInArray("addr_pid",lvOneAddrIds),
@@ -461,7 +461,7 @@ public class TAddressDao extends BaseEntityDao<TAddress> {
 			" and  replace(lower( t.addr_name),' ','') not like  '%'||?||'%' ",
 			" ) b  ",
 			" where a.addr_pid =b. addr_id ",
-			" and replace(lower( t.addr_name),' ','') like '%'||?||'%'",
+			" and replace(lower( a.addr_name),' ','') like '%'||?||'%'",
 			" union all ",
 			" select t.addr_id from t_address t ",
 			" where  ",getSqlGenerator().setWhereInArray("addr_pid",lvOneAddrIds),

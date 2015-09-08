@@ -143,6 +143,7 @@ AddressTree = Ext.extend(Ext.ux.tree.TreeGridEditor,{
 	            },
 	            btns: [{
 	                id: 'add',
+	                text:'新增下级',
 	                deepestState: 'uncreated',
 	                handler : function(n){
 	                	new AddressWin('add',n).show();
@@ -150,17 +151,13 @@ AddressTree = Ext.extend(Ext.ux.tree.TreeGridEditor,{
 	            },{
 	                id: 'leveladd',
 	                deepestState: 'uncreated',
+	                text:'新增平级',
 	                handler : function(n){
 	                	new AddressWin('leveladd',n).show();
 	                }
-	            }/*,{
-	                id: 'batchAdd',
-	                deepestState: 'uncreated',
-	                handler : function(n){
-	                	new AddressWin('batchAdd',n).show();
-	                }
-	            }*/,{
+	            },{
 	                id: 'edit',
+	                text:'修改',
 	                handler : function(n){
 	                	new AddressWin('edit',n).show();
 	                }
@@ -171,9 +168,11 @@ AddressTree = Ext.extend(Ext.ux.tree.TreeGridEditor,{
 	                validator: this.checkRemove
 	            }*/, {
 	                id: 'statusActive',
+	                text:'启用',
 	                handler : this.doStatusActive
 	            }, {
 	                id: 'statusInvalid',
+	                text:'禁用',
 	                handler : this.doStatusInvalid,
 	                validator: this.checkRemove
 	            }]
@@ -440,10 +439,6 @@ AddressWin = Ext.extend(Ext.Window,{
 			}
 			Ext.getCmp('addrName').setValue(node.text);
 			Ext.getCmp('treeLevel').setValue(this.level);
-		}else if(this.type == 'batchAdd'){
-			this.title = '批量添加地区';
-			this.item = new BatchAddGrid(this.node);
-			width = 500;
 		}else if(this.type == 'leveladd'){
 			if(this.level == 1){
 				this.title = '平级新增城市';
