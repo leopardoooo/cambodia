@@ -29,16 +29,12 @@ EditCustForm = Ext.extend( CustBaseForm , {
 		this.initField();
 		this.setCanUpdateField();
 		
-//		//模拟大客户不能修改为普通客户，普通客户也不能修改为模拟大客户
-//		var value = App.getData().custFullInfo.cust.cust_colony;
-//		if(Ext.isEmpty(value)){
-//			this.remove(this.unitForm);
-//			this.doLayout();
-//		}else{
-//			var comp = Ext.getCmp('custcount_itemId');
-//			comp.show();comp.enable();
-//			Ext.getCmp('cust_count_id').allowBlank = false;
-//		}
+		if(!this.oldCustType){
+			this.oldCustType = 'RESIDENT';
+		}
+		this.provinceStore.load();
+		this.removeCustType();
+		
 	},
 	initField:function(){
 		//初始化地址下拉框信息
@@ -50,24 +46,6 @@ EditCustForm = Ext.extend( CustBaseForm , {
 		 * cust.addr_id_text :　小区
 		 */
 		var custAddress = cust.address;
-//		if(cust.address){//割接 无地址
-//			if(cust.t1 || cust.t2 || cust.t3 || cust.t4 || cust.t5 || cust.note){
-//				index = cust.address.indexOf(cust.addr_id_text);
-//				//index + index+cust.addr_id_text.length 客户地址前面部分
-//				custAddress = cust.address.substring(0,index+cust.addr_id_text.length);
-//			}
-//			if(cust.note){
-//				if(custAddress.substring(0,4)=='Room'){
-//					var arr = custAddress.split(",");
-//					if(arr.length>0){
-//						var index = arr[0].length;
-//						custAddress = custAddress.substring(index+1,custAddress.length);
-//					}
-//				}
-//			}
-//		}
-//		addrTreeCombo.addOption(cust.addr_id,custAddress);
-//		Ext.getCmp('tempCustAddress').setValue(custAddress);
 		
 		//从app.data.cust,linkman,resident中初始化客户信息
 		var custFullInfo = {};
@@ -100,12 +78,6 @@ EditCustForm = Ext.extend( CustBaseForm , {
 				//客户地址
 				this.custAddress = cust.address;
 				
-//				if(Ext.getCmp('isCanToCustId')){
-//					if(cust.status == 'PREOPEN'){
-//						Ext.getCmp('isCanToCustId').enable();
-//						Ext.getCmp('isCanToCustId').checked = true;
-//					}
-//				};
 				
 				this.getForm().items.each(function(f){
 					if(f.label){
@@ -129,16 +101,7 @@ EditCustForm = Ext.extend( CustBaseForm , {
 								}
 							}
 							if(fields[i].field_name == 'cust.addr_id'){//如果是地址，把剩余的放开允许修改
-//								if(cust.status == 'PREOPEN'){
-//									Ext.getCmp('isCanToCustId').enable();
-//									Ext.getCmp('isCanToCustId').checked = true;
-//								}
-//								Ext.getCmp('cust.t1').enable();
-//								Ext.getCmp('cust.t2').enable();
-//								Ext.getCmp('cust.t3').enable();
-//								Ext.getCmp('cust.t4').enable();
-//								Ext.getCmp('cust.t5').enable();
-//								Ext.getCmp('cust.note').enable();
+
 							}
 							
 						}
@@ -162,14 +125,6 @@ EditCustForm = Ext.extend( CustBaseForm , {
 				eachItems(this.items);
 			}
 		});
-	},
-	doInit:function(){
-		if(!this.oldCustType){
-			this.oldCustType = 'RESIDENT';
-		}
-		this.provinceStore.load();
-		CustBaseForm.superclass.doInit.call(this);
-		this.removeCustType();
 	},
 	doValid:function(){
 		var oldCustName = App.getData().custFullInfo.cust.cust_name;
