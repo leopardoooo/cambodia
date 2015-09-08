@@ -19,6 +19,7 @@ import com.ycsoft.beans.core.acct.CGeneralAcct;
 import com.ycsoft.beans.core.acct.CGeneralContract;
 import com.ycsoft.business.dto.core.acct.PayDto;
 import com.ycsoft.business.dto.core.acct.QueryAcctitemThresholdDto;
+import com.ycsoft.business.dto.core.fee.CFeePayDto;
 import com.ycsoft.business.dto.core.prod.PromFeeProdDto;
 import com.ycsoft.business.service.IAcctService;
 import com.ycsoft.commons.constants.StatusConstants;
@@ -87,6 +88,16 @@ public class AcctAction extends BaseBusiAction {
 	private QueryAcctitemThresholdDto queryAcctitemThresholdDto;
 	private String promFeeSn;
 	
+	private CFeePayDto pay;
+	
+	public CFeePayDto getPay() {
+		return pay;
+	}
+
+	public void setPay(CFeePayDto pay) {
+		this.pay = pay;
+	}
+
 	public String saveTrans() throws Exception{
 		String sourceAcctId = request.getParameter("sourceAcctId");
 		String orderAcctId = request.getParameter("orderAcctId");
@@ -478,7 +489,7 @@ public class AcctAction extends BaseBusiAction {
 	 * @throws Exception
 	 */
 	public String saveGeneralContract() throws Exception{
-		acctService.saveGeneralContract(generalContract,optr,credentialStartNo,credentialEndNo,credentialAmount,presentAmount);
+		acctService.saveGeneralContract(generalContract, pay,optr,credentialStartNo,credentialEndNo,credentialAmount,presentAmount);
 		return JSON;
 	}
 	

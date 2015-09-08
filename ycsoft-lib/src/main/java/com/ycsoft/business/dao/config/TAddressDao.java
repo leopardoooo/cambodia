@@ -297,7 +297,7 @@ public class TAddressDao extends BaseEntityDao<TAddress> {
 	}
 	
 	public List<TAddressDto> queryAddrDistrict(String countyId) throws JDBCException {
-		String sql = "select * from t_address t where t.tree_level=2 and t.status='ACTIVE' ";
+		String sql = "select * from t_address t where t.addr_pid='1' and t.status='ACTIVE' ";
 		if(!countyId.equals(SystemConstants.COUNTY_ALL)){
 			sql = sql + " and t.county_id='"+countyId+"' ";
 		}
