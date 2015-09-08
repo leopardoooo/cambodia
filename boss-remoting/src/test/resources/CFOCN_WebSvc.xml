@@ -1,0 +1,666 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="http://tempuri.org/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" targetNamespace="http://tempuri.org/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">WebService说明：接入网运营过程中，ODN网管平台通过北向接口接收来自各家上游电信运营商或ISP的工单。</wsdl:documentation>
+  <wsdl:types>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://tempuri.org/">
+      <s:element name="TestSSL">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="param1" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="TestSSLResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="TestSSLResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="InternalFaultOrder">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="FaultNo" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="FaultContent" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="InternalFaultOrderResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="InternalFaultOrderResult" type="tns:ResultHead" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="ResultHead">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="HeadCode" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="HeadMsg" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="ReceiveWorkOrder">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="mWorkOrder" type="tns:WorkOrder" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="WorkOrder">
+        <s:sequence>
+          <s:element minOccurs="1" maxOccurs="1" name="OrderType" type="s:int" />
+          <s:element minOccurs="0" maxOccurs="1" name="OrderNo" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="ISPCode" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="PublisherNo" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="UserNo" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="UserName" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="UserTel" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="UserAddress" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="AreaCode" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="OrderContent" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="OrderLevel" type="s:int" />
+          <s:element minOccurs="0" maxOccurs="1" name="ArriveTime" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="OrderStatus" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="CreateTime" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="DealLine" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="ProductInfos" type="tns:ArrayOfProductInfo" />
+          <s:element minOccurs="0" maxOccurs="1" name="AttachData" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="ArrayOfProductInfo">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="ProductInfo" nillable="true" type="tns:ProductInfo" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="ProductInfo">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="ProductName" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="ProductCode" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="DeviceInfos" type="tns:ArrayOfDeviceInfo" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="ArrayOfDeviceInfo">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="DeviceInfo" nillable="true" type="tns:DeviceInfo" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="DeviceInfo">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="DeviceName" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="SplitRatio" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="DeviceSpecCode" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="OriginalDeviceSpecCode" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="IsFCPort" type="s:boolean" />
+          <s:element minOccurs="0" maxOccurs="1" name="DeviceSN" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="Replace" nillable="true" type="s:boolean" />
+          <s:element minOccurs="0" maxOccurs="1" name="OriginalDeviceName" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="OriginalDeviceSN" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="OCCSerialCode" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="POSSerialCode" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="ReceiveWorkOrderResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ReceiveWorkOrderResult" type="tns:ResultHead" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetWorkOrder">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="OrderNo" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetWorkOrderResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetWorkOrderResult" type="tns:WorkOrder" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ManuallyInfluencedWorkOrder">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="WorkOrderNo" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="No" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="Type" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="Content" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ManuallyInfluencedWorkOrderResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ManuallyInfluencedWorkOrderResult" type="tns:ResultHead" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetWorkOrdersCount">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="status" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetWorkOrdersCountResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="GetWorkOrdersCountResult" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetWorkOrders">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="status" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="start" type="s:int" />
+            <s:element minOccurs="1" maxOccurs="1" name="count" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetWorkOrdersResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetWorkOrdersResult" type="tns:ArrayOfWorkOrder" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="ArrayOfWorkOrder">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="WorkOrder" nillable="true" type="tns:WorkOrder" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="string" nillable="true" type="s:string" />
+      <s:element name="ResultHead" nillable="true" type="tns:ResultHead" />
+      <s:element name="WorkOrder" nillable="true" type="tns:WorkOrder" />
+      <s:element name="int" type="s:int" />
+      <s:element name="ArrayOfWorkOrder" nillable="true" type="tns:ArrayOfWorkOrder" />
+    </s:schema>
+  </wsdl:types>
+  <wsdl:message name="TestSSLSoapIn">
+    <wsdl:part name="parameters" element="tns:TestSSL" />
+  </wsdl:message>
+  <wsdl:message name="TestSSLSoapOut">
+    <wsdl:part name="parameters" element="tns:TestSSLResponse" />
+  </wsdl:message>
+  <wsdl:message name="InternalFaultOrderSoapIn">
+    <wsdl:part name="parameters" element="tns:InternalFaultOrder" />
+  </wsdl:message>
+  <wsdl:message name="InternalFaultOrderSoapOut">
+    <wsdl:part name="parameters" element="tns:InternalFaultOrderResponse" />
+  </wsdl:message>
+  <wsdl:message name="ReceiveWorkOrderSoapIn">
+    <wsdl:part name="parameters" element="tns:ReceiveWorkOrder" />
+  </wsdl:message>
+  <wsdl:message name="ReceiveWorkOrderSoapOut">
+    <wsdl:part name="parameters" element="tns:ReceiveWorkOrderResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetWorkOrderSoapIn">
+    <wsdl:part name="parameters" element="tns:GetWorkOrder" />
+  </wsdl:message>
+  <wsdl:message name="GetWorkOrderSoapOut">
+    <wsdl:part name="parameters" element="tns:GetWorkOrderResponse" />
+  </wsdl:message>
+  <wsdl:message name="ManuallyInfluencedWorkOrderSoapIn">
+    <wsdl:part name="parameters" element="tns:ManuallyInfluencedWorkOrder" />
+  </wsdl:message>
+  <wsdl:message name="ManuallyInfluencedWorkOrderSoapOut">
+    <wsdl:part name="parameters" element="tns:ManuallyInfluencedWorkOrderResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetWorkOrdersCountSoapIn">
+    <wsdl:part name="parameters" element="tns:GetWorkOrdersCount" />
+  </wsdl:message>
+  <wsdl:message name="GetWorkOrdersCountSoapOut">
+    <wsdl:part name="parameters" element="tns:GetWorkOrdersCountResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetWorkOrdersSoapIn">
+    <wsdl:part name="parameters" element="tns:GetWorkOrders" />
+  </wsdl:message>
+  <wsdl:message name="GetWorkOrdersSoapOut">
+    <wsdl:part name="parameters" element="tns:GetWorkOrdersResponse" />
+  </wsdl:message>
+  <wsdl:message name="TestSSLHttpGetIn">
+    <wsdl:part name="param1" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="TestSSLHttpGetOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="InternalFaultOrderHttpGetIn">
+    <wsdl:part name="FaultNo" type="s:string" />
+    <wsdl:part name="FaultContent" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="InternalFaultOrderHttpGetOut">
+    <wsdl:part name="Body" element="tns:ResultHead" />
+  </wsdl:message>
+  <wsdl:message name="GetWorkOrderHttpGetIn">
+    <wsdl:part name="OrderNo" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetWorkOrderHttpGetOut">
+    <wsdl:part name="Body" element="tns:WorkOrder" />
+  </wsdl:message>
+  <wsdl:message name="ManuallyInfluencedWorkOrderHttpGetIn">
+    <wsdl:part name="WorkOrderNo" type="s:string" />
+    <wsdl:part name="No" type="s:string" />
+    <wsdl:part name="Type" type="s:string" />
+    <wsdl:part name="Content" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="ManuallyInfluencedWorkOrderHttpGetOut">
+    <wsdl:part name="Body" element="tns:ResultHead" />
+  </wsdl:message>
+  <wsdl:message name="GetWorkOrdersCountHttpGetIn">
+    <wsdl:part name="status" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetWorkOrdersCountHttpGetOut">
+    <wsdl:part name="Body" element="tns:int" />
+  </wsdl:message>
+  <wsdl:message name="GetWorkOrdersHttpGetIn">
+    <wsdl:part name="status" type="s:string" />
+    <wsdl:part name="start" type="s:string" />
+    <wsdl:part name="count" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetWorkOrdersHttpGetOut">
+    <wsdl:part name="Body" element="tns:ArrayOfWorkOrder" />
+  </wsdl:message>
+  <wsdl:message name="TestSSLHttpPostIn">
+    <wsdl:part name="param1" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="TestSSLHttpPostOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="InternalFaultOrderHttpPostIn">
+    <wsdl:part name="FaultNo" type="s:string" />
+    <wsdl:part name="FaultContent" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="InternalFaultOrderHttpPostOut">
+    <wsdl:part name="Body" element="tns:ResultHead" />
+  </wsdl:message>
+  <wsdl:message name="GetWorkOrderHttpPostIn">
+    <wsdl:part name="OrderNo" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetWorkOrderHttpPostOut">
+    <wsdl:part name="Body" element="tns:WorkOrder" />
+  </wsdl:message>
+  <wsdl:message name="ManuallyInfluencedWorkOrderHttpPostIn">
+    <wsdl:part name="WorkOrderNo" type="s:string" />
+    <wsdl:part name="No" type="s:string" />
+    <wsdl:part name="Type" type="s:string" />
+    <wsdl:part name="Content" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="ManuallyInfluencedWorkOrderHttpPostOut">
+    <wsdl:part name="Body" element="tns:ResultHead" />
+  </wsdl:message>
+  <wsdl:message name="GetWorkOrdersCountHttpPostIn">
+    <wsdl:part name="status" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetWorkOrdersCountHttpPostOut">
+    <wsdl:part name="Body" element="tns:int" />
+  </wsdl:message>
+  <wsdl:message name="GetWorkOrdersHttpPostIn">
+    <wsdl:part name="status" type="s:string" />
+    <wsdl:part name="start" type="s:string" />
+    <wsdl:part name="count" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="GetWorkOrdersHttpPostOut">
+    <wsdl:part name="Body" element="tns:ArrayOfWorkOrder" />
+  </wsdl:message>
+  <wsdl:portType name="CFOCN_WebSvc_WorkOrderSoap">
+    <wsdl:operation name="TestSSL">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">测试接口是否可用</wsdl:documentation>
+      <wsdl:input message="tns:TestSSLSoapIn" />
+      <wsdl:output message="tns:TestSSLSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="InternalFaultOrder">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">内部故障工单</wsdl:documentation>
+      <wsdl:input message="tns:InternalFaultOrderSoapIn" />
+      <wsdl:output message="tns:InternalFaultOrderSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReceiveWorkOrder">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">收单</wsdl:documentation>
+      <wsdl:input message="tns:ReceiveWorkOrderSoapIn" />
+      <wsdl:output message="tns:ReceiveWorkOrderSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetWorkOrder">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">查单</wsdl:documentation>
+      <wsdl:input message="tns:GetWorkOrderSoapIn" />
+      <wsdl:output message="tns:GetWorkOrderSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ManuallyInfluencedWorkOrder">
+      <wsdl:input message="tns:ManuallyInfluencedWorkOrderSoapIn" />
+      <wsdl:output message="tns:ManuallyInfluencedWorkOrderSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetWorkOrdersCount">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">查询工单总数</wsdl:documentation>
+      <wsdl:input message="tns:GetWorkOrdersCountSoapIn" />
+      <wsdl:output message="tns:GetWorkOrdersCountSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetWorkOrders">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">查询指定状态的工单清单</wsdl:documentation>
+      <wsdl:input message="tns:GetWorkOrdersSoapIn" />
+      <wsdl:output message="tns:GetWorkOrdersSoapOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:portType name="CFOCN_WebSvc_WorkOrderHttpGet">
+    <wsdl:operation name="TestSSL">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">测试接口是否可用</wsdl:documentation>
+      <wsdl:input message="tns:TestSSLHttpGetIn" />
+      <wsdl:output message="tns:TestSSLHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="InternalFaultOrder">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">内部故障工单</wsdl:documentation>
+      <wsdl:input message="tns:InternalFaultOrderHttpGetIn" />
+      <wsdl:output message="tns:InternalFaultOrderHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetWorkOrder">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">查单</wsdl:documentation>
+      <wsdl:input message="tns:GetWorkOrderHttpGetIn" />
+      <wsdl:output message="tns:GetWorkOrderHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ManuallyInfluencedWorkOrder">
+      <wsdl:input message="tns:ManuallyInfluencedWorkOrderHttpGetIn" />
+      <wsdl:output message="tns:ManuallyInfluencedWorkOrderHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetWorkOrdersCount">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">查询工单总数</wsdl:documentation>
+      <wsdl:input message="tns:GetWorkOrdersCountHttpGetIn" />
+      <wsdl:output message="tns:GetWorkOrdersCountHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetWorkOrders">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">查询指定状态的工单清单</wsdl:documentation>
+      <wsdl:input message="tns:GetWorkOrdersHttpGetIn" />
+      <wsdl:output message="tns:GetWorkOrdersHttpGetOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:portType name="CFOCN_WebSvc_WorkOrderHttpPost">
+    <wsdl:operation name="TestSSL">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">测试接口是否可用</wsdl:documentation>
+      <wsdl:input message="tns:TestSSLHttpPostIn" />
+      <wsdl:output message="tns:TestSSLHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="InternalFaultOrder">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">内部故障工单</wsdl:documentation>
+      <wsdl:input message="tns:InternalFaultOrderHttpPostIn" />
+      <wsdl:output message="tns:InternalFaultOrderHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetWorkOrder">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">查单</wsdl:documentation>
+      <wsdl:input message="tns:GetWorkOrderHttpPostIn" />
+      <wsdl:output message="tns:GetWorkOrderHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ManuallyInfluencedWorkOrder">
+      <wsdl:input message="tns:ManuallyInfluencedWorkOrderHttpPostIn" />
+      <wsdl:output message="tns:ManuallyInfluencedWorkOrderHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetWorkOrdersCount">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">查询工单总数</wsdl:documentation>
+      <wsdl:input message="tns:GetWorkOrdersCountHttpPostIn" />
+      <wsdl:output message="tns:GetWorkOrdersCountHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetWorkOrders">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">查询指定状态的工单清单</wsdl:documentation>
+      <wsdl:input message="tns:GetWorkOrdersHttpPostIn" />
+      <wsdl:output message="tns:GetWorkOrdersHttpPostOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="CFOCN_WebSvc_WorkOrderSoap" type="tns:CFOCN_WebSvc_WorkOrderSoap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="TestSSL">
+      <soap:operation soapAction="http://tempuri.org/TestSSL" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="InternalFaultOrder">
+      <soap:operation soapAction="http://tempuri.org/InternalFaultOrder" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReceiveWorkOrder">
+      <soap:operation soapAction="http://tempuri.org/ReceiveWorkOrder" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetWorkOrder">
+      <soap:operation soapAction="http://tempuri.org/GetWorkOrder" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ManuallyInfluencedWorkOrder">
+      <soap:operation soapAction="http://tempuri.org/ManuallyInfluencedWorkOrder" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetWorkOrdersCount">
+      <soap:operation soapAction="http://tempuri.org/GetWorkOrdersCount" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetWorkOrders">
+      <soap:operation soapAction="http://tempuri.org/GetWorkOrders" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="CFOCN_WebSvc_WorkOrderSoap12" type="tns:CFOCN_WebSvc_WorkOrderSoap">
+    <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="TestSSL">
+      <soap12:operation soapAction="http://tempuri.org/TestSSL" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="InternalFaultOrder">
+      <soap12:operation soapAction="http://tempuri.org/InternalFaultOrder" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReceiveWorkOrder">
+      <soap12:operation soapAction="http://tempuri.org/ReceiveWorkOrder" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetWorkOrder">
+      <soap12:operation soapAction="http://tempuri.org/GetWorkOrder" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ManuallyInfluencedWorkOrder">
+      <soap12:operation soapAction="http://tempuri.org/ManuallyInfluencedWorkOrder" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetWorkOrdersCount">
+      <soap12:operation soapAction="http://tempuri.org/GetWorkOrdersCount" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetWorkOrders">
+      <soap12:operation soapAction="http://tempuri.org/GetWorkOrders" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="CFOCN_WebSvc_WorkOrderHttpGet" type="tns:CFOCN_WebSvc_WorkOrderHttpGet">
+    <http:binding verb="GET" />
+    <wsdl:operation name="TestSSL">
+      <http:operation location="/TestSSL" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="InternalFaultOrder">
+      <http:operation location="/InternalFaultOrder" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetWorkOrder">
+      <http:operation location="/GetWorkOrder" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ManuallyInfluencedWorkOrder">
+      <http:operation location="/ManuallyInfluencedWorkOrder" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetWorkOrdersCount">
+      <http:operation location="/GetWorkOrdersCount" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetWorkOrders">
+      <http:operation location="/GetWorkOrders" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="CFOCN_WebSvc_WorkOrderHttpPost" type="tns:CFOCN_WebSvc_WorkOrderHttpPost">
+    <http:binding verb="POST" />
+    <wsdl:operation name="TestSSL">
+      <http:operation location="/TestSSL" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="InternalFaultOrder">
+      <http:operation location="/InternalFaultOrder" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetWorkOrder">
+      <http:operation location="/GetWorkOrder" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ManuallyInfluencedWorkOrder">
+      <http:operation location="/ManuallyInfluencedWorkOrder" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetWorkOrdersCount">
+      <http:operation location="/GetWorkOrdersCount" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetWorkOrders">
+      <http:operation location="/GetWorkOrders" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="CFOCN_WebSvc_WorkOrder">
+    <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">WebService说明：接入网运营过程中，ODN网管平台通过北向接口接收来自各家上游电信运营商或ISP的工单。</wsdl:documentation>
+    <wsdl:port name="CFOCN_WebSvc_WorkOrderSoap" binding="tns:CFOCN_WebSvc_WorkOrderSoap">
+      <soap:address location="http://omis.cfocn.com.kh/boss/CFOCN_WebSvc_WorkOrder.asmx" />
+    </wsdl:port>
+    <wsdl:port name="CFOCN_WebSvc_WorkOrderSoap12" binding="tns:CFOCN_WebSvc_WorkOrderSoap12">
+      <soap12:address location="http://omis.cfocn.com.kh/boss/CFOCN_WebSvc_WorkOrder.asmx" />
+    </wsdl:port>
+    <wsdl:port name="CFOCN_WebSvc_WorkOrderHttpGet" binding="tns:CFOCN_WebSvc_WorkOrderHttpGet">
+      <http:address location="http://omis.cfocn.com.kh/boss/CFOCN_WebSvc_WorkOrder.asmx" />
+    </wsdl:port>
+    <wsdl:port name="CFOCN_WebSvc_WorkOrderHttpPost" binding="tns:CFOCN_WebSvc_WorkOrderHttpPost">
+      <http:address location="http://omis.cfocn.com.kh/boss/CFOCN_WebSvc_WorkOrder.asmx" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>
