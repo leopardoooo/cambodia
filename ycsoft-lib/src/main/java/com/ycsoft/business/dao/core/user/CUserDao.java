@@ -531,4 +531,11 @@ public class CUserDao extends BaseEntityDao<CUser> {
 		String sql="select * from c_user where login_name=? ";
 		return this.createQuery(sql, loginName).first();
 	}
+
+	public int updateUserNameByDeviceCode(CUser user,String custId) throws JDBCException {
+		String sql = "update c_user set user_name=? where cust_id=? and ( stb_id=? or card_id=? or modem_mac=? )";
+		String deviceCode = user.getStb_id();
+		int executeUpdate = executeUpdate(sql, user.getUser_name(),custId,deviceCode,deviceCode,deviceCode);
+		return executeUpdate;
+	}
 }

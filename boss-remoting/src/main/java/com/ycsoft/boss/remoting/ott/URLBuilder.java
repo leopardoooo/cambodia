@@ -1,7 +1,7 @@
 package com.ycsoft.boss.remoting.ott;
 
 public class URLBuilder {
-	private String ip="172.18.21.56";
+	private String ip="127.0.0.1";
 	private int port=80;
 	
 	public enum Method{

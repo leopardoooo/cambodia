@@ -18,6 +18,10 @@ public class LoggerHelper {
 	public static void debug( Class<?> cls , String msg ){
 		LogFactory.getLog(cls).debug( msg );
 	}
+	
+	public static void debug( Class<?> cls , String msg ,Throwable e){
+		LogFactory.getLog(cls).debug( msg,e );
+	}
 
 	/**
 	 * info level output

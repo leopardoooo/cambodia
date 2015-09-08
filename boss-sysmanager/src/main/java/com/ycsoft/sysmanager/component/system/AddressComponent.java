@@ -2,6 +2,7 @@ package com.ycsoft.sysmanager.component.system;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import com.ycsoft.beans.config.TAddress;
 import com.ycsoft.beans.config.TCustColonyCfg;
+import com.ycsoft.beans.config.TDistrict;
 import com.ycsoft.beans.config.TNonresCustApproval;
 import com.ycsoft.beans.config.TProvince;
 import com.ycsoft.beans.config.TSpell;
@@ -195,10 +197,11 @@ public class AddressComponent extends BaseComponent {
 		newAddr.setCounty_id(addr.getCounty_id());
 		newAddr.setAddr_name(addr.getAddr_name());
 		newAddr.setAddr_id(getNextAddrId());
+		newAddr.setNet_type(addr.getNet_type());
+		newAddr.setDistrict_id(addr.getDistrict_id());
 		newAddr.setIs_leaf(SystemConstants.BOOLEAN_TRUE);
 		float  b = (float) 0.00;
-		//新增平级
-		if("leveladd".equals(type)){
+		if("leveladd".equals(type)){//新增平级算排序值
 			TAddress lastAddr = tAddressDao.findByKey(addr.getAddr_last_id());
 			TAddress nextAddr = tAddressDao.querySortNumByNextId(lastAddr.getAddr_pid(), lastAddr.getSort_num());
 			if(nextAddr == null){
@@ -206,7 +209,7 @@ public class AddressComponent extends BaseComponent {
 			}else{
 				b  = (float)(Math.round((lastAddr.getSort_num()+nextAddr.getSort_num())/2*100))/100;
 			}
-		}else if("add".equals(type)){//新增下级
+		}else if("add".equals(type)){//新增下级算排序值，默认最大值+1000
 			String maxSortNum =	tAddressDao.queryMaxSortNumByPid(addr.getAddr_pid());
 			b = Float.parseFloat(maxSortNum)  + 1000;
 		}
@@ -282,6 +285,7 @@ public class AddressComponent extends BaseComponent {
 		newAddr.setAddr_id(addr.getAddr_id());
 		newAddr.setAddr_name(addr.getAddr_name());
 		newAddr.setNet_type(addr.getNet_type());
+		newAddr.setSort_num(addr.getSort_num());
 		newAddr.setDistrict_id(addr.getDistrict_id());
 		tAddressDao.update(newAddr);
 		
@@ -488,8 +492,8 @@ public class AddressComponent extends BaseComponent {
 					throw new ComponentException(ErrorCode.DeptAddrIsNull,dept.getDept_name());
 				}
 				//tAddressDao.queryAddrByAllowPids(levelId, addrPid)
-				String[] pids={SystemConstants.ADDRESS_ROOT_ID};
-				addrIds= CollectionHelper.converValueToArray(tAddressDao.queryAddrByAllowPids(SystemConstants.ADDR_TREE_LEVEL_ONE,pids),"addr_id");
+//				String[] pids={SystemConstants.ADDRESS_ROOT_ID};
+//				addrIds= CollectionHelper.converValueToArray(tAddressDao.queryAllAddrByPids(SystemConstants.ADDR_TREE_LEVEL_ONE,pids),"addr_id");
 			}
 			if(StringHelper.isEmpty(name)){
 				list = tAddressDao.queryAllAddrByIds(addrIds);
@@ -498,6 +502,15 @@ public class AddressComponent extends BaseComponent {
 				
 				list=tAddressDao.queryAddrSysTreeByLvOneAndName(addrIds,name);
 				
+			}
+		}
+		
+		List<TDistrict> districtList = tDistrictDao.findAll();
+		Map<String,TDistrict> map = CollectionHelper.converToMapSingle(districtList, "district_id");
+		for(TAddressSysDto dto:list){
+			TDistrict t = map.get(dto.getDistrict_id());
+			if(t != null && StringHelper.isNotEmpty(t.getDistrict_name())){
+				dto.setDistrict_name(t.getDistrict_name());
 			}
 		}
 		if(list.size()>2000){

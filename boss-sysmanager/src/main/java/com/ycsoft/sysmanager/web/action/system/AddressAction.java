@@ -98,6 +98,12 @@ public class AddressAction extends BaseAction {
 		getRoot().setRecords(list);
 		return JSON_RECORDS;
 	}
+	
+	public String queryDistrictByPid() throws Exception{
+		List addrs =  addressComponent.queryDistrictByPid(addrId);
+		getRoot().setRecords(TreeBuilder.createAdreeSynchronousTree(addrs));
+		return JSON_RECORDS;
+	}
 
 	public String queryOptrByCountyId() throws Exception {
 		getRoot().setRecords(addressComponent.queryOptrByCountyId(optr.getCounty_id()));

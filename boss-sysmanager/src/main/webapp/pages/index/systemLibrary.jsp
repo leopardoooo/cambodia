@@ -91,6 +91,9 @@
 	<!-- 服务器配置 -->
 	<script type="text/javascript" src="<%=r %>/pages/sysmanager/config/ServerCfg.js"></script>
 	
+	<!-- 汇率配置 -->
+	<script type="text/javascript" src="<%=r %>/pages/sysmanager/config/ExchangeRateManage.js"></script>
+	
 	<!-- OSD监控 -->
 	<script type="text/javascript" src="<%=r %>/pages/sysmanager/config/OsdPhraseCfg.js"></script>
 	<script type="text/javascript" src="<%=r %>/pages/sysmanager/config/OsdMonitor.js"></script>
