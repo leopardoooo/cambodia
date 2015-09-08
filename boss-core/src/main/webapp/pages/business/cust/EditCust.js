@@ -85,7 +85,7 @@ EditCustForm = Ext.extend( CustBaseForm , {
 					}
 					f.disable();
 				});
-
+				Ext.getCmp('clickAddrId').setDisabled(true);
 				var fields = Ext.decode(response.responseText);
 				
 				var compare = function(f,name){
@@ -101,13 +101,16 @@ EditCustForm = Ext.extend( CustBaseForm , {
 								}
 							}
 							if(fields[i].field_name == 'cust.addr_id'){//如果是地址，把剩余的放开允许修改
-
+								Ext.getCmp('clickAddrId').setDisabled(false);
 							}
 							
 						}
 					}
-				
 				}
+				if(cust.status == 'PREOPEN'){
+					Ext.getCmp('clickAddrId').setDisabled(false);
+				}
+				
 				
 				var eachItems = function(items){
 					if(items && items.length>0){
