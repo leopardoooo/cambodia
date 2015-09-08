@@ -163,6 +163,14 @@ EditCustForm = Ext.extend( CustBaseForm , {
 			}
 		});
 	},
+	doInit:function(){
+		if(!this.oldCustType){
+			this.oldCustType = 'RESIDENT';
+		}
+		this.provinceStore.load();
+		CustBaseForm.superclass.doInit.call(this);
+		this.removeCustType();
+	},
 	doValid:function(){
 		var oldCustName = App.getData().custFullInfo.cust.cust_name;
 		var oldAddress = App.getData().custFullInfo.cust.address;

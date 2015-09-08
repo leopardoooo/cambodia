@@ -742,7 +742,7 @@ public class PayService extends BaseBusiService implements IPayService {
 		}
 		for (FeeBusiFormDto feeDto:feeList){
 			
-			if (feeDto.getFee_type().equals(SystemConstants.FEE_TYPE_BUSI)){
+			if (feeDto.getFee_type().equals(SystemConstants.FEE_TYPE_BUSI) || feeDto.getFee_type().equals(SystemConstants.FEE_TYPE_CONTRACT)){
 				String payType = SystemConstants.PAY_TYPE_UNPAY;
 				if(null != getBusiParam().getPay()){
 					payType = getBusiParam().getPay().getPay_type();

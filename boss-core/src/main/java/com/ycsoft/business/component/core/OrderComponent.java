@@ -1421,4 +1421,28 @@ public class OrderComponent extends BaseBusiComponent {
 		}
 	}
 	
+	/**
+	 * 获取宽带最后一个订单
+	 * @param userId
+	 * @return
+	 * @throws Exception
+	 */
+	public CProdOrderDto getBandLastOrder(String userId)throws Exception{
+		List<CProdOrderDto> orderList = cProdOrderDao.queryProdOrderDtoByUserId(userId);
+		CProdOrderDto lastOrder = null;
+		if (CollectionHelper.isNotEmpty(orderList)){
+			for(CProdOrderDto order:orderList){
+				if (order.getProd_type().equals(SystemConstants.PROD_TYPE_BASE) &&order.getServ_id().equals(SystemConstants.PROD_SERV_ID_BAND)){
+					if(lastOrder == null){
+						lastOrder = order;
+					}else if(order.getExp_date().after(lastOrder.getExp_date())){
+						lastOrder = order;
+					}
+				}
+				
+			}
+		}
+		return lastOrder;
+	}
+	
 }

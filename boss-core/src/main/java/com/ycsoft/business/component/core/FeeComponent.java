@@ -1559,6 +1559,15 @@ public class FeeComponent extends BaseBusiComponent {
 		return tBusiFeeStdDao.queryBusiFeeStdByFeeId(queryTemplateId(SystemConstants.TEMPLATE_TYPE_FEE),busiFeeId);
 	}
 	
+	public List<BusiFeeDto> getBusiFeeAndIpFeeItems() throws Exception {
+		List<BusiFeeDto>  list = getBusiFeeItems();
+		BusiFeeDto ipFee = tBusiFeeStdDao.queryBusiFeeStdByFeeId(queryTemplateId(SystemConstants.TEMPLATE_TYPE_FEE),SystemConstants.USER_IP_FEE_ID);
+		if(ipFee != null){
+			list.add(ipFee);
+		}
+		return list;
+	}
+	
 	/**
 	 * 返回当前地区的所有设备费用项
 	 * @return
