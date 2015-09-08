@@ -78,28 +78,32 @@ BillGrid = Ext.extend(Ext.ux.Grid, {
 			}
 		});
 		var sm = new Ext.grid.CheckboxSelectionModel();
+		
+		var lc = langUtils.main("bill.list.columns");
+		
 		var cm = new Ext.ux.grid.LockingColumnModel({ 
     		columns : [
     			sm,
-    		    {header:'账期',dataIndex:'billing_cycle_id',width:80},
-    		    {header:'来源',dataIndex:'come_from_text',width:80},
-    		    {header:'智能卡号',dataIndex:'card_id',width:120,renderer:App.qtipValue},
-    			{header:'流水',dataIndex:'bill_done_code',width:80},
-    			{header:'出账时间',dataIndex:'bill_date',	width:130},
-    			{header:'账目名称',dataIndex:'acctitem_name',width:130,renderer:App.qtipValue},
-    			{header:'资费名称',dataIndex:'tariff_name',width:80},
-				{header:'状态',dataIndex:'status',width:65,renderer : this.renderStatus},
-				{header:'出账金额',dataIndex:'final_bill_fee',width:80,renderer:Ext.util.Format.formatFee},
-				{header:'欠费金额',dataIndex:'owe_fee',width:80,renderer:Ext.util.Format.formatFee},
-				{header:'操作',dataIndex:'owe_fee',scope:this,width:50,renderer:function(){
+    		    {header:lc[0],dataIndex:'billing_cycle_id',width:80},
+    		    {header:lc[1],dataIndex:'come_from_text',width:80},
+    		    {header:lc[2],dataIndex:'card_id',width:120,renderer:App.qtipValue},
+    			{header:lc[3],dataIndex:'bill_done_code',width:80},
+    			{header:lc[4],dataIndex:'bill_date',	width:130},
+    			{header:lc[5],dataIndex:'acctitem_name',width:130,renderer:App.qtipValue},
+    			{header:lc[6],dataIndex:'tariff_name',width:80},
+				{header:lc[7],dataIndex:'status',width:65,renderer : this.renderStatus},
+				{header:lc[8],dataIndex:'final_bill_fee',width:80,renderer:Ext.util.Format.formatFee},
+				{header:lc[9],dataIndex:'owe_fee',width:80,renderer:Ext.util.Format.formatFee},
+				{header:lc[10],dataIndex:'owe_fee',scope:this,width:50,renderer:function(){
 					return '<div class="icon-query" style="cursor:pointer;" onclick="Ext.getCmp(\'B_BILL\').showWriteOff()"; ext:qtitle="" ext:qtip="查看销账记录">&nbsp;</div>';
 				}}
 	        ]
 	     });
 		
+		var tbarText = langUtils.main("bill.list.tbar");
 		BillGrid.superclass.constructor.call(this, {
 					id:'B_BILL',
-					title : '账单信息',
+					title : langUtils.main("bill.list._title"),
 					loadMask : true,
 					store : this.billStore,
 					border : false,
@@ -109,16 +113,16 @@ BillGrid = Ext.extend(Ext.ux.Grid, {
 					bbar: new Ext.PagingToolbar({store: this.billStore, pageSize : this.pageSize}),
 					tbar:['-',
 					{xtype:'hidden',id:'radiogroupBtn',text:'欠费账单',value:true,getValue:function(){return this.value}},
-					{text : '智能卡'} ,
+					{text : tbarText[0]} ,
 					{xtype:'textfield',id:'cardFilter',scope : this},'-',
-					{text : '流水号'} ,
+					{text : tbarText[1]} ,
 					{xtype:'textfield',id:'doneCodeFilter',scope : this},'-',
-					{text : '欠费账单',iconCls:'ca_3',scope : this,handler : function(){
+					{text : tbarText[2],iconCls:'ca_3',scope : this,handler : function(){
 							if(!App.getCustId()){return;}
 							Ext.getCmp('radiogroupBtn').value = true;
 							this.billStore.load({params:{start: 0,limit: this.pageSize}});
 						}
-					},'-',{text : '全部账单',iconCls:'ca_2',scope : this,handler : function(){
+					},'-',{text : tbarText[3],iconCls:'ca_2',scope : this,handler : function(){
 							if(!App.getCustId()){return;}
 							Ext.getCmp('radiogroupBtn').value = false;
 							this.billStore.load({params:{start: 0,limit: this.pageSize}});
@@ -212,11 +216,12 @@ AcctitemInvalidGrid = Ext.extend(Ext.ux.Grid, {
 							 {name : 'invalid_fee',type : 'int'},'fee_type_text','acctitem_name','can_refund'
 							]
 				});
+		var lc = langUtils.main("bill.acctitemInvalid.columns")
 		var cm = new Ext.ux.grid.LockingColumnModel({ 
     		columns : [
-    			{header:'账目名称',dataIndex:'acctitem_name',width:150},
-				{header:'资金类型',dataIndex:'fee_type_text',width:80},
-				{header:'作废金额',dataIndex:'invalid_fee',width:100,renderer:Ext.util.Format.formatFee}
+    			{header:lc[0],dataIndex:'acctitem_name',width:150},
+				{header:lc[1],dataIndex:'fee_type_text',width:80},
+				{header:lc[2],dataIndex:'invalid_fee',width:100,renderer:Ext.util.Format.formatFee}
 	        ]
 	      });
 		
@@ -224,7 +229,7 @@ AcctitemInvalidGrid = Ext.extend(Ext.ux.Grid, {
 		pageTbar.refresh.hide();
 		AcctitemInvalidGrid.superclass.constructor.call(this, {
 					id:'B_INVALID',
-					title : '账目作废信息',
+					title : langUtils.main("bill.acctitemInvalid._title"),
 					loadMask : true,
 					store : this.acctitemInvalidStore,
 					border : false,

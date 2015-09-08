@@ -13,26 +13,27 @@ var CaGrid = Ext.extend(Ext.grid.GridPanel,{
 			fields:['done_code','stb_id','card_id','prg_name','result_flag','control_id','auth_end_date',
 				'error_info','record_date','send_date','ret_date','cmd_type_text']
 		});
+		var lc = langUtils.main("cmd.dtt.columns");
 		var cm = [
-			{header:'业务流水号',dataIndex:'done_code',width:90,sortable:true,renderer:App.qtipValue},
-			{header:'机顶盒号',dataIndex:'stb_id',width:130,sortable:true,renderer:App.qtipValue},
-			{header:'智能卡号',dataIndex:'card_id',width:90,sortable:true,renderer:App.qtipValue},
-			{header:'控制字',dataIndex:'control_id',width:80,sortable:true},
-			{header:'节目名称',dataIndex:'prg_name',width:100,sortable:true,renderer:App.qtipValue},
-			{header:'指令类型',dataIndex:'cmd_type_text',width:80,sortable:true,renderer:App.qtipValue},
-			{header:'结果标记',dataIndex:'result_flag',width:100,sortable:true,renderer:App.qtipValue},
-			{header:'生成时间',dataIndex:'record_date',width:120,sortable:true,renderer:App.qtipValue},
-			{header:'发送时间',dataIndex:'send_date',width:120,sortable:true,renderer:App.qtipValue},
-			{header:'CA回传时间',dataIndex:'ret_date',width:120,sortable:true,renderer:App.qtipValue},
-			{header:'错误信息',dataIndex:'error_info',width:100,sortable:true,renderer:App.qtipValue},
-			{header:'授权结束日期',dataIndex:'auth_end_date',width:100,sortable:true,renderer:function(val){
+			{header:lc[0],dataIndex:'done_code',width:90,sortable:true,renderer:App.qtipValue},
+			{header:lc[1],dataIndex:'stb_id',width:130,sortable:true,renderer:App.qtipValue},
+			{header:lc[2],dataIndex:'card_id',width:90,sortable:true,renderer:App.qtipValue},
+			{header:lc[3],dataIndex:'control_id',width:80,sortable:true},
+			{header:lc[4],dataIndex:'prg_name',width:100,sortable:true,renderer:App.qtipValue},
+			{header:lc[5],dataIndex:'cmd_type_text',width:80,sortable:true,renderer:App.qtipValue},
+			{header:lc[6],dataIndex:'result_flag',width:100,sortable:true,renderer:App.qtipValue},
+			{header:lc[7],dataIndex:'record_date',width:120,sortable:true,renderer:App.qtipValue},
+			{header:lc[8],dataIndex:'send_date',width:120,sortable:true,renderer:App.qtipValue},
+			{header:lc[9],dataIndex:'ret_date',width:120,sortable:true,renderer:App.qtipValue},
+			{header:lc[10],dataIndex:'error_info',width:100,sortable:true,renderer:App.qtipValue},
+			{header:lc[11],dataIndex:'auth_end_date',width:100,sortable:true,renderer:function(val){
 				return Ext.isEmpty(val)?val:val.substr(0,4) +'-' + val.substr(4,2)+'-' + val.substr(6,2);
 			}}
 			
 		];
 		CaGrid.superclass.constructor.call(this,{
 			id:'caGridId',
-			title:'DTT指令信息',
+			title: langUtils.main("cmd.dtt._title"),
 			region:'center',
 			autoScroll:true,
 			ds:this.caStore,
@@ -87,21 +88,22 @@ var VodGrid = Ext.extend(Ext.grid.GridPanel,{
 			fields:['done_code','stb_id','card_id','modem_mac','is_success','transnum',
 				'error_info','send_time','cmd_type_text']
 		});
+		var lc = langUtils.main("cmd.ott.columns");
 		var cm = [
-			{header:'指令编号',dataIndex:'transnum',width:70,sortable:true},
-			{header:'业务流水号',dataIndex:'done_code',width:70,sortable:true,renderer:App.qtipValue},
-			{header:'指令类型',dataIndex:'cmd_type_text',width:80,sortable:true,renderer:App.qtipValue},
-			{header:'机顶盒号',dataIndex:'stb_id',width:130,sortable:true,renderer:App.qtipValue},
-//			{header:'智能卡号',dataIndex:'card_id',width:130,sortable:true,renderer:App.qtipValue},
-			{header:'MAC',dataIndex:'modem_mac',width:130,sortable:true,renderer:App.qtipValue},
-			{header:'是否成功',dataIndex:'is_success',width:65,sortable:true,renderer:this.showResult},
-			{header:'错误信息',dataIndex:'error_info',width:70,sortable:true,renderer:App.qtipValue},
-			{header:'发送时间',dataIndex:'send_time',width:120,sortable:true,renderer:App.qtipValue}
+			{header:lc[0],dataIndex:'transnum',width:70,sortable:true},
+			{header:lc[1],dataIndex:'done_code',width:70,sortable:true,renderer:App.qtipValue},
+			{header:lc[2],dataIndex:'cmd_type_text',width:80,sortable:true,renderer:App.qtipValue},
+			{header:lc[3],dataIndex:'stb_id',width:130,sortable:true,renderer:App.qtipValue},
+//			{header:lc[4],dataIndex:'card_id',width:130,sortable:true,renderer:App.qtipValue},
+			{header:lc[5],dataIndex:'modem_mac',width:130,sortable:true,renderer:App.qtipValue},
+			{header:lc[6],dataIndex:'is_success',width:65,sortable:true,renderer:this.showResult},
+			{header:lc[7],dataIndex:'error_info',width:70,sortable:true,renderer:App.qtipValue},
+			{header:lc[8],dataIndex:'send_time',width:120,sortable:true,renderer:App.qtipValue}
 		];
 		VodGrid.superclass.constructor.call(this,{
 			id:'vodGridId',
 			region:'center',
-			title:'OTT指令信息',
+			title: langUtils.main("cmd.ott._title"),
 			autoScroll:true,
 			ds:this.store,
 			columns:cm,
@@ -161,20 +163,21 @@ var BandGrid = Ext.extend(Ext.grid.GridPanel,{
 			fields:['done_code','stb_id','modem_mac','is_success','transnum',
 				'error_info','send_time','cmd_type_text']
 		});
+		var lc = langUtils.main("cmd.band.columns");
 		var cm = [
-			{header:'指令编号',dataIndex:'transnum',width:70,sortable:true},
-			{header:'业务流水号',dataIndex:'done_code',width:70,sortable:true,renderer:App.qtipValue},
-			{header:'指令类型',dataIndex:'cmd_type_text',width:80,sortable:true,renderer:App.qtipValue},
-//			{header:'机顶盒号',dataIndex:'stb_id',width:130,sortable:true,renderer:App.qtipValue},
-			{header:'Modem号',dataIndex:'modem_mac',width:130,sortable:true,renderer:App.qtipValue},
-			{header:'是否成功',dataIndex:'is_success',width:65,sortable:true,renderer:this.showResult},
-			{header:'错误信息',dataIndex:'error_info',width:70,sortable:true,renderer:App.qtipValue},
-			{header:'发送时间',dataIndex:'send_time',width:120,sortable:true,renderer:App.qtipValue}
+			{header:lc[0],dataIndex:'transnum',width:70,sortable:true},
+			{header:lc[1],dataIndex:'done_code',width:70,sortable:true,renderer:App.qtipValue},
+			{header:lc[2],dataIndex:'cmd_type_text',width:80,sortable:true,renderer:App.qtipValue},
+//			{header:lc[3],dataIndex:'stb_id',width:130,sortable:true,renderer:App.qtipValue},
+			{header:lc[4],dataIndex:'modem_mac',width:130,sortable:true,renderer:App.qtipValue},
+			{header:lc[5],dataIndex:'is_success',width:65,sortable:true,renderer:this.showResult},
+			{header:lc[6],dataIndex:'error_info',width:70,sortable:true,renderer:App.qtipValue},
+			{header:lc[7],dataIndex:'send_time',width:120,sortable:true,renderer:App.qtipValue}
 		];
 		BandGrid.superclass.constructor.call(this,{
 			id:'bandGridId',
 			region:'center',
-			title:'BAND指令信息',
+			title:langUtils.main("cmd.band._title"),
 			ds:this.bandStore,
 			autoScroll:true,
 			columns:cm,		

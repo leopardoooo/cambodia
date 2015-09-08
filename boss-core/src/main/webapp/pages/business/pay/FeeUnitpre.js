@@ -1,220 +1,33 @@
 /**
  * 预收费
  */
- /**
-  * 预收款
-  * @class FeeUnitprePanel
-  * @extends Ext.Panel
-  */
-FeeUnitprePanel = Ext.extend(Ext.Panel,{
-	parent : null,
-	constructor : function(p){
-		this.parent = p;
-		FeeUnitprePanel.superclass.constructor.call(this,{
-			id : 'FeeUnitprePanel',
-			border : false,
-			layout : 'form',
-			anchor : '100%',
-			labelWidth:95,
-			baseCls:'x-plain',
-			bodyStyle: "background:#F9F9F9",
-			defaults : {
-				width : 180
-			},
-			items : [{
-				xtype:'numberfield',
-				fieldLabel:'用户数',
-				allowNegative : false,
-				allowDecimals : false,
-				name:'generalContract.user_amount'
-			}
-			,{
-				xtype:'numberfield',
-				fieldLabel:'序列起始号',
-				allowNegative : false,
-				allowDecimals : false,
-				name:'credentialStartNo',
-				maxValue : 99999,
-				allowBlank:false,
-				listeners : {
-					scope : this,
-					change : this.parent.doNumChange
-				}
-			},{
-				xtype:'numberfield',
-				fieldLabel:'序列截止号',
-				allowNegative : false,
-				allowDecimals : false,
-				name:'credentialEndNo',
-				maxValue : 99999,
-				allowBlank:false,
-				listeners : {
-					scope : this,
-					change : this.parent.doNumChange
-				} 
-			},{
-				xtype:'numberfield',
-				fieldLabel:'每张凭据金额',
-				allowNegative : false,
-				name:'credentialAmount',
-				allowBlank:false,
-				listeners : {
-					scope : this,
-					change : this.parent.doNumChange
-				}  
-			},{
-				xtype:'displayfield',
-				fieldLabel:'赠送总金额',
-				name:'presentAmount',
-				allowBlank:false 
-			}]
-		})
-	}
-}) 
-
-/**
- * 打印项下拉框
- * @class PrintItemPanel
- * @extends Ext.form.CompositeField
- */
-PrintItemPanel = Ext.extend(Ext.form.CompositeField,{
-	win : null,
-	combo : null,
-	printitemStore : null,
-	constructor : function(printitem_id){
-		
-		this.printitemStore = new Ext.data.JsonStore({
-			baseParams : {printitemId : printitem_id},
-			url: Constant.ROOT_PATH+"/core/x/Pay!queryPrintitem.action",
-			fields : ['printitem_id','printitem_name']
-		});
-		
-		this.combo = new Ext.form.ComboBox({
-			store : this.printitemStore,
-			hiddenName : 'printitem_id',
-			displayField : 'printitem_name',
-			valueField : 'printitem_id',
-			triggerAction : 'all',
-			forceSelection : true,
-			mode : 'local'
-		});
-		
-		this.printitemStore.load();
-		
-		this.printitemStore.on('load',this.doLoadData,this);
-		
-		PrintItemPanel.superclass.constructor.call(this,{
-			combineErrors: false,
-			fieldLabel : '打印名称',
-			items : [this.combo,{
-				xtype : 'button',
-				text : '修改',
-				scope : this,
-				handler : this.doModify
-			}]
-		})
-	},
-	doLoadData : function(store){
-		if(store.getCount()>0){
-			this.combo.setValue(store.getAt(0).get('printitem_id'));
-		}
-	},
-	doModify : function(){
-		this.win = new Ext.Window({
-			height : 150,
-			width : 300,
-			title : '修改打印名称',
-			layout : 'fit',
-			closeAction : 'close',
-			items : [{
-				xtype : 'form',
-				layout : 'form',
-				bodyStyle : 'padding : 5px;padding-top : 10px;',
-				items : [{
-					xtype : 'hidden',
-					name : 'printitemId',
-					value : this.combo.getValue()+''
-				},{
-					xtype : 'textfield',
-					fieldLabel : '打印项名称',
-					allowBlank : false,
-					name : 'printitemName',
-					value : this.combo.getRawValue(),
-					listeners : {
-						scope : this,
-						specialkey : function(txt,e){
-							if(e.getKey() == 13){
-								this.doSave();
-							}
-						}
-					}
-				}]
-			}],
-			buttons : [{
-				text : '保存',
-				scope : this,
-				iconCls : 'icon-save',
-				handler : this.doSave
-			}, {
-				text : '关闭',
-				scope : this,
-				handler : function() {
-					this.win.close();
-				}
-			}]
-		}).show();
-	},
-	doSave : function(){
-		var form = this.win.items.itemAt(0);
-		if(!form.getForm().isValid()){
-			return;
-		};
-		
-		var all = form.getForm().getValues();
-		
-		Confirm('确定保存吗',this,function(){
-			mb = Show();//显示正在提交
-			
-			Ext.Ajax.request({
-				scope : this,
-				url: Constant.ROOT_PATH+"/core/x/Pay!eidtPrintitem.action",
-				params : all,
-				success : function(res,opt){
-					mb.hide();//隐藏提示框
-					mb = null;
-					var rs = Ext.decode(res.responseText);
-					if(true === rs.success){
-						Alert('操作成功!');
-						this.printitemStore.reload();
-						this.win.close();
-					}else{
-						Alert('操作失败');
-			 		}
-				}
-			})
-		});
-	}
-});
-
 var FeeUnitpreForm = Ext.extend(BaseForm,{
 	url:Constant.ROOT_PATH+"/core/x/Acct!saveGeneralContract.action",
 	constructor:function(){
 		
+		this.payTypeStore = new Ext.data.JsonStore({
+			url : Constant.ROOT_PATH+"/commons/x/QueryParam!queryPayType.action",
+			fields : ['pay_type','pay_type_name'],
+			autoLoad: true
+		});
+		
 		FeeUnitpreForm.superclass.constructor.call(this,{
 			id:'feeUnitpreFormId',
-			labelWidth:95,
 			border:false,
 			baseCls:'x-plain',
 			bodyStyle: Constant.FORM_STYLE,
-			defaults : {
-				width : 180
+			defaults: {
+				layout: 'form',
+				columnWidth: .5,
+				border: false,
+				labelWidth:100,
+				baseCls:'x-plain',
+				defaults:{
+					width:120
+				}
 			},
+			layout: 'column',
 			items:[{
-				xtype:'textfield',
-				fieldLabel:'客户名称',
-				name:'generalContract.cust_name',
-				allowBlank:false
-			},{
 				xtype : 'hidden',
 				id : 'feeType',
 				name : 'generalContract.fee_type'
@@ -223,136 +36,251 @@ var FeeUnitpreForm = Ext.extend(BaseForm,{
 				id : 'feeId',
 				name : 'generalContract.fee_id'
 			},{
-				xtype:'combo',
-				fieldLabel:'费用名称',
-				store : new Ext.data.JsonStore({
-					autoLoad : true,
-					url : Constant.ROOT_PATH+"/core/x/Acct!queryUnBusiFee.action",
-					fields : ['fee_name','fee_type','fee_id','printitem_id']
-				}),
-				displayField : 'fee_name',
-				valueField : 'fee_name',
-				allowBlank:false,
-				forceSelection : true
-				,listeners : {
-					scope : this,
-					select : this.doSelectFeeType
-				}
+				items:[{
+					xtype:'textfield',
+					fieldLabel:'客户名称',
+					name:'generalContract.cust_name',
+					allowBlank:false
+				},{
+					xtype:'textfield',
+					fieldLabel:'合同号',
+					vtype : 'alphanum',
+					name:'generalContract.contract_no',
+					allowBlank:false
+				},{
+					xtype:'numberfield',
+					fieldLabel:'合同金额',
+					minValue : 1,
+					id : 'nominalAmount',
+					name:'generalContract.nominal_amount',
+					allowBlank:false,
+					listeners : {
+						scope : this,
+						change : this.doNumChange
+					}  
+				}]
 			},{
-				xtype:'textfield',
-				fieldLabel:'合同号',
-				vtype : 'alphanum',
-				name:'generalContract.contract_no',
-				allowBlank:false
-			},{
-				xtype:'textfield',
-				fieldLabel:'合同名称',
-				name:'generalContract.contract_name',
-				allowBlank:false
-			},{
-				xtype:'numberfield',
-				fieldLabel:'合同金额',
-				minValue : 1,
-				id : 'nominalAmount',
-				name:'generalContract.nominal_amount',
-				allowBlank:false
-				,listeners : {
-					scope : this,
-					change : this.doNumChange
-				}  
-			},{
-				xtype:'combo',
-				fieldLabel:'所在区域',
-				store : new Ext.data.JsonStore({
-					autoLoad : true,
-					url : Constant.ROOT_PATH+"/commons/x/QueryParam!queryAddrDistrict.action",
-					fields : ['addr_id','addr_name']
-				}),
-				displayField : 'addr_name',
-				valueField : 'addr_id',
-				hiddenName:'generalContract.addr_district',
-				editable : true,
-				triggerAction : 'all',
-				allowBlank:false,
-				forceSelection : true
-				,listeners : {
-					scope : this,
-					select : function(combo){
-						Ext.getCmp('AddrCommunity').setDisabled(false);
-						Ext.getCmp('AddrCommunity').getStore().load({
-							params : {
-								addrPid : combo.getValue()
-							}
-						})
-					},
-					keyup:function(){
-						Ext.getCmp('AddrCommunity').reset();
-						Ext.getCmp('AddrCommunity').setDisabled(true);
+				items:[{
+					xtype:'combo',
+					fieldLabel:'费用名称',
+					store : new Ext.data.JsonStore({
+						autoLoad : true,
+						url : Constant.ROOT_PATH+"/core/x/Acct!queryUnBusiFee.action",
+						fields : ['fee_name','fee_type','fee_id','printitem_id']
+					}),
+					displayField : 'fee_name',
+					valueField : 'fee_name',
+					allowBlank:false,
+					forceSelection : true,
+					listeners:{
+						scope:this,
+						select: function(combo,record){
+							Ext.getCmp('feeId').setValue(record.get('fee_id'));
+							Ext.getCmp('feeType').setValue(record.get('fee_type'));
+						}
 					}
-				}
+				},{
+					xtype:'textfield',
+					fieldLabel:'合同名称',
+					name:'generalContract.contract_name',
+					allowBlank:false
+				},{
+					xtype:'combo',
+					fieldLabel:'所属城市',
+					store : new Ext.data.JsonStore({
+						autoLoad : true,
+						url : Constant.ROOT_PATH+"/commons/x/QueryParam!queryAddrDistrict.action",
+						fields : ['addr_id','addr_name']
+					}),
+					displayField : 'addr_name',
+					valueField : 'addr_id',
+					hiddenName:'generalContract.addr_district',
+					editable : false,
+					triggerAction : 'all',
+					allowBlank:false,
+					forceSelection : true
+				}]
+			},
+			{
+				columnWidth:1,
+				bodyStyle:'padding-top:10px;',
+				style:'background:none; border-right: 0px solid;border-top: 0px solid;border-left: 0px solid;border-bottom: #000000 1px solid;'
 			},{
-				id : 'AddrCommunity',
-				xtype:'combo',
-				fieldLabel:'所在小区',
-				store : new Ext.data.JsonStore({
-					url : Constant.ROOT_PATH+"/commons/x/QueryParam!queryAddrCommunity.action",
-					fields : ['addr_id','addr_name']
-				}),
-				disabled : true,
-				displayField : 'addr_name',
-				hiddenName:'generalContract.addr_community',
-				valueField : 'addr_id',
-				allowBlank:false,
-				editable : true,
-				triggerAction : 'all',
-				forceSelection : true
+				bodyStyle: 'padding-top:10px',
+				items:[{
+						xtype: 'displayfield',
+						style: Constant.MONEY_LABEL_STYLE,
+						fieldLabel: '总额USD',
+						value: '0.00',
+						id: 'labelDollor',
+						name: 'lblFee'
+					},{
+						xtype: 'displayfield',
+						fieldLabel: '柬埔寨KHR',
+						value: '0.00',
+						id: 'LabelJian'
+					},{
+						fieldLabel: '实收USD',
+						xtype: 'numberfield',
+						decimalPrecision: 0,
+						id: 'nfDollar',
+						name: 'pay.usd',
+						listeners: {
+							scope: this,
+							change: this.doCalcJianYuan
+						}
+					},{
+						fieldLabel: '实收KHR',
+						xtype: 'numberfield',
+						name: 'pay.khr',
+						decimalPrecision: 0,
+						id: 'nfJianYuan'
+					}]
+			},{
+				bodyStyle: 'padding-top:10px',
+				items:[{
+					xtype: 'displayfield',
+					fieldLabel: '当日汇率',
+					id: 'labelExchange'
+				},{
+					id:'pay_type_id',
+					fieldLabel: '缴费方式',
+					xtype: 'combo',
+					store : this.payTypeStore,
+					hiddenValue : 'pay_type',
+					valueField : 'pay_type',
+					displayField : "pay_type_name",					
+					allowBlank: false,
+					hiddenName: 'pay.pay_type',
+					triggerAction: 'all',
+					mode: 'local',
+					listeners: {
+						scope: this,
+						select: this.doChangePayType,
+						'expand': function(combo){
+							var store = combo.getStore();
+							store.filterBy(function(record){
+								return record.get('pay_type') == 'XJ';
+							})
+						}
+					}
+				},{
+					fieldLabel: '票据编号',
+					maxLength: 18,
+					disabled: true,
+					xtype: 'textfield',
+					name: 'pay.receipt_id'
+				},{
+					fieldLabel: '发票号',
+					maxLength: 18,
+					xtype: 'textfield',
+					name: 'pay.invoice_id',
+					listeners:{
+						scope: this,
+						change: this.checkInvoice
+					}
+					
+				},{
+					xtype: 'hidden',
+					id: 'hdExchange',
+					name: 'pay.exchange'
+				}]
 			}]
 		});
+		this.payTypeStore.on("load",function(){
+			Ext.getCmp('pay_type_id').setValue("XJ");		
+		},this);
+		this.loadBaseData();
 	},
-	doSelectFeeType : function(combo,rec){
-		this.remove(this.items.itemAt(9),true);
-		var feeType = rec.get('fee_type');
-		//如果是预收款
-		if(feeType == 'UNITPRE'){
-			this.add(new FeeUnitprePanel(this));
-		}else if(feeType == 'CONTRACT'){
-			this.add(new FeeUnitprePanel(this));
-		}else{
-			this.add(new PrintItemPanel(rec.get('printitem_id')));
-		}
-		Ext.getCmp('feeType').setValue(feeType);
-		Ext.getCmp('feeId').setValue(rec.get('fee_id'));
-		
-		this.doLayout();
-	},
-	doNumChange : function(){
-		if(this.find('name','credentialEndNo').length > 0){
-			var endCmp = this.find('name','credentialEndNo')[0];
-		
-			var startNo = this.find('name','credentialStartNo')[0].getValue();
-			var endNo = endCmp.getValue();
-			
-			//每张凭据金额
-			var amount = this.find('name','credentialAmount')[0].getValue();
-			//合同金额
-			var nominalAmount = Ext.getCmp('nominalAmount').getValue();
-			
-			if(endNo && startNo){
-				if(startNo > endNo){
-					Alert("凭据截止号不能小于凭据起始号")
-					endCmp.reset();
-				}else{
-					if(amount && nominalAmount){
-						//赠送总金额
-						var presentAmount = (endNo-startNo+1)*amount - nominalAmount;
-						var presentCmp = this.find('name','presentAmount')[0];
-						if(presentAmount < 0){
-							presentAmount = 0;
-						}
-						presentCmp.setValue(presentAmount);
-					}
-				}
+	exchangeRate: null,		//汇率
+	loadBaseData: function(){
+		// 请求后台的数据
+		Ext.Ajax.request({
+			scope: this,
+			url: Constant.ROOT_PATH + "/core/x/Pay!queryBaseFeeData.action",
+			params: {cust_id: App.getCustId()},
+			success: function(res, ops){
+				this.exchangeRate = Ext.decode(res.responseText);
+				Ext.getCmp("labelExchange").setValue("1USD=" + this.exchangeRate + "KHR");
+				Ext.getCmp("hdExchange").setValue(this.exchangeRate);
 			}
+		});
+	},
+	doNumChange : function(field, newValue, oldValue){
+		Ext.getCmp('nfDollar').setValue(newValue);
+		Ext.getCmp('nfJianYuan').setValue(0);
+		
+		Ext.getCmp("labelDollor").setValue(Ext.util.Format.usMoney(newValue));
+		Ext.getCmp("LabelJian").setValue(Ext.util.Format.usMoney(newValue * this.exchangeRate).substr(1));
+	},
+	doCalcJianYuan: function(field, newValue, oldValue){
+		var sumDollar = Ext.getCmp('nominalAmount').getValue();
+		var inputDollar = Ext.getCmp("nfDollar");
+		var inputJianYuan = Ext.getCmp("nfJianYuan");
+		var inputDollarValue = inputDollar.getValue() || 0;
+		var inputJianYuanValue = inputJianYuan.getValue();
+		// 规则，优先取美元，如果美元不足时自动生成柬埔寨瑞尔，如果超出，则瑞尔显示找零
+		if(inputDollarValue > sumDollar || inputDollarValue < sumDollar){
+			var v = (sumDollar - inputDollarValue) * this.exchangeRate;
+			// 做四舍五入
+			var modV = v % 100;
+			if(modV >= 50){
+				v = v - modV + 100;
+			}else{
+				v = v - modV;
+			}
+			inputJianYuan.setValue( v );
+		}else{
+			inputJianYuan.setValue( "0");
+		}
+	},
+	checkInvoice: function(txt){
+		Ext.Ajax.request({
+			url:Constant.ROOT_PATH + "/core/x/Pay!checkInvoice.action",
+			params:{
+				invoice_id:txt.getValue(),
+				doc_type:'2',
+				invoice_mode:"A"	
+			},
+			success:function(res,ops){
+				var rec = Ext.decode(res.responseText);
+				var invoiceCode = Ext.getCmp('new_invoice_code');
+				if(rec.length == 0){
+					Alert('该发票无法使用');
+				}else{
+					var data = [];
+					for(var i=0;i<rec.length;i++){
+						var obj = {};
+						obj['invoice_code'] = rec[i].invoice_code;
+						obj['invoice_book_id'] = rec[i].invoice_book_id;
+						obj['invoice_type'] = rec[i].invoice_type;
+						obj['invoice_type_text'] = rec[i].invoice_type_text
+						data.push(obj);
+					}
+					invoiceCode.setValue('');
+					invoiceCode.getStore().loadData(data);
+				}
+			},
+			clearData:function(){
+				txt.setValue("");
+				var invoiceCode = Ext.getCmp('new_invoice_code');
+				invoiceCode.setValue('');
+				invoiceCode.getStore().removeAll();
+			}
+		});
+	},
+	doChangePayType: function(cb, record, index){
+		var b = false;
+		var receiptId = this.find("name", "pay.receipt_id")[0];
+		var noreceopttype = 'XJ,SHIFT,PRESENT';
+		if (noreceopttype.indexOf(record.get('pay_type'))>-1 ) {
+			b = true;
+			receiptId.clearInvalid();
+		}
+		receiptId.setDisabled(b);
+		receiptId.allowBlank = b;
+		if (!b) {
+			receiptId.focus();
 		}
 	},
 	getValues:function(){
@@ -366,6 +294,9 @@ var FeeUnitpreForm = Ext.extend(BaseForm,{
 		if(endCmp && !endCmp.getValue()){
 			values['credentialEndNo'] = 0;
 		}
+		values["pay.khr"] = values["pay.khr"] * 100;
+		values["pay.usd"] = values["pay.usd"] * 100;
+		console.log(values);
 		return values;
 	},
 	getFee : function(){

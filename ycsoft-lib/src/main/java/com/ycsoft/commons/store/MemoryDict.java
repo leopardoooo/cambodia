@@ -8,23 +8,44 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.beanutils.BeanUtils;
+
+import com.ycsoft.beans.system.SDataTranslation;
 import com.ycsoft.beans.system.SItemvalue;
+import com.ycsoft.business.commons.pojo.Parameter;
 import com.ycsoft.commons.constants.DictKey;
 import com.ycsoft.commons.helper.LoggerHelper;
 import com.ycsoft.commons.helper.StringHelper;
+import static com.ycsoft.commons.constants.SystemConstants.LANGUAGE_ZH;
+import static com.ycsoft.commons.constants.SystemConstants.LANGUAGE_EN;
+import static com.ycsoft.commons.constants.SystemConstants.LANGUAGE_KH;
 
 /**
  * @author <a href="mailto:nbljq99@163.com">Liujiaqi</a>
  *
  */
 public class MemoryDict {
+	private static ThreadLocal<String> langThreadLocal = new ThreadLocal<String>();
+	
 	// 字典
 	private static Map<String, Map<String, SItemvalue>> dictMap = new HashMap<String,Map<String,SItemvalue>>();
 
 	private static List<SItemvalue> datalist = new ArrayList<SItemvalue>();
+	
+	private static Map<String, SDataTranslation> transMap = new HashMap<String, SDataTranslation>();
+
+	private static List<SDataTranslation> transList = new ArrayList<SDataTranslation>();
 
 	private static boolean loadingData = false;
-
+	
+	public static void setLang(String lang){
+		langThreadLocal.set(lang);
+	}
+	
+	public static String getLang(){
+		return langThreadLocal.get();
+	}
+	
 	/**
 	 * 获取字典表name项
 	 *
@@ -41,7 +62,41 @@ public class MemoryDict {
 		SItemvalue s = m.get(value);
 		if (s == null)
 			return "";
-		return s.getItem_name();
+		
+		return getTransData(s.getItem_name());
+	}
+	
+	private static String getLanguageData(SDataTranslation dataTrans){
+		if(LANGUAGE_EN.equals( getLang() ) && StringHelper.isNotEmpty(dataTrans.getData_en())){
+			return dataTrans.getData_en();
+		}else if(LANGUAGE_KH.equals( getLang() ) && StringHelper.isNotEmpty(dataTrans.getData_kh())){
+			return dataTrans.getData_kh();
+		}
+		return dataTrans.getData_cn();
+	}
+	
+	public static String getTransData(String dataCn) {
+		if(StringHelper.isEmpty(dataCn)) return "";
+		SDataTranslation dataTrans = getTransMap().get(dataCn);
+		if(dataTrans == null) return dataCn;
+		
+		return getLanguageData(dataTrans);
+	}
+	
+	private static SItemvalue createItemvalue(SItemvalue s){
+		SItemvalue itemvalue = new SItemvalue();
+		itemvalue.setItem_desc(s.getItem_desc());
+		itemvalue.setItem_idx(s.getItem_idx());
+		itemvalue.setItem_key(s.getItem_key());
+		itemvalue.setItem_name(s.getItem_name());
+		itemvalue.setItem_value(s.getItem_value());
+		itemvalue.setShow_county_id(s.getShow_county_id());
+		return itemvalue;
+	}
+	
+	@Override
+	public void finalize() {
+		langThreadLocal.remove();
 	}
 
 	/**
@@ -59,6 +114,9 @@ public class MemoryDict {
 		SItemvalue s = m.get(value);
 		if (s == null)
 			return null;
+		
+		SItemvalue itemvalue = createItemvalue(s);
+		itemvalue.setItem_name( getTransData(s.getItem_name()) );
 		return s;
 	}
 
@@ -72,7 +130,14 @@ public class MemoryDict {
 		Map<String, SItemvalue> m = getDictMap().get(keyname.toString());
 
 		if (m != null){
-			List<SItemvalue> list = new ArrayList<SItemvalue>(m.values());
+			List<SItemvalue> list = new ArrayList<SItemvalue>();
+			for(String key : m.keySet()){
+				SItemvalue s = m.get(key);
+				
+				SItemvalue itemvalue = createItemvalue(s);
+				itemvalue.setItem_name( getTransData(s.getItem_name()) );
+				list.add(itemvalue);
+			}
 			Collections.sort(list, new Comparator<SItemvalue>() {
 				public int compare(final SItemvalue c1, final SItemvalue c2) {
 					if (c1.getItem_idx() != null && c2.getItem_idx() != null){
@@ -99,6 +164,7 @@ public class MemoryDict {
 			synchronized (MemoryDict.class) {
 				if (loadingData) {
 					Map<String, Map<String, SItemvalue>> tempmap = new HashMap<String, Map<String, SItemvalue>>();
+					Map<String, SDataTranslation> transTempMap = new HashMap<String, SDataTranslation>();
 					try {
 						for (SItemvalue itemvalue : datalist) {
 							String key = itemvalue.getItem_key();
@@ -110,6 +176,17 @@ public class MemoryDict {
 							dicts.put(itemvalue.getItem_value(), itemvalue);
 						}
 						dictMap = tempmap;
+						
+						for (SDataTranslation trans : transList) {
+							String key = trans.getData_cn();
+							SDataTranslation dataTrans = transTempMap.get(key);
+							if (dataTrans == null) {
+								dataTrans = new SDataTranslation();
+								transTempMap.put(key, dataTrans);
+							}
+							BeanUtils.copyProperties(dataTrans, trans);
+						}
+						transMap = transTempMap;
 					} catch (Exception e) {
 						LoggerHelper.error(MemoryDict.class, "字典装载异常");
 					} finally{
@@ -131,8 +208,9 @@ public class MemoryDict {
 	 * @param adddatalist
 	 *            新添加的数据
 	 */
-	public static void setupData(List<SItemvalue> datalist) {
+	public static void setupData(List<SItemvalue> datalist, List<SDataTranslation> transList) {
 		MemoryDict.datalist = datalist;
+		MemoryDict.transList = transList;
 		reLoadData();
 	}
 
@@ -194,6 +272,11 @@ public class MemoryDict {
 	public static Map<String, Map<String, SItemvalue>> getDictMap() {
 		loadData();
 		return dictMap;
+	}
+	
+	public static Map<String, SDataTranslation> getTransMap() {
+		loadData();
+		return transMap;
 	}
 }
 

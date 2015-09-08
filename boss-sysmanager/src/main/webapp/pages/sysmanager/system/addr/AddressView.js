@@ -50,7 +50,7 @@ SearchField = Ext.extend(Ext.form.TwinTriggerField, {
     
     onTrigger2Click: function() {
     	if(/.*\u0027.*/gi.test(this.getRawValue())){
-        	Alert('请不要输入单引号');
+        	Alert(langUtils.sys('AddressNodeManage.msg.noSingleQuoteAllowed'));
 			return;
         }
         if (this.getRawValue() != '') {
@@ -123,12 +123,12 @@ AddressTree = Ext.extend(Ext.ux.tree.TreeGridEditor,{
 	        enableHdMenu:true,
 	        rootNodeId: 'tge-root',
 	        // 超出最大深度，提示信息
-    		maxDepthText: '不能再往下添加',
+    		maxDepthText:langUtils.sys('AddressNodeManage.msg.maxDepthText') ,
 	        mouseoverShowObar: true,// mouseover事件触发显示Obar
 	        singleEdit: true,// 只允许同时编辑一条记录
 	        // 显示列
 	        columns: [{
-	            header: '地址树',
+	            header: langUtils.sys('AddressNodeManage.formWin.labelAddrTree'),
 	            dataIndex: 'text',
 //	            autoWidth: true,
 	            width:150,
@@ -137,12 +137,13 @@ AddressTree = Ext.extend(Ext.ux.tree.TreeGridEditor,{
 	        // 设置Obar
 	        obarCfg: {
 	            column: {
-	                header: '操作',
+	                header: langUtils.sys('common.doActionBtn'),
 	                dataIndex: 'id',
 	                width: 500
 	            },
 	            btns: [{
 	                id: 'add',
+	                text:langUtils.sys('AddressNodeManage.formWin.labelNewAddChild'),
 	                deepestState: 'uncreated',
 	                handler : function(n){
 	                	new AddressWin('add',n).show();
@@ -150,17 +151,13 @@ AddressTree = Ext.extend(Ext.ux.tree.TreeGridEditor,{
 	            },{
 	                id: 'leveladd',
 	                deepestState: 'uncreated',
+	                text:langUtils.sys('AddressNodeManage.formWin.labelNewAddBrother'),
 	                handler : function(n){
 	                	new AddressWin('leveladd',n).show();
 	                }
-	            }/*,{
-	                id: 'batchAdd',
-	                deepestState: 'uncreated',
-	                handler : function(n){
-	                	new AddressWin('batchAdd',n).show();
-	                }
-	            }*/,{
+	            },{
 	                id: 'edit',
+	                text:langUtils.sys('common.enableBtn'),
 	                handler : function(n){
 	                	new AddressWin('edit',n).show();
 	                }
@@ -171,17 +168,19 @@ AddressTree = Ext.extend(Ext.ux.tree.TreeGridEditor,{
 	                validator: this.checkRemove
 	            }*/, {
 	                id: 'statusActive',
+	                text:langUtils.sys('common.enableBtn'),
 	                handler : this.doStatusActive
 	            }, {
 	                id: 'statusInvalid',
+	                text:langUtils.sys('common.forbiddenBtn') ,
 	                handler : this.doStatusInvalid,
 	                validator: this.checkRemove
 	            }]
 	        }
 	        ,tbar: [' ',{
 	            xtype: 'searchfield',
-	            emptyText : '支持模糊查询',
-	            triggerTips: ['查询', '取消'],
+	            emptyText : langUtils.sys('AddressNodeManage.formWin.emptyTxtBlurQuery'),
+	            triggerTips: [langUtils.sys('common.cancelBtn'), langUtils.sys('common.cancelBtn')],
 	            listeners: {
 	            	scope : this,
 	                search: function(text) {
@@ -260,13 +259,13 @@ AddressTree = Ext.extend(Ext.ux.tree.TreeGridEditor,{
 	},
 	checkRemove : function(n){
 		if (!n.leaf) {
-            Alert('存在子级别,无法禁用!');
+            Alert(langUtils.sys('AddressNodeManage.msg.cantBeInvalided'));
             return false;
         }
         return true;
 	},
 	doDelete : function(n){
-		Confirm("确定要删除该数据吗?", this ,function(){
+		Confirm(langUtils.sys('AddressNodeManage.msg.confirmDelete'), this ,function(){
 			Ext.Ajax.request({
 				scope : this,
 				url : root + '/system/Address!deleteAddress.action',
@@ -276,13 +275,13 @@ AddressTree = Ext.extend(Ext.ux.tree.TreeGridEditor,{
 				success : function(res,opt){
 					var rs = Ext.decode(res.responseText);
 					if(rs.simpleObj === false){
-						Alert('还有客户在使用，暂不能删除。');
+						Alert(langUtils.sys('AddressNodeManage.msg.cantDelete'));
 					}else{
 						if(true === rs.success){
-							Alert('操作成功!');
+							Alert(langUtils.sys('AddressNodeManage.msg.actionSuccess'));
 							n.remove();
 						}else{
-							Alert('操作失败');
+							Alert(langUtils.sys('AddressNodeManage.msg.actionFailed'));
 				 		}
 					}
 				}
@@ -290,7 +289,7 @@ AddressTree = Ext.extend(Ext.ux.tree.TreeGridEditor,{
 		});
 	},
 	doStatusActive: function(node){
-		Confirm("确定要激活吗?", Ext.getCmp('AddressTree') ,function(){
+		Confirm(langUtils.sys('AddressNodeManage.msg.confirmActivate'), Ext.getCmp('AddressTree') ,function(){
 			Ext.Ajax.request({
 				scope : this,
 				url : root + '/system/Address!updateAddressStatus.action',
@@ -301,7 +300,7 @@ AddressTree = Ext.extend(Ext.ux.tree.TreeGridEditor,{
 				success : function(res,opt){
 					var res = Ext.decode(res.responseText);
 					if(res === true){
-						Alert('操作成功!');
+						Alert(langUtils.sys('AddressNodeManage.msg.actionSuccess'));
 						node.parentNode.attributes.is_refresh = false;
 						node.parentNode.reload();
 					}
@@ -310,7 +309,7 @@ AddressTree = Ext.extend(Ext.ux.tree.TreeGridEditor,{
 		});
 	},
 	doStatusInvalid: function(node){
-		Confirm("确定要禁用吗?", Ext.getCmp('AddressTree') ,function(){
+		Confirm(langUtils.sys('AddressNodeManage.msg.confirmInvalid'), Ext.getCmp('AddressTree') ,function(){
 			Ext.Ajax.request({
 				scope : this,
 				url : root + '/system/Address!updateAddressStatus.action',
@@ -321,7 +320,7 @@ AddressTree = Ext.extend(Ext.ux.tree.TreeGridEditor,{
 				success : function(res,opt){
 					var res = Ext.decode(res.responseText);
 					if(res === true){
-						Alert('操作成功!');
+						Alert(langUtils.sys('AddressNodeManage.msg.actionSuccess'));
 						node.parentNode.attributes.is_refresh = false;
 						node.parentNode.reload();
 					}
@@ -400,60 +399,56 @@ AddressWin = Ext.extend(Ext.Window,{
 				xtype : 'displayfield',
 				id : 'parentName',
 				name : 'parent_name',
-				fieldLabel : '上级名称'
+				fieldLabel : langUtils.sys('AddressNodeManage.formWin.labelParentName')
 			},{
 				xtype : 'textfield',
 				id : 'addrName',
 				name : 'addr_name',
 				allowBlank : false,
 				width:250,
-				fieldLabel : '显示名称'
+				fieldLabel : langUtils.sys('AddressNodeManage.formWin.labelShowName')
 			}]
 		});
 		
 		var width = 400;
 		//操作节点
 		this.node = node;
-		var fieldLabel = '显示名称';
+		var fieldLabel = langUtils.sys('AddressNodeManage.formWin.labelShowName');
 		this.level = parseFloat(node.attributes.others.tree_level);
 		if(this.type == 'add'){
 			if(this.level == 1){
-				this.title = "新增街道";
-				fieldLabel = "街道名称";
+				this.title = langUtils.sys('AddressNodeManage.formWin.titleNewSaveLevelStreet');
+				fieldLabel =langUtils.sys('AddressNodeManage.formWin.labelStreatName');
 			}else{
-				this.title = '新增路号';
-				fieldLabel = "路号名称";
+				this.title = langUtils.sys('AddressNodeManage.formWin.titleNewSaveLevelRoadNum');
+				fieldLabel =langUtils.sys('AddressNodeManage.formWin.labelRoadNum');
 			}
 			Ext.getCmp('treeLevel').setValue(this.level+1);
 			Ext.getCmp('areaId').setValue(node.attributes.others.area_id);
 			Ext.getCmp('countyId').setValue(node.attributes.others.county_id);
 		}else if(this.type == 'edit'){
 			if(this.level == 1){
-				this.title = '修改城市';
-				fieldLabel ="城市名称";
+				this.title = langUtils.sys('AddressNodeManage.formWin.titleNewSaveLevelCity');
+				fieldLabel = langUtils.sys('AddressNodeManage.formWin.labelCityName');
 			}else if(this.level == 2){
-				this.title = '修改街道';
-				fieldLabel ="街道名称";
+				this.title = langUtils.sys('AddressNodeManage.formWin.titleNewSaveLevelStreet');
+				fieldLabel =langUtils.sys('AddressNodeManage.formWin.labelStreatName');
 			}else if(this.level == 3){
-				this.title = '修改路号';
-				fieldLabel ="路号名称";
+				this.title = langUtils.sys('AddressNodeManage.formWin.titleNewSaveLevelRoadNum');
+				fieldLabel =langUtils.sys('AddressNodeManage.formWin.labelRoadNum');
 			}
 			Ext.getCmp('addrName').setValue(node.text);
 			Ext.getCmp('treeLevel').setValue(this.level);
-		}else if(this.type == 'batchAdd'){
-			this.title = '批量添加地区';
-			this.item = new BatchAddGrid(this.node);
-			width = 500;
 		}else if(this.type == 'leveladd'){
 			if(this.level == 1){
-				this.title = '平级新增城市';
-				fieldLabel ="城市名称";
+				this.title = langUtils.sys('AddressNodeManage.formWin.titleNewSaveLevelCity');
+				fieldLabel = langUtils.sys('AddressNodeManage.formWin.labelCityName');
 			}else if(this.level == 2){
-				this.title = '平级新增街道';
-				fieldLabel ="街道名称";
+				this.title = langUtils.sys('AddressNodeManage.formWin.titleNewSaveLevelStreet');
+				fieldLabel =langUtils.sys('AddressNodeManage.formWin.labelStreatName');
 			}else{
-				this.title = '平级新增路号';
-				fieldLabel ="路号名称";
+				this.title = langUtils.sys('AddressNodeManage.formWin.titleNewSaveLevelRoadNum');
+				fieldLabel =langUtils.sys('AddressNodeManage.formWin.labelRoadNum');
 			}
 			Ext.getCmp('treeLevel').setValue(this.level);
 			Ext.getCmp('areaId').setValue(node.attributes.others.area_id);
@@ -471,12 +466,12 @@ AddressWin = Ext.extend(Ext.Window,{
 			closeAction : 'close',
 			items : [this.itemForm],
 			buttons : [{
-				text : '保存',
+				text : langUtils.sys('AddressNodeManage.formWin.btnTxtSave'),
 				scope : this,
 				iconCls : 'icon-save',
 				handler : this.doSave
 			}, {
-				text : '关闭',
+				text : langUtils.sys('AddressNodeManage.formWin.btnTxtClose'),
 				scope : this,
 				handler : function() {
 					this.close();
@@ -497,7 +492,7 @@ AddressWin = Ext.extend(Ext.Window,{
 					fields:['item_value','item_name']
 				}),displayField:'item_name',valueField:'item_value',
 				triggerAction:'all',mode:'local',
-				fieldLabel : '网络类型'
+				fieldLabel : langUtils.sys('AddressNodeManage.formWin.labelNetType')
 			});
 			
 			App.form.initComboData(this.itemForm.findByType("lovcombo"), function(){
@@ -520,7 +515,7 @@ AddressWin = Ext.extend(Ext.Window,{
 				allowBlank : false,
 				minChars:2,
 				height: 22,
-				fieldLabel : '行政区域',
+				fieldLabel : langUtils.sys('AddressNodeManage.formWin.labelDistrict'),
 				treeUrl: root + '/system/Address!queryDistrictByPid.action',
 				treeParams : {addrId:provinceId},
 				hiddenName:'addrId',
@@ -545,14 +540,14 @@ AddressWin = Ext.extend(Ext.Window,{
 			this.itemForm.add({
 				xtype:'combo',
 				id : 'provinceId',
-				fieldLabel : '省',
+				fieldLabel : langUtils.sys('AddressNodeManage.formWin.labelProvince'),
 				forceSelection : true,
 				store : this.provinceStore,
 				triggerAction : 'all',
 				mode: 'local',
 				displayField : 'name',
 				valueField : 'id',
-				emptyText: '请选择省',
+				emptyText: langUtils.sys('AddressNodeManage.formWin.emptyTxtProvince'),
 				editable : false
 			});
 					
@@ -570,7 +565,7 @@ AddressWin = Ext.extend(Ext.Window,{
 				xtype : 'numberfield',
 				id : 'sortNum',
 				name : 'sort_num',
-				fieldLabel : '序号'
+				fieldLabel : langUtils.sys('AddressNodeManage.formWin.labelSortNum')
 			});
 			Ext.getCmp('sortNum').setValue(this.node.attributes.others.sort_num);
 		}
@@ -586,7 +581,7 @@ AddressWin = Ext.extend(Ext.Window,{
 	doSave : function(){
 		//添加和修改
 		if(this.itemForm.getForm().isValid()){
-			Confirm("确定保存吗?", this ,function(){
+			Confirm(langUtils.sys('AddressNodeManage.msg.confirmSave'), this ,function(){
 				mb = Show();//显示正在提交
 				var params = {};
 				
@@ -638,7 +633,7 @@ AddressWin = Ext.extend(Ext.Window,{
 						mb = null;
 						var rs = Ext.decode(res.responseText);
 						if(true === rs.success){
-							Alert('操作成功!');
+							Alert(langUtils.sys('AddressNodeManage.msg.actionSuccess'));
 							if(this.type == 'add'){
 								this.node.attributes.is_refresh = false;
 								this.node.reload();
@@ -649,7 +644,7 @@ AddressWin = Ext.extend(Ext.Window,{
 
 							this.close();
 						}else{
-							Alert('操作失败');
+							Alert(langUtils.sys('AddressNodeManage.msg.actionFailed'));
 				 		}
 					}
 				})
@@ -664,7 +659,7 @@ AddressView = Ext.extend(Ext.Panel,{
 		AddressView.superclass.constructor.call(this,{
 			id : 'AddressView',
 			layout : 'fit',
-			title : '地址管理',
+			title : langUtils.sys('AddressNodeManage.panelTitle'),
 			closable: true,
 			border : false ,
 			baseCls: "x-plain",

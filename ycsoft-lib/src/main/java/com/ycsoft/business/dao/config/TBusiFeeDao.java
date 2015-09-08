@@ -136,8 +136,8 @@ public class TBusiFeeDao extends BaseEntityDao<TBusiFee> {
 	 * @return
 	 * @throws JDBCException 
 	 */
-	public List<TBusiFee> queryUnBusiFee(String dataType) throws JDBCException {
-		String sql = "select * from t_busi_fee  t where "+dataType;
+	public List<TBusiFee> queryUnBusiFee() throws JDBCException {
+		String sql = "select * from t_busi_fee  t where t.fee_type!='DEVICE'";
 		return createQuery(TBusiFee.class, sql).list();
 	}
 }

@@ -492,14 +492,14 @@ public class AddressComponent extends BaseComponent {
 					throw new ComponentException(ErrorCode.DeptAddrIsNull,dept.getDept_name());
 				}
 				//tAddressDao.queryAddrByAllowPids(levelId, addrPid)
-//				String[] pids={SystemConstants.ADDRESS_ROOT_ID};
-//				addrIds= CollectionHelper.converValueToArray(tAddressDao.queryAllAddrByPids(SystemConstants.ADDR_TREE_LEVEL_ONE,pids),"addr_id");
+				String[] pids={SystemConstants.ADDRESS_ROOT_ID};
+				addrIds= CollectionHelper.converValueToArray(tAddressDao.queryAllAddrByPids(SystemConstants.ADDR_TREE_LEVEL_ONE,pids),"addr_id");
 			}
 			if(StringHelper.isEmpty(name)){
-				list = tAddressDao.queryAllAddrByIds(addrIds);
+				list = tAddressDao.queryAllAddrByIds(null);
 			}else{
 				name = name.toLowerCase();
-				
+				name = name.replaceAll(" ", "");
 				list=tAddressDao.queryAddrSysTreeByLvOneAndName(addrIds,name);
 				
 			}

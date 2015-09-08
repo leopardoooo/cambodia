@@ -85,7 +85,7 @@ public class SimpleComponent extends BaseBusiComponent {
 			
 		}
 		name = name.toLowerCase();
-		
+		name = name.replaceAll(" ", "");
 		List<TAddressDto> list=tAddressDao.queryAddrTreeByLvOneAndName(addrIds,name);
 		
 		if(list.size()>2000){

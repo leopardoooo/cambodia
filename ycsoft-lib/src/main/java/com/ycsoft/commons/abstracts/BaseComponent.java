@@ -1,4 +1,3 @@
-
 package com.ycsoft.commons.abstracts;
 
 import java.util.ArrayList;
@@ -23,6 +22,7 @@ import com.ycsoft.business.dao.core.common.CDoneCodeDao;
 import com.ycsoft.business.dao.core.job.JDataSyncDao;
 import com.ycsoft.business.dao.core.user.CUserDao;
 import com.ycsoft.business.dao.system.SDataRightTypeDao;
+import com.ycsoft.business.dao.system.SDataTranslationDao;
 import com.ycsoft.business.dao.system.SItemvalueDao;
 import com.ycsoft.business.dao.system.SLogDao;
 import com.ycsoft.business.dao.system.SOptrDao;
@@ -48,6 +48,7 @@ import com.ycsoft.daos.core.JDBCException;
  * @date Dec 30, 2009 10:10:56 AM
  */
 public abstract class BaseComponent{
+
 	@Autowired
 	protected SRoleDao sRoleDao;
 	@Autowired
@@ -68,6 +69,9 @@ public abstract class BaseComponent{
 	protected WLogDao wLogDao;
 	@Autowired
 	private CUserDao cUserDao;
+	@Autowired
+	protected SDataTranslationDao sDataTranslationDao;
+	
 	/**
 	 * 获得一个用户的所有授权资源时间
 	 * Map<res_id,exp_date>
@@ -271,12 +275,11 @@ public abstract class BaseComponent{
 	
 	protected int getLogDonecode() throws Exception{
 		return Integer.parseInt(sLogDao.findSequence(SequenceConstants.SEQ_LOG_DONE_CODE).toString());
-	}
-
-
-	public SSysChangeDao getSSysChangeDao() {
+	}	
+	
+	public SSysChangeDao getSSysChangeDao(){
 		return sSysChangeDao;
 	}
-
 	
+	//public 
 }

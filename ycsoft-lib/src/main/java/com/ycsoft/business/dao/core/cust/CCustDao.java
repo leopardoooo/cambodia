@@ -212,6 +212,9 @@ public class CCustDao extends BaseEntityDao<CCust> {
 		if(StringHelper.isNotEmpty(cust.getStatus())){
 			sql = append(sql," and t1.status = '" + cust.getStatus() + "'");
 		}
+		if(StringHelper.isNotEmpty(cust.getLogin_name())){
+			sql = append(sql, " and t1.cust_id in (select cust_id from c_user where login_name='"+cust.getLogin_name()+"')");
+		}
 		sql += " and "+dataType;
 		Pager<CCust> resultPager = createQuery(sql, countyId).setStart(start).setLimit(limit).page();
 		
@@ -232,6 +235,9 @@ public class CCustDao extends BaseEntityDao<CCust> {
 			}
 			if(StringHelper.isNotEmpty(cust.getStatus())){
 				sql = append(sql," and t1.status = '" + cust.getStatus() + "'");
+			}
+			if(StringHelper.isNotEmpty(cust.getLogin_name())){
+				sql = append(sql, " and t1.cust_id in (select cust_id from c_user_his where login_name='"+cust.getLogin_name()+"')");
 			}
 			sql += " and "+dataType;
 			resultPager = createQuery(sql, countyId).setStart(start).setLimit(limit).page();

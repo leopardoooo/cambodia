@@ -34,6 +34,7 @@ import com.ycsoft.business.dto.core.acct.GeneralContractDto;
 import com.ycsoft.business.dto.core.acct.PayDto;
 import com.ycsoft.business.dto.core.acct.QueryAcctitemThresholdDto;
 import com.ycsoft.business.dto.core.acct.UnitPayDto;
+import com.ycsoft.business.dto.core.fee.CFeePayDto;
 import com.ycsoft.business.dto.core.prod.PromFeeProdDto;
 import com.ycsoft.daos.core.JDBCException;
 import com.ycsoft.daos.core.Pager;
@@ -338,7 +339,7 @@ public interface IAcctService extends IBaseService{
 	 * @param presentAmount 
 	 * @throws Exception 
 	 */
-	public void saveGeneralContract(CGeneralContract generalContract,SOptr optr, Integer credentialStartNo, Integer credentialEndNo, Integer credentialAmount, Integer presentAmount) throws Exception;
+	public void saveGeneralContract(CGeneralContract generalContract, CFeePayDto pay,SOptr optr, Integer credentialStartNo, Integer credentialEndNo, Integer credentialAmount, Integer presentAmount) throws Exception;
 
 	/**
 	 * 查询预收款或工程款

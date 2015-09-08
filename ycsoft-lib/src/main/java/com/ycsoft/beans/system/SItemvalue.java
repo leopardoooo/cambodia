@@ -30,7 +30,7 @@ public class SItemvalue extends SItemDefine implements Serializable {
 	private String show_county_id;
 	
 	private String show_county_text;
-
+	
 	/**
 	 * default empty constructor
 	 */
@@ -102,5 +102,5 @@ public class SItemvalue extends SItemDefine implements Serializable {
 	public String getShow_county_text() {
 		return show_county_text;
 	}
-
+	
 }

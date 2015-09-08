@@ -288,49 +288,21 @@ SearchCustWindow = Ext.extend( Ext.Window , {
 			},
 			items : [{
 				fieldLabel : '客户名称',
-				allowBlank : false,
-				emptyText :'支持模糊搜索',
 				width : 140,
 				name : 'cust.cust_name'
 			},{
-				fieldLabel : '客户状态',
-				allowBlank : true,
+				fieldLabel : '意向客户',
 				name:'cust.status',
-				displayField:'df',
-				valueField:'vf',
-				xtype:'combo',
-				store:new Ext.data.JsonStore({
-					fields:['vf','df'],
-					data:[{vf:'',df:'不限'},{vf:'ACTIVE',df:'正常'},{vf:'LOGOFF',df:'销户'},{vf:'DATACLOSE',df:'资料隔离'},{vf:'INVALID',df:'失效'},{vf:'RELOCATE',df:'拆迁'},{vf:'PREOPEN',df:'预开户'}]
-				}),
-				width : 140
-			},{
-		    	xtype : 'treecombo',
-		    	width:140,
-		    	id : 'addrIdForSearch',
-				treeWidth:400,
-				minChars:2,
-				height: 22,
-				fieldLabel : '小区',
-				emptyText :'请输入两个字进行搜索',
-				blankText:'请选择客户地址',
-				treeUrl: Constant.ROOT_PATH+"/commons/x/QueryParam!queryAddrTree.action",
-				hiddenName:'cust.addr_id'
+				xtype:'checkbox',
+				inputValue:'PREOPEN'
 			},{
 				fieldLabel : '客户地址',
 				width : 140,
-				id : 'addressForSearch',
-				name : 'cust.address',
-				listeners : {
-					scope : this,
-					'specialkey' : function(field ,e){
-						if(13 == e.getKey()){
-							if(field.getValue()){
-								this.doSearch();
-							}
-						}
-					}
-				}
+				name : 'cust.address'
+			},{
+				fieldLabel : '账号',
+				width : 140,
+				name : 'cust.login_name'
 			}]
 		});
 		
@@ -361,17 +333,15 @@ SearchCustWindow = Ext.extend( Ext.Window , {
 		if(!this.form.getForm().isValid()){
 			return;
 		}
-		if((Ext.getCmp('addrIdForSearch').getValue() || Ext.getCmp('addressForSearch').getValue())){
-			var all = this.form.getForm().getValues();
+		var all = this.form.getForm().getValues();
+		if(Ext.isEmpty(all['cust.cust_name']) && Ext.isEmpty(all['cust.address']) && Ext.isEmpty(all['cust.login_name']) && Ext.isEmpty(all['cust.status'])){
+			Alert('请任填一项进行搜索!')
+		}else{
 			all['search_type'] = 'MULTIPLE';
-			all['cust.status']=this.form.getForm().findField('cust.status').getValue();
 			this.searchStore.baseParams = all;
 			this.searchStore.load({
 				params: { start:0, limit: CUST_PAGE_SIZE }
 			});
-			
-		}else{
-			Alert('地址和小区请任填一项')
 		}
 	}
 })

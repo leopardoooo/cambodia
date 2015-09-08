@@ -297,7 +297,7 @@ public class TAddressDao extends BaseEntityDao<TAddress> {
 	}
 	
 	public List<TAddressDto> queryAddrDistrict(String countyId) throws JDBCException {
-		String sql = "select * from t_address t where t.tree_level=2 and t.status='ACTIVE' ";
+		String sql = "select * from t_address t where t.addr_pid='1' and t.status='ACTIVE' ";
 		if(!countyId.equals(SystemConstants.COUNTY_ALL)){
 			sql = sql + " and t.county_id='"+countyId+"' ";
 		}
@@ -413,8 +413,17 @@ public class TAddressDao extends BaseEntityDao<TAddress> {
 		return createQuery(TAddressSysDto.class,sql).list();
 	}
 	
+	public List<TAddressSysDto> queryAllAddrByPids(String level ,String[] addrPids) throws JDBCException {
+		String src = "";
+		if(addrPids != null && addrPids.length>0){
+			src = " and "+getSqlGenerator().setWhereInArray("addr_pid",addrPids);
+		}
+		String sql = "SELECT * FROM t_address where  tree_level = ? "+ src;
+		return createQuery(TAddressSysDto.class,sql,level).list();
+	}
+	
 	public List<TAddressSysDto> queryAllAddrById(String addrId) throws JDBCException {
-		String sql = "SELECT * FROM t_address where addr_pid = ?  order by sort_num ";
+		String sql = "SELECT * FROM t_address where addr_pid = ? order by sort_num ";
 		return createQuery(TAddressSysDto.class,sql,addrId).list();
 	}
 	public List<TAddressSysDto> queryAddrSysTreeByLvOneAndName(String[] lvOneAddrIds,String name) throws JDBCException{
@@ -426,14 +435,14 @@ public class TAddressDao extends BaseEntityDao<TAddress> {
 			" from t_address a ,(",
 			" select t.addr_id from t_address t ",
 			" where ",getSqlGenerator().setWhereInArray("addr_pid",lvOneAddrIds),
-			" and  lower( t.addr_name) not like  '%'||?||'%' ",
+			" and  replace(lower( t.addr_name),' ','') not like  '%'||?||'%' ",
 			" ) b  ",
 			" where a.addr_pid =b. addr_id ",
-			" and lower( a.addr_name) like '%'||?||'%'",
+			" and replace(lower( a.addr_name),' ','') like '%'||?||'%'",
 			" union all ",
 			" select t.addr_id from t_address t ",
 			" where  ",getSqlGenerator().setWhereInArray("addr_pid",lvOneAddrIds),
-			" and  lower( t.addr_name) like '%'||?||'%' ",
+			" and  replace(lower( t.addr_name),' ','') like '%'||?||'%' ",
 			") connect by prior c.addr_pid = c.addr_id)d ",
 			" where d.tree_level<>0 order by d.tree_level,d.sort_num");
 		return createQuery(TAddressSysDto.class,sql,name,name,name).list();
@@ -449,14 +458,14 @@ public class TAddressDao extends BaseEntityDao<TAddress> {
 			" from t_address a ,(",
 			" select t.addr_id from t_address t ",
 			" where ",getSqlGenerator().setWhereInArray("addr_pid",lvOneAddrIds),
-			" and  lower( t.addr_name) not like  '%'||?||'%' ",
+			" and  replace(lower( t.addr_name),' ','') not like  '%'||?||'%' ",
 			" ) b  ",
 			" where a.addr_pid =b. addr_id ",
-			" and lower( a.addr_name) like '%'||?||'%'",
+			" and replace(lower( a.addr_name),' ','') like '%'||?||'%'",
 			" union all ",
 			" select t.addr_id from t_address t ",
 			" where  ",getSqlGenerator().setWhereInArray("addr_pid",lvOneAddrIds),
-			" and  lower( t.addr_name) like '%'||?||'%' ",
+			" and  replace(lower( t.addr_name),' ','') like '%'||?||'%' ",
 			") connect by prior c.addr_pid = c.addr_id)d ",
 			" where d.tree_level<>0 order by d.tree_level,d.sort_num");
 		return createQuery(TAddressDto.class,sql,name,name,name).list();
@@ -472,6 +481,5 @@ public class TAddressDao extends BaseEntityDao<TAddress> {
 		String sql = " select  decode(max(t.sort_num),null,0,max(t.sort_num)) sort_num from t_address t where t.addr_pid=? ";
 		return this.findUnique(sql,addrPId);
 	}
-	
 	
 }
