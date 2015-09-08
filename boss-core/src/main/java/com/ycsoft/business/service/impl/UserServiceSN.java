@@ -1324,8 +1324,36 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		CUser newUser = userComponent.queryUserById(user.getUser_id());
 		getBusiParam().addUser(newUser);
 		saveAllPublic(doneCode, getBusiParam());
+	}
+	
+	public CProdOrderDto queryBandLastOrder(String userId)throws Exception{
+		return orderComponent.getBandLastOrder(userId);
+	}
+	
+	/**
+	 * 补收IP费用所需要的信息
+	 * @param userId
+	 * @return
+	 * @throws Exception
+	 */
+	public Map<String , Object> queryIpFeeLoad(String userId)throws Exception{
+		Map<String , Object> map = new HashMap<String, Object>();
+		map.put("CProdOrder", queryBandLastOrder(userId)); //最后订单
+		map.put("tBusiFee", queryUserIpFee());//IP费 配置信息
+		return map;
+	}
 
+	/**
+	 * 保存IP费用
+	 * @throws Exception
+	 */
+	public void savePayIpFee() throws Exception{
+		CCust cust = getBusiParam().getCust();
+		doneCodeComponent.lockCust(cust.getCust_id());
+		// 获取业务流水
+		Integer doneCode = doneCodeComponent.gDoneCode();
 		
+		saveAllPublic(doneCode, getBusiParam());
 	}
 	
 }

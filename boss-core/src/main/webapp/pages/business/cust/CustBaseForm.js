@@ -679,14 +679,6 @@ CustBaseForm = Ext.extend( BaseForm , {
 			},this.linkPanel,this.extAttrForm]
 		});
 	},
-	doInit:function(){
-		if(!this.oldCustType){
-			this.oldCustType = 'RESIDENT';
-		}
-		this.provinceStore.load();
-		CustBaseForm.superclass.doInit.call(this);
-		this.removecustLevel();
-	},
 	doClickAddr:function(btn){
 		var win = Ext.getCmp('addrCustSelectWinId');
 		if(!win){
@@ -713,14 +705,15 @@ CustBaseForm = Ext.extend( BaseForm , {
 			Ext.getCmp('clickAddrId').setDisabled(false);
 		}
 	},
-	removecustLevel:function(){
+	removeCustLevel:function(){
 		var store = this.findById('cust_level_id').getStore();
 		store.each(function(record){
 			if(record.get('item_value') != 'YBKH'){
 				store.remove(record);
 			}
-		});
-		
+		});		
+	},
+	removeCustType:function(){
 		var comp = this.find("hiddenName" ,'cust.cust_type')[0];
 		var typeStore = comp.getStore();
 		typeStore.each(function(record){

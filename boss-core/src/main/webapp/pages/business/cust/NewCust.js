@@ -21,6 +21,15 @@ NewCustForm = Ext.extend( CustBaseForm , {
 		App.getApp().refreshPayInfo(parent);
 		App.getApp().refreshPanel(App.getApp().getData().currentResource.busicode);
 	},
+	doInit:function(){
+		if(!this.oldCustType){
+			this.oldCustType = 'RESIDENT';
+		}
+		this.provinceStore.load();
+		CustBaseForm.superclass.doInit.call(this);
+		this.removeCustLevel();
+		this.removeCustType();
+	},
 	doValid:function(){
 		if(!Ext.getCmp('tempCustAddress').getValue()){
 			Ext.getCmp('tempCustAddress').setValue("");
