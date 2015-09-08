@@ -91,11 +91,8 @@ public class BandAuthJob implements Job2 {
 					logger.error("保存指令发送结果失败"+e.getMessage());
 					return;
 				}
-				
 			}
-			
 		}
-		
 	}
 	
 	private String getJsonValue(JsonObject jo,String key){
