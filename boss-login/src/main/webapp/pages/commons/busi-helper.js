@@ -387,7 +387,7 @@ Ext.apply( App, {
 			panel.getUserPanel().userGrid.remoteRefresh();
 		}
 /****************用户面板相关业务*************************/		
-		else if(busiCode == '1021' || busiCode == '111'){//销户，高级销户
+		else if(busiCode == '1021' || busiCode == '111' || busiCode == '1130'){//销户，高级销户，加挂IP
 			panel.getUserPanel().userGrid.remoteRefresh();
 		}else if(busiCode == '1020'){//用户开户、刷新用户和设备，账户
 			//panel.getCustPanel().custDeviceGrid.remoteRefresh();

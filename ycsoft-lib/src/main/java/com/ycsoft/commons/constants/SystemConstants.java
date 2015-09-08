@@ -598,5 +598,5 @@ public class SystemConstants {
 	public static final String OTT_MOBILE_ADDR_ID="625";   //移动端固定的地址码
 	public static final String OTT_MOBILE_ADDRESS="Room #, No.Register, St.Mobile,Special";   //移动端固定的开户地址
 	
-	
+	public static final String USER_IP_FEE_ID = "5051";//用户IP外挂费用编号
  }
