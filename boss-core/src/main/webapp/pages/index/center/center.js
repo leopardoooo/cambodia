@@ -27,7 +27,7 @@ InfoPanel = Ext.extend( CommonTab , {
 		
 		this.userPanel = new UserPanel();
 		
-		this.acctPanel = new AcctPanel();
+//		this.acctPanel = new AcctPanel();
 		this.payfeePanel = new PayfeePanel();
 		this.billPanel = new BillPanel();
 		this.docPanel = new DocPanel();
@@ -151,8 +151,8 @@ InfoPanel = Ext.extend( CommonTab , {
 			var custTBar = null;
 			var packageTbar = null;
 			var userTBar = Ext.getCmp('U_USER').getTopToolbar();
-			var acctTBar = Ext.getCmp('A_ACCT').getTopToolbar();
-			var deviceTBar = Ext.getCmp('C_DEVICE').getTopToolbar();
+//			var acctTBar = Ext.getCmp('A_ACCT').getTopToolbar();
+//			var deviceTBar = Ext.getCmp('C_DEVICE').getTopToolbar();
 //			var busiTBar = Ext.getCmp('D_BUSI').getTopToolbar();
 			
 			if (App.data.custFullInfo.cust.cust_type=='UNIT'){
@@ -186,15 +186,15 @@ InfoPanel = Ext.extend( CommonTab , {
 				if(!Ext.isEmpty(userTBar)){
 					userTBar.hide();
 				}
-				if(!Ext.isEmpty(acctTBar)){
-					acctTBar.hide();
-				}
+//				if(!Ext.isEmpty(acctTBar)){
+//					acctTBar.hide();
+//				}
 				//if(!Ext.isEmpty(packageTbar)){
 				//	packageTbar.hide();
 				//}
-				if(!Ext.isEmpty(deviceTBar)){
-					deviceTBar.hide();
-				}
+//				if(!Ext.isEmpty(deviceTBar)){
+//					deviceTBar.hide();
+//				}
 //				busiTBar.hide();
 			}else{
 				if(!Ext.isEmpty(custTBar)){
@@ -203,15 +203,15 @@ InfoPanel = Ext.extend( CommonTab , {
 				if(!Ext.isEmpty(userTBar)){
 					userTBar.show();
 				}
-				if(!Ext.isEmpty(acctTBar)){
-					acctTBar.show();
-				}
+//				if(!Ext.isEmpty(acctTBar)){
+//					acctTBar.show();
+//				}
 				//if(!Ext.isEmpty(packageTbar)){
 				//	packageTbar.show();
 				//}
-				if(!Ext.isEmpty(deviceTBar)){
-					deviceTBar.show();
-				}
+//				if(!Ext.isEmpty(deviceTBar)){
+//					deviceTBar.show();
+//				}
 //				if(!Ext.isEmpty(busiTBar)){
 //					busiTBar.show();
 //				}
@@ -256,7 +256,7 @@ InfoPanel = Ext.extend( CommonTab , {
 		this.getDocPanel().setReload(reload);
 		this.getPayfeePanel().setReload(reload);
 		this.getUserPanel().setReload(reload);
-		this.getAcctPanel().setReload(reload);
+//		this.getAcctPanel().setReload(reload);
 		this.getBillPanel().setReload(reload);
 		this.getCommandInfoPanel().setReload(reload);
 	},

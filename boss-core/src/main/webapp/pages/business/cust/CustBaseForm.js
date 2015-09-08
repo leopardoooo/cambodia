@@ -1,5 +1,38 @@
 
 QueryFilterTree = Ext.extend(Ext.ux.QueryFilterTreePanel,{
+	
+	constructor: function(parent){
+		QueryFilterTree.superclass.constructor.call(this, {
+			root : new Ext.tree.AsyncTreeNode({expanded : true}),
+			loader : new Ext.tree.TreeLoader({
+						dataUrl : Constant.ROOT_PATH+"/commons/x/QueryParam!queryAddrTree.action",
+//						baseParams : this.treeParams,
+						listeners : {
+							beforeload : this.onBeforeLoad,
+							scope : this
+						}
+					}),
+			floating : true,
+			autoScroll : true,
+			region: 'west',
+			animate : false,
+			rootVisible : false,
+			width 	: 210,
+			split	: true,
+			minSize	: 210,
+	        maxSize	: 260,
+	        margins		:'0 0 3 2',  //元素上右下左和外面元素的距离都是0
+	        lines		:false,  // 去掉树的线
+	        animCollapse:true,
+	        collapseMode:'mini',
+			bodyStyle	:'padding:3px',    
+			
+			listeners : {
+//				click : this.onNodeClick,
+				scope : this
+			}
+		})
+	},
 	doSearch:function(){
 		var _v = this.searchT.getValue();
 		Ext.Ajax.request({
@@ -19,60 +52,6 @@ QueryFilterTree = Ext.extend(Ext.ux.QueryFilterTreePanel,{
 				this.setRootNode(root);
 			}
 		});				
-	}
-});
-
-AddressTreeCombo = Ext.extend(Ext.ux.TreeCombo,{
-	initList : function() {
-		var rootVisible = false;
-		if (this.rootNodeCfg) {
-			rootVisible = true;
-		} else {
-			this.rootNodeCfg = {
-				expanded : true
-			};
-		}
-		this.list = new QueryFilterTree({
-			root : new Ext.tree.AsyncTreeNode(this.rootNodeCfg),
-			loader : new Ext.tree.TreeLoader({
-						dataUrl : this.treeUrl,
-						baseParams : this.treeParams
-						,listeners : {
-							beforeload : this.onBeforeLoad,
-							scope : this
-						}
-					}),
-			floating : true,
-			height : this.treeHeight,
-			autoScroll : true,
-			animate : false,
-			searchFieldWidth : this.treeWidth - 80,
-			rootVisible : rootVisible,
-			listeners : {
-				click : this.onNodeClick,
-				checkchange : this.onCheckchange,
-				scope : this
-			},
-			alignTo : function(el, pos) {
-				this.setPagePosition(this.el.getAlignToXY(el, pos));
-			}
-		});
-		if (this.minChars == 0) {
-			this.doQuery("");
-		}
-	},
-	listeners:{
-		expand:function(thisCmp){
-			function getFocus(){
-				var search = thisCmp.list.searchT;//如果第一次获取焦点,list会为空
-				if(search){
-//					search.setValue('输入关键字搜索');
-					var dom = search.el.dom;
-					dom.select();
-				}
-			};
-			getFocus.defer(200,this);
-		}
 	},
 	onNodeClick : function(node, e) {		
 		if (!this.isCanClick(node)) {
@@ -95,98 +74,275 @@ AddressTreeCombo = Ext.extend(Ext.ux.TreeCombo,{
 				this.fireEvent('select', this, node, node.attributes);
 			}
 		});
-		
-	},
-	firstExpand: true,
-	doQuery : function(q, forceAll) {
-		if(!this.firstExpand){
-			this.firstExpand = true;
-			this.list.expandAll();
-		}
-		this.expand();
 	},
 	onBeforeLoad:function(l,node){
 		l.on('beforeload',function(loader,node){
   			l.baseParams.addrId=node.id; //通过这个传递参数，这样就可以点一个节点出来它的子节点来实现异步加载
 		},l);
+	},
+	// 检查当前的节点是否能够被点击
+	isCanClick : function(node) {
+		if (this.onlySelectLeaf) {
+			if (!node.leaf || node.attributes['is_leaf'] == 'F')
+				return false;
+		}
+		return true;
 	}
-	
-}); 
+});
 
-
-
-
-
-//UnitForm = Ext.extend(Ext.Panel, {
-//	parent : null,
-//	constructor: function(p){
-//		this.parent = p;
-//		UnitForm.superclass.constructor.call(this, {
-//			layout:'column',
-//			border : false,
-//			anchor: '100%',
-//			bodyStyle: "background:#F9F9F9",
-//			defaults:{
-//				baseCls: 'x-plain',
-//				columnWidth:0.5,
-//				labelWidth: 75
-//			},
-//			items:[{
-//				layout:'form',border:false,items:[{
-//					id:'cust_level_id',
-//					fieldLabel:'客户群体',
-//					xtype:'combo',
-//					hiddenName:'cust.cust_level',
-//					store:new Ext.data.JsonStore({
-//						fields:['text','value'],
-//						data:[{text:'协议客户',value:'XYKH'},{text:'模拟大客户',value:'MNDKH'}]
-//					}),displayField:'text',valueField:'value',editable:true,forceSelection:true,
-//					listeners : {
-//						scope : this,
-//						select : function(combo){
-//							var value = combo.getValue();
-//							this.parent.custLevel = value;
-//							var custCountCmp = Ext.getCmp('custcount_itemId');
-//							if(value){
-//								custCountCmp.show();
-//								Ext.getCmp('cust_count_id').allowBlank = false;
-//							}else{
-//								custCountCmp.hide();
-//								Ext.getCmp('cust_count_id').allowBlank = true;
-//							}
-//					},
-//					blur:function(combo){
-//						var value = combo.getValue();
-//						if(Ext.isEmpty(value)){
-//							Ext.getCmp('custcount_itemId').hide();
-//							Ext.getCmp('cust_count_id').allowBlank = true;
+//AddressTreeCombo = Ext.extend(Ext.ux.TreeCombo,{
+//	initList : function() {
+//		var rootVisible = false;
+//		if (this.rootNodeCfg) {
+//			rootVisible = true;
+//		} else {
+//			this.rootNodeCfg = {
+//				expanded : true
+//			};
+//		}
+//		this.list = new QueryFilterTree({
+//			root : new Ext.tree.AsyncTreeNode(this.rootNodeCfg),
+//			loader : new Ext.tree.TreeLoader({
+//						dataUrl : this.treeUrl,
+//						baseParams : this.treeParams
+//						,listeners : {
+//							beforeload : this.onBeforeLoad,
+//							scope : this
 //						}
-//					}
-//				}
-//			}]
-//			},{
-//				id:'custcount_itemId',
-//				layout:'form',border:false,
-//				items:[{
-//					id:'cust_count_id',
-//					fieldLabel:'容量',
-//					xtype:'numberfield',
-//					name:'cust.cust_count',
-//					minValue:1,
-//					allowDecimals:false,
-//					allowNegative:false
-//				}]
-//			}]
-//		})
+//					}),
+//			floating : true,
+//			height : this.treeHeight,
+//			autoScroll : true,
+//			animate : false,
+//			searchFieldWidth : this.treeWidth - 80,
+//			rootVisible : rootVisible,
+//			listeners : {
+//				click : this.onNodeClick,
+//				checkchange : this.onCheckchange,
+//				scope : this
+//			},
+//			alignTo : function(el, pos) {
+//				this.setPagePosition(this.el.getAlignToXY(el, pos));
+//			}
+//		});
+//		if (this.minChars == 0) {
+//			this.doQuery("");
+//		}
 //	},
-//    initEvents: function () {
-//        this.on('afterrender', function () {
-//	        Ext.getCmp('custcount_itemId').hide();
-//        });
-//	    this.doLayout();
-//        UnitForm.superclass.initEvents.call(this);
-//    }
-//});
+//	listeners:{
+//		expand:function(thisCmp){
+//			function getFocus(){
+//				var search = thisCmp.list.searchT;//如果第一次获取焦点,list会为空
+//				if(search){
+////					search.setValue('输入关键字搜索');
+//					var dom = search.el.dom;
+//					dom.select();
+//				}
+//			};
+//			getFocus.defer(200,this);
+//		}
+//	},
+//	onNodeClick : function(node, e) {		
+//		if (!this.isCanClick(node)) {
+//			return;
+//		}
+//		this.setRawValue('');
+//		Ext.Ajax.request({
+//			scope : this,
+//			url: Constant.ROOT_PATH+"/commons/x/QueryParam!queryCustAddrName.action",
+//			params : {
+//				addrId : node.id
+//			},
+//			success : function(res,opt){
+//				var rec = Ext.decode(res.responseText);
+//				//		// 显示隐藏值
+//				this.addOption(node.id, rec);
+//				this.setValue(node.id);
+//				this.setRawValue(rec);
+//				this.collapse();
+//				this.fireEvent('select', this, node, node.attributes);
+//			}
+//		});
+//		
+//	},
+//	firstExpand: true,
+//	doQuery : function(q, forceAll) {
+//		if(!this.firstExpand){
+//			this.firstExpand = true;
+//			this.list.expandAll();
+//		}
+//		this.expand();
+//	},
+//	onBeforeLoad:function(l,node){
+//		l.on('beforeload',function(loader,node){
+//  			l.baseParams.addrId=node.id; //通过这个传递参数，这样就可以点一个节点出来它的子节点来实现异步加载
+//		},l);
+//	}
+//	
+//}); 
+
+AddrCustSelectWin = Ext.extend( Ext.Window , {
+	//客户信息的store
+	custStore: null,
+	custGrid: null,
+	addrTree:null,
+	addrName:null,
+	nodeId:null,
+	pageSize:15,
+	roomPanel:null,
+	constructor: function (){
+		addrThat = this;
+		this.addrTree = new QueryFilterTree(this);
+		this.custStore = new Ext.data.JsonStore({
+			url: Constant.ROOT_PATH+"/commons/x/QueryParam!queryNoteCust.action",
+			root: 'records',
+			totalProperty: 'totalProperty',
+			fields: Ext.data.Record.create([
+				"note_status_type",
+				"cust_no",
+				"cust_name",
+				"note",
+				"note_status_type_text"
+			])
+		});
+		
+		var cm = [
+			{header: '房间号', dataIndex: 'note', width: 160},
+			{header: '房间状态', dataIndex: 'note_status_type_text',width: 80},
+			{header: '客户名称', dataIndex: 'cust_name'},
+			{header: '受理编号', dataIndex: 'cust_no'},
+		    { header: '操作', width: 50,renderer: function(v , md, record , i  ){
+				return "<DIV><a href='#' onclick='addrThat.doGridCheckRoom();'>确认</a></DIV>";
+			}}
+		];
+		
+		//实例化cust grid panel
+		this.custGrid = new Ext.grid.GridPanel({
+			stripeRows: true, 
+			title:'房间信息',
+	        store: this.custStore,
+	        columns: cm,
+	        region : "center" ,
+	        bbar: new Ext.PagingToolbar({
+	        	pageSize: this.pageSize,
+				store: this.custStore
+			})
+	    })
+	    
+	    this.roomPanel = new Ext.Panel({
+	    	region : "south" ,
+	    	height:60,
+	     	fullscreen: true,
+            layout : {
+				type:'hbox',
+				padding : '5',
+				pack:'center',
+				align : 'top'
+			},
+			defaults : {
+				height: '100%',
+				margins : '0 5 0 0',
+				height:40
+			},
+            items:[
+                {xtype:'button',text:'新增房间',id:'addRoomNewBoxId',iconCls:'icon-add',disabled:true,scope:this,handler:this.doCheckedChangeRoom},
+                {xtype:'textfield',width:150 ,id:'newRoomBoxId',disabled:true},
+                {xtype:'button',text:'提交',iconCls:'icon-save',id:'saveRoomNewBoxId',disabled:true,scope:this,handler:this.doSaveNewRoom}
+            ]
+           
+	    
+	    })
+	    
+		AddrCustSelectWin.superclass.constructor.call(this,{
+			title:'地址管理',
+			id:'addrCustSelectWinId',
+			border : false ,
+			maximizable:true,
+			width: 250,
+			height: 300,
+			layout : 'border',
+			items: [this.addrTree,{
+				layout : 'border',
+				region : "center" ,
+				border : false ,
+				items:[this.custGrid,this.roomPanel]
+			}]
+		});
+	},
+	doSaveNewRoom:function(){
+		var note = Ext.getCmp('newRoomBoxId').getValue();
+		if(Ext.isEmpty(note)){
+			Alert("房间号不能为空");
+			return;
+		}
+		this.setData(note);
+		this.close();
+	},
+	doGridCheckRoom:function(){
+		var rec = this.custGrid.getSelectionModel().getSelected();
+		this.setData(rec.get('note'));
+		this.close();
+	},
+	doCheckedChangeRoom:function(){
+		Ext.getCmp('newRoomBoxId').setDisabled(false);
+		Ext.getCmp('saveRoomNewBoxId').setDisabled(false);
+	},
+	//注册事件
+	initEvents: function(){
+		this.custGrid.on("rowdblclick", function(grid ,index, e){
+			var record = grid.getStore().getAt(index);
+			this.setData(record.get('note'));
+			
+			this.close();
+		}, this);
+		this.addrTree.on("click",function(node, e) {
+			if (!this.isCanClick(node)) {
+				return;
+			}
+			Ext.getCmp('addRoomNewBoxId').setDisabled(false);
+			Ext.getCmp('newRoomBoxId').setDisabled(true);
+			Ext.getCmp('saveRoomNewBoxId').setDisabled(true);
+			Ext.getCmp('custAddrId').setValue(node.id);
+			addrThat.nodeId = node.id;
+			addrThat.custStore.baseParams = {addrId:node.id};
+		
+			addrThat.custStore.load({
+				params: { start:0, limit: addrThat.pageSize}
+			});
+			
+			addrThat.custGrid.setTitle("房间信息");
+			Ext.Ajax.request({
+				scope : this,
+				url: Constant.ROOT_PATH+"/commons/x/QueryParam!queryCustAddrName.action",
+				params : {
+					addrId : addrThat.nodeId
+				},
+				success : function(res,opt){
+					var rec = Ext.decode(res.responseText);
+					// 显示隐藏值
+					addrThat.addrName = rec.addrName;
+					var title = "行政区域:"+rec.districtName+";  "
+					title = title + "服务类型:"+(Ext.isEmpty(rec.netType)?'':rec.netType);
+					addrThat.custGrid.setTitle(title);
+				}
+			});
+			
+		})
+		
+		AddrCustSelectWin.superclass.initEvents.call(this);
+	},
+	setData:function(note){
+		var name = "";
+		if(!Ext.isEmpty(note)){
+			var name = "Room "+note+",";
+		}
+		name = name + this.addrName;
+		Ext.getCmp('custNoteId').setValue(note);
+		Ext.getCmp('tempCustAddress').setValue(name);
+		Ext.getCmp('linkman.mail_address').setValue(name);
+	}	
+});
+
 
 /**
  * 联系人面板
@@ -222,24 +378,12 @@ LinkPanel = Ext.extend(Ext.Panel,{
 						allowBlank:false,
 						hiddenName:'linkman.cert_type',
 						paramName:'CERT_TYPE',
-						defaultValue:'SFZ',
-						listeners:{
-							scope:this,
-							'select': function(){
-								var field = Ext.getCmp("linkman_cert_num_el");
-								var value = field.getValue();
-								if(value && this.doCertNumChange(field, value, value) === false){
-									field.reset();
-								}
-							}
-						}
+						defaultValue:'SFZ'
 					},{
 						fieldLabel:'固定电话',
 						name:'linkman.tel',
 						xtype:'textfield',
-						regex: /^(\d{7}|\d{8})$/,
-						id: 'linkmanTel',
-						invalidText : '请输入7位或8位电话号码'
+						id: 'linkmanTel'
 					},{
 						fieldLabel:'邮箱',
 						name:'linkman.email',
@@ -248,9 +392,7 @@ LinkPanel = Ext.extend(Ext.Panel,{
 					},{
 						fieldLabel:'邮编',
 						name:'linkman.postcode',
-						xtype:'textfield',
-						regex: /^[1-9]{1}[0-9]{5}$/,
-						invalidText : '请输入6位不以0开头的数字'
+						xtype:'textfield'
 					}]
 				},{
 					items:[{
@@ -266,18 +408,12 @@ LinkPanel = Ext.extend(Ext.Panel,{
 						width : 130,
 						allowBlank:false,
 						name:'linkman.cert_num',
-						id: 'linkman_cert_num_el',
-						listeners:{
-							scope:this,
-							'change':this.doCertNumChange
-						}
+						id: 'linkman_cert_num_el'
 					},{
 						fieldLabel:'手机',
 						name:'linkman.mobile',
-						xtype:'numberfield',
-						regex: /^1[\d]{10}$/,
-						id: 'linkmanMobile',
-						invalidText : '请输入11位数字'
+						xtype:'numberfield',						
+						id: 'linkmanMobile'
 					},{
 						fieldLabel:'出生日期',
 						width : 125,
@@ -376,18 +512,21 @@ LinkPanel = Ext.extend(Ext.Panel,{
 CustBaseForm = Ext.extend( BaseForm , {
 	//扩展属性面板
 	extAttrForm: null,
-//	unitForm :null,
 	linkPanel : null,
 	oldCustType:'RESIDENT',
-	custAddress : null,//客户拼接后的地址
 	custLevel : null,
 	navMenu:null,
+	provinceStore:null,
+	custCode:null,
 	constructor: function(config){
 		Ext.apply(this, config);
+		this.provinceStore = new Ext.data.JsonStore({
+ 				url: root + '/commons/x/QueryCust!queryProvince.action',
+ 				fields : ['name','cust_code']
+ 		});
 		//居民信息扩展
 		this.doInitAttrForm(2);
 		this.linkPanel = new LinkPanel(this);
-//		this.unitForm = new UnitForm(this);
 		CustBaseForm.superclass.constructor.call(this, {
 			trackResetOnLoad:true,
 			labelWidth: 75,
@@ -417,7 +556,7 @@ CustBaseForm = Ext.extend( BaseForm , {
 					labelWidth: 75
 				},
 				items: [{
-					columnWidth:0.95,
+					columnWidth:0.5,
 					items:[{
 						fieldLabel:'客户名称',
 						xtype:'textfield',
@@ -431,44 +570,66 @@ CustBaseForm = Ext.extend( BaseForm , {
 						}
 					}]
 				},{
-					columnWidth:0.25,
+					columnWidth:0.2,
 					items:[{
-				    	width : 40,
-				    	id : 'cust.note',
-				    	name : 'cust.note',
-				    	fieldLabel : 'Room',
-				    	xtype : 'textfield',
-				    	listeners:{
-							scope: this,
-							'change': this.doAddressChange
-						}
-				    }]
+						xtype: 'checkbox',
+					    labelWidth: 80,
+					    fieldLabel: "意向客户",
+					    id: "isCanToCustId",
+					    listeners:{
+			            	scope: this,
+			            	check: this.doCheckedChange
+			            }
+					}]
 				},{
-					labelWidth: 45,
-					columnWidth:0.75,
-					items:[new AddressTreeCombo({
-						id : 'addrTreeCombo',
-				    	width:280,
-						treeWidth:350,
-						treeHeight : 300,
-						minChars:0,
-						height: 22,
-						fieldLabel : '地址',
-						allowBlank: false,
-						emptyText :'选择地址..',
-						hideTrigger: false,
-						editable: false,
-						blankText:'请选择客户地址',
-						treeUrl: Constant.ROOT_PATH+"/commons/x/QueryParam!queryAddrTree.action",
-						hiddenName:'cust.addr_id',
+					columnWidth:0.3,
+					labelWidth: 1,
+					items:[{
+						xtype:'combo',
+						id : 'provinceId',
+						forceSelection : true,
+						store : this.provinceStore,
+						triggerAction : 'all',
+						mode: 'local',
+						displayField : 'name',
+						valueField : 'cust_code',
+						emptyText: '请选择省',
+						disabled:true,
+						editable : false,
 						listeners:{
-							scope: this,
-							'select': function(combo){
-								Ext.getCmp('tempCustAddress').setValue(combo.getRawValue());
-								this.doAddressChange();
+							scope:this,
+							select:function(combo){
+								this.custCode = combo.getValue();
 							}
 						}
-					})]
+					}]
+				},{
+					columnWidth:0.85,
+					items:[{
+						fieldLabel:'地址',
+						width:350,
+						xtype:'textfield',
+						id : 'tempCustAddress',
+						name:'cust.address',
+						allowBlank:false,
+						disabled:true,
+						listeners:{
+							scope:this,
+							change:this.doAddressChange
+						}
+					}]
+				},{
+					columnWidth:0.15,
+					items:[{
+						id:'clickAddrId',
+						xtype : 'button',
+						text: '&nbsp;选择',
+						scope: this,
+						width: 60,
+						height : 18,
+						iconCls:'icon-tree',
+						handler: this.doClickAddr
+					}]
 				},{
 					id:'addCustItemsOne',
 					items:[{
@@ -502,17 +663,55 @@ CustBaseForm = Ext.extend( BaseForm , {
 							name:'cust.password'
 						}]
 				}]
+			},{
+				xtype : 'hidden',
+				name:'cust.note',
+				id : 'custNoteId'
 			}
 			,{
 				xtype : 'hidden',
-				id : 'tempCustAddress'
+				id : 'custAddrId',
+				name:'cust.addr_id'
+			},{
+				xtype : 'hidden',
+				id : 'custStatusId',
+				name:'cust.status'
 			},this.linkPanel,this.extAttrForm]
-//            }]
 		});
 	},
 	doInit:function(){
+		if(!this.oldCustType){
+			this.oldCustType = 'RESIDENT';
+		}
+		this.provinceStore.load();
 		CustBaseForm.superclass.doInit.call(this);
 		this.removecustLevel();
+	},
+	doClickAddr:function(btn){
+		var win = Ext.getCmp('addrCustSelectWinId');
+		if(!win){
+			win = new AddrCustSelectWin();
+		}
+		win.show();
+		win.maximize();
+	},
+	doCheckedChange:function(box, checked){
+		Ext.getCmp('tempCustAddress').setValue('');
+		Ext.getCmp('linkman.mail_address').setValue('');
+		Ext.getCmp('provinceId').setValue('');
+		this.custCode = null;
+		if(checked){
+			//意向客户，addrId 指定为9
+			Ext.getCmp('custAddrId').setValue(9);
+			Ext.getCmp('provinceId').setDisabled(false);
+			Ext.getCmp('tempCustAddress').setDisabled(false);
+			Ext.getCmp('clickAddrId').setDisabled(true);
+			Ext.getCmp('custStatusId').setValue('PREOPEN');
+		}else{
+			Ext.getCmp('tempCustAddress').setDisabled(true);
+			Ext.getCmp('provinceId').setDisabled(true);
+			Ext.getCmp('clickAddrId').setDisabled(false);
+		}
 	},
 	removecustLevel:function(){
 		var store = this.findById('cust_level_id').getStore();
@@ -530,33 +729,11 @@ CustBaseForm = Ext.extend( BaseForm , {
 			}
 		});
 	},
-	initComponent : function(){
-		if(!this.oldCustType){
-			this.oldCustType = 'RESIDENT';
-		}
-		CustBaseForm.superclass.initComponent.call(this);
-	},
 	doCustTypeChange:function(custType){//客户类型修改
 		if (this.oldCustType == custType)
 			return ;
 		this.remove(this.linkPanel,true);
 		this.remove(this.extAttrForm,true);
-//		this.remove(this.unitForm,true);
-		
-		
-//		var custToUserBtn = Ext.getCmp('newCustToUserId');
-//		var custToDeviceBtn = Ext.getCmp('newCustToDeviceId');
-//		if (custType != 'UNIT') {
-//			if (custToUserBtn && custToUserBtn.isHidden)
-//				custToUserBtn.hide();
-//			if (custToDeviceBtn && custToDeviceBtn.isHidden)
-//				custToDeviceBtn.hide();
-//		} else {
-//			if (custToUserBtn && !custToUserBtn.isHidden)
-//				custToUserBtn.hide();
-//			if (custToDeviceBtn && !custToDeviceBtn.isHidden)
-//				custToDeviceBtn.hide();
-//		}
 		
 		this.linkPanel = new LinkPanel();
 		if (custType == 'RESIDENT'){
@@ -566,11 +743,7 @@ CustBaseForm = Ext.extend( BaseForm , {
 		}else{
 			this.doInitAttrForm(1);
 			var countyId = App.getData().optr.county_id;
-			//单位，选择了客户群体，则为模拟大客户(武汉、直属)
-//			if(custType == 'UNIT' && (countyId == '0101' || countyId == '0102') ){
-//				this.unitForm = new UnitForm(this);
-//				this.add(this.unitForm);
-//			}
+			
 			this.add(this.linkPanel);
 			this.add(this.extAttrForm);
 		}
@@ -638,14 +811,8 @@ CustBaseForm = Ext.extend( BaseForm , {
 			linkManName.setValue(name);
 		}
 	},
-	doAddressChange : function(){
-		if(!Ext.isEmpty(Ext.getCmp('addrTreeCombo').getRawValue())){
-			this.custAddress = Ext.getCmp('tempCustAddress').getValue();
-			if(!Ext.isEmpty(Ext.getCmp('cust.note').getValue())){
-				this.custAddress = "Room "+Ext.getCmp('cust.note').getValue()+ ","+this.custAddress;
-			}
-			Ext.getCmp('linkman.mail_address').setValue(this.custAddress);
-		}
+	doAddressChange : function(obj){
+		Ext.getCmp('linkman.mail_address').setValue(obj.getValue());
 	},
 	doValid:function(){
 		if(!Ext.getCmp('linkmanTel').getValue() && !Ext.getCmp('linkmanMobile').getValue()){

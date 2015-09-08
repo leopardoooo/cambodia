@@ -27,8 +27,14 @@ Ext.ux.Gpanel = Ext.extend(Ext.Panel,{
 					var btn = {};
 					attrs["handler"]=goUrl;//按钮点击事件
 					Ext.apply(btn,attrs);
-					btn["tooltip"] = attr["res_name"];//鼠标悬浮时提示文本
-					btn["text"] = "<font style='font-family:微软雅黑;font-size:13'><b>"+attr["show_name"]+"</b></font>";//显示文本
+					var text = lang = langUtils.res(attr["res_id"]);
+					var tip = null;
+					if(Ext.isArray(lang)){
+						text = lang[0];
+						tip = lang[1];
+					}
+					btn["tooltip"] = tip;//鼠标悬浮时提示文本
+					btn["text"] = "<font style='font-family:微软雅黑;font-size:13'><b>"+text+"</b></font>";//显示文本
 					tbarBtns.push(btn,'-');
 				}
 			}

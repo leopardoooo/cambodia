@@ -1,4 +1,3 @@
-
 /*********************************************************
  * 业务数据查询 
  * 目前引入到core 工程
@@ -309,10 +308,10 @@ Ext.apply( App, {
 				panel.getCustPanel().setReload(false);
 			}
 			
-			panel.getAcctPanel().refresh();
+//			panel.getAcctPanel().refresh();
 			panel.getUserPanel().refresh();
 			panel.getUserPanel().setReload(false);
-			panel.getAcctPanel().setReload(false);
+//			panel.getAcctPanel().setReload(false);
 		}else if(busiCode == '1004' || busiCode == '156' || busiCode =='1330' || busiCode =='1114'  ){//修改客户，刷新客户信息和客户异动信息,修改优惠类型
 			if (unitRefresh){
 				panel.getUnitPanel().custInfoPanel.remoteRefresh();
@@ -330,9 +329,9 @@ Ext.apply( App, {
 				panel.getCustPanel().refreshPropChangeGrid();
 			}
 			App.getCust().status = 'ACTIVE';
-			panel.getCustPanel().custDeviceGrid.remoteRefresh();
+//			panel.getCustPanel().custDeviceGrid.remoteRefresh();
 			panel.getUserPanel().userGrid.remoteRefresh();
-			panel.getAcctPanel().acctGrid.remoteRefresh();
+//			panel.getAcctPanel().acctGrid.remoteRefresh();
 			panel.getUserPanel().prodGrid.remoteRefresh();
 		}else if(busiCode == '1005' || busiCode == '1006'
 			|| busiCode == '1106' || busiCode == '1105' || busiCode == '1146'){//加入或退出单位，刷新客户基本信息,银行解约
@@ -343,15 +342,15 @@ Ext.apply( App, {
 			}
 				
 		}else if(busiCode == '1007' || busiCode == '1201'){//购买设备终端、修改设备产权，刷新设备和费用,业务费用
-			if (!unitRefresh)
-				panel.getCustPanel().custDeviceGrid.remoteRefresh();
+//			if (!unitRefresh)
+//				panel.getCustPanel().custDeviceGrid.remoteRefresh();
 		}else if(busiCode == '1008' || busiCode == '1009' || busiCode == '1011' || busiCode == '1223'
 		|| busiCode == '1014' || busiCode == '1013'|| busiCode == '1231' || busiCode == '2002'){//更换、销售或回收设备,刷新设备,修改购买方式、设备互换
 			if (!unitRefresh){
-				panel.getCustPanel().custDeviceGrid.remoteRefresh();
-				panel.getCustPanel().deviceDetailTab.resetPanel();
+//				panel.getCustPanel().custDeviceGrid.remoteRefresh();
+//				panel.getCustPanel().deviceDetailTab.resetPanel();
 				panel.getUserPanel().userGrid.remoteRefresh();
-				panel.getAcctPanel().acctGrid.remoteRefresh();
+//				panel.getAcctPanel().acctGrid.remoteRefresh();
 			}
 //		}else if(busiCode == '1016' || busiCode == '1017'){//订购套餐，修改套餐
 //			if (unitRefresh){
@@ -365,38 +364,40 @@ Ext.apply( App, {
 			App.getCust().status = 'LYRELOCATE';
 			panel.getCustPanel().custInfoPanel.remoteRefresh();
 			panel.getCustPanel().refreshPropChangeGrid();
-			panel.getCustPanel().custDeviceGrid.remoteRefresh();
+//			panel.getCustPanel().custDeviceGrid.remoteRefresh();
 			panel.getUserPanel().userGrid.remoteRefresh();
-			panel.getAcctPanel().acctGrid.remoteRefresh();
+//			panel.getAcctPanel().acctGrid.remoteRefresh();
 			panel.getUserPanel().prodGrid.remoteRefresh();
 		}else if(busiCode == '1985'){//客户迁移
 			App.getCust().status = 'ACTIVE';
 			panel.getCustPanel().custInfoPanel.remoteRefresh();
 			panel.getCustPanel().refreshPropChangeGrid();
-			panel.getCustPanel().custDeviceGrid.remoteRefresh();
+//			panel.getCustPanel().custDeviceGrid.remoteRefresh();
 			panel.getUserPanel().userGrid.remoteRefresh();
-			panel.getAcctPanel().acctGrid.remoteRefresh();
+//			panel.getAcctPanel().acctGrid.remoteRefresh();
 			panel.getUserPanel().prodGrid.remoteRefresh();
 		}else if(busiCode == '1220'){//恢复客户状态
 			panel.getCustPanel().custInfoPanel.remoteRefresh();
 			panel.getCustPanel().refreshPropChangeGrid();
-			panel.getCustPanel().custDeviceGrid.remoteRefresh();
+//			panel.getCustPanel().custDeviceGrid.remoteRefresh();
 			panel.getUserPanel().userGrid.remoteRefresh();
-			panel.getAcctPanel().acctGrid.remoteRefresh();
+//			panel.getAcctPanel().acctGrid.remoteRefresh();
 			panel.getUserPanel().prodGrid.remoteRefresh();
 		}else if(busiCode == '1221'){//恢复用户状态
 			panel.getUserPanel().userGrid.remoteRefresh();
 		}
 /****************用户面板相关业务*************************/		
-		else if(busiCode == '1021' || busiCode == '111'){//销户，高级销户
+		else if(busiCode == '1021' || busiCode == '111' || busiCode == '1130'){//销户，高级销户，加挂IP
 			panel.getUserPanel().userGrid.remoteRefresh();
 		}else if(busiCode == '1020'){//用户开户、刷新用户和设备，账户
-			//panel.getCustPanel().custInfoPanel.remoteRefresh();
-			//panel.getCustPanel().refreshPropChangeGrid();
-		//	
 			//panel.getCustPanel().custDeviceGrid.remoteRefresh();
 			panel.getUserPanel().userGrid.remoteRefresh();
-//			panel.getAcctPanel().acctGrid.remoteRefresh();
+			panel.getCustPanel().acctItemGrid.remoteRefresh();
+		}else if(busiCode == '102' || busiCode == '101' || busiCode == '100' ||busiCode == '1015' ||busiCode =='1040'
+			|| busiCode == '110' ||busiCode == '109' || busiCode == '1027'){//订购，续订，升级,套餐订购,缴费,高级退订,超级退订，退订
+			panel.getUserPanel().userGrid.remoteRefresh();
+			panel.getUserPanel().prodGrid.remoteRefresh();
+			panel.getCustPanel().acctItemGrid.remoteRefresh();
 		}else if(busiCode == '1023' || busiCode == '1018' ||busiCode == '1118' || busiCode == '1074'||busiCode == '1075'||busiCode == '1078'||busiCode == '1079'){//用户修改资料，刷新用户，修改宽带密码，修改最大连接数,取消预报停,修改最大用户数
 			panel.getUserPanel().userGrid.remoteRefresh();
 		}else if(busiCode == '1024' || busiCode == '1025' 
@@ -405,12 +406,12 @@ Ext.apply( App, {
 			//panel.getCustPanel().custDeviceGrid.remoteRefresh();
 			panel.getUserPanel().userGrid.remoteRefresh();
 			//panel.getAcctPanel().acctGrid.remoteRefresh();
-		}else if(busiCode == '1500' || busiCode == '102' || busiCode == '101' || busiCode == '100'){//订购，刷新产品和账户
+		}else if(busiCode == '1500'){
 			panel.getUserPanel().prodGrid.remoteRefresh();
-			panel.getAcctPanel().acctGrid.remoteRefresh();
-		}else if(busiCode == '1015' || busiCode == '1027' || busiCode == '1127' || busiCode == '1034' || busiCode == '1028'|| busiCode == '1072' || busiCode == '1232' || busiCode == '1081'|| busiCode == '1983' || busiCode == '1984' || busiCode == '1036' || busiCode =='1304' || busiCode == '110'){//产品退订或套餐退订，刷新账户、产品和套餐, //资费变更、协议缴费,失效日期变更、取消变更资费,修改到期日,修改预开通时间,修改公用账目使用类型
+			panel.getCustPanel().acctItemGrid.remoteRefresh();
+		}else if( busiCode == '1127' || busiCode == '1034' || busiCode == '1028'|| busiCode == '1072' || busiCode == '1232' || busiCode == '1081'|| busiCode == '1983' || busiCode == '1984' || busiCode == '1036' || busiCode =='1304' ){//产品退订或套餐退订，刷新账户、产品和套餐, //资费变更、协议缴费,失效日期变更、取消变更资费,修改到期日,修改预开通时间,修改公用账目使用类型
 			panel.getUserPanel().prodGrid.remoteRefresh();
-			panel.getAcctPanel().acctGrid.remoteRefresh();
+//			panel.getAcctPanel().acctGrid.remoteRefresh();
 //			if(busiCode == '1015')
 //				panel.getBillPanel().billGrid.remoteRefresh();
 //			if (unitRefresh)
@@ -421,39 +422,37 @@ Ext.apply( App, {
 			panel.getUserPanel().prodGrid.remoteRefresh();
 		}else if(busiCode == '1030'){//模拟转数
 			panel.getUserPanel().userGrid.remoteRefresh();
-			panel.getCustPanel().custDeviceGrid.remoteRefresh();
+//			panel.getCustPanel().custDeviceGrid.remoteRefresh();
 			panel.getUserPanel().prodGrid.remoteRefresh();
-			panel.getAcctPanel().acctGrid.remoteRefresh();
+//			panel.getAcctPanel().acctGrid.remoteRefresh();
 		}else if(busiCode == '1064'){//促销
 			panel.getUserPanel().userGrid.remoteRefresh();
-			panel.getAcctPanel().acctGrid.remoteRefresh();
+//			panel.getAcctPanel().acctGrid.remoteRefresh();
 		}else if(busiCode == '1080' || busiCode == '1180'){//回退促销
 			panel.getUserPanel().userGrid.remoteRefresh();
 			panel.getUserPanel().prodGrid.remoteRefresh();
-			panel.getAcctPanel().acctGrid.remoteRefresh();
+//			panel.getAcctPanel().acctGrid.remoteRefresh();
 		}else if(busiCode == '1071'){//排斥资源
 			panel.getUserPanel().userGrid.remoteRefresh();
 		}else if(busiCode == '1038' || busiCode == '1193' || busiCode == '1194'){//第二终端转副机,免费终端(管理员)，免费终端（通用）
 			panel.getUserPanel().userGrid.remoteRefresh();
 			panel.getUserPanel().prodGrid.remoteRefresh();
 		}else if(busiCode == '1123'){//充值卡充值
-			panel.getAcctPanel().acctGrid.remoteRefresh();
-			panel.getPayfeePanel().acctFeeGrid.remoteRefresh();
+//			panel.getAcctPanel().acctGrid.remoteRefresh();
+//			panel.getPayfeePanel().acctFeeGrid.remoteRefresh();
 			panel.getDoneCodePanel().doneCodeGrid.remoteRefresh();
 		}else if(busiCode == '1303'){
 			if (!unitRefresh)
 			panel.getUserPanel().prodGrid.remoteRefresh();
 		}else if(busiCode == '1022'){
 			panel.getUserPanel().userGrid.remoteRefresh();
-			panel.getAcctPanel().acctGrid.remoteRefresh();
 		}
 /****************账户面板相关业务*************************/
-		else if(busiCode == '1040' || busiCode == '1110' || busiCode == '1112'){//缴费，刷新账户 、用户，费用
-			panel.getAcctPanel().acctItemGrid.remoteRefresh();
+		else if(busiCode == '1110' || busiCode == '1112'){//缴费，刷新账户 、用户，费用
+			panel.getCustPanel().acctItemGrid.remoteRefresh();
 			if (!unitRefresh)
 				panel.getUserPanel().userGrid.remoteRefresh();
 		}else if(busiCode == '1041' || busiCode == '1042' || busiCode == '1088' || busiCode == '1086' || busiCode == '1166' || busiCode == '1043' || busiCode == '1073' || busiCode == '1116'){//退款、减免费用、补收费用、转账，刷新账户,欠费抹零、各种调账 
-			panel.getAcctPanel().acctGrid.remoteRefresh();
 			panel.getUserPanel().prodGrid.remoteRefresh();
 //			panel.getBillPanel().billGrid.remoteRefresh();
 		}else if(busiCode == '1052' || busiCode == '1053'){//修改费用、修改备注
@@ -467,9 +466,9 @@ Ext.apply( App, {
 		}else if(busiCode == '2345'){
 			panel.getPayfeePanel().refresh();
 		}else if(busiCode == '1153'){//调账原因修改
-			panel.getAcctPanel().acctItemDetailTab.acctItemAdjustGrid.remoteRefresh();
+//			panel.getAcctPanel().acctItemDetailTab.acctItemAdjustGrid.remoteRefresh();
 		}else if(busiCode == '1688'){//套餐缴费
-			panel.getAcctPanel().acctGrid.remoteRefresh();
+//			panel.getAcctPanel().acctGrid.remoteRefresh();
 			panel.getUserPanel().prodGrid.remoteRefresh();
 			panel.getCustPanel().refreshPromFeeGrid();
 //			panel.getBillPanel().billGrid.remoteRefresh();
@@ -669,5 +668,3 @@ Ext.apply( App, {
 		Alert(msg);
 	}
 });
-
- 

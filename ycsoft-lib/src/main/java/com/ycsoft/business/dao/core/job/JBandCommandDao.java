@@ -4,6 +4,7 @@
  
 package com.ycsoft.business.dao.core.job; 
 
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +15,7 @@ import com.ycsoft.beans.core.job.JBandCommand;
 import com.ycsoft.beans.core.job.JVodCommand;
 import com.ycsoft.business.dto.core.prod.JBandCommandDto;
 import com.ycsoft.commons.constants.BusiCmdConstants;
+import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.daos.abstracts.BaseEntityDao;
 import com.ycsoft.daos.core.JDBCException;
@@ -37,16 +39,28 @@ public class JBandCommandDao extends BaseEntityDao<JBandCommand> {
 		return Integer.parseInt(this.findUnique(sql, userId,BusiCmdConstants.CREAT_USER));
 	}
 	public Pager<JBandCommand> queryByCustId(String custId,Integer start,Integer limit) throws JDBCException {
-		String sql = "select v.transnum,v.cmd_type,v.send_time,v.done_code,v.error_info,u.modem_mac," +
-				" CASE when v.error_info = 'null' AND v.is_success ='Y' then 'Y' " +
-				" when v.error_info is null and v.is_success = 'Y' and v.return_code = '1' then 'Y' " +
-				" when v.error_info  is null AND v.is_success is null then 'F' else 'N' end is_success " +
-				" from j_band_command v,(" +
-					"select user_id,modem_mac from c_user where cust_id=?"+
-					" union"+
-					" select user_id,modem_mac from c_user_his where cust_id=?" +
-				" ) u where  v.user_id=u.user_id and v.cust_id= ? order by v.transnum desc";
-		return createQuery(sql, custId, custId, custId).setStart(start).setLimit(limit).page();
+		String sql = "select * from ("
+				+ " select v.transnum,v.cmd_type,v.send_time,v.done_code,v.error_info,u.stb_id,u.card_id,u.modem_mac,"
+				+ " CASE when v.error_info = 'null' AND v.is_success ='Y' then 'Y' "
+				+ " when v.error_info is null and v.is_success = 'Y' and v.return_code = '1' then 'Y' "
+				+ " when v.error_info  is null AND v.is_success is null then 'F' else 'N' end is_success "
+				+ " from j_band_command v,(" 
+					+ "select user_id,stb_id,card_id,modem_mac from c_user where cust_id=?"
+					+ " union"
+					+ " select user_id,stb_id,card_id,modem_mac from c_user_his where cust_id=?" 
+				+ " ) u where  v.user_id=u.user_id and v.cust_id= ?"
+				+ " union all"
+				+ " select v.transnum,v.cmd_type,v.send_time,v.done_code,v.error_info,u.stb_id,u.card_id,u.modem_mac,"
+				+ " CASE when v.error_info = 'null' AND v.is_success ='Y' then 'Y' "
+				+ " when v.error_info is null and v.is_success = 'Y' and v.return_code = '1' then 'Y' "
+				+ " when v.error_info  is null AND v.is_success is null then 'F' else 'N' end is_success "
+				+ " from j_band_command_his v,(" 
+					+ "select user_id,stb_id,card_id,modem_mac from c_user where cust_id=?"
+					+ " union"
+					+ " select user_id,stb_id,card_id,modem_mac from c_user_his where cust_id=?" 
+				+ " ) u where  v.user_id=u.user_id and v.cust_id= ?"
+				+ ") order by transnum desc";
+		return createQuery(sql, custId, custId, custId, custId, custId, custId).setStart(start).setLimit(limit).page();
 	}
 	public Pager<JBandCommandDto> queryBandCommandByParam(Map<String,String> param,Integer start,Integer limit) throws JDBCException {
 		StringBuffer sql  = new StringBuffer();	 
@@ -75,5 +89,20 @@ public class JBandCommandDao extends BaseEntityDao<JBandCommand> {
 	public List<JBandCommand> queryCmd() throws JDBCException{
 		String sql = "select * from j_band_command where is_send='F' and rownum<500 order by transnum";
 		return this.createQuery(sql).list();
+	}
+	
+	public int updateByCmd(Long transnum,String isSent,String isSuccess,String errorInfo,Integer returnCode) throws JDBCException{
+		//cmd.setIs_send(SystemConstants.BOOLEAN_TRUE);
+		if(isSent==null){
+			isSent="F";
+		}
+		if(isSuccess==null){
+			isSuccess="F";
+		}
+		if(errorInfo!=null&&errorInfo.length()>100){
+			errorInfo=errorInfo.substring(0,100);
+		}
+		String sql="update j_band_command set is_send=?,send_time=sysdate,is_success=?,error_info=?,return_code=? where transnum=? ";
+		return this.executeUpdate(sql, isSent,isSuccess,errorInfo,returnCode,transnum);
 	}
 }

@@ -45,7 +45,6 @@ public class CCust extends BusiBase implements Serializable {
 	private Integer cust_count;
 	private String remark;
 	private String old_cust_no;
-	private String dept_id;
 	private String optr_id;
 	private String str1 ;
 	private String str2 ;
@@ -104,6 +103,21 @@ public class CCust extends BusiBase implements Serializable {
 	private String spkg_sn;
 	private String spkg_text;
 	
+	private String develop_optr_name;	//发展人
+	private String login_name;
+
+	public String getLogin_name() {
+		return login_name;
+	}
+
+	public void setLogin_name(String login_name) {
+		this.login_name = login_name;
+	}
+
+	public String getDevelop_optr_name() {
+		return develop_optr_name;
+	}
+
 	public String getSpkg_sn() {
 		return spkg_sn;
 	}
@@ -475,6 +489,7 @@ public class CCust extends BusiBase implements Serializable {
 
 	public void setStr9(String str9) {
 		this.str9 = str9;
+		this.develop_optr_name = MemoryDict.getDictName(DictKey.OPTR, str9);
 	}
 
 	public String getStr10() {
@@ -602,20 +617,6 @@ public class CCust extends BusiBase implements Serializable {
 	}
 
 	/**
-	 * @return the dept_id
-	 */
-	public String getDept_id() {
-		return dept_id;
-	}
-
-	/**
-	 * @param dept_id the dept_id to set
-	 */
-	public void setDept_id(String dept_id) {
-		this.dept_id = dept_id;
-	}
-
-	/**
 	 * @return the optr_id
 	 */
 	public String getOptr_id() {
@@ -710,4 +711,7 @@ public class CCust extends BusiBase implements Serializable {
 		return serv_optr_name;
 	}
 	
+	public void setStatus_text(String status_text) {
+		this.status_text = status_text;
+	}
 }

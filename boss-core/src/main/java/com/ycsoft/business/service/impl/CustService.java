@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.ycsoft.beans.config.TDeviceBuyMode;
@@ -35,6 +36,7 @@ import com.ycsoft.beans.device.RStb;
 import com.ycsoft.beans.device.RStbModel;
 import com.ycsoft.beans.system.SOptr;
 import com.ycsoft.business.commons.pojo.BusiParameter;
+import com.ycsoft.business.component.core.OrderComponent;
 import com.ycsoft.business.dto.config.TAddressDto;
 import com.ycsoft.business.dto.core.acct.AcctAcctitemActiveDto;
 import com.ycsoft.business.dto.core.acct.AcctitemDto;
@@ -66,6 +68,8 @@ import com.ycsoft.sysmanager.dto.resource.RDeviceModelTotalDto;
 
 @Service
 public class CustService extends BaseBusiService implements ICustService {
+	@Autowired
+	private OrderComponent orderComponent;
 	/**
 	 * 创建新客户
 	 * @param busiCode
@@ -74,11 +78,11 @@ public class CustService extends BaseBusiService implements ICustService {
 	 * @param resident
 	 * @throws Exception
 	 */
-	public void createCust(CCust cust, CCustLinkman linkman) throws Exception {
+	public void createCust(CCust cust, CCustLinkman linkman,String custCode) throws Exception {
 		//获取业务流水
 		Integer doneCode = doneCodeComponent.gDoneCode();
 		//保存客户信息
-		String custId = custComponent.createCust(cust,linkman);
+		String custId = custComponent.createCust(cust,linkman,custCode);
 		//为客户创建公用账户
 		acctComponent.createAcct(custId,null, SystemConstants.ACCT_TYPE_PUBLIC, null);
 		//设置拦截器所需要的参数
@@ -122,7 +126,7 @@ public class CustService extends BaseBusiService implements ICustService {
 				cust.setAddress(address);
 				linkman.setMail_address(address);
 			}
-			String custId = custComponent.createCust(cust,linkman);
+			String custId = custComponent.createCust(cust,linkman,null);
 			//为客户创建公用账户
 			acctComponent.createAcct(custId,null, SystemConstants.ACCT_TYPE_PUBLIC, null);
 			
@@ -190,6 +194,16 @@ public class CustService extends BaseBusiService implements ICustService {
 		jobComponent.createCreditCalJob(doneCode, cust.getCust_id(), null,SystemConstants.BOOLEAN_TRUE);
 		
 		saveAllPublic(doneCode, getBusiParam());
+	}
+	
+	public void editCustLevel(String cust_level) throws Exception{
+		List<CCustPropChange> propChangeList = new ArrayList<CCustPropChange>();
+		CCustPropChange propChange = new CCustPropChange();
+		propChange.setColumn_name("cust_level");
+		propChange.setOld_value(this.getBusiParam().getCust().getCust_level());
+		propChange.setNew_value(cust_level);
+		propChangeList.add(propChange);
+		editCust(propChangeList);
 	}
 	
 	public void editCust(List<CCustPropChange> propChangeList) throws Exception {
@@ -684,7 +698,7 @@ public class CustService extends BaseBusiService implements ICustService {
 		String nonresCustId = nonresCust.getCust_id();
 		//非居民不存在，需开户
 		if(StringHelper.isEmpty(nonresCustId)){
-			custComponent.createCust(nonresCust, linkman);
+			custComponent.createCust(nonresCust, linkman,null);
 			nonresCustId = nonresCust.getCust_id();
 			acctComponent.createAcct(nonresCustId,null, SystemConstants.ACCT_TYPE_PUBLIC, null);
 		}else{
@@ -1571,7 +1585,7 @@ public class CustService extends BaseBusiService implements ICustService {
 //		saveAllPublic(doneCode,getBusiParam(),busiInfo);
 		saveAllPublic(doneCode,getBusiParam());
 	}
-
+	
 	/**
 	 * 设备挂失
 	 */
@@ -1747,6 +1761,10 @@ public class CustService extends BaseBusiService implements ICustService {
 
 	public DeviceDto querySaleableDevice(String deviceCode) throws Exception {
 		return deviceComponent.querySaleableDevice(deviceCode);
+	}
+	
+	public DeviceDto queryChangeDevice(String userType, String deviceCode) throws Exception {
+		return deviceComponent.queryChangeDevice(userType, deviceCode);
 	}
 	
 	public Map<String, Object> queryDeviceForSwitch(String deviceCode,String deviceType, String custId) throws Exception{

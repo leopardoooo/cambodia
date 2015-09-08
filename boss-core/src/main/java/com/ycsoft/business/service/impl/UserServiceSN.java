@@ -8,11 +8,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.ycsoft.beans.config.TBusiFee;
 import com.ycsoft.beans.config.TDeviceBuyMode;
+import com.ycsoft.beans.config.TDeviceChangeReason;
 import com.ycsoft.beans.core.cust.CCust;
 import com.ycsoft.beans.core.cust.CCustDevice;
 import com.ycsoft.beans.core.job.JUserStop;
@@ -23,12 +25,17 @@ import com.ycsoft.beans.core.prod.CProdPropChange;
 import com.ycsoft.beans.core.user.CUser;
 import com.ycsoft.beans.core.user.CUserPropChange;
 import com.ycsoft.beans.core.user.FillUSerDeviceDto;
+import com.ycsoft.beans.device.RDeviceFee;
 import com.ycsoft.beans.prod.PPromotionAcct;
+import com.ycsoft.beans.prod.PSpkgOpenbusifee;
+import com.ycsoft.beans.prod.PSpkgOpenuser;
 import com.ycsoft.beans.system.SOptr;
+import com.ycsoft.business.commons.pojo.BusiParameter;
 import com.ycsoft.business.component.core.OrderComponent;
 import com.ycsoft.business.component.task.SnTaskComponent;
 import com.ycsoft.business.dao.core.prod.CProdOrderDao;
-import com.ycsoft.business.dao.core.prod.CProdPropChangeDao;
+import com.ycsoft.business.dto.config.TemplateConfigDto;
+import com.ycsoft.business.dto.core.fee.BusiFeeDto;
 import com.ycsoft.business.dto.core.fee.FeeInfoDto;
 import com.ycsoft.business.dto.core.prod.DisctFeeDto;
 import com.ycsoft.business.dto.core.prod.PromotionDto;
@@ -45,6 +52,7 @@ import com.ycsoft.commons.exception.ErrorCode;
 import com.ycsoft.commons.exception.ServicesException;
 import com.ycsoft.commons.helper.CollectionHelper;
 import com.ycsoft.commons.helper.DateHelper;
+import com.ycsoft.commons.helper.JsonHelper;
 import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.daos.core.JDBCException;
 @Service
@@ -54,19 +62,20 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 	@Autowired
 	private CProdOrderDao cProdOrderDao;
 	@Autowired
-	private CProdPropChangeDao cProdPropChangeDao;
-	@Autowired
 	private SnTaskComponent snTaskComponent;
 	
 	public void createUser(CUser user, String deviceCode, String deviceType, String deviceModel, String deviceBuyMode,
 			FeeInfoDto deviceFee) throws Exception {
 		CCust cust = getBusiParam().getCust();
+		this.validAccount(user.getLogin_name());
+		this.canOpenUser(cust);
 		doneCodeComponent.lockCust(cust.getCust_id());
 		// 获取业务流水
 		Integer doneCode = doneCodeComponent.gDoneCode();
 		// 获取客户信息
 		
-		openSingle(cust, user, doneCode, deviceCode, deviceType, deviceModel, deviceBuyMode, deviceFee);
+		int num = getUserCount(cust, user.getUser_type());
+		openSingle(cust, user, doneCode, deviceCode, deviceType, deviceModel, deviceBuyMode, deviceFee, num);
 		
 		// 设置拦截器所需要的参数
 		getBusiParam().resetUser();
@@ -75,44 +84,98 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 
 	}
 	
+	private void canOpenUser(CCust cust) throws Exception {
+		if(cust.getStatus().equals(StatusConstants.PREOPEN)){
+			throw new ServicesException(ErrorCode.CustStatusIsNotOpenUser);
+		}
+	}
+	
 	@Override
-	public void createUserBatch(List<UserInfo> userList) throws Exception {
+	public void createUserBatch(List<UserInfo> userList, String stopType, String isHand) throws Exception {
 		CCust cust = getBusiParam().getCust();
+		this.canOpenUser(cust);
 		doneCodeComponent.lockCust(cust.getCust_id());
 		Integer doneCode = doneCodeComponent.gDoneCode();
-		List<CUser> taskUserList = new ArrayList<CUser>();
-		// 获取客户信息
-		for (UserInfo userInfo:userList){
-			for (int i=0;i<userInfo.getUser_count();i++){
-				CUser user = new CUser();
-				user.setUser_type(userInfo.getUser_type());
-				String deviceType;
-				if (user.getUser_type().equals(SystemConstants.USER_TYPE_BAND)){
-					deviceType = SystemConstants.DEVICE_TYPE_MODEM;
-				} else {
-					deviceType = SystemConstants.DEVICE_TYPE_STB;
+		
+		if(SystemConstants.BOOLEAN_TRUE.equals(isHand)){
+			// 获取客户信息
+			for (UserInfo userInfo:userList){
+				for (int i=0;i<userInfo.getUser_count();i++){
+					CUser user = new CUser();
+					user.setUser_type(userInfo.getUser_type());
+					String deviceType;
+					if (user.getUser_type().equals(SystemConstants.USER_TYPE_BAND)){
+						deviceType = SystemConstants.DEVICE_TYPE_MODEM;
+					} else {
+						deviceType = SystemConstants.DEVICE_TYPE_STB;
+					}
+					
+					String deviceModel = userInfo.getDevice_model();
+					String deviceBuyMode = userInfo.getDevice_buy_mode();
+					FeeInfoDto deviceFee = new FeeInfoDto();
+					deviceFee.setFee_id(userInfo.getFee_id());
+					deviceFee.setFee(userInfo.getFee());
+					
+					user.setStop_type(stopType);
+					
+					int num = getUserCount(cust, user.getUser_type());
+					this.openSingle(cust, user, doneCode, null, deviceType, deviceModel, deviceBuyMode, deviceFee, num);
+					
 				}
-				
-				String deviceModel = userInfo.getDevice_model();
-				String deviceBuyMode = userInfo.getDevice_buy_mode();
-				FeeInfoDto deviceFee = new FeeInfoDto();
-				deviceFee.setFee_id(userInfo.getFee_id());
-				deviceFee.setFee(userInfo.getFee());
-				
-				this.openSingle(cust, user, doneCode, null, deviceType, deviceModel, deviceBuyMode, deviceFee);
-				
-				taskUserList.add(user);
 			}
+		}else{
+			List<PSpkgOpenuser> spkgUserList = this.querySpkgUser(cust.getSpkg_sn());
+			List<PSpkgOpenbusifee> spkgBusiFeeList = this.querySpkgOpenFee(cust.getSpkg_sn());
+			if(spkgUserList.size() > 0){
+				for(PSpkgOpenuser openUser : spkgUserList){
+					CUser user = new CUser();
+					user.setUser_type(openUser.getUser_type());
+					String deviceType;
+					if (user.getUser_type().equals(SystemConstants.USER_TYPE_BAND)){
+						deviceType = SystemConstants.DEVICE_TYPE_MODEM;
+					} else {
+						deviceType = SystemConstants.DEVICE_TYPE_STB;
+					}
+					
+					String deviceModel = openUser.getDevice_model();
+					String deviceBuyMode = openUser.getBuy_type();
+					FeeInfoDto deviceFee = new FeeInfoDto();
+					deviceFee.setFee_id(openUser.getFee_id());
+					deviceFee.setFee(openUser.getFee());
+					
+					user.setStop_type(stopType);
+					
+					int num = getUserCount(cust, user.getUser_type());
+					this.openSingle(cust, user, doneCode, null, deviceType, deviceModel, deviceBuyMode, deviceFee, num);
+				}
+			}
+			if(spkgBusiFeeList.size() > 0){
+				for(PSpkgOpenbusifee busiFee : spkgBusiFeeList){
+					feeComponent.saveBusiFee(cust.getCust_id(), cust != null ? cust.getAddr_id() : null, busiFee.getFee_id(), 1, 
+							SystemConstants.PAY_TYPE_UNPAY, busiFee.getFee(), doneCode, doneCode, getBusiParam().getBusiCode(), null, "");
+				}
+			}
+			userComponent.updateOpenUserDoneCode(cust.getSpkg_sn(), doneCode);
 		}
-		//工单处理
-		snTaskComponent.createOpenTask(doneCode, cust, taskUserList, getBusiParam().getWorkBillAsignType());
 		saveAllPublic(doneCode, getBusiParam());
 	}
 
-
+	private int getUserCount(CCust cust, String userType) throws Exception {
+		int num = userComponent.queryMaxNumByLoginName(cust.getCust_id(), cust.getCust_no(), userType);
+		if(userType.equals(SystemConstants.USER_TYPE_BAND)){
+			num += SystemConstants.USER_TYPE_BAND_NUM;
+		}else if(userType.equals(SystemConstants.USER_TYPE_OTT)){
+			if(num == 0){
+				num += SystemConstants.USER_TYPE_OTT_NUM;
+			}else{
+				num += 1;
+			}
+		}
+		return num;
+	}
 
 	private void openSingle(CCust cust, CUser user, Integer doneCode, String deviceCode, String deviceType,
-			String deviceModel, String deviceBuyMode, FeeInfoDto deviceFee) throws Exception, JDBCException {
+			String deviceModel, String deviceBuyMode, FeeInfoDto deviceFee, int num) throws Exception, JDBCException {
 		String custId = cust.getCust_id();
 		
 		String user_id = userComponent.gUserId();
@@ -134,7 +197,8 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		}
 		
 		//设置OTT用户终端类型和默认用户名
-		if (user.getUser_type().equals(SystemConstants.USER_TYPE_OTT)) {
+		String userType = user.getUser_type();
+		if (userType.equals(SystemConstants.USER_TYPE_OTT)) {
 			if (cust.getCust_type().equals(SystemConstants.CUST_TYPE_NONRESIDENT)){
 				user.setTerminal_type(SystemConstants.USER_TERMINAL_TYPE_ZZD);
 			} else {
@@ -153,20 +217,34 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 				}
 			}
 			
-			if (StringHelper.isEmpty(user.getLogin_name()))
-				user.setLogin_name("supertv"+user.getUser_id());
+			/*if (StringHelper.isEmpty(user.getLogin_name()))
+				user.setLogin_name("supertv"+user.getUser_id());*/
+			user.setLogin_name(cust.getCust_no()+""+num);
+		}else if(userType.equals(SystemConstants.USER_TYPE_BAND)){
+			String domainName = custComponent.gCustNoByAddr(cust.getAddr_id(), null);
+			user.setLogin_name(cust.getCust_no()+"0"+num+"@"+domainName);
+			user.setPassword(cust.getPassword());
 		}
 		
-		userComponent.createUser(user);
+		TDeviceBuyMode buyModeCfg = busiConfigComponent.queryBuyMode(deviceBuyMode);
 		//处理设备和授权
 		if (!user.getUser_type().equals(SystemConstants.USER_TYPE_OTT_MOBILE)){
-			TDeviceBuyMode buyModeCfg = busiConfigComponent.queryBuyMode(deviceBuyMode);
 			String ownership = SystemConstants.OWNERSHIP_GD;
-			if (buyModeCfg.getChange_ownship().equals(SystemConstants.BOOLEAN_TRUE))
+			if (buyModeCfg!= null && buyModeCfg.getChange_ownship().equals(SystemConstants.BOOLEAN_TRUE))
 				ownership = SystemConstants.OWNERSHIP_CUST;
 			this.buyDevice(device, deviceBuyMode,ownership, deviceFee, getBusiParam().getBusiCode(), cust, doneCode);
 			
+			//非自购模式 设置协议截止日期，读取模板配置数据
+			if(buyModeCfg!= null && !buyModeCfg.getBuy_mode().equals(SystemConstants.BUSI_BUY_MODE_BUY) && StringHelper.isNotEmpty(deviceModel)){
+				Integer months = Integer.parseInt( userComponent.queryTemplateConfig(TemplateConfigDto.Config.PROTOCOL_DATE_MONTHS.toString()) );
+				user.setProtocol_date( DateHelper.addTypeDate(DateHelper.now(), "MONTH", months) );
+			}
+//			if(buyModeCfg != null){
+//				user.setStr9(buyModeCfg.getBuy_mode());
+//			}
 		}
+		
+		userComponent.createUser(user);
 		
 		
 		if (user.getStatus().equals(StatusConstants.ACTIVE)){
@@ -198,19 +276,32 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 	}
 
 	/**
+	 * 验证ott_mobile账户是否唯一
+	 * @param name
+	 * @throws Exception
+	 */
+	public void validAccount(String name) throws Exception {
+		boolean flag = userComponent.validAccount(name);
+		if(flag){
+			throw new ServicesException(ErrorCode.UserLoginNameIsExists);
+		}
+	}
+	
+	public List<TDeviceChangeReason> queryDeviceChangeReason() throws Exception {
+		return userComponent.queryDeviceChangeReason();
+	}
+	
+	/**
 	 * 用户更换设备
 	 */
-	@Override
-	public void saveChangeDevice(String userId, String deviceCode, String devcieBuyMode, 
-			FeeInfoDto deviceFee,boolean reclaim)
-			throws Exception {
-		
+//	public void saveChangeDevice(String userId, String deviceCode, String devcieBuyMode, 
+//			FeeInfoDto deviceFee, String changeReason, boolean reclaim) throws Exception {
+	public void saveChangeDevice(String userId, String deviceCode, String reasonType) throws Exception {
+		Integer doneCode = doneCodeComponent.gDoneCode();
 		CCust cust = getBusiParam().getCust();
-		//lock cust
 		doneCodeComponent.lockCust(cust.getCust_id());
 		CUser oldUser = userComponent.queryUserById(userId);
 		CUser user = userComponent.queryUserById(userId);
-		Integer doneCode = doneCodeComponent.gDoneCode();
 		
 		String oldDeviceCode = user.getStb_id();
 		if (user.getUser_type().equals(SystemConstants.USER_TYPE_BAND))
@@ -222,26 +313,48 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		//修改用户设备信息
 		setUserDeviceInfo(user, device);
 		userComponent.updateDevice(doneCode, user);
+		
+		TDeviceChangeReason changeReason = userComponent.queryChangeReasonByType(reasonType);
+		
+		if(changeReason.getIs_charge().equals(SystemConstants.BOOLEAN_TRUE)){
+			TDeviceBuyMode buyMode = busiConfigComponent.queryBuyMode(SystemConstants.BUSI_BUY_MODE_BUY);
+			RDeviceFee deviceFee = deviceComponent.queryDeviceFee(device.getDevice_type(), device.getDevice_model(), buyMode.getBuy_mode()).get(0);
+			FeeInfoDto feeInfo = new FeeInfoDto();
+			BeanUtils.copyProperties(feeInfo, deviceFee);
+			feeInfo.setFee(deviceFee.getFee_value());
+			//处理设备购买和回收
+			this.buyDevice(device, SystemConstants.BUSI_BUY_MODE_BUY, oldDevice.getOwnership(), feeInfo, getBusiParam().getBusiCode(), cust, doneCode);
+		}
+		
+		if(changeReason.getIs_reclaim().equals(SystemConstants.BOOLEAN_TRUE)){
+			deviceComponent.saveDeviceReclaim(doneCode,  getBusiParam().getBusiCode(),
+					oldDevice.getDevice_id(), cust.getCust_id(), reasonType);
+		}
+		if(changeReason.getIs_lost().equals(SystemConstants.BOOLEAN_TRUE)){
+			deviceComponent.saveLossDevice(doneCode, getBusiParam().getBusiCode(), oldDeviceCode);
+		}
+		
 		//处理授权
 		if (user.getUser_type().equals(SystemConstants.USER_TYPE_OTT)){
 			authComponent.sendAuth(user, null, BusiCmdConstants.CHANGE_USER, doneCode);
 		} else if (user.getUser_type().equals(SystemConstants.USER_TYPE_DTT)){
-			authComponent.sendAuth(oldUser, null, BusiCmdConstants.PASSVATE_TERMINAL, doneCode);
+			//设备回收，发设备销毁指令
+			if(changeReason.getIs_reclaim().equals(SystemConstants.BOOLEAN_TRUE)){
+				authComponent.sendAuth(oldUser, null, BusiCmdConstants.PASSVATE_TERMINAL, doneCode);
+			}else{
+				//设备不回收，发产品减指令
+				List<CProdOrder> orderList = orderComponent.queryOrderProdByUserId(userId);
+				if(orderList.size() > 0)
+					authComponent.sendAuth(oldUser, orderList, BusiCmdConstants.PASSVATE_PROD, doneCode);
+			}
 			authComponent.sendAuth(user, null, BusiCmdConstants.ACCTIVATE_TERMINAL, doneCode);
 			authComponent.sendAuth(user, null, BusiCmdConstants.REFRESH_TERMINAL, doneCode);
 		}
-		//处理设备购买和回收
-		this.buyDevice(device, devcieBuyMode, oldDevice.getOwnership(), deviceFee, getBusiParam().getBusiCode(),
-				cust, doneCode);
-		if (reclaim){
-			deviceComponent.saveDeviceReclaim(doneCode,  getBusiParam().getBusiCode(),
-					oldDevice.getDevice_id(), cust.getCust_id(), "change device");
-		}
+		// 设置拦截器所需要的参数
+		getBusiParam().resetUser();
+		getBusiParam().addUser(user);
+		saveAllPublic(doneCode, getBusiParam());
 	}
-
-
-
-	
 
 	@Override
 	public void createUser(CUser user, String deviceBuyMode, FeeInfoDto deviceFee) throws Exception {
@@ -364,11 +477,11 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 				stbDevice = deviceComponent.queryDeviceByDeviceCode(user.getStb_id());
 				reclaimDevice(stbDevice.getDevice_id(), null,SystemConstants.RECLAIM_REASON_XHTH, 0, cust, doneCode, busiCode);
 			}
-			if(StringHelper.isNotEmpty(user.getCard_id()) && (stbDevice.getPairCard() == null  || !user.getCard_id().equals(stbDevice.getPairCard().getCard_id()))){
+			if(StringHelper.isNotEmpty(user.getCard_id()) && (stbDevice != null && (stbDevice.getPairCard() == null  || !user.getCard_id().equals(stbDevice.getPairCard().getCard_id())))){
 				DeviceDto device = deviceComponent.queryDeviceByDeviceCode(user.getCard_id());
 				reclaimDevice(device.getDevice_id(), null,SystemConstants.RECLAIM_REASON_XHTH, 0, cust, doneCode, busiCode);
 			}
-			if(StringHelper.isNotEmpty(user.getModem_mac()) && (stbDevice.getPairModem() == null  || !user.getModem_mac().equals(stbDevice.getPairModem().getModem_mac()))){
+			if(StringHelper.isNotEmpty(user.getModem_mac()) && (stbDevice != null && (stbDevice.getPairModem() == null  || !user.getModem_mac().equals(stbDevice.getPairModem().getModem_mac())))){
 				DeviceDto device = deviceComponent.queryDeviceByDeviceCode(user.getModem_mac());
 				reclaimDevice(device.getDevice_id(), null,SystemConstants.RECLAIM_REASON_XHTH, 0, cust, doneCode, busiCode);
 			}
@@ -648,8 +761,27 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 
 	@Override
 	public void saveResendCa() throws Exception {
-		// TODO Auto-generated method stub
-		
+		List<CUser> userList = getBusiParam().getSelectedUsers();
+		//获取业务流水
+		Integer doneCode = doneCodeComponent.gDoneCode();
+		for (CUser user:userList){
+			//重发加授权指令
+			List<CProdOrder> prodList = orderComponent.queryOrderProdByUserId(user.getUser_id());
+			for (CProdOrder prod:prodList){
+				//正常状态的产品,重复指令
+				List<CProdOrder> orderList = new ArrayList<CProdOrder>();
+				orderList.add(prod);
+				String authCmdType = "";
+				if (isProdOpen(prod.getStatus())){
+					authCmdType = BusiCmdConstants.ACCTIVATE_PROD;
+				}else{
+					authCmdType = BusiCmdConstants.PASSVATE_PROD;
+				}
+				authComponent.sendAuth(user, orderList, authCmdType, doneCode);
+			}
+		}
+
+		saveAllPublic(doneCode,getBusiParam());
 	}
 
 
@@ -657,17 +789,68 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 
 	@Override
 	public void saveRefreshCa(String refreshType) throws Exception {
-		// TODO Auto-generated method stub
-		
+		List<CUser> userList = getBusiParam().getSelectedUsers();
+		//获取业务流水
+		Integer doneCode = doneCodeComponent.gDoneCode();
+		for (CUser user:userList){
+			if (SystemConstants.REFRESH_TYPE_TERMINAL.equals(refreshType)){
+				authComponent.sendAuth(user, null, BusiCmdConstants.ACCTIVATE_TERMINAL, doneCode);
+			} else {
+				authComponent.sendAuth(user, null, BusiCmdConstants.REFRESH_TERMINAL, doneCode);
+			}
+				
+		}
+
+		saveAllPublic(doneCode,getBusiParam());
 	}
 
 
+	public void saveBatchUpdateUserName(List<CUser> userList, String custId) throws Exception {
+
+		if(CollectionHelper.isEmpty(userList)){
+			return ;
+		}
+		Integer doneCode = this.doneCodeComponent.gDoneCode();
+		
+		BusiParameter busiParam = getBusiParam();
+		for (CUser user : userList) {
+			int result = userComponent.updateUserNameByDeviceCode(user,custId);
+			if(result < 1){
+				throw new ServicesException(ErrorCode.NoUserExistsOrBelong2CurrentCust);
+			}
+		}
+		busiParam.setBusiCode(BusiCodeConstants.BATCH_MOD_USER_NAME);//其他参数不需要
+		saveAllPublic(doneCode,busiParam);
+	}
 
 
 	@Override
 	public void saveEditPwd(String newPwd) throws Exception {
-		// TODO Auto-generated method stub
+
+		//获取客户用户信息
+		String  custId = getBusiParam().getCust().getCust_id();
+		CUser user = getBusiParam().getSelectedUsers().get(0);
+		//获取业务流水
+		Integer doneCode = doneCodeComponent.gDoneCode();
+		//生成计算用户信用度的JOB
+		jobComponent.createCreditCalJob(doneCode, custId, null,SystemConstants.BOOLEAN_TRUE);
+		List<CUserPropChange> propChangeList = new ArrayList<CUserPropChange>();
+		CUser userDto = queryUserById(user.getUser_id());
+
+		userDto.setNewPassword(newPwd);
+		jobComponent.createBusiCmdJob(doneCode, BusiCmdConstants.BAND_EDIT_PWD, custId, user.getUser_id(), null, null, user.getModem_mac(), null, null, JsonHelper.fromObject(userDto));
+	
 		
+		CUserPropChange propChange = new CUserPropChange();
+		propChange.setColumn_name("password");
+		propChange.setOld_value(userDto.getPassword());
+		propChange.setNew_value(newPwd);
+		propChangeList.add(propChange);
+		userComponent.editUser(doneCode, getBusiParam().getSelectedUserIds().get(0), propChangeList);
+		
+		authComponent.sendAuth(user, null, BusiCmdConstants.CHANGE_USER, doneCode);
+		
+		saveAllPublic(doneCode,getBusiParam());
 	}
 
 
@@ -975,46 +1158,6 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 
 
 
-	private void buyDevice(DeviceDto device,String buyMode,String ownership,FeeInfoDto fee, 
-			String busiCode,CCust cust,Integer doneCode) throws Exception {
-		//增加客户设备
-		custComponent.addDevice(doneCode, cust.getCust_id(),
-				device.getDevice_id(), device.getDevice_type(), device.getDevice_model(), 
-				device.getPairCard() ==null?null:device.getPairCard().getDevice_id(),
-				device.getPairCard() ==null?null:device.getPairCard().getCard_id(), 
-				null, null,buyMode);
-		//保存设备费用
-		if (fee != null && fee.getFee_id()!= null && fee.getFee()>0){
-			String payType = SystemConstants.PAY_TYPE_UNPAY;
-			if (this.getBusiParam().getPay()!= null && this.getBusiParam().getPay().getPay_type() !=null)
-				payType = this.getBusiParam().getPay().getPay_type();
-			if(doneCodeComponent.queryDoneCodeUnPayByKey(doneCode)==null){
-				doneCodeComponent.saveDoneCodeUnPay(cust.getCust_id(), doneCode, getBusiParam().getOptr().getOptr_id());
-			}
-			feeComponent.saveDeviceFee( cust.getCust_id(), cust.getAddr_id(),fee.getFee_id(),fee.getFee_std_id(), 
-					payType,device.getDevice_type(), device.getDevice_id(), device.getDevice_code(),
-					null,
-					null,
-					null,
-					null,
-					device.getDevice_model(),
-					fee.getFee(), doneCode,doneCode, busiCode, 1);	
-			
-		}
-		
-		if (StringHelper.isNotEmpty(device.getDevice_id())){
-			//更新设备仓库状态
-			deviceComponent.updateDeviceDepotStatus(doneCode, busiCode, device.getDevice_id(),
-					device.getDepot_status(), StatusConstants.USE,true);
-			//更新设备产权
-			if (SystemConstants.OWNERSHIP_CUST.equals(ownership)){
-				deviceComponent.updateDeviceOwnership(doneCode, busiCode, device.getDevice_id(),device.getOwnership(),SystemConstants.OWNERSHIP_CUST,true);
-			}
-			//更新设备为旧设备
-			if (SystemConstants.BOOLEAN_TRUE.equals(device.getUsed()))
-				deviceComponent.updateDeviceUsed(doneCode, busiCode, device.getDevice_id(), SystemConstants.BOOLEAN_TRUE, SystemConstants.BOOLEAN_FALSE,true);
-		}
-	}
 	
 	/**
 	 * 清除预报停，并且使得操作流水失效
@@ -1026,6 +1169,16 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		if(userList.size()>0){
 			jobComponent.removeByUserId(userId);
 		}
+	}
+	
+	@Override
+	public List<PSpkgOpenuser> querySpkgUser(String spkgSn) throws Exception {
+		return userComponent.querySpkgUser(spkgSn);
+	}
+	
+	@Override
+	public List<PSpkgOpenbusifee> querySpkgOpenFee(String spkgSn) throws Exception {
+		return userComponent.querySpkgOpenFee(spkgSn);
 	}
 	
 	private void stopProd(Integer doneCode, CProdOrderDto order) throws Exception {
@@ -1044,7 +1197,6 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		CProdPropChange statusChange =new CProdPropChange();
 		statusChange.setChange_time(new Date(order.getStatus_date().getTime()));
 		statusChange.setNew_value(StatusConstants.ACTIVE);
-		//cProdPropChangeDao.queryLastStatus(order.getOrder_sn(), order.getCounty_id());
 		if (statusChange == null)
 			throw new ServicesException("找不到产品报停记录，请联系管理员");
 		if (startDate == null) {
@@ -1098,7 +1250,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 					|| (device.getPairCard() != null && StringHelper.isNotEmpty(device.getPairCard().getCard_id())))
 				throw new ServicesException("设备类型不正确");
 			user.setStb_id(device.getDevice_code());
-			user.setModem_mac(device.getDevice_mac());
+			user.setModem_mac(device.getStbMac());
 		}
 		if (user.getUser_type().equals(SystemConstants.USER_TYPE_DTT)){
 			if ( device.getPairCard() == null || StringHelper.isEmpty(device.getPairCard().getCard_id()))
@@ -1113,5 +1265,67 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 	 * 3、如果用户名下有未到期的归属客户套餐的产品，套餐下用户必须同时报停
 	 * @param users
 	 */
+	
+	
+	
+	
+	/**
+	 * 固定的ip外挂费用信息
+	 * @return
+	 * @throws Exception
+	 */
+	public BusiFeeDto queryUserIpFee()throws Exception{
+		return feeComponent.getBusiFee(SystemConstants.USER_IP_FEE_ID);
+	}
+	
+	
+	/**
+	 * 新增外挂IP
+	 * @param user
+	 * @throws Exception
+	 */
+	public void saveAddIpUser(CUser user) throws Exception{
+		CCust cust = getBusiParam().getCust();
+		doneCodeComponent.lockCust(cust.getCust_id());
+		// 获取业务流水
+		Integer doneCode = doneCodeComponent.gDoneCode();
+		// 获取客户信息
+		List<CUserPropChange> propChangeList = new ArrayList<CUserPropChange>();
+		CUser oldUser = userComponent.queryUserById(user.getUser_id());
+		
+		if(StringHelper.isNotEmpty(user.getStr4())){
+			CUserPropChange propChange = new CUserPropChange();
+			propChange.setColumn_name("str4");
+			propChange.setOld_value(oldUser.getStr4());
+			propChange.setNew_value(user.getStr4());
+			propChangeList.add(propChange);
+		}
+		
+		if(StringHelper.isNotEmpty(user.getStr5())){
+			CUserPropChange propChange = new CUserPropChange();
+			propChange.setColumn_name("str5");
+			propChange.setOld_value(oldUser.getStr5());
+			propChange.setNew_value(user.getStr5());
+			propChangeList.add(propChange);
+		}
+		
+		if(StringHelper.isNotEmpty(user.getStr6())){
+			CUserPropChange propChange = new CUserPropChange();
+			propChange.setColumn_name("str6");
+			propChange.setOld_value(oldUser.getStr6());
+			propChange.setNew_value(user.getStr6());
+			propChangeList.add(propChange);
+		}
+		
+		userComponent.editUser(doneCode, getBusiParam().getSelectedUserIds().get(0), propChangeList);
+			
+		// 设置拦截器所需要的参数
+		getBusiParam().resetUser();
+		CUser newUser = userComponent.queryUserById(user.getUser_id());
+		getBusiParam().addUser(newUser);
+		saveAllPublic(doneCode, getBusiParam());
+
+		
+	}
 	
 }

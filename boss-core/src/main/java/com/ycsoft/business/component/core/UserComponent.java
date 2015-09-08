@@ -2,18 +2,21 @@ package com.ycsoft.business.component.core;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.ycsoft.beans.config.TCustColonyCfg;
+import com.ycsoft.beans.config.TDeviceChangeReason;
 import com.ycsoft.beans.core.common.CDoneCode;
 import com.ycsoft.beans.core.common.CDoneCodeDetail;
 import com.ycsoft.beans.core.cust.CCust;
+import com.ycsoft.beans.core.cust.CCustDevice;
 import com.ycsoft.beans.core.job.JUserStop;
+import com.ycsoft.beans.core.prod.CProdOrderFee;
 import com.ycsoft.beans.core.promotion.CPromFee;
 import com.ycsoft.beans.core.promotion.CPromProdRefund;
 import com.ycsoft.beans.core.user.CRejectRes;
@@ -24,16 +27,24 @@ import com.ycsoft.beans.core.user.CUserDtv;
 import com.ycsoft.beans.core.user.CUserHis;
 import com.ycsoft.beans.core.user.CUserPropChange;
 import com.ycsoft.beans.core.user.CUserStb;
+import com.ycsoft.beans.device.RModemModel;
+import com.ycsoft.beans.device.RStbModel;
 import com.ycsoft.beans.prod.PPromFee;
 import com.ycsoft.beans.prod.PPromFeeUser;
 import com.ycsoft.beans.prod.PRes;
+import com.ycsoft.beans.prod.PSpkg;
+import com.ycsoft.beans.prod.PSpkgOpenbusifee;
+import com.ycsoft.beans.prod.PSpkgOpenuser;
 import com.ycsoft.beans.system.SOptr;
 import com.ycsoft.business.commons.abstracts.BaseBusiComponent;
 import com.ycsoft.business.component.config.ExpressionUtil;
 import com.ycsoft.business.dao.config.TCustColonyCfgDao;
+import com.ycsoft.business.dao.config.TDeviceChangeReasonDao;
 import com.ycsoft.business.dao.core.cust.CCustDao;
+import com.ycsoft.business.dao.core.cust.CCustDeviceDao;
 import com.ycsoft.business.dao.core.fee.CFeeDao;
 import com.ycsoft.business.dao.core.job.JUserStopDao;
+import com.ycsoft.business.dao.core.prod.CProdOrderFeeDao;
 import com.ycsoft.business.dao.core.promotion.CPromFeeDao;
 import com.ycsoft.business.dao.core.promotion.CPromProdRefundDao;
 import com.ycsoft.business.dao.core.promotion.CPromotionDao;
@@ -50,7 +61,12 @@ import com.ycsoft.business.dao.core.user.CUserPropChangeDao;
 import com.ycsoft.business.dao.prod.PPromFeeDao;
 import com.ycsoft.business.dao.prod.PPromFeeProdDao;
 import com.ycsoft.business.dao.prod.PPromFeeUserDao;
+import com.ycsoft.business.dao.prod.PSpkgDao;
+import com.ycsoft.business.dao.prod.PSpkgOpenbusifeeDao;
+import com.ycsoft.business.dao.prod.PSpkgOpenuserDao;
 import com.ycsoft.business.dao.resource.device.RDeviceDao;
+import com.ycsoft.business.dao.resource.device.RModemModelDao;
+import com.ycsoft.business.dao.resource.device.RStbModelDao;
 import com.ycsoft.business.dao.system.SOptrDao;
 import com.ycsoft.business.dto.core.bill.UserBillDto;
 import com.ycsoft.business.dto.core.prod.CPromotionDto;
@@ -102,25 +118,27 @@ public class UserComponent extends BaseBusiComponent {
 	private CPromFeeDao cPromFeeDao;
 	private TCustColonyCfgDao tCustColonyCfgDao;
 	private ExpressionUtil expressionUtil ;
-
-	/**
-	 * 查询挂载IP费用的用户清单
-	 * @param cust_id
-	 * @return
-	 * @throws Exception
-	 */
-	public Map<String,CUser> queryUserByIpAddresFee(String cust_id)throws Exception{
-		Map<String,CUser> map=new HashMap<String,CUser>();
-		for(CUser user:cUserDao.queryUserByIpAddressFee(cust_id)){
-			try{
-			 int fee_count= Integer.valueOf(user.getStr6());
-			 if(fee_count>0){
-				 map.put(user.getUser_id(), user);
-			 }
-			}catch(Exception e){}
-		}
-		return map;
+	@Autowired
+	private RStbModelDao rStbModelDao;
+	@Autowired
+	private RModemModelDao rModemModelDao;
+	@Autowired
+	private CCustDeviceDao cCustDeviceDao;
+	@Autowired
+	private CProdOrderFeeDao cProdOrderFeeDao;
+	@Autowired
+	private TDeviceChangeReasonDao tDeviceChangeReasonDao;
+	@Autowired
+	private PSpkgDao pSpkgDao;
+	@Autowired
+	private PSpkgOpenuserDao pSpkgOpenuserDao;
+	@Autowired
+	private PSpkgOpenbusifeeDao pSpkgOpenbusifeeDao;
+	
+	public List<TDeviceChangeReason> queryDeviceChangeReason() throws Exception{
+		return tDeviceChangeReasonDao.findAll();
 	}
+
 	public Map<String,CUser> queryUserMap(String cust_id) throws Exception{
 		return CollectionHelper.converToMapSingle(cUserDao.queryUserByCustId(cust_id), "user_id");
 	}
@@ -378,6 +396,39 @@ public class UserComponent extends BaseBusiComponent {
 			}
 			if(StringHelper.isNotEmpty(rejectRes))
 				userdto.setRejectRes(rejectRes);
+			
+			if(userdto.getUser_type().equals(SystemConstants.USER_TYPE_BAND)){
+				if(StringHelper.isNotEmpty(userdto.getModem_mac())){
+					RModemModel modemModel = rModemModelDao.queryByModemMac(userdto.getModem_mac());
+					if(modemModel != null){
+						userdto.setDevice_model(modemModel.getDevice_model());
+						userdto.setDevice_model_text(modemModel.getModel_name());
+					}
+					
+					CCustDevice custDevice = cCustDeviceDao.queryCustDeviceByDeviceCode(userdto.getCust_id(), userdto.getModem_mac());
+					if(custDevice != null){
+						userdto.setBuy_model(custDevice.getBuy_mode());
+						userdto.setBuy_model_text(custDevice.getBuy_mode_text());
+					}
+				}
+			}else{
+				if(StringHelper.isNotEmpty(userdto.getStb_id())){
+					RStbModel stbModel = rStbModelDao.queryByStbId(userdto.getStb_id());
+					if(stbModel != null){
+						userdto.setDevice_model(stbModel.getDevice_model());
+						userdto.setDevice_model_text(stbModel.getModel_name());
+					}
+					
+					CCustDevice custDevice = cCustDeviceDao.queryCustDeviceByDeviceCode(userdto.getCust_id(), userdto.getStb_id());
+					if(custDevice != null){
+						userdto.setBuy_model(custDevice.getBuy_mode());
+						userdto.setBuy_model_text(custDevice.getBuy_mode_text());
+					}
+				}
+			}
+			
+			
+			
 			result.add(userdto);
 		}
 		return result;
@@ -508,6 +559,10 @@ public class UserComponent extends BaseBusiComponent {
 		 }
 		 return propChangelist;
 	}
+	
+	public Pager<CProdOrderFee> queryOrderFeeDetail(String orderSn, Integer start, Integer limit) throws Exception {
+		return cProdOrderFeeDao.queryOrderFeeDetail(orderSn, start, limit);
+	}
 
 	/**
 	 * @param userId
@@ -527,7 +582,11 @@ public class UserComponent extends BaseBusiComponent {
 		String[] propNames = {"stb_id","card_id","modem_mac"};
 		List<CUserPropChange> upcList = new ArrayList<CUserPropChange>();
 		for (String propName:propNames){
-			if (!BeanHelper.getPropertyString(oldUser, propName).equals(BeanHelper.getPropertyString(user, propName))){
+			String oldValue = BeanHelper.getPropertyString(oldUser, propName);
+			String newValue = BeanHelper.getPropertyString(user, propName);
+			oldValue = (oldValue == null) ? "" : oldValue;
+			newValue = (newValue == null) ? "" : newValue;
+			if (!oldValue.equals(newValue)){
 				CUserPropChange upc = new CUserPropChange();
 				upc.setUser_id(user.getUser_id());
 				upc.setDone_code(doneCode);
@@ -545,7 +604,7 @@ public class UserComponent extends BaseBusiComponent {
 			
 		}
 		//记录异动
-		cUserPropChangeDao.update(upcList.toArray(new CUserPropChange[upcList.size()]));
+		cUserPropChangeDao.save(upcList.toArray(new CUserPropChange[upcList.size()]));
 	}
 
 	/**
@@ -1212,6 +1271,9 @@ public class UserComponent extends BaseBusiComponent {
 		return cUserDao.queryUserCount(custId);
 	}
 	
+	public TDeviceChangeReason queryChangeReasonByType(String reasonType) throws Exception {
+		return tDeviceChangeReasonDao.queryChangeReasonByType(reasonType);
+	}
 	
 
 	/**
@@ -1221,6 +1283,19 @@ public class UserComponent extends BaseBusiComponent {
 	public SOptr queryOptrById(String optr_id) throws Exception{
 		return sOptrDao.findByKey(optr_id);
 	}
+	
+	public List<PSpkgOpenuser> querySpkgUser(String spkgSn) throws Exception {
+		return pSpkgOpenuserDao.querySpkgUser(spkgSn);
+	}
+	
+	public List<PSpkgOpenbusifee> querySpkgOpenFee(String spkgSn) throws Exception {
+		return pSpkgOpenbusifeeDao.querySpkgOpenFee(spkgSn);
+	}
+	
+	public void updateOpenUserDoneCode(String spkgSn, Integer doneCode) throws Exception{
+		pSpkgOpenuserDao.updateOpenUserDoneCode(spkgSn, doneCode);
+	}
+	
 //	public String toUtilValue(String custId,String userId,String tariffId,List<ProdTariffDto> tariffList) throws Exception{
 //		//查找用户基本信息
 //		CUser user = cUserDao.findByKey(userId);
@@ -1266,6 +1341,15 @@ public class UserComponent extends BaseBusiComponent {
 //		}
 //		return flag;
 //	}
+	
+	public int queryMaxNumByLoginName(String custId, String custNo, String userType) throws Exception {
+		return cUserDao.queryMaxNumByLoginName(custId, custNo, userType);
+	}
+	
+	public boolean validAccount(String name) throws Exception{
+		return cUserDao.validAccount(name);
+	}
+	
 
 	public void setExpressionUtil(ExpressionUtil expressionUtil) {
 		this.expressionUtil = expressionUtil;
@@ -1273,6 +1357,17 @@ public class UserComponent extends BaseBusiComponent {
 
 	public void setCFeeDao(CFeeDao feeDao) {
 		cFeeDao = feeDao;
+	}
+
+	/**
+	 * 变更用户名,需要 设备号 和新的用户名.
+	 * @param user
+	 * @param custId 
+	 * @return 
+	 * @throws Exception 
+	 */
+	public int updateUserNameByDeviceCode(CUser user, String custId) throws Exception {
+		return cUserDao.updateUserNameByDeviceCode(user,custId);
 	}
 	
 	

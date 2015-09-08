@@ -24,6 +24,7 @@ public class PackageGroupUser extends PPackageProd  implements Serializable  {
     	this.setTerminal_type(pakProd.getTerminal_type());
     	this.setPackage_id(pakProd.getPackage_id());
     	this.setPrecent(pakProd.getPrecent());
+    	this.setProd_type(pakProd.getProd_type());
     }
     
     public PackageGroupUser(){}

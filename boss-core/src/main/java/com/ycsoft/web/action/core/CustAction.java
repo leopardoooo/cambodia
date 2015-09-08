@@ -82,6 +82,9 @@ public class CustAction extends BaseBusiAction{
 	
 	private String virtualCard;
 	private String virtualModem;
+	private String custCode;
+	
+	private FeeInfoDto deviceFee;
 
 	/**
 	 * 开户
@@ -89,7 +92,7 @@ public class CustAction extends BaseBusiAction{
 	 * @throws Exception
 	 */
 	public String createCust()throws Exception{
-		custService.createCust(cust, linkman);
+		custService.createCust(cust, linkman,custCode);
 		getRoot().setSimpleObj(cust);
 		return JSON;
 	}
@@ -220,6 +223,16 @@ public class CustAction extends BaseBusiAction{
 		String custClass = request.getParameter("custClass");
 		String custClassDate = DateHelper.dateToStr(DateHelper.parseDate(request.getParameter("custClassDate"),"yyyy-MM-dd"));
 		custService.editCustClass(userId, prodSn, tariffId, tariffStartDate, expDateStr, custClass, custClassDate);
+		return JSON;
+	}
+	
+	/**
+	 * 修改优惠类型
+	 * @return
+	 * @throws Exception
+	 */
+	public String editCustLevel() throws Exception{
+		custService.editCustLevel(request.getParameter("cust_level"));
 		return JSON;
 	}
 	
@@ -489,7 +502,7 @@ public class CustAction extends BaseBusiAction{
 				buyMode, feeInfoList, Integer.parseInt(modemZjFee),reclaim,deviceStatus );
 		return JSON;
 	}
-
+	
 	/**
 	 * 根据device_code查询设备是否可用
 	 * @return
@@ -807,4 +820,17 @@ public class CustAction extends BaseBusiAction{
 	public void setDevice_code(String device_code) {
 		this.device_code = device_code;
 	}
+
+	public void setCustCode(String custCode) {
+		this.custCode = custCode;
+	}
+
+	public FeeInfoDto getDeviceFee() {
+		return deviceFee;
+	}
+
+	public void setDeviceFee(FeeInfoDto deviceFee) {
+		this.deviceFee = deviceFee;
+	}
+	
 }

@@ -22,22 +22,32 @@ NewCustForm = Ext.extend( CustBaseForm , {
 		App.getApp().refreshPanel(App.getApp().getData().currentResource.busicode);
 	},
 	doValid:function(){
-		if(!Ext.getCmp('addrTreeCombo').getValue()){
-			Ext.getCmp('addrTreeCombo').setValue("");
+		if(!Ext.getCmp('tempCustAddress').getValue()){
+			Ext.getCmp('tempCustAddress').setValue("");
 			
 			var obj = {};
 			obj['isValid'] = false;
 			obj['msg'] = '无效的客户地址，请重新输入！';
 			return obj;
 		}
+		if(Ext.getCmp('isCanToCustId').getValue() && Ext.isEmpty(this.custCode)){
+			var obj = {};
+			obj['isValid'] = false;
+			obj['msg'] = '意向客户请选择省！';
+			return obj;
+		}
+		
 		return NewCustForm.superclass.doValid.call(this);
 	},
 	getValues : function(){
 		var all = this.getForm().getValues();
-		if(this.custColony){
-			all['cust.cust_colony'] = this.custColony;
+		all['cust.address'] = Ext.getCmp('tempCustAddress').getValue();
+		if(this.custLevel){
+			all['cust.cust_level'] = this.custLevel;
 		}
-		all['cust.address'] = this.custAddress;
+		if(this.custCode){
+			all['custCode'] = this.custCode;
+		}
 		return all;
 	}
 });

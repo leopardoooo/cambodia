@@ -25,12 +25,12 @@ AcctFeeGrid = Ext.extend(Ext.ux.Grid, {
 		var cm = new Ext.ux.grid.LockingColumnModel({ 
     		columns : [
     			{header:'流水号',dataIndex:'create_done_code',width:80},
-				{header:'业务名称',dataIndex:'busi_name',	width:70},
+				{header:'业务名称',dataIndex:'busi_name',	width:80},
 				{header:'账户类型',dataIndex:'acct_type_text',width:70},
 				{header:'账目名称',dataIndex:'fee_text',width:130,renderer:App.qtipValue},
 				{header:'用户类型',dataIndex:'user_type_text',width:70},
-				{header:'用户名',dataIndex:'user_name',width:70},
-				{header:'智能卡号',dataIndex:'device_code',width:130},
+				{header:'用户名',dataIndex:'user_name',width:70,renderer:App.qtipValue},
+				{header:'设备编号',dataIndex:'device_code',width:130},
 				{header:'状态',dataIndex:'status_text',width:60,renderer:Ext.util.Format.statusShow},
 				{header:'金额',dataIndex:'real_pay',width:60,renderer:Ext.util.Format.formatFee},				
 				{header:'缴费前预计到期日',dataIndex:'begin_date',width:125,renderer:Ext.util.Format.dateFormat},
@@ -150,8 +150,8 @@ BusiFeeGrid = Ext.extend(Ext.ux.Grid, {
     		columns : [
     			{header:'流水号',dataIndex:'create_done_code',width:80},
 				{header:'费用名称',dataIndex:'fee_text',width:110},
-				{header:'设备类型',dataIndex:'device_type_text',width:55},
-				{header:'设备编号',dataIndex:'device_code',width:140},
+				{header:'设备类型',dataIndex:'device_type_text',width:60},
+				{header:'设备编号',dataIndex:'device_code',width:130},
 				{header:'状态',dataIndex:'status_text',width:60,renderer:Ext.util.Format.statusShow},
 				{header:'打印状态',dataIndex:'is_doc_text',width:60,renderer:Ext.util.Format.statusShow},
 				{header:'应付',dataIndex:'should_pay',width:60,renderer:Ext.util.Format.formatFee},
@@ -347,8 +347,8 @@ FeePayGrid = Ext.extend(Ext.ux.Grid, {
 		
 		FeePayGrid.superclass.constructor.call(this, {
 					id:'P_FEE_PAY',
-					title : '订单记录',
-					region:"west",
+					title : '支付记录',
+					region:"east",
 					width:"30%",
 					split:true,
 					loadMask : true,

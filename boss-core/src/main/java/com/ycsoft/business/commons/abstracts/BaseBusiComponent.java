@@ -45,6 +45,7 @@ import com.ycsoft.business.dao.core.prod.CProdPropChangeDao;
 import com.ycsoft.business.dao.core.prod.CProdStatusChangeDao;
 import com.ycsoft.business.dao.prod.PProdDao;
 import com.ycsoft.business.dao.prod.PProdTariffDao;
+import com.ycsoft.business.dao.system.SAgentDao;
 import com.ycsoft.business.dao.system.SCountyDao;
 import com.ycsoft.business.dto.config.TemplateConfigDto;
 import com.ycsoft.commons.abstracts.BaseComponent;
@@ -87,6 +88,8 @@ public class BaseBusiComponent extends BaseComponent{
 	protected CAcctAcctitemDao cAcctAcctitemDao;
 	protected BBillDao bBillDao;
 	protected JProdNextTariffDao jProdNextTariffDao;
+	@Autowired
+	protected SAgentDao sAgentDao;
 
 	public void setCAcctAcctitemDao(CAcctAcctitemDao acctAcctitemDao) {
 		cAcctAcctitemDao = acctAcctitemDao;

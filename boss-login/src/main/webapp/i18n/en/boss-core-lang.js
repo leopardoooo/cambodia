@@ -14,8 +14,8 @@ BCLang.home = {
 				mobile: "Mobile Number",areaCateory: "Area Category",houseNetType: "House Internet Type",houseManager: "House Manager Name",
 				houseOptr: "House Operation Name",postalAddr: "Postal Address", remark: "Remark"
 			},
-			device: {
-				_title: "Device Infomation"
+			acct: {
+				_title: "AcctItem Infomation"
 			}
 		}
 	}

@@ -18,13 +18,13 @@ var FeeUnitpreGrid = Ext.extend(Ext.grid.GridPanel,{
 		
 		var sm = new Ext.grid.CheckboxSelectionModel();
 		var columns = [
-			{header:'合同类型',dataIndex:'fee_type_text',width:80},
+			{header:'合同类型',dataIndex:'fee_type_text',width:100},
 			{header:'合同号',dataIndex:'contract_no',width:100,renderer : App.qtipValue},
-			{header:'合同名称',dataIndex:'contract_name',width:100},
-			{header:'客户名称',dataIndex:'cust_name',width:100},
-			{header:'合同金额',dataIndex:'nominal_amount',width:80,renderer:Ext.util.Format.formatFee},
-			{header:'已付金额',dataIndex:'payed_amount',width:80,renderer:Ext.util.Format.formatFee},
-			{header:'发票号码',dataIndex:'invoice_id',width:80,renderer : App.qtipValue},
+			{header:'合同名称',dataIndex:'contract_name',width:120},
+			{header:'客户名称',dataIndex:'cust_name',width:120},
+			{header:'合同金额',dataIndex:'nominal_amount',width:100,renderer:Ext.util.Format.formatFee},
+//			{header:'已付金额',dataIndex:'payed_amount',width:80,renderer:Ext.util.Format.formatFee},
+			{header:'发票号码',dataIndex:'invoice_id',width:120,renderer : App.qtipValue},
 			{header:'发票代码',dataIndex:'invoice_code',width:60,renderer : App.qtipValue,hidden:true},
 		    {   header: '操作',
 		        dataIndex: 'contract_id',
@@ -54,12 +54,12 @@ var FeeUnitpreGrid = Ext.extend(Ext.grid.GridPanel,{
 	                width: 200,
 	                hasSearch : true,
 	                emptyText: '支持客户名称或合同号模糊查询'
-	            }),'->',{
+	            }),'->','-',{
 	        	text : '添加',
 	        	iconCls : 'icon-add',
 	        	scope : this,
 	        	handler : this.doAdd
-	        },' '],
+	        },'-',' '],
 			columns:columns,
 			bbar:new Ext.PagingToolbar({store: this.feeUnitpreStore ,pageSize : Constant.DEFAULT_PAGE_SIZE})
 		});
@@ -67,10 +67,11 @@ var FeeUnitpreGrid = Ext.extend(Ext.grid.GridPanel,{
 	},
 	doFilterBtns : function(record){
 		//record.get('optr_id') == App.getApp().data.optr['optr_id'] &&
-		var btns = "<a href='#' style='color:blue' onclick=Ext.getCmp(\'"+"feeUnitpreGridId"+"\').doModify()>修改 </>";
+//		var btns = "<a href='#' style='color:blue' onclick=Ext.getCmp(\'"+"feeUnitpreGridId"+"\').doModify()>修改 </>";
+		var btns = "";
 		
 		//发票打印
-		if(!record.get('invoice_id')){
+		/*if(!record.get('invoice_id')){
 			btns = btns + "<a href='#' style='color:blue' onclick=Ext.getCmp(\'"+"feeUnitpreGridId"+"\').doPrint()>打印 </>";
 		}else{//已打印
 			if(record.get('invoice_mode')== 'A'){//机打票才需要重新打印
@@ -82,11 +83,11 @@ var FeeUnitpreGrid = Ext.extend(Ext.grid.GridPanel,{
 				btns = btns + "<a href='#' style='color:blue' onclick=Ext.getCmp(\'"+"feeUnitpreGridId"+"\').doPay()>付款 </>";
 			}
 			
-		}
+		}*/
 		
 		//合同款显示明细
 //		if(record.get('fee_type') != 'UNBUSI'){
-			btns = btns + "<a href='#' onclick=Ext.getCmp(\'"+"feeUnitpreGridId"+"\').doQueryDetail(); style='color:blue'>明细 </a>";
+//			btns = btns + "<a href='#' onclick=Ext.getCmp(\'"+"feeUnitpreGridId"+"\').doQueryDetail(); style='color:blue'>明细 </a>";
 //		}
 		
 		//作废
@@ -97,11 +98,11 @@ var FeeUnitpreGrid = Ext.extend(Ext.grid.GridPanel,{
 		}
 		
 		//退款
-		if(record.get('nominal_amount') > 0  && record.get('fee_sn')&&record.get('refund_amount')>0){
+		/*if(record.get('nominal_amount') > 0  && record.get('fee_sn')&&record.get('refund_amount')>0){
 			if(record.get('fee_type') == 'UNBUSI' || !record.get('used_amount') ){//非营业费或者预收款未被使用
 				btns = btns + "<a href='#' onclick=Ext.getCmp(\'"+"feeUnitpreGridId"+"\').doRefund(); style='color:blue'>退款 </a>";
 			}
-		}
+		}*/
 		
 		
 		return btns;
@@ -111,7 +112,7 @@ var FeeUnitpreGrid = Ext.extend(Ext.grid.GridPanel,{
 					url: 'pages/business/pay/FeeUnitpre.js'};
 		App.getApp().menu.bigWindow.show({ text: '非营业收费',  attrs: {busicode:'1085',
 					url: 'pages/business/pay/FeeUnitpre.js'}} ,
-						{width: 600, height:500});
+						{width: 600, height:300});
 	},
 	doModify : function(){
 		var record = this.getSelectionModel().getSelected();

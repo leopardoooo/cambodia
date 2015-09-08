@@ -29,6 +29,8 @@ import com.ycsoft.business.dao.prod.PProdStaticResDao;
 import com.ycsoft.commons.abstracts.BaseComponent;
 import com.ycsoft.commons.constants.BusiCmdConstants;
 import com.ycsoft.commons.constants.SystemConstants;
+import com.ycsoft.commons.exception.ComponentException;
+import com.ycsoft.commons.exception.ErrorCode;
 import com.ycsoft.commons.helper.DateHelper;
 import com.ycsoft.daos.core.JDBCException;
 
@@ -63,7 +65,8 @@ public class AuthComponent extends BaseComponent{
 		if (authCmdType.equals(BusiCmdConstants.CREAT_USER) || 
 				authCmdType.equals(BusiCmdConstants.CHANGE_USER) || 
 				authCmdType.equals(BusiCmdConstants.PASSVATE_USER) ||
-				authCmdType.equals(BusiCmdConstants.ACCTIVATE_USER)){
+				authCmdType.equals(BusiCmdConstants.ACCTIVATE_USER)||
+				authCmdType.equals(BusiCmdConstants.ACCTIVATE_TERMINAL)){
 			this.editOttUser(user, doneCode);
 		} else if (authCmdType.equals(BusiCmdConstants.DEL_USER)){
 			this.deleteOttUser(user,orderList, doneCode);
@@ -72,7 +75,8 @@ public class AuthComponent extends BaseComponent{
 			this.authOttProd(user, orderList, doneCode);
 		} else if (authCmdType.equals(BusiCmdConstants.REFRESH_TERMINAL)){
 			this.refreshOttUserAuth(user, doneCode);
-			
+		} else {
+			throw new ComponentException(ErrorCode.CmdTypeUnDefined,authCmdType);
 		}
 		
 	}
@@ -87,6 +91,8 @@ public class AuthComponent extends BaseComponent{
 			this.refreshDttUserAuth(user, doneCode);
 		} else if (authCmdType.equals(BusiCmdConstants.PASSVATE_TERMINAL)){
 			this.StopTerminal(user, doneCode);
+		}else {
+			throw new ComponentException(ErrorCode.CmdTypeUnDefined,authCmdType);
 		}
 	}
 	
@@ -99,13 +105,31 @@ public class AuthComponent extends BaseComponent{
 			this.stopBandUser(user, doneCode);
 		} else if (authCmdType.equals(BusiCmdConstants.ACCTIVATE_USER)){
 			this.openBandUser(user, doneCode);
-			
 		} else if (authCmdType.equals(BusiCmdConstants.PASSVATE_PROD) ||
-				authCmdType.equals(BusiCmdConstants.ACCTIVATE_PROD) || 
-				authCmdType.equals(BusiCmdConstants.REFRESH_TERMINAL)){
+				authCmdType.equals(BusiCmdConstants.ACCTIVATE_PROD)){
 			this.refreshBandUserAuth(user, doneCode);
+		}else if(authCmdType.equals(BusiCmdConstants.REFRESH_TERMINAL)){
+			//宽带刷新设备要发销户、开户、订购3个指令
+			this.deleteBandUser(user, doneCode);
+			this.openBandUser(user, doneCode);
+			this.refreshBandUserAuth(user, doneCode);
+		}else if(authCmdType.equals(BusiCmdConstants.CHANGE_USER)){//修改密码...
+			this.updatePassword(user,doneCode);
+		}else {
+			throw new ComponentException(ErrorCode.CmdTypeUnDefined,authCmdType);
 		} 
 	}
+
+	private void updatePassword(CUser user, Integer doneCode) throws Exception {
+		JBandCommand bandCmd = gBandCmd(user,doneCode);
+		bandCmd.setCmd_type(BusiCmdConstants.BAND_EDIT_PWD);	
+		JsonObject params = new JsonObject();
+		params.addProperty(BusiCmdParam.login_name.name(), user.getLogin_name());
+		params.addProperty(BusiCmdParam.login_password.name(), user.getPassword());
+		bandCmd.setDetail_param(params.toString());
+		jBandCommandDao.save(bandCmd);
+	}
+
 
 	/**===================================FOR OTT USER=========================================**/
 	/**
@@ -147,11 +171,15 @@ public class AuthComponent extends BaseComponent{
 			Date expDate = userResMap.get(orderResId);
 			if (expDate == null || expDate.before(new Date())){
 				//发送减授权
+				JsonObject params = new JsonObject();
+				params.addProperty(BusiCmdParam.login_name.name(), user.getLogin_name());
+				ottCmd.setDetail_param(params.toString());
 				ottCmd.setCmd_type(BusiCmdConstants.PASSVATE_PROD);
 			} else {
 				ottCmd.setCmd_type(BusiCmdConstants.ACCTIVATE_PROD);
 				JsonObject params = new JsonObject();
-				params.addProperty(BusiCmdParam.prod_exp_date.name(), DateHelper.format(expDate, DateHelper.FORMAT_TIME));
+				params.addProperty(BusiCmdParam.login_name.name(), user.getLogin_name());
+				params.addProperty(BusiCmdParam.prod_exp_date.name(), DateHelper.format(expDate, DateHelper.FORMAT_TIME_END));
 				ottCmd.setDetail_param(params.toString());
 			}
 			jVodCommandDao.save(ottCmd);
@@ -277,8 +305,6 @@ public class AuthComponent extends BaseComponent{
 		bandCmd.setDetail_param(params.toString());
 		jBandCommandDao.save(bandCmd);
 		
-		//删除订购记录
-		cancelOrder(user, doneCode);
 	}
 	
 	private void stopBandUser(CUser user,Integer doneCode) throws Exception{
@@ -315,9 +341,6 @@ public class AuthComponent extends BaseComponent{
 		Map<String,Date> userResMap = this.getUserResExpDate(user.getUser_id());
 		//先取消所有授权
 		
-		//cancelOrder(user, doneCode);
-		//发送加授权
-		
 		if (userResMap!= null && userResMap.size()>0){
 			List<Entry<String, Date>> mappingList = new ArrayList<Entry<String, Date>>(userResMap.entrySet());
 			// 通过比较器实现比较排序
@@ -336,8 +359,8 @@ public class AuthComponent extends BaseComponent{
 			params.addProperty(BusiCmdParam.login_name.name(), user.getLogin_name());
 			params.addProperty(BusiCmdParam.band_policy_id.name(), resId);
 			params.addProperty(BusiCmdParam.prod_eff_date.name(),
-						DateHelper.format(new Date(), DateHelper.FORMAT_TIME_VOD));
-			params.addProperty(BusiCmdParam.prod_exp_date.name(), DateHelper.format(expDate, DateHelper.FORMAT_TIME_VOD));
+						DateHelper.format(DateHelper.today(), DateHelper.FORMAT_TIME_VOD));
+			params.addProperty(BusiCmdParam.prod_exp_date.name(), DateHelper.format(expDate, DateHelper.FORMAT_TIME_VOD_END));
 			bandCmd.setDetail_param(params.toString());
 			jBandCommandDao.save(bandCmd);
 			
@@ -400,11 +423,11 @@ public class AuthComponent extends BaseComponent{
 	}
 
 
-	private Integer gTransnum() throws Exception{
-		return Integer.parseInt(jCaCommandDao.findSequence().toString());
+	private Long gTransnum() throws Exception{
+		return Long.parseLong(jCaCommandDao.findSequence().toString());
 	}
 	
-	private Map<String,Date> getUserResExpDate(String userId) throws Exception{
+	public Map<String,Date> getUserResExpDate(String userId) throws Exception{
 		List<UserResExpDate> resList = cUserDao.queryUserProdResExpDate(userId);
 		Map<String,Date> resMap = new HashMap<>();
 		for (UserResExpDate res :resList){

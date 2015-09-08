@@ -6,7 +6,6 @@ Ext.ns("App.func");
  * @param busicode 功能操作对应的busicode,见s_resource表
  * @param gridpanel的id
  */
-
 Ext.apply(App.func,{
 	
 	FilterOperteBtn : function(data,busicode,panelName){
@@ -64,7 +63,14 @@ Ext.apply(App.func,{
 			//状态必须正常 1323为续报停
 			if(data['status'] == 'REQSTOP' && (busicode != '1323' && busicode != '1123')) return false;
 			if( (data['status'] == 'WAITLOGOFF' || data['status'] == 'DORMANCY' || data['status'] == 'ATVCLOSE') && busicode!='1221' && busicode!='1030')return false;
-			if(busicode === '1030'){//模拟转数(模拟电视)
+			if(busicode === '1009'){//更换设备
+				if( data['user_type'] == 'OTT_MOBILE' || ( (data['user_type'] =='OTT' || data['user_type'] =='DTT') && Ext.isEmpty(data['stb_id'])) || (data['user_type'] =='BAND' && Ext.isEmpty(data['modem_mac'])) )
+					return false;
+			}else if(busicode ==='1130' || busicode ==='1131'){ //加挂IP，补收IP费
+				if(data['user_type'] != 'BAND'){
+					return false;
+				}
+			}else if(busicode === '1030'){//模拟转数(模拟电视)
 				if(data['user_type'] != 'ATV' || data['status'] == 'CUSTLINE')
 					return false;
 			}else if(busicode === '1031'){//开通双向(数字电视，单向)
@@ -123,6 +129,14 @@ Ext.apply(App.func,{
 			}else if(busicode == '1074'){//修改宽带密码
 				if(data['user_type'] != 'BAND')
 					return false;
+			}else if(busicode == '2123'){//重置密码
+				//只有user_type = BAND和OTT_MOBILE用户显示, 且用户状态 是 正常 和施工 
+				if( (data['user_type'] == 'BAND' || data['user_type'] == 'OTT_MOBILE') 
+							&& ( data.status == 'ACTIVE' || data.status == 'INIT' ) ){
+					return true;
+				}else{
+					return false;
+				}
 			}else if(busicode == '1075'){//修改最大连接数
 				if(data['user_type'] != 'BAND')
 					return false;
@@ -229,9 +243,6 @@ Ext.apply(App.func,{
 			if(busicode == '1008'){//设备回收
 				//设备使用中或者智能卡有配对的机，不允许回收
 				if(data['status'] == 'USE' || data['pair_stb_device_id']||data['ownership']=='CUST')
-					return false;
-			}else if(busicode === '1009'){//更换设备
-				if(data['status'] != 'USE' || data['pair_stb_device_id'] !=null || data['loss_reg'] == 'T' || App.getCust().status=='RELOCATE')//设备使用中才能更换,挂失的不能更换
 					return false;
 			}else if(busicode == '1011'){//取消挂失
 				if(data['loss_reg'] == 'F')//挂失的才能取消挂失

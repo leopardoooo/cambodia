@@ -76,8 +76,9 @@ public class ProdOrderAction extends BaseBusiAction {
 	 * @return
 	 * @throws Exception
 	 */
+	@Deprecated
 	public String cancelTodayOrder() throws Exception{
-		orderService.saveCancelTodayOrder(order_sn, cancelFee,refundFee);
+		//orderService.saveCancelTodayOrder(order_sn, cancelFee,refundFee);
 		return JSON_SUCCESS;
 	}
 	
@@ -116,6 +117,7 @@ public class ProdOrderAction extends BaseBusiAction {
 			Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd").create();
 			orderList = gson.fromJson(payFeesData,type);
 		}
+		
 		orderService.saveOrderProdList(busi_code,orderList.toArray(new OrderProd[orderList.size()]));
 		return JSON_SUCCESS;
 	}
@@ -264,6 +266,7 @@ public class ProdOrderAction extends BaseBusiAction {
 	public void setLoadType(String loadType) {
 		this.loadType = loadType;
 	}
+
 
 	
 	

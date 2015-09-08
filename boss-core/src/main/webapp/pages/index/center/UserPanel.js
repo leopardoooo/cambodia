@@ -55,7 +55,11 @@ App.userRecord = Ext.data.Record.create([
 	{name: 'user_count'},
 	{name: 'rejectRes'},//排斥资源
 	{name: 'stop_date'},
-	{name: 'tv_model_text'}
+	{name: 'tv_model_text'},
+	{name: 'device_model'},
+	{name: 'device_model_text'},
+	{name: 'buy_model_text'},
+	{name: 'protocol_date'}
 ]);
 UserGrid = Ext.extend(Ext.ux.Grid,{
 	border:false,
@@ -72,38 +76,46 @@ UserGrid = Ext.extend(Ext.ux.Grid,{
 		this.userStore.on("load", this.doLoadResult ,this);
 		
 		var sm = new Ext.grid.CheckboxSelectionModel();
-		
+		var LC =  langUtils.main("user.list.columns");
 		var cm = new Ext.ux.grid.LockingColumnModel({ 
     		columns : [
             sm,
-			{header:'用户类型',dataIndex:'user_type_text',width:80},
-			{header:'用户名',dataIndex:'user_name',	width:80},
-			{header:'状态',dataIndex:'status_text',	width:60,renderer:Ext.util.Format.statusShow},
-			{header:'机顶盒',dataIndex:'stb_id',	width:130,renderer:App.qtipValue},
-			{header:'智能卡',dataIndex:'card_id',width:110,renderer:App.qtipValue},
-			{header:'Modem号',dataIndex:'modem_mac',width:90,renderer:App.qtipValue}
+			{header:LC[0],dataIndex:'user_type_text',width:80},
+			{header:LC[1],dataIndex:'user_name',	width:80, renderer:App.qtipValue},
+			{header:LC[2],dataIndex:'status_text',	width:60,renderer:Ext.util.Format.statusShow},
+			{header:LC[3],dataIndex:'status_date',	width:100,renderer:Ext.util.Format.dateFormat},
+			{header:LC[4],dataIndex:'stb_id',	width:130,renderer:App.qtipValue},
+			{header:LC[5],dataIndex:'card_id',width:110,renderer:App.qtipValue},
+			{header:LC[6],dataIndex:'modem_mac',width:90,renderer:App.qtipValue}
 	        ]
 	      });
 		
 		UserGrid.superclass.constructor.call(this,{
-			title: '用户信息',
+			title: langUtils.main("user.list._title"),
 			id:'U_USER',
 			store:this.userStore,
 			sm:sm,
 			cm:cm,
 			view: new Ext.ux.grid.ColumnLockBufferView()
-			,tools:[{id:'search',qtip:'查询',cls:'tip-target',scope:this,handler:function(){
+			,tools:[{id:'gear', qtip:langUtils.main("user.list.tools")[0], handler:function(){
+					this.parent.prodGrid.remoteRefresh('EFF');
+				}},/*{id:'gear', qtip:'有效产品', handler:function(){
+					this.parent.prodGrid.remoteRefresh('EFF');
+				}},{id:'gear', qtip:'有效产品', handler:function(){
+					this.parent.prodGrid.remoteRefresh('EFF');
+				}},*/
+			        {id:'search',qtip:langUtils.main("user.list.tools")[1],cls:'tip-target',scope:this,handler:function(){
 				
 					var comp = this.tools.search;
 					if(this.userStore.getCount()>0){
 						if(win)win.close();
 							win = FilterWindow.addComp(this,[
-							    {text:'用户类型',field:'user_type',showField:'user_type_text'},
-							    {text:'用户地址',field:'user_addr',type:'textfield'},
-								{text:'状态',field:'status',showField:'status_text'},
-								{text:'机顶盒',field:'stb_id',type:'textfield'},
-								{text:'智能卡',field:'card_id',type:'textfield'},
-								{text:'Modem号',field:'modem_mac',type:'textfield'}
+							    {text:LC[0],field:'user_type',showField:'user_type_text'},
+							    {text:LC[1],field:'user_addr',type:'textfield'},
+								{text:LC[2],field:'status',showField:'status_text'},
+								{text:LC[4],field:'stb_id',type:'textfield'},
+								{text:LC[5],field:'card_id',type:'textfield'},
+								{text:LC[6],field:'modem_mac',type:'textfield'}
 								], 690,"1",false);
 							
 						if(win){
@@ -261,18 +273,21 @@ ProdGrid = Ext.extend(Ext.TabPanel,{
 	prodMap : null,
 	constructor:function(p){
 		this.parent = p;
+		var lc = langUtils.main("user.prod.base.columns");
 		// 列定义
 		this.baseProdCm = new Ext.ux.grid.LockingColumnModel({ 
     		columns : [
-    		{header:'订购SN',dataIndex:'order_sn',width:40},
-			{header:'产品名称',dataIndex:'prod_name',width:120},
-			{header:'所属套餐',dataIndex:'package_name',width:80},
-			{header:'当前资费',dataIndex:'tariff_name',	width:80},
-			{header:'生效日期',dataIndex:'eff_date',width:80,renderer: Ext.util.Format.dateFormat},
-			{header:'失效日期',dataIndex:'exp_date',width:80,renderer: Ext.util.Format.dateFormat},
-			{header:'状态',dataIndex:'status_text',	width:60,renderer:Ext.util.Format.statusShow},
-			//{header:'产品类型',dataIndex:'prod_type_text',width:100},
-			{header:'订购时间',dataIndex:'order_time',width:80}
+    		{header:lc[0],dataIndex:'order_sn',width:60},
+			{header:lc[1],dataIndex:'prod_name',width:120},
+			{header:lc[2],dataIndex:'package_name',width:80},
+			{header:lc[3],dataIndex:'tariff_name',	width:80},
+			{header:lc[4],dataIndex:'eff_date',width:80,renderer: Ext.util.Format.dateFormat},
+			{header:lc[5],dataIndex:'exp_date',width:80,renderer: Ext.util.Format.dateFormat},
+			{header:lc[6],dataIndex:'done_code',width:80},
+			{header:lc[7],dataIndex:'status_text',	width:60,renderer:Ext.util.Format.statusShow},
+			{header:lc[8],dataIndex:'status_date',width:100,renderer: Ext.util.Format.dateFormat},
+			{header:lc[9],dataIndex:'order_time',width:80,renderer: Ext.util.Format.dateFormat},
+			{header:lc[10],dataIndex:'order_months',width:80}
 	        ]
 	      });
 		
@@ -283,7 +298,7 @@ ProdGrid = Ext.extend(Ext.TabPanel,{
 			         "order_sn","package_sn","package_id","cust_id","user_id","prod_id","tariff_id","disct_id",
 			         "status","status_text","status_date","eff_date","exp_date","active_fee","bill_fee",
 			         "rent_fee","last_bill_date","next_bill_date","order_months","order_fee","order_time",
-			         "order_type","package_group_id","remark","public_acctitem_type"],			
+			         "order_type","package_group_id","remark","public_acctitem_type","done_code"],			
 			sortInfo : {
 				field : 'prod_name',
 				direction:'DESC'
@@ -303,16 +318,17 @@ ProdGrid = Ext.extend(Ext.TabPanel,{
 		
 		// 客户套餐
 		// 列定义
+		var lc = langUtils.main("user.prod.pkg.columns");
 		this.custPkgCm = new Ext.ux.grid.LockingColumnModel({ 
     		columns : [
-    		{header:'订购SN',dataIndex:'order_sn',width:40},
-			{header:'产品名称',dataIndex:'prod_name',width:120},
-			{header:'当前资费',dataIndex:'tariff_name',	width:80},
-			{header:'状态',dataIndex:'status_text',	width:60,renderer:Ext.util.Format.statusShow},
-			{header:'生效日期',dataIndex:'eff_date',width:80,renderer: Ext.util.Format.dateFormat},
-			{header:'失效日期',dataIndex:'exp_date',width:80,renderer: Ext.util.Format.dateFormat},
-			{header:'产品类型',dataIndex:'prod_type_text',width:80},
-			{header:'订购时间',dataIndex:'order_time',width:80}
+    		{header:lc[0],dataIndex:'order_sn',width:40},
+			{header:lc[1],dataIndex:'prod_name',width:120},
+			{header:lc[2],dataIndex:'tariff_name',	width:80},
+			{header:lc[3],dataIndex:'status_text',	width:60,renderer:Ext.util.Format.statusShow},
+			{header:lc[4],dataIndex:'eff_date',width:80,renderer: Ext.util.Format.dateFormat},
+			{header:lc[5],dataIndex:'exp_date',width:80,renderer: Ext.util.Format.dateFormat},
+			{header:lc[6],dataIndex:'prod_type_text',width:80},
+			{header:lc[7],dataIndex:'order_time',width:80}
 	        ]
 	      });
 		this.custPkgStore = new Ext.data.JsonStore({
@@ -337,16 +353,24 @@ ProdGrid = Ext.extend(Ext.TabPanel,{
 			activeTab: 0,
 			border: false,
 			items: [{
-				title: '用户产品',
+				title: langUtils.main("user.prod.base._title"),
 				border: false,
 				layout: 'fit',
 				items: [this.baseProdGrid]
 			},{
-				title: '客户套餐',
+				title: langUtils.main("user.prod.pkg._title"),
 				border: false,
 				layout: 'fit',
 				items: [this.custPkgGrid]
-			}]
+			}],
+			tbar:[
+			      '->', '-', {text:langUtils.main("user.prod.tools")[0], scope:this, handler:function(){
+			    	  this.remoteRefresh();
+			      }}, '-',
+			      {text:langUtils.main("user.prod.tools")[1], scope:this, handler:function(){
+			    	  this.remoteRefresh('ALL');
+			      }},'-'
+			]
 		})
 	},
 	initEvents: function(){
@@ -426,14 +450,17 @@ ProdGrid = Ext.extend(Ext.TabPanel,{
 			}
 		}
 	},
-	remoteRefresh:function(){
+	remoteRefresh:function(loadType){
 		var cust = App.getData().custFullInfo.cust;
 		//显示数据加载提示框
 		App.showTip();
 		Ext.Ajax.request({
 			scope : this,
 			url : Constant.ROOT_PATH + "/core/x/ProdOrder!queryCustEffOrder.action",
-			params : {cust_id : App.getCustId()},
+			params : {
+				cust_id : App.getCustId(),
+				loadType:loadType
+			},
 			success : function(res,opt){
 				var data = Ext.decode(res.responseText);
 				// 过滤出客户套餐及用户产品
@@ -450,7 +477,7 @@ ProdGrid = Ext.extend(Ext.TabPanel,{
 				if(data["CUST"]){
 					this.custPkgGrid.getStore().loadData(data["CUST"]);
 				}
-				this.setActiveTab(1);
+//				this.setActiveTab(0);
 			}
 		});
 	},
@@ -491,116 +518,49 @@ ProdGrid = Ext.extend(Ext.TabPanel,{
  * 用户详细信息
  * @class UserDetailTemplate
  */
-UserAtvTemplate = new Ext.XTemplate(
+var UDT = langUtils.main("user.userDetail.detail");
+UserTemplate = new Ext.XTemplate(
 	'<table width="100%" border="0" cellpadding="0" cellspacing="0">',
 		'<tr height=24>',
-			'<td class="label" width=20%>用户类型：</td>',
+			'<td class="label" width=20%>'+ UDT[0] +'：</td>',
 			'<td class="input_bold" width=30%>&nbsp;{[values.user_type_text ||""]}</td>',
-			'<td class="label" width=20%>用户名：</td>',
-			'<td class="input_bold" width=30%>&nbsp;{[values.user_name ||""]}</td>',
+			'<td class="label" width=20%>'+ UDT[1] +'：</td>',
+			'<td class="input_bold" width=30%>&nbsp;{[values.user_name || values.login_name ||""]}</td>',
 		'</tr>',
 		'<tr height=24>',
-			'<td class="label" width=20%>服务类型：</td>',
-			'<td class="input" width=30%>&nbsp;{[values.serv_type_text ||""]}</td>',
-			'<td class="label" width=20%>终端类型：</td>',
-			'<td class="input" width=30%>&nbsp;{[values.terminal_type_text ||""]}</td>',
+			'<td class="label" width=20%>UDT[10]：</td>',
+			'<td class="input_bold" width=30%>&nbsp;{[values.login_name ||""]}</td>',
+			'<td class="label" width=20%>UDT[11]：</td>',
+			'<td class="input_bold" width=30%>&nbsp;{[values.terminal_type_text ||""]}</td>',
 		'</tr>',
 		'<tr height=24>',
-			'<td class="label" width=20%>状态：</td>',
-			'<td class="input_bold" width=30%>&nbsp;{[values.status_text ||""]}</td>',
-			'<tpl if="values.status == \'REQSTOP\'">' +
-			'<td class="label" width=20%>停机天数：</td>',
-			'<td class="input" width=30%>&nbsp;{[fm.DateDiffToday(values.status_date) ||""]}</td>',
-			'</tpl>',
+		'<td class="label" width=20%>'+ UDT[2] +'：</td>',
+		'<td class="input" width=30%>&nbsp;{[values.device_model_text ||""]}</td>',
+		'<td class="label" width=20%>'+ UDT[3] +'：</td>',
+		'<td class="input" width=30%>&nbsp;{[values.buy_model_text ||""]}</td>',
+	'</tr>',
+		'<tr height=24>',
+		'<td class="label" width=20%>'+ UDT[4] +'：</td>',
+		'<td class="input" width=30%>&nbsp;{[values.status_text ||""]}</td>',
+			'<td class="label" width=20%>'+ UDT[5] +'：</td>',
+			'<td class="input" width=30%>&nbsp;{[fm.dateFormat(values.status_date) ||""]}</td>',
 		'</tr>',
 		'<tr height=24>',
-			'<td class="label" width=20%>网络类型：</td>',
-			'<td class="input" width=30%>&nbsp;{[values.net_type_text ||""]}</td>',
-			'<td class="label" width=20%>开户时间：</td>',
+			'<td class="label" width=20%>'+ UDT[6] +'：</td>',
+			'<td class="input_bold" width=30%>&nbsp;{[fm.dateFormat(values.stop_date) ||""]}</td>',	
+			'<td class="label" width=20%>'+ UDT[7] +'：</td>',
 			'<td class="input" width=30%>&nbsp;{[fm.dateFormat(values.open_time) ||""]}</td>',
 		'</tr>',
 		'<tr height=24>',
-			'<td class="label" width=20%>用户地址：</td>',
-			'<td class="input" width=30%>&nbsp;{[values.user_addr ||""]}</td>',
-			'<td class="label" width=20%>预报停时间：</td>',
-			'<td class="input" width=30%>&nbsp;{[fm.DateWithToday(values.status,values.status_date,values.stop_date) ||""]}</td>',		
+			'<td class="label" width=20%>'+ UDT[8] +'：</td>',
+			'<td class="input" width=30%>&nbsp;{[values.stop_type_text ||""]}</td>',
+			'<td class="label" width=20%>'+ UDT[9] +'：</td>',
+			'<td class="input" width=30%>&nbsp;{[fm.dateFormat(values.protocol_date) ||""]}</td>',
 		'</tr>',
-		'<tr height=24>',
-			'<td class="label" width=20%>用户类别：</td>',
-			'<td class="input_bold" width=30%>&nbsp;{[values.str7_text ||""]}</td>',
-		'</tr>',
-	'</table>'
-);
-UserDtvTemplate = new Ext.XTemplate(
-	'<table width="100%" border="0" cellpadding="0" cellspacing="0">',
-		'<tr height=24>',
-			'<td class="label" width=20%>用户类型：</td>',
-			'<td class="input_bold" width=30%>&nbsp;{[values.user_type_text ||""]}</td>',
-			'<td class="label" width=20%>用户名：</td>',
-			'<td class="input_bold" width=30%>&nbsp;{[values.user_name ||""]}</td>',
-		'</tr>',
-		'<tr height=24>',
-			'<td class="label" >服务类型：</td>',
-			'<td class="input_bold" >&nbsp;{[values.serv_type_text ||""]}</td>',
-			'<td class="label" >终端类型：</td>',
-			'<td class="input_bold" >&nbsp;{[values.terminal_type_text ||""]}</td>',
-		'</tr>',
-		'<tr height=24>',
-			'<td class="label" >网络类型：</td>',
-			'<td class="input_bold" >&nbsp;{[values.net_type_text ||""]}</td>',
-			'<td class="label" >开户时间：</td>',
-			'<td class="input" >&nbsp;{[fm.dateFormat(values.open_time)]}</td>',
-		'</tr>',
-		'<tr height=24>',
-			'<td class="label" >机顶盒号：</td>',
-			'<td class="input" colspan="3">&nbsp;{[values.stb_id ||""]}</td>',
-		'</tr>',
-		'<tr height=24>',
-			'<td class="label" >智能卡号：</td>',
-			'<td class="input" colspan="3">&nbsp;{[values.card_id ||""]}</td>',
-		'</tr>',
-		'<tr height=24>',
-			'<td class="label" >Modem号：</td>',
-			'<td class="input" colspan="3">&nbsp;{[values.modem_mac ||""]}</td>',
-		'</tr>',
-		'<tr height=24>',
-			'<td class="label" >停机类型：</td>',
-			'<td class="input_bold" width=30%>&nbsp;{[values.stop_type_text ||""]}</td>',
-			'<tpl if="values.status == \'REQSTOP\'">' +
-			'<td class="label" width=20%>停机天数：</td>',
-			'<td class="input" width=30%>&nbsp;{[fm.DateDiffToday(values.status_date) ||""]}</td>',
-			'</tpl>',
-		'</tr>',
-		'<tr height=24>',
-			'<td class="label" width=20%>状态：</td>',
-			'<td class="input_bold" width=30%>&nbsp;{[values.status_text ||""]}</td>',
-			'<td class="label">用户地址：</td>',
-			'<td class="input">&nbsp;{[values.user_addr ||""]}</td>',
-		'</tr>',
-		'<tr height=24>',
-			'<td class="label" width=20%>排斥资源：</td>',
-			'<td class="input_bold" width=30%>&nbsp;{[values.rejectRes ||""]}</td>',
-			'<tpl if="values.str19 == \'T\'">',
-			'<td class="label" width=20%>免费：</td>',
-			'<td class="input_bold" width=30%>&nbsp;{[values.str19_text ||""]}</td>',	
-			'</tpl>',
-		'</tr>',
-		'<tr height=24>',
-			'<td class="label" width=20%>预报停时间：</td>',
-			'<td class="input" width=30%>&nbsp;{[fm.DateWithToday(values.status,values.status_date,values.stop_date) ||""]}</td>',
-			'<td class="label" width=20%>用户类别：</td>',
-			'<td class="input_bold" width=30%>&nbsp;{[values.str7_text ||""]}</td>',
-		'</tr>',
-		'<tpl if="values.serv_type == \'DOUBLE\'">',
-			'<tr height=24>',
-				'<td class="label" width=25%>双向用户类型：</td>',
-				'<td class="input" colspan="3">&nbsp;{[values.str11_text ||""]}</td>',
-			'</tr>',
-		'</tpl>',
 	'</table>'
 );
 UserBroadbandTemplate = new Ext.XTemplate(
-	'<table width="100%" border="0" cellpadding="0" cellspacing="0">',
+		'<table width="100%" border="0" cellpadding="0" cellspacing="0">',
 		'<tr height=24>',
 			'<td class="label" width=20%>用户类型：</td>',
 			'<td class="input_bold" width=30%>&nbsp;{[values.user_type_text ||""]}</td>',
@@ -608,61 +568,88 @@ UserBroadbandTemplate = new Ext.XTemplate(
 			'<td class="input_bold" width=30%>&nbsp;{[values.user_name ||""]}</td>',
 		'</tr>',
 		'<tr height=24>',
-			'<td class="label" width=20%>认证方式：</td>',
-			'<td class="input" width=30%>&nbsp;{[values.check_type_text ||""]}</td>',
-			'<td class="label" width=20%>绑定方式：</td>',
-			'<td class="input" width=30%>&nbsp;{[values.bind_type_text ||""]}</td>',
+			'<td class="label" width=20%>账号：</td>',
+			'<td class="input_bold" width=30%>&nbsp;{[values.login_name ||""]}</td>',
+			'<td class="label" width=20%>终端类型：</td>',
+			'<td class="input_bold" width=30%>&nbsp;{[values.terminal_type_text ||""]}</td>',
 		'</tr>',
 		'<tr height=24>',
-			'<td class="label" width=20%>登录名：</td>',
-			'<td class="input_bold" width=30%>&nbsp;{[values.login_name ||"" ]}</td>',
-			'<td class="label" width=20%>密码：</td>',
-			'<td class="input" width=30%>******</td>',
+			'<td class="label" width=20%>设备型号：</td>',
+			'<td class="input" width=30%>&nbsp;{[values.device_model_text ||""]}</td>',
+			'<td class="label" width=20%>购买方式：</td>',
+			'<td class="input" width=30%>&nbsp;{[values.buy_model_text ||""]}</td>',
 		'</tr>',
 		'<tr height=24>',
-			'<td class="label" width=20%>Modem号：</td>',
-			'<td class="input" width=30%>&nbsp;{[values.modem_mac ||""]}</td>',
-			'<td class="label" width=20%>最大连接数：</td>',
-			'<td class="input" width=30%>&nbsp;{[values.max_connection ||""]}</td>',
-		'</tr>',
-		
-		'<tr height=24>',
-			'<td class="label" width=20%>状态：</td>',
-			'<td class="input_bold" width=30%>&nbsp;{[values.status_text ||""]}</td>',
-			'<tpl if="values.status == \'REQSTOP\'">' +
-			'<td class="label" width=20%>停机天数：</td>',
-			'<td class="input" width=30%>&nbsp;{[fm.DateDiffToday(values.status_date) ||""]}</td>',
-			'</tpl>',
-		'</tr>',
-		'<tr height=24>',
-			'<td class="label" width=20%>网络类型：</td>',
-			'<td class="input_bold" width=30%>&nbsp;{[values.net_type_text ||""]}</td>',
-			'<td class="label" width=20%>开户时间：</td>',
-			'<td class="input" width=30%>&nbsp;{[fm.dateFormat(values.open_time) ||""]}</td>',
-		'</tr>',
-		'<tr height=24>',
-			'<td class="label" width=20%>优惠类型：</td>',
-			'<td class="input" width=30%>&nbsp;{[values.user_class_text ||""]}</td>',		
-			'<td class="label" width=20%>用户地址：</td>',
-			'<td class="input" width=30%>&nbsp;{[values.user_addr ||""]}</td>',
+		'<td class="label" width=20%>状态：</td>',
+		'<td class="input" width=30%>&nbsp;{[values.status_text ||""]}</td>',
+			'<td class="label" width=20%>状态时间：</td>',
+			'<td class="input" width=30%>&nbsp;{[fm.dateFormat(values.status_date) ||""]}</td>',
 		'</tr>',
 		'<tr height=24>',
 			'<td class="label" width=20%>预报停时间：</td>',
-			'<td class="input" width=30%>&nbsp;{[fm.DateWithToday(values.status,values.status_date,values.stop_date) ||""]}</td>',	
-			'<td class="label" width=20%>最大用户数：</td>',
-			'<td class="input" width=30%>&nbsp;{[values.max_user_num ||""]}</td>',
+			'<td class="input_bold" width=30%>&nbsp;{[fm.dateFormat(values.stop_date) ||""]}</td>',
+			'<td class="label" width=20%>创建时间：</td>',
+			'<td class="input" width=30%>&nbsp;{[fm.dateFormat(values.open_time) ||""]}</td>',
 		'</tr>',
 		'<tr height=24>',
-			'<td class="label" width=20%>用户类别：</td>',
-			'<td class="input_bold" width=30%>&nbsp;{[values.str7_text ||""]}</td>',
+			'<td class="label" width=20%>POE：</td>',
+			'<td class="input" width=30%>&nbsp;{[values.str8 ||""]}</td>',
+			'<td class="label" width=20%>OLT：</td>',
+			'<td class="input_bold" width=30%>&nbsp;{[values.str7 ||""]}</td>',
+		'</tr>',
+		'<tr height=24>',
+			'<td class="label" width=20%>IP信息：</td>',
+			'<td class="input" width=30%>&nbsp;{[values.str4 ||""]}</td>',
+			'<td class="label" width=20%>IP收费数：</td>',
+			'<td class="input_bold" width=30%>&nbsp;{[values.str6 ||""]}</td>',
+		'</tr>',
+		'<tr height=24>',
+			'<td class="label" width=20%>催费类型：</td>',
+			'<td class="input" width=30%>&nbsp;{[values.stop_type_text ||""]}</td>',
+			'<td class="label" width=20%>在网协议期：</td>',
+			'<td class="input" width=30%>&nbsp;{[fm.dateFormat(values.protocol_date) ||""]}</td>',
 		'</tr>',
 	'</table>'
 );
+
+UserOTTMobileTemplate = new Ext.XTemplate(
+		'<table width="100%" border="0" cellpadding="0" cellspacing="0">',
+		'<tr height=24>',
+			'<td class="label" width=20%>用户类型：</td>',
+			'<td class="input_bold" width=30%>&nbsp;{[values.user_type_text ||""]}</td>',
+			'<td class="label" width=20%>用户名：</td>',
+			'<td class="input_bold" width=30%>&nbsp;{[values.user_name ||""]}</td>',
+		'</tr>',
+		'<tr height=24>',
+			'<td class="label" width=20%>账号：</td>',
+			'<td class="input_bold" width=30%>&nbsp;{[values.login_name ||""]}</td>',
+			'<td class="label" width=20%>终端类型：</td>',
+			'<td class="input_bold" width=30%>&nbsp;{[values.terminal_type_text ||""]}</td>',
+		'</tr>',
+		'<tr height=24>',
+		'<td class="label" width=20%>状态：</td>',
+		'<td class="input" width=30%>&nbsp;{[values.status_text ||""]}</td>',
+			'<td class="label" width=20%>状态时间：</td>',
+			'<td class="input" width=30%>&nbsp;{[fm.dateFormat(values.status_date) ||""]}</td>',
+		'</tr>',
+		'<tr height=24>',
+			'<td class="label" width=20%>预报停时间：</td>',
+			'<td class="input_bold" width=30%>&nbsp;{[fm.dateFormat(values.stop_date) ||""]}</td>',
+			'<td class="label" width=20%>创建时间：</td>',
+			'<td class="input" width=30%>&nbsp;{[fm.dateFormat(values.open_time) ||""]}</td>',
+		'</tr>',
+		'<tr height=24>',
+			'<td class="label" width=20%>催费类型：</td>',
+			'<td class="input" width=30%>&nbsp;{[values.stop_type_text ||""]}</td>',
+		'</tr>',
+	'</table>'
+);
+
 UserDetailTemplate = {
-	"OTT": UserAtvTemplate,
-	"DTT": UserDtvTemplate,
+	"DTT": UserTemplate,
+	"OTT": UserTemplate,
 	"BAND": UserBroadbandTemplate,
-	"OTT_MOBILE": UserAtvTemplate
+	"OTT_MOBILE": UserOTTMobileTemplate
 };
 
 /**
@@ -680,13 +667,14 @@ UserPropChangeGrid = Ext.extend(Ext.grid.GridPanel,{
 			fields: ["cust_id","user_id","column_name","column_name_text","old_value","old_value_text","new_value","new_value_text",
 					"done_code","change_time","optr_name","busi_name"]
 		});
+		var lc = langUtils.main("user.userDetail.change");
 		var cm = [
-			{header:'业务',dataIndex:'busi_name',width:80,renderer:App.qtipValue},
-			{header:'属性',dataIndex:'column_name_text',width:80},
-			{header:'修改前',dataIndex:'old_value_text',	width:80,renderer:App.qtipValue},
-			{header:'修改后',dataIndex:'new_value_text',	width:80,renderer:App.qtipValue},
-			{header:'修改时间',dataIndex:'change_time',	width:100,renderer:App.qtipValue},
-			{header:'操作员',dataIndex:'optr_name'}
+			{header:lc[0],dataIndex:'busi_name',width:80,renderer:App.qtipValue},
+			{header:lc[1],dataIndex:'column_name_text',width:80},
+			{header:lc[2],dataIndex:'old_value_text',	width:120,renderer:App.qtipValue},
+			{header:lc[3],dataIndex:'new_value_text',	width:120,renderer:App.qtipValue},
+			{header:lc[4],dataIndex:'change_time',	width:130,renderer:App.qtipValue},
+			{header:lc[5],dataIndex:'optr_name'}
 		];
 		var pageTbar = new Ext.PagingToolbar({store: this.changeStore ,pageSize : App.pageSize});
 		pageTbar.refresh.hide();
@@ -884,7 +872,7 @@ UserDetailTab = Ext.extend(CommonTab,{
 	constructor:function(p){
 		this.parent = p;
 		this.userPropChangeGrid = new UserPropChangeGrid();
-//		this.userDetailInfo = new UserDetailInfo();
+		this.userDetailInfo = new UserDetailInfo();
 //		this.userValidResGrid = new UserValidResGrid();
 //		this.promotionGrid = new PromotionGrid();
 		UserDetailTab.superclass.constructor.call(this, {
@@ -894,12 +882,12 @@ UserDetailTab = Ext.extend(CommonTab,{
 				layout: 'fit',
 				border:false
 			},
-			items:[/*{
-				title:'详细信息',
+			items:[{
+				title:langUtils.main("user.userDetail.tabs")[0],
 //				id : 'test',
 				items:[this.userDetailInfo]
-			},*/{
-				title:'异动信息',
+			},{
+				title:langUtils.main("user.userDetail.tabs")[1],
 				items:[this.userPropChangeGrid]
 			}/*,{
 				title : '有效资源',
@@ -925,8 +913,8 @@ UserDetailTab = Ext.extend(CommonTab,{
 		}
 	},
 	refreshUserDetail: function(type,record){
-//		this.userDetailInfo.refresh(type,record);
-//		this.parent.prodDetailTab.resetPanel();
+		this.userDetailInfo.refresh(type,record);
+		this.parent.prodDetailTab.resetPanel();
 		
 	},
 	resetPanel : function(){//重置TAB面板
@@ -1111,14 +1099,14 @@ ProdPropChangeGrid = Ext.extend(Ext.grid.GridPanel,{
 				direction:'DESC'
 			}
 		}); 
-		
+		var lc = langUtils.main("user.userDetail.change");
 		var cm = [
-			{header:'业务',dataIndex:'busi_name', width:60,renderer:App.qtipValue},
-			{header:'属性',dataIndex:'column_name_text', width:90,renderer:App.qtipValue},
-			{header:'修改前',dataIndex:'old_value', width:90},
-			{header:'修改后',dataIndex:'new_value',width:90},
-			{header:'修改日期',dataIndex:'change_time',width:130},
-			{header:'操作员',dataIndex:'optr_name',width:80}
+			{header:lc[0],dataIndex:'busi_name', width:60,renderer:App.qtipValue},
+			{header:lc[1],dataIndex:'column_name_text', width:90,renderer:App.qtipValue},
+			{header:lc[2],dataIndex:'old_value', width:90},
+			{header:lc[3],dataIndex:'new_value',width:90},
+			{header:lc[4],dataIndex:'change_time',width:130},
+			{header:lc[5],dataIndex:'optr_name',width:80}
 		];
 				  
 		ProdPropChangeGrid.superclass.constructor.call(this,{
@@ -1134,6 +1122,62 @@ ProdPropChangeGrid = Ext.extend(Ext.grid.GridPanel,{
 	remoteRefresh:function(prodSn,prodStatus){
 		this.changeStore.baseParams.prodSn = prodSn;
 		this.changeStore.baseParams.prodStatus = prodStatus;
+		this.changeStore.baseParams.start = 0;
+		this.changeStore.baseParams.limit = 20;
+		this.changeStore.load();
+	},
+	reset : function(){
+		this.getStore().removeAll();
+		this.isReload = true;
+	}
+});
+
+/**
+ * 订单金额明细
+ */
+OrderFeeDetailGrid = Ext.extend(Ext.grid.GridPanel,{
+	region:'center',
+	border:false,
+	changeStore:null,
+	isReload : true,
+	constructor:function(){
+		this.changeStore = new Ext.data.JsonStore({
+			url:Constant.ROOT_PATH + "/commons/x/QueryUser!queryOrderFeeDetail.action",
+			fields: ['order_fee_sn', 'order_sn', 'done_code', 'input_type', 'input_type_text', 'output_type', 'output_type_text', 'fee_type', 'fee_type_text',
+			         'input_fee', 'writeoff_fee', 'create_time', 'output_fee', 'input_prod_id', 'input_prod_name', 'ouput_prod_id', 'output_prod_name'],
+			root: 'records',
+			totalProperty: 'totalProperty',
+			params:{start:0,limit:20},
+			sortInfo:{
+				field:'change_time',
+				direction:'DESC'
+			}
+		}); 
+		var lc = langUtils.main("user.prodDetail.detail");
+		var cm = [
+			{header:lc[0],dataIndex:'order_fee_sn', width:60},
+			{header:lc[1],dataIndex:'fee_type_text',width:70},
+			{header:lc[2],dataIndex:'input_prod_name',width:150, renderer: App.qtipValue},
+			{header:lc[3],dataIndex:'input_type_text', width:80},
+			{header:lc[4],dataIndex:'input_fee',width:80, renderer: Ext.util.Format.formatFee},
+			{header:lc[5],dataIndex:'output_prod_name',width:150, renderer: App.qtipValue},
+			{header:lc[6],dataIndex:'output_type_text',width:80},
+			{header:lc[7],dataIndex:'output_fee',width:80, renderer: Ext.util.Format.formatFee},
+			{header:lc[8],dataIndex:'done_code', width:80}
+		];
+				  
+		OrderFeeDetailGrid.superclass.constructor.call(this,{
+			region: 'center',
+			store:this.changeStore,
+			columns:cm,
+			bbar: new Ext.PagingToolbar({
+	        	pageSize: 20,
+				store: this.changeStore
+			})
+		})
+	},
+	remoteRefresh:function(orderSn){
+		this.changeStore.baseParams.orderSn = orderSn;
 		this.changeStore.baseParams.start = 0;
 		this.changeStore.baseParams.limit = 20;
 		this.changeStore.load();
@@ -1233,6 +1277,7 @@ ProdDetailTab = Ext.extend(CommonTab,{
 	constructor:function(){
 //		this.prodExpensesGrid = new ProdExpensesGrid();
 		this.prodPropChangeGrid = new ProdPropChangeGrid();
+		this.orderFeeDetailGrid = new OrderFeeDetailGrid();
 //		this.tariffChangeGrid = new TariffChangeGrid();
 //		this.prodResGrid = new ProdResGrid();
 //		this.prodDetailInfo = new ProdDetailInfo();
@@ -1253,7 +1298,11 @@ ProdDetailTab = Ext.extend(CommonTab,{
 				title:'资费信息',
 				items:[this.prodExpensesGrid]
 			},*/{
-				title:'状态异动',
+				title: langUtils.main("user.prodDetail.tabs")[0],
+				items: [this.orderFeeDetailGrid]
+			},
+			{
+				title:langUtils.main("user.prodDetail.tabs")[1],
 				items:[this.prodPropChangeGrid]
 			}/*,{
 				title:'资费变更',
@@ -1303,6 +1352,7 @@ ProdDetailTab = Ext.extend(CommonTab,{
 	resetPanel : function(){//重置Tab面板的子面板信息
 //		this.prodDetailInfo.reset();
 		//this.prodExpensesGrid.reset();
+		this.orderFeeDetailGrid.reset();
 		this.prodPropChangeGrid.reset();
 		//this.prodResGrid.reset();
 		//this.tariffChangeGrid.reset();

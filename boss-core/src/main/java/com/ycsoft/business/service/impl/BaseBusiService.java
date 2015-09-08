@@ -57,8 +57,10 @@ import com.ycsoft.business.component.resource.ProdComponent;
 import com.ycsoft.business.component.task.TaskComponent;
 import com.ycsoft.business.dto.core.acct.AcctAcctitemActiveDto;
 import com.ycsoft.business.dto.core.acct.PayDto;
+import com.ycsoft.business.dto.core.cust.CustFullInfoDto;
 import com.ycsoft.business.dto.core.fee.CFeePayDto;
 import com.ycsoft.business.dto.core.fee.FeeBusiFormDto;
+import com.ycsoft.business.dto.core.fee.FeeInfoDto;
 import com.ycsoft.business.dto.core.prod.CProdDto;
 import com.ycsoft.business.dto.core.prod.ProdListDto;
 import com.ycsoft.business.dto.core.user.UserDto;
@@ -102,7 +104,31 @@ public class BaseBusiService extends BaseService {
 	@Autowired
 	protected AuthComponent authComponent;
 	
-	
+	/**
+	 * 初始化接口的业务参数
+	 * @param busiCode
+	 * @throws Exception 
+	 */
+	protected Integer initExternalBusiParam(String busiCode,String  custId) throws Exception{
+		BusiParameter param=new BusiParameter();
+		SOptr optr=new SOptr();
+		optr.setOptr_id("0");
+		optr.setDept_id("4501");
+		optr.setLogin_name("admin");
+		optr.setArea_id("4500");
+		optr.setCounty_id("4501");
+		CustFullInfoDto custFullInfo = new CustFullInfoDto();
+		if(custId!=null){
+			custFullInfo.setCust(custComponent.queryCustById(custId));
+		}
+		param.setOptr(optr);
+		param.setBusiCode(busiCode);
+		param.setCustFullInfo(custFullInfo);
+		param.setService_channel(SystemConstants.SERVICE_CHANNEL_MOBILE);
+		param.setDoneCode(doneCodeComponent.gDoneCode());
+		this.setParam(param);
+		return param.getDoneCode();
+	}
 	/**
 	 * 保存订购产品受理单
 	 * @param doneCode
@@ -551,13 +577,14 @@ public class BaseBusiService extends BaseService {
 	 * @param status
 	 * @return
 	 */
-	protected boolean isProdOpen(String status){
-		if (status.equals(StatusConstants.ACTIVE) || status.equals(StatusConstants.OWENOTSTOP) 
+	protected boolean isProdOpen(String status) throws Exception {
+		/*if (status.equals(StatusConstants.ACTIVE) || status.equals(StatusConstants.OWENOTSTOP) 
 				|| status.equals(StatusConstants.TMPOPEN) || status.equals(StatusConstants.LNKUSTOP) 
 				|| status.equals(StatusConstants.PAUSE) )
 			return true;
 		else
-			return false;
+			return false;*/
+		return userProdComponent.isProdOpen(status);
 	}
 	
 	/**
@@ -1779,6 +1806,47 @@ public class BaseBusiService extends BaseService {
 // 	    	//生成销账任务
 //			jobComponent.createCustWriteOffJob(doneCode, user.getCust_id(), SystemConstants.BOOLEAN_FALSE);
 //    	}
+	}
+	
+	protected void buyDevice(DeviceDto device,String buyMode,String ownership,FeeInfoDto fee, 
+			String busiCode,CCust cust,Integer doneCode) throws Exception {
+		//增加客户设备
+		custComponent.addDevice(doneCode, cust.getCust_id(),
+				device.getDevice_id(), device.getDevice_type(), device.getDevice_code(), 
+				device.getPairCard() ==null?null:device.getPairCard().getDevice_id(),
+				device.getPairCard() ==null?null:device.getPairCard().getCard_id(), 
+				null, null,buyMode);
+		//保存设备费用
+		if (fee != null && fee.getFee_id()!= null && fee.getFee()>0){
+			String payType = SystemConstants.PAY_TYPE_UNPAY;
+			if (this.getBusiParam().getPay()!= null && this.getBusiParam().getPay().getPay_type() !=null)
+				payType = this.getBusiParam().getPay().getPay_type();
+			if(doneCodeComponent.queryDoneCodeUnPayByKey(doneCode)==null){
+				doneCodeComponent.saveDoneCodeUnPay(cust.getCust_id(), doneCode, getBusiParam().getOptr().getOptr_id());
+			}
+			feeComponent.saveDeviceFee( cust.getCust_id(), cust.getAddr_id(),fee.getFee_id(),fee.getFee_std_id(), 
+					payType,device.getDevice_type(), device.getDevice_id(), device.getDevice_code(),
+					null,
+					null,
+					null,
+					null,
+					device.getDevice_model(),
+					fee.getFee(), doneCode,doneCode, busiCode, 1);	
+			
+		}
+		
+		if (StringHelper.isNotEmpty(device.getDevice_id())){
+			//更新设备仓库状态
+			deviceComponent.updateDeviceDepotStatus(doneCode, busiCode, device.getDevice_id(),
+					device.getDepot_status(), StatusConstants.USE,true);
+			//更新设备产权
+			if (SystemConstants.OWNERSHIP_CUST.equals(ownership)){
+				deviceComponent.updateDeviceOwnership(doneCode, busiCode, device.getDevice_id(),device.getOwnership(),SystemConstants.OWNERSHIP_CUST,true);
+			}
+			//更新设备为旧设备
+			if (SystemConstants.BOOLEAN_TRUE.equals(device.getUsed()))
+				deviceComponent.updateDeviceUsed(doneCode, busiCode, device.getDevice_id(), SystemConstants.BOOLEAN_TRUE, SystemConstants.BOOLEAN_FALSE,true);
+		}
 	}
 	
 	

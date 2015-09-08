@@ -33,8 +33,14 @@ public class CProdOrder extends BusiBase implements Serializable {
     private String remark;
     private String public_acctitem_type; 
     private String is_pay;
+    private Date check_time;
     
-    
+	public Date getCheck_time() {
+		return check_time;
+	}
+	public void setCheck_time(Date check_time) {
+		this.check_time = check_time;
+	}
 	public String getIs_pay() {
 		return is_pay;
 	}

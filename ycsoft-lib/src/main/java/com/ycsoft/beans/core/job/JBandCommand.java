@@ -27,7 +27,7 @@ public class JBandCommand implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 8914092755631544635L;
-	private Integer transnum ;	
+	private Long transnum ;	
 	private Integer job_id ;	
 	private String supplyier_id ;	
 	private String server_id ;	
@@ -47,6 +47,8 @@ public class JBandCommand implements Serializable {
 	private String area_id ;
 	private Integer return_code;
 	
+	private String stb_id;
+	private String card_id;
 	private String modem_mac;
 	private String cmd_type_text;
 	/**
@@ -56,11 +58,11 @@ public class JBandCommand implements Serializable {
 	
 	
 	// transnum getter and setter
-	public Integer getTransnum(){
+	public Long getTransnum(){
 		return this.transnum ;
 	}
 	
-	public void setTransnum(Integer transnum){
+	public void setTransnum(Long transnum){
 		this.transnum = transnum ;
 	}
 	
@@ -246,6 +248,26 @@ public class JBandCommand implements Serializable {
 
 	public void setCmd_type_text(String cmdTypeText) {
 		cmd_type_text = cmdTypeText;
+	}
+
+
+	public String getStb_id() {
+		return stb_id;
+	}
+
+
+	public void setStb_id(String stb_id) {
+		this.stb_id = stb_id;
+	}
+
+
+	public String getCard_id() {
+		return card_id;
+	}
+
+
+	public void setCard_id(String card_id) {
+		this.card_id = card_id;
 	}
 
 }

@@ -10,6 +10,7 @@ import com.ycsoft.beans.system.SItemvalue;
 import com.ycsoft.business.commons.abstracts.BaseService;
 import com.ycsoft.business.commons.pojo.Parameter;
 import com.ycsoft.business.component.system.IndexComponent;
+import com.ycsoft.business.service.impl.OttExternalService;
 import com.ycsoft.commons.constants.DictKey;
 import com.ycsoft.commons.exception.ServicesException;
 import com.ycsoft.commons.helper.StringHelper;
@@ -32,7 +33,10 @@ public class FilterBusiCodeInterceptor implements MethodBeforeAdvice {
 		if(!(scope instanceof BaseService)){
 			throw new Exception("该拦截器只适用于Service层...");
 		}
-		
+		if(scope instanceof  OttExternalService ){
+			//接口不拦截
+			return ;
+		}
 		
 		HttpServletRequest request = null;
 		try {

@@ -182,6 +182,7 @@ public class BOSSBandServiceAdapter {
 	
 	/**
 	 * 查询用户订购记录
+	 * TODO 查询订购有问题 没有实现
 	 * @see AAARequestUtils#buildQuerySubscriberServiceMsg(long, String)
 	 */
 	public List<AAASubscriberServiceInfoWrapper> querySubscriberService(long doneCode, String userId)throws AAAException{

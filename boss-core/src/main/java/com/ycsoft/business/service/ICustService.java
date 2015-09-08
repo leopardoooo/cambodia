@@ -46,11 +46,12 @@ public interface ICustService extends IBaseService{
 	 * @param busiCode 业务编号
 	 * @param cust     客户基本信息
 	 * @param linkman  联系人信息
+	 * @param custCode 
 	 * @param resident 居民客户信息
 	 * @throws Exception
 	 *
 	 */
-	public void createCust(CCust cust, CCustLinkman linkman) throws Exception;
+	public void createCust(CCust cust, CCustLinkman linkman, String custCode) throws Exception;
 	
 	/**
 	 * 批量预开户
@@ -176,7 +177,7 @@ public interface ICustService extends IBaseService{
 			String newStbId, String newCardId, String newModemId, List<FeeInfoDto> feeInfoList, 
 			int stbZjFee, int cardZjFee, int modemZjFee,String deviceStatus, int buyFlag,
 			boolean singleCard,String changeReason) throws Exception;
-
+	
 	/**
 	 * 机卡互换,客户之间可以互换,必须是有用户的设备(正在使用的)才可以互换。</br>
 	 * 同客户互换：交换2个用户的机卡号，重发指令，保修期不变。</br>
@@ -286,6 +287,8 @@ public interface ICustService extends IBaseService{
 	 * @throws Exception
 	 */
 	public DeviceDto querySaleableDevice(String deviceCode) throws Exception;
+	
+	public DeviceDto queryChangeDevice(String userType, String deviceCode) throws Exception;
 	
 	/**
 	 * 根据设备编号查可以进行机卡互换的设备,该设备只能是已经在使用的。不能为空闲的.
@@ -460,12 +463,14 @@ public interface ICustService extends IBaseService{
 	 * @param deviceType
 	 * @param oldModel
 	 * @param newModel
-	 * @return
+	 * @returnR
 	 */
 	public RDeviceFee queryFeeByModel(String deviceType, String oldModel,String newModel) throws Exception;
 
 	public List<RDeviceModelTotalDto> queryDeviceCanBuy(SOptr optr) throws Exception;
 
 	public void saveBacthBuyMaterial(List<RDeviceModelTotalDto> feeInfoList) throws Exception;
+
+	public void editCustLevel(String parameter) throws Exception;
 
 }

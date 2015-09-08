@@ -92,6 +92,66 @@ public class TreeBuilder {
 		return target;
 	}
 	
+	public static List<AddrTreeNode> createSysAdreeTree(List<AddrTree> src){
+		List<AddrTreeNode> target = new ArrayList<AddrTreeNode>();
+		Map<String,AddrTreeNode> tempMap = new HashMap<String,AddrTreeNode>();
+		for (AddrTree tree : src){
+			AddrTreeNode node = new AddrTreeNode();
+			node.setChildren(null);
+			tree.transform( node );
+			
+			//如果不是叶子节点，直接修改
+			if(StringHelper.isNotEmpty(node.getIs_leaf()) && node.getIs_leaf().equals("F")){
+				node.setLeaf(false);
+				node.setCls("fold");
+			}
+			AddrTreeNode parentNode = tempMap.get( node.getPid() );
+			if (parentNode == null){
+				target.add(node);
+
+			} else {
+				if(parentNode.getChildren() == null){
+					parentNode.setChildren(new ArrayList<AddrTreeNode>());
+				}
+				parentNode.setExpanded(true);
+				parentNode.getChildren().add( node );
+				parentNode.setLeaf(false);
+				parentNode.setCls("fold");
+			}
+			tempMap.put( node.getId() , node);
+		}
+		return target;
+	}
+	
+	
+	public static List<TreeNode> createAdreeSynchronousTree(List<Tree> src){
+		List<TreeNode> target = new ArrayList<TreeNode>();
+		Map<String,TreeNode> tempMap = new HashMap<String,TreeNode>();
+		for (Tree tree : src){
+			TreeNode node = new TreeNode();
+			tree.transform( node );
+			
+			//如果不是叶子节点，直接修改
+			if(StringHelper.isNotEmpty(node.getIs_leaf()) && node.getIs_leaf().equals("F")){
+				node.setLeaf(false);
+				node.setCls("fold");
+			}
+			TreeNode parentNode = tempMap.get( node.getPid() );
+			if (parentNode == null){
+				target.add(node);
+
+			} else {
+				parentNode.setExpanded(true);
+				parentNode.getChildren().add( node );
+				parentNode.setLeaf(false);
+				parentNode.setCls("fold");
+			}
+			tempMap.put( node.getId() , node);
+		}
+		return target;
+	}
+	
+	
 /**
  * 复选框树，src已经设定好Checked的值
  */

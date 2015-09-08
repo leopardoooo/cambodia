@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.ycsoft.beans.system.SOptr;
 import com.ycsoft.business.commons.pojo.BusiParameter;
+import com.ycsoft.business.dto.core.fee.FeeBusiFormDto;
 import com.ycsoft.business.dto.core.prod.OrderProd;
 import com.ycsoft.business.dto.core.prod.PackageGroupPanel;
 import com.ycsoft.business.dto.core.prod.PackageGroupUser;
@@ -55,7 +56,6 @@ public class testOrderAction extends JunitSpringBase {
 		BusiParameter parm=new BusiParameter();
 		parm.setOptr(soptr);
 		orderService.setParam(parm);
-		
 		
 		orderService.saveOrderProdList(BusiCodeConstants.PROD_SINGLE_ORDER,order);
 		

@@ -140,7 +140,7 @@ AcctTransferPanel = Ext.extend(BaseForm,{
 		//账户store
 		var acctStore = App.getApp().main.infoPanel.acctPanel.acctGrid.getStore();
 		//选中的账目记录
-		var acctitemRecord = App.getApp().main.infoPanel.acctPanel.acctItemGrid.getSelectionModel().getSelected();
+		var acctitemRecord = App.getApp().main.infoPanel.custPanel.acctItemGrid.getSelectionModel().getSelected();
 		
 		var acctType = acctitemRecord.get('acct_type');//账目对应的账户类型
 		var isBase = acctitemRecord.get('is_base');//是否是基础包
@@ -199,11 +199,11 @@ AcctTransferPanel = Ext.extend(BaseForm,{
 	initEvents:function(){
 		this.on('afterrender',function(){
 			this.items.itemAt(0).items.itemAt(0).getEl().dom.innerHTML = 
-				AcctItemTemplate.applyTemplate(App.getApp().main.infoPanel.acctPanel.acctItemGrid.getSelectionModel().getSelected().data);
+				AcctItemTemplate.applyTemplate(App.getApp().main.infoPanel.custPanel.acctItemGrid.getSelectionModel().getSelected().data);
 		},this,{delay:10});
 	},
 	doInit:function(){
-		var acctItemRecord = App.getApp().main.infoPanel.acctPanel.acctItemGrid.getSelectionModel().getSelected();
+		var acctItemRecord = App.getApp().main.infoPanel.custPanel.acctItemGrid.getSelectionModel().getSelected();
 		
 		Ext.getCmp('sourceAcctId').setValue(acctItemRecord.get('acct_id'));
 		Ext.getCmp('sourceAcctItemId').setValue(acctItemRecord.get('acctitem_id'));

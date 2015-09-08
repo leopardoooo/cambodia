@@ -2,36 +2,48 @@ package com.ycsoft.sysmanager.component.system;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.ycsoft.beans.config.TAddress;
 import com.ycsoft.beans.config.TCustColonyCfg;
+import com.ycsoft.beans.config.TDistrict;
 import com.ycsoft.beans.config.TNonresCustApproval;
+import com.ycsoft.beans.config.TProvince;
 import com.ycsoft.beans.config.TSpell;
 import com.ycsoft.beans.core.cust.CCust;
 import com.ycsoft.beans.system.SCounty;
 import com.ycsoft.beans.system.SDept;
+import com.ycsoft.beans.system.SDeptAddr;
 import com.ycsoft.beans.system.SItemvalue;
 import com.ycsoft.beans.system.SOptr;
 import com.ycsoft.business.commons.pojo.BusiParameter;
 import com.ycsoft.business.dao.config.TAddressDao;
 import com.ycsoft.business.dao.config.TCustColonyCfgDao;
+import com.ycsoft.business.dao.config.TDistrictDao;
 import com.ycsoft.business.dao.config.TNonresCustApprovalDao;
+import com.ycsoft.business.dao.config.TProvinceDao;
 import com.ycsoft.business.dao.config.TSpellDao;
 import com.ycsoft.business.dao.system.SCountyDao;
+import com.ycsoft.business.dao.system.SDeptAddrDao;
 import com.ycsoft.business.dao.system.SDeptDao;
 import com.ycsoft.business.dao.system.SOptrDao;
 import com.ycsoft.business.dto.config.TAddressDto;
+import com.ycsoft.business.dto.config.TAddressSysDto;
 import com.ycsoft.business.dto.system.OptrDto;
 import com.ycsoft.business.service.externalImpl.ICustServiceExternal;
 import com.ycsoft.commons.abstracts.BaseComponent;
 import com.ycsoft.commons.constants.BusiCodeConstants;
+import com.ycsoft.commons.constants.SequenceConstants;
 import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.exception.ComponentException;
+import com.ycsoft.commons.exception.ErrorCode;
 import com.ycsoft.commons.helper.CnToSpell;
+import com.ycsoft.commons.helper.CollectionHelper;
 import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.daos.core.JDBCException;
 import com.ycsoft.daos.core.Pager;
@@ -47,6 +59,12 @@ public class AddressComponent extends BaseComponent {
 	private TCustColonyCfgDao tCustColonyCfgDao;
 	private SOptrDao sOptrDao;
 	private TNonresCustApprovalDao tNonresCustApprovalDao;
+	@Autowired
+	private SDeptAddrDao sDeptAddrDao;
+	@Autowired
+	private TProvinceDao tProvinceDao;
+	@Autowired
+	private TDistrictDao tDistrictDao;
 
 	public void setTNonresCustApprovalDao(
 			TNonresCustApprovalDao nonresCustApprovalDao) {
@@ -171,32 +189,53 @@ public class AddressComponent extends BaseComponent {
 	 * @return
 	 * @throws Exception
 	 */
-	public TAddress saveAddress(TAddress addr) throws Exception{
-		addr.setAddr_id(nextAddr(addr));
-		addr.setIs_leaf(SystemConstants.BOOLEAN_TRUE);
-		tAddressDao.save(addr);
+	public TAddress saveAddress(TAddressSysDto addr,String type) throws Exception{
+		TAddress  newAddr = new TAddress();
+		newAddr.setAddr_pid(addr.getAddr_pid());
+		newAddr.setArea_id(addr.getArea_id());
+		newAddr.setTree_level(addr.getTree_level());
+		newAddr.setCounty_id(addr.getCounty_id());
+		newAddr.setAddr_name(addr.getAddr_name());
+		newAddr.setAddr_id(getNextAddrId());
+		newAddr.setNet_type(addr.getNet_type());
+		newAddr.setDistrict_id(addr.getDistrict_id());
+		newAddr.setIs_leaf(SystemConstants.BOOLEAN_TRUE);
+		float  b = (float) 0.00;
+		if("leveladd".equals(type)){//新增平级算排序值
+			TAddress lastAddr = tAddressDao.findByKey(addr.getAddr_last_id());
+			TAddress nextAddr = tAddressDao.querySortNumByNextId(lastAddr.getAddr_pid(), lastAddr.getSort_num());
+			if(nextAddr == null){
+				b = lastAddr.getSort_num()+1000;
+			}else{
+				b  = (float)(Math.round((lastAddr.getSort_num()+nextAddr.getSort_num())/2*100))/100;
+			}
+		}else if("add".equals(type)){//新增下级算排序值，默认最大值+1000
+			String maxSortNum =	tAddressDao.queryMaxSortNumByPid(addr.getAddr_pid());
+			b = Float.parseFloat(maxSortNum)  + 1000;
+		}
+
+		newAddr.setSort_num(b);
+		tAddressDao.save(newAddr);
 		
-//		//保存地区拼音
-//		TSpell sp = new TSpell();
-//		sp.setData_id(addr.getAddr_id());
-//		sp.setData_type(SystemConstants.DATA_TYPE_ADDRESS);
-//		sp.setFull_sepll(CnToSpell.getPinYin(addr.getAddr_name()));
-//		sp.setSeq_sepll(CnToSpell.getPinYinHeadChar(addr.getAddr_name()));
-//		tSpellDao.save(sp);
 		
 		//修改父节点is_leaf为F
 		updateAddress(addr.getAddr_pid(), SystemConstants.BOOLEAN_FALSE);
-		return addr;
+		
+		return newAddr;
 	}
 
 	private String nextAddr(TAddress addr) throws JDBCException {
 		String nextAddrId = tAddressDao.getAddrId(addr.getAddr_pid());
 		if (addr.getTree_level()==2) {
 			nextAddrId = StringHelper.leftWithZero(nextAddrId, 2);
-		} else {
+		} else if(addr.getTree_level()>2){
 			nextAddrId = StringHelper.leftWithZero(nextAddrId, 5);
 		}
 		return nextAddrId;
+	}
+	
+	private String getNextAddrId() throws JDBCException{
+		return tAddressDao.findSequence(SequenceConstants.SEQ_ADDR_ID).toString();
 	}
 	
 	public List<OptrDto> queryOptrByCountyId(String countyId) throws Exception {
@@ -241,11 +280,17 @@ public class AddressComponent extends BaseComponent {
 	 * @return
 	 * @throws Exception
 	 */
-	public void editAddress(TAddress addr) throws JDBCException{
-		tAddressDao.update(addr);
+	public void editAddress(TAddressSysDto addr) throws JDBCException{
+		TAddress  newAddr = new TAddress();
+		newAddr.setAddr_id(addr.getAddr_id());
+		newAddr.setAddr_name(addr.getAddr_name());
+		newAddr.setNet_type(addr.getNet_type());
+		newAddr.setSort_num(addr.getSort_num());
+		newAddr.setDistrict_id(addr.getDistrict_id());
+		tAddressDao.update(newAddr);
 		
 		//修改地区拼音
-		tSpellDao.updateAddrName(addr.getAddr_id(), CnToSpell.getPinYin(addr.getAddr_name()), CnToSpell.getPinYinHeadChar(addr.getAddr_name()));
+//		tSpellDao.updateAddrName(addr.getAddr_id(), CnToSpell.getPinYin(addr.getAddr_name()), CnToSpell.getPinYinHeadChar(addr.getAddr_name()));
 	}
 
 	/**
@@ -429,5 +474,59 @@ public class AddressComponent extends BaseComponent {
 
 	public void setSOptrDao(SOptrDao optrDao) {
 		sOptrDao = optrDao;
+	}
+
+	public List queryAddrByName(String name, String pId, SOptr optr) throws Exception{
+		List<TAddressSysDto> list = new ArrayList<TAddressSysDto>();
+		if(StringHelper.isNotEmpty(pId)){
+			list = tAddressDao.queryAllAddrById(pId);
+		}else{
+		
+			List<SDeptAddr> sList = sDeptAddrDao.getAddrByDept(optr.getDept_id());
+			String[] addrIds = null;
+			if(sList.size()>0){
+				addrIds = CollectionHelper.converValueToArray(sList, "addr_id");
+			}else{
+				SDept dept= sDeptDao.findByKey(optr.getDept_id());
+				if(StringHelper.isNotEmpty(dept.getAgent_id())){
+					throw new ComponentException(ErrorCode.DeptAddrIsNull,dept.getDept_name());
+				}
+				//tAddressDao.queryAddrByAllowPids(levelId, addrPid)
+				String[] pids={SystemConstants.ADDRESS_ROOT_ID};
+				addrIds= CollectionHelper.converValueToArray(tAddressDao.queryAllAddrByPids(SystemConstants.ADDR_TREE_LEVEL_ONE,pids),"addr_id");
+			}
+			if(StringHelper.isEmpty(name)){
+				list = tAddressDao.queryAllAddrByIds(null);
+			}else{
+				name = name.toLowerCase();
+				name = name.replaceAll(" ", "");
+				list=tAddressDao.queryAddrSysTreeByLvOneAndName(addrIds,name);
+				
+			}
+		}
+		
+		List<TDistrict> districtList = tDistrictDao.findAll();
+		Map<String,TDistrict> map = CollectionHelper.converToMapSingle(districtList, "district_id");
+		for(TAddressSysDto dto:list){
+			TDistrict t = map.get(dto.getDistrict_id());
+			if(t != null && StringHelper.isNotEmpty(t.getDistrict_name())){
+				dto.setDistrict_name(t.getDistrict_name());
+			}
+		}
+		if(list.size()>2000){
+			throw new ComponentException(ErrorCode.DataNumTooMuch);
+		}
+		return list;
+	}
+	
+	public List<TProvince> queryProvince() throws Exception{
+		return tProvinceDao.queryProvince();
+	}
+	
+	public List queryDistrictByPid(String pId) throws Exception{
+		if(StringHelper.isEmpty(pId)){
+			throw new ComponentException(ErrorCode.ParamIsNull);
+		}
+		return tDistrictDao.queryDistrictListByPid(pId);
 	}
 }

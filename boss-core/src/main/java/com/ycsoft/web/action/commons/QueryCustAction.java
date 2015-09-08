@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Controller;
 
+import com.ycsoft.beans.config.TProvince;
 import com.ycsoft.beans.core.acct.CAcctAcctitem;
 import com.ycsoft.beans.core.cust.CCust;
 import com.ycsoft.beans.core.cust.CCustPropChange;
@@ -107,6 +108,12 @@ public class QueryCustAction extends BaseBusiAction {
 		return JSON_RECORDS;
 	}
 	
+	
+	public String queryProvince() throws Exception{
+		List<TProvince> list = queryCustService.queryProvince();
+		getRoot().setRecords(list);
+		return JSON_RECORDS;
+	}
 	
 	/**
 	 * 查询当前操作员，上线后未打印发票的客户编号

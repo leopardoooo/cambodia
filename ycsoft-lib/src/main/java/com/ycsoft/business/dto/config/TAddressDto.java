@@ -30,14 +30,7 @@ public class TAddressDto extends TAddress implements Tree {
 		node.getOthers().put("tree_level", String.valueOf(getTree_level()));
 		node.getOthers().put("area_id", getArea_id());
 		node.getOthers().put("county_id", getCounty_id());
-		node.getOthers().put("busi_optr_id", getBusi_optr_id());
-		node.getOthers().put("busi_optr_name", getBusi_optr_name());
-		node.getOthers().put("serv_optr_id", getServ_optr_id());
-		node.getOthers().put("serv_optr_name", getServ_optr_name());
 		node.getOthers().put("status", getStatus());
-		if(null != getCapacity()){
-			node.getOthers().put("capacity", getCapacity().toString());
-		}
 		node.getOthers().put("net_type", getNet_type());
 	}
 

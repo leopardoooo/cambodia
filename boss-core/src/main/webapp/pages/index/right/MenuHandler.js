@@ -355,6 +355,24 @@ Ext.apply(MenuHandler, {
 			height : 370
 		};
 	},
+	BatchModifyUserName:function(){//批量修改用户名
+		if (!hasCust()) {
+			return false;
+		}
+		return {
+			width : 590,
+			height : 180
+		};
+	},
+	ResetUserPassword:function(){//重置密码
+		if (!hasCust()) {
+			return false;
+		}
+		return {
+			width : 590,
+			height : 370
+		};
+	},
 	BatchNewCust : function() {
 		return {
 			width : 540,
@@ -407,16 +425,16 @@ Ext.apply(MenuHandler, {
 	ExchangeDevice : function() {
 		if (!hasCust())
 			return false;
-		var custDeviceGrid = App.getApp().main.infoPanel.getCustPanel().custDeviceGrid
+		/*var custDeviceGrid = App.getApp().main.infoPanel.getCustPanel().custDeviceGrid
 		var record = custDeviceGrid.getSelectionModel().getSelected();
-		/*
+		
 		 * if(records.length == 0){ Alert('请选择更换的设备'); return false; }else
 		 * if(records.length>1){ Alert('只能对一个设备进行更换，请选择一个设备'); return false; }
 		 * if(records[0].get('status')!='USE'){
 		 * Alert('选择的设备状态为未使用的设备，请选择使用的设备'); return false; }
 		 * if(records[0].get('loss_reg') === 'T'){ Alert('挂失的设备不能更换！'); return
 		 * false; }
-		 */
+		 
 
 		// 关闭过滤窗口
 		if (Ext.getCmp('filterWinID')) {
@@ -424,7 +442,7 @@ Ext.apply(MenuHandler, {
 			var index = custDeviceGrid.getStore().find('device_code',
 					record.get('device_code'));
 			custDeviceGrid.getSelectionModel().selectRow(index);
-		}
+		}*/
 
 		return {
 			width : 550,
@@ -765,9 +783,9 @@ Ext.apply(MenuHandler, {
 	// ----------------------用户信息---------------------------------------------------
 	// 用户开户
 	NewUser : function() {
-//		if (!hasCust()) {
-//			return false;
-//		}
+		if (!hasCust()) {
+			return false;
+		}
 		return {
 			width : 550,
 			height : 360
@@ -775,9 +793,12 @@ Ext.apply(MenuHandler, {
 	},
 	//派单开户
 	NewUserBatch: function(){
+		if (!hasCust()) {
+			return false;
+		}
 		return {
 			width: 580,
-			height: 460
+			height: 550
 		}
 	},
 	// 用户销户
@@ -899,6 +920,24 @@ Ext.apply(MenuHandler, {
 			};
 
 		}
+	},
+	AddIpUser : function() {
+		if (!hasCust()) {
+			return false;
+		}
+		return {
+			width : 550,
+			height : 360
+		};
+	},
+	PayIpUserFee : function() {
+		if (!hasCust()) {
+			return false;
+		}
+		return {
+			width : 550,
+			height : 360
+		};
 	},
 	ChangeCust : function(){
 	  	if(!hasCust()) return false;
@@ -1538,7 +1577,7 @@ Ext.apply(MenuHandler, {
 			return false;
 		}
 		for (var i = 0; i < len; i++) {
-			if (userRecords[i].get("status") != "ACTIVE" && userRecords[i].get("status") != "OWELONG" ) {
+			if (userRecords[i].get("status") != "ACTIVE" && userRecords[i].get("status") != "OWELONG" && userRecords[i].get("status") != "INSTALL" ) {
 				Alert("所选用户的状态必须是正常");
 				return false;
 			}
@@ -2522,7 +2561,7 @@ Ext.apply(MenuHandler, {
 		if (!hasCust())
 			return false;
 
-		var record = App.getApp().main.infoPanel.acctPanel.acctItemGrid
+		var record = App.getApp().main.infoPanel.custPanel.acctItemGrid
 				.getSelectionModel().getSelected();
 		if (record.get('can_refund_balance') === 0) {
 			Alert("账目退款余额不足！");
@@ -2544,7 +2583,7 @@ Ext.apply(MenuHandler, {
 	AcctTransfer : function() {
 		if (!hasCust())
 			return false;
-		var record = App.getApp().main.infoPanel.acctPanel.acctItemGrid
+		var record = App.getApp().main.infoPanel.custPanel.acctItemGrid
 				.getSelectionModel().getSelected();
 		if (record.get('can_trans_balance') === 0) {
 			Alert('账目可转金额不足！');
@@ -2853,7 +2892,7 @@ Ext.apply(MenuHandler, {
 	PublicAcctRecharge:function(){
 		if (!hasCust())
 			return false;
-		var acctStore = App.getApp().main.infoPanel.getAcctPanel().acctItemGrid.getStore();
+		var acctStore = App.getApp().main.infoPanel.getCustPanel().acctItemGrid.getStore();
 		if (acctStore.getCount() > 1) {
 			Alert("目前只支持单个公用账目！");
 			return false;
@@ -2866,7 +2905,7 @@ Ext.apply(MenuHandler, {
 	PublicAcctRefund:function(){
 		if (!hasCust())
 			return false;
-		var acctStore = App.getApp().main.infoPanel.getAcctPanel().acctItemGrid.getStore();
+		var acctStore = App.getApp().main.infoPanel.getCustPanel().acctItemGrid.getStore();
 		if (acctStore.getCount() > 1) {
 			Alert("目前只支持单个公用账目！");
 			return false;

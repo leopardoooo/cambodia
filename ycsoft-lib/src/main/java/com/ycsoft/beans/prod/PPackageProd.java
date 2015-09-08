@@ -5,9 +5,6 @@
 package com.ycsoft.beans.prod;
 
 import java.io.Serializable;
-
-import com.ycsoft.commons.constants.DictKey;
-import com.ycsoft.commons.store.MemoryDict;
 import com.ycsoft.daos.config.POJO;
 
 /**
@@ -31,6 +28,20 @@ public class PPackageProd implements Serializable {
 	private String prod_list;
 	private Integer precent;
 	
+	private String prod_type;
+	
+
+
+	public String getProd_type() {
+		return prod_type;
+	}
+
+
+
+	public void setProd_type(String prod_type) {
+		this.prod_type = prod_type;
+	}
+
 
 
 	public String getProd_list() {

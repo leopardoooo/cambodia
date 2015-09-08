@@ -44,7 +44,7 @@ public class PProdStaticResDao extends BaseEntityDao<PProdStaticRes> {
 			
 			prodIdStr = prodIdStr.substring(1);
 			
-			String sql = "select distinct b.external_res_id from p_prod_static_res a,t_server_res b "
+			String sql = "select distinct b.external_res_id res_id from p_prod_static_res a,t_server_res b "
 					+ " where a.res_id=b.boss_res_id and a.prod_id in ("+prodIdStr+")";
 			
 			List<PProdStaticRes> list = this.createQuery(sql).list();

@@ -35,12 +35,14 @@ public class TAddress extends OptrBase implements Serializable {
 	private String status;
 	private String district_id;
 	private String remark;
-	private Integer sort_num;
+	private float sort_num;
 	
 	private String busi_optr_name;
 	
 	private String serv_optr_id;//运维人员
 	private String serv_optr_name;//运维人员
+	
+	
 	
 	 
 
@@ -49,6 +51,7 @@ public class TAddress extends OptrBase implements Serializable {
 	 */
 	public TAddress() {
 	}
+
 
 	// addr_id getter and setter
 	public String getAddr_id() {
@@ -176,13 +179,17 @@ public class TAddress extends OptrBase implements Serializable {
 		this.remark = remark;
 	}
 
-	public Integer getSort_num() {
+
+	public float getSort_num() {
 		return sort_num;
 	}
 
-	public void setSort_num(Integer sort_num) {
+
+	public void setSort_num(float sort_num) {
 		this.sort_num = sort_num;
 	}
+
+
 	
 	
 

@@ -513,6 +513,8 @@ public class SystemConstants {
 	
 	public static final String CUST_CLASS_YBKH = "YBKH";
 	
+	public static final String CUST_LEVEL_YBKH="YBKH";
+	public static final String CUST_LEVEL_VIP="VIPKH";
 	/**
 	 * 充值卡充值用户名和密码
 	 */
@@ -588,4 +590,13 @@ public class SystemConstants {
 	public static final String UNPAY_CANCEL_PROMPT_FEEANDBUSI="FeeAndBusi";//回退业务并取消费用
 	public static final String UNPAY_CANCEL_PROMPT_ONLYFEE="OnlyFee";//业务正常，仅取消费用
 	public static final String UNPAY_CANCEL_PROMPT_ONLYACCT="OnlyAcct";//业务正常，仅退款转账户
+	
+	public static final int USER_TYPE_OTT_NUM = 61;		//ott用户账户名生成规则数字
+	public static final int USER_TYPE_BAND_NUM = 1;		//band用户账户名生成规则数字
+	
+	public static final String OTT_MOBILE_CUSTCODE="90";//移动端客户cust_no取值
+	public static final String OTT_MOBILE_ADDR_ID="625";   //移动端固定的地址码
+	public static final String OTT_MOBILE_ADDRESS="Room #, No.Register, St.Mobile,Special";   //移动端固定的开户地址
+	
+	public static final String USER_IP_FEE_ID = "5051";//用户IP外挂费用编号
  }

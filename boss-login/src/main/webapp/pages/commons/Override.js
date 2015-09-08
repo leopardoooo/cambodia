@@ -531,6 +531,44 @@ Ext.util.Format.formatFee = function(value){
 		return parseFloat(Ext.util.Format.convertToYuan(value));
 	}
 }
+Ext.util.Format.getMonths = function(date1 , date2){
+    //用-分成数组
+    date1 = date1.split("-");
+    date2 = date2.split("-");
+    //获取年,月数
+    var year1 = parseInt(date1[0]) , 
+        month1 = parseInt(date1[1]) , 
+        year2 = parseInt(date2[0]) , 
+        month2 = parseInt(date2[1]) , 
+        //通过年,月差计算月份差
+        months = (year2 - year1) * 12 + (month2-month1);
+    return months;    
+}
+Ext.util.Format.getDays = function(strDateStart, strDateEnd) {// sDate1和sDate2是2004-10-18格式
+	var oDate1, oDate2, iDays;
+	oDate1 = strDateStart.split("-");
+	oDate2 = strDateEnd.split("-");
+	var strDateS = new Date(oDate1[0], oDate1[1] - 1, oDate1[2]);
+	var strDateE = new Date(oDate2[0], oDate2[1] - 1, oDate2[2]);
+	var i = 1;
+	if (strDateS.getTime() > strDateE.getTime()) {
+		i = -1;
+	}
+	iDays = parseInt(Math.abs(strDateS - strDateE) / 1000 / 60 / 60 / 24)// 把相差的毫秒数转换为天数
+	return iDays * i;
+}
+
+Ext.util.Format.addMoth = function(d, m) {
+	var ds = d.split('-'), _d = ds[2] - 0;
+	var nextM = new Date(ds[0], ds[1] - 1 + m + 1, 0);
+	var max = nextM.getDate();
+	d = new Date(ds[0], Ext.util.Format.toChangep(ds[1] - 1 + m), Ext.util.Format.toChangep(_d > max? max: _d));
+	return d.format("Y-m-d");
+}
+
+Ext.util.Format.toChangep = function(s) {
+    return s < 10 ? '0' + s: s;
+}
 
 Ext.util.Format.formatToFen = function(value){
 	var finalFee = 0;

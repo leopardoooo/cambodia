@@ -82,6 +82,17 @@ public class CUser extends BusiBase implements Serializable {
 	private String auto_promotion;
 	private String newPassword;
 	private Date protocol_date;
+	
+	private Date prod_exp_date;
+	
+
+	public Date getProd_exp_date() {
+		return prod_exp_date;
+	}
+
+	public void setProd_exp_date(Date prod_exp_date) {
+		this.prod_exp_date = prod_exp_date;
+	}
 
 	public String getAuto_promotion() {
 		return auto_promotion;

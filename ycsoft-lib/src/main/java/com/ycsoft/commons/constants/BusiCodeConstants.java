@@ -25,16 +25,21 @@ public final class BusiCodeConstants {
 	
 	// Add business for the Cambodia
 	// Modified since 2015-07-31
+	public final static String BATCH_MOD_USER_NAME = "2122";//批量修改用户名
+	
 	public final static String PROD_PACKAGE_ORDER = "1015";//套餐订购
 	public final static String PROD_SINGLE_ORDER = "102"; //单用户订购
 	public final static String PROD_CONTINUE = "101";//续订
 	public final static String PROD_UPGRADE = "100";//升级
 	
-	public final static String PROD_HIGH_TERMINATE="110";//高级终止
+	public final static String PROD_TERMINATE = "1027";//退订
+	public final static String PROD_HIGH_TERMINATE="110";//高级退订
+	public final static String PROD_SUPER_TERMINATE="109";//超级退订
+	
 	public final static String USER_HIGH_WRITE_OFF="111";//高级销户
 	
 	public final static String PROD_CHANGE_TARIFF = "1028";//资费变更
-	public final static String PROD_TERMINATE = "1027";//终止(退订)
+	
 	public final static String PKG_ORDER = "1016";//订购套餐
 	public final static String PKG_EDIT = "1017";//修改套餐
 	public final static String USER_EDIT_LEVEL = "1018";//修改用户等级

@@ -41,12 +41,14 @@ import com.ycsoft.beans.core.fee.CFeePropChange;
 import com.ycsoft.beans.core.fee.CFeeUnitpre;
 import com.ycsoft.beans.core.prod.CProd;
 import com.ycsoft.beans.core.prod.CProdMobileBill;
+import com.ycsoft.beans.core.prod.CProdOrder;
 import com.ycsoft.beans.core.prod.CProdOrderDto;
 import com.ycsoft.beans.core.prod.CProdOrderFee;
 import com.ycsoft.beans.core.promotion.CPromFee;
 import com.ycsoft.beans.core.promotion.CPromFeeProd;
 import com.ycsoft.beans.core.user.CUser;
 import com.ycsoft.beans.core.voucher.CVoucher;
+import com.ycsoft.beans.invoice.RInvoice;
 import com.ycsoft.business.commons.abstracts.BaseBusiComponent;
 import com.ycsoft.business.component.config.ExpressionUtil;
 import com.ycsoft.business.dao.config.TBusiFeeDao;
@@ -95,6 +97,7 @@ import com.ycsoft.commons.constants.DataRight;
 import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.exception.ComponentException;
+import com.ycsoft.commons.exception.ErrorCode;
 import com.ycsoft.commons.helper.CollectionHelper;
 import com.ycsoft.commons.helper.DateHelper;
 import com.ycsoft.commons.helper.StringHelper;
@@ -145,6 +148,42 @@ public class FeeComponent extends BaseBusiComponent {
 	private ExpressionUtil expressionUtil;
 	@Autowired
 	private CDoneCodeUnpayDao cDoneCodeUnpayDao;
+	
+	
+	/**
+	 * 查询挂载IP费用的用户费用清单
+	 * @param cust_id
+	 * @return
+	 * @throws Exception
+	 */
+	public Map<String,BusiFeeDto> queryUserIpAddresFee(String cust_id)throws Exception{
+		Map<String,BusiFeeDto> map=new HashMap<String,BusiFeeDto>();
+		for(CUser user:cUserDao.queryUserByIpAddressFee(cust_id)){
+			int fee_count=0;
+			try{
+			   fee_count= Integer.valueOf(user.getStr6());
+			}catch(Exception e){}
+			if(fee_count<=0){
+				continue;
+			}
+			BusiFeeDto busiFee= getBusiFee(user.getStr5());
+			if(busiFee==null){
+				throw new ComponentException(ErrorCode.TemplateNotConfigBuseFee,user.getStr5());
+			}
+			busiFee.setFee_count(fee_count);
+			List<CProdOrder> orders= cProdOrderDao.queryNotExpAllOrderByUser(user.getUser_id());
+			
+			if(orders!=null&&orders.size()>0){
+				//开始计费日期=上次到期日+1天
+				busiFee.setLast_prod_exp(DateHelper.addDate(orders.get(orders.size()-1).getExp_date(),1));
+			}else{
+				busiFee.setLast_prod_exp(DateHelper.today());
+			}
+			map.put(user.getUser_id(), busiFee);	
+		}
+		return map;
+	}
+	
 	/**
 	 * 保存订单退款费用信息
 	 * @param cancelList
@@ -353,6 +392,38 @@ public class FeeComponent extends BaseBusiComponent {
 		fee.setArea_id(getOptr().getArea_id());
 		fee.setPay_type(payType);
 		fee.setAddr_id(addrId);
+		cFeeDao.save(fee);
+
+		return fee;
+	}
+	
+	public CFee saveFeeUnitpre(String payType,String feeId,String feeType,Integer realPay, Integer createDoneCode,Integer busiDoneCode,
+			String busiCode,String isDoc,String addrId, String paySn, String custId,RInvoice invoice) throws Exception {
+		CFee fee = new CFee();
+		fee.setFee_sn(gFeeSn());
+		
+		fee.setFee_id(feeId);
+		fee.setFee_type(feeType);//预付款
+		fee.setBusi_done_code(busiDoneCode);
+		fee.setCreate_done_code(createDoneCode);
+		fee.setBusi_code(busiCode);
+		fee.setIs_doc(isDoc);//未打印
+		fee.setStatus(StatusConstants.PAY);
+		fee.setShould_pay(realPay);
+		fee.setReal_pay(realPay);
+		fee.setCounty_id(getOptr().getCounty_id());
+		fee.setOptr_id(getOptr().getOptr_id());
+		fee.setDept_id(getOptr().getDept_id());
+		fee.setArea_id(getOptr().getArea_id());
+		fee.setPay_type(payType);
+		fee.setAddr_id(addrId);
+		
+		fee.setPay_sn(paySn);
+		fee.setCust_id(custId);
+		fee.setInvoice_id(invoice.getInvoice_id());
+		fee.setInvoice_code(invoice.getInvoice_code());
+		fee.setInvoice_book_id(invoice.getInvoice_book_id());
+		fee.setInvoice_mode(invoice.getInvoice_mode());
 		cFeeDao.save(fee);
 
 		return fee;
@@ -673,6 +744,14 @@ public class FeeComponent extends BaseBusiComponent {
 		if (StringHelper.isNotEmpty(fee.getInvoice_id()))
 			cancelInvoice(fee);
 	}
+	
+	public void saveCancelPayFee(String paySn, Integer doneCode) throws Exception {
+		CFeePay pay = new CFeePay();
+		pay.setPay_sn(paySn);
+		pay.setReverse_done_code(doneCode);
+		pay.setIs_valid(SystemConstants.BOOLEAN_FALSE);
+		cFeePayDao.update(pay);
+	}
 	/**
 	 * 取消费用
 	 * 判断是否删除未支付业务
@@ -763,6 +842,11 @@ public class FeeComponent extends BaseBusiComponent {
 			pay.setInvoice_id("xs" + doneCode);
 			pay.setInvoice_code("xs" + doneCode);
 			pay.setInvoice_book_id("xs" + doneCode);
+		}else{
+			if(StringHelper.isNotEmpty(pay.getInvoice_id())){
+				pay.setInvoice_book_id(pay.getInvoice_id());
+				pay.setInvoice_code(pay.getInvoice_code());
+			}
 		}
 		// 保存支付信息
 		cFeePayDao.save(pay);
@@ -1588,8 +1672,7 @@ public class FeeComponent extends BaseBusiComponent {
 	 * @return
 	 */
 	public List<TBusiFee> queryUnBusiFee() throws Exception {
-		String dataType = this.queryDataRightCon(getOptr(), DataRight.FEE_TYPE.toString());
-		return tBusiFeeDao.queryUnBusiFee(dataType);
+		return tBusiFeeDao.queryUnBusiFee();
 	}
 
 	

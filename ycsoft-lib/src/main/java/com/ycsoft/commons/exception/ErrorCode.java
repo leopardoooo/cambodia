@@ -14,7 +14,7 @@ public enum ErrorCode {
 	CustDataException("客户数据异常，请重新索搜客户！"),
 	CustSeqIsNull("系统未正确配置客户序列号,客户前缀号=%s"),
 
-	
+	NoUserExistsOrBelong2CurrentCust("用户不存在,或者不在当前客户名下"),
 	
 	
 	ExchangeConfigError("系统未正确配置汇率，请联系管理员"),
@@ -39,7 +39,7 @@ public enum ErrorCode {
 	CFeeAndProdOrderIsNotOne("费用记录和订单信息不一致"),
 	
 	OrderNotExists("订单不存在"),
-	OrderTodayHasCancel("订单已取消，不能再次取消"),
+	OrderTodayHasCancel("订单已退订，不能再次退订"),
 	
 	ProdNotExists("产品不存在"),
 	ProdIsInvalid("产品已失效"),
@@ -55,9 +55,11 @@ public enum ErrorCode {
 	OrderDateEffDateError("开始计费日错误"),
 	OrderDateExpDateError("结束计费日错误"),
 	OrderDateOrderMonthError("订购月数不能填0或订购月数必须是资费周期的倍数"),
+	OrderDateFeeError("订单应支付金额错误"),
 	OrderPackageHasSingleUserParam("订购套餐时，单用户参数不能填"),
 	OrderFeeDisagree("订单金额和明细不一致，请联系管理员！(order_sn=%s)"),
-	OrderTransUnPayPleaseCancel("被覆盖的订单存在未支付记录，请先取消订单号=%s的费用"),
+	OrderTransUnPayPleaseCancel("被覆盖的订单存在未支付记录，请先取消订单号=%s的费用才能升级"),
+	OrderDateCanNotUpWhyPak("产品不能升级,因为存在有效的套餐子产品"),
 
 	//depot
 	DeviceRepeat("设备重复"),
@@ -78,6 +80,37 @@ public enum ErrorCode {
 	
 	TemplateNotConfigBuseFee("该地区费用模板未配置该费用项(%s)"),
 	CustUserIpAddressFeeCoinfigError("客户宽带IP收费存在多个费用项目，请联系管理员！"),
+	UserLoginNameIsExists("账号名称已存在!"),
+	CustStatusIsNotOpenUser("意向客户不能直接开用户，请先修改地址!"),
+	OTTIsNotSingle("OTT用户不能使用单向设备!"),
+	DTTIsNotDouble("DTT用户不能使用双向设备!"),
+	
+	UserLoginNameIsNotExistsOrIsNotOttMobile("账号不存在或不是ott_mobile用户"),
+	
+	/**OTT接口相关错误码**/
+	E40001("Mac地址认证失败（提示用户，不能进入）"),
+	E40002("EPG认证失败，返回Guest帐号"),
+	E40003("token认证失败，返回Guest帐号"),
+	E40004("token 认证成功，用户认证成功。"),
+	E40005("无产品绑定免费"),
+	E40006("参数错误"),
+	E40007("IP地址非法"),
+	E40009("其它错误"),
+	E40010("有产品绑定，且用户已经购买，当前时间有效"),
+	E40011("续订/取消续订操作失败"),
+	E40012("IP地址认证失败（提示用户，不能进入）针对运营商的需求限制IP"),
+	E40013("设备被禁止"),
+	E20000("成功"),
+	E20001("用户或密码错误"),
+	E20002("充值失败,充值码错误"),
+	E20003("请求超时,请返回重试"),
+	E20004("产品鉴权失败"),
+	E20005("余额不足"),
+	
+	//OTT授权相关错误
+	ResIsNull("控制字为空"),
+	ResOttIsError("OTT控制字格式错误"),
+	CmdTypeUnDefined("授权类型(s%)未定义,请联系管理员"),
 	;
 
 	private ErrorCode(String desc){
@@ -87,5 +120,20 @@ public enum ErrorCode {
 	public String getDesc(){
 		return this.desc;
 	}
-	
+	/**
+	 * 获得OTT接口的状态码
+	 * @return
+	 */
+	public String getOttStatusCode(){
+		String name=this.name();
+		Integer statueCode=null;
+		try{
+			statueCode=Integer.valueOf(name.substring(1));
+		}catch(Exception e){}
+		if(statueCode!=null){
+			return statueCode.toString();
+		}else{
+			return "40009";
+		}
+	}
 }

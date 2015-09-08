@@ -3,8 +3,11 @@
  */
 package com.ycsoft.web.action.external;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Controller;
 
+import com.ycsoft.business.service.impl.OttExternalService;
 import com.ycsoft.commons.abstracts.AbstractAction;
 import com.ycsoft.commons.exception.ErrorCode;
 import com.ycsoft.commons.exception.ServicesException;
@@ -18,6 +21,7 @@ import com.ycsoft.commons.exception.ServicesException;
 @Controller
 public class BossExternalAction extends AbstractAction{
 	private static final String JSON = "json";
+	private static Log logger=LogFactory.getLog(BossExternalAction.class);
 	private ResultBody resultBody;
 	
 	/*! 用户相关属性 */
@@ -36,6 +40,7 @@ public class BossExternalAction extends AbstractAction{
 	private String product_id;	
 	private String product_fee_id;	
 	private Integer amount;	
+
 	private String film_name;
 	private String boss_data;
 	private String ott_data; 
@@ -44,7 +49,8 @@ public class BossExternalAction extends AbstractAction{
 	private float price;
 	private String currency_type;
 	
-	
+	private OttExternalService ottExternalService;
+//	private OrderService orderService;
 	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	// 用户相关接口定义
 	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -58,8 +64,7 @@ public class BossExternalAction extends AbstractAction{
 		this.doActionInCallbackForCommonResult(new Callback(){
 			@Override
 			public Object doCallback() throws Throwable {
-				// TODO get_account_info
-				return null;
+				return ottExternalService.getAccountInfo(user_id);
 			}
 		}, null);
 		
@@ -76,6 +81,13 @@ public class BossExternalAction extends AbstractAction{
 	 * @param telephone 手机号码
 	 */
 	public String modifyAccountInfo(){
+		this.doActionInCallbackForCommonResult(new Callback(){
+			@Override
+			public Object doCallback() throws Throwable {
+				ottExternalService.modifyAccountInfo(user_id, user_passwd, user_rank, user_name, telephone);
+				return new Object();
+			}
+		}, null);
 		return JSON;
 	}
 	
@@ -90,6 +102,12 @@ public class BossExternalAction extends AbstractAction{
 	 * @param email 邮箱
 	 */
 	public String registerAccount(){
+		this.doActionInCallbackForCommonResult(new Callback(){
+			@Override
+			public Object doCallback() throws Throwable {
+				return ottExternalService.RegisterAccount(user_id, user_passwd, user_name, user_rank, telephone, email);
+			}
+		}, null);
 		return JSON;
 	}
 	
@@ -98,6 +116,12 @@ public class BossExternalAction extends AbstractAction{
 	 * @param user 可输入用户ID或昵称(user_id, user_name)
 	 */
 	public String userValidate(){
+		this.doActionInCallbackForCommonResult(new Callback(){
+			@Override
+			public Object doCallback() throws Throwable {
+				return ottExternalService.queryUserValidate(user);
+			}
+		}, null);
 		return JSON;
 	}
 	
@@ -113,6 +137,12 @@ public class BossExternalAction extends AbstractAction{
 	 * @param user_ip 来源IP
 	 */
 	public String getOrderedProductList(){
+		this.doActionInCallbackForCommonResult(new Callback(){
+			@Override
+			public Object doCallback() throws Throwable {
+				return ottExternalService.getOrderedProductList(user_id);
+			}
+		}, null);
 		return JSON;
 	}
 	
@@ -126,6 +156,12 @@ public class BossExternalAction extends AbstractAction{
 	 * @param product_ids 产品ID列表, 可以为空,多产品以逗号分隔
 	 */
 	public String getProductList(){
+		this.doActionInCallbackForCommonResult(new Callback(){
+			@Override
+			public Object doCallback() throws Throwable {
+				return ottExternalService.getProductList(user_id, product_ids);
+			}
+		}, null);
 		return JSON;
 	}
 	
@@ -141,7 +177,13 @@ public class BossExternalAction extends AbstractAction{
 	 * @param ott_data OTT扩展参数,同步产品授权时回传CMS
 	 */
 	public String buyProduct(){
-		// TODO buy_product
+		this.doActionInCallbackForCommonResult(new Callback(){
+			@Override
+			public Object doCallback() throws Throwable {
+				ottExternalService.saveOttMobileBuyProduct(user_id, product_id, product_fee_id, amount, film_name, boss_data, ott_data);
+				return new Object();
+			}
+		}, null);
 		return JSON;
 	}
 	
@@ -152,7 +194,12 @@ public class BossExternalAction extends AbstractAction{
 	 * @param user_ip 来源IP
 	 */
 	public String getBuyProductHistory(){
-		// TODO get_buy_product_history
+		this.doActionInCallbackForCommonResult(new Callback(){
+			@Override
+			public Object doCallback() throws Throwable {
+				return ottExternalService.getBuyProductHistory(user_id);
+			}
+		}, null);
 		return JSON;
 	}
 	
@@ -166,7 +213,12 @@ public class BossExternalAction extends AbstractAction{
 	 * @param product_ids 产品ID列表, 可以为空,多产品以逗号分隔
 	 */
 	public String getProductListByUpdate(){
-		// TODO get_product_list_by_update
+		this.doActionInCallbackForCommonResult(new Callback(){
+			@Override
+			public Object doCallback() throws Throwable {
+				return ottExternalService.getProductListByUpdate();
+			}
+		}, null);
 		return JSON;
 	}
 	
@@ -182,7 +234,13 @@ public class BossExternalAction extends AbstractAction{
 	 * @param currency_type RMB：人民币, USD：美元
 	 */
 	public String updateProduct(){
-		// TODO update_product
+		this.doActionInCallbackForCommonResult(new Callback(){
+			@Override
+			public Object doCallback() throws Throwable {
+				ottExternalService.updateProduct();
+				return new Object();
+			}
+		}, null);
 		return JSON;
 	}
 	
@@ -209,8 +267,11 @@ public class BossExternalAction extends AbstractAction{
 			ServicesException tex = null;
 			if(e instanceof ServicesException){
 				tex = (ServicesException)e;
+				if(logger.isDebugEnabled()){
+					logger.debug(e.getMessage(),e);
+				}
 			}else{
-				e.printStackTrace();
+				logger.error(e.getMessage(), e);
 				tex = new ServicesException(ErrorCode.UNKNOW_EXCEPTION);
 			}
 			body = ResultBody.createWithExceptionAndMsg(tex, msg);
@@ -312,4 +373,15 @@ public class BossExternalAction extends AbstractAction{
 	public void setCurrency_type(String currency_type) {
 		this.currency_type = currency_type;
 	}
+
+	public OttExternalService getOttExternalService() {
+		return ottExternalService;
+	}
+
+	public void setOttExternalService(OttExternalService ottExternalService) {
+		this.ottExternalService = ottExternalService;
+	}
+
+
+	
 }

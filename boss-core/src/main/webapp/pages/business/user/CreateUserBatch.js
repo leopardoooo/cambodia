@@ -11,27 +11,34 @@ UserBaseBatchForm = Ext.extend( BaseForm , {
 		});
 		
 		var sm = new Ext.grid.CheckboxSelectionModel();
-		this.newUserRecordFields = ['user_type','buy_mode','buy_mode_text',
+		this.newUserRecordFields = ['user_type', 'device_model','buy_mode','buy_mode_text',
 		                            'open_amount','fee_id','fee','sub_total',
-		                            'device_type'];
+		                            'device_type', 'device_type_text', 'fee_name'];
 		this.newUserStore = new Ext.data.JsonStore({
 			fields: this.newUserRecordFields
 		});
 		this.newUserGrid = new Ext.grid.GridPanel({
 			region: 'center',
+//			anchor: '100%',
 			title: '用户暂存表',
 			store: this.newUserStore,
 	        columns: [
 	            sm,
-	            {id: 'aecid',menuDisabled: true, header: "用户类型", sortable: false, dataIndex: 'user_type'},
-	            {menuDisabled: true, width: 100, header: "购买方式", sortable: false, dataIndex: 'buy_mode_text'},
-	            {menuDisabled: true, width: 100, header: "数量", sortable: false, dataIndex: 'open_amount'},
-	            {menuDisabled: true, width: 100, header: "单价$", sortable: false, dataIndex: 'fee'},
-	            {menuDisabled: true, width: 100, header: "小计", sortable: false, dataIndex: 'sub_total'}
+	            {id: 'aecid',menuDisabled: true, header: "用户类型", width:85, sortable: false, dataIndex: 'user_type'},
+	            {menuDisabled: true, header: "设备类型", width:120, sortable: false, dataIndex: 'device_type_text', renderer:App.qtipValue},
+	            {menuDisabled: true, width: 80, header: "购买方式", sortable: false, dataIndex: 'buy_mode_text', renderer:App.qtipValue},
+	            {menuDisabled: true, width: 50, header: "数量", sortable: false, dataIndex: 'open_amount'},
+	            {menuDisabled: true, width: 100, header: "费用名称", sortable: false, dataIndex: 'fee_name', renderer:App.qtipValue},
+	            {menuDisabled: true, width: 50, header: "单价$", sortable: false, dataIndex: 'fee'},
+	            {menuDisabled: true, width: 50, header: "小计", sortable: false, dataIndex: 'sub_total'}
 	        ],
 	        sm: sm,
-	        autoExpandColumn: 'aecid',
+	        autoExpandColumn: 'aecid', 
+	        autoScroll:true,
+	        width:'100%',
+	        forceFit: false,
 	        tbar: [{
+	        	id: 'removeDataId',
 	        	text: '移除选中',
 	        	iconCls: 'icon-del',
 	        	scope: this,
@@ -41,6 +48,30 @@ UserBaseBatchForm = Ext.extend( BaseForm , {
 	        	}
 	        }]
 		});
+		
+		this.busiFeeStore = new Ext.data.JsonStore({
+			fields: ['fee_name', 'fee']
+		});
+		this.busiFeeGrid = new Ext.grid.GridPanel({
+			region: 'south',
+			title: '杂费表',
+			store: this.busiFeeStore,
+			width:'100%',
+			autoExpandColumn: 'aecid',
+	        columns: [
+	            {id:'aecid', menuDisabled: true, header: "费用名称", sortable: false, dataIndex: 'fee_name'},
+	            {menuDisabled: true, header: "收费金额", sortable: false, dataIndex: 'fee', width:300, renderer:Ext.util.Format.formatFee}
+	        ]
+		});
+		
+		/*this.spkgStore = new Ext.data.JsonStore({
+			url: root + '/core/x/User!querySpkgBySn.action',
+			fields: ['sp_id', 'spkg_title'],
+			params: {
+				spkgSn: App.getCust()['spkg_sn']
+			},
+			autoLoad: true
+		});*/
 		
 		
 		UserBaseBatchForm.superclass.constructor.call(this, {
@@ -129,7 +160,30 @@ UserBaseBatchForm = Ext.extend( BaseForm , {
 			            minValue: 1,
 			            maxValue: 5000,
 			            value: 2
-					}]
+					},{
+						xtype:'checkbox',
+					    fieldLabel: "手动开户",
+					    style: 'padding: 0 0 -20px 0;',
+					    id: "handOpenId",
+					    checked: true,
+					    listeners:{
+			            	scope: this,
+			            	check: this.doCheckedChangeOpenType
+			            }
+					}/*,{
+						id: 'spkgComboId',
+						fieldLabel: '协议开户',
+						width: 120,
+						xtype: 'combo',
+						store: this.spkgStore,
+						displayField: 'spkg_title',
+						valueField: 'sp_id',
+						allowBlank: false,
+						listeners: {
+							scope: this,
+							select: this.doQuerySpkgUser
+						}
+					}*/]
 				},{
 					columnWidth: .2,
 					layout: 'anchor',
@@ -142,11 +196,25 @@ UserBaseBatchForm = Ext.extend( BaseForm , {
 					scope: this,
 					handler: this.addToGrid
 				}]
-			},
-			this.newUserGrid, {
+			},{
+				region: 'center',
+				layout:{
+					type: 'vbox',
+					pack: 'start',
+					align: 'stretch'
+				},
+				border: false,
+				defaults:{baseCls: 'x-plain', border:false},
+				autoScroll: true,
+				items:[
+				       {id:'newUserPanelId', layout:'fit',flex:1, autoScroll:true, items:[this.newUserGrid]},
+				       {id:'busiFeePanelId', layout:'fit',flex:1, items:[this.busiFeeGrid]}
+				]
+			},{
 				region: 'south',
 				height: 60,
 				layout: 'column',
+				anchor:'100%',
 				bodyStyle:'background:#F9F9F9;padding-top:15px;border-top-width: 0;',
 				defaults: {
 					layout: 'form',
@@ -154,40 +222,96 @@ UserBaseBatchForm = Ext.extend( BaseForm , {
 					labelWidth:80
 				},
 				items: [{
-					columnWidth: .70,
-					items: [{
-						xtype: 'radiogroup',
-			            fieldLabel: '派单方式',
-			            anchor: '100%',
-			            id: 'radioAssignWay',
-			            columns: [70, 90, 120],
-			            items: [{
-			            	boxLabel: 'CFOCN',
-			            	name: 'assignWay',
-			            	inputValue: 'CFOCN'
-			            },{
-			            	boxLabel: 'SUPERNET',
-			            	name: 'assignWay',
-			            	inputValue: 'SUPERNET'
-			            },{
-			            	boxLabel: 'CFOCN+SUPERNET',
-			            	name: 'assignWay',
-			            	inputValue: 'CFOCN+SUPERNET'
-			            }]
+					columnWidth: .5,
+					items:[{
+						fieldLabel:'催费类型',
+						xtype:'paramcombo',
+						allowBlank:false,
+						width:150,
+						id:'boxStopType',
+						paramName:'STOP_TYPE',
+						defaultValue:'KCKT'
 					}]
 				},{
-					columnWidth: .3,
+					columnWidth: .5,
 					items:[{
 						xtype: 'textfield',
 						id: 'tfTotal',
 			            fieldLabel: '费用总额$',
 			            labelWidth: 60,
 			            readOnly: true,
-			            width: 60
+			            width: 120
 					}]
 				}]
 			}]
 		});
+	},
+	doInit:function(){
+		UserBaseBatchForm.superclass.doInit.call(this);
+		Ext.getCmp('busiFeePanelId').hide();
+		this.doLayout();
+	},
+	doDisabledComp: function(flag){
+		Ext.getCmp('boxUserType').setDisabled(flag);
+		Ext.getCmp('boxDeviceCategory').setDisabled(flag);
+		Ext.getCmp('nfFee').setDisabled(flag);
+		Ext.getCmp('deviceBuyMode').setDisabled(flag);
+		Ext.getCmp('sfOpenAmount').setDisabled(flag);
+	},
+	doCheckedChangeOpenType: function(box, checked){
+		var flag = true;
+		if(checked){
+			flag = false;
+			Ext.getCmp('busiFeePanelId').hide();
+			Ext.getCmp('removeDataId').setDisabled(false);
+			this.newUserGrid.getStore().removeAll();
+			Ext.getCmp("tfTotal").setValue(0);
+			Ext.getCmp('boxStopType').reset();
+		}else{
+			Ext.getCmp('busiFeePanelId').show();
+			Ext.getCmp('removeDataId').setDisabled(true);
+			
+			Ext.Ajax.request({
+				url: root + '/core/x/User!querySpkgUserInfo.action',
+				params: {
+					spkgSn: App.getCust()['spkg_sn']
+				},
+				scope: this,
+				success: function(res, opt){
+					var data = Ext.decode(res.responseText);
+					var spkgUsers = data['spkgUser'];
+					var array = [], total = 0;
+					for(var i=0; i<spkgUsers.length; i++){
+						var obj = {
+								user_type: spkgUsers[i]['user_type'],
+								device_type_text: spkgUsers[i]['device_model_text'],
+								buy_mode_text: spkgUsers[i]['buy_mode_name'],
+								open_amount: spkgUsers[i]['open_num'],
+								fee: 0,
+								sub_total: Ext.util.Format.formatFee( spkgUsers[i]['fee'] ),
+								fee_name: spkgUsers[i]['fee_name']
+						};
+						total += obj['sub_total'];
+						array.push(obj);
+					}
+					this.newUserGrid.getStore().removeAll();
+					this.newUserGrid.getStore().loadData(array);
+					
+					this.busiFeeGrid.getStore().removeAll();
+					this.busiFeeGrid.getStore().loadData(data['busiFee']);
+					
+					for(var i=0; i<data['busiFee'].length; i++){
+						total += Ext.util.Format.formatFee( data['busiFee'][i]['fee'] );
+					}
+					Ext.getCmp("tfTotal").setValue(total);
+				}
+			});
+		}
+		Ext.getCmp('boxUserType').setDisabled(flag);
+		Ext.getCmp('boxDeviceCategory').setDisabled(flag);
+		Ext.getCmp('nfFee').setDisabled(flag);
+		Ext.getCmp('deviceBuyMode').setDisabled(flag);
+		Ext.getCmp('sfOpenAmount').setDisabled(flag);
 	},
 	doFiltDeviceModel: function(){
 		var userType = Ext.getCmp("boxUserType").getValue();
@@ -237,7 +361,9 @@ UserBaseBatchForm = Ext.extend( BaseForm , {
 			fee_id: (fd ? fd["fee_id"] : 0),
 			fee: fee,
 			sub_total: amount * (fee || 0),
-			device_type: Ext.getCmp("boxDeviceCategory").getValue()
+			device_type: Ext.getCmp("boxDeviceCategory").getValue(),
+			device_type_text: Ext.getCmp("boxDeviceCategory").getRawValue(),
+			fee_name: this.currentFeeData['fee_name']
 		})]);
 		
 		// 计算费用总额
@@ -288,13 +414,6 @@ UserBaseBatchForm = Ext.extend( BaseForm , {
 				msg: "请将需要保存的用户添加至暂存表"
 			};
 		}
-		var assignWay = Ext.getCmp("radioAssignWay").getValue();
-		if(!assignWay){
-			return {
-				isValid: false,
-				msg: "请选择派单方式"
-			};
-		}
 		return true;
 	},
 	getValues : function(){
@@ -310,8 +429,9 @@ UserBaseBatchForm = Ext.extend( BaseForm , {
 			});
 		});
 		return {
+			isHand: Ext.getCmp('handOpenId').checked ? 'T' : 'F',
 			openUserList: Ext.encode(userData),
-			workBillAsignType: Ext.getCmp("radioAssignWay").getValue().inputValue
+			stopType: Ext.getCmp("boxStopType").getValue()
 		};
 	},
 	getFee: function(){

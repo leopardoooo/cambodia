@@ -38,6 +38,7 @@ import org.springframework.stereotype.Service;
 import com.google.gson.reflect.TypeToken;
 import com.ycsoft.beans.config.TBusiFee;
 import com.ycsoft.beans.config.TDeviceBuyMode;
+import com.ycsoft.beans.config.TDeviceChangeReason;
 import com.ycsoft.beans.config.TOpenTemp;
 import com.ycsoft.beans.core.acct.CAcct;
 import com.ycsoft.beans.core.acct.CAcctAcctitem;
@@ -69,6 +70,9 @@ import com.ycsoft.beans.prod.PProdTariff;
 import com.ycsoft.beans.prod.PProdUserRes;
 import com.ycsoft.beans.prod.PPromotionAcct;
 import com.ycsoft.beans.prod.PRes;
+import com.ycsoft.beans.prod.PSpkg;
+import com.ycsoft.beans.prod.PSpkgOpenbusifee;
+import com.ycsoft.beans.prod.PSpkgOpenuser;
 import com.ycsoft.beans.system.SOptr;
 import com.ycsoft.business.commons.pojo.BusiParameter;
 import com.ycsoft.business.component.config.BusiConfigComponent;
@@ -117,20 +121,13 @@ public class UserService extends BaseBusiService implements IUserService {
 	
 
 	@Override
-	public void createUserBatch(List<UserInfo> userList) throws Exception {
+	public void createUserBatch(List<UserInfo> userList, String stopType, String isHand) throws Exception {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void saveFillDevice(List<FillUSerDeviceDto> deviceList) throws Exception {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void saveChangeDevice(String userId, String deviceId, String devcieBuyMode, FeeInfoDto deviceFee,boolean reclaim)
-			throws Exception {
 		// TODO Auto-generated method stub
 		
 	}
@@ -153,10 +150,10 @@ public class UserService extends BaseBusiService implements IUserService {
 		Integer doneCode = doneCodeComponent.gDoneCode();
 		String user_id = userComponent.gUserId();
 		//创建账户信息
-		String acctId = acctComponent.createAcct(custId,user_id,  ACCT_TYPE_SPEC, null);
+		//String acctId = acctComponent.createAcct(custId,user_id,  ACCT_TYPE_SPEC, null);
 		//创建用户信息
 		user.setUser_id(user_id);
-		user.setAcct_id(acctId);
+		user.setAcct_id(acctComponent.gAcctId());
 		user.setCust_id(custId);		
 		userComponent.createUser(user);
 		
@@ -2787,6 +2784,36 @@ public class UserService extends BaseBusiService implements IUserService {
 			Integer refundFee, String transAcctId, String transAcctItemId) throws Exception {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public void validAccount(String name) throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void saveChangeDevice(String userId, String deviceCode, String changeReason) throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public List<TDeviceChangeReason> queryDeviceChangeReason() throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<PSpkgOpenuser> querySpkgUser(String custId) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<PSpkgOpenbusifee> querySpkgOpenFee(String custId) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 	

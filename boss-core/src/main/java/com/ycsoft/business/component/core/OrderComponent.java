@@ -282,7 +282,9 @@ public class OrderComponent extends BaseBusiComponent {
 	 * @return
 	 */
 	public boolean isHighCancel(String busi_code){
-		return BusiCodeConstants.PROD_HIGH_TERMINATE.equals(busi_code)||BusiCodeConstants.USER_HIGH_WRITE_OFF.equals(busi_code)
+		return BusiCodeConstants.PROD_HIGH_TERMINATE.equals(busi_code)
+				||BusiCodeConstants.USER_HIGH_WRITE_OFF.equals(busi_code)
+				||BusiCodeConstants.PROD_SUPER_TERMINATE.equals(busi_code)
 				?true:false;
 	}
 	
@@ -433,6 +435,38 @@ public class OrderComponent extends BaseBusiComponent {
 		return list;
 	}
 	
+	public List<CProdOrder> queryOrderProdByUserId(String user_id) throws Exception {
+		return cProdOrderDao.queryOrderProdByUserId(user_id);
+	}
+	
+	
+	/**
+	 * 退出一个所有资金（含已使用部分）明细
+	 * @param cancelOrder
+	 * @return
+	 * @throws Exception
+	 */
+	public List<CProdOrderFee> getOrderCancelAllFeeDetail(CProdOrderDto cancelOrder) throws Exception{
+		List<CProdOrderFee> orderFees=cProdOrderFeeDao.queryByOrderSn(cancelOrder.getOrder_sn());
+		
+		Map<String,TAcctFeeType> feeTypeMap=CollectionHelper.converToMapSingle( tAcctFeeTypeDao.findAll(), "fee_type");
+		int feeTotal=0;
+		for(CProdOrderFee orderFee: orderFees){
+			feeTotal+=orderFee.getInput_fee();
+			orderFee.setProd_name(cancelOrder.getProd_name());
+			orderFee.setOutput_fee(orderFee.getInput_fee());
+			
+			if(feeTypeMap.get(orderFee.getFee_type()).getCan_refund().equals(SystemConstants.BOOLEAN_TRUE)){
+				orderFee.setOutput_type(SystemConstants.ORDER_FEE_TYPE_CFEE);
+			}else{
+				orderFee.setOutput_type(SystemConstants.ORDER_FEE_TYPE_ACCT);
+			}
+		}
+		if(feeTotal!=cancelOrder.getOrder_fee().intValue()){
+			throw new ComponentException(ErrorCode.OrderFeeDisagree,cancelOrder.getOrder_sn());
+		}
+		return orderFees;
+	}
 	/**
 	 * 计算一个订单的可退金额的资金明细（产品退订和销户退订）
 	 * @param cancelOrder
@@ -492,11 +526,17 @@ public class OrderComponent extends BaseBusiComponent {
 	 * @return
 	 * @throws Exception
 	 */
-	public Map<String,Integer> getOrderCancelFee(CProdOrderDto cancelOrder,Date cancelDate) throws Exception{
+	public Map<String,Integer> getOrderCancelFee(CProdOrderDto cancelOrder,String busi_code,Date cancelDate) throws Exception{
 		Map<String,Integer> cancelFeeMap=new HashMap<>();
 		cancelFeeMap.put(SystemConstants.ORDER_FEE_TYPE_CFEE, 0);
 		cancelFeeMap.put(SystemConstants.ORDER_FEE_TYPE_ACCT, 0);
-		for(CProdOrderFee orderFee:  getOrderCacelFeeDetail(cancelOrder,cancelDate)){
+		List<CProdOrderFee> orderFees=null;
+		if(busi_code.equals(BusiCodeConstants.PROD_SUPER_TERMINATE)){
+			orderFees=getOrderCancelAllFeeDetail(cancelOrder);
+		}else{
+			orderFees=getOrderCacelFeeDetail(cancelOrder,cancelDate);
+		}
+		for(CProdOrderFee orderFee: orderFees){
 			cancelFeeMap.put(orderFee.getOutput_type(), orderFee.getOutput_fee()  +cancelFeeMap.get(orderFee.getOutput_type()));
 		}
 		return cancelFeeMap;
@@ -508,12 +548,14 @@ public class OrderComponent extends BaseBusiComponent {
 	 * @throws Exception 
 	 */
 	public Integer getMainOrderCancelFee(CProdOrder cancelOrder,Date cancelDate) throws Exception{
-		if(StringHelper.isNotEmpty(cancelOrder.getPackage_sn())){
+		if(StringHelper.isNotEmpty(cancelOrder.getPackage_sn())||cancelOrder.getOrder_fee()==0){
 			//套餐子产品可退金额=0;
 			return 0;
 		}
 		//Date cancelDate=DateHelper.today();
-		if(cancelOrder.getOrder_fee()==0||cancelOrder.getStatus().equals(StatusConstants.INSTALL)){
+		//当天订购或订单状态是施工中
+		if(cancelOrder.getStatus().equals(StatusConstants.INSTALL)
+				||DateHelper.isToday(cancelOrder.getCreate_time())){
 			return cancelOrder.getOrder_fee();
 		}
 		
@@ -587,12 +629,17 @@ public class OrderComponent extends BaseBusiComponent {
 	public List<CProdOrder> queryTransCancelOrderList(OrderProd orderProd,String busi_code) throws Exception{
 		List<CProdOrder> orderCancelList=new ArrayList<>(); 
 		//提取被取消的订购记录
+		if(busi_code.equals(BusiCodeConstants.PROD_UPGRADE)){
+			if(StringHelper.isEmpty(orderProd.getLast_order_sn())){
+				throw new ComponentException(ErrorCode.ParamIsNull);
+			}
+			//升级的情况
+			orderCancelList.addAll(queryTransferFeeByUpProd(orderProd));
+		}
+
 		if(orderProd.getGroupSelected()!=null&&orderProd.getGroupSelected().size()>0){
 			//套餐订购覆盖普通订购
-			orderCancelList= queryTransferFeeByPackage(orderProd);
-		}else if(busi_code.equals(BusiCodeConstants.PROD_UPGRADE)&&StringHelper.isNotEmpty(orderProd.getLast_order_sn())){
-			//升级的情况
-			orderCancelList=queryTransferFeeByUpProd(orderProd);
+			orderCancelList.addAll(queryTransferFeeByPackage(orderProd));
 		}
 		return orderCancelList;
 	}
@@ -742,9 +789,15 @@ public class OrderComponent extends BaseBusiComponent {
 			//宽带升级
 			if(SystemConstants.PROD_SERV_ID_BAND.equals(prod.getServ_id())){
 				CProdOrder prodOrder=cProdOrderDao.findByKey(orderProd.getLast_order_sn());
-				return cProdOrderDao.queryNotExpOrderByBand(prodOrder.getUser_id());
+				List<CProdOrder> transferList=cProdOrderDao.queryNotExpAllOrderByUser(prodOrder.getUser_id());
+				for(CProdOrder order:transferList){
+					if(StringHelper.isNotEmpty(order.getPackage_sn())){
+						throw new ServicesException(ErrorCode.OrderDateCanNotUpWhyPak);
+					}
+				}
+				return transferList;
 			}else{
-				throw new ServicesException("非宽带单产品不能升级");
+				throw new ServicesException(ErrorCode.OrderDateCanNotUp);
 			}
 		}else{
 			//套餐升级
@@ -786,6 +839,9 @@ public class OrderComponent extends BaseBusiComponent {
 		prod.setCreate_time(new Date());
 		prod.setPublic_acctitem_type(SystemConstants.PUBLIC_ACCTITEM_TYPE_NONE);
 		prod.setOrder_type(SystemConstants.PROD_ORDER_TYPE_ORDER);
+		if(orderProd.getEff_date().equals(DateHelper.today())){
+			prod.setCheck_time(prod.getCreate_time());
+		}
 		return prod;
 	}
 	
@@ -1265,6 +1321,7 @@ public class OrderComponent extends BaseBusiComponent {
 			tariff.setBilling_cycle(pt.getBilling_cycle());
 			tariff.setDisct_rent(pt.getRent());
 			tariff.setDisct_name(pt.getTariff_name());
+			tariff.setBilling_type(pt.getBilling_type());
 			tariffList.add(tariff);
 			// 查找资费所有的优惠
 			List<PProdTariffDisct> disctList = pProdTariffDisctDao.queryDisctByTariffId(pt.getTariff_id(),
@@ -1278,6 +1335,8 @@ public class OrderComponent extends BaseBusiComponent {
 					}
 					if (flag) {
 						disct.setTariff_id(disct.getTariff_id() + "_" + disct.getDisct_id());
+						
+						disct.setBilling_type(pt.getBilling_type());
 						//disct.setDisct_id(disct.getTariff_id() + "-" + disct.getDisct_id());
 						tariffList.add(disct);
 					}

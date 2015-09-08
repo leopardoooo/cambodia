@@ -74,15 +74,15 @@ PublicAcctRefundPanel = Ext.extend(BaseForm,{
 	},
 	initEvents:function(){
 		this.on('afterrender',function(){
-		var acctStore = App.getApp().main.infoPanel.getAcctPanel().acctItemGrid.getStore();
+		var acctStore = App.getApp().main.infoPanel.getCustPanel().acctItemGrid.getStore();
 		var acctItemRecord = acctStore.getAt(0);
 			this.items.itemAt(0).items.itemAt(0).getEl().dom.innerHTML = 
 				AcctItemTemplate.applyTemplate(acctItemRecord.data);
 		},this,{delay:10});
 	},
 	doInit:function(){
-		var userId = App.getApp().main.infoPanel.acctPanel.acctItemGrid.userId;
-		var acctStore = App.getApp().main.infoPanel.getAcctPanel().acctItemGrid.getStore();
+		var userId = App.getApp().main.infoPanel.custPanel.acctItemGrid.userId;
+		var acctStore = App.getApp().main.infoPanel.getCustPanel().acctItemGrid.getStore();
 		var acctItemRecord = acctStore.getAt(0);
 		
 		Ext.getCmp('acctId').setValue(acctItemRecord.get('acct_id'));

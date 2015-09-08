@@ -19,82 +19,59 @@ var custInfoHTML =
 		'<td class="input">&nbsp;{[values.cust.cust_type_text || ""]}</td>'+
 	'</tr>' +
 	'<tr height=24>'+
+		'<td class="label">'+ langUtils.main("cust.base.cust_level") +':</td>' +
+		'<td class="input">&nbsp;{[values.cust.cust_level_text || ""]}</td>'+
+	'</tr>' +
+	'<tr height=24>'+
+		'<td class="label">'+ langUtils.main("cust.base.linkMan") +':</td>' +
+		'<td class="input">&nbsp;{[values.linkman.linkman_name ? (values.linkman.linkman_name+" "+(values.linkman.sex_text ? "("+values.linkman.sex_text+")" : "" )+" "+(values.linkman.birthday ? "("+fm.dateFormat(values.linkman.birthday)+")" : "" )) : "" ]}</td>'+
+		'<td class="label">'+ langUtils.main("cust.base.email") +':</td>' +
+		'<td class="input">&nbsp;{[values.linkman.email || ""]}</td>'+
+	'</tr>'+
+	'<tr height=24>'+
+		'<td class="label">'+ langUtils.main("cust.base.tel") +':</td>' +
+		'<td class="input">&nbsp;{[values.linkman.tel || ""]}</td>'+
+		'<td class="label">'+ langUtils.main("cust.base.mobile") +':</td>' +
+		'<td class="input">&nbsp;{[values.linkman.mobile || ""]}</td>'+
+	'</tr>'+
+	'<tr height=24>'+
 		'<td class="label">'+ langUtils.main("cust.base.certType") +':</td>' +
 		'<td class="input">&nbsp;{[values.linkman.cert_type_text || ""]}</td>'+
 		'<td class="label">'+ langUtils.main("cust.base.certNum") +':</td>' +
 		'<td class="input">&nbsp;{[values.linkman.cert_num || ""]}</td>'+
 	'</tr>' +
-	'<tpl if="values.cust.cust_type == \'RESIDENT\'">' +
-		'<tr height=24>'+
-			'<td class="label">优惠类型:</td>' +
-			'<td class="input">&nbsp;{[values.cust.cust_class_text || ""]}&nbsp;&nbsp;{[values.cust.cust_class_date || ""]}</td>'+
-			'<td class="label">客户群体:</td>' +
-			'<td class="input">&nbsp;{[values.cust.cust_colony_text || ""]}</td>'+
-		'</tr>' + 
-	'</tpl>' +
-	'<tpl if="values.cust.cust_type == \'UNIT\' && !Ext.isEmpty(values.cust.cust_colony)">' +
-		'<tr height=24>'+
-			'<td class="label">客户群体:</td>' +
-			'<td class="input">&nbsp;{[values.cust.cust_colony_text || ""]}</td>'+
-		'</tr>' + 
-	'</tpl>' +
 	'<tr height=24>'+
-		'<td class="label">'+ langUtils.main("cust.base.linkMan") +':</td>' +
-		'<td class="input">&nbsp;{[values.linkman.linkman_name || ""]}</td>'+
-		'<td class="label">'+ langUtils.main("cust.base.tel") +':</td>' +
-		'<td class="input">&nbsp;{[values.linkman.tel || ""]}</td>'+	
-	'</tr>' +'<tr height=24>'+
-		'<td class="label">'+ langUtils.main("cust.base.barthday") +':</td>' +
-		'<td class="input">&nbsp;{[fm.dateFormat(values.linkman.birthday) || ""]}</td>'+
-		'<td class="label">'+ langUtils.main("cust.base.mobile") +':</td>' +
-		'<td class="input">&nbsp;{[values.linkman.mobile || ""]}</td>'+
+		'<td class="label">'+ langUtils.main("cust.base.deptName") +':</td>' +
+		'<td class="input">&nbsp;{[values.cust.dept_name || ""]}</td>'+
+		'<td class="label">'+ langUtils.main("cust.base.agentName") +':</td>' +
+		'<td class="input">&nbsp;{[values.cust.agent_name || ""]}</td>'+
 	'</tr>'+'<tr height=24>'+
-	'<td class="label">'+ langUtils.main("cust.base.areaCateory") +':</td>' +
-		'<td class="input">&nbsp;{[values.cust.addr_id_text || ""]}</td>'+
 		'<td class="label">'+ langUtils.main("cust.base.houseNetType") +':</td>' +
 		'<td class="input">&nbsp;{[values.cust.add_net_type_text || ""]}</td>'+
-	'</tr>'+'<tr height=24>'+
-	'<td class="label">'+ langUtils.main("cust.base.houseManager") +':</td>' +
-		'<td class="input">&nbsp;{[values.cust.busi_optr_name || ""]}</td>'+
-		'<td class="label">'+ langUtils.main("cust.base.houseOptr") +':</td>' +
-		'<td class="input">&nbsp;{[values.cust.serv_optr_name || ""]}</td>'+
-	'</tr>' +
+		'<td class="label">'+ langUtils.main("cust.base.developName") +':</td>' +
+		'<td class="input">&nbsp;{[values.cust.develop_optr_name || ""]}</td>'+
+	'</tr>'+
+	'</tr>'+
+	'<tpl if="values.cust.cust_type==\'NONRES\'">'+
 		'<tr height=24>'+
+			'<td class="label">'+ langUtils.main("cust.base.businessLicence") +':</td>' +
+			'<td class="input">&nbsp;{[values.cust.str7 || ""]}</td>'+
+			'<td class="label">'+ langUtils.main("cust.base.unitNumber") +':</td>' +
+			'<td class="input">&nbsp;{[values.cust.str8 || ""]}</td>'+
+		'</tr>' + 
+		'<tr height=24>'+
+			'<td class="label">'+ langUtils.main("cust.base.spkgSn") +':</td>' +
+			'<td class="input">&nbsp;{[values.cust.spkg_sn || ""]}</td>'+
+		'</tr>' + 
+	'</tpl>'+
+	'<tr height=24>'+
 		'<td class="label">'+ langUtils.main("cust.base.postalAddr") +':</td>' +
-		'<td class="input" colspan="3">&nbsp;{[values.linkman.mail_address ? values.linkman.mail_address + "&nbsp;&nbsp;&nbsp;&nbsp;postal:&nbsp;" + [values.linkman.postcode || ""] : "" ]}</td>'+
+		'<td class="input" colspan="3">&nbsp;{[values.linkman.mail_address || "" ]}</td>'+
 	'</tr>' +	
-	'<tpl if="values.cust.cust_colony == \'MNDKH\' || values.cust.cust_colony == \'XYKH\' ">' +
-	'<tr height=24>'+
-		'<td class="label">容量:</td>' +
-		'<td class="input">&nbsp;{[values.cust.cust_count || 0]}</td>'+
-		'<td class="label">实际数量:</td>' +
-		'<td class="input">&nbsp;{[values.cust.real_cust_count || 0]}</td>'+
-	'</tr>' +
-	'</tpl>' +
-	'<tpl if="values.cust.unit_name">' +
-	'<tr height=24>'+
-		'<td class="label">单位名称:</td>' +
-		'<td class="input"%>&nbsp;{[values.cust.unit_name || ""]}</td>'+
-	'</tr>' +
-	'</tpl>' +
 	'<tr height=24>'+
 		'<td class="label">'+ langUtils.main("cust.base.remark") +':</td>' +
 		'<td class="input" colspan="3">&nbsp;{[values.cust.remark || ""]}</td>'+
-	'</tr>' +	
-	'<tpl if="values.acctBank && values.acctBank.bank_account && (values.acctBank.status==\'ACTIVE\' || values.acctBank.status==\'STOP\')">' +
-	'<tr height=24>'+
-		'<td class="label">签约银行:</td>' +
-		'<td class="input">&nbsp;{[values.acctBank.bank_code_text || ""]}</td>'+
-		'<td class="label">银行账号:</td>' +
-		'<td class="input">&nbsp;{[values.acctBank.bank_account || ""]}</td>'+
-	'</tr>' + 
-	'<tr height=24>'+ 
-		'<td class="label">签约状态:</td>' +
-		'<td class="input">&nbsp;{[values.acctBank.status=="STOP"?"暂停":"正常"]}</td>'+
-		'<td class="label">账户名称:</td>' +
-		'<td class="input">&nbsp;{[values.acctBank.account_name || ""]}</td>'+
-	'</tr>' + 
-	'</tpl>' +
+	'</tr>' +
 '</table>';
 
 /**
@@ -335,12 +312,12 @@ PropChangeGrid = Ext.extend(Ext.grid.GridPanel,{
 			fields: ["column_name_text","old_value","new_value","old_value_text",
 				"new_value_text","change_time"]
 		}); 
-		
+		var lu = langUtils.main("cust.change.columns");
 		var cm = [
-			{header:'属性',dataIndex:'column_name_text',width:120},
-			{header:'修改前',	dataIndex:'old_value_text',width:120},
-			{header:'修改后',	dataIndex:'new_value_text',width:120},
-			{header:'修改日期',dataIndex:'change_time',width:130}
+			{header:lu[0], dataIndex:'column_name_text',width:120},
+			{header:lu[1], dataIndex:'old_value_text',width:120},
+			{header:lu[2], dataIndex:'new_value_text',width:120},
+			{header:lu[3], dataIndex:'change_time',width:130}
 		];
 		var pageTbar = new Ext.PagingToolbar({store: this.propChangeStore ,pageSize : App.pageSize});
 		pageTbar.refresh.hide();
@@ -882,7 +859,7 @@ CustDetailTab = Ext.extend(Ext.TabPanel,{
 //			    title: '综合信息',
 //			    items: [this.generalPanel]
 //			},
-				title: '异动信息',
+				title: langUtils.main("cust.change._title"),
 			    items: [this.propChangeGrid]
 			}/*,{
 				title: '套餐信息',
@@ -992,7 +969,375 @@ DeviceDetailTab = Ext.extend(Ext.TabPanel,{
 })
 
 
+AcctItemGrid = Ext.extend(Ext.ux.Grid,{
+	border:false,
+	acctItemStore:null,
+	region: 'center',
+	parent : null,
+	userId :null,//当前账目对应的用户ID
+	acctType:null,//当前账目对应的账户ID
+	singleSelect : false,
+	acctId : null,//保存当前显示的acctid
+	constructor:function(p){
+		this.parent = p;
+		this.acctItemStore = new Ext.data.JsonStore({
+			url:Constant.ROOT_PATH + "/core/x/Acct!queryPublicAcctitem.action",
+			fields : [
+			{name : 'acct_id'},
+			{name : 'acctitem_id'},
+			{name : 'acctitem_name'},
+			{name : 'acctitem_type'},
+			{name : 'active_balance',type : 'float'},
+			{name : 'real_bill',type : 'float'},
+			{name : 'real_fee',type : 'float'},
+			{name : 'can_trans_balance',type : 'float'},
+			{name : 'can_refund_balance',type : 'float'},
+			{name : 'owe_fee',type : 'float'},
+			{name : 'adjust_balance',type : 'float'},
+			{name : 'order_balance',type : 'float'},
+			{name : 'real_balance',type : 'float'},
+			{name : 'prod_id'},
+			{name : 'billing_cycle'},
+			{name : 'prod_name'},
+			{name : 'tariff_id'},
+			{name : 'tariff_name'},
+			{name : 'tariff_rent'},
+			{name : 'prod_sn'},
+			{name : 'invalid_date'},
+			{name : 'inactive_balance'},
+			{name : 'user_id'},
+			{name : 'next_tariff_id'},
+			{name : 'next_tariff_name'},
+			{name : 'prod_status'},
+			{name : 'prod_status_text'},
+			{name : 'invalid_date'},
+			{name:'acct_type'},
+			{name:'is_base'},
+			{name:'is_zero_tariff'},
+			{name:'allow_adjust'},
+			{name:'billing_type'},
+			{name:'allow_tran'},
+			{name:'status'},//账户状态
+			{name:'serv_id'},
+			{name:'card_id'},
+			{name:'ownFeeNumber'}	//基本包欠费天数
+			]
+		});
+		this.acctItemStore.on('load',this.doLoadResult,this);
+		
+		//添加列的时候，注意修改那些继承AcctItemGrid的js
+		var lar = langUtils.main("cust.acct.columns");
+    	var cm = new Ext.grid.ColumnModel({
+    		columns : [
+				{header:lar[0],dataIndex:'acctitem_name'},
+				{header:lar[1],dataIndex:'card_id',width:120,hidden:true},
+				{header:lar[2],dataIndex:'active_balance',renderer : Ext.util.Format.formatFee ,width:80},
+				{header:lar[3],dataIndex:'owe_fee',renderer : Ext.util.Format.formatFee,width:80},
+				{header:lar[4],dataIndex:'real_bill',renderer : Ext.util.Format.formatFee,width:80},
+				{header:lar[5],dataIndex:'real_fee',renderer : Ext.util.Format.formatFee,width:80},				
+				{header:lar[6],dataIndex:'real_balance',renderer : Ext.util.Format.formatFee,width:80},
+				{header:lar[7],dataIndex:'can_trans_balance',renderer : Ext.util.Format.formatFee,width:80},
+				{header:lar[8],dataIndex:'can_refund_balance',renderer : Ext.util.Format.formatFee,width:80},
+				{header:lar[9],dataIndex:'inactive_balance',renderer : Ext.util.Format.formatFee,width:80}
+		    ]
+    	});
+		AcctItemGrid.superclass.constructor.call(this,{
+			id:'A_ITEM',
+			title: langUtils.main("cust.acct._title"),
+			store:this.acctItemStore,
+			sm:new Ext.grid.RowSelectionModel(),
+			cm:cm,
+			tools:[{id:'search',qtip:'查询',cls:'tip-target',scope:this,handler:function(){
+					var comp = this.tools.search;
+					if(this.acctItemStore.getCount()>0){
+						if(win)win.close();
+						win = FilterWindow.addComp(this,[
+							{text:'账目名称',field:'acctitem_name',type:'textfield'}
+						],145,null,false);
+						
+						if(win){
+							win.setPosition(comp.getX()-win.width, comp.getY()-50);//弹出框右对齐
+							win.show();
+						}
+					}else{
+						Alert('请先查询数据！');
+					}
+		    	}
+		    }]
+		})
+	},
+	initEvents: function(){
+		this.on("rowclick", this.doDbClickRecord, this );
+		AcctItemGrid.superclass.initEvents.call(this);
+		this.on("afterrender",function(){
+			this.swapViews();
+		},this,{delay:10});
+	},
+	swapViews : function(){
+		if(this.view.lockedWrap){
+			this.view.lockedWrap.dom.style.right = "0px";
+		}
+        this.view.mainWrap.dom.style.left = "0px"; 
+        if(this.view.updateLockedWidth){
+        	this.view.updateLockedWidth = this.view.updateLockedWidth.createSequence(function(){ 
+	            this.view.mainWrap.dom.style.left = "0px"; 
+	        }, this); 
+        }
+          
+	},
+	doLoadResult : function(_store, _rs, ops){
+		//隐藏数据加载提示框
+		App.hideTip();
+		if(this.parent){
+			var acctId = this.parent.acctItemDetailTab.acctId;
+			var acctItemId = this.parent.acctItemDetailTab.acctItemId;
+			if(null != acctId && null != acctItemId){
+				var isExist = false;//账目是否存在
+				for(i=0;i<_rs.length;i++){
+					if(acctItemId == _rs[i].get('acctitem_id')){
+						var acctItemDetailTab = this.parent.acctItemDetailTab;
+						acctItemDetailTab.resetPanel(acctId,acctItemId);
+						acctItemDetailTab.refreshPanel(acctItemDetailTab.getActiveTab());
+						isExist = true;
+						break;
+					}
+				}
+				if(!isExist){
+					this.parent.acctItemDetailTab.resetPanel();
+				}
+			}
+		}
+	},
+	remoteRefresh:function(){
+		//显示数据加载提示框
+		App.showTip();
+		this.acctItemStore.baseParams.custId=App.getApp().getCustId();
+		this.acctItemStore.load();
+		this.parent.acctItemDetailTab.resetPanel();
+//		this.doLoadAcctItem(acctstore,this.acctId);
+	},
+	doDbClickRecord : function(grid,index,e){
+		if(this.parent){
+			var record = grid.getStore().getAt(index).data;
+			
+			var acctItemDetailTab = this.parent.acctItemDetailTab;
+			acctItemDetailTab.resetPanel(record["acct_id"],record["acctitem_id"]);
+			acctItemDetailTab.refreshPanel(acctItemDetailTab.getActiveTab());
+		}
+	},
+	reset : function(){
+		this.acctItemStore.removeAll();
+		this.acctId = null;
+	}
+});
 
+AcctItemAdjustGrid = Ext.extend(Ext.ux.Grid,{
+	adjustStore: null,
+	isReload : false,
+	constructor: function(){
+		this.adjustStore = new Ext.data.JsonStore({
+			url: Constant.ROOT_PATH + "/core/x/Acct!queryAcctitemAdjust.action",
+			fields: ["done_code","acct_id","acctitem_id","ajust_fee","create_time","remark","reason","reason_text"],
+			sortInfo:{
+				field:'create_time',
+				direction:'DESC'
+			}
+		});
+		var lar = langUtils.main("cust.acctTabs.adjust.columns");
+		var cm = [
+			{header:lar[0],dataIndex:'ajust_fee',width:65,renderer:Ext.util.Format.formatFee},
+			{header:lar[1],dataIndex:'create_time',width:120},
+			{header:lar[2],dataIndex:'reason_text',width:120},
+			{header:lar[3],dataIndex:'remark'}
+		];
+		AcctItemAdjustGrid.superclass.constructor.call(this,{
+			id:'A_ADJUST',
+			store:this.adjustStore,
+			border: false,
+			columns:cm,
+			sm:new Ext.grid.RowSelectionModel(),
+			width : 200,
+			viewConfig : {
+				forceFit : true
+			}
+		})
+	},
+	remoteRefresh:function(acctId,acctItemId){
+		this.adjustStore.baseParams.acctId= acctId;
+		this.adjustStore.baseParams.acctItemId= acctItemId;
+		this.adjustStore.load();
+	},
+	reset : function(){
+		this.getStore().removeAll();
+		this.isReload = true;
+	}
+});
+
+AcctItemActiveGrid = Ext.extend(Ext.ux.Grid,{
+	border: false,
+	itemStore: null,
+	isReload : false,
+	constructor: function(){
+		this.itemActiveStore = new Ext.data.JsonStore({
+			url: Constant.ROOT_PATH + "/core/x/Acct!queryAcctitemActive.action",
+			fields: ["acct_id","acctitem_id","fee_type_text","fee_type","balance"],
+			sortInfo:{
+				field:'fee_type',
+				direction:'DESC'
+			}
+		});
+		var lar = langUtils.main("cust.acctTabs.detail.columns");
+		var cm = new Ext.grid.ColumnModel({
+    		columns : [
+				{header:lar[0],dataIndex:'fee_type_text',width:80},
+				{header:lar[1],dataIndex:'balance',renderer:Ext.util.Format.formatFee}
+		    ]
+    	});
+		AcctItemActiveGrid.superclass.constructor.call(this,{
+			id:'ACCTITEM_ACTIVE',
+			width : 600,
+			store:this.itemActiveStore,
+			sm : new Ext.grid.CheckboxSelectionModel(),
+			cm:cm,
+			viewConfig : {
+				forceFit : true
+			}
+		})
+	},
+	remoteRefresh:function(acctId,acctItemId){
+		this.itemActiveStore.baseParams.acctId= acctId;
+		this.itemActiveStore.baseParams.acctItemId= acctItemId;
+		this.itemActiveStore.load();
+	},
+	reset : function(){
+		this.getStore().removeAll();
+		this.isReload = true;
+	}
+});
+
+AcctItemPropChangeGrid = Ext.extend(Ext.grid.GridPanel,{
+	border: false,
+	changeStore: null,
+	isReload : false,
+	constructor: function(){
+		this.changeStore = new Ext.data.JsonStore({
+			url: Constant.ROOT_PATH + "/core/x/Acct!queryAcctitemChange.action",
+			fields: ["acctitem_id","busi_name","fee_type_text","change_type_text","fee_type","change_type","change_fee","fee","pre_fee"
+					,"done_date","cometype"],
+			root: 'records',
+			totalProperty: 'totalProperty',
+			params:{start:0,limit:20},
+			sortInfo:{
+				field:'done_date',
+				direction:'DESC'
+			}
+		});
+		var lar = langUtils.main("cust.acctTabs.changes.columns");
+		var cm = [
+			{header:lar[0],dataIndex:'busi_name',width:40,renderer : App.qtipValue},
+			{header:lar[1],dataIndex:'fee_type_text',width:60,renderer : App.qtipValue},
+			{header:lar[2],dataIndex:'change_type_text',	width:60,renderer : App.qtipValue},
+			{header:lar[3],dataIndex:'pre_fee',renderer:Ext.util.Format.formatFee,width:50},
+			{header:lar[4],dataIndex:'change_fee',renderer:Ext.util.Format.formatFee,width:60},
+			{header:lar[5],dataIndex:'fee',renderer:Ext.util.Format.formatFee,	width:50},
+			{header:lar[6],dataIndex:'cometype',width:150,renderer : App.qtipValue},
+			{header:lar[7],dataIndex:'done_date',width:120}
+		];
+		AcctItemPropChangeGrid.superclass.constructor.call(this,{
+			width : 600,
+			store:this.changeStore,
+			columns:cm,
+			bbar: new Ext.PagingToolbar({
+	        	pageSize: 20,
+				store: this.changeStore
+			})
+		})
+	},
+	remoteRefresh:function(acctId,acctItemId){
+		this.changeStore.baseParams.acctId= acctId;
+		this.changeStore.baseParams.acctItemId= acctItemId;
+		this.changeStore.baseParams.start = 0;
+		this.changeStore.baseParams.limit = 20;
+		this.changeStore.load();
+	},
+	reset : function(){
+		this.getStore().removeAll();
+		this.isReload = true;
+	}
+});
+
+AcctItemDetailTab = Ext.extend(CommonTab,{
+	acctItemActiveGrid:null,
+	acctItemPropChangeGrid : null,
+	acctItemAdjustGrid : null,
+	acctItemId : null,
+	acctId : null,
+	constructor:function(){
+		this.acctItemAdjustGrid = new AcctItemAdjustGrid();
+		this.acctItemActiveGrid = new AcctItemActiveGrid();
+		this.acctItemPropChangeGrid = new AcctItemPropChangeGrid();
+		AcctItemDetailTab.superclass.constructor.call(this, {
+			activeTab: 0,
+			border: false,
+			defaults : {
+				border: false,
+				layout : 'fit'
+			},
+			items:[{
+				title: langUtils.main("cust.acctTabs.detail._title"),
+				items : [this.acctItemActiveGrid]
+			},{
+				title: langUtils.main("cust.acctTabs.adjust._title"),
+				items : [this.acctItemAdjustGrid]
+			},{
+				title: langUtils.main("cust.acctTabs.changes._title"),
+				items : [this.acctItemPropChangeGrid]
+			}]
+		});
+	},
+	refreshPanel : function(p){//重写父类CommonTab的方法，必须
+		var content = p.items.itemAt(0);
+		if(content && content.isReload && this.acctId && this.acctItemId){
+			content.remoteRefresh(this.acctId,this.acctItemId);
+			content.isReload = false;
+		}
+	},
+	resetPanel : function(acctId,acctItemId){
+		this.acctItemActiveGrid.reset();
+		this.acctItemPropChangeGrid.reset();
+		this.acctItemAdjustGrid.reset();
+		if(acctId){
+			this.acctId = acctId;
+		}else{
+			this.acctId = null;
+		}
+		
+		if(acctItemId){
+			this.acctItemId = acctItemId;
+		}else{
+			this.acctItemId = null;
+		}
+		
+		this.isReload = true;
+	},
+	refreshAcctItemInfo : function(acctId,acctItemId){
+		that = this;
+		Ext.Ajax.request({
+			scope : this,
+			url: Constant.ROOT_PATH + "/core/x/Acct!queryAcctitemInactive.action",
+			params : {
+				acctId : acctId,
+				acctItemId : acctItemId
+			},
+			success : function(res,opt){
+				var rec = Ext.decode(res.responseText);
+				if(rec.length > 0){
+					this.items.itemAt(0).getEl().dom.innerHTML = AcctItemInfoTpl.applyTemplate(rec[0]);
+				}
+			}
+		});
+	}
+});
 
 /**
  * 客户查询的结果显示面板构造，
@@ -1002,20 +1347,22 @@ CustPanel = Ext.extend( BaseInfoPanel , {
 	// 面板属性定义
 	custInfoPanel: null,
 	custDetailTab : null,
-	custDeviceGrid: null,
-	unitGrid:null,
+//	custDeviceGrid: null,
+//	unitGrid:null,
 	packageGrid: null,
 	deviceDetailTab: null,
-	
+	acctItemGrid:null,
+	acctItemDetailTab:null,
 	constructor: function(){
 		//子面板实例化
 		this.custInfoPanel =new CustInfoPanel('C_CUST');
 		this.custDetailTab = new CustDetailTab();
-		this.custDeviceGrid = new CustDeviceGrid(this);
-		this.deviceDetailTab = new DeviceDetailTab();
-		this.unitGrid = new UnitGrid(); 
-		
-		this.acctPanel = new AcctPanel();
+//		this.custDeviceGrid = new CustDeviceGrid(this);
+//		this.deviceDetailTab = new DeviceDetailTab();
+//		this.unitGrid = new UnitGrid(); 
+		this.acctItemGrid = new AcctItemGrid(this);
+		this.acctItemDetailTab = new AcctItemDetailTab(this);
+//		this.acctPanel = new AcctPanel();
 		
 		CustPanel.superclass.constructor.call(this, {
 			layout:"border",
@@ -1040,10 +1387,22 @@ CustPanel = Ext.extend( BaseInfoPanel , {
 				region:"east",
 				split:true,
 				width:"45%",
-				layout:"fit",
 				border: false,
-				layout: 'fit',
-				items: [this.acctPanel]
+				layout:"anchor",
+				items: [{
+					anchor:"100% 64%",
+					layout:'fit',
+					border: true,
+					bodyStyle: 'border-top-width: 0;border-right-width: 0;',
+					items:[this.acctItemGrid]
+				},{
+					anchor:"100% 36.2%",
+					layout:'fit',
+					height: 200,
+					border: false,
+					bodyStyle: 'border-left-width: 1px;',
+					items:[this.acctItemDetailTab]
+				}]
 //				,items:[{
 //					anchor:"100% 62%",
 //					layout:'fit',
@@ -1060,13 +1419,9 @@ CustPanel = Ext.extend( BaseInfoPanel , {
 	},
 	refresh:function(){
 		this.custInfoPanel.remoteRefresh();
-//		this.acctPanel.remoteRefresh();
-		
-		this.acctPanel.refresh();
-		//this.custDeviceGrid.remoteRefresh();
-		//this.deviceDetailTab.resetPanel();
 		this.refreshPropChangeGrid();
-		//this.refreshPromFeeGrid();
+		this.acctItemDetailTab.resetPanel();
+		this.acctItemGrid.remoteRefresh();
 	},
 	refreshPropChangeGrid : function(){
 		this.custDetailTab.propChangeGrid.remoteRefresh();
