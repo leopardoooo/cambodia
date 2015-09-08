@@ -24,6 +24,8 @@ release.properties
 .classpath
 .project
 .settings/
+servers.properties
+jdbc.properties
 
 # MAC #
 .DS_Store
