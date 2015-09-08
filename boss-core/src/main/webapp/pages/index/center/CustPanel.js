@@ -19,14 +19,18 @@ var custInfoHTML =
 		'<td class="input">&nbsp;{[values.cust.cust_type_text || ""]}</td>'+
 	'</tr>' +
 	'<tr height=24>'+
+		'<td class="label">'+ langUtils.main("cust.base.cust_level") +':</td>' +
+		'<td class="input">&nbsp;{[values.cust.cust_level_text || ""]}</td>'+
+	'</tr>' +
+	'<tr height=24>'+
 		'<td class="label">'+ langUtils.main("cust.base.linkMan") +':</td>' +
 		'<td class="input">&nbsp;{[values.linkman.linkman_name ? (values.linkman.linkman_name+" "+(values.linkman.sex_text ? "("+values.linkman.sex_text+")" : "" )+" "+(values.linkman.birthday ? "("+fm.dateFormat(values.linkman.birthday)+")" : "" )) : "" ]}</td>'+
 		'<td class="label">'+ langUtils.main("cust.base.email") +':</td>' +
 		'<td class="input">&nbsp;{[values.linkman.email || ""]}</td>'+
 	'</tr>'+
 	'<tr height=24>'+
-	'<td class="label">'+ langUtils.main("cust.base.tel") +':</td>' +
-	'<td class="input">&nbsp;{[values.linkman.tel || ""]}</td>'+
+		'<td class="label">'+ langUtils.main("cust.base.tel") +':</td>' +
+		'<td class="input">&nbsp;{[values.linkman.tel || ""]}</td>'+
 		'<td class="label">'+ langUtils.main("cust.base.mobile") +':</td>' +
 		'<td class="input">&nbsp;{[values.linkman.mobile || ""]}</td>'+
 	'</tr>'+
