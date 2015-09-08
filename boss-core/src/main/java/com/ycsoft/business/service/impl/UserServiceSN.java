@@ -27,7 +27,6 @@ import com.ycsoft.beans.core.user.CUserPropChange;
 import com.ycsoft.beans.core.user.FillUSerDeviceDto;
 import com.ycsoft.beans.device.RDeviceFee;
 import com.ycsoft.beans.prod.PPromotionAcct;
-import com.ycsoft.beans.prod.PSpkg;
 import com.ycsoft.beans.prod.PSpkgOpenbusifee;
 import com.ycsoft.beans.prod.PSpkgOpenuser;
 import com.ycsoft.beans.system.SOptr;
@@ -36,6 +35,7 @@ import com.ycsoft.business.component.core.OrderComponent;
 import com.ycsoft.business.component.task.SnTaskComponent;
 import com.ycsoft.business.dao.core.prod.CProdOrderDao;
 import com.ycsoft.business.dto.config.TemplateConfigDto;
+import com.ycsoft.business.dto.core.fee.BusiFeeDto;
 import com.ycsoft.business.dto.core.fee.FeeInfoDto;
 import com.ycsoft.business.dto.core.prod.DisctFeeDto;
 import com.ycsoft.business.dto.core.prod.PromotionDto;
@@ -1265,5 +1265,67 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 	 * 3、如果用户名下有未到期的归属客户套餐的产品，套餐下用户必须同时报停
 	 * @param users
 	 */
+	
+	
+	
+	
+	/**
+	 * 固定的ip外挂费用信息
+	 * @return
+	 * @throws Exception
+	 */
+	public BusiFeeDto queryUserIpFee()throws Exception{
+		return feeComponent.getBusiFee(SystemConstants.USER_IP_FEE_ID);
+	}
+	
+	
+	/**
+	 * 新增外挂IP
+	 * @param user
+	 * @throws Exception
+	 */
+	public void saveAddIpUser(CUser user) throws Exception{
+		CCust cust = getBusiParam().getCust();
+		doneCodeComponent.lockCust(cust.getCust_id());
+		// 获取业务流水
+		Integer doneCode = doneCodeComponent.gDoneCode();
+		// 获取客户信息
+		List<CUserPropChange> propChangeList = new ArrayList<CUserPropChange>();
+		CUser oldUser = userComponent.queryUserById(user.getUser_id());
+		
+		if(StringHelper.isNotEmpty(user.getStr4())){
+			CUserPropChange propChange = new CUserPropChange();
+			propChange.setColumn_name("str4");
+			propChange.setOld_value(oldUser.getStr4());
+			propChange.setNew_value(user.getStr4());
+			propChangeList.add(propChange);
+		}
+		
+		if(StringHelper.isNotEmpty(user.getStr5())){
+			CUserPropChange propChange = new CUserPropChange();
+			propChange.setColumn_name("str5");
+			propChange.setOld_value(oldUser.getStr5());
+			propChange.setNew_value(user.getStr5());
+			propChangeList.add(propChange);
+		}
+		
+		if(StringHelper.isNotEmpty(user.getStr6())){
+			CUserPropChange propChange = new CUserPropChange();
+			propChange.setColumn_name("str6");
+			propChange.setOld_value(oldUser.getStr6());
+			propChange.setNew_value(user.getStr6());
+			propChangeList.add(propChange);
+		}
+		
+		userComponent.editUser(doneCode, getBusiParam().getSelectedUserIds().get(0), propChangeList);
+			
+		// 设置拦截器所需要的参数
+		getBusiParam().resetUser();
+		CUser newUser = userComponent.queryUserById(user.getUser_id());
+		getBusiParam().addUser(newUser);
+		saveAllPublic(doneCode, getBusiParam());
+
+		
+	}
 	
 }

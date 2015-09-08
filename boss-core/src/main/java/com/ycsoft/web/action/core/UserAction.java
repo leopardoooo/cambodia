@@ -154,6 +154,16 @@ public class UserAction extends BaseBusiAction {
 		return JSON_SUCCESS;
 	}
 	
+	public String saveAddIpUser() throws Exception{
+		userServiceSN.saveAddIpUser(user);
+		return JSON_SUCCESS;
+	}
+	
+	public String queryUserIpFee() throws Exception{
+		getRoot().setSimpleObj(userServiceSN.queryUserIpFee());
+		return JSON_SIMPLEOBJ;
+	}
+	
 	/**
 	 * 设备更换
 	 * @return

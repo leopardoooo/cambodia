@@ -66,6 +66,10 @@ Ext.apply(App.func,{
 			if(busicode === '1009'){//更换设备
 				if( data['user_type'] == 'OTT_MOBILE' || ( (data['user_type'] =='OTT' || data['user_type'] =='DTT') && Ext.isEmpty(data['stb_id'])) || (data['user_type'] =='BAND' && Ext.isEmpty(data['modem_mac'])) )
 					return false;
+			}else if(busicode ==='1130' || busicode ==='1131'){ //加挂IP，补收IP费
+				if(data['user_type'] != 'BAND'){
+					return false;
+				}
 			}else if(busicode === '1030'){//模拟转数(模拟电视)
 				if(data['user_type'] != 'ATV' || data['status'] == 'CUSTLINE')
 					return false;
