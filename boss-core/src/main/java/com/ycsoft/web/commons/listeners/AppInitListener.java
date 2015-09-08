@@ -14,6 +14,7 @@ import com.ycsoft.business.cache.PrintContentConfiguration;
 import com.ycsoft.business.dao.config.TBusiConfirmDao;
 import com.ycsoft.business.dao.config.TTemplateDao;
 import com.ycsoft.business.dao.core.fee.CFeeDao;
+import com.ycsoft.business.dao.system.SDataTranslationDao;
 import com.ycsoft.business.dao.system.SItemvalueDao;
 import com.ycsoft.commons.helper.CollectionHelper;
 import com.ycsoft.commons.store.MemoryDict;
@@ -67,12 +68,13 @@ public class AppInitListener implements javax.servlet.ServletContextListener {
 	private void initComponent(ServletContext sc) throws Exception{
 		wc = WebApplicationContextUtils.getWebApplicationContext(sc);
 		SItemvalueDao sItemvalueDao = wc.getBean(SItemvalueDao.class);
+		SDataTranslationDao sDataTranslationDao = wc.getBean(SDataTranslationDao.class);
 		TTemplateDao tTemplateDao =wc.getBean(TTemplateDao.class);
 		CFeeDao cFeeDao = wc.getBean(CFeeDao.class);
 		if (sItemvalueDao == null || tTemplateDao == null || cFeeDao == null)
 			throw new Exception("初始化错误，DAO未注入");
 		
-		MemoryDict.setupData(sItemvalueDao.findAllViewDict());
+		MemoryDict.setupData(sItemvalueDao.findAllViewDict(), sDataTranslationDao.findAll());
 		MemoryPrintData.loadData(cFeeDao.queryUnPrintFee());
 		TemplateConfig.loadData(tTemplateDao);
 		

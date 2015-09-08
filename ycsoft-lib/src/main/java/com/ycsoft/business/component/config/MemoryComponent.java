@@ -47,7 +47,7 @@ public class MemoryComponent extends BaseComponent{
 	public void setupMemoryDict(JSignal signal) throws JDBCException {
 		if (StringHelper.isEmpty(signal.getSignal_content())) {
 			// 装载所有数据
-			MemoryDict.setupData(sItemvalueDao.findAllViewDict());
+			MemoryDict.setupData(sItemvalueDao.findAllViewDict(), sDataTranslationDao.findAll());
 		} else {
 			List<SItemvalue> datas = sItemvalueDao.findViewDict(signal
 					.getSignal_content());
