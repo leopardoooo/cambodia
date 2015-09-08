@@ -9,10 +9,10 @@ import static com.ycsoft.commons.helper.DateHelper.strToDate;
 import static org.junit.Assert.fail;
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.junit.Test;
+
+import com.ycsoft.commons.exception.ErrorCode;
 
 /**
  * @author liujiaqi
@@ -22,9 +22,10 @@ public class TestDateHelper {
 
 	@Test
 	public void testaaa(){
-		Map<String,Integer> aa=new HashMap<>();
-		int bb=123+aa.get("aaa");
-		System.out.println("###############"+bb);
+		for(ErrorCode c:ErrorCode.values()){
+			if(c.getOttStatusCode().equals("40009"))
+			System.out.println(c.getDesc());
+		}
 	}
 	/**
 	 * Test method for {@link com.ycsoft.commons.helper.DateHelper#format(java.util.Date, java.lang.String)}.

@@ -1,4 +1,4 @@
-package com.yaochen.boss.job;
+package com.yaochen.boss.job.unuse;
 
 import org.quartz.JobExecutionException;
 import org.slf4j.Logger;

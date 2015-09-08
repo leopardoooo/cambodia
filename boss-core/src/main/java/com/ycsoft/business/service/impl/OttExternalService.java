@@ -44,8 +44,10 @@ import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.exception.ErrorCode;
 import com.ycsoft.commons.exception.ServicesException;
 import com.ycsoft.commons.helper.DateHelper;
+import com.ycsoft.commons.helper.LoggerHelper;
 import com.ycsoft.commons.helper.NumericHelper;
 import com.ycsoft.commons.helper.StringHelper;
+import com.ycsoft.daos.core.JDBCException;
 /**
  * OTT调用BOSS接口实现
  * @author new
@@ -79,7 +81,7 @@ public class OttExternalService extends OrderService {
 	 * @param login_name
 	 */
 	public OttAccount getAccountInfo(String loginName)throws Exception{
-
+		LoggerHelper.debug(this.getClass(), "loginName="+loginName);
 			OttAccount ottAcct=new OttAccount();
 			CUser user=cUserDao.queryUserByLoginName(loginName);
 			if(user==null||!user.getUser_type().equals(SystemConstants.USER_TYPE_OTT_MOBILE)){
@@ -115,7 +117,7 @@ public class OttExternalService extends OrderService {
 	 * @param telephone 手机号码
 	 */
 	public void  modifyAccountInfo(String loginName,String user_passwd,String user_rank,String user_name,String telephone) throws Exception{
-	
+		LoggerHelper.debug(this.getClass(), "loginName="+loginName+" user_passwd="+user_passwd+" user_rank="+user_rank+" telephone="+telephone+" user_name="+user_name);
 			CUser user=cUserDao.queryUserByLoginName(loginName);
 			if(user==null||!user.getUser_type().equals(SystemConstants.USER_TYPE_OTT_MOBILE)){
 				throw new ServicesException(ErrorCode.UserLoginNameIsNotExistsOrIsNotOttMobile);
@@ -228,11 +230,19 @@ public class OttExternalService extends OrderService {
 	 */
 	public Map<String,String> RegisterAccount(String loginName,String user_passwd,
 			String user_name,String user_rank,String telephone,String email) throws Exception{
+		LoggerHelper.debug(this.getClass(), "loginName="+loginName+" user_passwd="+user_passwd+" user_rank="+user_rank+" telephone="+telephone+" user_name="+user_name+" email="+email);
 		
+		if(StringHelper.isEmpty(loginName)||StringHelper.isEmpty(user_passwd)){
+			throw new ServicesException(ErrorCode.E40006);
+		}
 		Integer doneCode=this.initExternalBusiParam(BusiCodeConstants.CUST_OPEN, null);
 		
 		if(userComponent.queryUserByLoginName(loginName)!=null){
 			throw new ServicesException(ErrorCode.E40009);
+		}
+		
+		if(StringHelper.isEmpty(user_name)){
+			user_name=loginName;
 		}
 		
 		CCust cust=new CCust();
@@ -258,7 +268,8 @@ public class OttExternalService extends OrderService {
 		
 		custComponent.createCust(cust, linkMan, SystemConstants.OTT_MOBILE_CUSTCODE);
 		this.getBusiParam().getCustFullInfo().setCust(cust);
-		
+		//为客户创建公用账户
+		acctComponent.createAcct(cust.getCust_id(),null, SystemConstants.ACCT_TYPE_PUBLIC, null);
 		//保存用户
 		CUser user=new CUser();
 		user.setUser_id(cUserDao.findSequence().toString());
@@ -279,6 +290,13 @@ public class OttExternalService extends OrderService {
 		
 		Map<String,String> resultMap=new HashMap<>();
 		resultMap.put("customer_code", cust.getCust_no());
+		
+		/**
+		 //开户免费送7天节目
+		OrderProd orderProd=getOttMobileOrderProd(user,"90922","1571_1364",1,null,null,null);
+		saveOrderProd(orderProd, this.getBusiParam().getBusiCode(), this.getBusiParam().getDoneCode());
+		**/
+		
 		this.saveAllPublic(doneCode, this.getBusiParam());
 		//调用接口
 		Result ottResult=ottClient.editUser(loginName,user_passwd ,
@@ -292,6 +310,17 @@ public class OttExternalService extends OrderService {
 	    	else
 	    		throw new ServicesException(ErrorCode.E40009);
 	    }
+	    /**
+	    Map<String,Date> userResMap = authComponent.getUserResExpDate(user.getUser_id());
+		for(String externalResId: userResMap.keySet()){
+			String resDate=DateHelper.format( userResMap.get(externalResId), DateHelper.FORMAT_TIME_END);
+			Result resutl=ottClient.openUserProduct(user.getLogin_name(), externalResId,resDate);
+			if(!resutl.isSuccess()){
+				throw new ServicesException(ErrorCode.E40009);
+			}
+		}
+		**/
+		
 		return resultMap;
 	}
 	
@@ -301,12 +330,13 @@ public class OttExternalService extends OrderService {
 	 * @throws Exception 
 	 */
 	public Map<String,String> queryUserValidate(String loginName) throws Exception{
+		LoggerHelper.debug(this.getClass(), "loginName="+loginName);
 		CUser user=userComponent.queryUserByLoginName(loginName);
 		Map<String,String> result=new HashMap<>();
 		if(user==null){
-			result.put("validate_result", "0");
-		}else{
 			result.put("validate_result", "1");
+		}else{
+			result.put("validate_result", "0");
 		}
 		return result;
 	}
@@ -318,6 +348,7 @@ public class OttExternalService extends OrderService {
 	 * @throws Exception 
 	 */
 	public List<OttUserProd> getOrderedProductList(String loginName) throws Exception{
+		LoggerHelper.debug(this.getClass(), "loginName="+loginName);
 		CUser user=userComponent.queryUserByLoginName(loginName);
 		if(user==null||!user.getUser_type().equals(SystemConstants.USER_TYPE_OTT_MOBILE)){
 			throw new ServicesException(ErrorCode.UserLoginNameIsNotExistsOrIsNotOttMobile);
@@ -345,41 +376,26 @@ public class OttExternalService extends OrderService {
 			re.setId(order.getProd_id());
 			re.setName(order.getProd_name());
 			re.setContinue_buy("1");
-			re.setBegin_time( DateHelper.format(order.getEff_date(),DateHelper.FORMAT_TIME));
-			re.setEnd_time( DateHelper.format(order.getExp_date(),DateHelper.FORMAT_TIME));
+			re.setBegin_time( DateHelper.format(order.getEff_date(),DateHelper.FORMAT_TIME_START));
+			re.setEnd_time( DateHelper.format(order.getExp_date(),DateHelper.FORMAT_TIME_END));
 			resutls.add(re);
 		}
 		return resutls;
 	}
 	
 	/**
-	 * OTT_MOBILE用户购买产品，购买指定产品包下的指定资费。
-	 * @param user_id 用户ID
-	 * @param version OTT业务版本号
-	 * @param product_id 产品ID	
-	 * @param product_fee_id 产品资费ID	
-	 * @param amount 订购数量（仅对周期性产品有效）
-	 * @param film_name 影片名称,可以为空，针对单片有效
-	 * @param boss_data BOSS扩展参数,从可订购产品列表中获取，订购产品透传BOSS
-	 * @param ott_data OTT扩展参数,同步产品授权时回传CMS
-	 * @throws Exception 
+	 * 生成订购产品的数据结构OrderProd
+	 * @param user
+	 * @param product_id
+	 * @param product_fee_id
+	 * @param amount
+	 * @param file_name
+	 * @param boss_data
+	 * @param ott_date
+	 * @return
+	 * @throws Exception
 	 */
-	public void saveOttMobileBuyProduct(String loginName,String product_id,String product_fee_id,Integer amount,String file_name,String boss_data,String ott_date) throws Exception{
-		if(StringHelper.isEmpty(loginName)||
-			StringHelper.isEmpty(product_id)||
-			StringHelper.isEmpty(product_fee_id)||
-			amount==null){
-			throw new ServicesException(ErrorCode.E40006);
-		}
-		CUser user=userComponent.queryUserByLoginName(loginName);
-		
-		if(user==null||!user.getUser_type().equals(SystemConstants.USER_TYPE_OTT_MOBILE)){
-			throw new ServicesException(ErrorCode.UserLoginNameIsNotExistsOrIsNotOttMobile);
-		}
-		String busi_code=BusiCodeConstants.PROD_SINGLE_ORDER;
-		this.initExternalBusiParam(busi_code, user.getCust_id());
-		doneCodeComponent.lockCust(user.getCust_id());
-		
+	private OrderProd getOttMobileOrderProd(CUser user,String product_id,String product_fee_id,Integer amount,String file_name,String boss_data,String ott_date) throws Exception{
 		OrderProd orderProd=new OrderProd();
 		orderProd.setCust_id(user.getCust_id());
 		orderProd.setUser_id(user.getUser_id());
@@ -433,7 +449,41 @@ public class OttExternalService extends OrderService {
 		orderProd.setPay_fee(pay_fee);
 		orderProd.setOrder_months(order_months);
 		orderProd.setExp_date(exp_date);
-	
+		orderProd.setLast_order_sn(last_order_sn);
+		
+		return orderProd;
+	}
+	/**
+	 * OTT_MOBILE用户购买产品，购买指定产品包下的指定资费。
+	 * @param user_id 用户ID
+	 * @param version OTT业务版本号
+	 * @param product_id 产品ID	
+	 * @param product_fee_id 产品资费ID	
+	 * @param amount 订购数量（仅对周期性产品有效）
+	 * @param film_name 影片名称,可以为空，针对单片有效
+	 * @param boss_data BOSS扩展参数,从可订购产品列表中获取，订购产品透传BOSS
+	 * @param ott_data OTT扩展参数,同步产品授权时回传CMS
+	 * @throws Exception 
+	 */
+	public void saveOttMobileBuyProduct(String loginName,String product_id,String product_fee_id,Integer amount,String file_name,String boss_data,String ott_date) throws Exception{
+		LoggerHelper.debug(this.getClass(), "loginName="+loginName+" product_id="+product_id+" product_fee_id="+product_fee_id+" amount="+amount);
+		if(StringHelper.isEmpty(loginName)||
+			StringHelper.isEmpty(product_id)||
+			StringHelper.isEmpty(product_fee_id)||
+			amount==null){
+			throw new ServicesException(ErrorCode.E40006);
+		}
+		CUser user=userComponent.queryUserByLoginName(loginName);
+		
+		if(user==null||!user.getUser_type().equals(SystemConstants.USER_TYPE_OTT_MOBILE)){
+			throw new ServicesException(ErrorCode.UserLoginNameIsNotExistsOrIsNotOttMobile);
+		}
+		String busi_code=BusiCodeConstants.PROD_SINGLE_ORDER;
+		this.initExternalBusiParam(busi_code, user.getCust_id());
+		doneCodeComponent.lockCust(user.getCust_id());
+		
+		OrderProd orderProd=getOttMobileOrderProd(user,product_id,product_fee_id,amount,file_name,boss_data,ott_date);
+		
 		try{
 		   saveOrderProd(orderProd, busi_code, this.getBusiParam().getDoneCode());
 		}catch(ServicesException e){
@@ -462,6 +512,7 @@ public class OttExternalService extends OrderService {
 	 * @throws Exception 
 	 */
 	public List<OttUserOrder> getBuyProductHistory(String loginName) throws Exception{
+		LoggerHelper.debug(this.getClass(), "loginName="+loginName);
 		CUser user=userComponent.queryUserByLoginName(loginName);
 		if(user==null||!user.getUser_type().equals(SystemConstants.USER_TYPE_OTT_MOBILE)){
 			throw new ServicesException(ErrorCode.UserLoginNameIsNotExistsOrIsNotOttMobile);
@@ -492,6 +543,7 @@ public class OttExternalService extends OrderService {
 	 * @throws Exception 
 	 */
 	public List<OttProdTariff> getProductList(String loginName,String product_ids) throws Exception{
+		LoggerHelper.debug(this.getClass(), "loginName="+loginName+" product_ids="+product_ids);
 		CUser user=userComponent.queryUserByLoginName(loginName);
 		if(user==null||!user.getUser_type().equals(SystemConstants.USER_TYPE_OTT_MOBILE)){
 			throw new ServicesException(ErrorCode.UserLoginNameIsNotExistsOrIsNotOttMobile);

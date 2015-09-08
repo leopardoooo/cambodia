@@ -742,7 +742,7 @@ public class UserComponent extends BaseBusiComponent {
 	 * @return
 	 */
 	public CUser queryUserByLoginName(String loginName) throws Exception {
-		return cUserBroadbandDao.queryUserByLoginName(loginName,getOptr().getCounty_id());
+		return cUserDao.queryUserByLoginName(loginName);
 	}
 
 

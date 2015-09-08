@@ -3,17 +3,25 @@ package com.ycsoft.commons.abstracts;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.ycsoft.beans.core.job.JDataSync;
+import com.ycsoft.beans.core.user.UserResExpDate;
 import com.ycsoft.beans.system.SDataRightType;
 import com.ycsoft.beans.system.SLog;
 import com.ycsoft.beans.system.SOptr;
 import com.ycsoft.beans.system.SRole;
-import com.ycsoft.beans.task.WLog;
 import com.ycsoft.business.dao.core.common.CDoneCodeDao;
 import com.ycsoft.business.dao.core.job.JDataSyncDao;
+import com.ycsoft.business.dao.core.user.CUserDao;
 import com.ycsoft.business.dao.system.SDataRightTypeDao;
 import com.ycsoft.business.dao.system.SItemvalueDao;
 import com.ycsoft.business.dao.system.SLogDao;
@@ -40,16 +48,70 @@ import com.ycsoft.daos.core.JDBCException;
  * @date Dec 30, 2009 10:10:56 AM
  */
 public abstract class BaseComponent{
-
+	@Autowired
 	protected SRoleDao sRoleDao;
+	@Autowired
 	protected SDataRightTypeDao sDataRightTypeDao;
+	@Autowired
 	protected SItemvalueDao sItemvalueDao;
+	@Autowired
 	protected JDataSyncDao jDataSyncDao;
+	@Autowired
 	protected SLogDao sLogDao;
+	@Autowired
 	protected SOptrDao sOptrDao;
+	@Autowired
 	protected CDoneCodeDao cDoneCodeDao;
+	@Autowired
 	protected SSysChangeDao sSysChangeDao;
+	@Autowired
 	protected WLogDao wLogDao;
+	@Autowired
+	private CUserDao cUserDao;
+	/**
+	 * 获得一个用户的所有授权资源时间
+	 * Map<res_id,exp_date>
+	 * @param userId
+	 * @return
+	 * @throws Exception
+	 */
+	public Map<String,Date> getUserResExpDate(String userId) throws Exception{
+		List<UserResExpDate> resList = cUserDao.queryUserProdResExpDate(userId);
+		Map<String,Date> resMap = new HashMap<>();
+		for (UserResExpDate res :resList){
+			Date expDate = resMap.get(res.getRes_id());
+			if (expDate== null){
+				resMap.put(res.getRes_id(), res.getExpDate());
+			} else {
+				if (expDate.before(res.getExpDate())){
+					resMap.put(res.getRes_id(), res.getExpDate());
+				}
+			}
+		}
+		
+		return resMap;
+	}
+	/**
+	 * 获得一个用户的授权资源按资源失效时间排序
+	 * List<Entry<res_id,exp_date>>
+	 * @param userId
+	 * @return
+	 * @throws Exception
+	 */
+	public List<Entry<String, Date>> getUserResMappingListOrderByExpDate(String userId) throws Exception{
+		Map<String,Date> userResMap=getUserResExpDate(userId);
+		if(userResMap==null||userResMap.size()==0)
+			return new ArrayList<>();
+		
+		List<Entry<String, Date>> mappingList = new ArrayList<Entry<String, Date>>(userResMap.entrySet());
+		// 通过比较器实现比较排序
+		Collections.sort(mappingList, new Comparator<Entry<String, Date>>() {
+			public int compare(Map.Entry<String, Date> mapping1, Map.Entry<String, Date> mapping2) {
+				return mapping1.getValue().compareTo(mapping2.getValue());
+			}
+		});
+		return mappingList;
+	}
 	/**
 	 * 账务模式的到期日计算(完全自然月计算方法)
 	 * 包含余额增加和余额减少情况的到期日计算
@@ -211,46 +273,10 @@ public abstract class BaseComponent{
 		return Integer.parseInt(sLogDao.findSequence(SequenceConstants.SEQ_LOG_DONE_CODE).toString());
 	}
 
-	public void setSRoleDao(SRoleDao roleDao) {
-		sRoleDao = roleDao;
-	}
-
-	public void setSDataRightTypeDao(SDataRightTypeDao dataRightTypeDao) {
-		sDataRightTypeDao = dataRightTypeDao;
-	}
-
-	/**
-	 * @param itemvalueDao the sItemvalueDao to set
-	 */
-	public void setSItemvalueDao(SItemvalueDao itemvalueDao) {
-		sItemvalueDao = itemvalueDao;
-	}
-
-	public void setJDataSyncDao(JDataSyncDao dataSyncDao) {
-		jDataSyncDao = dataSyncDao;
-	}
-
-	public void setSLogDao(SLogDao logDao) {
-		sLogDao = logDao;
-	}
-
-	public void setSOptrDao(SOptrDao optrDao) {
-		this.sOptrDao = optrDao;
-	}
-
-	public void setCDoneCodeDao(CDoneCodeDao cDoneCodeDao) {
-		this.cDoneCodeDao = cDoneCodeDao;
-	}
-	
-	public void setSSysChangeDao(SSysChangeDao sSysChangeDao) {
-		this.sSysChangeDao = sSysChangeDao;
-	}
 
 	public SSysChangeDao getSSysChangeDao() {
 		return sSysChangeDao;
 	}
-	public void setWLogDao(WLogDao logDao) {
-		wLogDao = logDao;
-	}
+
 	
 }

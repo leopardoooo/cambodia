@@ -1,4 +1,4 @@
-package com.yaochen.boss.job;
+package com.yaochen.boss.job.unuse;
 
 import java.util.List;
 
@@ -12,16 +12,18 @@ import com.yaochen.boss.job.component.BusiComponent;
 import com.yaochen.boss.job.component.JobComponent;
 import com.yaochen.myquartz.Job2;
 import com.yaochen.myquartz.Job2ExecutionContext;
-import com.ycsoft.beans.core.user.CUser;
+import com.ycsoft.beans.core.job.JProdNextTariff;
+import com.ycsoft.commons.constants.SystemConstants;
 
 /**
- * 缴费的促销
+ * 资费变更的任务处理
  * 
  * @author Tom
  */
 @Service
 @Scope("prototype")
-public class FeeDealPromotionJob implements Job2 {
+public class ChangeTariffJob implements Job2 {
+
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	private BusiComponent busiComponent;
 	private JobComponent jobComponent;
@@ -29,27 +31,24 @@ public class FeeDealPromotionJob implements Job2 {
 	@Override
 	public void execute(Job2ExecutionContext context)
 			throws JobExecutionException {
-		try {
-			List<CUser> userList = jobComponent.queryPromotionUsers();
-			dealPromotion(userList);
-		} catch (Exception e){
-			logger.error("系统错误", e);
-		}
 
-	}
-	
-	public void dealPromotion(List<CUser> userList) throws Exception{
-		logger.info("自动促销", "开始执行"+userList.size()+"条");
-		for (CUser user:userList){
-			try{
-				busiComponent.promotion(user.getUser_id());
-			} catch (Exception e){
-				logger.error("自动促销","用户【"+user.getUser_id()+"】"+e.getMessage());
+		try{
+			//查找资费变更任务
+			List<JProdNextTariff> tariffJobList = jobComponent.queryTariffJob();
+			for (JProdNextTariff tariffJob:tariffJobList){
+				try{
+					busiComponent.changeTariff(tariffJob);
+					jobComponent.saveJobExecute(tariffJob.getJob_id(), tariffJob.getArea_id(),tariffJob.getCounty_id(), SystemConstants.BOOLEAN_TRUE, null);
+					jobComponent.deleteTariffJobWithHis(tariffJob);
+				}catch(Exception e){
+					logger.error("资费变更任务", e.getMessage());
+					jobComponent.saveJobExecute(tariffJob.getJob_id(), tariffJob.getArea_id(),tariffJob.getCounty_id(), SystemConstants.BOOLEAN_FALSE, e.getMessage());
+				}
 			}
-			//更新用户所有费用
-			this.jobComponent.updateFeeAutoPromotion(user.getUser_id(),user.getCust_id(),user.getCounty_id());
+		}catch(Exception e){
+			logger.error("资费变更任务出错", e);
 		}
-		logger.info("自动促销", "结束执行"+userList.size()+"条");
+		
 	}
 
 	public void setBusiComponent(BusiComponent busiComponent) {
@@ -59,4 +58,5 @@ public class FeeDealPromotionJob implements Job2 {
 	public void setJobComponent(JobComponent jobComponent) {
 		this.jobComponent = jobComponent;
 	}
+
 }

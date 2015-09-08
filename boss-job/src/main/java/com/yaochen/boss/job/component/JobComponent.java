@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.yaochen.boss.dao.CfgDao;
@@ -41,6 +42,7 @@ import com.ycsoft.business.dao.core.common.CDoneCodeDao;
 import com.ycsoft.business.dao.core.job.JExecResultDao;
 import com.ycsoft.business.dao.core.job.JProdNextTariffHisDao;
 import com.ycsoft.business.dao.core.prod.CProdDao;
+import com.ycsoft.business.dao.core.prod.CProdOrderDao;
 import com.ycsoft.business.dao.task.WWorkDao;
 import com.ycsoft.business.dto.config.TaskQueryWorkDto;
 import com.ycsoft.business.dto.core.prod.CProdDto;
@@ -64,6 +66,25 @@ public class JobComponent {
 	private TAcctitemToProdDao tAcctitemToProdDao;
 	private TTemplateDao tTemplateDao;
 	private WWorkDao wWorkDao;
+	@Autowired
+	private CProdOrderDao cProdOrderDao;
+	/**
+	 * 查询需要修正带宽的宽带订单
+	 * @return
+	 * @throws Exception 
+	 */
+	public List<String> queryUserNeedChangeBandWidth() throws Exception{
+		/**
+		 select distinct  t.user_id
+		from busi.c_prod_order t,busi.p_prod p
+		 where  t.prod_id=p.prod_id and p.serv_id='BAND' 
+		 and t.status in ('ACTIVE','INSTALL')
+		AND t.EXP_DATE>=TRUNC(SYSDATE) AND t.check_time is null 
+		and t.eff_date <=trunc(sysdate)+1 and t.is_pay='T'
+		**/
+		return jobDao.queryUserNeedChanageBandWidth();
+	}
+	
 	/**
 	 * @param workDao the wWorkDao to set
 	 */

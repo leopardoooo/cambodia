@@ -1,4 +1,4 @@
-package com.yaochen.boss.job;
+package com.yaochen.boss.job.unuse;
 
 import java.util.List;
 
@@ -10,52 +10,50 @@ import org.springframework.stereotype.Service;
 
 import com.yaochen.boss.job.component.BusiComponent;
 import com.yaochen.boss.job.component.JobComponent;
-import com.yaochen.boss.job.task.UnFreezeDealTask;
-import com.yaochen.myquartz.CustomThreadJob;
+import com.yaochen.myquartz.Job2;
 import com.yaochen.myquartz.Job2ExecutionContext;
 import com.ycsoft.beans.core.acct.CAcctAcctitemInactive;
-import com.ycsoft.daos.core.DataHandler;
 
 /**
- * 月初资金解冻，线程池
+ * 资金解冻实时处理
  * 
  * @author Tom
  */
 @Service
 @Scope("prototype")
-public class AcctUnFreezeJob extends CustomThreadJob {
+public class DealAcctUnfreezeJob implements Job2 {
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	private BusiComponent busiComponent;
 	private JobComponent jobComponent;
 	
 	@Override
-	public void distribute(Job2ExecutionContext context)
+	public void execute(Job2ExecutionContext context)
 			throws JobExecutionException {
+		
 		try {
-			final AcctUnFreezeJob that = this;
-			logger.info("资金解冻阻塞并发处理开始..");
-			jobComponent.queryAcctUnfreezeJob(new DataHandler<CAcctAcctitemInactive>(){
-				@Override
-				public void fetchRows(List<CAcctAcctitemInactive> results,
-						int fetchCount) throws Exception {
-					that.runInThread(new UnFreezeDealTask(results));
-				}
-				
-			});
-		} catch (Exception e) {
-			logger.error("资金解冻失败", e);
+			//查找首次需要解冻的资金
+			List<CAcctAcctitemInactive> acctUnfreezeJobList = jobComponent.queryAcctFirstUnfreezeJob();
+			dealAcctUnfreeze(acctUnfreezeJobList);
+			
+		} catch (Exception e){
+			logger.error("系统错误", e);
 		}
+		
 	}
 
-	public BusiComponent getBusiComponent() {
-		return busiComponent;
+	public void dealAcctUnfreeze(List<CAcctAcctitemInactive> jobList)  {
+		logger.info("资金解冻","启动执行:"+jobList.size());
+		for (CAcctAcctitemInactive unfreezeJob:jobList){
+			try{
+				busiComponent.acctUnfreeze(unfreezeJob);
+			}catch(Exception e){
+				logger.error("资金解冻","账目【"+unfreezeJob.getAcct_id()+"|"+unfreezeJob.getAcctitem_id()+"】"+e.getMessage());
+			}
+		}
+		logger.info("资金解冻","结束执行");
 	}
 
-	public JobComponent getJobComponent() {
-		return jobComponent;
-	}
-	
 	public void setBusiComponent(BusiComponent busiComponent) {
 		this.busiComponent = busiComponent;
 	}

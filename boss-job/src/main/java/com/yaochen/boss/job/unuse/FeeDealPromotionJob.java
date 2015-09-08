@@ -1,4 +1,4 @@
-package com.yaochen.boss.job;
+package com.yaochen.boss.job.unuse;
 
 import java.util.List;
 
@@ -12,18 +12,16 @@ import com.yaochen.boss.job.component.BusiComponent;
 import com.yaochen.boss.job.component.JobComponent;
 import com.yaochen.myquartz.Job2;
 import com.yaochen.myquartz.Job2ExecutionContext;
-import com.ycsoft.business.dto.core.prod.CProdDto;
-
+import com.ycsoft.beans.core.user.CUser;
 
 /**
- * 自动加授权
+ * 缴费的促销
  * 
  * @author Tom
  */
 @Service
 @Scope("prototype")
-public class AutoPlusAccreditJob implements Job2 {
-
+public class FeeDealPromotionJob implements Job2 {
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	private BusiComponent busiComponent;
 	private JobComponent jobComponent;
@@ -31,18 +29,27 @@ public class AutoPlusAccreditJob implements Job2 {
 	@Override
 	public void execute(Job2ExecutionContext context)
 			throws JobExecutionException {
-		
-		try{
-			//自动加授权
-			List<CProdDto> stopJobList = jobComponent.queryAutoBusiCmd();
-			if(stopJobList.size()>0){
-				busiComponent.saveAutoBusiCmd(stopJobList);
-			}
-			
-		}catch(Exception e){
-			logger.error("自动加授权", e);
+		try {
+			List<CUser> userList = jobComponent.queryPromotionUsers();
+			dealPromotion(userList);
+		} catch (Exception e){
+			logger.error("系统错误", e);
 		}
 
+	}
+	
+	public void dealPromotion(List<CUser> userList) throws Exception{
+		logger.info("自动促销", "开始执行"+userList.size()+"条");
+		for (CUser user:userList){
+			try{
+				busiComponent.promotion(user.getUser_id());
+			} catch (Exception e){
+				logger.error("自动促销","用户【"+user.getUser_id()+"】"+e.getMessage());
+			}
+			//更新用户所有费用
+			this.jobComponent.updateFeeAutoPromotion(user.getUser_id(),user.getCust_id(),user.getCounty_id());
+		}
+		logger.info("自动促销", "结束执行"+userList.size()+"条");
 	}
 
 	public void setBusiComponent(BusiComponent busiComponent) {

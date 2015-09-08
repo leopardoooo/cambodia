@@ -44,8 +44,6 @@ public class AuthComponent extends BaseComponent{
 	private JBandCommandDao jBandCommandDao;
 	@Autowired
 	private PProdStaticResDao pProdStaticResDao;
-	@Autowired
-	private CUserDao cUserDao;
 	
 	public void sendAuth(CUser user,List<CProdOrder> orderList,String authCmdType,Integer doneCode) throws Exception{
 	
@@ -338,17 +336,10 @@ public class AuthComponent extends BaseComponent{
 	
 	private void refreshBandUserAuth(CUser user,Integer doneCode) throws Exception{
 		//获取用户所有资源的所有到期日
-		Map<String,Date> userResMap = this.getUserResExpDate(user.getUser_id());
-		//先取消所有授权
+		//Map<String,Date> userResMap = this.getUserResExpDate(user.getUser_id());
+		List<Entry<String, Date>> mappingList =this.getUserResMappingListOrderByExpDate(user.getUser_id());
 		
-		if (userResMap!= null && userResMap.size()>0){
-			List<Entry<String, Date>> mappingList = new ArrayList<Entry<String, Date>>(userResMap.entrySet());
-			// 通过比较器实现比较排序
-			Collections.sort(mappingList, new Comparator<Entry<String, Date>>() {
-				public int compare(Map.Entry<String, Date> mapping1, Map.Entry<String, Date> mapping2) {
-					return mapping1.getValue().compareTo(mapping2.getValue());
-				}
-			});
+		if (mappingList!= null && mappingList.size()>0){
 			
 			String resId = mappingList.get(0).getKey();
 			Date expDate = mappingList.get(mappingList.size()-1).getValue();
@@ -427,22 +418,6 @@ public class AuthComponent extends BaseComponent{
 		return Long.parseLong(jCaCommandDao.findSequence().toString());
 	}
 	
-	public Map<String,Date> getUserResExpDate(String userId) throws Exception{
-		List<UserResExpDate> resList = cUserDao.queryUserProdResExpDate(userId);
-		Map<String,Date> resMap = new HashMap<>();
-		for (UserResExpDate res :resList){
-			Date expDate = resMap.get(res.getRes_id());
-			if (expDate== null){
-				resMap.put(res.getRes_id(), res.getExpDate());
-			} else {
-				if (expDate.before(res.getExpDate())){
-					resMap.put(res.getRes_id(), res.getExpDate());
-				}
-			}
-		}
-		
-		return resMap;
-	}
 	
 	//获取订单产品对应的资源id
 	private String[] getOrderProdRes(List<CProdOrder> orderList) throws JDBCException {

@@ -6,7 +6,7 @@ import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.yaochen.boss.job.AcctUnFreezeJob;
+import com.yaochen.boss.job.unuse.AcctUnFreezeJob;
 import com.yaochen.myquartz.Job2;
 import com.yaochen.myquartz.Job2ExecutionContext;
 import com.yaochen.myquartz.Task;

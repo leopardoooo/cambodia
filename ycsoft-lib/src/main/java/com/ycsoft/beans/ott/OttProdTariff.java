@@ -25,7 +25,7 @@ public class OttProdTariff implements Serializable {
 	 private String currency_type="USD";//	货币类型	RMB：人民币USD：美元
 	 private String unit;//	单位（周期性产品的时间周期单位）	year:年month:月day:天
 	 private String amount;//	数量	
-	 private Object boss_data=new Object();//	BOSS扩展数据	产品订购时回传BOSS
+	 private Object boss_data="";//	BOSS扩展数据	产品订购时回传BOSS
 	 private String begin_time="2014-06-19 08:59:59";//	开始时间	2014-06-19 08:59:59
 	 private String  end_time="2050-06-19 08:59:59";//	结束时间	2050-06-19 08:59:59
 	public String getId() {

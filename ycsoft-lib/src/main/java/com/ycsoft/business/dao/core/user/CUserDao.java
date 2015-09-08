@@ -490,7 +490,7 @@ public class CUserDao extends BaseEntityDao<CUser> {
 	}
 	
 	public boolean validAccount(String name) throws Exception {
-		String sql = "select 1 from c_user t where t.login_name=?";
+		String sql = "select count(1) from c_user t where t.login_name=?";
 		return this.count(sql, name) > 0;
 	}
 	

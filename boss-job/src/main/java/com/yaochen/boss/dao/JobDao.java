@@ -39,6 +39,20 @@ public class JobDao extends BaseEntityDao<JBusiCmd> {
 	private static final long serialVersionUID = 3125100011171802396L;
 
 	/**
+	 * 查询需要宽带修正带宽的用户
+	 * @return
+	 * @throws JDBCException
+	 */
+	public List<String> queryUserNeedChanageBandWidth() throws JDBCException{
+		String sql=" select distinct  t.user_id "
+		+" from busi.c_prod_order t,busi.p_prod p "
+		+"  where  t.prod_id=p.prod_id and p.serv_id=? "
+		+"  and t.status in (?,?) "
+		+" AND t.EXP_DATE>=TRUNC(SYSDATE) AND t.check_time is null " 
+		+" and t.eff_date <=trunc(sysdate)+1 and t.is_pay='T' ";
+		return this.findUniques(sql, SystemConstants.PROD_SERV_ID_BAND,StatusConstants.ACTIVE,StatusConstants.INSTALL);
+	}
+	/**
 	 * 查找需要执行的资费变更任务
 	 * @return
 	 * @throws Exception

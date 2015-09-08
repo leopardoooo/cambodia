@@ -1,4 +1,4 @@
-package com.yaochen.boss.job;
+package com.yaochen.boss.job.unuse;
 
 import java.util.List;
 
@@ -9,42 +9,47 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import com.yaochen.boss.job.component.BusiComponent;
+import com.yaochen.boss.job.component.JobComponent;
 import com.yaochen.myquartz.Job2;
 import com.yaochen.myquartz.Job2ExecutionContext;
-import com.ycsoft.beans.core.user.CUser;
-import com.ycsoft.beans.system.SCounty;
+import com.ycsoft.business.dto.core.prod.CProdDto;
+
 
 /**
- * 修改长期欠费状态
+ * 自动加授权
  * 
  * @author Tom
  */
 @Service
 @Scope("prototype")
-public class ModifyUserStatusJob implements Job2 {
+public class AutoPlusAccreditJob implements Job2 {
+
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	private BusiComponent busiComponent;
+	private JobComponent jobComponent;
 	
 	@Override
 	public void execute(Job2ExecutionContext context)
 			throws JobExecutionException {
+		
 		try{
-			List<SCounty> countyList = busiComponent.queryAllCounty();
-			for(SCounty county : countyList){
-				List<CUser> userList = busiComponent.queryOwnFeeUser(county.getCounty_id());
-				logger.info("长期欠费：", county.getCounty_id()+"共:"+userList.size());
-				if(userList != null && userList.size()>0){
-					busiComponent.modifyUserStatus(userList);
-				}
+			//自动加授权
+			List<CProdDto> stopJobList = jobComponent.queryAutoBusiCmd();
+			if(stopJobList.size()>0){
+				busiComponent.saveAutoBusiCmd(stopJobList);
 			}
+			
 		}catch(Exception e){
-			logger.error("修改长期欠费用户状态时出错", e);
+			logger.error("自动加授权", e);
 		}
 
 	}
-	
+
 	public void setBusiComponent(BusiComponent busiComponent) {
 		this.busiComponent = busiComponent;
 	}
-	
+
+	public void setJobComponent(JobComponent jobComponent) {
+		this.jobComponent = jobComponent;
+	}
 }
