@@ -451,7 +451,6 @@ ProdListForm = Ext.extend(Ext.form.FormPanel, {
 										width : 130,
 										paramName : 'SERV_ID',
 										allowBlank : false,
-										defaultValue : 'DTV',
 										hiddenName : 'serv_id',
 										disabled : this.updateProd,
 										listeners : {
@@ -899,11 +898,11 @@ ProdWindow = Ext.extend(Ext.Window, {
 
 		} else {
 
-			this.prodList = new ProdList(store);
 
 			if (v == cfgProdType["P"]) {
 				this.FORM = this.resProdForm;
 			} else {
+				this.prodList = new ProdList(store);
 				this.FORM = this.prodList;
 			}
 		}
