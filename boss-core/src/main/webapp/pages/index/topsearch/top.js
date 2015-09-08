@@ -283,6 +283,7 @@ SearchCustWindow = Ext.extend( Ext.Window , {
 			bodyStyle : Constant.TAB_STYLE,
 			border : false,
 			fieldLabel : 70,
+			labelWidth:80,
 			defaults : {
 				xtype : 'textfield'
 			},
@@ -312,7 +313,7 @@ SearchCustWindow = Ext.extend( Ext.Window , {
 			maximizable : false,
 			layout : 'fit',
 			width : 300,
-			height : 250,
+			height : 200,
 			closeAction : 'close',
 			items : [this.form],
 			buttons : [{
