@@ -25,6 +25,7 @@ public class WTaskBaseInfo implements Serializable{
 	private String task_detail_type_id;
 	private String task_create_type;
 	private String task_status;
+	private String cancel_result;
 	private String team_id;
 	private int installer_id;
 	private Date task_create_time;
@@ -374,6 +375,20 @@ public class WTaskBaseInfo implements Serializable{
 
 	public void setZte_status(String zte_status) {
 		this.zte_status = zte_status;
+	}
+	
+	
+
+
+
+	public String getCancel_result() {
+		return cancel_result;
+	}
+
+
+
+	public void setCancel_result(String cancel_result) {
+		this.cancel_result = cancel_result;
 	}
 
 

@@ -6,6 +6,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.ycsoft.beans.core.job.JDataSync;
 import com.ycsoft.beans.system.SDataRightType;
 import com.ycsoft.beans.system.SLog;
@@ -15,6 +17,7 @@ import com.ycsoft.beans.task.WLog;
 import com.ycsoft.business.dao.core.common.CDoneCodeDao;
 import com.ycsoft.business.dao.core.job.JDataSyncDao;
 import com.ycsoft.business.dao.system.SDataRightTypeDao;
+import com.ycsoft.business.dao.system.SDataTranslationDao;
 import com.ycsoft.business.dao.system.SItemvalueDao;
 import com.ycsoft.business.dao.system.SLogDao;
 import com.ycsoft.business.dao.system.SOptrDao;
@@ -50,6 +53,8 @@ public abstract class BaseComponent{
 	protected CDoneCodeDao cDoneCodeDao;
 	protected SSysChangeDao sSysChangeDao;
 	protected WLogDao wLogDao;
+	@Autowired
+	protected SDataTranslationDao sDataTranslationDao;
 	/**
 	 * 账务模式的到期日计算(完全自然月计算方法)
 	 * 包含余额增加和余额减少情况的到期日计算

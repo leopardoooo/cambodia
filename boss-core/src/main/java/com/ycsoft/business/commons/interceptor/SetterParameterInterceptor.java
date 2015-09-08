@@ -1,6 +1,4 @@
 package com.ycsoft.business.commons.interceptor;
-import static com.ycsoft.commons.helper.LoggerHelper.debug;
-
 import java.lang.reflect.Method;
 
 import javax.servlet.http.HttpServletRequest;
@@ -14,6 +12,7 @@ import com.ycsoft.business.commons.pojo.Parameter;
 import com.ycsoft.business.service.impl.OttExternalService;
 import com.ycsoft.commons.constants.Environment;
 import com.ycsoft.commons.helper.JsonHelper;
+import com.ycsoft.commons.store.MemoryDict;
 
 /**
  * 使用拦截器设置 <code>Parameter</code> 等信息,
@@ -60,7 +59,12 @@ public class SetterParameterInterceptor implements MethodBeforeAdvice {
 				if(param.getPay() != null){
 					request.getSession().setAttribute(Environment.CURRENT_BUSI_OPTR_ID,param.getPay().getBusi_optr_id());
 				}
-				
+				Object langObj = request.getSession().getAttribute(Environment.USER_IN_SESSION_LANG);
+				if(langObj != null){
+					MemoryDict.setLang(langObj.toString());
+				}else{
+					MemoryDict.setLang(null);
+				}
 				base.setParam(param);
 			}
 			

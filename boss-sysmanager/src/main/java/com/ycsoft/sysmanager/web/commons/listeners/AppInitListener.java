@@ -6,6 +6,7 @@ import javax.servlet.ServletContextEvent;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
+import com.ycsoft.business.dao.system.SDataTranslationDao;
 import com.ycsoft.business.dao.system.SItemvalueDao;
 import com.ycsoft.commons.store.MemoryDict;
 import com.ycsoft.daos.core.JDBCException;
@@ -47,9 +48,10 @@ public class AppInitListener implements javax.servlet.ServletContextListener {
 	private void initComponent(ServletContext sc){
 		WebApplicationContext wc = WebApplicationContextUtils.getWebApplicationContext(sc);
 		SItemvalueDao sItemvalueDao = wc.getBean(SItemvalueDao.class);
+		SDataTranslationDao sDataTranslationDao = wc.getBean(SDataTranslationDao.class);
 
 		try {
-			MemoryDict.setupData(sItemvalueDao.findAllViewDict());
+			MemoryDict.setupData(sItemvalueDao.findAllViewDict(), sDataTranslationDao.findAll());
 		} catch (JDBCException e) {
 			e.printStackTrace();
 		}

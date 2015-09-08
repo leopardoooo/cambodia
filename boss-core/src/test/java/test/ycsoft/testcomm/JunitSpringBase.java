@@ -29,7 +29,7 @@ public abstract class JunitSpringBase extends AbstractTransactionalJUnit4SpringC
 
 	@Before
 	public void setUp() throws Exception {
-		MemoryDict.setupData(sItemvalueDao.findAll());
+//		MemoryDict.setupData(sItemvalueDao.findAll());
 	}
 
 	@After

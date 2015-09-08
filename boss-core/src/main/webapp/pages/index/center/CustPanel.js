@@ -312,12 +312,12 @@ PropChangeGrid = Ext.extend(Ext.grid.GridPanel,{
 			fields: ["column_name_text","old_value","new_value","old_value_text",
 				"new_value_text","change_time"]
 		}); 
-		
+		var lu = langUtils.main("cust.change.columns");
 		var cm = [
-			{header:'属性',dataIndex:'column_name_text',width:120},
-			{header:'修改前',	dataIndex:'old_value_text',width:120},
-			{header:'修改后',	dataIndex:'new_value_text',width:120},
-			{header:'修改日期',dataIndex:'change_time',width:130}
+			{header:lu[0], dataIndex:'column_name_text',width:120},
+			{header:lu[1], dataIndex:'old_value_text',width:120},
+			{header:lu[2], dataIndex:'new_value_text',width:120},
+			{header:lu[3], dataIndex:'change_time',width:130}
 		];
 		var pageTbar = new Ext.PagingToolbar({store: this.propChangeStore ,pageSize : App.pageSize});
 		pageTbar.refresh.hide();
@@ -859,7 +859,7 @@ CustDetailTab = Ext.extend(Ext.TabPanel,{
 //			    title: '综合信息',
 //			    items: [this.generalPanel]
 //			},
-				title: '异动信息',
+				title: langUtils.main("cust.change._title"),
 			    items: [this.propChangeGrid]
 			}/*,{
 				title: '套餐信息',
@@ -1026,23 +1026,24 @@ AcctItemGrid = Ext.extend(Ext.ux.Grid,{
 		this.acctItemStore.on('load',this.doLoadResult,this);
 		
 		//添加列的时候，注意修改那些继承AcctItemGrid的js
+		var lar = langUtils.main("cust.acct.columns");
     	var cm = new Ext.grid.ColumnModel({
     		columns : [
-				{header:'账目名称',dataIndex:'acctitem_name'},
-				{header:'卡号',dataIndex:'card_id',width:120,hidden:true},
-				{header:'余额',dataIndex:'active_balance',renderer : Ext.util.Format.formatFee ,width:80},
-				{header:'往月欠费',dataIndex:'owe_fee',renderer : Ext.util.Format.formatFee,width:80},
-				{header:'本月费用',dataIndex:'real_bill',renderer : Ext.util.Format.formatFee,width:80},
-				{header:'实时费用',dataIndex:'real_fee',renderer : Ext.util.Format.formatFee,width:80},				
-				{header:'实时余额',dataIndex:'real_balance',renderer : Ext.util.Format.formatFee,width:80},
-				{header:'可转余额',dataIndex:'can_trans_balance',renderer : Ext.util.Format.formatFee,width:80},
-				{header:'可退余额',dataIndex:'can_refund_balance',renderer : Ext.util.Format.formatFee,width:80},
-				{header:'冻结余额',dataIndex:'inactive_balance',renderer : Ext.util.Format.formatFee,width:80}
+				{header:lar[0],dataIndex:'acctitem_name'},
+				{header:lar[1],dataIndex:'card_id',width:120,hidden:true},
+				{header:lar[2],dataIndex:'active_balance',renderer : Ext.util.Format.formatFee ,width:80},
+				{header:lar[3],dataIndex:'owe_fee',renderer : Ext.util.Format.formatFee,width:80},
+				{header:lar[4],dataIndex:'real_bill',renderer : Ext.util.Format.formatFee,width:80},
+				{header:lar[5],dataIndex:'real_fee',renderer : Ext.util.Format.formatFee,width:80},				
+				{header:lar[6],dataIndex:'real_balance',renderer : Ext.util.Format.formatFee,width:80},
+				{header:lar[7],dataIndex:'can_trans_balance',renderer : Ext.util.Format.formatFee,width:80},
+				{header:lar[8],dataIndex:'can_refund_balance',renderer : Ext.util.Format.formatFee,width:80},
+				{header:lar[9],dataIndex:'inactive_balance',renderer : Ext.util.Format.formatFee,width:80}
 		    ]
     	});
 		AcctItemGrid.superclass.constructor.call(this,{
 			id:'A_ITEM',
-			title: '账目信息',
+			title: langUtils.main("cust.acct._title"),
 			store:this.acctItemStore,
 			sm:new Ext.grid.RowSelectionModel(),
 			cm:cm,
@@ -1142,11 +1143,12 @@ AcctItemAdjustGrid = Ext.extend(Ext.ux.Grid,{
 				direction:'DESC'
 			}
 		});
+		var lar = langUtils.main("cust.acctTabs.adjust.columns");
 		var cm = [
-			{header:'调账金额',dataIndex:'ajust_fee',width:65,renderer:Ext.util.Format.formatFee},
-			{header:'操作时间',dataIndex:'create_time',width:120},
-			{header:'调账原因',dataIndex:'reason_text',width:120},
-			{header:'备注',dataIndex:'remark'}
+			{header:lar[0],dataIndex:'ajust_fee',width:65,renderer:Ext.util.Format.formatFee},
+			{header:lar[1],dataIndex:'create_time',width:120},
+			{header:lar[2],dataIndex:'reason_text',width:120},
+			{header:lar[3],dataIndex:'remark'}
 		];
 		AcctItemAdjustGrid.superclass.constructor.call(this,{
 			id:'A_ADJUST',
@@ -1184,11 +1186,11 @@ AcctItemActiveGrid = Ext.extend(Ext.ux.Grid,{
 				direction:'DESC'
 			}
 		});
-		
+		var lar = langUtils.main("cust.acctTabs.detail.columns");
 		var cm = new Ext.grid.ColumnModel({
     		columns : [
-				{header:'资金类型',dataIndex:'fee_type_text',width:80},
-				{header:'余额',dataIndex:'balance',renderer:Ext.util.Format.formatFee}
+				{header:lar[0],dataIndex:'fee_type_text',width:80},
+				{header:lar[1],dataIndex:'balance',renderer:Ext.util.Format.formatFee}
 		    ]
     	});
 		AcctItemActiveGrid.superclass.constructor.call(this,{
@@ -1230,15 +1232,16 @@ AcctItemPropChangeGrid = Ext.extend(Ext.grid.GridPanel,{
 				direction:'DESC'
 			}
 		});
+		var lar = langUtils.main("cust.acctTabs.changes.columns");
 		var cm = [
-			{header:'业务',dataIndex:'busi_name',width:40,renderer : App.qtipValue},
-			{header:'资金类型',dataIndex:'fee_type_text',width:60,renderer : App.qtipValue},
-			{header:'变更类型',dataIndex:'change_type_text',	width:60,renderer : App.qtipValue},
-			{header:'变更前',dataIndex:'pre_fee',renderer:Ext.util.Format.formatFee,width:50},
-			{header:'变更金额',dataIndex:'change_fee',renderer:Ext.util.Format.formatFee,width:60},
-			{header:'变更后',dataIndex:'fee',renderer:Ext.util.Format.formatFee,	width:50},
-			{header:'备注',dataIndex:'cometype',width:150,renderer : App.qtipValue},
-			{header:'操作时间',dataIndex:'done_date',width:120}
+			{header:lar[0],dataIndex:'busi_name',width:40,renderer : App.qtipValue},
+			{header:lar[1],dataIndex:'fee_type_text',width:60,renderer : App.qtipValue},
+			{header:lar[2],dataIndex:'change_type_text',	width:60,renderer : App.qtipValue},
+			{header:lar[3],dataIndex:'pre_fee',renderer:Ext.util.Format.formatFee,width:50},
+			{header:lar[4],dataIndex:'change_fee',renderer:Ext.util.Format.formatFee,width:60},
+			{header:lar[5],dataIndex:'fee',renderer:Ext.util.Format.formatFee,	width:50},
+			{header:lar[6],dataIndex:'cometype',width:150,renderer : App.qtipValue},
+			{header:lar[7],dataIndex:'done_date',width:120}
 		];
 		AcctItemPropChangeGrid.superclass.constructor.call(this,{
 			width : 600,
@@ -1281,13 +1284,13 @@ AcctItemDetailTab = Ext.extend(CommonTab,{
 				layout : 'fit'
 			},
 			items:[{
-				title:'明细',
+				title: langUtils.main("cust.acctTabs.detail._title"),
 				items : [this.acctItemActiveGrid]
 			},{
-				title:'调账',
+				title: langUtils.main("cust.acctTabs.adjust._title"),
 				items : [this.acctItemAdjustGrid]
 			},{
-				title:'异动',
+				title: langUtils.main("cust.acctTabs.changes._title"),
 				items : [this.acctItemPropChangeGrid]
 			}]
 		});

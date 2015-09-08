@@ -1,5 +1,7 @@
 package com.ycsoft.commons.exception;
 
+import com.ycsoft.commons.store.MemoryDict;
+
 public enum ErrorCode {
 	
 	UNKNOW_EXCEPTION("未知异常，请联系管理员"),
@@ -118,7 +120,8 @@ public enum ErrorCode {
 	}
 	private String desc;
 	public String getDesc(){
-		return this.desc;
+		String transDesc = MemoryDict.getTransData(this.desc);
+		return transDesc;
 	}
 	/**
 	 * 获得OTT接口的状态码
