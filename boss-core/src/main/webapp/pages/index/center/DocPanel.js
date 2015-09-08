@@ -22,11 +22,11 @@ InvoiceGrid = Ext.extend(Ext.ux.Grid,{
 			{header:lc[1],dataIndex:'invoice_code',	width:80},
 			{header:lc[2],dataIndex:'amount',width:60,renderer : Ext.util.Format.formatFee},
 			{header:lc[3],dataIndex:'print_date',	width:120},
-			{header:lc[4],dataIndex:'invoice_mode_text',	width:70},
-			{header:lc[5],dataIndex:'doc_type_text',	width:70},
-			{header:lc[6],dataIndex:'status_text',	width:60,renderer:Ext.util.Format.statusShow},
-			{header:lc[7],dataIndex:'finance_status_text',	width:60,renderer:Ext.util.Format.statusShow},
-			{header:lc[8],dataIndex:'optr_name',	width:60},
+			{header:lc[4],dataIndex:'invoice_mode_text',	width:80},
+			{header:lc[5],dataIndex:'doc_type_text',	width:80},
+			{header:lc[6],dataIndex:'status_text',	width:70,renderer:Ext.util.Format.statusShow},
+			{header:lc[7],dataIndex:'finance_status_text',	width:70,renderer:Ext.util.Format.statusShow},
+			{header:lc[8],dataIndex:'optr_name',	width:80},
 			{header:lc[9],dataIndex:'fee_create_time',	width:120}
 	        ]
 	      });
