@@ -15,19 +15,19 @@ InvoiceGrid = Ext.extend(Ext.ux.Grid,{
 						"doc_sn","doc_type","fee_invoice_id","fee_invoice_code","doc_type_text",
 						"fee_invoice_status","fee_invoice_status_text","fee_done_code","invoice_mode_text"]
 		}); 
-		
+		var lc = langUtils.main("doc.invoice.columns");
 		var cm = new Ext.ux.grid.LockingColumnModel({ 
     		columns : [
-			{id:'invoice_id',header:'发票号码',dataIndex:'invoice_id',width:80},
-			{header:'发票代码',dataIndex:'invoice_code',	width:80},
-			{header:'金额',dataIndex:'amount',width:60,renderer : Ext.util.Format.formatFee},
-			{header:'打印时间',dataIndex:'print_date',	width:120},
-			{header:'出票方式',dataIndex:'invoice_mode_text',	width:70},
-			{header:'发票类型',dataIndex:'doc_type_text',	width:70},
-			{header:'使用状态',dataIndex:'status_text',	width:60,renderer:Ext.util.Format.statusShow},
-			{header:'结存状态',dataIndex:'finance_status_text',	width:60,renderer:Ext.util.Format.statusShow},
-			{header:'操作员',dataIndex:'optr_name',	width:60},
-			{header:'费用生成时间',dataIndex:'fee_create_time',	width:120}
+			{id:'invoice_id',header:lc[0],dataIndex:'invoice_id',width:80},
+			{header:lc[1],dataIndex:'invoice_code',	width:80},
+			{header:lc[2],dataIndex:'amount',width:60,renderer : Ext.util.Format.formatFee},
+			{header:lc[3],dataIndex:'print_date',	width:120},
+			{header:lc[4],dataIndex:'invoice_mode_text',	width:70},
+			{header:lc[5],dataIndex:'doc_type_text',	width:70},
+			{header:lc[6],dataIndex:'status_text',	width:60,renderer:Ext.util.Format.statusShow},
+			{header:lc[7],dataIndex:'finance_status_text',	width:60,renderer:Ext.util.Format.statusShow},
+			{header:lc[8],dataIndex:'optr_name',	width:60},
+			{header:lc[9],dataIndex:'fee_create_time',	width:120}
 	        ]
 	      });
 		
@@ -81,12 +81,13 @@ TaskGrid = Ext.extend(Ext.ux.Grid,{
 		this.taskStore = new Ext.data.JsonStore({
 			fields: ["task_type_text","task_type","cust_id","books_time","installer_time","task_status_text","create_time","work_id"]
 		}); 
+		var lc = langUtils.main("doc.task.columns");
 		var cm = [
-			{header:'工单类型',dataIndex:'task_type_text',	width:120},
-			{header:'工单状态',dataIndex:'task_status_text',	width:80},
-			{header:'预约时间',dataIndex:'books_time',	width:120},
-			{header:'完成时间',dataIndex:'installer_time',width:120},
-			{header:'创建时间',dataIndex:'create_time',	width:120}
+			{header:lc[0],dataIndex:'task_type_text',	width:120},
+			{header:lc[1],dataIndex:'task_status_text',	width:80},
+			{header:lc[2],dataIndex:'books_time',	width:120},
+			{header:lc[3],dataIndex:'installer_time',width:120},
+			{header:lc[4],dataIndex:'create_time',	width:120}
 		];
 		var pageTbar = new Ext.PagingToolbar({store: this.taskStore ,pageSize : App.pageSize});
 		pageTbar.refresh.hide();
@@ -132,11 +133,12 @@ BusiDocGrid = Ext.extend(Ext.ux.Grid,{
 				"last_print",'done_date','doc_sn','create_time']
 		}); 
 		var sm = new Ext.grid.CheckboxSelectionModel();
+		var lc = langUtils.main("doc.busi.columns");
 		var cm = [
 			sm,
-			{header:'操作员',dataIndex:'optr_name',	width:80},
-			{header:'最后打印',dataIndex:'create_time',width:140},
-			{header:'业务名称',dataIndex:'busi_name',	width:280}
+			{header:lc[0],dataIndex:'optr_name',	width:80},
+			{header:lc[1],dataIndex:'create_time',width:140},
+			{header:lc[2],dataIndex:'busi_name',	width:280}
 //			{header:'业务信息',dataIndex:'info',width:100}
 		];
 		var pageTbar = new Ext.PagingToolbar({store: this.docStore ,pageSize : App.pageSize});
@@ -192,7 +194,7 @@ DocPanel = Ext.extend(BaseInfoPanel,{
 				bodyStyle: 'border-right-width: 1px',
 				items:[{
 					anchor:"100% 100%",
-					title: '发票',
+					title: langUtils.main("doc.invoice._title"),
 					layout:'border',
 					border: false,
 					defaults: {border: false},
@@ -208,13 +210,13 @@ DocPanel = Ext.extend(BaseInfoPanel,{
 				items:[{
 					anchor:"100% 50%",
 					layout:'border',
-					title:'施工单',
+					title:langUtils.main("doc.task._title"),
 					border: false,
 					defaults: {border: false},
 					items:[this.taskGrid]
 				},{
 					anchor:"100% 50%",
-					title: '业务受理单',
+					title: langUtils.main("doc.busi._title"),
 					layout:'border',
 					border: false,
 					defaults: {border: false},

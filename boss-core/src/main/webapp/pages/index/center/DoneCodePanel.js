@@ -149,9 +149,9 @@ DoneCodeGrid = Ext.extend(Ext.ux.Grid,{
 				direction:'DESC'
 			}
 		}); 
-		
+		var lc = langUtils.main("doneCode.columns");
 		var cm = [
-			{header:'流水号',dataIndex:'done_code',width:100,renderer:function(value,metaData,record){
+			{header:lc[0],dataIndex:'done_code',width:100,renderer:function(value,metaData,record){
 				var busiCode = record.get('busi_code');
 					if(busiCode == '1020' || busiCode == '1015' || busiCode == '1064' 
 						|| busiCode == '1009' || busiCode == '9003'|| busiCode == '1007' || busiCode == '1127'){
@@ -161,21 +161,21 @@ DoneCodeGrid = Ext.extend(Ext.ux.Grid,{
 					}
 				}
 			},
-			{header:'业务名称',dataIndex:'busi_name',	width:100},
-			{header:'状态',dataIndex:'status_text',	width: 60,renderer:Ext.util.Format.statusShow},
-			{header:'受理日期',dataIndex:'done_date',	width:125},
-			{header:'操作员',dataIndex:'optr_name',	width:100},
-			{header:'受理部门',dataIndex:'dept_name',width:120},
-			{header:'可回退',dataIndex:'cancel_text',	width: 50},
-			{header:'可忽略',dataIndex:'ignore_text',	width: 50},
-			{header:'实缴金额',dataIndex:'real_pay',	width: 50,renderer: Ext.util.Format.formatFee},
-			{header:'扩展业务信息',dataIndex:'attr_remark',width: 200},
-			{header:'备注',dataIndex:'remark',	width: 200,renderer:App.qtipValue}
+			{header:lc[1],dataIndex:'busi_name',	width:100},
+			{header:lc[2],dataIndex:'status_text',	width: 60,renderer:Ext.util.Format.statusShow},
+			{header:lc[3],dataIndex:'done_date',	width:125},
+			{header:lc[4],dataIndex:'optr_name',	width:100},
+			{header:lc[5],dataIndex:'dept_name',width:120},
+			{header:lc[6],dataIndex:'cancel_text',	width: 50},
+			{header:lc[7],dataIndex:'ignore_text',	width: 50},
+			{header:lc[8],dataIndex:'real_pay',	width: 50,renderer: Ext.util.Format.formatFee},
+			{header:lc[9],dataIndex:'attr_remark',width: 200},
+			{header:lc[10],dataIndex:'remark',	width: 200,renderer:App.qtipValue}
 		];
 		
 		DoneCodeGrid.superclass.constructor.call(this,{
 			id:'D_DONE',
-			title:'受理记录',
+			title:langUtils.main("doneCode._title"),
 			region: 'center',
 			border:false,
 			store:this.doneCodeStore,

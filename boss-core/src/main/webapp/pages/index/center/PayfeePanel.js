@@ -21,37 +21,37 @@ AcctFeeGrid = Ext.extend(Ext.ux.Grid, {
 							'busi_optr_id','busi_optr_name','prod_sn','invoice_fee',"doc_type","doc_type_text","invoice_mode_text","allow_done_code"]
 				});
 		this.acctFeeStore.on("load",this.doOperate);
-		
+		var lc = langUtils.main("pay.payfee.columns");
 		var cm = new Ext.ux.grid.LockingColumnModel({ 
     		columns : [
-    			{header:'流水号',dataIndex:'create_done_code',width:80},
-				{header:'业务名称',dataIndex:'busi_name',	width:80},
-				{header:'账户类型',dataIndex:'acct_type_text',width:70},
-				{header:'账目名称',dataIndex:'fee_text',width:130,renderer:App.qtipValue},
-				{header:'用户类型',dataIndex:'user_type_text',width:70},
-				{header:'用户名',dataIndex:'user_name',width:70,renderer:App.qtipValue},
-				{header:'设备编号',dataIndex:'device_code',width:130},
-				{header:'状态',dataIndex:'status_text',width:60,renderer:Ext.util.Format.statusShow},
-				{header:'金额',dataIndex:'real_pay',width:60,renderer:Ext.util.Format.formatFee},				
-				{header:'缴费前预计到期日',dataIndex:'begin_date',width:125,renderer:Ext.util.Format.dateFormat},
-				{header:'缴费后预计到期日',dataIndex:'prod_invalid_date',width:125,renderer:Ext.util.Format.dateFormat},
-				{header:'打印状态',dataIndex:'is_doc_text',width:60,renderer:Ext.util.Format.statusShow},
-				{header:'付款方式',dataIndex:'pay_type_text',width:60},
-				{header:'受理日期',dataIndex:'create_time',width:125},
-				{header:'账务日期',dataIndex:'acct_date',width:75,renderer:Ext.util.Format.dateFormat},
-				{header:'受理人',dataIndex:'optr_name',width:60},
-				{header:'受理部门',dataIndex:'dept_name',width:60},
-				{header:'发票',dataIndex:'invoice_id',width:80},
-				{header:'出票方式',dataIndex:'invoice_mode_text',width:80},
-				{header:'发票类型',dataIndex:'doc_type_text',width:80},
-				{header:'业务员',dataIndex:'busi_optr_name',width:80,renderer:App.qtipValue}
+    			{header:lc[0],dataIndex:'create_done_code',width:80},
+				{header:lc[1],dataIndex:'busi_name',	width:80},
+				{header:lc[2],dataIndex:'acct_type_text',width:70},
+				{header:lc[3],dataIndex:'fee_text',width:130,renderer:App.qtipValue},
+				{header:lc[4],dataIndex:'user_type_text',width:70},
+				{header:lc[5],dataIndex:'user_name',width:70,renderer:App.qtipValue},
+				{header:lc[6],dataIndex:'device_code',width:130},
+				{header:lc[7],dataIndex:'status_text',width:60,renderer:Ext.util.Format.statusShow},
+				{header:lc[8],dataIndex:'real_pay',width:60,renderer:Ext.util.Format.formatFee},				
+				{header:lc[9],dataIndex:'begin_date',width:125,renderer:Ext.util.Format.dateFormat},
+				{header:lc[10],dataIndex:'prod_invalid_date',width:125,renderer:Ext.util.Format.dateFormat},
+				{header:lc[11],dataIndex:'is_doc_text',width:60,renderer:Ext.util.Format.statusShow},
+				{header:lc[12],dataIndex:'pay_type_text',width:60},
+				{header:lc[13],dataIndex:'create_time',width:125},
+				{header:lc[14],dataIndex:'acct_date',width:75,renderer:Ext.util.Format.dateFormat},
+				{header:lc[15],dataIndex:'optr_name',width:60},
+				{header:lc[16],dataIndex:'dept_name',width:60},
+				{header:lc[17],dataIndex:'invoice_id',width:80},
+				{header:lc[18],dataIndex:'invoice_mode_text',width:80},
+				{header:lc[19],dataIndex:'doc_type_text',width:80},
+				{header:lc[20],dataIndex:'busi_optr_name',width:80,renderer:App.qtipValue}
 	        ]
 	     });
 		
 		var pageTbar = new Ext.PagingToolbar({store: this.acctFeeStore ,pageSize : this.pageSize});
 		AcctFeeGrid.superclass.constructor.call(this, {
 					id:'P_ACCT',
-					title : '预存费用',
+					title : langUtils.main("pay.payfee._title"),
 					loadMask : true,
 					store : this.acctFeeStore,
 					border : false,
@@ -146,30 +146,31 @@ BusiFeeGrid = Ext.extend(Ext.ux.Grid, {
 							'data_right','finance_status','invoice_book_id','is_busi_fee',
 							'busi_optr_id','busi_optr_name','invoice_fee',"doc_type","doc_type_text","invoice_mode_text"]
 				});
+		var lc = langUtils.main("pay.busifee.columns");
 		var cm = new Ext.ux.grid.LockingColumnModel({ 
     		columns : [
-    			{header:'流水号',dataIndex:'create_done_code',width:80},
-				{header:'费用名称',dataIndex:'fee_text',width:110},
-				{header:'设备类型',dataIndex:'device_type_text',width:60},
-				{header:'设备编号',dataIndex:'device_code',width:130},
-				{header:'状态',dataIndex:'status_text',width:60,renderer:Ext.util.Format.statusShow},
-				{header:'打印状态',dataIndex:'is_doc_text',width:60,renderer:Ext.util.Format.statusShow},
-				{header:'应付',dataIndex:'should_pay',width:60,renderer:Ext.util.Format.formatFee},
-				{header:'实付',dataIndex:'real_pay',width:60,renderer:Ext.util.Format.formatFee},
-				{header:'付款方式',dataIndex:'pay_type_text',width:60},
-				{header:'受理日期',dataIndex:'create_time',width:125},
-				{header:'受理人',dataIndex:'optr_name',width:60},
-				{header:'受理部门',dataIndex:'dept_name',width:80},
-				{header:'发票',dataIndex:'invoice_id',width:90},
-				{header:'出票方式',dataIndex:'invoice_mode_text',width:80},
-				{header:'发票类型',dataIndex:'doc_type_text',width:80},
-				{header:'业务员',dataIndex:'busi_optr_name',width:80,renderer:App.qtipValue}
+    			{header:lc[0],dataIndex:'create_done_code',width:80},
+				{header:lc[1],dataIndex:'fee_text',width:110},
+				{header:lc[2],dataIndex:'device_type_text',width:60},
+				{header:lc[3],dataIndex:'device_code',width:130},
+				{header:lc[4],dataIndex:'status_text',width:60,renderer:Ext.util.Format.statusShow},
+				{header:lc[5],dataIndex:'is_doc_text',width:60,renderer:Ext.util.Format.statusShow},
+				{header:lc[6],dataIndex:'should_pay',width:60,renderer:Ext.util.Format.formatFee},
+				{header:lc[7],dataIndex:'real_pay',width:60,renderer:Ext.util.Format.formatFee},
+				{header:lc[8],dataIndex:'pay_type_text',width:60},
+				{header:lc[9],dataIndex:'create_time',width:125},
+				{header:lc[10],dataIndex:'optr_name',width:60},
+				{header:lc[11],dataIndex:'dept_name',width:80},
+				{header:lc[12],dataIndex:'invoice_id',width:90},
+				{header:lc[13],dataIndex:'invoice_mode_text',width:80},
+				{header:lc[14],dataIndex:'doc_type_text',width:80},
+				{header:lc[15],dataIndex:'busi_optr_name',width:80,renderer:App.qtipValue}
 	        ]
 	      });
 		
 		BusiFeeGrid.superclass.constructor.call(this, {
 					id:'P_BUSI',
-					title : '业务费用',
+					title : langUtils.main("pay.busifee._title"),
 					loadMask : true,
 					store : this.busiFeeStore,
 					border : false,
@@ -319,9 +320,10 @@ FeePayGrid = Ext.extend(Ext.ux.Grid, {
 								{name : 'cos',type : 'int'}, 'optr_id','optr_name',
 							{name : 'khr',type : 'int'},'create_time','data_right']
 				});
+		var lc = langUtils.main("pay.detail.columns");
 		var cm = new Ext.ux.grid.LockingColumnModel({ 
     		columns : [
-    			{header:'支付编号',dataIndex:'pay_sn',width:80,renderer:function(value,metaData,record){
+    			{header:lc[0],dataIndex:'pay_sn',width:80,renderer:function(value,metaData,record){
 						that = this;
 						if(value != ''){
 							return '<div style="text-decoration:underline;font-weight:bold"  onclick="Ext.getCmp(\'P_FEE_PAY\').doTransferFeeShow();"  ext:qtitle="" ext:qtip="' + value + '">' + value +'</div>';
@@ -329,25 +331,25 @@ FeePayGrid = Ext.extend(Ext.ux.Grid, {
 							return '<div ext:qtitle="" ext:qtip="' + value + '">' + value +'</div>';
 						}
 					}},
-				{header:'美元',dataIndex:'usd',width:60,renderer:Ext.util.Format.formatFee},
-				{header:'柬元',dataIndex:'khr',width:60,renderer:Ext.util.Format.formatFee},
-				{header:'汇率',dataIndex:'exchange',width:60},
-				{header:'柬元抹零',dataIndex:'cos',width:60,renderer:Ext.util.Format.formatFee},
-				{header:'有效',dataIndex:'is_valid_text',width:60,renderer:Ext.util.Format.statusShow},
-				{header:'付款方式',dataIndex:'pay_type_text',width:50},
-				{header:'付款人',dataIndex:'payer',width:60},
-				{header:'业务流水号',dataIndex:'done_code',width:80},
-				{header:'票据编号',dataIndex:'receipt_id',width:140},
-				{header:'出票方式',dataIndex:'invoice_mode_text',width:60},
-				{header:'受理日期',dataIndex:'create_time',width:125},
-				{header:'受理人',dataIndex:'optr_name',width:60},
-				{header:'受理部门',dataIndex:'dept_name',width:80}
+				{header:lc[1],dataIndex:'usd',width:60,renderer:Ext.util.Format.formatFee},
+				{header:lc[2],dataIndex:'khr',width:60,renderer:Ext.util.Format.formatFee},
+				{header:lc[3],dataIndex:'exchange',width:60},
+				{header:lc[4],dataIndex:'cos',width:60,renderer:Ext.util.Format.formatFee},
+				{header:lc[5],dataIndex:'is_valid_text',width:60,renderer:Ext.util.Format.statusShow},
+				{header:lc[6],dataIndex:'pay_type_text',width:50},
+				{header:lc[7],dataIndex:'payer',width:60},
+				{header:lc[8],dataIndex:'done_code',width:80},
+				{header:lc[9],dataIndex:'receipt_id',width:140},
+				{header:lc[10],dataIndex:'invoice_mode_text',width:60},
+				{header:lc[11],dataIndex:'create_time',width:125},
+				{header:lc[12],dataIndex:'optr_name',width:60},
+				{header:lc[13],dataIndex:'dept_name',width:80}
 	        ]
 	      });
 		
 		FeePayGrid.superclass.constructor.call(this, {
 					id:'P_FEE_PAY',
-					title : '支付记录',
+					title : langUtils.main("pay.detail._title"),
 					region:"east",
 					width:"30%",
 					split:true,
