@@ -27,7 +27,7 @@
 		<appender-ref ref="CON" />
 	</logger>
 	<logger name="org.apache">
-		<level value="DEBUG" />
+		<level value="INFO" />
 		<appender-ref ref="CON" />
 	</logger>
 	<logger name="org.springframework.jdbc.core.JdbcTemplate">
