@@ -104,6 +104,15 @@ public class CCust extends BusiBase implements Serializable {
 	private String spkg_text;
 	
 	private String develop_optr_name;	//发展人
+	private String login_name;
+
+	public String getLogin_name() {
+		return login_name;
+	}
+
+	public void setLogin_name(String login_name) {
+		this.login_name = login_name;
+	}
 
 	public String getDevelop_optr_name() {
 		return develop_optr_name;

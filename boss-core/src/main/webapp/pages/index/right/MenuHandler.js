@@ -921,6 +921,24 @@ Ext.apply(MenuHandler, {
 
 		}
 	},
+	AddIpUser : function() {
+		if (!hasCust()) {
+			return false;
+		}
+		return {
+			width : 550,
+			height : 360
+		};
+	},
+	PayIpUserFee : function() {
+		if (!hasCust()) {
+			return false;
+		}
+		return {
+			width : 550,
+			height : 360
+		};
+	},
 	ChangeCust : function(){
 	  	if(!hasCust()) return false;
 	  	

@@ -15,7 +15,7 @@ BCLang.home = {
 				houseOptr: "小区运维人员",postalAddr: "邮寄地址", remark: "备注",
 				email: "邮箱", sex: "性别",
 				agentName: "代理商", deptName: "开户部门", developName: "发展人", businessLicence: "营业执照", unitNumber: "单位税号",
-				spkgSn: "协议编号"
+				spkgSn: "协议编号", cust_level: "客户级别"
 			},
 			device: {
 				_title: "设备信息"

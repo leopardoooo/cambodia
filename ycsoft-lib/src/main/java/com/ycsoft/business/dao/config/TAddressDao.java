@@ -297,7 +297,7 @@ public class TAddressDao extends BaseEntityDao<TAddress> {
 	}
 	
 	public List<TAddressDto> queryAddrDistrict(String countyId) throws JDBCException {
-		String sql = "select * from t_address t where t.tree_level=2 and t.status='ACTIVE' ";
+		String sql = "select * from t_address t where t.addr_pid='1' and t.status='ACTIVE' ";
 		if(!countyId.equals(SystemConstants.COUNTY_ALL)){
 			sql = sql + " and t.county_id='"+countyId+"' ";
 		}
@@ -414,7 +414,7 @@ public class TAddressDao extends BaseEntityDao<TAddress> {
 	}
 	
 	public List<TAddressSysDto> queryAllAddrById(String addrId) throws JDBCException {
-		String sql = "SELECT * FROM t_address where addr_pid = ?  order by sort_num ";
+		String sql = "SELECT * FROM t_address where addr_pid = ? order by sort_num ";
 		return createQuery(TAddressSysDto.class,sql,addrId).list();
 	}
 	public List<TAddressSysDto> queryAddrSysTreeByLvOneAndName(String[] lvOneAddrIds,String name) throws JDBCException{
@@ -472,6 +472,5 @@ public class TAddressDao extends BaseEntityDao<TAddress> {
 		String sql = " select  decode(max(t.sort_num),null,0,max(t.sort_num)) sort_num from t_address t where t.addr_pid=? ";
 		return this.findUnique(sql,addrPId);
 	}
-	
 	
 }
