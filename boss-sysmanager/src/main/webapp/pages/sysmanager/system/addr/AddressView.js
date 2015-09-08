@@ -471,12 +471,12 @@ AddressWin = Ext.extend(Ext.Window,{
 			closeAction : 'close',
 			items : [this.itemForm],
 			buttons : [{
-				text : '保存',
+				text : langUtils.sys('AddressNodeManage.formWin.btnTxtSave'),
 				scope : this,
 				iconCls : 'icon-save',
 				handler : this.doSave
 			}, {
-				text : '关闭',
+				text : langUtils.sys('AddressNodeManage.formWin.btnTxtClose'),
 				scope : this,
 				handler : function() {
 					this.close();
@@ -497,7 +497,7 @@ AddressWin = Ext.extend(Ext.Window,{
 					fields:['item_value','item_name']
 				}),displayField:'item_name',valueField:'item_value',
 				triggerAction:'all',mode:'local',
-				fieldLabel : '网络类型'
+				fieldLabel : langUtils.sys('AddressNodeManage.formWin.labelNetType')
 			});
 			
 			App.form.initComboData(this.itemForm.findByType("lovcombo"), function(){
@@ -520,7 +520,7 @@ AddressWin = Ext.extend(Ext.Window,{
 				allowBlank : false,
 				minChars:2,
 				height: 22,
-				fieldLabel : '行政区域',
+				fieldLabel : langUtils.sys('AddressNodeManage.formWin.labelDistrict'),
 				treeUrl: root + '/system/Address!queryDistrictByPid.action',
 				treeParams : {addrId:provinceId},
 				hiddenName:'addrId',
@@ -545,14 +545,14 @@ AddressWin = Ext.extend(Ext.Window,{
 			this.itemForm.add({
 				xtype:'combo',
 				id : 'provinceId',
-				fieldLabel : '省',
+				fieldLabel : langUtils.sys('AddressNodeManage.formWin.labelProvince'),
 				forceSelection : true,
 				store : this.provinceStore,
 				triggerAction : 'all',
 				mode: 'local',
 				displayField : 'name',
 				valueField : 'id',
-				emptyText: '请选择省',
+				emptyText: langUtils.sys('AddressNodeManage.formWin.emptyTxtProvince'),
 				editable : false
 			});
 					
@@ -570,7 +570,7 @@ AddressWin = Ext.extend(Ext.Window,{
 				xtype : 'numberfield',
 				id : 'sortNum',
 				name : 'sort_num',
-				fieldLabel : '序号'
+				fieldLabel : langUtils.sys('AddressNodeManage.formWin.labelSortNum')
 			});
 			Ext.getCmp('sortNum').setValue(this.node.attributes.others.sort_num);
 		}
@@ -586,7 +586,7 @@ AddressWin = Ext.extend(Ext.Window,{
 	doSave : function(){
 		//添加和修改
 		if(this.itemForm.getForm().isValid()){
-			Confirm("确定保存吗?", this ,function(){
+			Confirm(langUtils.sys('AddressNodeManage.msg.confirmSave'), this ,function(){
 				mb = Show();//显示正在提交
 				var params = {};
 				
@@ -638,7 +638,7 @@ AddressWin = Ext.extend(Ext.Window,{
 						mb = null;
 						var rs = Ext.decode(res.responseText);
 						if(true === rs.success){
-							Alert('操作成功!');
+							Alert(langUtils.sys('AddressNodeManage.msg.actionSuccess'));
 							if(this.type == 'add'){
 								this.node.attributes.is_refresh = false;
 								this.node.reload();
@@ -649,7 +649,7 @@ AddressWin = Ext.extend(Ext.Window,{
 
 							this.close();
 						}else{
-							Alert('操作失败');
+							Alert(langUtils.sys('AddressNodeManage.msg.actionFailed'));
 				 		}
 					}
 				})
@@ -664,7 +664,7 @@ AddressView = Ext.extend(Ext.Panel,{
 		AddressView.superclass.constructor.call(this,{
 			id : 'AddressView',
 			layout : 'fit',
-			title : '地址管理',
+			title : langUtils.sys('AddressNodeManage.panelTitle'),
 			closable: true,
 			border : false ,
 			baseCls: "x-plain",
