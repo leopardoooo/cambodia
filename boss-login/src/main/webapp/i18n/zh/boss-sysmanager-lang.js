@@ -34,6 +34,28 @@ Sys = {
 		}
 	},
 	AddressNodeManage: {//地址节点配置
+		panelTitle:'地址管理',//面板主标题
+		msg:{//各种提示消息
+			actionFailed:'操作失败',
+			actionSuccess:'操作成功',
+			confirmSave:'确认保存?'
+			
+			
+		},
+		formWin:{
+			labelSortNum:'序号',
+			labelProvince:'省',
+			labelDistrict:'行政区域',
+			labelNetType:'网络类型',
+			emptyTxtProvince:'请选择省',
+			
+			
+		},
+		grid:{
+			
+		}
+	},
+	WorkTask:{//工单
 		
 	}
 }
