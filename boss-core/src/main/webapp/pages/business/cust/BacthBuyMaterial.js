@@ -15,7 +15,7 @@ var MaterialDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 			columns : [
 				{header:'器材编号',dataIndex:'device_id',width:250,hidden:true},
 				{header:'器材型号',dataIndex:'device_model_text',width:250},
-				{header:'单价',dataIndex:'fee_value',width:100,renderer:Ext.util.Format.formatFee},
+				{header:'单价',dataIndex:'fee_value',width:100,renderer:function(v){if(v == "-1"){return "<span style='font-weight:bold'>未配置器材费 </span>"}else{ return Ext.util.Format.formatFee(v)}}},
 				{header:'库存数量',dataIndex:'total_num',width:100,renderer:App.qtipValue},
 				{id:'buy_num_id',header:'购买数量',dataIndex:'buy_num',width:100,
 					scope:this
@@ -44,7 +44,7 @@ var MaterialDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 	cellEditable:function(colIndex,rowIndex){
 		var record = materalThat.getStore().getAt(rowIndex);//当前编辑行对应record
 		if(colIndex == this.getIndexById('buy_num_id')){
-			if(record.get('total_num') == 0){
+			if(record.get('total_num') == 0 || record.get('fee_value') == "-1"){
 				return false;
 			}
 		}

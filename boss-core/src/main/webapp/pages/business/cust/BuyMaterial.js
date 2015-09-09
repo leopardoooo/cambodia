@@ -16,8 +16,6 @@ BuyMaterialForm = Ext.extend( BaseForm , {
  				url :root + '/commons/x/QueryDevice!queryDeviceBuyMode.action',
  				fields : ['buy_mode','buy_mode_name']
  		});
-// 		this.buyModeStore.on("load",this.doLoadBuyMode,this);
- 		
  		this.deviceModelStore = new Ext.data.JsonStore({
 			fields : ['device_model','device_type','model_name','total_num']
 		});
@@ -55,13 +53,10 @@ BuyMaterialForm = Ext.extend( BaseForm , {
 						'select': this.doBuyModeSelect
 					}
 				},{
-					xtype : 'numberfield',
+					xtype : 'displayfield',
 					id : 'total_num_id',
 					fieldLabel : '库存数量',
-					name:'total_num',
-					readOnly: true,
-					style: Constant.TEXTFIELD_STYLE,
-					allowNegative : false
+					name:'total_num'
 				},{
 					fieldLabel : '购买方式',
 					xtype:'combo',
@@ -93,7 +88,6 @@ BuyMaterialForm = Ext.extend( BaseForm , {
 					baseCls: 'x-plain',
 					anchor : '100%',
 					id : 'feePanelId',
-					bodyStyle: "background:#F9F9F9",
 					layout : 'form',
 					items : []
 				}]
@@ -167,11 +161,9 @@ BuyMaterialForm = Ext.extend( BaseForm , {
 							var d = data[i];
 							Ext.getCmp('feePanelId').add({
 								fieldLabel : '费用名称',
-								xtype:'textfield',
+								xtype:'displayfield',
 								width : 150,
-								style : Constant.TEXTFIELD_STYLE,
 								name:'fee_name',
-								readOnly : true,
 								value:d['fee_name']
 							});
 							Ext.getCmp('feePanelId').add({
@@ -242,26 +234,10 @@ BuyMaterialForm = Ext.extend( BaseForm , {
 	},
 	url : Constant.ROOT_PATH + "/core/x/Cust!buyMaterial.action",
 	success: function(form, resultData){
-//		//清空参数
-//		App.getData().busiTaskToDo = [];
-//		var buyDevice = App.getData().busiTask['BuyMaterial'];
-//		var newUser = App.getData().busiTask['NewUser'];
-//		//跳转业务用户开户
-//		App.getData().busiTaskToDo.push(buyDevice);
-//		App.getData().busiTaskToDo.push(newUser);
 		//刷新支付
 		App.getApp().refreshPayInfo(parent);
 		App.getApp().refreshPanel(App.getApp().getData().currentResource.busicode);
 	}
-//	,getFee : function(){
-//		var buyNum = Ext.getCmp('buyNum').getValue();
-//		var fee = 0;
-//		for(var i=0,len=this.feeInfo.length;i<len;i++){
-//			fee += Ext.getCmp('deviceFeeValue'+i).getValue();	
-//		}
-//		fee = fee * buyNum;
-//		return fee;
-//	}
 });
 
 Ext.onReady(function(){
