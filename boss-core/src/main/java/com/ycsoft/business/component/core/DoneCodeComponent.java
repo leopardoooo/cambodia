@@ -25,6 +25,7 @@ import com.ycsoft.business.dto.core.cust.ExtAttributeDto;
 import com.ycsoft.business.dto.core.fee.QueryFeeInfo;
 import com.ycsoft.commons.constants.DictKey;
 import com.ycsoft.commons.constants.StatusConstants;
+import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.exception.ComponentException;
 import com.ycsoft.commons.exception.ErrorCode;
 import com.ycsoft.commons.helper.CollectionHelper;
@@ -242,6 +243,7 @@ public class DoneCodeComponent extends BaseBusiComponent {
 		List<DoneCodeDto> lstDone = pageLstDone.getRecords();
 		String[] doneCodeArr =  CollectionHelper.converValueToArray(lstDone, "done_code");
 		List<DoneCodeDto> queryCfeeByDoneCode = cDoneCodeDao.queryCfeeByDoneCode(doneCodeArr,custId);
+		Map<String, List<DoneCodeDto>> busiFeeMap =  CollectionHelper.converToMap(queryCfeeByDoneCode, "done_code");
 		Map<String, List<DoneCodeDto>> map2 = CollectionHelper.converToMap(queryCfeeByDoneCode, "reverse_done_code");
 		for (DoneCodeDto doneCodeDto : lstDone) {			
 			temp = new ExtAttributeDto( doneCodeDto );
@@ -263,6 +265,17 @@ public class DoneCodeComponent extends BaseBusiComponent {
 						realPay += d.getReal_pay();
 					}
 					doneCodeDto.setReal_pay(0-realPay);
+				}
+				
+				//ip外挂费用
+				List<DoneCodeDto> busiFeeList = busiFeeMap.get(doneCodeDto.getDone_code().toString());
+				if(CollectionHelper.isNotEmpty(busiFeeList)){
+					for(DoneCodeDto dto : busiFeeList){
+						if(StringHelper.isNotEmpty(dto.getFee_id()) && dto.getFee_id().equals(SystemConstants.USER_IP_FEE_ID)){
+							doneCodeDto.setFee_id(dto.getFee_id());
+							break;
+						}
+					}
 				}
 				
 				

@@ -951,6 +951,8 @@ public class DeviceComponent extends BaseBusiComponent {
 				List<RDevice> device = deviceMap.get(type);
 				if(device.size()==1){
 					dto.setTotal_num(device.get(0).getTotal_num());
+				}else{
+					throw new ComponentException(ErrorCode.DeviceDateException,type);
 				}
 			}
 			deviceList.add(dto);
