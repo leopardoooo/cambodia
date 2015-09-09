@@ -40,10 +40,10 @@ public class TExchangeDao extends BaseEntityDao<TExchange> {
 	 * @param exchange
 	 * @throws JDBCException 
 	 */
-	public void invalidExchange(TExchange exchange) throws JDBCException {
-		String sql = "update t_exchange set status = ? where eff_date = ? and exchange = ?";
+	public void invalidExchange(String exchangeId) throws JDBCException {
+		String sql = "update t_exchange set status = ? where exchange_id= ?";
 		
-		executeUpdate(sql, StatusConstants.INVALID,exchange.getEff_date(),exchange.getExchange());
+		executeUpdate(sql, StatusConstants.INVALID,exchangeId);
 	}
 
 	
