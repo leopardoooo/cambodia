@@ -1,6 +1,6 @@
 Ext.namespace("Ext.ux");
 
-var loadParamValues = function(store){
+var loadParamValues = function(store, combo){
 	if(this.isFilter === true){
 		var countyId = App.getData().optr.county_id;
 		store.each(function(record){
@@ -12,6 +12,11 @@ var loadParamValues = function(store){
 				}
 			}
 		});
+	}
+	
+	//只有一个值，默认选中
+	if(store.getCount() == 1){
+		combo.setValue(store.getAt(0).get('item_value'));
 	}
 };
 
@@ -37,7 +42,9 @@ Ext.ux.ParamCombo = Ext.extend(Ext.form.ComboBox, {
 			baseParams:{paramName:this.paramName},
 			listeners:{
 				scope:this,
-				load:loadParamValues
+				load: function(s){
+					loadParamValues(s, this);
+				}
 			}
 		});
 		Ext.ux.ParamCombo.superclass.constructor.apply(this, arguments);
