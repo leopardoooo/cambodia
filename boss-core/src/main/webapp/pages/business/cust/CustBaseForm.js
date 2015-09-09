@@ -17,9 +17,9 @@ QueryFilterTree = Ext.extend(Ext.ux.QueryFilterTreePanel,{
 			region: 'west',
 			animate : false,
 			rootVisible : false,
-			width 	: 210,
+			width 	: 180,
 			split	: true,
-			minSize	: 210,
+			minSize	: 180,
 	        maxSize	: 260,
 	        margins		:'0 0 3 2',  //元素上右下左和外面元素的距离都是0
 	        lines		:false,  // 去掉树的线
@@ -90,96 +90,6 @@ QueryFilterTree = Ext.extend(Ext.ux.QueryFilterTreePanel,{
 	}
 });
 
-//AddressTreeCombo = Ext.extend(Ext.ux.TreeCombo,{
-//	initList : function() {
-//		var rootVisible = false;
-//		if (this.rootNodeCfg) {
-//			rootVisible = true;
-//		} else {
-//			this.rootNodeCfg = {
-//				expanded : true
-//			};
-//		}
-//		this.list = new QueryFilterTree({
-//			root : new Ext.tree.AsyncTreeNode(this.rootNodeCfg),
-//			loader : new Ext.tree.TreeLoader({
-//						dataUrl : this.treeUrl,
-//						baseParams : this.treeParams
-//						,listeners : {
-//							beforeload : this.onBeforeLoad,
-//							scope : this
-//						}
-//					}),
-//			floating : true,
-//			height : this.treeHeight,
-//			autoScroll : true,
-//			animate : false,
-//			searchFieldWidth : this.treeWidth - 80,
-//			rootVisible : rootVisible,
-//			listeners : {
-//				click : this.onNodeClick,
-//				checkchange : this.onCheckchange,
-//				scope : this
-//			},
-//			alignTo : function(el, pos) {
-//				this.setPagePosition(this.el.getAlignToXY(el, pos));
-//			}
-//		});
-//		if (this.minChars == 0) {
-//			this.doQuery("");
-//		}
-//	},
-//	listeners:{
-//		expand:function(thisCmp){
-//			function getFocus(){
-//				var search = thisCmp.list.searchT;//如果第一次获取焦点,list会为空
-//				if(search){
-////					search.setValue('输入关键字搜索');
-//					var dom = search.el.dom;
-//					dom.select();
-//				}
-//			};
-//			getFocus.defer(200,this);
-//		}
-//	},
-//	onNodeClick : function(node, e) {		
-//		if (!this.isCanClick(node)) {
-//			return;
-//		}
-//		this.setRawValue('');
-//		Ext.Ajax.request({
-//			scope : this,
-//			url: Constant.ROOT_PATH+"/commons/x/QueryParam!queryCustAddrName.action",
-//			params : {
-//				addrId : node.id
-//			},
-//			success : function(res,opt){
-//				var rec = Ext.decode(res.responseText);
-//				//		// 显示隐藏值
-//				this.addOption(node.id, rec);
-//				this.setValue(node.id);
-//				this.setRawValue(rec);
-//				this.collapse();
-//				this.fireEvent('select', this, node, node.attributes);
-//			}
-//		});
-//		
-//	},
-//	firstExpand: true,
-//	doQuery : function(q, forceAll) {
-//		if(!this.firstExpand){
-//			this.firstExpand = true;
-//			this.list.expandAll();
-//		}
-//		this.expand();
-//	},
-//	onBeforeLoad:function(l,node){
-//		l.on('beforeload',function(loader,node){
-//  			l.baseParams.addrId=node.id; //通过这个传递参数，这样就可以点一个节点出来它的子节点来实现异步加载
-//		},l);
-//	}
-//	
-//}); 
 
 AddrCustSelectWin = Ext.extend( Ext.Window , {
 	//客户信息的store
@@ -230,27 +140,51 @@ AddrCustSelectWin = Ext.extend( Ext.Window , {
 	    })
 	    
 	    this.roomPanel = new Ext.Panel({
-	    	region : "south" ,
-	    	height:60,
-	     	fullscreen: true,
-            layout : {
-				type:'hbox',
-				padding : '5',
-				pack:'center',
-				align : 'top'
+	    	layout:'column',
+			anchor: '100%',
+			region : "south" ,
+			height:120,
+			border : false,
+			defaults:{
+				baseCls: 'x-plain'
 			},
-			defaults : {
-				height: '100%',
-				margins : '0 5 0 0',
-				height:40
-			},
-            items:[
-                {xtype:'button',text:'新增房间',id:'addRoomNewBoxId',iconCls:'icon-add',disabled:true,scope:this,handler:this.doCheckedChangeRoom},
-                {xtype:'textfield',width:150 ,id:'newRoomBoxId',disabled:true},
-                {xtype:'button',text:'提交',iconCls:'icon-save',id:'saveRoomNewBoxId',disabled:true,scope:this,handler:this.doSaveNewRoom}
-            ]
-           
-	    
+			items:[{
+				columnWidth:1,
+				labelWidth: 1,
+				layout: 'form',
+				items:[{
+	                xtype: 'displayfield',
+	                anchor:"95%",
+	                id:'feeDescId'
+				}]
+			},{
+				columnWidth:1,
+				items:[{
+			    	height:50,
+			    	border : false,
+			     	fullscreen: true,
+		            layout : {
+						type:'hbox',
+						padding : '5',
+						pack:'center',
+						align : 'top'
+					},
+					defaults : {
+						height: '100%',
+						margins : '0 5 0 0',
+						height:30
+					},
+		            items:[
+		                {xtype:'button',text:'新增房间',id:'addRoomNewBoxId',iconCls:'icon-add',disabled:true,scope:this,handler:this.doCheckedChangeRoom},
+		                {xtype:'textfield',width:150 ,id:'newRoomBoxId',disabled:true,enableKeyEvents:true,listeners:{
+							scope:this,
+							keyup:this.doNewRoom
+						}},
+		                {xtype:'button',text:'提交',iconCls:'icon-save',id:'saveRoomNewBoxId',disabled:true,scope:this,handler:this.doSaveNewRoom}
+		            ]
+		       	}]
+			
+			}]
 	    })
 	    
 		AddrCustSelectWin.superclass.constructor.call(this,{
@@ -268,6 +202,14 @@ AddrCustSelectWin = Ext.extend( Ext.Window , {
 				items:[this.custGrid,this.roomPanel]
 			}]
 		});
+	},
+	doNewRoom:function(comp){
+		var name = "";
+		if(!Ext.isEmpty(comp.getValue())){
+			var name = "Room "+comp.getValue()+",";
+		}
+		name = name + this.addrName;
+		Ext.get('newAddressId').update(name);
 	},
 	doSaveNewRoom:function(){
 		var note = Ext.getCmp('newRoomBoxId').getValue();
@@ -292,9 +234,12 @@ AddrCustSelectWin = Ext.extend( Ext.Window , {
 		this.custGrid.on("rowdblclick", function(grid ,index, e){
 			var record = grid.getStore().getAt(index);
 			this.setData(record.get('note'));
-			
 			this.close();
 		}, this);
+		this.custGrid.on("rowclick", function(grid ,index, e){
+			var record = grid.getStore().getAt(index);
+			this.setData(record.get('note'));
+		}, this)
 		this.addrTree.on("click",function(node, e) {
 			if (!this.isCanClick(node)) {
 				return;
@@ -324,6 +269,7 @@ AddrCustSelectWin = Ext.extend( Ext.Window , {
 					var title = "行政区域:"+rec.districtName+";  "
 					title = title + "服务类型:"+(Ext.isEmpty(rec.netType)?'':rec.netType);
 					addrThat.custGrid.setTitle(title);
+					Ext.get('newAddressId').update(rec.addrName);
 				}
 			});
 			
@@ -337,10 +283,20 @@ AddrCustSelectWin = Ext.extend( Ext.Window , {
 			var name = "Room "+note+",";
 		}
 		name = name + this.addrName;
+		Ext.get('newAddressId').update(name);
 		Ext.getCmp('custNoteId').setValue(note);
 		Ext.getCmp('tempCustAddress').setValue(name);
 		Ext.getCmp('linkman.mail_address').setValue(name);
-	}	
+	},
+	show:function(){
+		var oldAddr, custAddress = Ext.getCmp('tempCustAddress').getValue();
+		if(custAddress){
+			oldAddr = "<font style='font-size:12px'><b>old:</b>"+custAddress+"</font><br>";
+		}
+		Ext.getCmp('feeDescId').setValue( oldAddr==null?"":oldAddr+
+			"<font style='font-size:12px'><b>new:</b></font><font style='color:red'><span id='newAddressId'>--</span></font>");
+		AddrCustSelectWin.superclass.show.call(this);
+	}
 });
 
 
