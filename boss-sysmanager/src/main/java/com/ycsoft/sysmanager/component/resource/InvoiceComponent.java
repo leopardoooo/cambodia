@@ -108,7 +108,7 @@ public class InvoiceComponent extends BaseComponent {
 	 */
 	public List<SDept> queryQuotaInvoiceTransDepot(SOptr optr) throws Exception {
 		String depotId = findDepot(optr);
-		return rDepotDefineDao.queryQuotaInvoiceTransDepot(depotId);
+		return rDepotDefineDao.queryDeptForTransById(depotId);
 	}
 
 
