@@ -144,19 +144,20 @@ BusiFeeGrid = Ext.extend(Ext.ux.Grid, {
 							'status', 'invoice_code', 'invoice_id','invoice_mode', 'optr_id','optr_name',
 							{name : 'real_pay',type : 'int'},'fee_sn','create_time','acct_date','deposit',
 							'data_right','finance_status','invoice_book_id','is_busi_fee',
-							'busi_optr_id','busi_optr_name','invoice_fee',"doc_type","doc_type_text","invoice_mode_text"]
+							'busi_optr_id','busi_optr_name','invoice_fee',"doc_type","doc_type_text","invoice_mode_text",'buy_num']
 				});
 		var lc = langUtils.main("pay.busifee.columns");
 		var cm = new Ext.ux.grid.LockingColumnModel({ 
     		columns : [
     			{header:lc[0],dataIndex:'create_done_code',width:80},
-				{header:lc[1],dataIndex:'fee_text',width:110},
+				{header:lc[1],dataIndex:'fee_text',width:110, renderer:App.qtipValue},
 				{header:lc[2],dataIndex:'device_type_text',width:80},
-				{header:lc[3],dataIndex:'device_code',width:130},
+				{header:lc[3],dataIndex:'device_code',width:130, renderer:App.qtipValue},
 				{header:lc[4],dataIndex:'status_text',width:60,renderer:Ext.util.Format.statusShow},
 				{header:lc[5],dataIndex:'is_doc_text',width:80,renderer:Ext.util.Format.statusShow},
 				{header:lc[6],dataIndex:'should_pay',width:60,renderer:Ext.util.Format.formatFee},
 				{header:lc[7],dataIndex:'real_pay',width:60,renderer:Ext.util.Format.formatFee},
+				{header:lc[16],dataIndex:'buy_num',width:75},
 				{header:lc[8],dataIndex:'pay_type_text',width:80},
 				{header:lc[9],dataIndex:'create_time',width:125},
 				{header:lc[10],dataIndex:'optr_name',width:80},

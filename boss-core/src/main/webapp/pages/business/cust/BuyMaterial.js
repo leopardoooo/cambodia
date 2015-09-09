@@ -16,7 +16,7 @@ BuyMaterialForm = Ext.extend( BaseForm , {
  				url :root + '/commons/x/QueryDevice!queryDeviceBuyMode.action',
  				fields : ['buy_mode','buy_mode_name']
  		});
- 		this.buyModeStore.on("load",this.doLoadBuyMode,this);
+// 		this.buyModeStore.on("load",this.doLoadBuyMode,this);
  		
  		this.deviceModelStore = new Ext.data.JsonStore({
 			fields : ['device_model','device_type','model_name','total_num']
@@ -35,8 +35,8 @@ BuyMaterialForm = Ext.extend( BaseForm , {
 					emptyText: '请选择',
 					paramName:'OTHER_DEVICE_TYPE',
 					listeners: {
-						scope: this,
-						'select': this.filterDeviceModel
+						scope: this
+						,'select': this.filterDeviceModel
 					}
 				},{
 					fieldLabel : '设备型号',
@@ -100,18 +100,16 @@ BuyMaterialForm = Ext.extend( BaseForm , {
 		})
 	},
 	remoteData: null,
-	initComponent:function(){
-		BuyMaterialForm.superclass.initComponent.call(this);
+	doInit:function(){
+		BuyMaterialForm.superclass.doInit.call(this);
 		this.buyModeStore.load();
-		var that = this;
-		App.form.initComboData(this.findByType('paramcombo'), function(){
-			Ext.Ajax.request({
-				url :root + '/commons/x/QueryDevice!queryDeviceModel.action',
-				success: function(res, ops){
-					that.remoteData = Ext.decode(res.responseText);
-					that.filterDeviceModel();
-				}
-			});
+		Ext.Ajax.request({
+			scope : this,
+			url :root + '/commons/x/QueryDevice!queryDeviceModel.action',
+			success: function(res, ops){
+				this.remoteData = Ext.decode(res.responseText);
+				this.filterDeviceModel();
+			}
 		});
 	},
 	filterDeviceModel: function(){

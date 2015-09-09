@@ -17,14 +17,14 @@ public class TExchange extends BusiBase{
 	private String exchange_id;
 	
 	
+	public String getStatus_text() {
+		return status_text;
+	}
 	public String getExchange_id() {
 		return exchange_id;
 	}
 	public void setExchange_id(String exchange_id) {
 		this.exchange_id = exchange_id;
-	}
-	public String getStatusText(){
-		return status_text;
 	}
 	public Date getEff_date() {
 		return eff_date;

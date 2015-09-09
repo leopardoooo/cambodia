@@ -1,17 +1,13 @@
 package com.ycsoft.sysmanager.component.config;
 
-import java.util.Date;
 import java.util.List;
-
 import org.springframework.stereotype.Component;
-
 import com.ycsoft.beans.config.TExchange;
 import com.ycsoft.business.dao.config.TExchangeDao;
 import com.ycsoft.commons.abstracts.BaseComponent;
 import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.exception.ComponentException;
 import com.ycsoft.commons.exception.ErrorCode;
-import com.ycsoft.commons.helper.CollectionHelper;
 import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.daos.core.Pager;
 

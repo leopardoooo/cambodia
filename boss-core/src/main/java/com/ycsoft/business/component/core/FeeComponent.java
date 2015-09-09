@@ -1581,12 +1581,12 @@ public class FeeComponent extends BaseBusiComponent {
 	 * @return
 	 */
 	public BusiFeeDto getBusiFee(String busiFeeId) throws Exception{
-		return tBusiFeeStdDao.queryBusiFeeStdByFeeId(queryTemplateId(SystemConstants.TEMPLATE_TYPE_FEE),busiFeeId);
+		return tBusiFeeStdDao.queryIpBusiFeeStdByFeeId(queryTemplateId(SystemConstants.TEMPLATE_TYPE_FEE),busiFeeId);
 	}
 	
 	public List<BusiFeeDto> getBusiFeeAndIpFeeItems() throws Exception {
 		List<BusiFeeDto>  list = getBusiFeeItems();
-		BusiFeeDto ipFee = tBusiFeeStdDao.queryBusiFeeStdByFeeId(queryTemplateId(SystemConstants.TEMPLATE_TYPE_FEE),SystemConstants.USER_IP_FEE_ID);
+		BusiFeeDto ipFee = tBusiFeeStdDao.queryIpBusiFeeStdByFeeId(queryTemplateId(SystemConstants.TEMPLATE_TYPE_FEE),SystemConstants.USER_IP_FEE_ID);
 		if(ipFee != null){
 			list.add(ipFee);
 		}

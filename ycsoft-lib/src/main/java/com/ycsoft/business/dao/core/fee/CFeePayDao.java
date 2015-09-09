@@ -115,8 +115,6 @@ public class CFeePayDao extends BaseEntityDao<CFeePay> {
 				"    AND T1.COUNTY_ID = ?  ",
 				"    AND T1.create_done_code = ? ",
 				"    AND T1.STATUS = ? AND t1.pay_type=t5.pay_type and t5.is_print='T'",
-				"    AND T2.FEE_TYPE IN (?, ?)",
-				"     ",
 				" UNION ALL ",
 				" SELECT T1.FEE_SN, T1.REAL_PAY AMOUNT, T2.PRINTITEM_ID,t3.doc_type",
 				"   FROM C_FEE T1, VEW_ACCTITEM T2,t_invoice_printitem t3,t_template_county t4 ,t_pay_type t5 ",
@@ -124,15 +122,13 @@ public class CFeePayDao extends BaseEntityDao<CFeePay> {
 				"    AND t4.template_type=? AND T1.COUNTY_ID = ?  ",
 				"    AND T1.create_done_code = ?  ",
 				"    AND T1.STATUS = ?  AND t1.pay_type=t5.pay_type and t5.is_print='T'",
-				"    AND T1.ACCTITEM_ID = T2.ACCTITEM_ID  ",
-				"    AND T1.FEE_TYPE IN (?) ");
+				"    AND T1.ACCTITEM_ID = T2.ACCTITEM_ID  ");
 
 		return findToList(sql, countyId, 
 				SystemConstants.TEMPLATE_TYPE_INVOICE,countyId, doneCode,
-				StatusConstants.PAY, SystemConstants.FEE_TYPE_BUSI,
-				SystemConstants.FEE_TYPE_DEVICE,countyId,
+				StatusConstants.PAY,countyId,
 				SystemConstants.TEMPLATE_TYPE_INVOICE,  countyId,
-				doneCode, StatusConstants.PAY, SystemConstants.FEE_TYPE_ACCT);
+				doneCode, StatusConstants.PAY);
 	}
 
 	/**

@@ -129,7 +129,7 @@ public class CDoneCodeDao extends BaseEntityDao<CDoneCode> {
 	public List<DoneCodeDto> queryCfeeByDoneCode(String[] doneCode,String custId)throws Exception{
 		if (doneCode==null || doneCode.length==0)
 			return new ArrayList<DoneCodeDto>();
-		String sql = "select t.create_done_code ,t.reverse_done_code,t.real_pay from c_fee t where  t.cust_id =? " +
+		String sql = "select t.create_done_code done_code ,t.reverse_done_code,t.real_pay,t.fee_id from c_fee t where  t.cust_id =? " +
 				" and ("+getSqlGenerator().setWhereInArray("t.create_done_code",doneCode)+") ";
 		return createQuery(DoneCodeDto.class, sql,custId).list();
 	}
