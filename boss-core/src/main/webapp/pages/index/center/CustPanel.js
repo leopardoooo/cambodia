@@ -314,9 +314,9 @@ PropChangeGrid = Ext.extend(Ext.grid.GridPanel,{
 		}); 
 		var lu = langUtils.main("cust.change.columns");
 		var cm = [
-			{header:lu[0], dataIndex:'column_name_text',width:120},
-			{header:lu[1], dataIndex:'old_value_text',width:120},
-			{header:lu[2], dataIndex:'new_value_text',width:120},
+			{header:lu[0], dataIndex:'column_name_text',width:100},
+			{header:lu[1], dataIndex:'old_value_text',width:230},
+			{header:lu[2], dataIndex:'new_value_text',width:230},
 			{header:lu[3], dataIndex:'change_time',width:130}
 		];
 		var pageTbar = new Ext.PagingToolbar({store: this.propChangeStore ,pageSize : App.pageSize});
@@ -325,7 +325,10 @@ PropChangeGrid = Ext.extend(Ext.grid.GridPanel,{
 			region: 'center',
 			store:this.propChangeStore,
 			columns:cm,
-			bbar:pageTbar
+			bbar:pageTbar,
+			viewConfig : {
+				forceFit : true
+			}
 		})
 	},
 	remoteRefresh:function(){
@@ -1234,14 +1237,14 @@ AcctItemPropChangeGrid = Ext.extend(Ext.grid.GridPanel,{
 		});
 		var lar = langUtils.main("cust.acctTabs.changes.columns");
 		var cm = [
-			{header:lar[0],dataIndex:'busi_name',width:40,renderer : App.qtipValue},
-			{header:lar[1],dataIndex:'fee_type_text',width:60,renderer : App.qtipValue},
-			{header:lar[2],dataIndex:'change_type_text',	width:60,renderer : App.qtipValue},
-			{header:lar[3],dataIndex:'pre_fee',renderer:Ext.util.Format.formatFee,width:50},
-			{header:lar[4],dataIndex:'change_fee',renderer:Ext.util.Format.formatFee,width:60},
-			{header:lar[5],dataIndex:'fee',renderer:Ext.util.Format.formatFee,	width:50},
-			{header:lar[6],dataIndex:'cometype',width:150,renderer : App.qtipValue},
-			{header:lar[7],dataIndex:'done_date',width:120}
+			{header:lar[0],dataIndex:'busi_name',width:70,renderer : App.qtipValue},
+			{header:lar[1],dataIndex:'fee_type_text',width:70,renderer : App.qtipValue},
+			{header:lar[2],dataIndex:'change_type_text',	width:70,renderer : App.qtipValue},
+			{header:lar[3],dataIndex:'pre_fee',renderer:Ext.util.Format.formatFee,width:70},
+			{header:lar[4],dataIndex:'change_fee',renderer:Ext.util.Format.formatFee,width:70},
+			{header:lar[5],dataIndex:'fee',renderer:Ext.util.Format.formatFee,	width:70},
+			{header:lar[6],dataIndex:'cometype',width:100,renderer : App.qtipValue},
+			{header:lar[7],dataIndex:'done_date',width:130}
 		];
 		AcctItemPropChangeGrid.superclass.constructor.call(this,{
 			width : 600,
@@ -1321,7 +1324,6 @@ AcctItemDetailTab = Ext.extend(CommonTab,{
 		this.isReload = true;
 	},
 	refreshAcctItemInfo : function(acctId,acctItemId){
-		that = this;
 		Ext.Ajax.request({
 			scope : this,
 			url: Constant.ROOT_PATH + "/core/x/Acct!queryAcctitemInactive.action",

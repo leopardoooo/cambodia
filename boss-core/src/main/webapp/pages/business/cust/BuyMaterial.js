@@ -25,7 +25,7 @@ BuyMaterialForm = Ext.extend( BaseForm , {
 		BuyMaterialForm.superclass.constructor.call(this, {
 			border: false,
 			bodyStyle:'padding-top:15px',
-			defaults:{layout:'form',border:false},
+			defaults:{layout:'form',border:false, width:200},
 			items: [{
 					fieldLabel : '设备类型',
 					id : 'ctlDeviceType',
@@ -49,6 +49,7 @@ BuyMaterialForm = Ext.extend( BaseForm , {
 					model: 'local',
 					displayField: 'model_name',
 					valueField: 'device_model',
+					listWidth: 250,
 					listeners: {
 						scope: this,
 						'select': this.doBuyModeSelect
@@ -58,7 +59,6 @@ BuyMaterialForm = Ext.extend( BaseForm , {
 					id : 'total_num_id',
 					fieldLabel : '库存数量',
 					name:'total_num',
-					width : 100,
 					readOnly: true,
 					style: Constant.TEXTFIELD_STYLE,
 					allowNegative : false
@@ -86,7 +86,6 @@ BuyMaterialForm = Ext.extend( BaseForm , {
 					allowBlank:false,
 					xtype: 'spinnerfield',
 	            	minValue: 1,
-	            	width: 122,
 	            	value: 1
 				},{
 					xtype : 'panel',

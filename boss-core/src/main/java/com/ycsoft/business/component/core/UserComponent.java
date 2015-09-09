@@ -549,12 +549,14 @@ public class UserComponent extends BaseBusiComponent {
 	public List<CUserPropChange> queryUserPropChange(String userId,String userType) throws Exception{
 		 List<CUserPropChange> propChangelist =  cUserPropChangeDao.queryByUserId(userId,userType, getOptr().getCounty_id());
 		 for(CUserPropChange upc :propChangelist){
+			 upc.setBusi_name( MemoryDict.getTransData( upc.getBusi_name() ) );
+			 upc.setColumn_name_text( MemoryDict.getTransData(upc.getColumn_name_text()) );
 			 if (StringHelper.isNotEmpty(upc.getParam_name())){
 				upc.setOld_value_text(MemoryDict.getDictName( upc.getParam_name(), upc.getOld_value()));
 				upc.setNew_value_text(MemoryDict.getDictName( upc.getParam_name(), upc.getNew_value()));
 			 }else {
-				upc.setOld_value_text(upc.getOld_value());
-				upc.setNew_value_text(upc.getNew_value());
+				upc.setOld_value_text( MemoryDict.getTransData( upc.getOld_value() ));
+				upc.setNew_value_text( MemoryDict.getTransData( upc.getNew_value() ));
 			 }
 		 }
 		 return propChangelist;

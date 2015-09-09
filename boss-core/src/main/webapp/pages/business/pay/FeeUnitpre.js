@@ -5,12 +5,6 @@ var FeeUnitpreForm = Ext.extend(BaseForm,{
 	url:Constant.ROOT_PATH+"/core/x/Acct!saveGeneralContract.action",
 	constructor:function(){
 		
-		this.payTypeStore = new Ext.data.JsonStore({
-			url : Constant.ROOT_PATH+"/commons/x/QueryParam!queryPayType.action",
-			fields : ['pay_type','pay_type_name'],
-			autoLoad: true
-		});
-		
 		FeeUnitpreForm.superclass.constructor.call(this,{
 			id:'feeUnitpreFormId',
 			border:false,
@@ -145,24 +139,14 @@ var FeeUnitpreForm = Ext.extend(BaseForm,{
 				},{
 					id:'pay_type_id',
 					fieldLabel: '缴费方式',
-					xtype: 'combo',
-					store : this.payTypeStore,
-					hiddenValue : 'pay_type',
-					valueField : 'pay_type',
-					displayField : "pay_type_name",					
+					xtype: 'paramcombo',
+					paramName:'UNBUSI_PAY_FEE',
 					allowBlank: false,
 					hiddenName: 'pay.pay_type',
-					triggerAction: 'all',
-					mode: 'local',
+					defaultValue: 'XJ',
 					listeners: {
 						scope: this,
-						select: this.doChangePayType,
-						'expand': function(combo){
-							var store = combo.getStore();
-							store.filterBy(function(record){
-								return record.get('pay_type') == 'XJ';
-							})
-						}
+						select: this.doChangePayType
 					}
 				},{
 					fieldLabel: '票据编号',
@@ -187,9 +171,6 @@ var FeeUnitpreForm = Ext.extend(BaseForm,{
 				}]
 			}]
 		});
-		this.payTypeStore.on("load",function(){
-			Ext.getCmp('pay_type_id').setValue("XJ");		
-		},this);
 		this.loadBaseData();
 	},
 	exchangeRate: null,		//汇率
@@ -270,7 +251,7 @@ var FeeUnitpreForm = Ext.extend(BaseForm,{
 		});
 	},
 	doChangePayType: function(cb, record, index){
-		var b = false;
+		/*var b = false;
 		var receiptId = this.find("name", "pay.receipt_id")[0];
 		var noreceopttype = 'XJ,SHIFT,PRESENT';
 		if (noreceopttype.indexOf(record.get('pay_type'))>-1 ) {
@@ -281,7 +262,7 @@ var FeeUnitpreForm = Ext.extend(BaseForm,{
 		receiptId.allowBlank = b;
 		if (!b) {
 			receiptId.focus();
-		}
+		}*/
 	},
 	getValues:function(){
 		var values = this.getForm().getValues();

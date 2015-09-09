@@ -104,7 +104,7 @@ public class SimpleComponent extends BaseBusiComponent {
 		if(districtList.size() == 0 || (districtList.size()==1 && districtList.get(0).getDistrict_level()==0)){
 			throw new ComponentException(ErrorCode.CustDistrictIsNull,addr.getAddr_name());
 		}
-		String addrName = "No."+addr.getAddr_name()+",St."+paddr.getAddr_name()+",";
+		String addrName = "No."+addr.getAddr_name()+",St."+paddr.getAddr_name();
 		String districtName = "";
 		for(TDistrict t : districtList){
 			if(t.getDistrict_level() != 0){
