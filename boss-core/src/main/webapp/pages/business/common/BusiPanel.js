@@ -29,7 +29,7 @@ BusiPanel = Ext.extend( Ext.Panel , {
 	},
 	createButtonPanel : function(){
 		var buttons = [{
-			columnWidth : .55,
+			columnWidth : .5,
 			labelWidth : 80,
 			labelAlign: 'right',
 			items : [{
@@ -41,11 +41,11 @@ BusiPanel = Ext.extend( Ext.Panel , {
 		 		fieldLabel: '备注信息'
 			}]
 		},{
-			columnWidth : .15,
+			columnWidth : .2,
 			items : [{
 				id:'ywSaveId1',
 				xtype : 'button',
-				text: '&nbsp;&nbsp;业务保存',
+				text: '业务保存',
 				scope: this,
 				width: 80,
 				height : 25,
