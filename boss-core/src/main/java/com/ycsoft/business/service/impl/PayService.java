@@ -466,7 +466,7 @@ public class PayService extends BaseBusiService implements IPayService {
 		//保存支付记录
 		feeComponent.savePayFeeNew(pay,cust_id,done_code);
 		
-		//更新缴费信息状态、支付方式和发票相关信息
+		//更新缴费信息状态、支付方式和发票相关信息(未打印)
 		feeComponent.updateCFeeToPay(upPayDoneCodes, pay);
 		
 		//更新订单费用的费用类型(新订购记录才有需要处理)

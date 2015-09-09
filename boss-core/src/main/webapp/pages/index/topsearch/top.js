@@ -223,8 +223,8 @@ Ext.apply(TopSearch.prototype , {
 					App.removeTip();
 					
 					var rs = Ext.decode(res.responseText);
-					if(!Ext.isEmpty(rs)&&THIS_SYSTEM_VALUE){
-						Alert('请处理未打印发票客户，点击确定后跳转，请为该客户打印发票',function(){
+					if(!Ext.isEmpty(rs)){
+						Alert('请处理未支付或未打印发票客户，点击确定后跳转，请为该客户支付费用和打印发票',function(){
 							App.getData().paySearch  = false;
 							this.searchCust(rs,'cust_no');
 							//App.openPrint();
@@ -283,6 +283,7 @@ SearchCustWindow = Ext.extend( Ext.Window , {
 			bodyStyle : Constant.TAB_STYLE,
 			border : false,
 			fieldLabel : 70,
+			labelWidth:80,
 			defaults : {
 				xtype : 'textfield'
 			},
@@ -312,7 +313,7 @@ SearchCustWindow = Ext.extend( Ext.Window , {
 			maximizable : false,
 			layout : 'fit',
 			width : 300,
-			height : 250,
+			height : 200,
 			closeAction : 'close',
 			items : [this.form],
 			buttons : [{

@@ -166,9 +166,9 @@ DoneCodeGrid = Ext.extend(Ext.ux.Grid,{
 			{header:lc[3],dataIndex:'done_date',	width:125},
 			{header:lc[4],dataIndex:'optr_name',	width:100},
 			{header:lc[5],dataIndex:'dept_name',width:120},
-			{header:lc[6],dataIndex:'cancel_text',	width: 50},
-			{header:lc[7],dataIndex:'ignore_text',	width: 50},
-			{header:lc[8],dataIndex:'real_pay',	width: 50,renderer: Ext.util.Format.formatFee},
+			{header:lc[6],dataIndex:'cancel_text',	width: 70},
+			{header:lc[7],dataIndex:'ignore_text',	width: 70},
+			{header:lc[8],dataIndex:'real_pay',	width: 80,renderer: Ext.util.Format.formatFee},
 			{header:lc[9],dataIndex:'attr_remark',width: 200},
 			{header:lc[10],dataIndex:'remark',	width: 200,renderer:App.qtipValue}
 		];

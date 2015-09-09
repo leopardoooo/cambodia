@@ -286,9 +286,9 @@ SinglePayFeesGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 		var amount = 0
 		if(days != 0){
 			var v = parseInt(days/30*100)/100;
-			busiFeeAmount = v*feeCount*busiFee.min_value;
+			busiFeeAmount = v*feeCount*busiFee.default_value;
 		}else{
-			busiFeeAmount = feeMonths*feeCount*busiFee.min_value;
+			busiFeeAmount = feeMonths*feeCount*busiFee.default_value;
 		}
 		record.set('busiFeeAmount',busiFeeAmount);
 		record.set('busiFeeDate',Date.parseDate(startDate,"Y-m-d").format("Ymd")+"-"+Date.parseDate(dfExpDate, "Y-m-d").format("Ymd"));

@@ -20,6 +20,8 @@ public enum ErrorCode {
 	
 	
 	ExchangeConfigError("系统未正确配置汇率，请联系管理员"),
+	ExchangeConfigExits("该日汇率已存在不能重复添加"),
+	ExchangeConfigINvalid("汇率已作废不能再次修改"),
 	
 	NotCancleHasUnPay("产品含有未支付订单，不能退订"),
 	NotCancelHasMoreBillingCycle("产品存在包多月优惠订单，不能退订"),

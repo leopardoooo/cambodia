@@ -858,14 +858,15 @@ public class OrderService extends BaseBusiService implements IOrderService{
 	}
 	/**
 	 * 激活产品
-	 * 已支付且订单状态是正常的要发加授权指令
+	 * 已支付且订单状态是正常的要发加授权指令，且服务渠道非移动端的(移动端是直接授权)
 	 * @param cProdOrder
 	 * @param prodConfig
 	 * @throws JDBCException
 	 */
 	private void atvProd(CProdOrder cProdOrder,PProd prodConfig,Integer doneCode) throws Exception{
 		if(cProdOrder.getIs_pay().equals(SystemConstants.BOOLEAN_TRUE)
-				&&cProdOrder.getStatus().equals(StatusConstants.ACTIVE)){
+				&&cProdOrder.getStatus().equals(StatusConstants.ACTIVE)
+				&&!SystemConstants.SERVICE_CHANNEL_MOBILE.equals(this.getBusiParam().getService_channel())){
 			
 			if(prodConfig.getProd_type().equals(SystemConstants.PROD_TYPE_BASE)){
 				List<CProdOrder> list=new ArrayList<>();

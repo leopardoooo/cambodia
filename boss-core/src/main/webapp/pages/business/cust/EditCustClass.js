@@ -49,6 +49,7 @@ EditCustLevelForm = Ext.extend( BaseForm , {
 	success:function(){
 		var panel = App.getApp().main.infoPanel;
 		panel.getCustPanel().custInfoPanel.remoteRefresh();
+		panel.getCustPanel().custDetailTab.propChangeGrid.remoteRefresh();
 		panel.getUserPanel().prodGrid.remoteRefresh();
 		App.getApp().refreshPanel(App.getApp().getData().currentResource.busicode);
 	}

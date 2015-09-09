@@ -144,7 +144,7 @@ TariffWindow = Ext.extend(Ext.Window, {
         if (!Ext.isEmpty(record)) {
             tariff = record.get('tariff_id');
         }
-        this.prodPkgGrid = new ProdPkgGrid(this.tprodId,tariff,ispkg);
+//        this.prodPkgGrid = new ProdPkgGrid(this.tprodId,tariff,ispkg);
         this.ruleForm = new RuleForm(this);
         this.tariffInfoPanel = new TariffInfoPanel(this, record);
         this.countyTree = new CountyTree(this, areaId, tariff);
@@ -184,7 +184,7 @@ TariffWindow = Ext.extend(Ext.Window, {
 		            	width:"39%",
 		            	layout : 'fit',
 		            	split : true,
-		            	items : [this.prodPkgGrid]
+		            	items : [/*this.prodPkgGrid*/]
 		            }]
             	}]
             },{
@@ -210,6 +210,8 @@ TariffWindow = Ext.extend(Ext.Window, {
         	Ext.getCmp('pkgGridId').hide();
         	this.width = 500;
         	this.doLayout();
+        }else{
+//        	Ext.getCmp('pkgGridId').add(new ProdPkgGrid(this.tprodId,tariff,ispkg));
         }
     },
     doSave: function () {

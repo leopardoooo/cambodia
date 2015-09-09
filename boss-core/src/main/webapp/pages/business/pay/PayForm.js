@@ -8,12 +8,6 @@ PayForm = Ext.extend( Ext.form.FormPanel , {
 	parent: null,
 	constructor: function(parent){
 		this.parent = parent;
-		this.payTypeStore = new Ext.data.JsonStore({
-			url : Constant.ROOT_PATH+"/commons/x/QueryParam!queryPayType.action",
-			fields : ['pay_type','pay_type_name']
-		});
-		this.payTypeStore.load();
-		this.payTypeStore.on("load",this.loadData,this);
 		PayForm.superclass.constructor.call(this, {
 			border: false,
 //			iconCls: 'icon-pay',
@@ -45,23 +39,14 @@ PayForm = Ext.extend( Ext.form.FormPanel , {
 				emptyText: '默认为客户名称'
 			},{
 				fieldLabel: '缴费方式',
-				xtype: 'combo',
-				store : this.payTypeStore,
-				name: 'pay_type',
-				hiddenValue : 'pay_type',
-				valueField : 'pay_type',
-				displayField : "pay_type_name",					
+				xtype: 'paramcombo',
+				paramName:'CFF_PAY_FEE',
 				allowBlank: false,
 				hiddenName: 'pay.pay_type',
+				defaultValue: 'XJ',
 				listeners: {
 					scope: this,
-					select: this.doChangePayType,
-					'expand': function(combo){
-						var store = combo.getStore();
-						store.filterBy(function(record){
-							return record.get('pay_type') == 'XJ';
-						})
-					}
+					select: this.doChangePayType
 				}
 			},{
 				fieldLabel: '票据编号',
@@ -109,6 +94,10 @@ PayForm = Ext.extend( Ext.form.FormPanel , {
 		var acctdatecmp = this.find("name","pay.acct_date")[0];
 		App.acctDate(acctdatecmp);
 	},
+	initComponent: function(){
+		PayForm.superclass.initComponent.call(this);
+		App.form.initComboData(this.findByType('paramcombo'));
+	},
 	doCalcJianYuan: function(field, newValue, oldValue){
 		var exchange = this.parent.feeData["EXC"];
 		var sumDollar = this.parent.feeData["FEE"]/100.0;
@@ -132,7 +121,7 @@ PayForm = Ext.extend( Ext.form.FormPanel , {
 		}
 	},
 	doChangePayType: function(cb, record, index){
-		var b = false;
+		/*var b = false;
 		var receiptId = this.find("name", "pay.receipt_id")[0];
 		var noreceopttype = 'XJ,SHIFT,PRESENT';
 		if (noreceopttype.indexOf(record.get('pay_type'))>-1 ) {
@@ -143,15 +132,11 @@ PayForm = Ext.extend( Ext.form.FormPanel , {
 		receiptId.allowBlank = b;
 		if (!b) {
 			receiptId.focus();
-		}
+		}*/
 	},
 	getValues:function(){
 		var all = this.getForm().getValues();
 		
 		return all;
-	},
-	loadData:function(store){
-		var payType = this.find("hiddenName","pay.pay_type")[0];
-		payType.setValue("XJ");		
 	}
 });

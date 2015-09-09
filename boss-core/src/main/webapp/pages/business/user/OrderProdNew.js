@@ -394,9 +394,9 @@ ProdOrderForm = Ext.extend( BaseForm, {
 			}
 			if(days != 0){
 				var v = parseInt(days/30*100)/100;
-				this.busiFeeAmount = (v*feeCount*busiFee.min_value);
+				this.busiFeeAmount = (v*feeCount*busiFee.default_value);
 			}else{
-				this.busiFeeAmount = feeMonths*feeCount*busiFee.min_value;
+				this.busiFeeAmount = feeMonths*feeCount*busiFee.default_value;
 			}
 			Ext.get("busiFeeAmount").update(Ext.util.Format.convertToYuan(this.busiFeeAmount));
 			this.busiFeeTime =  Date.parseDate(startDate,"Y-m-d").format("Ymd")+"-"+Date.parseDate(dfExpDate, "Y-m-d").format("Ymd");

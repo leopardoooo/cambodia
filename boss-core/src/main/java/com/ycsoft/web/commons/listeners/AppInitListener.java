@@ -75,7 +75,7 @@ public class AppInitListener implements javax.servlet.ServletContextListener {
 			throw new Exception("初始化错误，DAO未注入");
 		
 		MemoryDict.setupData(sItemvalueDao.findAllViewDict(), sDataTranslationDao.findAll());
-		MemoryPrintData.loadData(cFeeDao.queryUnPrintFee());
+		//MemoryPrintData.loadData(cFeeDao.queryUnPrintFee());
 		TemplateConfig.loadData(tTemplateDao);
 		
 		TBusiConfirmDao tBusiConfirmDao =wc.getBean(TBusiConfirmDao.class);

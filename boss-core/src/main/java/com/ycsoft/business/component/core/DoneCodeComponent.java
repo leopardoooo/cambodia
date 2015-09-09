@@ -121,6 +121,15 @@ public class DoneCodeComponent extends BaseBusiComponent {
 		return cDoneCodeUnpayDao.queryUnPay(cust_id);
 	}
 	/**
+	 * 查询一个营业员的未支付业务
+	 * @param optr_id
+	 * @return
+	 * @throws JDBCException
+	 */
+	public List<CDoneCodeUnpay> queryUnPayByOptr(String optr_id) throws JDBCException{
+		return cDoneCodeUnpayDao.queryUnPayByOptr(optr_id);
+	}
+	/**
 	 * 删除未支付业务信息
 	 * @param unPayList
 	 * @throws JDBCException

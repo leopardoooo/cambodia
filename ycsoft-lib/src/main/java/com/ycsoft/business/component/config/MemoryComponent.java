@@ -61,7 +61,7 @@ public class MemoryComponent extends BaseComponent{
 	}
 	
 	public void setupMemoryPrintData() throws Exception {
-		MemoryPrintData.loadData(cFeeDao.queryUnPrintFee());
+		//MemoryPrintData.loadData(cFeeDao.queryUnPrintFee());
 	}
 
 	/**

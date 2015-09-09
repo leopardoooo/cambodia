@@ -277,7 +277,7 @@ ProdGrid = Ext.extend(Ext.TabPanel,{
 		// 列定义
 		this.baseProdCm = new Ext.ux.grid.LockingColumnModel({ 
     		columns : [
-    		{header:lc[0],dataIndex:'order_sn',width:60},
+    		{header:lc[0],dataIndex:'order_sn',width:70},
 			{header:lc[1],dataIndex:'prod_name',width:120},
 			{header:lc[2],dataIndex:'package_name',width:80},
 			{header:lc[3],dataIndex:'tariff_name',	width:80},
@@ -321,7 +321,7 @@ ProdGrid = Ext.extend(Ext.TabPanel,{
 		var lc = langUtils.main("user.prod.pkg.columns");
 		this.custPkgCm = new Ext.ux.grid.LockingColumnModel({ 
     		columns : [
-    		{header:lc[0],dataIndex:'order_sn',width:40},
+    		{header:lc[0],dataIndex:'order_sn',width:70},
 			{header:lc[1],dataIndex:'prod_name',width:120},
 			{header:lc[2],dataIndex:'tariff_name',	width:80},
 			{header:lc[3],dataIndex:'status_text',	width:60,renderer:Ext.util.Format.statusShow},
@@ -528,9 +528,9 @@ UserTemplate = new Ext.XTemplate(
 			'<td class="input_bold" width=30%>&nbsp;{[values.user_name || values.login_name ||""]}</td>',
 		'</tr>',
 		'<tr height=24>',
-			'<td class="label" width=20%>UDT[10]：</td>',
+			'<td class="label" width=20%>'+UDT[10]+'：</td>',
 			'<td class="input_bold" width=30%>&nbsp;{[values.login_name ||""]}</td>',
-			'<td class="label" width=20%>UDT[11]：</td>',
+			'<td class="label" width=20%>'+UDT[11]+'：</td>',
 			'<td class="input_bold" width=30%>&nbsp;{[values.terminal_type_text ||""]}</td>',
 		'</tr>',
 		'<tr height=24>',
@@ -669,12 +669,12 @@ UserPropChangeGrid = Ext.extend(Ext.grid.GridPanel,{
 		});
 		var lc = langUtils.main("user.userDetail.change");
 		var cm = [
-			{header:lc[0],dataIndex:'busi_name',width:80,renderer:App.qtipValue},
-			{header:lc[1],dataIndex:'column_name_text',width:80},
-			{header:lc[2],dataIndex:'old_value_text',	width:120,renderer:App.qtipValue},
-			{header:lc[3],dataIndex:'new_value_text',	width:120,renderer:App.qtipValue},
-			{header:lc[4],dataIndex:'change_time',	width:130,renderer:App.qtipValue},
-			{header:lc[5],dataIndex:'optr_name'}
+			{header:lc[0],dataIndex:'busi_name',		width:80,	renderer:App.qtipValue},
+			{header:lc[1],dataIndex:'column_name_text',	width:80, 	renderer:App.qtipValue},
+			{header:lc[2],dataIndex:'old_value_text',	width:120,	renderer:App.qtipValue},
+			{header:lc[3],dataIndex:'new_value_text',	width:120,	renderer:App.qtipValue},
+			{header:lc[4],dataIndex:'change_time',		width:130,	renderer:App.qtipValue},
+			{header:lc[5],dataIndex:'optr_name',					renderer:App.qtipValue}
 		];
 		var pageTbar = new Ext.PagingToolbar({store: this.changeStore ,pageSize : App.pageSize});
 		pageTbar.refresh.hide();

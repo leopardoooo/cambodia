@@ -407,8 +407,8 @@ public class DocService extends BaseBusiService implements IDocService {
 						.getAmount());
 				
 				//重载操作员未打印的费用
-				List<String> feeSnList = feeComponent.queryUnPrintFeeByOptr(optrId);
-				MemoryPrintData.reloadOptrFee(optrId, feeSnList);
+				//List<String> feeSnList = feeComponent.queryUnPrintFeeByOptr(optrId);
+				//MemoryPrintData.reloadOptrFee(optrId, feeSnList);
 				
 			}
 		}
