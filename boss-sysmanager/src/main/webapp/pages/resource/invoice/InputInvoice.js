@@ -15,7 +15,7 @@ CheckInInvoiceForm = Ext.extend(Ext.form.FormPanel,{
 			items:[
 				{columnWidth:.4,layout:'form',defaultType:'textfield',items:[
 					{id: 'invoidType_checkIn',fieldLabel:'&nbsp;&nbsp;&nbsp;发票类型',hiddenName:'invoiceDto.invoice_type',xtype:'paramcombo',
-						paramName:'INVOICE_TYPE',defaultValue:3,listeners:{
+						paramName:'INVOICE_TYPE',defaultValue:'2',listeners:{
 							scope:this,
 							select:this.setAmountDisable
 						}},
