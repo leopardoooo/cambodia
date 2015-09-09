@@ -895,7 +895,12 @@ public class DeviceComponent extends BaseBusiComponent {
 	 * @param buyNum 
 	 * @throws Exception
 	 */
-	public void removeTotalNumDevice(String deviceId, Integer buyNum) throws Exception{
+	public void removeTotalNumDevice(Integer doneCode,String busiCode,String deviceId, Integer buyNum,SOptr optr) throws Exception{
+		RDevice device = rDeviceDao.findByKey(deviceId);
+		
+		//总数异动记录
+		rDeviceChangeDao.saveMateralTransChange(doneCode,busiCode,device.getDevice_id(),"total_num",device.getTotal_num()
+				,device.getTotal_num()-buyNum,optr.getOptr_id(),optr.getDept_id(),optr.getCounty_id(), optr.getArea_id());
 		//减去数量
 		rDeviceDao.removeMateralDevice(deviceId, buyNum);
 		RDevice nextRdevice = rDeviceDao.findByKey(deviceId);
@@ -904,7 +909,7 @@ public class DeviceComponent extends BaseBusiComponent {
 		}
 	}
 	
-	
+		
 	/**
 	 * 原器材加上购买数量
 	 * @param deviceId
@@ -951,6 +956,8 @@ public class DeviceComponent extends BaseBusiComponent {
 				List<RDevice> device = deviceMap.get(type);
 				if(device.size()==1){
 					dto.setTotal_num(device.get(0).getTotal_num());
+				}else{
+					throw new ComponentException(ErrorCode.DeviceDateException,type);
 				}
 			}
 			deviceList.add(dto);

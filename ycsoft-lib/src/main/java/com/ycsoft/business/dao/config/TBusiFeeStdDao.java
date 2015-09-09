@@ -180,6 +180,16 @@ public class TBusiFeeStdDao extends BaseEntityDao<TBusiFeeStd> {
 		return createQuery(BusiFeeDto.class, sql, templteId,
 				SystemConstants.FEE_TYPE_CONTRACT,StatusConstants.ACTIVE,busiFeeId).first();
 	}
+	
+	public BusiFeeDto queryIpBusiFeeStdByFeeId(String templteId,String busiFeeId) throws JDBCException {
+		String sql = "SELECT * FROM T_BUSI_FEE TF,T_BUSI_FEE_STD BFS "
+				+ " WHERE BFS.TEMPLATE_ID=?  "
+				+ " AND bfs.fee_id=tf.fee_id AND tf.fee_type=? AND tf.status=? and tf.fee_id=? ";
+
+		return createQuery(BusiFeeDto.class, sql, templteId,
+				SystemConstants.FEE_TYPE_BUSI,StatusConstants.ACTIVE,busiFeeId).first();
+	}
+	
 	/**
 	 * 返回设备费用信息
 	 * @param templteId

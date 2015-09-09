@@ -100,13 +100,16 @@ public class CCustDao extends BaseEntityDao<CCust> {
 			resultPager = createQuery(sql, countyId,value).setStart(p.getStart()).setLimit(p.getLimit()).page();	
 					
 		}else if(key.equals("cust_name")){
+			if(value!=null){
+				value=value.toLowerCase();
+				value=value.replaceAll(" ", "");
+			}
 			sql = append("SELECT t1.* FROM c_cust t1",
 					" where t1.county_id=? ",
-					"  and(  t1.cust_name like '%'||?||'%' ",
-					"  or  lower( replace(t1.cust_name,' '))  like '%'||?||'%' )",
+					"  and lower( replace(t1.cust_name,' '))  like '%'||?||'%' ",
 					dataType.trim().equals("1=1")?"":" and t1."+dataType.trim(),
 					" order by cust_no"		);
-			resultPager = createQuery(sql, countyId,value,value).setStart(p.getStart()).setLimit(p.getLimit()).page();	
+			resultPager = createQuery(sql, countyId,value).setStart(p.getStart()).setLimit(p.getLimit()).page();	
 	
 		}else{
 			sql = append("SELECT t1.* FROM c_cust t1 where t1.county_id=? ",

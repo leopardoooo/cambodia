@@ -535,7 +535,7 @@ public class CustService extends BaseBusiService implements ICustService {
 		//获取本地该器材的数量
 		RDevice device = deviceComponent.queryTotalNumDevice(deviceModel, getOptr().getDept_id());
 		//本地器材数量减去已购数量
-		deviceComponent.removeTotalNumDevice(device.getDevice_id(), buyNum);
+		deviceComponent.removeTotalNumDevice(doneCode,BusiCodeConstants.DEVICE_BUY_PJ,device.getDevice_id(), buyNum,getOptr());
 		
 		//保存设备销售费用
 		if(feeInfoList != null){
@@ -2176,7 +2176,7 @@ public class CustService extends BaseBusiService implements ICustService {
 			//获取本地该器材的数量
 			RDevice device = deviceComponent.queryTotalNumDevice(dto.getDevice_model(), getOptr().getDept_id());
 			//本地器材数量减去已购数量
-			deviceComponent.removeTotalNumDevice(device.getDevice_id(), dto.getBuy_num());
+			deviceComponent.removeTotalNumDevice(doneCode,BusiCodeConstants.DEVICE_BUY_PJ_BACTH,device.getDevice_id(), dto.getBuy_num(),getOptr());
 			
 			//保存费用
 			String feeId = dto.getFee_id();

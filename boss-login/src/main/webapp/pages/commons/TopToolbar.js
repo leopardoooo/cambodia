@@ -414,7 +414,7 @@ DeptTreePanel = Ext.extend( Ext.ux.FilterTreePanel , {
 		var url = '';saveUrl = '';sysId = '';
 		sysId = s;
 		var optr = App.getData().optr;
-		if(Constant.ROOT_PATH == '/boss_core'){
+		if(sysId == 1){
 			url = Constant.ROOT_PATH+ '/system/x/Index!queryDeptTree.action';
 			saveUrl = Constant.ROOT_PATH+ '/system/x/Index!changeDept.action';
 		}else{

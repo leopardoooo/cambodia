@@ -74,6 +74,17 @@ public class RDepotDefineDao extends BaseEntityDao<RDepotDefine> {
 		return createQuery(sql, depotId,countyId,StatusConstants.ACTIVE).list();
 	}	
 	
+	public List<RDepotDefine> queryDepotForTransById(String depotId) throws JDBCException {
+		String sql = "select s.dept_id depot_id,s.dept_name depot_name  from s_dept s  where s.dept_id <>?   and s.status = ? order by s.dept_type ";
+		return createQuery(sql, depotId,StatusConstants.ACTIVE).list();
+	}
+	
+	
+	public List<SDept> queryDeptForTransById(String depotId) throws JDBCException {
+		String sql = "select s.dept_id depot_id,s.dept_name depot_name  from s_dept s  where s.dept_id <>?   and s.status = ? order by s.dept_type ";
+		return createQuery(SDept.class,sql, depotId,StatusConstants.ACTIVE).list();
+	}
+	
 	/**
 	 * 查询发票当前仓库可以流转的上下级仓库
 	 * @param depotId

@@ -1581,12 +1581,12 @@ public class FeeComponent extends BaseBusiComponent {
 	 * @return
 	 */
 	public BusiFeeDto getBusiFee(String busiFeeId) throws Exception{
-		return tBusiFeeStdDao.queryBusiFeeStdByFeeId(queryTemplateId(SystemConstants.TEMPLATE_TYPE_FEE),busiFeeId);
+		return tBusiFeeStdDao.queryIpBusiFeeStdByFeeId(queryTemplateId(SystemConstants.TEMPLATE_TYPE_FEE),busiFeeId);
 	}
 	
 	public List<BusiFeeDto> getBusiFeeAndIpFeeItems() throws Exception {
 		List<BusiFeeDto>  list = getBusiFeeItems();
-		BusiFeeDto ipFee = tBusiFeeStdDao.queryBusiFeeStdByFeeId(queryTemplateId(SystemConstants.TEMPLATE_TYPE_FEE),SystemConstants.USER_IP_FEE_ID);
+		BusiFeeDto ipFee = tBusiFeeStdDao.queryIpBusiFeeStdByFeeId(queryTemplateId(SystemConstants.TEMPLATE_TYPE_FEE),SystemConstants.USER_IP_FEE_ID);
 		if(ipFee != null){
 			list.add(ipFee);
 		}
@@ -1642,6 +1642,18 @@ public class FeeComponent extends BaseBusiComponent {
 	public List<CFee> queryFeeByInvoice(String invoiceCode, String invoiceId,String custId)
 			throws JDBCException {
 		return cFeeDao.queryFeeByInvoice(invoiceCode, invoiceId,custId);
+	}
+	/**
+	 * 
+	 * 根据发票号码和Id查询相应记录
+	 * @param invoiceCode
+	 * @param invoiceId
+	 * @return
+	 * @throws JDBCException
+	 */
+	public List<CFee> queryFeeByInvoice(String invoiceCode, String invoiceId)
+			throws JDBCException {
+		return cFeeDao.queryFeeByInvoice(invoiceCode, invoiceId);
 	}
 	
 	public List<PrintItemDto> queryPrintitemBySn(String docSn, String custType) throws Exception{

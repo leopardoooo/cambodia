@@ -69,5 +69,9 @@ public class ExchangeAction  extends BaseAction {
 	public void setNewEffDate(String newEffDate) {
 		this.newEffDate = newEffDate;
 	}
+	
+	public void setExchangeId(String exchangeId) {
+		this.exchangeId = exchangeId;
+	}
 
 }

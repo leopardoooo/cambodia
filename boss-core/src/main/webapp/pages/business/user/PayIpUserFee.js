@@ -83,8 +83,10 @@ PayIpUserFeeForm = Ext.extend(BaseForm,{
 		PayIpUserFeeForm.superclass.doInit.call(this)
 	},
 	doPayMonth:function(comp){
-		var startDate = Date.parseDate(Ext.util.Format.addMoth(Ext.getCmp('expDateId').getValue(),-1*comp.getValue()), "Y-m-d");
-		startDate.setDate(startDate.getDate()+1);
+		var endDate = Date.parseDate(Ext.getCmp('expDateId').getValue(),"Y-m-d");
+		endDate.setDate(endDate.getDate()+1);
+		var startDate = Date.parseDate(Ext.util.Format.addMoth(endDate.format("Y-m-d"),-1*comp.getValue()), "Y-m-d");
+//		startDate.setDate(startDate.getDate()+1);
 		
 		this.busiFeeTime =  startDate.format("Ymd")+"-"+Date.parseDate(Ext.getCmp('expDateId').getValue(),"Y-m-d").format("Ymd");
 		this.busiFeeAmount = comp.getValue()*this.busiFee.default_value*this.record.get('str6');

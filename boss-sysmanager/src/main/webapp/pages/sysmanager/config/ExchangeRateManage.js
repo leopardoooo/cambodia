@@ -1,10 +1,10 @@
 ExchangeFormWin = Ext.extend(Ext.Window,{
-	width:300,height:140,closeAction:'hide',
+	width:300,height:150,closeAction:'hide',
 	title:langUtils.sys('ExchangeRateManage.commons.addNewOne'),
 	parent:null,form:null,
 	loadRecord:function(rec){
 		this.recordModify = rec.data;
-		var data = {eff_date:Date.parseDate(rec.data.eff_date,'Y-m-d H:i:s'),exchange:rec.data.exchange}
+		rec.data['eff_date'] = Date.parseDate(rec.data.eff_date.substring(0,10),'Y-m-d');
 		this.form.getForm().setValues(rec.data);
 	},
 	resetForm:function(){
@@ -14,17 +14,25 @@ ExchangeFormWin = Ext.extend(Ext.Window,{
 	constructor:function(p){
 		this.parent = p;
 		this.form = new Ext.FormPanel({
+			bodyStyle: 'padding-top:10px',
+			border: false,
+			baseCls: 'x-plain',
+			resizable: false,
 			items:[
-			{xtype:'datefield',name:'eff_date',minValue:Date.parseDate(new Date().format('Y-m-d'),'Y-m-d'),fieldLabel:langUtils.sys('ExchangeRateManage.commons.effective_time'),allowBlank:false,editable:false},
-			{xtype:'numberfield',allowDecimals:false,allowNegative: false,name:'exchange',minValue:1,fieldLabel:langUtils.sys('ExchangeRateManage.commons.exchange_rate'),allowBlank:false}
+			       {xtype:'hidden',name:'exchange_id'},
+			       {xtype:'datefield',name:'eff_date',
+			    	   minValue:Date.parseDate(new Date().format('Y-m-d'),'Y-m-d'),
+			    	   format: 'Y-m-d',
+			    	   fieldLabel:langUtils.sys('ExchangeRateManage.commons.effective_time'),allowBlank:false,editable:false},
+			       {xtype:'numberfield',allowDecimals:false,allowNegative: false,name:'exchange',minValue:1,fieldLabel:langUtils.sys('ExchangeRateManage.commons.exchange_rate'),allowBlank:false}
 			]
 		});
 		ExchangeFormWin.superclass.constructor.call(this,{
 			items:this.form,
 			buttonAlign:'center',
 			buttons:[
-			{text:langUtils.sys('ExchangeRateManage.commons.saveBtn'),scope:this,handler:this.doSave},
-			{text:langUtils.sys('ExchangeRateManage.commons.cancelBtn'),scope:this,handler:this.doCancel}
+				{text:langUtils.sys('ExchangeRateManage.commons.saveBtn'),scope:this,handler:this.doSave},
+				{text:langUtils.sys('ExchangeRateManage.commons.cancelBtn'),scope:this,handler:this.doCancel}
 			]
 		});
 	},
@@ -32,8 +40,11 @@ ExchangeFormWin = Ext.extend(Ext.Window,{
 		var values = this.form.getForm().getValues();
 		this.recordModify = this.recordModify || {};
 		var params = {
-			oldExchange:this.recordModify.exchange, effDate:this.recordModify.eff_date,
-			newExchange:values.exchange,newEffDate:Date.parseDate(values.eff_date,this.form.items.itemAt(0).format).format('Y-m-d')
+				exchangeId: this.recordModify.exchange_id,
+				oldExchange:this.recordModify.exchange, 
+				effDate:this.recordModify.eff_date,
+				newExchange:values.exchange,
+				newEffDate:Date.parseDate(values.eff_date, 'Y-m-d').format('Y-m-d')
 		};
 		Ext.Ajax.request({
 				params: params,scope:this,
@@ -64,7 +75,7 @@ ExchangeRateManageGrid = Ext.extend(Ext.grid.GridPanel,{
 		this.exchangeStore = new Ext.data.JsonStore({
 			autoLoad : true,
 			url:root+'/config/Exchange!query.action',
-			fields : ['eff_date', 'status','exchange','optr_id','optr_name', 'create_time'],
+			fields : ['exchange_id', 'eff_date', 'status', 'status_text','exchange','optr_id','optr_name', 'create_time'],
 			totalProperty:'totalProperty',
 			root:'records',
 			listeners:{
@@ -78,17 +89,19 @@ ExchangeRateManageGrid = Ext.extend(Ext.grid.GridPanel,{
 			}
 		});
 		var cm =[
+		     new Ext.grid.RowNumberer(),
+		     {header:langUtils.sys('ExchangeRateManage.commons.exchange_id'),width:80,dataIndex:'exchange_id'},
 			{header:langUtils.sys('ExchangeRateManage.commons.effective_time'),width:160,dataIndex:'eff_date',renderer:function(v){
 				if(null == v ) return '';
 				return Date.parseDate(v,'Y-m-d H:i:s').format('Y-m-d');
 			}},
-			{header:langUtils.sys('ExchangeRateManage.commons.status'),width:160,dataIndex:'status'},
+			{header:langUtils.sys('ExchangeRateManage.commons.status'),width:160,dataIndex:'status_text', renderer:Ext.util.Format.statusShow},
 			{header:langUtils.sys('ExchangeRateManage.commons.exchange_rate'),width:160,dataIndex:'exchange'},
 			{header:langUtils.sys('ExchangeRateManage.commons.optr'),width:160,dataIndex:'optr_name'},
 			{header:langUtils.sys('ExchangeRateManage.commons.create_time'),width:160,dataIndex:'create_time'}
 		];
 		
-		this.effDateCmp = new Ext.form.DateField({});
+		this.effDateCmp = new Ext.form.DateField({format:'Y-m-d'});
 		this.exchangeCmp = new Ext.form.NumberField({
 			allowDecimals:false,allowNegative: false
 		});
@@ -110,20 +123,20 @@ ExchangeRateManageGrid = Ext.extend(Ext.grid.GridPanel,{
 			region:'center',
 			store:this.exchangeStore,
 			columns:cm,
-			sm : new Ext.grid.CheckboxSelectionModel({}),
+			sm : new Ext.grid.RowSelectionModel({singleSelect:true}),
 			viewConfig : {
 				forceFit : true
 			},
 			bbar:new Ext.PagingToolbar({store:this.exchangeStore,pageSize:20})
 			,
-			tbar : [' ', langUtils.sys('ExchangeRateManage.commons.effective_time')+' :',this.effDateCmp,
+			tbar : [' ','-', langUtils.sys('ExchangeRateManage.commons.effective_time')+' :',this.effDateCmp,
 					'-',langUtils.sys('ExchangeRateManage.commons.exchange_rate')+' :',this.exchangeCmp,'-' ,
 					langUtils.sys('ExchangeRateManage.commons.status')+' :',this.statusCmp,'-' ,
 					{text:'&nbsp;&nbsp;' +
-							langUtils.sys('ExchangeRateManage.commons.query') ,scope:this,handler:this.doQuery},'->',
-					{text:langUtils.sys('ExchangeRateManage.commons.addNewOne') ,scope:this,handler:this.doAdd},'-',
-					{text:langUtils.sys('ExchangeRateManage.commons.update') ,scope:this,handler:this.doUpdate},'-',
-					{text:langUtils.sys('ExchangeRateManage.commons.invalid') ,scope:this,handler:this.doInvalid},'-'
+							langUtils.sys('ExchangeRateManage.commons.query'), iconCls:'icon-query' ,scope:this,handler:this.doQuery},'-','->','-',
+					{text:langUtils.sys('ExchangeRateManage.commons.addNewOne'), iconCls:'icon-add' ,scope:this,handler:this.doAdd},'-',
+					{text:langUtils.sys('ExchangeRateManage.commons.update'), iconCls:'icon-modify' ,scope:this,handler:this.doUpdate},'-',
+					{text:langUtils.sys('ExchangeRateManage.commons.invalid'), iconCls:'icon-cancel' ,scope:this,handler:this.doInvalid},'-'
 					]
 					
 		});
@@ -156,7 +169,7 @@ ExchangeRateManageGrid = Ext.extend(Ext.grid.GridPanel,{
 			return false;
 		}
 		this.win.loadRecord(recs[0]);
-		this.win.setTitle(langUtils.sys('ExchangeRateManage.commons.update'));
+		this.win.setTitle(langUtils.sys('ExchangeRateManage.commons.update')+"("+ langUtils.sys('ExchangeRateManage.commons.exchange_id')+":"+ recs[0].get('exchange_id') +")");
 		this.win.show();
 	},
 	doInvalid:function(){
@@ -166,7 +179,11 @@ ExchangeRateManageGrid = Ext.extend(Ext.grid.GridPanel,{
 			return false;
 		}
 		var data = recs[0].data;
-		var params = {effDate:Date.parseDate(data.eff_date,'Y-m-d H:i:s').format('Y-m-d'),oldExchange:data.exchange};
+		var params = {
+				exchangeId: data['exchange_id'], 
+				effDate: Date.parseDate(data.eff_date,'Y-m-d H:i:s').format('Y-m-d'),
+				oldExchange: data.exchange
+		};
 		Confirm(langUtils.sys('ExchangeRateManage.msg.areYouSure') , this , function(){
 			Ext.Ajax.request({
 				params: params,scope:this,

@@ -123,7 +123,7 @@ public class DoneCodeService extends BaseBusiService implements IDoneCodeService
 		}  else {
 			List<BusiFeeDto> list = feeComponent.getBusiFeeAndIpFeeItems();
 			for (BusiFeeDto busiFee:list){
-				if (busiFee.getBusi_code().equals(busiCode) || busiFee.getFee_id().equals(SystemConstants.USER_IP_FEE_ID)){
+				if (busiFee.getFee_id().equals(SystemConstants.USER_IP_FEE_ID) || busiFee.getBusi_code().equals(busiCode)){
 					for (CFee fee:sumFeeList){
 						if (fee.getFee_id().equals(busiFee.getFee_id())){
 							busiFee.setSum_fee(fee.getReal_pay());

@@ -1382,12 +1382,12 @@ public class DeviceComponent extends BaseDeviceComponent {
 	 */
 	public List<RDepotDefine> queryTransferDepot(SOptr optr) throws Exception {
 		SDept dept = sDeptDao.findByKey(optr.getDept_id());
-		List<RDepotDefine> list = new ArrayList<RDepotDefine>();
-		if(dept.getDept_type().equals(SystemConstants.DEPT_TYPE_YYT)){
-			list = rDepotDefineDao.queryYytDepotById(optr.getDept_id(),optr.getCounty_id());
-		}else if(dept.getDept_type().equals(SystemConstants.DEPT_TYPE_CK) || dept.getDept_type().equals(SystemConstants.DEPT_TYPE_FGS)){
-			list = rDepotDefineDao.queryCkDepotById(optr.getDept_id(),optr.getCounty_id());
-		}
+		List<RDepotDefine> list = rDepotDefineDao.queryDepotForTransById(dept.getDept_id());
+//		if(dept.getDept_type().equals(SystemConstants.DEPT_TYPE_YYT)){
+//			list = rDepotDefineDao.queryYytDepotById(optr.getDept_id(),optr.getCounty_id());
+//		}else if(dept.getDept_type().equals(SystemConstants.DEPT_TYPE_CK) || dept.getDept_type().equals(SystemConstants.DEPT_TYPE_FGS)){
+//			list = rDepotDefineDao.queryCkDepotById(optr.getDept_id(),optr.getCounty_id());
+//		}
 		return list;
 	}
 
