@@ -1,6 +1,7 @@
 package com.ycsoft.business.dao.config;
 
 import java.util.Date;
+import java.util.List;
 
 import org.springframework.stereotype.Component;
 
@@ -46,6 +47,10 @@ public class TExchangeDao extends BaseEntityDao<TExchange> {
 		executeUpdate(sql, StatusConstants.INVALID,exchangeId);
 	}
 
+	public List<TExchange> queryByEffDate(Date effDate) throws JDBCException{
+		String sql="select * from t_exchange where eff_date=? and status=? ";
+		return this.createQuery(sql, effDate,StatusConstants.ACTIVE).list();
+	}
 	
 	public Pager<TExchange> query(TExchange query, Integer start,Integer limit) throws JDBCException {
 		if(query == null){

@@ -10,6 +10,7 @@ import com.ycsoft.business.dao.config.TExchangeDao;
 import com.ycsoft.commons.abstracts.BaseComponent;
 import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.exception.ComponentException;
+import com.ycsoft.commons.exception.ErrorCode;
 import com.ycsoft.commons.helper.CollectionHelper;
 import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.daos.core.Pager;
@@ -27,13 +28,22 @@ public class ExchangeComponent extends BaseComponent {
 	}
 
 	public void saveOrUpdate(TExchange exchange, String optrId) throws Exception{
-		exchange.setStatus(StatusConstants.ACTIVE);
+		
 		if(StringHelper.isEmpty(exchange.getExchange_id())){
+			List<TExchange>  list=tExchangeDao.queryByEffDate(exchange.getEff_date());
+			if(list!=null&&list.size()>0){
+				throw new ComponentException(ErrorCode.ExchangeConfigExits);
+			}
+			exchange.setStatus(StatusConstants.ACTIVE);
 			exchange.setExchange_id(tExchangeDao.findSequence().toString());
 			exchange.setOptr_id(optrId);
 			exchange.setCreate_time(new java.util.Date());
 			tExchangeDao.save(exchange);
 		}else{
+			TExchange tx=tExchangeDao.findByKey(exchange.getExchange_id());
+			if(!tx.getStatus().equals(StatusConstants.ACTIVE)){
+				throw new ComponentException(ErrorCode.ExchangeConfigINvalid);
+			}
 			tExchangeDao.update(exchange);
 		}
 	}
