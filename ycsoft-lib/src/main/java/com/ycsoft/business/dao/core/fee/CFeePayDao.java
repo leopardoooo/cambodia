@@ -210,7 +210,6 @@ public class CFeePayDao extends BaseEntityDao<CFeePay> {
 				"    AND T1.cust_id=? ",
 				"    AND T1.STATUS = ? AND t1.pay_type=t5.pay_type and t5.is_print='T'",
 				"    AND T1.is_doc= ? ",
-				"    AND T2.FEE_TYPE IN (?,?)",
 				"    AND T1.optr_id= ? ",
 				" UNION ALL ",
 				" SELECT T1.FEE_SN, T1.REAL_PAY AMOUNT, T2.PRINTITEM_ID,t3.doc_type,t1.acct_id,'' prom_fee_sn",
@@ -226,8 +225,7 @@ public class CFeePayDao extends BaseEntityDao<CFeePay> {
 		
 		return findToList(sql, 
 				countyId, SystemConstants.TEMPLATE_TYPE_INVOICE, countyId,custId,
-				StatusConstants.PAY, SystemConstants.BOOLEAN_FALSE,SystemConstants.FEE_TYPE_BUSI,
-				SystemConstants.FEE_TYPE_DEVICE,optrId,
+				StatusConstants.PAY, SystemConstants.BOOLEAN_FALSE,optrId,
 				countyId,SystemConstants.TEMPLATE_TYPE_INVOICE, countyId,custId,
 				 StatusConstants.PAY, SystemConstants.BOOLEAN_FALSE, SystemConstants.FEE_TYPE_ACCT,optrId
 				);
