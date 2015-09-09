@@ -104,7 +104,7 @@ public class CustComponent extends BaseBusiComponent {
 	private TProvinceDao tProvinceDao;
 	
 	/**
-	 * 查询变更产权的设备销售方
+	 * 查询变更产权的设备销售方式
 	 * @return
 	 * @throws Exception
 	 */
@@ -1256,13 +1256,14 @@ public class CustComponent extends BaseBusiComponent {
 	}
 
 	private void setPropText(CCustPropChange change) {
+		change.setColumn_name_text( MemoryDict.getTransData(change.getColumn_name_text()) );
 		//属性值有对应的系统参数
 		if (StringHelper.isNotEmpty(change.getParam_name())){
 			change.setOld_value_text(MemoryDict.getDictName(change.getParam_name(), change.getOld_value()));
 			change.setNew_value_text(MemoryDict.getDictName(change.getParam_name(), change.getNew_value()));
 		} else {
-			change.setOld_value_text( change.getOld_value());
-			change.setNew_value_text(change.getNew_value());
+			change.setOld_value_text( MemoryDict.getTransData( change.getOld_value() ));
+			change.setNew_value_text( MemoryDict.getTransData( change.getNew_value() ));
 		}
 	}
 	
