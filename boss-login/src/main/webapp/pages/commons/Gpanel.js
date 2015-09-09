@@ -27,7 +27,7 @@ Ext.ux.Gpanel = Ext.extend(Ext.Panel,{
 					var btn = {};
 					attrs["handler"]=goUrl;//按钮点击事件
 					Ext.apply(btn,attrs);
-					var text = lang = langUtils.res(attr["res_id"]);
+					var text = lang = langUtils.res(attr["res_id"]) || attr["show_name"];
 					var tip = null;
 					if(Ext.isArray(lang)){
 						text = lang[0];
