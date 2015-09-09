@@ -345,7 +345,7 @@ Ext.apply( App, {
 		
 		var width = 70,leftWidth = 0;
 		var pLeft = Ext.isIE ? 'padding-left:10px':'';
-		var toolstr = "<div style='width:"+width+"px;float:left;"+pLeft+"' >" +
+		var toolstr = "<div style='width:"+width+"px;float:left;padding-left:50px' >" +
 				"<div class='top_button print_big' onClick='App.openPrint()'></div>" +
 				"<div style='font:11px'>" +
 				"发票打印</div></div>";
