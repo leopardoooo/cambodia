@@ -11,11 +11,13 @@ import com.google.gson.JsonObject;
 import com.ycsoft.beans.core.job.BusiCmdParam;
 import com.ycsoft.beans.core.job.JBandCommand;
 import com.ycsoft.beans.core.job.JVodCommand;
+import com.ycsoft.beans.core.prod.CProdOrder;
 import com.ycsoft.beans.core.user.CUser;
 import com.ycsoft.boss.remoting.ott.Result;
 import com.ycsoft.business.dao.core.job.JBandCommandDao;
 import com.ycsoft.business.dao.core.job.JCaCommandDao;
 import com.ycsoft.business.dao.core.job.JVodCommandDao;
+import com.ycsoft.business.dao.core.prod.CProdOrderDao;
 import com.ycsoft.business.dao.core.user.CUserDao;
 import com.ycsoft.commons.abstracts.BaseComponent;
 import com.ycsoft.commons.constants.BusiCmdConstants;
@@ -32,6 +34,9 @@ public class AuthComponent extends BaseComponent {
 	private  CUserDao cUserDao;
 	@Autowired
 	private JCaCommandDao jCaCommandDao;
+	@Autowired
+	private CProdOrderDao cProdOrderDao;
+	
 	private Long gTransnum() throws Exception{
 		return Long.parseLong(jCaCommandDao.findSequence().toString());
 	}
@@ -53,9 +58,11 @@ public class AuthComponent extends BaseComponent {
 	 * @param userId
 	 * @throws Exception 
 	 */
-	public void changeBandWidth(String userId,List<String> prodSn) throws Exception{
+	public void changeBandWidth(CProdOrder order) throws Exception{
 		//修改订单check_time
-		
+		cProdOrderDao.updateCheckTime(order.getOrder_sn());
+		//插入指令
+		String userId=order.getUser_id();
 		List<Entry<String, Date>> list=this.getUserResMappingListOrderByExpDate(userId);
 		
 		if(list==null||list.size()==0)

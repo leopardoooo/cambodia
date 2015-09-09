@@ -4,11 +4,13 @@
 	Action: 使用Ext库所需要导入的文件。使用时只需要包含该文件即可。
  -->
  
+<%@page import="com.ycsoft.commons.constants.Environment"%>
 <%@ page contentType="text/html; charset=UTF-8" %>
 <jsp:directive.page import="com.ycsoft.commons.helper.DateHelper"/>
 <% 
 	String r = request.getContextPath(),
-	 	   boss_res = com.ycsoft.commons.constants.Environment.ROOT_PATH_BOSS_LOGIN;
+	 	   boss_res = Environment.ROOT_PATH_BOSS_LOGIN;
+String _lang = session.getAttribute(Environment.USER_IN_SESSION_LANG).toString();
 %>
 <script type="text/javascript">
 	function nowDate(){
@@ -27,6 +29,12 @@
 <script type="text/javascript" src="<%=boss_res %>/components/ext3/ext-lang-zh_CN.js" charset="UTF-8"></script>
 <script type="text/javascript" src="<%=boss_res %>/components/jquery/jquery-1.11.3.min.js"></script>
 <script type="text/javascript" src="<%=boss_res %>/components/jquery/ext-async-adapter.js"></script>
+
+<script type="text/javascript" src="<%=boss_res%>/i18n/<%=_lang %>/ext-lang.js"></script>
+<script type="text/javascript" src="<%=boss_res%>/i18n/<%=_lang %>/resouces-lang.js"></script>
+<script type="text/javascript" src="<%=boss_res%>/i18n/<%=_lang %>/boss-core-lang.js"></script>
+<script type="text/javascript" src="<%=boss_res%>/i18n/langUtils.js"></script>
+
 <script type="text/javascript">
 	var root = '<%=r %>';
 </script>

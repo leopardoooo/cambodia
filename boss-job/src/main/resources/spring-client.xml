@@ -35,5 +35,15 @@
 			<value>http://127.0.0.1/services/CardCharge?wsdl</value>
 		</property>
 	</bean>-->
+	
+	<bean id="ottClient" class="com.ycsoft.boss.remoting.ott.OttClient">
+		<property name="builder">
+			<bean class="com.ycsoft.boss.remoting.ott.URLBuilder">
+				<property name="ip" value="${ott.ip}" />
+				<property name="port" value="${ott.port}" />
+			</bean>	
+		</property>
+	</bean>
+	
 
 </beans>

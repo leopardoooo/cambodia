@@ -324,16 +324,7 @@ public class UserComponent extends BaseBusiComponent {
 	 */
 	public List<CUser> queryCanSelectByCustId(String custId)throws JDBCException {
 		List<CUser> users=cUserDao.queryCanSelectUserByCustId(custId);
-		
-		for( CUser user :users){
-			if(SystemConstants.USER_TYPE_BAND.equals(user.getUser_type()) 
-					|| SystemConstants.USER_TYPE_OTT_MOBILE.equals(user.getUser_type())){
-				user.setUser_name(user.getLogin_name());
-			} else if(SystemConstants.USER_TYPE_OTT.equals(user.getUser_type()) 
-					|| SystemConstants.USER_TYPE_DTT.equals(user.getUser_type())){
-				user.setUser_name(StringHelper.isEmpty(user.getStb_id())?"unknow":user.getStb_id());
-			}
-		}
+		fillUserName(users);
 		return users;
 	}
 	
@@ -616,17 +607,12 @@ public class UserComponent extends BaseBusiComponent {
 	 * 宽带用户为宽带帐号
 	 * @param records
 	 */
-	private void fillUserName(List<CUser> records) {
+	public void fillUserName(List<CUser> records) {
 		for( CUser user :records){
-			if(SystemConstants.USER_TYPE_BAND.equals(user.getUser_type()) 
-					|| SystemConstants.USER_TYPE_OTT_MOBILE.equals(user.getUser_type())){
-				user.setUser_name(user.getLogin_name());
-			} else if(SystemConstants.USER_TYPE_OTT.equals(user.getUser_type()) 
-					|| SystemConstants.USER_TYPE_DTT.equals(user.getUser_type())){
-				user.setUser_name(MemoryDict.getDictName(DictKey.TERMINAL_TYPE,user.getTerminal_type()));
-			}
+			user.setUser_name(getFillUserName(user));
 		}
 	}
+
 
 	/**
 	 * 根据设备号查询用户

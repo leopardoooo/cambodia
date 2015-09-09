@@ -268,5 +268,36 @@ public class CProdOrderDao extends BaseEntityDao<CProdOrder> {
 		String sql = "select * from c_prod_order where user_id=?";
 		return this.createQuery(sql, user_id).list();
 	}
-
+	/**
+	 * 更新订单的授权检查时间
+	 * @param orderSn
+	 * @throws Exception
+	 */
+	public void updateCheckTime(String orderSn) throws Exception{
+		String sql="update c_prod_order set check_time=sysdate where order_sn=? and check_time is null ";
+		this.executeUpdate(sql, orderSn);
+	}
+	
+	/**
+	 * 查询需要宽带修正带宽的用户
+	 * @return
+	 * @throws JDBCException
+	 */
+	public List<CProdOrder> queryUserNeedChanageBandWidth() throws JDBCException{
+		String sql=" select t.* "
+		+" from busi.c_prod_order t,busi.p_prod p "
+		+"  where  t.prod_id=p.prod_id and p.serv_id=? "
+		+"  and t.status in (?,?) "
+		+" AND t.EXP_DATE>=TRUNC(SYSDATE) AND t.check_time is null " 
+		+" and t.eff_date <=trunc(sysdate)+1 and t.is_pay='T' ";
+		return this.createQuery(CProdOrder.class,sql, SystemConstants.PROD_SERV_ID_BAND,StatusConstants.ACTIVE,StatusConstants.INSTALL).list();
+	}
+	/**
+	 * 更新失效的订单状态未到期停
+	 * @throws JDBCException 
+	 */
+	public void updateExpOrderStatusToForStop() throws JDBCException{
+		String sql="update   c_prod_order t set t.status=? ,t.status_date=sysdate where t.status=? and t.exp_date<trunc(sysdate)";
+		this.executeUpdate(sql, StatusConstants.FORSTOP,StatusConstants.ACTIVE);
+	}
 }

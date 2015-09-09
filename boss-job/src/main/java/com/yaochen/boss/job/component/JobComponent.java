@@ -30,6 +30,7 @@ import com.ycsoft.beans.core.job.JProdNextTariffHis;
 import com.ycsoft.beans.core.job.JProdPreopen;
 import com.ycsoft.beans.core.job.JUserStop;
 import com.ycsoft.beans.core.prod.CProd;
+import com.ycsoft.beans.core.prod.CProdOrder;
 import com.ycsoft.beans.core.user.CUser;
 import com.ycsoft.beans.device.RCardModel;
 import com.ycsoft.beans.prod.PProd;
@@ -43,6 +44,7 @@ import com.ycsoft.business.dao.core.job.JExecResultDao;
 import com.ycsoft.business.dao.core.job.JProdNextTariffHisDao;
 import com.ycsoft.business.dao.core.prod.CProdDao;
 import com.ycsoft.business.dao.core.prod.CProdOrderDao;
+import com.ycsoft.business.dao.core.prod.CProdStatusChangeDao;
 import com.ycsoft.business.dao.task.WWorkDao;
 import com.ycsoft.business.dto.config.TaskQueryWorkDto;
 import com.ycsoft.business.dto.core.prod.CProdDto;
@@ -68,21 +70,25 @@ public class JobComponent {
 	private WWorkDao wWorkDao;
 	@Autowired
 	private CProdOrderDao cProdOrderDao;
+	@Autowired
+	private CProdStatusChangeDao cProdStatusChangeDao;
+	/**
+	 * 变更失效订单的状态
+	 * @throws Exception 
+	 */
+	public void changeHasExpOrderStatusToForStop() throws Exception{
+		Integer doneCode=-7;
+		cProdStatusChangeDao.saveOrderExpStatus(doneCode);
+		cProdOrderDao.updateExpOrderStatusToForStop();
+	}
+	
 	/**
 	 * 查询需要修正带宽的宽带订单
 	 * @return
 	 * @throws Exception 
 	 */
-	public List<String> queryUserNeedChangeBandWidth() throws Exception{
-		/**
-		 select distinct  t.user_id
-		from busi.c_prod_order t,busi.p_prod p
-		 where  t.prod_id=p.prod_id and p.serv_id='BAND' 
-		 and t.status in ('ACTIVE','INSTALL')
-		AND t.EXP_DATE>=TRUNC(SYSDATE) AND t.check_time is null 
-		and t.eff_date <=trunc(sysdate)+1 and t.is_pay='T'
-		**/
-		return jobDao.queryUserNeedChanageBandWidth();
+	public List<CProdOrder> queryUserNeedChangeBandWidth() throws Exception{
+		return cProdOrderDao.queryUserNeedChanageBandWidth();
 	}
 	
 	/**

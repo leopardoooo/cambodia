@@ -1361,19 +1361,7 @@ public class OrderComponent extends BaseBusiComponent {
 	}
 
 	private String getUserDesc(CUser user) {
-		String desc = user.getUser_type();
-		if (SystemConstants.USER_TYPE_BAND.equals(user.getUser_type())
-				|| SystemConstants.USER_TYPE_OTT_MOBILE.equals(user.getUser_type())) {
-			desc = desc + "-" + user.getLogin_name();
-		} else {
-			desc = desc + "-" + MemoryDict.getDictName(DictKey.TERMINAL_TYPE, user.getTerminal_type());
-			if (StringHelper.isNotEmpty(user.getStb_id())) {
-				desc = desc + "-" + user.getStb_id();
-			}
-		}
-
-		return desc;
-
+		return getFillUserName(user);
 	}
 	
 	private CProdOrder getUserLastOrder(String userId,PProd prod,List<CProdOrderDto> orderList){
