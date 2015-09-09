@@ -144,7 +144,8 @@ BusiFeeGrid = Ext.extend(Ext.ux.Grid, {
 							'status', 'invoice_code', 'invoice_id','invoice_mode', 'optr_id','optr_name',
 							{name : 'real_pay',type : 'int'},'fee_sn','create_time','acct_date','deposit',
 							'data_right','finance_status','invoice_book_id','is_busi_fee',
-							'busi_optr_id','busi_optr_name','invoice_fee',"doc_type","doc_type_text","invoice_mode_text",'buy_num']
+							'busi_optr_id','busi_optr_name','invoice_fee',"doc_type","doc_type_text",
+							"invoice_mode_text",'buy_num','device_model','device_model_name']
 				});
 		var lc = langUtils.main("pay.busifee.columns");
 		var cm = new Ext.ux.grid.LockingColumnModel({ 
@@ -152,6 +153,7 @@ BusiFeeGrid = Ext.extend(Ext.ux.Grid, {
     			{header:lc[0],dataIndex:'create_done_code',width:80},
 				{header:lc[1],dataIndex:'fee_text',width:110, renderer:App.qtipValue},
 				{header:lc[2],dataIndex:'device_type_text',width:80},
+				{header:lc[17],dataIndex:'device_model_name',width:120, renderer:App.qtipValue},
 				{header:lc[3],dataIndex:'device_code',width:130, renderer:App.qtipValue},
 				{header:lc[4],dataIndex:'status_text',width:60,renderer:Ext.util.Format.statusShow},
 				{header:lc[5],dataIndex:'is_doc_text',width:80,renderer:Ext.util.Format.statusShow},
@@ -270,14 +272,14 @@ CfeePayWindow = Ext.extend(Ext.Window, {
 			url : Constant.ROOT_PATH+ "/commons/x/QueryCust!queryFeePayDetail.action",
 			fields: ["real_pay","fee_text"]
 		})
+		var lc = langUtils.main("pay.feePayDetail.columns");
 		var columns = [
-       	    {header: "费用项目", width: 200,sortable:true, dataIndex: 'fee_text'},
-       	    {header: "金额", width: 70, sortable:true, dataIndex: 'real_pay',renderer:Ext.util.Format.formatFee}
-       	    ];
-		// Window Construct instance
+		               {header: lc[0], width: 200,sortable:true, dataIndex: 'fee_text'},
+		               {header: lc[1], width: 70, sortable:true, dataIndex: 'real_pay',renderer:Ext.util.Format.formatFee}
+           ];
 		return CfeePayWindow.superclass.constructor.call(this, {
 			layout:"fit",
-			title: "费用明细",
+			title: langUtils.main("pay.feePayDetail._title"),
 			width: 450,
 			height: 200,
 			resizable: false,
@@ -290,6 +292,7 @@ CfeePayWindow = Ext.extend(Ext.Window, {
 				border: false,
 				store: this.feeStore,
 				columns: columns,
+				viewConfig:{forceFit:true},
 		        stateful: true
 			}]
 		});

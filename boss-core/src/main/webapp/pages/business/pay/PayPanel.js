@@ -1,83 +1,3 @@
-BusiTemplate = new Ext.XTemplate(
-	'<table width="100%" border="0" cellpadding="0" cellspacing="0">',
-		'<tr height=24>',
-			'<td class="label" width=13%>数量：</td>',
-			'<td class="input_bold" width=23%>&nbsp;{count}</td>',
-			'<td class="label" width=13%>实付：</td>',
-			'<td class="input_bold" width=23%>&nbsp;{real_pay}</td>',			
-		'</tr>',
-		'<tr height=24>',
-			'<td class="label" width=13%>优惠类型：</td>',
-			'<td class="input_bold" width=23%>&nbsp;{disct_type}</td>',
-			'<td class="label" width=13%>优惠信息：</td>',
-			'<td class="input_bold" width=23%>&nbsp;{disct_info}</td>',
-		'</tr>',
-		'<tr height=24>',
-			'<td class="label" width=13%>部门：</td>',
-			'<td class="input_bold" width=23%>&nbsp;{dept_id}</td>',
-			'<td class="label" width=13%>操作员：</td>',
-			'<td class="input_bold" width=23%>&nbsp;{optr_id}</td>',
-			'<td class="label" width=13%>创建时间：</td>',
-			'<td class="input_bold" width=23%>&nbsp;{create_time}</td>',
-		'</tr>',
-	'</table>'
-);
-DeviceTemplate = new Ext.XTemplate(
-	'<table width="100%" border="0" cellpadding="0" cellspacing="0">',
-		'<tr height=24>',
-			'<td class="label" width=13%>设备类型：</td>',
-			'<td class="input_bold" width=23%>&nbsp;{device_type}</td>',
-			'<td class="label" width=13%>设备型号：</td>',
-			'<td class="input_bold" width=23%>&nbsp;{device_model}</td>',
-			'<td class="label" width=13%>应付：</td>',
-			'<td class="input_bold" width=23%>&nbsp;{should_pay}</td>',
-		'</tr>',
-		'<tr height=24>',
-			'<td class="label" width=13%>部门：</td>',
-			'<td class="input_bold" width=23%>&nbsp;{dept_id}</td>',
-			'<td class="label" width=13%>操作员：</td>',
-			'<td class="input_bold" width=23%>&nbsp;{optr_id}</td>',
-			'<td class="label" width=13%>创建时间：</td>',
-			'<td class="input_bold" width=23%>&nbsp;{create_time}</td>',
-		'</tr>',
-	'</table>'
-);
-AcctTemplate = new Ext.XTemplate(
-	'<table width="100%" border="0" cellpadding="0" cellspacing="0">',
-		'<tr height=24>',
-			'<td class="label" width=13%>用户类型：</td>',
-			'<td class="input_bold" width=23%>&nbsp;{user_type}</td>',
-			'<td class="label" width=13%>业务类型：</td>',
-			'<td class="input_bold" width=23%>&nbsp;{serv_type}</td>',
-			'<td class="label" width=13%>终端类型：</td>',
-			'<td class="input_bold" width=23%>&nbsp;{terminal_type}</td>',
-		'</tr>',		
-		'<tr height=24>',
-			'<td class="label" width=13%>实付：</td>',
-			'<td class="input_bold" width=23%>&nbsp;{real_pay}</td>',
-			'<td class="label" width=13%>优惠类型：</td>',
-			'<td class="input_bold" width=23%>&nbsp;{disct_type}</td>',
-			'<td class="label" width=13%>优惠信息：</td>',
-			'<td class="input_bold" width=23%>&nbsp;{disct_info}</td>',
-		'</tr>',		
-		'<tr height=24>',
-			'<td class="label" width=13%>部门：</td>',
-			'<td class="input_bold" width=23%>&nbsp;{dept_id}</td>',		
-			'<td class="label" width=13%>操作员：</td>',
-			'<td class="input_bold" width=23%>&nbsp;{optr_id}</td>',
-			'<td class="label" width=13%>创建时间：</td>',
-			'<td class="input_bold" width=23%>&nbsp;{create_time}</td>',
-		'</tr>',
-	'</table>'
-);
-
-
-MoreInfoTemplate = {
-	"BUSI": BusiTemplate,
-	"DEVICE": DeviceTemplate,
-	"ACCT": AcctTemplate
-}
-
 /**
  * 封装支付面板
  */ 
@@ -86,7 +6,7 @@ PayPanel = Ext.extend( Ext.Panel ,{
 	payForm: null,
 	feeGrid:null,
 	constructor: function(){
-		payPanelThis = this;
+		var payPanelThis = this;
 		// 缴费信息的表单
 		this.payForm = new PayForm(this);
 		//实例化fee store
@@ -94,39 +14,33 @@ PayPanel = Ext.extend( Ext.Panel ,{
 			data: [],
 			fields: [
 				'fee_sn','busi_name','fee_text','count_text','optr_name','create_time',
-				{name: 'real_pay', type: 'int'},
-				'prod_sn', 'begin_date','prod_invalid_date','fee_type'
+				{name: 'real_pay', type: 'int'}, 'create_done_code',
+				'prod_sn', 'begin_date','prod_invalid_date','fee_type','buy_num'
 			]
 		});
-		p = this.payForm ;
+		var lc = langUtils.main("cashPay.pay.columns");
+		var bt = langUtils.main("cashPay.pay.buttons");
 		//费用表格
 		this.feeGrid = new Ext.grid.GridPanel({
-			title: '支付项目',
+			title: langUtils.main('cashPay.pay._title'),
 			region: 'center',
 			border: false,
-			autoExpandColumn: 'e',
 			columns: [
-			    { header: '操作', width: 50,renderer: function(v , md, record , i  ){
+			    { header: lc[0], width: 50,renderer: function(v , md, record , i  ){
 					return "<DIV><a href='#' onclick='payPanelThis.deletePay();'>取消</a></DIV>";
 				}},
-				{ header: '业务名称', dataIndex: 'busi_name', width: 60},
-				{ id: 'e', header: '费用名称', dataIndex: 'fee_text',width: 100},
-				{ header: '实付金额', dataIndex: 'real_pay', width: 60, xtype: 'moneycolumn'},
-				{ header: '订单号', dataIndex: 'prod_sn', width: 60},
-				{ header: '操作时间', dataIndex: 'create_time', width: 80},
-				{ header: '数量', dataIndex: 'count_text'}
+				{ header: lc[1], dataIndex: 'busi_name', width: 80},
+				{ header: lc[2], dataIndex: 'fee_text',width: 120, renderer:App.qtipValue},
+				{ header: lc[3], dataIndex: 'real_pay', width: 70, xtype: 'moneycolumn'},
+				{ header: lc[4], dataIndex: 'prod_sn', width: 70},
+				{ header: lc[5], dataIndex: 'count_text', width:150, renderer: App.qtipValue},
+				{ header: lc[6], dataIndex: 'buy_num', width: 70},
+				{ header: lc[7], dataIndex: 'create_time', width: 130},
+				{ header: lc[8], dataIndex: 'fee_sn', width: 80},
+				{ header: lc[9], dataIndex: 'create_done_code', width: 80}
 				
 			],
 			ds: this.feeStore
-		});
-		this.infoPanel = new Ext.Panel({
-			region: 'south',
-			height: 130,
-			border: false,
-			split: true,
-			bodyStyle: 'padding:8px;padding-bottom:0px;',
-			autoScroll: true,
-			html: '请点击<更多...>查看更多费用信息!'
 		});
 		
 		PayPanel.superclass.constructor.call(this,{
@@ -147,8 +61,15 @@ PayPanel = Ext.extend( Ext.Panel ,{
 				items: this.payForm
 			}],
 			buttons: [{
-				text: '保存',
+				text: bt[0],
+				iconCls: 'icon-save',
 				width: 100,
+				scope: this,
+				handler: this.doSave
+			},{
+				text: bt[1],
+				width: 100,
+				iconCls: 'icon-close',
 				scope: this,
 				handler: this.doSave
 			}]
@@ -157,7 +78,8 @@ PayPanel = Ext.extend( Ext.Panel ,{
 	},
 	deletePay : function() {
 		var rec = this.feeGrid.getSelectionModel().getSelected();
-		Confirm("确定要取消吗?", this ,function(){
+		var thiz = this;
+		var func = function(flag){
 			var comomonParams = App.getValues();
 			comomonParams["busiCode"] = "1113";
 			var params ={};
@@ -165,22 +87,27 @@ PayPanel = Ext.extend( Ext.Panel ,{
 			Ext.apply(params,{
 				fee_sn : rec.get('fee_sn'),
 				fee_type : rec.get('fee_type'),
-				onlyShowInfo : false
+				onlyShowInfo : flag
 			});
-					// 请求后台的数据
+			var info = "";
 			Ext.Ajax.request({
-				scope: this,
+				scope: thiz,
 				url: Constant.ROOT_PATH + "/core/x/Pay!cancelUnPayFee.action",
 				params: params,
+				async : false,
 				success: function(res, ops){
-					var data = Ext.decode(res.responseText);
-					this.loadBaseData();
-					Alert(data);
-					App.getApp().refreshPayInfo(parent);
+					info = Ext.decode(res.responseText);
+					if(!flag){
+						this.loadBaseData();
+						App.getApp().refreshPayInfo(parent);
+					}
 				}
 			});
+			return info;
+		}
+		Confirm( func(true), this ,function(){
+			func(false);
 		});
-		
 	},
 	feeData: null,
 	loadBaseData: function(){

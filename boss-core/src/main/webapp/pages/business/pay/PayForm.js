@@ -8,37 +8,37 @@ PayForm = Ext.extend( Ext.form.FormPanel , {
 	parent: null,
 	constructor: function(parent){
 		this.parent = parent;
+		var lc = langUtils.main("cashPay.charge.columns");
 		PayForm.superclass.constructor.call(this, {
 			border: false,
-//			iconCls: 'icon-pay',
-			title: '收费信息',
+			title: langUtils.main('cashPay.charge._title'),
 			bodyStyle: 'background: #F2F2F2;padding:15px 5px 5px 5px',
 			labelWidth: 80,
 			defaults: {width: 110},
 			items:[{
 				xtype: 'label',
 				style: Constant.MONEY_LABEL_STYLE,
-				fieldLabel: '总额USD',
+				fieldLabel: lc[0],
 				text: '0.00',
 				id: 'labelDollor',
 				name: 'lblFee'
 			},{
 				xtype: 'label',
-				fieldLabel: '当日汇率',
+				fieldLabel: lc[1],
 				id: 'labelExchange'
 			},{
 				xtype: 'label',
-				fieldLabel: '柬埔寨KHR',
+				fieldLabel: lc[2],
 				text: '0.00',
 				id: 'LabelJian'
 			},{
 				xtype: 'textfield',
-				fieldLabel: '付款人',
+				fieldLabel: lc[3],
 				name: 'pay.payer',
 				value: App.getApp().data.custFullInfo.cust.cust_name,
 				emptyText: '默认为客户名称'
 			},{
-				fieldLabel: '缴费方式',
+				fieldLabel: lc[4],
 				xtype: 'paramcombo',
 				paramName:'CFF_PAY_FEE',
 				allowBlank: false,
@@ -49,27 +49,19 @@ PayForm = Ext.extend( Ext.form.FormPanel , {
 					select: this.doChangePayType
 				}
 			},{
-				fieldLabel: '票据编号',
+				fieldLabel: lc[5],
 				maxLength: 18,
 				disabled: true,
 				xtype: 'textfield',
 				name: 'pay.receipt_id'
 			},{
-				fieldLabel: '账务日期',
+				fieldLabel: lc[6],
 				editable:false,
 				xtype:'datefield',
 				format:'Y-m-d',
 				name: 'pay.acct_date'
-//			},{
-//				name: 'invoice_mode',
-//				fieldLabel: '出票方式',
-//				maxLength: 18,
-//				xtype: 'paramcombo',
-//				paramName: 'INVOICE_MODE',
-//				defaultValue: 'A',
-//				hiddenName: 'pay.invoice_mode'
 			},{
-				fieldLabel: '实收USD',
+				fieldLabel: lc[7],
 				xtype: 'numberfield',
 				decimalPrecision: 0,
 				id: 'nfDollar',
@@ -79,7 +71,7 @@ PayForm = Ext.extend( Ext.form.FormPanel , {
 					change: this.doCalcJianYuan
 				}
 			},{
-				fieldLabel: '实收KHR',
+				fieldLabel: lc[8],
 				xtype: 'numberfield',
 				name: 'pay.khr',
 				decimalPrecision: 0,

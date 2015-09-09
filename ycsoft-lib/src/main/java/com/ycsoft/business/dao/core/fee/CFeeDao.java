@@ -102,14 +102,15 @@ public class CFeeDao extends BaseEntityDao<CFee> {
 		String sql=StringHelper.append(
 				"select cf.*,nvl(atm.acctitem_name,bf.fee_name) fee_text,fa.prod_invalid_date,fa.begin_date,fa.prod_sn,",
 					" case when fa.begin_date is not null and fa.prod_invalid_date is not null ",
-					"          then to_char(fa.begin_date,'yymmdd')||'-'||to_char(fa.prod_invalid_date,'yymmdd') ",
-					"      when cf.fee_id is not null then nvl(cf.disct_info,cf.count) end count_text ",
-				" from c_fee cf,c_done_code_unpay un,c_fee_acct fa,vew_acctitem atm,busi.t_busi_fee bf ",
-				" where cf.create_done_code=un.done_code ",
-				" and  bf.fee_id(+)=cf.fee_id ",
-				" and atm.acctitem_id(+)=cf.acctitem_id ",
-				" and fa.fee_sn(+)=cf.fee_sn ",
-				" and un.cust_id=? and un.optr_id=? and cf.status<> ? ",
+					"          then to_char(fa.begin_date,'yyyymmdd')||'-'||to_char(fa.prod_invalid_date,'yyyymmdd') ",
+					"      when cf.fee_id is not null and cf.fee_type='DEVICE' then vdtm.model_name end count_text, cfb.buy_num ",
+					" from c_fee cf join c_done_code_unpay un on cf.create_done_code=un.done_code",
+					" left join c_fee_acct fa on fa.fee_sn=cf.fee_sn ",              
+					" left join c_fee_device cfb on cfb.fee_sn=cf.fee_sn",
+					" left join t_busi_fee bf on bf.fee_id=cf.fee_id",
+					" left join vew_device_typemodel vdtm on cfb.device_type||'_'||cfb.device_model=vdtm.device_type_model",
+					" left join vew_acctitem atm on atm.acctitem_id=cf.acctitem_id",
+				" where un.cust_id=? and un.optr_id=? and cf.status<> ? ",
 				" order by cf.create_time ");
 		return this.createQuery(FeeDto.class, sql, cust_id,optr_id,StatusConstants.INVALID).list();
 	}

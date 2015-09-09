@@ -13,6 +13,9 @@
 <html>
   <head>
     <title>SupetNet BOSS 1.0</title>
+    <script type="text/javascript">
+    	var loginPath = '<%=boss_res %>';
+    </script>
     
     <link rel="stylesheet" href="<%=boss_res %>/components/ext3/resources/css/ext-all.css" type="text/css" />
    <!-- <link rel="stylesheet" href="<%=boss_res %>/components/ext3/resources/css/xtheme-gray.css" type="text/css" />  -->

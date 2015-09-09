@@ -348,7 +348,7 @@ Ext.apply( App, {
 		
 		var width = 70,leftWidth = 0;
 		var pLeft = Ext.isIE ? 'padding-left:10px':'';
-		var toolstr = "<div style='width:"+width+"px;float:left;"+pLeft+"' >" +
+		var toolstr = "<div style='width:"+width+"px;float:left;padding-left:50px' >" +
 				"<div class='top_button print_big' onClick='App.openPrint()'></div>" +
 				"<div style='font:11px'>" +
 				"发票打印</div></div>";
@@ -405,7 +405,7 @@ Ext.apply( App, {
 					url: 'pages/business/pay/PrintBill.jsp'}} ,{width: 660, height: 250});
  	},
  	openPay:function(){
- 		App.getApp().menu.bigWindow.show({ text: '支付',  attrs: {busiCode:'1027',
+ 		App.getApp().menu.bigWindow.show({ text: langUtils.main("cashPay._title"),  attrs: {busiCode:'1027',
 					url: 'pages/business/pay/PayForm.js,pages/business/pay/PayPanel.js'}} ,{width: 790, height: 460});
  	},
  	openBankPayment:function(){

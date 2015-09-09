@@ -47,8 +47,23 @@ public class FeeDto extends CFee {
 	private String is_busi_fee;
 	private String doc_type_text;
 	private String allow_done_code;
+	
+	private String device_model;
+	private String device_model_name;
 
 	
+	public String getDevice_model() {
+		return device_model;
+	}
+	public void setDevice_model(String device_model) {
+		this.device_model = device_model;
+	}
+	public String getDevice_model_name() {
+		return device_model_name;
+	}
+	public void setDevice_model_name(String device_model_name) {
+		this.device_model_name = device_model_name;
+	}
 	public String getCount_text() {
 		return count_text;
 	}
