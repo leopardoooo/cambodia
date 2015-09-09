@@ -17,6 +17,7 @@ var loadParamValues = function(store, combo){
 	//只有一个值，默认选中
 	if(store.getCount() == 1){
 		combo.setValue(store.getAt(0).get('item_value'));
+		combo.fireEvent('select', combo, store.getAt(0));
 	}
 };
 
