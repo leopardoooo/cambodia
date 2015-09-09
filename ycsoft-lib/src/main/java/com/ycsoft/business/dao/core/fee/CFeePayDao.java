@@ -623,7 +623,7 @@ public class CFeePayDao extends BaseEntityDao<CFeePay> {
 		sql = " select t.*,'Y' is_busi_fee from (SELECT t.fee_sn, t.fee_type, busi_done_code, create_done_code, reverse_done_code, busi_code, cust_id, user_id, is_doc, "
 				+ "t.status, t.fee_id, count, should_pay, real_pay, disct_type, disct_info, promotion_sn, pay_type, t.invoice_mode,"
 				+ " t.invoice_code,t.invoice_book_id, t.invoice_id, t.create_time, acct_date, t.area_id, t.county_id, t.optr_id, dept_id, acct_id, acctitem_id, auto_promotion,"
-				+ "t2.fee_name fee_text,t2.deposit,d.device_id,d.device_code,d.device_type,r.finance_status,t.busi_optr_id,r.invoice_type doc_type"
+				+ "t2.fee_name fee_text,t2.deposit,d.device_id,d.device_code,d.device_type,r.finance_status,t.busi_optr_id,r.invoice_type doc_type,d.buy_num"
 				+ " FROM c_fee t,t_busi_fee t2,c_fee_device d,r_invoice r"
 				+ " WHERE t.cust_id = ? and t.county_id= ? "
 				+ "  and t.fee_id = t2.fee_id and t.fee_sn=d.fee_sn "
@@ -633,7 +633,7 @@ public class CFeePayDao extends BaseEntityDao<CFeePay> {
 			sql += " UNION SELECT t.fee_sn, t.fee_type, busi_done_code, create_done_code, reverse_done_code, busi_code, cust_id, user_id, is_doc, " 
 				+ "t.status, t.fee_id, count, should_pay, real_pay, disct_type, disct_info, promotion_sn, pay_type, t.invoice_mode," 
 				+ " t.invoice_code,t.invoice_book_id, t.invoice_id, t.create_time, acct_date, t.area_id, t.county_id, t.optr_id, dept_id, acct_id, acctitem_id, auto_promotion,"
-				+ "t2.fee_name fee_text,t2.deposit,'','','',r.finance_status,t.busi_optr_id,r.invoice_type doc_type"
+				+ "t2.fee_name fee_text,t2.deposit,'','','',r.finance_status,t.busi_optr_id,r.invoice_type doc_type, null buy_num"
 				+ " FROM c_fee t,t_busi_fee t2,c_fee_busi d,r_invoice r"
 				+ " WHERE t.cust_id = ? and t.county_id= ? "
 				+ " and t.invoice_id=r.invoice_id(+) and t.invoice_code=r.invoice_code(+)"+ str
