@@ -110,44 +110,18 @@ Ext.apply(TopSearch.prototype , {
 		}
 		
 		var ps = {};
-		var values = searchValue.split(' ');
-		if(values.length > 1){
-			ps['cust.cust_name'] = values[0];
-			ps['cust.address'] = values[1];
-			ps['search_type'] = 'MULTIPLE';
-		}else{
-			if(t == 'cust'){
-				
-//				if(/[^0-9]/.test(searchValue.charAt(i)))
-				//全数字
-				
-				/*if(Ext.form.VTypes.IDNum(searchValue)){//搜索值为身份证
-					t = Constant.IDCARD;
-				}else if (searchValue.length>=15){
-					t = 'BANKNUM';
-				}else{
-					t = 'cust_no';
-					var flag = true;
-					for(var i=0;i<searchValue.length;i++){
-						flag = /[^\u4E00-\u9FA5]/.test(searchValue.charAt(i));
-						if(!flag || /[^a-zA-Z]/.test(searchValue.charAt(i))){
-							t = 'cust_name';
-							break;
-						}
-					}
-				}*/
-				if(/^[0-9]*$/.test(searchValue)){
-					t = 'cust_no';
-				}else{
-					t = 'cust_name'
-				}
+		if(t == 'cust'){
+			if(/^[0-9]*$/.test(searchValue)){
+				t = 'cust_no';
+			}else{
+				t = 'cust_name'
 			}
-			
-			ps = {
-				"search_type": t,
-				"search_value": searchValue
-			};
 		}
+		
+		ps = {
+			"search_type": t,
+			"search_value": searchValue
+		};
 		
 		this.searchStore.baseParams = ps ;
 		if(this.loading){

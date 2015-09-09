@@ -20,6 +20,7 @@ Sys = {
 	ExchangeRateManage: {//汇率配置
 		title:'汇率配置',
 		commons:{
+			exchange_id: '汇率编号',
 			effective_time :'生效时间',
 			exchange_rate:'汇率',
 			status:'状态',

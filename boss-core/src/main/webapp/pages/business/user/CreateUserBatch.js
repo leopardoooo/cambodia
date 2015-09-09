@@ -170,21 +170,9 @@ UserBaseBatchForm = Ext.extend( BaseForm , {
 			            	scope: this,
 			            	check: this.doCheckedChangeOpenType
 			            }
-					}/*,{
-						id: 'spkgComboId',
-						fieldLabel: '协议开户',
-						width: 120,
-						xtype: 'combo',
-						store: this.spkgStore,
-						displayField: 'spkg_title',
-						valueField: 'sp_id',
-						allowBlank: false,
-						listeners: {
-							scope: this,
-							select: this.doQuerySpkgUser
-						}
-					}*/]
+					}]
 				},{
+					id:'addUserToGridBtnId',
 					columnWidth: .2,
 					layout: 'anchor',
 					xtype: 'button',
@@ -251,13 +239,6 @@ UserBaseBatchForm = Ext.extend( BaseForm , {
 		Ext.getCmp('busiFeePanelId').hide();
 		this.doLayout();
 	},
-	doDisabledComp: function(flag){
-		Ext.getCmp('boxUserType').setDisabled(flag);
-		Ext.getCmp('boxDeviceCategory').setDisabled(flag);
-		Ext.getCmp('nfFee').setDisabled(flag);
-		Ext.getCmp('deviceBuyMode').setDisabled(flag);
-		Ext.getCmp('sfOpenAmount').setDisabled(flag);
-	},
 	doCheckedChangeOpenType: function(box, checked){
 		var flag = true;
 		if(checked){
@@ -312,6 +293,7 @@ UserBaseBatchForm = Ext.extend( BaseForm , {
 		Ext.getCmp('nfFee').setDisabled(flag);
 		Ext.getCmp('deviceBuyMode').setDisabled(flag);
 		Ext.getCmp('sfOpenAmount').setDisabled(flag);
+		Ext.getCmp('addUserToGridBtnId').setDisabled(flag);
 	},
 	doFiltDeviceModel: function(){
 		var userType = Ext.getCmp("boxUserType").getValue();
