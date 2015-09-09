@@ -39,6 +39,7 @@ import com.ycsoft.beans.core.fee.CFeePay;
 import com.ycsoft.beans.core.fee.CFeePayDetail;
 import com.ycsoft.beans.core.fee.CFeePropChange;
 import com.ycsoft.beans.core.fee.CFeeUnitpre;
+import com.ycsoft.beans.core.fee.CFeeUnprint;
 import com.ycsoft.beans.core.prod.CProd;
 import com.ycsoft.beans.core.prod.CProdMobileBill;
 import com.ycsoft.beans.core.prod.CProdOrder;
@@ -71,6 +72,7 @@ import com.ycsoft.business.dao.core.fee.CFeePayDao;
 import com.ycsoft.business.dao.core.fee.CFeePayDetailDao;
 import com.ycsoft.business.dao.core.fee.CFeePropChangeDao;
 import com.ycsoft.business.dao.core.fee.CFeeUnitpreDao;
+import com.ycsoft.business.dao.core.fee.CFeeUnprintDao;
 import com.ycsoft.business.dao.core.print.CDocItemDao;
 import com.ycsoft.business.dao.core.print.CInvoiceDao;
 import com.ycsoft.business.dao.core.prod.CProdMobileBillDao;
@@ -148,7 +150,17 @@ public class FeeComponent extends BaseBusiComponent {
 	private ExpressionUtil expressionUtil;
 	@Autowired
 	private CDoneCodeUnpayDao cDoneCodeUnpayDao;
-	
+	@Autowired
+	private CFeeUnprintDao cFeeUnprintDao;
+	/**
+	 * 查询营业员未打印的费用
+	 * @param optrId
+	 * @return
+	 * @throws JDBCException 
+	 */
+	public List<CFeeUnprint> queryUnPrintByOptr(String optrId) throws JDBCException{
+		return cFeeUnprintDao.queryByOptr(optrId);
+	}
 	
 	/**
 	 * 查询挂载IP费用的用户费用清单
@@ -238,15 +250,28 @@ public class FeeComponent extends BaseBusiComponent {
 	}
 	
 	/**
-	 * 缴费记录更新支付信息
+	 * 缴费记录更新支付信息,并记录未打印的信息
 	 * 状态，发票，打印，支付方式，等等
 	 * @param unpayList
 	 * @param pay
 	 * @throws JDBCException
 	 */
 	public void updateCFeeToPay(List<CDoneCodeUnpay> unpayList,CFeePayDto pay) throws JDBCException{
+		String isDoc=SystemConstants.BOOLEAN_FALSE;
+		if(pay.getFee()==0){//支付金额=0，则发票不需要打印
+			isDoc=SystemConstants.BOOLEAN_NO;
+		}
+		if(StringHelper.isNotEmpty(pay.getInvoice_id())){
+			//有发票号码则不需要打印
+			isDoc=SystemConstants.BOOLEAN_TRUE;
+		}
+		
 		for(CDoneCodeUnpay un:unpayList){
-			cFeeDao.updateCFeeToPay(un, pay);
+			if(isDoc.equals(SystemConstants.BOOLEAN_FALSE)){
+				//记录未打印的费用信息，用于营业员未打印提示
+				cFeeUnprintDao.insertByUnPayDoneCode(un);
+			}
+			cFeeDao.updateCFeeToPay(un, pay,isDoc);
 		}
 	}
 	/**

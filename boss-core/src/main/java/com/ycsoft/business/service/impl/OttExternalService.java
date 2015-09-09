@@ -25,6 +25,7 @@ import com.ycsoft.beans.ott.OttUserProd;
 import com.ycsoft.beans.prod.PProd;
 import com.ycsoft.beans.prod.PProdTariff;
 import com.ycsoft.beans.prod.PProdTariffDisct;
+import com.ycsoft.beans.prod.PPromotionEasyProd;
 import com.ycsoft.boss.remoting.ott.OttClient;
 import com.ycsoft.boss.remoting.ott.Result;
 import com.ycsoft.business.component.core.OrderComponent;
@@ -36,6 +37,7 @@ import com.ycsoft.business.dao.core.prod.CProdOrderDao;
 import com.ycsoft.business.dao.core.user.CUserDao;
 import com.ycsoft.business.dao.prod.PProdTariffDao;
 import com.ycsoft.business.dao.prod.PProdTariffDisctDao;
+import com.ycsoft.business.dao.prod.PPromotionEasyProdDao;
 import com.ycsoft.business.dto.core.prod.OrderProd;
 import com.ycsoft.business.dto.core.prod.OrderProdPanel;
 import com.ycsoft.commons.constants.BusiCodeConstants;
@@ -47,7 +49,6 @@ import com.ycsoft.commons.helper.DateHelper;
 import com.ycsoft.commons.helper.LoggerHelper;
 import com.ycsoft.commons.helper.NumericHelper;
 import com.ycsoft.commons.helper.StringHelper;
-import com.ycsoft.daos.core.JDBCException;
 /**
  * OTT调用BOSS接口实现
  * @author new
@@ -75,7 +76,8 @@ public class OttExternalService extends OrderService {
 	private PProdTariffDao pProdTariffDao;
 	@Autowired
 	private PProdTariffDisctDao pProdTariffDisctDao;
-	
+	@Autowired
+	private PPromotionEasyProdDao pPromotionEasyProdDao;
 	/**
 	 * 获得用户账户
 	 * @param login_name
@@ -291,11 +293,12 @@ public class OttExternalService extends OrderService {
 		Map<String,String> resultMap=new HashMap<>();
 		resultMap.put("customer_code", cust.getCust_no());
 		
-		/**
-		 //开户免费送7天节目
-		OrderProd orderProd=getOttMobileOrderProd(user,"90922","1571_1364",1,null,null,null);
-		saveOrderProd(orderProd, this.getBusiParam().getBusiCode(), this.getBusiParam().getDoneCode());
-		**/
+		
+		 //注册免费送3天节目
+		for(PPromotionEasyProd easyProd: pPromotionEasyProdDao.queryPromotionByType(SystemConstants.PROMOTION_TYPE_OTT_MOBILE_EXTERNAL)){
+			OrderProd orderProd=getOttMobileOrderProd(user,easyProd.getProd_id(),easyProd.getTariff_id(),easyProd.getOrder_cycles(),null,null,null);
+			saveOrderProd(orderProd, this.getBusiParam().getBusiCode(), this.getBusiParam().getDoneCode());
+		}
 		
 		this.saveAllPublic(doneCode, this.getBusiParam());
 		//调用接口
@@ -310,7 +313,7 @@ public class OttExternalService extends OrderService {
 	    	else
 	    		throw new ServicesException(ErrorCode.E40009);
 	    }
-	    /**
+	    //产品授权
 	    Map<String,Date> userResMap = authComponent.getUserResExpDate(user.getUser_id());
 		for(String externalResId: userResMap.keySet()){
 			String resDate=DateHelper.format( userResMap.get(externalResId), DateHelper.FORMAT_TIME_END);
@@ -319,7 +322,6 @@ public class OttExternalService extends OrderService {
 				throw new ServicesException(ErrorCode.E40009);
 			}
 		}
-		**/
 		
 		return resultMap;
 	}

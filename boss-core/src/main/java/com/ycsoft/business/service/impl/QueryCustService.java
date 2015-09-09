@@ -11,9 +11,11 @@ import com.ycsoft.beans.config.TProvince;
 import com.ycsoft.beans.core.acct.CAcctAcctitem;
 import com.ycsoft.beans.core.bill.BBillWriteoff;
 import com.ycsoft.beans.core.bill.BillDto;
+import com.ycsoft.beans.core.common.CDoneCodeUnpay;
 import com.ycsoft.beans.core.cust.CCust;
 import com.ycsoft.beans.core.cust.CCustPropChange;
 import com.ycsoft.beans.core.fee.CFee;
+import com.ycsoft.beans.core.fee.CFeeUnprint;
 import com.ycsoft.beans.core.job.JBandCommand;
 import com.ycsoft.beans.core.job.JCaCommand;
 import com.ycsoft.beans.core.job.JVodCommand;
@@ -153,26 +155,22 @@ public class QueryCustService extends BaseService implements IQueryCustService {
 	 * 查询操作员下未打印发票的客户
 	 */
 	public String queryUnPrintCustByOptr() throws Exception {
-		String custNo = null;
-		String optrId = getOptr().getOptr_id();
-		String feeSn = MemoryPrintData.getUnPrintFee(optrId);
-		if(StringHelper.isNotEmpty(feeSn)){
-			CFee fee =feeComponent.queryBySn(feeSn);
-			//如果是单位缴费的数据
-			if(BusiCodeConstants.Unit_ACCT_PAY.equals(fee.getBusi_code())){
-				List<CCust>unitCust = custComponent.queryUnitByResident(fee.getCust_id());
-				if(null !=unitCust && unitCust.size() > 0){
-					custNo = unitCust.get(0).getCust_no();
-				}
-			}else{
-				CCust cust = custComponent.queryCustById(fee.getCust_id());
-				if(null != cust){
-					custNo = cust.getCust_no();
-				}
-			}
-		}
 		
-		return custNo;
+		String optrId = getOptr().getOptr_id();
+		
+		//先找未支付，然后找未打印
+		List<CDoneCodeUnpay> unPays=doneCodeComponent.queryUnPayByOptr(optrId);
+		if(unPays!=null&&unPays.size()>0){
+			CCust cust = custComponent.queryCustById(unPays.get(0).getCust_id());
+			return cust.getCust_no();
+		}
+		List<CFeeUnprint> unPrints=feeComponent.queryUnPrintByOptr(optrId);
+		if(unPrints!=null&&unPrints.size()>0){
+			CCust cust = custComponent.queryCustById(unPrints.get(0).getCust_id());
+			return cust.getCust_no();
+		}
+
+		return null;
 	}
 	
 	public String queryUnRefundByOptr() throws Exception {
