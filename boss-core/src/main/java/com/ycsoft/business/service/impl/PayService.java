@@ -28,6 +28,7 @@ import com.ycsoft.beans.core.fee.CFeeDevice;
 import com.ycsoft.beans.core.fee.CFeePay;
 import com.ycsoft.beans.core.fee.CFeePropChange;
 import com.ycsoft.beans.core.fee.CFeeUnitpre;
+import com.ycsoft.beans.core.fee.CFeeUnprint;
 import com.ycsoft.beans.core.job.JCustWriteoff;
 import com.ycsoft.beans.core.prod.CProdMobileBill;
 import com.ycsoft.beans.core.prod.CProdOrder;
@@ -42,6 +43,7 @@ import com.ycsoft.business.dao.config.TExchangeDao;
 import com.ycsoft.business.dao.core.bank.CBankGotodiskDao;
 import com.ycsoft.business.dao.core.bank.CBankReturnDao;
 import com.ycsoft.business.dao.core.bank.CBankReturnPayerrorDao;
+import com.ycsoft.business.dao.core.fee.CFeeUnprintDao;
 import com.ycsoft.business.dao.core.prod.CProdOrderDao;
 import com.ycsoft.business.dao.core.prod.CProdOrderFeeDao;
 import com.ycsoft.business.dao.prod.PProdDao;
@@ -86,6 +88,8 @@ public class PayService extends BaseBusiService implements IPayService {
 	private OrderComponent orderComponent;
 	@Autowired
 	private CProdOrderFeeDao cProdOrderFeeDao;
+	@Autowired
+	private CFeeUnprintDao cFeeUnprintDao;
 	/**
 	 * 查询汇率
 	 * @return
@@ -783,11 +787,43 @@ public class PayService extends BaseBusiService implements IPayService {
 				invoiceId, invoiceCode, remark);
 		saveAllPublic(doneCode,getBusiParam());
 	}
-	
+	/**
+	 * 作废发票
+	 * 只有开票人可以作废自己的发票,且发票未上交的情况下
+	 */
 	public void invalidInvoice(String invoice_id, String invoice_code,
 			String invoice_book_id)throws Exception{
+		String optrId=this.getOptr().getOptr_id();
 		Integer doneCode = doneCodeComponent.gDoneCode();
+		//检查发票对应的费用记录是否当前操作员
+		List<CFee> list=feeComponent.queryFeeByInvoice(invoice_code, invoice_id);
+		for(CFee cfee:list){
+			if(!optrId.equals(cfee.getOptr_id())){
+				throw new ServicesException(ErrorCode.InvoiceIsNotYou);
+			}
+		}
+		
+		//检查发票状态是否缴销
+		RInvoice invoice= invoiceComponent.queryById(invoice_id, invoice_code);
+		if(!optrId.equals(invoice.getOptr_id())){
+			throw new ServicesException(ErrorCode.InvoiceIsNotYou);
+		}
+		if(!StatusConstants.IDLE.equals(invoice.getFinance_status())){
+			throw new ServicesException(ErrorCode.InvoiceCheckStatusIsNotIdle);
+		}
+		
 		invoiceComponent.invalidInvoiceAndClearFeeInfo(doneCode, invoice_id, invoice_code);
+		
+		//插入费用记录未打印
+		for(CFee cfee:list){
+			CFeeUnprint un=new CFeeUnprint();
+			un.setCreate_done_code(cfee.getCreate_done_code());
+			un.setFee_sn(cfee.getFee_sn());
+			un.setCust_id(cfee.getCust_id());
+			un.setOptr_id(cfee.getOptr_id());
+			cFeeUnprintDao.save(un);
+		}
+		
 	}
 	
 	public void invalidFeeListInvoice(Integer feeDoneCode) throws Exception {

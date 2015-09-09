@@ -115,8 +115,6 @@ public class CFeePayDao extends BaseEntityDao<CFeePay> {
 				"    AND T1.COUNTY_ID = ?  ",
 				"    AND T1.create_done_code = ? ",
 				"    AND T1.STATUS = ? AND t1.pay_type=t5.pay_type and t5.is_print='T'",
-				"    AND T2.FEE_TYPE IN (?, ?)",
-				"     ",
 				" UNION ALL ",
 				" SELECT T1.FEE_SN, T1.REAL_PAY AMOUNT, T2.PRINTITEM_ID,t3.doc_type",
 				"   FROM C_FEE T1, VEW_ACCTITEM T2,t_invoice_printitem t3,t_template_county t4 ,t_pay_type t5 ",
@@ -124,15 +122,13 @@ public class CFeePayDao extends BaseEntityDao<CFeePay> {
 				"    AND t4.template_type=? AND T1.COUNTY_ID = ?  ",
 				"    AND T1.create_done_code = ?  ",
 				"    AND T1.STATUS = ?  AND t1.pay_type=t5.pay_type and t5.is_print='T'",
-				"    AND T1.ACCTITEM_ID = T2.ACCTITEM_ID  ",
-				"    AND T1.FEE_TYPE IN (?) ");
+				"    AND T1.ACCTITEM_ID = T2.ACCTITEM_ID  ");
 
 		return findToList(sql, countyId, 
 				SystemConstants.TEMPLATE_TYPE_INVOICE,countyId, doneCode,
-				StatusConstants.PAY, SystemConstants.FEE_TYPE_BUSI,
-				SystemConstants.FEE_TYPE_DEVICE,countyId,
+				StatusConstants.PAY,countyId,
 				SystemConstants.TEMPLATE_TYPE_INVOICE,  countyId,
-				doneCode, StatusConstants.PAY, SystemConstants.FEE_TYPE_ACCT);
+				doneCode, StatusConstants.PAY);
 	}
 
 	/**
@@ -210,7 +206,6 @@ public class CFeePayDao extends BaseEntityDao<CFeePay> {
 				"    AND T1.cust_id=? ",
 				"    AND T1.STATUS = ? AND t1.pay_type=t5.pay_type and t5.is_print='T'",
 				"    AND T1.is_doc= ? ",
-				"    AND T2.FEE_TYPE IN (?,?)",
 				"    AND T1.optr_id= ? ",
 				" UNION ALL ",
 				" SELECT T1.FEE_SN, T1.REAL_PAY AMOUNT, T2.PRINTITEM_ID,t3.doc_type,t1.acct_id,'' prom_fee_sn",
@@ -226,8 +221,7 @@ public class CFeePayDao extends BaseEntityDao<CFeePay> {
 		
 		return findToList(sql, 
 				countyId, SystemConstants.TEMPLATE_TYPE_INVOICE, countyId,custId,
-				StatusConstants.PAY, SystemConstants.BOOLEAN_FALSE,SystemConstants.FEE_TYPE_BUSI,
-				SystemConstants.FEE_TYPE_DEVICE,optrId,
+				StatusConstants.PAY, SystemConstants.BOOLEAN_FALSE,optrId,
 				countyId,SystemConstants.TEMPLATE_TYPE_INVOICE, countyId,custId,
 				 StatusConstants.PAY, SystemConstants.BOOLEAN_FALSE, SystemConstants.FEE_TYPE_ACCT,optrId
 				);
@@ -623,7 +617,7 @@ public class CFeePayDao extends BaseEntityDao<CFeePay> {
 		sql = " select t.*,'Y' is_busi_fee from (SELECT t.fee_sn, t.fee_type, busi_done_code, create_done_code, reverse_done_code, busi_code, cust_id, user_id, is_doc, "
 				+ "t.status, t.fee_id, count, should_pay, real_pay, disct_type, disct_info, promotion_sn, pay_type, t.invoice_mode,"
 				+ " t.invoice_code,t.invoice_book_id, t.invoice_id, t.create_time, acct_date, t.area_id, t.county_id, t.optr_id, dept_id, acct_id, acctitem_id, auto_promotion,"
-				+ "t2.fee_name fee_text,t2.deposit,d.device_id,d.device_code,d.device_type,r.finance_status,t.busi_optr_id,r.invoice_type doc_type,d.buy_num"
+				+ "t2.fee_name fee_text,t2.deposit,d.device_id,d.device_code,d.device_type,r.finance_status,t.busi_optr_id,r.invoice_type doc_type"
 				+ " FROM c_fee t,t_busi_fee t2,c_fee_device d,r_invoice r"
 				+ " WHERE t.cust_id = ? and t.county_id= ? "
 				+ "  and t.fee_id = t2.fee_id and t.fee_sn=d.fee_sn "
@@ -633,7 +627,7 @@ public class CFeePayDao extends BaseEntityDao<CFeePay> {
 			sql += " UNION SELECT t.fee_sn, t.fee_type, busi_done_code, create_done_code, reverse_done_code, busi_code, cust_id, user_id, is_doc, " 
 				+ "t.status, t.fee_id, count, should_pay, real_pay, disct_type, disct_info, promotion_sn, pay_type, t.invoice_mode," 
 				+ " t.invoice_code,t.invoice_book_id, t.invoice_id, t.create_time, acct_date, t.area_id, t.county_id, t.optr_id, dept_id, acct_id, acctitem_id, auto_promotion,"
-				+ "t2.fee_name fee_text,t2.deposit,'','','',r.finance_status,t.busi_optr_id,r.invoice_type doc_type, null buy_num"
+				+ "t2.fee_name fee_text,t2.deposit,'','','',r.finance_status,t.busi_optr_id,r.invoice_type doc_type"
 				+ " FROM c_fee t,t_busi_fee t2,c_fee_busi d,r_invoice r"
 				+ " WHERE t.cust_id = ? and t.county_id= ? "
 				+ " and t.invoice_id=r.invoice_id(+) and t.invoice_code=r.invoice_code(+)"+ str
