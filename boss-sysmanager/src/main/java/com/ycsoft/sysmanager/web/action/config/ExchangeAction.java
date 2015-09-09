@@ -17,6 +17,8 @@ public class ExchangeAction  extends BaseAction {
 	
 	private String status;
 	
+	private String exchangeId;
+	
 	private ExchangeComponent exchangeComponent;
 	
 	public String query() throws Exception{
@@ -30,18 +32,17 @@ public class ExchangeAction  extends BaseAction {
 	
 	public String saveOrUpdate() throws Exception {
 		TExchange exchange = new TExchange();
+		exchange.setExchange_id(exchangeId);
 		exchange.setEff_date(DateHelper.parseDate(newEffDate, DateHelper.FORMAT_YMD));
 		exchange.setExchange(newExchange);
-		exchangeComponent.saveOrUpdate(exchange,getOptr().getOptr_id(), oldExchange, DateHelper.parseDate(effDate, DateHelper.FORMAT_YMD));
+		exchangeComponent.saveOrUpdate(exchange,getOptr().getOptr_id());
 		
 		return JSON_SUCCESS;
 	}
 
 	public String invalid() throws Exception {
-		TExchange exchange = new TExchange();
-		exchange.setEff_date(DateHelper.parseDate(effDate, DateHelper.FORMAT_YMD));
-		exchange.setExchange(oldExchange);
-		exchangeComponent.saveInvalid(exchange);
+	
+		exchangeComponent.saveInvalid(exchangeId);
 		return JSON_SUCCESS;
 	}
 
