@@ -1,5 +1,8 @@
 /** boss-core简体中文语言包 */
 BCLang = {}
+BCLang.common = {
+	optr: "操作"
+}
 //主页模块
 BCLang.home = {
 	topWelcome: "当前操作员~",

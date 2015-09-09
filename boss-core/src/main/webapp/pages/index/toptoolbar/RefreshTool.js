@@ -7,25 +7,25 @@ Ext.apply( App, {
 		var data = App.data;
 		var deptmenu ;
 			App.tool.insert(2,{
-				text: '切换部门',
+				text: langUtils.tools("qhbm"),
 				iconCls: 'icon-t-dept',
 				handler : App.tool.onToggleDept
 			});
 		if (data.optr['login_name']=='admin'){
 			//工具菜单
 			App.tool.insert(2, {
-				text:'工具',
+				text: langUtils.tools("gj"),
 				iconCls:'icon-t-county',
 				menu: new Ext.menu.Menu({
 					items:[	
 						{
 							itemId:'reloadConfig',
-							text:'重载配置',
+							text: langUtils.tools("czpz"),
 							iconCls:'icon-t-county'
 						},
 						{
 							itemId:'reloadPrintData',
-							text:'重载发票数据',
+							text: langUtils.tools("czfpsj"),
 							iconCls:'icon-t-county'
 						}
 					],
@@ -44,7 +44,7 @@ Ext.apply( App, {
 			App.tool.insert(3,'-');
 		}
 		
-		App.tool.insert(2,{text:'公告',iconCls:'bulletin',listeners:{
+		App.tool.insert(2,{text: langUtils.tools("gg") ,iconCls:'bulletin',listeners:{
 				click:function(){
 					App.tool.bulletinAllWin();
 				}
@@ -56,122 +56,125 @@ Ext.apply( App, {
 		//操作员权限包含的其他业务按钮
 		var menuItems = [];
 		for(var i=0;i<App.data.resources.length;i++){
+			var resId = App.data.resources[i]["attrs"]["res_id"];
+			var text = langUtils.res(resId);
+			text = Ext.isArray(text)? text[0] : text;
 			if(App.data.resources[i].handler == 'queryDeviceId'){
 				menuItems.push({
 					itemId:'queryDeviceId',
-					text:'设备查询',
+					text: text,
 					iconCls:'query',
 					attrs : App.data.resources[i]
 				});
 			}else if(App.data.resources[i].handler == 'queryInvoiceId'){
 				menuItems.push({
 					itemId:'queryInvoiceId',
-					text:'发票查询',
+					text: text,
 					iconCls:'query',
 					attrs : App.data.resources[i]
 				});
 			}else if(App.data.resources[i].handler == 'checkAccountId'){
 				menuItems.push({
 					itemId:'checkAccountId',
-					text:'轧账',
+					text: text,
 					iconCls:'gz',
 					attrs : App.data.resources[i]
 				});
 			}else if(App.data.resources[i].handler == 'DeviceCountCheck'){
 				menuItems.push({
 					itemId:'DeviceCountCheck',
-					text:'终端数轧账',
+					text: text,
 					iconCls:'gz',
 					attrs : App.data.resources[i]
 				});
 			}else if(App.data.resources[i].handler == 'UserCountCheck'){
 				menuItems.push({
 					itemId:'UserCountCheck',
-					text:'用户数轧账',
+					text: text,
 					iconCls:'gz',
 					attrs : App.data.resources[i]
 				});
 			}else if(App.data.resources[i].handler == 'feeUnitpreId'){
 				menuItems.push({
 					itemId:'feeUnitpreId',
-					text:'非营业费收取',
+					text: text,
 					iconCls:'pay',
 					attrs : App.data.resources[i]
 				});
 			}else if(App.data.resources[i].handler == 'batchPayFeeId'){
 				menuItems.push({
 					itemId:'batchPayFeeId',
-					text:'批量收费',
+					text: text,
 					iconCls:'pay',
 					attrs : App.data.resources[i]
 				});
 			}else if(App.data.resources[i].handler == 'batchEditAcctDateId'){
 				menuItems.push({
 					itemId:'batchEditAcctDateId',
-					text:'修改账务日期',
+					text: text,
 					iconCls:'editCust',
 					attrs : App.data.resources[i]
 				});
 			}else if(App.data.resources[i].handler == 'BatchNewCust'){
 				menuItems.push({
 					itemId:'batchOpenCust',
-					text:'批量预开户',
+					text: text,
 					iconCls:'newCust',
 					attrs : App.data.resources[i]
 				});
 			}else if(App.data.resources[i].handler == 'BatchLogoffCust'){
 				menuItems.push({
 					itemId:'batchLogoffCust',
-					text:'批量销客户',
+					text: text,
 					iconCls:'delCust',
 					attrs : App.data.resources[i]
 				});
 			}else if(App.data.resources[i].handler == 'BatchLogoffUser'){
 				menuItems.push({
 					itemId:'batchLogoffUser',
-					text:'批量销用户',
+					text: text,
 					iconCls:'logoffUser',
 					attrs : App.data.resources[i]
 				});
 			}else if(App.data.resources[i].handler == 'BatchOrderProd'){
 				menuItems.push({
 					itemId:'batchOrderProd',
-					text:'批量订购产品',
+					text: text,
 					iconCls:'orderProd',
 					attrs : App.data.resources[i]
 				});
 			}else if(App.data.resources[i].handler == 'BatchCancelProd'){
 				menuItems.push({
 					itemId:'batchCancelProd',
-					text:'批量退订产品',
+					text: text,
 					iconCls:'cancelProd',
 					attrs : App.data.resources[i]
 				});
 			}else if(App.data.resources[i].handler == 'ConfigBranchCom'){
 				menuItems.push({
 					itemId:'ConfigBranchCom',
-					text:'配置分公司账户',
+					text: text,
 					iconCls:'newCust',
 					attrs : App.data.resources[i]
 				});
 			}else if(App.data.resources[i].handler == 'valuableCardWinId'){
 				menuItems.push({
 					itemId:'valuableCardWinId',
-					text:'充值卡销售',
+					text: text,
 					iconCls:'icon_card',
 					attrs : App.data.resources[i]
 				});
 			}else if(App.data.resources[i].handler == 'updateAddressId'){
 				menuItems.push({
 					itemId:'updateAddressId',
-					text:'批量修改地址',
+					text: text,
 					iconCls:'changeAddr',
 					attrs : App.data.resources[i]
 				});
 			}else if(App.data.resources[i].handler == 'queryVoucherId'){
 				menuItems.push({
 					itemId:'queryVoucherId',
-					text:'代金券查询',
+					text: text,
 					iconCls:'query',
 					attrs : App.data.resources[i]
 				});
@@ -205,7 +208,7 @@ Ext.apply( App, {
 				//将客户状态修改为"资料隔离"
 				menuItems.push({
 					itemId:'editCustStatusId',
-					text:'批量修改客户状态',
+					text: text,
 					iconCls:'editUserStatus',
 					attrs : App.data.resources[i]
 				});
@@ -213,7 +216,7 @@ Ext.apply( App, {
 				//将用户状态修改为"休眠"或"关模隔离"
 				menuItems.push({
 					itemId:'editUserStatusId',
-					text:'批量修改用户状态',
+					text: text,
 					iconCls:'editUserStatus',
 					attrs : App.data.resources[i]
 				});
@@ -221,28 +224,28 @@ Ext.apply( App, {
 				//未支付结账
 				menuItems.push({
 					itemId:'checkMobileBill',
-					text:'未支付结账',
+					text: text,
 					iconCls:'pay',
 					attrs : App.data.resources[i]
 				});
 			}else if(App.data.resources[i].handler == 'queryBandOnlineUser'){
 				menuItems.push({
 					itemId:'queryBandOnlineUser',
-					text:'宽带在线用户查询',
+					text: text,
 					iconCls:'query',
 					attrs : App.data.resources[i]
 				});
 			}else if(App.data.resources[i].handler == 'queryBandUserFailedLog'){
 				menuItems.push({
 					itemId:'queryBandUserFailedLog',
-					text:'宽带认证失败日志查询',
+					text: text,
 					iconCls:'query',
 					attrs : App.data.resources[i]
 				});
 			}else if(App.data.resources[i].handler == 'sendCaCardId'){
 				menuItems.push({
 					itemId:'sendCaCardId',
-					text:'一体机授权',
+					text: text,
 					iconCls:'icon-busi',
 					attrs : App.data.resources[i]
 				});
@@ -260,7 +263,7 @@ Ext.apply( App, {
 			//只在营业系统中显示"发票结账"
 			App.tool.insert(4,{
 				id:'otherBusiMenuId',
-				text:'其他业务',
+				text: langUtils.tools("qtyw"),
 				iconCls:'others',
 				menu: new Ext.menu.Menu({
 					items:menuItems,

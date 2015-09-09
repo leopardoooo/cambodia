@@ -41,7 +41,7 @@ Ext.ux.Gpanel = Ext.extend(Ext.Panel,{
 			
 			if(columnBtns.length > 0){
 				this.columns.push({
-					header : "操作",
+					header : "Action",
 							dataIndex:'OPERATE',
 							width : columnBtns.length * 22+5>50?columnBtns.length * 22+5:50,
 							renderer:function(value,meta,record,rowIndex,columnIndex,store){

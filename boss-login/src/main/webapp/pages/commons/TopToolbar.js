@@ -16,7 +16,7 @@ TopToolbar = Ext.extend(Ext.Toolbar , {
 			height: 26,
 			cls: 'site-tool-bg',
 		    items: ['->','-',{
-				text: '切换系统',
+				text: langUtils.tools("qhxt"),
 				iconCls: 'icon-t-sys',
 				menu: new Ext.menu.Menu({
 					id:'subsustemMenuId',
@@ -27,21 +27,21 @@ TopToolbar = Ext.extend(Ext.Toolbar , {
 					}
 				})
 			},'-',{
-				text: '个人修改',
+				text: langUtils.tools("grxg"),
 				iconCls: 'icon-password',
 				handler: this.showOptrDataWin
 			},'-',{
-				text: '安全退出',
+				text: langUtils.tools("aqtc"),
 				iconCls: 'icon-exit',
 				handler: this.onSafetyExit
 			},'-',{
 				iconCls: 'icon-help',
-				text: '帮助',
+				text: langUtils.tools("bz"),
 				menu: [{
-					text: 'BOSS帮助',
+					text: langUtils.tools("bsbz"),
 					handler: this.openHelpPage
 				},{
-					text: '关于我们',
+					text: langUtils.tools("gywm"),
 					handler: this.aboutUs
 				}]
 			},' ',' ',' ',' ']
