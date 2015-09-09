@@ -66,12 +66,6 @@ PayPanel = Ext.extend( Ext.Panel ,{
 				width: 100,
 				scope: this,
 				handler: this.doSave
-			},{
-				text: bt[1],
-				width: 100,
-				iconCls: 'icon-close',
-				scope: this,
-				handler: this.doSave
 			}]
 		});
 		this.loadBaseData();
