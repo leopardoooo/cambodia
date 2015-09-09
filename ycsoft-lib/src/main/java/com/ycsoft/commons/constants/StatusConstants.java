@@ -19,7 +19,7 @@ public class StatusConstants {
 	public static String OWESTOP = "OWESTOP";//欠费停 红
 	public static String OWENOTSTOP = "OUNSTOP";//欠费未停  橙
 	public static String LINKSTOP = "LINKSTOP";//关联停 红
-	public static String FORSTOP = "FORSTOP";//强制停   红
+	public static String FORSTOP = "FORSTOP";//到期停
 	public static String TMPOPEN = "TMPOPEN";//临时开通
     public static String LNKUSTOP = "LNKUSTOP";//关联未停
     public static String CANCEL = "CANCEL";//失效  红

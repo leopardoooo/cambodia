@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.yaochen.boss.job.component.AuthComponent;
@@ -25,6 +24,8 @@ public class OttAuthJob implements Job2 {
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	@Autowired
 	private AuthComponent authComponent;
+	@Autowired
+	private OttClient ottClient;
 	
 	@Override
 	public void execute(Job2ExecutionContext arg0) throws JobExecutionException {
@@ -36,14 +37,14 @@ public class OttAuthJob implements Job2 {
 			logger.error("读取指令失败"+e.getMessage());
 			return;
 		}
-		OttClient client = new OttClient();
+		
 		for (JVodCommand cmd:cmdList){
 			Result result = null;
 			try{
 				JsonObject params =new JsonParser().parse(cmd.getDetail_param()).getAsJsonObject();
 				if ((cmd.getCmd_type().equals(BusiCmdConstants.CHANGE_USER))){
 					
-					result = client.editUser(cmd.getLogin_name(), 
+					result = ottClient.editUser(cmd.getLogin_name(), 
 							getJsonValue(params,BusiCmdParam.login_name.name()), 
 							getJsonValue(params,BusiCmdParam.login_password.name()),
 							null, null,null,
@@ -52,14 +53,14 @@ public class OttAuthJob implements Job2 {
 							getJsonValue(params,BusiCmdParam.user_status.name()));
 				} else if ((cmd.getCmd_type().equals(BusiCmdConstants.DEL_USER))){
 					
-					result = client.deleteUser(getJsonValue(params,BusiCmdParam.login_name.name()));
+					result = ottClient.deleteUser(getJsonValue(params,BusiCmdParam.login_name.name()));
 				} else if ((cmd.getCmd_type().equals(BusiCmdConstants.PASSVATE_PROD))){
-					result = client.stopUserProduct(getJsonValue(params,BusiCmdParam.login_name.name()), cmd.getRes_id());
+					result = ottClient.stopUserProduct(getJsonValue(params,BusiCmdParam.login_name.name()), cmd.getRes_id());
 				} else if  ((cmd.getCmd_type().equals(BusiCmdConstants.ACCTIVATE_PROD))){
-					result = client.openUserProduct(getJsonValue(params,BusiCmdParam.login_name.name()), cmd.getRes_id(),
+					result = ottClient.openUserProduct(getJsonValue(params,BusiCmdParam.login_name.name()), cmd.getRes_id(),
 							getJsonValue(params,BusiCmdParam.prod_exp_date.name()));
 				}else{
-					result=client.getBossErrorResult("未定义的指令类型");
+					result=ottClient.getBossErrorResult("未定义的指令类型");
 				}
 			}catch(Exception e){
 				result = new Result();
@@ -80,7 +81,6 @@ public class OttAuthJob implements Job2 {
 			try{
 				authComponent.saveOttSendResult(cmd, result);
 			} catch(Exception e){
-				e.printStackTrace();
 				logger.error("保存指令发送结果失败",e);
 				return;
 			}

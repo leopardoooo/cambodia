@@ -96,6 +96,20 @@ public class BaseBusiComponent extends BaseComponent{
 	}
 	
 	/**
+	 * 获得终端用户名
+	 * @param user
+	 */
+	public String getFillUserName(CUser user){
+		if(StringHelper.isEmpty(user.getUser_name())){
+			if(StringHelper.isEmpty(user.getLogin_name())){
+				return user.getUser_type();
+			}else{
+				return user.getLogin_name();
+			}
+		}
+		return user.getUser_name();
+	}
+	/**
 	 * 创建包多月产品的按月账单
 	 * @param acctItem
 	 * @param invalidDate
