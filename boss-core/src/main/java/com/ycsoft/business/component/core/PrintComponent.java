@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.ycsoft.beans.config.TBusiDocTemplatefile;
@@ -29,6 +30,7 @@ import com.ycsoft.business.dao.core.common.CDoneCodeInfoDao;
 import com.ycsoft.business.dao.core.cust.CCustDao;
 import com.ycsoft.business.dao.core.cust.CCustLinkmanDao;
 import com.ycsoft.business.dao.core.fee.CFeeDao;
+import com.ycsoft.business.dao.core.fee.CFeeUnprintDao;
 import com.ycsoft.business.dao.core.print.CDocDao;
 import com.ycsoft.business.dao.core.print.CDocFeeDao;
 import com.ycsoft.business.dao.core.print.CDocItemDao;
@@ -85,7 +87,8 @@ public class PrintComponent extends BaseBusiComponent  {
 	private CInvoiceItemDao cInvoiceItemDao;
 	private CDoneCodeInfoDao cDoneCodeInfoDao;
 	private TPrintitemDao tPrintitemDao;
-
+	@Autowired
+	private CFeeUnprintDao cFeeUnprintDao;
 	
 	public void saveServiceDoc(String custId,Integer doneCode,String docSn) throws Exception {
 		CDoc doc = new CDoc();
@@ -599,6 +602,8 @@ public class PrintComponent extends BaseBusiComponent  {
 			List<CInvoiceItem> invoiceitems = new ArrayList<CInvoiceItem>();
 			for (String docitemsn : docSnItems) {
 				String[] dsns = docitemsn.split(",");
+				//删除已打印的费用记录，用于操作员未打印提示
+				cFeeUnprintDao.deleteUnPrintByDocItem(dsns);
 				for(String sn : dsns){
 					CInvoiceItem cInvoiceItem = new CInvoiceItem();
 					cInvoiceItem.setDocitem_sn(sn);

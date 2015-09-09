@@ -58,19 +58,19 @@ public class CFeeDao extends BaseEntityDao<CFee> {
 	 * @param done_code
 	 * @throws JDBCException 
 	 */
-	public void updateCFeeToPay(CDoneCodeUnpay unpay,CFeePayDto pay) throws JDBCException{
+	public void updateCFeeToPay(CDoneCodeUnpay unpay,CFeePayDto pay,String isDoc) throws JDBCException{
 		String sql=StringHelper.append(
 				"update c_fee set status=? ,pay_type=?,",
 				" invoice_mode=?,invoice_id=?,invoice_book_id=?,invoice_code=?,",
 				" pay_sn=?,acct_date=?,busi_optr_id=?,",
 				" is_doc=? ",
-				" where create_done_code=? and cust_id=? ");
+				" where create_done_code=? and cust_id=? and optr_id=? and status=? ");
 		this.executeUpdate(sql, 
 				StatusConstants.PAY,pay.getPay_type(),
 				pay.getInvoice_mode(),pay.getInvoice_id(),pay.getInvoice_book_id(),pay.getInvoice_code(),
 				pay.getPay_sn(),pay.getAcct_date(),pay.getBusi_optr_id(),
-				(StringHelper.isEmpty(pay.getInvoice_id())?SystemConstants.BOOLEAN_FALSE:SystemConstants.BOOLEAN_TRUE),
-				unpay.getDone_code(),unpay.getCust_id());
+				isDoc,
+				unpay.getDone_code(),unpay.getCust_id(),unpay.getOptr_id(),StatusConstants.UNPAY);
 	}
 	/**
 	 * 查询待支付的总额
@@ -374,10 +374,10 @@ public class CFeeDao extends BaseEntityDao<CFee> {
 			String invoiceId,String invoiceMode) throws JDBCException {
 		//非套餐缴费
 		String sql = "update c_fee f set f.invoice_code=?,f.invoice_id=?,f.invoice_book_id=?,f.invoice_mode=?,is_doc=? " +
-				" where f.busi_code<>? and f.fee_sn in(select t.fee_sn from c_doc_fee t where t.docitem_sn=?)";
+				" where f.fee_sn in(select t.fee_sn from c_doc_fee t where t.docitem_sn=?)";
 		executeUpdate(sql, invoiceCode, invoiceId, invoiceBookId, invoiceMode,
-				SystemConstants.BOOLEAN_TRUE, BusiCodeConstants.PROM_ACCT_PAY, docitemsn);
-		
+				SystemConstants.BOOLEAN_TRUE, docitemsn);
+		/**
 		//套餐缴费
 		sql = "update c_fee f set f.invoice_code=?,f.invoice_id=?,f.invoice_book_id=?,f.invoice_mode=?,is_doc=? " + 
 	         	" where f.busi_code=? and f.create_done_code in ("+
@@ -385,6 +385,7 @@ public class CFeeDao extends BaseEntityDao<CFee> {
 	         	"      where t.fee_sn=cpf.prom_fee_sn and t.docitem_sn=?)";
 		executeUpdate(sql, invoiceCode, invoiceId, invoiceBookId, invoiceMode,
 				SystemConstants.BOOLEAN_TRUE, BusiCodeConstants.PROM_ACCT_PAY, docitemsn);
+		**/
 	}
 
 	/**

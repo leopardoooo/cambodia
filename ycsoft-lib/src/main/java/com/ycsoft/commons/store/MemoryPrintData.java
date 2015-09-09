@@ -11,6 +11,7 @@ public class MemoryPrintData {
 	//操作员对应的未打印费用
 	private static Map<String,List<String>> printMap = null;
 
+	/**
 	public static void appendPrintData(String optrId,String feeSn){
 		List<String> feeSnList = printMap.get(optrId);
 		if(null != feeSnList){
@@ -27,7 +28,7 @@ public class MemoryPrintData {
 		if(null != feeSnList && feeSnList.contains(feeSn)){
 			feeSnList.remove(feeSn);
 		}
-	}
+	}**/
 	
 	public static void reloadOptrFee(String optrId,List<String> feeSnList){
 		if(null!=printMap.get(optrId)){
