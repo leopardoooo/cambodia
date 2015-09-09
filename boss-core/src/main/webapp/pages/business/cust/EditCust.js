@@ -212,11 +212,12 @@ EditCustForm = Ext.extend( CustBaseForm , {
 		return all;
 	},
 	success:function(){
-		if(App.getData().currentResource.busicode == '1003'){
-			var acctBank=App.getApp().data.custFullInfo.acctBank;
-			if(acctBank && acctBank.cust_id){
-				App.getApp().alertMsg("该客户有银行签约扣款，请询问客户是否需要继续银行扣款，如不需要务必操作银行解约！");
-			}
+		if(App.getData().currentResource.busicode == '1003' || App.getData().currentResource.busicode == '1010'){
+//			var acctBank=App.getApp().data.custFullInfo.acctBank;
+//			if(acctBank && acctBank.cust_id){
+//				App.getApp().alertMsg("该客户有银行签约扣款，请询问客户是否需要继续银行扣款，如不需要务必操作银行解约！");
+//			}
+			App.getApp().refreshPayInfo(parent);
 		}
 		App.getApp().refreshPanel(App.getApp().getData().currentResource.busicode);
 	}

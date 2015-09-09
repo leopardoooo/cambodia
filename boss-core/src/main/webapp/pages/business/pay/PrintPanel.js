@@ -631,13 +631,12 @@ InvoiceWindow = Ext.extend( Ext.Window ,{
 		this.refelshTitle();
 		InvoiceWindow.superclass.show.call(this);
 		this.initPageItem();
-		this.invoiceGrid.startEditing(0, 1);
+//		this.invoiceGrid.startEditing(0, 1);
 	},
 	refelshTitle: function(){
 		this.setTitle('打印共需要 ' + this.pageCount + " 张发票"); 
 	},
 	initPageItem: function(){
-		var rs = [];
 		// 生成控件
 		var invoiceId = App.getUrlParam('invoiceId');
 		var t = App.getUrlParam('invoiceBookId').split(",");
@@ -647,6 +646,7 @@ InvoiceWindow = Ext.extend( Ext.Window ,{
 			invoiceId = oldInvoiceId ;
 			invoiceCode = oldInvoiceCode;
 			invoiceBookId =	oldInvoiceBookId;
+			this.doAddInvoice(invoiceId,invoiceCode,invoiceBookId);
 		}else{
 			invoiceId = App.getApp().getNextInvoice(this.docType);
 			if (!Ext.isEmpty(invoiceId)){
@@ -668,41 +668,54 @@ InvoiceWindow = Ext.extend( Ext.Window ,{
 					if (data.length==1){
 						invoiceBookId = data[0]['invoice_book_id'];
 						invoiceCode = data[0]['invoice_code'];
-					}
 						
-					this.invoiceGrid.startEditing(1, 2);
+					}
+					this.doAddInvoice(invoiceId,invoiceCode,invoiceBookId);
+//					this.invoiceGrid.startEditing(1, 2);
 				};
 				var clearFunc = function(){
 					invoiceId='';
 				};
 				this.checkInvoice(invoiceId,successFunc,clearFunc);
+			}else{
+				this.doAddInvoice(invoiceId,invoiceCode,invoiceBookId);
 			}
 		}
 		
-		for(var i = 0 ;i< this.pageCount ;i++){
-			if (i==0)
-				rs[i] = new Ext.data.Record({
-					serialNum: i + 1,
-					invoiceId: invoiceId,
-					invoice_book_id:invoiceBookId,
-					invoice_code :invoiceCode
-				});
-			else
-				rs[i] = new Ext.data.Record({
-					serialNum: i + 1,
-					invoiceId: invoiceId,
-					invoice_book_id:'',
-					invoice_code:''
-				});
-				
-			if (invoiceId!="")
-				invoiceId = String.leftPad(parseInt(invoiceId,10)+1,invoiceId.length,'0')
-		}
 
-		this.invoiceStore.add(rs);
 //		if (this.pageCount==1)
 //			this.onSave();
 	},
+	doAddInvoice:function(invoiceId,invoiceCode,invoiceBookId){
+		var rs = [];
+		for(var i = 0 ;i< this.pageCount ;i++){
+		if (i==0)
+			rs[i] = new Ext.data.Record({
+				serialNum: i + 1,
+				invoiceId: invoiceId,
+				invoice_book_id:invoiceBookId,
+				invoice_code :invoiceCode
+			});
+		else
+			rs[i] = new Ext.data.Record({
+				serialNum: i + 1,
+				invoiceId: invoiceId,
+				invoice_book_id:'',
+				invoice_code:''
+			});
+			
+		if (invoiceId!="")
+			invoiceId = String.leftPad(parseInt(invoiceId,10)+1,invoiceId.length,'0')
+		}
+		this.invoiceStore.add(rs);
+		if(invoiceId == ""){
+			this.invoiceGrid.startEditing(0, 1);
+		}else if(invoiceCode == ""){
+			this.invoiceGrid.startEditing(1, 2);
+		}
+		
+	}
+	,
 	//验证是否已经全部输入完整
 	isValid: function(){
 		var obj = {};

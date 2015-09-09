@@ -138,13 +138,13 @@ public class ProdOrderAction extends BaseBusiAction {
 	
 	public String savePublicRecharge() throws Exception{
 		orderService.savePublicRecharge(pay_type,fee,receipt_id);
-		return JSON_SUCCESS;
+		return JSON;
 	}
 	
 	
 	public String savePublicRefund() throws Exception{
 		orderService.savePublicRefund(fee);
-		return JSON_SUCCESS;
+		return JSON;
 	}
 	
 	public String queryProdOrderInit(){
