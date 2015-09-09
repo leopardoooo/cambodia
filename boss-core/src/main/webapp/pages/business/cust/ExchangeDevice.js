@@ -94,7 +94,6 @@ ExchangeDevicePanel = Ext.extend(BaseForm,{
 		ExchangeDevicePanel.superclass.doInit.call(this);
 		var record = App.getApp().main.infoPanel.getUserPanel().userGrid.getSelectionModel().getSelected();
 		this.userData = record.data;
-		console.log(this.userData);
 		var userType = this.userData['user_type'];//设备ID
 		
 		var showCmp = function(flag){
