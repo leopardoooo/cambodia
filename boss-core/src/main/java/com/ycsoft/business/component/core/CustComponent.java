@@ -104,7 +104,7 @@ public class CustComponent extends BaseBusiComponent {
 	private TProvinceDao tProvinceDao;
 	
 	/**
-	 * 查询变更产权的设备销售方式
+	 * 查询变更产权的设备销售方
 	 * @return
 	 * @throws Exception
 	 */
