@@ -315,8 +315,8 @@ PropChangeGrid = Ext.extend(Ext.grid.GridPanel,{
 		var lu = langUtils.main("cust.change.columns");
 		var cm = [
 			{header:lu[0], dataIndex:'column_name_text',width:120},
-			{header:lu[1], dataIndex:'old_value_text',width:120},
-			{header:lu[2], dataIndex:'new_value_text',width:120},
+			{header:lu[1], dataIndex:'old_value_text',width:230},
+			{header:lu[2], dataIndex:'new_value_text',width:230},
 			{header:lu[3], dataIndex:'change_time',width:130}
 		];
 		var pageTbar = new Ext.PagingToolbar({store: this.propChangeStore ,pageSize : App.pageSize});
@@ -1321,7 +1321,6 @@ AcctItemDetailTab = Ext.extend(CommonTab,{
 		this.isReload = true;
 	},
 	refreshAcctItemInfo : function(acctId,acctItemId){
-		that = this;
 		Ext.Ajax.request({
 			scope : this,
 			url: Constant.ROOT_PATH + "/core/x/Acct!queryAcctitemInactive.action",
