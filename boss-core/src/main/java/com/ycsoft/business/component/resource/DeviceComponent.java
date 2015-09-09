@@ -16,7 +16,6 @@ import com.ycsoft.beans.core.fee.CFeeDevice;
 import com.ycsoft.beans.core.valuable.CValuableCard;
 import com.ycsoft.beans.core.valuable.CValuableCardFee;
 import com.ycsoft.beans.core.valuable.CValuableCardHis;
-import com.ycsoft.beans.depot.RDepotDefine;
 import com.ycsoft.beans.device.RDevice;
 import com.ycsoft.beans.device.RDeviceFee;
 import com.ycsoft.beans.device.RDeviceModel;
@@ -24,7 +23,6 @@ import com.ycsoft.beans.device.RDeviceReclaim;
 import com.ycsoft.beans.device.RDeviceUseRecords;
 import com.ycsoft.beans.device.RStb;
 import com.ycsoft.beans.device.RStbModel;
-import com.ycsoft.beans.system.SDept;
 import com.ycsoft.beans.system.SOptr;
 import com.ycsoft.business.commons.abstracts.BaseBusiComponent;
 import com.ycsoft.business.dao.config.TBusiFeeDeviceDao;
@@ -48,10 +46,8 @@ import com.ycsoft.business.dao.resource.device.RPairCfgDao;
 import com.ycsoft.business.dao.resource.device.RStbDao;
 import com.ycsoft.business.dao.resource.device.RStbModelDao;
 import com.ycsoft.business.dao.system.SDeptDao;
-import com.ycsoft.business.dto.config.TemplateConfigDto;
 import com.ycsoft.business.dto.device.DeviceDto;
 import com.ycsoft.business.dto.device.ValuableCardDto;
-import com.ycsoft.commons.constants.BusiCodeConstants;
 import com.ycsoft.commons.constants.DataRight;
 import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.constants.SystemConstants;
@@ -980,7 +976,8 @@ public class DeviceComponent extends BaseBusiComponent {
 				f.setFee_value(fList.get(0).getFee_value());
 				f.setFee_std_id(fList.get(0).getFee_std_id());
 			}else{
-				f.setFee_value(0);
+				//未配置BUY的费用返回-1
+				f.setFee_value(-1);
 			}
 			list.add(f);
 		}
