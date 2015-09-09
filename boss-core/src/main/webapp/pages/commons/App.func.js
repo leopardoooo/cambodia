@@ -39,12 +39,6 @@ Ext.apply(App.func,{
 				}else if(busicode == '1234'){//作废账单
 					if(data['status'] != '1' )//已出账
 						{return false;}else{return true;}
-				}else if(busicode == '1052'){//修改费用
-					if (data['status']=='INVALID' || (data['busi_fee']=='F' && data['busi_code'] !='1007' 
-						&& data['busi_code'] !='1008' && data['busi_code'] !='1009' 
-						&& data['busi_code'] !='1013' && data['busi_code'] !='1108'
-						))
-						{return false;}else{return true;}
 				}
 				return false;
 		}else if(custStatus == 'DATACLOSE'){//资料隔离
@@ -600,7 +594,7 @@ Ext.apply(App.func,{
 					|| Ext.util.Format.date(nowDate(),'Y-m-d') !== data['done_date'].substring(0,10))
 					return false;
 			}else if( busicode == '1052'){//修改业务费用
-				if(!Ext.isEmpty(data['fee_id']) && data['fee_id'] =='5051'){
+				if(!Ext.isEmpty(data['fee_id']) && data['fee_id'] =='5051' && data['busi_code'] !='1052'){
 					return true;
 				}
 				if (data['status']=='INVALID' || (data['busi_fee']=='F' && data['busi_code'] !='1007' 

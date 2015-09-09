@@ -59,14 +59,19 @@ Ext.ux.Grid = Ext.extend(Ext.grid.GridPanel,{
 				}else if(attr["button_type"]=='T'){//tbar上按钮
 					var btn = {};
 					attrs["handler"]=goUrl;//按钮点击事件
-					
 					Ext.apply(btn,attrs);
 					//批量缴费
 					if(this.childID == 'A_ACCT'){
 						btn["id"] = attrs.attrs.handler;
 					}
-					btn["tooltip"] = attr["res_name"];//鼠标悬浮时提示文本
-					btn["text"] = "<font style='font-family:微软雅黑;font-size:13'><b>"+attr["show_name"]+"</b></font>";//显示文本
+					var text = lang = langUtils.res(attr["res_id"]) || attr["show_name"];
+					var tip = null;
+					if(Ext.isArray(lang)){
+						text = lang[0];
+						tip = lang[1];
+					}
+					btn["tooltip"] = tip;//鼠标悬浮时提示文本
+					btn["text"] = "<font style='font-family:微软雅黑;font-size:13'><b>"+text+"</b></font>";//显示文本
 					tbarBtns.push(btn,'-');
 				}
 			}
@@ -75,7 +80,7 @@ Ext.ux.Grid = Ext.extend(Ext.grid.GridPanel,{
 				var columnBtnsLength = columnBtns.length > 13 ? 13 : columnBtns.length;
 				if(this.columns){//普通表格
 					this.columns.push(new Ext.grid.Column({
-						header : "操作",
+						header : langUtils.bc("common.optr"),
 						dataIndex:'OPERATE',
 						menuDisabled : true,
 						width : columnBtnsLength * 22>45?columnBtnsLength * 22+8:53,
@@ -92,7 +97,7 @@ Ext.ux.Grid = Ext.extend(Ext.grid.GridPanel,{
 				}else{//列锁定表格
 					var gridId = this.childID;
 					this.cm.columns.push(new Ext.grid.Column({
-						header : "操作",
+						header : langUtils.bc("common.optr"),
 						locked : true,
 						menuDisabled : true,
 						dataIndex:'OPERATE',

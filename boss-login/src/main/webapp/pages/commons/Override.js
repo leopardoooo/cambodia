@@ -561,10 +561,10 @@ Ext.util.Format.getDays = function(strDateStart, strDateEnd) {// sDate1和sDate2
 Ext.util.Format.addMoth = function(d, m) {
 	var date = Date.parseDate(d,"Y-m-d");
 	var ds = d.split('-'), _d = ds[2] - 0;
-	var nextM = new Date(date.getFullYear(), date.getMonth()+m, 0);
+	var nextM = new Date(date.getFullYear(), date.getMonth()+1+m, 0);
 	var max = nextM.getDate();
-	d = new Date(nextM.getFullYear(), nextM.getMonth()+1, Ext.util.Format.toChangep(_d > max? max: _d));
-	return d.format("Y-m-d");
+	date = new Date(nextM.getFullYear(), nextM.getMonth(), Ext.util.Format.toChangep(_d > max? max: _d));
+	return date.format("Y-m-d");
 }
 
 

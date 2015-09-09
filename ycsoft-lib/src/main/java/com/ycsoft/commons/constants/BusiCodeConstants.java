@@ -16,7 +16,8 @@ public final class BusiCodeConstants {
 	public final static String CUST_QUIT_UNIT = "1006";//退出单位
 	public final static String CUST_CHANGE_LINE = "1065";//改线
 	public final static String DEVICE_BUY = "1007";//购买设备
-	public final static String DEVICE_BUY_PJ = "1108";//购买设备
+	public final static String DEVICE_BUY_PJ = "1108";//购买配件
+	public final static String DEVICE_BUY_PJ_BACTH = "1109";//批量购买配件
 	public final static String DEVICE_RECLAIM = "1008";//回收设备
 	public final static String DEVICE_CHANGE = "1009";//更换设备
 	public final static String DEVICE_REG_LOST = "1014";//设备挂失
