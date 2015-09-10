@@ -6,11 +6,10 @@ UserStopList = Ext.extend(Ext.Panel, {
 				var userRecords = App.getApp().main.infoPanel.getUserPanel().userGrid.getSelections();
 				var items = [{
 					xtype : 'datefield',
-					fieldLabel : '报停时间',
+					fieldLabel : lmain("user._form.stopTime"),
 					id : 'effectivedateid',
 					width : 100,
 					allowBlank : false,
-					minText : '不能选择当日之前',
 					minValue : nowDate().format('Y-m-d'),
 					value : nowDate(),
 					format : 'Y-m-d',
@@ -20,7 +19,7 @@ UserStopList = Ext.extend(Ext.Panel, {
 				if(userRecords[0].get('is_rstop_fee') == 'T'){
 					items.push({
 						xtype : 'numberfield',
-						fieldLabel : '报停费用',
+						fieldLabel : lmain("user._form.stopFee"),
 						width : 100,
 						id:'fee',
 						value:0,
@@ -30,7 +29,7 @@ UserStopList = Ext.extend(Ext.Panel, {
 				UserStopList.superclass.constructor.call(this, {
 							border : false,
 							labelWidth : 120,
-							title : '业务受理',
+							title : lbc("common.busido"),
 							bodyStyle : Constant.TAB_STYLE,
 							layout : 'form',
 							items : items

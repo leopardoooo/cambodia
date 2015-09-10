@@ -32,7 +32,7 @@ UserBaseForm = Ext.extend( BaseForm , {
 				},
 				items:[{
 					items:[{
-						fieldLabel:'用户类型',
+						fieldLabel: lmain("user.base.type"),
 						xtype:'paramcombo',
 						width:150,
 						allowBlank:false,
@@ -46,7 +46,7 @@ UserBaseForm = Ext.extend( BaseForm , {
 				},{
 					items:[{
 						id:'userNameId',
-						fieldLabel:'用户名称',
+						fieldLabel: lmain("user.base.name"),
 						xtype:'textfield',
 						name:'user_name'
 					}]
@@ -68,7 +68,7 @@ UserBaseForm = Ext.extend( BaseForm , {
 					items:[{
 						xtype: 'checkbox',
 					    labelWidth: 120,
-					    fieldLabel: "施工回填",
+					    fieldLabel: lmain("user._form.taskBackFill"),
 					    id: "boxTaskEl",
 					    checked: true,
 					    listeners:{
@@ -79,10 +79,9 @@ UserBaseForm = Ext.extend( BaseForm , {
 				},{
 					items:[{
 			            xtype: 'textfield',
-			            fieldLabel: '设备编码',
+			            fieldLabel: lmain("user._form.deviceCode"),
 			            width : 150,
 			            id: 'deviceCodeEl',
-			            emptyText: "输入设备编码..",
 			            disabled: true,
 			            listeners: {
 			            	scope: this,
@@ -105,7 +104,7 @@ UserBaseForm = Ext.extend( BaseForm , {
 				},
 				items:[{
 					items:[{
-						fieldLabel:'设备型号',
+						fieldLabel: lmain("user.base.deviceModel"),
 						width : 150,
 						xtype:'paramcombo',
 						hiddenName:'device_model',
@@ -119,13 +118,13 @@ UserBaseForm = Ext.extend( BaseForm , {
 						}
 					},{
 						xtype: 'displayfield',
-			            fieldLabel: '费用名称',
+			            fieldLabel: lmain("user._form.feeName"),
 			            width : 150,
 			            id: 'dfFeeNameEl'
 					}]
 				},{
 					items:[{
-						fieldLabel:'购买方式',
+						fieldLabel: lmain("user.base.buyWay"),
 						xtype:'combo',
 						id : 'deviceBuyMode',
 						forceSelection : true,
@@ -135,7 +134,7 @@ UserBaseForm = Ext.extend( BaseForm , {
 						width : 150,
 						displayField : 'buy_mode_name',
 						valueField : 'buy_mode',
-						emptyText: '请选择',
+						emptyText: lbc("common.plsSwitch"),
 						editable : false,
 						allowBlank:false,
 						listeners: {
@@ -143,7 +142,7 @@ UserBaseForm = Ext.extend( BaseForm , {
 							select: this.doBuyModeSelect
 						}
 					},{
-						fieldLabel:'收费金额$',
+						fieldLabel: lmain("user._form.feeAmount"),
 						xtype:'numberfield',
 						width:150,
 						allowBlank:false,
@@ -151,7 +150,7 @@ UserBaseForm = Ext.extend( BaseForm , {
 					}]
 				},{
 					items:[{
-						fieldLabel:'催费类型',
+						fieldLabel: lmain("user.base.stopType"),
 						xtype:'paramcombo',
 						allowBlank:false,
 						width:150,
@@ -166,7 +165,7 @@ UserBaseForm = Ext.extend( BaseForm , {
 			    labelWidth: 120,
 			    height: 50,
 			    id: 'dfProtocolInfoEl',
-			    fieldLabel: "协议信息"
+			    fieldLabel: lmain("user._form.protocolInfo")
 			},{
 			    xtype:'fieldset',
 			    width: '100%',
@@ -184,7 +183,7 @@ UserBaseForm = Ext.extend( BaseForm , {
 			        items :[{
 			        	xtype: "textfield",
 			        	id: "txtLoginName",
-		                fieldLabel: '账号',
+		                fieldLabel: lmain("user.base.loginName"),
 		                allowBlank:false,
 		                listeners: {
 		                	change: this.validAccount
@@ -196,7 +195,7 @@ UserBaseForm = Ext.extend( BaseForm , {
 			    		xtype: 'textfield',
 			    		id: "txtLoginPswd",
 			    		allowBlank:false,
-		                fieldLabel: '密码'
+		                fieldLabel: lbc("common.pswd")
 		            }]
 			    }]
 			}]
@@ -369,7 +368,7 @@ UserBaseForm = Ext.extend( BaseForm , {
 					item_name: data["device_model_text"],
 					item_value: data["device_model"]
 				}]);
-				box.setValue(data["device_model"]);
+				box.setValue(data["device_model_text"]);
 			}
 		});
 	},
@@ -509,4 +508,4 @@ NewUserForm = Ext.extend(UserBaseForm , {
 Ext.onReady(function(){
 	var nup = new NewUserForm();
 	var box = TemplateFactory.gTemplate(nup);
-})
+});

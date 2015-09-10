@@ -38,7 +38,7 @@ UserInfoPanel = Ext.extend(Ext.Panel,{
 				else{//单用户显示panel
 					var UserDetailTemplate = App.getApp().main.infoPanel.getUserPanel().getUserDetailTemplate();	
 					var UserSelectform = new Ext.Panel({	
-							title : '用户信息',
+							title : lmain("user.list._title"),
 							height: appheight,	
 							border : false,	
 							autoScroll:true,
