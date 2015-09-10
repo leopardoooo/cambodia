@@ -93,3 +93,6 @@ langUtils = function(DOC){
 		}
 	}
 }(document);
+// fn alias
+lmain = langUtils.main;
+lbc = langUtils.bc;

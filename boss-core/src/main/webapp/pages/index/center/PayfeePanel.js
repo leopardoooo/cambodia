@@ -25,12 +25,12 @@ AcctFeeGrid = Ext.extend(Ext.ux.Grid, {
 		var cm = new Ext.ux.grid.LockingColumnModel({ 
     		columns : [
     			{header:lc[0],dataIndex:'create_done_code',width:80},
-				{header:lc[1],dataIndex:'busi_name',	width:80},
+				{header:lc[1],dataIndex:'busi_name',	width:80,renderer:App.qtipValue},
 				{header:lc[2],dataIndex:'acct_type_text',width:70},
 				{header:lc[3],dataIndex:'fee_text',width:130,renderer:App.qtipValue},
 				{header:lc[4],dataIndex:'user_type_text',width:70},
 				{header:lc[5],dataIndex:'user_name',width:70,renderer:App.qtipValue},
-				{header:lc[6],dataIndex:'device_code',width:130},
+				{header:lc[6],dataIndex:'device_code',width:130,renderer:App.qtipValue},
 				{header:lc[7],dataIndex:'status_text',width:60,renderer:Ext.util.Format.statusShow},
 				{header:lc[8],dataIndex:'real_pay',width:60,renderer:Ext.util.Format.formatFee},				
 				{header:lc[9],dataIndex:'begin_date',width:125,renderer:Ext.util.Format.dateFormat},

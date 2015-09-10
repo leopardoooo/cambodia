@@ -151,7 +151,7 @@ public class UserComponent extends BaseBusiComponent {
 	public CUser createUser(CUser user) throws Exception {
 		//DTT,OTT用户没有机顶盒号、宽带用户没有MAC
 		if (((user.getUser_type().equals(SystemConstants.USER_TYPE_DTT)
-				|| user.getUser_type().equals(SystemConstants.USER_TYPE_OTT))) && StringHelper.isEmpty(user.getStb_id())
+				|| user.getUser_type().equals(SystemConstants.USER_TYPE_OTT)) && StringHelper.isEmpty(user.getStb_id()))
 				|| (user.getUser_type().equals(SystemConstants.USER_TYPE_BAND)
 						&& StringHelper.isEmpty(user.getModem_mac())))
 			user.setStatus(StatusConstants.INSTALL);

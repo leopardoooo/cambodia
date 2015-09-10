@@ -9,7 +9,7 @@ UserTypeForm = Ext.extend( Ext.Panel,{
 			baseCls:'x-plain',
 			layout:'form',
 			bodyStyle:'background:#F9F9F9;padding-top:4px',
-			items:[{fieldLabel:'用户类型',
+			items:[{fieldLabel: lmain("user.base.type"),
 					id : 'comboForUserBaseForm',
 					xtype:'paramcombo',
 					width:150,

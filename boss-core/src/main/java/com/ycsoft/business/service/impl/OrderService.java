@@ -921,7 +921,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 			}
 		}
 		for(CUser user:  pstProdMap.keySet()){
-			authComponent.sendAuth(user, pstProdMap.get(user), BusiCmdConstants.PASSVATE_PROD, done_code);
+			authComponent.sendAuth(user, pstProdMap.get(user), BusiCmdConstants.ACCTIVATE_PROD, done_code);
 		}
 	}
 	/**

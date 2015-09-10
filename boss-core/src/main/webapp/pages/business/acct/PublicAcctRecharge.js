@@ -25,7 +25,7 @@ PublicRechargeForm = Ext.extend(BaseForm,{
 				value:this.acctitemId
 			},{
 				xtype : 'paramcombo',
-				fieldLabel:'充值方式',
+				fieldLabel: lmain("cust._form.rechargeWay"),
 				allowBlank : false,
 				paramName:'PUBLIC_PAY_FEE',
 				hiddenName:'pay_type',
@@ -36,7 +36,7 @@ PublicRechargeForm = Ext.extend(BaseForm,{
 					select: this.doChangePayType
 				}
 			},{
-				fieldLabel: '凭据号',
+				fieldLabel: lmain("cust._form.byTicket"),
 				maxLength: 18,
 				width:150,
 				disabled: true,
@@ -45,7 +45,7 @@ PublicRechargeForm = Ext.extend(BaseForm,{
 			},{
 				xtype : 'numberfield',
 				id : 'rechargeFeeValue',
-				fieldLabel : '充值金额',
+				fieldLabel : lmain("cust._form.rechargeCount"),
 				width : 150,
 				name:'fee',
 				allowNegative : false,
@@ -59,7 +59,6 @@ PublicRechargeForm = Ext.extend(BaseForm,{
 		App.form.initComboData(this.findByType('paramcombo'));
 	},
 	success:function(){
-		App.getApp().refreshPayInfo(parent);
 		App.getApp().refreshPanel(App.getApp().getData().currentResource.busicode);
 	},
 	doChangePayType: function(cb, record, index){
@@ -85,11 +84,11 @@ PublicRechargeForm = Ext.extend(BaseForm,{
 			obj["isValid"] = true;
 		}else{
 			obj["isValid"] = false;
-			obj["msg"] = "含有验证不通过的输入项";
+			obj["msg"] = lbc("common.tipFormInvalid");
 		}
 		if(this.getForm().findField('fee').getValue()<=0){
 			obj["isValid"] = false;
-			obj["msg"] = "金额需要大于0!";
+			obj["msg"] = lmain("cust._form.tipRechargeCountMustBeGreaterThanZero");
 		}
 		return obj;
 	},

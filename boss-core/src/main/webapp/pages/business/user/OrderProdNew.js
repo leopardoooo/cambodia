@@ -26,7 +26,7 @@ ProdOrderForm = Ext.extend( BaseForm, {
 		// 订购月份
 		var orderMonthField = new Ext.ux.form.SpinnerField({
 			xtype: 'spinnerfield',
-            fieldLabel: '订购月数',
+            fieldLabel: lmain("user._form.prodOrderMonths"),
            // allowBlank: false,
             readOnly: true,
             id: 'sfOrderCycle',
@@ -60,11 +60,11 @@ ProdOrderForm = Ext.extend( BaseForm, {
 				bodyStyle:'background:#F9F9F9;padding-top:10px; border-bottom: 0px;',
 				region: "north",
 				layout: 'form',
-				title: '第一步：选择产品',
+				title: lmain("user._form.titleSwitchProd"),
 				height: 94,
 				items: [{
 					xtype: 'combo',
-				    fieldLabel: "产品名称",
+				    fieldLabel: lmain("user._form.prodName"),
 				    width: 200,
 				    displayField: 'prod_name',
 				    valueField: 'prod_id',
@@ -81,9 +81,9 @@ ProdOrderForm = Ext.extend( BaseForm, {
 				},{
 					anchor: '90%',
 		            xtype: 'displayfield',
-		            fieldLabel: '产品描述',
+		            fieldLabel: lmain("user._form.prodDesc"),
 		            id: 'dfProdDesc',
-		            value: 'balabalabala..'
+		            value: ''
 				}]
 			},{
 				region: 'center',
@@ -92,7 +92,7 @@ ProdOrderForm = Ext.extend( BaseForm, {
 				items: [{
 					region: 'west',
 					width: 280,
-					title: "第二步：确定订购用户",
+					title: lmain("user._form.titleDetemineUser"),
 					split: true,
 			        minSize: 150,
 			        maxSize: 350,
@@ -105,16 +105,16 @@ ProdOrderForm = Ext.extend( BaseForm, {
 					labelAlign: 'top',
 					labelPad: 20,
 					defaults: {anchor: "90%"},
-					title: '第三步：订购信息',
+					title: lmain("user._form.titleOrderInfo"),
 					bodyStyle: 'padding: 15px 0 0 20px;border-bottom: none;',
 					items: [{
 					    xtype: 'combo',
-					    fieldLabel: "产品资费",
+					    fieldLabel: lmain("user._form.prodTariff"),
 					    displayField: 'disct_name',
 					    allowBlank: false,
 					    valueField: 'tariff_id',
 					    mode: 'local',
-					    emptyText: '选择产品资费..',
+					    emptyText: lbc("common.plsSwitch"),
 					    id: 'boxProdTariff',
 					    store: new Ext.data.JsonStore({
 							fields: ['tariff_id', 'disct_name', 'billing_cycle','max_order_cycle', 'disct_rent']
@@ -128,10 +128,10 @@ ProdOrderForm = Ext.extend( BaseForm, {
 						anchor: '100%',
 						baseCls: 'x-plain',
 						style: 'padding-bottom: 10px;',
-						html: '<b>【上期订购结束日：<span id="lastOrderProdExtDate">--</span>】</b>'
+						html: '<b>【'+ lmain("user._form.lastOrderExpDate") +'：<span id="lastOrderProdExtDate">--</span>】</b>'
 					},{
 						xtype: 'datefield',
-					    fieldLabel: "开始计费日",
+					    fieldLabel: lmain("user._form.prodStartDate"),
 					    id: 'dfStartDate',
 					    format: 'Y-m-d',
 					    allowBlank: false,
@@ -141,7 +141,7 @@ ProdOrderForm = Ext.extend( BaseForm, {
 						id: 'dfExpDate',
 						editable: true,
 						allowBlank: false,
-			            fieldLabel: '结束计费日'
+			            fieldLabel: lmain("user._form.prodExpDate")
 					}]
 				}]
 			},{  
@@ -160,17 +160,17 @@ ProdOrderForm = Ext.extend( BaseForm, {
 		         	xtype:'fieldset',  
 		         	id:'orderFeeItemId',
 				    height: 75, 
-				    title:'产品费',
+				    title: lmain("user._form.titleOrderFee"),
          			style:'margin-left:2px;padding: 10px 0 10px 10px; color: red',
          			layout:'column',
          			items:[{
          				columnWidth:.65,
          				items:[{
          						bodyStyle:'padding-top:4px',
-		         				html: "*应收$:<span id='totalAmount'>--</span>"
-								+"（新增订购:<b id='addAmount'>--</b> "
+		         				html: "*"+ lmain("user._form.shouldPay") + "$:<span id='totalAmount'>--</span>"
+								+"（"+ lmain("user._form.addOrderFee") +":<b id='addAmount'>--</b> "
 								+" - "
-								+" <a id='transferHrefTag' href='#'>转移支付:<b id='transferAmount'>--</b></a>"
+								+" <a id='transferHrefTag' href='#'>"+lmain("user._form.transferPay")+":<b id='transferAmount'>--</b></a>"
 								+" ）"
 			         			}]
          				},{
@@ -178,13 +178,13 @@ ProdOrderForm = Ext.extend( BaseForm, {
          				layout : 'form',
          				labelWidth:40,  
          				items:[{
-								fieldLabel : '支付',
+								fieldLabel : lbc("common.pay"),
 								id : 'orderFeeTypeId',
 								name:'order_fee_type',
 								allowBlank : false,
 								xtype:'paramcombo',
 								width: 60,
-								emptyText: '请选择',
+								emptyText: lbc("common.plsSwitch"),
 								defaultValue:'CFEE',
 								paramName:'ORDER_FEE_TYPE',
 								listeners: {
@@ -704,8 +704,6 @@ ProdOrderForm = Ext.extend( BaseForm, {
 	}
 	,
 	success : function(form,res){
-		var userId = res.simpleObj;
-		App.getApp().refreshPayInfo(parent);
 		App.getApp().refreshPanel(App.getApp().getData().currentResource.busicode);
 	}
 });

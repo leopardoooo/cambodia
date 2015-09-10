@@ -17,8 +17,6 @@ NewCustForm = Ext.extend( CustBaseForm , {
 			App.getData().busiTaskToDo.push(buyDevice);
 			App.getData().busiTaskToDo.push(newUser);
 		}
-		//刷新支付
-		App.getApp().refreshPayInfo(parent);
 		App.getApp().refreshPanel(App.getApp().getData().currentResource.busicode);
 	},
 	doInit:function(){

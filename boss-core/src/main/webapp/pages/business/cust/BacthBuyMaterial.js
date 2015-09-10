@@ -14,10 +14,10 @@ var MaterialDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 		var cm = new Ext.ux.grid.LockingColumnModel({ 
 			columns : [
 				{header:'器材编号',dataIndex:'device_id',width:250,hidden:true},
-				{header:'器材型号',dataIndex:'device_model_text',width:250},
-				{header:'单价',dataIndex:'fee_value',width:100,renderer:function(v){if(v == "-1"){return "<span style='font-weight:bold'>未配置器材费 </span>"}else{ return Ext.util.Format.formatFee(v)}}},
-				{header:'库存数量',dataIndex:'total_num',width:100,renderer:App.qtipValue},
-				{id:'buy_num_id',header:'购买数量',dataIndex:'buy_num',width:100,
+				{header:lmain("cust._form.deviceModel"),dataIndex:'device_model_text',width:250},
+				{header:lbc("common.price"),dataIndex:'fee_value',width:100,renderer:function(v){if(v == "-1"){return "<span style='font-weight:bold'>未配置器材费 </span>"}else{ return Ext.util.Format.formatFee(v)}}},
+				{header:lmain("cust._form.storeCount"),dataIndex:'total_num',width:100,renderer:App.qtipValue},
+				{id:'buy_num_id',header:lmain("cust._form.buyCount"),dataIndex:'buy_num',width:100,
 					scope:this
 					,editor: new Ext.form.NumberField({
 						allowDecimals:false,//不允许输入小数 
@@ -25,12 +25,12 @@ var MaterialDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 		    			minValue:1//enableKeyEvents: true,
 					})
 				},
-				{header:'总价',dataIndex:'fee_back',width:100}
+				{header:lbc("common.total"),dataIndex:'fee_back',width:100}
 			]
         });
 		cm.isCellEditable = this.cellEditable;
 		MaterialDeviceGrid.superclass.constructor.call(this,{
-			title : '器材信息',
+			title : lmain("cust._form.titleBatchBuyMaterial"),
 			id:'buyMaterialId',
 			store:this.store,
 			cm:cm,
@@ -129,7 +129,6 @@ var MaterialDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 BacthBuyMaterialForm = Ext.extend( BaseForm , {
 	url : Constant.ROOT_PATH + "/core/x/Cust!bacthBuyMaterial.action",
 	success : function(){
-		App.getApp().refreshPayInfo(parent);
 		App.getApp().refreshPanel(App.getApp().getData().currentResource.busicode);
 	},
 	materialDeviceGrid : null,

@@ -85,7 +85,7 @@ EditCustForm = Ext.extend( CustBaseForm , {
 					}
 					f.disable();
 				});
-				Ext.getCmp('clickAddrId').disable();
+				Ext.getCmp('clickAddrId').setDisabled(true);
 				var fields = Ext.decode(response.responseText);
 				
 				var compare = function(f,name){

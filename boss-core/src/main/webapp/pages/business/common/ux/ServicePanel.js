@@ -100,7 +100,7 @@ ServiceGrid = Ext.extend( Ext.grid.EditorGridPanel, {
 				rowdeselect : this.doSelectedChange
 			}
 		});
-		
+		var cm = langUtils.bc("common.fee.columns");
 		ServiceGrid.superclass.constructor.call(this, {
 			border: false,
 			autoScroll: true,
@@ -109,25 +109,26 @@ ServiceGrid = Ext.extend( Ext.grid.EditorGridPanel, {
 			autoExpandColumn : 'e',
 	        clicksToEdit: 1,
 			sm : this.checkSm,
+			viewConfig:{forceFit:true},
 			cm: new Ext.grid.ColumnModel({
 				defaults: { width: 55 },
 				columns: [this.checkSm,
-					{ id : 'e',header: '费用项', dataIndex: 'fee_name'},
-					{ header: '户数', dataIndex: 'count', width: 40,
+					{ id : 'e',header: cm[0], dataIndex: 'fee_name',renderer:App.qtipValue},
+					{ header: cm[1], dataIndex: 'count', width: 40,
 						editor : new Ext.form.NumberField({
 							allowBlank : false,
 							minValue : 1,
 							allowNegative : false
 						})},
-					{ header: '单价', dataIndex: 'default_value',width : 40,
+					{ header: cm[2], dataIndex: 'default_value',width : 40,
 						editor : new Ext.form.NumberField({
 							allowBlank : false,
 							allowNegative : false
 						})},
-					{ header : '金额', dataIndex: 'feeValue',width : 40}
+					{ header : cm[3], dataIndex: 'feeValue',width : 40}
 				]
 			}),
-			tbar : ['业务费用','->','合计:',{
+			tbar : [langUtils.bc("common.fee.tbar0"),'->',langUtils.bc("common.total"),":",{
 								id: 'txtSumFee',
 								readOnly: true,
 								style: Constant.MONEY_STYLE,

@@ -28,11 +28,11 @@ EditCustLevelForm = Ext.extend( BaseForm , {
 			bodyStyle:'padding-top:10px',
 			labelWidth:100,
 			items:[{
-				xtype:'displayfield',fieldLabel:'原客户级别',
+				xtype:'displayfield',fieldLabel: langUtils.main("cust._form.oldCustLevel"),
 				value:this.formerCustLevel
 			},{
 				xtype : 'paramcombo',
-				fieldLabel:'新客户级别',
+				fieldLabel:langUtils.main("cust._form.newCustLevel"),
 				allowBlank : false,
 				paramName:'CUST_LEVEL',
 				hiddenName:'cust_level',
