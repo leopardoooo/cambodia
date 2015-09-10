@@ -118,5 +118,11 @@ public class SDeptDao extends BaseEntityDao<SDept> {
 		+") connect by prior s.dept_id = s.dept_pid  order by level,s.dept_type desc";
 		return createQuery(SDeptDto.class,sql, StatusConstants.ACTIVE).list();
 	}
+	
+	public List<SDept> queryAllDept() throws Exception{
+		String sql = "  select * from vew_depot ";
+		return createQuery(SDept.class,sql).list();
+	}
+	
 
 }

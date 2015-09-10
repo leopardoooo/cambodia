@@ -100,15 +100,17 @@ EditCustForm = Ext.extend( CustBaseForm , {
 										});	
 								}
 							}
-							if(fields[i].field_name == 'cust.addr_id'){//如果是地址，把剩余的放开允许修改
-								Ext.getCmp('clickAddrId').setDisabled(false);
+							if(fields[i].field_name == 'cust.addr_id'){//如果可以修改地址，把 选择地址按钮放开，隐藏的地址ID放开
+								Ext.getCmp('clickAddrId').enable();
+								Ext.getCmp('custAddrId').enable();
 							}
 							
 						}
 					}
 				}
-				if(cust.status == 'PREOPEN'){
-					Ext.getCmp('clickAddrId').setDisabled(false);
+				if(cust.status == 'PREOPEN'){//如果是意向客户，把 选择地址按钮放开，隐藏的地址ID放开
+					Ext.getCmp('clickAddrId').enable();
+					Ext.getCmp('custAddrId').enable();
 				}
 				
 				
@@ -187,12 +189,13 @@ EditCustForm = Ext.extend( CustBaseForm , {
 						oldValue : 'PREOPEN'
 					});
 				}			
+				arr.push({
+					columnName : 'cust.address',
+					newValue : address,
+					oldValue : oldAddress
+				});
+
 			}
-			arr.push({
-				columnName : 'cust.address',
-				newValue : address,
-				oldValue : oldAddress
-			});
 		}
 		//ROOM变更
 		var oldNote = App.getApp().getData().custFullInfo.cust.note
@@ -212,6 +215,13 @@ EditCustForm = Ext.extend( CustBaseForm , {
 		return all;
 	},
 	success:function(){
+		if(App.getData().currentResource.busicode == '1003' || App.getData().currentResource.busicode == '1010'){
+//			var acctBank=App.getApp().data.custFullInfo.acctBank;
+//			if(acctBank && acctBank.cust_id){
+//				App.getApp().alertMsg("该客户有银行签约扣款，请询问客户是否需要继续银行扣款，如不需要务必操作银行解约！");
+//			}
+			App.getApp().refreshPayInfo(parent);
+		}
 		App.getApp().refreshPanel(App.getApp().getData().currentResource.busicode);
 	}
 });

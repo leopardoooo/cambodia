@@ -371,6 +371,16 @@ public class BaseBusiService extends BaseService {
 		jobComponent.createCreditExecJob(doneCode, custId);
 	}
 	
+	//TODO 杂费取消
+	protected void cancelOtherFee( Integer doneCode, String busiCode,CFee fee) throws Exception, JDBCException {
+		//更新费用记录为冲正
+		feeComponent.saveCancelFee(fee,doneCode);
+		//重载操作员未打印的费用
+		String optrId = getOptr().getOptr_id();
+		List<String> feeSnList = feeComponent.queryUnPrintFeeByOptr(optrId);
+		MemoryPrintData.reloadOptrFee(optrId, feeSnList);
+	}
+	
 
 	/**
 	 * 冲正
@@ -604,8 +614,16 @@ public class BaseBusiService extends BaseService {
 	 * @param doneCode
 	 * @throws Exception
 	 */
-	protected void createUserJob(CUser user, String custId, Integer doneCode) throws Exception {
+	protected void createUserJob(CUser user, String custId, Integer doneCode)
+			throws Exception {
+		
 		authComponent.sendAuth(user, null, BusiCmdConstants.CREAT_USER, doneCode);
+		if (StringHelper.isNotEmpty(user.getCard_id())){
+			authComponent.sendAuth(user, null, BusiCmdConstants.ACCTIVATE_TERMINAL, doneCode);
+		}
+		if (StringHelper.isNotEmpty(user.getModem_mac())){
+			authComponent.sendAuth(user, null, BusiCmdConstants.ACCTIVATE_TERMINAL, doneCode);
+		}
 	}
 
 	/**
@@ -1009,6 +1027,8 @@ public class BaseBusiService extends BaseService {
 		updateUserCheckFlag(newCardId);
 		return busiInfo;
 	}
+	
+	
 	
 	/**
 	 * 回收设备

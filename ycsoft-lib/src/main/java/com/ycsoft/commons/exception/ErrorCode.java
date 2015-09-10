@@ -93,6 +93,8 @@ public enum ErrorCode {
 	
 	UserLoginNameIsNotExistsOrIsNotOttMobile("账号不存在或不是ott_mobile用户"),
 	
+	BusiCodeCanNotCancel("该业务不能回退（%s）"),
+	
 	/**OTT接口相关错误码**/
 	E40001("Mac地址认证失败（提示用户，不能进入）"),
 	E40002("EPG认证失败，返回Guest帐号"),

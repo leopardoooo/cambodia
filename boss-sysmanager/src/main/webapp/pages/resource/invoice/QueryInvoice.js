@@ -50,27 +50,42 @@ QueryInvoiceForm = Ext.extend(Ext.form.FormPanel,{
 			layout:'column',
 			items:[
 				{columnWidth:.5,layout:'form',border:false,items:[
-						{xtype:'treecombo',fieldLabel:'仓库',hiddenName:'invoiceDto.depot_id',
-						width:322,
-						treeWidth:322,
-						height: 20,
-						allowBlank: false,
-						onlySelectLeaf:false,
-						emptyText :'请选择仓库',
-						blankText:'请选择仓库',
-						treeUrl: 'resource/Invoice!queryChildInvoiceDepot.action',
-						listeners : {
-							scope:this,
-							'focus' : function(comboTree){
-								if(comboTree.list){
-									comboTree.expand();
+						{xtype:'combo',fieldLabel:'仓库',hiddenName:'invoiceDto.depot_id',width :150,minListWidth :250,
+							store:new Ext.data.JsonStore({
+								url:'resource/Device!queryAllDept.action',
+								fields:['dept_id','dept_name']
+							}),displayField:'dept_name',valueField:'dept_id',allowBlank:false,
+							triggerAction:'all',mode:'local',
+							listeners : {
+								scope:this,
+								select:function(comp){
+									this.fillOptrCombo(comp.getValue());
 								}
-							},
-							select:function(comboTree,node,nodeAttrs){
-								this.fillOptrCombo(nodeAttrs.id)
 							}
 						}
-						}
+				
+				
+//						{xtype:'treecombo',fieldLabel:'仓库',hiddenName:'invoiceDto.depot_id',
+//						width:322,
+//						treeWidth:322,
+//						height: 20,
+//						allowBlank: false,
+//						onlySelectLeaf:false,
+//						emptyText :'请选择仓库',
+//						blankText:'请选择仓库',
+//						treeUrl: 'resource/Invoice!queryChildInvoiceDepot.action',
+//						listeners : {
+//							scope:this,
+//							'focus' : function(comboTree){
+//								if(comboTree.list){
+//									comboTree.expand();
+//								}
+//							},
+//							select:function(comboTree,node,nodeAttrs){
+//								this.fillOptrCombo(nodeAttrs.id)
+//							}
+//						}
+//						}
 				]},
 				{columnWidth:.5,layout:'form',style:'padding-buttom:5px',border:false,items:[
 				
@@ -192,6 +207,7 @@ QueryInvoiceForm = Ext.extend(Ext.form.FormPanel,{
 				]}
 			]
 		});	
+		this.getForm().findField('invoiceDto.depot_id').getStore().load();
 	},
 	doQuery:function(){
 		if(this.getForm().isValid()){
