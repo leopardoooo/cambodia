@@ -262,8 +262,17 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 			setUserDeviceInfo(user, device);
 			userComponent.updateDevice(doneCode, user);
 			//发送授权
-			this.createUserJob(user, user.getCust_id(), doneCode);
-			authComponent.sendAuth(user, null, BusiCmdConstants.REFRESH_TERMINAL, doneCode);
+			if(user.getUser_type().equals(SystemConstants.USER_TYPE_DTT)||
+					user.getUser_type().equals(SystemConstants.USER_TYPE_OTT)){
+				this.createUserJob(user, user.getCust_id(), doneCode);
+			}
+			//发产品授权
+			List<CProdOrder> prodList = orderComponent.queryOrderProdByUserId(user.getUser_id());
+			authComponent.sendAuth(user, prodList, BusiCmdConstants.ACCTIVATE_PROD, doneCode);
+			
+			
+			//TODO DTT回填有变更设备处理，要对换下的设备发销户指令DEL_USER
+			
 			//处理设备
 			TDeviceBuyMode buyModeCfg = busiConfigComponent.queryBuyMode(user.getStr10());
 			String ownership = SystemConstants.OWNERSHIP_GD;
@@ -336,19 +345,23 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		
 		//处理授权
 		if (user.getUser_type().equals(SystemConstants.USER_TYPE_OTT)){
+		    //OTT 发变更用户信息
 			authComponent.sendAuth(user, null, BusiCmdConstants.CHANGE_USER, doneCode);
 		} else if (user.getUser_type().equals(SystemConstants.USER_TYPE_DTT)){
+			//DTT新设备发开户指令
+			authComponent.sendAuth(user, null, BusiCmdConstants.CREAT_USER, doneCode);
+			//新设备发产品授权
+			List<CProdOrder> prodList = orderComponent.queryOrderProdByUserId(user.getUser_id());
+			authComponent.sendAuth(user, prodList, BusiCmdConstants.ACCTIVATE_PROD, doneCode);
+	
 			//设备回收，发设备销毁指令
 			if(changeReason.getIs_reclaim().equals(SystemConstants.BOOLEAN_TRUE)){
-				authComponent.sendAuth(oldUser, null, BusiCmdConstants.PASSVATE_TERMINAL, doneCode);
+				authComponent.sendAuth(oldUser, null, BusiCmdConstants.DEL_USER, doneCode);
 			}else{
-				//设备不回收，发产品减指令
-				List<CProdOrder> orderList = orderComponent.queryOrderProdByUserId(userId);
-				if(orderList.size() > 0)
-					authComponent.sendAuth(oldUser, orderList, BusiCmdConstants.PASSVATE_PROD, doneCode);
+				//设备不回收，旧设备发产品减指令
+				authComponent.sendAuth(oldUser, prodList, BusiCmdConstants.PASSVATE_PROD, doneCode);
 			}
-			authComponent.sendAuth(user, null, BusiCmdConstants.ACCTIVATE_TERMINAL, doneCode);
-			authComponent.sendAuth(user, null, BusiCmdConstants.REFRESH_TERMINAL, doneCode);
+			
 		}
 		// 设置拦截器所需要的参数
 		getBusiParam().resetUser();
@@ -487,6 +500,18 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 			}
 												
 		}
+
+		//直接解除授权，不等支付（因为不能取消）
+		if(user.getUser_type().equals(SystemConstants.USER_TYPE_DTT)
+				&&!SystemConstants.BOOLEAN_TRUE.equals(reclaim)){
+			//DTT用户不回收设备，发产品减授权
+			List<CProdOrder> prodList = orderComponent.queryOrderProdByUserId(user.getUser_id());
+			authComponent.sendAuth(user, prodList, BusiCmdConstants.PASSVATE_PROD, doneCode);
+		}else{
+			//发销户指令
+			authComponent.sendAuth(user, null, BusiCmdConstants.DEL_USER, doneCode);
+		}
+		
 		//是否高级权限
 		boolean isHigh=orderComponent.isHighCancel(busiCode);
 		List<CProdOrderFee> orderFees=new ArrayList<>();
@@ -511,11 +536,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 			cancelResultList.addAll(orderComponent.saveCancelProdOrder(dto, doneCode));
 		}
 		
-		//直接解除授权，不等支付（因为不能取消）
-		if(cancelResultList.size()>0){
-			authComponent.sendAuth(user, cancelResultList, BusiCmdConstants.PASSVATE_PROD, doneCode);
-		}
-		authComponent.sendAuth(user, cancelResultList, BusiCmdConstants.DEL_USER, doneCode);
+		
 		
 		//记录用户到历史表
 		userComponent.removeUserWithHis(doneCode, user);
@@ -654,8 +675,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 				removeStopByUserId(user.getUser_id());
 				//修改用户状态
 				updateUserStatus(doneCode, user.getUser_id(), user.getStatus(), StatusConstants.REQSTOP);
-				//生成钝化用户JOB
-				authComponent.sendAuth(user, null, BusiCmdConstants.PASSVATE_USER, doneCode);
+				
 				//修改用户订单状态为报停状态
 				
 				for (CProdOrderDto order:orderList){
@@ -666,6 +686,12 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 						}
 					}
 				}
+				//生成钝化用户JOB
+				authComponent.sendAuth(user, null, BusiCmdConstants.PASSVATE_USER, doneCode);
+				//产品减授权
+				List<CProdOrder> prodList = orderComponent.queryOrderProdByUserId(user.getUser_id());
+				authComponent.sendAuth(user, prodList, BusiCmdConstants.PASSVATE_PROD, doneCode);
+				
 			}
 			
 			if (isCustPkgStop){
@@ -738,6 +764,9 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 			
 			//发授权
 			authComponent.sendAuth(user, null, BusiCmdConstants.ACCTIVATE_USER, doneCode);
+			//产品的到期日可能变化了，需要重发加授权
+			List<CProdOrder> prodList = orderComponent.queryOrderProdByUserId(user.getUser_id());
+			authComponent.sendAuth(user, prodList, BusiCmdConstants.ACCTIVATE_PROD, doneCode);
 		}
 		
 		if (isCustPkgOpen){
@@ -754,11 +783,10 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 	}
 
 
-	
 
-
-
-
+	/**
+	 * 指令重发
+	 */
 	@Override
 	public void saveResendCa() throws Exception {
 		List<CUser> userList = getBusiParam().getSelectedUsers();
@@ -767,20 +795,8 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		for (CUser user:userList){
 			//重发加授权指令
 			List<CProdOrder> prodList = orderComponent.queryOrderProdByUserId(user.getUser_id());
-			for (CProdOrder prod:prodList){
-				//正常状态的产品,重复指令
-				List<CProdOrder> orderList = new ArrayList<CProdOrder>();
-				orderList.add(prod);
-				String authCmdType = "";
-				if (isProdOpen(prod.getStatus())){
-					authCmdType = BusiCmdConstants.ACCTIVATE_PROD;
-				}else{
-					authCmdType = BusiCmdConstants.PASSVATE_PROD;
-				}
-				authComponent.sendAuth(user, orderList, authCmdType, doneCode);
-			}
+			authComponent.sendAuth(user, prodList, BusiCmdConstants.ACCTIVATE_PROD, doneCode);
 		}
-
 		saveAllPublic(doneCode,getBusiParam());
 	}
 
@@ -793,12 +809,11 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		//获取业务流水
 		Integer doneCode = doneCodeComponent.gDoneCode();
 		for (CUser user:userList){
-			if (SystemConstants.REFRESH_TYPE_TERMINAL.equals(refreshType)){
-				authComponent.sendAuth(user, null, BusiCmdConstants.ACCTIVATE_TERMINAL, doneCode);
-			} else {
-				authComponent.sendAuth(user, null, BusiCmdConstants.REFRESH_TERMINAL, doneCode);
-			}
-				
+			//用户刷新
+			authComponent.sendAuth(user, null, BusiCmdConstants.REFRESH_TERMINAL, doneCode);
+			//产品指令重发
+			List<CProdOrder> prodList = orderComponent.queryOrderProdByUserId(user.getUser_id());
+			authComponent.sendAuth(user, prodList, BusiCmdConstants.ACCTIVATE_PROD, doneCode);
 		}
 
 		saveAllPublic(doneCode,getBusiParam());
