@@ -67,7 +67,7 @@ UserGrid = Ext.extend(Ext.grid.GridPanel,{
 	userStore:null,
 	constructor : function(){
 		this.userStore = new Ext.data.GroupingStore({
-						url:'/boss_login/online',
+						url:'/boss-login/online',
 			baseParams:{countyId:App.data.optr['county_id']},
 			reader: new Ext.data.JsonReader(
 				{

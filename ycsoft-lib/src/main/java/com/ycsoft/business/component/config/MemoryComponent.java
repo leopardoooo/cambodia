@@ -8,6 +8,7 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 
 import com.ycsoft.beans.core.job.JSignal;
+import com.ycsoft.beans.system.SDataTranslation;
 import com.ycsoft.beans.system.SItemvalue;
 import com.ycsoft.business.dao.core.fee.CFeeDao;
 import com.ycsoft.business.dao.core.job.JSignalDao;
@@ -52,6 +53,9 @@ public class MemoryComponent extends BaseComponent{
 			List<SItemvalue> datas = sItemvalueDao.findViewDict(signal
 					.getSignal_content());
 			MemoryDict.appendData(datas);
+			
+			SDataTranslation trans = sDataTranslationDao.findByKey(signal.getSignal_content());
+			MemoryDict.appendTransData(trans);
 		}
 	}
 

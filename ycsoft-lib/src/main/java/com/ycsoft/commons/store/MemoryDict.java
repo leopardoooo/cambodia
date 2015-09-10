@@ -243,6 +243,34 @@ public class MemoryDict {
 		}
 	}
 	
+	public static void appendTransData(SDataTranslation trans) {
+		try {
+			/*Map<String, SDataTranslation> transTempMap = new HashMap<String, SDataTranslation>();
+			for (SDataTranslation trans : datalist) {
+				String dataCn = trans.getData_cn();
+				SDataTranslation dataTrans = transTempMap.get(dataCn);
+				if (dataTrans == null) {
+					dataTrans = new SDataTranslation();
+					transTempMap.put(dataCn, dataTrans);
+				}
+				BeanUtils.copyProperties(dataTrans, trans);
+			}
+			transMap.putAll(transTempMap);*/
+			if(trans != null){
+				transMap.put(trans.getData_cn(), trans);
+			}
+			
+		} catch (Exception e) {
+			LoggerHelper.error(MemoryDict.class, "国际化数据装载异常");
+		} finally{
+			if (transMap == null){
+				transMap = new HashMap<String, SDataTranslation>();
+			}
+		}
+	}
+	
+	
+	
 	/**
 	 * 添加字典数据
 	 * 有相同的覆盖，没有就新添加
