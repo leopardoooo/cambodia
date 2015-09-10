@@ -117,13 +117,14 @@ AddrCustSelectWin = Ext.extend( Ext.Window , {
 		});
 		
 		var cm = [
-			{header: '房间号', dataIndex: 'note', width: 160},
-			{header: '房间状态', dataIndex: 'note_status_type_text',width: 80},
-			{header: '客户名称', dataIndex: 'cust_name'},
-			{header: '受理编号', dataIndex: 'cust_no'},
-		    { header: '操作', width: 50,renderer: function(v , md, record , i  ){
+			{ header: '操作', width: 50,renderer: function(v , md, record , i  ){
 				return "<DIV><a href='#' onclick='addrThat.doGridCheckRoom();'>确认</a></DIV>";
-			}}
+			}},
+			{header: '房间号', dataIndex: 'note', width: 120},
+			{header: '房间状态', dataIndex: 'note_status_type_text',width: 80},
+			{header: '客户名称', dataIndex: 'cust_name',width: 80},
+			{header: '受理编号', dataIndex: 'cust_no',width: 80}
+		    
 		];
 		
 		//实例化cust grid panel
@@ -210,7 +211,6 @@ AddrCustSelectWin = Ext.extend( Ext.Window , {
 			var name = "Room "+comp.getValue()+",";
 		}
 		name = name + this.addrName;
-		Ext.get('newAddressId').update(name);
 	},
 	doSaveNewRoom:function(){
 		var note = Ext.getCmp('newRoomBoxId').getValue();
@@ -240,6 +240,7 @@ AddrCustSelectWin = Ext.extend( Ext.Window , {
 		this.custGrid.on("rowclick", function(grid ,index, e){
 			var record = grid.getStore().getAt(index);
 			this.setData(record.get('note'));
+			Ext.get('newAddressId').update(this.addrName);
 		}, this)
 		this.addrTree.on("click",function(node, e) {
 			if (!this.isCanClick(node)) {
@@ -249,6 +250,7 @@ AddrCustSelectWin = Ext.extend( Ext.Window , {
 			Ext.getCmp('newRoomBoxId').setDisabled(true);
 			Ext.getCmp('saveRoomNewBoxId').setDisabled(true);
 			Ext.getCmp('custAddrId').setValue(node.id);
+			Ext.get('newAddressId').update('');
 			addrThat.nodeId = node.id;
 			addrThat.custStore.baseParams = {addrId:node.id};
 		
@@ -270,7 +272,6 @@ AddrCustSelectWin = Ext.extend( Ext.Window , {
 					var title = "行政区域:"+rec.districtName+";  "
 					title = title + "服务类型:"+(Ext.isEmpty(rec.netType)?'':rec.netType);
 					addrThat.custGrid.setTitle(title);
-					Ext.get('newAddressId').update(rec.addrName);
 				}
 			});
 			
