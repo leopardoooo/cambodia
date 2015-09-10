@@ -248,10 +248,10 @@ TopToolbar = Ext.extend(Ext.Toolbar , {
 	},
 	reloadConfig:function(){
 		var url = '';
-		if(Constant.ROOT_PATH == '/boss_core'){
-			url = Constant.ROOT_PATH+"/system/x/Index!reloadConfig.action"
+		if(Constant.ROOT_PATH == '/boss-core'){
+			url = Constant.ROOT_PATH+"/system/x/Index!reloadConfig.action";
 		}else{
-			url = Constant.ROOT_PATH+"/system/Index!reloadConfig.action"
+			url = Constant.ROOT_PATH+"/system/Index!reloadConfig.action";
 		}
 		Ext.Ajax.request({
 			url: url,
@@ -802,7 +802,7 @@ OptrDataWin = Ext.extend(Ext.Window, {
 	systemStore : null,
 	sysUrl:null,
 	constructor : function() {
-		if(Constant.ROOT_PATH=='/boss_core'){
+		if(Constant.ROOT_PATH=='/boss-core'){
 			this.sysUrl = Constant.ROOT_PATH+'/system/x/Index!getSubSystemByOptrId.action';
 		}else if(Constant.ROOT_PATH == '/boss_report'){
 			this.sysUrl= Constant.ROOT_PATH+ '/system/Index!getSubSystemByOptrId.action';
@@ -901,7 +901,7 @@ OptrDataWin = Ext.extend(Ext.Window, {
 		var obj = {};saveUrl=null;
 		
 		obj["query"] = Ext.getCmp('optrIoginSysId').getValue();
-		if(Constant.ROOT_PATH == "/boss_core" ){
+		if(Constant.ROOT_PATH == "/boss-core" ){
 			saveUrl = root+"/system/x/Index!updateOptrData.action" ;
 		}else if(Constant.ROOT_PATH == '/boss_report'){
 			saveUrl = root+ '/system/Index!updateOptrData.action';
