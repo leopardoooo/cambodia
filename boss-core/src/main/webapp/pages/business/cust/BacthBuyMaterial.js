@@ -129,7 +129,6 @@ var MaterialDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 BacthBuyMaterialForm = Ext.extend( BaseForm , {
 	url : Constant.ROOT_PATH + "/core/x/Cust!bacthBuyMaterial.action",
 	success : function(){
-		App.getApp().refreshPayInfo(parent);
 		App.getApp().refreshPanel(App.getApp().getData().currentResource.busicode);
 	},
 	materialDeviceGrid : null,

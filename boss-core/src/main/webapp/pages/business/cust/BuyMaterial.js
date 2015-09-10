@@ -234,8 +234,6 @@ BuyMaterialForm = Ext.extend( BaseForm , {
 	},
 	url : Constant.ROOT_PATH + "/core/x/Cust!buyMaterial.action",
 	success: function(form, resultData){
-		//刷新支付
-		App.getApp().refreshPayInfo(parent);
 		App.getApp().refreshPanel(App.getApp().getData().currentResource.busicode);
 	}
 });

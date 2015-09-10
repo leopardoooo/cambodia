@@ -227,8 +227,6 @@ LogoffUserForm = Ext.extend(BaseForm,{
 		return all;
 	},
 	success : function(){
-		//刷新支付
-		App.getApp().refreshPayInfo(parent);
 		App.getApp().refreshPanel(App.getApp().getData().currentResource.busicode);
 	}
 	

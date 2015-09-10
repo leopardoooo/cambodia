@@ -106,7 +106,6 @@ PublicAcctRefundPanel = Ext.extend(BaseForm,{
 		return PublicAcctRefundPanel.superclass.doValid.call(this);
 	},
 	success:function(){
-		App.getApp().refreshPayInfo(parent);
 		App.getApp().refreshPanel(App.getApp().getData().currentResource.busicode);
 	},
 	getValues:function(){

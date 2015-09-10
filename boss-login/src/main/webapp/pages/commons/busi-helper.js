@@ -475,6 +475,7 @@ Ext.apply( App, {
 		}
 		
 		App.getApp().refreshFeeView();
+		App.getApp().refreshPayInfo();
 		//无论那个业务操作完成，重置这些面板刷新标志
 		panel.getPayfeePanel().setReload(true);		
 		panel.getDocPanel().setReload(true);

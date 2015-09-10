@@ -704,8 +704,6 @@ ProdOrderForm = Ext.extend( BaseForm, {
 	}
 	,
 	success : function(form,res){
-		var userId = res.simpleObj;
-		App.getApp().refreshPayInfo(parent);
 		App.getApp().refreshPanel(App.getApp().getData().currentResource.busicode);
 	}
 });
