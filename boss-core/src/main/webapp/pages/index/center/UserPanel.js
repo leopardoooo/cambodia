@@ -278,9 +278,9 @@ ProdGrid = Ext.extend(Ext.TabPanel,{
 		this.baseProdCm = new Ext.ux.grid.LockingColumnModel({ 
     		columns : [
     		{header:lc[0],dataIndex:'order_sn',width:70},
-			{header:lc[1],dataIndex:'prod_name',width:120},
-			{header:lc[2],dataIndex:'package_name',width:80},
-			{header:lc[3],dataIndex:'tariff_name',	width:80},
+			{header:lc[1],dataIndex:'prod_name',width:120, renderer: App.qtipValue},
+			{header:lc[2],dataIndex:'package_name',width:80, renderer: App.qtipValue},
+			{header:lc[3],dataIndex:'tariff_name',	width:80, renderer: App.qtipValue},
 			{header:lc[4],dataIndex:'eff_date',width:80,renderer: Ext.util.Format.dateFormat},
 			{header:lc[5],dataIndex:'exp_date',width:80,renderer: Ext.util.Format.dateFormat},
 			{header:lc[6],dataIndex:'status_text',	width:60,renderer:Ext.util.Format.statusShow},
