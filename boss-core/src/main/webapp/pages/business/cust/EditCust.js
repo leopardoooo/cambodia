@@ -85,7 +85,7 @@ EditCustForm = Ext.extend( CustBaseForm , {
 					}
 					f.disable();
 				});
-				Ext.getCmp('clickAddrId').setDisabled(true);
+				Ext.getCmp('clickAddrId').disable();
 				var fields = Ext.decode(response.responseText);
 				
 				var compare = function(f,name){
@@ -100,15 +100,17 @@ EditCustForm = Ext.extend( CustBaseForm , {
 										});	
 								}
 							}
-							if(fields[i].field_name == 'cust.addr_id'){//如果是地址，把剩余的放开允许修改
-								Ext.getCmp('clickAddrId').setDisabled(false);
+							if(fields[i].field_name == 'cust.addr_id'){//如果可以修改地址，把 选择地址按钮放开，隐藏的地址ID放开
+								Ext.getCmp('clickAddrId').enable();
+								Ext.getCmp('custAddrId').enable();
 							}
 							
 						}
 					}
 				}
-				if(cust.status == 'PREOPEN'){
-					Ext.getCmp('clickAddrId').setDisabled(false);
+				if(cust.status == 'PREOPEN'){//如果是意向客户，把 选择地址按钮放开，隐藏的地址ID放开
+					Ext.getCmp('clickAddrId').enable();
+					Ext.getCmp('custAddrId').enable();
 				}
 				
 				
@@ -187,12 +189,13 @@ EditCustForm = Ext.extend( CustBaseForm , {
 						oldValue : 'PREOPEN'
 					});
 				}			
+				arr.push({
+					columnName : 'cust.address',
+					newValue : address,
+					oldValue : oldAddress
+				});
+
 			}
-			arr.push({
-				columnName : 'cust.address',
-				newValue : address,
-				oldValue : oldAddress
-			});
 		}
 		//ROOM变更
 		var oldNote = App.getApp().getData().custFullInfo.cust.note

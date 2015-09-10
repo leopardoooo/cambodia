@@ -19,15 +19,15 @@ CheckInInvoiceForm = Ext.extend(Ext.form.FormPanel,{
 							scope:this,
 							select:this.setAmountDisable
 						}},
-					{fieldLabel:'发票代码',xtype:'textfield',name:'invoiceDto.invoice_code',allowBlank:false},
+					{fieldLabel:'发票代码',xtype:'textfield',name:'invoiceDto.invoice_code',allowBlank:false,value:'AAA',readOnly:true},
 					{fieldLabel:'开始发票号',name:'invoiceDto.start_invoice_id',allowBlank:false,
-						maxLength:8,enableKeyEvents:true,vtype:'invoiceId',
+						minLength:8,maxLength:8,enableKeyEvents:true,vtype:'invoiceId',
 						listeners:{
 							scope:this,
 							keyup:this.showInvoiceDetail
 						}},
 					{fieldLabel:'结束发票号',name:'invoiceDto.end_invoice_id',allowBlank:false,
-						maxLength:8,enableKeyEvents:true,vtype:'invoiceId',
+						minLength:8,maxLength:8,enableKeyEvents:true,vtype:'invoiceId',
 						listeners:{
 							scope:this,
 							keyup:this.showInvoiceDetail

@@ -17,6 +17,12 @@ import com.ycsoft.web.commons.abstracts.BaseBusiAction;
 
 @Controller
 public class ProdOrderAction extends BaseBusiAction {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 3614724278247375954L;
+
+
 	private IOrderService orderService;
 	
 	

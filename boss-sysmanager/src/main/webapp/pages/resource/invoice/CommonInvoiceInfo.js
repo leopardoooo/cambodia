@@ -12,7 +12,7 @@ CommonInvoiceForm = Ext.extend(Ext.form.FormPanel,{
 			layout:'column',
 			labelWidth:90,
 			items:[{columnWidth:1,layout:'form',border:false,items:[
-				        {fieldLabel:'发票代码',allowBlank:false,xtype:'textfield',name:'invoiceCode'}
+				        {fieldLabel:'发票代码',allowBlank:false,xtype:'textfield',name:'invoiceCode',value:'AAA',readOnly:true}
 				]},
 				{columnWidth:.5,layout:'form',border:false,items:[
 					{

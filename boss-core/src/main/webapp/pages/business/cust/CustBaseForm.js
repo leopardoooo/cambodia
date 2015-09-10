@@ -154,7 +154,8 @@ AddrCustSelectWin = Ext.extend( Ext.Window , {
 				layout: 'form',
 				items:[{
 	                xtype: 'displayfield',
-	                anchor:"95%",
+	                autoWidth:true,
+	                autoHeight:true,
 	                id:'feeDescId'
 				}]
 			},{
@@ -295,6 +296,8 @@ AddrCustSelectWin = Ext.extend( Ext.Window , {
 		}
 		Ext.getCmp('feeDescId').setValue( oldAddr==null?"":oldAddr+
 			"<font style='font-size:12px'><b>new:</b></font><font style='color:red'><span id='newAddressId'>--</span></font>");
+			
+			
 		AddrCustSelectWin.superclass.show.call(this);
 	}
 });
@@ -488,20 +491,6 @@ CustBaseForm = Ext.extend( BaseForm , {
 			labelWidth: 75,
 			bodyStyle: Constant.TAB_STYLE,
 			items:[{
-				fieldLabel:'客户类型',
-				xtype:'paramcombo',
-				allowBlank:false,
-				width : 125,
-				hiddenName:'cust.cust_type',
-				paramName:'CUST_TYPE',
-				defaultValue:'RESIDENT',
-				listeners:{
-					scope: this,
-					'select': function(combo,rec){
-						this.doCustTypeChange(combo.getValue());
-					}
-				}
-			},{
 				layout:'column',
 				baseCls: 'x-plain',
 				anchor: '100%',
@@ -512,8 +501,21 @@ CustBaseForm = Ext.extend( BaseForm , {
 					labelWidth: 75
 				},
 				items: [{
-					columnWidth:0.5,
 					items:[{
+						fieldLabel:'客户类型',
+						xtype:'paramcombo',
+						allowBlank:false,
+						width : 125,
+						hiddenName:'cust.cust_type',
+						paramName:'CUST_TYPE',
+						defaultValue:'RESIDENT',
+						listeners:{
+							scope: this,
+							'select': function(combo,rec){
+								this.doCustTypeChange(combo.getValue());
+							}
+						}
+					},{
 						fieldLabel:'客户名称',
 						xtype:'textfield',
 						id : 'cust.cust_name',
@@ -524,46 +526,42 @@ CustBaseForm = Ext.extend( BaseForm , {
 							scope: this,
 							'change': this.doCustNameChange
 						}
-					}]
+					}]	
 				},{
-					columnWidth:0.2,
 					items:[{
-						xtype: 'checkbox',
-					    labelWidth: 80,
-					    fieldLabel: "意向客户",
-					    id: "isCanToCustId",
-					    listeners:{
-			            	scope: this,
-			            	check: this.doCheckedChange
-			            }
-					}]
-				},{
-					columnWidth:0.3,
-					labelWidth: 1,
-					items:[{
-						xtype:'combo',
-						id : 'provinceId',
-						forceSelection : true,
-						store : this.provinceStore,
-						triggerAction : 'all',
-						mode: 'local',
-						displayField : 'name',
-						valueField : 'cust_code',
-						emptyText: '请选择省',
-						disabled:true,
-						editable : false,
-						listeners:{
-							scope:this,
-							select:function(combo){
-								this.custCode = combo.getValue();
+							xtype: 'checkbox',
+						    fieldLabel: "意向客户",
+						    id: "isCanToCustId",
+						    listeners:{
+				            	scope: this,
+				            	check: this.doCheckedChange
+				            }
+						},{
+							xtype:'combo',
+							id : 'provinceId',
+							fieldLabel: "省",
+							forceSelection : true,
+							store : this.provinceStore,
+							triggerAction : 'all',
+							mode: 'local',
+							displayField : 'name',
+							valueField : 'cust_code',
+							emptyText: '请选择省',
+							disabled:true,
+							editable : false,
+							listeners:{
+								scope:this,
+								select:function(combo){
+									this.custCode = combo.getValue();
+								}
 							}
 						}
-					}]
+					]
 				},{
-					columnWidth:0.85,
+					columnWidth:0.80,
 					items:[{
 						fieldLabel:'地址',
-						width:350,
+						width:300,
 						xtype:'textfield',
 						id : 'tempCustAddress',
 						name:'cust.address',

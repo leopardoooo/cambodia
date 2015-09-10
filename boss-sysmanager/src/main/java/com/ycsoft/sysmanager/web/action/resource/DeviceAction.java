@@ -710,6 +710,21 @@ public class DeviceAction extends BaseAction {
 		getRoot().setRecords(deviceComponent.queryTransferDepot(optr));
 		return JSON_RECORDS;
 	}
+	
+	/**
+	 * 查询排除自己外的部门
+	 * @return
+	 * @throws Exception
+	 */
+	public String queryDeptByOptr() throws Exception {
+		getRoot().setRecords(deviceComponent.queryDeptByOptr(optr));
+		return JSON_RECORDS;
+	}
+	
+	public String queryAllDept() throws Exception {
+		getRoot().setRecords(deviceComponent.queryAllDept());
+		return JSON_RECORDS;
+	}
 
 	/**
 	 * 根据设备编号查询信息

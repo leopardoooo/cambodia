@@ -61,6 +61,7 @@ import com.ycsoft.commons.constants.BusiCmdConstants;
 import com.ycsoft.commons.constants.BusiCodeConstants;
 import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.constants.SystemConstants;
+import com.ycsoft.commons.exception.ErrorCode;
 import com.ycsoft.commons.exception.ServicesException;
 import com.ycsoft.commons.helper.CollectionHelper;
 import com.ycsoft.commons.helper.DateHelper;
@@ -97,25 +98,13 @@ public class DoneCodeService extends BaseBusiService implements IDoneCodeService
 				for(CFeeDevice device : deviceList){
 					CFee fee = feeMap.get(device.getFee_id());
 					if (StringHelper.isNotEmpty(device.getFee_std_id())){
-						if(SystemConstants.DEVICE_TYPE_FITTING.equals(device.getDevice_type())){
-							for (BusiFeeDto busiFee:list){
-								if (busiFee.getFee_std_id().equals(device.getFee_std_id())){
-									busiFee.setSum_fee(device.getReal_pay());
-									busiFee.setBuy_num(device.getBuy_num());
-									busiFee.setAddr_id(device.getAddr_id());
-									feeList.add(busiFee);
-									break;
-								}
-							}
-						}else{
-							for (BusiFeeDto busiFee:list){
-								if (busiFee.getFee_std_id().equals(device.getFee_std_id())){
-									busiFee.setSum_fee(fee.getReal_pay());
-									busiFee.setBuy_num(fee.getBuy_num());
-									busiFee.setAddr_id(fee.getAddr_id());
-									feeList.add(busiFee);
-									break;
-								}
+						for (BusiFeeDto busiFee:list){
+							if (busiFee.getFee_std_id().equals(device.getFee_std_id())){
+								busiFee.setSum_fee(fee.getReal_pay());
+								busiFee.setBuy_num(fee.getBuy_num());
+								busiFee.setAddr_id(fee.getAddr_id());
+								feeList.add(busiFee);
+								break;
 							}
 						}
 					} else {
@@ -186,55 +175,69 @@ public class DoneCodeService extends BaseBusiService implements IDoneCodeService
 		String busiCode = cDoneCode.getBusi_code();
 		if (busiCode.equals(CUST_OPEN))
 			cancelOpenCust(custId, doneCode);
-		else if (busiCode.equals(CUST_EDIT) || busiCode.equals(CUST_TRANS) 
-				|| busiCode.equals(CUST_CHANGE_ADDR) || busiCode.equals(CUST_RELOCATE))
-			cancelEditCust(custId, doneCode);
-		else if (busiCode.equals(USER_OPEN))
-			cancelOpenUser(custId, doneCode);
-		else if (busiCode.equals(USER_EDIT) || busiCode.equals(USER_EDIT_LEVEL))
-			cancelEditUser(custId, doneCode);
-		else if (busiCode.equals(USER_DTOI))
-			cancelOpenInteractive(custId, doneCode);
-		else if (busiCode.equals(USER_REQUIRE_STOP))
-			cancelRequireStop(custId, doneCode);
-		else if (busiCode.equals(PROD_PACKAGE_ORDER))
-			cancelOrder(custId, doneCode);
-		else if (busiCode.equals(PROD_CHANGE_TARIFF))
-			cancelEditTariff(custId, doneCode);
-		else if (busiCode.equals(USER_PROMOTION))
-			cancelPromotion(custId, doneCode);
-		else if (busiCode.equals(ACCT_TRANS))
-			cancelTransAcct(custId, doneCode);
-//		else if (busiCode.equals(ACCT_ADJUST))
-//			cancelAdjustAcct(custId, doneCode);
-		else if (busiCode.equals(DEVICE_BUY))
-			cancelBuyDevice(custId, doneCode);
-		else if (busiCode.equals(DEVICE_CHANGE))
-			cancelChangeDevice(custId, doneCode);
-		else if (busiCode.equals(EDIT_INVALID_DATE))
-			cancelEditInvalid(custId, doneCode);
+//		else if (busiCode.equals(CUST_EDIT) || busiCode.equals(CUST_TRANS) 
+//				|| busiCode.equals(CUST_CHANGE_ADDR) || busiCode.equals(CUST_RELOCATE))
+//			cancelEditCust(custId, doneCode);
+//		else if (busiCode.equals(USER_OPEN))
+//			cancelOpenUser(custId, doneCode);
+//		else if (busiCode.equals(USER_EDIT) || busiCode.equals(USER_EDIT_LEVEL))
+//			cancelEditUser(custId, doneCode);
+//		else if (busiCode.equals(USER_DTOI))
+//			cancelOpenInteractive(custId, doneCode);
+//		else if (busiCode.equals(USER_REQUIRE_STOP))
+//			cancelRequireStop(custId, doneCode);
+//		else if (busiCode.equals(PROD_PACKAGE_ORDER))
+//			cancelOrder(custId, doneCode);
+//		else if (busiCode.equals(PROD_CHANGE_TARIFF))
+//			cancelEditTariff(custId, doneCode);
+//		else if (busiCode.equals(USER_PROMOTION))
+//			cancelPromotion(custId, doneCode);
+//		else if (busiCode.equals(ACCT_TRANS))
+//			cancelTransAcct(custId, doneCode);
+////		else if (busiCode.equals(ACCT_ADJUST))
+////			cancelAdjustAcct(custId, doneCode);
+//		else if (busiCode.equals(DEVICE_BUY))
+//			cancelBuyDevice(custId, doneCode);
+//		else if (busiCode.equals(DEVICE_CHANGE))
+//			cancelChangeDevice(custId, doneCode);
+//		else if (busiCode.equals(EDIT_INVALID_DATE))
+//			cancelEditInvalid(custId, doneCode);
+		else
+			throw new ServicesException(ErrorCode.BusiCodeCanNotCancel,busiCode);
 		//冲正流水对应的费用
 		List<CFee> feeList = feeComponent.queryByDoneCode(doneCode);
 		for (CFee fee:feeList){
-			if (fee.getStatus().equals(StatusConstants.PAY))
-				cancelFee(doneCode, cDoneCode.getBusi_code(), fee);
-			else {
-				if (fee.getFee_type().equals(SystemConstants.FEE_TYPE_ACCT)){
-					cancelFee(doneCode, cDoneCode.getBusi_code(), fee);
-				}
-				feeComponent.removeFee(fee.getFee_sn());
+			if(fee.getFee_type().equals(SystemConstants.FEE_TYPE_BUSI)){
+				cancelOtherFee(doneCode,busiCode,fee);
 			}
 		}
-		//创建返销帐任务
-		if (feeList.size()>0){
-			jobComponent.createCustWriteOffJob(doneCode, custId, SystemConstants.BOOLEAN_FALSE);
-			jobComponent.createAcctModeCalJob(doneCode, custId);
+		//TODO  插入负费用，原先费用不用改
+		Integer createDoneCode = doneCodeComponent.gDoneCode();
+		getBusiParam().setRemark("doneCode="+doneCode);
+//		getBusiParam().setFees(fees);
+		getBusiParam().setBusiCode(BusiCodeConstants.BUSI_CANCEL);
+		saveAllPublic(createDoneCode, getBusiParam());
 			
-		}
-		//作废工单
-		taskComponent.cancelTaskByDoneCode(doneCode);
+			
+//			if (fee.getStatus().equals(StatusConstants.PAY))
+//				cancelFee(doneCode, cDoneCode.getBusi_code(), fee);
+//			else {
+//				if (fee.getFee_type().equals(SystemConstants.FEE_TYPE_ACCT)){
+//					cancelFee(doneCode, cDoneCode.getBusi_code(), fee);
+//				}
+//				feeComponent.removeFee(fee.getFee_sn());
+//			}
+//		}
+		//创建返销帐任务  jpz not need
+//		if (feeList.size()>0){
+//			jobComponent.createCustWriteOffJob(doneCode, custId, SystemConstants.BOOLEAN_FALSE);
+//			jobComponent.createAcctModeCalJob(doneCode, custId);
+//			
+//		}
+		//TODO 作废工单   wait new task jpz
+//		taskComponent.cancelTaskByDoneCode(doneCode);
 		//更新流水状态
-		doneCodeComponent.updateStatus(doneCode,cDoneCode.getBusi_code());
+//		doneCodeComponent.updateStatus(doneCode,cDoneCode.getBusi_code());
 	}
 
 	public Pager<DoneCodeExtAttrDto> queryByCustId(String custId, QueryFeeInfo queryFeeInfo,

@@ -91,7 +91,7 @@ Ext.apply(MenuHandler, {
 	// 开户
 	NewCust : function() {
 		return {
-			width : 550,
+			width : 580,
 			height : 470
 		};
 	},
@@ -342,7 +342,7 @@ Ext.apply(MenuHandler, {
 			return false;
 		}
 		return {
-			width : 600,
+			width : 580,
 			height : 470
 		};
 	},
