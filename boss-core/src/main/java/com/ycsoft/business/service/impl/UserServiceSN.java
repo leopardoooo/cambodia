@@ -223,9 +223,8 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		}else if(userType.equals(SystemConstants.USER_TYPE_BAND)){
 			String domainName = custComponent.gCustNoByAddr(cust.getAddr_id(), null);
 			user.setLogin_name(cust.getCust_no()+"0"+num+"@"+domainName);
-			user.setPassword(cust.getPassword());
 		}
-		
+		user.setPassword(cust.getPassword());
 		TDeviceBuyMode buyModeCfg = busiConfigComponent.queryBuyMode(deviceBuyMode);
 		//处理设备和授权
 		if (!user.getUser_type().equals(SystemConstants.USER_TYPE_OTT_MOBILE)){
@@ -264,6 +263,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 			//发送授权
 			if(user.getUser_type().equals(SystemConstants.USER_TYPE_DTT)||
 					user.getUser_type().equals(SystemConstants.USER_TYPE_OTT)){
+				//开户指令
 				this.createUserJob(user, user.getCust_id(), doneCode);
 			}
 			//发产品授权
