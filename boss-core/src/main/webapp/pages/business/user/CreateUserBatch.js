@@ -20,17 +20,17 @@ UserBaseBatchForm = Ext.extend( BaseForm , {
 		this.newUserGrid = new Ext.grid.GridPanel({
 			region: 'center',
 //			anchor: '100%',
-			title: '用户暂存表',
+			title: lmain("user._form.titleOpenUserGrid"),
 			store: this.newUserStore,
 	        columns: [
 	            sm,
-	            {id: 'aecid',menuDisabled: true, header: "用户类型", width:85, sortable: false, dataIndex: 'user_type'},
-	            {menuDisabled: true, header: "设备类型", width:120, sortable: false, dataIndex: 'device_type_text', renderer:App.qtipValue},
-	            {menuDisabled: true, width: 80, header: "购买方式", sortable: false, dataIndex: 'buy_mode_text', renderer:App.qtipValue},
-	            {menuDisabled: true, width: 50, header: "数量", sortable: false, dataIndex: 'open_amount'},
-	            {menuDisabled: true, width: 100, header: "费用名称", sortable: false, dataIndex: 'fee_name', renderer:App.qtipValue},
-	            {menuDisabled: true, width: 50, header: "单价$", sortable: false, dataIndex: 'fee'},
-	            {menuDisabled: true, width: 50, header: "小计", sortable: false, dataIndex: 'sub_total'}
+	            {id: 'aecid',menuDisabled: true, header: lmain("user.base.type"), width:85, sortable: false, dataIndex: 'user_type'},
+	            {menuDisabled: true, header: lmain("cust._form.deviceType"), width:120, sortable: false, dataIndex: 'device_type_text', renderer:App.qtipValue},
+	            {menuDisabled: true, width: 80, header: lmain("user.base.buyWay"), sortable: false, dataIndex: 'buy_mode_text', renderer:App.qtipValue},
+	            {menuDisabled: true, width: 50, header: lbc("common.count"), sortable: false, dataIndex: 'open_amount'},
+	            {menuDisabled: true, width: 100, header: lmain("user._form.feeName"), sortable: false, dataIndex: 'fee_name', renderer:App.qtipValue},
+	            {menuDisabled: true, width: 50, header: lbc("common.price"), sortable: false, dataIndex: 'fee'},
+	            {menuDisabled: true, width: 50, header: lbc("common.subTotal"), sortable: false, dataIndex: 'sub_total'}
 	        ],
 	        sm: sm,
 	        autoExpandColumn: 'aecid', 
@@ -39,7 +39,7 @@ UserBaseBatchForm = Ext.extend( BaseForm , {
 	        forceFit: false,
 	        tbar: [{
 	        	id: 'removeDataId',
-	        	text: '移除选中',
+	        	text: lbc("common.removeSelected"),
 	        	iconCls: 'icon-del',
 	        	scope: this,
 	        	handler: function(){
@@ -94,7 +94,7 @@ UserBaseBatchForm = Ext.extend( BaseForm , {
 				},
 				items:[{
 					items:[{
-						fieldLabel:'用户类型',
+						fieldLabel: lmain("user.base.type"),
 						xtype:'combo',
 						width:122,
 						allowBlank:false,
@@ -116,7 +116,7 @@ UserBaseBatchForm = Ext.extend( BaseForm , {
 					},{
 						xtype:'paramcombo',
 						hiddenName:'device_model',
-						fieldLabel: '设备类型',
+						fieldLabel: lmain("cust._form.deviceType"),
 						paramName:'DEVICE_MODEL',
 						id: 'boxDeviceCategory',
 						allowBlank: false,
@@ -127,14 +127,14 @@ UserBaseBatchForm = Ext.extend( BaseForm , {
 						}
 					},{
 						xtype: 'numberfield',
-			            fieldLabel: '费用名称',
+			            fieldLabel: lmain("user._form.feeName"),
 			            width : 122,
 			            labelWidth: 100,
 			            id: 'nfFee'
 					}]
 				},{
 					items:[{
-						fieldLabel:'购买方式',
+						fieldLabel: lmain("user.base.buyWay"),
 						xtype:'combo',
 						id : 'deviceBuyMode',
 						forceSelection : true,
@@ -145,14 +145,14 @@ UserBaseBatchForm = Ext.extend( BaseForm , {
 						width : 120,
 						displayField : 'buy_mode_name',
 						valueField : 'buy_mode',
-						emptyText: '请选择',
+						emptyText: lbc("common.plsSwitch"),
 						editable : false,
 						listeners: {
 							scope: this,
 							select: this.doLoadFeeSelect
 						}
 					},{
-						fieldLabel:'开户数量',
+						fieldLabel: lmain("user._form.openAmount"),
 						width:120,
 						id: 'sfOpenAmount',
 						xtype: 'spinnerfield',
@@ -162,7 +162,7 @@ UserBaseBatchForm = Ext.extend( BaseForm , {
 			            value: 2
 					},{
 						xtype:'checkbox',
-					    fieldLabel: "手动开户",
+					    fieldLabel: lmain("user._form.manualOpen"),
 					    style: 'padding: 0 0 -20px 0;',
 					    id: "handOpenId",
 					    checked: true,
@@ -178,7 +178,7 @@ UserBaseBatchForm = Ext.extend( BaseForm , {
 					xtype: 'button',
 					height: 48,
 					style: 'margin: 4px 10px 0 0;',
-					text: '添加至暂存表',
+					text: lmain("user._form.addToOpenUserGrid"),
 					iconAlign: 'top',
 					iconCls: 'icon-add-user',
 					scope: this,
@@ -212,7 +212,7 @@ UserBaseBatchForm = Ext.extend( BaseForm , {
 				items: [{
 					columnWidth: .5,
 					items:[{
-						fieldLabel:'催费类型',
+						fieldLabel: lmain("user.base.stopType"),
 						xtype:'paramcombo',
 						allowBlank:false,
 						width:150,
@@ -225,7 +225,7 @@ UserBaseBatchForm = Ext.extend( BaseForm , {
 					items:[{
 						xtype: 'textfield',
 						id: 'tfTotal',
-			            fieldLabel: '费用总额$',
+			            fieldLabel: lbc("common.total"),
 			            labelWidth: 60,
 			            readOnly: true,
 			            width: 120

@@ -13,14 +13,24 @@ BCLang.common = {
 	tipConfirmSave: '确定要保存业务吗?~',
 	tipFormInvalid: '含有验证不通过的输入项!~',
 	total: '合计~',
+	subTotal: '小计~',
 	price: '单价~',
+	count: '数量~',
+	pay: '支付~',
 	fee: {
 		columns: ["费用项~","户数~","单价~","金额~"],
 		tbar0: "业务费用~"
 	},
 	plsSwitch: '请选择~',
 	taskTitle: '工单~',
-	assignWay: '派单方式~'
+	assignWay: '派单方式~',
+	removeSelected: '移除选中~',
+	expandOrCollpse: '展开或收缩~',
+	optional: '可选~',
+	selected: '已选~',
+	save: '保存~',
+	close: '关闭~',
+	busido: '业务受理~'
 }
 //主页模块
 BCLang.home = {
@@ -99,8 +109,41 @@ BCLang.home = {
 			base:{
 				type: '用户类型~', name: '用户名称~', status: '状态~', statusTime: '状态时间~',
 				stbId: '机顶盒~', cardId: '智能卡~', modem: 'Modem号~', createTime: '创建时间~',
-				loginName: '账号~', terminal: '终端类型~', deviceModel: '设备型号', buyWay: '购买方式',
+				loginName: '账号~', terminal: '终端类型~', deviceModel: '设备型号~', buyWay: '购买方式~',
 				stopDate: '预报停时间~', stopType: '催费类型~', protocolDate: '协议日期~'
+			},
+			_form: {
+				taskBackFill: '施工回填~',
+				deviceCode: '设备编码~',
+				feeName: '费用名称~',
+				feeAmount: '收费金额$~',
+				protocolInfo: '协议信息~',
+				openAmount: '开户数量~',
+				manualOpen: '手动开户~',
+				addToOpenUserGrid: '添加至暂存表~',
+				titleOpenUserGrid: '用户暂存库~',
+				titleSwitchProd: '第一步：选择产品~',
+				prodName: '产品名称~',
+				prodDesc: '产品描述~',
+				titleDetemineUser: '第二步：确定订购用户~',
+				switchUsers: '选用户~',
+				titleOrderInfo: '第三步：订购信息~',
+				prodTariff: '产品资费~',
+				prodOrderMonths: '订购月数~',
+				prodStartDate: '开始计费日~',
+				prodExpDate: '结束计费日~',
+				lastOrderExpDate: '上期订购结束日~',
+				titleOrderFee: '产品费~',
+				shouldPay: '应收~',
+				addOrderFee: '新增订购~',
+				transferPay: '转移支付~',
+				maxUserCount: '最大用户数~',
+				titleDispatchUser: '分配用户~',
+				terminalInfo: '终端信息~',
+				addToSelected: '加入已选~',
+				moveToOptional: '移至可选~',
+				stopTime: '报停时间~',
+				stopFee: '报停费用~'
 			},
 			list: {
 				_title: '用户信息~',
