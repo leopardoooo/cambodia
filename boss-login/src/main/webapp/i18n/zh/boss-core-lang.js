@@ -1,7 +1,26 @@
 /** boss-core简体中文语言包 */
 BCLang = {}
 BCLang.common = {
-	optr: "操作"
+	optr: "操作~",
+	switchor: '选择~',
+	pswd: '密码~',
+	remark: '备注~',
+	remark2: '备注信息~',
+	busiInfo: '业务信息~',
+	busiSave: '业务保存~',
+	tipBusiSaveOK: '业务保存成功!~',
+	tipLoadText: '正在查询，请稍等...',
+	tipConfirmSave: '确定要保存业务吗?~',
+	tipFormInvalid: '含有验证不通过的输入项!~',
+	total: '合计~',
+	price: '单价~',
+	fee: {
+		columns: ["费用项~","户数~","单价~","金额~"],
+		tbar0: "业务费用~"
+	},
+	plsSwitch: '请选择~',
+	taskTitle: '工单~',
+	assignWay: '派单方式~'
 }
 //主页模块
 BCLang.home = {
@@ -30,9 +49,27 @@ BCLang.home = {
 				type: "客户类型~",certType: "证件类型~",certNum: "证件号码~",linkMan: "联系人~",tel: "固定电话~",barthday: "出生日期~",
 				mobile: "手机号码~",areaCateory: "区域小区~",houseNetType: "服务类型~",houseManager: "小区客户经理~",
 				houseOptr: "小区运维人员~",postalAddr: "邮寄地址~", remark: "备注~",
-				email: "邮箱~", sex: "性别~",
+				email: "邮箱~", sex: "性别~",postcode: '邮编~',
 				agentName: "代理商~", deptName: "开户部门~", developName: "发展人~", businessLicence: "营业执照~", unitNumber: "单位税号~",
 				spkgSn: "协议编号~", cust_level: "客户级别~"
+			},
+			_form: {
+				thinkCust: '意向客户~',
+				switchProvince: '请选择省~',
+				oldCustLevel: '原客户等级~',
+				newCustLevel: '新客户等级~',
+				deviceType: '设备类型~',
+				deviceModel: '设备型号~',
+				storeCount: '库存数量~',
+				buyWay: '购买方式~',
+				buyCount: '购买数量~',
+				titleBatchBuyMaterial: '器材信息~',
+				titleAcctRefund: '退款业务处理~',
+				refundTotal: '退款金额~',
+				rechargeWay: '充值方式~',
+				byTicket: '凭票据~',
+				rechargeCount: '充值金额~',
+				tipRechargeCountMustBeGreaterThanZero: '金额需要大于0!~'
 			},
 			acct: {
 				_title: "账目信息~",
@@ -59,9 +96,14 @@ BCLang.home = {
 		},
 		// 用户面板
 		user: {
+			base:{
+				type: '用户类型~', name: '用户名称~', status: '状态~', statusTime: '状态时间~',
+				stbId: '机顶盒~', cardId: '智能卡~', modem: 'Modem号~', createTime: '创建时间~',
+				loginName: '账号~', terminal: '终端类型~', deviceModel: '设备型号', buyWay: '购买方式',
+				stopDate: '预报停时间~', stopType: '催费类型~', protocolDate: '协议日期~'
+			},
 			list: {
 				_title: '用户信息~',
-				columns: ["用户类型~","用户名~","状态~","状态时间~", "机顶盒~","智能卡~","Modem号~"],
 				tools: ["有效产品~","查询~"]
 			},
 			prod: {

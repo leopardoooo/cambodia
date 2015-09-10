@@ -38,14 +38,14 @@ BusiPanel = Ext.extend( Ext.Panel , {
 				name: 'remark',
 				width : 200,
 				height : 25,
-		 		fieldLabel: '备注信息'
+		 		fieldLabel: langUtils.bc("common.remark2")
 			}]
 		},{
 			columnWidth : .2,
 			items : [{
 				id:'ywSaveId1',
 				xtype : 'button',
-				text: '业务保存',
+				text: langUtils.bc("common.busiSave"),
 				scope: this,
 				width: 80,
 				height : 25,
@@ -191,7 +191,7 @@ BusiPanel = Ext.extend( Ext.Panel , {
 		};
 		
 		this.btn = btn;
-		Confirm("确定要保存业务吗?", this , this.doSave );
+		Confirm(langUtils.bc("common.tipConfirmSave"), this , this.doSave );
 	},
 	doValid: function(){
 		for(var key in this.forms){
@@ -202,12 +202,12 @@ BusiPanel = Ext.extend( Ext.Panel , {
 					if(result.msg){
 						Alert(result.msg);
 					}else{
-						Alert("含有验证不通过的输入项!");
+						Alert(langUtils.bc("common.tipFormInvalid"));
 					}
 					return false;
 				}
 			}else if(result == false){
-				Alert("含有验证不通过的输入项!");
+				Alert(langUtils.bc("common.tipFormInvalid"));
 				return false;
 			}
 		}
@@ -305,7 +305,7 @@ BusiPanel = Ext.extend( Ext.Panel , {
 						if(o["msg"]){//错误信息
 							Alert(o["msg"]);
 						}else{
-							Alert('业务保存成功!',function(){
+							Alert(langUtils.bc("common.tipBusiSaveOK"),function(){
 								this.success();
 							},this);
 						}
@@ -335,7 +335,7 @@ BusiPanel = Ext.extend( Ext.Panel , {
 										|| busiCode == '1015'){
 							this.success();				
 						}else{
-							Alert('业务保存成功!');
+							Alert(langUtils.bc("common.tipBusiSaveOK"));
 							this.success();
 						}
 					}
@@ -391,7 +391,7 @@ BusiPanel = Ext.extend( Ext.Panel , {
 	showTip: function(){
 		if(!this.mask)
 			this.mask = new Ext.LoadMask(this.body, {
-				msg:"正在查询，请稍等..."
+				msg: langUtils.bc("common.tipLoadText")
 			});
 		this.mask.show();
 	},

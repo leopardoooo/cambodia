@@ -5,13 +5,13 @@ WorkForm = Ext.extend( BaseForm, {
 	constructor: function(workData,docForm, allowTitle){
 		//call superclass constructor
 		WorkForm.superclass.constructor.call(this, {
-			title: '工单' ,
+			title: lbc("common.taskTitle") ,
 			layout: 'form',
 			labelAlign: 'top',
 			bodyStyle: 'padding: 10px;',
 			items: [{
 				xtype: 'radiogroup',
-	            fieldLabel: '派单方式',
+	            fieldLabel: lbc("common.assignWay"),
 	            id: 'radioAssignWay',
 //	            vertical: true,
 	            allowBlank: false,

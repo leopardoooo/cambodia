@@ -25,24 +25,24 @@ BuyMaterialForm = Ext.extend( BaseForm , {
 			bodyStyle:'padding-top:15px',
 			defaults:{layout:'form',border:false, width:200},
 			items: [{
-					fieldLabel : '设备类型',
+					fieldLabel : langUtils.main("cust._form.deviceType"),
 					id : 'ctlDeviceType',
 					name:'device_type',
 					allowBlank : false,
 					xtype:'paramcombo',
-					emptyText: '请选择',
+					emptyText: langUtils.bc("common.plsSwitch"),
 					paramName:'OTHER_DEVICE_TYPE',
 					listeners: {
 						scope: this
 						,'select': this.filterDeviceModel
 					}
 				},{
-					fieldLabel : '设备型号',
+					fieldLabel : langUtils.main("cust._form.deviceModel"),
 					allowBlank : false,
 					id : 'ctlDeviceModel',
 					xtype:'combo',
 					name:'device_model',
-					emptyText: '请选择',
+					emptyText: langUtils.bc("common.plsSwitch"),
 					store: this.deviceModelStore,
 					model: 'local',
 					displayField: 'model_name',
@@ -55,10 +55,10 @@ BuyMaterialForm = Ext.extend( BaseForm , {
 				},{
 					xtype : 'displayfield',
 					id : 'total_num_id',
-					fieldLabel : '库存数量',
+					fieldLabel : langUtils.main("cust._form.storeCount"),
 					name:'total_num'
 				},{
-					fieldLabel : '购买方式',
+					fieldLabel : langUtils.main("cust._form.buyWay"),
 					xtype:'combo',
 					id : 'deviceBuyMode',
 					forceSelection : true,
@@ -67,7 +67,7 @@ BuyMaterialForm = Ext.extend( BaseForm , {
 					mode: 'local',
 					displayField : 'buy_mode_name',
 					valueField : 'buy_mode',
-					emptyText: '请选择',
+					emptyText: langUtils.bc("common.plsSwitch"),
 					allowBlank : false,
 					editable : false,
 					listeners:{
@@ -75,7 +75,7 @@ BuyMaterialForm = Ext.extend( BaseForm , {
 						'select': this.doBuyModeSelect
 					}
 				},{
-					fieldLabel : '购买数量',
+					fieldLabel : langUtils.main("cust._form.buyCount"),
 					id : 'buyNum',
 					name:'buy_num',
 					allowBlank:false,

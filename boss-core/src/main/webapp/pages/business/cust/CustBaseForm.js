@@ -325,40 +325,40 @@ LinkPanel = Ext.extend(Ext.Panel,{
 				},
 				items: [{
 					items:[{
-						fieldLabel:'联系人',
+						fieldLabel: langUtils.main("cust.base.linkMan"),
 						name:'linkman.linkman_name',
 						xtype:'textfield'
 					},{
-						fieldLabel:'证件类型',
+						fieldLabel: langUtils.main("cust.base.certType"),
 						xtype:'paramcombo',
 						allowBlank:false,
 						hiddenName:'linkman.cert_type',
 						paramName:'CERT_TYPE',
 						defaultValue:'SFZ'
 					},{
-						fieldLabel:'固定电话',
+						fieldLabel: langUtils.main("cust.base.tel"),
 						name:'linkman.tel',
 						xtype:'textfield',
 						id: 'linkmanTel'
 					},{
-						fieldLabel:'邮箱',
+						fieldLabel: langUtils.main("cust.base.email"),
 						name:'linkman.email',
 						xtype:'textfield',
 						vtype:'email'
 					},{
-						fieldLabel:'邮编',
+						fieldLabel:langUtils.main("cust.base.postcode"),
 						name:'linkman.postcode',
 						xtype:'textfield'
 					}]
 				},{
 					items:[{
-						fieldLabel:'性别',
+						fieldLabel:langUtils.main("cust.base.sex"),
 						id : 'linkmanSex',
 						hiddenName:'linkman.sex',
 						xtype:'paramcombo',
 						paramName:'SEX'
 					},{
-						fieldLabel:'证件号码',
+						fieldLabel: langUtils.main("cust.base.certNum"),
 						xtype:'textfield',
 						vtype: 'alphanum',
 						width : 130,
@@ -366,12 +366,12 @@ LinkPanel = Ext.extend(Ext.Panel,{
 						name:'linkman.cert_num',
 						id: 'linkman_cert_num_el'
 					},{
-						fieldLabel:'手机',
+						fieldLabel: langUtils.main("cust.base.mobile"),
 						name:'linkman.mobile',
 						xtype:'numberfield',						
 						id: 'linkmanMobile'
 					},{
-						fieldLabel:'出生日期',
+						fieldLabel: langUtils.main("cust.base.barthday"),
 						width : 125,
 						id : 'linkmanBirthday',
 						name:'linkman.birthday',
@@ -381,7 +381,7 @@ LinkPanel = Ext.extend(Ext.Panel,{
 				},{
 					columnWidth:1,
 					items:[{
-						fieldLabel:'邮寄地址',
+						fieldLabel:langUtils.main("cust.base.postalAddr"),
 						width : 400,
 						id : 'linkman.mail_address',
 						name:'linkman.mail_address',
@@ -390,7 +390,7 @@ LinkPanel = Ext.extend(Ext.Panel,{
 					
 				}]
 			},{
-				fieldLabel:'备注',
+				fieldLabel: langUtils.bc("common.remark"),
 				name:'cust.remark',
 //						grow : true,
 				preventScrollbars : true,
@@ -488,7 +488,7 @@ CustBaseForm = Ext.extend( BaseForm , {
 			labelWidth: 75,
 			bodyStyle: Constant.TAB_STYLE,
 			items:[{
-				fieldLabel:'客户类型',
+				fieldLabel: langUtils.main("cust.base.type"),
 				xtype:'paramcombo',
 				allowBlank:false,
 				width : 125,
@@ -514,12 +514,11 @@ CustBaseForm = Ext.extend( BaseForm , {
 				items: [{
 					columnWidth:0.5,
 					items:[{
-						fieldLabel:'客户名称',
+						fieldLabel: langUtils.main("cust.base.name"),
 						xtype:'textfield',
 						id : 'cust.cust_name',
 						name:'cust.cust_name',
 						allowBlank:false,
-						blankText:'请输入客户名称',
 						listeners:{
 							scope: this,
 							'change': this.doCustNameChange
@@ -530,7 +529,7 @@ CustBaseForm = Ext.extend( BaseForm , {
 					items:[{
 						xtype: 'checkbox',
 					    labelWidth: 80,
-					    fieldLabel: "意向客户",
+					    fieldLabel: langUtils.main("cust._form.thinkCust"),
 					    id: "isCanToCustId",
 					    listeners:{
 			            	scope: this,
@@ -549,7 +548,7 @@ CustBaseForm = Ext.extend( BaseForm , {
 						mode: 'local',
 						displayField : 'name',
 						valueField : 'cust_code',
-						emptyText: '请选择省',
+						emptyText: langUtils.main("cust._form.switchProvince"),
 						disabled:true,
 						editable : false,
 						listeners:{
@@ -562,7 +561,7 @@ CustBaseForm = Ext.extend( BaseForm , {
 				},{
 					columnWidth:0.85,
 					items:[{
-						fieldLabel:'地址',
+						fieldLabel: langUtils.main("cust.base.addr"),
 						width:350,
 						xtype:'textfield',
 						id : 'tempCustAddress',
@@ -579,7 +578,7 @@ CustBaseForm = Ext.extend( BaseForm , {
 					items:[{
 						id:'clickAddrId',
 						xtype : 'button',
-						text: '&nbsp;选择',
+						text: langUtils.bc("common.switchor"),
 						scope: this,
 						width: 60,
 						height : 18,
@@ -590,7 +589,7 @@ CustBaseForm = Ext.extend( BaseForm , {
 					id:'addCustItemsOne',
 					items:[{
 						id:'cust_level_id',
-						fieldLabel:'客户等级',
+						fieldLabel: langUtils.main("cust.base.cust_level"),
 						xtype:'paramcombo',
 						allowBlank:false,
 						hiddenName:'cust.cust_level',
@@ -603,7 +602,7 @@ CustBaseForm = Ext.extend( BaseForm , {
 							}
 						}
 					},{
-						fieldLabel: '发展人',
+						fieldLabel: langUtils.main("cust.base.developName"),
 						xtype:'paramcombo',
 						hiddenName: 'cust.str9',
 						paramName:'OPTR',
@@ -612,7 +611,7 @@ CustBaseForm = Ext.extend( BaseForm , {
 				},{
 					id:'addCustItemsTwo',
 					items:[{
-							fieldLabel:'密码',
+							fieldLabel: langUtils.bc("common.pswd"),
 							allowBlank:false,
 							vtype : 'loginName',
 							xtype:'textfield',
@@ -701,20 +700,20 @@ CustBaseForm = Ext.extend( BaseForm , {
 		if(custType == 'NONRES'){
 			Ext.getCmp('addCustItemsOne').add({
 					id:'cust_str7_id',
-					fieldLabel:'营业执照',
+					fieldLabel: langUtils.main("cust.base.businessLicence"),
 					xtype:'textfield',
 					name:'cust.str7',
 					allowBlank:false
 				});
 			Ext.getCmp('addCustItemsTwo').add({
 					id:'cust_str8_id',
-					fieldLabel:'税号',
+					fieldLabel: langUtils.main("cust.base.unitNumber"),
 					xtype:'textfield',
 					name:'cust.str8'
 				});
 			Ext.getCmp('addCustItemsTwo').add({
 					id:'cust_spkg_sn_id',
-					fieldLabel:'协议编号',
+					fieldLabel:langUtils.main("cust.base.spkgSn"),
 					xtype:'textfield',
 					name:'cust.spkg_sn'
 				})

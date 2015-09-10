@@ -3,39 +3,37 @@
  * @class PublicAcctRefundPanel
  * @extends BaseForm
  */
-
+var _acms = lmain("cust.acct.columns");
 AcctItemTemplate = new Ext.XTemplate(
 	'<table width="100%" border="0" cellpadding="0" cellspacing="0">',
 		'<tr height=24>',
-			'<td class="label" width=20%>账目名称：</td>',
+			'<td class="label" width=20%>'+ _acms[0] + '：</td>',
 			'<td class="input_bold" width=30% colspan=3>&nbsp;{[values.acctitem_name ||""]}</td>',
 		'</tr>',
 		'<tr height=24>',
-			'<td class="label" width=20%>余额：</td>',
+			'<td class="label" width=20%>'+_acms[2]+ '：</td>',
 			'<td class="input" width=30%>&nbsp;{[Ext.util.Format.formatFee(values.active_balance) ]}</td>',
-			'<td class="label" width=20%>欠费：</td>',
+			'<td class="label" width=20%>'+_acms[3]+ '：</td>',
 			'<td class="input" width=30%>&nbsp;{[Ext.util.Format.formatFee(values.owe_fee)]}</td>',
 		'</tr>',
 		'<tr height=24>',
-			'<td class="label" width=20%>本月费用：</td>',
+			'<td class="label" width=20%>'+_acms[4]+ '：</td>',
 			'<td class="input" width=30%>&nbsp;{[Ext.util.Format.formatFee(values.real_bill)]}</td>',
-			'<td class="label" width=20%>实时费用：</td>',
+			'<td class="label" width=20%>'+_acms[5]+ '：</td>',
 			'<td class="input" width=30%>&nbsp;{[Ext.util.Format.formatFee(values.real_fee)]}</td>',
 		'</tr>',
 		'<tr height=24>',
-			'<td class="label" width=20%>预约：</td>',
-			'<td class="input" width=30%>&nbsp;{[Ext.util.Format.formatFee(values.order_balance)]}</td>',
-			'<td class="label" width=20%>实时余额：</td>',
+			'<td class="label" width=20%>'+_acms[6]+ '：</td>',
 			'<td class="input" width=30% colspan=3>&nbsp;{[Ext.util.Format.formatFee(values.real_balance)]}</td>',
 		'</tr>',
 		'<tr height=24>',
-			'<td class="label" width=20%>可转余额：</td>',
+			'<td class="label" width=20%>'+_acms[7]+ '：</td>',
 			'<td class="input" width=30%>&nbsp;{[Ext.util.Format.formatFee(values.can_trans_balance)]}</td>',
-			'<td class="label" width=20%>可退余额：</td>',
+			'<td class="label" width=20%>'+_acms[8]+ '：</td>',
 			'<td class="input_bold" width=30%>&nbsp;{[Ext.util.Format.formatFee(values.can_refund_balance)]}</td>',
 		'</tr>',
 		'<tr height=24>',
-			'<td class="label" width=20%>冻结余额：</td>',
+			'<td class="label" width=20%>'+_acms[9]+ '：</td>',
 			'<td class="input" width=30% colspan=3>&nbsp;{[Ext.util.Format.formatFee(values.inactive_balance)]}</td>',
 		'</tr>',
 	'</table>'
@@ -57,17 +55,20 @@ PublicAcctRefundPanel = Ext.extend(BaseForm,{
 					region:'north',
 					bodyStyle: Constant.TAB_STYLE,
 					height:180,
-					title:'账目信息',items:[{}]
+					title:lmain("cust.acct._title"),items:[{}]
 				},
 				{xtype : 'panel',
-	            	title : '退款业务处理',
+	            	title : lmain("cust._form.titleAcctRefund"),
 	            	bodyStyle: Constant.TAB_STYLE,//baseCls: 'x-plain',
 					layout:'form',region:'center',items:[
 					{xtype:'hidden',id:'acctId'},
 					{xtype:'hidden',id:'acctItemId'},
 					{xtype:'hidden',id:'realBalanceId'},
 					{xtype:'hidden',id:'canRefundBalance'},
-					{xtype:'numberfield',fieldLabel:'退款金额',allowBlank:false,allowNegative:false,
+					{xtype:'numberfield',
+						fieldLabel: lmain("cust._form.refundTotal"),
+						allowBlank:false,
+						allowNegative:false,
 						name:'fee',id:'feeId',minValue:1}]}
 			]
 		});

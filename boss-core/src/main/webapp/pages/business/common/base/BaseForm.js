@@ -35,7 +35,7 @@ BaseForm = Ext.extend(Ext.FormPanel , {
 			obj["isValid"] = true;
 		}else{
 			obj["isValid"] = false;
-			obj["msg"] = "含有验证不通过的输入项";
+			obj["msg"] = langUtils.bc("common.tipFormInvalid");
 		}
 		return obj;
 	},

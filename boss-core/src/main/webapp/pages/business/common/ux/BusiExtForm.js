@@ -7,14 +7,14 @@
 	 	var items = this.gItems(attrData).concat([{
 	 		xtype: 'textarea',
 	 		name: 'remark',
-	 		fieldLabel: '备注信息',
+	 		fieldLabel: langUtils.bc("common.remark2"),
 	 		anchor: '95%',
 	 		height: 40
 	 	}]);
 	 	
 //	 	var items = this.gItems(attrData);
 		BusiExtForm.superclass.constructor.call(this, {
-			title: '业务信息',
+			title: langUtils.bc("common.busiInfo"),
 			labelWidth: 70,
 			bodyStyle: Constant.TAB_STYLE,
 			items: items
