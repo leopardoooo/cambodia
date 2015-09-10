@@ -12,7 +12,6 @@ WorkForm = Ext.extend( BaseForm, {
 			items: [{
 				xtype: 'radiogroup',
 	            fieldLabel: '派单方式',
-	            anchor: '100%',
 	            id: 'radioAssignWay',
 //	            vertical: true,
 	            allowBlank: false,

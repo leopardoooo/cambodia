@@ -109,10 +109,11 @@ ServiceGrid = Ext.extend( Ext.grid.EditorGridPanel, {
 			autoExpandColumn : 'e',
 	        clicksToEdit: 1,
 			sm : this.checkSm,
+			viewConfig:{forceFit:true},
 			cm: new Ext.grid.ColumnModel({
 				defaults: { width: 55 },
 				columns: [this.checkSm,
-					{ id : 'e',header: '费用项', dataIndex: 'fee_name'},
+					{ id : 'e',header: '费用项', dataIndex: 'fee_name',renderer:App.qtipValue},
 					{ header: '户数', dataIndex: 'count', width: 40,
 						editor : new Ext.form.NumberField({
 							allowBlank : false,
