@@ -215,7 +215,6 @@ EditPayForm = Ext.extend(BaseForm,{
 		}
 	},
 	success:function(){
-		App.getApp().refreshPayInfo(parent);
 		App.getApp().refreshPanel(App.getApp().getData().currentResource.busicode);
 	},
 	getValues:function(){

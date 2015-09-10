@@ -59,7 +59,6 @@ PublicRechargeForm = Ext.extend(BaseForm,{
 		App.form.initComboData(this.findByType('paramcombo'));
 	},
 	success:function(){
-		App.getApp().refreshPayInfo(parent);
 		App.getApp().refreshPanel(App.getApp().getData().currentResource.busicode);
 	},
 	doChangePayType: function(cb, record, index){

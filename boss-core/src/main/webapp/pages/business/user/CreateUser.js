@@ -501,8 +501,6 @@ UserBaseForm = Ext.extend( BaseForm , {
 NewUserForm = Ext.extend(UserBaseForm , {
 	url : Constant.ROOT_PATH+"/core/x/User!createUser.action",
 	success : function(form,res){
-		var userId = res.simpleObj;
-		App.getApp().refreshPayInfo(parent);
 		App.getApp().refreshPanel(App.getApp().getData().currentResource.busicode);
 	}
 });
@@ -510,4 +508,4 @@ NewUserForm = Ext.extend(UserBaseForm , {
 Ext.onReady(function(){
 	var nup = new NewUserForm();
 	var box = TemplateFactory.gTemplate(nup);
-})
+});

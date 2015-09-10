@@ -147,8 +147,6 @@ PayFeesForm = Ext.extend( BaseForm , {
 		});
 	},
 	success:function(){
-		//刷新支付
-		App.getApp().refreshPayInfo(parent);
 		App.getApp().refreshPanel(App.getApp().getData().currentResource.busicode);
 		delete this.panel;
 		delete this.data;

@@ -123,7 +123,6 @@ PayIpUserFeeForm = Ext.extend(BaseForm,{
 		return obj;
 	},
 	success : function(){
-		App.getApp().refreshPayInfo(parent);
 		App.getApp().refreshPanel(App.getApp().getData().currentResource.busicode);
 	}
 });

@@ -427,8 +427,6 @@ UserBaseBatchForm = Ext.extend( BaseForm , {
 NewUserBatchForm = Ext.extend(UserBaseBatchForm , {
 	url : Constant.ROOT_PATH+"/core/x/User!createUserBatch.action",
 	success : function(form,res){
-		var userId = res.simpleObj;
-		App.getApp().refreshPayInfo(parent);
 		App.getApp().refreshPanel(App.getApp().getData().currentResource.busicode);
 	}
 });
