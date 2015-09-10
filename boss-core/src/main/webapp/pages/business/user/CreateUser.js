@@ -368,7 +368,7 @@ UserBaseForm = Ext.extend( BaseForm , {
 					item_name: data["device_model_text"],
 					item_value: data["device_model"]
 				}]);
-				box.setValue(data["device_model_text"]);
+				box.setValue(data["device_model"]);
 			}
 		});
 	},
