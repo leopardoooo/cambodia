@@ -249,7 +249,8 @@ UserBaseForm = Ext.extend( BaseForm , {
 			Ext.getCmp("txtLoginName").setValue(App.getApp().data.custFullInfo.cust.cust_no + bandCount);
 			Ext.getCmp("txtLoginPswd").setValue(newPswd);
 			
-			fs.setVisible(true);
+			fs.setVisible(false);
+			isAllowBlank(false);
 		}else if(type === "OTT_MOBILE"){
 			fs.setVisible(true);
 			isAllowBlank(true);

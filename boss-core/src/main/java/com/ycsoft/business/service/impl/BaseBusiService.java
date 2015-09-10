@@ -616,14 +616,7 @@ public class BaseBusiService extends BaseService {
 	 */
 	protected void createUserJob(CUser user, String custId, Integer doneCode)
 			throws Exception {
-		
 		authComponent.sendAuth(user, null, BusiCmdConstants.CREAT_USER, doneCode);
-		if (StringHelper.isNotEmpty(user.getCard_id())){
-			authComponent.sendAuth(user, null, BusiCmdConstants.ACCTIVATE_TERMINAL, doneCode);
-		}
-		if (StringHelper.isNotEmpty(user.getModem_mac())){
-			authComponent.sendAuth(user, null, BusiCmdConstants.ACCTIVATE_TERMINAL, doneCode);
-		}
 	}
 
 	/**
