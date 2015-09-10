@@ -264,6 +264,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 			//发送授权
 			if(user.getUser_type().equals(SystemConstants.USER_TYPE_DTT)||
 					user.getUser_type().equals(SystemConstants.USER_TYPE_OTT)){
+				//开户指令
 				this.createUserJob(user, user.getCust_id(), doneCode);
 			}
 			//发产品授权
