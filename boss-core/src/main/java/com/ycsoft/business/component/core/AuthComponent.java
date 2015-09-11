@@ -32,6 +32,7 @@ import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.exception.ComponentException;
 import com.ycsoft.commons.exception.ErrorCode;
 import com.ycsoft.commons.helper.DateHelper;
+import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.daos.core.JDBCException;
 
 @Component
@@ -60,19 +61,22 @@ public class AuthComponent extends BaseComponent{
 	
 	
 	private void sendOttAuth(CUser user, List<CProdOrder> orderList, String authCmdType, Integer doneCode) throws Exception{
-		if (authCmdType.equals(BusiCmdConstants.CREAT_USER) || 
-				authCmdType.equals(BusiCmdConstants.CHANGE_USER) || 
-				authCmdType.equals(BusiCmdConstants.PASSVATE_USER) ||
-				authCmdType.equals(BusiCmdConstants.ACCTIVATE_USER)||
-				authCmdType.equals(BusiCmdConstants.ACCTIVATE_TERMINAL)){
+		if(user.getUser_type().equals(SystemConstants.USER_TYPE_OTT)&&
+				StringHelper.isEmpty(user.getStb_id())){
+			//OTT用户无设备，则忽略指令
+			return;
+		}
+		if (authCmdType.equals(BusiCmdConstants.CREAT_USER) || //创建用户
+				authCmdType.equals(BusiCmdConstants.CHANGE_USER) || //变更用户
+				authCmdType.equals(BusiCmdConstants.PASSVATE_USER) ||//钝化用户
+				authCmdType.equals(BusiCmdConstants.ACCTIVATE_USER)||//激活用户
+				authCmdType.equals(BusiCmdConstants.REFRESH_TERMINAL)){//刷新终端
 			this.editOttUser(user, doneCode);
-		} else if (authCmdType.equals(BusiCmdConstants.DEL_USER)){
+		} else if (authCmdType.equals(BusiCmdConstants.DEL_USER)){//删除用户
 			this.deleteOttUser(user,orderList, doneCode);
-		} else if (authCmdType.equals(BusiCmdConstants.PASSVATE_PROD) ||
+		} else if (authCmdType.equals(BusiCmdConstants.PASSVATE_PROD) ||//产品授权
 				authCmdType.equals(BusiCmdConstants.ACCTIVATE_PROD)){
 			this.authOttProd(user, orderList, doneCode);
-		} else if (authCmdType.equals(BusiCmdConstants.REFRESH_TERMINAL)){
-			this.refreshOttUserAuth(user, doneCode);
 		} else {
 			throw new ComponentException(ErrorCode.CmdTypeUnDefined,authCmdType);
 		}
@@ -80,14 +84,22 @@ public class AuthComponent extends BaseComponent{
 	}
 	
 	private void sendDttAuth(CUser user, List<CProdOrder> orderList, String authCmdType, Integer doneCode) throws Exception{
-		if (authCmdType.equals(BusiCmdConstants.ACCTIVATE_TERMINAL)){
+		if(StringHelper.isEmpty(user.getCard_id())){
+			//DTT用户无智能卡号，则忽略授权
+			return;
+		}
+		if (authCmdType.equals(BusiCmdConstants.CREAT_USER)||//创建用户
+				authCmdType.equals(BusiCmdConstants.REFRESH_TERMINAL)){//刷新终端
 			this.openTerminal(user, doneCode);
-		} else if (authCmdType.equals(BusiCmdConstants.PASSVATE_PROD) ||
-				authCmdType.equals(BusiCmdConstants.ACCTIVATE_PROD)){
+		} if (authCmdType.equals(BusiCmdConstants.PASSVATE_USER)||//激活和钝化用户
+				authCmdType.equals(BusiCmdConstants.ACCTIVATE_USER)){
+			//DTT忽略钝化和激活用户指令
+			return;
+		}else if (authCmdType.equals(BusiCmdConstants.PASSVATE_PROD)){//减授权
+			this.authDttCancelProd(user, orderList, doneCode);
+		}else if(authCmdType.equals(BusiCmdConstants.ACCTIVATE_PROD)){//加授权
 			this.authDttProd(user, orderList, doneCode);
-		} else if (authCmdType.equals(BusiCmdConstants.REFRESH_TERMINAL)){
-			this.refreshDttUserAuth(user, doneCode);
-		} else if (authCmdType.equals(BusiCmdConstants.PASSVATE_TERMINAL)){
+		} else if (authCmdType.equals(BusiCmdConstants.DEL_USER)){//删除用户
 			this.StopTerminal(user, doneCode);
 		}else {
 			throw new ComponentException(ErrorCode.CmdTypeUnDefined,authCmdType);
@@ -107,10 +119,10 @@ public class AuthComponent extends BaseComponent{
 				authCmdType.equals(BusiCmdConstants.ACCTIVATE_PROD)){
 			this.refreshBandUserAuth(user, doneCode);
 		}else if(authCmdType.equals(BusiCmdConstants.REFRESH_TERMINAL)){
-			//宽带刷新设备要发销户、开户、订购3个指令
+			//宽带刷新设备要发销户、开户、2个指令
 			this.deleteBandUser(user, doneCode);
 			this.openBandUser(user, doneCode);
-			this.refreshBandUserAuth(user, doneCode);
+			//this.refreshBandUserAuth(user, doneCode);
 		}else if(authCmdType.equals(BusiCmdConstants.CHANGE_USER)){//修改密码...
 			this.updatePassword(user,doneCode);
 		}else {
@@ -186,24 +198,6 @@ public class AuthComponent extends BaseComponent{
 
 	
 	
-	/**
-	 * 重发ott用户授权
-	 * @param user
-	 * @param doneCode
-	 * @throws Exception
-	 */
-	private void refreshOttUserAuth(CUser user,Integer doneCode) throws Exception{
-		//获取用户所有资源的所有到期日
-		Map<String,Date> userResMap = this.getUserResExpDate(user.getUser_id());
-		for (Entry<String,Date> entry:userResMap.entrySet()){
-			JVodCommand ottCmd = gOttCmd(user,doneCode);
-			ottCmd.setCmd_type(BusiCmdConstants.ACCTIVATE_PROD);
-			ottCmd.setRes_id(entry.getKey());
-			JsonObject params = new JsonObject();
-			params.addProperty(BusiCmdParam.prod_exp_date.name(), DateHelper.format(entry.getValue(), DateHelper.FORMAT_TIME));
-			ottCmd.setDetail_param(params.toString());
-		}
-	}	
 	
 	/**
 	 * 删除OTT用户
@@ -239,10 +233,28 @@ public class AuthComponent extends BaseComponent{
 	//销户
 	private void StopTerminal(CUser user,Integer doneCode) throws Exception{
 		JCaCommand dttCommand = gDttCmd(user, doneCode);
-		dttCommand.setCmd_type(SmsxCmd.OpenICC.name());
+		dttCommand.setCmd_type(SmsxCmd.StopICC.name());
 		jCaCommandDao.save(dttCommand);
 	}
 	
+	//发送DTT减授权
+	private void authDttCancelProd(CUser user,List<CProdOrder> orderList,Integer doneCode) throws Exception{
+		//获取用户所有资源的所有到期日
+		//Map<String,Date> userResMap = this.getUserResExpDate(user.getUser_id());
+		//获取订单包含的资源
+		String[] orderResIds = getOrderProdRes(orderList);
+		
+		for (String orderResId:orderResIds){
+			JCaCommand dttCmd = gDttCmd(user, doneCode);
+			dttCmd.setBoss_res_id(orderResId);
+			dttCmd.setControl_id(orderResId);
+		//	Date expDate = userResMap.get(orderResId);
+			//发送减授权
+			dttCmd.setCmd_type(SmsxCmd.CancelProduct.name());
+			jCaCommandDao.save(dttCmd);
+			
+		}
+	}
 	//发送DTT授权
 	private void authDttProd(CUser user,List<CProdOrder> orderList,Integer doneCode) throws Exception{
 		//获取用户所有资源的所有到期日
@@ -355,6 +367,9 @@ public class AuthComponent extends BaseComponent{
 			bandCmd.setDetail_param(params.toString());
 			jBandCommandDao.save(bandCmd);
 			
+		}else{
+			//发删除产品指令
+			cancelOrder(user,doneCode);
 		}
 		
 	}

@@ -157,7 +157,7 @@ AddressTree = Ext.extend(Ext.ux.tree.TreeGridEditor,{
 	                }
 	            },{
 	                id: 'edit',
-	                text:langUtils.sys('common.enableBtn'),
+	                text:langUtils.sys('common.update'),
 	                handler : function(n){
 	                	new AddressWin('edit',n).show();
 	                }
@@ -507,7 +507,6 @@ AddressWin = Ext.extend(Ext.Window,{
 			}else{
 				provinceId = this.node.parentNode.attributes.others.district_id;
 			}
-			
 			this.itemForm.add(new AddressDistrictTreeCombo({
 		    	width:200,
 		    	id : 'addressDistrictItemId',

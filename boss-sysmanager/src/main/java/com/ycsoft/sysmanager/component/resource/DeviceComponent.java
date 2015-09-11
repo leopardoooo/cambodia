@@ -2367,7 +2367,21 @@ public class DeviceComponent extends BaseDeviceComponent {
 		return device;
 	}
 	
-
+	public List<SDept> queryDeptByOptr(SOptr optr) throws Exception{
+		List<SDept> list = sDeptDao.queryAllDept();
+		for (int i = list.size() - 1; i >= 0; i--){
+			if(list.get(i).getDept_id().equals(optr.getDept_id())){
+				list.remove(i);
+			}
+		}
+		return list;
+	}
+	
+	public List<SDept> queryAllDept() throws Exception{
+		List<SDept> list = sDeptDao.queryAllDept();
+		return list;
+	}
+	
 	/**
 	 * @param deviceTransferDao
 	 *            the rDeviceTransferDao to set

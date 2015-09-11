@@ -36,7 +36,7 @@ SelectUserPanel = Ext.extend(Ext.Panel, {
 	        height: 450,
 	        animCollapse: false,
 	        tbar: [{
-	        	text: '选用户',
+	        	text: lmain("user._form.switchUsers"),
 	        	iconCls: 'icon-add-user',
 	        	scope: this,
 	        	disabled: true,
@@ -46,7 +46,7 @@ SelectUserPanel = Ext.extend(Ext.Panel, {
 	        	}
 	        },' ',{
 	        	iconCls: 'icon-collapse-all',
-	        	text: '展开或收缩',
+	        	text: lbc("common.expandOrCollpse"),
 	        	scope: this,
 	        	handler: function(){
 	        		this.userGrid.getView().toggleAllGroups();
@@ -142,7 +142,7 @@ OpenDispatchUserWindow = Ext.extend(Ext.Window, {
             '<div class="pkg-sub-prod" id="{package_group_id}">',
 		    	'<div class="pkg-title">{package_group_name}</div>',
 		    	'<div class="pkg-detail">',
-			    	'<div>用户类型：{user_type}, 最大用户数：<i style="color: red;">{max_user_cnt}</i></div>',
+			    	'<div>'+ lmain("user.base.type") +'：{user_type}, '+ lmain("user._form.maxUserCount") +'：<i style="color: red;">{max_user_cnt}</i></div>',
 		    	'</div>',
 		    	'<div class="pkg-user-selected"></div>',
 		    '</div>',
@@ -151,7 +151,7 @@ OpenDispatchUserWindow = Ext.extend(Ext.Window, {
 		// Window Construct instance
 		return OpenDispatchUserWindow.superclass.constructor.call(this, {
 			layout:"border",
-			title: "分配用户",
+			title: lmain("user._form.titleDispatchUser"),
 			width: 450,
 			height: 400,
 			resizable: false,
@@ -185,13 +185,13 @@ OpenDispatchUserWindow = Ext.extend(Ext.Window, {
 				layout: 'border',
 				border: false,
 				items: [{
-					title: '可选',
+					title: lbc("common.optional"),
 					region: "center",
 					xtype: 'grid',
 					stripeRows: true,
 					store: this.fromUserStore,
 					sm: this.fromSm,
-					columns: [this.fromSm, {id: 'userColumn1',header: "终端信息", dataIndex: 'user_name'} ],
+					columns: [this.fromSm, {id: 'userColumn1',header: lmain("user._form.terminalInfo"), dataIndex: 'user_name'} ],
 					autoExpandColumn: 'userColumn1',
 			        stateful: true,
 			        tbar: [{
@@ -208,7 +208,7 @@ OpenDispatchUserWindow = Ext.extend(Ext.Window, {
 			        		}
 			        	}
 			        },'-',{
-			        	text: '加入已选',
+			        	text: lmain("user._form.addToSelected"),
 			        	iconCls: 'icon-add',
 			        	scope: this,
 			        	handler: this.doAddSelected
@@ -218,7 +218,7 @@ OpenDispatchUserWindow = Ext.extend(Ext.Window, {
 			        	dblclick: this.doAddSelected
 			        }
 				},{
-					title: '已选',
+					title: lbc("common.selected"),
 					region: 'east',
 					width: '50%',
 					border: true,
@@ -228,11 +228,11 @@ OpenDispatchUserWindow = Ext.extend(Ext.Window, {
 			        maxSize: 350,
 					store: this.toUserStore,
 					sm: this.toSm,
-					columns: [this.toSm, {id: 'userColumn2',header: "终端信息", dataIndex: 'user_name'} ],
+					columns: [this.toSm, {id: 'userColumn2',header: lmain("user._form.terminalInfo"), dataIndex: 'user_name'} ],
 					autoExpandColumn: 'userColumn2',
 			        stateful: true,
 			        tbar: [{
-			        	text: '移至可选',
+			        	text: lmain("user._form.moveToOptional"),
 			        	iconCls: 'icon-del',
 			        	scope: this,
 			        	handler: this.doRemoveSelected
@@ -257,8 +257,8 @@ OpenDispatchUserWindow = Ext.extend(Ext.Window, {
 				}]
 			}],
 			buttons:[
-			         {text:'保存', iconCls:'icon-save', scope:this, handler: this.doPassResultToParent},
-			         {text:'关闭', iconCls:'icon-close', scope:this, handler: this.hide},
+			         {text:lbc("common.save"), iconCls:'icon-save', scope:this, handler: this.doPassResultToParent},
+			         {text:lbc("common.close"), iconCls:'icon-close', scope:this, handler: this.hide},
 			]
 		});
 	},

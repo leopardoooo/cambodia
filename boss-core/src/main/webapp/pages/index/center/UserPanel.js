@@ -613,7 +613,7 @@ UserBroadbandTemplate = new Ext.XTemplate(
 UserOTTMobileTemplate = new Ext.XTemplate(
 		'<table width="100%" border="0" cellpadding="0" cellspacing="0">',
 		'<tr height=24>',
-			'<td class="label" width=20%>'+lmain("user.base.type")+'</td>',
+			'<td class="label" width=20%>'+lmain("user.base.type")+'：</td>',
 			'<td class="input_bold" width=30%>&nbsp;{[values.user_type_text ||""]}</td>',
 			'<td class="label" width=20%>'+lmain("user.base.name")+'：</td>',
 			'<td class="input_bold" width=30%>&nbsp;{[values.user_name ||""]}</td>',

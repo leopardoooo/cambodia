@@ -6,9 +6,9 @@ var transferNo = {
 //仓库
 var depot = {fieldLabel:'仓库',hiddenName:'deviceTransfer.depot_order',xtype:'combo',allowBlank:false,
 		store:new Ext.data.JsonStore({
-			url:'resource/Device!queryTransferDepot.action',
-			fields:['depot_id','depot_name']
-		}),displayField:'depot_name',valueField:'depot_id',triggerAction:'all',mode:'local'
+			url:'resource/Device!queryDeptByOptr.action',
+			fields:['dept_id','dept_name']
+		}),displayField:'dept_name',valueField:'dept_id',triggerAction:'all',mode:'local',width :150,minListWidth :250
 };
 
 //备注

@@ -117,13 +117,14 @@ AddrCustSelectWin = Ext.extend( Ext.Window , {
 		});
 		
 		var cm = [
-			{header: '房间号', dataIndex: 'note', width: 160},
-			{header: '房间状态', dataIndex: 'note_status_type_text',width: 80},
-			{header: '客户名称', dataIndex: 'cust_name'},
-			{header: '受理编号', dataIndex: 'cust_no'},
-		    { header: '操作', width: 50,renderer: function(v , md, record , i  ){
+			{ header: '操作', width: 50,renderer: function(v , md, record , i  ){
 				return "<DIV><a href='#' onclick='addrThat.doGridCheckRoom();'>确认</a></DIV>";
-			}}
+			}},
+			{header: '房间号', dataIndex: 'note', width: 120},
+			{header: '房间状态', dataIndex: 'note_status_type_text',width: 80},
+			{header: '客户名称', dataIndex: 'cust_name',width: 80},
+			{header: '受理编号', dataIndex: 'cust_no',width: 80}
+		    
 		];
 		
 		//实例化cust grid panel
@@ -154,7 +155,8 @@ AddrCustSelectWin = Ext.extend( Ext.Window , {
 				layout: 'form',
 				items:[{
 	                xtype: 'displayfield',
-	                anchor:"95%",
+	                autoWidth:true,
+	                autoHeight:true,
 	                id:'feeDescId'
 				}]
 			},{
@@ -209,7 +211,7 @@ AddrCustSelectWin = Ext.extend( Ext.Window , {
 			var name = "Room "+comp.getValue()+",";
 		}
 		name = name + this.addrName;
-		Ext.get('newAddressId').update(name);
+//		Ext.get('newAddressId').update(name);
 	},
 	doSaveNewRoom:function(){
 		var note = Ext.getCmp('newRoomBoxId').getValue();
@@ -239,6 +241,7 @@ AddrCustSelectWin = Ext.extend( Ext.Window , {
 		this.custGrid.on("rowclick", function(grid ,index, e){
 			var record = grid.getStore().getAt(index);
 			this.setData(record.get('note'));
+			Ext.get('newAddressId').update(this.addrName);
 		}, this)
 		this.addrTree.on("click",function(node, e) {
 			if (!this.isCanClick(node)) {
@@ -248,6 +251,7 @@ AddrCustSelectWin = Ext.extend( Ext.Window , {
 			Ext.getCmp('newRoomBoxId').setDisabled(true);
 			Ext.getCmp('saveRoomNewBoxId').setDisabled(true);
 			Ext.getCmp('custAddrId').setValue(node.id);
+			Ext.get('newAddressId').update('');
 			addrThat.nodeId = node.id;
 			addrThat.custStore.baseParams = {addrId:node.id};
 		
@@ -269,7 +273,6 @@ AddrCustSelectWin = Ext.extend( Ext.Window , {
 					var title = "行政区域:"+rec.districtName+";  "
 					title = title + "服务类型:"+(Ext.isEmpty(rec.netType)?'':rec.netType);
 					addrThat.custGrid.setTitle(title);
-					Ext.get('newAddressId').update(rec.addrName);
 				}
 			});
 			
@@ -295,6 +298,8 @@ AddrCustSelectWin = Ext.extend( Ext.Window , {
 		}
 		Ext.getCmp('feeDescId').setValue( oldAddr==null?"":oldAddr+
 			"<font style='font-size:12px'><b>new:</b></font><font style='color:red'><span id='newAddressId'>--</span></font>");
+			
+			
 		AddrCustSelectWin.superclass.show.call(this);
 	}
 });
@@ -488,20 +493,6 @@ CustBaseForm = Ext.extend( BaseForm , {
 			labelWidth: 75,
 			bodyStyle: Constant.TAB_STYLE,
 			items:[{
-				fieldLabel: langUtils.main("cust.base.type"),
-				xtype:'paramcombo',
-				allowBlank:false,
-				width : 125,
-				hiddenName:'cust.cust_type',
-				paramName:'CUST_TYPE',
-				defaultValue:'RESIDENT',
-				listeners:{
-					scope: this,
-					'select': function(combo,rec){
-						this.doCustTypeChange(combo.getValue());
-					}
-				}
-			},{
 				layout:'column',
 				baseCls: 'x-plain',
 				anchor: '100%',
@@ -512,8 +503,21 @@ CustBaseForm = Ext.extend( BaseForm , {
 					labelWidth: 75
 				},
 				items: [{
-					columnWidth:0.5,
 					items:[{
+						fieldLabel: langUtils.main("cust.base.type"),
+						xtype:'paramcombo',
+						allowBlank:false,
+						width : 125,
+						hiddenName:'cust.cust_type',
+						paramName:'CUST_TYPE',
+						defaultValue:'RESIDENT',
+						listeners:{
+							scope: this,
+							'select': function(combo,rec){
+								this.doCustTypeChange(combo.getValue());
+							}
+						}
+					},{
 						fieldLabel: langUtils.main("cust.base.name"),
 						xtype:'textfield',
 						id : 'cust.cust_name',
@@ -523,46 +527,42 @@ CustBaseForm = Ext.extend( BaseForm , {
 							scope: this,
 							'change': this.doCustNameChange
 						}
-					}]
+					}]	
 				},{
-					columnWidth:0.2,
 					items:[{
-						xtype: 'checkbox',
-					    labelWidth: 80,
-					    fieldLabel: langUtils.main("cust._form.thinkCust"),
-					    id: "isCanToCustId",
-					    listeners:{
-			            	scope: this,
-			            	check: this.doCheckedChange
-			            }
-					}]
-				},{
-					columnWidth:0.3,
-					labelWidth: 1,
-					items:[{
-						xtype:'combo',
-						id : 'provinceId',
-						forceSelection : true,
-						store : this.provinceStore,
-						triggerAction : 'all',
-						mode: 'local',
-						displayField : 'name',
-						valueField : 'cust_code',
-						emptyText: langUtils.main("cust._form.switchProvince"),
-						disabled:true,
-						editable : false,
-						listeners:{
-							scope:this,
-							select:function(combo){
-								this.custCode = combo.getValue();
+							xtype: 'checkbox',
+						    fieldLabel: langUtils.main("cust._form.thinkCust"),
+						    id: "isCanToCustId",
+						    listeners:{
+				            	scope: this,
+				            	check: this.doCheckedChange
+				            }
+						},{
+							xtype:'combo',
+							id : 'provinceId',
+							fieldLabel: "省",
+							forceSelection : true,
+							store : this.provinceStore,
+							triggerAction : 'all',
+							mode: 'local',
+							displayField : 'name',
+							valueField : 'cust_code',
+							emptyText: '请选择省',
+							disabled:true,
+							editable : false,
+							listeners:{
+								scope:this,
+								select:function(combo){
+									this.custCode = combo.getValue();
+								}
 							}
 						}
-					}]
+					]
 				},{
-					columnWidth:0.85,
+					columnWidth:0.80,
 					items:[{
-						fieldLabel: langUtils.main("cust.base.addr"),
-						width:350,
+						width:300,
+						fieldLabel: langUtils.main("cust.base.addr"),						
 						xtype:'textfield',
 						id : 'tempCustAddress',
 						name:'cust.address',

@@ -91,7 +91,7 @@ Ext.apply(MenuHandler, {
 	// 开户
 	NewCust : function() {
 		return {
-			width : 550,
+			width : 580,
 			height : 470
 		};
 	},
@@ -342,7 +342,7 @@ Ext.apply(MenuHandler, {
 			return false;
 		}
 		return {
-			width : 600,
+			width : 580,
 			height : 470
 		};
 	},
@@ -2023,27 +2023,27 @@ Ext.apply(MenuHandler, {
 			return false;
 		}
 
-//		for (var i = 0; i < len; i++) {
-//			var status = userRecords[i].get("status");
-//			if ( status != "ACTIVE" && status != "OWELONG" ) {
-//				Alert("所选用户的状态必须是正常");
-//				return false;
-//			}
-//		}
+		for (var i = 0; i < len; i++) {
+			var status = userRecords[i].get("status");
+			if ( status != "ACTIVE" && status != "OWELONG" ) {
+				Alert("所选用户的状态必须是正常");
+				return false;
+			}
+		}
 
-		// //回调函数
-		// function callback(res,opt){
-		// if (res.responseText=='true'){
-		// Alert('刷新指令发送成功!');
-		// App.getApp().main.infoPanel.getUserPanel().userGrid.remoteRefresh();
-		// }
-		// }
-		// var url = Constant.ROOT_PATH + "/core/x/User!RefreshCmd.action";
-		//		
-		// Confirm("确定发送刷新指令吗?", this , function(){
-		// //调用请求函数,详细参数请看busi-helper.js
-		// App.sendRequest(url,null,callback);
-		// } );
+		 //回调函数
+		 function callback(res,opt){
+			 if (res.responseText=='true'){
+				 Alert('刷新指令发送成功!');
+				 App.getApp().main.infoPanel.getUserPanel().userGrid.remoteRefresh();
+			 }
+		 }
+		 var url = Constant.ROOT_PATH + "/core/x/User!RefreshCmd.action";
+				
+		 Confirm("确定发送刷新指令吗?", this , function(){
+			 //调用请求函数,详细参数请看busi-helper.js
+			 App.sendRequest(url,null,callback);
+		 } );
 
 		return {
 			width : 500,

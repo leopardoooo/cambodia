@@ -371,6 +371,16 @@ public class BaseBusiService extends BaseService {
 		jobComponent.createCreditExecJob(doneCode, custId);
 	}
 	
+	//TODO 杂费取消
+	protected void cancelOtherFee( Integer doneCode, String busiCode,CFee fee) throws Exception, JDBCException {
+		//更新费用记录为冲正
+		feeComponent.saveCancelFee(fee,doneCode);
+		//重载操作员未打印的费用
+		String optrId = getOptr().getOptr_id();
+		List<String> feeSnList = feeComponent.queryUnPrintFeeByOptr(optrId);
+		MemoryPrintData.reloadOptrFee(optrId, feeSnList);
+	}
+	
 
 	/**
 	 * 冲正
@@ -604,14 +614,9 @@ public class BaseBusiService extends BaseService {
 	 * @param doneCode
 	 * @throws Exception
 	 */
-	protected void createUserJob(CUser user, String custId, Integer doneCode) throws Exception {
-		//OTT用户有设备才发CREAT_USER授权，这里不处理，工单回填后，自动分配设备后需要发授权
-		if(user.getUser_type().equals(SystemConstants.USER_TYPE_BAND) || user.getUser_type().equals(SystemConstants.USER_TYPE_OTT_MOBILE)){
-			authComponent.sendAuth(user, null, BusiCmdConstants.CREAT_USER, doneCode);
-		}
-		if (StringHelper.isNotEmpty(user.getCard_id()) || StringHelper.isNotEmpty(user.getStb_id()) || StringHelper.isNotEmpty(user.getModem_mac())){
-			authComponent.sendAuth(user, null, BusiCmdConstants.ACCTIVATE_TERMINAL, doneCode);
-		}
+	protected void createUserJob(CUser user, String custId, Integer doneCode)
+			throws Exception {
+		authComponent.sendAuth(user, null, BusiCmdConstants.CREAT_USER, doneCode);
 	}
 
 	/**
@@ -1015,6 +1020,8 @@ public class BaseBusiService extends BaseService {
 		updateUserCheckFlag(newCardId);
 		return busiInfo;
 	}
+	
+	
 	
 	/**
 	 * 回收设备
