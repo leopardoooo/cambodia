@@ -438,7 +438,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 			orderList = cProdOrderDao.queryCustEffOrderDto(custId);
 		}else if("ALL".equals(loadType)){
 			//提取未退订的订购记录
-			orderList=cProdOrderDao.queryCustAllOrderDto(custId);
+			orderList=cProdOrderDao.queryCustOrderALLAndHisDto(custId);
 		}else if("HIS".equals(loadType)) {
 			//TODO 已退订的订购记录
 			
