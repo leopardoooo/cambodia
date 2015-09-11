@@ -394,73 +394,12 @@ LinkPanel = Ext.extend(Ext.Panel,{
 			},{
 				fieldLabel: langUtils.bc("common.remark"),
 				name:'cust.remark',
-//						grow : true,
 				preventScrollbars : true,
 				height : 30,
 				width : 350,
 				xtype:'textarea'
 			}]
 		})
-	},
-	/**
-	 * 证件号码改变后，判断如果证件类型是身份证，则号码必须为15或者18位
-	 */
-	doCertNumChange:function(txt,value,oldValue){
-		var certType = this.find('hiddenName','linkman.cert_type')[0].getValue();
-		if (certType =="SFZ"){
-			if (!Ext.form.VTypes.IDNum(value)){
-				if(value.length != 18 && value.length != 15){
-					txt.setValue(oldValue);
-				}
-				Alert(Ext.form.VTypes.IDNumText);
-				return false
-			}else{
-				if(value.length == 18){//18位身份证
-					//设置生日
-					var dateStr = value.substring(6,14);
-					var year = dateStr.substring(0,4);
-					var month = dateStr.substring(4,6);
-					var day = dateStr.substring(6,8);
-					var date = Date.parseDate(year+"-"+month+"-"+day,'Y-m-d');
-					Ext.getCmp('linkmanBirthday').setValue(date);
-					
-					//设置性别
-					var num = value.substring(value.length -2 ,value.length-1);
-					var index = 0;
-					var sex = Ext.getCmp('linkmanSex');
-					if(num%2 == 0){
-						index = sex.getStore().find('item_value','FEMALE');
-					}else{
-						index = sex.getStore().find('item_value','MALE');
-					}
-					sex.setValue(sex.getStore().getAt(index).get('item_value'))
-				}else{//15位身份证
-					//设置生日
-					var dateStr = value.substring(6,12);
-					var year = '19' + dateStr.substring(0,2);
-					var month = dateStr.substring(2,4);
-					var day = dateStr.substring(4,6);
-					var date = Date.parseDate(year+"-"+month+"-"+day,'Y-m-d');
-					Ext.getCmp('linkmanBirthday').setValue(date);
-					
-					//设置性别
-					var num = value.substring(value.length -1 ,value.length);
-					var index = 0;
-					var sex = Ext.getCmp('linkmanSex');
-					if(num%2 == 0){
-						index = sex.getStore().find('item_value','FEMALE');
-					}else{
-						index = sex.getStore().find('item_value','MALE');
-					}
-					sex.setValue(sex.getStore().getAt(index).get('item_value'))
-				}
-				
-				
-				
-			}
-		}
-		
-		return true;
 	}
 });
 /**
