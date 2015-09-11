@@ -11,9 +11,9 @@ UserBaseForm = Ext.extend( BaseForm , {
 			autoLoad: true
 		});
 
-		var b = "鸡鸡鸡鸡鸡鸡....";
-		var c = '222222222';
-		var a = "222222222222222222222222222222222222222";
+		var b = "鸡鸡鸡鸡鸡鸡....111";
+		var c = '222222222eeeeeeeeeeeee';
+		var a = "222222222222222222222222222222222222222333";
 		alert(a);
 		
 		var ee = "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
