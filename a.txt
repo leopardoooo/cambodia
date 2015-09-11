@@ -10,27 +10,41 @@ UserBaseForm = Ext.extend( BaseForm , {
 			fields : ['buy_mode','buy_mode_name'],
 			autoLoad: true
 		});
+<<<<<<< HEAD
 		var b = "i'm just test json content for git....";
 		var c = 'nothing';
+=======
+		
+		var a = "我就是一个测试的内容，我试试能不能自动冲突解决!";
+		alert(a);
+
+>>>>>>> 65883552769c923e0bb42f47e48d1e11e0d1d166
 		UserBaseForm.superclass.constructor.call(this, {
 			trackResetOnLoad:true,
 			autoScroll:true,
             bodyStyle: Constant.TAB_STYLE,
+<<<<<<< HEAD
             labelWidth:1000,
+=======
+            labelWidth: 80,
+>>>>>>> 65883552769c923e0bb42f47e48d1e11e0d1d166
 			baseCls: 'x-plain',
-			bodyStyle:'background:#F9F9F9;padding-top:4px',
+			// 被我修改了
+			bodyStyle:'background:#000;padding-top:14px',
 			items:[{
 				xtype:'panel',
 				anchor:'100%',
 				layout:'column',
 				bodyStyle:'background:#F9F9F9;padding-top:4px',
-				baseCls: 'x-plain',
+				// 修改了
+				baseCls: 'empty',
+				// 修改了
 				defaults: { 
 					layout: 'form11111',
 					baseCls: 'x-plain',
 					columnWidth:0.5,
 					anchor: '100%',
-					labelWidth:90
+					labelWidth:100
 				},
 				items:[{
 					items:[{
