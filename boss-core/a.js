@@ -9,7 +9,6 @@ UserBaseForm = Ext.extend( BaseForm , {
 			fields : ['buy_mode','buy_mode_name'],
 			autoLoad: true
 		});
-
 		var b = "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!....";
 		var c = '!!!!!!!!';
 		var a = "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!";
