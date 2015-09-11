@@ -1155,12 +1155,12 @@ OrderFeeDetailGrid = Ext.extend(Ext.grid.GridPanel,{
 		var cm = [
 			{header:lc[0],dataIndex:'order_fee_sn', width:60},
 			{header:lc[1],dataIndex:'fee_type_text',width:70},
-			{header:lc[2],dataIndex:'input_prod_name',width:150, renderer: App.qtipValue},
 			{header:lc[3],dataIndex:'input_type_text', width:80},
 			{header:lc[4],dataIndex:'input_fee',width:80, renderer: Ext.util.Format.formatFee},
-			{header:lc[5],dataIndex:'output_prod_name',width:150, renderer: App.qtipValue},
+			{header:lc[2],dataIndex:'input_prod_name',width:150, renderer: App.qtipValue},
 			{header:lc[6],dataIndex:'output_type_text',width:80},
 			{header:lc[7],dataIndex:'output_fee',width:80, renderer: Ext.util.Format.formatFee},
+			{header:lc[5],dataIndex:'output_prod_name',width:150, renderer: App.qtipValue},
 			{header:lc[8],dataIndex:'done_code', width:80}
 		];
 				  
