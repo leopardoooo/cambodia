@@ -1,5 +1,5 @@
 /**
- * 用户开户表单
+ * 用户开户表单，@@@@@@@
  */
 UserBaseForm = Ext.extend( BaseForm , {
 	buyModeStore: null,
