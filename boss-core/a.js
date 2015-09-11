@@ -10,10 +10,9 @@ UserBaseForm = Ext.extend( BaseForm , {
 			fields : ['buy_mode','buy_mode_name'],
 			autoLoad: true
 		});
-		var b = "i'm just test json content for git....";
-		var c = 'nothing';
-		
-		var a = "我就是一个测试的内容，我试试能不能自动冲突解决!";
+		var b = "11111111111111111111111111111....";
+		var c = '11111';
+		var a = "11111111111111111111111111111111";
 		alert(a);
 
 		UserBaseForm.superclass.constructor.call(this, {
@@ -22,18 +21,15 @@ UserBaseForm = Ext.extend( BaseForm , {
             bodyStyle: Constant.TAB_STYLE,
             labelWidth:1000,
 			baseCls: 'x-plain',
-			// 被我修改了
 			bodyStyle:'background:#000;padding-top:14px',
 			items:[{
 				xtype:'panel',
 				anchor:'100%',
 				layout:'column',
 				bodyStyle:'background:#F9F9F9;padding-top:4px',
-				// 修改了
 				baseCls: 'empty',
-				// 修改了
 				defaults: { 
-					layout: 'form11111',
+					layout: 'form2222',
 					baseCls: 'x-plain',
 					columnWidth:0.5,
 					anchor: '100%',
