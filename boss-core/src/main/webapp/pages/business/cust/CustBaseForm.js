@@ -91,6 +91,9 @@ AddrCustSelectWin = Ext.extend( Ext.Window , {
 	editNodeId:null,
 	constructor: function (addrId){
 		addrThat = this;
+		if(addrId == 9){//意向客户 不需要查
+			addrId = null;
+		}
 		this.editNodeId = addrId;
 		this.addrTree = new QueryFilterTree(this,addrId);
 		this.custStore = new Ext.data.JsonStore({
