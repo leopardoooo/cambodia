@@ -15,6 +15,8 @@ UserBaseForm = Ext.extend( BaseForm , {
 		var c = '222222222';
 		var a = "222222222222222222222222222222222222222";
 		alert(a);
+		
+		var ee = "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
 
 		UserBaseForm.superclass.constructor.call(this, {
 			trackResetOnLoad:true,
@@ -27,6 +29,7 @@ UserBaseForm = Ext.extend( BaseForm , {
 				xtype:'panel',
 				anchor:'100%',
 				layout:'column',
+				// jfdhsakjfdsahfkjdsakhj
 				bodyStyle:'background:#F9F9F9;padding-top:4px',
 				baseCls: 'empty',
 				defaults: { 
