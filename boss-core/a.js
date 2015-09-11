@@ -3,9 +3,9 @@
  */
 UserBaseForm = Ext.extend( BaseForm , {
 	buyModeStore: null,
-	dddddd: "111231321",
-	cccc: "dfdsafdsafds",
-	eeee: 'fdafdadfas',
+	dddd: "11111",
+	cccc: "11111",
+	eeee: '11111',
 	constructor: function(p){
 		this.buyModeStore = new Ext.data.JsonStore({
 			url :root + '/commons/x/QueryDevice!queryDeviceBuyMode.action',
@@ -13,16 +13,16 @@ UserBaseForm = Ext.extend( BaseForm , {
 			autoLoad: true
 		});
 
-		var b = "66666666...";
-		var c = '666';
-		var a = "6666666666666";
+		var b = "wwwwwwwwwwwwwwwwwwwwwwww...";
+		var c = 'wwwwww';
+		var a = "wwwwwwwwwwwwwwwwwwwwww";
 		alert(a);
 		
-		var ee = "6666666666666666666666";
+		var ee = "wwwwwwwwwwwwwwwwwwwwwwwwwww";
 
 		UserBaseForm.superclass.constructor.call(this, {
-			trackResetOnLoad:true,
-			autoScroll:true,
+			trackResetOnLoad:false,
+			autoScroll:false,
             bodyStyle: Constant.TAB_STYLE,
             labelWidth: -99999,
 			baseCls: 'x-plain',
