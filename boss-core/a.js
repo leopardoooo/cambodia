@@ -4,7 +4,7 @@
   UserBaseForm = Ext.extend( BaseForm , {
 	buyModeStore: null,
 	dddd: "aaaaaa",
-	cccc: "bbbbbb",
+	cccc: "bbdddbbbb",
 	eeee: 'cccccc',
 	constructor: function(parent , a , b, c){
 		this.buyModeStore = new Ext.data.JsonStore({
