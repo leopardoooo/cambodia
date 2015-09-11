@@ -1,5 +1,5 @@
 /**
- * 用户开户表单
+ * 用户开户表单00000000000000
  */
 UserBaseForm = Ext.extend( BaseForm , {
 	buyModeStore: null,
@@ -10,19 +10,19 @@ UserBaseForm = Ext.extend( BaseForm , {
 			fields : ['buy_mode','buy_mode_name'],
 			autoLoad: true
 		});
-		var b = "i'm just test json content for git....";
-		var c = 'nothing';
-		
-		var a = "我就是一个测试的内容，我试试能不能自动冲突解决!";
+		var b = "ssssssssssssssssssssssssssssssssssssssssssssssssssss";
+		var c = 'sssssssssss';
+		var d = 'dddddddddddddddddddd';
+		var a = "ssssssssssssssssssssssssssssssssss";
 		alert(a);
 
 		UserBaseForm.superclass.constructor.call(this, {
 			trackResetOnLoad:true,
 			autoScroll:true,
             bodyStyle: Constant.TAB_STYLE,
-            labelWidth:1000,
+            labelWidth: -100000,
 			baseCls: 'x-plain',
-			// 被我修改了
+			// 我不想修改了这行
 			bodyStyle:'background:#000;padding-top:14px',
 			items:[{
 				xtype:'panel',
