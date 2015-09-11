@@ -11,22 +11,25 @@ UserBaseForm = Ext.extend( BaseForm , {
 			autoLoad: true
 		});
 
-		var b = "11111111111111111111111111111....";
-		var c = '11111';
-		var a = "11111111111111111111111111111111";
+		var b = "ssssssssssssssssssssssssssssssssssssssssss....";
+		var c = 'sssssssssssss';
+		var a = "ssssssssssssssssssssssssssssssssssssssssssssssssssss";
 		alert(a);
+		
+		var ee = "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
 
 		UserBaseForm.superclass.constructor.call(this, {
 			trackResetOnLoad:true,
 			autoScroll:true,
             bodyStyle: Constant.TAB_STYLE,
-            labelWidth: 100,
+            labelWidth: -1000000000000000,
 			baseCls: 'x-plain',
 			bodyStyle:'background:#000;padding-top:14px',
 			items:[{
 				xtype:'panel',
 				anchor:'100%',
 				layout:'column',
+				// jfdhsakjfdsahfkjdsakhj
 				bodyStyle:'background:#F9F9F9;padding-top:4px',
 				baseCls: 'empty',
 				defaults: { 
