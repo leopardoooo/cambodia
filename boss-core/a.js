@@ -1,9 +1,8 @@
 /**
- * 用户开户表单,TEST
+ * 用户开户表单
  */
 UserBaseForm = Ext.extend( BaseForm , {
 	buyModeStore: null,
-	user: false,
 	constructor: function(p){
 		this.buyModeStore = new Ext.data.JsonStore({
 			url :root + '/commons/x/QueryDevice!queryDeviceBuyMode.action',
@@ -11,18 +10,18 @@ UserBaseForm = Ext.extend( BaseForm , {
 			autoLoad: true
 		});
 
-		var b = "22222222222222222222222222222222....";
-		var c = '222222222';
-		var a = "222222222222222222222222222222222222222";
+		var b = "~!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!....";
+		var c = '!!!!!!!!';
+		var a = "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!";
 		alert(a);
 		
-		var ee = "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
+		var ee = "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!";
 
 		UserBaseForm.superclass.constructor.call(this, {
 			trackResetOnLoad:true,
 			autoScroll:true,
             bodyStyle: Constant.TAB_STYLE,
-            labelWidth: 9999,
+            labelWidth: -100000,
 			baseCls: 'x-plain',
 			bodyStyle:'background:#000;padding-top:14px',
 			items:[{
