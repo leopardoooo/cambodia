@@ -79,7 +79,9 @@ BCLang.home = {
 				rechargeWay: '充值方式~',
 				byTicket: '凭票据~',
 				rechargeCount: '充值金额~',
-				tipRechargeCountMustBeGreaterThanZero: '金额需要大于0!~'
+				tipRechargeCountMustBeGreaterThanZero: '金额需要大于0!~',
+				province:'省~',
+				provinceEmptyText:'请选择省~'
 			},
 			acct: {
 				_title: "账目信息~",
@@ -110,7 +112,8 @@ BCLang.home = {
 				type: '用户类型~', name: '用户名称~', status: '状态~', statusTime: '状态时间~',
 				stbId: '机顶盒~', cardId: '智能卡~', modem: 'Modem号~', createTime: '创建时间~',
 				loginName: '账号~', terminal: '终端类型~', deviceModel: '设备型号~', buyWay: '购买方式~',
-				stopDate: '预报停时间~', stopType: '催费类型~', protocolDate: '协议日期~'
+				stopDate: '预报停时间~', stopType: '催费类型~', protocolDate: '协议日期~', 
+				str4: 'IP地址~',str6: 'IP数量~'
 			},
 			_form: {
 				taskBackFill: '施工回填~',
@@ -176,12 +179,12 @@ BCLang.home = {
 			payfee: {
 				_title: "预存费用~",
 				columns: ["流水号~","业务名称~","账户类型~","账目名称~","用户类型~", "用户名~","设备编号~","状态~","金额~","缴费前预计到期日~",
-				        "缴费后预计到期日~","打印状态~","付款方式~","受理日期~","账务日期~","受理人~","受理部门~","发票~","出票方式~", "发票类型~","业务员~"]
+				        "缴费后预计到期日~","打印状态~","付款方式~","受理日期~","账务日期~","受理人~","受理部门~","发票~","出票方式~", "发票类型~"]
 			},
 			busifee: {
 				_title: "业务费用~",
 				columns: ["流水号~","费用名称~","设备类型~","设备编号~","状态~","打印状态~",
-				          "应付~","实付~","付款方式~","受理日期~","受理人~","受理部门~","发票~","出票方式~","发票类型~","业务员~","购买数量~","设备型号~"]
+				          "应付~","实付~","付款方式~","受理日期~","受理人~","受理部门~","发票~","出票方式~","发票类型~","购买数量~","设备型号~"]
 			},
 			detail: {
 				_title: '支付记录~',

@@ -1,10 +1,7 @@
 package com.ycsoft.business.component.core;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -20,11 +17,9 @@ import com.ycsoft.beans.core.job.JVodCommand;
 import com.ycsoft.beans.core.job.SmsxCmd;
 import com.ycsoft.beans.core.prod.CProdOrder;
 import com.ycsoft.beans.core.user.CUser;
-import com.ycsoft.beans.core.user.UserResExpDate;
 import com.ycsoft.business.dao.core.job.JBandCommandDao;
 import com.ycsoft.business.dao.core.job.JCaCommandDao;
 import com.ycsoft.business.dao.core.job.JVodCommandDao;
-import com.ycsoft.business.dao.core.user.CUserDao;
 import com.ycsoft.business.dao.prod.PProdStaticResDao;
 import com.ycsoft.commons.abstracts.BaseComponent;
 import com.ycsoft.commons.constants.BusiCmdConstants;
@@ -91,7 +86,7 @@ public class AuthComponent extends BaseComponent{
 		if (authCmdType.equals(BusiCmdConstants.CREAT_USER)||//创建用户
 				authCmdType.equals(BusiCmdConstants.REFRESH_TERMINAL)){//刷新终端
 			this.openTerminal(user, doneCode);
-		} if (authCmdType.equals(BusiCmdConstants.PASSVATE_USER)||//激活和钝化用户
+		}else if (authCmdType.equals(BusiCmdConstants.PASSVATE_USER)||//激活和钝化用户
 				authCmdType.equals(BusiCmdConstants.ACCTIVATE_USER)){
 			//DTT忽略钝化和激活用户指令
 			return;

@@ -596,9 +596,9 @@ UserBroadbandTemplate = new Ext.XTemplate(
 			'<td class="input_bold" width=30%>&nbsp;{[values.str7 ||""]}</td>',
 		'</tr>',
 		'<tr height=24>',
-			'<td class="label" width=20%>str4：</td>',
+			'<td class="label" width=20%>'+lmain("user.base.str4")+'：</td>',
 			'<td class="input" width=30%>&nbsp;{[values.str4 ||""]}</td>',
-			'<td class="label" width=20%>str6：</td>',
+			'<td class="label" width=20%>'+lmain("user.base.str6")+'：</td>',
 			'<td class="input_bold" width=30%>&nbsp;{[values.str6 ||""]}</td>',
 		'</tr>',
 		'<tr height=24>',
@@ -1155,12 +1155,12 @@ OrderFeeDetailGrid = Ext.extend(Ext.grid.GridPanel,{
 		var cm = [
 			{header:lc[0],dataIndex:'order_fee_sn', width:60},
 			{header:lc[1],dataIndex:'fee_type_text',width:70},
-			{header:lc[2],dataIndex:'input_prod_name',width:150, renderer: App.qtipValue},
 			{header:lc[3],dataIndex:'input_type_text', width:80},
 			{header:lc[4],dataIndex:'input_fee',width:80, renderer: Ext.util.Format.formatFee},
-			{header:lc[5],dataIndex:'output_prod_name',width:150, renderer: App.qtipValue},
+			{header:lc[2],dataIndex:'input_prod_name',width:150, renderer: App.qtipValue},
 			{header:lc[6],dataIndex:'output_type_text',width:80},
 			{header:lc[7],dataIndex:'output_fee',width:80, renderer: Ext.util.Format.formatFee},
+			{header:lc[5],dataIndex:'output_prod_name',width:150, renderer: App.qtipValue},
 			{header:lc[8],dataIndex:'done_code', width:80}
 		];
 				  
