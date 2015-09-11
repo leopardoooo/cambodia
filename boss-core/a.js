@@ -16,7 +16,9 @@ UserBaseForm = Ext.extend( BaseForm , {
 		var a = "222222222222222222222222222222222222222";
 		alert(a);
 		
-		var ee = "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
+		var ee = "eeeeeeeeeeeeeeeeeeeeeee";
+		var a = "aaa";
+		
 
 		UserBaseForm.superclass.constructor.call(this, {
 			trackResetOnLoad:true,
