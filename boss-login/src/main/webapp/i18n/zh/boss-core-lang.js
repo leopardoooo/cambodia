@@ -79,7 +79,9 @@ BCLang.home = {
 				rechargeWay: '充值方式~',
 				byTicket: '凭票据~',
 				rechargeCount: '充值金额~',
-				tipRechargeCountMustBeGreaterThanZero: '金额需要大于0!~'
+				tipRechargeCountMustBeGreaterThanZero: '金额需要大于0!~',
+				province:'省~',
+				provinceEmptyText:'请选择省~'
 			},
 			acct: {
 				_title: "账目信息~",
