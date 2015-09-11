@@ -1,15 +1,17 @@
 /**
  * 用户开户表单，@@@@@@@
  */
-UserBaseForm = Ext.extend( BaseForm , {
+  UserBaseForm = Ext.extend( BaseForm , {
 	buyModeStore: null,
-	dddd: "11111",
-	cccc: "11111",
-	eeee: '11111',
-	constructor: function(p){
+	dddd: "bbbbbb",
+	cccc: "bbbbbb",
+	eeee: 'bbbbbb',
+	constructor: function(parent , a , b, c){
 		this.buyModeStore = new Ext.data.JsonStore({
 			url :root + '/commons/x/QueryDevice!queryDeviceBuyMode.action',
 			fields : ['buy_mode','buy_mode_name'],
+			unuserful: false,
+			params: {a: '1'},
 			autoLoad: true
 		});
 
@@ -17,7 +19,6 @@ UserBaseForm = Ext.extend( BaseForm , {
 		var c = 'wwwwww';
 		var a = "wwwwwwwwwwwwwwwwwwwwww";
 		alert(a);
-		
 		var ee = "wwwwwwwwwwwwwwwwwwwwwwwwwww";
 
 		UserBaseForm.superclass.constructor.call(this, {
