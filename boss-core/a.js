@@ -12,10 +12,10 @@ UserBaseForm = Ext.extend( BaseForm , {
 
 		var b = "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!....";
 		var c = '!!!!!!!!';
-		var a = "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!";
+		var a = "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!";
 		alert(a);
-		var aaa; var asd;
-		var ee = "!!!!!!!!!!!!!!!";
+		
+		var ee = "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!";
 
 		UserBaseForm.superclass.constructor.call(this, {
 			trackResetOnLoad:true,

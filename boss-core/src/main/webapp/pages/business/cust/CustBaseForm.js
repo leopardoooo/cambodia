@@ -211,7 +211,6 @@ AddrCustSelectWin = Ext.extend( Ext.Window , {
 			var name = "Room "+comp.getValue()+",";
 		}
 		name = name + this.addrName;
-//		Ext.get('newAddressId').update(name);
 	},
 	doSaveNewRoom:function(){
 		var note = Ext.getCmp('newRoomBoxId').getValue();
