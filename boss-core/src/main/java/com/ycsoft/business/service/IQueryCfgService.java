@@ -100,10 +100,11 @@ public interface IQueryCfgService extends IBaseService {
 	/**
 	 * 根据名称查询地址目录
 	 * @param name
+	 * @param editId 
 	 * @return
 	 * @throws Exception
 	 */
-	public List<TAddressDto> queryAddrByName(String name,String addrId) throws Exception;
+	public List<TAddressDto> queryAddrByName(String name,String addrId, String editId) throws Exception;
 	
 	public Map<String, Object> queryCustAddrName(String addrId) throws Exception;
 

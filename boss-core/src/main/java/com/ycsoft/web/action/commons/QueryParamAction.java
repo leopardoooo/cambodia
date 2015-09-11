@@ -26,6 +26,7 @@ public class QueryParamAction extends BaseBusiAction {
 	private String comboQueryText;
 	private String addrPid;
 	private String addrId;
+	private String editId;
 	private IQueryCfgService queryCfgService;
 
 
@@ -40,7 +41,7 @@ public class QueryParamAction extends BaseBusiAction {
 	 * @throws Exception
 	 */
 	public String queryAddrTree() throws Exception{
-		List addrs =  queryCfgService.queryAddrByName(comboQueryText,addrId);
+		List addrs =  queryCfgService.queryAddrByName(comboQueryText,addrId,editId);
 		getRoot().setRecords(TreeBuilder.createAdreeTree(addrs,false));
 		return JSON_RECORDS;
 	}
@@ -132,4 +133,13 @@ public class QueryParamAction extends BaseBusiAction {
 	public void setAddrId(String addrId) {
 		this.addrId = addrId;
 	}
+
+	public String getEditId() {
+		return editId;
+	}
+
+	public void setEditId(String editId) {
+		this.editId = editId;
+	}
+	
 }

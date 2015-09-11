@@ -213,8 +213,8 @@ public class QueryCfgService extends BaseService implements IQueryCfgService{
 	}
 
 	
-	public List<TAddressDto> queryAddrByName(String name,String pId) throws Exception{
-			return simpleComponent.queryAddrByLike(name,pId);
+	public List<TAddressDto> queryAddrByName(String name,String pId, String editId) throws Exception{
+			return simpleComponent.queryAddrByLike(name,pId,editId);
 	}
 	
 	public Pager<CCustAddrNote> queryNoteCust(String addrId,Integer start, Integer limit) throws Exception {

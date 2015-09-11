@@ -1,12 +1,15 @@
 
 QueryFilterTree = Ext.extend(Ext.ux.QueryFilterTreePanel,{
-	
-	constructor: function(parent){
+	treeParams:null,
+	parent:null,
+	constructor: function(parent,addrId){
+		this.parent = parent;
+		this.treeParams = {editId:addrId}
 		QueryFilterTree.superclass.constructor.call(this, {
 			root : new Ext.tree.AsyncTreeNode({expanded : true}),
 			loader : new Ext.tree.TreeLoader({
 						dataUrl : Constant.ROOT_PATH+"/commons/x/QueryParam!queryAddrTree.action",
-//						baseParams : this.treeParams,
+						baseParams : this.treeParams,
 						listeners : {
 							beforeload : this.onBeforeLoad,
 							scope : this
@@ -25,22 +28,29 @@ QueryFilterTree = Ext.extend(Ext.ux.QueryFilterTreePanel,{
 	        lines		:false,  // 去掉树的线
 	        animCollapse:true,
 	        collapseMode:'mini',
-			bodyStyle	:'padding:3px',    
-			
-			listeners : {
-//				click : this.onNodeClick,
-				scope : this
-			}
+			bodyStyle	:'padding:3px'
 		})
+	},	
+	doSearchEditId:function(v){
+		this.doLoadTreeData(null,v);
 	},
 	doSearch:function(){
 		var _v = this.searchT.getValue();
+		this.doLoadTreeData(_v,null);				
+	},
+	doLoadTreeData:function(n,v){
+		this.parent.doGridrest();
+		var params = {};
+		if(!Ext.isEmpty(n)){
+			params['comboQueryText'] = n;
+		}
+		if(!Ext.isEmpty(v)){
+			params['editId'] = v;
+		}
 		Ext.Ajax.request({
 			url: Constant.ROOT_PATH+"/commons/x/QueryParam!queryAddrTree.action",
 			scope : this,
-			params : {
-				comboQueryText : _v
-			},
+			params : params,
 			success : function(res,opt){
 				var data = Ext.decode(res.responseText);
 				var root = new Ext.tree.AsyncTreeNode({
@@ -49,36 +59,14 @@ QueryFilterTree = Ext.extend(Ext.ux.QueryFilterTreePanel,{
 						  draggable:false,
 						  children:data
 						 });
-				this.setRootNode(root);
-			}
-		});				
-	},
-	onNodeClick : function(node, e) {		
-		if (!this.isCanClick(node)) {
-			return;
-		}
-		this.setRawValue('');
-		Ext.Ajax.request({
-			scope : this,
-			url: Constant.ROOT_PATH+"/commons/x/QueryParam!queryCustAddrName.action",
-			params : {
-				addrId : node.id
-			},
-			success : function(res,opt){
-				var rec = Ext.decode(res.responseText);
-				//		// 显示隐藏值
-				this.addOption(node.id, rec);
-				this.setValue(node.id);
-				this.setRawValue(rec);
-				this.collapse();
-				this.fireEvent('select', this, node, node.attributes);
-			}
-		});
+				this.setRootNode(root);  
+				}
+		});	
 	},
 	onBeforeLoad:function(l,node){
-		l.on('beforeload',function(loader,node){
+		if(!node.isRoot){
   			l.baseParams.addrId=node.id; //通过这个传递参数，这样就可以点一个节点出来它的子节点来实现异步加载
-		},l);
+		}
 	},
 	// 检查当前的节点是否能够被点击
 	isCanClick : function(node) {
@@ -100,9 +88,11 @@ AddrCustSelectWin = Ext.extend( Ext.Window , {
 	nodeId:null,
 	pageSize:15,
 	roomPanel:null,
-	constructor: function (){
+	editNodeId:null,
+	constructor: function (addrId){
 		addrThat = this;
-		this.addrTree = new QueryFilterTree(this);
+		this.editNodeId = addrId;
+		this.addrTree = new QueryFilterTree(this,addrId);
 		this.custStore = new Ext.data.JsonStore({
 			url: Constant.ROOT_PATH+"/commons/x/QueryParam!queryNoteCust.action",
 			root: 'records',
@@ -205,6 +195,9 @@ AddrCustSelectWin = Ext.extend( Ext.Window , {
 			}]
 		});
 	},
+	doGridrest:function(){
+		this.custStore.removeAll();
+	},
 	doNewRoom:function(comp){
 		var name = "";
 		if(!Ext.isEmpty(comp.getValue())){
@@ -246,13 +239,20 @@ AddrCustSelectWin = Ext.extend( Ext.Window , {
 			if (!this.isCanClick(node)) {
 				return;
 			}
-			Ext.getCmp('addRoomNewBoxId').setDisabled(false);
+			addrThat.doGridrest();
+			addrThat.doLoadRoom(node.id);
+		})
+		
+		AddrCustSelectWin.superclass.initEvents.call(this);
+	},
+	doLoadRoom:function(addrId){
+		Ext.getCmp('addRoomNewBoxId').setDisabled(false);
 			Ext.getCmp('newRoomBoxId').setDisabled(true);
 			Ext.getCmp('saveRoomNewBoxId').setDisabled(true);
-			Ext.getCmp('custAddrId').setValue(node.id);
+			Ext.getCmp('custAddrId').setValue(addrId);
 			Ext.get('newAddressId').update('');
-			addrThat.nodeId = node.id;
-			addrThat.custStore.baseParams = {addrId:node.id};
+			addrThat.nodeId = addrId;
+			addrThat.custStore.baseParams = {addrId:addrId};
 		
 			addrThat.custStore.load({
 				params: { start:0, limit: addrThat.pageSize}
@@ -274,10 +274,7 @@ AddrCustSelectWin = Ext.extend( Ext.Window , {
 					addrThat.custGrid.setTitle(title);
 				}
 			});
-			
-		})
-		
-		AddrCustSelectWin.superclass.initEvents.call(this);
+	
 	},
 	setData:function(note){
 		var name = "";
@@ -298,6 +295,9 @@ AddrCustSelectWin = Ext.extend( Ext.Window , {
 		Ext.getCmp('feeDescId').setValue((oldAddr==null?"":oldAddr)+
 			"<font style='font-size:12px'><b>new:</b></font><font style='color:red'><span id='newAddressId'>--</span></font>");
 		AddrCustSelectWin.superclass.show.call(this);
+		if(this.editNodeId != null){
+			this.doLoadRoom(this.editNodeId);
+		}
 	}
 });
 
@@ -634,7 +634,7 @@ CustBaseForm = Ext.extend( BaseForm , {
 	doClickAddr:function(btn){
 		var win = Ext.getCmp('addrCustSelectWinId');
 		if(!win){
-			win = new AddrCustSelectWin();
+			win = new AddrCustSelectWin(Ext.getCmp('custAddrId').getValue());
 		}
 		win.show();
 		win.maximize();
