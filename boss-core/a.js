@@ -3,23 +3,22 @@
  */
   UserBaseForm = Ext.extend( BaseForm , {
 	buyModeStore: null,
-	dddd: "bbbbbb",
-	cccc: "bbbbbb",
-	eeee: 'bbbbbb',
+	gggg: "bbb11bbb",
+	gg111: "11",
+	gg231231: '111',
 	constructor: function(parent , a , b, c){
 		this.buyModeStore = new Ext.data.JsonStore({
 			url :root + '/commons/x/QueryDevice!queryDeviceBuyMode.action',
 			fields : ['buy_mode','buy_mode_name'],
-			unuserful: false,
-			params: {a: '1'},
+			params: {a: 'aaaaaaaaaa'},
 			autoLoad: true
 		});
 
-		var b = "wwwwwwwwwwwwwwwwwwwwwwww...";
-		var c = 'wwwwww';
-		var a = "wwwwwwwwwwwwwwwwwwwwww";
+		var b = "222222222222222222222...";
+		var c = '2222';
+		var a = "22222222222222222222222222222";
 		alert(a);
-		var ee = "wwwwwwwwwwwwwwwwwwwwwwwwwww";
+		var ee = "23332322222";
 
 		UserBaseForm.superclass.constructor.call(this, {
 			trackResetOnLoad:false,
