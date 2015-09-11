@@ -112,7 +112,8 @@ BCLang.home = {
 				type: '用户类型~', name: '用户名称~', status: '状态~', statusTime: '状态时间~',
 				stbId: '机顶盒~', cardId: '智能卡~', modem: 'Modem号~', createTime: '创建时间~',
 				loginName: '账号~', terminal: '终端类型~', deviceModel: '设备型号~', buyWay: '购买方式~',
-				stopDate: '预报停时间~', stopType: '催费类型~', protocolDate: '协议日期~'
+				stopDate: '预报停时间~', stopType: '催费类型~', protocolDate: '协议日期~', 
+				str4: 'IP地址~',str6: 'IP数量~'
 			},
 			_form: {
 				taskBackFill: '施工回填~',
