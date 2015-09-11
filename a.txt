@@ -3,18 +3,20 @@
  */
 UserBaseForm = Ext.extend( BaseForm , {
 	buyModeStore: null,
+	user: false,
 	constructor: function(p){
 		this.buyModeStore = new Ext.data.JsonStore({
 			url :root + '/commons/x/QueryDevice!queryDeviceBuyMode.action',
 			fields : ['buy_mode','buy_mode_name'],
 			autoLoad: true
 		});
-		
+		var b = "i'm just test json content for git....";
+		var c = 'nothing';
 		UserBaseForm.superclass.constructor.call(this, {
 			trackResetOnLoad:true,
 			autoScroll:true,
             bodyStyle: Constant.TAB_STYLE,
-            labelWidth:90,
+            labelWidth:1000,
 			baseCls: 'x-plain',
 			bodyStyle:'background:#F9F9F9;padding-top:4px',
 			items:[{
@@ -24,7 +26,7 @@ UserBaseForm = Ext.extend( BaseForm , {
 				bodyStyle:'background:#F9F9F9;padding-top:4px',
 				baseCls: 'x-plain',
 				defaults: { 
-					layout: 'form',
+					layout: 'form11111',
 					baseCls: 'x-plain',
 					columnWidth:0.5,
 					anchor: '100%',
@@ -508,5 +510,6 @@ NewUserForm = Ext.extend(UserBaseForm , {
 
 Ext.onReady(function(){
 	var nup = new NewUserForm();
+	var nfdjksahfdjksahfjdksahfjkdsahjfkdsahjkfdhsajkfhdsakjfhdjksahfjkds;
 	var box = TemplateFactory.gTemplate(nup);
 });
