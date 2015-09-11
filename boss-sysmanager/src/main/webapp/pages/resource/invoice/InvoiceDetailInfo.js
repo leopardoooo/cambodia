@@ -18,7 +18,7 @@ var InvoiceDetailForm = Ext.extend(Ext.form.FormPanel, {
 						border : false,
 						items : [{
 									xtype : 'textfield',
-									fieldLabel : '发票号码',
+									fieldLabel : langUtils.sys('InvoiceDetail.labels.invoice_id'),
 									allowBlank : false,
 									name : 'invoice_id',
 									width:100,
@@ -40,7 +40,7 @@ var InvoiceDetailForm = Ext.extend(Ext.form.FormPanel, {
 						layout : 'form',
 						border : false,
 						items : [{
-									fieldLabel : '发票代码',
+									fieldLabel : langUtils.sys('InvoiceDetail.labels.invoice_id'),
 									xtype : 'combo',
 									store : new Ext.data.JsonStore({
 												fields : ['invoice_code']

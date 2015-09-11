@@ -50,14 +50,14 @@ QueryInvoiceForm = Ext.extend(Ext.form.FormPanel,{
 			layout:'column',
 			items:[
 				{columnWidth:.5,layout:'form',border:false,items:[
-						{xtype:'treecombo',fieldLabel:'仓库',hiddenName:'invoiceDto.depot_id',
+						{xtype:'treecombo',fieldLabel:langUtils.sys('QueryInvoice.labels.depot_name'),hiddenName:'invoiceDto.depot_id',
 						width:322,
 						treeWidth:322,
 						height: 20,
 						allowBlank: false,
 						onlySelectLeaf:false,
-						emptyText :'请选择仓库',
-						blankText:'请选择仓库',
+						emptyText :langUtils.sys('QueryInvoice.msg.emptyTextSelectStore'),
+						blankText:langUtils.sys('QueryInvoice.msg.emptyTextSelectStore'),
 						treeUrl: 'resource/Invoice!queryChildInvoiceDepot.action',
 						listeners : {
 							scope:this,
@@ -74,7 +74,7 @@ QueryInvoiceForm = Ext.extend(Ext.form.FormPanel,{
 				]},
 				{columnWidth:.5,layout:'form',style:'padding-buttom:5px',border:false,items:[
 				
-					{fieldLabel:'操作员',width:322,height: 20,hiddenName:'invoiceDto.optrids',xtype:'paramlovcombo',
+					{fieldLabel:langUtils.sys('common.optr'),width:322,height: 20,hiddenName:'invoiceDto.optrids',xtype:'paramlovcombo',
 						displayField:'optr_name',valueField:'optr_id',
 						editable:true,triggerAction:'all',
 						store:new Ext.data.JsonStore({
@@ -90,27 +90,27 @@ QueryInvoiceForm = Ext.extend(Ext.form.FormPanel,{
 				
 				]},
 				{columnWidth:.5,layout:'form',border:false,items:[
-					{fieldLabel:'发票号码',
+					{fieldLabel:langUtils.sys('QueryInvoice.labels.invoice_id'),
 					    xtype:'compositefield',combineErrors:false,
 					    items: [
 					        {xtype:'textfield',name:'invoiceDto.start_invoice_id',vtype:'invoiceId',height:22,width:150},
-					        {xtype:'displayfield',value:'至'},
+					        {xtype:'displayfield',value:langUtils.sys('common.to')},
 					        {xtype:'textfield',name:'invoiceDto.end_invoice_id',vtype:'invoiceId',height:22,width:150}
 				    	]
 					},
-					{fieldLabel:'入库时间',
+					{fieldLabel:langUtils.sys('QueryInvoice.labels.create_time'),
 						    xtype:'compositefield',combineErrors:false,
 						    items: [
 						        {xtype:'datefield',name:'invoiceDto.start_input_time',style:'width:135px;height:22px',format:'Y-m-d'},
-						        {xtype:'displayfield',value:'至'},
+						        {xtype:'displayfield',value:langUtils.sys('common.to')},
 						        {xtype:'datefield',name:'invoiceDto.end_input_time',style:'width:135px;height:22px',format:'Y-m-d'}
 					    	]
 						},
-						{fieldLabel:'核销时间',
+						{fieldLabel:langUtils.sys('QueryInvoice.labels.close_time'),
 						    xtype:'compositefield',combineErrors:false,
 						    items: [
 						        {xtype:'datefield',name:'invoiceDto.start_close_time',style:'width:135px;height:22px',format:'Y-m-d'},
-						        {xtype:'displayfield',value:'至'},
+						        {xtype:'displayfield',value:langUtils.sys('common.to')},
 						        {xtype:'datefield',name:'invoiceDto.end_close_time',style:'width:135px;height:22px',format:'Y-m-d'}
 					    	]
 						}	
@@ -122,11 +122,11 @@ QueryInvoiceForm = Ext.extend(Ext.form.FormPanel,{
 				]},
 				*/
 				{columnWidth:.5,layout:'form',border:false,width:320,items:[
-						{fieldLabel:'发票代码',
+						{fieldLabel:langUtils.sys('QueryInvoice.labels.invoice_code'),
 						    xtype:'compositefield',combineErrors:false,
 						    items: [
 						        {xtype:'textfield',name:'invoiceDto.invoice_code',width:133,height:22},//,style:'width:135px;height:22px'
-						        {xtype:'displayfield',value:'发票类型'},
+						        {xtype:'displayfield',value:langUtils.sys('QueryInvoice.labels.invoice_type')},
 						        {xtype:'paramlovcombo',name:'invoiceDto.invoice_type',paramName:'INVOICE_TYPE',
 						        	displayField:'item_name',valueField:'item_value',
 						        	store:new Ext.data.JsonStore({
@@ -134,26 +134,26 @@ QueryInvoiceForm = Ext.extend(Ext.form.FormPanel,{
 						        	}),height:22,width:133}//style:'width:135px;height:22px'
 					    	]
 						},
-						{fieldLabel:'结账时间',
+						{fieldLabel:langUtils.sys('QueryInvoice.labels.check_time'),
 						    xtype:'compositefield',combineErrors:false,
 						    items: [
 						        {xtype:'datefield',name:'invoiceDto.start_check_time',style:'width:135px;height:22px',format:'Y-m-d'},
-						        {xtype:'displayfield',value:'至'},
+						        {xtype:'displayfield',value:langUtils.sys('common.to')},
 						        {xtype:'datefield',name:'invoiceDto.end_check_time',style:'width:135px;height:22px',format:'Y-m-d'}
 					    	]
 						},
-						{fieldLabel:'开票时间',
+						{fieldLabel:langUtils.sys('QueryInvoice.labels.use_time'),
 							    xtype:'compositefield',combineErrors:false,
 							    items: [
 							        {xtype:'datefield',name:'invoiceDto.start_use_time',style:'width:135px;height:22px',format:'Y-m-d'},
-							        {xtype:'displayfield',value:'至'},
+							        {xtype:'displayfield',value:langUtils.sys('common.to')},
 							        {xtype:'datefield',name:'invoiceDto.end_use_time',style:'width:135px;height:22px',format:'Y-m-d'}
 						    	]
 						}
 				]},
 				
 				{columnWidth:.5,layout:'form',border:false,width:150,items:[
-						{fieldLabel:'结存状态',
+						{fieldLabel:langUtils.sys('QueryInvoice.labels.finance_status'),
 						    xtype:'compositefield',combineErrors:false,
 						    items: [
 						        {xtype:'paramlovcombo',paramName:'FINANCE_STATUS_R_INVOICE',
@@ -162,7 +162,7 @@ QueryInvoiceForm = Ext.extend(Ext.form.FormPanel,{
 						        		fields:['item_name','item_value'],data:[]
 						        	}),
 						        		name:'invoiceDto.finance_status',height:22,width:133},
-						        {xtype:'displayfield',value:'使用状态'},
+						        {xtype:'displayfield',value:langUtils.sys('QueryInvoice.labels.status')},
 						        {xtype:'paramlovcombo',paramName:'STATUS_R_INVOICE',
 							        displayField:'item_name',valueField:'item_value',
 							        	store:new Ext.data.JsonStore({
@@ -186,7 +186,7 @@ QueryInvoiceForm = Ext.extend(Ext.form.FormPanel,{
 				*/
 				{columnWidth:.5,layout:'hbox',defaults:{border:false,flex:1},border:false,items:[
 						{width:300,bodyStyle:'padding-left:25px',border:false,items:[
-							{id:'queryInvoiceBtnId',xtype:'button',text:'查  询',iconCls:'icon-query',
+							{id:'queryInvoiceBtnId',xtype:'button',text:langUtils.sys('QueryInvoice.common.queryBtn'),iconCls:'icon-query',
 								scope:this,handler:this.doQuery}
 						]}
 				]}
@@ -200,7 +200,7 @@ QueryInvoiceForm = Ext.extend(Ext.form.FormPanel,{
 			
 			var store = this.parent.grid.getStore();
 			store.removeAll();
-			this.parent.grid.setTitle('发票信息');
+			this.parent.grid.setTitle(langUtils.sys('QueryInvoice.labels.titleInvoiceInfo'));
 			
 			var values = this.getForm().getValues();
 			values['invoiceDto.finance_status'] = this.getForm().findField('invoiceDto.finance_status').getValue();
@@ -248,30 +248,30 @@ QueryInvoiceGrid = Ext.extend(Ext.grid.GridPanel,{
 				if(record.get('status')=='USE')
 					total = record.get('amount') + total;
 			})
-			this.setTitle("有效总金额 "+Ext.util.Format.formatFee(total));
+			this.setTitle(langUtils.sys('QueryInvoice.labels.titleMoneyCountPrefix')+Ext.util.Format.formatFee(total));
 		},this);
 		var columns = new Ext.grid.ColumnModel({
 			defaults:{sortable:false},
 			
 			columns:[
-				{header:'发票号码',dataIndex:'invoice_id',width:70,align:'center',renderer:App.qtipValue},
-				{header:'发票代码',dataIndex:'invoice_code',width:80,align:'center',renderer:App.qtipValue},
-				{header:'发票类型',dataIndex:'invoice_type_text',width:65,align:'center',renderer:App.qtipValue},
-				{header:'使用状态',dataIndex:'status_text',width:65,align:'center',renderer:App.qtipValue},
-				{header:'结存状态',dataIndex:'finance_status_text',width:60,align:'center',renderer:App.qtipValue},
-				{header:'金额',dataIndex:'amount',width:45,align:'center',renderer:Ext.util.Format.formatFee},
-				{header:'所属营业员',dataIndex:'optr_name',width:90,align:'center'},
-				{header:'仓 库',dataIndex:'depot_name',width:80,align:'center',renderer:App.qtipValue},
-				{header:'入库时间',dataIndex:'create_time',width:120,align:'center',renderer:App.qtipValue},
-				{header:'开票时间',dataIndex:'use_time',width:120,align:'center',renderer:App.qtipValue},
-				{header:'结账时间',dataIndex:'check_time',width:120,align:'center',renderer:App.qtipValue},
-				{header:'核销时间',dataIndex:'close_time',width:120,align:'center',renderer:App.qtipValue}
+				{header:langUtils.sys('QueryInvoice.labels.invoice_id'),dataIndex:'invoice_id',width:70,align:'center',renderer:App.qtipValue},
+				{header:langUtils.sys('QueryInvoice.labels.invoice_code'),dataIndex:'invoice_code',width:80,align:'center',renderer:App.qtipValue},
+				{header:langUtils.sys('QueryInvoice.labels.invoice_type'),dataIndex:'invoice_type_text',width:65,align:'center',renderer:App.qtipValue},
+				{header:langUtils.sys('QueryInvoice.labels.status'),dataIndex:'status_text',width:65,align:'center',renderer:App.qtipValue},
+				{header:langUtils.sys('QueryInvoice.labels.finance_status'),dataIndex:'finance_status_text',width:60,align:'center',renderer:App.qtipValue},
+				{header:langUtils.sys('QueryInvoice.labels.amount'),dataIndex:'amount',width:45,align:'center',renderer:Ext.util.Format.formatFee},
+				{header:langUtils.sys('QueryInvoice.labels.optr_name'),dataIndex:'optr_name',width:90,align:'center'},
+				{header:langUtils.sys('QueryInvoice.labels.depot_name'),dataIndex:'depot_name',width:80,align:'center',renderer:App.qtipValue},
+				{header:langUtils.sys('QueryInvoice.labels.create_time'),dataIndex:'create_time',width:120,align:'center',renderer:App.qtipValue},
+				{header:langUtils.sys('QueryInvoice.labels.use_time'),dataIndex:'use_time',width:120,align:'center',renderer:App.qtipValue},
+				{header:langUtils.sys('QueryInvoice.labels.check_time'),dataIndex:'check_time',width:120,align:'center',renderer:App.qtipValue},
+				{header:langUtils.sys('QueryInvoice.labels.close_time'),dataIndex:'close_time',width:120,align:'center',renderer:App.qtipValue}
 			]
 		});
 		
 		var sm = new Ext.grid.CheckboxSelectionModel({});
 		QueryInvoiceGrid.superclass.constructor.call(this,{
-			title:'发票信息',
+			title:langUtils.sys('QueryInvoice.common.titleInvoiceInfo'),
 			autoScroll:true,
 			border:false,
 			ds:this.store,
@@ -299,7 +299,7 @@ DetailWin = Ext.extend(Ext.Window,{
 	constructor : function(){
 		this.info = new InvoiceAllInfo();
 		DeptSelectWin.superclass.constructor.call(this,{
-			title: '发票明细',
+			title: langUtils.sys('QueryInvoice.common.titlaQueryInvoick'),
 			layout: 'fit',
 			width: 800,
 			height: 500,
@@ -318,7 +318,7 @@ QueryInvoice = Ext.extend(Ext.Panel,{
 		this.grid = new QueryInvoiceGrid();
 		QueryInvoice.superclass.constructor.call(this,{
 			id:'QueryInvoice',
-			title:'发票查询',
+			title:langUtils.sys('QueryInvoice.common.titlaQueryInvoick'),
 			closable: true,
 			border : false ,
 			baseCls: "x-plain",
