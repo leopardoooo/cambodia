@@ -31,14 +31,14 @@ var WaitAcceptGrid = Ext.extend(TaskBaseForm, {
 		        	columns:[
 		        	this.waitSm,
 					//{header: '工单编号',		dataIndex : 'task_id', 				width: 100},
-					{header: '预约时间', 		dataIndex: 'books_time', width: 140 },
-					{header: '联系人', 		dataIndex: 'task_cust_name', 				width: 80},
-					{header: '联系电话', 	dataIndex : 'tel', 				width: 100},
-					{header: '地址', 		dataIndex : 'install_addr', 			width: 200},
-					{header: '工单类型',		dataIndex : 'task_type_text', 	width: 100, renderer: function(v, m ,rs){
+					{header: langUtils.sys('WorkTask.formWin.orderDate'), 		dataIndex: 'books_time', width: 140 },
+					{header: langUtils.sys('WorkTask.formLabels.contactPerson'), 		dataIndex: 'task_cust_name', 				width: 80},
+					{header: langUtils.sys('WorkTask.formLabels.contactPhone'), 	dataIndex : 'tel', 				width: 100},
+					{header: langUtils.sys('WorkTask.formLabels.labelAddress'), dataIndex : 'install_addr', 			width: 200},
+					{header: langUtils.sys('WorkTask.formLabels.workTaskType'),		dataIndex : 'task_type_text', 	width: 100, renderer: function(v, m ,rs){
 						return "<span style='font-weight: bold;'>"+ v +"</span>";
 					}},
-					{header: '工单状态', 		dataIndex: 'task_status', width: 100, renderer: function(v, m ,rs){
+					{header: langUtils.sys('WorkTask.formLabels.workTaskStatus'), 		dataIndex: 'task_status', width: 100, renderer: function(v, m ,rs){
 						var text = rs.get("task_status_text");
 						var color = "black";
 						if(v == 'INIT'){
@@ -52,20 +52,20 @@ var WaitAcceptGrid = Ext.extend(TaskBaseForm, {
 						}
 						return "<span style='font-weight: bold;color: "+ color +";'>"+ text +"</span>";
 					}},				
-					{header : "操作", menuDisabled : true, locked: true, dataIndex:'xxx', width : 120,scope:this,
+					{header : langUtils.sys('common.doActionBtn'), menuDisabled : true, locked: true, dataIndex:'xxx', width : 120,scope:this,
 					 renderer:function(v,m,rs,rIndex,cIndex,store){
 					 	var btns = this.doFilterBtns('WaitAcceptGridId',rs,this);
 	            		return btns;
 					}},
-					{header: '创建时间', 		dataIndex: 'create_time', 		width: 140,renderer:Ext.util.Format.dateFormat},
-					{header: '客户受理号',	dataIndex : 'cust_no', 				width: 80},
-					{header: '业务类型',		dataIndex : 'busi_name', 	width: 100, renderer: function(v, m ,rs){
+					{header: langUtils.sys('WorkTask.formLabels.createTime'), 		dataIndex: 'create_time', 		width: 140,renderer:Ext.util.Format.dateFormat},
+					{header: langUtils.sys('WorkTask.formLabels.custBusiName'),	dataIndex : 'cust_no', 				width: 80},
+					{header: langUtils.sys('WorkTask.formLabels.businessType'),		dataIndex : 'busi_name', 	width: 100, renderer: function(v, m ,rs){
 						return "<span style='font-weight: bold;'>"+ v +"</span>";
 					}},
 					
-					{header: '施工部门', dataIndex: 'assign_dept_text' , width: 100},
-					{header: '创建人员', dataIndex: 'books_optr_text' , width: 100},
-					{header:'施工备注',dataIndex:'remark',width:100,renderer:App.qtipValue}
+					{header: langUtils.sys('WorkTask.formLabels.workDept'), dataIndex: 'assign_dept_text' , width: 100},
+					{header: langUtils.sys('WorkTask.formLabels.createOptr'), dataIndex: 'books_optr_text' , width: 100},
+					{header:langUtils.sys('WorkTask.formLabels.workRemark'),dataIndex:'remark',width:100,renderer:App.qtipValue}
 		        ]}),
 		        sm: this.waitSm,
 		        region: 'center',
@@ -74,9 +74,9 @@ var WaitAcceptGrid = Ext.extend(TaskBaseForm, {
 			        store: this.taskStore, // grid and PagingToolbar using same store
 			        pageSize: Constant.DEFAULT_PAGE_SIZE
 			    }),
-				tbar: ['创建时间:',this.createStartDateField,' ',this.createEndDateField,'-',
+				tbar: [langUtils.sys('WorkTask.formLabels.createDate')+ ':',this.createStartDateField,' ',this.createEndDateField,'-',
 				this.custNoField,' ',this.newaddrField,' ',this.mobileField,' ','-',this.taskTeamCombo,'-',this.taskDetailTypeCombo,'-',{
-					text: '搜索工单',
+					text: langUtils.sys('WorkTask.formWin.btnSearchWorkTask'),
 					pressed: true,
 					scope: this,
 					width: 80,
@@ -112,7 +112,7 @@ WaitAcceptTaskView = Ext.extend(Ext.Panel, {
 				waitAcceptGrid = new WaitAcceptGrid();
 				WaitAcceptTaskView.superclass.constructor.call(this, {
 							id : 'WaitAcceptTaskView',
-							title : '待处理工单',
+							title : langUtils.sys('WorkTask.formWin.labelWaitAcceptTas'),
 							closable : true,
 							border : false,
 							layout : 'border',
