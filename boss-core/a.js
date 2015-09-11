@@ -4,7 +4,7 @@
 UserBaseForm = Ext.extend( BaseForm , {
 	buyModeStore: null,
 	aaa: false,
-	kkk:true,
+	kffffff:true,
 	bbb: true,
 	constructor: function(p){
 		this.buyModeStore = new Ext.data.JsonStore({
@@ -14,7 +14,7 @@ UserBaseForm = Ext.extend( BaseForm , {
 		});
 
 		var b = "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@...";
-		var c = '@@@@@@@@@@@';
+		var c = 'yyyyyyyyyyyy';
 		var a = "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@";
 		alert(a);
 		var t="3333333";
