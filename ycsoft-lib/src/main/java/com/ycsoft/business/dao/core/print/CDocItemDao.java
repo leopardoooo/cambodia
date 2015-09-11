@@ -40,11 +40,15 @@ public class CDocItemDao extends BaseEntityDao<CDocItem> {
 	 * @return
 	 * @throws JDBCException
 	 */
-	public List<PrintItemDto> queryBySn(String docSn, String custType) throws JDBCException{
+	public List<PrintItemDto> queryBySn(String docSn, String custType, String invoiceId, String invoiceCode) throws JDBCException{
+		String invoiceSql = "";
+		if(StringHelper.isNotEmpty(invoiceId)){
+			invoiceSql = " and f.invoice_id='"+invoiceId+"' and f.invoice_code='"+invoiceCode+"'";
+		}
 		String sql = StringHelper.append("SELECT distinct t.docitem_sn,t.amount,t2.printitem_name,u.card_id  ,d.doc_type",
 										 " FROM c_doc_item t, t_printitem t2,c_doc_fee t3,c_fee f,c_user u ,c_doc d " +
 										 " WHERE t3.doc_sn=d.doc_sn and t.doc_sn=t3.doc_sn AND t3.docitem_sn =t.docitem_sn AND f.fee_sn=t3.fee_sn AND u.user_id(+)=f.user_id AND ",
-										 " t.doc_sn= ? and t2.printitem_id=t.printitem_id",
+										 " t.doc_sn= ? and t2.printitem_id=t.printitem_id", invoiceSql,
 										 " union all",
 										 " SELECT distinct t.docitem_sn, t.amount, t2.printitem_name,'' card_id ,d.doc_type",
 										 " FROM c_doc_item t, t_printitem t2, c_doc_fee t3, c_prom_fee ff,p_prom_fee pf ,c_doc d",
@@ -59,7 +63,7 @@ public class CDocItemDao extends BaseEntityDao<CDocItem> {
 			sql = StringHelper.append("SELECT distinct t.docitem_sn,t.amount,t2.printitem_name ",
 					 " FROM c_doc_item t, t_printitem t2,c_doc_fee t3,c_fee f,c_user u ",
 					 " WHERE t.doc_sn=t3.doc_sn AND t3.docitem_sn =t.docitem_sn AND f.fee_sn=t3.fee_sn AND u.user_id(+)=f.user_id AND ",
-					 " t.doc_sn= ? and t2.printitem_id=t.printitem_id",
+					 " t.doc_sn= ? and t2.printitem_id=t.printitem_id", invoiceSql,
 					 " union all ",
 					 "SELECT distinct t.docitem_sn,t.amount,t2.printitem_name ",
 					 " FROM c_doc_item t, t_printitem t2,c_doc_fee t3,c_prom_fee ff,p_prom_fee pf",

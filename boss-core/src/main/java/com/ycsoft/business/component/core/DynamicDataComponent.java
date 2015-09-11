@@ -65,9 +65,9 @@ public class DynamicDataComponent extends BaseBusiComponent {
 			}else{
 				//单位的需要传客户类型
 				if(cust != null){
-					params.put("printItems", cDocItemDao.queryBySn(doc.getDoc_sn(),cust.getCust_type()));
+					params.put("printItems", cDocItemDao.queryBySn(doc.getDoc_sn(),cust.getCust_type(), String.valueOf(params.get("invoiceId")), String.valueOf(params.get("invoiceCode"))));
 				}else{
-					params.put("printItems", cDocItemDao.queryBySn(doc.getDoc_sn(),null));
+					params.put("printItems", cDocItemDao.queryBySn(doc.getDoc_sn(),null, String.valueOf(params.get("invoiceId")), String.valueOf(params.get("invoiceCode"))));
 				}
 				
 			}

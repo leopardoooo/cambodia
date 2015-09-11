@@ -167,7 +167,9 @@ var printdata = null;
 					}
  		});
 		
-		this.printStore.on('load',this.doLoadData,this);
+		this.printStore.on('load', function(s){
+			this.doLoadData(s, oldInvoiceId, oldInvoiceCode)
+		},this);
 		
  	},
 // 	initComponent:function(){
@@ -177,7 +179,7 @@ var printdata = null;
  	doClose: function(){
 		App.getApp().menu.hideBusiWin();
 	},
- 	doLoadData : function(store){
+ 	doLoadData : function(store, oldInvoiceId, oldInvoiceCode){
  		if (store.getCount()==1){
  			var rs = store.getAt(0);
  			var data = rs.get("printData");
@@ -189,7 +191,12 @@ var printdata = null;
 	 		var items = new Ext.data.JsonStore({
 	 			autoLoad : true,
 		 		url: Constant.ROOT_PATH+"/core/x/Pay!queryPrintItem.action",
-		 		baseParams : {docSn:rs.get('doc_sn'),custType : custType},
+		 		baseParams : {
+		 			docSn:rs.get('doc_sn'),
+		 			custType : custType,
+		 			invoiceId: oldInvoiceId,
+		 			invoiceCode: oldInvoiceCode
+		 		},
 				fields: [
 					'docitem_sn','amount','printitem_name','doc_type']
 		 	});
@@ -285,8 +292,8 @@ var printdata = null;
  			"doc.doc_sn": rs.get("doc_sn"),
 			"doc.done_code": rs.get("done_code"),
 			"doc.doc_type": rs.get("doc_type"),
-			"invoice_id": oldInvoiceId,
-			"invoice_code": oldInvoiceCode
+			"invoiceId": oldInvoiceId,
+			"invoiceCode": oldInvoiceCode
  		});
  		Ext.Ajax.request({
  			scope: this,
@@ -544,7 +551,6 @@ InvoiceWindow = Ext.extend( Ext.Window ,{
 		Ext.Ajax.request({
 			scope : this,
 			url:Constant.ROOT_PATH + "/core/x/Pay!checkInvoice.action",
-//			async: false,
 			params:{
 				invoice_id:invoiceId,
 				invoice_mode:'A',
