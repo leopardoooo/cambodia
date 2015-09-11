@@ -13,10 +13,16 @@ UserBaseForm = Ext.extend( BaseForm , {
 			params: {a: 'aaaaaaaaaa'},
 			autoLoad: true
 		});
+<<<<<<< HEAD
+		var b = "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!....";
+		var c = '!!!!!!!!';
+		var a = "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!";
+=======
 
 		var b = "222222222222222222222...";
 		var c = '2222';
 		var a = "22222222222222222222222222222";
+>>>>>>> branch 'master' of https://github.com/leopardoooo/cambodia.git
 		alert(a);
 		var ee = "23332322222";
 

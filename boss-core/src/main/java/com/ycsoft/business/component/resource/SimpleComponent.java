@@ -1,6 +1,7 @@
 package com.ycsoft.business.component.resource;
 
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -60,7 +61,7 @@ public class SimpleComponent extends BaseBusiComponent {
 	}
 	
 	
-	public List<TAddressDto> queryAddrByLike(String name,String pId) throws Exception{
+	public List<TAddressDto> queryAddrByLike(String name,String pId, String editId) throws Exception{
 		
 		if(StringHelper.isNotEmpty(pId)){
 			return tAddressDao.queryAddrById(pId);
@@ -80,6 +81,24 @@ public class SimpleComponent extends BaseBusiComponent {
 			addrIds= CollectionHelper.converValueToArray(tAddressDao.queryAddrByAllowPids(SystemConstants.ADDR_TREE_LEVEL_ONE,pids),"addr_id");
 		}
 		if(StringHelper.isEmpty(name)){
+			if(StringHelper.isNotEmpty(editId)){
+				TAddress editAddr = tAddressDao.findByKey(editId);
+				if(editAddr!= null && SystemConstants.ADDR_TREE_LEVEL_THREE.equals(editAddr.getTree_level().toString())){
+					List<TAddressDto> threeAddrList = tAddressDao.queryAddrById(editAddr.getAddr_pid());
+					TAddress twoAddr = tAddressDao.findByKey(editAddr.getAddr_pid());
+					List<String> addrArrs =  Arrays.asList(addrIds);
+					if(addrArrs.contains(twoAddr.getAddr_pid())){
+						List<TAddressDto> oneAddrList = tAddressDao.queryAddrByIds(addrIds);
+						List<TAddressDto> twoAddrList = tAddressDao.queryAddrById(twoAddr.getAddr_pid());
+						if(twoAddrList.size()>0 && threeAddrList.size()>0){
+							oneAddrList.addAll(twoAddrList);
+							oneAddrList.addAll(threeAddrList);
+							return oneAddrList;
+						}
+					}
+				}
+				
+			}
 			return tAddressDao.queryAddrByIds(addrIds);
 		}else{
 			
