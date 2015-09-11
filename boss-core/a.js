@@ -1,5 +1,5 @@
 /**
- * 用户开户表单
+ * 用户开户表单,TEST
  */
 UserBaseForm = Ext.extend( BaseForm , {
 	buyModeStore: null,
@@ -11,16 +11,16 @@ UserBaseForm = Ext.extend( BaseForm , {
 			autoLoad: true
 		});
 
-		var b = "11111111111111111111111111111....";
-		var c = '11111';
-		var a = "11111111111111111111111111111111";
+		var b = "22222222222222222222222222222222....";
+		var c = '222222222';
+		var a = "222222222222222222222222222222222222222";
 		alert(a);
 
 		UserBaseForm.superclass.constructor.call(this, {
 			trackResetOnLoad:true,
 			autoScroll:true,
             bodyStyle: Constant.TAB_STYLE,
-            labelWidth: 100,
+            labelWidth: 9999,
 			baseCls: 'x-plain',
 			bodyStyle:'background:#000;padding-top:14px',
 			items:[{
