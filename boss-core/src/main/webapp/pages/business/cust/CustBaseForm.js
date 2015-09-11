@@ -295,10 +295,8 @@ AddrCustSelectWin = Ext.extend( Ext.Window , {
 		if(custAddress){
 			oldAddr = "<font style='font-size:12px'><b>old:</b>"+custAddress+"</font><br>";
 		}
-		Ext.getCmp('feeDescId').setValue( oldAddr==null?"":oldAddr+
+		Ext.getCmp('feeDescId').setValue((oldAddr==null?"":oldAddr)+
 			"<font style='font-size:12px'><b>new:</b></font><font style='color:red'><span id='newAddressId'>--</span></font>");
-			
-			
 		AddrCustSelectWin.superclass.show.call(this);
 	}
 });
