@@ -15,7 +15,7 @@ UserBaseForm = Ext.extend( BaseForm , {
 		var c = '222222222';
 		var a = "222222222222222222222222222222222222222";
 		alert(a);
-		
+		var t ="aaaaaaa";
 		var ee = "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
 
 		UserBaseForm.superclass.constructor.call(this, {
