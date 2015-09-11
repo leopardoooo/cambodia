@@ -90,10 +90,13 @@ public class CInvoiceDao extends BaseEntityDao<CInvoice> {
 	 *            单据编号
 	 * @return
 	 */
-	public List<InvoiceFromDto> queryInvoiceByDocSn(String docSn)
+	public List<InvoiceFromDto> queryInvoiceByDocSn(String docSn, String invoiceId, String invoiceCode)
 			throws JDBCException {
 		String sql = "select doc_sn, invoice_code, invoice_id, status, amount , docitem_data"
 				+ " from c_invoice " + " where doc_sn=?";
+		if(StringHelper.isNotEmpty(invoiceId)){
+			sql += " and invoice_id='"+invoiceId+"' and invoice_code='"+invoiceCode+"'";
+		}
 		return createQuery(InvoiceFromDto.class, sql, docSn).list();
 	}
 	

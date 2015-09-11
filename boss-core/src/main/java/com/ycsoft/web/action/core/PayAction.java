@@ -414,7 +414,9 @@ public class PayAction extends BaseBusiAction{
 	
 	public String queryPrintItem()throws Exception{
 		String custType = request.getParameter("custType");
-		getRoot().setRecords( docService.queryPrintItemByDoc(docSn,custType));
+		String invoiceId = request.getParameter("invoiceId");
+		String invoiceCode = request.getParameter("invoiceCode");
+		getRoot().setRecords( docService.queryPrintItemByDoc(docSn,custType,invoiceId, invoiceCode));
 		return JSON_RECORDS;
 	}
 	
@@ -433,7 +435,9 @@ public class PayAction extends BaseBusiAction{
 		if(null == custId || null == doc){
 			throw new ActionException("客户编号或单据记录不能为空!");
 		}
-		getRoot().setOthers(docService.queryPrintContent(custId, doc, getPrintSuffix()));
+		String invoiceId = request.getParameter("invoiceId");
+		String invoiceCode = request.getParameter("invoiceCode");
+		getRoot().setOthers(docService.queryPrintContent(custId, doc, getPrintSuffix(), invoiceId, invoiceCode));
 		return JSON_OTHER;
 	}
 	/**
@@ -458,7 +462,7 @@ public class PayAction extends BaseBusiAction{
 		if(null == custId || null == doneCode){
 			throw new ActionException("客户编号或单据记录不能为空!");
 		}
-		getRoot().setOthers(docService.queryPrintContent(custId,doc, getPrintSuffix()));
+		getRoot().setOthers(docService.queryPrintContent(custId,doc, getPrintSuffix(), null, null));
 		return JSON_OTHER;
 	}
 	

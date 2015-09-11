@@ -1300,8 +1300,8 @@ public class FeeComponent extends BaseBusiComponent {
 	 * @return
 	 * @throws Exception
 	 */
-	public List<InvoiceFromDto> queryInvoiceByDocSn(String docSn)throws Exception {
-		return cInvoiceDao.queryInvoiceByDocSn(docSn);
+	public List<InvoiceFromDto> queryInvoiceByDocSn(String docSn, String invoiceId, String invoiceCode)throws Exception {
+		return cInvoiceDao.queryInvoiceByDocSn(docSn, invoiceId, invoiceCode);
 	}
 	
 	/**
@@ -1656,8 +1656,8 @@ public class FeeComponent extends BaseBusiComponent {
 		return cFeeDao.queryFeeByInvoice(invoiceCode, invoiceId);
 	}
 	
-	public List<PrintItemDto> queryPrintitemBySn(String docSn, String custType) throws Exception{
-		return cDocItemDao.queryBySn(docSn,custType);
+	public List<PrintItemDto> queryPrintitemBySn(String docSn, String custType, String invoiceId, String invoiceCode) throws Exception{
+		return cDocItemDao.queryBySn(docSn,custType, invoiceId, invoiceCode);
 	}
 	
 	/**

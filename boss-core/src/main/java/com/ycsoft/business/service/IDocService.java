@@ -74,7 +74,7 @@ public interface IDocService extends IBaseService{
 	 * @throws Exception
 	 */
 
-	public Map<String, ?> queryPrintContent(String custId, CDoc cDoc, String suffix)throws Exception;
+	public Map<String, ?> queryPrintContent(String custId, CDoc cDoc, String suffix, String invoiceId, String invoiceCode)throws Exception;
 
 	/**
 	 * 保存合并打印项
@@ -192,7 +192,7 @@ public interface IDocService extends IBaseService{
 	public void saveChangeInvoice(List<FeeDto> fees) throws Exception;
 
 
-	public List<PrintItemDto> queryPrintItemByDoc(String docSn, String custType) throws Exception;
+	public List<PrintItemDto> queryPrintItemByDoc(String docSn, String custType, String invoiceId, String invoiceCode) throws Exception;
 	
 	public List<PrintItemDto> queryPrintItemByDoneCode(String doneCode) throws Exception;
 

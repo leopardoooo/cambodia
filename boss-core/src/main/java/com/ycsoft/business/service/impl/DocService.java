@@ -170,7 +170,7 @@ public class DocService extends BaseBusiService implements IDocService {
 		saveAllPublic(doneCode,getBusiParam());
 	}
 	
-	public Map<String, ?> queryPrintContent(String custId, CDoc doc, String suffix)throws Exception{
+	public Map<String, ?> queryPrintContent(String custId, CDoc doc, String suffix, String invoiceId, String invoiceCode)throws Exception{
 		Map<String,Object> map = new HashMap<String,Object>();
 
 		//查询单据的配置
@@ -186,7 +186,7 @@ public class DocService extends BaseBusiService implements IDocService {
 			String content = PrintContentConfiguration.getTemplate(suffix + busiDoc.getTemplate_filename());
 			
 			int balance = 0;//现金余额
-			List<InvoiceFromDto> list = feeComponent.queryInvoiceByDocSn(doc.getDoc_sn());
+			List<InvoiceFromDto> list = feeComponent.queryInvoiceByDocSn(doc.getDoc_sn(), invoiceId, invoiceCode);
 			if(list != null && list.size() > 0){
 				InvoiceFromDto ifdto = list.get(0);
 				balance = ifdto.getBalance();
@@ -202,6 +202,8 @@ public class DocService extends BaseBusiService implements IDocService {
 			data.put("doc", doc);
 			data.put("custid", custId);
 			data.put("balance", balance);
+			data.put("invoiceId", invoiceId);
+			data.put("invoiceCode", invoiceCode);
 			printComponent.fillData(data,busiDoc.getMethod_name());
 	
 			//设置数据，返回
@@ -212,8 +214,8 @@ public class DocService extends BaseBusiService implements IDocService {
 		return map;
 	}
 	
-	public List<PrintItemDto> queryPrintItemByDoc(String docSn, String custType) throws Exception{
-		return feeComponent.queryPrintitemBySn(docSn,custType);
+	public List<PrintItemDto> queryPrintItemByDoc(String docSn, String custType, String invoiceId, String invoiceCode) throws Exception{
+		return feeComponent.queryPrintitemBySn(docSn,custType, invoiceId, invoiceCode);
 	}
 	
 	
