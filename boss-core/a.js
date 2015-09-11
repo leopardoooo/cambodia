@@ -5,7 +5,7 @@ UserBaseForm = Ext.extend( BaseForm , {
 	buyModeStore: null,
 	dddddd: "111231321",
 	cccc: "3838383",
-	eeee: 'fdafdadfas',
+	ee333ee: 'fdafdadfas',
 	constructor: function(p){
 		this.buyModeStore = new Ext.data.JsonStore({
 			url :root + '/commons/x/QueryDevice!queryDeviceBuyMode.action',
