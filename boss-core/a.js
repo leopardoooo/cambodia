@@ -10,6 +10,7 @@ UserBaseForm = Ext.extend( BaseForm , {
 			fields : ['buy_mode','buy_mode_name'],
 			autoLoad: true
 		});
+
 		var b = "11111111111111111111111111111....";
 		var c = '11111';
 		var a = "11111111111111111111111111111111";
@@ -19,7 +20,7 @@ UserBaseForm = Ext.extend( BaseForm , {
 			trackResetOnLoad:true,
 			autoScroll:true,
             bodyStyle: Constant.TAB_STYLE,
-            labelWidth:1000,
+            labelWidth: 100,
 			baseCls: 'x-plain',
 			bodyStyle:'background:#000;padding-top:14px',
 			items:[{
