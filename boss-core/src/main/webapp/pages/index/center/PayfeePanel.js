@@ -18,7 +18,7 @@ AcctFeeGrid = Ext.extend(Ext.ux.Grid, {
 							'pay_type', 'status_text', 'status', 'dept_id','dept_name',
 							'user_id','user_name', 'user_type_text','fee_sn','optr_id','optr_name',
 							'OPERATE','busi_code','busi_name','create_done_code','data_right',
-							'busi_optr_id','busi_optr_name','prod_sn','invoice_fee',"doc_type","doc_type_text","invoice_mode_text","allow_done_code"]
+							'busi_optr_id','busi_optr_name','prod_sn','invoice_fee',"doc_type","doc_type_text","invoice_mode_text","allow_done_code",'count_text']
 				});
 		this.acctFeeStore.on("load",this.doOperate);
 		var lc = langUtils.main("pay.payfee.columns");
@@ -144,7 +144,7 @@ BusiFeeGrid = Ext.extend(Ext.ux.Grid, {
 							{name : 'real_pay',type : 'int'},'fee_sn','create_time','acct_date','deposit',
 							'data_right','finance_status','invoice_book_id','is_busi_fee',
 							'busi_optr_id','busi_optr_name','invoice_fee',"doc_type","doc_type_text",
-							"invoice_mode_text",'buy_num','device_model','device_model_name']
+							"invoice_mode_text",'buy_num','device_model','device_model_name', 'count_text']
 				});
 		var lc = langUtils.main("pay.busifee.columns");
 		var cm = new Ext.ux.grid.LockingColumnModel({ 
@@ -158,6 +158,7 @@ BusiFeeGrid = Ext.extend(Ext.ux.Grid, {
 				{header:lc[5],dataIndex:'is_doc_text',width:80,renderer:Ext.util.Format.statusShow},
 				{header:lc[6],dataIndex:'should_pay',width:60,renderer:Ext.util.Format.formatFee},
 				{header:lc[7],dataIndex:'real_pay',width:60,renderer:Ext.util.Format.formatFee},
+				{header:lc[17],dataIndex:'count_text',width:120,renderer:App.qtipValue},
 				{header:lc[15],dataIndex:'buy_num',width:75},
 				{header:lc[8],dataIndex:'pay_type_text',width:80},
 				{header:lc[9],dataIndex:'create_time',width:125},
