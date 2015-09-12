@@ -15,9 +15,9 @@ var MaterialDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 			columns : [
 				{header:'器材编号',dataIndex:'device_id',width:250,hidden:true},
 				{header:lmain("cust._form.deviceModel"),dataIndex:'device_model_text',width:250},
-				{header:lbc("common.price"),dataIndex:'fee_value',width:100,renderer:function(v){if(v == "-1"){return "<span style='font-weight:bold'>未配置器材费 </span>"}else{ return Ext.util.Format.formatFee(v)}}},
-				{header:lmain("cust._form.storeCount"),dataIndex:'total_num',width:100,renderer:App.qtipValue},
-				{id:'buy_num_id',header:lmain("cust._form.buyCount"),dataIndex:'buy_num',width:100,
+				{header:lbc("common.price"),dataIndex:'fee_value',width:80,renderer:function(v){if(v == "-1"){return "<span style='font-weight:bold'>未配置器材费 </span>"}else{ return Ext.util.Format.formatFee(v)}}},
+				{header:lmain("cust._form.storeCount"),dataIndex:'total_num',width:80,renderer:App.qtipValue},
+				{id:'buy_num_id',header:lmain("cust._form.buyCount"),dataIndex:'buy_num',width:80,
 					scope:this
 					,editor: new Ext.form.NumberField({
 						allowDecimals:false,//不允许输入小数 

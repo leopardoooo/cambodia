@@ -2,9 +2,9 @@
 QueryFilterTree = Ext.extend(Ext.ux.QueryFilterTreePanel,{
 	treeParams:null,
 	parent:null,
-	constructor: function(parent,addrId){
+	constructor: function(parent){
 		this.parent = parent;
-		this.treeParams = {editId:addrId}
+		this.treeParams = {editId:this.parent.editNodeId}
 		QueryFilterTree.superclass.constructor.call(this, {
 			root : new Ext.tree.AsyncTreeNode({expanded : true}),
 			loader : new Ext.tree.TreeLoader({
@@ -28,7 +28,23 @@ QueryFilterTree = Ext.extend(Ext.ux.QueryFilterTreePanel,{
 	        lines		:false,  // 去掉树的线
 	        animCollapse:true,
 	        collapseMode:'mini',
-			bodyStyle	:'padding:3px'
+			bodyStyle	:'padding:3px',
+			listeners : {
+				scope : this,
+				expandnode: function(node) { //节点展开时高亮显示
+					var childNodes = node.childNodes;
+					var that = this;
+					if(childNodes && childNodes.length > 0){
+						Ext.each(childNodes, function(node){
+							if (node.id == that.parent.editNodeId) {
+								node.getUI().getTextEl().style.color = "red";
+								that.getSelectionModel().select(node);
+							}
+						});
+					};
+				}
+
+			}
 		})
 	},	
 	doSearchEditId:function(v){
@@ -95,7 +111,7 @@ AddrCustSelectWin = Ext.extend( Ext.Window , {
 			addrId = null;
 		}
 		this.editNodeId = addrId;
-		this.addrTree = new QueryFilterTree(this,addrId);
+		this.addrTree = new QueryFilterTree(this);
 		this.custStore = new Ext.data.JsonStore({
 			url: Constant.ROOT_PATH+"/commons/x/QueryParam!queryNoteCust.action",
 			root: 'records',
@@ -207,6 +223,7 @@ AddrCustSelectWin = Ext.extend( Ext.Window , {
 			var name = "Room "+comp.getValue()+",";
 		}
 		name = name + this.addrName;
+		Ext.get('newAddressId').update(name);
 	},
 	doSaveNewRoom:function(){
 		var note = Ext.getCmp('newRoomBoxId').getValue();
@@ -236,7 +253,6 @@ AddrCustSelectWin = Ext.extend( Ext.Window , {
 		this.custGrid.on("rowclick", function(grid ,index, e){
 			var record = grid.getStore().getAt(index);
 			this.setData(record.get('note'));
-			Ext.get('newAddressId').update(this.addrName);
 		}, this)
 		this.addrTree.on("click",function(node, e) {
 			if (!this.isCanClick(node)) {
@@ -298,7 +314,7 @@ AddrCustSelectWin = Ext.extend( Ext.Window , {
 		Ext.getCmp('feeDescId').setValue((oldAddr==null?"":oldAddr)+
 			"<font style='font-size:12px'><b>new:</b></font><font style='color:red'><span id='newAddressId'>--</span></font>");
 		AddrCustSelectWin.superclass.show.call(this);
-		if(this.editNodeId != null){
+		if(!Ext.isEmpty(this.editNodeId)){
 			this.doLoadRoom(this.editNodeId);
 		}
 	}
