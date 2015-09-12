@@ -1315,30 +1315,31 @@ public class OrderComponent extends BaseBusiComponent {
 		
 		// 如果有适用的资费
 		if (CollectionHelper.isNotEmpty(ptList)) {
-			ProdTariffDto pt = ptList.get(0);
-			PProdTariffDisct tariff = new PProdTariffDisct();
-			tariff.setTariff_id(pt.getTariff_id());
-			tariff.setBilling_cycle(pt.getBilling_cycle());
-			tariff.setDisct_rent(pt.getRent());
-			tariff.setDisct_name(pt.getTariff_name());
-			tariff.setBilling_type(pt.getBilling_type());
-			tariffList.add(tariff);
-			// 查找资费所有的优惠
-			List<PProdTariffDisct> disctList = pProdTariffDisctDao.queryDisctByTariffId(pt.getTariff_id(),
-					cust.getCounty_id());
-			if (CollectionHelper.isNotEmpty(disctList)) {
-				for (PProdTariffDisct disct : disctList) {
-					boolean flag = true;
-					if (StringHelper.isNotEmpty(disct.getRule_id())) {
-						if (!checkRule(cust,user, tRuleDefineDao.findByKey(disct.getRule_id()).getRule_str()))
-							flag = false;
-					}
-					if (flag) {
-						disct.setTariff_id(disct.getTariff_id() + "_" + disct.getDisct_id());
-						
-						disct.setBilling_type(pt.getBilling_type());
-						//disct.setDisct_id(disct.getTariff_id() + "-" + disct.getDisct_id());
-						tariffList.add(disct);
+			for(ProdTariffDto pt:ptList){
+				PProdTariffDisct tariff = new PProdTariffDisct();
+				tariff.setTariff_id(pt.getTariff_id());
+				tariff.setBilling_cycle(pt.getBilling_cycle());
+				tariff.setDisct_rent(pt.getRent());
+				tariff.setDisct_name(pt.getTariff_name());
+				tariff.setBilling_type(pt.getBilling_type());
+				tariffList.add(tariff);
+				// 查找资费所有的优惠
+				List<PProdTariffDisct> disctList = pProdTariffDisctDao.queryDisctByTariffId(pt.getTariff_id(),
+						cust.getCounty_id());
+				if (CollectionHelper.isNotEmpty(disctList)) {
+					for (PProdTariffDisct disct : disctList) {
+						boolean flag = true;
+						if (StringHelper.isNotEmpty(disct.getRule_id())) {
+							if (!checkRule(cust,user, tRuleDefineDao.findByKey(disct.getRule_id()).getRule_str()))
+								flag = false;
+						}
+						if (flag) {
+							disct.setTariff_id(disct.getTariff_id() + "_" + disct.getDisct_id());
+							
+							disct.setBilling_type(pt.getBilling_type());
+							//disct.setDisct_id(disct.getTariff_id() + "-" + disct.getDisct_id());
+							tariffList.add(disct);
+						}
 					}
 				}
 			}
