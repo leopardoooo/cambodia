@@ -933,10 +933,12 @@ Ext.apply(MenuHandler, {
 	PayIpUserFee : function() {
 		if (!hasCust()) {
 			return false;
-		}
-		var prodData = App.getApp().main.infoPanel.getUserPanel().prodGrid.prodMap[data['user_id']];
-		if(!prodData || prodData.length == 0){
-			Alert('没有产品不能补收!');
+		}	
+		var record = App.main.infoPanel.getUserPanel().userGrid.getSelectionModel().getSelected();
+		var prodMap = App.main.infoPanel.getUserPanel().prodGrid.prodMap;
+		var prid = prodMap[record.get('user_id')];
+		if(null==prid || prid.length==0){
+			Alert('宽带用户下无产品请先订购产品');
 			return false;
 		}
 		return {

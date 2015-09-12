@@ -83,6 +83,7 @@ public enum ErrorCode {
 	
 	InvoiceIsNotYou("只有开票人可以操作"),
 	InvoiceCheckStatusIsNotIdle("发票已结账或缴销，不能操作"),
+	InvoiceTemplateDeptIsNull("模板缺失发票缴销仓库配置，请联系管理员"),
 	
 	TemplateNotConfigBuseFee("该地区费用模板未配置该费用项(%s)"),
 	CustUserIpAddressFeeCoinfigError("客户宽带IP收费存在多个费用项目，请联系管理员！"),

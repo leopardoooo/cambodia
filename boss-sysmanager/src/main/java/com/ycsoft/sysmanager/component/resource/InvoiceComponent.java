@@ -4,8 +4,10 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.ycsoft.beans.config.TConfigTemplate;
 import com.ycsoft.beans.depot.RDepotDefine;
 import com.ycsoft.beans.invoice.RInvoice;
 import com.ycsoft.beans.invoice.RInvoiceDetail;
@@ -14,12 +16,14 @@ import com.ycsoft.beans.invoice.RInvoiceOptr;
 import com.ycsoft.beans.invoice.RInvoiceTransfer;
 import com.ycsoft.beans.system.SDept;
 import com.ycsoft.beans.system.SOptr;
+import com.ycsoft.business.dao.config.TConfigTemplateDao;
 import com.ycsoft.business.dao.resource.device.RDepotDefineDao;
 import com.ycsoft.business.dao.resource.invoice.RInvoiceDao;
 import com.ycsoft.business.dao.resource.invoice.RInvoiceDetailDao;
 import com.ycsoft.business.dao.resource.invoice.RInvoiceInputDao;
 import com.ycsoft.business.dao.resource.invoice.RInvoiceOptrDao;
 import com.ycsoft.business.dao.resource.invoice.RInvoiceTransferDao;
+import com.ycsoft.business.dto.config.TemplateConfigDto;
 import com.ycsoft.commons.abstracts.BaseComponent;
 import com.ycsoft.commons.constants.DataRight;
 import com.ycsoft.commons.constants.DataRightLevel;
@@ -28,6 +32,7 @@ import com.ycsoft.commons.constants.SequenceConstants;
 import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.exception.ComponentException;
+import com.ycsoft.commons.exception.ErrorCode;
 import com.ycsoft.commons.helper.DateHelper;
 import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.daos.core.JDBCException;
@@ -50,7 +55,9 @@ public class InvoiceComponent extends BaseComponent {
 	private RInvoiceTransferDao rInvoiceTransferDao;
 	private RInvoiceOptrDao rInvoiceOptrDao;
 	private RDepotDefineDao rDepotDefineDao;
-
+	@Autowired
+	private TConfigTemplateDao tConfigTemplateDao;
+	
 	/**
 	 * 查找操作员管理的仓库
 	 * @param optrId
@@ -488,15 +495,22 @@ public class InvoiceComponent extends BaseComponent {
 	//保存发票结账
 	public void saveCheck(SOptr optr,List<RInvoice> invoiceList) throws Exception{
 		Integer doneCode = gDoneCode();//流水号
-		String depotId = findDepot(optr);//原仓库
-		String depotPid= rDepotDefineDao.queryParentDepot(depotId);//结账后归属仓库
+//		String depotId = findDepot(optr);//原仓库
+//		String depotPid= rDepotDefineDao.queryParentDepot(depotId);//结账后归属仓库
+		//结账后归属仓库 根据模板配置
+		TConfigTemplate ct = tConfigTemplateDao.queryConfigByConfigName(
+				TemplateConfigDto.Config.INVOICE_DEPT_CHECKOUT.toString(), optr.getCounty_id());	//当前值
+		if(ct == null){
+			throw new ComponentException(ErrorCode.InvoiceTemplateDeptIsNull);
+		}
+		String depotPid = ct.getConfig_value();
 		//保存结账记录
 		saveInvoiceOptr(doneCode, optr, invoiceList.size(),InvoiceOptrType.CHECK.toString());
 		saveDetails(doneCode, invoiceList);
 		
-		if(depotPid.equals(SystemConstants.COUNTY_ALL)){
-			depotPid = depotId;
-		}
+//		if(depotPid.equals(SystemConstants.COUNTY_ALL)){
+//			depotPid = depotId;
+//		}
 		//修改发票信息
 		rInvoiceDao.saveCheck(doneCode, depotPid);
 
