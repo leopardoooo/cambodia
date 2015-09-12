@@ -213,8 +213,8 @@ public class FeeComponent extends BaseBusiComponent {
 				BeanHelper.copyProperties(pay, order);
 				pay.setProd_sn(order.getOrder_sn());
 				pay.setAcctitem_id(order.getProd_id());
-				pay.setBegin_date(DateHelper.dateToStr(DateHelper.today().before(order.getEff_date())? order.getEff_date():DateHelper.today()));
-				pay.setInvalid_date(DateHelper.dateToStr(order.getExp_date()));
+				pay.setInvalid_date(DateHelper.dateToStr(DateHelper.today().before(order.getEff_date())? order.getEff_date():DateHelper.today()));
+				pay.setBegin_date(DateHelper.dateToStr(order.getExp_date()));
 				pay.setPresent_fee(0);
 				pay.setFee(order.getBalance_cfee()*-1);
 				CFeeAcct cfeeacct=this.saveAcctFee(cust.getCust_id(), cust.getAddr_id(), pay, doneCode, busi_code, StatusConstants.UNPAY);
