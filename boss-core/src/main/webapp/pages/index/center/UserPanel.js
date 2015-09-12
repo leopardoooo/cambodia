@@ -187,7 +187,7 @@ UserGrid = Ext.extend(Ext.ux.Grid,{
 				this.getTopToolbar().show();
 			App.getApp().disableBarByBusiCode(this.getTopToolbar(),['1020','1025','1015'],false);
 		}
-		App.getApp().disableBarByBusiCode(this.getTopToolbar(),['1040'],true);
+//		App.getApp().disableBarByBusiCode(this.getTopToolbar(),['1040'],true);
 	},
 	refresh:function(){
 		this.userStore.load();
