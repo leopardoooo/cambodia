@@ -1952,14 +1952,6 @@ Ext.apply(MenuHandler, {
 			return false;
 		}
 
-//		for (var i = 0; i < len; i++) {
-//			var status = userRecords[i].get("status");
-//			if ( status != "ACTIVE" && status != "OWELONG" ) {
-//				Alert("所选用户的状态必须是正常");
-//				return false;
-//			}
-//		}
-
 		// 回调函数
 		function callback(res, opt) {
 			if (res.responseText == 'true') {
@@ -2023,14 +2015,6 @@ Ext.apply(MenuHandler, {
 			return false;
 		}
 
-		for (var i = 0; i < len; i++) {
-			var status = userRecords[i].get("status");
-			if ( status != "ACTIVE" && status != "OWELONG" ) {
-				Alert("所选用户的状态必须是正常");
-				return false;
-			}
-		}
-
 		 //回调函数
 		 function callback(res,opt){
 			 if (res.responseText=='true'){
@@ -2045,10 +2029,7 @@ Ext.apply(MenuHandler, {
 			 App.sendRequest(url,null,callback);
 		 } );
 
-		return {
-			width : 500,
-			height : 150
-		};
+		return false;
 	},
 	// 促销
 	Promotion : function() {
