@@ -1,8 +1,3 @@
-/**
- * 顶部面板的组件封装
- **/
- 
- 
  /**
  * 为搜索面板初始化事件
  */
@@ -186,7 +181,7 @@ Ext.apply(TopSearch.prototype , {
 	  	FilterWindow.clearRelatedCmpsTitle();
 	},
 	searchCustUnPrint:function(v){
-		if (App.getApp().isPrintInvoice()=='F'){
+		if (App.getApp().isPrintInvoice()=='T'){
 			//必须打印发票，检查未打印发票
 			App.showTip();
 			Ext.Ajax.request({
@@ -200,6 +195,7 @@ Ext.apply(TopSearch.prototype , {
 					if(!Ext.isEmpty(rs)){
 						Alert('请处理未支付或未打印发票客户，点击确定后跳转，请为该客户支付费用和打印发票',function(){
 							App.getData().paySearch  = false;
+							Ext.getDom('q').value = '';
 							this.searchCust(rs,'cust_no');
 							//App.openPrint();
 						},this);
@@ -385,5 +381,3 @@ ChooseCustWindow = Ext.extend( Ext.Window , {
 		ChooseCustWindow.superclass.initEvents.call(this);
 	}
 });
- 
- 
