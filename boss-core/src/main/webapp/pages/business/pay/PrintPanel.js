@@ -8,7 +8,7 @@
  
  //打印的条数
  PRINT_PAGE_SIZE = 5 ;
- 
+var INVOICE_SIZE = 8;//发票长度 ,暂时不用
 var oldInvoiceId= "";
 var oldInvoiceCode="";
 var oldInvoiceBookId="";
