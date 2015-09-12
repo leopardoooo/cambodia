@@ -95,15 +95,8 @@ UserGrid = Ext.extend(Ext.ux.Grid,{
 			store:this.userStore,
 			sm:sm,
 			cm:cm,
-			view: new Ext.ux.grid.ColumnLockBufferView()
-			,tools:[{id:'gear', qtip:langUtils.main("user.list.tools")[0], handler:function(){
-					this.parent.prodGrid.remoteRefresh('EFF');
-				}},/*{id:'gear', qtip:'有效产品', handler:function(){
-					this.parent.prodGrid.remoteRefresh('EFF');
-				}},{id:'gear', qtip:'有效产品', handler:function(){
-					this.parent.prodGrid.remoteRefresh('EFF');
-				}},*/
-			        {id:'search',qtip:langUtils.main("user.list.tools")[1],cls:'tip-target',scope:this,handler:function(){
+			view: new Ext.ux.grid.ColumnLockBufferView(),
+			tools:[{id:'search',qtip:langUtils.main("user.list.tools")[0],cls:'tip-target',scope:this,handler:function(){
 				
 					var comp = this.tools.search;
 					if(this.userStore.getCount()>0){

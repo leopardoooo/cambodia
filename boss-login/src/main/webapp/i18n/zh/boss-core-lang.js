@@ -150,7 +150,7 @@ BCLang.home = {
 			},
 			list: {
 				_title: '用户信息~',
-				tools: ["有效产品~","查询~"]
+				tools: ["查询~"]
 			},
 			prod: {
 				base: {
