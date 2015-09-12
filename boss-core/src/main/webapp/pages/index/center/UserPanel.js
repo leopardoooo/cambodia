@@ -223,7 +223,7 @@ UserGrid = Ext.extend(Ext.ux.Grid,{
 			
 			//刷新产品信息
 			this.parent.prodGrid.userId = null;
-			this.parent.prodGrid.getStore().removeAll();
+			this.parent.prodGrid.reset();
 		}
 		
 	},

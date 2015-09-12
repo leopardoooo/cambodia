@@ -934,6 +934,11 @@ Ext.apply(MenuHandler, {
 		if (!hasCust()) {
 			return false;
 		}
+		var prodData = App.getApp().main.infoPanel.getUserPanel().prodGrid.prodMap[data['user_id']];
+		if(!prodData || prodData.length == 0){
+			Alert('没有产品不能补收!');
+			return false;
+		}
 		return {
 			width : 550,
 			height : 360

@@ -236,10 +236,14 @@ var printdata = null;
  	 * @param t 预览(doPreview)或者打印(doPrint)
  	 */
  	actionProcesser: function( t,data ){
-		printdata = this.printGrid.getSelectionModel().getSelected();
+//		printdata = this.printGrid.getSelectionModel().getSelected();
+ 		//只有1个的时候this.removeAll(); 使得this.printGrid 取不到数据，打印按钮会失效
 		if(printdata == null){
- 			Alert("请选择要打印的发票!");
- 			return ;
+			printdata = this.printGrid.getSelectionModel().getSelected();
+			if(printdata == null){
+	 			Alert("请选择要打印的发票!");
+	 			return ;
+			}
  		}
  		if(data){
  			this[t].call(this , printdata);
@@ -589,6 +593,7 @@ InvoiceWindow = Ext.extend( Ext.Window ,{
 	afterEdit : function(o){
 		if(o.column == 1){
 			var currentVal=  Ext.util.Format.lpad(parseInt(o.value , 10),o.value.length,'0');
+			var invoiceLength = o.value.length;//发票长度
 			if("" == currentVal) return ;
 			var fm = Ext.util.Format;
 			o.record.set('invoiceId', o.value );
@@ -598,7 +603,7 @@ InvoiceWindow = Ext.extend( Ext.Window ,{
 				// 发票号码如果为1，则发票号码累加
 				for(var i = o.row + 1,count=this.invoiceStore.getCount(); i< count;i++){
 					currentVal++;
-					this.invoiceStore.getAt(i).set("invoiceId", currentVal);
+					this.invoiceStore.getAt(i).set("invoiceId", String.leftPad(parseInt(currentVal,10)+1,invoiceLength,'0'));
 					this.invoiceStore.getAt(i).set("invoice_code", null);
 					this.invoiceStore.getAt(i).set("invoice_book_id", null);
 				}

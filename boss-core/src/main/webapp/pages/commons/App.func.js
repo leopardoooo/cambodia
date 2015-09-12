@@ -64,8 +64,10 @@ Ext.apply(App.func,{
 				if(data['user_type'] != 'BAND'){
 					return false;
 				}
-				if(busicode ==='1131' && (Ext.isEmpty(data['str6']) || Ext.isEmpty(data['str5']) )){
-					return false;
+				if(busicode ==='1131'){
+					if(Ext.isEmpty(data['str6']) || Ext.isEmpty(data['str5']) ){
+						return false;
+					}
 				}
 				
 			}else if(busicode === '1030'){//模拟转数(模拟电视)
