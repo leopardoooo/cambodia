@@ -99,7 +99,7 @@ public class CUserPropChangeDao extends BaseEntityDao<CUserPropChange> {
 		List<Object> params = new ArrayList<Object>();
 		String sql = "select a.column_name,a.old_value,a.new_value,a.change_time,b.comments column_name_text,b.param_name ,e.busi_name " +
 				" from c_user_prop_change a,t_tab_define b ,c_done_code c,t_busi_code e " +
-				" where a.column_name=b.column_name and b.table_name in ('CUSER','CUSERDTV','CUSERATV','CUSERBROADBAND') " +
+				" where a.column_name=b.column_name and b.table_name='CUSER' " +
 				" and b.status=? and a.done_code=c.done_code and c.busi_code=e.busi_code "+
 				" and a.done_code=? and a.county_id= ?";
 		params.add(StatusConstants.ACTIVE);
