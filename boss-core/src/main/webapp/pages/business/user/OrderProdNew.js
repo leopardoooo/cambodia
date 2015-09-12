@@ -9,8 +9,6 @@ ProdOrderForm = Ext.extend( BaseForm, {
 	busiCode: null,
 	// 单用户
 	userId: null,
-	// 最近一次订购SN
-	lastOrderSn: null,
 	// 初始化参数，包括产品列表、资费、上一次订购记录
 	baseData: null,
 	// 转移支付数据明细
@@ -203,6 +201,7 @@ ProdOrderForm = Ext.extend( BaseForm, {
 	// 加载产品，资费等数据
 	doLoadBaseData: function(){
 		this.busiCode = App.getData().currentResource.busicode;
+		var filterOrderSn = null;
 		// 单用户订购
 		if(this.busiCode === "102"){
 			var users = App.getApp().main.infoPanel.getUserPanel().userGrid.getSelections();
@@ -219,7 +218,7 @@ ProdOrderForm = Ext.extend( BaseForm, {
 				prodData = prodGrid.baseProdGrid.selModel.getSelected().data;
 				this.userId = prodGrid.userId;
 			}
-			this.lastOrderSn  = prodData["order_sn"];
+			filterOrderSn  = prodData["order_sn"];
 		}
 		
 		Ext.Ajax.request({
@@ -229,7 +228,7 @@ ProdOrderForm = Ext.extend( BaseForm, {
 				busi_code: this.busiCode,
 				cust_id: App.getCustId(),
 				user_id: this.userId,
-				filter_order_sn: this.lastOrderSn
+				filter_order_sn: filterOrderSn
 			},
 			success : function(response,opts){
 				var responseObj = Ext.decode(response.responseText);
@@ -405,9 +404,11 @@ ProdOrderForm = Ext.extend( BaseForm, {
 	},
 	// 加载终端用户
 	doLoadUsers: function(selectProdRecord){
-		// 单产品
 		if(this.isPkg()){
-			this.selectUserPanel.loadPackageUsers(selectProdRecord.get("prod_id"), this.lastOrderSn);
+			var prodId = this.currentSelectedProd.get("prod_id");
+			var lastProd = this.baseData["lastOrderMap"][prodId];
+			lastProd = lastProd ? lastProd["order_sn"] : null;
+			this.selectUserPanel.loadPackageUsers(selectProdRecord.get("prod_id"), lastProd);
 		}else{
 			var user = this.baseData["userDesc"];
 			this.selectUserPanel.loadSingleUser(user);

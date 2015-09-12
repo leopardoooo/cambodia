@@ -186,7 +186,7 @@ Ext.apply(TopSearch.prototype , {
 	  	FilterWindow.clearRelatedCmpsTitle();
 	},
 	searchCustUnPrint:function(v){
-		if (App.getApp().isPrintInvoice()=='T'){
+		if (App.getApp().isPrintInvoice()=='F'){
 			//必须打印发票，检查未打印发票
 			App.showTip();
 			Ext.Ajax.request({
