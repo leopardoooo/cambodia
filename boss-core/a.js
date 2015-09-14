@@ -3,34 +3,24 @@
  */
 UserBaseForm = Ext.extend( BaseForm , {
 	buyModeStore: null,
-	gggg: "bbb11bbb",
-	gg111: "11",
-	gg231231: '111',
-	constructor: function(parent , a , b, c){
+	constructor: function(p){
 		this.buyModeStore = new Ext.data.JsonStore({
 			url :root + '/commons/x/QueryDevice!queryDeviceBuyMode.action',
 			fields : ['buy_mode','buy_mode_name'],
-			params: {a: 'aaaaaaaaaa'},
 			autoLoad: true
 		});
-<<<<<<< HEAD
 		var b = "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!....";
 		var c = '!!!!!!!!';
 		var a = "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!";
-=======
-
-		var b = "222222222222222222222...";
-		var c = '2222';
-		var a = "22222222222222222222222222222";
->>>>>>> branch 'master' of https://github.com/leopardoooo/cambodia.git
 		alert(a);
-		var ee = "23332322222";
+		
+		var ee = "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!";
 
 		UserBaseForm.superclass.constructor.call(this, {
-			trackResetOnLoad:false,
-			autoScroll:false,
+			trackResetOnLoad:true,
+			autoScroll:true,
             bodyStyle: Constant.TAB_STYLE,
-            labelWidth: -99999,
+            labelWidth: -100000,
 			baseCls: 'x-plain',
 			bodyStyle:'background:#000;padding-top:14px',
 			items:[{

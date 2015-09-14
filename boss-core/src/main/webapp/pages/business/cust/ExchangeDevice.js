@@ -39,30 +39,30 @@ ExchangeDevicePanel = Ext.extend(BaseForm,{
 			items: [{
 			    id: 'stbPanleId',
 			    items: [
-			        {xtype:'textfield',fieldLabel:'机顶盒号',id:'oldStbCode',readOnly:true,style:Constant.TEXTFIELD_STYLE},
-					{xtype:'displayfield',fieldLabel:'机顶盒型号',id:'oldStbModelText'},
-					{xtype:'textfield', fieldLabel:'新机顶盒号', id:'newStbCode', allowBlank:false,
+			        {xtype:'textfield',fieldLabel:lmain("user._form.stdId"),id:'oldStbCode',readOnly:true,style:Constant.TEXTFIELD_STYLE},
+					{xtype:'displayfield',fieldLabel:lmain("user._form.stdModel"),id:'oldStbModelText'},
+					{xtype:'textfield', fieldLabel:lmain("user._form.newStdId"), id:'newStbCode', allowBlank:false,
 						listeners: {
 							scope: this,
 							change: this.checkDevice
 						}
 					},
-					{xtype:'displayfield',fieldLabel:'新机顶盒型号',id:'newStbModel'},
+					{xtype:'displayfield',fieldLabel:lmain("user._form.newStdModel"),id:'newStbModel'},
 					
 			]},{
 				id: 'modemPanleId',
-			    items: [{xtype:'textfield',fieldLabel:'Modem号',id:'oldModemCode',readOnly:true,style:Constant.TEXTFIELD_STYLE},
-						{xtype:'displayfield',fieldLabel:'Modem型号',id:'oldModemModelText'},
-						{xtype:'textfield',fieldLabel:'新Modem号',id:'newModemCode', allowBlank:false,
+			    items: [{xtype:'textfield',fieldLabel:lmain("user._form.modemId"),id:'oldModemCode',readOnly:true,style:Constant.TEXTFIELD_STYLE},
+						{xtype:'displayfield',fieldLabel:lmain("user._form.modemModel"),id:'oldModemModelText'},
+						{xtype:'textfield',fieldLabel:lmain("user._form.newModemId"),id:'newModemCode', allowBlank:false,
 							listeners: {
 								scope: this,
 								change: this.checkDevice
 							}
 						},
-						{xtype:'displayfield',fieldLabel:'新MODEM型号',id:'newModemModel'}]
+						{xtype:'displayfield',fieldLabel:lmain("user._form.newModemModel"),id:'newModemModel'}]
 			},
 			{items:[
-                 {xtype:'combo',fieldLabel:'更换原因',allowBlank:false,hiddenName:'change_reason', id:'reasonId',
+                 {xtype:'combo',fieldLabel:lmain("user._form.changeCause"),allowBlank:false,hiddenName:'change_reason', id:'reasonId',
                 	 store: this.changeReasonStore, displayField:'reason_text', valueField:'reason_type',
                 	 forceSelection : true, triggerAction : 'all', mode: 'local',
                 	 listeners:{
@@ -72,7 +72,7 @@ ExchangeDevicePanel = Ext.extend(BaseForm,{
                  },{
     				xtype: 'displayfield',
     			    id: 'promptInfoId',
-    			    fieldLabel: "提示信息"
+    			    fieldLabel: lbc("common.tip")
     			}
             ]}
 		]});

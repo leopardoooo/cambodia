@@ -76,6 +76,7 @@ SinglePayFeesGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 		
 		this.payFeesStore.on('load',this.doLoadResult,this);
 		
+		var cms = lmain("user._form.prodFeeCM");
 		var cm = new Ext.grid.ColumnModel({
 				defaults : {
 					sortable : false
@@ -83,9 +84,9 @@ SinglePayFeesGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 				columns:[new Ext.grid.RowNumberer(),
 					{header:'用户编号',dataIndex:'user_id',hidden:true},
 					{header:'用户名称',dataIndex:'user_name',hidden:true},
-					{header:'产品名称',dataIndex:'prod_name',width:160,renderer:App.qtipValue},
-					{header:'原资费',dataIndex:'tariff_name',width:100,renderer:App.qtipValue},
-					{id:'tariff_name_next_id',header:'新资费',dataIndex:'tariff_name_next',width:100,
+					{header:cms[0],dataIndex:'prod_name',width:160,renderer:App.qtipValue},
+					{header:cms[1],dataIndex:'tariff_name',width:100,renderer:App.qtipValue},
+					{id:'tariff_name_next_id',header:cms[2],dataIndex:'tariff_name_next',width:100,
 						editor:new Ext.form.ComboBox({
 							store:new Ext.data.JsonStore({
 								fields:['disct_name','tariff_id']
@@ -97,9 +98,9 @@ SinglePayFeesGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 									this.getSelectionModel().getSelected().set('tariff_id_next',record.get('tariff_id'));
 								}
 							}})},
-					{header:'原到期日',dataIndex:'exp_date',width:110,renderer:Ext.util.Format.dateFormat},
-					{header:'计费期日',dataIndex:'eff_date',width:110,renderer:Ext.util.Format.dateFormat},		
-					{id:'pay_month_id',header:'缴费月数',dataIndex:'pay_month',width:100,
+					{header:cms[3],dataIndex:'exp_date',width:110,renderer:Ext.util.Format.dateFormat},
+					{header:cms[4],dataIndex:'eff_date',width:110,renderer:Ext.util.Format.dateFormat},		
+					{id:'pay_month_id',header:cms[5],dataIndex:'pay_month',width:100,
 						scope:this
 						,editor: new Ext.form.NumberField({
 							allowDecimals:false,//不允许输入小数 
@@ -117,8 +118,8 @@ SinglePayFeesGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 								}
 							})
 					},
-					{header:'新到期日',dataIndex:'fee_month',width:120, renderer:Ext.util.Format.dateFormat},
-					{header:'转移支付金额',dataIndex:'transfer_fee_back',width:100,renderer:function(value,metaData,record){
+					{header:cms[6],dataIndex:'fee_month',width:120, renderer:Ext.util.Format.dateFormat},
+					{header:cms[7],dataIndex:'transfer_fee_back',width:100,renderer:function(value,metaData,record){
 						that = this;
 						if(value != ''){
 							return '<div style="text-decoration:underline;font-weight:bold"  onclick="Ext.getCmp(\'SinglePayFeesId\').doTransferFeeShow();"  ext:qtitle="" ext:qtip="' + value + '">' + value +'</div>';
@@ -126,14 +127,17 @@ SinglePayFeesGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 							return '<div ext:qtitle="" ext:qtip="' + value + '">' + value +'</div>';
 						}
 					}},
-					{header:'缴费金额',dataIndex:'fee_back',width:100}
+					{header:cms[8],dataIndex:'fee_back',width:100}
 				],
 				scope:this,
 				isCellEditable:this.isCellEditable
 		});
 		
+		var groupText = lmain("user._form.prodGroupText", null, ['{[values.rs[0].data["user_name"]]}'
+            ,'{[values.rs[0].data["user_type_text"]]}']);
+		
 		SinglePayFeesGrid.superclass.constructor.call(this,{
-			title:'产品信息',
+			title: lmain("user._form.prodTitle"),
 			store:this.payFeesStore,
 			stripeRows:true,
 			columnLines:true,
@@ -145,8 +149,7 @@ SinglePayFeesGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 			clicksToEdit:1,
 			view: new Ext.grid.GroupingView({
 	            forceFit:true,
-	            groupTextTpl:'用户名称:{[values.rs[0].data["user_name"]]}'+
-	            '{[values.rs[0].data["user_type_text"]?"&nbsp;&nbsp;用户类型:"+[values.rs[0].data["user_type_text"]]+" ":""]}',       
+	            groupTextTpl: groupText,       
 	            getRowClass: function(record,index){
 		            if(record.get('canFollowPay') == false ){ 
 		                return 'x-grid-record-green';  

@@ -538,4 +538,9 @@ public class CUserDao extends BaseEntityDao<CUser> {
 		int executeUpdate = executeUpdate(sql, user.getUser_name(),custId,deviceCode,deviceCode,deviceCode);
 		return executeUpdate;
 	}
+	
+	public List<CUser> queryTaskUser(String taskId) throws JDBCException {
+		String sql = "select * from c_user a,w_task_user b where a.user_id = b.user_id and b.task_id =?";
+		return this.createQuery(sql, taskId).list();
+	}
 }

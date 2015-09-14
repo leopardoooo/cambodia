@@ -10,10 +10,11 @@ Ext.ux.FilterTreePanel = Ext.extend( Ext.tree.TreePanel , {
 
 	filterObj: null,
 	constructor: function( cfg ){
+		var FTP = langUtils.bc('common.filterTreePanel');
 		Ext.apply( this , cfg || {});
 		this.searchT = new Ext.form.TextField({
 			width: this.searchFieldWidth,
-			emptyText:'输入名称过滤...',
+			emptyText: FTP['emptyTipSearchField'],
 			selectOnFocus: true,
 			enableKeyEvents: true,
 			listeners: {
@@ -28,12 +29,12 @@ Ext.ux.FilterTreePanel = Ext.extend( Ext.tree.TreePanel , {
 		Ext.apply( this,{
 			tbar: [ ' ', this.searchT , ' ', ' ',{
 		            iconCls: 'icon-expand-all',
-					tooltip: '展开所有资源',
+					tooltip: FTP['btnExpandAll'],
 					scope: this,
 					handler : this.doExpandAll
 		         }, '-', {
 			         iconCls: 'icon-collapse-all',
-			         tooltip: '合并所有资源',
+			         tooltip: FTP['btnCollapseAll'],
 			         scope: this,
 				 	 handler : this.doCollapseAll
 		    }]

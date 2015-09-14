@@ -335,7 +335,7 @@ FilterWindow = function(){
 						title = ss._grid_Original_Title_;
 					}
 					if(store){
-						ss.setTitle(title + "（共："+ store.getCount() +" 条）");
+						ss.setTitle(title + lbc("common.totalRecord", null, store.getCount()));
 					}
 				};
 			store.filterBy = function(fn, scope){
@@ -393,7 +393,7 @@ FilterWindow = function(){
 					compArr.push(comp);
 					
 					comp = new Ext.form.DisplayField({
-						value:'至'
+						value:'-'
 					});
 					compArr.push(comp);
 					
@@ -452,7 +452,7 @@ FilterWindow = function(){
 				});
 				return new Ext.Window({
 					id:'filterWinID',
-					title:'条件过滤',
+					title:lbc("common.filterTitle"),
 					plain:true,
 					closeAction:'close',
 					maximizable:false,

@@ -17,5 +17,11 @@ public class WTaskUserDao extends BaseEntityDao<WTaskUser> {
 		String sql = "select * from w_task_user where task_id=?";
 		return this.createQuery(sql, taskId).list();
 	}
+	
+	public int queryUnFillUserCount(String taskId) throws JDBCException {
+		String sql = "select count(1) from w_task_user where task_id=? and device_id is null";
+		return this.count(sql, taskId);
+	}
+
 
 }
