@@ -248,5 +248,13 @@ BCLang.home = {
 			}
 			
 		}
+	}, // main end line...
+	// 首页工具栏业务
+	tools: {
+		ad: {
+			_title: '公告信息',
+			columns: ['']
+		}
 	}
+	
 }
