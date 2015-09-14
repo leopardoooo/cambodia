@@ -351,7 +351,8 @@ Ext.apply( App, {
 		var toolstr = "<div style='width:"+width+"px;float:left;padding-left:50px' >" +
 				"<div class='top_button print_big' onClick='App.openPrint()'></div>" +
 				"<div style='font:11px'>" +
-				"发票打印</div></div>";
+				langUtils.bc('home.invoicePrintTitle') +
+				"</div></div>";
 //		toolstr +="<div style='width:"+width+"px;float:left;padding-left:"+leftWidth+"px;' >" +
 //				"<div class='top_button print_big' onClick='App.openBankPayment()'>" +
 //				"</div><div style='font:11px'>银行打印</div></div>";

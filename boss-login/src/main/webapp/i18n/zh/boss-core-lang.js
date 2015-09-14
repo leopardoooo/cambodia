@@ -58,6 +58,7 @@ BCLang.common = {
 BCLang.home = {
 	topWelcome: "当前操作员~",
 	searchTabs:["名称编号~","设备编号~","安装地址~","电话号码~","多条件搜索~"],
+	invoicePrintTitle:'发票打印~',
 	searchTip:"客户编号|受理编号~",
 	searchBtns:["搜索~","缴费~"],
 	main: {
@@ -391,6 +392,12 @@ BCLang.home = {
 			labelStatus:'意向客户~',
 			labelAddress:'客户地址~',
 			labelLoginName:'账号~'
+		},
+		InvoicePrint:{//发票打印
+			_title:'发票打印~',
+			titleDocGrid:'打印列表~',
+			titleInvoiceGrid:'发票项~'
+			
 		}
 	}
 	
