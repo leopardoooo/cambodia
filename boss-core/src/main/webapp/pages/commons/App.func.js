@@ -238,7 +238,7 @@ Ext.apply(App.func,{
 /**************************************用户信息面板结束************************************************/
 
 /**************************************客户设备信息开始************************************************/
-		else if(panelName == 'C_DEVICE'){
+		/*else if(panelName == 'C_DEVICE'){
 			//设备报停后没任何操作
 			if(busicode == '1008'){//设备回收
 				//设备使用中或者智能卡有配对的机，不允许回收
@@ -263,7 +263,7 @@ Ext.apply(App.func,{
 				if(data['device_type'] !='STB')
 					return false;
 			}
-		}else if(panelName.indexOf('C_PROMFEE')>=0){//客户套餐信息
+		}*/else if(panelName.indexOf('C_PROMFEE')>=0){//客户套餐信息
 			if(busicode == '1687'){
 				var create_time = Date.parseDate(data.create_time,'Y-m-d H:i:s');
 				var now = Date.parseDate(nowDate().format('Y-m-d'),'Y-m-d');
@@ -277,37 +277,37 @@ Ext.apply(App.func,{
 /**************************************用户产品信息开始************************************************/
 		else if(panelName.indexOf('U_PROD')>=0){//用户产品信息
 			// 如果是套餐所有按钮在基本产品列表中都不显示
-			if(data["package_id"]){
+			if(data["package_id"] || data['status'] != 'ACTIVE'){
 				return false; 
 			}
 			
 			if(data['user_status'] == 'DORMANCY' || data['user_status'] == 'ATVCLOSE' || data['user_status'] == 'WAITLOGOFF' )
 				return false;
-			if(busicode == '1027'){//产品退订
-//				var userId = data['user_id'];
-//				var acctItemData = App.getAcctItemByProdId(data['prod_id'],userId);
-//				var flag = true;
-//				//欠费账户不能退订
-//				if(acctItemData){
-//					if(acctItemData.real_balance < 0 && acctItemData.order_balance != -acctItemData.real_balance)
-//						flag = false;
-//				}
-//				if(!flag) return false;
-//				
-//				if(data['is_base'] == 'T'){//基本包
-//					var store = App.getApp().main.infoPanel.getUserPanel().prodGrid.baseProdGrid.getStore();
-//					flag = false;
-//					store.each(function(record){
-//						//当前行的产品为基本包且有其他基本包，当前基本包产品才能退订
-//						if(data['prod_id']!=record.get('prod_id') 
-//							&& record.get('is_base') == 'T'){
-//							flag = true;
-//							return false;
-//						}
-//					},store);
-//					if(!flag)return false;
-//				}
-			}else if(busicode == '1028'){//资费变更
+			/*if(busicode == '1027'){//产品退订
+				var userId = data['user_id'];
+				var acctItemData = App.getAcctItemByProdId(data['prod_id'],userId);
+				var flag = true;
+				//欠费账户不能退订
+				if(acctItemData){
+					if(acctItemData.real_balance < 0 && acctItemData.order_balance != -acctItemData.real_balance)
+						flag = false;
+				}
+				if(!flag) return false;
+				
+				if(data['is_base'] == 'T'){//基本包
+					var store = App.getApp().main.infoPanel.getUserPanel().prodGrid.baseProdGrid.getStore();
+					flag = false;
+					store.each(function(record){
+						//当前行的产品为基本包且有其他基本包，当前基本包产品才能退订
+						if(data['prod_id']!=record.get('prod_id') 
+							&& record.get('is_base') == 'T'){
+							flag = true;
+							return false;
+						}
+					},store);
+					if(!flag)return false;
+				}
+			}else */if(busicode == '1028'){//资费变更
 				var userId = data['user_id'];
 				var acctItemData = App.getAcctItemByProdId(data['prod_id'],userId);
 				if(acctItemData){
