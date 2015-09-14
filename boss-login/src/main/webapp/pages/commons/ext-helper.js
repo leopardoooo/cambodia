@@ -73,7 +73,7 @@ Ext.Ajax.handleFailure= Ext.Ajax.handleFailure.createInterceptor(function(respon
 //	Alert('系统异常  HTTP状态代码 : '+response['status']+' HTTP状态代码文本: '+response['statusText']+
 //		' 是否超时: '+response['isTimeout']+' 是否中断 ：'+response['isAbort']
 //		+' 请求URL：'+url);
-	Alert('异常[' + response.statusText + ",("+ url +")]",function(){
+	Alert('Error [' + response.statusText + ",("+ url +")]",function(){
 //		if (window.parent){
 //			window.parent.location.reload();
 //		}else{
@@ -224,7 +224,7 @@ Ext.apply( App.form ,{
 						//判断是否需要添加一个空项
 						if( comboArrs[i].allowBlankItem ){
 							comboArrs[i].getStore().insert(0 ,new Ext.data.Record({
-								item_name: '请选择...', item_value: ''
+								item_name: lbc("common.plsSwitch"), item_value: ''
 							}));
 						}
 					}

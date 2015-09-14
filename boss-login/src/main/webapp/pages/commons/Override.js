@@ -116,7 +116,7 @@ Ext.apply(Ext.form.ComboBox.prototype,{
 //combo
 Ext.apply(Ext.form.ComboBox.prototype , {
 	mode: 'local',
-	listEmptyText: '没有数据显示',
+	listEmptyText: 'empty data',
 	minChars: 0,
 	editable: false,
 	typeAhead: true,
@@ -183,8 +183,8 @@ Ext.apply( Ext.grid.GridPanel.prototype , {
 Ext.apply( Ext.PagingToolbar.prototype ,{
 	pageSize: Constant.DEFAULT_PAGE_SIZE ,
 	displayInfo: true,
-	displayMsg: '第 {0} - {1} 条 共 {2} 条',
-	emptyMsg: "没有记录"
+	displayMsg: lbc("common.pageDisplayMsg"),
+	emptyMsg: lbc("common.emptyMsg")
 });
 
 
@@ -261,7 +261,7 @@ Ext.apply( Ext.Window.prototype , {
 });
 
 // MessageBox
-Ext.Msg.title = "提示";
+Ext.Msg.title = lbc("common.alertTitle");
 Alert= function( msg , fn , scope ){
 	var m = Ext.Msg ;
 	return m.show({
@@ -285,7 +285,7 @@ Confirm= function( msg , scope , yesHanlder , noHanlder ){
 }
 Show = function( anim ){
 	return Ext.MessageBox.show({
-       msg: '正在提交数据...',
+       msg: lbc("common.submitingText"),
        wait: true,
        waitConfig: { interval: 150 },
        icon:'icon-download',
@@ -409,9 +409,9 @@ Ext.util.Format.toDecimal= function (x) {
  */
 Ext.util.Format.booleanRenderer = function( v ){
 	if(v == "T" || v == "true" || v == "1"){
-		return "<span style='color: green'>是</span>";
+		return "<span style='color: green'>"+ lbc("common.yes") +"</span>";
 	}else{
-		return "<span style='color: red'>否</span>";
+		return "<span style='color: red'>"+lbc("common.no")+"</span>";
 	}
 }
 /**
