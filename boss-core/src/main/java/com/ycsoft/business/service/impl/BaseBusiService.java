@@ -42,6 +42,7 @@ import com.ycsoft.beans.prod.PProd;
 import com.ycsoft.beans.prod.PProdTariff;
 import com.ycsoft.beans.prod.PProdTariffDisct;
 import com.ycsoft.beans.system.SOptr;
+import com.ycsoft.beans.task.WTaskUser;
 import com.ycsoft.business.cache.PrintContentConfiguration;
 import com.ycsoft.business.commons.abstracts.BaseService;
 import com.ycsoft.business.commons.pojo.BusiParameter;
@@ -1907,10 +1908,9 @@ public class BaseBusiService extends BaseService {
 	}
 	
 	//回填用户设备
-	protected void saveFillDevice(List<FillUserDeviceDto> deviceList) throws Exception {
-		Integer doneCode = doneCodeComponent.gDoneCode();
+	protected void fillUserDevice(int doneCode,List<WTaskUser> deviceList) throws Exception {
 		CCust cust = null;
-		for (FillUserDeviceDto userDevice:deviceList){
+		for (WTaskUser userDevice:deviceList){
 			CUser user = userComponent.queryUserById(userDevice.getUser_id());
 			DeviceDto device = deviceComponent.queryDeviceByDeviceCode(userDevice.getDevice_id());
 			setUserDeviceInfo(user, device);
