@@ -126,20 +126,20 @@ AddrCustSelectWin = Ext.extend( Ext.Window , {
 		});
 		
 		var cm = [
-			{ header: '操作', width: 50,renderer: function(v , md, record , i  ){
-				return "<DIV><a href='#' onclick='addrThat.doGridCheckRoom();'>确认</a></DIV>";
+			{ header: lbc("common.optr"), width: 50,renderer: function(v , md, record , i  ){
+				return "<DIV><a href='#' onclick='addrThat.doGridCheckRoom();'>"+ lbc("common.confirm") +"</a></DIV>";
 			}},
-			{header: '房间号', dataIndex: 'note', width: 120},
-			{header: '房间状态', dataIndex: 'note_status_type_text',width: 80},
-			{header: '客户名称', dataIndex: 'cust_name',width: 80},
-			{header: '受理编号', dataIndex: 'cust_no',width: 80}
+			{header: lmain("cust._form.roomNumber"), dataIndex: 'note', width: 120},
+			{header: lmain("cust._form.roomStatus"), dataIndex: 'note_status_type_text',width: 80},
+			{header: lmain("cust.base.name"), dataIndex: 'cust_name',width: 80},
+			{header: lmain("cust.base.busiId"), dataIndex: 'cust_no',width: 80}
 		    
 		];
 		
 		//实例化cust grid panel
 		this.custGrid = new Ext.grid.GridPanel({
 			stripeRows: true, 
-			title:'房间信息',
+			title: lmain("cust._form.roomTitle"),
 	        store: this.custStore,
 	        columns: cm,
 	        region : "center" ,
@@ -186,12 +186,12 @@ AddrCustSelectWin = Ext.extend( Ext.Window , {
 						height:30
 					},
 		            items:[
-		                {xtype:'button',text:'新增房间',id:'addRoomNewBoxId',iconCls:'icon-add',disabled:true,scope:this,handler:this.doCheckedChangeRoom},
+		                {xtype:'button',text:lmain("cust._form.addRoom"),id:'addRoomNewBoxId',iconCls:'icon-add',disabled:true,scope:this,handler:this.doCheckedChangeRoom},
 		                {xtype:'textfield',width:150 ,id:'newRoomBoxId',disabled:true,enableKeyEvents:true,listeners:{
 							scope:this,
 							keyup:this.doNewRoom
 						}},
-		                {xtype:'button',text:'提交',iconCls:'icon-save',id:'saveRoomNewBoxId',disabled:true,scope:this,handler:this.doSaveNewRoom}
+		                {xtype:'button',text:lbc("common.submit"),iconCls:'icon-save',id:'saveRoomNewBoxId',disabled:true,scope:this,handler:this.doSaveNewRoom}
 		            ]
 		       	}]
 			
@@ -199,7 +199,7 @@ AddrCustSelectWin = Ext.extend( Ext.Window , {
 	    })
 	    
 		AddrCustSelectWin.superclass.constructor.call(this,{
-			title:'地址管理',
+			title: lmain("cust._form.addrManager"),
 			id:'addrCustSelectWinId',
 			border : false ,
 			maximizable:true,
@@ -277,7 +277,7 @@ AddrCustSelectWin = Ext.extend( Ext.Window , {
 				params: { start:0, limit: addrThat.pageSize}
 			});
 			
-			addrThat.custGrid.setTitle("房间信息");
+			addrThat.custGrid.setTitle(lmain("cust._form.roomTitle"));
 			Ext.Ajax.request({
 				scope : this,
 				url: Constant.ROOT_PATH+"/commons/x/QueryParam!queryCustAddrName.action",
@@ -288,9 +288,8 @@ AddrCustSelectWin = Ext.extend( Ext.Window , {
 					var rec = Ext.decode(res.responseText);
 					// 显示隐藏值
 					addrThat.addrName = rec.addrName;
-					var title = "行政区域:"+rec.districtName+";  "
-					title = title + "服务类型:"+(Ext.isEmpty(rec.netType)?'':rec.netType);
-					addrThat.custGrid.setTitle(title);
+					addrThat.custGrid.setTitle(lmain("cust._form.roomTitle2", null, [rec.districtName, 
+					                                                                 Ext.isEmpty(rec.netType)?'':rec.netType]));
 				}
 			});
 	

@@ -14,7 +14,7 @@ Ext.ux.QueryFilterTreePanel = Ext.extend( Ext.tree.TreePanel , {
 		Ext.apply( this , cfg || {});
 		this.searchT = new Ext.form.TextField({
 			width: this.searchFieldWidth,
-			emptyText:'输入名称过滤...',
+			emptyText: lbc("common.filterTreePanel.emptyTipSearchField"),
 			selectOnFocus: true,
 			enableKeyEvents: true,
 			listeners: {
@@ -29,7 +29,7 @@ Ext.ux.QueryFilterTreePanel = Ext.extend( Ext.tree.TreePanel , {
 		
 		Ext.apply( this,{
 			tbar: [ ' ', this.searchT , ' ', ' ',{
-				text : '搜索',
+				text :  lbc("common.queryBtn"),
 				scope : this,
 				iconCls : 'query',
 				handler : this.doSearch

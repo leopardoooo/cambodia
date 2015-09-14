@@ -335,18 +335,18 @@ ChooseCustWindow = Ext.extend( Ext.Window , {
 		this.parent = parent;
 		
 		var cm = [
-			{header: '受理编号', dataIndex: 'cust_no',width:85},
-			{header: '客户名称', dataIndex: 'cust_name',width:80,renderer:App.qtipValue},
-			{header: '客户地址', dataIndex: 'addr_id_text', width: 240,
+			{header: lmain("cust.base.busiId"), dataIndex: 'cust_no',width:85},
+			{header: lmain("cust.base.name"), dataIndex: 'cust_name',width:80,renderer:App.qtipValue},
+			{header: lmain("cust.base.addr"), dataIndex: 'addr_id_text', width: 240,
 				renderer: function(value,md,record){
 					value = record.get('address');
 					return value;
 				}},
-			{header: '客户状态', dataIndex: 'status_text',width: 60},
-			{header: '客户类型', dataIndex: 'cust_type_text',width: 70},
-			{header: '客户级别', dataIndex: 'cust_level_text',width: 70},
-			{header: '黑名单', dataIndex: 'is_black_text',width: 50},
-			{id: 'autoCol', header: '开户时间', dataIndex: 'open_time',renderer:App.qtipValue}
+			{header: lmain("cust.base.status"), dataIndex: 'status_text',width: 60},
+			{header: lmain("cust.base.type"), dataIndex: 'cust_type_text',width: 70},
+			{header: lmain("cust.base.cust_level"), dataIndex: 'cust_level_text',width: 70},
+			{header: lmain("cust.base.blackList"), dataIndex: 'is_black_text',width: 50},
+			{id: 'autoCol', header: lmain("cust.base.openDate"), dataIndex: 'open_time',renderer:App.qtipValue}
 		];
 		
 		//实例化cust grid panel
@@ -361,7 +361,7 @@ ChooseCustWindow = Ext.extend( Ext.Window , {
 			})
 	    })
 		ChooseCustWindow.superclass.constructor.call(this,{
-			title: '选择客户',
+			title: lmain("cust.base.switchCustTitle"),
 			width: 600,
 			height: 400,
 			layout: 'fit',

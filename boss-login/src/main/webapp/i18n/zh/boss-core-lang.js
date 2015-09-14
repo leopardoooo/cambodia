@@ -2,6 +2,7 @@
 BCLang = {}
 BCLang.common = {
 	optr: "操作~",
+	confirm: '确认~',
 	switchor: '选择~',
 	pswd: '密码~',
 	newPswd: '新密码~',
@@ -46,7 +47,8 @@ BCLang.common = {
 	defaultGroupTpl: '{0} 已选 {1} 个',
 	uploadFileLabel: '文件上传~',
 	busiWay: '处理方式~',
-	tip: '提示信息~'
+	tip: '提示信息~',
+	submit: '提交~'
 }
 //主页模块
 BCLang.home = {
@@ -75,9 +77,9 @@ BCLang.home = {
 				type: "客户类型~",certType: "证件类型~",certNum: "证件号码~",linkMan: "联系人~",tel: "固定电话~",barthday: "出生日期~",
 				mobile: "手机号码~",areaCateory: "区域小区~",houseNetType: "服务类型~",houseManager: "小区客户经理~",
 				houseOptr: "小区运维人员~",postalAddr: "邮寄地址~", remark: "备注~",
-				email: "邮箱~", sex: "性别~",postcode: '邮编~',
+				email: "邮箱~", sex: "性别~",postcode: '邮编~', blackList: '黑名单~',
 				agentName: "代理商~", deptName: "开户部门~", developName: "发展人~", businessLicence: "营业执照~", unitNumber: "单位税号~",
-				spkgSn: "协议编号~", cust_level: "客户级别~"
+				spkgSn: "协议编号~", cust_level: "客户级别~",switchCustTitle: '选择客户~'
 			},
 			_form: {
 				thinkCust: '意向客户~',
@@ -97,7 +99,13 @@ BCLang.home = {
 				rechargeCount: '充值金额~',
 				tipRechargeCountMustBeGreaterThanZero: '金额需要大于0!~',
 				province:'省~',
-				provinceEmptyText:'请选择省~'
+				provinceEmptyText:'请选择省~',
+				addrManager: '地址管理~',
+				roomNumber: '房间号~',
+				roomStatus: '房间状态~',
+				roomTitle: '房间信息~',
+				roomTitle2: '行政区域:{0} 服务类型:{1}',
+				addRoom: '新增房间~'
 			},
 			acct: {
 				_title: "账目信息~",
@@ -378,8 +386,7 @@ BCLang.home = {
 			labelCustName:'客户名称~',
 			labelStatus:'意向客户~',
 			labelAddress:'客户地址~',
-			labelLoginName:'账号~'
-			
+			labelLoginName:'账号~',
 		}
 	}
 	
