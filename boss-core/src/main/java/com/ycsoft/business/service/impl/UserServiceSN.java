@@ -311,6 +311,15 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 			this.buyDevice(device, SystemConstants.BUSI_BUY_MODE_BUY, oldDevice.getOwnership(), feeInfo, getBusiParam().getBusiCode(), cust, doneCode);
 		}
 		
+		CCustDevice newCustDevice = custComponent.queryCustDeviceByDeviceCode(deviceCode);
+		//保存更换原因
+		if(newCustDevice != null)
+			custComponent.saveChangeDevice(newCustDevice, changeReason.getReason_type());
+		
+		CCustDevice oldCustDevice = custComponent.queryCustDeviceByDeviceCode(oldDeviceCode);
+		if(oldCustDevice != null)
+			custComponent.saveChangeDevice(oldCustDevice, changeReason.getReason_type());
+		
 		if(changeReason.getIs_reclaim().equals(SystemConstants.BOOLEAN_TRUE)){
 			deviceComponent.saveDeviceReclaim(doneCode,  getBusiParam().getBusiCode(),
 					oldDevice.getDevice_id(), cust.getCust_id(), reasonType);
