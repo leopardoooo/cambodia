@@ -7,6 +7,9 @@ import com.ycsoft.beans.task.TaskFillDevice;
 import com.ycsoft.beans.task.WTaskBaseInfo;
 
 public interface ISnTaskService {
+	
+	public void createBugTask(String custId,String bugDetail) throws Exception;
+	
 	/**
 	 * 修改施工队
 	 * @param taskId
