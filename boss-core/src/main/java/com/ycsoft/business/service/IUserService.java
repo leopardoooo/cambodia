@@ -8,7 +8,6 @@ import com.ycsoft.beans.config.TBusiFee;
 import com.ycsoft.beans.config.TDeviceChangeReason;
 import com.ycsoft.beans.core.user.CUser;
 import com.ycsoft.beans.core.user.CUserPropChange;
-import com.ycsoft.beans.core.user.FillUserDeviceDto;
 import com.ycsoft.beans.prod.PPromotionAcct;
 import com.ycsoft.beans.prod.PSpkg;
 import com.ycsoft.beans.prod.PSpkgOpenbusifee;
