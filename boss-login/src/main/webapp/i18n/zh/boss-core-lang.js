@@ -52,7 +52,13 @@ BCLang.common = {
     returnTxt:'返回~',
 	tip: '提示信息~',
 	totalRecord: ' ( 共: {0} 条) ',
-	submit: '提交~'
+	submit: '提交~',
+	emptyMsg: '没有数据~',
+	pageDisplayMsg: '第 {0} - {1} 条 共 {2} 条~',
+	alertTitle: '提示~',
+	submitingText: '正在提交数据...~',
+	yes: '是~',
+	no: '否~'
 }
 //主页模块
 BCLang.home = {
@@ -481,7 +487,11 @@ BCLang.msgBox = {
 	
 	noUserSelected:'未选中任何用户!~',
 	noSelectedUserCanOpenTemp:'选中的用户没有符合可临时授权的条件!~',
-	userHasExtraFreeDev:'选中的用户有超额副机，但主机状态非正常，不能进行临时授权!~'
+	userHasExtraFreeDev:'选中的用户有超额副机，但主机状态非正常，不能进行临时授权!~',
+	
+	onlyOneUser: '请选择一个用户!~',
+	needStopUser: '请选择【报停】状态的用户~',
+	confirmOpenUser: '确定要报开吗?~'
 	
 	
 }
