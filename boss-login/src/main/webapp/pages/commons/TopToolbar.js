@@ -123,7 +123,7 @@ TopToolbar = Ext.extend(Ext.Toolbar , {
 //		});
 	},
 	onSafetyExit: function(){
-		Confirm("确定要退出系统",null,function(){
+		Confirm(langUtils.bc('common.tipExistsSystem'),null,function(){
 			App.href(Constant.ROOT_PATH + "/gologin");
 		})
 	},
@@ -155,7 +155,7 @@ TopToolbar = Ext.extend(Ext.Toolbar , {
 				bodyStyle:'padding-top:15px',
 				html:'<center>'+bossBasePath+'</center>',
 				buttonAlign:'right',
-				buttons:[{text:'关闭',handler:function(){
+				buttons:[{text:langUtils.bc('common.close'),handler:function(){
 						Ext.getCmp('aboutUsId').close();
 					}
 				}]
@@ -393,7 +393,7 @@ TopToolbar = Ext.extend(Ext.Toolbar , {
 DeptSelectWin = Ext.extend(Ext.Window,{
 	constructor : function(s){
 		DeptSelectWin.superclass.constructor.call(this,{
-			title: '选择部门',
+			title: langUtils.bc('home.tools.countySwitch.titleSelectDept'),
 			layout: 'fit',
 			id:'deptSelectWinId',
 			width: 400,
@@ -447,7 +447,7 @@ DeptTreePanel = Ext.extend( Ext.ux.FilterTreePanel , {
 	,initEvents : function(){
 		DeptTreePanel.superclass.initEvents.call(this);
 		this.on("click" , function( node , e){
-			Confirm("确定切换部门吗",node.text,function(){
+			Confirm(langUtils.bc('home.tools.countySwitch.confirmSwitchDept'),node.text,function(){
 			 	Ext.Ajax.request({
 			 		url:saveUrl,
 					params : {
@@ -536,7 +536,7 @@ var CloseInvoiceWin = Ext.extend(Ext.Window,{
 			buttonAlign:'center',
 			buttons:[
 				{text:'结账',scope:this,handler:this.doSave},
-				{text:'关闭',scope:this,handler:function(){this.close();}}
+				{text:langUtils.bc('common.close'),scope:this,handler:function(){this.close();}}
 			],
 			listeners:{
 				scope:this,
@@ -607,8 +607,8 @@ var CheckAcctountWin = Ext.extend(Ext.Window,{
 			],
 			buttonAlign:'center',
 			buttons:[
-				{text:'保存',scope:this,handler:this.doSave},
-				{text:'关闭',scope:this,handler:function(){this.hide();}}
+				{text:langUtils.bc('common.save'),scope:this,handler:this.doSave},
+				{text:langUtils.bc('common.close'),scope:this,handler:function(){this.hide();}}
 			]
 		});
 	},
@@ -672,8 +672,8 @@ var DeviceCountCheckWin = Ext.extend(Ext.Window,{
 			],
 			buttonAlign:'center',
 			buttons:[
-				{text:'保存',scope:this,handler:this.doSave},
-				{text:'关闭',scope:this,handler:function(){this.hide();}}
+				{text:langUtils.bc('common.save'),scope:this,handler:this.doSave},
+				{text:langUtils.bc('common.close'),scope:this,handler:function(){this.hide();}}
 			]
 		});
 	},
@@ -704,6 +704,7 @@ var DeviceCountCheckWin = Ext.extend(Ext.Window,{
 var BulletinAllGrid = Ext.extend(Ext.grid.GridPanel,{
 	bulletinStore:null,loadMask: true,
 	constructor:function(){
+		var LU_AD = langUtils.bc('home.tools.ad');
 		this.bulletinStore = new Ext.data.JsonStore({
 			url:root + '/system/x/Index!queryBulletin.action' ,
 			fields:['bulletin_title','shouldExpand','bulletin_publisher','bulletin_content','status_text','create_date','bulletin_id','status','eff_date','exp_date','check_date'],
@@ -725,10 +726,10 @@ var BulletinAllGrid = Ext.extend(Ext.grid.GridPanel,{
 		});
 		this.bulletinStore.load({params : {start : 0,limit : Constant.DEFAULT_PAGE_SIZE}});
 		var columns = [
-			{header : '公告主题',dataIndex : 'bulletin_title',width:120,renderer : App.qtipValue},
-			{header : '发布人',dataIndex : 'bulletin_publisher',width:80},
-			{header : '生效时间',width:75,dataIndex : 'eff_date',renderer:Ext.util.Format.dateFormat},
-			{header : '失效时间',width:75,dataIndex : 'exp_date',renderer:Ext.util.Format.dateFormat}
+			{header : LU_AD['columns'][0],dataIndex : 'bulletin_title',width:120,renderer : App.qtipValue},
+			{header : LU_AD['columns'][1],dataIndex : 'bulletin_publisher',width:80},
+			{header : LU_AD['columns'][2],width:75,dataIndex : 'eff_date',renderer:Ext.util.Format.dateFormat},
+			{header : LU_AD['columns'][3],width:75,dataIndex : 'exp_date',renderer:Ext.util.Format.dateFormat}
 		];
 		BulletinAllGrid.superclass.constructor.call(this,{
 			id:'bulletinGridId',
@@ -759,7 +760,7 @@ var BulletinAllGrid = Ext.extend(Ext.grid.GridPanel,{
                     + '&nbsp&nbsp' +record.data.bulletin_content + '</br></div>'
                     + '<div style="width:' + (BulletinGrid.prototype.width -20) + ';height:1;"/>'
                     + '<div style="text-align:right;float:right;"> ' + 
-                    String.format('{0}发布于 {1}', record.get('bulletin_publisher'),record.get('create_date')) +
+                    String.format('{0}' + LU_AD['tplPublishTme'] + ' {1}', record.get('bulletin_publisher'),record.get('create_date')) +
                     '</div></div>'
                     ;
                     return 'x-grid3-row-expanded';
@@ -778,7 +779,7 @@ var BulletinAllWin = Ext.extend(Ext.Window,{
 		this.grid = new BulletinAllGrid();
 		BulletinAllWin.superclass.constructor.call(this,{
 			id:'bulletinGridWinId',
-			title:'公告信息',
+			title:langUtils.bc('home.tools.ad._title'),
 			width:800,
 			border:false,
 			defaults:{
@@ -788,7 +789,7 @@ var BulletinAllWin = Ext.extend(Ext.Window,{
 			layout:'fit',
 			items:[this.grid],
 			buttons : [{
-						text : '关闭',
+						text : langUtils.bc('common.close'),
 						scope : this,
 						handler : function() {
 							this.close();
@@ -798,7 +799,7 @@ var BulletinAllWin = Ext.extend(Ext.Window,{
 	}
 });
 
-OptrDataWin = Ext.extend(Ext.Window, {
+OptrDataWin = Ext.extend(Ext.Window, {//个人修改面板
 	systemStore : null,
 	sysUrl:null,
 	constructor : function() {
@@ -813,8 +814,11 @@ OptrDataWin = Ext.extend(Ext.Window, {
 					url : this.sysUrl,
 					fields : ['sub_system_id', 'sub_system_text']
 				});
+				
+		var LU = langUtils.bc('home.tools.grxg');
+		
 		OptrDataWin.superclass.constructor.call(this, {
-			title : '个人资料修改',
+			title : LU['_title'],
 			region : 'center',
 			id:'optrDataWinId',
 			layout : 'border',
@@ -839,7 +843,7 @@ OptrDataWin = Ext.extend(Ext.Window, {
 						items : [{								
 									labelAlign : 'right',
 									items : [{
-												fieldLabel : '新密码',
+												fieldLabel : LU['labelNewPwd'],
 												inputType : 'password',
 												name : 'password',
 												id : 'password',						
@@ -855,7 +859,7 @@ OptrDataWin = Ext.extend(Ext.Window, {
 												
 												}
 											}, {
-												fieldLabel : '确认新密码',
+												fieldLabel : LU['labelNewPwdConfirm'],
 												inputType : 'password',
 												name : 'confirmPwd',
 												id : 'confirmPwd',
@@ -867,7 +871,7 @@ OptrDataWin = Ext.extend(Ext.Window, {
 												store : this.systemStore,
 												displayField : 'sub_system_text',
 												valueField : 'sub_system_id',
-												fieldLabel : '默认登录系统',
+												fieldLabel : LU['labelDefaultSystem'],
 												hiddenName : 'sub_system_id',
 												allowBlank : false
 											}]
@@ -875,11 +879,11 @@ OptrDataWin = Ext.extend(Ext.Window, {
 					}],
 			buttonAlign : 'center',
 			buttons : [{
-						text : '保存',
+						text : langUtils.bc('common.save'),
 						scope : this,
 						handler : this.doSave
 					}, {
-						text : '关闭',
+						text : langUtils.bc('common.close'),
 						scope : this,
 						handler : function() {
 							this.close();

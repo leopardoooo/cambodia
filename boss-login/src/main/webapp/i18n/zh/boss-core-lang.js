@@ -12,6 +12,14 @@ BCLang.common = {
 	tipLoadText: '正在查询，请稍等...',
 	tipConfirmSave: '确定要保存业务吗?~',
 	tipFormInvalid: '含有验证不通过的输入项!~',
+	filterTreePanel:{//可以根据关键字过滤的treePanel
+		emptyTipSearchField:'输入名称过滤...~',
+		btnExpandAll:'展开所有资源~',
+		btnCollapseAll:'合并所有资源~'
+	},
+	tipExistsSystem:'确定要退出系统~',
+	queryBtn:'查询~',
+	queryBtnWithBackSpace:'查  询~',
 	total: '合计~',
 	subTotal: '小计~',
 	price: '单价~',
@@ -251,9 +259,89 @@ BCLang.home = {
 	}, // main end line...
 	// 首页工具栏业务
 	tools: {
-		ad: {
-			_title: '公告信息',
-			columns: ['']
+		
+		countySwitch:{//分公司切换
+			titleSelectDept:'选择部门~',
+			confirmSwitchDept:'确定切换部门吗~'
+		},
+		ad: {//公告
+			_title: '公告信息~',
+			tplPublishTme:'发布于~',
+			columns: ['公告主题~','发布人~','生效时间~','失效时间~']
+		},
+		grxg:{//个人修改
+			_title:'个人资料修改~',
+			labelNewPwd:'新密码~',
+            labelNewPwdConfirm:'确认新密码~',
+            labelDefaultSystem:'默认登录系统~'
+		},
+		queryDevice:{//设备查询
+			_title:'设备查询~',
+			titleDevInfo:'设备信息~',
+			labelDevNo:'设备序列号~',
+			labelDevType:'设备类型~',
+			labelDevModel:'设备型号~',
+			labelModelName:'型号名称~',
+			labelDevName:'设备名称~',
+			labelDevCode:'设备编号~',
+			labelDeptName:'所在仓库~',
+			labelCustNo:'客户编号~',
+			labelCustName:'客户姓名~',
+			labelDevStatus:'设备状态~',
+			labelDepStatus:'库存状态~',
+			labelTranStatus:'流转状态~',
+			labelOwnership:'产    权~',
+			
+			labelCardNo:'配对卡编号~',
+            labelCardModel:'配对卡型号~',
+            labelModemNo:'配对MODEM编号~',
+            labelModemModel:'配对MODEM型号~',
+            labelStbNo:'配对机顶盒编号~',
+            labelStbModel:'配对机顶盒型号~',
+            tipDevNotExists:'查询设备不存在!~'
+			
+		},
+		invoiceQuery:{//发票查询
+			_title:'发票查询~',
+			titleInvoiceInfo:'发票信息~',
+			btnShowInvoiceDetail:'费用明细~',
+			btnChangeStatus:'修改状态~',
+			btnChangeStatusIdel:'修改为空闲~',
+			btnChangeStatusInvalid:'修改为失效~',
+			btnChangeStatusUsed:'已被使用~',
+			
+			confirmChangeStatus:'是否将发票状态修改为~',
+			tipInvoiceNotExists:'  发票不存在!~',
+			tipInvoiceNotExists2:'查询发票不存在!~',
+			statusInvalid:'失效~',
+			statusIdel:'空闲~',
+			
+			cols:['客户名称~', '客户编号~', '业务名称~', '费用名称~', '实际金额~', '操作时间~', '操作员~'],
+			
+			labelInvoiceId:'发票号码~',
+			labelInvoiceId2:'发&nbsp;票&nbsp;号&nbsp;~',
+			labelInvoiceCode:'发票代码~',
+			labelInvoiceType:'发票类型~',
+			labelDeptName:'所在仓库~',
+			labelUseStatus:'使用状态~',
+			labelMoneyAmount2:'金&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;额~',
+			labelUserOptrName:'开&nbsp;票&nbsp;员&nbsp;~',
+			labelOptrName:'领&nbsp;用&nbsp;人&nbsp;~',
+			labelCreateTime:'入库时间~',
+			labelFinanceStatus:'结存状态~',
+			labelCloseTime:'核销时间~',
+			labelCheckDeptName:'结账仓库~',
+			labelCheckTime:'结账时间~'
+			
+		},
+		CustSearch:{//客户查询(多条件查询)
+			_title:'客户查询~',
+			tipInputAnyField:'请任填一项进行搜索!~',
+			labelCustName:'客户名称~',
+			labelStatus:'意向客户~',
+			labelAddress:'客户地址~',
+			labelLoginName:'账号~'
+			
 		}
 	}
 	

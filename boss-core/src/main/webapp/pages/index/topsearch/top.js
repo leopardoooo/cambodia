@@ -241,10 +241,11 @@ Ext.apply(TopSearch.prototype , {
 	}
 });
 
-SearchCustWindow = Ext.extend( Ext.Window , {
+SearchCustWindow = Ext.extend( Ext.Window , {//复杂查询
 	form : null,
 	searchStore : null,
 	constructor : function(){
+		this.LU_CS = langUtils.bc('home.tools.CustSearch');
 		//实例化store
 		this.searchStore = App.search.searchStore;
 		
@@ -258,27 +259,27 @@ SearchCustWindow = Ext.extend( Ext.Window , {
 				xtype : 'textfield'
 			},
 			items : [{
-				fieldLabel : '客户名称',
+				fieldLabel : this.LU_CS['labelCustName'],
 				width : 140,
 				name : 'cust.cust_name'
 			},{
-				fieldLabel : '意向客户',
+				fieldLabel :this.LU_CS['labelStatus'],
 				name:'cust.status',
 				xtype:'checkbox',
 				inputValue:'PREOPEN'
 			},{
-				fieldLabel : '客户地址',
+				fieldLabel : this.LU_CS['labelAddress'],
 				width : 140,
 				name : 'cust.address'
 			},{
-				fieldLabel : '账号',
+				fieldLabel : this.LU_CS['labelLoginName'],
 				width : 140,
 				name : 'cust.login_name'
 			}]
 		});
 		
 		SearchCustWindow.superclass.constructor.call(this,{
-			title : '客户查询',
+			title : this.LU_CS['_title'],
 			id : 'SearchCustWindow',
 			maximizable : false,
 			layout : 'fit',
@@ -287,12 +288,12 @@ SearchCustWindow = Ext.extend( Ext.Window , {
 			closeAction : 'close',
 			items : [this.form],
 			buttons : [{
-				text : '搜索',
+				text : langUtils.bc('home.searchBtns')[0],
 				scope : this,
 				iconCls : 'query',
 				handler : this.doSearch
 			}, {
-				text : '关闭',
+				text : langUtils.bc('common.close'),
 				scope : this,
 				handler : function() {
 					this.close();
@@ -306,7 +307,7 @@ SearchCustWindow = Ext.extend( Ext.Window , {
 		}
 		var all = this.form.getForm().getValues();
 		if(Ext.isEmpty(all['cust.cust_name']) && Ext.isEmpty(all['cust.address']) && Ext.isEmpty(all['cust.login_name']) && Ext.isEmpty(all['cust.status'])){
-			Alert('请任填一项进行搜索!')
+			Alert(this.LU_CS['tipInputAnyField']);
 		}else{
 			all['search_type'] = 'MULTIPLE';
 			this.searchStore.baseParams = all;
