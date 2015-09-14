@@ -1,4 +1,3 @@
-
 QueryFilterTree = Ext.extend(Ext.ux.QueryFilterTreePanel,{
 	treeParams:null,
 	parent:null,
