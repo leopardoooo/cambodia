@@ -117,20 +117,19 @@ PayFeesForm = Ext.extend( BaseForm , {
          				columnWidth:.40,
          				items:[{
          						bodyStyle:'padding-top:4px',
-		         				html: "* 应收$:<span id='totalAmount'>--</span>"
+		         				html: "* "+ lmain("user._form.shouldPay") +"$:<span id='totalAmount'>--</span>"
 			         			}]
          				},{
          				columnWidth:.60,
          				layout : 'form',
          				labelWidth:60,  
          				items:[{
-								fieldLabel : '支付',
+								fieldLabel : lbc("common.pay"),
 								id : 'payFeeTypeId',
 								name:'order_fee_type',
 								allowBlank : false,
 								xtype:'paramcombo',
 								width: 60,
-								emptyText: '请选择',
 								defaultValue:'CFEE',
 								paramName:'ORDER_FEE_TYPE',
 								listeners: {

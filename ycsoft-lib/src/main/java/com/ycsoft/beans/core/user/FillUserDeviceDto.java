@@ -1,6 +1,6 @@
 package com.ycsoft.beans.core.user;
 
-public class FillUSerDeviceDto {
+public class FillUserDeviceDto {
 	private String user_id;
 	private String device_id;
 	public String getUser_id() {
@@ -15,7 +15,4 @@ public class FillUSerDeviceDto {
 	public void setDevice_id(String device_id) {
 		this.device_id = device_id;
 	}
-	
-	
-
 }

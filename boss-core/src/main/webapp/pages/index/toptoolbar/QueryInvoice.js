@@ -2,48 +2,50 @@
 var QueryInvoiceWin = Ext.extend(Ext.Window,{
 	invoiceTpl:null,
 	constructor:function(){
+		this.LU_INVO = langUtils.bc('home.tools.invoiceQuery');
+		
 		this.invoiceTpl = new Ext.XTemplate(
 			'<table width="100%" border="0" cellpadding="0" cellspacing="0">',
 				'<tr height=24>',
-					'<td class="label" width=20%>发&nbsp;票&nbsp;号&nbsp;：</td>',
+					'<td class="label" width=20%>' + this.LU_INVO['labelInvoiceId2'] + '：</td>',
 					'<td class="input_bold" width=30%>&nbsp;{invoice_id}</td>',
-					'<td class="label" width=20%>发票代码：</td>',
+					'<td class="label" width=20%>' + this.LU_INVO['labelInvoiceCode'] + '：</td>',
 					'<td class="input_bold" width=30%>&nbsp;{invoice_code}</td>',
 				'</tr>',
 				'<tr height=24>',
-			      	'<td class="label" width=20%>发票类型：</td>',
+			      	'<td class="label" width=20%>' + this.LU_INVO['labelInvoiceType'] + '：</td>',
 					'<td class="input_bold" width=30%>&nbsp;{invoice_type_text}</td>',
-					'<td class="label" width=20%>所在仓库：</td>',
+					'<td class="label" width=20%>' + this.LU_INVO['labelDeptName'] + '：</td>',
 		      		'<td class="input_bold" width=30%>&nbsp;{depot_name}</td>',
 			
 		    	'</tr>',
 		    	'<tr height=24>',
-		      		'<td class="label" width=20%>使用状态：</td>',
+		      		'<td class="label" width=20%>' + this.LU_INVO['labelUseStatus'] + '：</td>',
 		      		'<td class="input_bold" width=30%>&nbsp;{status_text}</td>',
-				'<td class="label" width=20%>金&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;额：</td>',
+				'<td class="label" width=20%>' + this.LU_INVO['labelMoneyAmount2'] + '：</td>',
 		      		'<td class="input_bold" width=30%>&nbsp;{[fm.formatFee(values.amount)]}</td>',		
 		    	'</tr>',		    	
 		    	'<tr height=24>',
-		    		'<td class="label" width=20%>开&nbsp;票&nbsp;员&nbsp;：</td>',
+		    		'<td class="label" width=20%>' + this.LU_INVO['labelUserOptrName'] + '：</td>',
 		      		'<td class="input_bold" width=30%>&nbsp;{user_optr_name}</td>',
-		    		'<td class="label" width=20%>领&nbsp;用&nbsp;人&nbsp;：</td>',
+		    		'<td class="label" width=20%>' + this.LU_INVO['labelOptrName'] + '：</td>',
 		      		'<td class="input_bold" width=30%>&nbsp;{optr_name}</td>',
 		    	'</tr>',		    	
 		    	'<tr height=24>',
-		     		'<td class="label" width=20%>入库时间：</td>',
+		     		'<td class="label" width=20%>' + this.LU_INVO['labelCreateTime'] + '：</td>',
 		      		'<td class="input_bold" width=30%>&nbsp;{create_time}</td>',
 		    	'</tr>',
 		    	'<tr height=24>',
-		    		'<td class="label" width=20%>结存状态：</td>',
+		    		'<td class="label" width=20%>' + this.LU_INVO['labelFinanceStatus'] + '：</td>',
 		      		'<td class="input_bold" width=30%>&nbsp;{finance_status_text}</td>',
-		    		'<td class="label" width=20%>核销时间：</td>',
+		    		'<td class="label" width=20%>' + this.LU_INVO['labelCloseTime'] + '：</td>',
 		      		'<td class="input_bold" width=30%>&nbsp;{close_time}</td>',//fm.dateFormat(
 
 		    	'</tr>',
 		    	'<tr height=24>',
-		    		'<td class="label" width=20%>结账仓库：</td>',
+		    		'<td class="label" width=20%>' + this.LU_INVO['labelCheckDeptName'] + '：</td>',
 		      		'<td class="input_bold" width=30%>&nbsp;{check_depot_id_text}</td>',		    	
-		    		'<td class="label" width=20%>结账时间：</td>',
+		    		'<td class="label" width=20%>' + this.LU_INVO['labelCheckTime'] + '：</td>',
 		      		'<td class="input_bold" width=30%>&nbsp;{check_time}</td>',
 		    	'</tr>',
 		    	'<tr height=24>',
@@ -53,7 +55,7 @@ var QueryInvoiceWin = Ext.extend(Ext.Window,{
 		);
 		QueryInvoiceWin.superclass.constructor.call(this,{
 			id:'queryInvoiceWinId',
-			title:'发票查询',
+			title:this.LU_INVO['_title'],
 			region:'center',
 			closeAction:'close',
 			width:620,
@@ -65,7 +67,7 @@ var QueryInvoiceWin = Ext.extend(Ext.Window,{
 					defaults:{labelAlign:'right'},labelAlign:'right',
 					border:false,items:[
 					{columnWidth:.4,layout:'form',border:false,items:[
-						{xtype:'textfield',fieldLabel:'发票号码',allowBlank:false,
+						{xtype:'textfield',fieldLabel:this.LU_INVO['labelInvoiceId'],allowBlank:false,
 							name:'invoice_id',vtype:'invoiceId',
 							enableKeyEvents :true,
 							listeners:{
@@ -82,7 +84,7 @@ var QueryInvoiceWin = Ext.extend(Ext.Window,{
 						}
 					]},
 					{columnWidth:.4,layout:'form',border:false,items:[
-						{fieldLabel: '发票代码',
+						{fieldLabel: this.LU_INVO['labelInvoiceCode'],
 							xtype : 'combo',
 							store : new Ext.data.JsonStore({
 								fields : ['invoice_code']
@@ -97,7 +99,7 @@ var QueryInvoiceWin = Ext.extend(Ext.Window,{
 						}
 					]},
 					{columnWidth:.2,border:false,items:[
-						{xtype:'button',text:'查  询',iconCls:'icon-query',
+						{xtype:'button',text:langUtils.bc('common.queryBtnWithBackSpace'),iconCls:'icon-query',
 							listeners:{
 								scope:this,
 								click:this.doQuery
@@ -105,18 +107,18 @@ var QueryInvoiceWin = Ext.extend(Ext.Window,{
 						}
 					]}
 				]},
-				{xtype : "panel",title:'发票信息',border : false,
+				{xtype : "panel",title:this.LU_INVO['titleInvoiceInfo'],border : false,
 					bodyStyle: "background:#F9F9F9; padding: 10px;padding-top: 4px;padding-bottom: 0px;",
 					html : this.invoiceTpl.applyTemplate({}),
 					buttonAlign : 'center',
 					buttons : [{
-						text : '费用明细',
+						text : this.LU_INVO['btnShowInvoiceDetail'],
 						id : 'showInvoiceDetail',
 						disabled : true,
 						scope : this,
 						handler : this.showDetailWin
 					},{
-						text : '修改状态',
+						text : this.LU_INVO['btnChangeStatus'],
 						id : 'changeStatusBtn',
 						disabled : true,
 						scope : this,
@@ -143,7 +145,7 @@ var QueryInvoiceWin = Ext.extend(Ext.Window,{
 			success:function(res,opt){
 				var data = Ext.decode(res.responseText);
 				if(data.length == 0){
-					Alert(invoiceId+' 发票不存在!',function(){
+					Alert(invoiceId + this.LU_INVO['tipInvoiceNotExists'],function(){
 						invoiceCodeCmp.setReadOnly(false);
 						invoiceCodeCmp.getStore().removeAll();
 						invoiceCodeCmp.setValue('');
@@ -181,19 +183,19 @@ var QueryInvoiceWin = Ext.extend(Ext.Window,{
 					Ext.getCmp('showInvoiceDetail').enable();
 					
 					if(data.status == 'INVALID'){
-						Ext.getCmp('changeStatusBtn').setText('修改为空闲');
+						Ext.getCmp('changeStatusBtn').setText(this.LU_INVO['btnChangeStatusIdel']);
 					}else if(data.status == 'IDLE'){
-						Ext.getCmp('changeStatusBtn').setText('修改为失效');
+						Ext.getCmp('changeStatusBtn').setText(this.LU_INVO['btnChangeStatusInvalid']);
 					}else if(data.status == 'USE'){
 						Ext.getCmp('changeStatusBtn').disable();
-						Ext.getCmp('changeStatusBtn').setText('已被使用');
+						Ext.getCmp('changeStatusBtn').setText(this.LU_INVO['btnChangeStatusUsed']);
 					}					
 					
 					if(this.items.itemAt(1).getEl()){
 						this.invoiceTpl.overwrite( this.items.itemAt(1).body, data);
 					}
 				}else{
-					Alert('查询发票不存在！',function(){
+					Alert(this.LU_INVO['tipInvoiceNotExists2'],function(){
 						if(this.items.itemAt(1).getEl()){
 							this.invoiceTpl.overwrite( this.items.itemAt(1).body, {});
 						}
@@ -217,13 +219,13 @@ var QueryInvoiceWin = Ext.extend(Ext.Window,{
 		}
 	},
 	changeStatus:function(){
-		var msg = '是否将发票状态修改为 ';
+		var msg = this.LU_INVO['confirmChangeStatus'];
 		var newStatus = 'IDLE';
 		if(this.data.status == "INVALID"){
-			msg += '空闲';
+			msg += this.LU_INVO['statusIdel'];
 		}else if(this.data.status == "IDLE"){
 			newStatus = 'INVALID';
-			msg += '失效';
+			msg += this.LU_INVO['statusInvalid'];
 		}
 		Confirm(msg, this ,function(){
 			Ext.Ajax.request({
@@ -247,6 +249,8 @@ var QueryInvoiceWin = Ext.extend(Ext.Window,{
 FeeDetailWin = Ext.extend(Ext.Window,{
 	grid : null,
 	constructor : function(){
+		var COLUMN_HEADERS = langUtils.bc('home.tools.invoiceQuery.cols');
+		
 		var invoiceDetailStore = new Ext.data.JsonStore({
 			fields : ['cust_name', 'cust_no', 'busi_name',
 					'fee_name', 'real_pay', 'create_time','optr_name']
@@ -256,30 +260,30 @@ FeeDetailWin = Ext.extend(Ext.Window,{
 			ds : invoiceDetailStore,
 			sm : new Ext.grid.CheckboxSelectionModel(),
 			cm : new Ext.grid.ColumnModel([{
-				header : '客户名称',
+				header : COLUMN_HEADERS[0],
 				dataIndex : 'cust_name',
 				renderer : App.qtipValue
 			}, {
-				header : '客户编号',
+				header : COLUMN_HEADERS[1],
 				dataIndex : 'cust_no',
 				renderer : App.qtipValue
 			}, {
-				header : '业务名称',
+				header : COLUMN_HEADERS[2],
 				dataIndex : 'busi_name',
 				renderer : App.qtipValue
 			}, {
-				header : '费用名称',
+				header : COLUMN_HEADERS[3],
 				dataIndex : 'fee_name'
 			}, {
-				header : '实际金额',
+				header : COLUMN_HEADERS[4],
 				dataIndex : 'real_pay',
 				renderer : Ext.util.Format.formatFee
 			}, {
-				header : '操作时间',
+				header : COLUMN_HEADERS[5],
 				dataIndex : 'create_time',
 				renderer : App.qtipValue
 			}, {
-				header : '操作员',
+				header : COLUMN_HEADERS[6],
 				dataIndex : 'optr_name',
 				renderer : App.qtipValue
 			}]),

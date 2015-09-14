@@ -63,7 +63,7 @@ import com.ycsoft.beans.core.user.CUserAtv;
 import com.ycsoft.beans.core.user.CUserBroadband;
 import com.ycsoft.beans.core.user.CUserDtv;
 import com.ycsoft.beans.core.user.CUserPropChange;
-import com.ycsoft.beans.core.user.FillUSerDeviceDto;
+import com.ycsoft.beans.core.user.FillUserDeviceDto;
 import com.ycsoft.beans.prod.PPackageProd;
 import com.ycsoft.beans.prod.PProd;
 import com.ycsoft.beans.prod.PProdTariff;
@@ -126,11 +126,6 @@ public class UserService extends BaseBusiService implements IUserService {
 		
 	}
 
-	@Override
-	public void saveFillDevice(List<FillUSerDeviceDto> deviceList) throws Exception {
-		// TODO Auto-generated method stub
-		
-	}
 
 	@Override
 	public void createUser(CUser user, String deviceId, String deviceType, String deviceModel, String deviceBuyMode,

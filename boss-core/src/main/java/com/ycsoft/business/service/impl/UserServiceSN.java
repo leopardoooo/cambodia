@@ -24,7 +24,7 @@ import com.ycsoft.beans.core.prod.CProdOrderFee;
 import com.ycsoft.beans.core.prod.CProdPropChange;
 import com.ycsoft.beans.core.user.CUser;
 import com.ycsoft.beans.core.user.CUserPropChange;
-import com.ycsoft.beans.core.user.FillUSerDeviceDto;
+import com.ycsoft.beans.core.user.FillUserDeviceDto;
 import com.ycsoft.beans.device.RDeviceFee;
 import com.ycsoft.beans.prod.PPromotionAcct;
 import com.ycsoft.beans.prod.PSpkgOpenbusifee;
@@ -58,8 +58,7 @@ import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.daos.core.JDBCException;
 @Service
 public class UserServiceSN extends BaseBusiService implements IUserService {
-	@Autowired
-	private OrderComponent orderComponent;
+
 	@Autowired
 	private CProdOrderDao cProdOrderDao;
 	@Autowired
@@ -97,6 +96,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		this.canOpenUser(cust);
 		doneCodeComponent.lockCust(cust.getCust_id());
 		Integer doneCode = doneCodeComponent.gDoneCode();
+		List<CUser> users = new ArrayList<CUser>();
 		
 		if(SystemConstants.BOOLEAN_TRUE.equals(isHand)){
 			// 获取客户信息
@@ -120,8 +120,8 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 					user.setStop_type(stopType);
 					
 					int num = getUserCount(cust, user.getUser_type());
-					this.openSingle(cust, user, doneCode, null, deviceType, deviceModel, deviceBuyMode, deviceFee, num);
-					
+					CUser newUser = this.openSingle(cust, user, doneCode, null, deviceType, deviceModel, deviceBuyMode, deviceFee, num);
+					users.add(newUser);
 				}
 			}
 		}else{
@@ -147,7 +147,8 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 					user.setStop_type(stopType);
 					
 					int num = getUserCount(cust, user.getUser_type());
-					this.openSingle(cust, user, doneCode, null, deviceType, deviceModel, deviceBuyMode, deviceFee, num);
+					CUser newUser = this.openSingle(cust, user, doneCode, null, deviceType, deviceModel, deviceBuyMode, deviceFee, num);
+					users.add(newUser);
 				}
 			}
 			if(spkgBusiFeeList.size() > 0){
@@ -158,6 +159,9 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 			}
 			userComponent.updateOpenUserDoneCode(cust.getSpkg_sn(), doneCode);
 		}
+		
+		snTaskComponent.createOpenTask(doneCode, cust, users, getBusiParam().getWorkBillAsignType());
+		
 		saveAllPublic(doneCode, getBusiParam());
 	}
 
@@ -175,7 +179,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		return num;
 	}
 
-	private void openSingle(CCust cust, CUser user, Integer doneCode, String deviceCode, String deviceType,
+	private CUser openSingle(CCust cust, CUser user, Integer doneCode, String deviceCode, String deviceType,
 			String deviceModel, String deviceBuyMode, FeeInfoDto deviceFee, int num) throws Exception, JDBCException {
 		String custId = cust.getCust_id();
 		
@@ -250,40 +254,11 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		if (user.getStatus().equals(StatusConstants.ACTIVE)){
 			createUserJob(user, custId, doneCode);
 		}
+		
+		return user;
 	}
 	
-	@Override
-	public void saveFillDevice(List<FillUSerDeviceDto> deviceList) throws Exception {
-		Integer doneCode = doneCodeComponent.gDoneCode();
-		CCust cust = null;
-		for (FillUSerDeviceDto userDevice:deviceList){
-			CUser user = userComponent.queryUserById(userDevice.getUser_id());
-			DeviceDto device = deviceComponent.queryDeviceByDeviceCode(userDevice.getDevice_id());
-			setUserDeviceInfo(user, device);
-			userComponent.updateDevice(doneCode, user);
-			//发送授权
-			if(user.getUser_type().equals(SystemConstants.USER_TYPE_DTT)||
-					user.getUser_type().equals(SystemConstants.USER_TYPE_OTT)){
-				//开户指令
-				this.createUserJob(user, user.getCust_id(), doneCode);
-			}
-			//发产品授权
-			List<CProdOrder> prodList = orderComponent.queryOrderProdByUserId(user.getUser_id());
-			authComponent.sendAuth(user, prodList, BusiCmdConstants.ACCTIVATE_PROD, doneCode);
-			
-			
-			//TODO DTT回填有变更设备处理，要对换下的设备发销户指令DEL_USER
-			
-			//处理设备
-			TDeviceBuyMode buyModeCfg = busiConfigComponent.queryBuyMode(user.getStr10());
-			String ownership = SystemConstants.OWNERSHIP_GD;
-			if (buyModeCfg.getChange_ownship().equals(SystemConstants.BOOLEAN_TRUE))
-				ownership = SystemConstants.OWNERSHIP_CUST;
-			if (cust == null)
-				cust = custComponent.queryCustById(user.getCust_id());
-			this.buyDevice(device, user.getStr10(), ownership, null, getBusiParam().getBusiCode(), cust, doneCode);
-		}
-	}
+	
 
 	/**
 	 * 验证ott_mobile账户是否唯一
@@ -1213,79 +1188,13 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		orderComponent.editProd(doneCode,order.getOrder_sn(),changeList);
 	}
 	
-	private Date openProd(Integer doneCode, CProdOrderDto order,Date startDate) throws Exception, ServicesException {
-		Date expDate = null;
-		Date effDate = null;
-		CProdPropChange statusChange =new CProdPropChange();
-		statusChange.setChange_time(new Date(order.getStatus_date().getTime()));
-		statusChange.setNew_value(StatusConstants.ACTIVE);
-		if (statusChange == null)
-			throw new ServicesException("找不到产品报停记录，请联系管理员");
-		if (startDate == null) {
-			//计算报停天数
-			int stopDays = DateHelper.getDiffDays(statusChange.getChange_time(), DateHelper.today());
-			expDate = DateHelper.addDate(order.getExp_date(), stopDays);
-		} else {
-			effDate =  DateHelper.addDate(startDate, 1);
-			if(order.getBilling_type().equals(SystemConstants.BILLING_TYPE_MONTH)){
-				//包月计费方式处理
-				expDate = DateHelper.getNextMonthPreviousDay(effDate, order.getOrder_months().intValue());
-			}else if(order.getBilling_type().equals(SystemConstants.BILLING_TYPE_DAY)){
-				//包天计费方式处理
-				int orderDays=Math.round(order.getOrder_months()*30);
-				expDate=DateHelper.addDate(effDate, orderDays-1);
-			}else{
-				//其他计费方式处理
-				int stopDays = DateHelper.getDiffDays(statusChange.getChange_time(), DateHelper.today());
-				expDate = DateHelper.addDate(order.getExp_date(), stopDays);
-			}
-			
-		}
-		
-		List<CProdPropChange> changeList = new ArrayList<CProdPropChange>();
-		changeList.add(new CProdPropChange("status",
-				order.getStatus(),statusChange.getNew_value()));
-		changeList.add(new CProdPropChange("status_date",
-				DateHelper.dateToStr(order.getStatus_date()),DateHelper.dateToStr(new Date())));
-		changeList.add(new CProdPropChange("exp_date",DateHelper.dateToStr(order.getExp_date()),
-				DateHelper.dateToStr(expDate)));
-		
-		
-		if (effDate != null){
-			changeList.add(new CProdPropChange("eff_date",DateHelper.dateToStr(order.getEff_date()),
-					DateHelper.dateToStr(effDate)));
-		}
-		orderComponent.editProd(doneCode,order.getOrder_sn(),changeList);
-		
-		return expDate;
-		
-	}
 	
-	private void setUserDeviceInfo(CUser user, DeviceDto device) throws Exception{
-		if (user.getUser_type().equals(SystemConstants.USER_TYPE_BAND)){
-			if (!device.getDevice_type().equals(SystemConstants.DEVICE_TYPE_MODEM))
-				throw new ServicesException("设备类型不正确");
-			user.setModem_mac(device.getDevice_code());
-		}
-		if (user.getUser_type().equals(SystemConstants.USER_TYPE_OTT)){
-			if (!device.getDevice_type().equals(SystemConstants.DEVICE_TYPE_STB) 
-					|| (device.getPairCard() != null && StringHelper.isNotEmpty(device.getPairCard().getCard_id())))
-				throw new ServicesException("设备类型不正确");
-			user.setStb_id(device.getDevice_code());
-			user.setModem_mac(device.getStbMac());
-		}
-		if (user.getUser_type().equals(SystemConstants.USER_TYPE_DTT)){
-			if ( device.getPairCard() == null || StringHelper.isEmpty(device.getPairCard().getCard_id()))
-				throw new ServicesException("设备类型不正确");
-			user.setStb_id(device.getDevice_code());
-			user.setCard_id(device.getPairCard().getCard_id());
-		}
-	}
+	
+	
 	/**验证用户能不能报停
 	 * 1、协议期用户不能报亭
 	 * 2、OTT主机没有报停的情况下，副机不能报停
 	 * 3、如果用户名下有未到期的归属客户套餐的产品，套餐下用户必须同时报停
-	 * @param users
 	 */
 	
 	

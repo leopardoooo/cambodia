@@ -38,20 +38,21 @@ CancelProdGrid = Ext.extend(Ext.grid.GridPanel,{
 				rowdeselect : this.doSelectedChange
 			}
 		});
+		var cms = lmain("user.prod.base.columns");
 		var cm= new Ext.ux.grid.LockingColumnModel({
 	        	columns:[
 	        	this.checkSm,	
-				{header:'订购SN',dataIndex:'order_sn',width:40},
-				{header:'产品名称',dataIndex:'prod_name',width:120},
-				{header:'所属套餐',dataIndex:'package_name',width:80},
-				{header:'当前资费',dataIndex:'tariff_name',	width:80},
-				{header:'订单余额',dataIndex:'active_fee',width:80,xtype: 'moneycolumn'},
-				{header:'可退金额',dataIndex:'balance_cfee',width:80,xtype: 'moneycolumn'},
-				{header:'可转金额',dataIndex:'balance_acct',width:80,xtype: 'moneycolumn'},
-				{header:'生效日期',dataIndex:'eff_date',width:80,renderer: Ext.util.Format.dateFormat},
-				{header:'失效日期',dataIndex:'exp_date',width:80,renderer: Ext.util.Format.dateFormat},
-				{header:'状态',dataIndex:'status_text',	width:60,renderer:Ext.util.Format.statusShow},				
-				{header:'订购时间',dataIndex:'order_time',width:80}
+				{header:cms[0],dataIndex:'order_sn',width:40},
+				{header:cms[1],dataIndex:'prod_name',width:120},
+				{header:cms[2],dataIndex:'package_name',width:80},
+				{header:cms[3],dataIndex:'tariff_name',	width:80},
+				{header:lmain("user._form.orderFee"),dataIndex:'active_fee',width:80,xtype: 'moneycolumn'},
+				{header:lmain("user._form.canRetrunFee"),dataIndex:'balance_cfee',width:80,xtype: 'moneycolumn'},
+				{header:lmain("user._form.canTransferFee"),dataIndex:'balance_acct',width:80,xtype: 'moneycolumn'},
+				{header:cms[4],dataIndex:'eff_date',width:80,renderer: Ext.util.Format.dateFormat},
+				{header:cms[5],dataIndex:'exp_date',width:80,renderer: Ext.util.Format.dateFormat},
+				{header:cms[6],dataIndex:'status_text',	width:60,renderer:Ext.util.Format.statusShow},				
+				{header:cms[8],dataIndex:'order_time',width:80}
 		        
 	        ]})
 		CancelProdGrid.superclass.constructor.call(this,{
@@ -135,27 +136,26 @@ CancelProdNewForm = Ext.extend(BaseForm,{
 		         	columnWidth:.5,
 		         	xtype:'fieldset',  
 				    height: 60, 
-				    title:'可退',
+				    title: lmain("user._form.retrunInfo"),
          			style:'margin-left:10px;padding: 10px 0 10px 10px; color: red',
          			layout:'column',
          			items:[{
          				columnWidth:.50,
          				items:[{
          						bodyStyle:'padding-top:4px',
-		         				html: "* 可退总额$:<span id='cfeeTotalAmount'>--</span>"
+		         				html: "* "+ lmain("user._form.canRetrunFee") +"$:<span id='cfeeTotalAmount'>--</span>"
 			         			}]
          				},{
          				columnWidth:.50,
          				layout : 'form',
          				labelWidth:75,  
          				items:[{
-								fieldLabel : '处理方式',
+								fieldLabel : lbc("common.busiWay"),
 								id : 'CancelFeeTypeId',
 								name:'order_fee_type',
 								allowBlank : false,
 								xtype:'paramcombo',
 								width: 80,
-								emptyText: '请选择',
 								defaultValue:'REFUND',
 								paramName:'ACCT_BALANCE',
 								listeners: {
@@ -171,27 +171,26 @@ CancelProdNewForm = Ext.extend(BaseForm,{
 		         	columnWidth:.5,
 		         	xtype:'fieldset',  
 				    height: 60, 
-				    title:'可转',
+				    title: lmain("user._form.transferInfo"),
          			style:'margin-left:10px;padding: 10px 0 10px 10px; color: red',
          			layout:'column',
          			items:[{
          				columnWidth:.50,
          				items:[{
          						bodyStyle:'padding-top:4px',
-		         				html: "* 可转总额$:<span id='acctTotalAmount'>--</span>"
+		         				html: "* "+ lmain("user._form.canTransferFee") +"$:<span id='acctTotalAmount'>--</span>"
 			         			}]
          				},{
          				columnWidth:.50,
          				layout : 'form',
          				labelWidth:75,  
          				items:[{
-								fieldLabel : '处理方式',
+								fieldLabel : lbc("common.busiWay"),
 								name:'order_fee_type_id',
 								allowBlank : false,
 								xtype:'paramcombo',
 								width: 80,
 								disabled: true,
-								emptyText: '请选择',
 								defaultValue:'TRANS',
 								paramName:'ACCT_BALANCE',
 								listeners: {

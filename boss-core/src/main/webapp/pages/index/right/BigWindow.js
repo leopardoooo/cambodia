@@ -21,15 +21,25 @@ BigWindow = Ext.extend( Ext.Window , {
 	},
 	frameId : "busiWindowPageFrame",
 	show : function( t  , o ,record){
+		var title;
+		if(t && !t.attrs["res_id"]){
+			title = t.text;
+		}else{
+			title = langUtils.res(t.attrs.res_id) || t.attrs["show_name"];
+			if(Ext.isArray(title)){
+				title = title[0];
+			}
+		}
+		
 		if(t){
 			var busiCode = t.attrs.busicode;
 			if(App.getData().deptBusiCode.contain(busiCode)){
-				Alert('当前部门无法进行 “' + (t.attrs.businame || t.text) + '” 这项业务!');
+				Alert('当前部门无法进行 “' + title + '” 这项业务!');
 				return;
 			}
 		}
 		App.data.ownFormSize = o;
-		this.setTitle(t.text);
+		this.setTitle(title);
 		this.setSize( o.width , o.height );
 		//添加操作员正在使用的功能
 		App.addOnlineUser(t.attrs);
