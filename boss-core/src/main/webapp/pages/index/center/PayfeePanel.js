@@ -371,7 +371,7 @@ FeePayGrid = Ext.extend(Ext.ux.Grid, {
 					},
 					tools:[{id:'search',qtip:'查询',cls:'tip-target',scope:this,handler:function(){
 							var comp = this.tools.search;
-							if(this.busiFeeStore.getCount()>0){
+							if(this.feePayStore.getCount()>0){
 								if(win)win.close();
 								win = FilterWindow.addComp(this,[									
 									{text:'状态',field:'status',showField:'is_valid_text',
@@ -384,7 +384,7 @@ FeePayGrid = Ext.extend(Ext.ux.Grid, {
 									{text:'受理日期',field:'create_time',type:'datefield'},
 									{text:'受理人',field:'optr_name',type:'textfield'},
 									{text:'发票号',field:'invoice_id',type:'textfield'}
-								],800,null,true,"queryFeeInfo");
+								],580,null,true,"queryFeeInfo");
 								if(win){	
 									win.setPosition(comp.getX()-win.width, comp.getY()-50);//弹出框右对齐
 									win.show();

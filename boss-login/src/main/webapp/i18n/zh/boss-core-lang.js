@@ -20,6 +20,7 @@ BCLang.common = {
 		btnExpandAll:'展开所有资源~',
 		btnCollapseAll:'合并所有资源~'
 	},
+	filterTitle: '条件过滤~',
 	tipExistsSystem:'确定要退出系统~',
 	queryBtn:'查询~',
 	queryBtnWithBackSpace:'查  询~',
@@ -47,9 +48,10 @@ BCLang.common = {
 	defaultGroupTpl: '{0} 已选 {1} 个',
 	uploadFileLabel: '文件上传~',
 	busiWay: '处理方式~',
-	tip: '提示信息~',
 	tipSimple: '提示~',
-	returnTxt:'返回~',
+    returnTxt:'返回~',
+	tip: '提示信息~',
+	totalRecord: ' ( 共: {0} 条) ',
 	submit: '提交~'
 }
 //主页模块
