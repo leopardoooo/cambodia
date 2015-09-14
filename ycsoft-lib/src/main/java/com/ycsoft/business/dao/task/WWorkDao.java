@@ -265,9 +265,9 @@ public class WWorkDao extends BaseEntityDao<WWork> {
 			sql += "  AND wc.task_cust_name like ? ";
 			params.add("%" + cond.getLinkman() + "%");
 		}
-		if(StringHelper.isNotEmpty(cond.getNewAddr())){
+		if(StringHelper.isNotEmpty(cond.getAddr())){
 			sql += "  AND wc.install_addr like ? ";
-			params.add("%" + cond.getNewAddr() + "%");
+			params.add("%" + cond.getAddr() + "%");
 		}
 		if(StringHelper.isNotEmpty(cond.getMobile())){
 			sql += "  AND wc.tel like ? ";
@@ -277,9 +277,9 @@ public class WWorkDao extends BaseEntityDao<WWork> {
 			sql += "  AND c.cust_no = ? ";
 			params.add(cond.getCustNo());
 		}		
-		if(StringHelper.isNotEmpty(cond.getTaskDetailType())){
+		if(StringHelper.isNotEmpty(cond.getTaskType())){
 			sql += "  AND  t.task_type =? ";
-			params.add(cond.getTaskDetailType());
+			params.add(cond.getTaskType());
 		}
 		sql += " ORDER BY create_time DESC ";
 		return this.createQuery(QueryTaskResultDto.class, sql, params.toArray(new Object[params.size()]))

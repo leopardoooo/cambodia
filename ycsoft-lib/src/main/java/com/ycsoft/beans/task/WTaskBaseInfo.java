@@ -44,10 +44,14 @@ public class WTaskBaseInfo implements Serializable{
 	private String remark;
 	private String visit_result;
 	private String zte_status;
+	private String bug_type;
+	private String buy_detail;
+	private String optr_id;
 
 	private String task_type_name;
 	private String task_detail_type_name;
 	private String task_status_text;
+	private String zte_status_text;
 	
 	
 	
@@ -396,8 +400,56 @@ public class WTaskBaseInfo implements Serializable{
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}
-	
-	
 
+
+
+	public String getBug_type() {
+		return bug_type;
+	}
+
+
+
+	public void setBug_type(String bug_type) {
+		this.bug_type = bug_type;
+	}
+
+
+
+	public String getBuy_detail() {
+		return buy_detail;
+	}
+
+
+
+	public void setBuy_detail(String buy_detail) {
+		this.buy_detail = buy_detail;
+	}
+
+
+
+	public String getZte_status_text() {
+		return zte_status_text;
+	}
+
+
+
+	public void setZte_status_text(String zte_status_text) {
+		this.zte_status_text = zte_status_text;
+	}
+
+
+
+	public String getOptr_id() {
+		return optr_id;
+	}
+
+
+
+	public void setOptr_id(String optr_id) {
+		this.optr_id = optr_id;
+	}
+	
+	
+	
 	
 }
