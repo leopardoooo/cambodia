@@ -6,6 +6,8 @@
  PRINT_TYPE_WEB = "WEB";
  PRINT_TYPE_ACTIVE = "ACTIVEX";
  
+ var LU_PI = lbc('home.tools.InvoicePrint');//打印需要国际化内容
+ 
  //打印的条数
  PRINT_PAGE_SIZE = 5 ;
 var INVOICE_SIZE = 8;//发票长度 ,暂时不用
@@ -22,7 +24,7 @@ var printdata = null;
  	printItemGrid:null,
  	winPreview: null,
  	winInvoice: null,
- 	paytype:'网点现金',
+ 	paytype:LU_PI.wdxj,
  	printStoreUrl:Constant.ROOT_PATH+"/core/x/Pay!queryPrintRecord.action",
  	printStoreFields: [
 				'cust_id','doc_sn','done_code','doc_name',
@@ -30,9 +32,9 @@ var printdata = null;
 				'optr_id'
 			],
 	printGridColumns:[
-		{ header: '流水号', dataIndex: 'done_code'},
-		{ header: '单据名称', dataIndex: 'doc_name', width: 120},
-		{ header: '创建时间', dataIndex: 'done_date', width: 140}
+		{ header: LU_PI.printGridColumns[0], dataIndex: 'done_code'},
+		{ header: LU_PI.printGridColumns[1], dataIndex: 'doc_name', width: 120},
+		{ header: LU_PI.printGridColumns[2], dataIndex: 'done_date', width: 140}
 	],
  	//构造函数
  	constructor: function(){
@@ -46,7 +48,7 @@ var printdata = null;
  		this.printGrid = new Ext.grid.GridPanel({
  			border: false,
  			region: 'center',
- 			title: '打印列表',
+ 			title: LU_PI.titleDocGrid,
  			listeners:{
  				scope:this,
  				rowclick:function(grid,rowNumber){
@@ -77,16 +79,16 @@ var printdata = null;
 		 this.printItemGrid = new Ext.grid.GridPanel({
 				border : false,
 				region : 'center',
-				title : '发票项',
+				title : LU_PI.titleInvoiceGrid,
 				sm: sm1,
 				loadMask : true,
 				columns : [sm1,
 						{
-							header : '名称',
+							header : LU_PI.printItemGridColumns[0],
 							dataIndex : 'printitem_name',
 							width: 200
 						}, {
-							header : '金额',
+							header : LU_PI.printItemGridColumns[1],
 							dataIndex : 'amount',
 							xtype: 'moneycolumn',
 							width: 120
@@ -121,7 +123,7 @@ var printdata = null;
 // 				}
 // 			},
  				{
- 				text: '打印',
+ 				text: lbc('common').print,
  				scope: this,
  				width: 60,
  				iconCls:'print',
@@ -129,7 +131,7 @@ var printdata = null;
  					this.actionProcesser("doPrint");
  				}
  			},{
-				text: '关闭',
+				text: lbc('common').close,
 				scope: this,
 				iconCls:'icon-comments_remove',
 				width: 60,
@@ -204,13 +206,13 @@ var printdata = null;
 		 	this.printItem = new Ext.grid.GridPanel({
 				border : false,
 				region : 'center',
-				title : '打印明细',
+				title : LU_PI.titlePrintDetail,
 				columns : [{
-							header : '名称',
+							header : LU_PI.printItemGridColumns[0],
 							dataIndex : 'printitem_name',
 							width: 200
 						}, {
-							header : '金额',
+							header : LU_PI.printItemGridColumns[1],
 							dataIndex : 'amount',
 							xtype: 'moneycolumn',
 							width: 120
@@ -241,7 +243,7 @@ var printdata = null;
 		if(printdata == null){
 			printdata = this.printGrid.getSelectionModel().getSelected();
 			if(printdata == null){
-	 			Alert("请选择要打印的发票!");
+	 			Alert(lmsg('selectInvoice2Print'));
 	 			return ;
 			}
  		}
@@ -250,7 +252,7 @@ var printdata = null;
  		}else{
  			if (printdata.get("done_date") == null){
  				if (!this.printItemGrid.getSelectionModel().getSelected()){
- 					Alert("请选择发票的打印项");
+ 					Alert(lmsg('selectInvicePrintItem'));
  					return ;
  				}
  				itemRecords = this.printItemGrid.getSelectionModel().getSelections();
@@ -362,7 +364,7 @@ var printdata = null;
 				window.showModalDialog(url ,xmlStr);
 				this.printStore.remove(rs);
 			}catch(e){
-					alert("模板变量替换时出错! error:" + e.message);
+					alert(lmsg('templateReplaceError',null,e.message));
 					throw new Error(e);
 			}
 		}else{
@@ -377,13 +379,13 @@ var printdata = null;
 					var xmlStr = PrintTools.getContent(map["content"],
 									map["data"]);
 				}catch(e){
-					alert("模板变量替换时出错! error:" + e.message);
+					alert(lmsg('templateReplaceError',null,e.message));
 					throw new Error(e);
 				}
 				try{
 					PrintTools.print(xmlStr);
 				}catch(e){
-					alert("打印控件调用异常，请检查是否安装了打印控件" + e.message);
+					alert(lmsg('printCmpError',null,e.message));
 				}				
 			}
 		}
@@ -409,14 +411,14 @@ var printdata = null;
 	 			try{
 		 			xmlStr = PrintTools.getContent( map["content"] , data );
 	 			}catch(e){
-					alert("模板变量替换时出错! error:" + e.message);
+	 				alert(lmsg('templateReplaceError',null,e.message));
 					throw new Error(e);
 				}
 				if(PrintTools.isIE){
 					try{
 						PrintTools.print(xmlStr);
 					}catch(e){
-						alert("打印控件调用异常，请检查是否安装了打印控件" + e.message);
+						alert(lmsg('printCmpError',null,e.message));
 					}	
 				}else{
 					//noIePrintContent += '<div class="breakPage">' + xmlStr + "</div>";
@@ -446,7 +448,7 @@ PreviewWindow = Ext.extend( Ext.Window, {
 	//构造函数
 	constructor: function(){
 		PreviewWindow.superclass.constructor.call(this,{
-			title: '打印预览',
+			title: LU_PI.titlePrintPreview,
 			width: 600,
 			height: 400,
 			autoScroll: true,
@@ -493,18 +495,18 @@ InvoiceWindow = Ext.extend( Ext.Window ,{
 			border: false,
 			store: this.invoiceStore,
 			columns: [{
-                header: '顺序号',
+                header: LU_PI.invoiceGridColumns[0],
                 align: 'center',
                 dataIndex: 'serialNum',
                 width: 60
             }, {
-                header: '发票号码',
+                header: LU_PI.invoiceGridColumns[1],
                 dataIndex: 'invoiceId',
                 width: 130,
                 align: 'center',
                 editor: new Ext.form.TextField()
             }, {
-                header: '发票代码',
+                header: LU_PI.invoiceGridColumns[2],
                 align: 'center',
                 id : 'col_invoiceCode',
                 dataIndex: 'invoice_code',
@@ -533,11 +535,11 @@ InvoiceWindow = Ext.extend( Ext.Window ,{
 			layout: 'fit',
 			items: this.invoiceGrid,
 			buttons: [{
-				text: '保存',
+				text: lbc('common.save'),
 				scope: this,
 				handler: this.onSave
 			},{
-				text: '取消',
+				text: lbc('common.cancel'),
 				scope: this,
 				handler: function(){
 					this.hide();
@@ -579,7 +581,7 @@ InvoiceWindow = Ext.extend( Ext.Window ,{
 		if(obj.field == 'invoice_code'){
 			obj.record.set('invoice_code',null);
 			if(!obj.record.get('invoiceId')){
-				Alert('请输入发票号码');
+				Alert(lmsg('invoiceIdNeeded'));
 				return false;
 			}
 			var invoiceId = obj.record.get('invoiceId');
@@ -650,7 +652,7 @@ InvoiceWindow = Ext.extend( Ext.Window ,{
 //		this.invoiceGrid.startEditing(0, 1);
 	},
 	refelshTitle: function(){
-		this.setTitle('打印共需要 ' + this.pageCount + " 张发票"); 
+		this.setTitle(lbc('home.tools.InvoicePrint.titleInvoiceWindow',null,this.pageCount)); 
 	},
 	initPageItem: function(){
 		// 生成控件
@@ -741,7 +743,7 @@ InvoiceWindow = Ext.extend( Ext.Window ,{
 			var rs = this.invoiceStore.getAt(i);
 			if(Ext.isEmpty(rs.get("invoiceId")) || Ext.isEmpty(rs.get("invoice_code"))){
 				obj['isValid'] = false;
-				obj['msg'] = "还有为空的发票输入框!";
+				obj['msg'] = LU_PI.stillEmptyInvoiceField;
 				break;
 			}
 		}
@@ -759,7 +761,7 @@ InvoiceWindow = Ext.extend( Ext.Window ,{
 		}
 		if(flag === true){
 			obj['isValid'] = false;
-			obj['msg'] = "有重复的发票，请确认!";
+			obj['msg'] = LU_PI.hasDuplcateInvoice;
 		}
 		return obj;
 	},
@@ -858,7 +860,7 @@ InvoiceWindow = Ext.extend( Ext.Window ,{
 			}
 		}else{
 			if(obj['isValid'] === true){
-				Confirm("确定保存发票信息吗?" , this ,saveFunc);
+				Confirm(lmsg('confirmSaveInvoiceInfo') , this ,saveFunc);
 			}else{
 				Alert(obj['msg']);
 			}

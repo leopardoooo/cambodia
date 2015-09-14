@@ -123,7 +123,7 @@ public class SnTaskComponent extends BaseBusiComponent{
 	}
 	
 	private String createSingleTaskWithUser(int doneCode,CCust cust,List<CUser> userList,String deptId,String taskType) throws Exception{
-		String taskId = this.saveTaskBaseInfo(cust, doneCode,taskType, deptId, null);
+		String taskId = this.saveTaskBaseInfo(cust, doneCode,taskType, deptId, null,null);
 		for (CUser user:userList){
 			WTaskUser taskUser = new WTaskUser();
 			taskUser.setTask_id(taskId);
@@ -136,13 +136,18 @@ public class SnTaskComponent extends BaseBusiComponent{
 		return taskId;
 	}
 	
-	
+	//创建故障单
+	public void createBugTask(int doneCode,CCust cust,String bugDetail) throws Exception{
+		this.saveTaskBaseInfo(cust, doneCode, SystemConstants.TASK_TYPE_FAULT, 
+				getTeamId(SystemConstants.TEAM_TYPE_SUPERNET), null, bugDetail);
+		
+	}
 	//生成移机工单
 	public void createMoveTask(int doneCode,CCust cust,String newAddrId,String newAddr,String assignType) throws Exception{
 		String teamType = SystemConstants.TEAM_TYPE_SUPERNET;
 		if(assignType.equals(SystemConstants.TASK_ASSIGN_CFOCN))
 			teamType = SystemConstants.TEAM_TYPE_CFOCN;
-		this.saveTaskBaseInfo(cust, doneCode, SystemConstants.TASK_TYPE_MOVE, getTeamId(teamType), newAddr);
+		this.saveTaskBaseInfo(cust, doneCode, SystemConstants.TASK_TYPE_MOVE, getTeamId(teamType), newAddr,null);
 	}
 	
 	
@@ -273,7 +278,7 @@ public class SnTaskComponent extends BaseBusiComponent{
 	}
 	
 	//保存工单基本信息
-	private String saveTaskBaseInfo(CCust cust,int doneCode,String taskType,String teamId,String newAddr) throws Exception{
+	private String saveTaskBaseInfo(CCust cust,int doneCode,String taskType,String teamId,String newAddr,String bugDetail) throws Exception{
 		CCustLinkman linkman = CCustLinkmanDao.findByKey(cust.getCust_id());
 		
 		WTaskBaseInfo task = new WTaskBaseInfo();

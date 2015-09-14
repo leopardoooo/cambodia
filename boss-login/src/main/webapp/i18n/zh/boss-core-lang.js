@@ -59,12 +59,15 @@ BCLang.common = {
 	submitingText: '正在提交数据...~',
 	loadingText: '正在查询，请稍等...~',
 	yes: '是~',
+	print: '打印~',
+	cancel: '取消~',
 	no: '否~'
 }
 //主页模块
 BCLang.home = {
 	topWelcome: "当前操作员~",
 	searchTabs:["名称编号~","设备编号~","安装地址~","电话号码~","多条件搜索~"],
+	invoicePrintTitle:'发票打印~',
 	searchTip:"客户编号|受理编号~",
 	searchBtns:["搜索~","缴费~"],
 	main: {
@@ -396,6 +399,21 @@ BCLang.home = {
 			labelStatus:'意向客户~',
 			labelAddress:'客户地址~',
 			labelLoginName:'账号~'
+		},
+		InvoicePrint:{//发票打印
+			_title:'发票打印~',
+			titleDocGrid:'打印列表~',
+			titleInvoiceGrid:'发票项~',
+			titlePrintDetail:'打印明细~',
+			titlePrintPreview:'打印预览~',
+			titleInvoiceWindow:'打印共需要 {0} 张发票~',
+			wdxj:'网点现金~',
+			printGridColumns:['流水号~','单据名称~','创建时间~'],
+			invoiceGridColumns:['顺序号~','发票号码~','发票代码~'],
+			printItemGridColumns:['名称~','金额~'],
+			stillEmptyInvoiceField:"还有为空的发票输入框!~",
+			hasDuplcateInvoice:"有重复的发票，请确认!~"
+			
 		}
 	}
 	
@@ -404,7 +422,12 @@ BCLang.home = {
 BCLang.msgBox = {
 	payInfo: '您有<b>{0}</b>笔待支付,共<b>{1}</b>$',
 	payButton: '现金支付',
-	commonSuccess:'业务操作成功!~',
+	selectInvoice2Print:"请选择要打印的发票!~",
+	selectInvicePrintItem:"请选择发票的打印项~",
+	templateReplaceError:"模板变量替换时出错! error:{0}~",
+	printCmpError:'打印控件调用异常，请检查是否安装了打印控件 {0}~',
+	invoiceIdNeeded:'请输入发票号码~',
+	confirmSaveInvoiceInfo:"确定保存发票信息吗?~",
 	waitMsg:'操作中,请稍候~',
 	needCust:'请先查找要操作的客户!~',
 	needUser:'请选择用户!~',
