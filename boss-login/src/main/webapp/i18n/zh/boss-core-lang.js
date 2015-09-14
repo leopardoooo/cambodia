@@ -346,3 +346,6 @@ BCLang.home = {
 	}
 	
 }
+//各种弹出的提示信息
+BCLang.msgBox = {
+}
