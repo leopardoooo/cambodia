@@ -2,8 +2,11 @@
 BCLang = {}
 BCLang.common = {
 	optr: "操作~",
+	confirm: '确认~',
 	switchor: '选择~',
 	pswd: '密码~',
+	newPswd: '新密码~',
+	confirmPswd: '确定密码~',
 	remark: '备注~',
 	remark2: '备注信息~',
 	busiInfo: '业务信息~',
@@ -12,6 +15,15 @@ BCLang.common = {
 	tipLoadText: '正在查询，请稍等...',
 	tipConfirmSave: '确定要保存业务吗?~',
 	tipFormInvalid: '含有验证不通过的输入项!~',
+	filterTreePanel:{//可以根据关键字过滤的treePanel
+		emptyTipSearchField:'输入名称过滤...~',
+		btnExpandAll:'展开所有资源~',
+		btnCollapseAll:'合并所有资源~'
+	},
+	filterTitle: '条件过滤~',
+	tipExistsSystem:'确定要退出系统~',
+	queryBtn:'查询~',
+	queryBtnWithBackSpace:'查  询~',
 	total: '合计~',
 	subTotal: '小计~',
 	price: '单价~',
@@ -28,9 +40,19 @@ BCLang.common = {
 	expandOrCollpse: '展开或收缩~',
 	optional: '可选~',
 	selected: '已选~',
+	optionalGroup: '共 {0} 个可选',
+	selectedGroup: "已选 {0} 个",
 	save: '保存~',
 	close: '关闭~',
-	busido: '业务受理~'
+	busido: '业务受理~',
+	defaultGroupTpl: '{0} 已选 {1} 个',
+	uploadFileLabel: '文件上传~',
+	busiWay: '处理方式~',
+	tipSimple: '提示~',
+    returnTxt:'返回~',
+	tip: '提示信息~',
+	totalRecord: ' ( 共: {0} 条) ',
+	submit: '提交~'
 }
 //主页模块
 BCLang.home = {
@@ -59,9 +81,9 @@ BCLang.home = {
 				type: "客户类型~",certType: "证件类型~",certNum: "证件号码~",linkMan: "联系人~",tel: "固定电话~",barthday: "出生日期~",
 				mobile: "手机号码~",areaCateory: "区域小区~",houseNetType: "服务类型~",houseManager: "小区客户经理~",
 				houseOptr: "小区运维人员~",postalAddr: "邮寄地址~", remark: "备注~",
-				email: "邮箱~", sex: "性别~",postcode: '邮编~',
+				email: "邮箱~", sex: "性别~",postcode: '邮编~', blackList: '黑名单~',
 				agentName: "代理商~", deptName: "开户部门~", developName: "发展人~", businessLicence: "营业执照~", unitNumber: "单位税号~",
-				spkgSn: "协议编号~", cust_level: "客户级别~"
+				spkgSn: "协议编号~", cust_level: "客户级别~",switchCustTitle: '选择客户~'
 			},
 			_form: {
 				thinkCust: '意向客户~',
@@ -81,7 +103,13 @@ BCLang.home = {
 				rechargeCount: '充值金额~',
 				tipRechargeCountMustBeGreaterThanZero: '金额需要大于0!~',
 				province:'省~',
-				provinceEmptyText:'请选择省~'
+				provinceEmptyText:'请选择省~',
+				addrManager: '地址管理~',
+				roomNumber: '房间号~',
+				roomStatus: '房间状态~',
+				roomTitle: '房间信息~',
+				roomTitle2: '行政区域:{0} 服务类型:{1}',
+				addRoom: '新增房间~'
 			},
 			acct: {
 				_title: "账目信息~",
@@ -113,7 +141,7 @@ BCLang.home = {
 				stbId: '机顶盒~', cardId: '智能卡~', modem: 'Modem号~', createTime: '创建时间~',
 				loginName: '账号~', terminal: '终端类型~', deviceModel: '设备型号~', buyWay: '购买方式~',
 				stopDate: '预报停时间~', stopType: '催费类型~', protocolDate: '协议日期~', 
-				str4: 'IP地址~',str6: 'IP数量~'
+				str4: 'IP地址~',str6: 'IP收费数量~'
 			},
 			_form: {
 				taskBackFill: '施工回填~',
@@ -146,7 +174,29 @@ BCLang.home = {
 				addToSelected: '加入已选~',
 				moveToOptional: '移至可选~',
 				stopTime: '报停时间~',
-				stopFee: '报停费用~'
+				stopFee: '报停费用~',
+				prodFeeCM: ["产品名称~","原资费~","新资费~","原到期日~","计费期日~",
+				          "缴费月数~","新到期日~","转移支付金额~","缴费金额~"],
+				prodTitle: '产品信息~',
+				prodGroupText: '用户名称:{0}  用户类型:{1} ~',
+				templateDown: '模板下载~',
+				templateDownTip: '请勿在业务繁忙时操作;请勿删除模板中第一行;~',
+				loginId: '登录账号~',
+				orderFee: '订单余额~',
+				canRetrunFee: '可退金额~',
+				canTransferFee: '可转金额~',
+				returnDevice: '回收设备~',
+				retrunInfo: '可退~',
+				transferInfo: '可转~',
+				stdId: '机顶盒号~',
+				stdModel: '机顶盒型号~',
+				newStdId: '新机顶盒号~',
+				newStdModel: '新机顶盒型号~',
+				modemId: 'Modem号~',
+				modemModel: 'Modem型号~',
+				newModemId: '新Modem号~',
+				newModemModel: '新Modem型号~',
+				changeCause: '更换原因~'
 			},
 			list: {
 				_title: '用户信息~',
@@ -210,6 +260,14 @@ BCLang.home = {
 			busi: {
 				_title: '业务受理单~',
 				columns: ["操作员~","最后打印~","业务名称~"]
+			},
+			_form: {
+				oldInvoiceId: '原发票号码~',
+				oldInvoiceCode: '原发票代码~',
+				oldInvoiceType: '原发票类型~',
+				oldStatus: '原发票状态~',
+				newInvoiceId: '新发票号码~',
+				newInvoiceCode: '新发票代码~'
 			}
 		},
 		//受理记录
@@ -248,5 +306,182 @@ BCLang.home = {
 			}
 			
 		}
+	}, // main end line...
+	// 首页工具栏业务
+	tools: {
+		
+		countySwitch:{//分公司切换
+			titleSelectDept:'选择部门~',
+			confirmSwitchDept:'确定切换部门吗~'
+		},
+		ad: {//公告
+			_title: '公告信息~',
+			tplPublishTme:'发布于~',
+			columns: ['公告主题~','发布人~','生效时间~','失效时间~']
+		},
+		grxg:{//个人修改
+			_title:'个人资料修改~',
+			labelNewPwd:'新密码~',
+            labelNewPwdConfirm:'确认新密码~',
+            labelDefaultSystem:'默认登录系统~'
+		},
+		queryDevice:{//设备查询
+			_title:'设备查询~',
+			titleDevInfo:'设备信息~',
+			labelDevNo:'设备序列号~',
+			labelDevType:'设备类型~',
+			labelDevModel:'设备型号~',
+			labelModelName:'型号名称~',
+			labelDevName:'设备名称~',
+			labelDevCode:'设备编号~',
+			labelDeptName:'所在仓库~',
+			labelCustNo:'客户编号~',
+			labelCustName:'客户姓名~',
+			labelDevStatus:'设备状态~',
+			labelDepStatus:'库存状态~',
+			labelTranStatus:'流转状态~',
+			labelOwnership:'产    权~',
+			
+			labelCardNo:'配对卡编号~',
+            labelCardModel:'配对卡型号~',
+            labelModemNo:'配对MODEM编号~',
+            labelModemModel:'配对MODEM型号~',
+            labelStbNo:'配对机顶盒编号~',
+            labelStbModel:'配对机顶盒型号~',
+            tipDevNotExists:'查询设备不存在!~'
+			
+		},
+		invoiceQuery:{//发票查询
+			_title:'发票查询~',
+			titleInvoiceInfo:'发票信息~',
+			btnShowInvoiceDetail:'费用明细~',
+			btnChangeStatus:'修改状态~',
+			btnChangeStatusIdel:'修改为空闲~',
+			btnChangeStatusInvalid:'修改为失效~',
+			btnChangeStatusUsed:'已被使用~',
+			
+			confirmChangeStatus:'是否将发票状态修改为~',
+			tipInvoiceNotExists:'  发票不存在!~',
+			tipInvoiceNotExists2:'查询发票不存在!~',
+			statusInvalid:'失效~',
+			statusIdel:'空闲~',
+			
+			cols:['客户名称~', '客户编号~', '业务名称~', '费用名称~', '实际金额~', '操作时间~', '操作员~'],
+			
+			labelInvoiceId:'发票号码~',
+			labelInvoiceId2:'发&nbsp;票&nbsp;号&nbsp;~',
+			labelInvoiceCode:'发票代码~',
+			labelInvoiceType:'发票类型~',
+			labelDeptName:'所在仓库~',
+			labelUseStatus:'使用状态~',
+			labelMoneyAmount2:'金&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;额~',
+			labelUserOptrName:'开&nbsp;票&nbsp;员&nbsp;~',
+			labelOptrName:'领&nbsp;用&nbsp;人&nbsp;~',
+			labelCreateTime:'入库时间~',
+			labelFinanceStatus:'结存状态~',
+			labelCloseTime:'核销时间~',
+			labelCheckDeptName:'结账仓库~',
+			labelCheckTime:'结账时间~'
+			
+		},
+		CustSearch:{//客户查询(多条件查询)
+			_title:'客户查询~',
+			tipInputAnyField:'请任填一项进行搜索!~',
+			labelCustName:'客户名称~',
+			labelStatus:'意向客户~',
+			labelAddress:'客户地址~',
+			labelLoginName:'账号~'
+		}
 	}
+	
+}
+//各种弹出的提示信息
+BCLang.msgBox = {
+	commonSuccess:'业务操作成功!~',
+	waitMsg:'操作中,请稍候~',
+	needCust:'请先查找要操作的客户!~',
+	needUser:'请选择用户!~',
+	cancelFeeSuccess:'冲正成功!~',
+	confirmCancelFeeAndInvaidInvoice:'发票{0}将作废!该发票上的费用项需要重打，确定冲正?~',
+	confirmCancelFee:'确定冲正吗?~',
+	selectRec4CancelFee:'请选择要冲正的费用记录!~',
+	confirmUnPayWithParam:'确定要回退【金额：{0} 】吗?~',
+	confirmRestoreCust:'是否确定返销户?~',
+	restoreCustSuccess:'返销户成功!~',
+	restoreCustFailed:'返销户失败,请联系管理员.~',
+	needLogOffUser:'请先注销该客户下的用户~',
+	recycleGdDevice:'请先回收产权为广电的设备~',
+	custIsRelocated:'客户已经拆迁。~',
+	confirmRelocateCust:'确定客户拆迁吗?~',
+	notAllowedJoinUnit:'该客户为单位客户，不能加入单位!~',
+	confirmQuitUnit:'确定退出单位吗?~',
+	confirmBankStop:'确定要暂停卡扣吗?~',
+	confirmEnableBankPay:'启用银行扣费吗?~',
+	confirmDisableBankPay:'禁止银行扣费吗?~',
+	confirmEditBankPay:'确定该产品',
+	confirmBankResume:'确定要恢复卡扣吗?~',
+	confirmRenewCust:'去顶恢复客户状态吗?~',
+	
+	custHasUnSuitableDev:'该用户现在不能进行设备互换~',
+	custCantExchangeDev:'该用户现在不能进行设备互换~',
+	
+	confirmRegLoss:'确定挂失吗?~',
+	regLossSuccess:'挂失成功!~',
+	
+	selectDev2RegLoss:'请选择要取消挂失的设备~',
+	selectDevIsRegLossAlready:'请选择已经挂失的设备~',
+	unRegLossSuccess:'取消挂失成功!~',
+	confirmUnRegLoss:'确定取消挂失吗?~',
+	//打开和关闭打印标记
+	statusNotPrintStatusSuccess:'不打印标记成功!~',
+	confirmNotPrintStatus:'确定不打印吗?~',
+	statusPrintStatusSuccess:'打开标记成功!~',
+	confirmPrintStatus:'确定打开打印标记吗?~',
+	//销售设备
+	selectDev2Sale:'请选择要销售的设备!~',
+	cantSaleCosOwerIsCust:'设备的产权是客户的,不允许销售~',
+	//修改购买方式
+	modifyBuyType:'修改购买方式~',
+	need2SwitchCountyId:'当前营业厅非购买设备营业厅，请先切换到[{0}]再操作！~',
+	//修改产权
+	changeOwner2Cust:'确定将产权修改为个人？~',
+	changeOwner2Gd:'确定将产权修改为广电？~',
+	cangeOwnerSuccess:'修改产权成功!~',
+	//回收设备
+	selectDev2Recycle:'请选择要回收的设备!~',
+	devCantRecycleStillInUse:"设备的在使用中,不允许回收~",
+	
+	onlyResidentCanNonResiCust:'只能居民客户转集团客户~',
+	
+	depositUnPaySuccess:'退押金成功!~',
+	unPayed:'费用未支付！~',
+	notDeposit:'该费用不是押金！~',
+	confirmDepositUnPay:"确定退押金吗?~",
+	
+	userNotActive:"选择的用户状态非正常~",
+	cantLogOffZzd:'主终端不能先销户~',
+	cantLogOffCosBaseProdOweFee:'有基本包产品欠费,不能销户!~',
+	cantLogOffCosBaseProdNotActive:'有基本包产品状态不正常,不能销户!~',
+	
+	cantPayIpUserFee:'宽带用户下无产品请先订购产品~',
+	
+	freeUsersOver2:"免费终端不能超过2台~",
+	
+	singleInteractiveDevCantOpenDuplex:'该用户机顶盒交互方式是单向的，无法开通双向~',
+	custMustHaveDuplexDev:'用户必选拥有交互方式双向的机顶盒~',
+	
+	needCancelProgramFirst:'用户下有互动电视产品，请退订后再操作!~',
+	confirmCancelDuplex:"确定取消双向吗?~",
+	
+	userHasNoBaseProd:'用户无基本包!~',
+	baseProdRechargedWait30Seconds:'基本包已充值，请稍等半分钟~',
+	usersNotOweFeeStop:'用户的基本包产品[{0}]状态不是欠费停机！~',
+	confirmOpenTemp:"确定授权吗?~",
+	openTempSuccess:'临时授权成功!~',
+	
+	noUserSelected:'未选中任何用户!~',
+	noSelectedUserCanOpenTemp:'选中的用户没有符合可临时授权的条件!~',
+	userHasExtraFreeDev:'选中的用户有超额副机，但主机状态非正常，不能进行临时授权!~'
+	
+	
 }

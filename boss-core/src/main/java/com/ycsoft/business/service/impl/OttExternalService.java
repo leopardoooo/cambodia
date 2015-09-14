@@ -261,7 +261,7 @@ public class OttExternalService extends OrderService {
 		cust.setAddress(SystemConstants.OTT_MOBILE_ADDRESS);
 		cust.setAddr_id(SystemConstants.OTT_MOBILE_ADDR_ID);
 		cust.setCust_type(SystemConstants.CUST_TYPE_RESIDENT);
-
+		cust.setPassword(user_passwd);
 		
 		CCustLinkman linkMan=new CCustLinkman();
 		linkMan.setLinkman_name(user_name);

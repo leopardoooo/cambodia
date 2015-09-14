@@ -1216,6 +1216,36 @@ public class CustComponent extends BaseBusiComponent {
 		return  seq;
 	}
 	
+	
+	/**
+	 * 根据地址码获得客户对应的宽带域名
+	 * @param custCode 
+	 * @param cust
+	 * @return
+	 */
+	public String getDomainByAddr(String addrId) throws Exception {
+		String Domain = "";
+		
+		TAddress adr = tAddressDao.findByKey(addrId);
+		if(adr == null){
+			throw new ComponentException(ErrorCode.CustAddressIsNull);
+		}
+		TDistrict district = tDistrictDao.findByKey(adr.getDistrict_id());
+		if(district == null){
+			throw new ComponentException(ErrorCode.CustDistrictIsNull,addrId);
+		}
+		TProvince province = tProvinceDao.findByKey(district.getProvince_id());
+		if(province == null || StringHelper.isEmpty(province.getCust_code())){
+			throw new ComponentException(ErrorCode.CustProvinceIsNull,adr.getDistrict_id());
+		}
+		Domain=province.getDomain_name();
+		
+		if(StringHelper.isEmpty(Domain)){
+			throw new ComponentException(ErrorCode.CustProvinceDomainIsNull,province.getName());
+		}
+		
+		return Domain;
+	}
 	/**
 	 * 根据地址码产生客户编号
 	 * @param custCode 

@@ -1,11 +1,14 @@
 Ext.ns("MenuHandler");
 
+var LU_MSG = langUtils.bc('msgBox');
+var LU_FM = langUtils.bc;//带参数的
+
 /**
  * 判断是否已经查询了客户
  */
 hasCust = function() {
 	if (!App.getCustId()) {
-		Alert('请先查找要操作的客户!');
+		Alert(LU_MSG['needCust']);
 		return false;
 	}
 	return true;
@@ -14,7 +17,7 @@ hasCust = function() {
 UnPayBak = function(record) {
 	// 回调函数
 	function callback(res, opt) {
-		Alert('冲正成功!');
+		Alert(LU_MSG['cancelFeeSuccess']);
 		App.main.infoPanel.setReload(true);
 		App.main.infoPanel.getPayfeePanel().refresh();
 		App.main.infoPanel.getAcctPanel().refresh();
@@ -29,19 +32,19 @@ UnPayBak = function(record) {
 		var url = Constant.ROOT_PATH + "/core/x/Pay!saveCancelFee.action";
 		if (!Ext.isEmpty(record.get('invoice_id'))
 				|| Ext.isEmpty(record.get('invoice_mode') == 'A')) {
-			Confirm("发票" + record.get('invoice_id') + "将作废!该发票上的费用项需要重打，确定冲正?",
+			Confirm( LU_FM('msgBox.confirmCancelFeeAndInvaidInvoice',null,[record.get('invoice_id')]),
 					this, function() {
 						// 调用请求函数,详细参数请看busi-helper.js
 						App.sendRequest(url, params, callback);
 					});
 		} else {
-			Confirm("确定冲正吗?", this, function() {
+			Confirm(LU_MSG('confirmCancelFee'), this, function() {
 						// 调用请求函数,详细参数请看busi-helper.js
 						App.sendRequest(url, params, callback);
 					});
 		}
 	} else {
-		Alert('请选择要冲正的费用记录!');
+		Alert(LU_MSG('selectRec4CancelFee'));
 		return false;
 	}
 	return false;
@@ -51,7 +54,7 @@ UnPayBak = function(record) {
 UnPay = function(record) {
 	// 回调函数
 	function callback(res, opt) {
-		Alert('冲正成功!');
+		Alert(LU_MSG['cancelFeeSuccess']);
 		App.main.infoPanel.setReload(true);
 		App.main.infoPanel.getPayfeePanel().refresh();
 		App.main.infoPanel.getAcctPanel().refresh();
@@ -66,11 +69,11 @@ UnPay = function(record) {
 		params["cancelFee"] = record.get("real_pay");
 
 		var url = Constant.ROOT_PATH + "/core/x/ProdOrder!cancelTodayOrder.action";
-		Confirm("确定要回退【金额："+ params["cancelFee"]/100.0+"】吗?", this, function() {
+		Confirm( LU_FM('msgBox.confirmUnPayWithParam',null,[params["cancelFee"]/100.0]), this, function() {
 			App.sendRequest(url, params, callback);
 		});
 	} else {
-		Alert('请选择要冲正的费用记录!');
+		Alert(LU_MSG('selectRec4CancelFee'));
 		return false;
 	}
 	return false;
@@ -102,8 +105,8 @@ Ext.apply(MenuHandler, {
 		if(!hasCust()){
 			return false;
 		}
-		Confirm('是否确定返销户?',this,function(){
-			Ext.getBody().mask('操作中,请稍候');
+		Confirm(LU_MSG('confirmRestoreCust'),this,function(){
+			Ext.getBody().mask(LU_MSG('waitMsg'));
 			
 			var all = {custId:App.getApp().getCustId()};
 			//公有的参数
@@ -121,11 +124,11 @@ Ext.apply(MenuHandler, {
 					tip = null;
 					var result = Ext.decode(res.responseText);
 					if (result.success == true) {
-						Alert('返销户成功!');
+						Alert(LU_MSG('restoreCustSuccess'));
 						Ext.getBody().unmask();
 						App.search.doRefreshCust(result.custInfo.cust);
 					}else{
-						Alert('返销户失败,请联系管理员.');
+						Alert(LU_MSG('restoreCustFailed'));
 					}
 				}
 			})
@@ -140,12 +143,12 @@ Ext.apply(MenuHandler, {
 		var count = App.main.infoPanel.getUserPanel().userGrid.getStore()
 				.getCount();
 		if (count != 0) {
-			Alert("请先注销该客户下的用户");
+			Alert(LU_MSG('needLogOffUser'));
 			return false;
 		}
 		var custDeviceGrid = App.getApp().main.infoPanel.getCustPanel().custDeviceGrid;
 		if (custDeviceGrid.GDDeviceArray.length > 0) {
-			Alert("请先回收产权为广电的设备");
+			Alert(LU_MSG('recycleGdDevice'));
 			return false;
 		}
 		// alert(custDeviceGrid.CustDeviceArray.length);
@@ -197,7 +200,7 @@ Ext.apply(MenuHandler, {
 			return false;
 
 		if (App.data.custFullInfo.cust.status == 'RELOCATE') {
-			Alert('客户已经拆迁。')
+			Alert(LU_MSG('custIsRelocated'))
 			return false;
 		}
 
@@ -205,7 +208,7 @@ Ext.apply(MenuHandler, {
 		function callback(res, opt) {
 			var result = Ext.decode(res.responseText);
 			if (result.success == true) {
-				Alert('业务保存成功!');
+				Alert(LU_MSG('commonSuccess'));
 				App.getApp().refreshPanel('1119');// 1119：客户拆迁
 			}
 		}
@@ -213,7 +216,7 @@ Ext.apply(MenuHandler, {
 
 		var params = {};
 		params['custId'] = App.getApp().getCustId();
-		Confirm("确定客户拆迁吗?", this, function() {
+		Confirm(LU_MSG('confirmRelocateCust'), this, function() {
 					// 调用请求函数,详细参数请看busi-helper.js
 					App.sendRequest(url, params, callback);
 				});
@@ -225,7 +228,7 @@ Ext.apply(MenuHandler, {
 		if (!hasCust())
 			return false;
 		if (App.data.custFullInfo.cust.cust_type == "UNIT") {
-			Alert('该客户为单位客户，不能加入单位!');
+			Alert(LU_MSG('notAllowedJoinUnit'));
 			return false;
 		}
 		return {
@@ -242,7 +245,7 @@ Ext.apply(MenuHandler, {
 		function callback(res, opt) {
 			var result = Ext.decode(res.responseText);
 			if (result.success == true) {
-				Alert('业务保存成功!');
+				Alert(LU_MSG('commonSuccess'));
 				App.getApp().refreshPanel('1006');// 1006：退出单位
 			}
 		}
@@ -252,7 +255,7 @@ Ext.apply(MenuHandler, {
 		params['custId'] = App.getApp().getCustId();
 		params['unitId'] = App.getCust().unit_id;
 
-		Confirm("确定退出单位吗?", this, function() {
+		Confirm(LU_MSG('confirmQuitUnit'), this, function() {
 					// 调用请求函数,详细参数请看busi-helper.js
 					App.sendRequest(url, params, callback);
 				});
@@ -266,7 +269,7 @@ Ext.apply(MenuHandler, {
 		function callback(res, opt) {
 			var result = Ext.decode(res.responseText);
 			if (result.success == true) {
-				Alert('业务保存成功!');
+				Alert(LU_MSG('commonSuccess'));
 				App.getApp().main.infoPanel.getCustPanel().custInfoPanel.remoteRefresh();
 				App.getApp().main.infoPanel.getCustPanel().custDetailTab.propChangeGrid.remoteRefresh();
 			}
@@ -275,7 +278,7 @@ Ext.apply(MenuHandler, {
 		var url = Constant.ROOT_PATH + "/core/x/Bank!bankStop.action";
 		var params = {};
 		params['custId'] = App.getApp().getCustId();
-		Confirm("确定要暂停卡扣吗?", this, function() {
+		Confirm(LU_MSG('confirmBankStop'), this, function() {
 			// 调用请求函数,详细参数请看busi-helper.js
 			App.sendRequest(url, params, callback);
 		});
@@ -289,7 +292,7 @@ Ext.apply(MenuHandler, {
 		function callback(res, opt) {
 			var result = Ext.decode(res.responseText);
 			if (result.success == true) {
-				Alert('业务保存成功!');
+				Alert(LU_MSG('commonSuccess'));
 				App.getApp().main.infoPanel.getUserPanel().userGrid.remoteRefresh();
 			}
 		}
@@ -302,11 +305,11 @@ Ext.apply(MenuHandler, {
 		var params = {};
 		params['prodSn'] = record.get('prod_sn');
 		
-		var txt = "启用银行扣费吗?";
+		var txt = LU_MSG('confirmEnableBankPay');
 		if(record.get('is_bank_pay') == 'T'){
-			txt = "禁止银行扣费吗?";
+			txt = LU_MSG('confirmDisableBankPay');
 		}
-		Confirm("确定该产品,"+txt, this, function() {
+		Confirm(LU_MSG('confirmEditBankPay')+txt, this, function() {
 			// 调用请求函数,详细参数请看busi-helper.js
 			App.sendRequest(url, params, callback);
 		});
@@ -320,7 +323,7 @@ Ext.apply(MenuHandler, {
 		function callback(res, opt) {
 			var result = Ext.decode(res.responseText);
 			if (result.success == true) {
-				Alert('业务保存成功!');
+				Alert(LU_MSG('commonSuccess'));
 				App.getApp().main.infoPanel.getCustPanel().custInfoPanel.remoteRefresh();
 				App.getApp().main.infoPanel.getCustPanel().custDetailTab.propChangeGrid.remoteRefresh();
 			}
@@ -329,7 +332,7 @@ Ext.apply(MenuHandler, {
 		var url = Constant.ROOT_PATH + "/core/x/Bank!bankResume.action";
 		var params = {};
 		params['custId'] = App.getApp().getCustId();
-		Confirm("确定要恢复卡扣吗", this, function() {
+		Confirm(LU_MSG('confirmBankResume'), this, function() {
 			// 调用请求函数,详细参数请看busi-helper.js
 			App.sendRequest(url, params, callback);
 		});
@@ -385,12 +388,12 @@ Ext.apply(MenuHandler, {
 		function callback(res, opt) {
 			var result = Ext.decode(res.responseText);
 			if (result.success == true) {
-				Alert('业务保存成功!');
+				Alert(LU_MSG('commonSuccess'));
 				App.getCust().status = result.simple_obj;
 				App.getApp().refreshPanel('1220');
 			}
 		}
-		Confirm("确定恢复客户状态吗?", this, function() {
+		Confirm(LU_MSG('confirmRenewCust'), this, function() {
 					App.sendRequest(url, null, callback);
 				});
 		return false;
@@ -404,7 +407,7 @@ Ext.apply(MenuHandler, {
 		var userGrid = App.getApp().main.infoPanel.userPanel.userGrid;
 		var record = userGrid.getSelectionModel().getSelected();
 		if(record.get('modem_mac')){//TODO 如果有猫,暂时不给换.
-			Alert('当前用户有不符合更换要求的设备');
+			Alert(LU_MSG('custHasUnSuitableDev'));
 			return false;
 		}
 		// 关闭过滤窗口
@@ -417,7 +420,7 @@ Ext.apply(MenuHandler, {
 		if(continueFlag){
 			return {width : 650,height : 310};
 		}else{
-			Alert('该用户现在不能进行设备互换');
+			Alert(LU_MSG('custCantExchangeDev'));
 			return false;
 		}
 	},
@@ -510,7 +513,7 @@ Ext.apply(MenuHandler, {
 		function callback(res, opt) {
 			var data = Ext.decode(res.responseText);
 			if (data['success'] == true) {
-				Alert('挂失成功!', function() {
+				Alert(LU_MSG('regLossSuccess'), function() {
 							App.main.infoPanel.getCustPanel().custDeviceGrid
 									.remoteRefresh();
 						}, this);
@@ -518,7 +521,7 @@ Ext.apply(MenuHandler, {
 		}
 		var params = {};
 		params['deviceId'] = record.get('device_id');
-		Confirm("确定挂失吗?", this, function() {
+		Confirm(LU_MSG('confirmRegLoss'), this, function() {
 					App.sendRequest(url, params, callback);
 				});
 		return false;
@@ -531,11 +534,11 @@ Ext.apply(MenuHandler, {
 				.getSelectionModel().getSelections();
 
 		if (records.length === 0) {
-			Alert('请选择要取消挂失的设备！');
+			Alert(LU_MSG('selectDev2RegLoss'));
 			return false;
 		}
 		if (records[0].get('loss_reg') === 'F') {
-			Alert('请选择已经挂失的设备');
+			Alert(LU_MSG('selectDevIsRegLossAlready'));
 			return false;
 		}
 		var url = Constant.ROOT_PATH
@@ -544,7 +547,7 @@ Ext.apply(MenuHandler, {
 		function callback(res, opt) {
 			var data = Ext.decode(res.responseText);
 			if (data['success'] == true) {
-				Alert('取消挂失成功!', function() {
+				Alert(LU_MSG('unRegLossSuccess'), function() {
 							App.main.infoPanel.getCustPanel().custDeviceGrid
 									.remoteRefresh();
 						}, this);
@@ -552,7 +555,7 @@ Ext.apply(MenuHandler, {
 		}
 		var params = {};
 		params['deviceId'] = records[0].get('device_id');
-		Confirm("确定取消挂失吗?", this, function() {
+		Confirm(LU_MSG('confirmUnRegLoss'), this, function() {
 					App.sendRequest(url, params, callback);
 				});
 		return false;
@@ -568,14 +571,14 @@ Ext.apply(MenuHandler, {
 		function callback(res, opt) {
 			var data = Ext.decode(res.responseText);
 			if (data['success'] == true) {
-				Alert('不打印标记成功!', function() {
+				Alert(LU_MSG('statusNotPrintStatusSuccess'), function() {
 					grid.remoteRefresh();
 				}, this);
 			}
 		}
 		var params = {};
 		params['fee_sn'] = record.get('fee_sn');
-		Confirm("确定不打印吗?", this, function() {
+		Confirm(LU_MSG('confirmNotPrintStatus'), this, function() {
 			App.sendRequest(url, params, callback);
 		});
 		return false;
@@ -591,14 +594,14 @@ Ext.apply(MenuHandler, {
 		function callback(res, opt) {
 			var data = Ext.decode(res.responseText);
 			if (data['success'] == true) {
-				Alert('打开标记成功!', function() {
+				Alert(LU_MSG('statusPrintStatusSuccess'), function() {
 							grid.remoteRefresh();
 						}, this);
 			}
 		}
 		var params = {};
 		params['fee_sn'] = record.get('fee_sn');
-		Confirm("确定打开打印标记吗?", this, function() {
+		Confirm(LU_MSG('confirmPrintStatus'), this, function() {
 					App.sendRequest(url, params, callback);
 				});
 		return false;
@@ -610,11 +613,11 @@ Ext.apply(MenuHandler, {
 		var records = App.getApp().main.infoPanel.getCustPanel().custDeviceGrid
 				.getSelectionModel().getSelections();
 		if (records.length === 0) {
-			Alert('请选择要销售的设备！');
+			Alert(LU_MSG('selectDev2Sale'));
 			return false;
 		}
 		if (records[0].get('ownership') == 'CUST') {
-			Alert("设备的产权是客户的,不允许销售");
+			Alert(LU_MSG('cantSaleCosOwerIsCust'));
 			return false;
 		}
 		return {
@@ -625,17 +628,17 @@ Ext.apply(MenuHandler, {
 	// 修改购买方式
 	ChangeDeviceType : function() {
 		var record = App.getApp().main.infoPanel.getCustPanel().custDeviceGrid.getSelectionModel().getSelected();
-		var btn = {text:'修改购买方式',attrs:App.data.currentResource};
+		var btn = {text:LU_MSG('modifyBuyType'),attrs:App.data.currentResource};
 		var cfg = {width : 560,height : 460}; 
 		if(record.get('depot_id') == App.data.optr['dept_id']){
 			App.menu.bigWindow.show(btn,cfg);
 		}else{
-			var msg = '当前营业厅非购买设备营业厅，请先切换到['+record.get('depot_name')+']再操作！';
+			var msg = LU_FM('msgBox.need2SwitchCountyId',null,[record.get('depot_name')]);
 			Ext.Msg.show({
-                title : '提示',
+                title : langUtils.bc('common.tipSimple'),
                 msg : msg,
                 width:300,
-                buttons: {cancel : "<font size='2'><b>返回</b></font>"},
+                buttons: {cancel : "<font size='2'><b>" + langUtils.bc('common.returnTxt') + "</b></font>"},
                 scope : this
             });
             
@@ -655,9 +658,9 @@ Ext.apply(MenuHandler, {
 
 		var ownership = record.get('ownership'), msg;
 		if (ownership == CoreConstant.OWNERSHIP_GD) {
-			msg = '确定将产权修改为个人？';
+			msg = LU_MSG('changeOwner2Cust');
 		} else {
-			msg = '确定将产权修改为广电？';
+			msg = LU_MSG('changeOwner2Gd');
 		}
 
 		Confirm(msg, this, function() {
@@ -667,7 +670,7 @@ Ext.apply(MenuHandler, {
 					}, function(res, opt) {
 						var data = Ext.decode(res.responseText);
 						if (data['success'] == true) {
-							Alert('修改产权成功!');
+							Alert(LU_MSG('cangeOwnerSuccess'));
 							App
 									.getApp()
 									.refreshPanel(App.getApp().getData().currentResource.busicode);
@@ -684,11 +687,11 @@ Ext.apply(MenuHandler, {
 		var deviceids = App.getApp().main.infoPanel.getCustPanel().custDeviceGrid
 				.getSelectionModel().getSelections();
 		if (deviceids.length == 0) {
-			Alert('请选择要回收的设备!');
+			Alert(LU_MSG('selectDev2Recycle'));
 			return false;
 		}
 		if (deviceids[0].get("status") == "USE") {
-			Alert("设备的在使用中,不允许回收");
+			Alert(LU_MSG('devCantRecycleStillInUse'));
 			return false;
 		};
 		return {
@@ -699,7 +702,7 @@ Ext.apply(MenuHandler, {
 	ChangeNonresCust: function(){
 		if(!hasCust()) return false;
 		if (App.data.custFullInfo.cust.cust_type != 'RESIDENT') {
-			Alert('只能居民客户转集团客户')
+			Alert(LU_MSG('onlyResidentCanNonResiCust'))
 			return false;
 		}
 //		if(App.main.infoPanel.getCustPanel().packageGrid.getStore().getCount() > 0){
@@ -733,23 +736,23 @@ Ext.apply(MenuHandler, {
 		// 回调函数
 		function callback(res, opt) {
 			if (res.responseText == 'true') {
-				Alert('退押金成功!', function() {
+				Alert(LU_MSG('depositUnPaySuccess'), function() {
 							App.main.infoPanel.getPayfeePanel().busiFeeGrid
 									.remoteRefresh();
 						}, this);
 			}
 		}
 		if (records.get('status') !== 'PAY') {
-			Alert('费用未支付！');
+			Alert(LU_MSG('unPayed'));
 			return false;
 		}
 		if (records.get('deposit') == 'F') {
-			Alert('该费用不是押金！');
+			Alert(LU_MSG('notDeposit'));
 			return false;
 		}
 		var params = {};
 		params['feeSn'] = records.get('fee_sn');
-		Confirm("确定退押金吗?", this, function() {
+		Confirm(LU_MSG('confirmDepositUnPay'), this, function() {
 					App.sendRequest(url, params, callback);
 				});
 		return false;
@@ -807,7 +810,7 @@ Ext.apply(MenuHandler, {
 			return false;
 		var record = App.getApp().main.infoPanel.getUserPanel().userGrid.getSelectionModel().getSelected();	
 		if (record.get("status") != "ACTIVE" ) {
-			Alert("选择的用户状态非正常");
+			Alert(LU_MSG('userNotActive'));
 			return false;
 		}
 			
@@ -826,13 +829,13 @@ Ext.apply(MenuHandler, {
 		var len = userRecords.length;// 选中记录
 
 		if (len == 0) {
-			Alert('请选择用户');
+			Alert(LU_MSG('needUser'));
 			return false;
 		} else {
 			var dtv = false;// 如果选中的用户中不存在数字电视
 			for (i = 0; i < len; i++) {
 				if (userRecords[i].get("status") != "ACTIVE" && ( userRecords[i].get("status") != "OWELONG" ) ) {
-					Alert("选择的用户状态非正常");
+					Alert(LU_MSG('userNotActive'));
 					return false;
 				}
 				if (userRecords[i].get("user_type") == 'DTV') {
@@ -867,7 +870,7 @@ Ext.apply(MenuHandler, {
 					}
 					// 选中的用户中有主终端,没选中的用户中没有主终端,有未选中的数字用户
 					if (!flag2 && flag && dtvAmount != len) {
-						Alert('主终端不能先销户');
+						Alert(LU_MSG('cantLogOffZzd'));
 						return false;
 					}
 					
@@ -897,7 +900,7 @@ Ext.apply(MenuHandler, {
 				
 				var item = acctMap[uid];
 				if(item && item.real_balance <0){
-					Alert('有基本包产品欠费,不能销户!');
+					Alert(LU_MSG('cantLogOffCosBaseProdOweFee'));
 					return false;
 				}
 				
@@ -908,7 +911,7 @@ Ext.apply(MenuHandler, {
 				for(var idx = 0;idx<array.length;idx++){
 					var prod = array[idx];
 					if(prod.is_base == 'T' && prod.status != 'ACTIVE'){
-						Alert('有基本包产品状态不正常,不能销户!');
+						Alert(LU_MSG('cantLogOffCosBaseProdNotActive'));
 						return false;
 					}
 				}
@@ -933,10 +936,12 @@ Ext.apply(MenuHandler, {
 	PayIpUserFee : function() {
 		if (!hasCust()) {
 			return false;
-		}
-		var prodData = App.getApp().main.infoPanel.getUserPanel().prodGrid.prodMap[data['user_id']];
-		if(!prodData || prodData.length == 0){
-			Alert('没有产品不能补收!');
+		}	
+		var record = App.main.infoPanel.getUserPanel().userGrid.getSelectionModel().getSelected();
+		var prodMap = App.main.infoPanel.getUserPanel().prodGrid.prodMap;
+		var prid = prodMap[record.get('user_id')];
+		if(null==prid || prid.length==0){
+			Alert(LU_MSG('cantPayIpUserFee'));
 			return false;
 		}
 		return {
@@ -969,7 +974,7 @@ Ext.apply(MenuHandler, {
 		});
 		
 		if(num >= 2 && record.get('str19') != 'T'){
-			Alert("免费终端不能超过2台");
+			Alert(LU_MSG('freeUsersOver2'));
 			return false;
 		}
 		return {
@@ -1010,13 +1015,13 @@ Ext.apply(MenuHandler, {
 						success : function(res, opt) {
 							var rec = Ext.decode(res.responseText);
 							if (rec.interactive_type == 'SINGLE') {
-								Alert('该用户机顶盒交互方式是单向的，无法开通双向');
+								Alert(LU_MSG('singleInteractiveDevCantOpenDuplex'));
 								flag = false;
 							}
 						}
 					})
 		} else {
-			Alert('用户必选拥有交互方式双向的机顶盒');
+			Alert(LU_MSG('custMustHaveDuplexDev'));
 			return false;
 		}
 		if (!flag) {
@@ -1043,17 +1048,17 @@ Ext.apply(MenuHandler, {
 					}
 				});
 		if (flag === true) {
-			Alert('用户下有互动电视产品，请退订后再操作!');
+			Alert(LU_MSG('needCancelProgramFirst'));
 			return false;
 		}
 
-		Confirm("确定取消双向吗?", this, function() {
+		Confirm(LU_MSG('confirmCancelDuplex'), this, function() {
 			App.sendRequest(Constant.ROOT_PATH
 							+ "/core/x/User!saveCancelOpenInteractive.action",
 					null, function(res, opt) {
 						var data = Ext.decode(res.responseText);
 						if (data['success'] === true) {
-							Alert('取消双向成功!');
+							Alert(LU_MSG('confirmCancelDuplex'));
 							App
 									.getApp()
 									.refreshPanel(App.getApp().getData().currentResource.busicode);
@@ -1080,7 +1085,7 @@ Ext.apply(MenuHandler, {
 	OpenTemp : function() {
 		var prodStore = App.main.infoPanel.getUserPanel().prodGrid.getStore();
 		if (prodStore.getCount() == 0) {
-			Alert('用户无基本包!');
+			Alert(LU_MSG('userHasNoBaseProd'));
 			return false;
 		}
 		for (var i = 0; i < prodStore.getCount(); i++) {
@@ -1100,7 +1105,7 @@ Ext.apply(MenuHandler, {
 							for (var j = 0; j < acctItems.length; j++) {
 								if (acctItems[j]['acctitem_id'] == prodId) {
 									if (acctItems[j]['real_balance'] > 1) {
-										Alert('基本包已充值，请稍等半分钟');
+										Alert(LU_MSG('baseProdRechargedWait30Seconds'));
 										return false;
 									}
 									break;
@@ -1109,20 +1114,20 @@ Ext.apply(MenuHandler, {
 						}
 					}
 				} else {
-					Alert('用户的基本包产品['+prodStore.getAt(i).get('prod_name')+']状态不是欠费停机！');
+					Alert(LU_FM('msgBox.usersNotOweFeeStop'),null,[prodStore.getAt(i).get('prod_name')]);
 					return false;
 				}
 				
 			}
 		}
 		
-		Confirm("确定授权吗?", this, function() {
+		Confirm(LU_MSG('confirmOpenTemp'), this, function() {
 					App.sendRequest(Constant.ROOT_PATH
 									+ "/core/x/User!saveOpenTemp.action", null,
 							function(res, opt) {
 								var data = Ext.decode(res.responseText);
 								if (data == true) {
-									Alert('临时授权成功!');
+									Alert(LU_MSG('openTempSuccess'));
 									App.getApp().main.infoPanel.getUserPanel().userGrid
 											.remoteRefresh();
 								}
@@ -1137,7 +1142,7 @@ Ext.apply(MenuHandler, {
 		var userGrid = App.getApp().main.infoPanel.getUserPanel().userGrid;
 		var users = userGrid.getSelections();
 		if(users.length==0){
-			Alert('未选中任何用户!');
+			Alert(LU_MSG('noUserSelected'));
 			return false;
 		}
 		//验证过滤用户类型
@@ -1152,7 +1157,7 @@ Ext.apply(MenuHandler, {
 		
 		users = userGrid.getSelections();
 		if(users.length==0){
-			Alert('选中的用户没有符合可临时授权的条件!');
+			Alert(LU_MSG('noSelectedUserCanOpenTemp'));
 			return false;
 		}
 		
@@ -1174,7 +1179,7 @@ Ext.apply(MenuHandler, {
 		}
 		users = userGrid.getSelections();
 		if(users.length==0){
-			Alert('选中的用户有超额副机，但主机状态非正常，不能进行临时授权!');
+			Alert(LU_MSG('userHasExtraFreeDev'));
 			return false;
 		}
 		
@@ -1349,7 +1354,7 @@ Ext.apply(MenuHandler, {
 		var userGrid = App.main.infoPanel.getUserPanel().userGrid;
 		var userRecords = userGrid.getSelections();
 		if (userRecords.length == 0) {
-			Alert('请选择用户');
+			Alert(LU_MSG('needUser'));
 			return false;
 		}
 		var userIds = [];
@@ -1828,7 +1833,7 @@ Ext.apply(MenuHandler, {
 		function callback(res, opt) {
 			var result = Ext.decode(res.responseText);
 			if (result.success == true) {
-				Alert('业务保存成功!');
+				Alert(LU_MSG('commonSuccess'));
 				App.getCust().status = result.simple_obj;
 				App.getApp().refreshPanel('1221');
 			}
@@ -1928,7 +1933,7 @@ Ext.apply(MenuHandler, {
 				.getSelections();
 		var len = userRecords.length;
 		if (len == 0) {
-			Alert('请选择用户');
+			Alert(LU_MSG('needUser'));
 			return false;
 		}
 
@@ -1953,7 +1958,7 @@ Ext.apply(MenuHandler, {
 				.getSelections();
 		var len = userRecords.length;
 		if (len == 0) {
-			Alert('请选择用户');
+			Alert(LU_MSG('needUser'));
 			return false;
 		}
 
@@ -1981,7 +1986,7 @@ Ext.apply(MenuHandler, {
 				.getSelections();
 		var len = userRecords.length;
 		if (len == 0) {
-			Alert('请选择用户');
+			Alert(LU_MSG('needUser'));
 			return false;
 		}
 
@@ -2016,7 +2021,7 @@ Ext.apply(MenuHandler, {
 				.getSelections();
 		var len = userRecords.length;
 		if (len == 0) {
-			Alert('请选择用户');
+			Alert(LU_MSG('needUser'));
 			return false;
 		}
 
@@ -2053,7 +2058,7 @@ Ext.apply(MenuHandler, {
 				.getSelections();
 		var len = userRecords.length;
 		if (len == 0) {
-			Alert('请选择用户');
+			Alert(LU_MSG('needUser'));
 			return false;
 		}
 		// 回调函数
@@ -2080,7 +2085,7 @@ Ext.apply(MenuHandler, {
 		var userRecords = App.main.infoPanel.getUserPanel().userGrid.getSelections();
 		var len = userRecords.length;
 		if (len == 0) {
-			Alert('请选择用户');
+			Alert(LU_MSG('needUser'));
 			return false;
 		}
 		//判断用户名下是否有产品
@@ -2115,13 +2120,13 @@ Ext.apply(MenuHandler, {
 		var len = userRecords.length;// 选中记录
 
 		if (len == 0) {
-			Alert('请选择用户');
+			Alert(LU_MSG('needUser'));
 			return false;
 		} else {
 			for (i = 0; i < len; i++) {
 				var status = userRecords[i].get("status");
 				if ( status != "ACTIVE" && status != "OWELONG" ) {
-					Alert("选择的用户状态非正常");
+					Alert(LU_MSG('userNotActive'));
 					return false;
 				}
 				if (Ext.isEmpty(userRecords[i].get("stop_date"))) {

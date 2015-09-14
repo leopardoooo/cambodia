@@ -12,6 +12,7 @@ public enum ErrorCode {
 	CustAddressIsNull("地址为空"),
 	CustDistrictIsNull("%s未配置对应的行政区域！"),
 	CustProvinceIsNull("该行政区域未配置对应的省,行政区域编号=%s"),
+	CustProvinceDomainIsNull("%s未配置宽带域名后缀,请联系管理员！"),
 	DeptAddrIsNull("部门(%s)未配置管辖的城市"),
 	CustDataException("客户数据异常，请重新索搜客户！"),
 	CustSeqIsNull("系统未正确配置客户序列号,客户前缀号=%s"),
@@ -83,6 +84,7 @@ public enum ErrorCode {
 	
 	InvoiceIsNotYou("只有开票人可以操作"),
 	InvoiceCheckStatusIsNotIdle("发票已结账或缴销，不能操作"),
+	InvoiceTemplateDeptIsNull("模板缺失发票缴销仓库配置，请联系管理员"),
 	
 	TemplateNotConfigBuseFee("该地区费用模板未配置该费用项(%s)"),
 	CustUserIpAddressFeeCoinfigError("客户宽带IP收费存在多个费用项目，请联系管理员！"),

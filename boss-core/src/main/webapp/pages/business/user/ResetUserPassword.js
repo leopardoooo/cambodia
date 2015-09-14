@@ -18,11 +18,11 @@ EditPasswordForm = Ext.extend(BaseForm, {
 			},
 			items : [{
 				xtype : 'textfield',
-				fieldLabel : '登录账号',
+				fieldLabel : lmain("user._form.loginId"),
 				style : Constant.TEXTFIELD_STYLE,
 				value : record.get('user_name')
 			},{
-						fieldLabel : '新密码',
+						fieldLabel : lbc("common.newPswd"),
 						inputType : 'password',
 						xtype : 'textfield',
 						name : 'password',
@@ -40,7 +40,7 @@ EditPasswordForm = Ext.extend(BaseForm, {
 
 						}
 					}, {
-						fieldLabel : '确认密码',
+						fieldLabel : lbc("common.confirmPswd"),
 						inputType : 'password',
 						xtype : 'textfield',
 						name : 'confirmPwd',

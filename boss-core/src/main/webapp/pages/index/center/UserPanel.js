@@ -102,12 +102,12 @@ UserGrid = Ext.extend(Ext.ux.Grid,{
 					if(this.userStore.getCount()>0){
 						if(win)win.close();
 							win = FilterWindow.addComp(this,[
-							    {text:LC[0],field:'user_type',showField:'user_type_text'},
-							    {text:LC[1],field:'user_addr',type:'textfield'},
-								{text:LC[2],field:'status',showField:'status_text'},
-								{text:LC[4],field:'stb_id',type:'textfield'},
-								{text:LC[5],field:'card_id',type:'textfield'},
-								{text:LC[6],field:'modem_mac',type:'textfield'}
+							    {text:lmain("user.base.type"),field:'user_type',showField:'user_type_text'},
+							    {text:lmain("user.base.name"),field:'user_addr',type:'textfield'},
+								{text:lmain("user.base.status"),field:'status',showField:'status_text'},
+								{text:lmain("user.base.stbId"),field:'stb_id',type:'textfield'},
+								{text:lmain("user.base.cardId"),field:'card_id',type:'textfield'},
+								{text:lmain("user.base.modem"),field:'modem_mac',type:'textfield'}
 								], 690,"1",false);
 							
 						if(win){
@@ -187,7 +187,7 @@ UserGrid = Ext.extend(Ext.ux.Grid,{
 				this.getTopToolbar().show();
 			App.getApp().disableBarByBusiCode(this.getTopToolbar(),['1020','1025','1015'],false);
 		}
-		App.getApp().disableBarByBusiCode(this.getTopToolbar(),['1040'],true);
+//		App.getApp().disableBarByBusiCode(this.getTopToolbar(),['1040'],true);
 	},
 	refresh:function(){
 		this.userStore.load();

@@ -23,12 +23,12 @@ SelectUserPanel = Ext.extend(Ext.Panel, {
 		this.userGrid = new Ext.grid.GridPanel({
 			store: this.store,
 	        columns: [
-	            {id: 'autoExpandColumn',menuDisabled: true, align: 'left', header: "终端信息", sortable: false, dataIndex: 'user_name'},
+	            {id: 'autoExpandColumn',menuDisabled: true, align: 'left', header: lmain("user._form.terminalInfo"), sortable: false, dataIndex: 'user_name'},
 	            {menuDisabled: true, hidden: true,width: 20, align: 'left', header: "", sortable: false, dataIndex: 'package_group_name'}
 	        ],
 	        view: new Ext.grid.GroupingView({
 	            forceFit:true,
-	            groupTextTpl: '{group} 已选{[values.rs.length]} 个终端'
+	            groupTextTpl: lbc("common.defaultGroupTpl", null, ['{group}','{[values.rs.length]}'])
 	        }),
 	        width: 700,
 	        border: false,
@@ -257,8 +257,8 @@ OpenDispatchUserWindow = Ext.extend(Ext.Window, {
 				}]
 			}],
 			buttons:[
-			         {text:lbc("common.save"), iconCls:'icon-save', scope:this, handler: this.doPassResultToParent},
-			         {text:lbc("common.close"), iconCls:'icon-close', scope:this, handler: this.hide},
+			         {text:lbc("common.save"), iconCls:'icon-save', scope:this, handler: this.doPassResultToParent}/*,
+			         {text:lbc("common.close"), iconCls:'icon-close', scope:this, handler: this.hide}*/
 			]
 		});
 	},
@@ -300,6 +300,8 @@ OpenDispatchUserWindow = Ext.extend(Ext.Window, {
 			// 父面板加载数据
 			this.parent.store.loadData(targetData);
 			this.hide();
+		}else{
+			Alert('请选择要参加套餐的终端用户!');
 		}
 	},
 	// 如果已经有默认值了，就不需要显示窗口，跳过选择的步骤
@@ -358,7 +360,24 @@ OpenDispatchUserWindow = Ext.extend(Ext.Window, {
 				}
 			}
 		}else{
-			tmpUsers = groupUsers;
+			selectedUsers = [];
+			var userSelectList = this.allUserGroup[groupId]['group']['userSelectList'];
+			if(userSelectList.length > 0){
+				for(var i=0,len=groupUsers.length;i<len;i++){
+					var flag = false;
+					Ext.each(userSelectList, function(userId){
+						if(groupUsers[i]['user_id'] == userId){
+							selectedUsers.push(groupUsers[i]);
+						}else{
+							tmpUsers.push((groupUsers[i]));
+						}
+					}, this);
+				}
+				
+			}else{
+				tmpUsers = groupUsers;
+			}
+			
 		}
 		this.fromUserStore.loadData(tmpUsers);
 		this.toUserStore.loadData(selectedUsers || []);
@@ -377,8 +396,9 @@ OpenDispatchUserWindow = Ext.extend(Ext.Window, {
 		}
 	},
 	setGridTitle: function(){
-		this.fromSm.grid.setTitle("共"+ this.fromUserStore.getCount() + "个可选用户");
-		this.toSm.grid.setTitle("已选"+ this.toUserStore.getCount() + "个用户");
+		
+		this.fromSm.grid.setTitle(lbc("common.optionalGroup", null, [this.fromUserStore.getCount()]));
+		this.toSm.grid.setTitle(lbc("common.selectedGroup", null, [this.toUserStore.getCount()]));
 	},
 	setActiveItemsCount: function(){
 		var arr = this.selectedDataMap[this.currentActiveGroup];
@@ -439,7 +459,35 @@ OpenDispatchUserWindow = Ext.extend(Ext.Window, {
 			this.fromUserStore.removeAll();
 			this.toUserStore.removeAll();
 		}
-		return OpenDispatchUserWindow.superclass.show.call(this);
+		OpenDispatchUserWindow.superclass.show.call(this);
+		
+		if(data){
+			var userArray = [];
+			for(var i=0,len=data["groupList"].length;i<len;i++){
+				var groupId = data["groupList"][i]['package_group_id'];
+				var users = this.allUserGroup[groupId]['users'];
+				var selectUserIds = this.allUserGroup[groupId]['group']['userSelectList'];
+				
+				if(selectUserIds && selectUserIds.length>0){
+					this.selectedDataMap[groupId] = [];
+					for(var j=0,len2=users.length;j<len2;j++){
+						var flag = false;
+						Ext.each(selectUserIds, function(selectUId){
+							if(users[j]['user_id'] == selectUId){
+								this.selectedDataMap[groupId].push({
+									'user_id': users[j]['user_id'],
+									'user_name': users[j]['user_name']
+								});
+							}
+						}, this);
+					}
+				}
+			}
+			if(data['needShow'] == false){
+				this.doPassResultToParent();
+			}
+		}
+		
 	},
 	doAnalysisData: function(data){
 		// 内容组

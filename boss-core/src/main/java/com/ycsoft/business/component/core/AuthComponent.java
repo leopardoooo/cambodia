@@ -23,6 +23,7 @@ import com.ycsoft.business.dao.core.job.JVodCommandDao;
 import com.ycsoft.business.dao.prod.PProdStaticResDao;
 import com.ycsoft.commons.abstracts.BaseComponent;
 import com.ycsoft.commons.constants.BusiCmdConstants;
+import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.exception.ComponentException;
 import com.ycsoft.commons.exception.ErrorCode;
@@ -117,7 +118,10 @@ public class AuthComponent extends BaseComponent{
 			//宽带刷新设备要发销户、开户、2个指令
 			this.deleteBandUser(user, doneCode);
 			this.openBandUser(user, doneCode);
-			//this.refreshBandUserAuth(user, doneCode);
+			//如果用户是报停状态，则钝化用户
+			if(user.getStatus().equals(StatusConstants.REQSTOP)){
+				this.stopBandUser(user, doneCode);
+			}
 		}else if(authCmdType.equals(BusiCmdConstants.CHANGE_USER)){//修改密码...
 			this.updatePassword(user,doneCode);
 		}else {

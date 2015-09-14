@@ -8,7 +8,7 @@
  
  //打印的条数
  PRINT_PAGE_SIZE = 5 ;
- 
+var INVOICE_SIZE = 8;//发票长度 ,暂时不用
 var oldInvoiceId= "";
 var oldInvoiceCode="";
 var oldInvoiceBookId="";
@@ -587,7 +587,12 @@ InvoiceWindow = Ext.extend( Ext.Window ,{
 				var store = this.invoiceGrid.getColumnModel().getColumnById('col_invoiceCode').editor.getStore();
 				store.loadData(data);
 			};
-			this.checkInvoice(invoiceId,successFunc);
+			var clearFunc = function(){
+				obj.record.set('invoiceId','');
+				obj.record.set('invoice_code','');
+				obj.record.set('invoice_book_id','');
+			};
+			this.checkInvoice(invoiceId,successFunc,clearFunc);
 		}
 	},
 	afterEdit : function(o){
@@ -603,7 +608,7 @@ InvoiceWindow = Ext.extend( Ext.Window ,{
 				// 发票号码如果为1，则发票号码累加
 				for(var i = o.row + 1,count=this.invoiceStore.getCount(); i< count;i++){
 					currentVal++;
-					this.invoiceStore.getAt(i).set("invoiceId", String.leftPad(parseInt(currentVal,10)+1,invoiceLength,'0'));
+					this.invoiceStore.getAt(i).set("invoiceId", Ext.util.Format.lpad(currentVal,invoiceLength,'0'));
 					this.invoiceStore.getAt(i).set("invoice_code", null);
 					this.invoiceStore.getAt(i).set("invoice_book_id", null);
 				}
@@ -682,7 +687,7 @@ InvoiceWindow = Ext.extend( Ext.Window ,{
 						
 					}
 					this.doAddInvoice(invoiceId,invoiceCode,invoiceBookId);
-//					this.invoiceGrid.startEditing(1, 2);
+					this.invoiceGrid.startEditing(1, 2);
 				};
 				var clearFunc = function(){
 					invoiceId='';
@@ -815,7 +820,7 @@ InvoiceWindow = Ext.extend( Ext.Window ,{
 			Ext.Ajax.request({
 				url: Constant.ROOT_PATH+"/core/x/Pay!saveInvoiceInfo.action",
 				params : baseparam,
-				async : false,
+//				async : false,
 				scope: this,
 				success: function(res , ops ){
 					for(var i =0 ;i<all.length ;i++){
@@ -835,10 +840,6 @@ InvoiceWindow = Ext.extend( Ext.Window ,{
 	 					valuableGrid.getStore().reload();
 	 				}
 	 				
-	 				if (Ext.getCmp("PrintPanel").printStore.getCount()==0){
-						App.getApp().data.currentResource.busicode = null;
-	 					App.getApp().menu.hideBusiWin();
-	 				}
 					App.getApp().main.infoPanel.getPayfeePanel().acctFeeGrid.remoteRefresh();
 					App.getApp().main.infoPanel.getPayfeePanel().busiFeeGrid.remoteRefresh();
 					App.getApp().main.infoPanel.getDocPanel().invoiceGrid.remoteRefresh();

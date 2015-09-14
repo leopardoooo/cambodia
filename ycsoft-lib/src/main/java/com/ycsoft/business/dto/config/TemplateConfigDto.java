@@ -67,7 +67,9 @@ public class TemplateConfigDto extends TTemplate {
 		/**自动退订天数**/
 		PROD_CANCEL_DAYS,
 		/**在网协议截止日期月份数**/
-		PROTOCOL_DATE_MONTHS
+		PROTOCOL_DATE_MONTHS,
+		/**发票缴销仓库**/
+		INVOICE_DEPT_CHECKOUT
 	};
 
 	private List<TConfigTemplate> configList = null;

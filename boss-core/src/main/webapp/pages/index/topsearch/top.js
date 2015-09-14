@@ -1,8 +1,3 @@
-/**
- * 顶部面板的组件封装
- **/
- 
- 
  /**
  * 为搜索面板初始化事件
  */
@@ -197,20 +192,21 @@ Ext.apply(TopSearch.prototype , {
 					App.removeTip();
 					
 					var rs = Ext.decode(res.responseText);
-//					if(!Ext.isEmpty(rs)){
-//						Alert('请处理未支付或未打印发票客户，点击确定后跳转，请为该客户支付费用和打印发票',function(){
-//							App.getData().paySearch  = false;
-//							this.searchCust(rs,'cust_no');
-//							//App.openPrint();
-//						},this);
-//					}else{
+					if(!Ext.isEmpty(rs)){
+						Alert('请处理未支付或未打印发票客户，点击确定后跳转，请为该客户支付费用和打印发票',function(){
+							App.getData().paySearch  = false;
+							Ext.getDom('q').value = '';
+							this.searchCust(rs,'cust_no');
+							//App.openPrint();
+						},this);
+					}else{
 						if(v==true){
 							App.getData().paySearch = true;
 						}else{
 							App.getData().paySearch = false;
 						}
 						this.searchCust();
-//					}
+					}
 				}
 			});
 		}else{
@@ -245,10 +241,11 @@ Ext.apply(TopSearch.prototype , {
 	}
 });
 
-SearchCustWindow = Ext.extend( Ext.Window , {
+SearchCustWindow = Ext.extend( Ext.Window , {//复杂查询
 	form : null,
 	searchStore : null,
 	constructor : function(){
+		this.LU_CS = langUtils.bc('home.tools.CustSearch');
 		//实例化store
 		this.searchStore = App.search.searchStore;
 		
@@ -262,27 +259,27 @@ SearchCustWindow = Ext.extend( Ext.Window , {
 				xtype : 'textfield'
 			},
 			items : [{
-				fieldLabel : '客户名称',
+				fieldLabel : this.LU_CS['labelCustName'],
 				width : 140,
 				name : 'cust.cust_name'
 			},{
-				fieldLabel : '意向客户',
+				fieldLabel :this.LU_CS['labelStatus'],
 				name:'cust.status',
 				xtype:'checkbox',
 				inputValue:'PREOPEN'
 			},{
-				fieldLabel : '客户地址',
+				fieldLabel : this.LU_CS['labelAddress'],
 				width : 140,
 				name : 'cust.address'
 			},{
-				fieldLabel : '账号',
+				fieldLabel : this.LU_CS['labelLoginName'],
 				width : 140,
 				name : 'cust.login_name'
 			}]
 		});
 		
 		SearchCustWindow.superclass.constructor.call(this,{
-			title : '客户查询',
+			title : this.LU_CS['_title'],
 			id : 'SearchCustWindow',
 			maximizable : false,
 			layout : 'fit',
@@ -291,12 +288,12 @@ SearchCustWindow = Ext.extend( Ext.Window , {
 			closeAction : 'close',
 			items : [this.form],
 			buttons : [{
-				text : '搜索',
+				text : langUtils.bc('home.searchBtns')[0],
 				scope : this,
 				iconCls : 'query',
 				handler : this.doSearch
 			}, {
-				text : '关闭',
+				text : langUtils.bc('common.close'),
 				scope : this,
 				handler : function() {
 					this.close();
@@ -310,7 +307,7 @@ SearchCustWindow = Ext.extend( Ext.Window , {
 		}
 		var all = this.form.getForm().getValues();
 		if(Ext.isEmpty(all['cust.cust_name']) && Ext.isEmpty(all['cust.address']) && Ext.isEmpty(all['cust.login_name']) && Ext.isEmpty(all['cust.status'])){
-			Alert('请任填一项进行搜索!')
+			Alert(this.LU_CS['tipInputAnyField']);
 		}else{
 			all['search_type'] = 'MULTIPLE';
 			this.searchStore.baseParams = all;
@@ -338,18 +335,18 @@ ChooseCustWindow = Ext.extend( Ext.Window , {
 		this.parent = parent;
 		
 		var cm = [
-			{header: '受理编号', dataIndex: 'cust_no',width:85},
-			{header: '客户名称', dataIndex: 'cust_name',width:80,renderer:App.qtipValue},
-			{header: '客户地址', dataIndex: 'addr_id_text', width: 240,
+			{header: lmain("cust.base.busiId"), dataIndex: 'cust_no',width:85},
+			{header: lmain("cust.base.name"), dataIndex: 'cust_name',width:80,renderer:App.qtipValue},
+			{header: lmain("cust.base.addr"), dataIndex: 'addr_id_text', width: 240,
 				renderer: function(value,md,record){
 					value = record.get('address');
 					return value;
 				}},
-			{header: '客户状态', dataIndex: 'status_text',width: 60},
-			{header: '客户类型', dataIndex: 'cust_type_text',width: 70},
-			{header: '客户级别', dataIndex: 'cust_level_text',width: 70},
-			{header: '黑名单', dataIndex: 'is_black_text',width: 50},
-			{id: 'autoCol', header: '开户时间', dataIndex: 'open_time',renderer:App.qtipValue}
+			{header: lmain("cust.base.status"), dataIndex: 'status_text',width: 60},
+			{header: lmain("cust.base.type"), dataIndex: 'cust_type_text',width: 70},
+			{header: lmain("cust.base.cust_level"), dataIndex: 'cust_level_text',width: 70},
+			{header: lmain("cust.base.blackList"), dataIndex: 'is_black_text',width: 50},
+			{id: 'autoCol', header: lmain("cust.base.openDate"), dataIndex: 'open_time',renderer:App.qtipValue}
 		];
 		
 		//实例化cust grid panel
@@ -364,7 +361,7 @@ ChooseCustWindow = Ext.extend( Ext.Window , {
 			})
 	    })
 		ChooseCustWindow.superclass.constructor.call(this,{
-			title: '选择客户',
+			title: lmain("cust.base.switchCustTitle"),
 			width: 600,
 			height: 400,
 			layout: 'fit',
@@ -385,5 +382,3 @@ ChooseCustWindow = Ext.extend( Ext.Window , {
 		ChooseCustWindow.superclass.initEvents.call(this);
 	}
 });
- 
- 
