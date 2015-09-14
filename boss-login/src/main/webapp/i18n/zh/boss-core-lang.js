@@ -206,7 +206,18 @@ BCLang.home = {
 				modemModel: 'Modem型号~',
 				newModemId: '新Modem号~',
 				newModemModel: '新Modem型号~',
-				changeCause: '更换原因~'
+				changeCause: '更换原因~',
+				userName: '用户名~',
+				chargeNum: '收费数量~',
+				desc: '描述~',
+				feeItem: '费用项~',
+				unitPrice: '单价~',
+				ipFeeDesc: 'IP费用=单价*收费数量*月数（或者相差天数/30）~',
+				tipNoChargeNumber: '费用编号不存在!~',
+				expDate: '到期日~',
+				payMonth: '补收月数~',
+				totalPrice: '总价~',
+				timeSlot: '时间段~'
 			},
 			list: {
 				_title: '用户信息~',

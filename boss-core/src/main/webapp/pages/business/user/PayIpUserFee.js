@@ -23,7 +23,7 @@ PayIpUserFeeForm = Ext.extend(BaseForm,{
 				name : 'user_id'
 			},{
 				xtype : 'textfield',
-				fieldLabel : '用户名',
+				fieldLabel : lmain("user._form.userName"),
 				style : Constant.TEXTFIELD_STYLE,
 				value : this.record.get('user_name')
 			},{
@@ -35,12 +35,12 @@ PayIpUserFeeForm = Ext.extend(BaseForm,{
 				value : this.record.get('str4')
 			},{
 				xtype : 'textfield',
-				fieldLabel : '到期日',
+				fieldLabel : lmain("expDate"),
 				style : Constant.TEXTFIELD_STYLE,
 				id:'expDateId'
 			},{
 				xtype : 'numberfield',
-				fieldLabel : '补收月数',
+				fieldLabel : lmain("user._form.payMonth"),
 				allowDecimals:false,//不允许输入小数 
 			    allowNegative:false,
 				id:'payMonth',
@@ -55,7 +55,7 @@ PayIpUserFeeForm = Ext.extend(BaseForm,{
 			},{
                 xtype: 'displayfield',
                 width : 350,
-                fieldLabel:'描述',
+                fieldLabel:lbc("common.remark"),
                 id:'feeDescId'
 			}]
 		})
@@ -72,10 +72,10 @@ PayIpUserFeeForm = Ext.extend(BaseForm,{
 				Ext.getCmp('expDateId').setValue(Ext.util.Format.dateFormat(rec.CProdOrder.exp_date));
 				if(rec.tBusiFee){
 					this.busiFee = rec.tBusiFee;
-					Ext.getCmp('feeDescId').setValue("<font style='font-size:14px'>费用项:<b>"+rec.tBusiFee.fee_name+"</b>," +
-						"单价:<b>"+Ext.util.Format.convertToYuan(rec.tBusiFee.default_value)+"</b>,收费数量:<b>"+this.record.get('str6')+"</b>" +
-						"</font>"+"<br>总价:<font style='font-size:16px;color:red'><b><span id='busiFeeAmount'>--</span></b></font>" +
-						",时间段:<font style='font-size:16px;color:red'><b><span id='busiFeeDate'>--</span></b></font>");
+					Ext.getCmp('feeDescId').setValue("<font style='font-size:14px'>"+lmain('user._form.feeItem')+":<b>"+rec.tBusiFee.fee_name+"</b>,"
+						+lmain('user._form.unitPrice')+":<b>"+Ext.util.Format.convertToYuan(rec.tBusiFee.default_value)+"</b>,"+lmain('user._form.chargeNum')+":<b>"+this.record.get('str6')+"</b>"
+						+"</font>"+"<br>"+lmain('user._form.totalPrice')+":<font style='font-size:16px;color:red'><b><span id='busiFeeAmount'>--</span></b></font>,"
+						+lmain('user._form.timeSlot')+":<font style='font-size:16px;color:red'><b><span id='busiFeeDate'>--</span></b></font>");
 						
 				}
 			}
@@ -114,11 +114,11 @@ PayIpUserFeeForm = Ext.extend(BaseForm,{
 			obj["isValid"] = true;
 		}else{
 			obj["isValid"] = false;
-			obj["msg"] = "含有验证不通过的输入项";
+			obj["msg"] = lbc("common.tipFormInvalid");
 		}
 		if(this.busiFeeAmount == 0){
 			obj["isValid"] = false;
-			obj["msg"] = "费用不存在!";
+			obj["msg"] = lmain("tipNoChargeNumber");
 		}
 		return obj;
 	},

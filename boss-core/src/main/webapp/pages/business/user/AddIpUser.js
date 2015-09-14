@@ -26,7 +26,7 @@ AddIpUserForm = Ext.extend(BaseForm,{
 				id:'userStrId'
 			},{
 				xtype : 'textfield',
-				fieldLabel : '用户名',
+				fieldLabel : lmain("user._form.userName"),
 				style : Constant.TEXTFIELD_STYLE,
 				value : record.get('user_name'),
 				id : 'userName'
@@ -40,7 +40,7 @@ AddIpUserForm = Ext.extend(BaseForm,{
 				value : record.get('str4'),
 				xtype:'textarea'
 			},{
-				fieldLabel:'收费数量',
+				fieldLabel: lmain("user._form.chargeNum"),
 				xtype:'numberfield',
 				name:'user.str6',
 				value : record.get('str6'),
@@ -49,7 +49,7 @@ AddIpUserForm = Ext.extend(BaseForm,{
 			},{
                 xtype: 'displayfield',
                 width : 350,
-                fieldLabel:'描述',
+                fieldLabel: lbc("common.remark"),
                 id:'feeDescId'
 			}]
 		})
@@ -61,8 +61,9 @@ AddIpUserForm = Ext.extend(BaseForm,{
 			success : function(res,opt){
 				var rec = Ext.decode(res.responseText);
 				Ext.getCmp('userStrId').setValue(rec.fee_id);
-				Ext.getCmp('feeDescId').setValue("<font style='font-size:14px'>费用项为<b>"+rec.fee_name+"</b>," +
-						"单价为<b>"+Ext.util.Format.convertToYuan(rec.default_value)+"</b>,<br>IP费用=单价*收费数量*月数（或者相差天数/30）</font>");
+				Ext.getCmp('feeDescId').setValue("<font style='font-size:14px'>"+lmain('user._form.feeItem')+":<b>"+rec.fee_name+"</b>,"
+					+lmain('user._form.unitPrice')+":<b>"+Ext.util.Format.convertToYuan(rec.default_value)+"</b>,<br>"
+					+lmain('user._form.ipFeeDesc')+"</font>");
 			}
 		});
 		
@@ -79,11 +80,11 @@ AddIpUserForm = Ext.extend(BaseForm,{
 			obj["isValid"] = true;
 		}else{
 			obj["isValid"] = false;
-			obj["msg"] = "含有验证不通过的输入项";
+			obj["msg"] = lbc("common.tipFormInvalid");
 		}
 		if(this.getForm().findField('user.str5').getValue()==0){
 			obj["isValid"] = false;
-			obj["msg"] = "费用编号不存在!";
+			obj["msg"] = lmain("tipNoChargeNumber");
 		}
 		return obj;
 	},

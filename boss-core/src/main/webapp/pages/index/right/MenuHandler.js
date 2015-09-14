@@ -105,8 +105,8 @@ Ext.apply(MenuHandler, {
 		if(!hasCust()){
 			return false;
 		}
-		Confirm(LU_MSG('confirmRestoreCust'),this,function(){
-			Ext.getBody().mask(LU_MSG('waitMsg'));
+		Confirm(lmsg('confirmRestoreCust'),this,function(){
+			Ext.getBody().mask(lmsg('waitMsg'));
 			
 			var all = {custId:App.getApp().getCustId()};
 			//公有的参数
@@ -124,11 +124,11 @@ Ext.apply(MenuHandler, {
 					tip = null;
 					var result = Ext.decode(res.responseText);
 					if (result.success == true) {
-						Alert(LU_MSG('restoreCustSuccess'));
+						Alert(lmsg('restoreCustSuccess'));
 						Ext.getBody().unmask();
 						App.search.doRefreshCust(result.custInfo.cust);
 					}else{
-						Alert(LU_MSG('restoreCustFailed'));
+						Alert(lmsg('restoreCustFailed'));
 					}
 				}
 			})
@@ -143,12 +143,12 @@ Ext.apply(MenuHandler, {
 		var count = App.main.infoPanel.getUserPanel().userGrid.getStore()
 				.getCount();
 		if (count != 0) {
-			Alert(LU_MSG('needLogOffUser'));
+			Alert(lmsg('needLogOffUser'));
 			return false;
 		}
 		var custDeviceGrid = App.getApp().main.infoPanel.getCustPanel().custDeviceGrid;
 		if (custDeviceGrid.GDDeviceArray.length > 0) {
-			Alert(LU_MSG('recycleGdDevice'));
+			Alert(lmsg('recycleGdDevice'));
 			return false;
 		}
 		// alert(custDeviceGrid.CustDeviceArray.length);
@@ -200,7 +200,7 @@ Ext.apply(MenuHandler, {
 			return false;
 
 		if (App.data.custFullInfo.cust.status == 'RELOCATE') {
-			Alert(LU_MSG('custIsRelocated'))
+			Alert(lmsg('custIsRelocated'))
 			return false;
 		}
 
@@ -208,7 +208,7 @@ Ext.apply(MenuHandler, {
 		function callback(res, opt) {
 			var result = Ext.decode(res.responseText);
 			if (result.success == true) {
-				Alert(LU_MSG('commonSuccess'));
+				Alert(lmsg('commonSuccess'));
 				App.getApp().refreshPanel('1119');// 1119：客户拆迁
 			}
 		}
@@ -216,7 +216,7 @@ Ext.apply(MenuHandler, {
 
 		var params = {};
 		params['custId'] = App.getApp().getCustId();
-		Confirm(LU_MSG('confirmRelocateCust'), this, function() {
+		Confirm(lmsg('confirmRelocateCust'), this, function() {
 					// 调用请求函数,详细参数请看busi-helper.js
 					App.sendRequest(url, params, callback);
 				});
@@ -228,7 +228,7 @@ Ext.apply(MenuHandler, {
 		if (!hasCust())
 			return false;
 		if (App.data.custFullInfo.cust.cust_type == "UNIT") {
-			Alert(LU_MSG('notAllowedJoinUnit'));
+			Alert(lmsg('notAllowedJoinUnit'));
 			return false;
 		}
 		return {
@@ -245,7 +245,7 @@ Ext.apply(MenuHandler, {
 		function callback(res, opt) {
 			var result = Ext.decode(res.responseText);
 			if (result.success == true) {
-				Alert(LU_MSG('commonSuccess'));
+				Alert(lmsg('commonSuccess'));
 				App.getApp().refreshPanel('1006');// 1006：退出单位
 			}
 		}
@@ -255,7 +255,7 @@ Ext.apply(MenuHandler, {
 		params['custId'] = App.getApp().getCustId();
 		params['unitId'] = App.getCust().unit_id;
 
-		Confirm(LU_MSG('confirmQuitUnit'), this, function() {
+		Confirm(lmsg('confirmQuitUnit'), this, function() {
 					// 调用请求函数,详细参数请看busi-helper.js
 					App.sendRequest(url, params, callback);
 				});
@@ -269,7 +269,7 @@ Ext.apply(MenuHandler, {
 		function callback(res, opt) {
 			var result = Ext.decode(res.responseText);
 			if (result.success == true) {
-				Alert(LU_MSG('commonSuccess'));
+				Alert(lmsg('commonSuccess'));
 				App.getApp().main.infoPanel.getCustPanel().custInfoPanel.remoteRefresh();
 				App.getApp().main.infoPanel.getCustPanel().custDetailTab.propChangeGrid.remoteRefresh();
 			}
@@ -278,7 +278,7 @@ Ext.apply(MenuHandler, {
 		var url = Constant.ROOT_PATH + "/core/x/Bank!bankStop.action";
 		var params = {};
 		params['custId'] = App.getApp().getCustId();
-		Confirm(LU_MSG('confirmBankStop'), this, function() {
+		Confirm(lmsg('confirmBankStop'), this, function() {
 			// 调用请求函数,详细参数请看busi-helper.js
 			App.sendRequest(url, params, callback);
 		});
@@ -292,7 +292,7 @@ Ext.apply(MenuHandler, {
 		function callback(res, opt) {
 			var result = Ext.decode(res.responseText);
 			if (result.success == true) {
-				Alert(LU_MSG('commonSuccess'));
+				Alert(lmsg('commonSuccess'));
 				App.getApp().main.infoPanel.getUserPanel().userGrid.remoteRefresh();
 			}
 		}
@@ -305,11 +305,11 @@ Ext.apply(MenuHandler, {
 		var params = {};
 		params['prodSn'] = record.get('prod_sn');
 		
-		var txt = LU_MSG('confirmEnableBankPay');
+		var txt = lmsg('confirmEnableBankPay');
 		if(record.get('is_bank_pay') == 'T'){
-			txt = LU_MSG('confirmDisableBankPay');
+			txt = lmsg('confirmDisableBankPay');
 		}
-		Confirm(LU_MSG('confirmEditBankPay')+txt, this, function() {
+		Confirm(lmsg('confirmEditBankPay')+txt, this, function() {
 			// 调用请求函数,详细参数请看busi-helper.js
 			App.sendRequest(url, params, callback);
 		});
@@ -323,7 +323,7 @@ Ext.apply(MenuHandler, {
 		function callback(res, opt) {
 			var result = Ext.decode(res.responseText);
 			if (result.success == true) {
-				Alert(LU_MSG('commonSuccess'));
+				Alert(lmsg('commonSuccess'));
 				App.getApp().main.infoPanel.getCustPanel().custInfoPanel.remoteRefresh();
 				App.getApp().main.infoPanel.getCustPanel().custDetailTab.propChangeGrid.remoteRefresh();
 			}
@@ -332,7 +332,7 @@ Ext.apply(MenuHandler, {
 		var url = Constant.ROOT_PATH + "/core/x/Bank!bankResume.action";
 		var params = {};
 		params['custId'] = App.getApp().getCustId();
-		Confirm(LU_MSG('confirmBankResume'), this, function() {
+		Confirm(lmsg('confirmBankResume'), this, function() {
 			// 调用请求函数,详细参数请看busi-helper.js
 			App.sendRequest(url, params, callback);
 		});
@@ -388,12 +388,12 @@ Ext.apply(MenuHandler, {
 		function callback(res, opt) {
 			var result = Ext.decode(res.responseText);
 			if (result.success == true) {
-				Alert(LU_MSG('commonSuccess'));
+				Alert(lmsg('commonSuccess'));
 				App.getCust().status = result.simple_obj;
 				App.getApp().refreshPanel('1220');
 			}
 		}
-		Confirm(LU_MSG('confirmRenewCust'), this, function() {
+		Confirm(lmsg('confirmRenewCust'), this, function() {
 					App.sendRequest(url, null, callback);
 				});
 		return false;
@@ -407,7 +407,7 @@ Ext.apply(MenuHandler, {
 		var userGrid = App.getApp().main.infoPanel.userPanel.userGrid;
 		var record = userGrid.getSelectionModel().getSelected();
 		if(record.get('modem_mac')){//TODO 如果有猫,暂时不给换.
-			Alert(LU_MSG('custHasUnSuitableDev'));
+			Alert(lmsg('custHasUnSuitableDev'));
 			return false;
 		}
 		// 关闭过滤窗口
@@ -420,7 +420,7 @@ Ext.apply(MenuHandler, {
 		if(continueFlag){
 			return {width : 650,height : 310};
 		}else{
-			Alert(LU_MSG('custCantExchangeDev'));
+			Alert(lmsg('custCantExchangeDev'));
 			return false;
 		}
 	},
@@ -513,7 +513,7 @@ Ext.apply(MenuHandler, {
 		function callback(res, opt) {
 			var data = Ext.decode(res.responseText);
 			if (data['success'] == true) {
-				Alert(LU_MSG('regLossSuccess'), function() {
+				Alert(lmsg('regLossSuccess'), function() {
 							App.main.infoPanel.getCustPanel().custDeviceGrid
 									.remoteRefresh();
 						}, this);
@@ -521,7 +521,7 @@ Ext.apply(MenuHandler, {
 		}
 		var params = {};
 		params['deviceId'] = record.get('device_id');
-		Confirm(LU_MSG('confirmRegLoss'), this, function() {
+		Confirm(lmsg('confirmRegLoss'), this, function() {
 					App.sendRequest(url, params, callback);
 				});
 		return false;
@@ -534,11 +534,11 @@ Ext.apply(MenuHandler, {
 				.getSelectionModel().getSelections();
 
 		if (records.length === 0) {
-			Alert(LU_MSG('selectDev2RegLoss'));
+			Alert(lmsg('selectDev2RegLoss'));
 			return false;
 		}
 		if (records[0].get('loss_reg') === 'F') {
-			Alert(LU_MSG('selectDevIsRegLossAlready'));
+			Alert(lmsg('selectDevIsRegLossAlready'));
 			return false;
 		}
 		var url = Constant.ROOT_PATH
@@ -547,7 +547,7 @@ Ext.apply(MenuHandler, {
 		function callback(res, opt) {
 			var data = Ext.decode(res.responseText);
 			if (data['success'] == true) {
-				Alert(LU_MSG('unRegLossSuccess'), function() {
+				Alert(lmsg('unRegLossSuccess'), function() {
 							App.main.infoPanel.getCustPanel().custDeviceGrid
 									.remoteRefresh();
 						}, this);
@@ -555,7 +555,7 @@ Ext.apply(MenuHandler, {
 		}
 		var params = {};
 		params['deviceId'] = records[0].get('device_id');
-		Confirm(LU_MSG('confirmUnRegLoss'), this, function() {
+		Confirm(lmsg('confirmUnRegLoss'), this, function() {
 					App.sendRequest(url, params, callback);
 				});
 		return false;
@@ -571,14 +571,14 @@ Ext.apply(MenuHandler, {
 		function callback(res, opt) {
 			var data = Ext.decode(res.responseText);
 			if (data['success'] == true) {
-				Alert(LU_MSG('statusNotPrintStatusSuccess'), function() {
+				Alert(lmsg('statusNotPrintStatusSuccess'), function() {
 					grid.remoteRefresh();
 				}, this);
 			}
 		}
 		var params = {};
 		params['fee_sn'] = record.get('fee_sn');
-		Confirm(LU_MSG('confirmNotPrintStatus'), this, function() {
+		Confirm(lmsg('confirmNotPrintStatus'), this, function() {
 			App.sendRequest(url, params, callback);
 		});
 		return false;
@@ -594,14 +594,14 @@ Ext.apply(MenuHandler, {
 		function callback(res, opt) {
 			var data = Ext.decode(res.responseText);
 			if (data['success'] == true) {
-				Alert(LU_MSG('statusPrintStatusSuccess'), function() {
+				Alert(lmsg('statusPrintStatusSuccess'), function() {
 							grid.remoteRefresh();
 						}, this);
 			}
 		}
 		var params = {};
 		params['fee_sn'] = record.get('fee_sn');
-		Confirm(LU_MSG('confirmPrintStatus'), this, function() {
+		Confirm(lmsg('confirmPrintStatus'), this, function() {
 					App.sendRequest(url, params, callback);
 				});
 		return false;
@@ -613,11 +613,11 @@ Ext.apply(MenuHandler, {
 		var records = App.getApp().main.infoPanel.getCustPanel().custDeviceGrid
 				.getSelectionModel().getSelections();
 		if (records.length === 0) {
-			Alert(LU_MSG('selectDev2Sale'));
+			Alert(lmsg('selectDev2Sale'));
 			return false;
 		}
 		if (records[0].get('ownership') == 'CUST') {
-			Alert(LU_MSG('cantSaleCosOwerIsCust'));
+			Alert(lmsg('cantSaleCosOwerIsCust'));
 			return false;
 		}
 		return {
@@ -628,7 +628,7 @@ Ext.apply(MenuHandler, {
 	// 修改购买方式
 	ChangeDeviceType : function() {
 		var record = App.getApp().main.infoPanel.getCustPanel().custDeviceGrid.getSelectionModel().getSelected();
-		var btn = {text:LU_MSG('modifyBuyType'),attrs:App.data.currentResource};
+		var btn = {text:lmsg('modifyBuyType'),attrs:App.data.currentResource};
 		var cfg = {width : 560,height : 460}; 
 		if(record.get('depot_id') == App.data.optr['dept_id']){
 			App.menu.bigWindow.show(btn,cfg);
@@ -658,9 +658,9 @@ Ext.apply(MenuHandler, {
 
 		var ownership = record.get('ownership'), msg;
 		if (ownership == CoreConstant.OWNERSHIP_GD) {
-			msg = LU_MSG('changeOwner2Cust');
+			msg = lmsg('changeOwner2Cust');
 		} else {
-			msg = LU_MSG('changeOwner2Gd');
+			msg = lmsg('changeOwner2Gd');
 		}
 
 		Confirm(msg, this, function() {
@@ -670,7 +670,7 @@ Ext.apply(MenuHandler, {
 					}, function(res, opt) {
 						var data = Ext.decode(res.responseText);
 						if (data['success'] == true) {
-							Alert(LU_MSG('cangeOwnerSuccess'));
+							Alert(lmsg('cangeOwnerSuccess'));
 							App
 									.getApp()
 									.refreshPanel(App.getApp().getData().currentResource.busicode);
@@ -687,11 +687,11 @@ Ext.apply(MenuHandler, {
 		var deviceids = App.getApp().main.infoPanel.getCustPanel().custDeviceGrid
 				.getSelectionModel().getSelections();
 		if (deviceids.length == 0) {
-			Alert(LU_MSG('selectDev2Recycle'));
+			Alert(lmsg('selectDev2Recycle'));
 			return false;
 		}
 		if (deviceids[0].get("status") == "USE") {
-			Alert(LU_MSG('devCantRecycleStillInUse'));
+			Alert(lmsg('devCantRecycleStillInUse'));
 			return false;
 		};
 		return {
@@ -702,7 +702,7 @@ Ext.apply(MenuHandler, {
 	ChangeNonresCust: function(){
 		if(!hasCust()) return false;
 		if (App.data.custFullInfo.cust.cust_type != 'RESIDENT') {
-			Alert(LU_MSG('onlyResidentCanNonResiCust'))
+			Alert(lmsg('onlyResidentCanNonResiCust'))
 			return false;
 		}
 //		if(App.main.infoPanel.getCustPanel().packageGrid.getStore().getCount() > 0){
@@ -736,23 +736,23 @@ Ext.apply(MenuHandler, {
 		// 回调函数
 		function callback(res, opt) {
 			if (res.responseText == 'true') {
-				Alert(LU_MSG('depositUnPaySuccess'), function() {
+				Alert(lmsg('depositUnPaySuccess'), function() {
 							App.main.infoPanel.getPayfeePanel().busiFeeGrid
 									.remoteRefresh();
 						}, this);
 			}
 		}
 		if (records.get('status') !== 'PAY') {
-			Alert(LU_MSG('unPayed'));
+			Alert(lmsg('unPayed'));
 			return false;
 		}
 		if (records.get('deposit') == 'F') {
-			Alert(LU_MSG('notDeposit'));
+			Alert(lmsg('notDeposit'));
 			return false;
 		}
 		var params = {};
 		params['feeSn'] = records.get('fee_sn');
-		Confirm(LU_MSG('confirmDepositUnPay'), this, function() {
+		Confirm(lmsg('confirmDepositUnPay'), this, function() {
 					App.sendRequest(url, params, callback);
 				});
 		return false;
@@ -808,9 +808,14 @@ Ext.apply(MenuHandler, {
 	SingleLogoffUser : function() {
 		if (!hasCust())
 			return false;
-		var record = App.getApp().main.infoPanel.getUserPanel().userGrid.getSelectionModel().getSelected();	
-		if (record.get("status") != "ACTIVE" ) {
-			Alert(LU_MSG('userNotActive'));
+		var userGrid = App.main.infoPanel.getUserPanel().userGrid;
+		var userRecords = userGrid.getSelections();
+		if (userRecords.length == 0) {
+			Alert(lmsg('needUser'));
+			return false;
+		}
+		if (userRecords[0].get("status") != "ACTIVE" ) {
+			Alert(lmsg('userNotActive'));
 			return false;
 		}
 			
@@ -829,13 +834,13 @@ Ext.apply(MenuHandler, {
 		var len = userRecords.length;// 选中记录
 
 		if (len == 0) {
-			Alert(LU_MSG('needUser'));
+			Alert(lmsg('needUser'));
 			return false;
 		} else {
 			var dtv = false;// 如果选中的用户中不存在数字电视
 			for (i = 0; i < len; i++) {
 				if (userRecords[i].get("status") != "ACTIVE" && ( userRecords[i].get("status") != "OWELONG" ) ) {
-					Alert(LU_MSG('userNotActive'));
+					Alert(lmsg('userNotActive'));
 					return false;
 				}
 				if (userRecords[i].get("user_type") == 'DTV') {
@@ -870,7 +875,7 @@ Ext.apply(MenuHandler, {
 					}
 					// 选中的用户中有主终端,没选中的用户中没有主终端,有未选中的数字用户
 					if (!flag2 && flag && dtvAmount != len) {
-						Alert(LU_MSG('cantLogOffZzd'));
+						Alert(lmsg('cantLogOffZzd'));
 						return false;
 					}
 					
@@ -900,7 +905,7 @@ Ext.apply(MenuHandler, {
 				
 				var item = acctMap[uid];
 				if(item && item.real_balance <0){
-					Alert(LU_MSG('cantLogOffCosBaseProdOweFee'));
+					Alert(lmsg('cantLogOffCosBaseProdOweFee'));
 					return false;
 				}
 				
@@ -911,7 +916,7 @@ Ext.apply(MenuHandler, {
 				for(var idx = 0;idx<array.length;idx++){
 					var prod = array[idx];
 					if(prod.is_base == 'T' && prod.status != 'ACTIVE'){
-						Alert(LU_MSG('cantLogOffCosBaseProdNotActive'));
+						Alert(lmsg('cantLogOffCosBaseProdNotActive'));
 						return false;
 					}
 				}
@@ -941,7 +946,7 @@ Ext.apply(MenuHandler, {
 		var prodMap = App.main.infoPanel.getUserPanel().prodGrid.prodMap;
 		var prid = prodMap[record.get('user_id')];
 		if(null==prid || prid.length==0){
-			Alert(LU_MSG('cantPayIpUserFee'));
+			Alert(lmsg('cantPayIpUserFee'));
 			return false;
 		}
 		return {
@@ -974,7 +979,7 @@ Ext.apply(MenuHandler, {
 		});
 		
 		if(num >= 2 && record.get('str19') != 'T'){
-			Alert(LU_MSG('freeUsersOver2'));
+			Alert(lmsg('freeUsersOver2'));
 			return false;
 		}
 		return {
@@ -1015,13 +1020,13 @@ Ext.apply(MenuHandler, {
 						success : function(res, opt) {
 							var rec = Ext.decode(res.responseText);
 							if (rec.interactive_type == 'SINGLE') {
-								Alert(LU_MSG('singleInteractiveDevCantOpenDuplex'));
+								Alert(lmsg('singleInteractiveDevCantOpenDuplex'));
 								flag = false;
 							}
 						}
 					})
 		} else {
-			Alert(LU_MSG('custMustHaveDuplexDev'));
+			Alert(lmsg('custMustHaveDuplexDev'));
 			return false;
 		}
 		if (!flag) {
@@ -1048,17 +1053,17 @@ Ext.apply(MenuHandler, {
 					}
 				});
 		if (flag === true) {
-			Alert(LU_MSG('needCancelProgramFirst'));
+			Alert(lmsg('needCancelProgramFirst'));
 			return false;
 		}
 
-		Confirm(LU_MSG('confirmCancelDuplex'), this, function() {
+		Confirm(lmsg('confirmCancelDuplex'), this, function() {
 			App.sendRequest(Constant.ROOT_PATH
 							+ "/core/x/User!saveCancelOpenInteractive.action",
 					null, function(res, opt) {
 						var data = Ext.decode(res.responseText);
 						if (data['success'] === true) {
-							Alert(LU_MSG('confirmCancelDuplex'));
+							Alert(lmsg('confirmCancelDuplex'));
 							App
 									.getApp()
 									.refreshPanel(App.getApp().getData().currentResource.busicode);
@@ -1085,7 +1090,7 @@ Ext.apply(MenuHandler, {
 	OpenTemp : function() {
 		var prodStore = App.main.infoPanel.getUserPanel().prodGrid.getStore();
 		if (prodStore.getCount() == 0) {
-			Alert(LU_MSG('userHasNoBaseProd'));
+			Alert(lmsg('userHasNoBaseProd'));
 			return false;
 		}
 		for (var i = 0; i < prodStore.getCount(); i++) {
@@ -1105,7 +1110,7 @@ Ext.apply(MenuHandler, {
 							for (var j = 0; j < acctItems.length; j++) {
 								if (acctItems[j]['acctitem_id'] == prodId) {
 									if (acctItems[j]['real_balance'] > 1) {
-										Alert(LU_MSG('baseProdRechargedWait30Seconds'));
+										Alert(lmsg('baseProdRechargedWait30Seconds'));
 										return false;
 									}
 									break;
@@ -1121,13 +1126,13 @@ Ext.apply(MenuHandler, {
 			}
 		}
 		
-		Confirm(LU_MSG('confirmOpenTemp'), this, function() {
+		Confirm(lmsg('confirmOpenTemp'), this, function() {
 					App.sendRequest(Constant.ROOT_PATH
 									+ "/core/x/User!saveOpenTemp.action", null,
 							function(res, opt) {
 								var data = Ext.decode(res.responseText);
 								if (data == true) {
-									Alert(LU_MSG('openTempSuccess'));
+									Alert(lmsg('openTempSuccess'));
 									App.getApp().main.infoPanel.getUserPanel().userGrid
 											.remoteRefresh();
 								}
@@ -1142,7 +1147,7 @@ Ext.apply(MenuHandler, {
 		var userGrid = App.getApp().main.infoPanel.getUserPanel().userGrid;
 		var users = userGrid.getSelections();
 		if(users.length==0){
-			Alert(LU_MSG('noUserSelected'));
+			Alert(lmsg('noUserSelected'));
 			return false;
 		}
 		//验证过滤用户类型
@@ -1157,7 +1162,7 @@ Ext.apply(MenuHandler, {
 		
 		users = userGrid.getSelections();
 		if(users.length==0){
-			Alert(LU_MSG('noSelectedUserCanOpenTemp'));
+			Alert(lmsg('noSelectedUserCanOpenTemp'));
 			return false;
 		}
 		
@@ -1179,7 +1184,7 @@ Ext.apply(MenuHandler, {
 		}
 		users = userGrid.getSelections();
 		if(users.length==0){
-			Alert(LU_MSG('userHasExtraFreeDev'));
+			Alert(lmsg('userHasExtraFreeDev'));
 			return false;
 		}
 		
@@ -1354,7 +1359,7 @@ Ext.apply(MenuHandler, {
 		var userGrid = App.main.infoPanel.getUserPanel().userGrid;
 		var userRecords = userGrid.getSelections();
 		if (userRecords.length == 0) {
-			Alert(LU_MSG('needUser'));
+			Alert(lmsg('needUser'));
 			return false;
 		}
 		var userIds = [];
@@ -1833,7 +1838,7 @@ Ext.apply(MenuHandler, {
 		function callback(res, opt) {
 			var result = Ext.decode(res.responseText);
 			if (result.success == true) {
-				Alert(LU_MSG('commonSuccess'));
+				Alert(lmsg('commonSuccess'));
 				App.getCust().status = result.simple_obj;
 				App.getApp().refreshPanel('1221');
 			}
@@ -1933,7 +1938,7 @@ Ext.apply(MenuHandler, {
 				.getSelections();
 		var len = userRecords.length;
 		if (len == 0) {
-			Alert(LU_MSG('needUser'));
+			Alert(lmsg('needUser'));
 			return false;
 		}
 
@@ -1958,7 +1963,7 @@ Ext.apply(MenuHandler, {
 				.getSelections();
 		var len = userRecords.length;
 		if (len == 0) {
-			Alert(LU_MSG('needUser'));
+			Alert(lmsg('needUser'));
 			return false;
 		}
 
@@ -1986,7 +1991,7 @@ Ext.apply(MenuHandler, {
 				.getSelections();
 		var len = userRecords.length;
 		if (len == 0) {
-			Alert(LU_MSG('needUser'));
+			Alert(lmsg('needUser'));
 			return false;
 		}
 
@@ -2021,7 +2026,7 @@ Ext.apply(MenuHandler, {
 				.getSelections();
 		var len = userRecords.length;
 		if (len == 0) {
-			Alert(LU_MSG('needUser'));
+			Alert(lmsg('needUser'));
 			return false;
 		}
 
@@ -2058,7 +2063,7 @@ Ext.apply(MenuHandler, {
 				.getSelections();
 		var len = userRecords.length;
 		if (len == 0) {
-			Alert(LU_MSG('needUser'));
+			Alert(lmsg('needUser'));
 			return false;
 		}
 		// 回调函数
@@ -2085,7 +2090,7 @@ Ext.apply(MenuHandler, {
 		var userRecords = App.main.infoPanel.getUserPanel().userGrid.getSelections();
 		var len = userRecords.length;
 		if (len == 0) {
-			Alert(LU_MSG('needUser'));
+			Alert(lmsg('needUser'));
 			return false;
 		}
 		//判断用户名下是否有产品
@@ -2120,13 +2125,13 @@ Ext.apply(MenuHandler, {
 		var len = userRecords.length;// 选中记录
 
 		if (len == 0) {
-			Alert(LU_MSG('needUser'));
+			Alert(lmsg('needUser'));
 			return false;
 		} else {
 			for (i = 0; i < len; i++) {
 				var status = userRecords[i].get("status");
 				if ( status != "ACTIVE" && status != "OWELONG" ) {
-					Alert(LU_MSG('userNotActive'));
+					Alert(lmsg('userNotActive'));
 					return false;
 				}
 				if (Ext.isEmpty(userRecords[i].get("stop_date"))) {
