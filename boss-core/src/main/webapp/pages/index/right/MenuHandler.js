@@ -1,7 +1,7 @@
 Ext.ns("MenuHandler");
 
-var LU_MSG = langUtils.bc('msgBox');
-var LU_FM = langUtils.bc;//带参数的
+var LU_MSG = lmsg;
+var LU_FM = lbc;//带参数的
 
 /**
  * 判断是否已经查询了客户
@@ -1248,10 +1248,10 @@ Ext.apply(MenuHandler, {
 		var userRecords = App.main.infoPanel.getUserPanel().userGrid
 				.getSelections();
 		if (userRecords.length != 1) {
-			Alert('请选择一个用户!');
+			Alert(lmsg("onlyOneUser"));
 			return false;
 		} else if (userRecords[0].get("status") != "ACTIVE" && userRecords[0].get("status") != "OWELONG") {
-			Alert("请选择【正常】状态的用户");
+			Alert(lmsg("needStopUser"));
 			return false;
 		} else {
 			return {
@@ -1399,18 +1399,18 @@ Ext.apply(MenuHandler, {
 				.getSelections();
 		var typecout = 0;
 		if (userRecords.length == 0) {
-			Alert('请选择要报开的用户!');
+			Alert(lmsg("needUser"));
 			return false;
 		}
 		for (i = 0; i < userRecords.length; i++) {
 			if (userRecords[i].get("status") != "REQSTOP") {
-				Alert("请选择【报停】状态的用户");
+				Alert(lmsg("needStopUser"));
 				return false;
 			}
 		}
 		
 		var url = Constant.ROOT_PATH + "/core/x/User!openUser.action";
-		Confirm("确定要报开吗?", this, function() {
+		Confirm(lmsg("confirmOpenUser"), this, function() {
 			App.sendRequest(url, null, function(res, opt){
 				var data = Ext.decode(res.responseText);
 				if (data == true) {
