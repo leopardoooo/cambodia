@@ -118,3 +118,4 @@ langUtils = function(DOC){
 lmain = langUtils.main;
 lbc = langUtils.bc;
 lmsg = langUtils.msg;
+lsys = langUtils.sys;

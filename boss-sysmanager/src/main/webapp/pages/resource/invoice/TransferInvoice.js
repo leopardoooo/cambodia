@@ -7,9 +7,9 @@
 TransferInvoicePanel = Ext.extend(CommonInvoicePanel,{
 	initComponent:function(){
 		TransferInvoicePanel.superclass.initComponent.call(this);
-		this.items.itemAt(0).title='发票调拨';
+		this.items.itemAt(0).title=lsys('TransferInvoice._title');
 		this.form.insert(0,{columnWidth:1,layout:'form',border:false,items:[
-						{xtype:'combo',fieldLabel:'调拨对象',hiddenName:'transDepotId',width :150,minListWidth :250,
+						{xtype:'combo',fieldLabel:lsys('TransferInvoice.transDepotId'),hiddenName:'transDepotId',width :150,minListWidth :250,
 							store:new Ext.data.JsonStore({
 								url:'resource/Device!queryDeptByOptr.action',
 								fields:['dept_id','dept_name']
@@ -57,7 +57,7 @@ TransferInvoice = Ext.extend(Ext.Panel,{
 		this.transferInvoicePanel = new TransferInvoicePanel("TRANS");
 		TransferInvoice.superclass.constructor.call(this,{
 			id:'TransferInvoice',
-			title:'调拨',
+			title:lsys('TransferInvoice._titleSimple'),
 			closable: true,
 			border : false ,
 			baseCls: "x-plain",
