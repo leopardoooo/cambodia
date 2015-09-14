@@ -35,7 +35,6 @@ import com.ycsoft.beans.core.prod.CProdPropChange;
 import com.ycsoft.beans.core.promotion.CPromFeeProd;
 import com.ycsoft.beans.core.user.CUser;
 import com.ycsoft.beans.core.user.CUserPropChange;
-import com.ycsoft.beans.core.user.FillUserDeviceDto;
 import com.ycsoft.beans.device.RCard;
 import com.ycsoft.beans.device.RModem;
 import com.ycsoft.beans.prod.PProd;
