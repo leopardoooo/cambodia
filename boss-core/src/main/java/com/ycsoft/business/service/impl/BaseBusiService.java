@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import com.ycsoft.beans.config.TBusiConfirm;
 import com.ycsoft.beans.config.TCountyAcct;
 import com.ycsoft.beans.config.TCountyAcctChange;
+import com.ycsoft.beans.config.TDeviceBuyMode;
 import com.ycsoft.beans.core.acct.CAcctAcctitem;
 import com.ycsoft.beans.core.acct.CAcctAcctitemInactive;
 import com.ycsoft.beans.core.acct.CGeneralCredential;
@@ -28,10 +29,13 @@ import com.ycsoft.beans.core.fee.CFeeAcct;
 import com.ycsoft.beans.core.fee.CFeePay;
 import com.ycsoft.beans.core.job.JProdNextTariff;
 import com.ycsoft.beans.core.prod.CProd;
+import com.ycsoft.beans.core.prod.CProdOrder;
+import com.ycsoft.beans.core.prod.CProdOrderDto;
 import com.ycsoft.beans.core.prod.CProdPropChange;
 import com.ycsoft.beans.core.promotion.CPromFeeProd;
 import com.ycsoft.beans.core.user.CUser;
 import com.ycsoft.beans.core.user.CUserPropChange;
+import com.ycsoft.beans.core.user.FillUserDeviceDto;
 import com.ycsoft.beans.device.RCard;
 import com.ycsoft.beans.device.RModem;
 import com.ycsoft.beans.prod.PProd;
@@ -49,6 +53,7 @@ import com.ycsoft.business.component.core.BillComponent;
 import com.ycsoft.business.component.core.CustComponent;
 import com.ycsoft.business.component.core.FeeComponent;
 import com.ycsoft.business.component.core.JobComponent;
+import com.ycsoft.business.component.core.OrderComponent;
 import com.ycsoft.business.component.core.UserComponent;
 import com.ycsoft.business.component.core.UserProdComponent;
 import com.ycsoft.business.component.resource.DeviceComponent;
@@ -58,7 +63,6 @@ import com.ycsoft.business.component.task.TaskComponent;
 import com.ycsoft.business.dto.core.acct.AcctAcctitemActiveDto;
 import com.ycsoft.business.dto.core.acct.PayDto;
 import com.ycsoft.business.dto.core.cust.CustFullInfoDto;
-import com.ycsoft.business.dto.core.fee.CFeePayDto;
 import com.ycsoft.business.dto.core.fee.FeeBusiFormDto;
 import com.ycsoft.business.dto.core.fee.FeeInfoDto;
 import com.ycsoft.business.dto.core.prod.CProdDto;
@@ -100,6 +104,8 @@ public class BaseBusiService extends BaseService {
 	protected InvoiceComponent invoiceComponent;
 	protected ExtTableComponent extTableComponent;
 	protected TaskComponent taskComponent;
+	@Autowired
+	protected OrderComponent orderComponent;
 	protected BusiConfigComponent busiConfigComponent;
 	@Autowired
 	protected AuthComponent authComponent;
@@ -1851,6 +1857,106 @@ public class BaseBusiService extends BaseService {
 			//更新设备为旧设备
 			if (SystemConstants.BOOLEAN_TRUE.equals(device.getUsed()))
 				deviceComponent.updateDeviceUsed(doneCode, busiCode, device.getDevice_id(), SystemConstants.BOOLEAN_TRUE, SystemConstants.BOOLEAN_FALSE,true);
+		}
+	}
+	
+	protected Date openProd(Integer doneCode, CProdOrderDto order,Date startDate) throws Exception, ServicesException {
+		Date expDate = null;
+		Date effDate = null;
+		CProdPropChange statusChange =new CProdPropChange();
+		statusChange.setChange_time(new Date(order.getStatus_date().getTime()));
+		statusChange.setNew_value(StatusConstants.ACTIVE);
+		if (startDate == null) {
+			//计算延期天数
+			int stopDays = DateHelper.getDiffDays(statusChange.getChange_time(), DateHelper.today());
+			expDate = DateHelper.addDate(order.getExp_date(), stopDays);
+		} else {
+			effDate =  DateHelper.addDate(startDate, 1);
+			if(order.getBilling_type().equals(SystemConstants.BILLING_TYPE_MONTH)){
+				//包月计费方式处理
+				expDate = DateHelper.getNextMonthPreviousDay(effDate, order.getOrder_months().intValue());
+			}else if(order.getBilling_type().equals(SystemConstants.BILLING_TYPE_DAY)){
+				//包天计费方式处理
+				int orderDays=Math.round(order.getOrder_months()*30);
+				expDate=DateHelper.addDate(effDate, orderDays-1);
+			}else{
+				//其他计费方式处理
+				int stopDays = DateHelper.getDiffDays(statusChange.getChange_time(), DateHelper.today());
+				expDate = DateHelper.addDate(order.getExp_date(), stopDays);
+			}
+			
+		}
+		
+		List<CProdPropChange> changeList = new ArrayList<CProdPropChange>();
+		changeList.add(new CProdPropChange("status",
+				order.getStatus(),statusChange.getNew_value()));
+		changeList.add(new CProdPropChange("status_date",
+				DateHelper.dateToStr(order.getStatus_date()),DateHelper.dateToStr(new Date())));
+		changeList.add(new CProdPropChange("exp_date",DateHelper.dateToStr(order.getExp_date()),
+				DateHelper.dateToStr(expDate)));
+		
+		
+		if (effDate != null){
+			changeList.add(new CProdPropChange("eff_date",DateHelper.dateToStr(order.getEff_date()),
+					DateHelper.dateToStr(effDate)));
+		}
+		orderComponent.editProd(doneCode,order.getOrder_sn(),changeList);
+		
+		return expDate;
+		
+	}
+	
+	//回填用户设备
+	protected void saveFillDevice(List<FillUserDeviceDto> deviceList) throws Exception {
+		Integer doneCode = doneCodeComponent.gDoneCode();
+		CCust cust = null;
+		for (FillUserDeviceDto userDevice:deviceList){
+			CUser user = userComponent.queryUserById(userDevice.getUser_id());
+			DeviceDto device = deviceComponent.queryDeviceByDeviceCode(userDevice.getDevice_id());
+			setUserDeviceInfo(user, device);
+			userComponent.updateDevice(doneCode, user);
+			//发送授权
+			if(user.getUser_type().equals(SystemConstants.USER_TYPE_DTT)||
+					user.getUser_type().equals(SystemConstants.USER_TYPE_OTT)){
+				//开户指令
+				this.createUserJob(user, user.getCust_id(), doneCode);
+			}
+			//发产品授权
+			List<CProdOrder> prodList = orderComponent.queryOrderProdByUserId(user.getUser_id());
+			authComponent.sendAuth(user, prodList, BusiCmdConstants.ACCTIVATE_PROD, doneCode);
+			
+			
+			//TODO DTT回填有变更设备处理，要对换下的设备发销户指令DEL_USER
+			
+			//处理设备
+			TDeviceBuyMode buyModeCfg = busiConfigComponent.queryBuyMode(user.getStr10());
+			String ownership = SystemConstants.OWNERSHIP_GD;
+			if (buyModeCfg.getChange_ownship().equals(SystemConstants.BOOLEAN_TRUE))
+				ownership = SystemConstants.OWNERSHIP_CUST;
+			if (cust == null)
+				cust = custComponent.queryCustById(user.getCust_id());
+			this.buyDevice(device, user.getStr10(), ownership, null, getBusiParam().getBusiCode(), cust, doneCode);
+		}
+	}
+	
+	protected void setUserDeviceInfo(CUser user, DeviceDto device) throws Exception{
+		if (user.getUser_type().equals(SystemConstants.USER_TYPE_BAND)){
+			if (!device.getDevice_type().equals(SystemConstants.DEVICE_TYPE_MODEM))
+				throw new ServicesException("设备类型不正确");
+			user.setModem_mac(device.getDevice_code());
+		}
+		if (user.getUser_type().equals(SystemConstants.USER_TYPE_OTT)){
+			if (!device.getDevice_type().equals(SystemConstants.DEVICE_TYPE_STB) 
+					|| (device.getPairCard() != null && StringHelper.isNotEmpty(device.getPairCard().getCard_id())))
+				throw new ServicesException("设备类型不正确");
+			user.setStb_id(device.getDevice_code());
+			user.setModem_mac(device.getStbMac());
+		}
+		if (user.getUser_type().equals(SystemConstants.USER_TYPE_DTT)){
+			if ( device.getPairCard() == null || StringHelper.isEmpty(device.getPairCard().getCard_id()))
+				throw new ServicesException("设备类型不正确");
+			user.setStb_id(device.getDevice_code());
+			user.setCard_id(device.getPairCard().getCard_id());
 		}
 	}
 	

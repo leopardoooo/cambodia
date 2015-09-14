@@ -119,7 +119,13 @@ public enum ErrorCode {
 	ResIsNull("控制字为空"),
 	ResOttIsError("OTT控制字格式错误"),
 	CmdTypeUnDefined("授权类型(s%)未定义,请联系管理员"),
+	
+	//======================未翻译===========================
+	NoStopRecord("找不到产品报停记录，请联系管理员"),
+	TaskDeviceUnFill("有未回填设备的用户，不能完工"),
 	;
+	
+	
 
 	private ErrorCode(String desc){
 		this.desc=desc;

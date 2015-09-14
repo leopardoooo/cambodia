@@ -147,8 +147,27 @@ public class SnTaskComponent extends BaseBusiComponent{
 	
 	
 	//修改施工队
-	public void changeTaskTeam(int doneCode,String taskId,Integer deptId){
-		
+	public void changeTaskTeam(int doneCode,String taskId,String deptId,String buyType)  throws Exception{
+		//修改工单对应的施工队
+		WTaskBaseInfo task = wTaskBaseInfoDao.findByKey(taskId);
+		String oldTeamId = task.getTeam_id();
+		task.setBug_type(buyType);
+		task.setTeam_id(deptId);
+		wTaskBaseInfoDao.update(task);
+		//记录操作日志
+		JsonObject jo = new JsonObject();
+		jo.addProperty("oldTeamId", oldTeamId);
+		jo.addProperty("newTeamId", deptId);
+		String cfonTeamId = getTeamId(SystemConstants.TEAM_TYPE_CFOCN);
+		if (cfonTeamId.equals(deptId) || cfonTeamId.equals(oldTeamId)){
+			if (cfonTeamId.equals(deptId))
+				jo.addProperty("synType", "add");
+			else 
+				jo.addProperty("synType", "remove");
+			createTaskLog(taskId,BusiCodeConstants.TASK_ASSIGN, doneCode, jo.toString(), StatusConstants.NOT_EXEC);
+		} else {
+			createTaskLog(taskId,BusiCodeConstants.TASK_ASSIGN, doneCode, jo.toString(), StatusConstants.NONE);
+		}
 	}
 	
 	//删除开户工单的用户
@@ -236,6 +255,9 @@ public class SnTaskComponent extends BaseBusiComponent{
 
 	//完工
 	public void finishTask(int doneCode,String taskId,String resultType) throws Exception{
+		//检查设备是否已经回填
+		if (wTaskUserDao.queryUnFillUserCount(taskId)>0)
+			throw new SystemException();
 		WTaskBaseInfo task = new WTaskBaseInfo();
 		task.setTask_id(gTaskId());
 		task.setTask_status(StatusConstants.TASK_END);
@@ -270,9 +292,10 @@ public class SnTaskComponent extends BaseBusiComponent{
 		}
 		task.setMobile(linkman.getMobile());
 		task.setTel(linkman.getTel());
-		//设置地区县市信息
+		//设置地区县市、操作员信息
 		task.setCounty_id(cust.getCounty_id());
 		task.setArea_id(cust.getArea_id());
+		task.setOptr_id(getOptr().getOptr_id());
 		wTaskBaseInfoDao.save(task);
 		return task.getTask_id();
 	}
@@ -282,7 +305,7 @@ public class SnTaskComponent extends BaseBusiComponent{
 		return wTaskBaseInfoDao.findSequence(SequenceConstants.SEQ_TASK).toString();
 	}
 	
-	private String getTeamId(String teamType) throws Exception{
+	public String getTeamId(String teamType) throws Exception{
 		//获取施工队信息
 		List<WTeam> teamList = wTeamDao.findAll();
 		for (WTeam team:teamList){
