@@ -23,12 +23,12 @@ SelectUserPanel = Ext.extend(Ext.Panel, {
 		this.userGrid = new Ext.grid.GridPanel({
 			store: this.store,
 	        columns: [
-	            {id: 'autoExpandColumn',menuDisabled: true, align: 'left', header: "终端信息", sortable: false, dataIndex: 'user_name'},
+	            {id: 'autoExpandColumn',menuDisabled: true, align: 'left', header: lmain("user._form.terminalInfo"), sortable: false, dataIndex: 'user_name'},
 	            {menuDisabled: true, hidden: true,width: 20, align: 'left', header: "", sortable: false, dataIndex: 'package_group_name'}
 	        ],
 	        view: new Ext.grid.GroupingView({
 	            forceFit:true,
-	            groupTextTpl: '{group} 已选{[values.rs.length]} 个终端'
+	            groupTextTpl: lbc("common.defaultGroupTpl", null, ['{group}','{[values.rs.length]}'])
 	        }),
 	        width: 700,
 	        border: false,
@@ -396,8 +396,9 @@ OpenDispatchUserWindow = Ext.extend(Ext.Window, {
 		}
 	},
 	setGridTitle: function(){
-		this.fromSm.grid.setTitle("共"+ this.fromUserStore.getCount() + "个可选用户");
-		this.toSm.grid.setTitle("已选"+ this.toUserStore.getCount() + "个用户");
+		
+		this.fromSm.grid.setTitle(lbc("common.optionalGroup", null, [this.fromUserStore.getCount()]));
+		this.toSm.grid.setTitle(lbc("common.selectedGroup", null, [this.toUserStore.getCount()]));
 	},
 	setActiveItemsCount: function(){
 		var arr = this.selectedDataMap[this.currentActiveGroup];

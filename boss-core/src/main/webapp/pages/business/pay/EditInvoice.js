@@ -9,9 +9,9 @@ AutoInvoicePanel = Ext.extend( Ext.Panel, {
 			labelWidth : 80,
 			defaultType:'textfield',
 			items:[
-				{id:'old_invoice_id',name:'oldInvoice.invoice_id',fieldLabel:'原发票号码',style : Constant.TEXTFIELD_STYLE},
-				{id:'old_invoice_code_id',name:'oldInvoice.invoice_code',fieldLabel:'原发票代码',style : Constant.TEXTFIELD_STYLE},
-				{id:'old_invoice_type_text',xtype:'displayfield',fieldLabel:'原发票类型'},
+				{id:'old_invoice_id',name:'oldInvoice.invoice_id',fieldLabel:lmain("doc._form.oldInvoiceId"),style : Constant.TEXTFIELD_STYLE},
+				{id:'old_invoice_code_id',name:'oldInvoice.invoice_code',fieldLabel:lmain("doc._form.oldInvoiceCode"),style : Constant.TEXTFIELD_STYLE},
+				{id:'old_invoice_type_text',xtype:'displayfield',fieldLabel:lmain("doc._form.oldInvoiceType")},
 				{id:'old_invoice_type',name:'oldInvoice.doc_type',xtype:'hidden'},
 				{id:'old_invoice_book_id',name:'oldInvoice.invoice_book_id',xtype : 'hidden'},
 				{id:'new_invoice_book_id',name : 'newInvoice.invoice_book_id',xtype : 'hidden'},
@@ -25,7 +25,7 @@ AutoInvoicePanel = Ext.extend( Ext.Panel, {
 							}),
 					displayField : 'status_text',
 					valueField : 'status',
-					fieldLabel : '原发票状态',
+					fieldLabel : lmain("doc._form.oldInvoiceStatus"),
 					forceSelection : true,
 					allowBlank : false,
 					hiddenName : 'oldInvoice.status'

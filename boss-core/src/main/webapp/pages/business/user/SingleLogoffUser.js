@@ -29,23 +29,23 @@ UserProdGrid = Ext.extend(Ext.grid.GridPanel,{
 			}
 		});
 		this.userProdStore.on('load',this.doLoadResult,this,{delay:100});
-		
+		var cms = lmain("user.prod.base.columns");
 		var cm = [
 			{header:'用户ID',dataIndex:'user_id',hidden : true},
-			{header:'订购SN',dataIndex:'order_sn',width:40},
-			{header:'产品名称',dataIndex:'prod_name',width:120},
-			{header:'所属套餐',dataIndex:'package_name',width:80},
-			{header:'当前资费',dataIndex:'tariff_name',	width:80},
-			{header:'订单余额',dataIndex:'active_fee',width:80,xtype: 'moneycolumn'},
-			{header:'可退金额',dataIndex:'balance_cfee',width:80,xtype: 'moneycolumn'},
-			{header:'可转金额',dataIndex:'balance_acct',width:80,xtype: 'moneycolumn'},
-			{header:'生效日期',dataIndex:'eff_date',width:80,renderer: Ext.util.Format.dateFormat},
-			{header:'失效日期',dataIndex:'exp_date',width:80,renderer: Ext.util.Format.dateFormat},
-			{header:'状态',dataIndex:'status_text',	width:60,renderer:Ext.util.Format.statusShow,hidden : true},				
-			{header:'订购时间',dataIndex:'order_time',width:80}
+			{header:cms[0],dataIndex:'order_sn',width:40},
+			{header:cms[1],dataIndex:'prod_name',width:120},
+			{header:cms[2],dataIndex:'package_name',width:80},
+			{header:cms[3],dataIndex:'tariff_name',	width:80},
+			{header:lmain("user._form.orderFee"),dataIndex:'active_fee',width:80,xtype: 'moneycolumn'},
+			{header:lmain("user._form.canRetrunFee"),dataIndex:'balance_cfee',width:80,xtype: 'moneycolumn'},
+			{header:lmain("user._form.canTransferFee"),dataIndex:'balance_acct',width:80,xtype: 'moneycolumn'},
+			{header:cms[4],dataIndex:'eff_date',width:80,renderer: Ext.util.Format.dateFormat},
+			{header:cms[5],dataIndex:'exp_date',width:80,renderer: Ext.util.Format.dateFormat},
+			{header:cms[6],dataIndex:'status_text',	width:60,renderer:Ext.util.Format.statusShow,hidden : true},				
+			{header:cms[8],dataIndex:'order_time',width:80}
 		]
 		UserProdGrid.superclass.constructor.call(this,{
-			title : '用户产品信息',
+			title : lmain("user.prod.base._title"),
 			region:'center',
 			store : this.userProdStore,
 			columns : cm			
@@ -96,7 +96,7 @@ LogoffUserForm = Ext.extend(BaseForm,{
             layout: 'border',
 			items:[this.userProdGrid,{
             	xtype : 'panel',
-            	title : '业务处理',
+            	title : lbc("common.busido"),
             	region: "south",
             	height : 200,
             	bodyStyle: Constant.TAB_STYLE,
@@ -109,36 +109,36 @@ LogoffUserForm = Ext.extend(BaseForm,{
 					labelWidth : 85
 				},
 				items : [{
-					items:[{xtype:'displayfield',fieldLabel:'用户名',style:Constant.TEXTFIELD_STYLE,
+					items:[{xtype:'displayfield',fieldLabel:lmain("user.base.name"),style:Constant.TEXTFIELD_STYLE,
 					value:record.get('user_name')}]
 				},{
-					items:[{xtype:'displayfield',fieldLabel:'用户类型',style:Constant.TEXTFIELD_STYLE,
+					items:[{xtype:'displayfield',fieldLabel:lmain("user.base.type"),style:Constant.TEXTFIELD_STYLE,
 					value:record.get('user_type')}]
 				},{
-					items:[{xtype:'displayfield',fieldLabel:'状态',style:Constant.TEXTFIELD_STYLE,
+					items:[{xtype:'displayfield',fieldLabel:lmain("user.base.status"),style:Constant.TEXTFIELD_STYLE,
 					value:record.get('status_text')}]
 				},{
-					items:[{xtype:'displayfield',fieldLabel:'机顶盒号',style:Constant.TEXTFIELD_STYLE,
+					items:[{xtype:'displayfield',fieldLabel:lmain("user.base.stbId"),style:Constant.TEXTFIELD_STYLE,
 					value:record.get('stb_id')}]
 				},{
-					items:[{xtype:'displayfield',fieldLabel:'智能卡号',style:Constant.TEXTFIELD_STYLE,
+					items:[{xtype:'displayfield',fieldLabel:lmain("user.base.cardId"),style:Constant.TEXTFIELD_STYLE,
 					value:record.get('card_id')}]
 				},{
-					items:[{xtype:'displayfield',fieldLabel:'MODEM号',style:Constant.TEXTFIELD_STYLE,
+					items:[{xtype:'displayfield',fieldLabel:lmain("user.base.modem"),style:Constant.TEXTFIELD_STYLE,
 					value:record.get('modem_mac')}]
 				},{
 					width : 60,
 					columnWidth : 1,
-					items:[{xtype : 'paramcombo',fieldLabel : '回收设备',paramName : 'BOOLEAN',defaultValue: 'T',
+					items:[{xtype : 'paramcombo',fieldLabel : lmain("user._form.returnDevice"),paramName : 'BOOLEAN',defaultValue: 'T',
 				width : 60,foreceSelection : true,id : 'reclaim',hiddenName : 'reclaimDevice'}]
 				}
 				,{
-					items:[{xtype:'displayfield',fieldLabel:'可退金额',style:Constant.TEXTFIELD_STYLE,id:'cfeeTotalAmountId'}]
+					items:[{xtype:'displayfield',fieldLabel:lmain("user._form.canRetrunFee"),style:Constant.TEXTFIELD_STYLE,id:'cfeeTotalAmountId'}]
 				},{
-					items:[{xtype:'displayfield',fieldLabel:'可转金额',style:Constant.TEXTFIELD_STYLE,id:'acctTotalAmountId'}]
+					items:[{xtype:'displayfield',fieldLabel:lmain("user._form.canTransferFee"),style:Constant.TEXTFIELD_STYLE,id:'acctTotalAmountId'}]
 				},{
 					items : [{
-						fieldLabel:'处理方式',
+						fieldLabel: lbc("common.busiWay"),
 						xtype:'paramcombo',
 						id : 'banlanceDealType',
 						allowBlank:false,

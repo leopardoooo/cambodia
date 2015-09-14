@@ -4,6 +4,8 @@ BCLang.common = {
 	optr: "操作~",
 	switchor: '选择~',
 	pswd: '密码~',
+	newPswd: '新密码~',
+	confirmPswd: '确定密码~',
 	remark: '备注~',
 	remark2: '备注信息~',
 	busiInfo: '业务信息~',
@@ -36,9 +38,15 @@ BCLang.common = {
 	expandOrCollpse: '展开或收缩~',
 	optional: '可选~',
 	selected: '已选~',
+	optionalGroup: '共 {0} 个可选',
+	selectedGroup: "已选 {0} 个",
 	save: '保存~',
 	close: '关闭~',
-	busido: '业务受理~'
+	busido: '业务受理~',
+	defaultGroupTpl: '{0} 已选 {1} 个',
+	uploadFileLabel: '文件上传~',
+	busiWay: '处理方式~',
+	tip: '提示信息~'
 }
 //主页模块
 BCLang.home = {
@@ -154,7 +162,29 @@ BCLang.home = {
 				addToSelected: '加入已选~',
 				moveToOptional: '移至可选~',
 				stopTime: '报停时间~',
-				stopFee: '报停费用~'
+				stopFee: '报停费用~',
+				prodFeeCM: ["产品名称~","原资费~","新资费~","原到期日~","计费期日~",
+				          "缴费月数~","新到期日~","转移支付金额~","缴费金额~"],
+				prodTitle: '产品信息~',
+				prodGroupText: '用户名称:{0}  用户类型:{1} ~',
+				templateDown: '模板下载~',
+				templateDownTip: '请勿在业务繁忙时操作;请勿删除模板中第一行;~',
+				loginId: '登录账号~',
+				orderFee: '订单余额~',
+				canRetrunFee: '可退金额~',
+				canTransferFee: '可转金额~',
+				returnDevice: '回收设备~',
+				retrunInfo: '可退~',
+				transferInfo: '可转~',
+				stdId: '机顶盒号~',
+				stdModel: '机顶盒型号~',
+				newStdId: '新机顶盒号~',
+				newStdModel: '新机顶盒型号~',
+				modemId: 'Modem号~',
+				modemModel: 'Modem型号~',
+				newModemId: '新Modem号~',
+				newModemModel: '新Modem型号~',
+				changeCause: '更换原因~'
 			},
 			list: {
 				_title: '用户信息~',
@@ -218,6 +248,14 @@ BCLang.home = {
 			busi: {
 				_title: '业务受理单~',
 				columns: ["操作员~","最后打印~","业务名称~"]
+			},
+			_form: {
+				oldInvoiceId: '原发票号码~',
+				oldInvoiceCode: '原发票代码~',
+				oldInvoiceType: '原发票类型~',
+				oldStatus: '原发票状态~',
+				newInvoiceId: '新发票号码~',
+				newInvoiceCode: '新发票代码~'
 			}
 		},
 		//受理记录
