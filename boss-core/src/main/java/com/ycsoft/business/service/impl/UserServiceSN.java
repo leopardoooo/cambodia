@@ -309,7 +309,9 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 	public void saveChangeDevice(String userId, String deviceCode, String reasonType) throws Exception {
 		Integer doneCode = doneCodeComponent.gDoneCode();
 		CCust cust = getBusiParam().getCust();
-		doneCodeComponent.lockCust(cust.getCust_id());
+		String custId = cust.getCust_id();
+		String busiCode = getBusiParam().getBusiCode();
+		doneCodeComponent.lockCust(custId);
 		CUser oldUser = userComponent.queryUserById(userId);
 		CUser user = userComponent.queryUserById(userId);
 		
@@ -325,7 +327,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		userComponent.updateDevice(doneCode, user);
 		
 		TDeviceChangeReason changeReason = userComponent.queryChangeReasonByType(reasonType);
-		
+		//是否收自购费
 		if(changeReason.getIs_charge().equals(SystemConstants.BOOLEAN_TRUE)){
 			TDeviceBuyMode buyMode = busiConfigComponent.queryBuyMode(SystemConstants.BUSI_BUY_MODE_BUY);
 			RDeviceFee deviceFee = deviceComponent.queryDeviceFee(device.getDevice_type(), device.getDevice_model(), buyMode.getBuy_mode()).get(0);
@@ -335,13 +337,19 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 			//处理设备购买和回收
 			this.buyDevice(device, SystemConstants.BUSI_BUY_MODE_BUY, oldDevice.getOwnership(), feeInfo, getBusiParam().getBusiCode(), cust, doneCode);
 		}
-		
+		//是否回收
 		if(changeReason.getIs_reclaim().equals(SystemConstants.BOOLEAN_TRUE)){
-			deviceComponent.saveDeviceReclaim(doneCode,  getBusiParam().getBusiCode(),
-					oldDevice.getDevice_id(), cust.getCust_id(), reasonType);
+			deviceComponent.saveDeviceReclaim(doneCode,  busiCode,
+					oldDevice.getDevice_id(), custId, reasonType);
+		}else{
+			//不回收，直接修改旧设备在库状态，删除用户使用设备记录
+			deviceComponent.updateDeviceDepotStatus(doneCode, busiCode, oldDevice.getDevice_id(),
+					oldDevice.getDevice_status(), StatusConstants.IDLE, true);
+			custComponent.removeDevice(custId, oldDevice.getDevice_id(), doneCode, SystemConstants.BOOLEAN_FALSE);
 		}
+		//是否挂失
 		if(changeReason.getIs_lost().equals(SystemConstants.BOOLEAN_TRUE)){
-			deviceComponent.saveLossDevice(doneCode, getBusiParam().getBusiCode(), oldDeviceCode);
+			deviceComponent.saveLossDevice(doneCode, busiCode, oldDeviceCode);
 		}
 		
 		//处理授权
