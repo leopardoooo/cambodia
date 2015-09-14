@@ -35,6 +35,7 @@ import com.ycsoft.business.component.core.OrderComponent;
 import com.ycsoft.business.component.task.SnTaskComponent;
 import com.ycsoft.business.dao.core.prod.CProdOrderDao;
 import com.ycsoft.business.dto.config.TemplateConfigDto;
+import com.ycsoft.business.dto.core.cust.CustFullInfoDto;
 import com.ycsoft.business.dto.core.fee.BusiFeeDto;
 import com.ycsoft.business.dto.core.fee.FeeInfoDto;
 import com.ycsoft.business.dto.core.prod.DisctFeeDto;
@@ -221,7 +222,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 				user.setLogin_name("supertv"+user.getUser_id());*/
 			user.setLogin_name(cust.getCust_no()+""+num);
 		}else if(userType.equals(SystemConstants.USER_TYPE_BAND)){
-			String domainName = custComponent.gCustNoByAddr(cust.getAddr_id(), null);
+			String domainName = custComponent.getDomainByAddr(cust.getAddr_id());
 			user.setLogin_name(cust.getCust_no()+"0"+num+"@"+domainName);
 		}
 		user.setPassword(cust.getPassword());
@@ -825,15 +826,21 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		if(CollectionHelper.isEmpty(userList)){
 			return ;
 		}
+		CCust cust=custComponent.queryCustById(custId);
+		if(cust==null){
+			throw new ServicesException(ErrorCode.ParamIsNull);
+		}
 		Integer doneCode = this.doneCodeComponent.gDoneCode();
 		
 		BusiParameter busiParam = getBusiParam();
+		CustFullInfoDto custFullInfo=new CustFullInfoDto();
+		custFullInfo.setCust(cust);
+		busiParam.setCustFullInfo(custFullInfo);
 		for (CUser user : userList) {
-			int result = userComponent.updateUserNameByDeviceCode(user,custId);
-			if(result < 1){
-				throw new ServicesException(ErrorCode.NoUserExistsOrBelong2CurrentCust);
-			}
+			userComponent.updateUserNameByDeviceCode(user,custId);
 		}
+		
+		
 		busiParam.setBusiCode(BusiCodeConstants.BATCH_MOD_USER_NAME);//其他参数不需要
 		saveAllPublic(doneCode,busiParam);
 	}

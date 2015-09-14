@@ -12,6 +12,7 @@ public enum ErrorCode {
 	CustAddressIsNull("地址为空"),
 	CustDistrictIsNull("%s未配置对应的行政区域！"),
 	CustProvinceIsNull("该行政区域未配置对应的省,行政区域编号=%s"),
+	CustProvinceDomainIsNull("%s未配置宽带域名后缀,请联系管理员！"),
 	DeptAddrIsNull("部门(%s)未配置管辖的城市"),
 	CustDataException("客户数据异常，请重新索搜客户！"),
 	CustSeqIsNull("系统未正确配置客户序列号,客户前缀号=%s"),

@@ -1,8 +1,3 @@
-/**
- * 顶部面板的组件封装
- **/
- 
- 
  /**
  * 为搜索面板初始化事件
  */
@@ -386,5 +381,3 @@ ChooseCustWindow = Ext.extend( Ext.Window , {
 		ChooseCustWindow.superclass.initEvents.call(this);
 	}
 });
- 
- 
