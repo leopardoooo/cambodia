@@ -9,7 +9,7 @@ FileForm = Ext.extend(Ext.FormPanel,{
 			border : false,
 			buttonAlign:'center',
 			buttons:[
-				{text:'提交处理',scope:this,handler:this.doLoad}
+				{text: lbc("common.busiSave"),scope:this,handler:this.doLoad}
 			],
 			defaults : {
 				layout : 'form',
@@ -20,7 +20,7 @@ FileForm = Ext.extend(Ext.FormPanel,{
 				columnWidth : .7,
 				items : [{
 					id:'checkInFielId',
-					fieldLabel:'文件上传',
+					fieldLabel: lbc("common.uploadFileLabel"),
 					name:'files',
 					xtype:'textfield',
 					inputType:'file',
@@ -32,8 +32,8 @@ FileForm = Ext.extend(Ext.FormPanel,{
 				columnWidth : .15,
 				items:[{
 					xtype : 'button',
-					text : '模板下载',
-					tooltip:'请勿在业务繁忙时操作;<br/>请勿删除模板中第一行;<br/>',
+					text : lmain("user._form.templateDown"),
+					tooltip: lmain("user._form.templateDownTip"),
 					scope : this,
 					handler : function(){
 						window.open(Constant.ROOT_PATH+'/template/batch_mod_user_name.xls');
@@ -51,7 +51,7 @@ FileForm = Ext.extend(Ext.FormPanel,{
 			
 			this.getForm().submit({
 				url:"core/x/User!batchModifyUserName.action",scope:this,
-				waitTitle:'请稍候',waitMsg: '正在提交数据...',
+				waitTitle:'请稍候', waitMsg: '正在提交数据...',
 				params:{custId:App.getCust().cust_id},
 				success:function(form,action){
 					var data = action.result;

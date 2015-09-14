@@ -88,8 +88,13 @@ Ext.ux.Grid = Ext.extend(Ext.grid.GridPanel,{
 						renderer:function(value,meta,record,rowIndex,columnIndex,store){
 							var arr = [];
 							Ext.each(columnBtns,function(btn){
+								var attr = btn['attrs'];
+								var text = langUtils.res(attr["res_id"]) || attr["show_name"];
+								if(Ext.isArray(text)){
+									text = text[0];
+								}
 								if(App.func.FilterOperteBtn(record.data,btn['attrs']['busicode'],btn['attrs']['panel_name']) )
-									arr.push(String.format(cmFormat,btn['attrs']["res_name"],btn['attrs']["iconcls"],Ext.encode(btn)));
+									arr.push(String.format(cmFormat,text,btn['attrs']["iconcls"],Ext.encode(btn)));
 							},this);
 							return arr.join('');
 						}
@@ -106,8 +111,13 @@ Ext.ux.Grid = Ext.extend(Ext.grid.GridPanel,{
 						renderer:function(value,meta,record,rowIndex,columnIndex,store){
 							var arr = [];
 							Ext.each(columnBtns,function(btn){
+								var attr = btn['attrs'];
+								var text = langUtils.res(attr["res_id"]) || attr["show_name"];
+								if(Ext.isArray(text)){
+									text = text[0];
+								}
 								if(App.func.FilterOperteBtn(record.data,btn['attrs']['busicode'],btn['attrs']['panel_name']) )
-									arr.push(String.format(lockCmFormat,Ext.encode(btn),gridId,btn['attrs']["res_name"],btn['attrs']["iconcls"]))
+									arr.push(String.format(lockCmFormat,Ext.encode(btn),gridId,text,btn['attrs']["iconcls"]))
 							},this);
 							return arr.join('');
 						}

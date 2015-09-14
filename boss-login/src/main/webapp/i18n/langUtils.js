@@ -18,6 +18,10 @@ langUtils = function(DOC){
 	
 	// find a lang string from current scope start.
 	function findLangString(langKeys){
+		if(!langKeys){
+			return "";
+		}
+		
 		var current = this;
 		if(!isObject(current)){
 			return "";
@@ -64,6 +68,15 @@ langUtils = function(DOC){
 		return text;
 	}
 	
+	// 格式化函数
+	function format(text, params){
+		if(!params || params.length == 0){
+			return text;
+		}
+		var args = [text].concat(params);
+		return String.format.apply(String, args);
+	}
+	
 	return {
 		/**
 		 * 获取boss-core-lang.js的国际化属性值，如果传入的dom元素是一个表单元素，
@@ -72,17 +85,21 @@ langUtils = function(DOC){
 		 * @param langKeys 如传入:"home.topWelcome",如果是数组可以使用比如: "home.searchTabs.[0]"
 		 * @param dom 一个可选参数，可以是ID或Dom对象
 		 */
-		bc: function(langKeys, dom){
-			return set(findLangString.apply(BCLang, [langKeys]), dom);
+		bc: function(langKeys, dom, fmtParams){
+			var text = findLangString.apply(BCLang, [langKeys]);
+			return set(format(text, fmtParams), dom);
 		},
-		main: function(mainLangKeys, dom){
-			return set(findLangString.apply(BCLang.home.main, [mainLangKeys]), dom);
+		main: function(mainLangKeys, dom, fmtParams){
+			var text = findLangString.apply(BCLang.home.main, [mainLangKeys]);
+			return set(format(text, fmtParams), dom);
 		},
-		sys: function(mainLangKeys, dom){
-			return set(findLangString.apply(Sys, [mainLangKeys]), dom);
+		sys: function(mainLangKeys, dom, fmtParams){
+			var text = findLangString.apply(Sys, [mainLangKeys]);
+			return set(format(text, fmtParams), dom);
 		},
-		tools: function(mainLangKeys, dom){
-			return set(findLangString.apply(Tools, [mainLangKeys]), dom);
+		tools: function(mainLangKeys, dom, fmtParams){
+			var text = findLangString.apply(Tools, [mainLangKeys]);
+			return set(format(text, fmtParams), dom);
 		},
 		/**
 		 * 获取resource-lang.js资源菜单的属性值

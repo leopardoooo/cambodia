@@ -125,6 +125,7 @@ ButtonPanel = Ext.extend(Ext.Panel, {
      */
     goUrl:function(){
     	var t = this.attrs;
+    	console.log(t);
     	//赋值当前的资源数据，以便在业务模块中使用。
     	App.data.currentResource = t;
     	if( Ext.isEmpty(t.url )&& Ext.isEmpty(t.handler)){
