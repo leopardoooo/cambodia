@@ -160,14 +160,14 @@ BuyMaterialForm = Ext.extend( BaseForm , {
 						for(var i=0,len=data.length;i<len;i++){
 							var d = data[i];
 							Ext.getCmp('feePanelId').add({
-								fieldLabel : '费用名称',
+								fieldLabel : lmain('user._form.feeName'),
 								xtype:'displayfield',
 								width : 150,
 								name:'fee_name',
 								value:d['fee_name']
 							});
 							Ext.getCmp('feePanelId').add({
-								fieldLabel : '单价',
+								fieldLabel : lmain('user._form.unitPrice'),
 								id : 'deviceFeeValue'+i,
 								width : 150,
 								vtype : 'num',
@@ -200,12 +200,12 @@ BuyMaterialForm = Ext.extend( BaseForm , {
 			obj["isValid"] = true;
 		}else{
 			obj["isValid"] = false;
-			obj["msg"] = "含有验证不通过的输入项";
+			obj["msg"] = lbc("common.tipFormInvalid");
 		}
 		if(this.getForm().findField('total_num').getValue()==0 || 
 		this.getForm().findField('total_num').getValue()<this.getForm().findField('buy_num').getValue()){
 			obj["isValid"] = false;
-			obj["msg"] = "购买数量不能大于库存数量!";
+			obj["msg"] = lmsg('buyNumExceedStockNum');
 		}
 		return obj;
 	},

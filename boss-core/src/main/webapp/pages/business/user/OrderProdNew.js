@@ -243,14 +243,14 @@ ProdOrderForm = Ext.extend( BaseForm, {
 					    columnWidth:.4,
 			         	xtype:'fieldset',
 			         	height: 75, 
-			         	title:'IP费',
+			         	title:lmain("user._form.ipFee"),
 			         	style:'margin-left:10px;padding: 10px 0 10px 10px; color: red',
 						items:[{
 			         		bodyStyle:'padding-top:4px',
-							html: "*应收$:<span id='busiFeeAmount'>--</span>"
+							html: "*"+lmain('user._form.shouldPay')+"$:<span id='busiFeeAmount'>--</span>"
 			         	},{
 			         		bodyStyle:'padding-top:4px',
-							html: "时间段:<span id='busiFeeTime'>--</span>"
+							html: lmain('user._form.timeSlot')+":<span id='busiFeeTime'>--</span>"
 			         	}]
 			         });
 					Ext.getCmp('busiFeeItemId').setTitle(busiFee.fee_name);
@@ -275,7 +275,7 @@ ProdOrderForm = Ext.extend( BaseForm, {
 				if(that.transferPayData && that.transferPayData.length > 0){
 					that.transferPayWindow.show(that.transferPayData, Ext.getCmp("dfStartDate").getValue());
 				}else{
-					Alert("没有转移支付项目!");
+					Alert(lmsg('notTransProject'));
 				}
 			});
 		}, 2000);
@@ -515,7 +515,7 @@ ProdOrderForm = Ext.extend( BaseForm, {
 		var boxProdTariff = Ext.getCmp("boxProdTariff");
 		var disctId = boxProdTariff.getValue();
 		if(Ext.isEmpty(disctId)){
-			Alert("请先选择资费!");
+			Alert(lmsg('chooseTariff'));
 			return false;
 		}
 		var index = boxProdTariff.getStore().find("tariff_id", disctId);
@@ -555,7 +555,7 @@ ProdOrderForm = Ext.extend( BaseForm, {
 		if(String(orderCycle).trim() === ""){
 			return {
 				isValid: false,
-				msg: "订购月数是必须的!"
+				msg: lmsg('MustBeOrderMonth')
 			}
 		}
 		
@@ -568,7 +568,7 @@ ProdOrderForm = Ext.extend( BaseForm, {
 			if(Date.parseDate(Ext.getCmp("dfExpDate").getValue(), "Y-m-d").getTime() < tmpDate.getTime()){
 				return {
 					isValid: false,
-					msg: '升级时，结束计费日必须大于上期订购结束日，请调整订购月数'
+					msg: lmsg('upgradeEndDateMoreThanBeginDate')
 				}
 			}
 		}
@@ -576,7 +576,7 @@ ProdOrderForm = Ext.extend( BaseForm, {
 		if(this.totalAmount < 0){
 			return {
 				isValid: false,
-				msg: "实际应付不能小于0，请增加订购月数"
+				msg: lmsg('realpayMustBeGreaterThanZero')
 			}
 		}
 		return true;
@@ -590,7 +590,7 @@ ProdOrderForm = Ext.extend( BaseForm, {
 		if(this.selectUserPanel.store.getCount() == 0){
 			return {
 				isValid: false,
-				msg: '没有需要订购的用户'
+				msg: lmsg('notMustBeOrderUser')
 			}
 		}
 		
@@ -706,41 +706,6 @@ ProdOrderForm = Ext.extend( BaseForm, {
 	,
 	success : function(form,res){
 		App.getApp().refreshPanel(App.getApp().getData().currentResource.busicode);
-	}
-});
-
-// 产品临时列表
-SelectedProdGrid = Ext.extend(Ext.grid.GridPanel, {
-	store: new Ext.data.JsonStore({
-		fields: ["cust_id","user_id","user_name","user_selected","prod_id", "prod_name","tariff_id","tariff_name","last_order_sn","last_exp_date"]
-	}),
-	constructor: function(){
-		var sm = new Ext.grid.CheckboxSelectionModel();
-		
-		var columns = [sm,
-    	    {header: "产品名称", width: 100,sortable:true, dataIndex: 'prod_name'},
-    	    {header: "资费", width: 80, sortable:true, dataIndex: 'traff_name'},
-    	    {header: "用户", width: 100, sortable:true, dataIndex: 'user_ids'},
-    	    {header: "订购月数", width: 60, sortable:true, dataIndex: 'month_count'},
-    	    {header: "金额", width: 60, sortable:true, dataIndex: 'fee'},
-    	    {header: "开始计费日", width: 80, sortable:true, dataIndex: 'start_date'},
-    	    {header: "结束计费日", width: 80, sortable:true, dataIndex: 'start_date'},
-    	    {header: "上期结束日", width: 80, sortable:true, dataIndex: 'last_order_end_date'}
-    	];
-		
-		return SelectedProdGrid.superclass.constructor.call(this, {
-			stripeRows: true,
-			region: "center",
-			layotu: "fit",
-			title: "已定产品列表",
-			columns: columns,
-	        stateful: true,
-	        sm: sm,
-	        bbar: [{
-	        	text: '移除选中',
-	        	iconCls: 'icon-del'
-	        }]
-		});
 	}
 });
 

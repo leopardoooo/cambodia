@@ -84,7 +84,7 @@ AddIpUserForm = Ext.extend(BaseForm,{
 		}
 		if(this.getForm().findField('user.str5').getValue()==0){
 			obj["isValid"] = false;
-			obj["msg"] = lmain("tipNoChargeNumber");
+			obj["msg"] = lmsg("noChargeNumber");
 		}
 		return obj;
 	},

@@ -111,7 +111,6 @@ BCLang.home = {
 				rechargeWay: '充值方式~',
 				byTicket: '凭票据~',
 				rechargeCount: '充值金额~',
-				tipRechargeCountMustBeGreaterThanZero: '金额需要大于0!~',
 				province:'省~',
 				provinceEmptyText:'请选择省~',
 				addrManager: '地址管理~',
@@ -120,6 +119,7 @@ BCLang.home = {
 				roomTitle: '房间信息~',
 				roomTitle2: '行政区域:{0} 服务类型:{1}',
 				addRoom: '新增房间~'
+				
 			},
 			acct: {
 				_title: "账目信息~",
@@ -213,11 +213,16 @@ BCLang.home = {
 				feeItem: '费用项~',
 				unitPrice: '单价~',
 				ipFeeDesc: 'IP费用=单价*收费数量*月数（或者相差天数/30）~',
-				tipNoChargeNumber: '费用编号不存在!~',
 				expDate: '到期日~',
 				payMonth: '补收月数~',
 				totalPrice: '总价~',
-				timeSlot: '时间段~'
+				timeSlot: '时间段~',
+				titleBusiFeeGrid: '杂费~',
+				ipFee: 'IP费~',
+				
+				titleTransferPayDetailGrid: '转移支付明细~',
+				transferPayCM: ['产品名称~', '资费~', '用户~', '开始计费日~', '结束计费日~', '转移金额$~'],
+				transferDetailDate: '转移明细（开始计费日：{0} "）~'
 			},
 			list: {
 				_title: '用户信息~',
@@ -535,5 +540,37 @@ BCLang.msgBox = {
 	confirmInvalidInvoice: "确定作废发票吗?~",
 	confirmRefreshCmd: '确定发送刷新指令吗?~',
 	confirmResendCmd: '确定重发开户指令?~',
-	noPreStopUser: '该用户没有进行预报停操作!~'
+	noPreStopUser: '该用户没有进行预报停操作!~',
+	
+	phoneOrFixedPhoneMustBeEnterOne: '电话号码或固定电话必须输入一个!~',
+	invalidAddressPlsReInput: '无效的客户地址，请重新输入!~',
+	intentionCustPlsChooseProvince: '意向客户请选择省!~',
+	rechargeCountMustBeGreaterThanZero: '金额需要大于0!~',
+	transferModifyCustName: '过户请修改客户名称!~',
+	changeModifyCustAddr: '移机请修改客户地址!~',
+	notModifyAnyInfo: '您没有修改任何资料!~',
+	buyNumExceedStockNum: '购买数量超过库存数量!~',
+	enterPositiverNum: '请输入正整数!~',
+	enterBuyNum: '请输入购买数量!~',
+	refundAmountShouldLeeThanSumofTheAccounts: '退款金额应小于账目可退余额!~',
+	
+	notChooseDeviceMustBeInput: '当设备没有选择施工回填时，设备编码是必须输入的!~',
+	noChargeNumber: '费用编号不存在!~',
+	singleStbNotSupDTT: '此设备为单向机顶盒，不支持当前的OTT用户类型!~',
+	doubleStbNotSupOTT: '此设备为双向机顶盒，不支持当前的DTT用户类型!~',
+	modemNotSupUserType: '设备为Modem猫，不支持所选[{0}]用户类型!~',
+	currDeviceNotSupUserType: '此设备不支持当前的用户类型!~',
+	deviceFeeMustBeBetween:'设备费用必须介于[{0}]-[{1}]之间!~',
+	addUserToTempTable: '请将需要保存的用户添加至暂存表!~',
+	notTransProject: '没有转移支付项目!~',
+	chooseTariff: '请先选择资费!~',
+	MustBeOrderMonth: '订购月数是必须的!~',
+	upgradeEndDateMoreThanBeginDate:'升级时，结束计费日必须大于上期订购结束日，请调整订购月数!~',
+	realpayMustBeGreaterThanZero: '实际应付不能小于0，请增加订购月数!~',
+	notMustBeOrderUser: '没有需要订购的用户!~',
+	custPkgChooseUserMustBeEqualToMaxUserNum: '客户套餐已选用户必须等于套餐最大用户数!~',
+	spkgPkgCanContinueChooseUser: '协议套餐已选用户小于套餐内容最大用户数，可继续选择用户!~',
+	chooseInUsers: '请选择要参加套餐的终端用户!~',
+	exceedPkgMaxUserNum: '已超过套餐最大用户数限制!~',
+	completeChooseUserTerminal: '请完整选择需要参加的每种用户类型终端!~',
 }

@@ -719,7 +719,7 @@ CustBaseForm = Ext.extend( BaseForm , {
 		if(!Ext.getCmp('linkmanTel').getValue() && !Ext.getCmp('linkmanMobile').getValue()){
 			var obj = {};
 			obj['isValid'] = false;
-			obj['msg'] = '电话号码或固定电话必须输入一个！';
+			obj['msg'] = lmsg("phoneOrFixedPhoneMustBeEnterOne");
 			return obj;
 		}
 		return CustBaseForm.superclass.doValid.call(this);

@@ -100,7 +100,7 @@ PublicAcctRefundPanel = Ext.extend(BaseForm,{
 		var obj={};
 		if(fee > canRefundBalance){
 			obj["isValid"] = false;
-			obj["msg"] = '退款金额应小于账目可退余额';
+			obj["msg"] = lmsg('refundAmountShouldLeeThanSumofTheAccounts');
 			return obj;
 		}
 		return PublicAcctRefundPanel.superclass.doValid.call(this);
