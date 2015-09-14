@@ -47,6 +47,7 @@ import com.ycsoft.business.dao.resource.device.RStbDao;
 import com.ycsoft.business.dao.resource.device.RStbModelDao;
 import com.ycsoft.business.dao.system.SDeptDao;
 import com.ycsoft.business.dto.device.DeviceDto;
+import com.ycsoft.business.dto.device.DeviceSmallDto;
 import com.ycsoft.business.dto.device.ValuableCardDto;
 import com.ycsoft.commons.constants.DataRight;
 import com.ycsoft.commons.constants.StatusConstants;
@@ -982,6 +983,11 @@ public class DeviceComponent extends BaseBusiComponent {
 			list.add(f);
 		}
 		return list;
+	}
+	
+	public List<DeviceSmallDto>  getDeviceCodeByDeviceId(String[] deviceIds) throws Exception{
+		//加上数量购买数量
+		return rDeviceDao.getDeviceCodeByDeviceId(deviceIds);
 	}
 	
 	

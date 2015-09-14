@@ -17,8 +17,16 @@ public class QueryTaskConditionDto {
 	private String addr;
 	private String taskId;
 	private String custName;
+	private String addrIds;
 	
 	
+	
+	public String getAddrIds() {
+		return addrIds;
+	}
+	public void setAddrIds(String addrIds) {
+		this.addrIds = addrIds;
+	}
 	public String getTaskId() {
 		return taskId;
 	}

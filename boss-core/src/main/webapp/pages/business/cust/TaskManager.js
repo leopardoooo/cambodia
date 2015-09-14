@@ -28,7 +28,7 @@ TaskDetailGrid = Ext.extend(Ext.grid.GridPanel, {
 	constructor : function() {
 		this.taskDetailStore = new Ext.data.JsonStore({
 					fields : ['busi_code', 'busi_name', 'optr_id','optr_name','log_time',
-							'syn_status','error_remark']});
+							'syn_status','error_remark','syn_status_text']});
 		TaskDetailGrid.superclass.constructor.call(this, {
 			ds : this.taskDetailStore,
 			viewConfig : {
@@ -108,16 +108,6 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 						items : [this.grid]
 					}],
 			buttons: [{
-//				id:'add_btn_id',
-//				text: '新增工单',
-//				disabled:true,
-//				tooltip: '新增业务单,报修单',
-//				height: 30,
-//				width: 80,
-//				style: 'color: red;',
-//				scope: this,
-//				handler: this.addTask
-//			},{
 				id:'team_btn_id',
 				text: '分配施工队',
 				height: 30,
@@ -266,13 +256,13 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 		    emptyText: '施工队',
 		    editable : true,
 		    store: new Ext.data.JsonStore({
-//		    	url: root + '/core/x/Task!queryInstallerDept.action' ,
-//		    	autoLoad : true,
-//		   	 	autoDestroy:true,
-		        fields: [ 'item_value', 'item_name' ]
+		    	url: root + '/core/x/Task!queryTaskTeam.action' ,
+		    	autoLoad : true,
+		   	 	autoDestroy:true,
+		        fields: [ 'dept_id', 'dept_name' ]
 		    }),
-		    valueField: 'item_value',
-		    displayField: 'item_name'
+		    valueField: 'dept_id',
+		    displayField: 'dept_name'
 		});
 		//初始化下拉框的数据 
 		App.form.initComboData([this.taskStatusCombo,this.taskDetailTypeCombo]);
@@ -304,7 +294,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 					return "<span style='font-weight: bold;'>"+ v +"</span>";
 				}},
 				{header: '客户名称', 		dataIndex: 'cust_name', 				width: 80},
-				{header: '地址', 		dataIndex : 'old_addr', 			width: 200},
+				{header: '地址', 		dataIndex : 'old_addr', 			width: 200,renderer:App.qtipValue},
 				{header: '联系电话', 	dataIndex : 'tel', 				width: 100},
 				{header: '工单状态', 		dataIndex: 'task_status', width: 100, renderer: function(v, m ,rs){
 					var text = rs.get("task_status_text");
@@ -322,7 +312,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 				}},
 				{header:'施工队', dataIndex:'team_id_text',width:100,renderer:App.qtipValue},
 				{header:'故障类型',dataIndex:'bug_type_text',width:85},
-				{header:'故障详细信息',dataIndex:'bug_detail',width:120},
+				{header:'故障详细信息',dataIndex:'bug_detail',width:120,renderer:App.qtipValue},
 				{header: 'ZTE授权状态',dataIndex: 'zte_status_text', width: 100, renderer:App.qtipValue},
 				{header: '创建时间', dataIndex: 'create_time', 	width: 165, renderer: Ext.util.Format.dateFormat}					
 	        ]}),
@@ -348,6 +338,30 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 				}
 			}
 	    });
+	},
+	initEvents: function(){
+		this.grid.on("rowclick", this.doClickRecord, this );
+		
+		TaskManagerPanel.superclass.initEvents.call(this);
+	},
+	doClickRecord:function(g, i, e){
+		//选中一条时才显示
+		var records = g.getSelectionModel().getSelections();
+		if(records.length == 1){
+			Ext.Ajax.request({
+				scope : this,
+				url: root + '/core/x/Task!queryTaskDetail.action' ,
+				params : {
+					task_id : records[0].get("task_id")
+				},
+				success : function(res,opt){
+					var rs = Ext.decode(res.responseText);
+					this.taskAllInfo.userGrid.getStore().loadData(rs.taskUserList);
+					this.taskAllInfo.detail.getStore().loadData(rs.taskLogList);
+				}
+			});
+			
+		}
 	},
 	createStartDateField: null,
 	createEndDateField: null,
@@ -416,15 +430,15 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 				});
 		});
 	},
-	addTask:function(){
-		var w  = new TaskAddWin();
-		w.show();
+	doTeamTask:function(){//分配施工队
+		var rs = this.getSelections();
+		if(rs === false){
+			return ;
+		}
+		alert(rs.get('task_id'));
 		
 	},
-	doTeamTask:function(){
-	
-	},
-	doDeviceTask:function(){
+	doDeviceTask:function(){//取消工单
 	
 	},
 	doEndTask:function(){
@@ -433,16 +447,10 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 	doVisitTask:function(){
 	
 	},
-	doTeamTask:function(){
-	
-	},
-	getSelections: function(allowMoreRows){
-		var rs = this.grid.getSelectionModel().getSelections();
-		if(rs.length == 0){
+	getSelections: function(){
+		var rs = this.grid.getSelectionModel().getSelected();
+		if(Ext.isEmpty(rs.get('task_id'))){
 			Alert("请选择需要操作的记录!");
-			return false;
-		}else if(rs.length > 1 && allowMoreRows === false){
-			Alert("仅能选择一条记录进行操作!");
 			return false;
 		}
 		return rs;
@@ -450,8 +458,8 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 	//search task from remote
 	doSearchTask: function(){
 		var o = {
-			"taskCond.startTime": Ext.util.Format.date(this.createStartDateField.getValue(), "Y/m/d"),
-			"taskCond.EndTime": Ext.util.Format.date(this.createEndDateField.getValue(), "Y/m/d"),
+			"taskCond.startTime": Ext.util.Format.date(this.createStartDateField.getValue(), "Y-m-d"),
+			"taskCond.EndTime": Ext.util.Format.date(this.createEndDateField.getValue(), "Y-m-d"),
 			"taskCond.custNo": this.custNoField.getValue(),
 			"taskCond.status": this.taskStatusCombo.getValue(),
 			"taskCond.mobile": this.mobileField.getValue(),

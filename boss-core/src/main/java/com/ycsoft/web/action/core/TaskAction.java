@@ -7,6 +7,7 @@ import org.springframework.stereotype.Controller;
 
 import com.ycsoft.beans.task.WTaskBaseInfo;
 import com.ycsoft.business.dto.core.cust.QueryTaskConditionDto;
+import com.ycsoft.business.service.ISnTaskService;
 import com.ycsoft.business.service.ITaskService;
 import com.ycsoft.web.commons.abstracts.BaseBusiAction;
 
@@ -33,6 +34,7 @@ public class TaskAction extends BaseBusiAction{
 	private String cancelRemark;
 	private QueryTaskConditionDto taskCond;
 	private String bugCause;
+	private ISnTaskService snTaskService;
 
 
 	public String saveBugTask()throws Exception{
@@ -82,8 +84,19 @@ public class TaskAction extends BaseBusiAction{
 		}
 		taskCond.setStart(start);
 		taskCond.setLimit(limit);
-		getRoot().setPage(taskService.queryTask(taskCond));
+		getRoot().setPage(snTaskService.queryTask(taskCond.getTaskType(),taskCond.getAddrIds(),taskCond.getStartTime(),taskCond.getEndTime(),taskCond.getTaskId()
+				,taskCond.getTaskTeam(),taskCond.getStatus(),taskCond.getCustNo(),taskCond.getCustName(),taskCond.getAddr(),taskCond.getMobile(),taskCond.getStart(),taskCond.getLimit()));
 		return JSON_PAGE;
+	}
+	
+	public String queryTaskDetail() throws Exception{
+		getRoot().setOthers(snTaskService.queryTaskDetail(task_id));
+		return JSON_OTHER;
+	}
+	
+	public String queryTaskTeam() throws Exception{
+		getRoot().setRecords(snTaskService.queryTaskTeam());
+		return JSON_RECORDS;
 	}
 	
 	public String getTaskType() throws Exception{
@@ -245,6 +258,17 @@ public class TaskAction extends BaseBusiAction{
 	public void setBugCause(String bugCause) {
 		this.bugCause = bugCause;
 	}
+
+
+	public ISnTaskService getSnTaskService() {
+		return snTaskService;
+	}
+
+
+	public void setSnTaskService(ISnTaskService snTaskService) {
+		this.snTaskService = snTaskService;
+	}
+
 
 
 }

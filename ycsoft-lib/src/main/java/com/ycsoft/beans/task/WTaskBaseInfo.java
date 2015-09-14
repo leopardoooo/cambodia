@@ -7,9 +7,7 @@ package com.ycsoft.beans.task;
 import java.io.Serializable;
 import java.util.Date;
 
-import com.ycsoft.beans.base.BusiBase;
 import com.ycsoft.commons.constants.DictKey;
-import com.ycsoft.commons.pojo.UserTypeDto;
 import com.ycsoft.commons.store.MemoryDict;
 import com.ycsoft.daos.config.POJO;
 
@@ -27,7 +25,7 @@ public class WTaskBaseInfo implements Serializable{
 	private String task_status;
 	private String cancel_result;
 	private String team_id;
-	private int installer_id;
+	private Integer installer_id;
 	private Date task_create_time;
 	private Date task_invalide_time;
 	private Date task_finish_time;
@@ -38,7 +36,7 @@ public class WTaskBaseInfo implements Serializable{
 	private String old_addr;
 	private String tel;
 	private String mobile;
-	private int done_code;
+	private Integer done_code;
 	private String county_id;
 	private String area_id;
 	private String remark;
@@ -52,8 +50,10 @@ public class WTaskBaseInfo implements Serializable{
 	private String task_detail_type_name;
 	private String task_status_text;
 	private String zte_status_text;
-	
-	
+	private String task_type_id_text;
+	private String optr_name;
+	private String bug_type_text;
+	private String team_id_text;
 	
 	public String getTask_id() {
 		return task_id;
@@ -87,6 +87,19 @@ public class WTaskBaseInfo implements Serializable{
 
 	public void setTask_type_id(String task_type_id) {
 		this.task_type_id = task_type_id;
+		task_type_id_text = MemoryDict.getDictName(DictKey.TASK_TYPE, task_type_id);
+	}
+
+
+
+	public String getTeam_id_text() {
+		return team_id_text;
+	}
+
+
+
+	public void setTeam_id_text(String team_id_text) {
+		this.team_id_text = team_id_text;
 	}
 
 
@@ -123,6 +136,7 @@ public class WTaskBaseInfo implements Serializable{
 
 	public void setTask_status(String task_status) {
 		this.task_status = task_status;
+		task_status_text = MemoryDict.getDictName(DictKey.TASK_STATUS, task_status);
 	}
 
 
@@ -135,6 +149,7 @@ public class WTaskBaseInfo implements Serializable{
 
 	public void setTeam_id(String team_id) {
 		this.team_id = team_id;
+		team_id_text = MemoryDict.getDictName(DictKey.DEPT, team_id);
 	}
 
 
@@ -259,14 +274,24 @@ public class WTaskBaseInfo implements Serializable{
 
 
 
-	public int getDone_code() {
+
+
+
+
+	public Integer getDone_code() {
 		return done_code;
 	}
 
 
 
-	public void setDone_code(int done_code) {
+	public void setDone_code(Integer done_code) {
 		this.done_code = done_code;
+	}
+
+
+
+	public void setInstaller_id(Integer installer_id) {
+		this.installer_id = installer_id;
 	}
 
 
@@ -339,21 +364,9 @@ public class WTaskBaseInfo implements Serializable{
 		this.task_status_text = task_status_text;
 	}
 	
-	
-
-
-
-	public int getInstaller_id() {
+	public Integer getInstaller_id() {
 		return installer_id;
 	}
-
-
-
-	public void setInstaller_id(int installer_id) {
-		this.installer_id = installer_id;
-	}
-	
-	
 
 
 
@@ -367,18 +380,14 @@ public class WTaskBaseInfo implements Serializable{
 		this.visit_result = visit_result;
 	}
 	
-	
-
-
 
 	public String getZte_status() {
 		return zte_status;
 	}
 
-
-
 	public void setZte_status(String zte_status) {
 		this.zte_status = zte_status;
+		zte_status_text = MemoryDict.getDictName(DictKey.STATUS, zte_status);
 	}
 	
 	
@@ -411,6 +420,7 @@ public class WTaskBaseInfo implements Serializable{
 
 	public void setBug_type(String bug_type) {
 		this.bug_type = bug_type;
+		bug_type_text = MemoryDict.getDictName(DictKey.TASK_BUG_CAUSE, bug_type);
 	}
 
 
@@ -447,6 +457,43 @@ public class WTaskBaseInfo implements Serializable{
 
 	public void setOptr_id(String optr_id) {
 		this.optr_id = optr_id;
+		optr_name = MemoryDict.getDictName(DictKey.OPTR, optr_id);
+	}
+
+
+
+	public String getTask_type_id_text() {
+		return task_type_id_text;
+	}
+
+
+
+	public void setTask_type_id_text(String task_type_id_text) {
+		this.task_type_id_text = task_type_id_text;
+	}
+
+
+
+	public String getOptr_name() {
+		return optr_name;
+	}
+
+
+
+	public void setOptr_name(String optr_name) {
+		this.optr_name = optr_name;
+	}
+
+
+
+	public String getBug_type_text() {
+		return bug_type_text;
+	}
+
+
+
+	public void setBug_type_text(String bug_type_text) {
+		this.bug_type_text = bug_type_text;
 	}
 	
 	

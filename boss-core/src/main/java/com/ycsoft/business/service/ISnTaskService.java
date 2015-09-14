@@ -1,10 +1,12 @@
 package com.ycsoft.business.service;
 
-import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import com.ycsoft.beans.task.TaskFillDevice;
 import com.ycsoft.beans.task.WTaskBaseInfo;
+import com.ycsoft.beans.task.WTeam;
+import com.ycsoft.daos.core.Pager;
 
 public interface ISnTaskService {
 	/**
@@ -50,11 +52,13 @@ public interface ISnTaskService {
 	 * @param custNo
 	 * @param custName
 	 * @param custAddr
+	 * @param limit 
+	 * @param start 
 	 * @throws Exception
 	 */
-	public List<WTaskBaseInfo> queryTask(String[] taskTypes,String[] areaIds,Date beginDate,Date endDate,
+	public Pager<WTaskBaseInfo> queryTask(String taskTypes,String addrIds,String beginDate,String endDate,
 			String taskId,String teamId,String status,
-			String custNo,String custName,String custAddr) throws Exception;
+			String custNo,String custName,String custAddr,String mobile, Integer start, Integer limit) throws Exception;
 	
 	/**
 	 * 查询待处理工单
@@ -62,6 +66,10 @@ public interface ISnTaskService {
 	 * @throws Exception
 	 */
 	public List<WTaskBaseInfo> queryUnProcessTask() throws Exception;
+
+	public Map<String, ?> queryTaskDetail(String task_id) throws Exception;
+
+	public List<WTeam> queryTaskTeam()throws Exception;
 	
 	
 
