@@ -12,24 +12,38 @@ public class QueryTaskConditionDto {
 	private String mobile;
 	private Integer start;
 	private Integer limit;
-	private String installTeam;
-	private String taskDetailType;
-	private String newAddr;
+	private String taskTeam;
+	private String taskType;
+	private String addr;
+	private String taskId;
+	private String custName;
 	
-	public String getTaskDetailType() {
-		return taskDetailType;
+	
+	public String getTaskId() {
+		return taskId;
 	}
-	public void setTaskDetailType(String taskDetailType) {
-		this.taskDetailType = taskDetailType;
+	public void setTaskId(String taskId) {
+		this.taskId = taskId;
 	}
-	public String getInstallTeam() {
-		return installTeam;
+	public String getCustName() {
+		return custName;
 	}
-	public void setInstallTeam(String installTeam) {
-		this.installTeam = installTeam;
+	public void setCustName(String custName) {
+		this.custName = custName;
 	}
 
-
+	public String getTaskType() {
+		return taskType;
+	}
+	public void setTaskType(String taskType) {
+		this.taskType = taskType;
+	}
+	public String getTaskTeam() {
+		return taskTeam;
+	}
+	public void setTaskTeam(String taskTeam) {
+		this.taskTeam = taskTeam;
+	}
 	public String getStartTime() {
 		return startTime;
 	}
@@ -103,12 +117,12 @@ public class QueryTaskConditionDto {
 	public void setMobile(String mobile) {
 		this.mobile = mobile;
 	}
-	public String getNewAddr() {
-		return newAddr;
+	public String getAddr() {
+		return addr;
 	}
-	public void setNewAddr(String newAddr) {
-		this.newAddr = newAddr;
+	public void setAddr(String addr) {
+		this.addr = addr;
 	}
-	
+
 	
 }

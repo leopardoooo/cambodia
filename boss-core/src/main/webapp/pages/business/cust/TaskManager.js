@@ -1,166 +1,25 @@
 /**工单管理*/
-
-/**
- * 修改工单
- */
-TaskManager_update = function(){
-	
-	var rs = Ext.getCmp('taskManagerPanelId').grid.getSelectionModel().getSelected();
-	if(!rs){
-		Alert("请选择一条需要修改的工单");
-	}
-	
-	var oldDate = rs.get("books_time");
-	var tomorrow = new Date();
-	tomorrow.setDate(tomorrow.getDate() + 1);
-
-	this.bugCauseCombo = new Ext.ux.ParamCombo({
-		fieldLabel:'故障类型',
-		xtype:'paramcombo',
-		allowBlank:false,
-		hiddenName:'bug_cause',
-		anchor: '95%',
-		paramName:'TASK_BUG_CAUSE'
-	});
-	
-	var form = new Ext.form.FormPanel({
-		labelWidth: 90,
-		bodyStyle: 'padding-top: 10px;',
-		items: [{
-				xtype:'textfield',
-				name: 'task_cust_name',
-				value: rs.get("task_cust_name"),
-				fieldLabel: '联系人'
-			},{
-				xtype:'textfield',
-				name: 'tel',
-				value: rs.get("tel"),
-				fieldLabel: '联系电话'
-			},{
-				xtype : 'xdatetime',
-				fieldLabel : '预约时间',
-				width : 160,
-				name:'books_time',
-				minText : '不能选择当日之前',
-				timeWidth : 60,
-				timeFormat : 'H:i',
-				value: rs.get("books_time"),			
-				timeConfig : {
-					increment : 60,
-					editable:true,
-					altFormats : 'H:i|H:i:s',
-					minValue:'04:00',  
-					value: Ext.util.Format.date(oldDate, 'H:i'),
-					maxValue:'21:00' 
-				},
-				dateFormat : 'Y-m-d'
-				,dateConfig : {
-					value: Ext.util.Format.date(oldDate, 'Y-m-d'),
-					altFormats : 'Y-m-d|Y-n-d'
-				}
-			},{
-				xtype:'textarea',
-				name: 'remark',
-				height:40,
-				value: rs.get("remark"),
-				fieldLabel: '备注'
-			}]
-	});
-	//初始化下拉框的数据 
-	App.form.initComboData([this.bugCauseCombo],function(){
-		if(rs.get("task_type") == 'WX'){
-			form.add(this.bugCauseCombo);
-			this.bugCauseCombo.setValue(rs.get("bug_cause"));
-			form.doLayout();			
-		}
-	},this);
-	var win = new Ext.Window({
-		width: 320,
-		height: 360,
-		title: '变更',
-		border: false,
-		closeAction:'close',
-		layout: 'fit',
-		items: form,
-		buttons: [{
-			text: '保存',
-			scope: this,
-			iconCls : 'icon-save',
-			handler: function(){
-				var url = Constant.ROOT_PATH + "/core/x/Task!modifyTask.action";
-				var o = {
-					task_id : rs.get("work_id"), 
-					booksTime: form.getForm().getValues()["books_time"],
-					taskCustName: form.getForm().getValues()["task_cust_name"], 
-					tel: form.getForm().getValues()["tel"], 
-					remark: form.getForm().getValues()["remark"],
-					bugCause : form.getForm().getValues()["bug_cause"]
-				};
-				App.sendRequest( url, o, function(res,opt){
-					rs.set("books_time", o.booksTime);
-					rs.set("task_cust_name", o.taskCustName);
-					rs.set("tel", o.tel);
-					rs.set("remark", o.remark);	
-					if(o.bugCause != null){
-						rs.set("bug_cause",o.bugCause);
-						var index = 0;
-						index = this.bugCauseCombo.getStore().find('item_value',o.bugCause);
-						rs.set("bug_cause_text",this.bugCauseCombo.getStore().getAt(index).get('item_name'));
-					}
-					win.close();
-				});
-			}
-		},{
-			text: '取消',
-			handler: function(){
-				win.hide();
-			}
-		}]
-	});
-	win.show();
-}
-
-
 UserDetailGrid = Ext.extend(Ext.grid.GridPanel, {
 	userDetailStore : null,
 	constructor : function() {
 		this.userDetailStore = new Ext.data.JsonStore({
-					fields : ['cust_name', 'cust_no', 'busi_name','optr_id','optr_name',
-							'fee_name', 'real_pay', 'create_time', 'status', 'status_text']
+					fields : ['user_type', 'user_type_text','user_name', 'divice_model','divice_model_text','task_id',
+							'device_code', 'password']
 				});
 		UserDetailGrid.superclass.constructor.call(this, {
-					ds : this.userDetailStore,
-					viewConfig : {
-						forceFit :true
-					},
-					sm : new Ext.grid.CheckboxSelectionModel(),
-					cm : new Ext.grid.ColumnModel([{
-								header : '客户名称',
-								dataIndex : 'cust_name',
-								width : 100,
-								renderer : App.qtipValue
-							}, {
-								header : '客户编号',
-								dataIndex : 'cust_no',
-								renderer : App.qtipValue
-							}, {
-								header : '业务名称',
-								dataIndex : 'busi_name',
-								renderer : App.qtipValue
-							}, {
-								header : '费用名称',
-								dataIndex : 'fee_name',
-								renderer : App.qtipValue
-							}, {
-								header : '实际金额',
-								dataIndex : 'real_pay',
-								renderer : Ext.util.Format.formatFee
-							}, {
-								header : '操作时间',
-								dataIndex : 'create_time',
-								renderer : App.qtipValue
-							}])
-				})
+			ds : this.userDetailStore,
+			viewConfig : {
+				forceFit :true
+			},
+			sm : new Ext.grid.CheckboxSelectionModel(),
+			cm : new Ext.grid.ColumnModel([{
+						header : '用户类型',dataIndex : 'user_type_text',width : 100,renderer : App.qtipValue}, {
+						header : '用户名',dataIndex : 'user_name',renderer : App.qtipValue}, {
+						header : '密码',dataIndex : 'password',renderer : App.qtipValue}, {
+						header : '设备型号',dataIndex : 'divice_model_text',renderer : App.qtipValue}, {
+						header : '设备号',dataIndex : 'device_code',renderer : App.qtipValue}, {
+						header : '宽带',dataIndex : 'task_id',renderer : App.qtipValue}])
+		})
 	}
 })
 
@@ -168,38 +27,22 @@ TaskDetailGrid = Ext.extend(Ext.grid.GridPanel, {
 	taskDetailStore : null,
 	constructor : function() {
 		this.taskDetailStore = new Ext.data.JsonStore({
-					fields : ['user_type_text', 'user_type', 'user_name','password','device_model',
-							'device_model_text', 'real_pay', 'create_time', 'status', 'status_text']
-				});
+					fields : ['busi_code', 'busi_name', 'optr_id','optr_name','log_time',
+							'syn_status','error_remark']});
 		TaskDetailGrid.superclass.constructor.call(this, {
-					ds : this.taskDetailStore,
-					viewConfig : {
-						forceFit :true
-					},
-					sm : new Ext.grid.CheckboxSelectionModel(),
-					cm : new Ext.grid.ColumnModel([{
-								header : '客户名称',
-								dataIndex : 'cust_name',
-								width : 100,
-								renderer : App.qtipValue
-							}, {
-								header : '客户编号',
-								dataIndex : 'cust_no',
-								renderer : App.qtipValue
-							}, {
-								header : '业务名称',
-								dataIndex : 'busi_name',
-								renderer : App.qtipValue
-							}, {
-								header : '费用名称',
-								dataIndex : 'fee_name',
-								renderer : App.qtipValue
-							}, {
-								header : '实际金额',
-								dataIndex : 'real_pay',
-								renderer : Ext.util.Format.formatFee
-							}])
-				})
+			ds : this.taskDetailStore,
+			viewConfig : {
+				forceFit :true
+			},
+			sm : new Ext.grid.CheckboxSelectionModel(),
+			cm : new Ext.grid.ColumnModel([{
+				header : '操作时间',dataIndex : 'log_time',width : 100,renderer : Ext.util.Format.dateFormat}, {
+				header : '操作类型',dataIndex : 'busi_name',renderer : App.qtipValue}, {
+				header : '操作人',dataIndex : 'optr_name',renderer : App.qtipValue}, {
+				header : '同步状态',dataIndex : 'syn_status_text',renderer : App.qtipValue}, {
+				header : '错误描述',dataIndex : 'error_remark',renderer :  App.qtipValue
+			}])
+		})
 	}
 })
 
@@ -265,34 +108,63 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 						items : [this.grid]
 					}],
 			buttons: [{
-				id:'add_btn_id',
-				text: '新增工单',
-				disabled:true,
-				tooltip: '新增业务单,报修单',
+//				id:'add_btn_id',
+//				text: '新增工单',
+//				disabled:true,
+//				tooltip: '新增业务单,报修单',
+//				height: 30,
+//				width: 80,
+//				style: 'color: red;',
+//				scope: this,
+//				handler: this.addTask
+//			},{
+				id:'team_btn_id',
+				text: '分配施工队',
 				height: 30,
 				width: 80,
 				style: 'color: red;',
 				scope: this,
-				handler: this.addTask
+				handler: this.doTeamTask
 			},{
 				id:'ivalid_btn_id',
-				text: '作废',
-				disabled:true,
-				tooltip: '作废选择的施工单',
+				text: '取消工单',
 				height: 30,
 				width: 80,
 				style: 'color: red;',
 				scope: this,
-				handler: this.cancelTask
+				handler: this.doCancelTask
+			},{
+				id:'device_btn_id',
+				text: '回填设备',
+				height: 30,
+				width: 80,
+				style: 'color: red;',
+				scope: this,
+				handler: this.doDeviceTask
+			},{
+				id:'end_btn_id',
+				text: '完工',
+				height: 30,
+				width: 80,
+				style: 'color: red;',
+				scope: this,
+				handler: this.doEndTask
+			},{
+				id:'visit_btn_id',
+				text: '回访',
+				height: 30,
+				width: 80,
+				style: 'color: red;',
+				scope: this,
+				handler: this.doVisitTask
 			},{
 				id:'send_btn_id',
-				text: '提交呼叫',
-				disabled:true,
+				text: '发送ZTE授权',
 				width: 80,
-				tooltip: '工单传给呼叫',
+//				tooltip: '工单传给呼叫',
 				height: 30,
 				scope: this,
-				handler: this.assignTask
+				handler: this.doSendTask
 			}]
 		});
 	},
@@ -318,16 +190,9 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 	initWidgets: function(item){
 		this.taskStore = new Ext.data.JsonStore({
 			url: root + '/core/x/Task!queryTasks.action' ,
-			fields:['work_id','cust_id','cust_no','task_cust_name','tel','install_addr','task_type',
-					'task_status','task_status_text','task_type_text','task_finish_type','books_time',{
-						name: 'create_time',
-						type: 'date',
-						dateFormat: 'Y-m-d H:i:s'
-					},{
-						name: 'installer_time',
-						type: 'date',
-						dateFormat: 'Y-m-d H:i:s'
-					},"books_optr","books_optr_text","busi_code","busi_name","bug_cause","bug_cause_text","remark"],
+			fields:['task_id','cust_id','cust_no','cust_name','tel','old_addr','new_addr','task_type_id',
+					'task_status','task_status_text','task_type_id_text','team_id','team_id_text','bug_type','bug_type_text'
+					,'bug_detail','zte_status','zte_status_text','task_create_time'],
 			root : 'records',
 			totalProperty : 'totalProperty',
 			autoDestroy : true
@@ -337,61 +202,43 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 		tomorrow.setDate(tomorrow.getDate() + 1);
 		var startDate = new Date();
 		startDate.setDate(startDate.getDate() - 1);
-//		startDate.setFullYear(startDate.getFullYear()-5);
-		//create search field
 		this.createStartDateField = new Ext.form.DateField({
-				xtype: 'datefield',
-				width: 90,
-				format: 'Y-m-d',
-				allowBlank: false,
-				value: startDate
+				xtype: 'datefield',width: 90,format: 'Y-m-d',allowBlank: false,value: startDate
 			});
 		this.createEndDateField = new Ext.form.DateField({
-				xtype: 'datefield',
-				width: 90,
-				format: 'Y-m-d',
-				allowBlank: false,
-				value: tomorrow
-			});
+				xtype: 'datefield',width: 90,format: 'Y-m-d',allowBlank: false,value: tomorrow});
 		this.custNoField = new Ext.form.TextField({
-				xtype: 'textfield',
-				width: 90,
-				emptyText: '客户编号'
-			});
+				xtype: 'textfield',width: 90,emptyText: '客户编号'});
 		this.taskNoField = new Ext.form.TextField({
-				xtype: 'textfield',
-				width: 90,
-				emptyText: '工单编号'
-			});			
+				xtype: 'textfield',width: 90,emptyText: '工单编号'});			
 		this.custNameField = new Ext.form.TextField({
-				xtype: 'textfield',
-				width: 90,
-				emptyText: '客户名称'
-			});
+				xtype: 'textfield',width: 90,emptyText: '客户名称'});
 		this.mobileField = new Ext.form.TextField({
-				xtype: 'textfield',
-				width: 100,
-				emptyText: '联系电话'
-			});
+				xtype: 'textfield',width: 100,emptyText: '联系电话'});
 		this.newaddrField = new Ext.form.TextField({
-				xtype: 'textfield',
-				width: 140,
-				emptyText: '地址'
-			});
-		this.taskStatusCombo = new Ext.ux.ParamCombo({
-				xtype: 'textfield',
+				xtype: 'textfield',width: 140,emptyText: '地址'});
+		this.taskStatusCombo = new Ext.ux.LovCombo({
 				width: 120,
 				emptyText: '工单状态',
 				paramName:'TASK_STATUS',
-				allowBlankItem: true
+				hiddenName : 'task_status',
+				typeAhead:true,editable:true,
+				store:new Ext.data.JsonStore({
+					fields:['item_value','item_name']
+				}),displayField:'item_name',valueField:'item_value',
+				triggerAction:'all',mode:'local'
 			});		
 		
-		this.taskDetailTypeCombo = new Ext.ux.ParamCombo({
+		this.taskDetailTypeCombo = new Ext.ux.LovCombo({
 				xtype: 'textfield',
 				width: 120,
 				emptyText: '工单类型',
+				typeAhead:true,editable:true,
 				paramName:'TASK_DETAIL_TYPE',
-				allowBlankItem: true
+				store:new Ext.data.JsonStore({
+					fields:['item_value','item_name']
+				}),displayField:'item_name',valueField:'item_value',
+				triggerAction:'all',mode:'local'
 		});
 		
 		this.taskAddrCombo = new Ext.form.ComboBox({
@@ -402,9 +249,9 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 		    emptyText: '地区',
 		    editable : true,
 		    store: new Ext.data.JsonStore({
-//		    	url:root+'/config/Task!queryInstallerDept.action',
-		    	autoLoad : true,
-		   	 	autoDestroy:true,
+//		    	url: root + '/core/x/Task!queryTaskAddr.action' ,
+//		    	autoLoad : true,
+//		   	 	autoDestroy:true,
 		        fields: [ 'item_value', 'item_name' ]
 		    }),
 		    valueField: 'item_value',
@@ -419,15 +266,14 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 		    emptyText: '施工队',
 		    editable : true,
 		    store: new Ext.data.JsonStore({
-//		    	url:root+'/config/Task!queryInstallerDept.action',
-		    	autoLoad : true,
-		   	 	autoDestroy:true,
+//		    	url: root + '/core/x/Task!queryInstallerDept.action' ,
+//		    	autoLoad : true,
+//		   	 	autoDestroy:true,
 		        fields: [ 'item_value', 'item_name' ]
 		    }),
 		    valueField: 'item_value',
 		    displayField: 'item_name'
 		});
-		
 		//初始化下拉框的数据 
 		App.form.initComboData([this.taskStatusCombo,this.taskDetailTypeCombo]);
 		
@@ -448,27 +294,18 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 		});
 		
     	// create the Grid
-    	var sm = new Ext.grid.CheckboxSelectionModel();
+    	var sm = new Ext.grid.RowSelectionModel();
 	    this.grid = new Ext.grid.GridPanel({
 	        store: this.taskStore,
 	        cm: new Ext.ux.grid.LockingColumnModel({
 	        	columns:[
-	        	sm,
-				//{header: '工单编号',		dataIndex : 'work_id', 				width: 100},
-				{header: '创建时间', 		dataIndex: 'create_time', 		width: 165, renderer: Ext.util.Format.dateRenderer("Y年m月d日H点i分s秒")},
-				{header: '预约时间', 		dataIndex: 'books_time', width: 140},
-				{header: '客户受理号',	dataIndex : 'cust_no', 				width: 80},
-				{header: '联系人', 		dataIndex: 'task_cust_name', 				width: 80},
+				//{header: '工单编号',		dataIndex : 'task_id', 				width: 100},
+				{header: '工单类型',		dataIndex : 'task_type_id_text', 	width: 100, renderer: function(v, m ,rs){
+					return "<span style='font-weight: bold;'>"+ v +"</span>";
+				}},
+				{header: '客户名称', 		dataIndex: 'cust_name', 				width: 80},
+				{header: '地址', 		dataIndex : 'old_addr', 			width: 200},
 				{header: '联系电话', 	dataIndex : 'tel', 				width: 100},
-				{header: '地址', 		dataIndex : 'install_addr', 			width: 200},
-				{header: '业务名称',		dataIndex : 'busi_name', 	width: 100, renderer: function(v, m ,rs){
-					return "<span style='font-weight: bold;'>"+ v +"</span>";
-				}},
-				
-				{header: '工单类型',		dataIndex : 'task_type_text', 	width: 100, renderer: function(v, m ,rs){
-					return "<span style='font-weight: bold;'>"+ v +"</span>";
-				}},
-				{header:'故障原因',dataIndex:'bug_cause_text',width:85},
 				{header: '工单状态', 		dataIndex: 'task_status', width: 100, renderer: function(v, m ,rs){
 					var text = rs.get("task_status_text");
 					var color = "black";
@@ -482,20 +319,16 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 						color = "gray";
 					}
 					return "<span style='font-weight: bold;color: "+ color +";'>"+ text +"</span>";
-				}},							
-				{header : "操作", menuDisabled : true, locked: true, dataIndex:'xxx', width : 80,
-				 renderer:function(v,m,rs,rIndex,cIndex,store){
-				 	var optrHtml = "", status = rs.get("task_status");
-				 	if(status == 'CREATE'){
-						optrHtml = "<a href='#' style='color: blue;font-weight: bold;' id='TaskManager_update_btn' onclick='TaskManager_update();' title='修改工单信息'>修改</a> ";
-					}
-					return optrHtml;
 				}},
-				{header:'施工备注',dataIndex:'remark',width:100,renderer:App.qtipValue}
+				{header:'施工队', dataIndex:'team_id_text',width:100,renderer:App.qtipValue},
+				{header:'故障类型',dataIndex:'bug_type_text',width:85},
+				{header:'故障详细信息',dataIndex:'bug_detail',width:120},
+				{header: 'ZTE授权状态',dataIndex: 'zte_status_text', width: 100, renderer:App.qtipValue},
+				{header: '创建时间', dataIndex: 'create_time', 	width: 165, renderer: Ext.util.Format.dateFormat}					
 	        ]}),
 	        view: new Ext.ux.grid.ColumnLockBufferView({
 	        	getRowClass: function(record,index){
-		            if(Ext.util.Format.date(record.get('books_time'), 'Y-m-d') < nowDate().format('Y-m-d') && record.get('task_status')=='CREATE' ){ 
+		            if(record.get('task_status')=='CREATE' ){ 
 		                return 'red-row';  
 	                }
 	                return '';  
@@ -512,8 +345,6 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 			listeners : {
 				'render' : function() {
 					twoTbar.render(this.tbar);
-//					threeTbar.render(this.tbar);
-//					fourTbar.render(this.tbar);
 				}
 			}
 	    });
@@ -524,7 +355,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 	taskStatusCombo: null,
 	mobileField: null,
 	newaddrField: null,
-	cancelTask: function(){
+	doCancelTask: function(){
 		var rs = this.getSelections();
 		if(rs === false){
 			return ;
@@ -536,7 +367,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 				Alert("不允许作废!");
 				return ;
 			}
-			taskIds.push(rs[i].get("work_id"));
+			taskIds.push(rs[i].get("task_id"));
 		}
 		Ext.MessageBox.prompt("备注","作废原因：",function(bu,txt){
 			if(bu != 'cancel'){
@@ -558,7 +389,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 		
 		
 	},
-	assignTask: function(){
+	doSendTask: function(){
 		var rs = this.getSelections();
 		if(rs === false){
 			return ;
@@ -569,7 +400,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 				Alert("只有新建的工单才能提交呼叫!");
 				return ;
 			}
-			taskIds.push(rs[i].get("work_id"));
+			taskIds.push(rs[i].get("task_id"));
 		}
 		
 		var that = this;
@@ -590,6 +421,21 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 		w.show();
 		
 	},
+	doTeamTask:function(){
+	
+	},
+	doDeviceTask:function(){
+	
+	},
+	doEndTask:function(){
+	
+	},
+	doVisitTask:function(){
+	
+	},
+	doTeamTask:function(){
+	
+	},
 	getSelections: function(allowMoreRows){
 		var rs = this.grid.getSelectionModel().getSelections();
 		if(rs.length == 0){
@@ -609,8 +455,11 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 			"taskCond.custNo": this.custNoField.getValue(),
 			"taskCond.status": this.taskStatusCombo.getValue(),
 			"taskCond.mobile": this.mobileField.getValue(),
-			"taskCond.newAddr": this.newaddrField.getValue(),
-			"taskCond.taskDetailType":this.taskDetailTypeCombo.getValue()
+			"taskCond.addr": this.newaddrField.getValue(),
+			"taskCond.custName":this.custNameField.getValue(),
+			"taskCond.taskTeam":this.taskTeamCombo.getValue(),
+			"taskCond.taskId":this.taskNoField.getValue(),
+			"taskCond.taskType":this.taskDetailTypeCombo.getValue()
 		};
 		this.taskStore.baseParams = o;
 		this.taskStore.load({
