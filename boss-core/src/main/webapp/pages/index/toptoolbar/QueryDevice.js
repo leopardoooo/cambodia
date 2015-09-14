@@ -2,22 +2,24 @@
 var QueryDeviceWin = Ext.extend(Ext.Window,{
 	deviceTpl:null,
 	constructor:function(){
+		this.LU_DEV = langUtils.bc('home.tools.queryDevice');
+		
 		this.deviceTpl = new Ext.XTemplate(
 			'<table width="100%" border="0" cellpadding="0" cellspacing="0">',
 				'<tr height=24>',
-					'<td class="label" width=20%>设备类型：</td>',
+					'<td class="label" width=20%>' + this.LU_DEV['labelDevType'] + '：</td>',
 					'<td class="input_bold" width=30%>&nbsp;{device_type_text}</td>',
-					'<td class="label" width=20%>设备型号：</td>',
+					'<td class="label" width=20%>' + this.LU_DEV['labelDevModel'] + '：</td>',
 					'<td class="input_bold" width=30%>&nbsp;{device_model_text}</td>',
 				'</tr>',
 				'<tr height=24>',
-					'<td class="label" width=20%>型号名称：</td>',
+					'<td class="label" width=20%>' + this.LU_DEV['labelModelName'] + '：</td>',
 					'<td class="input_bold" width=30%>&nbsp;{model_name}</td>',
 				'</tr>',				
 				'<tr height=24>',
-					'<td class="label" width=20%>设备编号：</td>',
+					'<td class="label" width=20%>' + this.LU_DEV['labelDevCode'] + '：</td>',
 					'<td class="input_bold" width=30%>&nbsp;{device_code}</td>',
-					'<td class="label" width=20%>所在仓库：</td>',
+					'<td class="label" width=20%>' + this.LU_DEV['labelDeptName'] + '：</td>',
 					'<td class="input_bold" width=30%>&nbsp;{depot_id_text}</td>',
 			      	
 		    	'</tr>',
@@ -34,37 +36,37 @@ var QueryDeviceWin = Ext.extend(Ext.Window,{
 			      	'<td class="input_bold" width=30%>&nbsp;{pair_device_modem_model_text}</td>',
 		    	'</tr>',
 		    	'<tr height=24>',
-					'<td class="label" width=20%>客户编号：</td>',
+					'<td class="label" width=20%>' + this.LU_DEV['labelCustNo'] + '：</td>',
 					'<td class="input_bold" width=30%>&nbsp;{cust_no}</td>',
-			      	'<td class="label" width=20%>客户姓名：</td>',
+			      	'<td class="label" width=20%>' + this.LU_DEV['labelCustName'] + '：</td>',
 			      	'<td class="input_bold" width=30%>&nbsp;{cust_name}</td>',
 		    	'</tr>',
 		    	'<tr height=24>',
-		      		'<td class="label" width=20%>设备状态：</td>',
+		      		'<td class="label" width=20%>' + this.LU_DEV['labelDevStatus'] + '：</td>',
 		      		'<td class="input_bold" width=30%>&nbsp;{device_status_text}</td>',
-		      		'<td class="label" width=20%>库存状态：</td>',
+		      		'<td class="label" width=20%>' + this.LU_DEV['labelDepStatus'] + '：</td>',
 		      		'<td class="input_bold" width=30%>&nbsp;{depot_status_text}</td>',
 		    	'</tr>',
 		    	'<tr height=24>',
-		     		'<td class="label" width=20%>流转状态：</td>',
+		     		'<td class="label" width=20%>' + this.LU_DEV['labelTranStatus'] + '：</td>',
 		      		'<td class="input_bold" width=30%>&nbsp;{tran_status_text}</td>',
-		      		'<td class="label" width=20%>产    权：</td>',
+		      		'<td class="label" width=20%>' + this.LU_DEV['labelOwnership'] + '：</td>',
 		      		'<td class="input_bold" width=30%>&nbsp;{ownership_text}</td>',
 		    	'</tr>',
 			'</table>'
 		);
 		QueryDeviceWin.superclass.constructor.call(this,{
 			id:'queryDeviceWinId',
-			title:'设备查询',
+			title:this.LU_DEV['_title'],
 			closeAction:'close',
-			width:550,
+			width:550,   
 			height:340,
 			bodyStyle: "background:#F9F9F9",
 			items:[
 				{layout:'column',bodyStyle:'padding:15px',
 					border:false,items:[
 					{columnWidth:.8,layout:'form',defaults:{labelWidth:100},border:false,items:[
-						{xtype:'textfield',fieldLabel:'设备序列号',allowBlank:false,
+						{xtype:'textfield',fieldLabel:this.LU_DEV['labelDevNo'],allowBlank:false,
 							name:'device_code',vtype:'alphanum',width:200,
 							listeners:{
 								scope:this,
@@ -77,7 +79,7 @@ var QueryDeviceWin = Ext.extend(Ext.Window,{
 						}
 					]},
 					{columnWidth:.2,border:false,items:[
-						{xtype:'button',text:'查  询',iconCls:'icon-query',
+						{xtype:'button',text:langUtils.bc('common.queryBtnWithBackSpace'),iconCls:'icon-query',
 							listeners:{
 								scope:this,
 								click:this.doQuery
@@ -85,7 +87,7 @@ var QueryDeviceWin = Ext.extend(Ext.Window,{
 						}
 					]}
 				]},
-				{xtype : "panel",title:'设备信息',
+				{xtype : "panel",title:this.LU_DEV['titleDevInfo'],
 					border : false,
 					bodyStyle: "background:#F9F9F9; padding: 10px;padding-top: 4px;padding-bottom: 0px;",
 					html : this.deviceTpl.applyTemplate({})
@@ -110,29 +112,29 @@ var QueryDeviceWin = Ext.extend(Ext.Window,{
 				if(data){
 					if(this.items.itemAt(1).getEl()){
 						if(data.device_type == 'STB'){
-							data['pair_card_label'] = '配对卡编号';
-							data['pair_card_type_label'] = '配对卡型号';
-							data['pair_modem_label'] = '配对MODEM编号';
-							data['pair_modem_type_label'] = '配对MODEM型号';
+							data['pair_card_label'] = this.LU_DEV['labelCardNo'];//'配对卡编号';
+							data['pair_card_type_label'] = this.LU_DEV['labelCardModel'];//'配对卡型号';
+							data['pair_modem_label'] = this.LU_DEV['labelModemNo'];//'配对MODEM编号';
+							data['pair_modem_type_label'] = this.LU_DEV['labelModemModel'];//'配对MODEM型号';
 						}else if(data.device_type == 'CARD'){
-							data['pair_card_label'] = '配对机顶盒编号';
-							data['pair_card_type_label'] = '配对机顶盒型号';
-							data['pair_modem_label'] = '配对MODEM编号';
-							data['pair_modem_type_label'] = '配对MODEM型号';
+							data['pair_card_label'] = this.LU_DEV['labelCardNo'];//'配对机顶盒编号';
+							data['pair_card_type_label'] = this.LU_DEV['labelCardNo'];//'配对机顶盒型号';
+							data['pair_modem_label'] = this.LU_DEV['labelModemNo'];//'配对MODEM编号';
+							data['pair_modem_type_label'] = this.LU_DEV['labelModemModel'];//'配对MODEM型号';
 							data.pair_device_code = data.pair_device_stb_code;
 							data.pair_device_model_text = data.pair_device_stb_model_text;
 						}else {
-							data['pair_card_label'] = '配对卡编号';
-							data['pair_card_type_label'] = '配对卡型号';
-							data['pair_modem_label'] = '配对机顶盒编号';
-							data['pair_modem_type_label'] = '配对机顶盒型号';
+							data['pair_card_label'] = this.LU_DEV['labelCardNo'];//'配对卡编号';
+							data['pair_card_type_label'] = this.LU_DEV['labelCardModel'];//'配对卡型号';
+							data['pair_modem_label'] = this.LU_DEV['labelStbNo'];//'配对机顶盒编号';
+							data['pair_modem_type_label'] = this.LU_DEV['labelStbModel'];//'配对机顶盒型号';
 							data.pair_device_code = data.pair_device_stb_code;
 							data.pair_device_model_text = data.pair_device_stb_model_text;
 						}
 						this.deviceTpl.overwrite( this.items.itemAt(1).body, data);
 					}
 				}else{
-					Alert('查询设备不存在！',function(){
+					Alert(this.LU_DEV['tipDevNotExists'],function(){
 						if(this.items.itemAt(1).getEl()){
 							this.deviceTpl.overwrite( this.items.itemAt(1).body, {});
 						}
