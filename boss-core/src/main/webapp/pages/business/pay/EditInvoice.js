@@ -6,7 +6,7 @@ AutoInvoicePanel = Ext.extend( Ext.Panel, {
 			border : false,
 			layout: 'form',
 			bodyStyle:Constant.TAB_STYLE,
-			labelWidth : 80,
+			labelWidth : 120,
 			defaultType:'textfield',
 			items:[
 				{id:'old_invoice_id',name:'oldInvoice.invoice_id',fieldLabel:lmain("doc._form.oldInvoiceId"),style : Constant.TEXTFIELD_STYLE},
@@ -25,7 +25,7 @@ AutoInvoicePanel = Ext.extend( Ext.Panel, {
 							}),
 					displayField : 'status_text',
 					valueField : 'status',
-					fieldLabel : lmain("doc._form.oldInvoiceStatus"),
+					fieldLabel : lmain("doc._form.oldStatus"),
 					forceSelection : true,
 					allowBlank : false,
 					hiddenName : 'oldInvoice.status'
@@ -34,7 +34,7 @@ AutoInvoicePanel = Ext.extend( Ext.Panel, {
 					id : 'new_invoice_id',
 					allowBlank : false,
 					name : 'newInvoice.invoice_id',
-					fieldLabel : '新发票号码',
+					fieldLabel : lmain("doc._form.newInvoiceId"),
 					listeners : {
 						change : this.checkInvoice
 					}
@@ -56,7 +56,7 @@ AutoInvoicePanel = Ext.extend( Ext.Panel, {
 						}
 					}),
 					hiddenName:'newInvoice.invoice_code',
-					fieldLabel:'新发票代码',
+					fieldLabel:lmain("doc._form.newInvoiceCode"),
 					displayField : 'invoice_code',
 					valueField : 'invoice_code',
 					forceSelection : true,
