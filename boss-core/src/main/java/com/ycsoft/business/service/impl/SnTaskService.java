@@ -8,6 +8,7 @@ import javax.transaction.SystemException;
 import com.ycsoft.beans.core.prod.CProdOrder;
 import com.ycsoft.beans.core.prod.CProdOrderDto;
 import com.ycsoft.beans.core.user.CUser;
+import com.ycsoft.beans.core.user.FillUserDeviceDto;
 import com.ycsoft.beans.task.TaskFillDevice;
 import com.ycsoft.beans.task.WTaskBaseInfo;
 import com.ycsoft.beans.task.WTaskUser;
@@ -63,7 +64,8 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 		//获取业务流水
 		Integer doneCode = doneCodeComponent.gDoneCode();
 		List<WTaskUser> taskUsers = snTaskComponent.fillOpenTaskInfo(doneCode, taskId, otlNo, ponNo, deviceList);
-		
+		//修改用户设备信息
+		this.fillUserDevice(doneCode, taskUsers);
 	}
 
 	
