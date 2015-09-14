@@ -389,10 +389,10 @@ Ext.apply( App, {
  	openPrint:function(){
  		App.getApp().data.currentResource = {busicode:'1068'};
  		if (App.data.custFullInfo.cust.cust_type=='UNIT'){
- 			App.getApp().menu.bigWindow.show({ text: '发票打印',  attrs: {busiCode:'1068',
+ 			App.getApp().menu.bigWindow.show({ text: lbc('home.tools.invoiceQuery._title'),  attrs: {busiCode:'1068',
 					url: 'pages/business/pay/Print.jsp?type=unit'}} ,{width: 710, height: 460});
  		}else{
- 			App.getApp().menu.bigWindow.show({ text: '发票打印',  attrs: {busiCode:'1068',
+ 			App.getApp().menu.bigWindow.show({ text: lbc('home.tools.invoiceQuery._title'),  attrs: {busiCode:'1068',
 					url: 'pages/business/pay/Print.jsp?type=through'}} ,{width: 710, height: 460});
  		}
  		

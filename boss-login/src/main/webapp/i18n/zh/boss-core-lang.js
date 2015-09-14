@@ -58,6 +58,8 @@ BCLang.common = {
 	alertTitle: '提示~',
 	submitingText: '正在提交数据...~',
 	yes: '是~',
+	print: '打印~',
+	cancel: '取消~',
 	no: '否~'
 }
 //主页模块
@@ -402,7 +404,16 @@ BCLang.home = {
 		InvoicePrint:{//发票打印
 			_title:'发票打印~',
 			titleDocGrid:'打印列表~',
-			titleInvoiceGrid:'发票项~'
+			titleInvoiceGrid:'发票项~',
+			titlePrintDetail:'打印明细~',
+			titlePrintPreview:'打印预览~',
+			titleInvoiceWindow:'打印共需要 {0} 张发票~',
+			wdxj:'网点现金~',
+			printGridColumns:['流水号~','单据名称~','创建时间~'],
+			invoiceGridColumns:['顺序号~','发票号码~','发票代码~'],
+			printItemGridColumns:['名称~','金额~'],
+			stillEmptyInvoiceField:"还有为空的发票输入框!~",
+			hasDuplcateInvoice:"有重复的发票，请确认!~"
 			
 		}
 	}
@@ -410,6 +421,13 @@ BCLang.home = {
 }
 //各种弹出的提示信息
 BCLang.msgBox = {
+	selectInvoice2Print:"请选择要打印的发票!~",
+	selectInvicePrintItem:"请选择发票的打印项~",
+	templateReplaceError:"模板变量替换时出错! error:{0}~",
+	printCmpError:'打印控件调用异常，请检查是否安装了打印控件 {0}~',
+	invoiceIdNeeded:'请输入发票号码~',
+	confirmSaveInvoiceInfo:"确定保存发票信息吗?~",
+	
 	commonSuccess:'业务操作成功!~',
 	waitMsg:'操作中,请稍候~',
 	needCust:'请先查找要操作的客户!~',
