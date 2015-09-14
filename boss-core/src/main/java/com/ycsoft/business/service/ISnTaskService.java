@@ -9,6 +9,9 @@ import com.ycsoft.beans.task.WTeam;
 import com.ycsoft.daos.core.Pager;
 
 public interface ISnTaskService {
+	
+	public void createBugTask(String custId,String bugDetail) throws Exception;
+	
 	/**
 	 * 修改施工队
 	 * @param taskId

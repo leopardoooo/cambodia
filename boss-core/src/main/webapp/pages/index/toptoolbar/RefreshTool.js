@@ -378,8 +378,8 @@ Ext.apply( App, {
 				if(el){ el.remove(); }
 				if(count > 0){
 					Ext.get('tool').insertHtml("beforeEnd",'<div id="payAllContainer">'
-							+'<div class="amount">您有<b>'+ count +'</b>笔待支付,共<b>'+ payfeeAmount/100.0 +'</b></div>' 
-							+'<div class="nowToPayBtn"><button onclick="App.openPay()">现金支付</button></div>'
+							+'<div class="amount">'+lmsg("payInfo", null, [count, payfeeAmount/100.0])+'</div>' 
+							+'<div class="nowToPayBtn"><button onclick="App.openPay()">'+ lmsg("payButton")+'</button></div>'
 						+'</div>');
 				}
 			}

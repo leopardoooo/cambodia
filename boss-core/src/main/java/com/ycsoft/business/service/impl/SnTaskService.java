@@ -10,6 +10,7 @@ import javax.transaction.SystemException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.ycsoft.beans.core.cust.CCust;
 import com.ycsoft.beans.core.prod.CProdOrder;
 import com.ycsoft.beans.core.prod.CProdOrderDto;
 import com.ycsoft.beans.core.user.CUser;
@@ -21,6 +22,7 @@ import com.ycsoft.beans.task.WTeam;
 import com.ycsoft.business.component.core.DoneCodeComponent;
 import com.ycsoft.business.component.resource.DeviceComponent;
 import com.ycsoft.business.component.task.SnTaskComponent;
+import com.ycsoft.business.dao.core.cust.CCustDao;
 import com.ycsoft.business.dao.core.prod.CProdOrderDao;
 import com.ycsoft.business.dao.core.user.CUserDao;
 import com.ycsoft.business.dao.task.WTaskBaseInfoDao;
@@ -53,7 +55,19 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 	private DeviceComponent deviceComponent;
 	@Autowired
 	private WTeamDao wTeamDao;
+	private CCustDao cCustDao;
 	
+	
+	
+	@Override
+	public void createBugTask(String custId, String bugDetail) throws Exception {
+		//获取业务流水
+		Integer doneCode = doneCodeComponent.gDoneCode();
+		CCust cust = cCustDao.findByKey(custId);
+		snTaskComponent.createBugTask(doneCode, cust, bugDetail);
+		
+	}
+
 	@Override
 	public void editTaskTeam(String taskId, String deptId, String bugType) throws Exception{
 		WTaskBaseInfo task = wTaskBaseInfoDao.findByKey(taskId);

@@ -34,13 +34,13 @@ NewCustForm = Ext.extend( CustBaseForm , {
 			
 			var obj = {};
 			obj['isValid'] = false;
-			obj['msg'] = '无效的客户地址，请重新输入！';
+			obj['msg'] = lmsg('invalidAddressPlsReInput');
 			return obj;
 		}
 		if(Ext.getCmp('isCanToCustId').getValue() && Ext.isEmpty(this.custCode)){
 			var obj = {};
 			obj['isValid'] = false;
-			obj['msg'] = '意向客户请选择省！';
+			obj['msg'] = lmsg('intentionCustPlsChooseProvince');
 			return obj;
 		}
 		

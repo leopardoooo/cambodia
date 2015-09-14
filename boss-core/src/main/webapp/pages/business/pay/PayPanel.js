@@ -6,7 +6,6 @@ PayPanel = Ext.extend( Ext.Panel ,{
 	payForm: null,
 	feeGrid:null,
 	constructor: function(){
-		var payPanelThis = this;
 		// 缴费信息的表单
 		this.payForm = new PayForm(this);
 		//实例化fee store
@@ -27,7 +26,7 @@ PayPanel = Ext.extend( Ext.Panel ,{
 			border: false,
 			columns: [
 			    { header: lc[0], width: 50,renderer: function(v , md, record , i  ){
-					return "<DIV><a href='#' onclick='payPanelThis.deletePay();'>取消</a></DIV>";
+					return "<DIV><a href='#' onclick=Ext.getCmp('PayPanelId').deletePay()>取消</a></DIV>";
 				}},
 				{ header: lc[1], dataIndex: 'busi_name', width: 80},
 				{ header: lc[2], dataIndex: 'fee_text',width: 120, renderer:App.qtipValue},
@@ -44,6 +43,7 @@ PayPanel = Ext.extend( Ext.Panel ,{
 		});
 		
 		PayPanel.superclass.constructor.call(this,{
+			id:'PayPanelId',
 			border: false,
 			layout: 'border',
 			region: 'center',

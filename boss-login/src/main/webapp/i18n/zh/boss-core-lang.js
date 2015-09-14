@@ -15,7 +15,7 @@ BCLang.common = {
 	tipLoadText: '正在查询，请稍等...',
 	tipConfirmSave: '确定要保存业务吗?~',
 	tipFormInvalid: '含有验证不通过的输入项!~',
-	filterTreePanel:{//可以根据关键字过滤的treePanel
+	filterTreePanel:{
 		emptyTipSearchField:'输入名称过滤...~',
 		btnExpandAll:'展开所有资源~',
 		btnCollapseAll:'合并所有资源~'
@@ -52,12 +52,22 @@ BCLang.common = {
     returnTxt:'返回~',
 	tip: '提示信息~',
 	totalRecord: ' ( 共: {0} 条) ',
-	submit: '提交~'
+	submit: '提交~',
+	emptyMsg: '没有数据~',
+	pageDisplayMsg: '第 {0} - {1} 条 共 {2} 条~',
+	alertTitle: '提示~',
+	submitingText: '正在提交数据...~',
+	loadingText: '正在查询，请稍等...~',
+	yes: '是~',
+	print: '打印~',
+	cancel: '取消~',
+	no: '否~'
 }
 //主页模块
 BCLang.home = {
 	topWelcome: "当前操作员~",
 	searchTabs:["名称编号~","设备编号~","安装地址~","电话号码~","多条件搜索~"],
+	invoicePrintTitle:'发票打印~',
 	searchTip:"客户编号|受理编号~",
 	searchBtns:["搜索~","缴费~"],
 	main: {
@@ -101,7 +111,6 @@ BCLang.home = {
 				rechargeWay: '充值方式~',
 				byTicket: '凭票据~',
 				rechargeCount: '充值金额~',
-				tipRechargeCountMustBeGreaterThanZero: '金额需要大于0!~',
 				province:'省~',
 				provinceEmptyText:'请选择省~',
 				addrManager: '地址管理~',
@@ -110,6 +119,7 @@ BCLang.home = {
 				roomTitle: '房间信息~',
 				roomTitle2: '行政区域:{0} 服务类型:{1}',
 				addRoom: '新增房间~'
+				
 			},
 			acct: {
 				_title: "账目信息~",
@@ -196,7 +206,23 @@ BCLang.home = {
 				modemModel: 'Modem型号~',
 				newModemId: '新Modem号~',
 				newModemModel: '新Modem型号~',
-				changeCause: '更换原因~'
+				changeCause: '更换原因~',
+				userName: '用户名~',
+				chargeNum: '收费数量~',
+				desc: '描述~',
+				feeItem: '费用项~',
+				unitPrice: '单价~',
+				ipFeeDesc: 'IP费用=单价*收费数量*月数（或者相差天数/30）~',
+				expDate: '到期日~',
+				payMonth: '补收月数~',
+				totalPrice: '总价~',
+				timeSlot: '时间段~',
+				titleBusiFeeGrid: '杂费~',
+				ipFee: 'IP费~',
+				
+				titleTransferPayDetailGrid: '转移支付明细~',
+				transferPayCM: ['产品名称~', '资费~', '用户~', '开始计费日~', '结束计费日~', '转移金额$~'],
+				transferDetailDate: '转移明细（开始计费日：{0} "）~'
 			},
 			list: {
 				_title: '用户信息~',
@@ -244,7 +270,6 @@ BCLang.home = {
 			feePayDetail: {
 				_title: '费用明细~',
 				columns: ['费用项目~', '金额~']
-				
 			}
 		},
 		// 单据信息
@@ -309,7 +334,6 @@ BCLang.home = {
 	}, // main end line...
 	// 首页工具栏业务
 	tools: {
-		
 		countySwitch:{//分公司切换
 			titleSelectDept:'选择部门~',
 			confirmSwitchDept:'确定切换部门吗~'
@@ -391,13 +415,35 @@ BCLang.home = {
 			labelStatus:'意向客户~',
 			labelAddress:'客户地址~',
 			labelLoginName:'账号~'
+		},
+		InvoicePrint:{//发票打印
+			_title:'发票打印~',
+			titleDocGrid:'打印列表~',
+			titleInvoiceGrid:'发票项~',
+			titlePrintDetail:'打印明细~',
+			titlePrintPreview:'打印预览~',
+			titleInvoiceWindow:'打印共需要 {0} 张发票~',
+			wdxj:'网点现金~',
+			printGridColumns:['流水号~','单据名称~','创建时间~'],
+			invoiceGridColumns:['顺序号~','发票号码~','发票代码~'],
+			printItemGridColumns:['名称~','金额~'],
+			stillEmptyInvoiceField:"还有为空的发票输入框!~",
+			hasDuplcateInvoice:"有重复的发票，请确认!~"
+			
 		}
 	}
 	
 }
 //各种弹出的提示信息
 BCLang.msgBox = {
-	commonSuccess:'业务操作成功!~',
+	payInfo: '您有<b>{0}</b>笔待支付,共<b>{1}</b>$',
+	payButton: '现金支付',
+	selectInvoice2Print:"请选择要打印的发票!~",
+	selectInvicePrintItem:"请选择发票的打印项~",
+	templateReplaceError:"模板变量替换时出错! error:{0}~",
+	printCmpError:'打印控件调用异常，请检查是否安装了打印控件 {0}~',
+	invoiceIdNeeded:'请输入发票号码~',
+	confirmSaveInvoiceInfo:"确定保存发票信息吗?~",
 	waitMsg:'操作中,请稍候~',
 	needCust:'请先查找要操作的客户!~',
 	needUser:'请选择用户!~',
@@ -481,7 +527,50 @@ BCLang.msgBox = {
 	
 	noUserSelected:'未选中任何用户!~',
 	noSelectedUserCanOpenTemp:'选中的用户没有符合可临时授权的条件!~',
-	userHasExtraFreeDev:'选中的用户有超额副机，但主机状态非正常，不能进行临时授权!~'
+	userHasExtraFreeDev:'选中的用户有超额副机，但主机状态非正常，不能进行临时授权!~',
 	
+	onlyOneUser: '请选择一个用户!~',
+	needStopUser: '请选择【报停】状态的用户~',
+	confirmOpenUser: '确定要报开吗?~',
+	searchCustTip1: '查询客户请输入至少一个关键字~',
+	searchCustTip2: '请不要输入单引号~',
+	searchNoCust: '没有查询到符合条件的客户，请确认后重新输入!~',
+	searchToPayOrPrint: '请处理未支付或未打印发票客户，点击确定后跳转，请为该客户支付费用和打印发票~',
+	confirmSwitchThisCust: '确定要选择该客户吗?~',
+	confirmInvalidInvoice: "确定作废发票吗?~",
+	confirmRefreshCmd: '确定发送刷新指令吗?~',
+	confirmResendCmd: '确定重发开户指令?~',
+	noPreStopUser: '该用户没有进行预报停操作!~',
 	
+	phoneOrFixedPhoneMustBeEnterOne: '电话号码或固定电话必须输入一个!~',
+	invalidAddressPlsReInput: '无效的客户地址，请重新输入!~',
+	intentionCustPlsChooseProvince: '意向客户请选择省!~',
+	rechargeCountMustBeGreaterThanZero: '金额需要大于0!~',
+	transferModifyCustName: '过户请修改客户名称!~',
+	changeModifyCustAddr: '移机请修改客户地址!~',
+	notModifyAnyInfo: '您没有修改任何资料!~',
+	buyNumExceedStockNum: '购买数量超过库存数量!~',
+	enterPositiverNum: '请输入正整数!~',
+	enterBuyNum: '请输入购买数量!~',
+	refundAmountShouldLeeThanSumofTheAccounts: '退款金额应小于账目可退余额!~',
+	
+	notChooseDeviceMustBeInput: '当设备没有选择施工回填时，设备编码是必须输入的!~',
+	noChargeNumber: '费用编号不存在!~',
+	singleStbNotSupDTT: '此设备为单向机顶盒，不支持当前的OTT用户类型!~',
+	doubleStbNotSupOTT: '此设备为双向机顶盒，不支持当前的DTT用户类型!~',
+	modemNotSupUserType: '设备为Modem猫，不支持所选[{0}]用户类型!~',
+	currDeviceNotSupUserType: '此设备不支持当前的用户类型!~',
+	deviceFeeMustBeBetween:'设备费用必须介于[{0}]-[{1}]之间!~',
+	addUserToTempTable: '请将需要保存的用户添加至暂存表!~',
+	notTransProject: '没有转移支付项目!~',
+	chooseTariff: '请先选择资费!~',
+	MustBeOrderMonth: '订购月数是必须的!~',
+	upgradeEndDateMoreThanBeginDate:'升级时，结束计费日必须大于上期订购结束日，请调整订购月数!~',
+	realpayMustBeGreaterThanZero: '实际应付不能小于0，请增加订购月数!~',
+	notMustBeOrderUser: '没有需要订购的用户!~',
+	custPkgChooseUserMustBeEqualToMaxUserNum: '客户套餐已选用户必须等于套餐最大用户数!~',
+	spkgPkgCanContinueChooseUser: '协议套餐已选用户小于套餐内容最大用户数，可继续选择用户!~',
+	chooseInUsers: '请选择要参加套餐的终端用户!~',
+	exceedPkgMaxUserNum: '已超过套餐最大用户数限制!~',
+	completeChooseUserTerminal: '请完整选择需要参加的每种用户类型终端!~',
 }

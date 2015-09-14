@@ -266,17 +266,31 @@ OpenDispatchUserWindow = Ext.extend(Ext.Window, {
 	doPassResultToParent: function(){
 		var targetData = []; 
 		var alertInfo = null;
+		var store = Ext.getCmp('datViewId').getStore();
+		
+		var flag = false;
+		store.each(function(record){
+			if(!this.selectedDataMap[record.get('package_group_id')]){
+				flag = true;
+				return false;
+			}
+		}, this);
+		if(flag){
+			Alert(lmsg('completeChooseUserTerminal'));
+			return;
+		}
+		
 		for(var gid in this.selectedDataMap){
 			var group = this.allUserGroup[gid]["group"];
 			var users = this.selectedDataMap[gid];
 			
 			if(group['prod_type'] == 'CPKG' && users.length != group['max_user_cnt']){
-				Alert('客户套餐已选用户必须等于套餐最大用户数!');
+				Alert(lmsg('custPkgChooseUserMustBeEqualToMaxUserNum'));
 				return;
 			}
 			
 			if(group['prod_type'] == "SPKG" && users.length < group['max_user_cnt']){
-				alertInfo = '协议套餐已选用户小于套餐内容最大用户数，可继续选择用户!';
+				alertInfo = lmsg('spkgPkgCanContinueChooseUser');
 			}
 			
 			for(var i = 0; i< users.length; i++){
@@ -301,7 +315,7 @@ OpenDispatchUserWindow = Ext.extend(Ext.Window, {
 			this.parent.store.loadData(targetData);
 			this.hide();
 		}else{
-			Alert('请选择要参加套餐的终端用户!');
+			Alert(lmsg('chooseInUsers'));
 		}
 	},
 	// 如果已经有默认值了，就不需要显示窗口，跳过选择的步骤
@@ -409,7 +423,7 @@ OpenDispatchUserWindow = Ext.extend(Ext.Window, {
 	doAddSelected: function(){
 		var selectedRecord = Ext.getCmp('datViewId').getSelectedRecords()[0];
 		if(this.toUserStore.getCount() >= selectedRecord.get('max_user_cnt')){
-			Alert('已超过套餐最大用户数限制!');
+			Alert(lmsg('exceedPkgMaxUserNum'));
 			return;
 		}
 		
@@ -530,18 +544,19 @@ TransferPayWindow = Ext.extend(Ext.Window, {
 		fields: ["prod_name","tariff_name", "user_name", "month_count", "active_fee", "last_order_end_date", "eff_date", "exp_date"]
 	}),
 	constructor: function(){
+		var cms = lmain("user._form.transferPayCM");
 		var columns = [
-       	    {header: "产品名称", width: 100,sortable:true, dataIndex: 'prod_name'},
-       	    {header: "资费", width: 70, sortable:true, dataIndex: 'tariff_name'},
-       	    {header: "用户", width: 60, sortable:true, dataIndex: 'user_name'},
-       	    {header: "开始计费日", width: 80, sortable:true, dataIndex: 'eff_date',renderer: Ext.util.Format.dateFormat},
-       	    {header: "结束计费日", width: 80, sortable:true, dataIndex: 'exp_date',renderer: Ext.util.Format.dateFormat},
-       	    {header: "转移金额$", width: 60, sortable:true, dataIndex: 'active_fee',renderer: Ext.util.Format.convertToYuan}
+       	    {header: cms[0], width: 100,sortable:true, dataIndex: 'prod_name'},
+       	    {header: cms[1], width: 70, sortable:true, dataIndex: 'tariff_name'},
+       	    {header: cms[2], width: 60, sortable:true, dataIndex: 'user_name'},
+       	    {header: cms[3], width: 80, sortable:true, dataIndex: 'eff_date',renderer: Ext.util.Format.dateFormat},
+       	    {header: cms[4], width: 80, sortable:true, dataIndex: 'exp_date',renderer: Ext.util.Format.dateFormat},
+       	    {header: cms[5], width: 60, sortable:true, dataIndex: 'active_fee',renderer: Ext.util.Format.convertToYuan}
        	];
 		// Window Construct instance
 		return TransferPayWindow.superclass.constructor.call(this, {
 			layout:"fit",
-			title: "转移支付明细",
+			title: lmain('user._form.titleTransferPayDetailGrid'),
 			width: 450,
 			height: 200,
 			resizable: false,
@@ -560,7 +575,7 @@ TransferPayWindow = Ext.extend(Ext.Window, {
 	},
 	show: function(data, effDate){
 		this.store.loadData(data);
-		this.setTitle("转移明细（开始计费日：" + effDate.format("Y-m-d") + "）");
+		this.setTitle(lmain("user._form.transferDetailDate", null, [effDate.format("Y-m-d")]));
 		return TransferPayWindow.superclass.show.call(this);
 	}
 });
