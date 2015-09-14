@@ -22,7 +22,7 @@
 		}, 200);
 		
 		var resources = App.getData().resources;
-		for(var i=0,len=resources.length;i<len;i++){
+		/* for(var i=0,len=resources.length;i<len;i++){
 			var res = resources[i];
 			if(res['handler'] == 'ivalid_btn_id'){
 				Ext.getCmp('ivalid_btn_id').enable();
@@ -31,7 +31,7 @@
 			}else if(res['handler'] == 'add_btn_id'){
 				Ext.getCmp('add_btn_id').enable();
 			}
-		}
+		} */
 	});
   </script>
 </html>
