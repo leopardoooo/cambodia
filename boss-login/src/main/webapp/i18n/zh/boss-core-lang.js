@@ -46,7 +46,9 @@ BCLang.common = {
 	defaultGroupTpl: '{0} 已选 {1} 个',
 	uploadFileLabel: '文件上传~',
 	busiWay: '处理方式~',
-	tip: '提示信息~'
+	tip: '提示信息~',
+	tipSimple: '提示~',
+	returnTxt:'返回~'
 }
 //主页模块
 BCLang.home = {
@@ -386,4 +388,91 @@ BCLang.home = {
 }
 //各种弹出的提示信息
 BCLang.msgBox = {
+	commonSuccess:'业务操作成功!~',
+	waitMsg:'操作中,请稍候~',
+	needCust:'请先查找要操作的客户!~',
+	needUser:'请选择用户!~',
+	cancelFeeSuccess:'冲正成功!~',
+	confirmCancelFeeAndInvaidInvoice:'发票{0}将作废!该发票上的费用项需要重打，确定冲正?~',
+	confirmCancelFee:'确定冲正吗?~',
+	selectRec4CancelFee:'请选择要冲正的费用记录!~',
+	confirmUnPayWithParam:'确定要回退【金额：{0} 】吗?~',
+	confirmRestoreCust:'是否确定返销户?~',
+	restoreCustSuccess:'返销户成功!~',
+	restoreCustFailed:'返销户失败,请联系管理员.~',
+	needLogOffUser:'请先注销该客户下的用户~',
+	recycleGdDevice:'请先回收产权为广电的设备~',
+	custIsRelocated:'客户已经拆迁。~',
+	confirmRelocateCust:'确定客户拆迁吗?~',
+	notAllowedJoinUnit:'该客户为单位客户，不能加入单位!~',
+	confirmQuitUnit:'确定退出单位吗?~',
+	confirmBankStop:'确定要暂停卡扣吗?~',
+	confirmEnableBankPay:'启用银行扣费吗?~',
+	confirmDisableBankPay:'禁止银行扣费吗?~',
+	confirmEditBankPay:'确定该产品',
+	confirmBankResume:'确定要恢复卡扣吗?~',
+	confirmRenewCust:'去顶恢复客户状态吗?~',
+	
+	custHasUnSuitableDev:'该用户现在不能进行设备互换~',
+	custCantExchangeDev:'该用户现在不能进行设备互换~',
+	
+	confirmRegLoss:'确定挂失吗?~',
+	regLossSuccess:'挂失成功!~',
+	
+	selectDev2RegLoss:'请选择要取消挂失的设备~',
+	selectDevIsRegLossAlready:'请选择已经挂失的设备~'
+	unRegLossSuccess:'取消挂失成功!~',
+	confirmUnRegLoss:'确定取消挂失吗?~',
+	//打开和关闭打印标记
+	statusNotPrintStatusSuccess:'不打印标记成功!~',
+	confirmNotPrintStatus:'确定不打印吗?~',
+	statusPrintStatusSuccess:'打开标记成功!~',
+	confirmPrintStatus:'确定打开打印标记吗?~',
+	//销售设备
+	selectDev2Sale:'请选择要销售的设备!~',
+	cantSaleCosOwerIsCust:'设备的产权是客户的,不允许销售~',
+	//修改购买方式
+	modifyBuyType:'修改购买方式~',
+	need2SwitchCountyId:'当前营业厅非购买设备营业厅，请先切换到[{0}]再操作！~',
+	//修改产权
+	changeOwner2Cust:'确定将产权修改为个人？~',
+	changeOwner2Gd:'确定将产权修改为广电？~',
+	cangeOwnerSuccess:'修改产权成功!~',
+	//回收设备
+	selectDev2Recycle:'请选择要回收的设备!~',
+	devCantRecycleStillInUse:"设备的在使用中,不允许回收~",
+	
+	onlyResidentCanNonResiCust:'只能居民客户转集团客户~',
+	
+	depositUnPaySuccess:'退押金成功!~',
+	unPayed:'费用未支付！~',
+	notDeposit:'该费用不是押金！~',
+	confirmDepositUnPay:"确定退押金吗?~",
+	
+	userNotActive:"选择的用户状态非正常~",
+	cantLogOffZzd:'主终端不能先销户~',
+	cantLogOffCosBaseProdOweFee:'有基本包产品欠费,不能销户!~',
+	cantLogOffCosBaseProdNotActive:'有基本包产品状态不正常,不能销户!~',
+	
+	cantPayIpUserFee:'宽带用户下无产品请先订购产品~',
+	
+	freeUsersOver2:"免费终端不能超过2台~",
+	
+	singleInteractiveDevCantOpenDuplex:'该用户机顶盒交互方式是单向的，无法开通双向~',
+	custMustHaveDuplexDev:'用户必选拥有交互方式双向的机顶盒~',
+	
+	needCancelProgramFirst:'用户下有互动电视产品，请退订后再操作!~',
+	confirmCancelDuplex:"确定取消双向吗?~",
+	
+	userHasNoBaseProd:'用户无基本包!~',
+	baseProdRechargedWait30Seconds:'基本包已充值，请稍等半分钟~',
+	usersNotOweFeeStop:'用户的基本包产品[{0}]状态不是欠费停机！~',
+	confirmOpenTemp:"确定授权吗?~",
+	openTempSuccess:'临时授权成功!~',
+	
+	noUserSelected:'未选中任何用户!~',
+	noSelectedUserCanOpenTemp:'选中的用户没有符合可临时授权的条件!~',
+	userHasExtraFreeDev:'选中的用户有超额副机，但主机状态非正常，不能进行临时授权!~'
+	
+	
 }
