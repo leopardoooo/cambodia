@@ -1,3 +1,4 @@
+
 package com.ycsoft.business.service.impl;
 
 import static com.ycsoft.commons.constants.SystemConstants.ACCT_TYPE_SPEC;
@@ -30,7 +31,6 @@ import com.ycsoft.beans.prod.PSpkgOpenbusifee;
 import com.ycsoft.beans.prod.PSpkgOpenuser;
 import com.ycsoft.beans.system.SOptr;
 import com.ycsoft.business.commons.pojo.BusiParameter;
-import com.ycsoft.business.component.core.OrderComponent;
 import com.ycsoft.business.component.task.SnTaskComponent;
 import com.ycsoft.business.dao.core.prod.CProdOrderDao;
 import com.ycsoft.business.dto.config.TemplateConfigDto;
@@ -283,6 +283,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 	public void saveChangeDevice(String userId, String deviceCode, String reasonType) throws Exception {
 		Integer doneCode = doneCodeComponent.gDoneCode();
 		CCust cust = getBusiParam().getCust();
+		String busiCode = getBusiParam().getBusiCode();
 		doneCodeComponent.lockCust(cust.getCust_id());
 		CUser oldUser = userComponent.queryUserById(userId);
 		CUser user = userComponent.queryUserById(userId);
@@ -313,6 +314,11 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		if(changeReason.getIs_reclaim().equals(SystemConstants.BOOLEAN_TRUE)){
 			deviceComponent.saveDeviceReclaim(doneCode,  getBusiParam().getBusiCode(),
 					oldDevice.getDevice_id(), cust.getCust_id(), reasonType);
+		}else{
+			//不回收，直接修改旧设备在库状态，删除用户使用设备记录
+			deviceComponent.updateDeviceDepotStatus(doneCode, busiCode, oldDevice.getDevice_id(),
+					oldDevice.getDevice_status(), StatusConstants.IDLE, true);
+			custComponent.removeDevice(cust.getCust_id(), oldDevice.getDevice_id(), doneCode, SystemConstants.BOOLEAN_FALSE);
 		}
 		if(changeReason.getIs_lost().equals(SystemConstants.BOOLEAN_TRUE)){
 			deviceComponent.saveLossDevice(doneCode, getBusiParam().getBusiCode(), oldDeviceCode);
