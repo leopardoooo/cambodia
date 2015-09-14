@@ -15,7 +15,7 @@ BCLang.common = {
 	tipLoadText: '正在查询，请稍等...',
 	tipConfirmSave: '确定要保存业务吗?~',
 	tipFormInvalid: '含有验证不通过的输入项!~',
-	filterTreePanel:{//可以根据关键字过滤的treePanel
+	filterTreePanel:{
 		emptyTipSearchField:'输入名称过滤...~',
 		btnExpandAll:'展开所有资源~',
 		btnCollapseAll:'合并所有资源~'
@@ -57,6 +57,7 @@ BCLang.common = {
 	pageDisplayMsg: '第 {0} - {1} 条 共 {2} 条~',
 	alertTitle: '提示~',
 	submitingText: '正在提交数据...~',
+	loadingText: '正在查询，请稍等...~',
 	yes: '是~',
 	no: '否~'
 }
@@ -250,7 +251,6 @@ BCLang.home = {
 			feePayDetail: {
 				_title: '费用明细~',
 				columns: ['费用项目~', '金额~']
-				
 			}
 		},
 		// 单据信息
@@ -315,7 +315,6 @@ BCLang.home = {
 	}, // main end line...
 	// 首页工具栏业务
 	tools: {
-		
 		countySwitch:{//分公司切换
 			titleSelectDept:'选择部门~',
 			confirmSwitchDept:'确定切换部门吗~'
@@ -403,6 +402,8 @@ BCLang.home = {
 }
 //各种弹出的提示信息
 BCLang.msgBox = {
+	payInfo: '您有<b>{0}</b>笔待支付,共<b>{1}</b>$',
+	payButton: '现金支付',
 	commonSuccess:'业务操作成功!~',
 	waitMsg:'操作中,请稍候~',
 	needCust:'请先查找要操作的客户!~',
@@ -491,7 +492,14 @@ BCLang.msgBox = {
 	
 	onlyOneUser: '请选择一个用户!~',
 	needStopUser: '请选择【报停】状态的用户~',
-	confirmOpenUser: '确定要报开吗?~'
-	
-	
+	confirmOpenUser: '确定要报开吗?~',
+	searchCustTip1: '查询客户请输入至少一个关键字~',
+	searchCustTip2: '请不要输入单引号~',
+	searchNoCust: '没有查询到符合条件的客户，请确认后重新输入!~',
+	searchToPayOrPrint: '请处理未支付或未打印发票客户，点击确定后跳转，请为该客户支付费用和打印发票~',
+	confirmSwitchThisCust: '确定要选择该客户吗?~',
+	confirmInvalidInvoice: "确定作废发票吗?~",
+	confirmRefreshCmd: '确定发送刷新指令吗?~',
+	confirmResendCmd: '确定重发开户指令?~',
+	noPreStopUser: '该用户没有进行预报停操作!~'
 }

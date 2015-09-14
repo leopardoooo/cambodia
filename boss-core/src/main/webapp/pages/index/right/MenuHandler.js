@@ -1,6 +1,6 @@
 Ext.ns("MenuHandler");
 
-var LU_MSG = lmsg;
+var LU_MSG = BCLang.msgBox;
 var LU_FM = lbc;//带参数的
 
 /**
@@ -1993,7 +1993,7 @@ Ext.apply(MenuHandler, {
 		for (var i = 0; i < len; i++) {
 			var status = userRecords[i].get("status");
 			if ( status != "ACTIVE" && status != "OWELONG" ) {
-				Alert("所选用户的状态必须是正常");
+				Alert(lmsg("userNotActive"));
 				return false;
 			}
 		}
@@ -2001,12 +2001,12 @@ Ext.apply(MenuHandler, {
 		// 回调函数
 		function callback(res, opt) {
 			if (res.responseText == 'true') {
-				Alert('指令重发成功!');
+				Alert(lmsg("commonSuccess"));
 			}
 		}
 		var url = Constant.ROOT_PATH + "/core/x/User!ResendVodCmd.action";
 
-		Confirm("确定重发开户指令?", this, function() {
+		Confirm(lmsg("confirmResendCmd"), this, function() {
 					// 调用请求函数,详细参数请看busi-helper.js
 					App.sendRequest(url, null, callback);
 				});
@@ -2028,13 +2028,13 @@ Ext.apply(MenuHandler, {
 		 //回调函数
 		 function callback(res,opt){
 			 if (res.responseText=='true'){
-				 Alert('刷新指令发送成功!');
+				 Alert(lmsg("commonSuccess"));
 				 App.getApp().main.infoPanel.getUserPanel().userGrid.remoteRefresh();
 			 }
 		 }
 		 var url = Constant.ROOT_PATH + "/core/x/User!RefreshCmd.action";
 				
-		 Confirm("确定发送刷新指令吗?", this , function(){
+		 Confirm(lmsg("confirmRefreshCmd"), this , function(){
 			 //调用请求函数,详细参数请看busi-helper.js
 			 App.sendRequest(url,null,callback);
 		 } );
@@ -2130,7 +2130,7 @@ Ext.apply(MenuHandler, {
 					return false;
 				}
 				if (Ext.isEmpty(userRecords[i].get("stop_date"))) {
-					Alert("该用户没有进行预报停操作!");
+					Alert(lmsg("noPreStopUser"));
 					return false;
 				}
 			}
@@ -2644,14 +2644,14 @@ Ext.apply(MenuHandler, {
 		function callback(res, opt) {
 			var data = Ext.decode(res.responseText);
 			if (data['success'] == true) {
-				Alert('作废成功!');
+				Alert(lmsg("commonSuccess"));
 				App.getApp().main.infoPanel.getDocPanel().invoiceGrid.remoteRefresh();
 				App.getApp().main.infoPanel.getPayfeePanel().refresh();
 			}
 		}
 		var url = Constant.ROOT_PATH + "/core/x/Pay!invalidInvoice.action";
 
-		Confirm("确定作废发票吗?", this, function() {
+		Confirm(lmsg("confirmInvalidInvoice"), this, function() {
 					App.sendRequest(url, {
 								'invoice_id': invoice.get('invoice_id'),
 								'invoice_code': invoice.get('invoice_code'),

@@ -84,7 +84,7 @@ Ext.apply(TopSearch.prototype , {
 	loading: false,
 	//搜索客户
 	searchCust: function(value,name){
-		Ext.getBody().mask("正在查询，请稍等...","x-mask-loading");
+		Ext.getBody().mask(lbc("common.loadingText"),"x-mask-loading");
 		
 		var q = Ext.getDom('q').value;
 		var t = Ext.getDom("type").value;
@@ -93,14 +93,14 @@ Ext.apply(TopSearch.prototype , {
 			t = name;
 		}
 		if(/.*\u0027.*/gi.test(q.trim())){
-			Alert('请不要输入单引号');
+			Alert(lmsg("searchCustTip2"));
 			return;
 		}
 		
 		var searchValue = q.trim();
 		if(searchValue.length == 0){
 			Ext.getBody().unmask();
-			Alert('查询客户请输入至少一个关键字');
+			Alert(lmsg("searchCustTip1"));
 			return;
 		}
 		
@@ -133,7 +133,7 @@ Ext.apply(TopSearch.prototype , {
 		
 		switch (_rs.length){
 			case 0  : 	
-						Alert("没有查询到符合条件的客户，请确认后重新输入!",function(){
+						Alert(lmsg("searchNoCust"),function(){
 							Ext.getDom('q').focus();
 						});
 					  	break ;
@@ -193,7 +193,7 @@ Ext.apply(TopSearch.prototype , {
 					
 					var rs = Ext.decode(res.responseText);
 					if(!Ext.isEmpty(rs)){
-						Alert('请处理未支付或未打印发票客户，点击确定后跳转，请为该客户支付费用和打印发票',function(){
+						Alert(lmsg("searchToPayOrPrint"),function(){
 							App.getData().paySearch  = false;
 							Ext.getDom('q').value = '';
 							this.searchCust(rs,'cust_no');
@@ -372,7 +372,7 @@ ChooseCustWindow = Ext.extend( Ext.Window , {
 	//注册事件
 	initEvents: function(){
 		this.custGrid.on("rowclick", function(grid ,index, e){
-			Confirm("确定要选择该客户吗?", this ,function(){
+			Confirm(lmsg("confirmSwitchThisCust"), this ,function(){
 				var record = grid.getStore().getAt(index);
 //				this.parent.doRefreshCust( record.data );
 				App.search.doRefreshCust( record.data );
