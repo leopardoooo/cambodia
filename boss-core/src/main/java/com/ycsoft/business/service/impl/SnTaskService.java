@@ -40,12 +40,15 @@ import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.daos.core.Pager;
 @Service
 public class SnTaskService  extends BaseBusiService implements ISnTaskService{
-
+	@Autowired
 	private SnTaskComponent snTaskComponent ; 
 	@Autowired
 	private WTaskBaseInfoDao wTaskBaseInfoDao;
+	@Autowired
 	private DoneCodeComponent doneCodeComponent;
+	@Autowired
 	private CProdOrderDao cProdOrderDao;
+	@Autowired
 	private CUserDao cUserDao;
 	@Autowired
 	private WTaskUserDao wTaskUserDao;
@@ -55,6 +58,7 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 	private DeviceComponent deviceComponent;
 	@Autowired
 	private WTeamDao wTeamDao;
+	@Autowired
 	private CCustDao cCustDao;
 	
 	

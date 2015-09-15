@@ -435,8 +435,69 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 		if(rs === false){
 			return ;
 		}
-		alert(rs.get('task_id'));
+		var arr = [];
+		this.taskTeamCombo.getStore().each(function(record){
+			if(record.get('dept_id') != rs.get('team_id')){
+				arr.push(record.data);
+			}
+		});
 		
+		var teamCombo = new Ext.form.ComboBox({
+			typeAhead: true,
+			width: 120,
+		    triggerAction: 'all',
+		    mode: 'local',
+		    fieldLabel:'施工队',
+		    editable : true,
+		    store: new Ext.data.JsonStore({
+		        fields: [ 'dept_id', 'dept_name' ]
+		    }),
+		    valueField: 'dept_id',
+		    displayField: 'dept_name'
+		});
+		teamCombo.getStore().loadData(arr);
+		
+		var form = new Ext.form.FormPanel({
+			labelWidth: 90,
+			bodyStyle: 'padding-top: 10px;',
+			items: [teamCombo]
+		});
+	
+		var win = new Ext.Window({
+			width: 320,
+			height: 250,
+			title: '施工队',
+			border: false,
+			closeAction:'close',
+			layout: 'fit',
+			items: form,
+			buttons: [{
+				text: '保存',
+				scope: this,
+				iconCls : 'icon-save',
+				handler: function(){
+					var url = Constant.ROOT_PATH + "/core/x/Task!editTaskTeam.action";
+					var o = {
+						task_id : rs.get("task_id"), 
+						deptId: teamCombo.getValue()
+//						,bugType : form.getForm().getValues()["bug_cause"]
+					};
+					App.sendRequest( url, o, function(res,opt){
+						rs.set("team_id",teamCombo.getValue());
+						var index = 0;
+						index = teamCombo.getStore().find('dept_id',teamCombo.getValue());
+						rs.set("team_id_text",teamCombo.getStore().getAt(index).get('dept_name'));					
+						win.close();
+					});
+				}
+			},{
+				text: '取消',
+				handler: function(){
+					win.hide();
+				}
+			}]
+		});
+		win.show();
 	},
 	doDeviceTask:function(){//取消工单
 	
@@ -449,7 +510,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 	},
 	getSelections: function(){
 		var rs = this.grid.getSelectionModel().getSelected();
-		if(Ext.isEmpty(rs.get('task_id'))){
+		if(rs && Ext.isEmpty(rs.get('task_id'))){
 			Alert("请选择需要操作的记录!");
 			return false;
 		}
