@@ -37,6 +37,7 @@ public class TaskAction extends BaseBusiAction{
 	private ISnTaskService snTaskService;
 	private String deptId;
 	private String bugType;
+	private String resultType;
 
 
 	public String saveBugTask()throws Exception{
@@ -142,6 +143,16 @@ public class TaskAction extends BaseBusiAction{
 	public String cancelTaskSn()throws Exception{
 		snTaskService.cancelTask(task_id);
 		getRoot().setSuccess(true);
+		return JSON_SUCCESS;
+	}
+	
+	/**
+	 * 完工
+	 * @return
+	 * @throws Exception
+	 */
+	public String endTask() throws Exception{
+		snTaskService.finishTask(task_id,bugType);
 		return JSON_SUCCESS;
 	}
 	
@@ -310,6 +321,16 @@ public class TaskAction extends BaseBusiAction{
 
 	public void setBugType(String bugType) {
 		this.bugType = bugType;
+	}
+
+
+	public String getResultType() {
+		return resultType;
+	}
+
+
+	public void setResultType(String resultType) {
+		this.resultType = resultType;
 	}
 
 

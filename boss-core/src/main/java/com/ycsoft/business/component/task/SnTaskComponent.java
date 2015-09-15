@@ -53,18 +53,18 @@ public class SnTaskComponent extends BaseBusiComponent{
 	private CUserDao cUserDao;
 	
 	//创建开户工单
-	public void createOpenTask(int doneCode,CCust cust,List<CUser> userList,String assignType) throws Exception{
+	public void createOpenTask(Integer doneCode,CCust cust,List<CUser> userList,String assignType) throws Exception{
 		this.createTaskWithUser(doneCode, cust, userList, SystemConstants.TASK_TYPE_INSTALL, assignType);
 	}
 	
 	//创建销户工单
-	public void createWriteOffTask(int doneCode,CCust cust,List<CUser> userList,String assignType) throws Exception{
+	public void createWriteOffTask(Integer doneCode,CCust cust,List<CUser> userList,String assignType) throws Exception{
 		this.createTaskWithUser(doneCode, cust, userList, SystemConstants.TASK_TYPE_WRITEOFF, assignType);
 	}
 	
 	
 	//创建需要记录用户信息的工单
-	private void createTaskWithUser(int doneCode,CCust cust,List<CUser> userList,String taskType,String assignType) throws Exception{
+	private void createTaskWithUser(Integer doneCode,CCust cust,List<CUser> userList,String taskType,String assignType) throws Exception{
 		if (StringHelper.isEmpty(assignType))
 			return;
 		//剔除ott_mobile用户
@@ -121,7 +121,7 @@ public class SnTaskComponent extends BaseBusiComponent{
 		
 	}
 	
-	private String createSingleTaskWithUser(int doneCode,CCust cust,List<CUser> userList,String deptId,String taskType) throws Exception{
+	private String createSingleTaskWithUser(Integer doneCode,CCust cust,List<CUser> userList,String deptId,String taskType) throws Exception{
 		if (userList == null || userList.size()==0)
 			return null;
 		String taskId = this.saveTaskBaseInfo(cust, doneCode,taskType, deptId, null,null);
@@ -138,13 +138,13 @@ public class SnTaskComponent extends BaseBusiComponent{
 	}
 	
 	//创建故障单
-	public void createBugTask(int doneCode,CCust cust,String bugDetail) throws Exception{
+	public void createBugTask(Integer doneCode,CCust cust,String bugDetail) throws Exception{
 		this.saveTaskBaseInfo(cust, doneCode, SystemConstants.TASK_TYPE_FAULT, 
 				getTeamId(SystemConstants.TEAM_TYPE_SUPERNET), null, bugDetail);
 		
 	}
 	//生成移机工单
-	public void createMoveTask(int doneCode,CCust cust,String newAddrId,String newAddr,String assignType) throws Exception{
+	public void createMoveTask(Integer doneCode,CCust cust,String newAddrId,String newAddr,String assignType) throws Exception{
 		String teamType = SystemConstants.TEAM_TYPE_SUPERNET;
 		if(assignType.equals(SystemConstants.TASK_ASSIGN_CFOCN))
 			teamType = SystemConstants.TEAM_TYPE_CFOCN;
@@ -153,7 +153,7 @@ public class SnTaskComponent extends BaseBusiComponent{
 	
 	
 	//修改施工队
-	public void changeTaskTeam(int doneCode,String taskId,String deptId,String buyType)  throws Exception{
+	public void changeTaskTeam(Integer doneCode,String taskId,String deptId,String buyType)  throws Exception{
 		//修改工单对应的施工队
 		WTaskBaseInfo task = wTaskBaseInfoDao.findByKey(taskId);
 		String oldTeamId = task.getTeam_id();
@@ -177,16 +177,17 @@ public class SnTaskComponent extends BaseBusiComponent{
 	}
 	
 	//删除开户工单的用户
-	public void deleteTaskUser(int doneCode,String taskId,List<Integer> userList){
+	public void deleteTaskUser(Integer doneCode,String taskId,List<Integer> userList){
 		
 	}
 	
 	//作废工单
-	public void cancelTask(int doneCode,String taskId) throws Exception{
+	public void cancelTask(Integer doneCode,String taskId) throws Exception{
 		WTaskBaseInfo task = new WTaskBaseInfo();
-		task.setTask_id(gTaskId());
+		task.setTask_id(taskId);
 		task.setTask_status(StatusConstants.CANCEL);
-		wTaskBaseInfoDao.save(task);
+		task.setTask_invalide_time(new Date());
+		wTaskBaseInfoDao.update(task);
 		//如果是CFON的工单需要同步
 		task = wTaskBaseInfoDao.findByKey(taskId);
 		String synStatus=StatusConstants.NONE;
@@ -196,7 +197,7 @@ public class SnTaskComponent extends BaseBusiComponent{
 	}
 	
 	//回填工单
-	public List<WTaskUser> fillOpenTaskInfo(int doneCode,String taskId,String otlNo,String ponNo,List<TaskFillDevice> deviceList) throws Exception{
+	public List<WTaskUser> fillOpenTaskInfo(Integer doneCode,String taskId,String otlNo,String ponNo,List<TaskFillDevice> deviceList) throws Exception{
 		WTaskBaseInfo task = wTaskBaseInfoDao.findByKey(taskId);
 		if (task.getTask_status().equals(StatusConstants.CANCEL)){
 			throw new SystemException("工单已经被取消，不能回填");
@@ -260,17 +261,17 @@ public class SnTaskComponent extends BaseBusiComponent{
 	}
 
 	//完工
-	public void finishTask(int doneCode,String taskId,String resultType) throws Exception{
+	public void finishTask(Integer doneCode,String taskId,String resultType) throws Exception{
 		//检查设备是否已经回填
 		if (wTaskUserDao.queryUnFillUserCount(taskId)>0)
 			throw new SystemException();
 		WTaskBaseInfo task = new WTaskBaseInfo();
-		task.setTask_id(gTaskId());
+		task.setTask_id(taskId);
 		task.setTask_status(StatusConstants.TASK_END);
 		task.setTask_finish_type(resultType);
 		task.setTask_finish_time(new Date());
 		
-		wTaskBaseInfoDao.save(task);
+		wTaskBaseInfoDao.update(task);
 		//记录操作日志
 		JsonObject jo = new JsonObject();
 		jo.addProperty("resultType", resultType);
@@ -279,7 +280,7 @@ public class SnTaskComponent extends BaseBusiComponent{
 	}
 	
 	//保存工单基本信息
-	private String saveTaskBaseInfo(CCust cust,int doneCode,String taskType,String teamId,String newAddr,String bugDetail) throws Exception{
+	private String saveTaskBaseInfo(CCust cust,Integer doneCode,String taskType,String teamId,String newAddr,String bugDetail) throws Exception{
 		CCustLinkman linkman = CCustLinkmanDao.findByKey(cust.getCust_id());
 		
 		WTaskBaseInfo task = new WTaskBaseInfo();
@@ -321,7 +322,7 @@ public class SnTaskComponent extends BaseBusiComponent{
 		return null;
 	}
 	
-	private void createTaskLog(String taskId,String busiCode,int doneCode,String logDetail,String synStatus) throws Exception{
+	private void createTaskLog(String taskId,String busiCode,Integer doneCode,String logDetail,String synStatus) throws Exception{
 		if(StringHelper.isNotEmpty(taskId))
 			return;
 		WTaskLog log = new WTaskLog();

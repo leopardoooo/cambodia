@@ -301,9 +301,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 					var color = "black";
 					if(v == 'INIT'){
 						color = "purple";
-					}else if(v == 'CREATE'){
-						color = "orange";
-					}else if(v == 'COMPLETE'){
+					}else if(v == 'END'){
 						color = "green";
 					}else if(v == 'CANCEL'){
 						color = "gray";
@@ -318,7 +316,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 	        ]}),
 	        view: new Ext.ux.grid.ColumnLockBufferView({
 	        	getRowClass: function(record,index){
-		            if(record.get('task_status')=='CREATE' ){ 
+		            if(record.get('task_status')=='INIT' ){ 
 		                return 'red-row';  
 	                }
 	                return '';  
@@ -512,10 +510,10 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 		});
 		win.show();
 	},
-	doDeviceTask:function(){//取消工单
+	doDeviceTask:function(){//
 	
 	},
-	doEndTask:function(){
+	doEndTask:function(){//完成工单
 	
 	},
 	doVisitTask:function(){
