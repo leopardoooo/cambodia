@@ -53,6 +53,7 @@ QueryInvoiceForm = Ext.extend(Ext.form.FormPanel,{
 					{xtype:'combo',fieldLabel:lsys('InvoiceCommon.depot_name'),hiddenName:'invoiceDto.depot_id',width :150,minListWidth :250,
 						store:new Ext.data.JsonStore({
 							url:'resource/Device!queryAllDept.action',
+							autoLoad:true,
 							fields:['dept_id','dept_name']
 						}),displayField:'dept_name',valueField:'dept_id',allowBlank:false,
 						triggerAction:'all',mode:'local',
@@ -193,7 +194,7 @@ QueryInvoiceForm = Ext.extend(Ext.form.FormPanel,{
 				]}
 			]
 		});	
-
+        this.getForm().findField('invoiceDto.depot_id').getStore().load();
 	},
 	doQuery:function(){
 		if(this.getForm().isValid()){
