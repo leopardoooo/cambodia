@@ -84,8 +84,7 @@ public class SnTaskComponent extends BaseBusiComponent{
 		if (assignType.equals(SystemConstants.TASK_ASSIGN_BOTH)){
 			String taskId = createSingleTaskWithUser(doneCode, cust, tvUserList, 
 					getTeamId(SystemConstants.TEAM_TYPE_SUPERNET), taskType);
-			if(StringHelper.isNotEmpty(taskId))
-				createTaskLog(taskId, BusiCodeConstants.TASK_INIT, doneCode, null, StatusConstants.NOT_EXEC);
+			createTaskLog(taskId, BusiCodeConstants.TASK_INIT, doneCode, null, StatusConstants.NOT_EXEC);
 			//一个宽带用户一个工单
 			for (CUser user:bandList){
 				List<CUser> l = new ArrayList<CUser>();
@@ -322,17 +321,17 @@ public class SnTaskComponent extends BaseBusiComponent{
 	}
 	
 	private void createTaskLog(String taskId,String busiCode,int doneCode,String logDetail,String synStatus) throws Exception{
-		if(StringHelper.isNotEmpty(taskId))
-			return;
-		WTaskLog log = new WTaskLog();
-		log.setTask_id(taskId);
-		log.setBusi_code(busiCode);
-		log.setDone_code(doneCode);
-		log.setOptr_id(getOptr().getOptr_id());
-		log.setSyn_status(synStatus);
-		log.setLog_time(new Date());
-		log.setLog_detail(logDetail);
-		wTaskLogDao.save(log);
+		if(StringHelper.isNotEmpty(taskId)){
+			WTaskLog log = new WTaskLog();
+			log.setTask_id(taskId);
+			log.setBusi_code(busiCode);
+			log.setDone_code(doneCode);
+			log.setOptr_id(getOptr().getOptr_id());
+			log.setSyn_status(synStatus);
+			log.setLog_time(new Date());
+			log.setLog_detail(logDetail);
+			wTaskLogDao.save(log);
+		}
 		
 	}
 
