@@ -2,10 +2,8 @@ package com.ycsoft.business.component.task;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import javax.transaction.SystemException;
 
@@ -164,7 +162,7 @@ public class SnTaskComponent extends BaseBusiComponent{
 		jo.addProperty("oldTeamId", oldTeamId);
 		jo.addProperty("newTeamId", deptId);
 		String cfonTeamId = getTeamId(SystemConstants.TEAM_TYPE_CFOCN);
-		if (cfonTeamId.equals(deptId) || cfonTeamId.equals(oldTeamId)){
+		if (StringHelper.isNotEmpty(cfonTeamId) && (cfonTeamId.equals(deptId) || cfonTeamId.equals(oldTeamId))){
 			if (cfonTeamId.equals(deptId))
 				jo.addProperty("synType", "add");
 			else 
@@ -189,7 +187,7 @@ public class SnTaskComponent extends BaseBusiComponent{
 		//如果是CFON的工单需要同步
 		task = wTaskBaseInfoDao.findByKey(taskId);
 		String synStatus=StatusConstants.NONE;
-		if (task.getTeam_id().equals(getTeamId(SystemConstants.TEAM_TYPE_CFOCN)))
+		if (StringHelper.isNotEmpty(task.getTeam_id()) && task.getTeam_id().equals(getTeamId(SystemConstants.TEAM_TYPE_CFOCN)))
 			synStatus = StatusConstants.NOT_EXEC;
 		createTaskLog(taskId,BusiCodeConstants.TASK_CANCEL, doneCode,null, synStatus);
 	}

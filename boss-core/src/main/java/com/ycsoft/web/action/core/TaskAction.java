@@ -135,6 +135,17 @@ public class TaskAction extends BaseBusiAction{
 	}
 	
 	/**
+	 * 取消工单
+	 * @return
+	 * @throws Exception
+	 */
+	public String cancelTaskSn()throws Exception{
+		snTaskService.cancelTask(task_id);
+		getRoot().setSuccess(true);
+		return JSON_SUCCESS;
+	}
+	
+	/**
 	 * @return the cust_ids
 	 */
 	public String[] getCust_ids() {
