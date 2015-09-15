@@ -18,7 +18,7 @@ var InvoiceDetailForm = Ext.extend(Ext.form.FormPanel, {
 						border : false,
 						items : [{
 									xtype : 'textfield',
-									fieldLabel : langUtils.sys('InvoiceDetail.labels.invoice_id'),
+									fieldLabel : lsys('InvoiceCommon.invoice_id'),
 									allowBlank : false,
 									name : 'invoice_id',
 									width:100,
@@ -40,7 +40,7 @@ var InvoiceDetailForm = Ext.extend(Ext.form.FormPanel, {
 						layout : 'form',
 						border : false,
 						items : [{
-									fieldLabel : langUtils.sys('InvoiceDetail.labels.invoice_id'),
+									fieldLabel : lsys('InvoiceCommon.invoice_id'),
 									xtype : 'combo',
 									store : new Ext.data.JsonStore({
 												fields : ['invoice_code']
@@ -59,7 +59,7 @@ var InvoiceDetailForm = Ext.extend(Ext.form.FormPanel, {
 						border : false,
 						items : [{
 									xtype : 'button',
-									text : '查  询',
+									text : lsys('common').query,
 									iconCls : 'icon-query',
 									listeners : {
 										scope : this,
@@ -84,7 +84,7 @@ var InvoiceDetailForm = Ext.extend(Ext.form.FormPanel, {
 					success : function(res, opt) {
 						var data = Ext.decode(res.responseText);
 						if (data.length == 0) {
-							Alert(invoiceId + ' 发票不存在!', function() {
+							Alert(lsys('msgBox.invoiceNotExists',null,[invoiceId]), function() {
 										invoiceCodeCmp.setReadOnly(false);
 										invoiceCodeCmp.getStore().removeAll();
 										invoiceCodeCmp.setValue('');
@@ -111,7 +111,7 @@ var InvoiceDetailForm = Ext.extend(Ext.form.FormPanel, {
 		var invoiceCodeCmp = this.getForm().findField('invoice_code');
 		var invoice_code = invoiceCodeCmp.getValue();
 		if(!invoice_code){
-			Alert('请选择发票代码');
+			Alert(lsys('msgBox.selectInvoiceCode'));
 			return false;
 		}
 		var invoiceIdCmp = this.getForm().findField('invoice_id');
@@ -135,17 +135,17 @@ InvoiceDepotDetailGrid = Ext.extend(Ext.grid.GridPanel, {
 							},
 							sm : new Ext.grid.CheckboxSelectionModel(),
 							cm : new Ext.grid.ColumnModel([{
-										header : '操作类型',
+										header : lsys('InvoiceDetail.InvoiceDepotDetailGridColls')[0],
 										dataIndex : 'optr_type',
 										width : 100
 									}, {
-										header : '发票流转',
+										header : lsys('InvoiceDetail.InvoiceDepotDetailGridColls')[0],
 										dataIndex : 'depot_name'
 									}, {
-										header : '操作员',
+										header : lsys('InvoiceDetail.InvoiceDepotDetailGridColls')[1],
 										dataIndex : 'optr_name'
 									}, {
-										header : '操作时间',
+										header : lsys('InvoiceDetail.InvoiceDepotDetailGridColls')[2],
 										dataIndex : 'create_time'
 									}])
 						})
@@ -166,35 +166,35 @@ InvoiceDepotDetailGrid = Ext.extend(Ext.grid.GridPanel, {
 							},
 							sm : new Ext.grid.CheckboxSelectionModel(),
 							cm : new Ext.grid.ColumnModel([{
-										header : '客户名称',
+										header : lsys('InvoiceDetail.InvoiceDetailGridColls')[0],
 										dataIndex : 'cust_name',
 										width : 100,
 										renderer : App.qtipValue
 									}, {
-										header : '客户编号',
+										header : lsys('InvoiceDetail.InvoiceDetailGridColls')[1],
 										dataIndex : 'cust_no',
 										renderer : App.qtipValue
 									}, {
-										header : '业务名称',
+										header : lsys('InvoiceDetail.InvoiceDetailGridColls')[2],
 										dataIndex : 'busi_name',
 										renderer : App.qtipValue
 									}, {
-										header : '费用名称',
+										header : lsys('InvoiceDetail.InvoiceDetailGridColls')[3],
 										dataIndex : 'fee_name',
 										renderer : App.qtipValue
 									}, {
-										header : '实际金额',
+										header : lsys('InvoiceDetail.InvoiceDetailGridColls')[4],
 										dataIndex : 'real_pay',
 										renderer : Ext.util.Format.formatFee
 									}, {
-										header : '操作时间',
+										header : lsys('InvoiceDetail.InvoiceDetailGridColls')[5],
 										dataIndex : 'create_time',
 										renderer : App.qtipValue
 									},{
-										header:'操作员',
+										header:lsys('InvoiceDetail.InvoiceDetailGridColls')[6],
 										dataIndex:'optr_name'
 									}, {
-										header : '状态',
+										header : lsys('InvoiceDetail.InvoiceDetailGridColls')[7],
 										dataIndex : 'status_text',
 										renderer : Ext.util.Format.statusShow
 									}])
@@ -208,46 +208,46 @@ var InvoiceDetailPanel = Ext.extend(Ext.Panel, {
 		this.invoiceTpl = new Ext.XTemplate(
 				'<table width="100%" border="0" cellpadding="0" cellspacing="0">',
 				'<tr height=24>',
-				'<td class="label" width=20%>发票号码：</td>',
+				'<td class="label" width=20%>'+lsys('InvoiceCommon.invoice_id')+'：</td>',
 				'<td class="input_bold" width=30%>&nbsp;{invoice_id}</td>',
-				'<td class="label" width=20%>发票类型：</td>',
+				'<td class="label" width=20%>'+lsys('InvoiceCommon.invoice_type')+'：</td>',
 				'<td class="input_bold" width=30%>&nbsp;{invoice_type_text}</td>',
 				'</tr>',
 				'<tr height=24>',
-				'<td class="label" width=20%>发票代码：</td>',
+				'<td class="label" width=20%>'+lsys('InvoiceCommon.invoice_code')+'：</td>',
 				'<td class="input_bold" width=30%>&nbsp;{invoice_code}</td>',
-				'<td class="label" width=20%>出票方式：</td>',
+				'<td class="label" width=20%>'+lsys('InvoiceCommon.invoice_mode')+'：</td>',
 				'<td class="input_bold" width=30%>&nbsp;{invoice_mode_text}</td>',
 				'</tr>',
 				'<tr height=24>',
-				'<td class="label" width=20%>使用状态：</td>',
+				'<td class="label" width=20%>'+lsys('InvoiceCommon.status')+'：</td>',
 				'<td class="input_bold" width=30%>&nbsp;{status_text}</td>',
-				'<td class="label" width=20%>结存状态：</td>',
+				'<td class="label" width=20%>'+lsys('InvoiceCommon.finance_status')+'：</td>',
 				'<td class="input_bold" width=30%>&nbsp;{finance_status_text}</td>',
 				'</tr>',
 				'<tr height=24>',
-				'<td class="label" width=20%>仓&nbsp;&nbsp;&nbsp;&nbsp;库：</td>',
+				'<td class="label" width=20%>'+lsys('InvoiceCommon.depot_name')+'：</td>',
 				'<td class="input_bold" width=30%>&nbsp;{depot_name}</td>',
-				'<td class="label" width=20%>结账仓库：</td>',
+				'<td class="label" width=20%>'+lsys('InvoiceCommon.check_depot_id')+'：</td>',
 				'<td class="input_bold" width=30%>&nbsp;{check_depot_id_text}</td>',
 				'</tr>',
 				'<tr height=24>',
-				'<td class="label" width=20%>入库时间：</td>',
+				'<td class="label" width=20%>'+lsys('InvoiceCommon.create_time')+'：</td>',
 				'<td class="input_bold" width=30%>&nbsp;{create_time}</td>',
-				'<td class="label" width=20%>核销时间：</td>',
+				'<td class="label" width=20%>'+lsys('InvoiceCommon.close_time')+'：</td>',
 				'<td class="input_bold" width=30%>&nbsp;{[values.close_time|| ""]}</td>',// fm.dateFormat(
 				'</tr>',
 				'<tr height=24>',
-				'<td class="label" width=20%>结账时间：</td>',
+				'<td class="label" width=20%>'+lsys('InvoiceCommon.check_time')+'：</td>',
 				'<td class="input_bold" width=30%>&nbsp;{[values.check_time|| ""]}</td>',
-				'<td class="label" width=20%>开票时间：</td>',
+				'<td class="label" width=20%>'+lsys('InvoiceCommon.use_time')+'：</td>',
 				'<td class="input_bold" width=30%>&nbsp;{[values.use_time|| ""]}</td>',
 				'</tr>',
 				'<tr height=24>',
-				'<td class="label" width=20%>金&nbsp;&nbsp;&nbsp;&nbsp;额：</td>',
+				'<td class="label" width=20%>'+lsys('InvoiceCommon.amount')+'：</td>',
 				'<td class="input_bold" width=30%>&nbsp;{[this.checkAmount(values)]}</td>',
 				
-				'<td class="label" width=20%>领&nbsp;&nbsp;用&nbsp;&nbsp;人：</td>',
+				'<td class="label" width=20%>'+lsys('InvoiceCommon.use_optr')+'：</td>',
 				'<td class="input_bold" width=30%>&nbsp;{[values.optr_name||""]}</td>',
 				'</tr>',
 				'</table>', {
@@ -294,7 +294,7 @@ InvoiceAllInfo = Ext.extend(Ext.Panel,{
 								height : 200,
 								split : true,
 								autoScroll:true,
-								title : '发票基础信息',
+								title : lsys('InvoiceDetail.titleInvoiceBaseInfo'),
 								items : [this.panel]
 							}, {
 								region : 'center',
@@ -304,12 +304,12 @@ InvoiceAllInfo = Ext.extend(Ext.Panel,{
 											layout : 'fit',
 											width : '40%',
 											split : true,
-											title : '发票操作记录',
+											title : lsys('InvoiceDetail.titleInvoiceOptrRec'),
 											items : [this.depotGrid]
 										}, {
 											region : 'center',
 											layout : 'fit',
-											title : '费用明细',
+											title : lsys('InvoiceDetail.titleFeeDetail'),
 											items : [this.detail]
 										}]
 							}]
@@ -384,11 +384,12 @@ InvoiceDetailInfo = Ext.extend(Ext.Panel, {
 				this.info.queryInvoiceDetail(invoiceId,invoiceCode);
 			},
 			constructor : function() {
+				
 				this.form = new InvoiceDetailForm(this);
 				this.info = new InvoiceAllInfo();
 				InvoiceDetailInfo.superclass.constructor.call(this, {
 					id : 'InvoiceDetailInfo',
-					title : '详细查询',
+					title : lsys('InvoiceDetail.titleDetailQuery'),
 					border : false,
 					layout : 'border',
 					closable : true,

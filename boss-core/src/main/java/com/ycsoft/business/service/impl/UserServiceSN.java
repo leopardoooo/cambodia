@@ -2,6 +2,10 @@
 package com.ycsoft.business.service.impl;
 
 import static com.ycsoft.commons.constants.SystemConstants.ACCT_TYPE_SPEC;
+import static com.ycsoft.commons.constants.SystemConstants.USER_TYPE_BAND;
+import static com.ycsoft.commons.constants.SystemConstants.USER_TYPE_OTT;
+import static com.ycsoft.commons.constants.SystemConstants.USER_TYPE_DTT;
+import static com.ycsoft.commons.constants.SystemConstants.USER_TYPE_OTT_MOBILE;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -69,13 +73,20 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		this.validAccount(user.getLogin_name());
 		this.canOpenUser(cust);
 		doneCodeComponent.lockCust(cust.getCust_id());
-		// 获取业务流水
-		Integer doneCode = doneCodeComponent.gDoneCode();
-		// 获取客户信息
 		
+		Integer doneCode = doneCodeComponent.gDoneCode();
 		int num = getUserCount(cust, user.getUser_type());
 		openSingle(cust, user, doneCode, deviceCode, deviceType, deviceModel, deviceBuyMode, deviceFee, num);
 		
+		String userType = user.getUser_type();
+		//若没有设备号，新增工单
+		if ((userType.equals(USER_TYPE_BAND) && StringHelper.isEmpty(user.getModem_mac()))
+				|| ((userType.equals(USER_TYPE_DTT) || userType.equals(USER_TYPE_OTT))
+						&& StringHelper.isEmpty(user.getStb_id()))) {
+			List<CUser> userList = new ArrayList<CUser>();
+			userList.add(user);
+			snTaskComponent.createOpenTask(doneCode, cust, userList, getBusiParam().getWorkBillAsignType());
+		}
 		// 设置拦截器所需要的参数
 		getBusiParam().resetUser();
 		getBusiParam().addUser(user);
@@ -104,7 +115,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 					CUser user = new CUser();
 					user.setUser_type(userInfo.getUser_type());
 					String deviceType;
-					if (user.getUser_type().equals(SystemConstants.USER_TYPE_BAND)){
+					if (user.getUser_type().equals(USER_TYPE_BAND)){
 						deviceType = SystemConstants.DEVICE_TYPE_MODEM;
 					} else {
 						deviceType = SystemConstants.DEVICE_TYPE_STB;
@@ -131,7 +142,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 					CUser user = new CUser();
 					user.setUser_type(openUser.getUser_type());
 					String deviceType;
-					if (user.getUser_type().equals(SystemConstants.USER_TYPE_BAND)){
+					if (user.getUser_type().equals(USER_TYPE_BAND)){
 						deviceType = SystemConstants.DEVICE_TYPE_MODEM;
 					} else {
 						deviceType = SystemConstants.DEVICE_TYPE_STB;
@@ -166,9 +177,9 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 
 	private int getUserCount(CCust cust, String userType) throws Exception {
 		int num = userComponent.queryMaxNumByLoginName(cust.getCust_id(), cust.getCust_no(), userType);
-		if(userType.equals(SystemConstants.USER_TYPE_BAND)){
+		if(userType.equals(USER_TYPE_BAND)){
 			num += SystemConstants.USER_TYPE_BAND_NUM;
-		}else if(userType.equals(SystemConstants.USER_TYPE_OTT)){
+		}else if(userType.equals(USER_TYPE_OTT)){
 			if(num == 0){
 				num += SystemConstants.USER_TYPE_OTT_NUM;
 			}else{
@@ -202,7 +213,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		
 		//设置OTT用户终端类型和默认用户名
 		String userType = user.getUser_type();
-		if (userType.equals(SystemConstants.USER_TYPE_OTT)) {
+		if (userType.equals(USER_TYPE_OTT)) {
 			if (cust.getCust_type().equals(SystemConstants.CUST_TYPE_NONRESIDENT)){
 				user.setTerminal_type(SystemConstants.USER_TERMINAL_TYPE_ZZD);
 			} else {
@@ -221,17 +232,15 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 				}
 			}
 			
-			/*if (StringHelper.isEmpty(user.getLogin_name()))
-				user.setLogin_name("supertv"+user.getUser_id());*/
 			user.setLogin_name(cust.getCust_no()+""+num);
-		}else if(userType.equals(SystemConstants.USER_TYPE_BAND)){
+		}else if(userType.equals(USER_TYPE_BAND)){
 			String domainName = custComponent.getDomainByAddr(cust.getAddr_id());
 			user.setLogin_name(cust.getCust_no()+"0"+num+"@"+domainName);
 		}
 		user.setPassword(cust.getPassword());
 		TDeviceBuyMode buyModeCfg = busiConfigComponent.queryBuyMode(deviceBuyMode);
 		//处理设备和授权
-		if (!user.getUser_type().equals(SystemConstants.USER_TYPE_OTT_MOBILE)){
+		if (!user.getUser_type().equals(USER_TYPE_OTT_MOBILE)){
 			String ownership = SystemConstants.OWNERSHIP_GD;
 			if (buyModeCfg!= null && buyModeCfg.getChange_ownship().equals(SystemConstants.BOOLEAN_TRUE))
 				ownership = SystemConstants.OWNERSHIP_CUST;
@@ -278,8 +287,6 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 	/**
 	 * 用户更换设备
 	 */
-//	public void saveChangeDevice(String userId, String deviceCode, String devcieBuyMode, 
-//			FeeInfoDto deviceFee, String changeReason, boolean reclaim) throws Exception {
 	public void saveChangeDevice(String userId, String deviceCode, String reasonType) throws Exception {
 		Integer doneCode = doneCodeComponent.gDoneCode();
 		CCust cust = getBusiParam().getCust();
@@ -289,7 +296,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		CUser user = userComponent.queryUserById(userId);
 		
 		String oldDeviceCode = user.getStb_id();
-		if (user.getUser_type().equals(SystemConstants.USER_TYPE_BAND))
+		if (user.getUser_type().equals(USER_TYPE_BAND))
 			oldDeviceCode = user.getModem_mac();
 		DeviceDto oldDevice = deviceComponent.queryDeviceByDeviceCode(oldDeviceCode);
 		DeviceDto device = deviceComponent.queryDeviceByDeviceCode(deviceCode);
@@ -334,10 +341,10 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		}
 		
 		//处理授权
-		if (user.getUser_type().equals(SystemConstants.USER_TYPE_OTT)){
+		if (user.getUser_type().equals(USER_TYPE_OTT)){
 		    //OTT 发变更用户信息
 			authComponent.sendAuth(user, null, BusiCmdConstants.CHANGE_USER, doneCode);
-		} else if (user.getUser_type().equals(SystemConstants.USER_TYPE_DTT)){
+		} else if (user.getUser_type().equals(USER_TYPE_DTT)){
 			//DTT新设备发开户指令
 			authComponent.sendAuth(user, null, BusiCmdConstants.CREAT_USER, doneCode);
 			//新设备发产品授权
@@ -492,7 +499,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		}
 
 		//直接解除授权，不等支付（因为不能取消）
-		if(user.getUser_type().equals(SystemConstants.USER_TYPE_DTT)
+		if(user.getUser_type().equals(USER_TYPE_DTT)
 				&&!SystemConstants.BOOLEAN_TRUE.equals(reclaim)){
 			//DTT用户不回收设备，发产品减授权
 			List<CProdOrder> prodList = orderComponent.queryOrderProdByUserId(user.getUser_id());
@@ -627,7 +634,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 				count ++;
 			}
 			if (StringHelper.isNotEmpty(user.getTerminal_type())){
-				if (user.getUser_type().equals(SystemConstants.USER_TYPE_OTT)){
+				if (user.getUser_type().equals(USER_TYPE_OTT)){
 					if(user.getTerminal_type().equals(SystemConstants.USER_TERMINAL_TYPE_ZZD)){
 						hasZzd = true;
 					} else {
