@@ -84,7 +84,8 @@ public class SnTaskComponent extends BaseBusiComponent{
 		if (assignType.equals(SystemConstants.TASK_ASSIGN_BOTH)){
 			String taskId = createSingleTaskWithUser(doneCode, cust, tvUserList, 
 					getTeamId(SystemConstants.TEAM_TYPE_SUPERNET), taskType);
-			createTaskLog(taskId, BusiCodeConstants.TASK_INIT, doneCode, null, StatusConstants.NOT_EXEC);
+			if(StringHelper.isNotEmpty(taskId))
+				createTaskLog(taskId, BusiCodeConstants.TASK_INIT, doneCode, null, StatusConstants.NOT_EXEC);
 			//一个宽带用户一个工单
 			for (CUser user:bandList){
 				List<CUser> l = new ArrayList<CUser>();
@@ -121,6 +122,8 @@ public class SnTaskComponent extends BaseBusiComponent{
 	}
 	
 	private String createSingleTaskWithUser(int doneCode,CCust cust,List<CUser> userList,String deptId,String taskType) throws Exception{
+		if (userList == null || userList.size()==0)
+			return null;
 		String taskId = this.saveTaskBaseInfo(cust, doneCode,taskType, deptId, null,null);
 		for (CUser user:userList){
 			WTaskUser taskUser = new WTaskUser();
@@ -319,6 +322,8 @@ public class SnTaskComponent extends BaseBusiComponent{
 	}
 	
 	private void createTaskLog(String taskId,String busiCode,int doneCode,String logDetail,String synStatus) throws Exception{
+		if(StringHelper.isNotEmpty(taskId))
+			return;
 		WTaskLog log = new WTaskLog();
 		log.setTask_id(taskId);
 		log.setBusi_code(busiCode);
