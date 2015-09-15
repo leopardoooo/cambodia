@@ -62,13 +62,13 @@ Ext.onReady(function() {
 				//工具菜单
 		    	App.tool.insert(2,'-');
 				App.tool.insert(3, {
-					text:'工具',
+					text:langUtils.tools("gj"),
 					iconCls:'icon-t-county',
 					menu: new Ext.menu.Menu({
 						items:[	
 							{
 								itemId:'reloadConfig',
-								text:'重载配置',
+								text:langUtils.tools("czpz"),
 								iconCls:'icon-t-county'
 							}
 						],
@@ -107,7 +107,7 @@ Ext.onReady(function() {
 			}
 			
 			App.tool.insert(2,{
-				text: '切换部门',
+				text: langUtils.tools("qhbm"),
 				iconCls: 'icon-t-dept',
 				handler : App.tool.onToggleDept
 			});

@@ -1,19 +1,20 @@
 var columns = [
-	{header:'流转编号',align:'center',dataIndex:'transfer_no',width:60},
-	{header:'源仓库',align:'center',dataIndex:'depot_source_text',width:90,renderer:App.qtipValue},
-	{header:'目标仓库',align:'center',dataIndex:'depot_order_text',width:80,renderer:App.qtipValue},
-	{header:'状态',align:'center',dataIndex:'status_text',width:50,renderer:Ext.util.Format.statusShow},
-	{header:'创建人',align:'center',dataIndex:'optr_name',width:75},
-	{header:'创建时间',align:'center',dataIndex:'create_time',width:110},
-	{header:'确认人',align:'center',dataIndex:'confirm_optr_name',width:75},
-	{header:'确认时间',align:'center',dataIndex:'confirm_date',width:110},
-	{header:'确认信息',align:'center',dataIndex:'confirm_info',width:80,renderer:App.qtipValue},
-	{id:'remark_id',align:'center',header:'备注',width:70,dataIndex:'remark',renderer:App.qtipValue}
+	{header:lsys('DepotIndexManager.columnNames')[0],align:'center',dataIndex:'transfer_no',width:60},
+	{header:lsys('DepotIndexManager.columnNames')[1],align:'center',dataIndex:'depot_source_text',width:90,renderer:App.qtipValue},
+	{header:lsys('DepotIndexManager.columnNames')[2],align:'center',dataIndex:'depot_order_text',width:80,renderer:App.qtipValue},
+	{header:lsys('DepotIndexManager.columnNames')[3],align:'center',dataIndex:'status_text',width:50,renderer:Ext.util.Format.statusShow},
+	{header:lsys('DepotIndexManager.columnNames')[4],align:'center',dataIndex:'optr_name',width:75},
+	{header:lsys('DepotIndexManager.columnNames')[5],align:'center',dataIndex:'create_time',width:110},
+	{header:lsys('DepotIndexManager.columnNames')[6],align:'center',dataIndex:'confirm_optr_name',width:75},
+	{header:lsys('DepotIndexManager.columnNames')[7],align:'center',dataIndex:'confirm_date',width:110},
+	{header:lsys('DepotIndexManager.columnNames')[8],align:'center',dataIndex:'confirm_info',width:80,renderer:App.qtipValue},
+	{id:'remark_id',align:'center',header:lsys('DepotIndexManager.columnNames')[9],width:70,dataIndex:'remark',renderer:App.qtipValue}
 ];
 //待审批调入
 var ExamInPanel = Ext.extend(Ext.grid.GridPanel,{
 	examInStore :null,
 	constructor:function(){
+		
 		this.examInStore = new Ext.data.JsonStore({
 			url:'resource/Device!queryUnCheckInput.action',
 			fields:['transfer_no','depot_source','depot_order','status','optr_id','create_time',
@@ -22,7 +23,7 @@ var ExamInPanel = Ext.extend(Ext.grid.GridPanel,{
 		});
 		this.examInStore.load();
 		ExamInPanel.superclass.constructor.call(this,{
-			title:'待审批调入',
+			title:lsys('DepotIndexManager.titleExamInPanel'),
 			autoScroll:true,
 			ds:this.examInStore,
 			columns:columns
@@ -42,7 +43,7 @@ var ExamOutPanel = Ext.extend(Ext.grid.GridPanel,{
 		});
 		this.examOutStore.load();
 		ExamOutPanel.superclass.constructor.call(this,{
-			title:'待审批调出',
+			title:lsys('DepotIndexManager.titleExamOutPanel'),
 			autoScroll:true,
 			ds:this.examOutStore,
 			columns:columns
@@ -60,7 +61,7 @@ DepotIndexManager = Ext.extend(Ext.Panel,{
 		this.examOutPanel = new ExamOutPanel();
 		
 		DepotIndexManager.superclass.constructor.call(this,{
-			title:'终端管理',
+			title:lsys('DepotIndexManager._title'),
 			closable:false,
 			layout:'anchor',
 			items:[
