@@ -301,9 +301,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 					var color = "black";
 					if(v == 'INIT'){
 						color = "purple";
-					}else if(v == 'CREATE'){
-						color = "orange";
-					}else if(v == 'COMPLETE'){
+					}else if(v == 'END'){
 						color = "green";
 					}else if(v == 'CANCEL'){
 						color = "gray";
@@ -314,11 +312,11 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 				{header:'故障类型',dataIndex:'bug_type_text',width:85},
 				{header:'故障详细信息',dataIndex:'bug_detail',width:120,renderer:App.qtipValue},
 				{header: 'ZTE授权状态',dataIndex: 'zte_status_text', width: 100, renderer:App.qtipValue},
-				{header: '创建时间', dataIndex: 'create_time', 	width: 165, renderer: Ext.util.Format.dateFormat}					
+				{header: '创建时间', dataIndex: 'task_create_time', 	width: 165, renderer: Ext.util.Format.dateFormat}					
 	        ]}),
 	        view: new Ext.ux.grid.ColumnLockBufferView({
 	        	getRowClass: function(record,index){
-		            if(record.get('task_status')=='CREATE' ){ 
+		            if(record.get('task_status')=='INIT' ){ 
 		                return 'red-row';  
 	                }
 	                return '';  
@@ -374,34 +372,23 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 		if(rs === false){
 			return ;
 		}
-		var taskIds = [];
-		for(var i = 0; i< rs.length ; i++){
-			var ts = rs[i].get("task_status");
-			if(ts == 'COMPLETE' || ts == 'CANCEL' || ts == 'INIT'){
-				Alert("不允许作废!");
-				return ;
-			}
-			taskIds.push(rs[i].get("task_id"));
+		var ts = rs.get("task_status");
+		if(ts == 'WAITEND' || ts == 'CANCEL' || ts == 'END'){
+			Alert("不允许取消!");
+			return ;
 		}
-		Ext.MessageBox.prompt("备注","作废原因：",function(bu,txt){
-			if(bu != 'cancel'){
-	   			Confirm("确定要作废选中的工单吗?", this , function(){
-					App.sendRequest(
-						Constant.ROOT_PATH + "/core/x/Task!cancelTask.action",
-						{task_ids : taskIds,cancelRemark:txt},
-						function(res,opt){
-							Alert('工单已作废!');
-							for(var i = 0; i< rs.length ; i++){
-								rs[i].set("task_status", "CANCEL");
-								rs[i].set("task_status_text", "作废");
-								rs[i].set("remark", txt);
-							}
-						});
-				}); 
-			}
+		Confirm("确定要作废选中的工单吗?", this , function(){
+			App.sendRequest(
+				Constant.ROOT_PATH + "/core/x/Task!cancelTaskSn.action",
+				{task_id : rs.get('task_id')},
+				function(res,opt){
+					Alert('工单已作废!');
+					for(var i = 0; i< rs.length ; i++){
+						rs.set("task_status", "CANCEL");
+						rs.set("task_status_text", "作废");
+					}
+				});
 		}); 
-		
-		
 	},
 	doSendTask: function(){
 		var rs = this.getSelections();
@@ -435,13 +422,98 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 		if(rs === false){
 			return ;
 		}
-		alert(rs.get('task_id'));
+		var arr = [];
+		this.taskTeamCombo.getStore().each(function(record){
+			if(record.get('dept_id') != rs.get('team_id')){
+				arr.push(record.data);
+			}
+		});
 		
+		var teamCombo = new Ext.form.ComboBox({
+			typeAhead: true,
+			width: 120,
+		    triggerAction: 'all',
+		    mode: 'local',
+		    fieldLabel:'施工队',
+		    editable : true,
+		    allowBlank:false,
+		    store: new Ext.data.JsonStore({
+		        fields: [ 'dept_id', 'dept_name' ]
+		    }),
+		    valueField: 'dept_id',
+		    displayField: 'dept_name'
+		});
+		teamCombo.getStore().loadData(arr);
+		
+		var form = new Ext.form.FormPanel({
+			labelWidth: 90,
+			bodyStyle: 'padding-top: 10px;',
+			items: [teamCombo]
+		});
+	
+		if(rs.get('task_type_id') == '2'){
+			var bugCauseCombo = new Ext.ux.ParamCombo({
+				fieldLabel:'故障类型',
+				xtype:'paramcombo',
+				allowBlank:false,
+				anchor: '95%',
+				paramName:'TASK_BUG_CAUSE'
+			});
+			App.form.initComboData([bugCauseCombo]);
+			form.add(bugCauseCombo);
+		}
+		
+		var win = new Ext.Window({
+			width: 320,
+			height: 250,
+			title: '施工队',
+			border: false,
+			closeAction:'close',
+			layout: 'fit',
+			items: form,
+			buttons: [{
+				text: '保存',
+				scope: this,
+				iconCls : 'icon-save',
+				handler: function(){
+					if(Ext.isEmpty(teamCombo.getValue())){
+						Alert("施工队不能为空");return false;
+					}
+					if(bugCauseCombo && Ext.isEmpty(bugCauseCombo.getValue())){
+						Alert("故障类型不能为空");return false;
+					}
+					var url = Constant.ROOT_PATH + "/core/x/Task!editTaskTeam.action";
+					var o = {
+						task_id : rs.get("task_id"), 
+						deptId: teamCombo.getValue(),
+						bugType : bugCauseCombo?bugCauseCombo.getValue():null
+					};
+					App.sendRequest( url, o, function(res,opt){
+						rs.set("team_id",teamCombo.getValue());
+						var index = 0;
+						index = teamCombo.getStore().find('dept_id',teamCombo.getValue());
+						rs.set("team_id_text",teamCombo.getStore().getAt(index).get('dept_name'));	
+						if(bugCauseCombo){
+							rs.set("bug_type",bugCauseCombo.getValue());
+							index = bugCauseCombo.getStore().find('item_value',bugCauseCombo.getValue());
+							rs.set("bug_type_text",bugCauseCombo.getStore().getAt(index).get('item_name'));
+						}
+						win.close();
+					});
+				}
+			},{
+				text: '取消',
+				handler: function(){
+					win.hide();
+				}
+			}]
+		});
+		win.show();
 	},
-	doDeviceTask:function(){//取消工单
+	doDeviceTask:function(){//
 	
 	},
-	doEndTask:function(){
+	doEndTask:function(){//完成工单
 	
 	},
 	doVisitTask:function(){
@@ -449,7 +521,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 	},
 	getSelections: function(){
 		var rs = this.grid.getSelectionModel().getSelected();
-		if(Ext.isEmpty(rs.get('task_id'))){
+		if(rs == null || Ext.isEmpty(rs.get('task_id'))){
 			Alert("请选择需要操作的记录!");
 			return false;
 		}

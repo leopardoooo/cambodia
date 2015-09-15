@@ -40,12 +40,15 @@ import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.daos.core.Pager;
 @Service
 public class SnTaskService  extends BaseBusiService implements ISnTaskService{
-
+	@Autowired
 	private SnTaskComponent snTaskComponent ; 
 	@Autowired
 	private WTaskBaseInfoDao wTaskBaseInfoDao;
+	@Autowired
 	private DoneCodeComponent doneCodeComponent;
+	@Autowired
 	private CProdOrderDao cProdOrderDao;
+	@Autowired
 	private CUserDao cUserDao;
 	@Autowired
 	private WTaskUserDao wTaskUserDao;
@@ -55,6 +58,7 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 	private DeviceComponent deviceComponent;
 	@Autowired
 	private WTeamDao wTeamDao;
+	@Autowired
 	private CCustDao cCustDao;
 	
 	
@@ -74,7 +78,7 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 		if (task == null)
 			throw new SystemException("工单不存在!");
 		if (task.getTask_type_id().equals(SystemConstants.TASK_TYPE_FAULT) && 
-				StringHelper.isEmpty(task.getBug_type()))
+				StringHelper.isEmpty(bugType))
 			throw new SystemException("请指定故障类型!");	
 		if (task.getTeam_id().equals(deptId))
 			throw new SystemException("施工队不能相同!");	

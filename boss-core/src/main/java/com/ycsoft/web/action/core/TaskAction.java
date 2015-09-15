@@ -35,6 +35,9 @@ public class TaskAction extends BaseBusiAction{
 	private QueryTaskConditionDto taskCond;
 	private String bugCause;
 	private ISnTaskService snTaskService;
+	private String deptId;
+	private String bugType;
+	private String resultType;
 
 
 	public String saveBugTask()throws Exception{
@@ -121,6 +124,37 @@ public class TaskAction extends BaseBusiAction{
 		return JSON_SUCCESS;
 	}
 	
+	
+	/**
+	 * 分配施工队
+	 * @return
+	 * @throws Exception
+	 */
+	public String editTaskTeam() throws Exception{
+		snTaskService.editTaskTeam(task_id,deptId,bugType);
+		return JSON_SUCCESS;
+	}
+	
+	/**
+	 * 取消工单
+	 * @return
+	 * @throws Exception
+	 */
+	public String cancelTaskSn()throws Exception{
+		snTaskService.cancelTask(task_id);
+		getRoot().setSuccess(true);
+		return JSON_SUCCESS;
+	}
+	
+	/**
+	 * 完工
+	 * @return
+	 * @throws Exception
+	 */
+	public String endTask() throws Exception{
+		snTaskService.finishTask(task_id,bugType);
+		return JSON_SUCCESS;
+	}
 	
 	/**
 	 * @return the cust_ids
@@ -267,6 +301,36 @@ public class TaskAction extends BaseBusiAction{
 
 	public void setSnTaskService(ISnTaskService snTaskService) {
 		this.snTaskService = snTaskService;
+	}
+
+
+	public String getDeptId() {
+		return deptId;
+	}
+
+
+	public void setDeptId(String deptId) {
+		this.deptId = deptId;
+	}
+
+
+	public String getBugType() {
+		return bugType;
+	}
+
+
+	public void setBugType(String bugType) {
+		this.bugType = bugType;
+	}
+
+
+	public String getResultType() {
+		return resultType;
+	}
+
+
+	public void setResultType(String resultType) {
+		this.resultType = resultType;
 	}
 
 
