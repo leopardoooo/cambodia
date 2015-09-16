@@ -18,7 +18,7 @@ UserDetailGrid = Ext.extend(Ext.grid.GridPanel, {
 						header : '密码',dataIndex : 'password',renderer : App.qtipValue}, {
 						header : '设备型号',dataIndex : 'device_model_text',renderer : App.qtipValue}, {
 						header : '设备号',dataIndex : 'device_code',renderer : App.qtipValue}, {
-						header : '宽带',dataIndex : 'task_id',renderer : App.qtipValue}])
+						header : '带宽',dataIndex : 'task_id',renderer : App.qtipValue}])
 		})
 	}
 })

@@ -227,6 +227,11 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 	public DeviceDto queryDeviceInfoByCodeAndModel(String deviceCode, String deviceModel) throws Exception{
 		return deviceComponent.queryDeviceInfoByCodeAndModel(deviceCode, deviceModel);
 	}
+
+	public List<TaskBaseInfoDto> queryTaskByCustId(String custId) throws Exception {
+		// TODO Auto-generated method stub
+		return wTaskBaseInfoDao.queryTaskByCustId(custId);
+	}
 	
 
 }

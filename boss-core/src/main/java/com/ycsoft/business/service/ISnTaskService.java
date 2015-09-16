@@ -77,6 +77,8 @@ public interface ISnTaskService {
 	public List<WTeam> queryTaskTeam()throws Exception;
 	
 	public DeviceDto queryDeviceInfoByCodeAndModel(String deviceCode, String deviceModel) throws Exception;
+
+	public List<TaskBaseInfoDto> queryTaskByCustId(String custId) throws Exception;
 	
 	
 
