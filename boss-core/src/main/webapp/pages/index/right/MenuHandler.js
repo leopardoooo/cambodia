@@ -814,7 +814,7 @@ Ext.apply(MenuHandler, {
 			Alert(lmsg('needUser'));
 			return false;
 		}
-		if (userRecords[0].get("status") != "ACTIVE" ) {
+		if (userRecords[0].get("status") != "ACTIVE" &&  userRecords[0].get("status") != "INSTALL") {
 			Alert(lmsg('userNotActive'));
 			return false;
 		}
@@ -839,11 +839,11 @@ Ext.apply(MenuHandler, {
 		} else {
 			var dtv = false;// 如果选中的用户中不存在数字电视
 			for (i = 0; i < len; i++) {
-				if (userRecords[i].get("status") != "ACTIVE" && ( userRecords[i].get("status") != "OWELONG" ) ) {
+				if (userRecords[i].get("status") != "ACTIVE" && userRecords[i].get("status") != "INSTALL" ) {
 					Alert(lmsg('userNotActive'));
 					return false;
 				}
-				if (userRecords[i].get("user_type") == 'DTV') {
+				if (userRecords[i].get("user_type") == 'OTT') {
 					dtv = true;
 				}
 			}
@@ -857,7 +857,7 @@ Ext.apply(MenuHandler, {
 					var dtvAmount = 0;
 					for (var i = 0; i < store.getCount(); i++) {
 						var record = store.getAt(i);
-						if (record.get('user_type') != 'BAND') {
+						if (record.get('user_type') != 'BAND' && record.get('user_type') != 'DTT') {
 							if (record.get('terminal_type') == 'ZZD') {
 								// 不在选中的用户中
 								if (userIds
@@ -1592,7 +1592,7 @@ Ext.apply(MenuHandler, {
 			return false;
 		}
 		for (var i = 0; i < len; i++) {
-			if (userRecords[i].get("status") != "ACTIVE" && userRecords[i].get("status") != "OWELONG" && userRecords[i].get("status") != "INSTALL" ) {
+			if (userRecords[i].get("status") != "ACTIVE" && userRecords[i].get("status") != "INSTALL" ) {
 				Alert("所选用户的状态必须是正常");
 				return false;
 			}
@@ -2130,7 +2130,7 @@ Ext.apply(MenuHandler, {
 		} else {
 			for (i = 0; i < len; i++) {
 				var status = userRecords[i].get("status");
-				if ( status != "ACTIVE" && status != "OWELONG" ) {
+				if ( status != "ACTIVE" && status != "INSTALL" && status != "OWELONG" ) {
 					Alert(lmsg('userNotActive'));
 					return false;
 				}
