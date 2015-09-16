@@ -9,6 +9,7 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 
 import com.ycsoft.beans.task.WTaskBaseInfo;
+import com.ycsoft.business.dto.config.TaskBaseInfoDto;
 import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.daos.abstracts.BaseEntityDao;
 import com.ycsoft.daos.core.JDBCException;
@@ -55,7 +56,7 @@ public class WTaskBaseInfoDao extends BaseEntityDao<WTaskBaseInfo> {
 
 	}
 
-	public Pager<WTaskBaseInfo> queryTask(String taskTypes, String addrIds, String beginDate, String endDate,
+	public Pager<TaskBaseInfoDto> queryTask(String taskTypes, String addrIds, String beginDate, String endDate,
 			String taskId, String teamId, String status, String custNo, String custName, String custAddr,String mobile, Integer start, Integer limit) throws Exception {
 		String sql = "select t.* "
 				+ " from w_task_base_info t, C_CUST c "
@@ -97,7 +98,7 @@ public class WTaskBaseInfoDao extends BaseEntityDao<WTaskBaseInfo> {
 		}
 		
 		sql += " ORDER BY t.task_create_time DESC ";
-		return this.createQuery(sql, params.toArray(new Object[params.size()]))
+		return this.createQuery(TaskBaseInfoDto.class,sql, params.toArray(new Object[params.size()]))
 			.setLimit(limit)
 			.setStart(start)
 			.page();

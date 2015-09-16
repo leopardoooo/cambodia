@@ -343,7 +343,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 	initWidgets: function(item){
 		this.taskStore = new Ext.data.JsonStore({
 			url: root + '/core/x/Task!queryTasks.action' ,
-			fields:['task_id','cust_id','cust_no','cust_name','tel','old_addr','new_addr','task_type_id',
+			fields:['task_id','cust_id','cust_no','cust_name','tel','old_addr','new_addr','address','task_type_id',
 					'task_status','task_status_text','task_type_id_text','team_id','team_id_text','bug_type','bug_type_text'
 					,'bug_detail','zte_status','zte_status_text','task_create_time'],
 			root : 'records',
@@ -456,8 +456,8 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 				{header: '工单类型',		dataIndex : 'task_type_id_text', 	width: 100, renderer: function(v, m ,rs){
 					return "<span style='font-weight: bold;'>"+ v +"</span>";
 				}},
-				{header: '客户名称', 		dataIndex: 'cust_name', 				width: 80},
-				{header: '地址', 		dataIndex : 'old_addr', 			width: 200,renderer:App.qtipValue},
+				{header: '客户名称', 	dataIndex: 'cust_name', width: 80},
+				{header: '地址', 		dataIndex : 'address', width: 200,renderer:App.qtipValue},
 				{header: '联系电话', 	dataIndex : 'tel', 				width: 100},
 				{header: '工单状态', 		dataIndex: 'task_status', width: 100, renderer: function(v, m ,rs){
 					var text = rs.get("task_status_text");

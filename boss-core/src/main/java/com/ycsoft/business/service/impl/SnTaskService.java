@@ -29,6 +29,7 @@ import com.ycsoft.business.dao.task.WTaskBaseInfoDao;
 import com.ycsoft.business.dao.task.WTaskLogDao;
 import com.ycsoft.business.dao.task.WTaskUserDao;
 import com.ycsoft.business.dao.task.WTeamDao;
+import com.ycsoft.business.dto.config.TaskBaseInfoDto;
 import com.ycsoft.business.dto.config.TaskUserDto;
 import com.ycsoft.business.dto.device.DeviceDto;
 import com.ycsoft.business.dto.device.DeviceSmallDto;
@@ -187,7 +188,7 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 		
 	}
 
-	public Pager<WTaskBaseInfo> queryTask(String taskTypes, String addrIds, String beginDate, String endDate,
+	public Pager<TaskBaseInfoDto> queryTask(String taskTypes, String addrIds, String beginDate, String endDate,
 			String taskId, String teamId, String status, String custNo, String custName, String custAddr,String mobile, Integer start, Integer limit)
 					throws Exception {
 		return wTaskBaseInfoDao.queryTask(taskTypes,addrIds,beginDate,endDate,taskId,teamId,status,custNo,custName,custAddr,mobile, start, limit);
