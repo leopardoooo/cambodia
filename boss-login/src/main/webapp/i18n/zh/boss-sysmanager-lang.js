@@ -7,10 +7,15 @@ Sys = {
 	common:{
 		status:'状态~',
 		query:'查询~',
+		inputKeyWork:'输入关键字~',
 		addNewOne:'新增~',
+		addSuccess:"添加成功!~",
+		updateSuccess:'修改成功!~',
 		update:'修改~',
 		invalid:'作废~',
+		remove:'删除~',
 		saveBtn:'保存~',
+		cancel:'关闭~',
 		cancelBtn:'取消~',
 		forbiddenBtn:'禁用~',
 		enableBtn:'启用~',
@@ -20,6 +25,14 @@ Sys = {
 		remarkTxt:'备注~',
 		exitBtn:'备注~',
 		to:'至~',//从 xxx 至 xxxx
+		pleaseSelect:'请选择...~',
+		orderNum:'编号~',
+		detailInfo:'详细信息~',
+		selectAll:'全选~',
+		confirm:'确认~',
+		effect:'有效~',
+		createDate:'创建日期',
+		createTime:'创建时间',
 		
 	statusEnum:{
 		empty:'所有~',
@@ -267,23 +280,88 @@ Sys = {
 	},
 	EditStatusInvoice:{//修改发票状态
 		_title:'修改状态~'
+		
 	},
 	
 /** 设备管理开始 **/
 	DeviceCommon:{//设备信息通用字段
+		titleDeviceInfo:'设备信息~',
+		labelDeviceType:'设备类型~',
+		labelDeviceModel:"型号~",
+		labelPrice:'单价~',
+		labelOrderNum:'订购数量~',
+		labelOwnerShip:'产权~',
+		labelSupplier:'供应商~',
+		labelSupplier:'供应商~',
+		labelInputDate:'入库日期~',
+		labelNum:'数量!~',
+		labelBatchNum:'批号~',
+		labelPairCardCode:'配对卡号~',
+		labelDeviceModel:'设备型号~',
+		labelDevCode:'设备编号~',
+		labelDevStatus:'设备状态~',
+		labelInputDepotNum:'入库数量~',
+		titleInputSimple:'入库~',
+		labelDepot:'仓库~',
+		labelIsNewStb:'新机~',
+		titleModifyOrderNum:'修改单号~',
+		labelNewOrderNo:'新单号~',
+		labelTransNo:'调拨单号~'
 		
+	},
+	DepotIndexManager:{//终端管理
+		_title:'终端管理~',
+		titleExamOutPanel:'待审批调出~',
+		columnNames:['流转编号~','源仓库~','目标仓库~','状态~','创建人~','创建时间~','确认人~','确认时间~','确认信息~','备注~'],
+		titleExamInPanel:'待审批调入~'
 	},
 	EditOrder : {// 修改加入订单日期
 		_title:'修改加入订单日期~'
 	},
 	OrderManager : {// 订单管理
-		_title:'订单管理~'
+		_title:'订单管理~',
+		addTitle:"添加订单~",
+		titleOrderGrid:'订单信息~',
+		titleOrderInputDetailGrid:'到货明细~',
+		modifyTitle:"修改订单~",
+		titleAddOrder:'添加订单~',
+		btnMakeHistory:'历史~',
+		btnResumeOrder:'恢复~',
+		btnResumeOrderTip:'恢复订单~',
+		columnsOrderGrid:["编号~", "供应商~", "供货日期~", "设备类型~", "型号~", "单价~", "订购数量~", "到货数量~", "订单类型~", "备注~", "操作~"],
+		columnsOrderInputDetailGrid:['设备类型~','型号~','到货日期~','数量~'],
+		tipOrderStatus:'执行中的订单或历史订单~',
+		orderStatus:{
+			ALL:'所有订单~',
+			NOW:'执行订单~',
+			HISTORY:'历史订单~'
+		},
+		labelOrderNo:'订单编号~',
+		labelSupplier:'供应商~',
+		labelSupplyDate:'供货日期~'
+		
 	},
 	CheckIn : {// 设备入库
-		_title:'设备入库~'
+		_title:'设备入库~',
+		labelInputNo:'入库编号~',
+		labelBackUp:'备机~',
+		labelInputNo:'入库单号~',
+		labelOrderNo:'订单号~',
+		labelCheckBatchNum:'入库批号~',
+		titleCheckInGrid:'入库信息~',
+		labelFileInput:'文件入库~',
+		labelManualInput:'手工入库!~',
+		labelMateralCheckIn:'器材入库~',
+		labelDevFile:'设备文件~'
+		
+		
+		
 	},
 	CheckOut : {// 设备调拨
-		_title:'设备调拨~'
+		_title:'设备调拨~',
+		titleTransConfirm:'调拨确认~',
+		labelConfirmInfo:'确认信息!~',
+		labelTransType:'调拨类别~'
 	},
 	AppUseDevice : {// 设备领用
 		_title:'设备领用~'
@@ -332,8 +410,26 @@ Sys = {
 		selectTransDepotId:'请选择调拨仓库~',
 		selectStatus2BeModify:'请选择要修改的状态~',
 		confirmSaveBusiWithInvoice:'{0} 确定要保存业务吗?~',
-		selectARecord:'请选择要操作的记录行！~'
-			
+		selectARecord:'请选择要操作的记录行！~',
+		supportOrderFuzzyQuery:'支持订单编号模糊查询~',
+		confirmConvert2HisOrder:'确认转换为历史订单吗？~',
+		confirmConvert2NowOrder:'确认转换为执行中的订单吗？~',
+		orderNumCantLessThanGoodsNum:'订购数量不能小于到货数量!~',
+		confirmDelete:'确定删除吗?~',
+		selectDevType:'请选择设备类型!~',
+		selectModel:'请选择型号!~',
+		numberShouldBiggerThan0:'单价请输入大于零的数字!~',
+		orderNumShouldBigThan0:'订购数量请输入大于零的数字!~',
+		confirmOverideSaveDevModel:'存在不同的型号设备，是否保存~',
+		errCantAssignParent4DevNo:'请为设备编号单元格配置parent属性指向表格~',
+		pleaseSelectSaveTypeAndModel:'请先选择设备类型和设备型号~',
+		deviceCodeExists:'设备号已存在~',
+		supportDevCodeOrderNoFuzzyQuery:'支持入库编号和订单编号模糊查询~',
+		tipCheckInFileInput:"文件入库：[机顶盒]：第一列：机顶盒型号,第二列：机顶盒编号,第三列：配对智能卡编号(可空);第四列：配对MODEM编号(可空),[智能卡]:第一列：设备型号,第二列：设备编号;[modem]：第一列：modem型号,第二列：mac地址,第三列：modem编号; 最后一列为批号~",
+		fileUploadSuccess:'文件上传成功!~',
+		fileUploadFailure:"文件上传失败!~",
+		pleaseInputCorrectDevInfo:'请正确输入设备信息！~',
+		transSuccess:'调拨确认成功~'
 	}
 	
 }
