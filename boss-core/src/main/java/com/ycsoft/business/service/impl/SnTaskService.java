@@ -142,9 +142,6 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 				authComponent.sendAuth(user, prodList, BusiCmdConstants.PASSVATE_USER, doneCode);
 			}
 		}
-		
-		saveAllPublic(doneCode, getBusiParam());
-		
 	}
 	
 	public void installSuccess(Integer doneCode,String custId,List<CUser> users) throws Exception {

@@ -82,7 +82,6 @@ var TaskDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 	constructor:function(){
 		var that = this;
 		this.taskDeviceGridStore = new Ext.data.JsonStore({
-//			url:Constant.ROOT_PATH + "/core/x/Task!queryTaskUserDevice.action",
 			fields:['device_id','device_type','device_type_text','device_model','device_model_text',
 				'device_code','user_type', 'user_type_text','user_name','task_id']
 		});
@@ -101,9 +100,6 @@ var TaskDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 							}
 						})},
 						{header:'类型',dataIndex:'device_type_text',width:70}
-//						,{header:'操作',dataIndex:'',width:40,renderer:function(value,metavalue,record,i){
-//							return "<a href='#' onclick=doDel()>删除</a>";
-//						}}
 		];
 		
 		TaskDeviceGrid.superclass.constructor.call(this,{
@@ -221,12 +217,10 @@ TaskDeviceWin = Ext.extend(Ext.Window,{
 			otlNo: this.deviceGrid.otlNoField.getValue(),
 			ponNo : this.deviceGrid.ponNoField.getValue()
 		};
+		var that = this;
 		App.sendRequest( url, o, function(res,opt){
-//			rs.set("team_id",teamCombo.getValue());
-//			var index = 0;
-//			index = teamCombo.getStore().find('dept_id',teamCombo.getValue());
-//			rs.set("team_id_text",teamCombo.getStore().getAt(index).get('dept_name'));	
-			this.close();
+			Ext.getCmp('taskManagerPanelId').loadTaskData(that.task_id);
+			that.close();
 		});
 	},
 	show:function(t,data){
@@ -248,6 +242,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 	iconCls: 'doc',
 	taskAllInfo:null,
 	taskUserData:null,
+	taskLogData:null,
 	constructor:function(item){
 		this.initWidgets(item);	
 		this.taskAllInfo = new TaskAllInfo();
@@ -278,7 +273,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 				handler: this.doTeamTask
 			},{
 				id:'ivalid_btn_id',
-				text: '取消工单',
+				text: '工单作废',
 				height: 30,
 				width: 80,
 				style: 'color: red;',
@@ -501,21 +496,24 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 		//选中一条时才显示
 		var records = g.getSelectionModel().getSelections();
 		if(records.length == 1){
-			Ext.Ajax.request({
-				scope : this,
-				url: root + '/core/x/Task!queryTaskDetail.action' ,
-				params : {
-					task_id : records[0].get("task_id")
-				},
-				success : function(res,opt){
-					var rs = Ext.decode(res.responseText);
-					this.taskUserData = rs.taskUserList;
-					this.taskAllInfo.userGrid.getStore().loadData(rs.taskUserList);
-					this.taskAllInfo.detail.getStore().loadData(rs.taskLogList);
-				}
-			});
-			
+			this.loadTaskData(records[0].get("task_id"));
 		}
+	},
+	loadTaskData:function(taskId){
+		Ext.Ajax.request({
+			scope : this,
+			url: root + '/core/x/Task!queryTaskDetail.action' ,
+			params : {
+				task_id : taskId
+			},
+			success : function(res,opt){
+				var rs = Ext.decode(res.responseText);
+				this.taskUserData = rs.taskUserList;
+				this.taskLogData = rs.taskLogList;
+				this.taskAllInfo.userGrid.getStore().loadData(rs.taskUserList);
+				this.taskAllInfo.detail.getStore().loadData(rs.taskLogList);
+			}
+		});
 	},
 	createStartDateField: null,
 	createEndDateField: null,
