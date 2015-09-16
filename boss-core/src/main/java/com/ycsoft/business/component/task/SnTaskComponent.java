@@ -30,6 +30,8 @@ import com.ycsoft.commons.constants.BusiCodeConstants;
 import com.ycsoft.commons.constants.SequenceConstants;
 import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.constants.SystemConstants;
+import com.ycsoft.commons.exception.ComponentException;
+import com.ycsoft.commons.exception.ErrorCode;
 import com.ycsoft.commons.helper.StringHelper;
 
 /**
@@ -128,7 +130,7 @@ public class SnTaskComponent extends BaseBusiComponent{
 			WTaskUser taskUser = new WTaskUser();
 			taskUser.setTask_id(taskId);
 			taskUser.setUser_id(user.getUser_id());
-			taskUser.setDivice_model(user.getDevice_model());
+			taskUser.setDevice_model(user.getDevice_model());
 			taskUser.setUser_type(user.getUser_type());
 			wTaskUserDao.save(taskUser);
 		}
@@ -239,14 +241,16 @@ public class SnTaskComponent extends BaseBusiComponent{
 			for (WTaskUser tu:userList){
 				if (device.getOldDeviceCode().equals(tu.getDevice_id())){
 					user = tu;
+					tu.setDevice_id(device.getDeviceId());
 					break;
 				}
 			}
 		} else {
 			for (WTaskUser tu:userList){
 				if (StringHelper.isEmpty(tu.getDevice_id())){
-					if (tu.getDivice_model().equals(device.getDeviceModel())){
+					if (tu.getDevice_model().equals(device.getDeviceModel())){
 						user = tu;
+						tu.setDevice_id(device.getDeviceId());
 						break;
 					}
 				}
@@ -255,7 +259,8 @@ public class SnTaskComponent extends BaseBusiComponent{
 		
 		if (user != null){
 			user.setDevice_id(device.getDeviceId());
-			wTaskUserDao.update(user);
+			//更新设备号
+			wTaskUserDao.updateTaskUserDevice(user.getDevice_id(),user.getUser_id(),user.getTask_id());
 		}
 	}
 
@@ -263,7 +268,7 @@ public class SnTaskComponent extends BaseBusiComponent{
 	public void finishTask(Integer doneCode,String taskId,String resultType) throws Exception{
 		//检查设备是否已经回填
 		if (wTaskUserDao.queryUnFillUserCount(taskId)>0)
-			throw new SystemException();
+			throw new ComponentException(ErrorCode.TaskDeviceIsNull);
 		WTaskBaseInfo task = new WTaskBaseInfo();
 		task.setTask_id(taskId);
 		task.setTask_status(StatusConstants.TASK_END);

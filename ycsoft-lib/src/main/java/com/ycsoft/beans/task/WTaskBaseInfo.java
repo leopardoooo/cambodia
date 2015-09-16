@@ -80,7 +80,7 @@ public class WTaskBaseInfo implements Serializable{
 
 	public void setTask_type_id(String task_type_id) {
 		this.task_type_id = task_type_id;
-		task_type_id_text = MemoryDict.getDictName(DictKey.TASK_TYPE, task_type_id);
+		task_type_id_text = MemoryDict.getDictName(DictKey.TASK_DETAIL_TYPE, task_type_id);
 	}
 
 	public String getTeam_id_text() {

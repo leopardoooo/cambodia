@@ -6,6 +6,7 @@ import java.util.Map;
 import com.ycsoft.beans.task.TaskFillDevice;
 import com.ycsoft.beans.task.WTaskBaseInfo;
 import com.ycsoft.beans.task.WTeam;
+import com.ycsoft.business.dto.device.DeviceDto;
 import com.ycsoft.daos.core.Pager;
 
 public interface ISnTaskService {
@@ -73,6 +74,8 @@ public interface ISnTaskService {
 	public Map<String, ?> queryTaskDetail(String task_id) throws Exception;
 
 	public List<WTeam> queryTaskTeam()throws Exception;
+	
+	public DeviceDto queryDeviceInfoByCodeAndModel(String deviceCode, String deviceModel) throws Exception;
 	
 	
 

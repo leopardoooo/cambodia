@@ -66,6 +66,11 @@ public enum ErrorCode {
 	OrderTransUnPayPleaseCancel("被覆盖的订单存在未支付记录，请先取消订单号=%s的费用才能升级"),
 	OrderDateCanNotUpWhyPak("产品不能升级,因为存在有效的套餐子产品"),
 
+	//task
+	TaskDeviceIsNull("设备未回填"),
+	TaskDeviceModelIsNull("该工单用户的设备型号不存在"),
+	TaskDeviceModelIsWrong("%s不是工单所需要的型号"),
+	
 	//depot
 	DeviceRepeat("设备重复"),
 	DeviceNotExists("设备不存在"),

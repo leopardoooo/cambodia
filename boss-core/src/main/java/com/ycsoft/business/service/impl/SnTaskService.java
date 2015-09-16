@@ -30,6 +30,7 @@ import com.ycsoft.business.dao.task.WTaskLogDao;
 import com.ycsoft.business.dao.task.WTaskUserDao;
 import com.ycsoft.business.dao.task.WTeamDao;
 import com.ycsoft.business.dto.config.TaskUserDto;
+import com.ycsoft.business.dto.device.DeviceDto;
 import com.ycsoft.business.dto.device.DeviceSmallDto;
 import com.ycsoft.business.service.ISnTaskService;
 import com.ycsoft.commons.constants.BusiCmdConstants;
@@ -204,7 +205,7 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 		List<TaskUserDto> userList = wTaskUserDao.queryUserDetailByTaskId(task_id);
 		if(userList.size()>0){
 			List<DeviceSmallDto> list = deviceComponent.getDeviceCodeByDeviceId(CollectionHelper.converValueToArray(userList, "device_id"));
-			if(list.size()>0){
+			if(list!=null && list.size()>0){
 				Map<String, DeviceSmallDto> deviceMap = CollectionHelper.converToMapSingle(list, "device_id");
 				if(deviceMap != null)
 				for(TaskUserDto dto: userList){
@@ -221,10 +222,12 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 		return map;
 	}
 
-	@Override
 	public List<WTeam> queryTaskTeam() throws Exception {
-		// TODO Auto-generated method stub
 		return wTeamDao.findAll();
+	}
+
+	public DeviceDto queryDeviceInfoByCodeAndModel(String deviceCode, String deviceModel) throws Exception{
+		return deviceComponent.queryDeviceInfoByCodeAndModel(deviceCode, deviceModel);
 	}
 	
 

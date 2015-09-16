@@ -102,6 +102,27 @@ public class DeviceComponent extends BaseBusiComponent {
 		throws Exception {
 		return rDeviceDao.queryDeviceInfoByCode(deviceCode);
 	}
+	
+	
+	public DeviceDto queryDeviceInfoByCodeAndModel(String deviceCode,String models ) throws Exception {
+		if(StringHelper.isEmpty(models)){
+			throw new ComponentException(ErrorCode.TaskDeviceModelIsNull);
+		}
+		DeviceDto dto =  rDeviceDao.queryDeviceInfoByCodeAndModel(deviceCode);
+		isDeviceSaleable(dto);
+//		String[] modesArr = models.split(",");
+//		boolean isModel = false;
+//		for(int i=0;i<modesArr.length;i++){
+//			if(modesArr[i].equals(dto.getDevice_model())){
+//				isModel = true;
+//				break;
+//			}
+//		}
+		if(!models.equals(dto.getDevice_model())){
+			throw new ComponentException(ErrorCode.TaskDeviceModelIsWrong,dto.getDevice_model_text());
+		}
+		return dto;
+	}
 
 	/**
 	 * 修改设备的仓库状态
@@ -637,6 +658,9 @@ public class DeviceComponent extends BaseBusiComponent {
 	 * @return
 	 */
 	private boolean isDeviceSaleable(DeviceDto device) throws Exception{
+		if (device == null){
+			throw new ComponentException(ErrorCode.DeviceNotExists);
+		}
 		if (device.getDepot_status().equals(StatusConstants.USE)) {
 			throw new ComponentException("设备已被使用");
 		}
@@ -986,8 +1010,11 @@ public class DeviceComponent extends BaseBusiComponent {
 	}
 	
 	public List<DeviceSmallDto>  getDeviceCodeByDeviceId(String[] deviceIds) throws Exception{
-		//加上数量购买数量
-		return rDeviceDao.getDeviceCodeByDeviceId(deviceIds);
+		if(deviceIds.length>0){
+			return rDeviceDao.getDeviceCodeByDeviceId(deviceIds);
+		}else{
+			return null;
+		}
 	}
 	
 	
