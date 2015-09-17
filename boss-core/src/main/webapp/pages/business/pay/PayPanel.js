@@ -296,7 +296,7 @@ PayPanel = Ext.extend( Ext.Panel ,{
 			this.realFeeStore.each(function(record){
 				feeSns.push(record.get('fee_sn'));
 			},this);
-			params['feeSns'] = feeSns;
+			params['feeSn'] = feeSns;
 			console.log(feeSns);
 			
 			var mb = Show();
