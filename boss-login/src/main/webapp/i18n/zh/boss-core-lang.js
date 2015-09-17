@@ -93,7 +93,7 @@ BCLang.home = {
 				houseOptr: "小区运维人员~",postalAddr: "邮寄地址~", remark: "备注~",
 				email: "邮箱~", sex: "性别~",postcode: '邮编~', blackList: '黑名单~',
 				agentName: "代理商~", deptName: "开户部门~", developName: "发展人~", businessLicence: "营业执照~", unitNumber: "单位税号~",
-				spkgSn: "协议编号~", cust_level: "客户级别~",switchCustTitle: '选择客户~'
+				spkgSn: "协议编号~", cust_level: "客户级别~",switchCustTitle: '选择客户~', languageType: '服务语言~'
 			},
 			_form: {
 				thinkCust: '意向客户~',
@@ -542,7 +542,7 @@ BCLang.msgBox = {
 	confirmResendCmd: '确定重发开户指令?~',
 	noPreStopUser: '该用户没有进行预报停操作!~',
 	
-	phoneOrFixedPhoneMustBeEnterOne: '电话号码或固定电话必须输入一个!~',
+	phoneOrFixedPhoneMustBeEnterOne: '手机号码必须输入一个!~',
 	invalidAddressPlsReInput: '无效的客户地址，请重新输入!~',
 	intentionCustPlsChooseProvince: '意向客户请选择省!~',
 	rechargeCountMustBeGreaterThanZero: '金额需要大于0!~',
@@ -572,5 +572,5 @@ BCLang.msgBox = {
 	spkgPkgCanContinueChooseUser: '协议套餐已选用户小于套餐内容最大用户数，可继续选择用户!~',
 	chooseInUsers: '请选择要参加套餐的终端用户!~',
 	exceedPkgMaxUserNum: '已超过套餐最大用户数限制!~',
-	completeChooseUserTerminal: '请完整选择需要参加的每种用户类型终端!~',
+	completeChooseUserTerminal: '请完整选择需要参加的每种用户类型终端!~'
 }
