@@ -132,12 +132,11 @@ public class PayAction extends BaseBusiAction{
 	}
 	/**
 	 * 保存支付
-	 * 
 	 * @return
 	 * @throws Exception
 	 */
 	public String savePayNew() throws Exception{
-		payService.savePay(pay);
+		payService.savePay(pay,feeSn);
 		return JSON_SUCCESS;
 	}
 	/**

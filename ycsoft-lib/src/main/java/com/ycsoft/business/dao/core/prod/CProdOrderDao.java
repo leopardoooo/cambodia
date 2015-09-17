@@ -123,9 +123,9 @@ public class CProdOrderDao extends BaseEntityDao<CProdOrder> {
 	 * @param cust_id
 	 * @throws JDBCException
 	 */
-    public void updateOrderToPay(Integer done_code,String cust_id) throws JDBCException{
-    	String sql="update c_prod_order set is_pay='T' where is_pay='F' and done_code=? and cust_id=? ";
-    	this.executeUpdate(sql, done_code,cust_id);
+    public void updateOrderToPay(String order_sn,String cust_id) throws JDBCException{
+    	String sql="update c_prod_order set is_pay='T' where is_pay='F' and order_sn=? and cust_id=? ";
+    	this.executeUpdate(sql, order_sn,cust_id);
     }
 
 	/**

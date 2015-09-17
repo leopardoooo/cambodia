@@ -159,6 +159,7 @@ var FeeUnitpreForm = Ext.extend(BaseForm,{
 					maxLength: 18,
 					xtype: 'textfield',
 					name: 'pay.invoice_id',
+					allowBlank: false,
 					listeners:{
 						scope: this,
 						change: this.checkInvoice

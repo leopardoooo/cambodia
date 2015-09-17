@@ -92,9 +92,9 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		
 		String userType = user.getUser_type();
 		//若没有设备号，新增工单
+		//DTT不开工单
 		if ((userType.equals(USER_TYPE_BAND) && StringHelper.isEmpty(user.getModem_mac()))
-				|| ((userType.equals(USER_TYPE_DTT) || userType.equals(USER_TYPE_OTT))
-						&& StringHelper.isEmpty(user.getStb_id()))) {
+				|| (userType.equals(USER_TYPE_OTT) && StringHelper.isEmpty(user.getStb_id()))) {
 			List<CUser> userList = new ArrayList<CUser>();
 			user.setDevice_model(deviceModel);
 			userList.add(user);

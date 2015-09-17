@@ -63,10 +63,8 @@ public class TestPayService extends JunitSpringBase{
 		
 		pay.setCust_id(cust_id);
 		 
-		
-		payService.savePay(pay);
-		
-		
+		String[] aa={"1","2"};
+		payService.savePay(pay,aa);
 		
 	}
 

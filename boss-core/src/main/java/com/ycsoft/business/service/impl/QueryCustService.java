@@ -157,13 +157,14 @@ public class QueryCustService extends BaseService implements IQueryCustService {
 	public String queryUnPrintCustByOptr() throws Exception {
 		
 		String optrId = getOptr().getOptr_id();
-		
+		/**
 		//先找未支付，然后找未打印
 		List<CDoneCodeUnpay> unPays=doneCodeComponent.queryUnPayByOptr(optrId);
 		if(unPays!=null&&unPays.size()>0){
 			CCust cust = custComponent.queryCustById(unPays.get(0).getCust_id());
 			return cust.getCust_no();
 		}
+		**/
 		List<CFeeUnprint> unPrints=feeComponent.queryUnPrintByOptr(optrId);
 		if(unPrints!=null&&unPrints.size()>0){
 			CCust cust = custComponent.queryCustById(unPrints.get(0).getCust_id());

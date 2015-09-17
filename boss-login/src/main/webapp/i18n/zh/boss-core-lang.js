@@ -76,6 +76,7 @@ BCLang.home = {
 		cashPay: {
 			_title: '支付~',
 			pay: {
+				_stayTitle: '待支付项目~',
 				_title: '支付项目~',
 				columns: ['操作~', '业务名称~', '费用名称~', '实付金额~', '订单号~', '备注~', '数量~', '操作时间~', '费用编号~', '流水号~'],
 				buttons: ['保存~', '关闭~']
@@ -255,12 +256,12 @@ BCLang.home = {
 			payfee: {
 				_title: "预存费用~",
 				columns: ["流水号~","业务名称~","账户类型~","账目名称~","用户类型~", "用户名~","设备编号~","状态~","金额~","缴费前预计到期日~",
-				        "缴费后预计到期日~","打印状态~","付款方式~","受理日期~","账务日期~","受理人~","受理部门~","发票~","出票方式~", "发票类型~"]
+				        "缴费后预计到期日~","打印状态~","付款方式~","受理日期~","账务日期~","受理人~","受理部门~","发票~","出票方式~", "发票类型~","发展人~"]
 			},
 			busifee: {
 				_title: "业务费用~",
 				columns: ["流水号~","费用名称~","设备类型~","设备编号~","状态~","打印状态~",
-				          "应付~","实付~","付款方式~","受理日期~","受理人~","受理部门~","发票~","出票方式~","发票类型~","购买数量~","设备型号~","备注~"]
+				          "应付~","实付~","付款方式~","受理日期~","受理人~","受理部门~","发票~","出票方式~","发票类型~","购买数量~","设备型号~","备注~","发展人~"]
 			},
 			detail: {
 				_title: '支付记录~',
@@ -270,7 +271,11 @@ BCLang.home = {
 			feePayDetail: {
 				_title: '费用明细~',
 				columns: ['费用项目~', '金额~']
-			}
+			},
+			_form: {
+					oldOptrName: '旧发展人~',
+					newOptrName: '新发展人~'
+				}
 		},
 		// 单据信息
 		doc: {
@@ -467,6 +472,7 @@ BCLang.msgBox = {
 	confirmEditBankPay:'确定该产品',
 	confirmBankResume:'确定要恢复卡扣吗?~',
 	confirmRenewCust:'去顶恢复客户状态吗?~',
+	commonSuccess: '业务操作成功!~',
 	
 	custHasUnSuitableDev:'该用户现在不能进行设备互换~',
 	custCantExchangeDev:'该用户现在不能进行设备互换~',
@@ -539,7 +545,7 @@ BCLang.msgBox = {
 	confirmSwitchThisCust: '确定要选择该客户吗?~',
 	confirmInvalidInvoice: "确定作废发票吗?~",
 	confirmRefreshCmd: '确定发送刷新指令吗?~',
-	confirmResendCmd: '确定重发开户指令?~',
+	confirmResendCmd: '确定指令重发吗?~',
 	noPreStopUser: '该用户没有进行预报停操作!~',
 	
 	phoneOrFixedPhoneMustBeEnterOne: '手机号码必须输入一个!~',

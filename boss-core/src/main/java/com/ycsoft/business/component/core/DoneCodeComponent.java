@@ -1,8 +1,10 @@
 package com.ycsoft.business.component.core;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,24 +15,27 @@ import com.ycsoft.beans.core.common.CDoneCode;
 import com.ycsoft.beans.core.common.CDoneCodeDetail;
 import com.ycsoft.beans.core.common.CDoneCodeInfo;
 import com.ycsoft.beans.core.common.CDoneCodeUnpay;
+import com.ycsoft.beans.core.fee.CFee;
+import com.ycsoft.beans.core.user.CUser;
 import com.ycsoft.business.commons.abstracts.BaseBusiComponent;
 import com.ycsoft.business.dao.config.TBusiConfirmDao;
 import com.ycsoft.business.dao.core.common.CDoneCodeInfoDao;
 import com.ycsoft.business.dao.core.common.CDoneCodeUnpayDao;
 import com.ycsoft.business.dao.core.cust.CCustDao;
+import com.ycsoft.business.dao.core.fee.CFeeDao;
+import com.ycsoft.business.dao.core.user.CUserDao;
 import com.ycsoft.business.dto.core.cust.DoneCodeDto;
 import com.ycsoft.business.dto.core.cust.DoneCodeExtAttrDto;
 import com.ycsoft.business.dto.core.cust.DoneInfoDto;
 import com.ycsoft.business.dto.core.cust.ExtAttributeDto;
+import com.ycsoft.business.dto.core.fee.FeeDto;
 import com.ycsoft.business.dto.core.fee.QueryFeeInfo;
-import com.ycsoft.commons.constants.DictKey;
+import com.ycsoft.commons.constants.BusiCodeConstants;
 import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.exception.ComponentException;
-import com.ycsoft.commons.exception.ErrorCode;
 import com.ycsoft.commons.helper.CollectionHelper;
 import com.ycsoft.commons.helper.StringHelper;
-import com.ycsoft.commons.store.MemoryDict;
 import com.ycsoft.daos.core.JDBCException;
 import com.ycsoft.daos.core.Pager;
 
@@ -51,6 +56,10 @@ public class DoneCodeComponent extends BaseBusiComponent {
 	private CDoneCodeUnpayDao cDoneCodeUnpayDao;
 	@Autowired
 	private CCustDao cCustDao;
+	@Autowired
+	private CFeeDao cFeeDao;
+	@Autowired
+	private CUserDao cUserDao;
 	/**
 	 * 给业务增加用户锁，防止并发临界时数据不一致。
 	 * @param cust_id
@@ -70,22 +79,15 @@ public class DoneCodeComponent extends BaseBusiComponent {
 	 * @throws JDBCException
 	 */
 	public void saveDoneCodeUnPay(String cust_id,Integer done_code,String optr_id) throws Exception{
-		boolean needSave=true;
+		
 		for(CDoneCodeUnpay unPay: cDoneCodeUnpayDao.queryUnPay(cust_id)){
-			if(!unPay.getOptr_id().equals(optr_id)){
-				//检查未支付业务，只能一个营业员操作。
-				String login_name = MemoryDict.getDictName(DictKey.OPTR_LOGIN,unPay.getOptr_id());
-				String optr_name=MemoryDict.getDictName(DictKey.OPTR, unPay.getOptr_id());
-				throw new ComponentException(ErrorCode.UnPayLock,optr_name,login_name);
-			}
 			if(unPay.getDone_code().equals(done_code)){
 				//已经保存过，不需要重复保存
-				needSave=false;
+				return;
 			}
 		}
-		if(needSave){
-			cDoneCodeUnpayDao.saveUnpay(cust_id, done_code,optr_id);
-		}
+		cDoneCodeUnpayDao.saveUnpay(cust_id, done_code,optr_id);
+		
 	}
 	/**
 	 * 业务被其他营业员锁定检查
@@ -93,7 +95,7 @@ public class DoneCodeComponent extends BaseBusiComponent {
 	 * @param done_code
 	 * @param optr_id
 	 * @throws Exception
-	 */
+	 
 	public void checkUnPayOtherLock(String cust_id,String optr_id)throws Exception{
 		List<CDoneCodeUnpay>  otherLocks=cDoneCodeUnpayDao.queryUnPayOtherLock(cust_id,optr_id);
 		if(otherLocks!=null&&otherLocks.size()>0){	
@@ -102,46 +104,59 @@ public class DoneCodeComponent extends BaseBusiComponent {
 			throw new ComponentException(ErrorCode.UnPayLock,optr_name,login_name);
 		}
 	}
+	*/
 
 	/**
 	 * 
 	 * @param doneCode
 	 * @return
 	 * @throws JDBCException
-	 */
+	
 	public CDoneCodeUnpay queryDoneCodeUnPayByKey(Integer doneCode) throws JDBCException{
 		return cDoneCodeUnpayDao.findByKey(doneCode);
 	}
+	 */
 	/**
 	 * 加锁查询未支付业务
 	 * @param cust_id
 	 * @return
 	 * @throws JDBCException 
-	 */
+	 
 	public List<CDoneCodeUnpay> queryUnPayList(String cust_id) throws JDBCException{
 		return cDoneCodeUnpayDao.queryUnPay(cust_id);
 	}
+	*/
 	/**
 	 * 查询一个营业员的未支付业务
 	 * @param optr_id
 	 * @return
 	 * @throws JDBCException
-	 */
+	 
 	public List<CDoneCodeUnpay> queryUnPayByOptr(String optr_id) throws JDBCException{
 		return cDoneCodeUnpayDao.queryUnPayByOptr(optr_id);
 	}
+	*/
 	/**
 	 * 删除未支付业务信息
 	 * @param unPayList
 	 * @throws JDBCException
 	 */
-	public void deleteDoneCodeUnPay(List<CDoneCodeUnpay> unPayList) throws JDBCException{
-		Integer[] doneCodes=new Integer[unPayList.size()];
-		for(int i=0;i<unPayList.size();i++){
-			doneCodes[i]=unPayList.get(i).getDone_code();
+	public void deleteDoneCodeUnPay(List<FeeDto> feeList) throws JDBCException{
+	
+		Set<Integer> doneCodeSet=new HashSet<>();
+		
+		for(FeeDto fee:feeList){
+			doneCodeSet.add(fee.getCreate_done_code());
 		}
-		cDoneCodeUnpayDao.remove(doneCodes);
-	}
+		for(Integer doneCode:doneCodeSet){
+			List<CFee> list=cFeeDao.queryUnPayByDoneCode(doneCode);
+			if(list==null||list.size()==0){
+				//不存在未支付则删除未支付业务流水号
+				cDoneCodeUnpayDao.remove(doneCode);
+			}
+		}
+		
+	} 
 		
 	public void updateStatus(Integer doneCode,String busiCode) throws Exception{
 		CDoneCode cDoneCode = new CDoneCode();
@@ -292,6 +307,16 @@ public class DoneCodeComponent extends BaseBusiComponent {
 					tempQ.setAttr_remark(str.toString());
 				}
 				tempQ.getExtAttrs().add(temp);
+			}
+			if(doneCodeDto.getBusi_code().equals(BusiCodeConstants.USER_OPEN)){
+				CUser user = cUserDao.findByKey(doneCodeDto.getUser_id());
+				String str = user.getUser_type();
+				if(str.equals(SystemConstants.USER_TYPE_BAND) && StringHelper.isNotEmpty(user.getModem_mac())){
+					str += " Modem: "+user.getModem_mac();
+				}else  if(StringHelper.isNotEmpty(user.getStb_id())){
+					str += " Stb: "+user.getStb_id();
+				}
+				tempQ.setRemark(str);
 			}
 		}
 		return pageTarget;

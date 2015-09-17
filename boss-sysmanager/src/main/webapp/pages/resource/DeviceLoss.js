@@ -2,6 +2,11 @@
 *设备挂失
 */
 
+var COMMON_LU = lsys('common');
+var DEV_COMMON_LU = lsys('DeviceCommon');
+var DEV_LOSS_LU = lsys('DeviceLoss');
+var MSG_LU = lsys('msgBox');
+
 //列出当前仓库中所有空闲设备信息
 var DeviceLossGrid = Ext.extend(Ext.grid.GridPanel,{
 	constructor:function(){
@@ -19,36 +24,38 @@ var DeviceLossGrid = Ext.extend(Ext.grid.GridPanel,{
 			}
 		});
 		var columns = [
-			{header:'设备编号',dataIndex:'device_code',width:120,renderer:App.qtipValue},
-			{header:'设备类型',dataIndex:'device_type_text',width:80},
-			{header:'设备型号',dataIndex:'device_model_text',width:100,renderer:App.qtipValue},
-			{header:'所属仓库',dataIndex:'depot_id_text',width:100},
-			{header:'虚拟MODEM号',dataIndex:'pair_device_modem_code',width:120},
-			{header:'虚拟MODEM型号',dataIndex:'pair_device_modem_model_text',width:100,renderer:App.qtipValue},
-			{header:'配对卡号',dataIndex:'pair_device_code',width:120},
-			{header:'配对卡型号',dataIndex:'pair_device_model',width:100,renderer:App.qtipValue},
-			{header:'操作',dataIndex:'',renderer:function(){
-					return '<a href="#" onclick=Ext.getCmp("deviceLossGridId").cancelLossDevice()>取消挂失</a>';
+			{header:DEV_COMMON_LU.labelDevCode,dataIndex:'device_code',width:120,renderer:App.qtipValue},
+			{header:DEV_COMMON_LU.labelDeviceType,dataIndex:'device_type_text',width:80},
+			{header:DEV_COMMON_LU.labelDeviceModel,dataIndex:'device_model_text',width:100,renderer:App.qtipValue},
+			{header:COMMON_LU.depotText,dataIndex:'depot_id_text',width:100},
+			{header:DEV_COMMON_LU.labelVitualModemCode,dataIndex:'pair_device_modem_code',width:120},
+			{header:DEV_COMMON_LU.labelVitualModemModel,dataIndex:'pair_device_modem_model_text',width:100,renderer:App.qtipValue},
+			{header:DEV_COMMON_LU.labelPairCardCode,dataIndex:'pair_device_code',width:120},
+			{header:DEV_COMMON_LU.labelPairCardType,dataIndex:'pair_device_model',width:100,renderer:App.qtipValue},
+			{header:COMMON_LU.doActionBtn,dataIndex:'',renderer:function(){
+					return '<a href="#" onclick=Ext.getCmp("deviceLossGridId").cancelLossDevice()>' +
+							DEV_LOSS_LU.labelCancelLoss +
+							'</a>';
 				}
 			}
 		];
 		DeviceLossGrid.superclass.constructor.call(this,{
 			id:'deviceLossGridId',
-			title:'设备挂失',
+			title:DEV_LOSS_LU._title,
 			border:false,
 			store:this.lossStore,
 			columns:columns,
 			sm:new Ext.grid.RowSelectionModel(),
 			bbar:new Ext.PagingToolbar({store:this.lossStore,pageSize:Constant.DEFAULT_PAGE_SIZE}),
 			tbar:[
-				'-','输入关键字&nbsp;',
+				'-',COMMON_LU.inputKeyWork,
 				new Ext.ux.form.SearchField({  
 	                store: this.lossStore,
 	                width: 200,
 	                hasSearch : true,
-	                emptyText: '支持设备编号查询'
+	                emptyText: MSG_LU.supportDevCodeQuery
 	            }),'-','->',
-	            {text:'添加',iconCls:'icon-add',scope:this,handler:this.doAdd}
+	            {text:COMMON_LU.addNewOne,iconCls:'icon-add',scope:this,handler:this.doAdd}
 			]
 		});
 	},
@@ -60,7 +67,7 @@ var DeviceLossGrid = Ext.extend(Ext.grid.GridPanel,{
 		win.show();
 	},
 	cancelLossDevice:function(){
-		Confirm('确定吗?',this,function(){
+		Confirm(MSG_LU.confirmDoAction,this,function(){
 			var record = this.getSelectionModel().getSelected();
 			Ext.Ajax.request({
 				url:root+'/resource/Device!updateDeviceLoss.action',
@@ -85,19 +92,19 @@ var DeviceLossWin = Ext.extend(Ext.Window,{
 	constructor:function(){
 		DeviceLossWin.superclass.constructor.call(this,{
 			id:'deviceLossWinId',
-			title:'添加设备挂失',
+			title:DEV_LOSS_LU.titleAddDevLoss,
 			width:350,
 			height:120,
 			layout:'fit',
 			items:[{
 				id:'deviceLossFormId',xtype:'form',border:false,bodyStyle:'padding-top:10px',items:[
-					{fieldLabel:'设备编号',name:'deviceCode',xtype:'textfield',allowBlank:false,anchor:'90%'}
+					{fieldLabel:DEV_COMMON_LU.labelDevCode,name:'deviceCode',xtype:'textfield',allowBlank:false,anchor:'90%'}
 				]
 			}],
 			buttonAlign:'center',
 			buttons:[
-				{text:'保存',iconCls:'icon-save',scope:this,handler:this.doSave},
-				{text:'关闭',iconCls:'icon-close',scope:this,handler:function(){
+				{text:COMMON_LU.saveBtn,iconCls:'icon-save',scope:this,handler:this.doSave},
+				{text:COMMON_LU.cancel,iconCls:'icon-close',scope:this,handler:function(){
 						this.hide();
 					}
 				}
@@ -135,7 +142,7 @@ DeviceLoss = Ext.extend(Ext.Panel,{
 		var grid = new DeviceLossGrid();
 		DeviceLoss.superclass.constructor.call(this,{
 			id:'DeviceLoss',
-			title:'设备挂失',
+			title:DEV_LOSS_LU._title,
 			closable: true,
 			border : false ,
 			layout:'fit',

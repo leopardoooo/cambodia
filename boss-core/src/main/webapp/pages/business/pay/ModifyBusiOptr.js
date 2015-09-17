@@ -25,10 +25,10 @@ ModifyBusiOptrForm = Ext.extend(BaseForm,{
 			bodyStyle: "background:#F9F9F9; padding: 10px;",
 			items:[
 				{xtype:'hidden',name:'fee_sn',value:feeSn},
-				{xtype:'displayfield',fieldLabel:'旧业务员',value:busiOptrName},
+				{xtype:'displayfield',fieldLabel: lmain("pay._form.oldOptrName"),value:busiOptrName},
 				{
 					hiddenName: 'busi_optr_id',
-					fieldLabel: '新业务员',
+					fieldLabel: lmain("pay._form.newOptrName"),
 					xtype:'lovcombo',width:200,
 					store:this.busiOptrStore,
 					valueField:'optr_id',displayField:'optr_name',boxMaxHeight:500,

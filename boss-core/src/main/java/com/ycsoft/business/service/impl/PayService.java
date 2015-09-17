@@ -322,12 +322,42 @@ public class PayService extends BaseBusiService implements IPayService {
 		//删除c_prod_order_fee
 		cProdOrderFeeDao.deleteOrderFeeByOrderSn(order_sn);
 		//移除订单到历史表
-		orderComponent.saveCancelProdOrder(order, doneCode);
+		List<CProdOrder> cancelOrders=orderComponent.saveCancelProdOrder(order, doneCode);
 
 		//作废缴费信息
 		feeComponent.saveCancelFeeUnPay(fee, doneCode);
 		//作废业务
 		doneCodeComponent.cancelDoneCode(fee.getCreate_done_code());
+		//取消授权
+		sendProdAtuh(cancelOrders,fee.getCust_id(),doneCode);
+	}
+	/**
+	 * 加减授权都能正确处理
+	 * @param orders
+	 * @param custId
+	 * @param doneCode
+	 * @throws Exception
+	 */
+	private void sendProdAtuh(List<CProdOrder> orders,String custId,Integer doneCode) throws Exception{
+		Map<String,CUser> userMap=userComponent.queryUserMap(custId);
+		Map<CUser,List<CProdOrder>> atvMap=new HashMap<>();
+		//查询待支付的订单(含套餐和套餐子产品)
+		for(CProdOrder order:orders){ 
+				CUser user=userMap.get(order.getUser_id());
+				if(user==null){
+					throw new ServicesException(ErrorCode.OrderDateException,order.getOrder_sn());
+				}
+				List<CProdOrder> list=atvMap.get(user);
+				if(list==null){
+					list=new ArrayList<>();
+					atvMap.put(user, list);
+				}
+				list.add(order);		
+		}	
+		//发授权
+		for(CUser user:atvMap.keySet()){
+			authComponent.sendAuth(user, atvMap.get(user),  BusiCmdConstants.ACCTIVATE_PROD, doneCode);
+		}
 	}
 	/**
 	 * 检查是否按顺序取消
@@ -456,31 +486,31 @@ public class PayService extends BaseBusiService implements IPayService {
 	 * 保存支付信息
 	 * @throws Exception 
 	 */
-	public void savePay(CFeePayDto pay) throws Exception{
+	public void savePay(CFeePayDto pay, String[] feeSn) throws Exception{
 		String cust_id=pay.getCust_id();
 		//用户锁
 		doneCodeComponent.lockCust(cust_id);
 		
 		//查询未支付业务
-		List<CDoneCodeUnpay> upPayDoneCodes=doneCodeComponent.queryUnPayList(cust_id);
+		//List<CDoneCodeUnpay> upPayDoneCodes=doneCodeComponent.queryUnPayList(cust_id);
 		//数据验证
-		this.checkCFeePayParam(pay, upPayDoneCodes,cust_id);
+		List<FeeDto> feeList=this.checkCFeePayParam(pay,feeSn,cust_id);
 		
 		Integer done_code=doneCodeComponent.gDoneCode();
 		//保存支付记录
 		feeComponent.savePayFeeNew(pay,cust_id,done_code);
 		
 		//更新缴费信息状态、支付方式和发票相关信息(未打印)
-		feeComponent.updateCFeeToPay(upPayDoneCodes, pay);
+		feeComponent.updateCFeeToPay(feeList, pay);
 		
 		//更新订单费用的费用类型(新订购记录才有需要处理)
-		orderComponent.updateOrderFeeTypeByPayType(upPayDoneCodes, pay.getPay_type());
+		orderComponent.updateOrderFeeTypeByPayType(feeList, pay.getPay_type());
 		
 		//更新订单状体并给订单发授权
-		updateOrder(cust_id,done_code);
+		updateOrder(feeList,cust_id,done_code);
 		
 		//删除未支付业务信息
-		doneCodeComponent.deleteDoneCodeUnPay(upPayDoneCodes);
+		doneCodeComponent.deleteDoneCodeUnPay(feeList);
 	
 		//保存业务流水
 		this.saveAllPublic(done_code, this.getBusiParam());
@@ -490,9 +520,9 @@ public class PayService extends BaseBusiService implements IPayService {
 	 * @param cust_id
 	 * @throws Exception 
 	 */
-	private void checkCFeePayParam(CFeePayDto pay, List<CDoneCodeUnpay> upPayDoneCodes,String cust_id) throws Exception{
+	private List<FeeDto> checkCFeePayParam(CFeePayDto pay,String[] feeSns,String cust_id) throws Exception{
 		//参数不能为空
-		if(StringHelper.isEmpty(cust_id)||pay.getExchange()==null
+		if(feeSns==null||feeSns.length==0||StringHelper.isEmpty(cust_id)||pay.getExchange()==null
 				||pay.getUsd()==null||pay.getKhr()==null||this.getBusiParam().getCust()==null
 				||StringHelper.isEmpty(pay.getPay_type())
 				){
@@ -512,13 +542,35 @@ public class PayService extends BaseBusiService implements IPayService {
 
 		//验证支付金额和待支付金额是否一致
 		int payFee=pay.getUsd()+Math.round(pay.getKhr()*1.0f/exchange);
-		int needPayFee=feeComponent.queryUnPaySum(cust_id,this.getOptr().getOptr_id()).get("FEE").intValue();
-		if(upPayDoneCodes==null||upPayDoneCodes.size()==0||payFee!=needPayFee){
+		
+		List<FeeDto> feeList=feeComponent.queryUnPayFeeDtoByFeeSn(feeSns);
+		int needPayFee=0;
+		for(FeeDto fee:feeList){
+			if(fee==null){
+				//费用不存在
+				throw new ServicesException(ErrorCode.ParamIsNull);
+			}else if(!fee.getStatus().equals(StatusConstants.UNPAY)){
+				//费用已支付
+				throw new ServicesException(ErrorCode.UnPayIsOld);
+			}
+			if(StringHelper.isNotEmpty(fee.getAcctitem_id())&&
+					!fee.getAcctitem_id().equals(SystemConstants.ACCTITEM_PUBLIC_ID)
+					&&fee.getReal_pay()!=0
+					&&StringHelper.isEmpty(fee.getProd_sn())){
+				//非公用账目的订购产品费，如果没有对应订单记录prod_sn，则报错
+				throw new ServicesException(ErrorCode.CFeeAndProdOrderIsNotOne);
+			}
+			needPayFee=needPayFee+fee.getReal_pay();
+		}
+		
+		//int needPayFee=feeComponent.queryUnPaySum(cust_id,this.getOptr().getOptr_id()).get("FEE").intValue();
+		if(payFee!=needPayFee){
 			throw new ServicesException(ErrorCode.UnPayIsOld);
 		}
 		pay.setFee(needPayFee);
 		//四舍五入部分
 		pay.setCos((needPayFee-pay.getUsd())*exchange-pay.getKhr());
+		return feeList;
 	}
 	/**
 	 * 保存支付信息
@@ -535,16 +587,26 @@ public class PayService extends BaseBusiService implements IPayService {
 	 * @param done_code
 	 * @throws Exception
 	 */
-	private void updateOrder(String cust_id,Integer done_code) throws Exception{
+	private void updateOrder(List<FeeDto> feeList,String cust_id,Integer done_code) throws Exception{
 		
-		Set<Integer> doneCodeSet=new HashSet<Integer>();
 		Map<String,CUser> userMap=userComponent.queryUserMap(cust_id);
+		//被支付的订单SN
+		Set<String> payOrderSnSet=new HashSet<String>();
+		for(FeeDto fee:feeList){
+			if(StringHelper.isNotEmpty(fee.getProd_sn())){
+				payOrderSnSet.add(fee.getProd_sn());
+			}
+		}
 		
 		Map<CUser,List<CProdOrder>> atvMap=new HashMap<>();
 		//查询待支付的订单(含套餐和套餐子产品)
 		for(CProdOrder order:cProdOrderDao.queryUnPayOrder(cust_id)){ 
-			//有订单的未支付业务流水号
-			doneCodeSet.add(order.getDone_code());
+			if(!payOrderSnSet.contains(order.getOrder_sn())&&
+					!payOrderSnSet.contains(order.getPackage_sn())){
+				continue;
+			}
+			//更改订单支付属性
+			cProdOrderDao.updateOrderToPay(order.getOrder_sn(), cust_id);
 			//订单状态是正常的才要授权
 			if(StringHelper.isNotEmpty(order.getUser_id())
 					&&order.getStatus().equals(StatusConstants.ACTIVE)){
@@ -559,12 +621,7 @@ public class PayService extends BaseBusiService implements IPayService {
 				}
 				list.add(order);
 			}
-		}
-		//更改订单支付属性
-		Iterator<Integer> it= doneCodeSet.iterator();
-		while(it.hasNext()){
-			cProdOrderDao.updateOrderToPay(it.next(), cust_id);
-		}
+		}	
 		//发授权
 		for(CUser user:atvMap.keySet()){
 			authComponent.sendAuth(user, atvMap.get(user),  BusiCmdConstants.ACCTIVATE_PROD, done_code);
@@ -623,7 +680,7 @@ public class PayService extends BaseBusiService implements IPayService {
 
 	/**
 	 * 保存支付信息
-	 */
+	
 	public void savePay(CFeePayDto pay, String[] feeSn) throws Exception {
 		Integer doneCode = doneCodeComponent.gDoneCode();
 
@@ -641,6 +698,7 @@ public class PayService extends BaseBusiService implements IPayService {
 		
 		saveAllPublic(doneCode,getBusiParam());
 	}
+	 */
 
 	/**
 	 * 冲正

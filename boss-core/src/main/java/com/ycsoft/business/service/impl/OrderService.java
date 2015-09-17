@@ -961,9 +961,9 @@ public class OrderService extends BaseBusiService implements IOrderService{
 	 * @return
 	 * @throws JDBCException 
 	 * @throws Exception 
-	 */
+	
 	private boolean saveDoneCodeUnPay(String custId,Integer payFee,Integer done_code,String optr_id) throws Exception{
-		List<CDoneCodeUnpay> unPayList =doneCodeComponent.queryUnPayList(custId);
+		List<CDoneCodeUnpay> unPayList = doneCodeComponent.queryUnPayList(custId);
 		if(unPayList.size()==0&&payFee==0){
 			//没有未支付的业务，且当前新订单不需要支付，则该笔订单业务设置为已支付
 			return true;
@@ -972,6 +972,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 			return false;
 		}
 	}
+	 */
 	
 	/**
 	 * 检查保存产品订购的参数
@@ -1126,7 +1127,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 	 * 过期产品的问题？怎么搞好？
 	 */
 	public List<CProdOrderFollowPay> queryFollowPayOrderDto(String custId) throws Exception{
-		doneCodeComponent.checkUnPayOtherLock(custId, this.getOptr().getOptr_id());
+		//doneCodeComponent.checkUnPayOtherLock(custId, this.getOptr().getOptr_id());
 		List<CProdOrderFollowPay> orderList  = orderComponent.queryFollowPayOrderDto(custId);
 		if(orderList.size()>0){
 			//ip收费
