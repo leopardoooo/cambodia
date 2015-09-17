@@ -647,7 +647,7 @@ public class CFeeDao extends BaseEntityDao<CFee> {
 			  "	select order_sn "+
 			  "	  from c_prod_order "+
 			  "	 where cust_id = ?  "+
-			  "	   and user_id in ("+sqlGenerator.in(userIds)+"') "+
+			  "	   and user_id in ("+sqlGenerator.in(userIds)+") "+
 			  "	   and package_sn is null "+
 			  "	union "+
 			  "	select package_sn order_sn "+
