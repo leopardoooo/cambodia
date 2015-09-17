@@ -291,6 +291,14 @@ PayPanel = Ext.extend( Ext.Panel ,{
 			var comomonParams = App.getValues();
 			comomonParams["busiCode"] = "1207";
 			params[CoreConstant.JSON_PARAMS] = Ext.encode(comomonParams);
+			
+			var feeSns = [];
+			this.realFeeStore.each(function(record){
+				feeSns.push(record.get('fee_sn'));
+			},this);
+			params['feeSns'] = feeSns;
+			console.log(feeSns);
+			
 			var mb = Show();
 			//提交
 			Ext.Ajax.request({
