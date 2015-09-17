@@ -88,12 +88,12 @@ var MaterialDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 				//输入正整数
 				var re = /^[1-9]+[0-9]*]*$/;
 			    if (!re.test(value)){  
-			        Alert("请输入正整数");  
+			        Alert(lmsg('enterPositiverNum'));  
 			        return false;  
 			    }
 			    
 				if(record.get('total_num')<value){
-					Alert("输入的数量已经超出库存");
+					Alert(lmsg('buyNumExceedStockNum'));
 					return false;
 				}
 				
@@ -156,7 +156,7 @@ BacthBuyMaterialForm = Ext.extend( BaseForm , {
 		var data = this.materialDeviceGrid.getValues();
 		if(data.length==0){
 			var obj = {};
-			obj['msg'] = '请输入购买数量';
+			obj['msg'] = lmsg('enterBuyNum');
 			obj['isValid'] = false;
 			return obj;
 		}

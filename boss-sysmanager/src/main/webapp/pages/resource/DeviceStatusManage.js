@@ -5,6 +5,11 @@
  * @extends Ext.Panel
  */
 
+var COMMON_LU = lsys('common');
+var DEV_COMMON_LU = lsys('DeviceCommon');
+var STATUS_LU = lsys('DeviceStatus');
+var MSG_LU = lsys('msgBox');
+
 var DeviceStatusGrid = Ext.extend(Ext.grid.GridPanel, {
 			statusStore : null,
 			detaiGrid:null,
@@ -34,29 +39,29 @@ var DeviceStatusGrid = Ext.extend(Ext.grid.GridPanel, {
 					dataIndex : 'new_value_text',
 					width : 150
 				}, {
-					header : '仓库',
+					header : DEV_COMMON_LU.labelDepot,
 					dataIndex : 'depot_id_text',
 					width : 150
 				}, {
-					header : '操作时间',
+					header : DEV_COMMON_LU.labelOperateTime,
 					dataIndex : 'create_time',
 					width : 150,
 					renderer:Ext.util.Format.dateFormat
 				}, {
-					header : '设备类型',
+					header : DEV_COMMON_LU.labelDeviceType,
 					dataIndex : 'device_type_text',
 					width : 120
 				}, {
-					header : '型号',
+					header : DEV_COMMON_LU.labelDeviceModel,
 					dataIndex : 'device_model_text',
 					width : 120
 				}, {
-					header : '数量',
+					header : DEV_COMMON_LU.labelNum,
 					dataIndex : 'count',
 					width : 120
 				}, {
 					id : 'deviceStatus_remark_id',
-					header : '备注',
+					header : COMMON_LU.remarkTxt,
 					dataIndex : 'remark',
 					width : 150
 				}];
@@ -69,12 +74,12 @@ var DeviceStatusGrid = Ext.extend(Ext.grid.GridPanel, {
 							autoExpandColumn : 'deviceStatus_remark_id',
 							sm : new Ext.grid.RowSelectionModel({}),
 							tbar : ['-', {
-										text : '文件操作',
+										text : DEV_COMMON_LU.labelFileOperate,
 										iconCls : 'icon-excel',
 										scope : this,
 										handler : this.fileIn
 									}, '-', {
-										text : '手工录入',
+										text : DEV_COMMON_LU.labelManualInput,
 										iconCls : 'icon-hand',
 										scope : this,
 										handler : this.handIn
@@ -155,7 +160,7 @@ var DeviceStatusFileForm = Ext.extend(Ext.form.FormPanel, {
 								baseCls : 'x-plain'
 							},
 							items : [{
-										fieldLabel : '设备类型',
+										fieldLabel : DEV_COMMON_LU.labelDeviceType,
 										xtype : 'paramcombo',
 										typeAhead : false,
 										paramName : 'DEVICE_TYPE',
@@ -163,26 +168,26 @@ var DeviceStatusFileForm = Ext.extend(Ext.form.FormPanel, {
 										allowBlank : false
 									}, {
 										id : 'deviceStatusFielId',
-										fieldLabel : '设备文件',
+										fieldLabel : DEV_COMMON_LU.labelDevFile,
 										name : 'files',
 										xtype : 'textfield',
 										inputType : 'file',
 										allowBlank : false,
 										anchor : '95%'
 									}, {
-										fieldLabel : '设备状态',
+										fieldLabel : DEV_COMMON_LU.labelDevStatus,
 										hiddenName : 'deviceStatus',
 										allowBlank : false,
 										xtype : 'paramcombo',
 										paramName : 'DEVICE_STATUS_R_DEVICE'
 									},  {
-										fieldLabel : '设新旧',
+										fieldLabel : STATUS_LU.labelSetNewOrOld,
 										hiddenName : 'isNewStb',
 										allowBlank : false,
 										xtype : 'paramcombo',
 										paramName : 'BOOLEAN'
 									}, {
-										fieldLabel : '备注 ',
+										fieldLabel : COMMON_LU.remarkTxt,
 										xtype : 'textarea',
 										name : 'remark',
 										width : 375,
@@ -202,7 +207,7 @@ var DeviceStatusFileWin = Ext.extend(Ext.Window, {
 				this.statusForm = new DeviceStatusFileForm();
 				DeviceStatusFileWin.superclass.constructor.call(this, {
 							id : 'deviceStatusFileWinId',
-							title : '设备状态管理(文件操作)',
+							title : STATUS_LU.titleFileOptr,
 							closeAction : 'hide',
 							maximizable : false,
 							width : 500,
@@ -212,12 +217,12 @@ var DeviceStatusFileWin = Ext.extend(Ext.Window, {
 							items : [this.statusForm],
 							buttonAlign : 'right',
 							buttons : [{
-										text : '保存',
+										text : COMMON_LU.saveBtn,
 										iconCls : 'icon-save',
 										scope : this,
 										handler : this.doSave
 									}, {
-										text : '关闭',
+										text : COMMON_LU.cancel,
 										iconCls : 'icon-close',
 										scope : this,
 										handler : function() {
@@ -321,7 +326,7 @@ var DeviceStatusHandForm = Ext.extend(Ext.form.FormPanel, {
 			},
 			items : [{
 						id : 'device_stauts_id',
-						fieldLabel : '设备状态',
+						fieldLabel : DEV_COMMON_LU.labelDevStatus,
 						hiddenName : 'deviceStatus',
 						xtype : 'paramcombo',
 						listeners:{
@@ -330,7 +335,7 @@ var DeviceStatusHandForm = Ext.extend(Ext.form.FormPanel, {
 						},
 						paramName : 'DEVICE_STATUS_R_DEVICE'
 					},  {
-						fieldLabel : '设新旧',
+						fieldLabel : STATUS_LU.labelSetNewOrOld,
 						hiddenName : 'isNewStb',
 						id:'device_is_new_stb',
 						xtype : 'paramcombo',
@@ -340,7 +345,7 @@ var DeviceStatusHandForm = Ext.extend(Ext.form.FormPanel, {
 						},
 						paramName : 'BOOLEAN'
 					},{
-						fieldLabel : '备注 ',
+						fieldLabel : COMMON_LU.remarkTxt,
 						xtype : 'textarea',
 						name : 'remark',
 						width : 350,
@@ -380,7 +385,7 @@ var StatusQueryDeviceGrid = Ext.extend(QueryDeviceGrid, {
 			var deviceStatus = Ext.getCmp('device_stauts_id').getValue();
 			var isNewStb = Ext.getCmp('device_is_new_stb').getValue();
 			if (Ext.isEmpty(deviceStatus)) {
-				Alert('请先选择要修改的设备状态类型!');
+				Alert(MSG_LU.tipSelectTragetDevStatus);
 				return;
 			}
 			Ext.Ajax.request({
@@ -418,7 +423,7 @@ var DeviceStatusHandWin = Ext.extend(Ext.Window, {
 				this.statusGrid = new StatusQueryDeviceGrid();
 				ProcureWin.superclass.constructor.call(this, {
 							id : 'deviceStatusHandWinId',
-							title : '设备状态管理(手工录入)',
+							title : STATUS_LU.titleManualOptr,
 							closeAction : 'hide',
 							maximizable : false,
 							width : 800,
@@ -428,12 +433,12 @@ var DeviceStatusHandWin = Ext.extend(Ext.Window, {
 							items : [this.statusForm, this.statusGrid],
 							buttonAlign : 'right',
 							buttons : [{
-										text : '保存',
+										text : COMMON_LU.saveBtn,
 										iconCls : 'icon-save',
 										scope : this,
 										handler : this.doSave
 									}, {
-										text : '关闭',
+										text : COMMON_LU.cancel,
 										iconCls : 'icon-close',
 										scope : this,
 										handler : function() {
@@ -452,7 +457,7 @@ var DeviceStatusHandWin = Ext.extend(Ext.Window, {
 			doSave : function() {
 				var form = this.statusForm.getForm();
 				if (!this.statusForm.doValid()){
-					Alert('设备状态和设备的新旧属性请至少填写一个.');
+					Alert(MSG_LU.tipSbztSbxjZstxyg);
 					return;
 				}
 					
@@ -470,7 +475,7 @@ var DeviceStatusHandWin = Ext.extend(Ext.Window, {
 						});
 				deviceIds = deviceIds.substring(0, deviceIds.length - 1);
 				if (deviceIds.length === 0) {
-					Alert('请正确输入设备信息！');
+					Alert(MSG_LU.pleaseInputCorrectDevInfo);
 					return;
 				}
 
@@ -486,7 +491,7 @@ var DeviceStatusHandWin = Ext.extend(Ext.Window, {
 							success : function(res, opt) {
 								msg.hide();
 								msg = null;
-								Alert('添加成功', function() {
+								Alert(COMMON_LU.addSuccess, function() {
 											this.hide();
 											Ext.getCmp('deviceStatusGridId')
 													.getStore().reload();
@@ -503,7 +508,7 @@ DeviceStatus = Ext.extend(Ext.Panel, {
 		grid.detaiGrid = detailGrid;
 		DeviceStatus.superclass.constructor.call(this, {
 					id : 'DeviceStatus',
-					title : '状态管理',
+					title : STATUS_LU._title,
 					closable : true,
 					border : false,
 					layout : 'border',

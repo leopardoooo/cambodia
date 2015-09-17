@@ -47,6 +47,7 @@ import com.ycsoft.business.dao.resource.device.RStbDao;
 import com.ycsoft.business.dao.resource.device.RStbModelDao;
 import com.ycsoft.business.dao.system.SDeptDao;
 import com.ycsoft.business.dto.device.DeviceDto;
+import com.ycsoft.business.dto.device.DeviceSmallDto;
 import com.ycsoft.business.dto.device.ValuableCardDto;
 import com.ycsoft.commons.constants.DataRight;
 import com.ycsoft.commons.constants.StatusConstants;
@@ -100,6 +101,27 @@ public class DeviceComponent extends BaseBusiComponent {
 	public com.ycsoft.sysmanager.dto.resource.DeviceDto queryDeviceInfoByCode(String deviceCode) 
 		throws Exception {
 		return rDeviceDao.queryDeviceInfoByCode(deviceCode);
+	}
+	
+	
+	public DeviceDto queryDeviceInfoByCodeAndModel(String deviceCode,String models ) throws Exception {
+		if(StringHelper.isEmpty(models)){
+			throw new ComponentException(ErrorCode.TaskDeviceModelIsNull);
+		}
+		DeviceDto dto =  rDeviceDao.queryDeviceInfoByCodeAndModel(deviceCode);
+		isDeviceSaleable(dto);
+//		String[] modesArr = models.split(",");
+//		boolean isModel = false;
+//		for(int i=0;i<modesArr.length;i++){
+//			if(modesArr[i].equals(dto.getDevice_model())){
+//				isModel = true;
+//				break;
+//			}
+//		}
+		if(!models.equals(dto.getDevice_model())){
+			throw new ComponentException(ErrorCode.TaskDeviceModelIsWrong,dto.getDevice_model_text());
+		}
+		return dto;
 	}
 
 	/**
@@ -636,6 +658,9 @@ public class DeviceComponent extends BaseBusiComponent {
 	 * @return
 	 */
 	private boolean isDeviceSaleable(DeviceDto device) throws Exception{
+		if (device == null){
+			throw new ComponentException(ErrorCode.DeviceNotExists);
+		}
 		if (device.getDepot_status().equals(StatusConstants.USE)) {
 			throw new ComponentException("设备已被使用");
 		}
@@ -982,6 +1007,14 @@ public class DeviceComponent extends BaseBusiComponent {
 			list.add(f);
 		}
 		return list;
+	}
+	
+	public List<DeviceSmallDto>  getDeviceCodeByDeviceId(String[] deviceIds) throws Exception{
+		if(deviceIds.length>0){
+			return rDeviceDao.getDeviceCodeByDeviceId(deviceIds);
+		}else{
+			return null;
+		}
 	}
 	
 	

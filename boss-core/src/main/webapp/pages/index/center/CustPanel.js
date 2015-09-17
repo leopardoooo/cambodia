@@ -21,6 +21,8 @@ var custInfoHTML =
 	'<tr height=24>'+
 		'<td class="label">'+ langUtils.main("cust.base.cust_level") +':</td>' +
 		'<td class="input">&nbsp;{[values.cust.cust_level_text || ""]}</td>'+
+		'<td class="label">'+ langUtils.main("cust.base.languageType") +':</td>' +
+		'<td class="input">&nbsp;{[values.cust.str6_text || ""]}</td>'+
 	'</tr>' +
 	'<tr height=24>'+
 		'<td class="label">'+ langUtils.main("cust.base.linkMan") +':</td>' +

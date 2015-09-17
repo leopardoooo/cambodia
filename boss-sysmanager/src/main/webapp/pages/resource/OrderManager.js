@@ -2,9 +2,11 @@
  * 订单管理
  * @type 
  */
+var ORDER_LU = lsys('OrderManager');
 
-var addTitle="添加订单";
-var modifyTitle="修改订单";
+var addTitle=ORDER_LU.addTitle;
+var modifyTitle=ORDER_LU.modifyTitle;
+
 
 /**
  * 订单信息
@@ -30,32 +32,33 @@ var OrderGrid = Ext.extend(Ext.grid.GridPanel,{
 		var sm = new Ext.grid.RowSelectionModel({singleSelect:true});
 		var currentOptrId = App.data.optr['optr_id'];
 		var columns = [
-			{header:'编号',dataIndex:'order_no',width:90,renderer:App.qtipValue},
-			{header:'供应商',dataIndex:'supplier_name',width:70,renderer:App.qtipValue},
-			{header:'供货日期',dataIndex:'supply_date',width:85,renderer:Ext.util.Format.dateFormat},
-			{header:'设备类型',dataIndex:'device_type_text',width:90},
-			{header:'型号',dataIndex:'device_model_text',width:120,renderer:App.qtipValue},
-			{header:'单价',dataIndex:'price',renderer:App.qtipValue,width:60},
-			{header:'订购数量',dataIndex:'order_num',width:60},
-			{header:'到货数量',dataIndex:'supply_num',width:60},
-			{header:'订单类型',dataIndex:'is_history',width:70,renderer:function(v){
+			{header:ORDER_LU.columnsOrderGrid[0],dataIndex:'order_no',width:90,renderer:App.qtipValue},
+			{header:ORDER_LU.columnsOrderGrid[1],dataIndex:'supplier_name',width:70,renderer:App.qtipValue},
+			{header:ORDER_LU.columnsOrderGrid[2],dataIndex:'supply_date',width:85,renderer:Ext.util.Format.dateFormat},
+			{header:ORDER_LU.columnsOrderGrid[3],dataIndex:'device_type_text',width:90},
+			{header:ORDER_LU.columnsOrderGrid[4],dataIndex:'device_model_text',width:120,renderer:App.qtipValue},
+			{header:ORDER_LU.columnsOrderGrid[5],dataIndex:'price',renderer:App.qtipValue,width:60},
+			{header:ORDER_LU.columnsOrderGrid[6],dataIndex:'order_num',width:60},
+			{header:ORDER_LU.columnsOrderGrid[7],dataIndex:'supply_num',width:60},
+			{header:ORDER_LU.columnsOrderGrid[8],dataIndex:'is_history',width:70,renderer:function(v){
 					if(v == 'T'){
-						return '历史订单';
+						return ORDER_LU.orderStatus.HISTORY;
 					}else if(v == 'F'){
-						return '执行中订单';
+						return ORDER_LU.orderStatus.NOW;
 					}
 				}
 			},
-			{id:'order_remark_id',header:'备注',dataIndex:'remark'}
-			,{header:'操作',dataIndex:'device_done_code',renderer:function(v,meta,record){
+			{id:'order_remark_id',header:ORDER_LU.columnsOrderGrid[9],dataIndex:'remark'}
+			,{header:ORDER_LU.columnsOrderGrid[10],dataIndex:'device_done_code',renderer:function(v,meta,record){
 					var isHistory = record.get('is_history'),result = "";
 					if(currentOptrId == record.get('optr_id')){
-						result = "<a href='#' title='修改订单' onclick=Ext.getCmp('orderGridId').editOrder()>修改</a>";
+						result = "<a href='#' title='" + ORDER_LU.modifyTitle + "' onclick=Ext.getCmp('orderGridId').editOrder()>" + lsys('common.update') + "</a>";
 					}
 					if(isHistory == 'F'){
-						result += "&nbsp;&nbsp;<a href='#' title='历史订单' onclick=Ext.getCmp('orderGridId').editHisOrder("+v+",'T')>历史</a>";
+						result += "&nbsp;&nbsp;<a href='#' title='" + ORDER_LU.orderStatus.HISTORY + "' onclick=Ext.getCmp('orderGridId').editHisOrder("+v+",'T')>" + ORDER_LU.btnMakeHistory + "</a>";
 					}else{
-						result += "&nbsp;&nbsp;<a href='#' title='恢复订单' onclick=Ext.getCmp('orderGridId').editHisOrder("+v+",'F')>恢复</a>";
+						result += "&nbsp;&nbsp;<a href='#' title='" + ORDER_LU.btnResumeOrderTip +
+								"' onclick=Ext.getCmp('orderGridId').editHisOrder("+v+",'F')>" + ORDER_LU.btnResumeOrder + "</a>";
 					}
 					return result;
 				},scope:this
@@ -63,7 +66,7 @@ var OrderGrid = Ext.extend(Ext.grid.GridPanel,{
 		];
 		CheckInGrid.superclass.constructor.call(this,{
 			id:'orderGridId',
-			title:'订单信息',
+			title:ORDER_LU.titleOrderGrid,
 			height:300,
 			region:'north',
 			split:true,
@@ -71,25 +74,25 @@ var OrderGrid = Ext.extend(Ext.grid.GridPanel,{
 			autoExpandColumn:'order_remark_id',
 			columns:columns,
 			sm:sm,
-			tbar:['-','输入关键字&nbsp;',
+			tbar:['-',lsys('common.inputKeyWork'),
 				new Ext.ux.form.SearchField({  
 	                store: this.orderGridStore,
 	                width: 200,
 	                hasSearch : true,
-	                emptyText: '支持订单编号模糊查询'
+	                emptyText: lsys('msgBox.supportOrderFuzzyQuery')
 	            }),'-',
 	            {
 	            	xtype:'combo',store:new Ext.data.ArrayStore({
 	            			fields:['orderTypeText','orderType'],
-	            			data:[['所有订单','ALL'],['执行订单','NOW'],['历史订单','HISTORY']]
+	            			data:[[ORDER_LU.orderStatus.ALL,'ALL'],[ORDER_LU.orderStatus.NOW,'NOW'],[ORDER_LU.orderStatus.HISTORY,'HISTORY']]
 	            		}),displayField:'orderTypeText',valueField:'orderType',
-	            	emptyText:'执行中的订单或历史订单',width:170,
+	            	emptyText:ORDER_LU.tipOrderStatus,width:170,
 	            	listeners:{
 	            		scope:this,select:this.queryOrderByType
 	            	}
 	            },'-',
 	            '->','-',
-	            {text:'添加',iconCls : 'icon-add',scope:this,handler:this.addOrder},'-'
+	            {text:lsys('common.addNewOne'),iconCls : 'icon-add',scope:this,handler:this.addOrder},'-'
 			],
 			bbar : new Ext.PagingToolbar({
 										store : this.orderGridStore,
@@ -157,9 +160,9 @@ var OrderGrid = Ext.extend(Ext.grid.GridPanel,{
 		store.load({params:{start:0,limit:Constant.DEFAULT_PAGE_SIZE}});
 	},
 	editHisOrder: function(v,isHistory){
-		var text = '确认转换为历史订单吗？';
+		var text = lsys('msgBox.confirmConvert2HisOrder');
 		if(isHistory == 'F'){
-			text = '确认转换为执行中的订单吗？';
+			text = lsys('msgBox.confirmConvert2NowOrder');
 		}
 		Confirm(text,this,function(){
 			var record = this.getSelectionModel().getSelected();
@@ -194,14 +197,14 @@ var OrderInputDetailGrid = Ext.extend(Ext.grid.GridPanel,{
 		});
 		
 		var columns = [
-			{header:'设备类型',dataIndex:'device_type_text'},
-			{header:'型号',dataIndex:'device_model_text'},
-			{header:'到货日期',dataIndex:'create_time',width:120},
-			{header:'数量',dataIndex:'count',width:70}
+			{header:ORDER_LU.columnsOrderInputDetailGrid[0],dataIndex:'device_type_text'},
+			{header:ORDER_LU.columnsOrderInputDetailGrid[1],dataIndex:'device_model_text'},
+			{header:ORDER_LU.columnsOrderInputDetailGrid[2],dataIndex:'create_time',width:120},
+			{header:ORDER_LU.columnsOrderInputDetailGrid[3],dataIndex:'count',width:70}
 		];
 		OrderInputDetailGrid.superclass.constructor.call(this,{
 			id:'orderInputDetailGridId',
-			title:'到货明细',
+			title:ORDER_LU.titleOrderInputDetailGrid,
 			region:'center',
 			ds:this.orderInputDetailGridStore,
 			columns:columns
@@ -230,13 +233,13 @@ var OrderForm = Ext.extend(Ext.form.FormPanel,{
 					columnWidth:.5,layout:'form',
 					items:[
 						{name:'deviceOrder.device_done_code',xtype:'hidden'},
-						{fieldLabel:'订单编号',xtype:'textfield',vtype:'alphanum',name:'deviceOrder.order_no',allowBlank:false},
-						{fieldLabel:'供应商',xtype:'combo',hiddenName:'deviceOrder.supplier_id',
+						{fieldLabel:ORDER_LU.labelOrderNo,xtype:'textfield',vtype:'alphanum',name:'deviceOrder.order_no',allowBlank:false},
+						{fieldLabel:ORDER_LU.labelSupplier,xtype:'combo',hiddenName:'deviceOrder.supplier_id',
 							store:new Ext.data.JsonStore({
 								url:'resource/Device!queryDeviceSupplier.action',
 								autoLoad:true,
 								fields:['supplier_id','supplier_name']
-							}),displayField:'supplier_name',emptyText:'请选择...',
+							}),displayField:'supplier_name',emptyText:lsys('common.pleaseSelect'),
 							valueField:'supplier_id',model:'local',triggerAction:'all'
 						}
 					]
@@ -245,12 +248,12 @@ var OrderForm = Ext.extend(Ext.form.FormPanel,{
 					columnWidth:.5,layout:'form',
 					items:[
 //						{fieldLabel:'确认单号',xtype:'textfield',vtype:'alphanum',name:'deviceOrder.confirm_id',allowBlank:false},
-						{fieldLabel:'供货日期',xtype:'datefield',format:'Y-m-d',width:125,
-							name:'deviceOrder.supply_date',allowBlank:false,emptyText:'请选择...'}
+						{fieldLabel:ORDER_LU.labelSupplyDate,xtype:'datefield',format:'Y-m-d',width:125,
+							name:'deviceOrder.supply_date',allowBlank:false,emptyText:lsys('common.pleaseSelect')}
 					]
 				},{columnWidth:1,layout:'form',
 					items:[
-						{fieldLabel:'备注',name:'deviceOrder.remark',xtype:'textarea',anchor:'90%',height:50}
+						{fieldLabel:lsys('common.remarkTxt'),name:'deviceOrder.remark',xtype:'textarea',anchor:'90%',height:50}
 					]}
 			]
 		});
@@ -299,17 +302,17 @@ var DeviceInfoGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 		});
 		
 		var cm = new Ext.grid.ColumnModel([
-			{header:'设备类型',dataIndex:'device_type',width:90
+			{header:lsys('DeviceCommon.labelDeviceType'),dataIndex:'device_type',width:90
 				,editor:this.deviceTypeCombo
 				,renderer:this.paramComboRender.createDelegate(this.deviceTypeCombo.getStore())
 				,scope:this},
-			{id:'device_model_id',header:'型号',dataIndex:'device_model_text',width:150,
+			{id:'device_model_id',header:lsys('DeviceCommon.labelDeviceModel'),dataIndex:'device_model_text',width:150,
 				editor:this.deviceModelCombo
 				,scope:this},
-			{id:'pair_device_model_id',header:'单价',dataIndex:'price',width:100,
+			{id:'pair_device_model_id',header:lsys('DeviceCommon.labelPrice'),dataIndex:'price',width:100,
 				editor:new Ext.form.NumberField({allowNegative:false,minValue:0.01})
 				,scope:this},
-			{header:'订购数量',dataIndex:'order_num',width:100,
+			{header:lsys('DeviceCommon.labelOrderNum'),dataIndex:'order_num',width:100,
 				editor:new Ext.form.NumberField({
 					allowNegative:false,minValue:1,allowDecimals:false,minValue:1,
 					listeners:{
@@ -322,21 +325,21 @@ var DeviceInfoGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 					}
 				})
 			},
-			{header:'操作',dataIndex:'',width:70,renderer:function(value,metavalue,record,i){
-				return "<a href='#' onclick=dinfoGrid.doDel("+i+")>删除</a>";
+			{header:lsys('common.doActionBtn'),dataIndex:'',width:70,renderer:function(value,metavalue,record,i){
+				return "<a href='#' onclick=dinfoGrid.doDel("+i+")>" + lsys('common.remove') + "</a>";
 			}}
 		]);
 		
 		DeviceInfoGrid.superclass.constructor.call(this,{
 			id:'deviceInfoGridId',
-			title:'设备信息',
+			title:lsys('DeviceCommon.titleDeviceInfo'),
 			border:false,
 			height:230,
 			ds:this.deviceInfoGridStore,
 			clicksToEdit:1,
 			cm:cm,
 			sm:new Ext.grid.RowSelectionModel({}),
-			tbar:[{text:'添加',scope:this,handler:this.doAdd}]
+			tbar:[{text:lsys('common.addNewOne'),scope:this,handler:this.doAdd}]
 		});
 	},
 	paramComboRender:function(value,combo){
@@ -386,7 +389,7 @@ var DeviceInfoGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 			var fieldName = obj.field;//编辑的column对应的dataIndex
 			if(fieldName == 'order_num'){
 				if (obj.record.get('supply_num') > obj.value) {
-                    Alert('订购数量不能小于到货数量!',function(){
+                    Alert(lsys('msgBox.orderNumCantLessThanGoodsNum'),function(){
                     	obj.record.set('order_num','');
 						this.startEditing(obj.row, obj.column);
 					},this);
@@ -416,7 +419,7 @@ var DeviceInfoGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 		this.getSelectionModel().selectRow(count);
 	},
 	doDel:function(index){
-		Confirm('确定删除吗?',this,function(){
+		Confirm(lsys('msgBox.confirmDelete'),this,function(){
 			this.getStore().remove(this.getSelectionModel().getSelected());
 		});
 	}
@@ -435,7 +438,7 @@ var OrderWin = Ext.extend(Ext.Window,{
 		this.deviceInfoGrid = new DeviceInfoGrid();
 		OrderWin.superclass.constructor.call(this,{
 			id : 'orderWinId',
-			title:'添加订单',
+			title:ORDER_LU.titleAddOrder,
 			closeAction:'hide',
 			maximizable:false,
 			width: 535,
@@ -443,8 +446,8 @@ var OrderWin = Ext.extend(Ext.Window,{
 			border: false,
 			items:[this.orderForm,this.deviceInfoGrid],
 			buttonAlign:'right',
-			buttons:[{text:'保存',iconCls:'icon-save',scope:this,handler:this.doSave},
-				{text:'关闭',iconCls:'icon-close',scope:this,handler:function(){
+			buttons:[{text:lsys('common.saveBtn'),iconCls:'icon-save',scope:this,handler:this.doSave},
+				{text:lsys('common.cancel'),iconCls:'icon-close',scope:this,handler:function(){
 					this.hide();
 				}}],
 			listeners:{
@@ -471,25 +474,25 @@ var OrderWin = Ext.extend(Ext.Window,{
 		for(var i=0;i<store.getCount();i++){
 			var data = store.getAt(i).data;
 			if(Ext.isEmpty( data['device_type'] ) ){
-				Alert('请选择设备类型!',function(){
+				Alert(lsys('msgBox.selectDevType'),function(){
 					this.deviceInfoGrid.startEditing(i,0);
 				},this);
 				return;
 			}
 			if(Ext.isEmpty( data['device_model'] )){
-				Alert('请选择型号!',function(){
+				Alert(lsys('msgBox.selectModel'),function(){
 					this.deviceInfoGrid.startEditing(i,1);
 				},this);
 				return;
 			}
 			if(data['price'] == 0 ){
-				Alert('单价请输入大于零的数字!',function(){
+				Alert(lsys('msgBox.numberShouldBiggerThan0'),function(){
 					this.deviceInfoGrid.startEditing(i,2);
 				},this);
 				return;
 			}
 			if(data['order_num'] == 0 ){
-				Alert('订购数量请输入大于零的数字!',function(){
+				Alert(lsys('msgBox.orderNumShouldBigThan0'),function(){
 					this.deviceInfoGrid.startEditing(i,3);
 				},this);
 				return;
@@ -505,7 +508,7 @@ var OrderWin = Ext.extend(Ext.Window,{
 			Ext.apply(obj,formValues);
 			obj['deviceOrderDetailList'] = Ext.encode(arr);
 			
-			var msg = "添加成功!";
+			var msg = lsys('common.addSuccess');
 			var ms = Show();
 			Ext.Ajax.request({
 				url:'resource/Device!saveDeviceOrder.action',
@@ -515,7 +518,7 @@ var OrderWin = Ext.extend(Ext.Window,{
 					ms.hide();
 					ms=null;
 					if(obj['device_done_code'])
-						msg="修改成功!";
+						msg=lsys('common.updateSuccess');
 					Alert(msg,function(){
 						this.hide();
 						Ext.getCmp('orderGridId').getStore().reload();
@@ -537,7 +540,7 @@ var OrderWin = Ext.extend(Ext.Window,{
 			}
 		}
 		if(flag === true){
-			Confirm('存在不同的型号设备，是否保存',this,function(){
+			Confirm(lsys('msgBox.confirmOverideSaveDevModel'),this,function(){
 				func();
 			});
 		}else{
@@ -553,9 +556,10 @@ OrderManager = Ext.extend(Ext.Panel,{
 		var orderGrid = new OrderGrid();
 //		var orderDetailGrid = new OrderDetailGrid();
 		var orderInputDetailGrid = new OrderInputDetailGrid();
+		
 		CheckIn.superclass.constructor.call(this,{
 			id:'OrderManager',
-			title:'订单管理',
+			title:ORDER_LU._title,
 			closable: true,
 			border : false ,
 			baseCls: "x-plain",

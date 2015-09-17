@@ -634,8 +634,13 @@ AddressWin = Ext.extend(Ext.Window,{
 						if(true === rs.success){
 							Alert(langUtils.sys('AddressNodeManage.msg.actionSuccess'));
 							if(this.type == 'add'){
-								this.node.attributes.is_refresh = false;
-								this.node.reload();
+								if(this.node.leaf){
+									this.node.parentNode.attributes.is_refresh = false;
+									this.node.parentNode.reload();
+								}else{
+									this.node.attributes.is_refresh = false;
+									this.node.reload();
+								}
 							}else{
 								this.node.parentNode.attributes.is_refresh = false;
 								this.node.parentNode.reload();

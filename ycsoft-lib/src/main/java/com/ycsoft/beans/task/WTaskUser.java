@@ -1,15 +1,36 @@
 package com.ycsoft.beans.task;
 
+import com.ycsoft.commons.constants.DictKey;
+import com.ycsoft.commons.store.MemoryDict;
 import com.ycsoft.daos.config.POJO;
 
 @POJO(tn = "W_TASK_USER", sn = "", pk = "task_id,user_id")
 public class WTaskUser {
 	private String task_id;
 	private String user_id;
-	private String divice_model;
+	private String device_model;
 	private String device_id;
 	private String is_valid;
 	private String user_type;
+	
+	private String user_type_text;
+	private String device_model_text;
+	
+	
+	
+	public String getUser_type_text() {
+		return user_type_text;
+	}
+	public void setUser_type_text(String user_type_text) {
+		this.user_type_text = user_type_text;
+	}
+
+	public String getDevice_model_text() {
+		return device_model_text;
+	}
+	public void setDevice_model_text(String device_model_text) {
+		this.device_model_text = device_model_text;
+	}
 	public String getTask_id() {
 		return task_id;
 	}
@@ -22,11 +43,12 @@ public class WTaskUser {
 	public void setUser_id(String user_id) {
 		this.user_id = user_id;
 	}
-	public String getDivice_model() {
-		return divice_model;
+	public String getDevice_model() {
+		return device_model;
 	}
-	public void setDivice_model(String divice_model) {
-		this.divice_model = divice_model;
+	public void setDevice_model(String device_model) {
+		this.device_model = device_model;
+		device_model_text = MemoryDict.getDictName(DictKey.DEVICE_MODEL, this.device_model);
 	}
 	public String getDevice_id() {
 		return device_id;
@@ -45,6 +67,7 @@ public class WTaskUser {
 	}
 	public void setUser_type(String user_type) {
 		this.user_type = user_type;
+		user_type_text = MemoryDict.getDictName(DictKey.USER_TYPE, this.user_type);
 	}
 
 }

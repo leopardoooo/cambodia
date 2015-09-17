@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,7 +53,6 @@ import com.ycsoft.business.dto.core.prod.OrderProdPanel;
 import com.ycsoft.business.dto.core.prod.PackageGroupUser;
 import com.ycsoft.business.dto.core.prod.ProdTariffDto;
 import com.ycsoft.commons.constants.BusiCodeConstants;
-import com.ycsoft.commons.constants.DictKey;
 import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.exception.ComponentException;
@@ -60,7 +61,6 @@ import com.ycsoft.commons.exception.ServicesException;
 import com.ycsoft.commons.helper.CollectionHelper;
 import com.ycsoft.commons.helper.DateHelper;
 import com.ycsoft.commons.helper.StringHelper;
-import com.ycsoft.commons.store.MemoryDict;
 import com.ycsoft.daos.core.JDBCException;
 import com.ycsoft.daos.helper.BeanHelper;
 /**
@@ -1312,7 +1312,9 @@ public class OrderComponent extends BaseBusiComponent {
 					tariffIt.remove();
 			}
 		}
-		
+		java.text.DecimalFormat   df=new   java.text.DecimalFormat("#.##");  
+		//资费的格式
+		Pattern p = Pattern.compile("USD/*M");
 		// 如果有适用的资费
 		if (CollectionHelper.isNotEmpty(ptList)) {
 			for(ProdTariffDto pt:ptList){
@@ -1321,6 +1323,17 @@ public class OrderComponent extends BaseBusiComponent {
 				tariff.setBilling_cycle(pt.getBilling_cycle());
 				tariff.setDisct_rent(pt.getRent());
 				tariff.setDisct_name(pt.getTariff_name());
+				
+				Matcher tariffRent = p.matcher(tariff.getDisct_name());
+				if(!tariffRent.find()){
+					String _v = null;
+					if(tariff.getBilling_cycle() != null && tariff.getDisct_rent() !=null ){
+						_v = tariff.getBilling_cycle() == 1 ?"":tariff.getBilling_cycle().toString(); 
+					}
+					if(_v != null){
+						tariff.setDisct_name(tariff.getDisct_name()+"("+df.format((double)tariff.getDisct_rent()/100)+"USD/"+_v+"M)");
+					}
+				}
 				tariff.setBilling_type(pt.getBilling_type());
 				tariffList.add(tariff);
 				// 查找资费所有的优惠
@@ -1335,8 +1348,18 @@ public class OrderComponent extends BaseBusiComponent {
 						}
 						if (flag) {
 							disct.setTariff_id(disct.getTariff_id() + "_" + disct.getDisct_id());
-							
 							disct.setBilling_type(pt.getBilling_type());
+							
+							Matcher disctRent = p.matcher(disct.getDisct_name());
+							if(!disctRent.find()){
+								String _v = null;
+								if(disct.getBilling_cycle() != null && disct.getDisct_rent() !=null ){
+									_v = disct.getBilling_cycle() == 1 ?"":disct.getBilling_cycle().toString();
+								}
+								if(_v != null){
+									disct.setDisct_name(disct.getDisct_name()+"("+df.format((double)disct.getDisct_rent()/100)+"USD/"+_v+"M)");
+								}
+							}
 							//disct.setDisct_id(disct.getTariff_id() + "-" + disct.getDisct_id());
 							tariffList.add(disct);
 						}

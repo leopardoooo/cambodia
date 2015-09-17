@@ -242,8 +242,8 @@ public class WWorkDao extends BaseEntityDao<WWork> {
 				+ " from w_work t, w_cust_info wc, C_CUST c, c_done_Code cd "
 				+ " where t.work_id = wc.work_id and wc.cust_id = c.cust_id and  t.create_done_code = cd.done_code "
 				+ " and t.county_id = c.county_id"
-				+ "  AND t.create_time >= to_date(?, 'yyyy/MM/dd') "
-				+ "  AND t.create_time < to_date(?, 'yyyy/MM/dd') ";
+				+ "  AND t.create_time >= to_date(?, 'yyyy-MM-dd') "
+				+ "  AND t.create_time < to_date(?, 'yyyy-MM-dd') ";
 		List<Object> params = new ArrayList<Object>();
 		params.add(cond.getStartTime());
 		params.add(cond.getEndTime());

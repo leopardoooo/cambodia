@@ -344,23 +344,23 @@ UserBaseForm = Ext.extend( BaseForm , {
 					var subType = data["deviceModel"]["interactive_type"]
 					if(subType === "SINGLE"){
 						if(currUserType !== "DTT"){
-							Alert("此设备为单向机顶盒，不支持当前的DTT用户类型");
+							Alert(lmsg('singleStbNotSupDTT'));
 							field.setRawValue("");
 							return ;
 						}
 					}else if(currUserType !== "OTT"){
-						Alert("此设备为双向机顶盒，不支持当前的OTT用户类型");
+						Alert(lmsg('doubleStbNotSupOTT'));
 						field.setRawValue("");
 						return ;
 					}
 				}else if(dtype === "MODEM" ){
 					if(currUserType !== "BAND"){
-						Alert("设备为Modem猫，不支持所选"+ currUserType +"用户类型");
+						Alert(lbc('msgBox.modemNotSupUserType', null, [currUserType]));
 						field.setRawValue("");
 						return;
 					}
 				}else{
-					Alert("此设备不支持当前的用户类型!");
+					Alert(lmsg('currDeviceNotSupUserType'));
 					field.setRawValue("");
 					return;
 				}
@@ -444,11 +444,12 @@ UserBaseForm = Ext.extend( BaseForm , {
 		var txtFeeEl = Ext.getCmp("txtFeeEl");
 		var deviceCodeEl = Ext.getCmp("deviceCodeEl");
 		
+		alert(boxTask.checked+"  "+deviceCodeEl.getValue());
 		// 设备回填
 		if(boxTask.checked && !deviceCodeEl.getValue()){
 			return {
 				"isValid": false,
-				"msg": "当设备没有选择施工回填时，设备编码是必须输入的"
+				"msg": lmsg('notChooseDeviceMustBeInput')
 			}
 		}
 		
@@ -461,7 +462,7 @@ UserBaseForm = Ext.extend( BaseForm , {
 			if(feeValue < minfee || feeValue > maxfee){
 				return {
 					isValid: false,
-					msg: "设备费用必须介于"+ minfee +"-" +maxfee +"之间"
+					msg: lbc('msgBox.deviceFeeMustBeBetween', null, [minfee, maxfee])
 				};
 			}
 		}

@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 
 import com.ycsoft.beans.task.WTaskUser;
+import com.ycsoft.business.dto.config.TaskUserDto;
 import com.ycsoft.daos.abstracts.BaseEntityDao;
 import com.ycsoft.daos.core.JDBCException;
 
@@ -23,5 +24,15 @@ public class WTaskUserDao extends BaseEntityDao<WTaskUser> {
 		return this.count(sql, taskId);
 	}
 
+	public List<TaskUserDto> queryUserDetailByTaskId(String taskId) throws JDBCException {
+		String sql = "select t.*,cu.password password,cu.user_name user_name"
+				+ " from w_task_user t,c_user cu  where t.task_id=? and t.user_id = cu.user_id ";
+		return this.createQuery(TaskUserDto.class,sql, taskId).list();
+	}
+	
+	public void updateTaskUserDevice(String deviceId,String userId,String taskId) throws Exception {
+		String sql = "update w_task_user set device_id=? where task_id=? and user_id=?";
+		this.executeUpdate(sql,deviceId,taskId,userId);
+	}
 
 }

@@ -47,7 +47,7 @@ Ext.apply(App.func,{
 /**************************************用户信息面板开始*************************************************/
 		if(panelName == 'U_USER'){
 			//如果数字用户，且卡号为空，只允许补入设备
-			if(data['user_type'] == 'DTV' && Ext.isEmpty(data['card_id'])){
+			/*if(data['user_type'] == 'DTV' && Ext.isEmpty(data['card_id'])){
 				if(busicode != '1222'){
 					return false;
 				}else{
@@ -57,6 +57,7 @@ Ext.apply(App.func,{
 			//状态必须正常 1323为续报停
 			if(data['status'] == 'REQSTOP' && (busicode != '1323' && busicode != '1123')) return false;
 			if( (data['status'] == 'WAITLOGOFF' || data['status'] == 'DORMANCY' || data['status'] == 'ATVCLOSE') && busicode!='1221' && busicode!='1030')return false;
+			*/
 			if(busicode === '1009'){//更换设备
 				if( data['user_type'] == 'OTT_MOBILE' || ( (data['user_type'] =='OTT' || data['user_type'] =='DTT') && Ext.isEmpty(data['stb_id'])) || (data['user_type'] =='BAND' && Ext.isEmpty(data['modem_mac'])) )
 					return false;

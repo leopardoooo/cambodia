@@ -19,7 +19,6 @@ UserBaseBatchForm = Ext.extend( BaseForm , {
 		});
 		this.newUserGrid = new Ext.grid.GridPanel({
 			region: 'center',
-//			anchor: '100%',
 			title: lmain("user._form.titleOpenUserGrid"),
 			store: this.newUserStore,
 	        columns: [
@@ -54,25 +53,15 @@ UserBaseBatchForm = Ext.extend( BaseForm , {
 		});
 		this.busiFeeGrid = new Ext.grid.GridPanel({
 			region: 'south',
-			title: '杂费表',
+			title: lmain("user._form.titleBusiFeeGrid"),
 			store: this.busiFeeStore,
 			width:'100%',
 			autoExpandColumn: 'aecid',
 	        columns: [
-	            {id:'aecid', menuDisabled: true, header: "费用名称", sortable: false, dataIndex: 'fee_name'},
-	            {menuDisabled: true, header: "收费金额", sortable: false, dataIndex: 'fee', width:300, renderer:Ext.util.Format.formatFee}
+	            {id:'aecid', menuDisabled: true, header: lmain('user._form.feeName'), sortable: false, dataIndex: 'fee_name'},
+	            {menuDisabled: true, header: lmain('user._form.feeAmount'), sortable: false, dataIndex: 'fee', width:300, renderer:Ext.util.Format.formatFee}
 	        ]
 		});
-		
-		/*this.spkgStore = new Ext.data.JsonStore({
-			url: root + '/core/x/User!querySpkgBySn.action',
-			fields: ['sp_id', 'spkg_title'],
-			params: {
-				spkgSn: App.getCust()['spkg_sn']
-			},
-			autoLoad: true
-		});*/
-		
 		
 		UserBaseBatchForm.superclass.constructor.call(this, {
 			trackResetOnLoad:true,
@@ -393,7 +382,7 @@ UserBaseBatchForm = Ext.extend( BaseForm , {
 		if(this.newUserStore.getCount() == 0){
 			return {
 				isValid: false,
-				msg: "请将需要保存的用户添加至暂存表"
+				msg: lmsg('addUserToTempTable')
 			};
 		}
 		return true;

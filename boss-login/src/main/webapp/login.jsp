@@ -75,8 +75,8 @@
 									<th>语&nbsp;&nbsp;&nbsp;&nbsp;言</th> 
 									<td width="90" class="inner-input-cmp">
 										<select id="lang" style="margin-left: 7px;">
-											<option value="zh">简体中文</option>
-											<option value="en" selected>English</option>
+											<option value="zh" selected>简体中文</option>
+											<option value="en">English</option>
 											<option value="kh">ភាសាខ្មែរ</option>
 										</select>
 									</td>
@@ -110,7 +110,7 @@
   					<ul>
   					</ul>
   					<div>	
-  						尧辰科技版权所有　&copy; 2009-2014&nbsp; &nbsp; 
+  						　&copy; 2009-2014&nbsp; &nbsp; 
   					</div>
   				</div>
   			</td>

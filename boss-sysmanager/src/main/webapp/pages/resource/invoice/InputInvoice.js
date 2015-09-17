@@ -14,19 +14,19 @@ CheckInInvoiceForm = Ext.extend(Ext.form.FormPanel,{
 			},
 			items:[
 				{columnWidth:.4,layout:'form',defaultType:'textfield',items:[
-					{id: 'invoidType_checkIn',fieldLabel:'&nbsp;&nbsp;&nbsp;发票类型',hiddenName:'invoiceDto.invoice_type',xtype:'paramcombo',
+					{id: 'invoidType_checkIn',fieldLabel:lsys('InvoiceCommon.invoice_type'),hiddenName:'invoiceDto.invoice_type',xtype:'paramcombo',
 						paramName:'INVOICE_TYPE',defaultValue:'2',listeners:{
 							scope:this,
 							select:this.setAmountDisable
 						}},
-					{fieldLabel:'发票代码',xtype:'textfield',name:'invoiceDto.invoice_code',allowBlank:false,value:'AAA',readOnly:true},
-					{fieldLabel:'开始发票号',name:'invoiceDto.start_invoice_id',allowBlank:false,
+					{fieldLabel:lsys('InvoiceCommon.invoice_code'),xtype:'textfield',name:'invoiceDto.invoice_code',allowBlank:false,value:'AAA',readOnly:true},
+					{fieldLabel:lsys('InvoiceInput.startInvoiceId'),name:'invoiceDto.start_invoice_id',allowBlank:false,
 						minLength:8,maxLength:8,enableKeyEvents:true,vtype:'invoiceId',
 						listeners:{
 							scope:this,
 							keyup:this.showInvoiceDetail
 						}},
-					{fieldLabel:'结束发票号',name:'invoiceDto.end_invoice_id',allowBlank:false,
+					{fieldLabel:lsys('InvoiceInput.endInvoiceId'),name:'invoiceDto.end_invoice_id',allowBlank:false,
 						minLength:8,maxLength:8,enableKeyEvents:true,vtype:'invoiceId',
 						listeners:{
 							scope:this,
@@ -78,7 +78,7 @@ CheckInInvoiceForm = Ext.extend(Ext.form.FormPanel,{
 			var startInvoiceId = form.findField('invoiceDto.start_invoice_id').getValue();//开始发票号
 			var endInvoiceId = form.findField('invoiceDto.end_invoice_id').getValue();//结束发票号
 			if (startInvoiceId.length!=endInvoiceId.length){
-				Ext.getCmp('invoiceStatisId').setValue("发票开始号和发票结束号长度不一致");
+				Ext.getCmp('invoiceStatisId').setValue(lsys('msgBox.invoiceIdLengthNotEquals'));
 				return;
 			}
 			//不足8位，前面补零
@@ -94,7 +94,8 @@ CheckInInvoiceForm = Ext.extend(Ext.form.FormPanel,{
 					if(comp.hidden){
 						comp.show();	
 					}
-					Ext.getCmp('invoiceStatisId').setValue('发票共 '+(intEnd - intStart + 1)+" 张");
+					
+					Ext.getCmp('invoiceStatisId').setValue(lsys('InvoiceInput.invoiceCount',null,[(intEnd - intStart + 1)]));
 				}else{
 					if(!comp.hidden)
 						comp.hide();
@@ -128,12 +129,12 @@ var CheckInPanel = Ext.extend(Ext.Panel,{
 			id:'checkInWinId',
 			width:560,
 			height:210,
-			title:'发票入库',
+			title:lsys('InvoiceInput._title'),
 			region:'center',
 			items:[this.checkInInvoiceForm],
 			buttonAlign:'center',
 			buttons:[
-				{text:'录入',scope:this,handler:this.doSave}
+				{text:lsys('InvoiceInput.btnRecord'),scope:this,handler:this.doSave}
 			]
 		});
 	},
@@ -143,7 +144,7 @@ var CheckInPanel = Ext.extend(Ext.Panel,{
 		var startInvoiceId = form.findField('invoiceDto.start_invoice_id').getValue();//开始发票号
 		var endInvoiceId = form.findField('invoiceDto.end_invoice_id').getValue();//结束发票号
 		if (startInvoiceId.length!=endInvoiceId.length){
-			Ext.getCmp('invoiceStatisId').setValue("发票开始号和发票结束号长度不一致");
+			Ext.getCmp('invoiceStatisId').setValue(lsys('msgBox.invoiceIdLengthNotEquals'));
 			return;
 		}
 		var values = this.checkInInvoiceForm.getValues();
@@ -152,7 +153,7 @@ var CheckInPanel = Ext.extend(Ext.Panel,{
 		values['invoiceDto.invoice_amount'] = Ext.util.Format.formatToFen(values['invoiceDto.invoice_amount']);
 		var comp = Ext.getCmp('invoiceLabelStatisId');
 		if(comp.hidden && parseInt(startInvoiceId,10) > parseInt(endInvoiceId,10)){
-			Alert('请正确输入发票号!');
+			Alert(lsys('msgBox.needCorrectInvoiceId'));
 			return;
 		}
 		var mb = Show();
@@ -164,11 +165,11 @@ var CheckInPanel = Ext.extend(Ext.Panel,{
 			success : function(res, opt) {
 				mb.hide();
 				if (true === Ext.decode(res.responseText).success){
-					Alert('入库成功!',function(){
+					Alert(lsys('common.msg.actionSuccess'),function(){
 						this.checkInInvoiceForm.getForm().reset();
 					},this);
 				}else
-					Alert('入库失败!');
+					Alert(lsys('common.msg.actionFailed'));
 			}
 		});
 	}
@@ -180,7 +181,7 @@ InputInvoice = Ext.extend(Ext.Panel,{
 		this.checkInPanel = new CheckInPanel();
 		InputInvoice.superclass.constructor.call(this,{
 			id:'InputInvoice',
-			title:'发票入库',
+			title:lsys('InvoiceInput._title'),
 			closable: true,
 			border : false ,
 			baseCls: "x-plain",

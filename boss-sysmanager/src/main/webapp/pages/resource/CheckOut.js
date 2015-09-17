@@ -1,10 +1,15 @@
+var COMMON_LU = lsys('common');
+var DEV_COMMON_LU = lsys('DeviceCommon');
+var CHE_OUT_LU = lsys('CheckOut');
+var MSG_LU = lsys('msgBox');
+
 //调拨
 var transferNo = {
-	fieldLabel:'调拨单号',xtype:'textfield',vtype:'alphanum',name:'deviceTransfer.transfer_no',allowBlank:false
+	fieldLabel:DEV_COMMON_LU.labelTransNo,xtype:'textfield',vtype:'alphanum',name:'deviceTransfer.transfer_no',allowBlank:false
 };
 
 //仓库
-var depot = {fieldLabel:'仓库',hiddenName:'deviceTransfer.depot_order',xtype:'combo',allowBlank:false,
+var depot = {fieldLabel:DEV_COMMON_LU.labelDepot,hiddenName:'deviceTransfer.depot_order',xtype:'combo',allowBlank:false,
 		store:new Ext.data.JsonStore({
 			url:'resource/Device!queryDeptByOptr.action',
 			fields:['dept_id','dept_name']
@@ -12,9 +17,9 @@ var depot = {fieldLabel:'仓库',hiddenName:'deviceTransfer.depot_order',xtype:'
 };
 
 //备注
-var outRemark = {fieldLabel:'备注',name:'deviceTransfer.remark',xtype:'textarea',anchor:'90%',height:45};
+var outRemark = {fieldLabel:lsys('common.remarkTxt'),name:'deviceTransfer.remark',xtype:'textarea',anchor:'90%',height:45};
 //调拨状态
-var statusCmp = {fieldLabel:'设备状况',xtype:'paramcombo',paramName:'TRANSFER_STATUS',allowBlank:false,
+var statusCmp = {fieldLabel:DEV_COMMON_LU.labelDevStatus,xtype:'paramcombo',paramName:'TRANSFER_STATUS',allowBlank:false,
 		hiddenName:'deviceTransfer.transfer_status'
 };
 
@@ -42,7 +47,7 @@ var TransferGrid = Ext.extend(Ext.grid.GridPanel,{
 		this.deviceModelStore.load();
         this.deviceModelStore.on("load", function (s) {
             s.insert(0, new Ext.data.Record({
-                model_type_name: '全选',
+                model_type_name: COMMON_LU.selectAll,
                 device_model: ''
             }));
         });
@@ -50,7 +55,7 @@ var TransferGrid = Ext.extend(Ext.grid.GridPanel,{
 		var sm = new Ext.grid.RowSelectionModel({singleselect:true});
 		var currentOptrId = App.data.optr['optr_id'];
 		var columns = [
-			{header:'调拨单号',dataIndex:'transfer_no',width:75,renderer:function(value,metaData,record){
+			{header:DEV_COMMON_LU.labelTransNo,dataIndex:'transfer_no',width:75,renderer:function(value,metaData,record){
 				that = this;
 				if(record.get('device_type') == 'STB' || record.get('device_type') == 'CARD' && record.get('device_type') == 'MODEM'){
 					return '<div style="text-decoration:underline;font-weight:bold"  onclick="Ext.getCmp(\'transferGridId\').doDblclick();"  ext:qtitle="" ext:qtip="' + value + '">' + value +'</div>';
@@ -58,37 +63,37 @@ var TransferGrid = Ext.extend(Ext.grid.GridPanel,{
 					return '<div ext:qtitle="" ext:qtip="' + value + '">' + value +'</div>';
 				}
 			}},
-			{header:'调拨类别',dataIndex:'tran_type_text',width:55},
-			{header:'仓库',dataIndex:'depot_text',width:100,renderer:App.qtipValue},
-			{header:'状态',dataIndex:'status_text',width:50,renderer:Ext.util.Format.statusShow},
-			{header:'创建日期',dataIndex:'create_time',width:105,renderer:Ext.util.Format.timeFormat},
-			{header:'确认日期',dataIndex:'confirm_date',width:105,renderer:Ext.util.Format.timeFormat},
-			{header:'设备类型',dataIndex:'device_type_text',width:55},
-			{header:'调拨状态',dataIndex:'transfer_status_text',width:55},
-			{header:'型号',dataIndex:'device_model_text',width:120,renderer:App.qtipValue},
-			{header:'数量',dataIndex:'count',width:40},
-			{id:'checkout_remark_id',header:'备注',dataIndex:'remark'},
-			{header:'操作',dataIndex:'device_done_code',width:200,renderer:function(value,meta,record){
+			{header:CHE_OUT_LU.labelTransType,dataIndex:'tran_type_text',width:55},
+			{header:DEV_COMMON_LU.labelDepot,dataIndex:'depot_text',width:100,renderer:App.qtipValue},
+			{header:COMMON_LU.status,dataIndex:'status_text',width:50,renderer:Ext.util.Format.statusShow},
+			{header:COMMON_LU.createDate,dataIndex:'create_time',width:105,renderer:Ext.util.Format.timeFormat},
+			{header:CHE_OUT_LU.labelConfirmDate,dataIndex:'confirm_date',width:105,renderer:Ext.util.Format.timeFormat},
+			{header:DEV_COMMON_LU.labelDeviceType,dataIndex:'device_type_text',width:55},
+			{header:DEV_COMMON_LU.labelTransStatus,dataIndex:'transfer_status_text',width:55},
+			{header:DEV_COMMON_LU.labelDeviceModel,dataIndex:'device_model_text',width:120,renderer:App.qtipValue},
+			{header:DEV_COMMON_LU.labelNum,dataIndex:'count',width:40},
+			{id:'checkout_remark_id',header:lsys('common.remarkTxt'),dataIndex:'remark'},
+			{header:COMMON_LU.doActionBtn,dataIndex:'device_done_code',width:200,renderer:function(value,meta,record){
 				var result = "";
 				if(currentOptrId == record.get('optr_id')){
-					result = "<a href='#' title='修改单号' onclick=Ext.getCmp('transferGridId').editTransferNo("+value+")>修改单号</a>";
+					result = "<a href='#' title='"+ DEV_COMMON_LU.titleModifyOrderNum + "' onclick=Ext.getCmp('transferGridId').editTransferNo("+value+")>" + DEV_COMMON_LU.titleTransConfirm + "</a>";
 				}
 				if(record.get('status') === 'UNCONFIRM' && record.get('tran_type') === 'TRANIN'){
-					result += "&nbsp;&nbsp;<a href='#' title='调拨确认' onclick=Ext.getCmp('transferGridId').transferConfirm("+value+")>调拨确认</a>";
+					result += "&nbsp;&nbsp;<a href='#' title='" + DEV_COMMON_LU.titleTransConfirm + "' onclick=Ext.getCmp('transferGridId').transferConfirm("+value+")>" + CHE_OUT_LU.titleModifyOrderNum + "</a>";
 				}
 				if(record.get('status') === 'CONFIRM' && record.get('tran_type') === 'TRANIN'){
 					if(record.get('device_type') == 'STB' || record.get('device_type') == 'CARD' && record.get('device_type') == 'MODEM'){
-						result += "&nbsp;&nbsp;<a href='#' title='转发' onclick=Ext.getCmp('transferGridId').retransfer("+record.get('device_done_code')+")>转发</a>";
+						result += "&nbsp;&nbsp;<a href='#' title='" + CHE_OUT_LU.labelTransIn + "' onclick=Ext.getCmp('transferGridId').retransfer("+record.get('device_done_code')+")>" + CHE_OUT_LU.labelTransIn + "</a>";
 					}
 				}
 				var isHistory = record.get('is_history');
 				if(isHistory == 'F'){
-						result += "&nbsp;&nbsp;<a href='#' title='历史调拨' onclick=Ext.getCmp('transferGridId').editHisTransfer("+value+",'T')>历史</a>";
+						result += "&nbsp;&nbsp;<a href='#' title='"+CHE_OUT_LU.labelTransHistory+"' onclick=Ext.getCmp('transferGridId').editHisTransfer("+value+",'T')>"+COMMON_LU.labelHistory+"</a>";
 				}else{
-					result += "&nbsp;&nbsp;<a href='#' title='恢复调拨' onclick=Ext.getCmp('transferGridId').editHisTransfer("+value+",'F')>恢复</a>";
+					result += "&nbsp;&nbsp;<a href='#' title='"+DEV_COMMON_LU.labelRestoreTrans.restore+"' onclick=Ext.getCmp('transferGridId').editHisTransfer("+value+",'F')>"+COMMON_LU.restore+"</a>";
 				}
 				if(record.get('device_type') == 'STB' || record.get('device_type') == 'CARD' && record.get('device_type') == 'MODEM'){
-					result += "&nbsp;&nbsp;<a href='#' title='下载明细' onclick=Ext.getCmp('transferGridId').downloadExcel("+value+")>下载</a>";
+					result += "&nbsp;&nbsp;<a href='#' title='"+COMMON_LU.downLoadDetail+"' onclick=Ext.getCmp('transferGridId').downloadExcel("+value+")>"+COMMON_LU.downLoad+"</a>";
 				}
 				return result;
 			}}
@@ -112,7 +117,7 @@ var TransferGrid = Ext.extend(Ext.grid.GridPanel,{
 		}
 		TransferGrid.superclass.constructor.call(this,{
 			id:'transferGridId',
-			title:'调拨信息',
+			title:DEV_COMMON_LU.titleTransInfo,
 			region:'center',
 			autoExpandColumn:'checkout_remark_id',
 			autoScroll:true,
@@ -120,12 +125,12 @@ var TransferGrid = Ext.extend(Ext.grid.GridPanel,{
 			ds:this.transferGridStore,
 			columns:columns,
 			sm:sm,
-			tbar:['-','关键字&nbsp;',
+			tbar:['-',COMMON_LU.inputKeyWork ,
 				new Ext.ux.form.SearchField({  
 	                store: this.transferGridStore,
 	                width: 120,
 	                hasSearch : true,
-	                emptyText: '支持编号模糊查询'
+	                emptyText: DEV_COMMON_LU.tipSupportFuzzyQuery
 	            }),'-',
 	            new Ext.form.ComboBox({
 					store : this.deviceModelStore,
@@ -135,7 +140,7 @@ var TransferGrid = Ext.extend(Ext.grid.GridPanel,{
 					boxMinWidth : 250,
 					minListWidth : 250,
 					mode:'local',
-					emptyText:'选择型号',
+					emptyText:MSG_LU.selectModel,
 					displayField : 'model_type_name',
 					valueField : 'device_model',
 					listeners : {
@@ -146,15 +151,15 @@ var TransferGrid = Ext.extend(Ext.grid.GridPanel,{
 	            {
 	            	xtype:'combo',store:new Ext.data.ArrayStore({
 	            			fields:['transferTypeText','transferType'],
-	            			data:[['所有调拨','ALL'],['执行调拨','NOW'],['历史调拨','HISTORY']]
+	            			data:[[CHE_OUT_LU.transStatus.ALL,'ALL'],[CHE_OUT_LU.transStatus.NOW,'NOW'],[CHE_OUT_LU.transStatus.HISTORY,'HISTORY']]
 	            		}),displayField:'transferTypeText',valueField:'transferType',
-	            	emptyText:'执行中或历史调拨',width:80,
+	            	emptyText:CHE_OUT_LU.tipTransStatus,width:80,
 	            	listeners:{
 	            		scope:this,select:this.queryTransferByType
 	            	}
 	            },'-',
 	            {id:'checkout_startDate_id',xtype:'datefield',name:'checkout_startDate',format:'Y-m-d',
-	            	emptyText:'开始日期',width:90,listeners:{
+	            	emptyText:COMMON_LU.startDate,width:90,listeners:{
 	            		scope:this,
 	            		blur: function(comp){
 	            			var v = comp.getValue();
@@ -167,7 +172,7 @@ var TransferGrid = Ext.extend(Ext.grid.GridPanel,{
 	            	}
 	            },'-',
 	            {id:'checkout_endDate_id',xtype:'datefield',name:'checkout_endDate',
-	            	width:90,format:'Y-m-d',emptyText:'结束日期',listeners:{
+	            	width:90,format:'Y-m-d',emptyText:COMMON_LU.endDate,listeners:{
 	            		scope:this,
 	            		blur: function(comp){
 	            			var v = comp.getValue();
@@ -178,11 +183,11 @@ var TransferGrid = Ext.extend(Ext.grid.GridPanel,{
 	            			}
 	            		}
 	            	}},'-',
-	            {xtype:'button',text:'查询',iconCls:'icon-query',scope:this,handler:this.doDateQuery},'-',
-				{text:'文件调拨',iconCls:'icon-excel',scope:this,handler:this.fileTransfer,tooltip:'文件入库：只有1列设备编号'},'-',
-				{text:'手工调拨',iconCls:'icon-hand',scope:this,handler:this.handTransfer},'-',
-				{text:'批号调拨',iconCls:'icon-batch-number',scope:this,handler:this.batchNumTransfer},
-				{text:'器材调拨',iconCls:'icon-batch-number',scope:this,handler:this.materalTransfer}
+	            {xtype:'button',text:COMMON_LU.query,iconCls:'icon-query',scope:this,handler:this.doDateQuery},'-',
+				{text:CHE_OUT_LU.labelFileTrans,iconCls:'icon-excel',scope:this,handler:this.fileTransfer,tooltip:MSG_LU.tipDevCheckFileFormat},'-',
+				{text:CHE_OUT_LU.labelManualTrans,iconCls:'icon-hand',scope:this,handler:this.handTransfer},'-',
+				{text:CHE_OUT_LU.labelBatchNumTrans,iconCls:'icon-batch-number',scope:this,handler:this.batchNumTransfer},
+				{text:CHE_OUT_LU.labelMateralTrans,iconCls:'icon-batch-number',scope:this,handler:this.materalTransfer}
 				
 			],
 			bbar : new Ext.PagingToolbar({
@@ -234,9 +239,9 @@ var TransferGrid = Ext.extend(Ext.grid.GridPanel,{
 		store.load({params:{start:0,limit:Constant.DEFAULT_PAGE_SIZE}});
 	},
 	editHisTransfer: function(v,isHistory){
-		var text = '确认转换为历史调拨吗？';
+		var text = MSG_LU.confirm2HisTrans;
 		if(isHistory == 'F'){
-			text = '确认转换为执行中的调拨吗？';
+			text = MSG_LU.confirm2NowTrans;
 		}
 		Confirm(text,this,function(){
 			var record = this.getSelectionModel().getSelected();
@@ -318,11 +323,11 @@ var TransferFileForm = Ext.extend(Ext.form.FormPanel,{
 			},
 			items:[
 				transferNo,
-				{fieldLabel:'设备类型',xtype:'paramcombo',typeAhead:false,paramName:'DEVICE_TYPE',
+				{fieldLabel:DEV_COMMON_LU.labelDeviceType,xtype:'paramcombo',typeAhead:false,paramName:'DEVICE_TYPE',
 					hiddenName:'deviceType',allowBlank:false
 				},
 				depot,statusCmp,
-				{id:'checkOutFileId',fieldLabel:'设备文件',name:'files',xtype:'textfield',inputType:'file',allowBlank:false,anchor:'95%'},
+				{id:'checkOutFileId',fieldLabel:DEV_COMMON_LU.labelDevFile,name:'files',xtype:'textfield',inputType:'file',allowBlank:false,anchor:'95%'},
 				outRemark
 				]
 		});
@@ -352,7 +357,7 @@ var TransferFileWin = Ext.extend(Ext.Window,{
 		this.transferFileForm = new TransferFileForm();
 		TransferFileWin.superclass.constructor.call(this,{
 			id : 'transferFileWinId',
-			title:'文件调拨',
+			title:CHE_OUT_LU.labelFileTrans,
 			closeAction:'hide',
 			maximizable:false,
 			width: 450,
@@ -361,8 +366,8 @@ var TransferFileWin = Ext.extend(Ext.Window,{
 			border: false,
 			items:[this.transferFileForm],
 			buttonAlign:'right',
-			buttons:[{text:'保存',iconCls:'icon-save',scope:this,handler:this.doSave},
-				{text:'关闭',iconCls:'icon-close',scope:this,handler:function(){
+			buttons:[{text:COMMON_LU.saveBtn,iconCls:'icon-save',scope:this,handler:this.doSave},
+				{text:COMMON_LU.cancel,iconCls:'icon-close',scope:this,handler:function(){
 					this.hide();
 				}}],
 			listeners:{
@@ -385,8 +390,8 @@ var TransferFileWin = Ext.extend(Ext.Window,{
 			var values = this.transferFileForm.getForm().getValues();
 			this.transferFileForm.getForm().submit({
 				url:'resource/Device!saveTransferFile.action',
-				waitTitle:'提示',
-				waitMsg:'正在上传中,请稍后...',
+				waitTitle:COMMON_LU.tipTxt,
+				waitMsg:COMMON_LU.waitForUpload,
 				scope:this,
 				success:function(form,action){
 					var data = action.result;
@@ -394,7 +399,7 @@ var TransferFileWin = Ext.extend(Ext.Window,{
 						if(data.msg){//错误信息
 							Alert(data.msg);
 						}else{
-							Alert('文件上传成功!',function(){
+							Alert(MSG_LU.fileUploadSuccess,function(){
 								this.hide();
 								Ext.getCmp('transferGridId').getStore().reload();
 							},this);
@@ -402,7 +407,7 @@ var TransferFileWin = Ext.extend(Ext.Window,{
 					}
 				},  
 				failure : function(form, action) {  
-					alert("文件上传失败!");  
+					alert(MSG_LU.fileUploadFailure);  
 				}
 			});
 		}
@@ -503,7 +508,7 @@ var TransferHandWin = Ext.extend(Ext.Window,{
 		this.transferDeviceGrid = new TransferDeviceGrid();
 		FileCheckInWin.superclass.constructor.call(this,{
 			id : 'transferHandWinId',
-			title:'手工调拨',
+			title:CHE_OUT_LU.labelManualTrans,
 			closeAction:'hide',
 			maximizable:false,
 			width: 800,
@@ -512,8 +517,8 @@ var TransferHandWin = Ext.extend(Ext.Window,{
 			layout:'border',
 			items:[this.handForm,this.transferDeviceGrid],
 			buttonAlign:'right',
-			buttons:[{text:'保存',iconCls:'icon-save',scope:this,handler:this.doSave},
-				{text:'关闭',iconCls:'icon-close',scope:this,handler:function(){
+			buttons:[{text:COMMON_LU.saveBtn,iconCls:'icon-save',scope:this,handler:this.doSave},
+				{text:COMMON_LU.cancel,iconCls:'icon-close',scope:this,handler:function(){
 					this.hide();
 				}}],
 			listeners:{
@@ -541,7 +546,7 @@ var TransferHandWin = Ext.extend(Ext.Window,{
 			if(data['device_id']){
 				//过滤掉重复调拨的设备
 				if(arrCode.indexOf(data['device_id']) >=0){
-					Alert('编号有相同的，请检查！');
+					Alert(MSG_LU.warnHasSaveCode);
 					return ;
 				}
 				arrCode.push(data);
@@ -557,7 +562,7 @@ var TransferHandWin = Ext.extend(Ext.Window,{
 		});
 		
 		if(arr.length === 0){
-			Alert('请正确输入设备信息！');
+			Alert(MSG_LU.pleaseInputCorrectDevInfo);
 			return;
 		}
 		
@@ -573,7 +578,7 @@ var TransferHandWin = Ext.extend(Ext.Window,{
 			success:function(res,opt){
 				msg.hide();
 				msg = null;
-				Alert('添加成功',function(){
+				Alert(COMMON_LU.addSuccess,function(){
 					this.hide();
 					Ext.getCmp('transferGridId').getStore().reload();
 				},this);
@@ -595,21 +600,33 @@ ReTransferHandWin = Ext.extend(Ext.Window,{
 		
 		this.transferInfoTemplate = '<table width="100%" border="0" cellpadding="0" cellspacing="0">' +
 			'<tr height=24>'+
-				'<td class="label" width=20%>原调拨机顶盒数量:</td>' +
+				'<td class="label" width=20%>' +
+				CHE_OUT_LU.labelOldTransStbNum +
+				':</td>' +
 				'<td class="input_bold" width=30%>&nbsp;{[values.old.STB || 0]}</td>'+
-				'<td class="label" width=20%>本次调拨机顶盒数量:</td>' +
+				'<td class="label" width=20%>' +
+				CHE_OUT_LU.labelNewTransStbNum +
+				':</td>' +
 				'<td class="input_bold" width=30%>&nbsp;{[values.now.STB || 0]}</td>'+
 			'</tr>'+
 			'<tr height=24>'+
-			'<td class="label">原调拨智能卡数量:</td>' +
+			'<td class="label">' +
+			CHE_OUT_LU.labelOldTransCardNum +
+			':</td>' +
 				'<td class="input">&nbsp;{[values.old.CARD || 0]}</td>'+
-				'<td class="label">本次调拨智能卡数量:</td>' +
+				'<td class="label">' +
+				CHE_OUT_LU.labelNewTransCardNum +
+				':</td>' +
 				'<td class="input">&nbsp;{[values.now.CARD || 0]}</td>'+
 			'</tr>' +
 			'<tr height=24>'+
-				'<td class="label">原调拨猫数量:</td>' +
+				'<td class="label">' +
+				CHE_OUT_LU.labelOldTransModemNum +
+				':</td>' +
 				'<td class="input">&nbsp;{[values.old.MODEM || 0]}</td>'+
-				'<td class="label">本次调拨猫数量:</td>' +
+				'<td class="label">' +
+				CHE_OUT_LU.labelNewTransModemNum +
+				':</td>' +
 				'<td class="input">&nbsp;{[values.now.MODEM || 0]}</td>'+
 			'</tr>' +
 			'</tpl>' +
@@ -619,7 +636,7 @@ ReTransferHandWin = Ext.extend(Ext.Window,{
 		Ext.apply(this.handForm,{height:145,border:false,bodyStyle: "background:#F9F9F9;padding-top: 4px;"})
 		ReTransferHandWin.superclass.constructor.call(this,{
 			id : 'retransferHandWinId',
-			title:'转发',
+			title:CHE_OUT_LU.labelTransIn,
 			closeAction:'hide',
 			maximizable:false,
 			width: 600,
@@ -634,8 +651,8 @@ ReTransferHandWin = Ext.extend(Ext.Window,{
 				}
 			],
 			buttonAlign:'right',
-			buttons:[{text:'保存',iconCls:'icon-save',scope:this,handler:this.doSave},
-				{text:'关闭',iconCls:'icon-close',scope:this,handler:function(){
+			buttons:[{text:COMMON_LU.saveBtn,iconCls:'icon-save',scope:this,handler:this.doSave},
+				{text:COMMON_LU.cancel,iconCls:'icon-close',scope:this,handler:function(){
 					this.hide();
 				}}],
 			listeners:{
@@ -660,7 +677,7 @@ ReTransferHandWin = Ext.extend(Ext.Window,{
 				var data = Ext.decode(res.responseText);
 				if(!data || !data.now || 
 						(data.now.STB ==0 && data.now.CARD ==0 && data.now.MODEM ==0) ){
-					Alert('本批次调拨的设备已没有符合可调拨条件的设备!');
+					Alert(MSG_LU.notSuitableDev4Trans);
 					return;
 				}
 				this.tpl.applyTemplate(data)
@@ -685,7 +702,7 @@ ReTransferHandWin = Ext.extend(Ext.Window,{
 			success:function(res,opt){
 				msg.hide();
 				msg = null;
-				Alert('转发成功',function(){
+				Alert(COMMON_LU.msg.actionSuccess,function(){
 					this.hide();
 					Ext.getCmp('transferGridId').getStore().reload();
 				},this);
@@ -736,7 +753,7 @@ var TransferBatchForm = Ext.extend(Ext.form.FormPanel,{
 BatchNumTransferDeviceGrid = Ext.extend(Ext.grid.GridPanel,{
 	constructor:function(){
 		this.queryField = new Ext.form.TextField({
-			emptyText: '设备批号...',
+			emptyText: DEV_COMMON_LU.labelDevBatchNum,
 			width: 160,
 			listeners: {
 				scope: this,
@@ -756,19 +773,19 @@ BatchNumTransferDeviceGrid = Ext.extend(Ext.grid.GridPanel,{
 		this.queryDeviceGridStore.on("load", this.setDefaults, this );
 		var sm = new Ext.grid.CheckboxSelectionModel();
 		var columns = [new Ext.grid.RowNumberer(), sm,
-   			{header:'编号(Modem_mac)',dataIndex:'device_code',width:150},//,editor:deviceCodeComp
-   			{header:'类型',dataIndex:'device_type_text',width:70},
-   			{header:'型号',dataIndex:'device_model_text',width:90},
+   			{header:DEV_COMMON_LU.labelDevCode2,dataIndex:'device_code',width:150},//,editor:deviceCodeComp
+   			{header:DEV_COMMON_LU.labelDeviceType,dataIndex:'device_type_text',width:70},
+   			{header:DEV_COMMON_LU.labelDeviceModel,dataIndex:'device_model_text',width:90},
    			{header:'modem_mac',dataIndex:'modem_mac',width:75,hidden:true},
-   			{header:'配对卡型号',dataIndex:'pair_device_model_text',width:90},
-   			{header:'配对卡号',dataIndex:'pair_device_code',width:120},
-   			{header:'配对MODEM型号',dataIndex:'pair_device_modem_model_text',width:90},
-   			{header:'配对MODEM号',dataIndex:'pair_device_modem_code',width:120}
+   			{header:DEV_COMMON_LU.labelPairCardType,dataIndex:'pair_device_model_text',width:90},
+   			{header:DEV_COMMON_LU.labelPairCardCode,dataIndex:'pair_device_code',width:120},
+   			{header:DEV_COMMON_LU.labelPairModemType,dataIndex:'pair_device_modem_model_text',width:90},
+   			{header:DEV_COMMON_LU.labelPairModemCode,dataIndex:'pair_device_modem_code',width:120}
    		];
 		
 		BatchNumTransferDeviceGrid.superclass.constructor.call(this, {
 			region: 'center',
-			title:'设备信息',
+			title:DEV_COMMON_LU.titleDeviceInfo,
 			store: this.queryDeviceGridStore,
 			columns: columns,
 			maskDisabled: true,
@@ -778,7 +795,7 @@ BatchNumTransferDeviceGrid = Ext.extend(Ext.grid.GridPanel,{
 			sm: sm,
 			tbar: [this.queryField ,'-',{
 				iconCls: 'icon-query',
-				text: '查询',
+				text: COMMON_LU.query,
 				scope: this,
 				handler: this.doQuery
 			}]
@@ -796,7 +813,7 @@ BatchNumTransferDeviceGrid = Ext.extend(Ext.grid.GridPanel,{
 				}
 			});
 		}else{
-			Alert("请输入批号查询");
+			Alert(MSG_LU.pleaseInputBatchNum);
 		}
 	}
 });
@@ -814,7 +831,7 @@ TransferBatchNumWin = Ext.extend(Ext.Window,{
 		this.queryDeviceGrid = new BatchNumTransferDeviceGrid();
 		TransferBatchNumWin.superclass.constructor.call(this,{
 			id : 'transferBatchNumWinId',
-			title:'批号调拨',
+			title:CHE_OUT_LU.labelBatchNumTrans,
 			closeAction:'hide',
 			maximizable:false,
 			width: 800,
@@ -823,8 +840,8 @@ TransferBatchNumWin = Ext.extend(Ext.Window,{
 			layout:'border',
 			items:[this.batchNumForm, this.queryDeviceGrid],
 			buttonAlign:'right',
-			buttons:[{text:'保存',iconCls:'icon-save',scope:this,handler:this.doSave},
-				{text:'关闭',iconCls:'icon-close',scope:this,handler:function(){
+			buttons:[{text:COMMON_LU.saveBtn,iconCls:'icon-save',scope:this,handler:this.doSave},
+				{text:COMMON_LU.cancel,iconCls:'icon-close',scope:this,handler:function(){
 					this.hide();
 				}}],
 			listeners:{
@@ -852,7 +869,7 @@ TransferBatchNumWin = Ext.extend(Ext.Window,{
 		});
 		
 		if(arr.length === 0){
-			Alert('请选择需要调拨的设备！');
+			Alert(MSG_LU.pleaseSelectDev2Trans);
 			return;
 		}
 		
@@ -868,7 +885,7 @@ TransferBatchNumWin = Ext.extend(Ext.Window,{
 			success:function(res,opt){
 				msg.hide();
 				msg = null;
-				Alert('调拨成功！',function(){
+				Alert(COMMON_LU.msg.actionSuccess,function(){
 					this.queryDeviceGrid.getStore().removeAll();
 					Ext.getCmp('transferGridId').getStore().reload();
 				},this);
@@ -889,12 +906,12 @@ var MateralTransferDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 		});	
 		
 		doDel = function(){
-			Confirm('确定删除吗?',this,function(){
+			Confirm(MSG_LU.confirmDelete,this,function(){
 				materalThat.getStore().remove(materalThat.getSelectionModel().getSelected());
 			});
 		};
 		var cm = new Ext.grid.ColumnModel([
-				{id:'device_model_text_id',header:'设备型号',dataIndex:'device_model_text',width:120,editor:new Ext.form.ComboBox({
+				{id:'device_model_text_id',header:DEV_COMMON_LU.labelDeviceModel,dataIndex:'device_model_text',width:120,editor:new Ext.form.ComboBox({
 					store:new Ext.data.JsonStore({
 						fields:['device_model_text','device_model','total_num','device_id']
 					}),displayField:'device_model_text',valueField:'device_model_text',triggerAction:'all',mode: 'local'
@@ -907,8 +924,8 @@ var MateralTransferDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 						}
 					}
 				})},
-				{header:'库存数量',dataIndex:'total_num',width:70,renderer:App.qtipValue},
-				{id:'num_id',header:'数量',dataIndex:'num',width:100,
+				{header:DEV_COMMON_LU.labelTotalStoreNum,dataIndex:'total_num',width:70,renderer:App.qtipValue},
+				{id:'num_id',header:DEV_COMMON_LU.labelNum,dataIndex:'num',width:100,
 					scope:this
 					,editor: new Ext.form.NumberField({
 						allowDecimals:false,//不允许输入小数 
@@ -916,15 +933,15 @@ var MateralTransferDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 		    			minValue:1//enableKeyEvents: true,
 					})
 				},
-				{header:'设备编号',dataIndex:'device_id',hidden:true},
-				{header:'操作',dataIndex:'',width:40,renderer:function(value,metavalue,record,i){
-					return "<a href='#' onclick=doDel()>删除</a>";
+				{header:DEV_COMMON_LU.labelDevCode,dataIndex:'device_id',hidden:true},
+				{header:COMMON_LU.doActionBtn,dataIndex:'',width:40,renderer:function(value,metavalue,record,i){
+					return "<a href='#' onclick=doDel()>" +COMMON_LU.remove + "</a>";
 				}}
 			]
 		);
 		cm.isCellEditable = this.cellEditable;
 		MateralTransferDeviceGrid.superclass.constructor.call(this,{
-			title:'器材信息',
+			title:DEV_COMMON_LU.labelMateralInfo,
 			region:'center',
 			id:'MateralTransferDeviceGridId',
 			ds:this.materalStore,
@@ -933,7 +950,7 @@ var MateralTransferDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 			sm:new Ext.grid.RowSelectionModel({}),
 			tbar:[
 				'-',
-				{text:'添加',iconCls:'icon-add',handler:this.doAdd,scope:this},'-'
+				{text:COMMON_LU.addNewOne,iconCls:'icon-add',handler:this.doAdd,scope:this},'-'
 			]
 		});
 	},//是否可编辑
@@ -990,7 +1007,7 @@ var MateralTransferDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 		if(fieldName == 'num'){
 			if(value >record.get('total_num')){
 				record.set('num','');
-				Confirm('不能大于库存数量！',this,function(){
+				Confirm(MSG_LU.tipOutOfStock,this,function(){
 					materalThat.startEditing(obj.row,obj.column);
 				});
 			}
@@ -1019,7 +1036,7 @@ TransferMateralWin = Ext.extend(Ext.Window,{
 		this.queryDeviceGrid = new MateralTransferDeviceGrid();
 		TransferMateralWin.superclass.constructor.call(this,{
 			id : 'transferMateralWinId',
-			title:'器材调拨',
+			title:CHE_OUT_LU.labelMateralTrans,
 			closeAction:'hide',
 			maximizable:false,
 			width: 600,
@@ -1028,8 +1045,8 @@ TransferMateralWin = Ext.extend(Ext.Window,{
 			layout:'border',
 			items:[this.materalForm, this.queryDeviceGrid],
 			buttonAlign:'right',
-			buttons:[{text:'保存',iconCls:'icon-save',scope:this,handler:this.doSave},
-				{text:'关闭',iconCls:'icon-close',scope:this,handler:function(){
+			buttons:[{text:COMMON_LU.saveBtn,iconCls:'icon-save',scope:this,handler:this.doSave},
+				{text:COMMON_LU.cancel,iconCls:'icon-close',scope:this,handler:function(){
 					this.hide();
 				}}],
 			listeners:{
@@ -1066,11 +1083,11 @@ TransferMateralWin = Ext.extend(Ext.Window,{
 			if(data['device_id']){
 				//过滤掉重复调拨的设备
 				if(arrCode.indexOf(data['device_id']) >=0){
-					Alert('器材有相同的，请检查！');
+					Alert(MSG_LU.tipHasSameMateral);
 					return ;
 				}
 				if(Ext.isEmpty(data['num'])){
-					Alert('调拨数量不能为空！');
+					Alert(MSG_LU.tipTransNumCantBeEmpty);
 					return;
 				}
 				arrCode.push(data);
@@ -1087,7 +1104,7 @@ TransferMateralWin = Ext.extend(Ext.Window,{
 		});
 		
 		if(arr.length === 0){
-			Alert('请正确输入设备信息！');
+			Alert(MSG_LU.pleaseInputCorrectDevInfo);
 			return;
 		}
 		var obj={};
@@ -1102,7 +1119,7 @@ TransferMateralWin = Ext.extend(Ext.Window,{
 			success:function(res,opt){
 				msg.hide();
 				msg = null;
-				Alert('添加成功',function(){
+				Alert(COMMON_LU.addSuccess,function(){
 					this.hide();
 					Ext.getCmp('transferGridId').getStore().reload();
 				},this);
@@ -1129,15 +1146,15 @@ var TransferConfirmForm = Ext.extend(Ext.form.FormPanel,{
 				xtype:'textfield'
 			},
 			items:[
-				{id:'transferNoId',fieldLabel:'调拨单号',name:'transferNo',readOnly:true},
+				{id:'transferNoId',fieldLabel:DEV_COMMON_LU.labelTransNo,name:'transferNo',readOnly:true},
 				{id:'transfer_device_done_code_id',name:'deviceDoneCode',xtype:'hidden'},
-				{fieldLabel:'有效',hiddenName:'status',xtype:'combo',allowBlank:false,
+				{fieldLabel:COMMON_LU.effect,hiddenName:'status',xtype:'combo',allowBlank:false,
 					store:new Ext.data.ArrayStore({
 						fields:['statusDis','statusValue'],
-						data:[['确认','CONFIRM'],['取消','INVALID']]
+						data:[[COMMON_LU.confirm,'CONFIRM'],[COMMON_LU.cancelBtn,'INVALID']]
 					}),displayField:'statusDis',valueField:'statusValue'
 				},
-				{fieldLabel:'确认信息',name:'confirmInfo',xtype:'textarea',height:60,anchor:'90%'}
+				{fieldLabel:CHE_OUT_LU.labelConfirmInfo,name:'confirmInfo',xtype:'textarea',height:60,anchor:'90%'}
 			]
 		});
 	}
@@ -1154,7 +1171,7 @@ var TransferConfirmWin = Ext.extend(Ext.Window,{
 		this.transferConfirmForm = new TransferConfirmForm();
 		TransferConfirmWin.superclass.constructor.call(this,{
 			id : 'transferConfirmWinId',
-			title:'调拨确认',
+			title:CHE_OUT_LU.titleTransConfirm,
 			closeAction:'hide',
 			maximizable:false,
 			width: 300,
@@ -1162,8 +1179,8 @@ var TransferConfirmWin = Ext.extend(Ext.Window,{
 			layout:'fit',
 			items:[this.transferConfirmForm],
 			buttonAlign:'right',
-			buttons:[{text:'保存',iconCls:'icon-save',scope:this,handler:this.doSave},
-				{text:'关闭',iconCls:'icon-close',scope:this,handler:function(){
+			buttons:[{text:COMMON_LU.saveBtn,iconCls:'icon-save',scope:this,handler:this.doSave},
+				{text:COMMON_LU.cancel,iconCls:'icon-close',scope:this,handler:function(){
 					this.hide();
 				}}],
 			listeners:{
@@ -1182,7 +1199,7 @@ var TransferConfirmWin = Ext.extend(Ext.Window,{
 			params:values,
 			scope:this,
 			success:function(res,opt){
-				Alert('调拨确认成功',function(){
+				Alert(MSG_LU.transSuccess,function(){
 					this.hide();
 					Ext.getCmp('transferGridId').getStore().reload();
 				},this);
@@ -1200,7 +1217,7 @@ var TransferNoWin = Ext.extend(Ext.Window, {
 	constructor: function(){
 		TransferNoWin.superclass.constructor.call(this,{
 			id:'transferNoWinId',
-			title:'修改单号',
+			title:DEV_COMMON_LU.titleModifyOrderNum,
 			closeAction:'hide',
 			border:false,
 			maximizable:false,
@@ -1209,14 +1226,14 @@ var TransferNoWin = Ext.extend(Ext.Window, {
 			items:[{id:'transferNoFormId',xtype:'form',border:false,
 				bodyStyle:'padding-top:10px',labelWidth:65,items:[
 					{xtype:'hidden',name:'deviceDoneCode'},
-					{xtype:'textfield',fieldLabel:'新单号',name:'transferNo',width:200,vtype:'alphanum',allowBlank:false},
-					{fieldLabel:'备注',name:'remark',maxLength:128,xtype:'textarea',width : 210,height : 140}//128个汉字
+					{xtype:'textfield',fieldLabel:DEV_COMMON_LU.labelNewOrderNo,name:'transferNo',width:200,vtype:'alphanum',allowBlank:false},
+					{fieldLabel:lsys('common.remarkTxt'),name:'remark',maxLength:128,xtype:'textarea',width : 210,height : 140}//128个汉字
 				]
 			}],
 			buttonAlign:'right',
 			buttons:[
-				{text:'保存',iconCls:'icon-save',scope:this,handler:this.doSave},
-				{text:'关闭',iconCls:'icon-close',scope:this,handler:function(){
+				{text:COMMON_LU.saveBtn,iconCls:'icon-save',scope:this,handler:this.doSave},
+				{text:COMMON_LU.cancel,iconCls:'icon-close',scope:this,handler:function(){
 						this.fireEvent('hide',this);
 					}
 				}
@@ -1286,10 +1303,10 @@ var TransferDetailWin = Ext.extend(Ext.Window,{
 			fields:['device_model_text','device_code','is_new_stb_text','device_status_text']
 		});
 		var columns = [
-			{header:'设备型号',dataIndex:'device_model_text',width:150,renderer:App.qtipValue},
-			{header:'设备编号',dataIndex:'device_code',width:120,renderer:App.qtipValue},
-			{header:'设备状态',dataIndex:'device_status_text',width:120,renderer:App.qtipValue},
-			{header:'新机',dataIndex:'is_new_stb_text',width:120,renderer:App.qtipValue}
+			{header:DEV_COMMON_LU.labelDeviceModel,dataIndex:'device_model_text',width:150,renderer:App.qtipValue},
+			{header:DEV_COMMON_LU.labelDevCode,dataIndex:'device_code',width:120,renderer:App.qtipValue},
+			{header:DEV_COMMON_LU.labelDevStatus,dataIndex:'device_status_text',width:120,renderer:App.qtipValue},
+			{header:DEV_COMMON_LU.labelIsNewStb,dataIndex:'is_new_stb_text',width:120,renderer:App.qtipValue}
 
 		];
 		this.grid = new Ext.grid.GridPanel({
@@ -1300,14 +1317,14 @@ var TransferDetailWin = Ext.extend(Ext.Window,{
 		});
 		TransferDetailWin.superclass.constructor.call(this,{
 			id:'deviceDetailInfoWinId',
-			title:'详细信息',
+			title:COMMON_LU.detailInfo,
 			closeAction:'close',
 			maximizable:false,
 			width:850,
 			height:400,
 			layout:'fit',
 			items:[this.grid],
-			buttons:[{text:'关闭',iconCls:'icon-close',scope:this,handler:function(){
+			buttons:[{text:COMMON_LU.cancel,iconCls:'icon-close',scope:this,handler:function(){
 					this.close();
 				}
 			}]
@@ -1333,7 +1350,7 @@ CheckOut = Ext.extend(Ext.Panel,{
 //		checkOutDeviceGrid = new TransferDetailDeviceGrid();
 		CheckOut.superclass.constructor.call(this,{
 			id:'CheckOut',
-			title:'设备调拨',
+			title:CHE_OUT_LU._title,
 			closable: true,
 			border : false ,
 			baseCls: "x-plain",

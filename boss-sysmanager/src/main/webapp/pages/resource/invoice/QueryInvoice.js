@@ -50,9 +50,10 @@ QueryInvoiceForm = Ext.extend(Ext.form.FormPanel,{
 			layout:'column',
 			items:[
 				{columnWidth:.5,layout:'form',border:false,items:[
-					{xtype:'combo',fieldLabel:langUtils.sys('QueryInvoice.labels.depot_name'),hiddenName:'invoiceDto.depot_id',width :150,minListWidth :250,
+					{xtype:'combo',fieldLabel:lsys('InvoiceCommon.depot_name'),hiddenName:'invoiceDto.depot_id',width :150,minListWidth :250,
 						store:new Ext.data.JsonStore({
 							url:'resource/Device!queryAllDept.action',
+							autoLoad:true,
 							fields:['dept_id','dept_name']
 						}),displayField:'dept_name',valueField:'dept_id',allowBlank:false,
 						triggerAction:'all',mode:'local',
@@ -82,7 +83,7 @@ QueryInvoiceForm = Ext.extend(Ext.form.FormPanel,{
 				
 				]},
 				{columnWidth:.5,layout:'form',border:false,items:[
-					{fieldLabel:langUtils.sys('QueryInvoice.labels.invoice_id'),
+					{fieldLabel:lsys('InvoiceCommon.invoice_id'),
 
 					    xtype:'compositefield',combineErrors:false,
 					    items: [
@@ -91,7 +92,7 @@ QueryInvoiceForm = Ext.extend(Ext.form.FormPanel,{
 					        {xtype:'textfield',name:'invoiceDto.end_invoice_id',vtype:'invoiceId',height:22,width:150}
 				    	]
 					},
-					{fieldLabel:langUtils.sys('QueryInvoice.labels.create_time'),
+					{fieldLabel:lsys('InvoiceCommon.create_time'),
 
 						    xtype:'compositefield',combineErrors:false,
 						    items: [
@@ -100,7 +101,7 @@ QueryInvoiceForm = Ext.extend(Ext.form.FormPanel,{
 						        {xtype:'datefield',name:'invoiceDto.end_input_time',style:'width:135px;height:22px',format:'Y-m-d'}
 					    	]
 						},
-						{fieldLabel:langUtils.sys('QueryInvoice.labels.close_time'),
+						{fieldLabel:lsys('InvoiceCommon.close_time'),
 
 						    xtype:'compositefield',combineErrors:false,
 						    items: [
@@ -117,12 +118,12 @@ QueryInvoiceForm = Ext.extend(Ext.form.FormPanel,{
 				]},
 				*/
 				{columnWidth:.5,layout:'form',border:false,width:320,items:[
-						{fieldLabel:langUtils.sys('QueryInvoice.labels.invoice_code'),
+						{fieldLabel:lsys('InvoiceCommon.invoice_code'),
 
 						    xtype:'compositefield',combineErrors:false,
 						    items: [
 						        {xtype:'textfield',name:'invoiceDto.invoice_code',width:133,height:22},//,style:'width:135px;height:22px'
-						        {xtype:'displayfield',value:langUtils.sys('QueryInvoice.labels.invoice_type')},
+						        {xtype:'displayfield',value:lsys('InvoiceCommon.invoice_type')},
 
 						        {xtype:'paramlovcombo',name:'invoiceDto.invoice_type',paramName:'INVOICE_TYPE',
 						        	displayField:'item_name',valueField:'item_value',
@@ -131,7 +132,7 @@ QueryInvoiceForm = Ext.extend(Ext.form.FormPanel,{
 						        	}),height:22,width:133}//style:'width:135px;height:22px'
 					    	]
 						},
-						{fieldLabel:langUtils.sys('QueryInvoice.labels.check_time'),
+						{fieldLabel:lsys('InvoiceCommon.check_time'),
 
 						    xtype:'compositefield',combineErrors:false,
 						    items: [
@@ -140,7 +141,7 @@ QueryInvoiceForm = Ext.extend(Ext.form.FormPanel,{
 						        {xtype:'datefield',name:'invoiceDto.end_check_time',style:'width:135px;height:22px',format:'Y-m-d'}
 					    	]
 						},
-						{fieldLabel:langUtils.sys('QueryInvoice.labels.use_time'),
+						{fieldLabel:lsys('InvoiceCommon.use_time'),
 
 							    xtype:'compositefield',combineErrors:false,
 							    items: [
@@ -152,7 +153,7 @@ QueryInvoiceForm = Ext.extend(Ext.form.FormPanel,{
 				]},
 				
 				{columnWidth:.5,layout:'form',border:false,width:150,items:[
-						{fieldLabel:langUtils.sys('QueryInvoice.labels.finance_status'),
+						{fieldLabel:lsys('InvoiceCommon.finance_status'),
 
 						    xtype:'compositefield',combineErrors:false,
 						    items: [
@@ -162,7 +163,7 @@ QueryInvoiceForm = Ext.extend(Ext.form.FormPanel,{
 						        		fields:['item_name','item_value'],data:[]
 						        	}),
 						        		name:'invoiceDto.finance_status',height:22,width:133},
-						        {xtype:'displayfield',value:langUtils.sys('QueryInvoice.labels.status')},
+						        {xtype:'displayfield',value:lsys('InvoiceCommon.status')},
 
 						        {xtype:'paramlovcombo',paramName:'STATUS_R_INVOICE',
 							        displayField:'item_name',valueField:'item_value',
@@ -187,13 +188,13 @@ QueryInvoiceForm = Ext.extend(Ext.form.FormPanel,{
 				*/
 				{columnWidth:.5,layout:'hbox',defaults:{border:false,flex:1},border:false,items:[
 						{width:300,bodyStyle:'padding-left:25px',border:false,items:[
-							{id:'queryInvoiceBtnId',xtype:'button',text:langUtils.sys('QueryInvoice.common.queryBtn'),iconCls:'icon-query',
+							{id:'queryInvoiceBtnId',xtype:'button',text:lsys('common.query'),iconCls:'icon-query',
 								scope:this,handler:this.doQuery}
 						]}
 				]}
 			]
 		});	
-
+        this.getForm().findField('invoiceDto.depot_id').getStore().load();
 	},
 	doQuery:function(){
 		if(this.getForm().isValid()){
@@ -202,7 +203,7 @@ QueryInvoiceForm = Ext.extend(Ext.form.FormPanel,{
 			
 			var store = this.parent.grid.getStore();
 			store.removeAll();
-			this.parent.grid.setTitle(langUtils.sys('QueryInvoice.labels.titleInvoiceInfo'));
+			this.parent.grid.setTitle(lsys('InvoiceCommon.titleInvoiceInfo'));
 
 			
 			var values = this.getForm().getValues();
@@ -251,30 +252,30 @@ QueryInvoiceGrid = Ext.extend(Ext.grid.GridPanel,{
 				if(record.get('status')=='USE')
 					total = record.get('amount') + total;
 			})
-			this.setTitle(langUtils.sys('QueryInvoice.labels.titleMoneyCountPrefix')+Ext.util.Format.formatFee(total));
+			this.setTitle(lsys('InvoiceCommon.titleMoneyCountPrefix')+Ext.util.Format.formatFee(total));
 		},this);
 		var columns = new Ext.grid.ColumnModel({
 			defaults:{sortable:false},
 			
 			columns:[
-				{header:langUtils.sys('QueryInvoice.labels.invoice_id'),dataIndex:'invoice_id',width:70,align:'center',renderer:App.qtipValue},
-				{header:langUtils.sys('QueryInvoice.labels.invoice_code'),dataIndex:'invoice_code',width:80,align:'center',renderer:App.qtipValue},
-				{header:langUtils.sys('QueryInvoice.labels.invoice_type'),dataIndex:'invoice_type_text',width:65,align:'center',renderer:App.qtipValue},
-				{header:langUtils.sys('QueryInvoice.labels.status'),dataIndex:'status_text',width:65,align:'center',renderer:App.qtipValue},
-				{header:langUtils.sys('QueryInvoice.labels.finance_status'),dataIndex:'finance_status_text',width:60,align:'center',renderer:App.qtipValue},
-				{header:langUtils.sys('QueryInvoice.labels.amount'),dataIndex:'amount',width:45,align:'center',renderer:Ext.util.Format.formatFee},
-				{header:langUtils.sys('QueryInvoice.labels.optr_name'),dataIndex:'optr_name',width:90,align:'center'},
-				{header:langUtils.sys('QueryInvoice.labels.depot_name'),dataIndex:'depot_name',width:80,align:'center',renderer:App.qtipValue},
-				{header:langUtils.sys('QueryInvoice.labels.create_time'),dataIndex:'create_time',width:120,align:'center',renderer:App.qtipValue},
-				{header:langUtils.sys('QueryInvoice.labels.use_time'),dataIndex:'use_time',width:120,align:'center',renderer:App.qtipValue},
-				{header:langUtils.sys('QueryInvoice.labels.check_time'),dataIndex:'check_time',width:120,align:'center',renderer:App.qtipValue},
-				{header:langUtils.sys('QueryInvoice.labels.close_time'),dataIndex:'close_time',width:120,align:'center',renderer:App.qtipValue}
+				{header:lsys('InvoiceCommon.invoice_id'),dataIndex:'invoice_id',width:70,align:'center',renderer:App.qtipValue},
+				{header:lsys('InvoiceCommon.invoice_code'),dataIndex:'invoice_code',width:80,align:'center',renderer:App.qtipValue},
+				{header:lsys('InvoiceCommon.invoice_type'),dataIndex:'invoice_type_text',width:65,align:'center',renderer:App.qtipValue},
+				{header:lsys('InvoiceCommon.status'),dataIndex:'status_text',width:65,align:'center',renderer:App.qtipValue},
+				{header:lsys('InvoiceCommon.finance_status'),dataIndex:'finance_status_text',width:60,align:'center',renderer:App.qtipValue},
+				{header:lsys('InvoiceCommon.amount'),dataIndex:'amount',width:45,align:'center',renderer:Ext.util.Format.formatFee},
+				{header:lsys('InvoiceCommon.optr_name'),dataIndex:'optr_name',width:90,align:'center'},
+				{header:lsys('InvoiceCommon.depot_name'),dataIndex:'depot_name',width:80,align:'center',renderer:App.qtipValue},
+				{header:lsys('InvoiceCommon.create_time'),dataIndex:'create_time',width:120,align:'center',renderer:App.qtipValue},
+				{header:lsys('InvoiceCommon.use_time'),dataIndex:'use_time',width:120,align:'center',renderer:App.qtipValue},
+				{header:lsys('InvoiceCommon.check_time'),dataIndex:'check_time',width:120,align:'center',renderer:App.qtipValue},
+				{header:lsys('InvoiceCommon.close_time'),dataIndex:'close_time',width:120,align:'center',renderer:App.qtipValue}
 			]
 		});
 		
 		var sm = new Ext.grid.CheckboxSelectionModel({});
 		QueryInvoiceGrid.superclass.constructor.call(this,{
-			title:langUtils.sys('QueryInvoice.common.titleInvoiceInfo'),
+			title:lsys('InvoiceCommon.titleInvoiceInfo'),
 
 			autoScroll:true,
 			border:false,

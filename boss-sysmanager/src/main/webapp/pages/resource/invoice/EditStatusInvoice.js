@@ -7,9 +7,9 @@
 EditStatusInvoicePanel = Ext.extend(CommonInvoicePanel,{
 	initComponent:function(){
 		EditStatusInvoicePanel.superclass.initComponent.call(this);
-		this.items.itemAt(0).title='修改状态';
+		this.items.itemAt(0).title=lsys('EditStatusInvoice._title');
 		this.form.insert(0,{columnWidth:.5,layout:'form',border:false,items:[
-						{xtype:'paramcombo',fieldLabel:'发票类型',hiddenName:'invoiceType',
+						{xtype:'paramcombo',fieldLabel:lsys('InvoiceCommon.invoice_type'),hiddenName:'invoiceType',
 							paramName:'INVOICE_TYPE',allowBlank:false,
 							listeners:{
 								scope:this,
@@ -32,10 +32,10 @@ EditStatusInvoicePanel = Ext.extend(CommonInvoicePanel,{
 							}
 						}]});
 		this.form.insert(1,{columnWidth:.5,layout:'form',border:false,items:[
-						{xtype:'combo',fieldLabel:'使用状态',hiddenName:'status',disabled:true,
+						{xtype:'combo',fieldLabel:lsys('InvoiceCommon.status'),hiddenName:'status',disabled:true,
 							store:new Ext.data.ArrayStore({
 								fields:['status','status_text'],
-								data:[['IDLE','空闲'],['INVALID','失效'],['USE','使用']]
+								data:[['IDLE',lsys('common.statusEnum.IDLE')],['INVALID',lsys('common.statusEnum.INVALID')],['USE',lsys('common.statusEnum.USE')]]
 							}),lastQuery:'',displayField:'status_text',valueField:'status',allowBlank:false
 						}]});
 		this.items.itemAt(0).anchor = '100% 25%';
@@ -54,7 +54,7 @@ EditStatusInvoice = Ext.extend(Ext.Panel,{
 		this.editStatusInvoicePanel = new EditStatusInvoicePanel("EDITSTATUS");
 		EditStatusInvoice.superclass.constructor.call(this,{
 			id:'EditStatusInvoice',
-			title:'修改状态',
+			title:lsys('EditStatusInvoice._title'),
 			closable: true,
 			border : false ,
 			baseCls: "x-plain",

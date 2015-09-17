@@ -88,7 +88,7 @@ PublicRechargeForm = Ext.extend(BaseForm,{
 		}
 		if(this.getForm().findField('fee').getValue()<=0){
 			obj["isValid"] = false;
-			obj["msg"] = lmain("cust._form.tipRechargeCountMustBeGreaterThanZero");
+			obj["msg"] = lmsg("rechargeCountMustBeGreaterThanZero");
 		}
 		return obj;
 	},

@@ -18,6 +18,7 @@ import com.ycsoft.beans.device.RDevice;
 import com.ycsoft.beans.device.RDeviceModel;
 import com.ycsoft.beans.device.RStb;
 import com.ycsoft.beans.system.SOptr;
+import com.ycsoft.business.dto.device.DeviceSmallDto;
 import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.helper.StringHelper;
@@ -869,4 +870,19 @@ public class RDeviceDao extends BaseEntityDao<RDevice> {
 		String sql = "UPDATE r_device SET total_num= total_num + ?  WHERE device_id=?";
 		executeUpdate(sql,total_num, device_id);
 	}
+	
+	public List<DeviceSmallDto> getDeviceCodeByDeviceId(String[] deviceIds) throws JDBCException{
+		String sql = "select T.CARD_ID device_code,t.device_id from r_card T WHERE " + getSqlGenerator().setWhereInArray("t.device_id",deviceIds)
+				+ "UNION select t.stb_id device_code,t.device_id from r_Stb T WHERE  " + getSqlGenerator().setWhereInArray("t.device_id",deviceIds)
+				+ "UNION select t.modem_mac device_code,t.device_id from r_modem T WHERE "  + getSqlGenerator().setWhereInArray("t.device_id",deviceIds);
+		return createQuery(DeviceSmallDto.class, sql).list();
+	}
+
+	public com.ycsoft.business.dto.device.DeviceDto queryDeviceInfoByCodeAndModel(String deviceCode) throws JDBCException{
+		String sql = "select T.CARD_ID device_code,t.device_model,r.* from r_card T,r_device r WHERE r.device_id=t.device_id and t.card_id = ?  "
+				+ "UNION select t.stb_id device_code,t.device_model,r.* from r_Stb T,r_device r WHERE r.device_id=t.device_id and t.stb_id = ?  "
+				+ "UNION select t.modem_mac device_code,t.device_model,r.* from r_modem T,r_device r WHERE r.device_id=t.device_id and t.modem_mac = ?  ";
+		return createQuery(com.ycsoft.business.dto.device.DeviceDto.class, sql,deviceCode,deviceCode,deviceCode).first();
+	}
+	
 }

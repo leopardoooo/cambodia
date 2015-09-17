@@ -88,9 +88,9 @@ public class DoneCodeService extends BaseBusiService implements IDoneCodeService
 		List<BusiFeeDto> feeList = new ArrayList<BusiFeeDto>();
 		List<CFee>  sumFeeList = feeComponent.querySumFeeByDoneCode(custId,doneCode);
 		Map<String,CFee> feeMap = CollectionHelper.converToMapSingle(sumFeeList, "fee_id");
-		if (busiCode.equals(DEVICE_BUY) || busiCode.equals(DEVICE_SALE)
-				|| busiCode.equals(DEVICE_RECLAIM) || busiCode.equals(BusiCodeConstants.DEVICE_CHANGE )
-				|| busiCode.equals(BusiCodeConstants.DEVICE_BUY_PJ ) || busiCode.equals(BusiCodeConstants.DEVICE_BUY_PJ_BACTH)){
+//		if (busiCode.equals(DEVICE_BUY) || busiCode.equals(DEVICE_SALE)
+//				|| busiCode.equals(DEVICE_RECLAIM) || busiCode.equals(BusiCodeConstants.DEVICE_CHANGE )
+//				|| busiCode.equals(BusiCodeConstants.DEVICE_BUY_PJ ) || busiCode.equals(BusiCodeConstants.DEVICE_BUY_PJ_BACTH)){
 			
 			List<BusiFeeDto> list = feeComponent.getDeviceFeeItems();
 			List<CFeeDevice> deviceList = feeComponent.queryDeviceByDoneCode(doneCode);
@@ -121,9 +121,9 @@ public class DoneCodeService extends BaseBusiService implements IDoneCodeService
 					}
 				}
 			} 
-		}  else {
-			List<BusiFeeDto> list = feeComponent.getBusiFeeAndIpFeeItems();
-			for (BusiFeeDto busiFee:list){
+//		}  else {
+			List<BusiFeeDto> busiList = feeComponent.getBusiFeeAndIpFeeItems();
+			for (BusiFeeDto busiFee:busiList){
 				//IP费用
 				if(busiFee.getFee_id().equals(SystemConstants.USER_IP_FEE_ID)){
 					CFee fee = feeMap.get(busiFee.getFee_id());
@@ -148,7 +148,7 @@ public class DoneCodeService extends BaseBusiService implements IDoneCodeService
 				}
 			}
 			
-		}
+//		}
 		
 		return feeList;
 			

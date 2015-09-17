@@ -55,6 +55,8 @@ var printdata = null;
  					var data = grid.store.getAt(rowNumber).data;
  					var doctype = data.doc_type;
  					this.printItemGrid.store.filter('doc_type',doctype);
+ 					var mod = this.printItemGrid.getSelectionModel();
+					mod.selectAll();
  				}
  			},
  			columns: [
@@ -238,15 +240,11 @@ var printdata = null;
  	 * @param t 预览(doPreview)或者打印(doPrint)
  	 */
  	actionProcesser: function( t,data ){
-//		printdata = this.printGrid.getSelectionModel().getSelected();
- 		//只有1个的时候this.removeAll(); 使得this.printGrid 取不到数据，打印按钮会失效
+		printdata = this.printGrid.getSelectionModel().getSelected();
 		if(printdata == null){
-			printdata = this.printGrid.getSelectionModel().getSelected();
-			if(printdata == null){
-	 			Alert(lmsg('selectInvoice2Print'));
-	 			return ;
-			}
- 		}
+ 			Alert(lmsg('selectInvoice2Print'));
+ 			return ;
+		}
  		if(data){
  			this[t].call(this , printdata);
  		}else{
@@ -434,7 +432,7 @@ var printdata = null;
 		
  		this.printStore.remove(record);
  		this.printItemStore.remove(this.printItemGrid.getSelectionModel().getSelections());
- 		if (this.printItemStore.getCount()==0){
+ 		if (this.printStore.getCount()==0 && this.printItemStore.getCount()==0){
  			App.getApp().menu.hideBusiWin();
  		}
  	}
@@ -668,6 +666,7 @@ InvoiceWindow = Ext.extend( Ext.Window ,{
 		}else{
 			invoiceId = App.getApp().getNextInvoice(this.docType);
 			if (!Ext.isEmpty(invoiceId)){
+				var that = this;
 				var successFunc = function(data){
 					var store = this.invoiceGrid.getColumnModel().getColumnById('col_invoiceCode').editor.getStore();
 					store.loadData(data);
@@ -689,10 +688,13 @@ InvoiceWindow = Ext.extend( Ext.Window ,{
 						
 					}
 					this.doAddInvoice(invoiceId,invoiceCode,invoiceBookId);
-					this.invoiceGrid.startEditing(1, 2);
+//					this.invoiceGrid.startEditing(1, 2);
 				};
 				var clearFunc = function(){
 					invoiceId='';
+					invoiceCode='';
+					invoiceBookId='';
+					that.doAddInvoice(invoiceId,invoiceCode,invoiceBookId);
 				};
 				this.checkInvoice(invoiceId,successFunc,clearFunc);
 			}else{
@@ -739,11 +741,17 @@ InvoiceWindow = Ext.extend( Ext.Window ,{
 		var obj = {};
 		obj['isValid'] = true;
 		this.invoiceGrid.stopEditing();
+		if(this.invoiceStore.getCount() == 0){
+			obj['isValid'] = false;
+			obj['msg'] = LU_PI.stillEmptyInvoiceField;
+			return obj;
+		}
 		for(var i = 0;i<this.invoiceStore.getCount();i++){
 			var rs = this.invoiceStore.getAt(i);
 			if(Ext.isEmpty(rs.get("invoiceId")) || Ext.isEmpty(rs.get("invoice_code"))){
 				obj['isValid'] = false;
 				obj['msg'] = LU_PI.stillEmptyInvoiceField;
+				return obj;
 				break;
 			}
 		}

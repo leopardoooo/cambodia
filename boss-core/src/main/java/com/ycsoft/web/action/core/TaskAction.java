@@ -1,13 +1,18 @@
 package com.ycsoft.web.action.core;
 
+import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.stereotype.Controller;
 
+import com.google.gson.reflect.TypeToken;
+import com.ycsoft.beans.task.TaskFillDevice;
 import com.ycsoft.beans.task.WTaskBaseInfo;
 import com.ycsoft.business.dto.core.cust.QueryTaskConditionDto;
+import com.ycsoft.business.service.ISnTaskService;
 import com.ycsoft.business.service.ITaskService;
+import com.ycsoft.commons.helper.JsonHelper;
 import com.ycsoft.web.commons.abstracts.BaseBusiAction;
 
 /** 
@@ -33,6 +38,13 @@ public class TaskAction extends BaseBusiAction{
 	private String cancelRemark;
 	private QueryTaskConditionDto taskCond;
 	private String bugCause;
+	private ISnTaskService snTaskService;
+	private String deptId;
+	private String bugType;
+	private String resultType;
+	private String deviceCode;
+	private String deviceModel;
+	private String custId;
 
 
 	public String saveBugTask()throws Exception{
@@ -82,8 +94,19 @@ public class TaskAction extends BaseBusiAction{
 		}
 		taskCond.setStart(start);
 		taskCond.setLimit(limit);
-		getRoot().setPage(taskService.queryTask(taskCond));
+		getRoot().setPage(snTaskService.queryTask(taskCond.getTaskType(),taskCond.getAddrIds(),taskCond.getStartTime(),taskCond.getEndTime(),taskCond.getTaskId()
+				,taskCond.getTaskTeam(),taskCond.getStatus(),taskCond.getCustNo(),taskCond.getCustName(),taskCond.getAddr(),taskCond.getMobile(),taskCond.getStart(),taskCond.getLimit()));
 		return JSON_PAGE;
+	}
+	
+	public String queryTaskDetail() throws Exception{
+		getRoot().setOthers(snTaskService.queryTaskDetail(task_id));
+		return JSON_OTHER;
+	}
+	
+	public String queryTaskTeam() throws Exception{
+		getRoot().setRecords(snTaskService.queryTaskTeam());
+		return JSON_RECORDS;
 	}
 	
 	public String getTaskType() throws Exception{
@@ -109,6 +132,57 @@ public class TaskAction extends BaseBusiAction{
 	}
 	
 	
+	/**
+	 * 分配施工队
+	 * @return
+	 * @throws Exception
+	 */
+	public String editTaskTeam() throws Exception{
+		snTaskService.editTaskTeam(task_id,deptId,bugType);
+		return JSON_SUCCESS;
+	}
+	
+	/**
+	 * 取消工单
+	 * @return
+	 * @throws Exception
+	 */
+	public String cancelTaskSn()throws Exception{
+		snTaskService.cancelTask(task_id);
+		getRoot().setSuccess(true);
+		return JSON_SUCCESS;
+	}
+	
+	/**
+	 * 完工
+	 * @return
+	 * @throws Exception
+	 */
+	public String endTask() throws Exception{
+		snTaskService.finishTask(task_id,resultType);
+		return JSON_SUCCESS;
+	}
+	
+	public String  queryDeviceInfoByCodeAndModel() throws Exception {
+		getRoot().setSimpleObj(snTaskService.queryDeviceInfoByCodeAndModel(deviceCode,deviceModel)); 
+		return JSON_SIMPLEOBJ;
+	}
+	
+	public String fillTask() throws Exception{
+		String devices = request.getParameter("devices");
+		String otlNo = request.getParameter("otlNo");
+		String ponNo = request.getParameter("ponNo");
+		Type t = new TypeToken<List<TaskFillDevice>>(){}.getType();
+		List<TaskFillDevice> list = JsonHelper.gson.fromJson( devices , t);
+		snTaskService.fillTask(task_id,otlNo,ponNo,list);
+		return JSON_SUCCESS;
+	}
+	
+	
+	public String queryTaskByCustId()throws Exception{
+		getRoot().setRecords(snTaskService.queryTaskByCustId(custId));
+		return JSON_RECORDS;
+	}
 	/**
 	 * @return the cust_ids
 	 */
@@ -245,6 +319,77 @@ public class TaskAction extends BaseBusiAction{
 	public void setBugCause(String bugCause) {
 		this.bugCause = bugCause;
 	}
+
+
+	public ISnTaskService getSnTaskService() {
+		return snTaskService;
+	}
+
+
+	public void setSnTaskService(ISnTaskService snTaskService) {
+		this.snTaskService = snTaskService;
+	}
+
+
+	public String getDeptId() {
+		return deptId;
+	}
+
+
+	public void setDeptId(String deptId) {
+		this.deptId = deptId;
+	}
+
+
+	public String getBugType() {
+		return bugType;
+	}
+
+
+	public void setBugType(String bugType) {
+		this.bugType = bugType;
+	}
+
+
+	public String getResultType() {
+		return resultType;
+	}
+
+
+	public void setResultType(String resultType) {
+		this.resultType = resultType;
+	}
+
+
+	public String getDeviceCode() {
+		return deviceCode;
+	}
+
+
+	public void setDeviceCode(String deviceCode) {
+		this.deviceCode = deviceCode;
+	}
+
+
+	public String getDeviceModel() {
+		return deviceModel;
+	}
+
+
+	public void setDeviceModel(String deviceModel) {
+		this.deviceModel = deviceModel;
+	}
+
+
+	public String getCustId() {
+		return custId;
+	}
+
+
+	public void setCustId(String custId) {
+		this.custId = custId;
+	}
+
 
 
 }

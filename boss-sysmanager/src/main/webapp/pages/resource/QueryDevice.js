@@ -3,6 +3,11 @@
  * @class QueryDevice
  * @extends Ext.Panel
  */
+var COMMON_LU = lsys('common');
+var DEV_COMMON_LU = lsys('DeviceCommon');
+var QD_LU = lsys('QueryDevice');
+var MSG_LU = lsys('msgBox');
+
 QueryDeviceForm = Ext.extend(Ext.form.FormPanel,{
 	parent:null,
 	showDownloadBtn:false,
@@ -15,15 +20,15 @@ QueryDeviceForm = Ext.extend(Ext.form.FormPanel,{
 			labelWidth:75,
 			items:[
 				{columnWidth:.33,layout:'form',border:false,items:[
-					{xtype:'treecombo',fieldLabel:'仓库',hiddenName:'depotId',
+					{xtype:'treecombo',fieldLabel:DEV_COMMON_LU.labelDepot,hiddenName:'depotId',
 						width:150,
 						treeWidth:400,
 //						minChars:2,
 						height: 22,
 						allowBlank: false,
 						onlySelectLeaf:false,
-						emptyText :'请选择仓库',
-						blankText:'请选择仓库',
+						emptyText :MSG_LU.emptyTextSelectStore,
+						blankText:MSG_LU.emptyTextSelectStore,
 						treeUrl: 'resource/Device!queryChildDepot.action',
 						listeners : {
 							'focus' : function(){
@@ -33,21 +38,21 @@ QueryDeviceForm = Ext.extend(Ext.form.FormPanel,{
 							}
 						}
 					},
-					{fieldLabel:'设备状态',hiddenName:'status',xtype:'paramcombo',width:150,
+					{fieldLabel:DEV_COMMON_LU.labelDevStatus,hiddenName:'status',xtype:'paramcombo',width:150,
 						forceSelection:true,selectOnFocus:true,editable:true,
 						paramName:'DEVICE_STATUS_R_DEVICE'
 					},
-					{fieldLabel:'备机',hiddenName:'backup',xtype:'paramcombo',width:150,
+					{fieldLabel:DEV_COMMON_LU.labelBackUp,hiddenName:'backup',xtype:'paramcombo',width:150,
 						forceSelection:true,selectOnFocus:true,editable:true,
 						paramName:'BOOLEAN'
 					}
 				]},
 				{columnWidth:.33,layout:'form',border:false,defaultType:'textfield',items:[
-					{fieldLabel:'设备类型',hiddenName:'mode',xtype:'combo',allowBlank:false,
+					{fieldLabel:DEV_COMMON_LU.labelDeviceType,hiddenName:'mode',xtype:'combo',allowBlank:false,
 						store:new Ext.data.ArrayStore({
 							fields:['mode','mode_name'],
-							data:[['STB','单机顶盒'],['CARD','单智能卡'],
-								['MODEM','单MODEM'],['STBCARD','机卡配对'],['STBMODEM','机MODEM配对']]
+							data:[['STB',DEV_COMMON_LU.labelSingleStb],['CARD',DEV_COMMON_LU.labelSingleCard],
+								['MODEM',DEV_COMMON_LU.labelSingleModem],['STBCARD',DEV_COMMON_LU.labelStbCardPair],['STBMODEM',DEV_COMMON_LU.labelStbModemPair]]
 						}),
 						displayField:'mode_name',valueField:'mode',width:150,
 						listeners:{
@@ -55,7 +60,7 @@ QueryDeviceForm = Ext.extend(Ext.form.FormPanel,{
 							select:this.doSelect
 						}
 					},
-					{fieldLabel:'设备型号',hiddenName:'deviceModel',
+					{fieldLabel:DEV_COMMON_LU.labelDeviceModel,hiddenName:'deviceModel',
 						xtype:'lovcombo',forceSelection:true,selectOnFocus:true,editable:true,
 						store:new Ext.data.JsonStore({
 							url : root + '/resource/Device!queryDeviceModelByType.action',
@@ -64,13 +69,13 @@ QueryDeviceForm = Ext.extend(Ext.form.FormPanel,{
 						triggerAction:'all',mode:'local',width:150,listWidth:150,
 						beforeBlur:function(){}
 					},
-					{fieldLabel:'设备批号',name:'batch_num',
+					{fieldLabel:DEV_COMMON_LU.labelDevBatchNum,name:'batch_num',
 						xtype:'textfield',
 						width: 150
 					}
 				]},
 				{columnWidth:.33,layout:'form',border:false,items:[
-					{fieldLabel:'MODEM类型',hiddenName:'modemType',xtype:'paramcombo',width:150,
+					{fieldLabel:DEV_COMMON_LU.labelModemType,hiddenName:'modemType',xtype:'paramcombo',width:150,
 						disabled : true,
 						paramName:'MODEM_TYPE',
 						listeners:{
@@ -83,7 +88,7 @@ QueryDeviceForm = Ext.extend(Ext.form.FormPanel,{
 							}
 						}
 					},
-					{fieldLabel:'库存状态',hiddenName:'depotStatus',xtype:'paramcombo',width:150,
+					{fieldLabel:DEV_COMMON_LU.labelDepotStatus,hiddenName:'depotStatus',xtype:'paramcombo',width:150,
 //						forceSelection:true,selectOnFocus:true,editable:true,
 						paramName:'DEPOT_STATUS_R_DEVICE',
 						listeners:{
@@ -104,11 +109,11 @@ QueryDeviceForm = Ext.extend(Ext.form.FormPanel,{
 						}
 					}
 				]},{columnWidth:1,layout:'form',border:false,items:[{	
-						fieldLabel:'入库时间',
+						fieldLabel:DEV_COMMON_LU.labelRecordTime,
 					    xtype:'compositefield',combineErrors:false,
 					    items: [
 					        {xtype:'datefield',name:'start_input_time',style:'width:135px;height:22px',format:'Y-m-d'},
-					        {xtype:'displayfield',value:'至'},
+					        {xtype:'displayfield',value:COMMON_LU.to},
 					        {xtype:'datefield',name:'end_input_time',style:'width:135px;height:22px',format:'Y-m-d'}
 				    	]
 					}]
@@ -116,9 +121,9 @@ QueryDeviceForm = Ext.extend(Ext.form.FormPanel,{
 				
 			],
 			buttonAlign : 'center',
-			buttons : [{id:'queryDeviceBtnId',xtype:'button',text:'查  询',iconCls:'icon-query',disableSelfCtrl:true,
+			buttons : [{id:'queryDeviceBtnId',xtype:'button',text:COMMON_LU.query,iconCls:'icon-query',disableSelfCtrl:true,
 						scope:this,handler:this.doQuery},
-					{id:'downloadBtnId',xtype:'button',hidden:true,text:'下  载',iconCls:'icon-excel',
+					{id:'downloadBtnId',xtype:'button',hidden:true,text:COMMON_LU.downLoad,iconCls:'icon-excel',
 						scope:this,handler:this.doDownload}]
 		});
 	},
@@ -175,7 +180,7 @@ QueryDeviceForm = Ext.extend(Ext.form.FormPanel,{
 	doDownload:function(){
 		var count = this.parent.grid.getStore().getCount();
 		if(count == 0){
-			Alert('请先查询出数据，方能下载!');
+			Alert(MSG_LU.tipQueryDateBeforeDownLoad);
 			return ;
 		}
 		var values = Ext.Ajax.serializeForm(this.getForm().getEl().dom);
@@ -206,41 +211,41 @@ QueryDeviceGrid = Ext.extend(Ext.grid.GridPanel,{
 			this.getEl().unmask();
 		},this);
 		this.stbColumns = [
-			{header:'机顶盒号',dataIndex:'device_code',width:130,renderer:App.qtipValue},
-			{header:'盒类型',dataIndex:'device_model_text',width:100,renderer:App.qtipValue},
-			{header:'智能卡号',dataIndex:'pair_device_code',width:120,renderer:App.qtipValue},
-			{header:'卡类型',dataIndex:'pair_device_model_text',width:100,renderer:App.qtipValue},
-			{header:'配对MODEM',dataIndex:'pair_device_modem_code',width:120,renderer:App.qtipValue},
-			{header:'配对MODEM类型',dataIndex:'pair_device_modem_model_text',width:100,renderer:App.qtipValue},
-			{header:'设备状态',dataIndex:'device_status_text',width:75,renderer:App.qtipValue},
-			{header:'库存状态',dataIndex:'depot_status_text',width:75,renderer:App.qtipValue},
-			{header:'所在仓库',dataIndex:'depot_id_text',width:100,renderer:App.qtipValue},
-			{header:'客户编号',dataIndex:'cust_id',width:75,renderer:App.qtipValue},
-			{header:'客户名称',dataIndex:'cust_name',width:100,renderer:App.qtipValue},
-			{header:'批号',dataIndex:'batch_num',width:100,renderer:App.qtipValue}
+			{header:DEV_COMMON_LU.labelStbCode,dataIndex:'device_code',width:130,renderer:App.qtipValue},
+			{header:DEV_COMMON_LU.labelStbType,dataIndex:'device_model_text',width:100,renderer:App.qtipValue},
+			{header:DEV_COMMON_LU.labelCardCode,dataIndex:'pair_device_code',width:120,renderer:App.qtipValue},
+			{header:DEV_COMMON_LU.labelCardType,dataIndex:'pair_device_model_text',width:100,renderer:App.qtipValue},
+			{header:DEV_COMMON_LU.labelPairModemCode,dataIndex:'pair_device_modem_code',width:120,renderer:App.qtipValue},
+			{header:DEV_COMMON_LU.labelPairModemType2,dataIndex:'pair_device_modem_model_text',width:100,renderer:App.qtipValue},
+			{header:DEV_COMMON_LU.labelDevStatus,dataIndex:'device_status_text',width:75,renderer:App.qtipValue},
+			{header:DEV_COMMON_LU.labelDevStatus,dataIndex:'depot_status_text',width:75,renderer:App.qtipValue},
+			{header:COMMON_LU.depotText,dataIndex:'depot_id_text',width:100,renderer:App.qtipValue},
+			{header:DEV_COMMON_LU.labelCustNo,dataIndex:'cust_id',width:75,renderer:App.qtipValue},
+			{header:DEV_COMMON_LU.labelCustName,dataIndex:'cust_name',width:100,renderer:App.qtipValue},
+			{header:DEV_COMMON_LU.labelBatchNum,dataIndex:'batch_num',width:100,renderer:App.qtipValue}
 			
 		];
 		this.cardColumns = [
-			{header:'智能卡号',dataIndex:'device_code',width:160,renderer:App.qtipValue},
-			{header:'类型',dataIndex:'device_model_text',width:120,renderer:App.qtipValue},
-			{header:'设备状态',dataIndex:'device_status_text',width:80,renderer:App.qtipValue},
-			{header:'库存状态',dataIndex:'depot_status_text',width:75,renderer:App.qtipValue},
-			{header:'所在仓库',dataIndex:'depot_id_text',width:130,renderer:App.qtipValue},
-			{header:'客户编号',dataIndex:'cust_id',width:120,renderer:App.qtipValue},
-			{header:'客户名称',dataIndex:'cust_name',width:130,renderer:App.qtipValue}
+			{header:DEV_COMMON_LU.labelCardCode,dataIndex:'device_code',width:160,renderer:App.qtipValue},
+			{header:COMMON_LU.typeSimple,dataIndex:'device_model_text',width:120,renderer:App.qtipValue},
+			{header:DEV_COMMON_LU.labelDevStatus,dataIndex:'device_status_text',width:80,renderer:App.qtipValue},
+			{header:DEV_COMMON_LU.labelDevStatus,dataIndex:'depot_status_text',width:75,renderer:App.qtipValue},
+			{header:COMMON_LU.depotText,dataIndex:'depot_id_text',width:130,renderer:App.qtipValue},
+			{header:DEV_COMMON_LU.labelCustNo,dataIndex:'cust_id',width:120,renderer:App.qtipValue},
+			{header:DEV_COMMON_LU.labelCustName,dataIndex:'cust_name',width:130,renderer:App.qtipValue}
 		];
 		this.modemColumns = [
-			{header:'MODEM号',dataIndex:'modem_mac',width:160,renderer:App.qtipValue},
-			{header:'类型',dataIndex:'device_model_text',width:120,renderer:App.qtipValue},
-			{header:'设备状态',dataIndex:'device_status_text',width:80,renderer:App.qtipValue},
-			{header:'库存状态',dataIndex:'depot_status_text',width:75,renderer:App.qtipValue},
-			{header:'所在仓库',dataIndex:'depot_id_text',width:130,renderer:App.qtipValue},
-			{header:'客户编号',dataIndex:'cust_id',width:120,renderer:App.qtipValue},
-			{header:'客户名称',dataIndex:'cust_name',width:130,renderer:App.qtipValue}
+			{header:DEV_COMMON_LU.labelModemCode,dataIndex:'modem_mac',width:160,renderer:App.qtipValue},
+			{header:COMMON_LU.typeSimple,dataIndex:'device_model_text',width:120,renderer:App.qtipValue},
+			{header:DEV_COMMON_LU.labelDevStatus,dataIndex:'device_status_text',width:80,renderer:App.qtipValue},
+			{header:DEV_COMMON_LU.labelDevStatus,dataIndex:'depot_status_text',width:75,renderer:App.qtipValue},
+			{header:COMMON_LU.depotText,dataIndex:'depot_id_text',width:130,renderer:App.qtipValue},
+			{header:DEV_COMMON_LU.labelCustNo,dataIndex:'cust_id',width:120,renderer:App.qtipValue},
+			{header:DEV_COMMON_LU.labelCustName,dataIndex:'cust_name',width:130,renderer:App.qtipValue}
 		];
 		this.currColumns = this.stbColumns;
 		QueryDeviceGrid.superclass.constructor.call(this,{
-			title:'设备信息',
+			title:DEV_COMMON_LU.titleDeviceInfo,
 			border:false,
 			ds:this.store,
 			columns:this.stbColumns,
@@ -257,7 +262,7 @@ QueryDevice = Ext.extend(Ext.Panel,{
 		this.grid = new QueryDeviceGrid();
 		QueryDevice.superclass.constructor.call(this,{
 			id:'QueryDevice',
-			title:'设备查询',
+			title:QD_LU._title,
 			closable: true,
 			border : false ,
 			baseCls: "x-plain",

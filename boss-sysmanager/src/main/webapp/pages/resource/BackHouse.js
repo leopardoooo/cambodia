@@ -1,7 +1,13 @@
+
+var COMMON_LU = lsys('common');
+var DEV_COMMON_LU = lsys('DeviceCommon');
+var BH_LU = lsys('BackHouse');
+var MSG_LU = lsys('msgBox');
+
 //退库
-var outputNo = {fieldLabel:'退库编号',name:'deviceOutput.output_no',vtype:'alphanum',xtype:'textfield',allowBlank:false}
+var outputNo = {fieldLabel:BH_LU.outPutNo,name:'deviceOutput.output_no',vtype:'alphanum',xtype:'textfield',allowBlank:false}
 //供应商下拉框
-var backSupplierCombo = {fieldLabel:'供应商',hiddenName:'deviceOutput.supplier_id',xtype:'combo',
+var backSupplierCombo = {fieldLabel:DEV_COMMON_LU.labelSupplier,hiddenName:'deviceOutput.supplier_id',xtype:'combo',
 		store:new Ext.data.JsonStore({
 			url:'resource/Device!queryDeviceSupplier.action',
 			fields:['supplier_id','supplier_name']
@@ -9,17 +15,17 @@ var backSupplierCombo = {fieldLabel:'供应商',hiddenName:'deviceOutput.supplie
 };
 
 //设备类型
-var backDeviceType = {fieldLabel:'设备类型',xtype:'paramcombo',
+var backDeviceType = {fieldLabel:DEV_COMMON_LU.labelDeviceType,xtype:'paramcombo',
 		typeAhead:false,paramName:'DEVICE_TYPE',hiddenName:'deviceType',allowBlank:false,defaultValue:'STB'
 };
 
 //退库类型
-var outputType = {fieldLabel:'退库类型',hiddenName:'deviceOutput.output_type',xtype:'paramcombo',
+var outputType = {fieldLabel:BH_LU.outPutType,hiddenName:'deviceOutput.output_type',xtype:'paramcombo',
 	paramName:'DEVICE_OUT_TYPE',allowBlank:false
 };
 
 //备注
-var backRemark = {fieldLabel:'备注',name:'deviceOutput.remark',xtype:'textarea',anchor:'90%',height:50};
+var backRemark = {fieldLabel:COMMON_LU.remarkTxt,name:'deviceOutput.remark',xtype:'textarea',anchor:'90%',height:50};
 
 /**
  * 退库信息
@@ -41,17 +47,17 @@ var BackHouseGrid = Ext.extend(Ext.grid.GridPanel,{
 		var sm = new Ext.grid.RowSelectionModel({singleSelect:true});
 		var currentOptrId = App.data.optr['optr_id'];
 		var columns = [
-			{header:'退库单号',dataIndex:'output_no',width:85},
-			{header:'退库类别',dataIndex:'output_type_text',width:75},
-			{header:'供应商',dataIndex:'supplier_name',width:75},
-			{header:'退库日期',dataIndex:'create_time',width:90,renderer:Ext.util.Format.dateFormat},
-			{header:'设备类型',dataIndex:'device_type_text',width:70},
-			{header:'型号',dataIndex:'device_model_text',width:120,renderer:App.qtipValue},
-			{header:'数量',dataIndex:'count',width:70},
-			{id:'backHome_remark_id',header:'备注',dataIndex:'remark',width:200},
-			{header:'操作',dataIndex:'device_done_code',renderer:function(v,meta,record){
+			{header:BH_LU.outPutNo,dataIndex:'output_no',width:85},
+			{header:BH_LU.outPutType,dataIndex:'output_type_text',width:75},
+			{header:DEV_COMMON_LU.labelSupplier,dataIndex:'supplier_name',width:75},
+			{header:BH_LU.outPutDate,dataIndex:'create_time',width:90,renderer:Ext.util.Format.dateFormat},
+			{header:DEV_COMMON_LU.labelDeviceType,dataIndex:'device_type_text',width:70},
+			{header:COMMON_LU.modelSimple,dataIndex:'device_model_text',width:120,renderer:App.qtipValue},
+			{header:DEV_COMMON_LU.labelNum,dataIndex:'count',width:70},
+			{id:'backHome_remark_id',header:COMMON_LU.remarkTxt,dataIndex:'remark',width:200},
+			{header:COMMON_LU.doActionBtn,dataIndex:'device_done_code',renderer:function(v,meta,record){
 					if(currentOptrId == record.get('optr_id')){
-						return "<a href='#' onclick=Ext.getCmp('backHourseGridId').editOutputNo("+v+")>修改单号</a>";
+						return "<a href='#' onclick=Ext.getCmp('backHourseGridId').editOutputNo("+v+")>" + DEV_COMMON_LU.titleModifyOrderNum + "</a>";
 					}
 					return null;
 				}
@@ -66,23 +72,23 @@ var BackHouseGrid = Ext.extend(Ext.grid.GridPanel,{
 		}
 		BackHouseGrid.superclass.constructor.call(this,{
 			id:'backHourseGridId',
-			title:'退库信息',
+			title:BH_LU.titleOutputInfo,
 			region:'center',
 			autoExpandColumn:'backHome_remark_id',
 			border:false,
 			store:this.backHouseGridStore,
 			columns:columns,
 			sm:sm,
-			tbar:['-','输入关键字&nbsp;',
+			tbar:['-',COMMON_LU.inputKeyWork,
 				new Ext.ux.form.SearchField({  
 	                store: this.backHouseGridStore,
 	                width: 200,
 	                hasSearch : true,
-	                emptyText: '支持退库编号模糊查询'
+	                emptyText: DEV_COMMON_LU.tipSupportFuzzyQuery
 	            }),'-','->','-',
-				{text:'文件退库',iconCls:'icon-excel',scope:this,handler:this.fileBack},'-',
-				{text:'手工退库',iconCls:'icon-hand',scope:this,handler:this.handBack},'-',
-				{text:'器材退库',iconCls:'icon-batch-number',scope:this,handler:this.materalBack}
+				{text:BH_LU.fileOutput,iconCls:'icon-excel',scope:this,handler:this.fileBack},'-',
+				{text:BH_LU.manualOutput,iconCls:'icon-hand',scope:this,handler:this.handBack},'-',
+				{text:BH_LU.materalOutPut,iconCls:'icon-batch-number',scope:this,handler:this.materalBack}
 			],
 			bbar : new Ext.PagingToolbar({
 										store : this.backHouseGridStore,
@@ -163,12 +169,12 @@ var MateralBackDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 		});	
 		
 		doDel = function(){
-			Confirm('确定删除吗?',this,function(){
+			Confirm(MSG_LU.confirmDelete,this,function(){
 				materalThat.getStore().remove(materalThat.getSelectionModel().getSelected());
 			});
 		};
 		var cm = new Ext.grid.ColumnModel([
-				{id:'device_type_text_id',header:'设备类型',dataIndex:'device_type_text',width:80,editor:new Ext.form.ComboBox({
+				{id:'device_type_text_id',header:DEV_COMMON_LU.labelDeviceType,dataIndex:'device_type_text',width:80,editor:new Ext.form.ComboBox({
 					store:new Ext.data.JsonStore({
 						fields:['device_type_text','device_type','materialList']
 					}),displayField:'device_type_text',valueField:'device_type_text',triggerAction:'all',mode: 'local'
@@ -191,7 +197,7 @@ var MateralBackDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 						}
 					}
 				})},
-				{id:'device_model_text_id',header:'设备型号',dataIndex:'device_model_text',width:120,editor:new Ext.form.ComboBox({
+				{id:'device_model_text_id',header:DEV_COMMON_LU.labelDeviceModel,dataIndex:'device_model_text',width:120,editor:new Ext.form.ComboBox({
 					store:new Ext.data.JsonStore({
 						fields:['device_model_text','device_model','total_num','device_id']
 					}),displayField:'device_model_text',valueField:'device_model_text',triggerAction:'all',mode: 'local'
@@ -204,8 +210,8 @@ var MateralBackDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 						}
 					}
 				})},
-				{header:'库存数量',dataIndex:'total_num',width:70,renderer:App.qtipValue},
-				{id:'num_id',header:'数量',dataIndex:'num',width:100,
+				{header:DEV_COMMON_LU.labelTotalStoreNum,dataIndex:'total_num',width:70,renderer:App.qtipValue},
+				{id:'num_id',header:DEV_COMMON_LU.labelNum,dataIndex:'num',width:100,
 					scope:this
 					,editor: new Ext.form.NumberField({
 						allowDecimals:false,//不允许输入小数 
@@ -213,16 +219,16 @@ var MateralBackDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 		    			minValue:1//enableKeyEvents: true,
 					})
 				},
-				{header:'设备编号',dataIndex:'device_id',hidden:true},
-				{header:'设备类型编号',dataIndex:'device_type',hidden:true},
-				{header:'操作',dataIndex:'',width:40,renderer:function(value,metavalue,record,i){
-					return "<a href='#' onclick=doDel()>删除</a>";
+				{header:DEV_COMMON_LU.labelDevCode,dataIndex:'device_id',hidden:true},
+				{header:DEV_COMMON_LU.labelDeviceTypeCode ,dataIndex:'device_type',hidden:true},
+				{header:COMMON_LU.doActionBtn,dataIndex:'',width:40,renderer:function(value,metavalue,record,i){
+					return "<a href='#' onclick=doDel()>" + COMMON_LU.remove + "</a>";
 				}}
 			]
 		);
 		cm.isCellEditable = this.cellEditable;
 		MateralBackDeviceGrid.superclass.constructor.call(this,{
-			title:'器材信息',
+			title:DEV_COMMON_LU.labelMateralInfo,
 			region:'center',
 			id:'MateralBackDeviceGridId',
 			ds:this.materalStore,
@@ -231,7 +237,7 @@ var MateralBackDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 			sm:new Ext.grid.RowSelectionModel({}),
 			tbar:[
 				'-',
-				{text:'添加',iconCls:'icon-add',handler:this.doAdd,scope:this},'-'
+				{text:COMMON_LU.addNewOne,iconCls:'icon-add',handler:this.doAdd,scope:this},'-'
 			]
 		});
 	},//是否可编辑
@@ -302,7 +308,7 @@ var MateralBackDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 		}else if(fieldName == 'num'){
 			if(value >record.get('total_num')){
 				record.set('num','');
-				Confirm('不能大于库存数量！',this,function(){
+				Confirm(MSG_LU.tipOutOfStock,this,function(){
 					materalThat.startEditing(obj.row,obj.column);
 				});
 			}
@@ -332,7 +338,7 @@ BackMateralWin = Ext.extend(Ext.Window,{
 		this.queryDeviceGrid = new MateralBackDeviceGrid();
 		BackMateralWin.superclass.constructor.call(this,{
 			id : 'backMateralWinId',
-			title:'器材退库',
+			title:DEV_COMMON_LU.materalOutPut,
 			closeAction:'hide',
 			maximizable:false,
 			width: 600,
@@ -341,8 +347,8 @@ BackMateralWin = Ext.extend(Ext.Window,{
 			layout:'border',
 			items:[this.handForm, this.queryDeviceGrid],
 			buttonAlign:'right',
-			buttons:[{text:'保存',iconCls:'icon-save',scope:this,handler:this.doSave},
-				{text:'关闭',iconCls:'icon-close',scope:this,handler:function(){
+			buttons:[{text:COMMON_LU.saveBtn,iconCls:'icon-save',scope:this,handler:this.doSave},
+				{text:COMMON_LU.cancel,iconCls:'icon-close',scope:this,handler:function(){
 					this.hide();
 				}}],
 			listeners:{
@@ -379,11 +385,11 @@ BackMateralWin = Ext.extend(Ext.Window,{
 			if(data['device_id']){
 				//过滤掉重复调拨的设备
 				if(arrCode.indexOf(data['device_id']) >=0){
-					Alert('器材有相同的，请检查！');
+					Alert(MSG_LU.tipHasSameMateral);
 					return ;
 				}
 				if(Ext.isEmpty(data['num'])){
-					Alert('退库数量不能为空！');
+					Alert(MSG_LU.tipOutputNumCantBeEmpty);
 					return;
 				}
 				arrCode.push(data);
@@ -400,7 +406,7 @@ BackMateralWin = Ext.extend(Ext.Window,{
 		});
 		
 		if(arr.length === 0){
-			Alert('请正确输入设备信息！');
+			Alert(MSG_LU.pleaseInputCorrectDevInfo);
 			return;
 		}
 		var obj={};
@@ -415,7 +421,7 @@ BackMateralWin = Ext.extend(Ext.Window,{
 			success:function(res,opt){
 				msg.hide();
 				msg = null;
-				Alert('添加成功',function(){
+				Alert(COMMON_LU.addSuccess,function(){
 					this.hide();
 					Ext.getCmp('backHourseGridId').getStore().reload();
 				},this);
@@ -455,7 +461,7 @@ var BackFileForm = Ext.extend(Ext.form.FormPanel,{
 					]
 				},{columnWidth:1,layout:'form',
 					items:[
-						{id:'backHouseFileId',fieldLabel:'设备文件',name:'files',xtype:'textfield',inputType:'file',allowBlank:false,anchor:'95%'},//,width:367},
+						{id:'backHouseFileId',fieldLabel:DEV_COMMON_LU.labelDevFile,name:'files',xtype:'textfield',inputType:'file',allowBlank:false,anchor:'95%'},//,width:367},
 						backRemark
 				]}
 			]
@@ -487,7 +493,7 @@ var BackFileWin = Ext.extend(Ext.Window,{
 		this.fileForm = new BackFileForm();
 		BackFileWin.superclass.constructor.call(this,{
 			id : 'backFileWinId',
-			title:'文件退库',
+			title:BH_LU.fileOutput,
 			closeAction:'hide',
 			maximizable:false,
 			width: 450,
@@ -496,8 +502,8 @@ var BackFileWin = Ext.extend(Ext.Window,{
 			border: false,
 			items:[this.fileForm],
 			buttonAlign:'right',
-			buttons:[{text:'保存',iconCls:'icon-save',scope:this,handler:this.doSave},
-				{text:'关闭',iconCls:'icon-close',scope:this,handler:function(){this.hide();}}],
+			buttons:[{text:COMMON_LU.saveBtn,iconCls:'icon-save',scope:this,handler:this.doSave},
+				{text:COMMON_LU.cancel,iconCls:'icon-close',scope:this,handler:function(){this.hide();}}],
 			listeners:{
 				scope:this,
 				hide:function(){
@@ -517,8 +523,8 @@ var BackFileWin = Ext.extend(Ext.Window,{
 			
 			this.fileForm.getForm().submit({
 				url:'resource/Device!saveDeviceOutputFile.action',
-				waitTitle:'提示',
-				waitMsg:'正在上传中,请稍后...',
+				waitTitle:COMMON_LU.tipTxt,
+				waitMsg:COMMON_LU.waitForUpload,
 				scope:this,
 				success:function(form,action){
 					var data = action.result;
@@ -526,7 +532,7 @@ var BackFileWin = Ext.extend(Ext.Window,{
 						if(data.msg){//错误信息
 							Alert(data.msg);
 						}else{
-							Alert('文件上传成功!',function(){
+							Alert(MSG_LU.fileUploadSuccess,function(){
 								this.hide();
 								Ext.getCmp('backHourseGridId').getStore().reload();
 							},this);
@@ -534,7 +540,7 @@ var BackFileWin = Ext.extend(Ext.Window,{
 					}
 				},  
 				failure : function(form, action) {  
-					alert("文件上传失败!");  
+					alert(MSG_LU.fileUploadFailure);  
 				}
 			});
 		}
@@ -640,7 +646,7 @@ var BackHandWin = Ext.extend(Ext.Window,{
 		this.backDeviceGrid = new BackDeviceGrid();
 		BackHandWin.superclass.constructor.call(this,{
 			id : 'backHandWinId',
-			title:'手工退库',
+			title:DEV_COMMON_LU.manualOutput,
 			closeAction:'hide',
 			maximizable:false,
 			width: 800,
@@ -649,8 +655,8 @@ var BackHandWin = Ext.extend(Ext.Window,{
 			layout:'border',
 			items:[this.handForm,this.backDeviceGrid],
 			buttonAlign:'right',
-			buttons:[{text:'保存',iconCls:'icon-save',scope:this,handler:this.doSave},
-				{text:'关闭',iconCls:'icon-close',scope:this,handler:function(){
+			buttons:[{text:COMMON_LU.saveBtn,iconCls:'icon-save',scope:this,handler:this.doSave},
+				{text:COMMON_LU.cancel,iconCls:'icon-close',scope:this,handler:function(){
 					this.hide();
 				}}],
 			listeners:{
@@ -678,7 +684,7 @@ var BackHandWin = Ext.extend(Ext.Window,{
 			if(data['device_id']){
 				//过滤掉重复调拨的设备
 				if(arrCode.indexOf(data['device_id']) >=0){
-					Alert('编号有相同的，请检查！');
+					Alert(MSG_LU.warnHasSaveCode);
 					return ;
 				}
 				arrCode.push(data);
@@ -694,7 +700,7 @@ var BackHandWin = Ext.extend(Ext.Window,{
 		});
 		
 		if(arr.length === 0){
-			Alert('请正确输入设备信息！');
+			Alert(MSG_LU.pleaseInputCorrectDevInfo);
 			return;
 		}
 		
@@ -713,7 +719,7 @@ var BackHandWin = Ext.extend(Ext.Window,{
 			success:function(res,opt){
 				msg.hide();
 				msg = null;
-				Alert('添加成功',function(){
+				Alert(MSG_LU.addSuccess,function(){
 					this.hide();
 					Ext.getCmp('backHourseGridId').getStore().reload();
 				},this);
@@ -726,7 +732,7 @@ var OutputNoWin = Ext.extend(Ext.Window, {
 	constructor: function(){
 		OutputNoWin.superclass.constructor.call(this,{
 			id:'outputNoWinId',
-			title:'修改单号',
+			title:DEV_COMMON_LU.titleModifyOrderNum,
 			closeAction:'hide',
 			border:false,
 			maximizable:false,
@@ -735,15 +741,15 @@ var OutputNoWin = Ext.extend(Ext.Window, {
 			items:[{id:'outputNoFormId',xtype:'form',border:false,
 				bodyStyle:'padding-top:10px',labelWidth:65,items:[
 					{xtype:'hidden',name:'deviceDoneCode'},
-					{xtype:'textfield',fieldLabel:'新单号',width:200,name:'outputNo',vtype:'alphanum',allowBlank:false},
-					{fieldLabel:'备注',name:'remark',maxLength:128,xtype:'textarea',width : 210,height : 140}//128个汉字
+					{xtype:'textfield',fieldLabel:DEV_COMMON_LU.labelNewOrderNo,width:200,name:'outputNo',vtype:'alphanum',allowBlank:false},
+					{fieldLabel:COMMON_LU.remarkTxt,name:'remark',maxLength:128,xtype:'textarea',width : 210,height : 140}//128个汉字
 					
 				]
 			}],
 			buttonAlign:'right',
 			buttons:[
-				{text:'保存',iconCls:'icon-save',scope:this,handler:this.doSave},
-				{text:'关闭',iconCls:'icon-close',scope:this,handler:function(){
+				{text:COMMON_LU.saveBtn,iconCls:'icon-save',scope:this,handler:this.doSave},
+				{text:COMMON_LU.cancel,iconCls:'icon-close',scope:this,handler:function(){
 						this.fireEvent('hide',this);
 					}
 				}
@@ -788,7 +794,7 @@ BackHouse = Ext.extend(Ext.Panel,{
 		backGrid.detaiGrid = detailGrid;
 		BackHouse.superclass.constructor.call(this,{
 			id:'BackHouse',
-			title:'退库',
+			title:BH_LU.titleSimple,
 			closable: true,
 			border : false ,
 			baseCls: "x-plain",

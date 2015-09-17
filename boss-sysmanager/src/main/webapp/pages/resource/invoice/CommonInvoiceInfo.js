@@ -12,22 +12,22 @@ CommonInvoiceForm = Ext.extend(Ext.form.FormPanel,{
 			layout:'column',
 			labelWidth:90,
 			items:[{columnWidth:1,layout:'form',border:false,items:[
-				        {fieldLabel:'发票代码',allowBlank:false,xtype:'textfield',name:'invoiceCode',value:'AAA',readOnly:true}
+				        {fieldLabel:lsys('InvoiceCommon.invoice_code'),allowBlank:false,xtype:'textfield',name:'invoiceCode',value:'AAA',readOnly:true}
 				]},
 				{columnWidth:.5,layout:'form',border:false,items:[
 					{
-					fieldLabel:'发票号码',
+					fieldLabel:lsys('InvoiceCommon.invoice_id'),
 				    xtype:'compositefield',combineErrors:false,
 				    labelWidth:120,
 				    items: [
 				        {xtype:'textfield',name:'startInvoiceId',vtype:'invoiceId'},
-				        {xtype:'displayfield',value:'至'},
+				        {xtype:'displayfield',value:lsys('common.to')},
 				        {xtype:'textfield',name:'endInvoiceId',vtype:'invoiceId'}
 				    	]
 					}
 				]},
 				{columnWidth:.3,layout:'form',border:false,items:[
-					{id:this.queryBtnId,text:'查  询',xtype:'button',iconCls:'icon-query',
+					{id:this.queryBtnId,text:lsys('common.query'),xtype:'button',iconCls:'icon-query',
 						listeners:{
 							scope:this,
 							click:this.doQuery
@@ -52,7 +52,7 @@ CommonInvoiceForm = Ext.extend(Ext.form.FormPanel,{
 				}
 			}
 			if(isEmpty){
-				Alert('请至少输入一个发票号码');
+				Alert(lsys('msgBox.needInputAtLeastOneInvoice'));
 				return;
 			}
 			
@@ -70,16 +70,16 @@ CommonInvoiceForm = Ext.extend(Ext.form.FormPanel,{
 					Ext.getCmp(this.queryBtnId).enable();
 					var data = Ext.decode(res.responseText);
 					if(Ext.isEmpty(data)){
-						Alert('未查询到发票信息，请重新输入发票号查询！');
-						this.parent.grid.setTitle("发票信息");
+						Alert(lsys('msgBox.invoiceNotFoundTryReSearch'));
+						this.parent.grid.setTitle(lsys('InvoiceCommon.titleInvoiceInfo'));
 					}else{
 						this.doSuccess(data);
-						this.parent.grid.setTitle("发票信息  数量："+data.length);
+						this.parent.grid.setTitle(lsys('InvoiceCommon.titleInvoiceCount',null,[data.length]));
 					}
 				},
 				failure:function(){
 					msg.hide();
-					Alert('连接异常!查询失败');
+					Alert(lsys('msgBox.linkFailure'));
 				}
 			});
 		}
@@ -118,20 +118,20 @@ CommonInvoiceGrid = Ext.extend(Ext.grid.GridPanel,{
 			defaults:{sortable:false},
 			columns:[
 				sm,
-				{header:'发票号码',dataIndex:'invoice_id',align:'center',width:90},
-				{header:'发票代码',dataIndex:'invoice_code',align:'center',width:90},
-				{header:'发票类型',dataIndex:'invoice_type_text',align:'center',width:80},
-				{header:'使用状态',dataIndex:'status_text',align:'center',width:80},
-				{header:'金额',dataIndex:'amount',align:'center',width:70,renderer:Ext.util.Format.formatFee},
+				{header:lsys('InvoiceCommon.commonGridColls')[0],dataIndex:'invoice_id',align:'center',width:90},
+				{header:lsys('InvoiceCommon.commonGridColls')[1],dataIndex:'invoice_code',align:'center',width:90},
+				{header:lsys('InvoiceCommon.commonGridColls')[2],dataIndex:'invoice_type_text',align:'center',width:80},
+				{header:lsys('InvoiceCommon.commonGridColls')[3],dataIndex:'status_text',align:'center',width:80},
+				{header:lsys('InvoiceCommon.commonGridColls')[4],dataIndex:'amount',align:'center',width:70,renderer:Ext.util.Format.formatFee},
 //				{header:'定额票面额',dataIndex:'invoice_amount',align:'center',width:70,renderer:Ext.util.Format.formatFee},
-				{header:'出票方式',dataIndex:'invoice_mode_text',align:'center',width:70},
-				{header:'结存状态',dataIndex:'finance_status_text',align:'center',width:60},
-				{header:'仓库',dataIndex:'depot_name',align:'center',width:80},
-				{header:'领用人',dataIndex:'optr_name',align:'center',width:80}
+				{header:lsys('InvoiceCommon.commonGridColls')[5],dataIndex:'invoice_mode_text',align:'center',width:70},
+				{header:lsys('InvoiceCommon.commonGridColls')[6],dataIndex:'finance_status_text',align:'center',width:60},
+				{header:lsys('InvoiceCommon.commonGridColls')[7],dataIndex:'depot_name',align:'center',width:80},
+				{header:lsys('InvoiceCommon.commonGridColls')[8],dataIndex:'optr_name',align:'center',width:80}
 			]
 		});
 		CommonInvoiceGrid.superclass.constructor.call(this,{
-			title:'发票信息',
+			title:lsys('InvoiceCommon.titleInvoiceInfo'),
 			border:false,
 			ds:this.store,
 			cm:columns,
@@ -163,14 +163,12 @@ CommonInvoiceGrid = Ext.extend(Ext.grid.GridPanel,{
 							this.amount * 100 + 
 							Ext.util.Format.formatFee(amount) * 100);
 		}
-		var str = "发票信息 共选中{0}行,金额总和为{1}";
-		str = String.format(str,this.rowCount,this.amount);
-		this.setTitle(str);
+		this.setTitle(lsys('InvoiceCommon.titleInvoiceCountAndAmount',null,[this.rowCount,this.amount]));
 	},
 	doReset:function(){//重置数据
 		this.rowCount = 0;
 		this.amount = 0;
-		this.setTitle("发票信息");
+		this.setTitle(lsys('InvoiceCommon.titleInvoiceInfo'));
 	},
 	getSelections:function(){
 		return this.getSelectionModel().getSelections();
@@ -204,7 +202,8 @@ CommonInvoiceGrid = Ext.extend(Ext.grid.GridPanel,{
 					amount = amount+record.get('amount');
 				}
 			});		
-			str ="一共:"+records.length+"张发票，总额:"+Ext.util.Format.formatFee(amount)+"元，";
+//			str ="一共:"+records.length+"张发票，总额:"+Ext.util.Format.formatFee(amount)+"元，";
+			str = lsys('InvoiceCommon.tipInvoiceCountAndAmount',null,[records.length,Ext.util.Format.formatFee(amount)]);
 		}
 		return str;
 	}
@@ -228,7 +227,7 @@ CommonInvoicePanel = Ext.extend(Ext.Panel,{
 				{anchor:'100% 80%',border:false,layout:'fit',autoScroll:true,items:[this.grid]}
 			],
 			buttonAlign:'center',
-			buttons:[{text:'保  存',iconCls:'icon-save',scope:this,handler:this.doSave}]
+			buttons:[{text:lsys('common.saveBtn'),iconCls:'icon-save',scope:this,handler:this.doSave}]
 		});
 	},
 	doSave:function(){
@@ -240,14 +239,14 @@ CommonInvoicePanel = Ext.extend(Ext.Panel,{
 					values['optrId'] = this.form.getForm().findField('optrId').getValue();
 				}
 				if(Ext.isEmpty(values['transDepotId'])){
-					Alert('请选择调拨仓库');
+					Alert(lsys('msgBox.selectTransDepotId'));
 					return;
 				}
 			}else if(this.optrType == 'EDITSTATUS'){
 				values['status'] = this.form.getForm().findField('status').getValue();
 				values['invoiceType'] = this.form.getForm().findField('invoiceType').getValue();
 				if(Ext.isEmpty(values['status'])){
-					Alert('请选择要修改的状态');
+					Alert(lsys('msgBox.selectStatus2BeModify'));
 					return;
 				}
 			}else if(this.optrType == 'QUOTA_ADJUST'){
@@ -257,13 +256,13 @@ CommonInvoicePanel = Ext.extend(Ext.Panel,{
 			this.valueArr = values;
 			var strArr = this.grid.getNumValues();
 			if(this.optrType == 'CHECK' || this.optrType == 'CLOSE' || this.optrType == 'CANCELCHECK' || this.optrType == 'CANCELCLOSE'){
-				Confirm(strArr+"确定要保存业务吗?", this , this.doToSave );
+				Confirm(lsys('msgBox.confirmSaveBusiWithInvoice',null,[strArr]), this , this.doToSave );
 			}else{
 				this.doToSave();
 			}
 					
 		}else{
-			Alert('请选择要操作的记录行！');
+			Alert(lsys('msgBox.selectARecord'));
 		}
 	},
 	doToSave:function(){
@@ -277,10 +276,10 @@ CommonInvoicePanel = Ext.extend(Ext.Panel,{
 				msg.hide();
 				var data = Ext.decode(res.responseText);
 				if(data['success'] === true)
-					Alert('保存成功',function(){
+					Alert(lsys('common.msg.actionSuccess'),function(){
 						this.form.getForm().reset();
 						this.grid.getStore().removeAll();
-						this.grid.setTitle("发票信息");
+						this.grid.setTitle(lsys('InvoiceCommon.titleInvoiceInfo'));
 					},this);
 			}
 		});

@@ -144,20 +144,20 @@ EditCustForm = Ext.extend( CustBaseForm , {
 		if(busiCode == '1003'){//过户
 			if(oldCustName == custName){
 				obj['isValid'] = false;
-				obj['msg'] = '过户请修改客户名称！';
+				obj['msg'] = lmsg('transferModifyCustName');
 				return obj;
 			}
 		}else if(busiCode == '1010'){//移机
 			if(oldAddress == custAddress){
 				obj['isValid'] = false;
-				obj['msg'] = '移机请修改客户地址！';
+				obj['msg'] = lmsg('changeModifyCustAddr');
 				return obj;
 			}
 		}else{//修改客户
 			var values = this.getForm().getChangeValues();
 			if(Ext.isEmpty(values) || values.length == 0){
 				obj['isValid'] = false;
-				obj['msg'] = '您没有修改任何资料！';
+				obj['msg'] = lmsg('notModifyAnyInfo');
 				return obj;
 			}
 		}
@@ -175,6 +175,7 @@ EditCustForm = Ext.extend( CustBaseForm , {
 				arr.push(vs[i]);
 			}
 		}
+		console.log(arr);
 		var address = Ext.getCmp('tempCustAddress').getValue();
 		//地址变更
 		if(address){
@@ -207,8 +208,6 @@ EditCustForm = Ext.extend( CustBaseForm , {
 			});
 		}
 		
-		
-		
 		Ext.apply( all , {
 			'custChangeInfo':Ext.encode(arr)
 		})
@@ -216,10 +215,6 @@ EditCustForm = Ext.extend( CustBaseForm , {
 	},
 	success:function(){
 		if(App.getData().currentResource.busicode == '1003' || App.getData().currentResource.busicode == '1010'){
-//			var acctBank=App.getApp().data.custFullInfo.acctBank;
-//			if(acctBank && acctBank.cust_id){
-//				App.getApp().alertMsg("该客户有银行签约扣款，请询问客户是否需要继续银行扣款，如不需要务必操作银行解约！");
-//			}
 			App.getApp().refreshPayInfo(parent);
 		}
 		App.getApp().refreshPanel(App.getApp().getData().currentResource.busicode);

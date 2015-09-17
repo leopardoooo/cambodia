@@ -1,9 +1,14 @@
 package com.ycsoft.business.service.impl;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.transaction.SystemException;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.ycsoft.beans.core.cust.CCust;
 import com.ycsoft.beans.core.prod.CProdOrder;
@@ -11,28 +16,52 @@ import com.ycsoft.beans.core.prod.CProdOrderDto;
 import com.ycsoft.beans.core.user.CUser;
 import com.ycsoft.beans.task.TaskFillDevice;
 import com.ycsoft.beans.task.WTaskBaseInfo;
+import com.ycsoft.beans.task.WTaskLog;
 import com.ycsoft.beans.task.WTaskUser;
+import com.ycsoft.beans.task.WTeam;
 import com.ycsoft.business.component.core.DoneCodeComponent;
+import com.ycsoft.business.component.resource.DeviceComponent;
 import com.ycsoft.business.component.task.SnTaskComponent;
 import com.ycsoft.business.dao.core.cust.CCustDao;
 import com.ycsoft.business.dao.core.prod.CProdOrderDao;
 import com.ycsoft.business.dao.core.user.CUserDao;
 import com.ycsoft.business.dao.task.WTaskBaseInfoDao;
+import com.ycsoft.business.dao.task.WTaskLogDao;
+import com.ycsoft.business.dao.task.WTaskUserDao;
+import com.ycsoft.business.dao.task.WTeamDao;
+import com.ycsoft.business.dto.config.TaskBaseInfoDto;
+import com.ycsoft.business.dto.config.TaskUserDto;
+import com.ycsoft.business.dto.device.DeviceDto;
+import com.ycsoft.business.dto.device.DeviceSmallDto;
 import com.ycsoft.business.service.ISnTaskService;
 import com.ycsoft.commons.constants.BusiCmdConstants;
 import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.constants.SystemConstants;
+import com.ycsoft.commons.helper.CollectionHelper;
 import com.ycsoft.commons.helper.StringHelper;
-
+import com.ycsoft.daos.core.Pager;
+@Service
 public class SnTaskService  extends BaseBusiService implements ISnTaskService{
-
+	@Autowired
 	private SnTaskComponent snTaskComponent ; 
+	@Autowired
 	private WTaskBaseInfoDao wTaskBaseInfoDao;
+	@Autowired
 	private DoneCodeComponent doneCodeComponent;
+	@Autowired
 	private CProdOrderDao cProdOrderDao;
+	@Autowired
 	private CUserDao cUserDao;
+	@Autowired
+	private WTaskUserDao wTaskUserDao;
+	@Autowired
+	private WTaskLogDao wTaskLogDao;
+	@Autowired
+	private DeviceComponent deviceComponent;
+	@Autowired
+	private WTeamDao wTeamDao;
+	@Autowired
 	private CCustDao cCustDao;
-	
 	
 	
 	
@@ -51,7 +80,7 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 		if (task == null)
 			throw new SystemException("工单不存在!");
 		if (task.getTask_type_id().equals(SystemConstants.TASK_TYPE_FAULT) && 
-				StringHelper.isEmpty(task.getBug_type()))
+				StringHelper.isEmpty(bugType))
 			throw new SystemException("请指定故障类型!");	
 		if (task.getTeam_id().equals(deptId))
 			throw new SystemException("施工队不能相同!");	
@@ -113,9 +142,6 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 				authComponent.sendAuth(user, prodList, BusiCmdConstants.PASSVATE_USER, doneCode);
 			}
 		}
-		
-		saveAllPublic(doneCode, getBusiParam());
-		
 	}
 	
 	public void installSuccess(Integer doneCode,String custId,List<CUser> users) throws Exception {
@@ -159,12 +185,10 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 		
 	}
 
-	@Override
-	public List<WTaskBaseInfo> queryTask(String[] taskTypes, String[] areaIds, Date beginDate, Date endDate,
-			String taskId, String teamId, String status, String custNo, String custName, String custAddr)
+	public Pager<TaskBaseInfoDto> queryTask(String taskTypes, String addrIds, String beginDate, String endDate,
+			String taskId, String teamId, String status, String custNo, String custName, String custAddr,String mobile, Integer start, Integer limit)
 					throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		return wTaskBaseInfoDao.queryTask(taskTypes,addrIds,beginDate,endDate,taskId,teamId,status,custNo,custName,custAddr,mobile, start, limit);
 	}
 
 	@Override
@@ -172,8 +196,42 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 		// TODO Auto-generated method stub
 		return null;
 	}
+
 	
-	
+	public Map<String , Object> queryTaskDetail(String task_id)throws Exception{
+		Map<String , Object> map = new HashMap<String, Object>();
+		List<TaskUserDto> userList = wTaskUserDao.queryUserDetailByTaskId(task_id);
+		if(userList.size()>0){
+			List<DeviceSmallDto> list = deviceComponent.getDeviceCodeByDeviceId(CollectionHelper.converValueToArray(userList, "device_id"));
+			if(list!=null && list.size()>0){
+				Map<String, DeviceSmallDto> deviceMap = CollectionHelper.converToMapSingle(list, "device_id");
+				if(deviceMap != null)
+				for(TaskUserDto dto: userList){
+					DeviceSmallDto device = deviceMap.get(dto.getDevice_id());
+					if(device != null){
+						dto.setDevice_code(device.getDevice_code());
+					}
+				}
+			}
+		}
+		List<WTaskLog> logList = wTaskLogDao.queryByTaskId(task_id);
+		map.put("taskUserList", userList);
+		map.put("taskLogList", logList);	
+		return map;
+	}
+
+	public List<WTeam> queryTaskTeam() throws Exception {
+		return wTeamDao.findAll();
+	}
+
+	public DeviceDto queryDeviceInfoByCodeAndModel(String deviceCode, String deviceModel) throws Exception{
+		return deviceComponent.queryDeviceInfoByCodeAndModel(deviceCode, deviceModel);
+	}
+
+	public List<TaskBaseInfoDto> queryTaskByCustId(String custId) throws Exception {
+		// TODO Auto-generated method stub
+		return wTaskBaseInfoDao.queryTaskByCustId(custId);
+	}
 	
 
 }
