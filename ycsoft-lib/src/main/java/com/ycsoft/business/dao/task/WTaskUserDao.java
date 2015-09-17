@@ -29,5 +29,10 @@ public class WTaskUserDao extends BaseEntityDao<WTaskUser> {
 				+ " from w_task_user t,c_user cu  where t.task_id=? and t.user_id = cu.user_id ";
 		return this.createQuery(TaskUserDto.class,sql, taskId).list();
 	}
+	
+	public void updateTaskUserDevice(String deviceId,String userId,String taskId) throws Exception {
+		String sql = "update w_task_user set device_id=? where task_id=? and user_id=?";
+		this.executeUpdate(sql,deviceId,taskId,userId);
+	}
 
 }

@@ -6,6 +6,8 @@ import java.util.Map;
 import com.ycsoft.beans.task.TaskFillDevice;
 import com.ycsoft.beans.task.WTaskBaseInfo;
 import com.ycsoft.beans.task.WTeam;
+import com.ycsoft.business.dto.config.TaskBaseInfoDto;
+import com.ycsoft.business.dto.device.DeviceDto;
 import com.ycsoft.daos.core.Pager;
 
 public interface ISnTaskService {
@@ -59,7 +61,7 @@ public interface ISnTaskService {
 	 * @param start 
 	 * @throws Exception
 	 */
-	public Pager<WTaskBaseInfo> queryTask(String taskTypes,String addrIds,String beginDate,String endDate,
+	public Pager<TaskBaseInfoDto> queryTask(String taskTypes,String addrIds,String beginDate,String endDate,
 			String taskId,String teamId,String status,
 			String custNo,String custName,String custAddr,String mobile, Integer start, Integer limit) throws Exception;
 	
@@ -73,6 +75,10 @@ public interface ISnTaskService {
 	public Map<String, ?> queryTaskDetail(String task_id) throws Exception;
 
 	public List<WTeam> queryTaskTeam()throws Exception;
+	
+	public DeviceDto queryDeviceInfoByCodeAndModel(String deviceCode, String deviceModel) throws Exception;
+
+	public List<TaskBaseInfoDto> queryTaskByCustId(String custId) throws Exception;
 	
 	
 

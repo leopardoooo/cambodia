@@ -1911,7 +1911,7 @@ public class BaseBusiService extends BaseService {
 		CCust cust = null;
 		for (WTaskUser userDevice:deviceList){
 			CUser user = userComponent.queryUserById(userDevice.getUser_id());
-			DeviceDto device = deviceComponent.queryDeviceByDeviceCode(userDevice.getDevice_id());
+			DeviceDto device = deviceComponent.queryDeviceByDeviceId(userDevice.getDevice_id());
 			setUserDeviceInfo(user, device);
 			userComponent.updateDevice(doneCode, user);
 			//发送授权

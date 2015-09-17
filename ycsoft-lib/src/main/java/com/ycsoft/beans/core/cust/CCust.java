@@ -105,6 +105,12 @@ public class CCust extends BusiBase implements Serializable {
 	
 	private String develop_optr_name;	//发展人
 	private String login_name;
+	private String str6_text;
+	
+
+	public String getStr6_text() {
+		return str6_text;
+	}
 
 	public String getLogin_name() {
 		return login_name;
@@ -465,6 +471,7 @@ public class CCust extends BusiBase implements Serializable {
 
 	public void setStr6(String str6) {
 		this.str6 = str6;
+		this.str6_text = MemoryDict.getDictName(DictKey.LANGUAGE_TYPE, str6);
 	}
 
 	public String getStr7() {

@@ -62,7 +62,7 @@ public class CProdOrderFeeDao extends BaseEntityDao<CProdOrderFee>  {
 				+ " left join c_prod_order_fee output on t.output_type = ? and t.output_sn = output.order_fee_sn"
 				+ " left join c_prod_order output1 on output1.order_sn = output.order_sn"
 				+ " left join c_prod_order_his output2 on output2.order_sn = output.order_sn"
-				+ " order by create_time desc";
+				+ " order by t.create_time desc";
 		
 		return this.createQuery(sql, orderSn, SystemConstants.ORDER_FEE_TYPE_TRANSFEE, SystemConstants.ORDER_FEE_TYPE_TRANSFEE).setStart(start).setLimit(limit).page();
 	}

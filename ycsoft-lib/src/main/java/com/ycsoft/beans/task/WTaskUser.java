@@ -8,13 +8,13 @@ import com.ycsoft.daos.config.POJO;
 public class WTaskUser {
 	private String task_id;
 	private String user_id;
-	private String divice_model;
+	private String device_model;
 	private String device_id;
 	private String is_valid;
 	private String user_type;
 	
 	private String user_type_text;
-	private String divice_model_text;
+	private String device_model_text;
 	
 	
 	
@@ -24,11 +24,12 @@ public class WTaskUser {
 	public void setUser_type_text(String user_type_text) {
 		this.user_type_text = user_type_text;
 	}
-	public String getDivice_model_text() {
-		return divice_model_text;
+
+	public String getDevice_model_text() {
+		return device_model_text;
 	}
-	public void setDivice_model_text(String divice_model_text) {
-		this.divice_model_text = divice_model_text;
+	public void setDevice_model_text(String device_model_text) {
+		this.device_model_text = device_model_text;
 	}
 	public String getTask_id() {
 		return task_id;
@@ -42,12 +43,12 @@ public class WTaskUser {
 	public void setUser_id(String user_id) {
 		this.user_id = user_id;
 	}
-	public String getDivice_model() {
-		return divice_model;
+	public String getDevice_model() {
+		return device_model;
 	}
-	public void setDivice_model(String divice_model) {
-		this.divice_model = divice_model;
-		divice_model_text = MemoryDict.getDictName(DictKey.DEVICE_MODEL, this.divice_model);
+	public void setDevice_model(String device_model) {
+		this.device_model = device_model;
+		device_model_text = MemoryDict.getDictName(DictKey.DEVICE_MODEL, this.device_model);
 	}
 	public String getDevice_id() {
 		return device_id;

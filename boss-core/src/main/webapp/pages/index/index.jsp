@@ -39,7 +39,7 @@
 	<div id="header" style="visibility: hidden;">
 		<div class="site-nav-search">
 			<div class="logo">
-					<img src="<%=boss_res %>/resources/images/index/logo3.gif"/>
+					<img src="<%=boss_res %>/resources/images/index/logo33.gif"/>
 			</div>
 			<div action="?" method="post" name="search" id="search">
 				 <div class="search-panel">

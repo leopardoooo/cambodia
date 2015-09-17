@@ -29,7 +29,9 @@ import com.ycsoft.business.dao.task.WTaskBaseInfoDao;
 import com.ycsoft.business.dao.task.WTaskLogDao;
 import com.ycsoft.business.dao.task.WTaskUserDao;
 import com.ycsoft.business.dao.task.WTeamDao;
+import com.ycsoft.business.dto.config.TaskBaseInfoDto;
 import com.ycsoft.business.dto.config.TaskUserDto;
+import com.ycsoft.business.dto.device.DeviceDto;
 import com.ycsoft.business.dto.device.DeviceSmallDto;
 import com.ycsoft.business.service.ISnTaskService;
 import com.ycsoft.commons.constants.BusiCmdConstants;
@@ -140,9 +142,6 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 				authComponent.sendAuth(user, prodList, BusiCmdConstants.PASSVATE_USER, doneCode);
 			}
 		}
-		
-		saveAllPublic(doneCode, getBusiParam());
-		
 	}
 	
 	public void installSuccess(Integer doneCode,String custId,List<CUser> users) throws Exception {
@@ -186,7 +185,7 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 		
 	}
 
-	public Pager<WTaskBaseInfo> queryTask(String taskTypes, String addrIds, String beginDate, String endDate,
+	public Pager<TaskBaseInfoDto> queryTask(String taskTypes, String addrIds, String beginDate, String endDate,
 			String taskId, String teamId, String status, String custNo, String custName, String custAddr,String mobile, Integer start, Integer limit)
 					throws Exception {
 		return wTaskBaseInfoDao.queryTask(taskTypes,addrIds,beginDate,endDate,taskId,teamId,status,custNo,custName,custAddr,mobile, start, limit);
@@ -204,7 +203,7 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 		List<TaskUserDto> userList = wTaskUserDao.queryUserDetailByTaskId(task_id);
 		if(userList.size()>0){
 			List<DeviceSmallDto> list = deviceComponent.getDeviceCodeByDeviceId(CollectionHelper.converValueToArray(userList, "device_id"));
-			if(list.size()>0){
+			if(list!=null && list.size()>0){
 				Map<String, DeviceSmallDto> deviceMap = CollectionHelper.converToMapSingle(list, "device_id");
 				if(deviceMap != null)
 				for(TaskUserDto dto: userList){
@@ -221,10 +220,17 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 		return map;
 	}
 
-	@Override
 	public List<WTeam> queryTaskTeam() throws Exception {
-		// TODO Auto-generated method stub
 		return wTeamDao.findAll();
+	}
+
+	public DeviceDto queryDeviceInfoByCodeAndModel(String deviceCode, String deviceModel) throws Exception{
+		return deviceComponent.queryDeviceInfoByCodeAndModel(deviceCode, deviceModel);
+	}
+
+	public List<TaskBaseInfoDto> queryTaskByCustId(String custId) throws Exception {
+		// TODO Auto-generated method stub
+		return wTaskBaseInfoDao.queryTaskByCustId(custId);
 	}
 	
 

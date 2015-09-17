@@ -9,6 +9,7 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 
 import com.ycsoft.beans.task.WTaskBaseInfo;
+import com.ycsoft.business.dto.config.TaskBaseInfoDto;
 import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.daos.abstracts.BaseEntityDao;
 import com.ycsoft.daos.core.JDBCException;
@@ -37,12 +38,11 @@ public class WTaskBaseInfoDao extends BaseEntityDao<WTaskBaseInfo> {
 	 * @param county_id
 	 * @return
 	 */
-	public List<WTaskBaseInfo> queryTaskByCustId(String custId, String countyId) throws JDBCException {
-		String sql = " select t.*,tt.task_type_name,ttd.detail_type_name task_detail_type_name " +
-				" from w_task_base_info t ,t_task_detail_type ttd,t_task_type tt  " +
-				" where ttd.task_type_id=tt.task_type_id and ttd.detail_type_id =t.task_detail_type_id  " +
-				" and t.cust_id=? and t.county_id=? order by t.task_create_time desc";
-		return createQuery(sql, custId,countyId).list();
+	public List<TaskBaseInfoDto> queryTaskByCustId(String custId) throws JDBCException {
+		String sql = " select t.* " +
+				" from w_task_base_info t  " +
+				" where  t.cust_id=?  order by t.task_create_time desc";
+		return createQuery(TaskBaseInfoDto.class,sql, custId).list();
 	}
 
 	/**
@@ -55,7 +55,7 @@ public class WTaskBaseInfoDao extends BaseEntityDao<WTaskBaseInfo> {
 
 	}
 
-	public Pager<WTaskBaseInfo> queryTask(String taskTypes, String addrIds, String beginDate, String endDate,
+	public Pager<TaskBaseInfoDto> queryTask(String taskTypes, String addrIds, String beginDate, String endDate,
 			String taskId, String teamId, String status, String custNo, String custName, String custAddr,String mobile, Integer start, Integer limit) throws Exception {
 		String sql = "select t.* "
 				+ " from w_task_base_info t, C_CUST c "
@@ -97,7 +97,7 @@ public class WTaskBaseInfoDao extends BaseEntityDao<WTaskBaseInfo> {
 		}
 		
 		sql += " ORDER BY t.task_create_time DESC ";
-		return this.createQuery(sql, params.toArray(new Object[params.size()]))
+		return this.createQuery(TaskBaseInfoDto.class,sql, params.toArray(new Object[params.size()]))
 			.setLimit(limit)
 			.setStart(start)
 			.page();

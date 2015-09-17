@@ -1,14 +1,18 @@
 package com.ycsoft.web.action.core;
 
+import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.stereotype.Controller;
 
+import com.google.gson.reflect.TypeToken;
+import com.ycsoft.beans.task.TaskFillDevice;
 import com.ycsoft.beans.task.WTaskBaseInfo;
 import com.ycsoft.business.dto.core.cust.QueryTaskConditionDto;
 import com.ycsoft.business.service.ISnTaskService;
 import com.ycsoft.business.service.ITaskService;
+import com.ycsoft.commons.helper.JsonHelper;
 import com.ycsoft.web.commons.abstracts.BaseBusiAction;
 
 /** 
@@ -38,6 +42,9 @@ public class TaskAction extends BaseBusiAction{
 	private String deptId;
 	private String bugType;
 	private String resultType;
+	private String deviceCode;
+	private String deviceModel;
+	private String custId;
 
 
 	public String saveBugTask()throws Exception{
@@ -152,10 +159,30 @@ public class TaskAction extends BaseBusiAction{
 	 * @throws Exception
 	 */
 	public String endTask() throws Exception{
-		snTaskService.finishTask(task_id,bugType);
+		snTaskService.finishTask(task_id,resultType);
 		return JSON_SUCCESS;
 	}
 	
+	public String  queryDeviceInfoByCodeAndModel() throws Exception {
+		getRoot().setSimpleObj(snTaskService.queryDeviceInfoByCodeAndModel(deviceCode,deviceModel)); 
+		return JSON_SIMPLEOBJ;
+	}
+	
+	public String fillTask() throws Exception{
+		String devices = request.getParameter("devices");
+		String otlNo = request.getParameter("otlNo");
+		String ponNo = request.getParameter("ponNo");
+		Type t = new TypeToken<List<TaskFillDevice>>(){}.getType();
+		List<TaskFillDevice> list = JsonHelper.gson.fromJson( devices , t);
+		snTaskService.fillTask(task_id,otlNo,ponNo,list);
+		return JSON_SUCCESS;
+	}
+	
+	
+	public String queryTaskByCustId()throws Exception{
+		getRoot().setRecords(snTaskService.queryTaskByCustId(custId));
+		return JSON_RECORDS;
+	}
 	/**
 	 * @return the cust_ids
 	 */
@@ -331,6 +358,36 @@ public class TaskAction extends BaseBusiAction{
 
 	public void setResultType(String resultType) {
 		this.resultType = resultType;
+	}
+
+
+	public String getDeviceCode() {
+		return deviceCode;
+	}
+
+
+	public void setDeviceCode(String deviceCode) {
+		this.deviceCode = deviceCode;
+	}
+
+
+	public String getDeviceModel() {
+		return deviceModel;
+	}
+
+
+	public void setDeviceModel(String deviceModel) {
+		this.deviceModel = deviceModel;
+	}
+
+
+	public String getCustId() {
+		return custId;
+	}
+
+
+	public void setCustId(String custId) {
+		this.custId = custId;
 	}
 
 

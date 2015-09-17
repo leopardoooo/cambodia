@@ -45,6 +45,10 @@ public enum DictKey {
 	NOTE_STATUS_TYPE, AGENT,
 	DEVICE_MODEL,
 	/**订单支付类型**/
-	ORDER_FEE_TYPE
+	ORDER_FEE_TYPE,
+	/**工单完成类型**/
+	TASK_FINISH_TYPE,
+	/**开户服务语言**/
+	LANGUAGE_TYPE
 
 }

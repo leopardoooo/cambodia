@@ -84,6 +84,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 				|| ((userType.equals(USER_TYPE_DTT) || userType.equals(USER_TYPE_OTT))
 						&& StringHelper.isEmpty(user.getStb_id()))) {
 			List<CUser> userList = new ArrayList<CUser>();
+			user.setDevice_model(deviceModel);
 			userList.add(user);
 			snTaskComponent.createOpenTask(doneCode, cust, userList, getBusiParam().getWorkBillAsignType());
 		}
@@ -201,6 +202,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		user.setAcct_id(acctId);
 		user.setCust_id(custId);
 		user.setStr10(deviceBuyMode);//用户开始时设备购买方式
+		user.setDevice_model(deviceModel);//工单需要记录设备型号
 		DeviceDto device = null;
 		if (StringHelper.isNotEmpty(deviceCode)){
 			device = deviceComponent.queryDeviceByDeviceCode(deviceCode);

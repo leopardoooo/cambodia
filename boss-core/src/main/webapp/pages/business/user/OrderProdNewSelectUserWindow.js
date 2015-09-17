@@ -257,8 +257,8 @@ OpenDispatchUserWindow = Ext.extend(Ext.Window, {
 				}]
 			}],
 			buttons:[
-			         {text:lbc("common.save"), iconCls:'icon-save', scope:this, handler: this.doPassResultToParent}/*,
-			         {text:lbc("common.close"), iconCls:'icon-close', scope:this, handler: this.hide}*/
+			         {text:lbc("common.save"), iconCls:'icon-save', scope:this, handler: this.doPassResultToParent},
+			         {text:lbc("common.close"), iconCls:'icon-close', scope:this, handler: this.hide}
 			]
 		});
 	},
