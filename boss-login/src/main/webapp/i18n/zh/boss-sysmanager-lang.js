@@ -5,22 +5,31 @@
  */
 Sys = {
 	common:{
+		no:'否~',
 		status:'状态~',
 		query:'查询~',
 		inputKeyWork:'输入关键字~',
 		addNewOne:'新增~',
 		addSuccess:"添加成功!~",
+		saveSuccess:'保存成功!~',
+		saveFailed:'保存失败~',
 		updateSuccess:'修改成功!~',
+		deleteSuccess:'删除成功!~',
 		update:'修改~',
 		invalid:'作废~',
 		remove:'删除~',
 		saveBtn:'保存~',
 		cancel:'关闭~',
+		refresh:'刷新~',
+		filter:'过滤~',
 		cancelBtn:'取消~',
 		forbiddenBtn:'禁用~',
 		enableBtn:'启用~',
+		reset:'重置~',
 		doActionBtn:'操作~',
 		optr:'操作员~',
+		busiOptr:'营业员~',
+		businessHall:'营业厅',
 		changeBtn:'变更~',
 		remarkTxt:'备注~',
 		exitBtn:'备注~',
@@ -30,9 +39,34 @@ Sys = {
 		detailInfo:'详细信息~',
 		selectAll:'全选~',
 		confirm:'确认~',
+		unConfirm:'不确认~',
+		cancelConfirm:'取消确认~',
+		notForSure:'不确认~',
 		effect:'有效~',
 		createDate:'创建日期',
 		createTime:'创建时间',
+		restore:'恢复~',
+		downLoad:'下载~',
+		downLoadDetail:'下载明细~',
+		labelHistory:'历史~',
+		startDate:'开始日期~',
+		endDate:'结束日期~',
+		tipTxt:'提示~',
+		waitForUpload:'正在上传中,请稍候...~',
+		optrDetail:'操作明细~',
+		depotText:'所在仓库~',
+		countyText:'所在县市~',
+		certType:'凭证类型~',
+		operateType:'操作类型~',
+		labelDate:'日期~',
+		busiDate:'业务日期~',
+		labelBusiName:'业务名称~',
+		labelDoneCode:'流水号~',
+		confirmDoAction:'确认操作~',
+		typeSimple:'类型~',
+		modelSimple:'型号~',
+		labelName:'名称~',
+		labelChargeFee:'收费~',
 		
 	statusEnum:{
 		empty:'所有~',
@@ -47,7 +81,6 @@ Sys = {
 		confirmSave:'确认保存?~',
 		confirmDelete:'确认要删除?~',
 		noDataToBeprinted:'没有要打印的数据~'
-			
 		}
 	},
 	ExchangeRateManage: {//汇率配置
@@ -286,29 +319,85 @@ Sys = {
 /** 设备管理开始 **/
 	DeviceCommon:{//设备信息通用字段
 		titleDeviceInfo:'设备信息~',
+		labelStbModel:'机顶盒型号~',
+		labelCardModel:'智能卡型号~',
+		labelModemModel:'猫类型~',
+		labelModemModel2:'MODEM型号~',
+		labelStbCode:'机顶盒号~',
+		labelCardCode:'智能卡号~',
+		labelModemCode:'MODEM号~',
 		labelDeviceType:'设备类型~',
-		labelDeviceModel:"型号~",
+		labelDeviceTypeCode:'设备类型编号~',
 		labelPrice:'单价~',
 		labelOrderNum:'订购数量~',
 		labelOwnerShip:'产权~',
 		labelSupplier:'供应商~',
-		labelSupplier:'供应商~',
+		labelDefinition:'清晰~',
+		labelInteractiveType:'交互方式~',
 		labelInputDate:'入库日期~',
+		labelDevInputDepot:'入库仓库~',
 		labelNum:'数量!~',
 		labelBatchNum:'批号~',
+		labelPairStbCode:'配对机顶盒号~',
+		labelPairStbType:'配对机顶盒型号~',
 		labelPairCardCode:'配对卡号~',
+		labelPairCardType:'配对卡型号~',
+		labelPairCardType2:'配对卡类型~',
+		labelPairModemType:'配对MODEM型号~',
+		labelPairModemCode:'配对MODEM号~',
 		labelDeviceModel:'设备型号~',
 		labelDevCode:'设备编号~',
+		labelDevCode2:'编号(Modem_mac)~',
 		labelDevStatus:'设备状态~',
 		labelInputDepotNum:'入库数量~',
 		titleInputSimple:'入库~',
 		labelDepot:'仓库~',
 		labelIsNewStb:'新机~',
+		labelIsNewStb2:'是否新机~',
 		titleModifyOrderNum:'修改单号~',
 		labelNewOrderNo:'新单号~',
-		labelTransNo:'调拨单号~'
+		labelTransNo:'调拨单号~',
+		labelTransStatus:'调拨状态~',
+		labelRestoreTrans:'恢复调拨~',
+		labelTransHistory:'历史调拨~',
+		titleTransInfo:'调拨信息~',
+		tipSupportFuzzyQuery:'支持编号模糊查询~',
+		labelDevBatchNum:'设备批号...~',
+		labelTotalStoreNum:'库存数量~',
+		labelMateralInfo:'器材信息~',
+		labelDevDetail:'设备明细~',
+		labelApplyInfo:'领用信息~',
+		labelSwitchDepot:'切换仓库~',
+		labelVitualModemModel:'虚拟MODEM型号~',
+		labelVitualModemCode:'虚拟MODEM号~',
+		labelDevFile:'设备文件~',
+		labelOperateTime:'操作时间~',
+		labelFileOperate:'文件操作~',
+		labelManualInput:'手工录入~',
+		labelSingleStb:'单机顶盒~',
+		labelSingleCard:'单智能卡~',
+		labelStbCardPair:'机卡配对~',
+		labelSingleModem:'单MODEM~',
+		labelStbModemPair:'机MODEM配对~',
+		labelConfirmDate:'确认时间~',
+		labelConfirmOptr:'确认人~',
+		labelCustName:'客户名称~',
+		labelCustNo:'客户编号~',
+		vitualDevice:'虚拟设备~',
+		isDifferent:'是否差异~',
+		labelBackUp:'备机~',
+		labelModemType:'MODEM类型~',
+		labelDepotStatus:'库存状态~',
+		labelRecordTime:'入库时间~',
+		labelStbType:'盒类型~',
+		labelCardType:'卡类型~',
+		labelPairModemType2:'配对MODEM类型~',
+		labelTypeName:'类型名称~'
+		
+		
 		
 	},
+	
 	DepotIndexManager:{//终端管理
 		_title:'终端管理~',
 		titleExamOutPanel:'待审批调出~',
@@ -343,8 +432,6 @@ Sys = {
 	},
 	CheckIn : {// 设备入库
 		_title:'设备入库~',
-		labelInputNo:'入库编号~',
-		labelBackUp:'备机~',
 		labelInputNo:'入库单号~',
 		labelOrderNo:'订单号~',
 		labelCheckBatchNum:'入库批号~',
@@ -352,7 +439,8 @@ Sys = {
 		labelFileInput:'文件入库~',
 		labelManualInput:'手工入库!~',
 		labelMateralCheckIn:'器材入库~',
-		labelDevFile:'设备文件~'
+		labelInputOptr:'入库人~',
+		labelInputBatchNum:'入库批号~'
 		
 		
 		
@@ -361,34 +449,117 @@ Sys = {
 		_title:'设备调拨~',
 		titleTransConfirm:'调拨确认~',
 		labelConfirmInfo:'确认信息!~',
-		labelTransType:'调拨类别~'
+		labelTransType:'调拨类别~',
+		labelConfirmDate:'确认日期~',
+		labelTransIn:'转发~',
+		transStatus:{
+			ALL:'所有调拨~',
+			NOW:'执行调拨~',
+			HISTORY:'历史调拨~'
+		},
+		tipTransStatus:'执行中或历史调拨~',
+		labelFileTrans:'文件调拨~',
+		labelManualTrans:'手工调拨~',
+		labelBatchNumTrans:'批号调拨~',
+		labelMateralTrans:'器材调拨~',
+		labelOldTransStbNum:'原调拨机顶盒数量~',
+		labelNewTransStbNum:'本次调拨机顶盒数量~',
+		labelOldTransCardNum:'原调拨智能卡数量~',
+		labelNewTransCardNum:'本次调拨智能卡数量~',
+		labelOldTransModemNum :'原调拨猫数量~',
+		labelNewTransModemNum:'本次调拨猫数量~'
 	},
 	AppUseDevice : {// 设备领用
-		_title:'设备领用~'
+		_title:'设备领用~',
+		deviceCodeNeeded:'请输入设备号:~',
+		labelProcureType:'领用类型~',
+		labelProcurer:'领用人~',
+		labelProcureDept:'领用部门~',
+		labelProcureNo:'领用单号~',
+		labelProcureTime:'领用时间~',
+		labelProcureNo:'领用单号~',
+		arrayDocType:[['销售单~'],['领导批条~']],
+		labelFeeNo:'缴费单号~'
 	},
 	DifferenceManage : {// 差异管理
-		_title:'差异管理~'
+		_title:'差异管理~',
+        labelDiffType:'差异类型~',
+        labelDiffTime:'差异时间~',
+        labelManualDiff:'手工差异~',
+        labelFileDiff:'文件差异~',
+        labelConfirmDiff:'确认差异~',
+        labelCancelDiff:'取消差异~',
+        titleManualAddDiff:'手工增加差异~',
+        titleFileAddDiff:'文件增加差异~'
+    
 	},
 	DeviceStatus : {// 状态管理
-		_title:'状态管理~'
+		_title:'状态管理~',
+		labelSetNewOrOld:'设新旧~',
+		titleFileOptr:'设备状态管理(文件操作)~',
+		titleManualOptr:'设备状态管理(手工录入)~'
 	},
 	BackHouse : {// 设备退库
-		_title:'设备退库~'
+		_title:'设备退库~',
+		titleSimple:'退库~',
+		outPutNo:'退库编号~',
+		outPutType:'退库类型~',
+		outPutDate:'退库日期~',
+		titleOutputInfo:'退库信息~',
+		fileOutput:'文件退库~',
+		manualOutput:'手工退库~',
+		materalOutPut:'材料退库~'
+		
 	},
 	Deploy : {// 基本配置
-		_title:'基本配置~'
+		_title:'配置~',
+		titleMateralCfg:'器材型号配置~',
+		titleProducerCfg:'供应商配置~',
+		titleBuyTypeCfg:'购买方式配置~',
+		labelMateralType:'器材类型~',
+		labelModelName:'型号名称~',
+		stbCardPairCfg:'机卡配对配置~',
+        labelProducer:'制造商~',
+        labelSelectableCardModel:'可选智能卡型号~',
+        labelSelectedCardModel:'可选智能卡型号~',
+        isVitual:'是否虚拟~',
+        caType:'CA类型~',
+		labelBuyType:'购买类型~',
+		labelBuyTypeCode:'购买方式代码~',
+		labelChangeOwnership:'转换产权~',
+		labelNetType:'接入类型~',
+		titleDevTypeCfg:'设备类型配置~',
+		titleCountyCfg:'适用地区配置~',
+		titleTypeCountyCfg:'分配型号-> {0}',
+		labelAssignType:'分配型号~',
+		labelSuitableCounty:'适用地区~'
+		
 	},
 	QueryDevice : {// 设备查询
 		_title:'设备查询~'
 	},
 	DeviceDetailInfo : {// 详细查询
-		_title:'详细查询~'
+		_title:'详细查询~',
+		titleUseRecord:'使用记录~',
+		labelTargetDepot:'目标仓库~',
+		labelSourceDepot:'源仓库~'
 	},
 	ReclaimDevice : {// 设备回收
-		_title:'设备回收~'
+		_title:'设备回收~',
+		labelConfirmRecycle:'是否回收~',
+		titleRecycleConfirm:'回收确认~',
+		labelRecycleStatus:'执行中或历史回收~',
+		recycleStatusEnum:{
+			ALL:'所有回收~',
+			NOW:'执行回收~',
+			HISTORY:'历史回收~'
+		},
+		labelRecycleReason:'回收原因~'
 	},
 	DeviceLoss : {// 设备挂失
-		_title:'设备挂失~'
+		_title:'设备挂失~',
+		titleAddDevLoss:'添加设备挂失~',
+		labelCancelLoss:'取消挂失~'
 	},
 	DownloadDeviceInfo : {//设备盘点
 		_title:'设备盘点~'
@@ -416,6 +587,8 @@ Sys = {
 		confirmConvert2NowOrder:'确认转换为执行中的订单吗？~',
 		orderNumCantLessThanGoodsNum:'订购数量不能小于到货数量!~',
 		confirmDelete:'确定删除吗?~',
+		tipSelectOneRow:'请选中要操作的行~',
+		confirmDoAction:'确定操作吗?~',
 		selectDevType:'请选择设备类型!~',
 		selectModel:'请选择型号!~',
 		numberShouldBiggerThan0:'单价请输入大于零的数字!~',
@@ -429,7 +602,39 @@ Sys = {
 		fileUploadSuccess:'文件上传成功!~',
 		fileUploadFailure:"文件上传失败!~",
 		pleaseInputCorrectDevInfo:'请正确输入设备信息！~',
-		transSuccess:'调拨确认成功~'
+		transSuccess:'调拨确认成功~',
+		pleaseInputBatchNum:'请输入批号查询~',
+		tipDevCheckFileFormat:'文件入库：只有1列设备编号~',
+		confirm2HisTrans:'确认转换为历史调拨吗?~',
+		confirm2NowTrans:'确认转换为执行中的调拨吗?~',
+		warnHasSaveCode:'编号有相同的，请检查！~',
+		notSuitableDev4Trans:'本批次调拨的设备已没有符合可调拨条件的设备!~',
+		pleaseSelectDev2Trans:'请选择需要调拨的设备~',
+		tipOutOfStock:'不能大于库存数量！~',
+		tipHasSameMateral:'器材有相同的，请检查！~',
+		tipTransNumCantBeEmpty:'调拨数量不能为空！~',
+		tipOutputNumCantBeEmpty:'退库数量不能为空~',
+		pleaseUploadExcelFile:'请选择excel文件进行上传！~',
+		pleaseUploadExcel2003:'请选择excel2003文件进行上传,文件后缀名为.xls!~',
+		needDevCode2Query:'输入设备编号回车查询~',
+		confirmCancelApply:"确定取消领用吗?~",
+		confirmCancelAllApply:"确定取消所有领用吗?~",
+		supportDevCodeQuery:'支持设备编号查询~',
+		tipDevHasNoDiff:'该设备已差异，无需再确认~',
+		tipDevNotDiffCantCancel:'该设备未差异，不能取消确认~',
+		tipDevFileDiffInfo:'文件增加差异：文件类型为Excel，共一列，第一列为差异设备编号~',
+		tipConfirmDiffSuccess:'确认差异成功!~',
+		tipCalcenDiffSuccess:'取消差异成功!~',
+		tipSelectTragetDevStatus : '请先选择要修改的设备状态类型!~',
+		fileDownloadFailed:'文件下载失败~',
+		confirmCancelRecycle:'确认取消回收吗？~',
+		tipDevDosNotExists:'查询的设备不存在~',
+		tipQueryDateBeforeDownLoad:'请先查询出数据，方能下载!!~',
+		tipPleaseEditWell:'请编辑完整~',
+		duplicateRows:"第 {0} 行和第 {1} 行相同,请重新编辑！"
+    
+		
+		
 	}
 	
 }

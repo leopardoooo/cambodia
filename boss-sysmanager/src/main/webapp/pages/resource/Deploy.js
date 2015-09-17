@@ -6,6 +6,11 @@
  * @param {} paramsValue 请求参数的值
  * 该方法仅供当前js中调用！！
  */
+var COMMON_LU = lsys('common');
+var DEV_COMMON_LU = lsys('DeviceCommon');
+var BASE_CFG_LU = lsys('Deploy');
+var MSG_LU = lsys('msgBox');
+
 var commonDoSave = function(scopeThis,url,paramsKey,paramsValue){
 		var records = scopeThis.getStore().getModifiedRecords();
 		if(records.length > 0){
@@ -26,7 +31,7 @@ var commonDoSave = function(scopeThis,url,paramsKey,paramsValue){
 				params:paramsObj,
 				scope:scopeThis,
 				success:function(res,opt){
-					Alert('保存成功！',function(){
+					Alert(COMMON_LU.saveSuccess,function(){
 						scopeThis.getStore().reload();
 					});
 				}
@@ -78,7 +83,7 @@ var CheckDeviceModel = function(scopeThis,field){
 					&& a !=='buy_type_text'*/ && a !=='virtual_card_model_name'
 					&& a !=='virtual_modem_model_name'
 					&& a !== 'supplier_id'){
-				Alert('请编辑完整!',function(){
+				Alert(MSG_LU.tipPleaseEditWell ,function(){
 					scopeThis.getSelectionModel().selectRow(i);
 					scopeThis.startEditing(i,k);
 				});
@@ -93,7 +98,8 @@ var CheckDeviceModel = function(scopeThis,field){
 				var d = store.getAt(j).data;
 				if(data[field] == d[field]){//新增行数据中型号不能已存在
 					flag = false;
-					Alert("第"+(i+1)+"行和第"+(j+1)+"行相同,请重新编辑！",function(){
+					
+					Alert(lsys('msgBox.duplicateRows',null,[(i+1),(j+1)]) ,function(){
 						scopeThis.getSelectionModel().selectRow(i);
 						scopeThis.startEditing(i,dataIndexes.indexOf(field));
 					});
@@ -169,12 +175,12 @@ var commonBeforeedit = function(obj){
  * @param {} paramsObj 请求参数
  */
 var commonDoDel = function(scopeThis,url,paramsObj){
-	Confirm('确定删除吗？',this,function(){
+	Confirm(MSG_LU.confirmDelete,this,function(){
 				Ext.Ajax.request({
 					url:url,
 					params:paramsObj,
 					success:function(res,opt){
-						Alert('删除成功!',function(){
+						Alert(COMMON_LU.deleteSuccess,function(){
 							scopeThis.getStore().remove(scopeThis.getSelectionModel().getSelected());
 						});
 					},
@@ -249,14 +255,16 @@ var BuyTypeGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 				}
 			}});
 		var cm = new Ext.grid.ColumnModel([
-			{header:'购买类型',dataIndex:'buy_type_text',width:150,editor:this.buyTypeCombo,scope:this},
-			{id:'buy_mode_id',header:'购买方式代码',dataIndex:'buy_mode',width:150,editor:new Ext.form.TextField({vtype:'alphanum'})},
-			{header:'名称',dataIndex:'buy_mode_name',width:150,editor:new Ext.form.TextField({})},
-			{header:'收费',dataIndex:'buy_text',width:80,editor:this.buyCombo},
+			{header:BASE_CFG_LU.labelBuyType,dataIndex:'buy_type_text',width:150,editor:this.buyTypeCombo,scope:this},
+			{id:'buy_mode_id',header:BASE_CFG_LU.labelBuyTypeCode,dataIndex:'buy_mode',width:150,editor:new Ext.form.TextField({vtype:'alphanum'})},
+			{header:COMMON_LU.labelName,dataIndex:'buy_mode_name',width:150,editor:new Ext.form.TextField({})},
+			{header:COMMON_LU.labelChargeFee,dataIndex:'buy_text',width:80,editor:this.buyCombo},
 //			{id:'fee_name_id',header:'费用',dataIndex:'fee_name',width:75,editor:this.feeCombo},
-			{header:'转换产权',dataIndex:'change_ownship_text',width:90,editor:this.changeOwnshipCombo},
-			{header:'操作',dataIndex:'buy_mode',width:80,renderer:function(value){
-				return "<a href='#' onclick=buyTypeGrid.doDel('"+value+"')>删除</a>";
+			{header:BASE_CFG_LU.labelChangeOwnership,dataIndex:'change_ownship_text',width:90,editor:this.changeOwnshipCombo},
+			{header:COMMON_LU.doActionBtn,dataIndex:'buy_mode',width:80,renderer:function(value){
+				return "<a href='#' onclick=buyTypeGrid.doDel('"+value+"')>" +
+						COMMON_LU.remove +
+						"</a>";
 			}}
 		]);
 		
@@ -265,16 +273,16 @@ var BuyTypeGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 		BuyTypeGrid.superclass.constructor.call(this,{
 			id:'buyTypeGridId',
 			region:'center',
-			title:'购买方式配置',
+			title:BASE_CFG_LU.titleBuyTypeCfg,
 			ds:this.buyTypeStore,
 			clicksToEdit:1,
 			cm:cm,
 			sm:new Ext.grid.RowSelectionModel({}),
 			tbar:[
 				'-',
-				{text:'添加',iconCls:'icon-add',handler:this.doAdd,scope:this},'-',
-				{text:'保存',iconCls:'icon-save',handler:this.doSave,scope:this},'-',
-				{text:'刷新',iconCls:'icon-refresh',handler:comomRefresh,scope:this},'-'
+				{text:COMMON_LU.addNewOne,iconCls:'icon-add',handler:this.doAdd,scope:this},'-',
+				{text:COMMON_LU.saveBtn,iconCls:'icon-save',handler:this.doSave,scope:this},'-',
+				{text:COMMON_LU.refresh,iconCls:'icon-refresh',handler:comomRefresh,scope:this},'-'
 			]
 		});
 	},
@@ -337,27 +345,27 @@ var ProvideGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 		});
 //		this.provideStore.load();
 		var cm = new Ext.grid.ColumnModel([
-			{header:'编号',dataIndex:'supplier_id',width:40,sortable:true},
-			{header:'名称',dataIndex:'supplier_name',width:100,sortable:true,
+			{header:COMMON_LU.orderNum,dataIndex:'supplier_id',width:40,sortable:true},
+			{header:COMMON_LU.labelName,dataIndex:'supplier_name',width:100,sortable:true,
 				editor:new Ext.form.TextField({})},
-			{header:'操作',dataIndex:'supplier_id',width:40,
-				renderer:function(value,meta,record){return "<a href='#' onclick=providerGrid.doDel("+Ext.encode(record.data)+")>删除</a>";}}
+			{header:COMMON_LU.doActionBtn,dataIndex:'supplier_id',width:40,
+				renderer:function(value,meta,record){return "<a href='#' onclick=providerGrid.doDel("+Ext.encode(record.data)+")>" + COMMON_LU.remove + "</a>";}}
 		]);
 		ProvideGrid.superclass.constructor.call(this,{
 			id:'provideGridId',
 			region:'east',
 			width:'22%',
 			split:true,
-			title:'供应商配置',
+			title:BASE_CFG_LU.titleProducerCfg,
 			ds:this.provideStore,
 			clicksToEdit:1,
 			cm:cm,
 			sm:new Ext.grid.RowSelectionModel({}),
 			tbar:[
 				'-',
-				{text:'添加',iconCls:'icon-add',handler:this.doAdd,scope:this},'-',
-				{text:'保存',iconCls:'icon-save',handler:this.doSave,scope:this},'-',
-				{text:'刷新',iconCls:'icon-refresh',handler:comomRefresh,scope:this},'-'
+				{text:COMMON_LU.addNewOne,iconCls:'icon-add',handler:this.doAdd,scope:this},'-',
+				{text:COMMON_LU.saveBtn,iconCls:'icon-save',handler:this.doSave,scope:this},'-',
+				{text:COMMON_LU.refresh,iconCls:'icon-refresh',handler:comomRefresh,scope:this},'-'
 			]
 		});
 	},
@@ -379,7 +387,7 @@ var ProvideGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 });
 
 StbCardMatchWin = Ext.extend(Ext.Window,{
-	title:'机卡配对配置',
+	title:BASE_CFG_LU.stbCardPairCfg,
 	width:600,height:480,
     IdleModelGrid: null,
     selectedModelGrid: null,
@@ -403,16 +411,16 @@ StbCardMatchWin = Ext.extend(Ext.Window,{
         this.selectedModelStore.setDefaultSort("device_model", "ASC");
         
         this.IdleModelGrid = new Ext.grid.EditorGridPanel({
-            title: '可选智能卡型号',
+            title: BASE_CFG_LU.labelSelectableCardModel,
             border: false,
             autoScroll: true,
             ds: this.idleModelStore,
             sm: this.setProd,
             region: 'center',
             columns: [this.setProd,
-            	{header: '型号',width:80,dataIndex: 'device_model'},
-            		{header: '型号名',width:120,dataIndex: 'model_name'}],
-			tbar:['过滤:',{xtype:'textfield',enableKeyEvents:true,
+            	{header: COMMON_LU.modelSimple,width:80,dataIndex: 'device_model'},
+            		{header: BASE_CFG_LU.labelModelName,width:120,dataIndex: 'model_name'}],
+			tbar:[COMMON_LU.filter,{xtype:'textfield',enableKeyEvents:true,
 							listeners:{
 								scope:this,
 								keyup:function(txt,e){
@@ -431,7 +439,7 @@ StbCardMatchWin = Ext.extend(Ext.Window,{
         });
 
         this.selectedModelGrid = new Ext.grid.EditorGridPanel({
-            title: '已选智能卡型号',
+            title: BASE_CFG_LU.labelSelectedCardModel,
             region: 'center',
             ds: this.selectedModelStore,
             sm: this.setUprod,
@@ -440,9 +448,9 @@ StbCardMatchWin = Ext.extend(Ext.Window,{
             border: true,
             clicksToEdit: 1,
             columns: [this.setProd,
-            	{header: '型号',width:80,dataIndex: 'device_model'},
-            		{header: '型号名',width:120,dataIndex: 'model_name'}],
-			tbar:['过滤:',{xtype:'textfield',enableKeyEvents:true,id:'selectSystemId',
+            	{header: COMMON_LU.modelSimple,width:80,dataIndex: 'device_model'},
+            		{header: BASE_CFG_LU.labelModelName,width:120,dataIndex: 'model_name'}],
+			tbar:[COMMON_LU.filter,{xtype:'textfield',enableKeyEvents:true,id:'selectSystemId',
 						listeners:{
 							scope:this,
 								keyup:function(txt,e){
@@ -466,13 +474,13 @@ StbCardMatchWin = Ext.extend(Ext.Window,{
             border: false,
             fbar:[
             	{
-                text: '保存',
+                text: COMMON_LU.saveBtn,
                 scope: this,
                 iconCls: 'icon-save',
                 handler: this.doSave
             },
             {
-                text: '关闭',
+                text: COMMON_LU.cancel,
                 scope: this,
                 handler: function () {
                     this.hide();
@@ -594,17 +602,17 @@ StbCardMatchWin = Ext.extend(Ext.Window,{
     		success:function(req){
     			var simple = req.responseText;
     			if(simple == 'true'){
-    				Alert('保存成功',function(){
+    				Alert(COMMON_LU.saveSuccess,function(){
     					this.hide();
     				},this);
     			}else{
-    				Alert('保存失败',function(){
+    				Alert(COMMON_LU.saveFailed,function(){
     					this.hide();
     				},this);
     			}
     		},
     		failure:function(){
-    			Alert('保存失败',function(){
+    			Alert(COMMON_LU.saveFailed,function(){
     				this.hide();
     			},this);
     		}
@@ -711,30 +719,30 @@ var StbGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 			}
 		});
 		var cm = new Ext.grid.ColumnModel([
-			{id:'device_model_id',header:'型号',dataIndex:'device_model',width:110,editor:new Ext.form.TextField({vtype:'singleChar'})},
-			{header:'型号名称',dataIndex:'model_name',width:120,editor:new Ext.form.TextField({})},
-			{header:'制造商',dataIndex:'supplier_name',width:75,editor:this.supplierCombo},
-			{header:'交互方式',dataIndex:'interactive_type_text',width:60,editor:this.interactiveTypeCombo},
-			{header:'清晰',dataIndex:'definition_type_text',width:50,editor:this.definitionTypeCombo},
-			{header:'配对卡类型',dataIndex:'virtual_card_model_name',width:80,editor:this.virtualCardModelCombo},
+			{id:'device_model_id',header:COMMON_LU.modelSimple,dataIndex:'device_model',width:110,editor:new Ext.form.TextField({vtype:'singleChar'})},
+			{header:BASE_CFG_LU.labelModelName,dataIndex:'model_name',width:120,editor:new Ext.form.TextField({})},
+			{header:BASE_CFG_LU.labelProducer,dataIndex:'supplier_name',width:75,editor:this.supplierCombo},
+			{header:DEV_COMMON_LU.labelInteractiveType,dataIndex:'interactive_type_text',width:60,editor:this.interactiveTypeCombo},
+			{header:DEV_COMMON_LU.labelDefinition,dataIndex:'definition_type_text',width:50,editor:this.definitionTypeCombo},
+			{header:DEV_COMMON_LU.labelPairCardType2,dataIndex:'virtual_card_model_name',width:80,editor:this.virtualCardModelCombo},
 //			{header:'虚拟MODEM类型',dataIndex:'virtual_modem_model_name',width:95,editor:this.virtualModemModelCombo},
-			{header:'操作',dataIndex:'device_model',width:80,renderer:function(value){
-				return "<a href='#' onclick=stbGrid.matchCard('"+value+"')>机卡配对配置</a>";
+			{header:COMMON_LU.doActionBtn,dataIndex:'device_model',width:80,renderer:function(value){
+				return "<a href='#' onclick=stbGrid.matchCard('"+value+"')>" + BASE_CFG_LU.stbCardPairCfg + "</a>";
 			}}
 		]);
 		cm.isCellEditable = commonIsCellEditable;
 		StbGrid.superclass.constructor.call(this,{
 			id:'stbGridId',
-			title:'机顶盒型号',
+			title:DEV_COMMON_LU.labelStbModel,
 			ds:this.stbStore,
 			clicksToEdit:1,
 			cm:cm,
 			sm:new Ext.grid.RowSelectionModel({}),
 			tbar:[
 				'-',
-				{text:'添加',iconCls:'icon-add',handler:this.doAdd,scope:this},'-',
-				{text:'保存',iconCls:'icon-save',handler:this.doSave,scope:this},'-',
-				{text:'刷新',iconCls:'icon-refresh',handler:comomRefresh,scope:this},'-'
+				{text:COMMON_LU.addNewOne,iconCls:'icon-add',handler:this.doAdd,scope:this},'-',
+				{text:COMMON_LU.saveBtn,iconCls:'icon-save',handler:this.doSave,scope:this},'-',
+				{text:COMMON_LU.refresh,iconCls:'icon-refresh',handler:comomRefresh,scope:this},'-'
 			]
 		});
 	},
@@ -823,27 +831,27 @@ var ModemGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 			}
 		});
 		var cm = new Ext.grid.ColumnModel([
-			{header:'MODEM类型',dataIndex:'modem_type_name',width:80,editor:this.modemTypeCombo},
-			{id:'device_model_id',header:'型号',dataIndex:'device_model',width:120,editor:new Ext.form.TextField({vtype:'singleChar'})},
-			{header:'型号名称',dataIndex:'model_name',width:120,editor:new Ext.form.TextField({})},
-			{header:'接入类型',dataIndex:'net_type_name',width:70,editor:this.netTypeCombo},
-			{header:'制造商',dataIndex:'supplier_name',width:70,editor:this.supplierCombo},
-			{header:'是否虚拟',dataIndex:'is_virtual_text',width:70,editor:this.isVirtualCombo},
-			{header:'备注',dataIndex:'remark',width:120,editor:new Ext.form.TextField({})}
+			{header:DEV_COMMON_LU.labelModemType,dataIndex:'modem_type_name',width:80,editor:this.modemTypeCombo},
+			{id:'device_model_id',header:COMMON_LU.modelSimple,dataIndex:'device_model',width:120,editor:new Ext.form.TextField({vtype:'singleChar'})},
+			{header:BASE_CFG_LU.labelModelName,dataIndex:'model_name',width:120,editor:new Ext.form.TextField({})},
+			{header:BASE_CFG_LU.labelNetType,dataIndex:'net_type_name',width:70,editor:this.netTypeCombo},
+			{header:BASE_CFG_LU.labelProducer,dataIndex:'supplier_name',width:70,editor:this.supplierCombo},
+			{header:BASE_CFG_LU.isVitual,dataIndex:'is_virtual_text',width:70,editor:this.isVirtualCombo},
+			{header:COMMON_LU.remarkTxt,dataIndex:'remark',width:120,editor:new Ext.form.TextField({})}
 		]);
 		cm.isCellEditable = commonIsCellEditable;
 		ModemGrid.superclass.constructor.call(this,{
 			id:'modemGridId',
-			title:'MODEM型号',
+			title:DEV_COMMON_LU.labelModemModel2,
 			ds:this.modemStore,
 			clicksToEdit:1,
 			cm:cm,
 			sm:new Ext.grid.RowSelectionModel({}),
 			tbar:[
 				'-',
-				{text:'添加',iconCls:'icon-add',handler:this.doAdd,scope:this},'-',
-				{text:'保存',iconCls:'icon-save',handler:this.doSave,scope:this},'-',
-				{text:'刷新',iconCls:'icon-refresh',handler:comomRefresh,scope:this},'-'
+				{text:COMMON_LU.addNewOne,iconCls:'icon-add',handler:this.doAdd,scope:this},'-',
+				{text:COMMON_LU.saveBtn,iconCls:'icon-save',handler:this.doSave,scope:this},'-',
+				{text:COMMON_LU.refresh,iconCls:'icon-refresh',handler:comomRefresh,scope:this},'-'
 			]
 		});
 	},
@@ -860,7 +868,7 @@ var ModemGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 		commonDoAdd(this,{
 			device_model:'',device_type:'',model_name:'',supplier_id:'',remark:'',
 				supplier_name:'',device_type_text:'',net_type:'',net_type_name:'',
-				is_virtual:'F',is_virtual_text:'否'
+				is_virtual:'F',is_virtual_text:COMMON_LU.no
 		});
 	},
 	doSave:function(){
@@ -918,26 +926,26 @@ var CardGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 			}
 		});
 		var cm = new Ext.grid.ColumnModel([
-			{id:'device_model_id',header:'型号',dataIndex:'device_model',width:120,editor:new Ext.form.TextField({vtype:'singleChar'})},
-			{header:'型号名称',dataIndex:'model_name',width:120,editor:new Ext.form.TextField({})},
-			{header:'CA类型',dataIndex:'ca_supplier_name',width:70,editor:this.caSupplierCombo},
-			{header:'制造商',dataIndex:'supplier_name',width:70,editor:this.supplierCombo},
-			{header:'是否虚拟',dataIndex:'is_virtual_text',width:70,editor:this.isVirtualCombo},
-			{header:'备注',dataIndex:'remark',width:120,editor:new Ext.form.TextField({})}
+			{id:'device_model_id',header:COMMON_LU.modelSimple,dataIndex:'device_model',width:120,editor:new Ext.form.TextField({vtype:'singleChar'})},
+			{header:BASE_CFG_LU.labelModelName,dataIndex:'model_name',width:120,editor:new Ext.form.TextField({})},
+			{header:BASE_CFG_LU.caType,dataIndex:'ca_supplier_name',width:70,editor:this.caSupplierCombo},
+			{header:BASE_CFG_LU.labelProducer,dataIndex:'supplier_name',width:70,editor:this.supplierCombo},
+			{header:BASE_CFG_LU.isVitual,dataIndex:'is_virtual_text',width:70,editor:this.isVirtualCombo},
+			{header:COMMON_LU.remarkTxt,dataIndex:'remark',width:120,editor:new Ext.form.TextField({})}
 		]);
 		cm.isCellEditable = commonIsCellEditable;
 		CardGrid.superclass.constructor.call(this,{
 			id:'cardGridId',
-			title:'智能卡型号',
+			title:DEV_COMMON_LU.labelCardModel,
 			ds:this.cardStore,
 			clicksToEdit:1,
 			cm:cm,
 			sm:new Ext.grid.RowSelectionModel({}),
 			tbar:[
 				'-',
-				{text:'添加',iconCls:'icon-add',handler:this.doAdd,scope:this},'-',
-				{text:'保存',iconCls:'icon-save',handler:this.doSave,scope:this},'-',
-				{text:'刷新',iconCls:'icon-refresh',handler:comomRefresh,scope:this},'-'
+				{text:COMMON_LU.addNewOne,iconCls:'icon-add',handler:this.doAdd,scope:this},'-',
+				{text:COMMON_LU.saveBtn,iconCls:'icon-save',handler:this.doSave,scope:this},'-',
+				{text:COMMON_LU.refresh,iconCls:'icon-refresh',handler:comomRefresh,scope:this},'-'
 			]
 		});
 	},
@@ -954,7 +962,7 @@ var CardGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 		commonDoAdd(this,{
 			device_model:'',device_type:'',model_name:'',supplier_id:'',remark:'',
 				supplier_name:'',device_type_text:'',ca_supplier_name:'',ca_type:'',
-				is_virtual:'F',is_virtual_text:'否'
+				is_virtual:'F',is_virtual_text:COMMON_LU.no
 		});
 	},
 	doSave:function(){
@@ -1034,11 +1042,11 @@ ModelToCountyWindow = Ext.extend(Ext.Window, {
 							closeAction : 'hide',
 							items : this.goToOptrTree,
 							buttons : [{
-								text : '保存',
+								text : COMMON_LU.saveBtn,
 								scope : this,
 								handler :this.saveOptr
 							},{
-								text : '关闭',
+								text : COMMON_LU.cancel,
 								scope:this,
 								handler:function(){
 									this.hide();
@@ -1069,7 +1077,7 @@ ModelToCountyWindow = Ext.extend(Ext.Window, {
 					success : function(res, ops) {
 						var rs = Ext.decode(res.responseText);
 						if (true === rs.success) {
-							 Alert("操作成功!", function () {
+							 Alert(COMMON_LU.msg.actionSuccess, function () {
 	                            Ext.getCmp('countyCfgGridId').getStore().load({
 	                                params: {
 	                                    start: 0,
@@ -1078,7 +1086,7 @@ ModelToCountyWindow = Ext.extend(Ext.Window, {
 	                            });
 	                            modelToCountyWinThis.close();
 	                        });
-						} else {Alert('操作失败!');}
+						} else {Alert(COMMON_LU.msg.actionFailed);}
 					}
 				});
 			}
@@ -1095,11 +1103,11 @@ var CountyModelGrid = Ext.extend(Ext.grid.GridPanel,{
 //		this.countyStore.load();
 
 		var cm = new Ext.grid.ColumnModel([
-			{header:'适用地区',dataIndex:'county_name',width:120},
-			{header:'机顶盒型号',dataIndex:'stb_model_src',width:350, renderer: App.qtipValue},
-			{header:'智能卡型号',dataIndex:'card_model_src',width:120, renderer: App.qtipValue},
-			{header:'MODEM型号',dataIndex:'modem_model_src',width:100, renderer: App.qtipValue},
-			{header: '操作',width:100,scope:this,
+			{header:BASE_CFG_LU.labelSuitableCounty,dataIndex:'county_name',width:120},
+			{header:DEV_COMMON_LU.labelStbModel,dataIndex:'stb_model_src',width:350, renderer: App.qtipValue},
+			{header:DEV_COMMON_LU.labelCardModel,dataIndex:'card_model_src',width:120, renderer: App.qtipValue},
+			{header:DEV_COMMON_LU.labelModemModel2,dataIndex:'modem_model_src',width:100, renderer: App.qtipValue},
+			{header: COMMON_LU.doActionBtn,width:100,scope:this,
 	            renderer:function(value,meta,record,rowIndex,columnIndex,store){
 	            	var btns = this.doFilterBtns(record);
 	            	return btns;
@@ -1108,7 +1116,7 @@ var CountyModelGrid = Ext.extend(Ext.grid.GridPanel,{
 		]);
 		CountyModelGrid.superclass.constructor.call(this,{
 			id:'countyCfgGridId',
-			title:'适用地区配置',
+			title:BASE_CFG_LU.titleCountyCfg,
 			ds:this.countyStore,
 			cm:cm,
 			sm:new Ext.grid.RowSelectionModel({})
@@ -1116,13 +1124,16 @@ var CountyModelGrid = Ext.extend(Ext.grid.GridPanel,{
 	},
 	doFilterBtns : function(record){
 		var btns = "";
-			btns = btns + "<a href='#' onclick='countyModelGrid.modelToCounty();' style='color:blue'>分配型号</a>";
+			btns = btns + "<a href='#' onclick='countyModelGrid.modelToCounty();' style='color:blue'>" +
+					BASE_CFG_LU.labelAssignType +
+					"</a>";
 		return btns;
 	},
 	modelToCounty:function(v){
     	var record  = Ext.getCmp('countyCfgGridId').getSelectionModel().getSelected();
         var win = new ModelToCountyWindow(record);
-    	win.setTitle('分配型号->'+record.get('county_name'));
+        
+    	win.setTitle( lsys('Deploy.titleTypeCountyCfg',null,[record.get('county_name')]) );
  		win.setIconClass('icon-add-user');   	
  		win.show();
     }
@@ -1168,24 +1179,24 @@ var MateralCfgGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 //		});
 		
 		var cm = new Ext.grid.ColumnModel([
-			{id:'device_type_id',header:'器材类型',dataIndex:'device_type_text',width:80,editor:this.deviceTypeCombo},
-			{id:'device_model_id',header:'型号',dataIndex:'device_model',width:120,editor:new Ext.form.TextField({vtype:'singleChar'})},
-			{header:'型号名称',dataIndex:'model_name',width:120,editor:new Ext.form.TextField({})}
-//			{header:'制造商',dataIndex:'supplier_name',width:70,editor:this.supplierCombo}
+			{id:'device_type_id',header:BASE_CFG_LU.labelMateralType,dataIndex:'device_type_text',width:80,editor:this.deviceTypeCombo},
+			{id:'device_model_id',header:COMMON_LU.modelSimple,dataIndex:'device_model',width:120,editor:new Ext.form.TextField({vtype:'singleChar'})},
+			{header:BASE_CFG_LU.labelModelName,dataIndex:'model_name',width:120,editor:new Ext.form.TextField({})}
+//			{header:BASE_CFG_LU.labelProducer,dataIndex:'supplier_name',width:70,editor:this.supplierCombo}
 		]);
 		cm.isCellEditable = commonIsCellEditable;
 		MateralCfgGrid.superclass.constructor.call(this,{
 			id:'MateralCfgGridId',
-			title:'器材型号配置',
+			title:BASE_CFG_LU.titleMateralCfg,
 			ds:this.modemStore,
 			clicksToEdit:1,
 			cm:cm,
 			sm:new Ext.grid.RowSelectionModel({}),
 			tbar:[
 				'-',
-				{text:'添加',iconCls:'icon-add',handler:this.doAdd,scope:this},'-',
-				{text:'保存',iconCls:'icon-save',handler:this.doSave,scope:this},'-',
-				{text:'刷新',iconCls:'icon-refresh',handler:comomRefresh,scope:this},'-'
+				{text:COMMON_LU.addNewOne,iconCls:'icon-add',handler:this.doAdd,scope:this},'-',
+				{text:COMMON_LU.saveBtn,iconCls:'icon-save',handler:this.doSave,scope:this},'-',
+				{text:COMMON_LU.refresh,iconCls:'icon-refresh',handler:comomRefresh,scope:this},'-'
 			]
 		});
 	},
@@ -1224,22 +1235,22 @@ var DeviceCfgGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 		
 		
 		var cm = new Ext.grid.ColumnModel([
-			{id:'device_type_id',header:'设备类型',dataIndex:'device_type',width:80,editor:new Ext.form.TextField({vtype:'singleChar'})},
-			{id:'device_model_id',header:'类型名称',dataIndex:'type_name',width:120,editor:new Ext.form.TextField({})}
+			{id:'device_type_id',header:DEV_COMMON_LU.labelDeviceType,dataIndex:'device_type',width:80,editor:new Ext.form.TextField({vtype:'singleChar'})},
+			{id:'device_model_id',header:DEV_COMMON_LU.labelTypeName,dataIndex:'type_name',width:120,editor:new Ext.form.TextField({})}
 		]);
 		cm.isCellEditable = commonIsCellEditable;
 		DeviceCfgGrid.superclass.constructor.call(this,{
 			id:'DeviceCfgGridId',
-			title:'设备类型配置',
+			title:BASE_CFG_LU.titleDevTypeCfg,
 			ds:this.modemStore,
 			clicksToEdit:1,
 			cm:cm,
 			sm:new Ext.grid.RowSelectionModel({}),
 			tbar:[
 				'-',
-				{text:'添加',iconCls:'icon-add',handler:this.doAdd,scope:this},'-',
-				{text:'保存',iconCls:'icon-save',handler:this.doSave,scope:this},'-',
-				{text:'刷新',iconCls:'icon-refresh',handler:comomRefresh,scope:this},'-'
+				{text:COMMON_LU.addNewOne,iconCls:'icon-add',handler:this.doAdd,scope:this},'-',
+				{text:COMMON_LU.saveBtn,iconCls:'icon-save',handler:this.doSave,scope:this},'-',
+				{text:COMMON_LU.refresh,iconCls:'icon-refresh',handler:comomRefresh,scope:this},'-'
 			]
 		});
 	},
@@ -1317,7 +1328,7 @@ Deploy = Ext.extend(Ext.Panel,{
 		var deviceTab = new DeviceTab();
 		Deploy.superclass.constructor.call(this,{
 			id:'Deploy',
-			title:'配置',
+			title:BASE_CFG_LU._title,
 			closable: true,
 			border: false ,
 			baseCls: "x-plain",
