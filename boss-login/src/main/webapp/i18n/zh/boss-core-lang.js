@@ -451,6 +451,7 @@ BCLang.msgBox = {
 	confirmEditBankPay:'确定该产品',
 	confirmBankResume:'确定要恢复卡扣吗?~',
 	confirmRenewCust:'去顶恢复客户状态吗?~',
+	commonSuccess: '业务操作成功!~',
 	
 	custHasUnSuitableDev:'该用户现在不能进行设备互换~',
 	custCantExchangeDev:'该用户现在不能进行设备互换~',
@@ -523,6 +524,6 @@ BCLang.msgBox = {
 	confirmSwitchThisCust: '确定要选择该客户吗?~',
 	confirmInvalidInvoice: "确定作废发票吗?~",
 	confirmRefreshCmd: '确定发送刷新指令吗?~',
-	confirmResendCmd: '确定重发开户指令?~',
+	confirmResendCmd: '确定指令重发吗?~',
 	noPreStopUser: '该用户没有进行预报停操作!~'
 }

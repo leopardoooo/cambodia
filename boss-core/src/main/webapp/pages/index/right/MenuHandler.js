@@ -1,6 +1,6 @@
 Ext.ns("MenuHandler");
 
-var LU_MSG = BCLang.msgBox;
+var LU_MSG = lmsg;
 var LU_FM = lbc;//带参数的
 
 /**
@@ -8,7 +8,7 @@ var LU_FM = lbc;//带参数的
  */
 hasCust = function() {
 	if (!App.getCustId()) {
-		Alert(LU_MSG['needCust']);
+		Alert(LU_MSG('needCust'));
 		return false;
 	}
 	return true;
@@ -17,7 +17,7 @@ hasCust = function() {
 UnPayBak = function(record) {
 	// 回调函数
 	function callback(res, opt) {
-		Alert(LU_MSG['cancelFeeSuccess']);
+		Alert(LU_MSG('cancelFeeSuccess'));
 		App.main.infoPanel.setReload(true);
 		App.main.infoPanel.getPayfeePanel().refresh();
 		App.main.infoPanel.getAcctPanel().refresh();
@@ -1965,14 +1965,14 @@ Ext.apply(MenuHandler, {
 		// 回调函数
 		function callback(res, opt) {
 			if (res.responseText == 'true') {
-				Alert('指令重发成功!');
+				Alert(lmsg("commonSuccess"));
 				App.getApp().main.infoPanel.getUserPanel().userGrid
 						.remoteRefresh();
 			}
 		}
 		var url = Constant.ROOT_PATH + "/core/x/User!ResendCmd.action";
 
-		Confirm("确定指令重发吗?", this, function() {
+		Confirm(lmsg("confirmResendCmd"), this, function() {
 					// 调用请求函数,详细参数请看busi-helper.js
 					App.sendRequest(url, null, callback);
 				});
