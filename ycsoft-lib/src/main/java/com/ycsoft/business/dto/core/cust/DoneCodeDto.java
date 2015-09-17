@@ -36,7 +36,14 @@ public class DoneCodeDto extends CDoneCode{
 	private String fee_id;
 	private String attr_remark;
 	private Integer reverse_done_code;
+	private String user_id;
 	
+	public String getUser_id() {
+		return user_id;
+	}
+	public void setUser_id(String user_id) {
+		this.user_id = user_id;
+	}
 	public String getActive_num() {
 		return active_num;
 	}
