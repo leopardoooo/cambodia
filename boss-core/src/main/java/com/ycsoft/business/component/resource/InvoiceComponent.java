@@ -306,7 +306,7 @@ public class InvoiceComponent extends BaseBusiComponent {
 					}else if (!invoice.getStatus().equals(SystemConstants.INVOICE_STATUS_IDLE)
 							&&!SystemConstants.INVOICE_MODE_MANUAL.equals(invoice.getInvoice_mode())){
 						//打印的发票状态必须为空闲
-						errorMeg = "发票已使用";
+						errorMeg = "发票["+ invoice.getInvoice_id() +"]已使用";
 						errorMsgList.add(errorMeg);
 						continue;
 					}else if (SystemConstants.INVOICE_MODE_AUTO.equals(invoiceMode)){

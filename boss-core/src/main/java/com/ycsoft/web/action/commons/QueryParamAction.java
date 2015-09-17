@@ -1,12 +1,14 @@
 package com.ycsoft.web.action.commons;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.ycsoft.beans.config.TAddress;
+import com.ycsoft.beans.config.TProvince;
+import com.ycsoft.business.dto.config.TAddressSysDto;
 import com.ycsoft.business.service.IQueryCfgService;
 import com.ycsoft.commons.constants.DataRight;
 import com.ycsoft.commons.constants.DictKey;
-import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.commons.tree.TreeBuilder;
 import com.ycsoft.web.commons.abstracts.BaseBusiAction;
 
@@ -28,7 +30,10 @@ public class QueryParamAction extends BaseBusiAction {
 	private String addrId;
 	private String editId;
 	private IQueryCfgService queryCfgService;
-
+	private String queryText;
+	private String districtId;
+	private TAddressSysDto addrDto;
+	private String status;
 
 	public String queryProdFreeDay() throws Exception{
 		getRoot().setOthers(queryCfgService.queryProdFreeDay());
@@ -106,6 +111,67 @@ public class QueryParamAction extends BaseBusiAction {
 		return JSON_RECORDS;
 	}
 	
+	public String queryAddressTree() throws Exception{
+		List addrs =  queryCfgService.queryAddressTree(queryText,addrId,optr);
+		getRoot().setRecords(TreeBuilder.createSysAdreeTree(addrs));
+		return JSON_RECORDS;
+	}
+	
+	public String queryDistrictTree() throws Exception{
+		List addrs =  queryCfgService.queryDistrictByPid(districtId);
+		getRoot().setRecords(TreeBuilder.createSysAdreeTree(addrs));
+		return JSON_RECORDS;
+	}
+	
+	/**
+	 * 增加地区
+	 * @return
+	 * @throws Exception
+	 */
+	public String saveAddress() throws Exception{
+		//TODO 记录异动
+		List<TAddress> oldList = new ArrayList<TAddress>();
+		String type = request.getParameter("type");
+		TAddress  addr = queryCfgService.saveAddress(addrDto,type);
+		getRoot().setSimpleObj(addr);
+//		TAddress newAdd = addressComponent.queryAddrByaddrId(addrDto.getAddr_id());
+		List<TAddress> newList = new ArrayList<TAddress>();
+		newList.add(addr);
+//		saveChanges(oldList, newList);
+		return JSON;
+	}
+	
+	public String queryProvince() throws Exception{
+		List<TProvince> list = queryCfgService.queryProvince();
+		getRoot().setRecords(list);
+		return JSON_RECORDS;
+	}
+	
+	public String queryDistrictByPid() throws Exception{
+		List addrs =  queryCfgService.queryDistrictByPid(addrId);
+		getRoot().setRecords(TreeBuilder.createAdreeSynchronousTree(addrs));
+		return JSON_RECORDS;
+	}
+	public String updateAddressStatus() throws Exception {
+		queryCfgService.updateAddressStatus(addrId, status);
+		return JSON_SUCCESS;
+	}
+	
+	/**
+	 * 修改地区名字
+	 * @return
+	 * @throws Exception
+	 */
+	public String editAddress() throws Exception{
+//		List<TAddress> oldList = new ArrayList<TAddress>();
+//		oldList.add(addressComponent.queryAddrByaddrId(addrDto.getAddr_id()));
+		queryCfgService.editAddress(addrDto);
+//		List<TAddress> newList = new ArrayList<TAddress>();
+//		newList.add(addressComponent.queryAddrByaddrId(addrDto.getAddr_id()));
+//		saveChanges(oldList, newList);
+		return JSON;
+	}
+	
 	public String getComboQueryText() {
 		return comboQueryText;
 	}
@@ -140,6 +206,27 @@ public class QueryParamAction extends BaseBusiAction {
 
 	public void setEditId(String editId) {
 		this.editId = editId;
+	}
+
+	public void setQueryText(String queryText) {
+		this.queryText = queryText;
+	}
+
+	public void setDistrictId(String districtId) {
+		this.districtId = districtId;
+	}
+
+	
+	public TAddressSysDto getAddrDto() {
+		return addrDto;
+	}
+
+	public void setAddrDto(TAddressSysDto addrDto) {
+		this.addrDto = addrDto;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
 	}
 	
 }

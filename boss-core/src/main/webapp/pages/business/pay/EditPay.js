@@ -91,25 +91,28 @@ BusiFeeGrid = Ext.extend( Ext.grid.EditorGridPanel, {
 		var record = obj.record,field = obj.field, fee = 0;
 		var buyNum = record.get('buy_num');
 		if(field == 'buy_num'){
-			record.set('real_pay',Ext.util.Format.formatFee( obj.value * record.get('sum_fee') ));
+			record.set('real_pay',Ext.util.Format.formatFee( obj.value * record.get('default_value') ));
+			record.set('feeValue',Ext.util.Format.formatFee(record.get('sum_fee') - Ext.util.Format.formatToFen(record.get('real_pay'))));
 		}
-		fee = Ext.util.Format.formatFee(Ext.util.Format.formatToFen(record.get('real_pay')) - record.get('sum_fee'));
-		if( buyNum > 1 ){
-			var addBuyNum = fee % Ext.util.Format.formatFee( record.get('sum_fee')/record.get('buy_num') );
-			
-			//购买多个配件时，购买个数=费用除以单价，所以必须是整数(例：购买配件)
-			//若购买设备，购买个数为1个，此时不必是整数(例：购买设备、销售设备、更换设备)
-			if(record.get('buy_num') > 1 && addBuyNum != 0  ){
-				Alert('本次收费不能整除单价!<br/> <font color=red>购买个数应为整数!</font>');
-				record.set('real_pay',Ext.util.Format.formatFee(record.get('sum_fee')));
-				record.set('feeValue',0);
+		if(field == 'real_pay'){
+			fee = Ext.util.Format.formatFee(Ext.util.Format.formatToFen(record.get('real_pay')) - record.get('sum_fee'));
+			if( buyNum > 1 ){
+				var addBuyNum = fee % Ext.util.Format.formatFee( record.get('sum_fee')/record.get('buy_num') );
+				
+				//购买多个配件时，购买个数=费用除以单价，所以必须是整数(例：购买配件)
+				//若购买设备，购买个数为1个，此时不必是整数(例：购买设备、销售设备、更换设备)
+				if(record.get('buy_num') > 1 && addBuyNum != 0  ){
+					Alert('本次收费不能整除单价!<br/> <font color=red>购买个数应为整数!</font>');
+					record.set('real_pay',Ext.util.Format.formatFee(record.get('sum_fee')));
+					record.set('feeValue',0);
+				}else{
+					record.set('feeValue',fee);
+					this.setTotalFee();
+				}
 			}else{
 				record.set('feeValue',fee);
 				this.setTotalFee();
 			}
-		}else{
-			record.set('feeValue',fee);
-			this.setTotalFee();
 		}
 	},
 	//将0的显示为空，或分转成元

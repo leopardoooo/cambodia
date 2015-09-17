@@ -256,6 +256,13 @@ Ext.apply( App, {
 					iconCls: App.data.resources[i].iconCls,
 					attrs : App.data.resources[i]
 				});
+			}else if('AddressViewWin' == App.data.resources[i].handler){
+				menuItems.push({
+					itemId: App.data.resources[i].handler,
+					text: App.data.resources[i].text,
+					iconCls: App.data.resources[i].iconCls,
+					attrs : App.data.resources[i]
+				});
 			}
 		}
 		
@@ -331,6 +338,8 @@ Ext.apply( App, {
 								App.tool.showCaCardWin();
 							}else if(item.itemId == 'TaskManager'){
 								App.tool.showTaskManagerWin(item);
+							}else if(item.itemId == 'AddressViewWin'){
+								App.tool.showAddressViewWin(item);
 							}
 						}
 					}

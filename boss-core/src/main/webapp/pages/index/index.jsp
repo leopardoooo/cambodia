@@ -26,6 +26,8 @@
 <!-- 	<link rel="stylesheet" href="<%=boss_res %>/resources/css/icon.css" type="text/css" /> -->
 	<link rel="stylesheet" href="<%=boss_res %>/resources/css/icon.css" type="text/css" />
 	<link rel="stylesheet" href="<%=boss_res %>/resources/css/msg-tip.css" type="text/css" />
+	<link rel="stylesheet" href="<%=boss_res %>/resources/css/treegrid.css" type="text/css" />
+	<link rel="stylesheet" href="<%=boss_res %>/resources/css/treegrideditor.css" type="text/css" />
   </head>
   <body style="overflow: hide;">
   	<div id="loading">
@@ -169,6 +171,25 @@
 	<script type="text/javascript" src="<%=boss_res %>/pages/commons/ux/FileUploadField.js" charset="UTF-8"></script>
 	<script type="text/javascript" src="<%=boss_res %>/pages/commons/ux/PrintTools.js"></script>
 	
+		<!-- TreeGrid -->
+	<script type="text/javascript" src="<%=boss_res %>/pages/commons/ux/treegrid/TreeGridSorter.js"></script>
+    <script type="text/javascript" src="<%=boss_res %>/pages/commons/ux/treegrid/TreeGridColumnResizer.js"></script>
+    <script type="text/javascript" src="<%=boss_res %>/pages/commons/ux/treegrid/TreeGridNodeUI.js"></script>
+    <script type="text/javascript" src="<%=boss_res %>/pages/commons/ux/treegrid/TreeGridLoader.js"></script>
+    <script type="text/javascript" src="<%=boss_res %>/pages/commons/ux/treegrid/TreeGridColumns.js"></script>
+    <script type="text/javascript" src="<%=boss_res %>/pages/commons/ux/treegrid/TreeGrid.js"></script>
+  	<script type="text/javascript" src="<%=boss_res %>/pages/commons/ux/treegrid/TreeNodeChecked.js"></script>
+    <script type="text/javascript" src="<%=boss_res %>/pages/commons/ux/treegrid/TreeGridEditor.js"></script>
+    <script type="text/javascript" src="<%=boss_res %>/pages/commons/ux/treegrid/TreeGridEditorEventModel.js"></script>
+    <script type="text/javascript" src="<%=boss_res %>/pages/commons/ux/treegrid/TreeGridEditorNode.js"></script>
+    <script type="text/javascript" src="<%=boss_res %>/pages/commons/ux/treegrid/TreeGridEditorNodeUI.js"></script>
+    <script type="text/javascript" src="<%=boss_res %>/pages/commons/ux/treegrid/TreeGridEditorNodeReader.js"></script>
+    <script type="text/javascript" src="<%=boss_res %>/pages/commons/ux/treegrid/TreeGridEditorNodeWriter.js"></script>
+    <script type="text/javascript" src="<%=boss_res %>/pages/commons/ux/treegrid/TreeGridEditorLoader.js"></script>
+    <script type="text/javascript" src="<%=boss_res %>/pages/commons/ux/treegrid/TreeGridEditorDragZone.js"></script>
+    <script type="text/javascript" src="<%=boss_res %>/pages/commons/ux/treegrid/TreeGridEditorSelectionModel.js"></script>
+    <script type="text/javascript" src="<%=boss_res %>/pages/commons/ux/DataView-more.js"></script>
+ 
 	
 	<%--  top部分，包含最顶端的菜单及其刷新、搜索栏、公告 --%>
 	<script type="text/javascript" src="<%=boss_res %>/pages/commons/TopToolbar.js"></script>
@@ -196,6 +217,7 @@
    	<script type="text/javascript" src="<%=root %>/pages/index/toptoolbar/BandUserFailedLogWin.js"></script>
     <script type="text/javascript" src="<%=root %>/pages/index/toptoolbar/RefreshTool.js"></script>
     <script type="text/javascript" src="<%=root %>/pages/index/toptoolbar/SendCaCard.js"></script>
+    <script type="text/javascript" src="<%=root %>/pages/index/toptoolbar/AddressViewWin.js"></script>
 	
 	<%--  right部分，包含资源菜单 --%>
 	<script type="text/javascript" src="<%=root %>/pages/commons/CoreConstant.js"></script>
