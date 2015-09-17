@@ -100,6 +100,7 @@ import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.exception.ComponentException;
 import com.ycsoft.commons.exception.ErrorCode;
+import com.ycsoft.commons.exception.ServicesException;
 import com.ycsoft.commons.helper.CollectionHelper;
 import com.ycsoft.commons.helper.DateHelper;
 import com.ycsoft.commons.helper.StringHelper;
@@ -248,6 +249,19 @@ public class FeeComponent extends BaseBusiComponent {
 	public Map<String,Integer> queryUnPaySum(String cust_id,String optr_id) throws Exception{
 		return cFeeDao.queryUnPaySum(cust_id,optr_id);
 	}
+	/**
+	 * 查询未支付的费用清单
+	 * @param feeSns
+	 * @return
+	 * @throws Exception
+	 */
+	public List<FeeDto> queryUnPayFeeDtoByFeeSn(String[] feeSns) throws Exception{
+		List<FeeDto> list=new ArrayList<FeeDto>();
+		for(String feeSn:feeSns){
+			list.add(cFeeDao.queryUnPayFeeDto(feeSn));
+		}
+		return list;
+	}
 	
 	/**
 	 * 缴费记录更新支付信息,并记录未打印的信息
@@ -255,8 +269,9 @@ public class FeeComponent extends BaseBusiComponent {
 	 * @param unpayList
 	 * @param pay
 	 * @throws JDBCException
+	 * @throws ServicesException 
 	 */
-	public void updateCFeeToPay(List<CDoneCodeUnpay> unpayList,CFeePayDto pay) throws JDBCException{
+	public void updateCFeeToPay(List<FeeDto> feeList,CFeePayDto pay) throws Exception{
 		String isDoc=SystemConstants.BOOLEAN_FALSE;
 		if(pay.getFee()==0){//支付金额=0，则发票不需要打印
 			isDoc=SystemConstants.BOOLEAN_NO;
@@ -266,13 +281,22 @@ public class FeeComponent extends BaseBusiComponent {
 			isDoc=SystemConstants.BOOLEAN_TRUE;
 		}
 		
+		for(FeeDto fee:feeList){
+			if(isDoc.equals(SystemConstants.BOOLEAN_FALSE)){
+				//记录未打印的费用信息，用于营业员未打印提示
+				cFeeUnprintDao.insertByUnPayDoneCode(fee.getFee_sn(),this.getOptr().getOptr_id());
+			}
+			cFeeDao.updateCFeeToPay(fee.getFee_sn(),this.getOptr().getOptr_id(), pay,isDoc);
+		}
+		
+		/**
 		for(CDoneCodeUnpay un:unpayList){
 			if(isDoc.equals(SystemConstants.BOOLEAN_FALSE)){
 				//记录未打印的费用信息，用于营业员未打印提示
 				cFeeUnprintDao.insertByUnPayDoneCode(un);
 			}
 			cFeeDao.updateCFeeToPay(un, pay,isDoc);
-		}
+		}**/
 	}
 	/**
 	 * 取消未支付的缴费记录
