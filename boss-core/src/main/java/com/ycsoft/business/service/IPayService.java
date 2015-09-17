@@ -33,7 +33,6 @@ public interface IPayService extends IBaseService{
 	
 	public List<FeeDto> queryUnPayDetail(String cust_id)throws Exception;
 	
-	public void savePay(CFeePayDto pay) throws Exception;
 	
 	public String saveCancelUnPayFee(String fee_sn,String fee_type,boolean onlyShowInfo) throws Exception;
 	

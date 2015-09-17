@@ -52,25 +52,28 @@ public class CFeeDao extends BaseEntityDao<CFee> {
 	 */
 	public CFeeDao() {}
 
+	public FeeDto queryUnPayFeeDto(String feeSn) throws JDBCException{
+		String sql="select cf.*,fa.prod_sn from c_fee cf left join c_fee_acct fa on fa.fee_sn=cf.fee_sn where cf.fee_sn=? ";
+		return  this.createQuery(FeeDto.class, sql, feeSn).first();
+	}
 	/**
 	 * 更新缴费记录的未支付状态
 	 * @param cust_id
 	 * @param done_code
 	 * @throws JDBCException 
 	 */
-	public void updateCFeeToPay(CDoneCodeUnpay unpay,CFeePayDto pay,String isDoc) throws JDBCException{
+	public void updateCFeeToPay(String feeSn,String pay_optr_id,CFeePayDto pay,String isDoc) throws JDBCException{
 		String sql=StringHelper.append(
 				"update c_fee set status=? ,pay_type=?,",
 				" invoice_mode=?,invoice_id=?,invoice_book_id=?,invoice_code=?,",
-				" pay_sn=?,acct_date=?,busi_optr_id=?,",
+				" pay_sn=?,acct_date=sysdate,busi_optr_id=?,",
 				" is_doc=? ",
-				" where create_done_code=? and cust_id=? and optr_id=? and status=? ");
+				" where fee_sn=? and status=? ");
 		this.executeUpdate(sql, 
 				StatusConstants.PAY,pay.getPay_type(),
 				pay.getInvoice_mode(),pay.getInvoice_id(),pay.getInvoice_book_id(),pay.getInvoice_code(),
-				pay.getPay_sn(),pay.getAcct_date(),pay.getBusi_optr_id(),
-				isDoc,
-				unpay.getDone_code(),unpay.getCust_id(),unpay.getOptr_id(),StatusConstants.UNPAY);
+				pay.getPay_sn(),pay_optr_id,
+				isDoc,feeSn,StatusConstants.UNPAY);
 	}
 	/**
 	 * 查询待支付的总额
