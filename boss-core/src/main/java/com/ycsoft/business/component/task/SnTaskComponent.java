@@ -224,10 +224,18 @@ public class SnTaskComponent extends BaseBusiComponent{
 				//更新工单修改中兴配置的状态
 				task.setZte_status(StatusConstants.NOT_EXEC);
 				wTaskBaseInfoDao.update(task);
+				
+				//记录操作日志
+				JsonObject jo = new JsonObject();
+				jo.addProperty("Zte_status", StatusConstants.NOT_EXEC);
+				jo.addProperty("str7", otlNo);
+				jo.addProperty("str8", ponNo);
+				createTaskLog(taskId,BusiCodeConstants.TASK_FILL, doneCode, jo.toString(), StatusConstants.NONE);
+
 			}
 		}
 		for (TaskFillDevice device:deviceList){
-			updateUSerDevice(device,userList);
+			updateUSerDevice(device,userList,doneCode,taskId);
 		}
 		
 		return userList;
@@ -235,13 +243,13 @@ public class SnTaskComponent extends BaseBusiComponent{
 	
 	
 
-	private void updateUSerDevice(TaskFillDevice device, List<WTaskUser> userList) throws Exception{
+	private void updateUSerDevice(TaskFillDevice device, List<WTaskUser> userList, Integer doneCode, String taskId) throws Exception{
 		WTaskUser user = null;
 		if (StringHelper.isNotEmpty(device.getOldDeviceCode())){
 			for (WTaskUser tu:userList){
 				if (device.getOldDeviceCode().equals(tu.getDevice_id())){
 					user = tu;
-					tu.setDevice_id(device.getDeviceId());
+					tu.setDevice_id(device.getDeviceCode());
 					break;
 				}
 			}
@@ -250,7 +258,7 @@ public class SnTaskComponent extends BaseBusiComponent{
 				if (StringHelper.isEmpty(tu.getDevice_id())){
 					if (tu.getDevice_model().equals(device.getDeviceModel())){
 						user = tu;
-						tu.setDevice_id(device.getDeviceId());
+						tu.setDevice_id(device.getDeviceCode());
 						break;
 					}
 				}
@@ -258,9 +266,13 @@ public class SnTaskComponent extends BaseBusiComponent{
 		}
 		
 		if (user != null){
-			user.setDevice_id(device.getDeviceId());
+			user.setDevice_id(device.getDeviceCode());
 			//更新设备号
 			wTaskUserDao.updateTaskUserDevice(user.getDevice_id(),user.getUser_id(),user.getTask_id());
+			//记录操作日志
+			JsonObject jo = new JsonObject();
+			jo.addProperty("device_id", device.getDeviceCode()+"->"+user.getDevice_id());
+			createTaskLog(taskId,BusiCodeConstants.TASK_FILL, doneCode, jo.toString(), StatusConstants.NONE);
 		}
 	}
 

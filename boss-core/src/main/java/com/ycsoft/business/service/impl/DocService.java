@@ -399,9 +399,11 @@ public class DocService extends BaseBusiService implements IDocService {
 		if(invoiceIdList.contains(invoiceId)){
 			oldFlag = true;
 		}
-		//验证发票是否可用
-		for (InvoiceFromDto i : invoices) {
-			invoiceComponent.checkInvoice(i.getInvoice_id(), i.getDoc_type(), SystemConstants.INVOICE_MODE_AUTO);
+		if(BusiCodeConstants.PRINT.equals(getBusiParam().getBusiCode())){
+			//验证发票是否可用
+			for (InvoiceFromDto i : invoices) {
+				invoiceComponent.checkInvoice(i.getInvoice_id(), i.getDoc_type(), SystemConstants.INVOICE_MODE_AUTO);
+			}
 		}
 		
 		

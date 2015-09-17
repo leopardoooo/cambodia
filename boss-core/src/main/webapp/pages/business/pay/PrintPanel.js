@@ -827,8 +827,6 @@ InvoiceWindow = Ext.extend( Ext.Window ,{
 			baseparam.invoice_id = oldInvoiceId;
 			
 			baseparam["parameter.busiCode"] = App.getApp().data.currentResource.busicode;
-			
-			
 			Ext.Ajax.request({
 				url: Constant.ROOT_PATH+"/core/x/Pay!saveInvoiceInfo.action",
 				params : baseparam,

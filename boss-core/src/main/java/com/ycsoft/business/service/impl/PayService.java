@@ -18,6 +18,7 @@ import com.ycsoft.beans.core.acct.CGeneralContractPay;
 import com.ycsoft.beans.core.bank.CBankGotodisk;
 import com.ycsoft.beans.core.bank.CBankReturn;
 import com.ycsoft.beans.core.bank.CBankReturnPayerror;
+import com.ycsoft.beans.core.common.CDoneCode;
 import com.ycsoft.beans.core.common.CDoneCodeDetail;
 import com.ycsoft.beans.core.common.CDoneCodeUnpay;
 import com.ycsoft.beans.core.cust.CCust;
@@ -772,6 +773,12 @@ public class PayService extends BaseBusiService implements IPayService {
 						device.getPair_card_code(), device.getPair_modem_id(),
 						device.getPair_modem_code(),device.getDevice_model(), feeDto.getReal_pay(),
 						doneCode,busiDoneCode, busiCode, feeDto.getBuy_num());
+				//配件处理数量
+				CDoneCode cd = doneCodeComponent.queryByKey(busiDoneCode);
+				if(cd.getBusi_code().equals(BusiCodeConstants.DEVICE_BUY_PJ) || cd.getBusi_code().equals(BusiCodeConstants.DEVICE_BUY_PJ_BACTH)){
+					
+					
+				}
 			}
 		}
 
