@@ -3,8 +3,8 @@ package com.ycsoft.business.service.impl;
 
 import static com.ycsoft.commons.constants.SystemConstants.ACCT_TYPE_SPEC;
 import static com.ycsoft.commons.constants.SystemConstants.USER_TYPE_BAND;
-import static com.ycsoft.commons.constants.SystemConstants.USER_TYPE_OTT;
 import static com.ycsoft.commons.constants.SystemConstants.USER_TYPE_DTT;
+import static com.ycsoft.commons.constants.SystemConstants.USER_TYPE_OTT;
 import static com.ycsoft.commons.constants.SystemConstants.USER_TYPE_OTT_MOBILE;
 
 import java.util.ArrayList;
@@ -22,6 +22,9 @@ import com.ycsoft.beans.config.TDeviceBuyMode;
 import com.ycsoft.beans.config.TDeviceChangeReason;
 import com.ycsoft.beans.core.cust.CCust;
 import com.ycsoft.beans.core.cust.CCustDevice;
+import com.ycsoft.beans.core.fee.CFee;
+import com.ycsoft.beans.core.fee.CFeeBusi;
+import com.ycsoft.beans.core.fee.CFeeDevice;
 import com.ycsoft.beans.core.job.JUserStop;
 import com.ycsoft.beans.core.prod.CProdOrder;
 import com.ycsoft.beans.core.prod.CProdOrderDto;
@@ -29,14 +32,19 @@ import com.ycsoft.beans.core.prod.CProdOrderFee;
 import com.ycsoft.beans.core.prod.CProdPropChange;
 import com.ycsoft.beans.core.user.CUser;
 import com.ycsoft.beans.core.user.CUserPropChange;
+import com.ycsoft.beans.device.RDevice;
 import com.ycsoft.beans.device.RDeviceFee;
 import com.ycsoft.beans.prod.PPromotionAcct;
 import com.ycsoft.beans.prod.PSpkgOpenbusifee;
 import com.ycsoft.beans.prod.PSpkgOpenuser;
 import com.ycsoft.beans.system.SOptr;
+import com.ycsoft.beans.task.WTaskBaseInfo;
+import com.ycsoft.beans.task.WTaskUser;
 import com.ycsoft.business.commons.pojo.BusiParameter;
 import com.ycsoft.business.component.task.SnTaskComponent;
 import com.ycsoft.business.dao.core.prod.CProdOrderDao;
+import com.ycsoft.business.dao.task.WTaskBaseInfoDao;
+import com.ycsoft.business.dao.task.WTaskUserDao;
 import com.ycsoft.business.dto.config.TemplateConfigDto;
 import com.ycsoft.business.dto.core.cust.CustFullInfoDto;
 import com.ycsoft.business.dto.core.fee.BusiFeeDto;
@@ -66,6 +74,10 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 	private CProdOrderDao cProdOrderDao;
 	@Autowired
 	private SnTaskComponent snTaskComponent;
+	@Autowired
+	private WTaskBaseInfoDao wTaskBaseInfoDao;
+	@Autowired
+	private WTaskUserDao wTaskUserDao;
 	
 	public void createUser(CUser user, String deviceCode, String deviceType, String deviceModel, String deviceBuyMode,
 			FeeInfoDto deviceFee) throws Exception {
@@ -1309,5 +1321,72 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		
 		saveAllPublic(doneCode, getBusiParam());
 	}
+
+	@Override
+	public void cancelInstallTask(String taskId) throws Exception {
+		WTaskBaseInfo task = wTaskBaseInfoDao.findByKey(taskId);
+		int busiDoneCode = task.getDone_code();
+		// 获取业务流水
+		Integer doneCode = doneCodeComponent.gDoneCode();
+		//find unpay busi fee
+		List<CFee> feeList= feeComponent.queryByBusiDoneCode(busiDoneCode);
+		for (CFee fee:feeList){
+			if (fee.getStatus().equals(StatusConstants.UNPAY)){
+				feeComponent.saveCancelFeeUnPay(fee, doneCode);
+				if (fee.getBusi_code().equals(BusiCodeConstants.FEE_EDIT)){
+					//作废业务
+					doneCodeComponent.cancelDoneCode(fee.getCreate_done_code());
+				} 
+				
+			} 
+		}
+		// find pay busi fee
+		feeList = feeComponent.querySumFeeByDoneCode(task.getTask_id(), busiDoneCode);
+		for (CFee fee:feeList){
+			if (fee.getReal_pay()>0 && fee.getFee_type().equals(SystemConstants.FEE_TYPE_BUSI)){
+				feeComponent.saveBusiFee(task.getCust_id(), fee.getAddr_id(), fee.getFee_id(), 
+						fee.getReal_pay()*-1, doneCode, busiDoneCode, BusiCodeConstants.TASK_CANCEL, new CFeeBusi());
+			}
+		}
+		
+		// find pay device fee
+		List<CFeeDevice> deviceFeeList = feeComponent.queryDeviceByDoneCode(busiDoneCode);
+		for (CFeeDevice fee:deviceFeeList){
+			if (fee.getReal_pay()>0 && fee.getStatus().equals(StatusConstants.PAY)){
+				feeComponent.saveDeviceFee(task.getCust_id(), fee.getAddr_id(), fee.getFee_id(), null, 
+						fee.getPay_type(), fee.getDevice_type(), fee.getDevice_id(),
+						fee.getDevice_code(), null, null, null, null, fee.getDevice_model(), fee.getReal_pay()*-1,
+						doneCode, busiDoneCode, BusiCodeConstants.TASK_CANCEL, -1);
+			}
+		}
+		
+		//find all acctfee
+		//List<CProdOrder> orderList = orderComponent.queryOrderProdByUserId(user_id);
+		
+		//update device status to idle,write off user
+		List<WTaskUser> userList = wTaskUserDao.queryByTaskId(taskId);
+		for (WTaskUser user:userList){
+			if (StringHelper.isNotEmpty(user.getDevice_id())){
+				DeviceDto device = deviceComponent.queryDeviceByDeviceCode(user.getDevice_id());
+				deviceComponent.updateDeviceDepotStatus(doneCode, BusiCodeConstants.TASK_CANCEL, device.getDevice_id(), 
+					StatusConstants.USE, StatusConstants.ACTIVE, true);
+			}
+			
+			// send write off cmd
+			CUser cuser = userComponent.queryUserById(user.getUser_id());
+			authComponent.sendAuth(cuser, null, BusiCmdConstants.DEL_USER, doneCode);
+			
+			//write off user
+			userComponent.removeUserWithHis(doneCode, cuser);
+		}
+		
+		//cancel task
+		String[] taskIds = new String[1];
+		taskIds[0] = taskId;
+		taskComponent.cancelTask(taskIds, "muanual cancel");
+		
+	}
+	
+	
 	
 }

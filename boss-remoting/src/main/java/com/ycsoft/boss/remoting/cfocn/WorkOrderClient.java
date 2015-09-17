@@ -23,6 +23,8 @@ public class WorkOrderClient {
 	private final String INFL_TYPE_REMIND="Remind";//催单
 	private final String INFL_TYPE_CONTACT="Contact";//联系单
 	
+	private final String ISP_CODE="1";
+	
 	
 	public WorkOrderClient (){
 		try {
@@ -32,7 +34,7 @@ public class WorkOrderClient {
 		}
 	}
 	
-	private boolean createTaskService(WTaskBaseInfo task,List<WTaskUser> userList) throws WordOrderException{
+	private boolean createTaskService(WTaskBaseInfo task,String custNo,List<WTaskUser> userList) throws WordOrderException{
 		ReceiveWorkOrder workOrder = new ReceiveWorkOrder();
 		return createTaskService(workOrder);
 	}

@@ -2800,8 +2800,12 @@ public class UserService extends BaseBusiService implements IUserService {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
-	
-	
+
+
+	@Override
+	public void cancelInstallTask(String taskId) throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
 
 }

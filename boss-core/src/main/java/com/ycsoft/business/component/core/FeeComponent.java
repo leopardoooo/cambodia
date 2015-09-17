@@ -1215,6 +1215,10 @@ public class FeeComponent extends BaseBusiComponent {
 		return cFeeDao.queryByDoneCode(doneCode, getOptr().getCounty_id());
 	}
 	
+	public List<CFee> queryByBusiDoneCode(Integer busiDoneCode) throws Exception{
+		return cFeeDao.queryByDoneCode(busiDoneCode, getOptr().getCounty_id());
+	}
+	
 	/**
 	 * 根据流水号查询业务费用，按费用进行汇总
 	 * @param doneCode

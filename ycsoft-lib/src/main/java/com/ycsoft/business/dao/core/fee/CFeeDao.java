@@ -309,6 +309,12 @@ public class CFeeDao extends BaseEntityDao<CFee> {
 
 	}
 	
+	public List<CFee> queryByBusiDoneCode(Integer busiDoneCode,String countyId) throws Exception{
+		String sql = "select * from c_fee where busi_done_code=? and county_id=? ";
+		return createQuery(sql,busiDoneCode,countyId).list();
+
+	}
+	
 	public List<CFee> queryByInvoiceId(String feeSn,CInvoiceDto oldInvoice,String countyId) throws Exception{
 		String sql = "select * from c_fee where fee_sn <> ? and invoice_id = ? and invoice_code = ? and county_id = ? ";
 		return createQuery(sql,feeSn,oldInvoice.getInvoice_id(),oldInvoice.getInvoice_code(),countyId).list();
@@ -316,19 +322,19 @@ public class CFeeDao extends BaseEntityDao<CFee> {
 	}
 	
 	public List<CFee> querySumFeeByDoneCode(String custId,Integer doneCode, String countyId) throws Exception{
-		String sql = "select fee_id,null addr_id,sum(decode(status,'PAY',real_pay,'UNPAY',real_pay,0)) real_pay,sum(fd.buy_num) buy_num" +
+		String sql = "select fee_type,fee_id,null addr_id,sum(decode(status,'PAY',real_pay,'UNPAY',real_pay,0)) real_pay,sum(fd.buy_num) buy_num" +
 				" from c_fee f,c_fee_device fd " +
 				" where f.fee_sn=fd.fee_sn and f.cust_id=?" +
 				" and f.busi_done_code=? and f.county_id=? and fd.county_id=?" +
 				" and f.fee_type<> ?" +
-				" group by f.fee_id" +
+				" group by fee_type,f.fee_id" +
 				" union all " +
-				"select fee_id,max(f.addr_id) addr_id,sum(decode(status,'PAY',real_pay,'UNPAY',real_pay,0)) real_pay,1 buy_num" +
+				"select fee_type,fee_id,max(f.addr_id) addr_id,sum(decode(status,'PAY',real_pay,'UNPAY',real_pay,0)) real_pay,1 buy_num" +
 				" from c_fee f,c_fee_busi fd " +
 				" where f.fee_sn=fd.fee_sn and f.cust_id=?" +
 				" and f.busi_done_code=? and f.county_id=? and fd.county_id=?" +
 				" and f.fee_type<> ?" +
-				" group by f.fee_id";
+				" group by fee_type,f.fee_id";
 		return createQuery(sql, custId, doneCode, countyId, countyId,
 				SystemConstants.FEE_TYPE_ACCT, custId, doneCode, countyId,
 				countyId, SystemConstants.FEE_TYPE_ACCT).list();
