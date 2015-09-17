@@ -286,7 +286,8 @@ public class FeeComponent extends BaseBusiComponent {
 				//记录未打印的费用信息，用于营业员未打印提示
 				cFeeUnprintDao.insertByUnPayDoneCode(fee.getFee_sn(),this.getOptr().getOptr_id());
 			}
-			cFeeDao.updateCFeeToPay(fee.getFee_sn(),this.getOptr().getOptr_id(), pay,isDoc);
+			CCust cust = cCustDao.findByKey(pay.getCust_id());
+			cFeeDao.updateCFeeToPay(fee.getFee_sn(), cust.getStr9(), pay,isDoc);
 		}
 		
 		/**
@@ -410,6 +411,13 @@ public class FeeComponent extends BaseBusiComponent {
 		return list;
 
 	}
+	
+	private void setBusiOptrId(CFee fee, String custId) throws Exception {
+		CCust cust = cCustDao.findByKey(custId);
+		if(cust != null){
+			fee.setBusi_optr_id(cust.getStr9());
+		}
+	}
 
 	/**
 	 * 预付款,充值卡
@@ -473,6 +481,7 @@ public class FeeComponent extends BaseBusiComponent {
 		fee.setInvoice_code(invoice.getInvoice_code());
 		fee.setInvoice_book_id(invoice.getInvoice_book_id());
 		fee.setInvoice_mode(invoice.getInvoice_mode());
+		setBusiOptrId(fee, custId);
 		cFeeDao.save(fee);
 
 		return fee;
@@ -595,7 +604,7 @@ public class FeeComponent extends BaseBusiComponent {
 		fee.setAddr_id(addr_id);
 		fee.setDisct_info(disctInfo);
 		setBaseCFee(fee, custId, createDoneCode, busiDoneCode, busiCode);
-
+		setBusiOptrId(fee, custId);
 		cFeeDao.save(fee);
 		
 
@@ -632,7 +641,7 @@ public class FeeComponent extends BaseBusiComponent {
 		fee.setFee_type(SystemConstants.FEE_TYPE_BUSI);
 		fee.setAcct_id(addrId);
 		setBaseCFee(fee, custId, createDoneCode,busiDoneCode, busiCode);
-		
+		setBusiOptrId(fee, custId);
 		cFeeDao.save( fee);
 		
 
@@ -674,7 +683,7 @@ public class FeeComponent extends BaseBusiComponent {
 		fee.setPay_type(payType);
 		fee.setAddr_id(addrId);
 		setBaseCFee(fee, custId,createDoneCode, busiDoneCode, busiCode);
-		
+		setBusiOptrId(fee, custId);
 		cFeeDao.save( fee);
 		
 		//保存设备信息
@@ -740,7 +749,7 @@ public class FeeComponent extends BaseBusiComponent {
 			if(SystemConstants.PAY_TYPE_UNPAY.equals(payType)){
 				fee.setStatus(payType);
 			}
-			
+			setBusiOptrId(fee, custId);
 			cFeeDao.save(fee);
 			
 			
@@ -1035,7 +1044,9 @@ public class FeeComponent extends BaseBusiComponent {
 		//保存明细
 		cFeePayDetailDao.save( details );
 		//修改费用信息
-		cFeeDao.updatePay(feeSn, pay.getAcct_date(),pay.getBusi_optr_id());
+		CCust cust = cCustDao.findByKey(custId);
+		//默认所有产生费用 使用客户发展人id
+		cFeeDao.updatePay(feeSn, pay.getAcct_date(), cust.getStr9());
 		
 		if(feePropList.size() > 0){
 			this.saveFeePropChange(feePropList);
