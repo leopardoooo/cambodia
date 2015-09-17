@@ -12,6 +12,9 @@ import com.ycsoft.beans.task.WTaskBaseInfo;
 import com.ycsoft.business.dto.core.cust.QueryTaskConditionDto;
 import com.ycsoft.business.service.ISnTaskService;
 import com.ycsoft.business.service.ITaskService;
+import com.ycsoft.business.service.IUserService;
+import com.ycsoft.business.service.impl.UserServiceSN;
+import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.helper.JsonHelper;
 import com.ycsoft.web.commons.abstracts.BaseBusiAction;
 
@@ -39,13 +42,14 @@ public class TaskAction extends BaseBusiAction{
 	private QueryTaskConditionDto taskCond;
 	private String bugCause;
 	private ISnTaskService snTaskService;
+	private UserServiceSN userServiceSN;
 	private String deptId;
 	private String bugType;
 	private String resultType;
 	private String deviceCode;
 	private String deviceModel;
 	private String custId;
-
+	private String taskType;
 
 	public String saveBugTask()throws Exception{
 		String bugCause = request.getParameter("bugCause");
@@ -148,7 +152,11 @@ public class TaskAction extends BaseBusiAction{
 	 * @throws Exception
 	 */
 	public String cancelTaskSn()throws Exception{
-		snTaskService.cancelTask(task_id);
+		if(SystemConstants.TASK_TYPE_INSTALL.equals(taskType)){
+			userServiceSN.cancelInstallTask(task_id);
+		}else{
+			snTaskService.cancelTask(task_id);
+		}
 		getRoot().setSuccess(true);
 		return JSON_SUCCESS;
 	}
@@ -330,6 +338,15 @@ public class TaskAction extends BaseBusiAction{
 		this.snTaskService = snTaskService;
 	}
 
+	public UserServiceSN getUserServiceSN() {
+		return userServiceSN;
+	}
+
+
+	public void setUserServiceSN(UserServiceSN userServiceSN) {
+		this.userServiceSN = userServiceSN;
+	}
+
 
 	public String getDeptId() {
 		return deptId;
@@ -388,6 +405,11 @@ public class TaskAction extends BaseBusiAction{
 
 	public void setCustId(String custId) {
 		this.custId = custId;
+	}
+
+
+	public void setTaskType(String taskType) {
+		this.taskType = taskType;
 	}
 
 
