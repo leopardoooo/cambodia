@@ -1,3 +1,7 @@
+var COMMON_LU = lsys('common');
+var DEV_COMMON_LU = lsys('DeviceCommon');
+var RECYC_DEV_LU = lsys('ReclaimDevice');
+var MSG_LU = lsys('msgBox');
 
 ReclaimDeviceGrid = Ext.extend(Ext.grid.GridPanel,{
 	reclaimStore:null,
@@ -14,22 +18,22 @@ ReclaimDeviceGrid = Ext.extend(Ext.grid.GridPanel,{
 		this.reclaimStore.load({params:{start:0,limit:Constant.DEFAULT_PAGE_SIZE}});
 		var deptId = App.getApp().data.optr.dept_id;
 		var columns = [
-			{header:'业务日期',dataIndex:'create_time',width:120},
-			{header:'设备类型',dataIndex:'device_type_text',width:60},
-			{header:'设备编号',dataIndex:'device_code',width:130,renderer:App.qtipValue},
-			{header:'配对卡',dataIndex:'pair_device_code',width:120,renderer:App.qtipValue},
-			{header:'配对modem',dataIndex:'pair_device_modem_code',width:120,renderer:App.qtipValue},
-			{header:'营业厅',dataIndex:'depot_text',width:100,renderer:App.qtipValue},
-			{header:'营业员',dataIndex:'optr_name',width:70,renderer:App.qtipValue},
-			{header:'状态',dataIndex:'status_text',width:65},
-			{header:'回收原因',dataIndex:'reclaim_reason_text',width:100},
-			{header:'操作',dataIndex:'done_code',renderer:function(v,mete,record){
+			{header:COMMON_LU.busiDate,dataIndex:'create_time',width:120},
+			{header:DEV_COMMON_LU.labelDeviceType,dataIndex:'device_type_text',width:60},
+			{header:DEV_COMMON_LU.labelDevCode,dataIndex:'device_code',width:130,renderer:App.qtipValue},
+			{header:DEV_COMMON_LU.labelPairCardCode,dataIndex:'pair_device_code',width:120,renderer:App.qtipValue},
+			{header:DEV_COMMON_LU.labelPairModemCode,dataIndex:'pair_device_modem_code',width:120,renderer:App.qtipValue},
+			{header:COMMON_LU.businessHall,dataIndex:'depot_text',width:100,renderer:App.qtipValue},
+			{header:COMMON_LU.busiOptr,dataIndex:'optr_name',width:70,renderer:App.qtipValue},
+			{header:COMMON_LU.status,dataIndex:'status_text',width:65},
+			{header:RECYC_DEV_LU.labelRecycleReason,dataIndex:'reclaim_reason_text',width:100},
+			{header:COMMON_LU.doActionBtn,dataIndex:'done_code',renderer:function(v,mete,record){
 					var text = '';
 					var status = record.get('status');
 					if(status == 'CONFIRM'){
 						if (record.get('depot_status') == 'IDLE'
 									&& deptId == record.get('depot_id')){
-							text = "<a href='#' onclick=Ext.getCmp('reclaimDeviceGridId').doCancel("+v+")>取消确认</a>";
+							text = "<a href='#' onclick=Ext.getCmp('reclaimDeviceGridId').doCancel("+v+")>" + COMMON_LU.cancelConfirm + "</a>";
 						}
 					}/*else if(status == 'UNCONFIRM'){//未确认
 						
@@ -37,31 +41,31 @@ ReclaimDeviceGrid = Ext.extend(Ext.grid.GridPanel,{
 						
 					}*/
 					else{
-						text = "<a href='#' onclick=Ext.getCmp('reclaimDeviceGridId').doReclaim("+v+")>确认</a>";
+						text = "<a href='#' onclick=Ext.getCmp('reclaimDeviceGridId').doReclaim("+v+")>" + COMMON_LU.confirm + "</a>";
 					}
 					return text;
 				}
 			},
-			{header:'确认人',dataIndex:'confirm_optr_text',width:70,renderer:App.qtipValue},
-			{header:'确认时间',dataIndex:'confirm_time',width:120}
+			{header:DEV_COMMON_LU.labelConfirmOptr,dataIndex:'confirm_optr_text',width:70,renderer:App.qtipValue},
+			{header:DEV_COMMON_LU.labelConfirmDate,dataIndex:'confirm_time',width:120}
 		];
 		ReclaimDeviceGrid.superclass.constructor.call(this,{
 			id:'reclaimDeviceGridId',
-			title:'设备回收',
+			title:RECYC_DEV_LU._title,
 			border:false,
 			store:this.reclaimStore,
 			columns:columns,
 			sm:new Ext.grid.RowSelectionModel({}),
-			tbar:['-','输入关键字&nbsp;',
+			tbar:['-',COMMON_LU.inputKeyWork,
 				new Ext.ux.form.SearchField({  
 	                store: this.reclaimStore,
 	                width: 200,
 	                hasSearch : true,
-	                emptyText: '支持设备编号模糊查询'
-	            }),'-','日期:',
+	                emptyText: DEV_COMMON_LU.tipSupportFuzzyQuery
+	            }),'-',COMMON_LU.labelDate,
 	            '-',
 	            {id:'reclaim_startDate_id',xtype:'datefield',name:'reclaim_startDate',format:'Y-m-d',
-	            	emptyText:'开始日期',width:100,listeners:{
+	            	emptyText:COMMON_LU.startDate,width:100,listeners:{
 	            		scope:this,
 	            		blur: function(comp){
 	            			var v = comp.getValue();
@@ -74,7 +78,7 @@ ReclaimDeviceGrid = Ext.extend(Ext.grid.GridPanel,{
 	            	}
 	            },'-',
 	            {id:'reclaim_endDate_id',xtype:'datefield',name:'reclaim_endDate',
-	            	width:100,format:'Y-m-d',emptyText:'结束日期',listeners:{
+	            	width:100,format:'Y-m-d',emptyText:COMMON_LU.endDate,listeners:{
 	            		scope:this,
 	            		blur: function(comp){
 	            			var v = comp.getValue();
@@ -84,32 +88,32 @@ ReclaimDeviceGrid = Ext.extend(Ext.grid.GridPanel,{
 	            				Ext.getCmp('reclaim_startDate_id').setMaxValue(null);
 	            			}
 	            		}
-	            	}},'-','设备类型',
+	            	}},'-',DEV_COMMON_LU.labelDeviceType,
 	            	{ id:'device_type_id',hiddenName:'device_type',xtype:'combo',allowBlank:true,
            				 store:new Ext.data.ArrayStore({
               						fields:['device_type','device_name'],
-             						data:[['','请选择...'],['STB','单机顶盒'],['CARD','单智能卡'],
-									['MODEM','单MODEM'],['STBCARD','机卡配对']]
+             						data:[['',COMMON_LU.pleaseSelect],['STB',DEV_COMMON_LU.labelSingleStb],['CARD',DEV_COMMON_LU.labelSingleCard],
+									['MODEM',DEV_COMMON_LU.labelSingleModem],['STBCARD',DEV_COMMON_LU.labelStbCardPair]]
 						}),
 						displayField:'device_name',valueField:'device_type',width:80 
 					},'-',{
 		            	xtype:'combo',store:new Ext.data.ArrayStore({
 		            			fields:['reclaimTypeText','reclaimType'],
-		            			data:[['所有回收','ALL'],['执行回收','NOW'],['历史回收','HISTORY']]
+		            			data:[[RECYC_DEV_LU.recycleStatusEnum.ALL,'ALL'],[RECYC_DEV_LU.recycleStatusEnum.ALL,'NOW'],[RECYC_DEV_LU.recycleStatusEnum.HISTORY,'HISTORY']]
 		            		}),displayField:'reclaimTypeText',valueField:'reclaimType',
-		            	emptyText:'执行中或历史回收',width:80,
+		            	emptyText:RECYC_DEV_LU.labelRecycleStatus,width:80,
 		            	listeners:{
 		            		scope:this,select:this.queryTransferByType
 		            	}
-	            	},'-','  操作类型',
+	            	},'-',COMMON_LU.operateType,
 					{ id:'confirm_type_id',hiddenName:'confirm_type',xtype:'combo',allowBlank:true,
            				 store:new Ext.data.ArrayStore({
               						fields:['confirm_type','confirm_name'],
-             						data:[[' ','请选择...'],['CONFIRM','取消确认'],['UNCONFIRM','确认']]
+             						data:[[' ',COMMON_LU.pleaseSelect],['CONFIRM',COMMON_LU.cancelConfirm],['UNCONFIRM',COMMON_LU.confirm]]
 						}),
 						displayField:'confirm_name',valueField:'confirm_type',width:80 
 					},'-',
-	            {xtype:'button',text:'查询',iconCls:'icon-query',scope:this,handler:this.doDateQuery},'-'
+	            {xtype:'button',text:COMMON_LU.query,iconCls:'icon-query',scope:this,handler:this.doDateQuery},'-'
 			],
 			bbar : new Ext.PagingToolbar({
 				store : this.reclaimStore,
@@ -145,7 +149,7 @@ ReclaimDeviceGrid = Ext.extend(Ext.grid.GridPanel,{
 		store.load({params:{start:0,limit:Constant.DEFAULT_PAGE_SIZE}});
 	},
 	doCancel:function(doneCode){//取消回收
-		Confirm('确认取消回收吗？',this,function(){
+		Confirm(MSG_LU.confirmCancelRecycle,this,function(){
 			var record = this.getSelectionModel().getSelected();
 			Ext.Ajax.request({
 				url:root+'/resource/Device!cancelReclaimDevice.action',
@@ -157,7 +161,7 @@ ReclaimDeviceGrid = Ext.extend(Ext.grid.GridPanel,{
 				success:function(res,opt){
 					var data = Ext.decode(res.responseText);
 					if(data['success'] === true){
-						Alert('保存成功!');
+						Alert(COMMON_LU.saveSuccess);
 						Ext.getCmp('reclaimDeviceGridId').getStore().reload();
 
 					}
@@ -178,7 +182,7 @@ var ConfirmReclaimWin = Ext.extend(Ext.Window,{
 	constructor:function(){
 		ConfirmReclaimWin.superclass.constructor.call(this,{
 			id:'confirmReclaimWinId',
-			title:'回收确认',
+			title:RECYC_DEV_LU.titleRecycleConfirm,
 			border:false,
 			width:300,
 			height:180,
@@ -187,7 +191,7 @@ var ConfirmReclaimWin = Ext.extend(Ext.Window,{
 				id:'reclaimFormId',xtype:'form',bodyStyle:'padding-top:10px',
 				border:false,
 				items:[
-					{fieldLabel:'是否回收',xtype:'paramcombo',hiddenName:'flag',
+					{fieldLabel:RECYC_DEV_LU.labelConfirmRecycle,xtype:'paramcombo',hiddenName:'flag',
 						paramName:'BOOLEAN',allowBlank:false
 						,listeners:{
 							scope:this,
@@ -208,16 +212,16 @@ var ConfirmReclaimWin = Ext.extend(Ext.Window,{
 				width: 280,
 				labelWidth: 100,
 				items: [
-					{fieldLabel:'设备状态',hiddenName:'deviceStatus',allowBlank:false,id:'deviceStatusId',
-					xtype:'paramcombo',paramName:'DEVICE_STATUS_R_DEVICE',defaultValue:'CORRUPT'},{fieldLabel:'是否新机',xtype:'paramcombo',hiddenName:'isNewStb',
+					{fieldLabel:DEV_COMMON_LU.labelDevStatus,hiddenName:'deviceStatus',allowBlank:false,id:'deviceStatusId',
+					xtype:'paramcombo',paramName:'DEVICE_STATUS_R_DEVICE',defaultValue:'CORRUPT'},{fieldLabel:DEV_COMMON_LU.labelIsNewStb2,xtype:'paramcombo',hiddenName:'isNewStb',
 						id:'isNewStbId',paramName:'BOOLEAN',allowBlank:false,defaultValue:'F'}
 				]}
 				]
 			}],
 			buttonAlign:'center',
 			buttons:[
-				{text:'保存',iconCls:'icon-save',scope:this,handler:this.doSave},
-				{text:'关闭',iconCls:'icon-close',scope:this,handler:function(){
+				{text:COMMON_LU.saveBtn,iconCls:'icon-save',scope:this,handler:this.doSave},
+				{text:COMMON_LU.cancel,iconCls:'icon-close',scope:this,handler:function(){
 						this.hide();
 					}
 				}
@@ -251,14 +255,14 @@ var ConfirmReclaimWin = Ext.extend(Ext.Window,{
 				var data = Ext.decode(res.responseText);
 				if(data['success'] === true){
 					msg.hide();msg=null;
-					Alert('保存成功!');
+					Alert(COMMON_LU.saveSuccess);
 					if(values['flag'] == 'T'){
 						Ext.getCmp('reclaimDeviceGridId').getStore().load({
 							params:{start:0,limit:Constant.DEFAULT_PAGE_SIZE}
 						});
 					}else{
 						record.set('status','NOTCONFIRM');
-						record.set('status_text','不确认');
+						record.set('status_text',COMMON_LU.notForSure);
 					}
 					record.commit();
 					this.hide();
@@ -273,7 +277,7 @@ ReclaimDevice = Ext.extend(Ext.Panel,{
 		var grid = new ReclaimDeviceGrid();
 		ReclaimDevice.superclass.constructor.call(this,{
 			id:'ReclaimDevice',
-			title:'设备回收',
+			title:RECYC_DEV_LU._title,
 			closable: true,
 			border : false ,
 //			baseCls: "x-plain",

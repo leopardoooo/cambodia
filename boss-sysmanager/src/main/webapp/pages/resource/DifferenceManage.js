@@ -3,6 +3,11 @@
  * @class
  * @extends Ext.grid.GridPanel
  */
+var COMMON_LU = lsys('common');
+var DEV_COMMON_LU = lsys('DeviceCommon');
+var DIFF_LU = lsys('DifferenceManage');
+var MSG_LU = lsys('msgBox');
+
 var DifferenceGrid = Ext.extend(Ext.grid.GridPanel,{
 	differenceGridStore: null,
 	constructor:function(){
@@ -18,16 +23,16 @@ var DifferenceGrid = Ext.extend(Ext.grid.GridPanel,{
 		var sm = new Ext.grid.CheckboxSelectionModel({});     
 		var columns = [
 			sm,
-			{header:'设备编号',dataIndex:'device_code',width:180},
-			{header:'设备类型',dataIndex:'device_type_text',width:75},
-			{header:'型号',dataIndex:'device_model_text',width:120},
-			{header:'差异类型',dataIndex:'diffence_type_text',width:75},
-			{header:'所在仓库',dataIndex:'depot_id_text',width:120},
-			{header:'差异时间',dataIndex:'create_time',width:120},
-			{header:'虚拟MODEM型号',dataIndex:'pair_device_modem_model_text',width:100},
-			{header:'虚拟MODEM号',dataIndex:'pair_device_modem_code',width:120},
-			{header:'配对卡型号',dataIndex:'pair_device_model',width:100},
-			{header:'配对卡号',dataIndex:'pair_device_code',width:120}
+			{header:DEV_COMMON_LU.labelDevCode,dataIndex:'device_code',width:180},
+			{header:DEV_COMMON_LU.labelDeviceType,dataIndex:'device_type_text',width:75},
+			{header:DEV_COMMON_LU.labelDeviceModel,dataIndex:'device_model_text',width:120},
+			{header:DIFF_LU.labelDiffType,dataIndex:'diffence_type_text',width:75},
+			{header:COMMON_LU.depotText,dataIndex:'depot_id_text',width:120},
+			{header:DIFF_LU.labelDiffTime,dataIndex:'create_time',width:120},
+			{header:DEV_COMMON_LU.labelVitualModemModel,dataIndex:'pair_device_modem_model_text',width:100},
+			{header:DEV_COMMON_LU.labelVitualModemCode,dataIndex:'pair_device_modem_code',width:120},
+			{header:DEV_COMMON_LU.labelPairCardType,dataIndex:'pair_device_model',width:100},
+			{header:DEV_COMMON_LU.labelPairCardCode,dataIndex:'pair_device_code',width:120}
 		];
 		
 		DifferenceGrid.superclass.constructor.call(this,{
@@ -39,21 +44,21 @@ var DifferenceGrid = Ext.extend(Ext.grid.GridPanel,{
 			sm:sm,
 			bbar:new Ext.PagingToolbar({store:this.differenceGridStore,pageSize:Constant.DEFAULT_PAGE_SIZE}),
 			tbar:[
-				'-','输入关键字&nbsp;',
+				'-',COMMON_LU.inputKeyWork,
 				new Ext.ux.form.SearchField({  
 	                store: this.differenceGridStore,
 	                width: 200,
 	                hasSearch : true,
-	                emptyText: '支持设备编号查询'
+	                emptyText: MSG_LU.supportDevCodeQuery
 	            }),'-',
-	            {xtype:'treecombo',fieldLabel:'仓库',id:'diff_depot_id',
+	            {xtype:'treecombo',fieldLabel:DEV_COMMON_LU.labelDepot,id:'diff_depot_id',
 					width:150,
 					treeWidth:400,
 					height: 22,
 					allowBlank: false,
 					onlySelectLeaf:false,
-					emptyText :'切换仓库',
-					blankText:'请选择仓库',
+					emptyText :DEV_COMMON_LU.labelSwitchDepot,
+					blankText:MSG_LU.emptyTextSelectStore,
 					treeUrl: 'resource/Device!queryChildDepot.action',
 					listeners : {
 						scope:this,
@@ -68,10 +73,10 @@ var DifferenceGrid = Ext.extend(Ext.grid.GridPanel,{
 						}
 					}
 				},'-',
-				{text:'手工差异',iconCls:'icon-add',scope:this,handler:this.addDifference},'-',
-				{text:'文件差异',iconCls:'icon-add',scope:this,tooltip:'文件增加差异：文件类型为Excel，共一列，第一列为差异设备编号' ,handler:this.addFileDifference},'-',
-				{text:'确认差异',iconCls:'icon-confirm',scope:this,handler:function(){this.callProcess('confirmDifference',['UNCHECK','NODIFF'],'该设备已差异，无需再确认')}},'-',
-				{text:'取消差异',iconCls:'icon-cancel',scope:this,handler:function(){this.callProcess('cancelDifference',['DIFF'],'该设备未差异，不能取消确认')}},'-'
+				{text:DIFF_LU.labelManualDiff,iconCls:'icon-add',scope:this,handler:this.addDifference},'-',
+				{text:DIFF_LU.labelFileDiff,iconCls:'icon-add',scope:this,tooltip:MSG_LU.tipDevFileDiffInfo ,handler:this.addFileDifference},'-',
+				{text:DIFF_LU.labelConfirmDiff,iconCls:'icon-confirm',scope:this,handler:function(){this.callProcess('confirmDifference',['UNCHECK','NODIFF'],MSG_LU.tipDevHasNoDiff)}},'-',
+				{text:DIFF_LU.labelCancelDiff,iconCls:'icon-cancel',scope:this,handler:function(){this.callProcess('cancelDifference',['DIFF'],MSG_LU.tipDevNotDiffCantCancel)}},'-'
 			]
 		});
 	},
@@ -84,7 +89,7 @@ var DifferenceGrid = Ext.extend(Ext.grid.GridPanel,{
 					return;
 				}
 			}
-			Confirm('确定操作吗?',this,function(){
+			Confirm(MSG_LU.confirmDoAction,this,function(){
 				var deviceIds='';
 				Ext.each(records,function(r){
 					deviceIds = deviceIds.concat(r.get('device_id'),',');
@@ -95,7 +100,7 @@ var DifferenceGrid = Ext.extend(Ext.grid.GridPanel,{
 			});
 			
 		}else{
-			Alert('请选中要操作的行');
+			Alert(MSG_LU.tipSelectOneRow);
 		}
 	},
 	addDifference:function(deviceIds){
@@ -119,7 +124,7 @@ var DifferenceGrid = Ext.extend(Ext.grid.GridPanel,{
 			params:{deviceIds:deviceIds},
 			scope:this,
 			success:function(res,opt){
-				Alert('确认差异成功!',function(){
+				Alert(MSG_LU.tipConfirmDiffSuccess,function(){
 					this.getStore().reload();
 				},this);
 			}
@@ -131,7 +136,7 @@ var DifferenceGrid = Ext.extend(Ext.grid.GridPanel,{
 			params:{deviceIds:deviceIds},
 			scope:this,
 			success:function(res,opt){
-				Alert('取消差异成功!',function(){
+				Alert(MSG_LU.tipCalcenDiffSuccess,function(){
 					this.getStore().reload();
 				},this);
 			}
@@ -199,8 +204,8 @@ var DiffFileForm = Ext.extend(Ext.form.FormPanel,{
 			},
 			items:[ {columnWidth:1,layout:'form',
 					items:[
-						{id:'differenceManageFielId',fieldLabel:'设备文件',name:'files',xtype:'textfield',inputType:'file',allowBlank:false,anchor:'80%',emptyText:''},
-						 {fieldLabel:'备注',name:'remark',xtype:'textarea',anchor:'80%',height:50},
+						{id:'differenceManageFielId',fieldLabel:DEV_COMMON_LU.labelDevFile,name:'files',xtype:'textfield',inputType:'file',allowBlank:false,anchor:'80%',emptyText:''},
+						 {fieldLabel:COMMON_LU.remarkTxt,name:'remark',xtype:'textarea',anchor:'80%',height:50},
 						{id:'depotId',name:'depotId',xtype:'hidden'}
 						 
 				]}
@@ -225,7 +230,7 @@ var AddDifferenceWin = Ext.extend(Ext.Window,{
 		this.grid = new DifferenceQueryDeviceGrid();
  		AddDifferenceWin.superclass.constructor.call(this,{
 			id : 'addDifferenceWinId',
-			title:'手工增加差异',
+			title:DIFF_LU.titleManualAddDiff,
 			closeAction:'hide',
 			maximizable:false,
 			width: 800,
@@ -233,8 +238,8 @@ var AddDifferenceWin = Ext.extend(Ext.Window,{
 			layout:'border',
 			items:[this.grid],
 			buttonAlign:'right',
-			buttons:[{text:'保存',iconCls:'icon-save',scope:this,handler:this.doSave},
-				{text:'关闭',iconCls:'icon-close',scope:this,handler:function(){
+			buttons:[{text:COMMON_LU.saveBtn,iconCls:'icon-save',scope:this,handler:this.doSave},
+				{text:COMMON_LU.cancel,iconCls:'icon-close',scope:this,handler:function(){
 					this.hide();
 				}}],
 			listeners:{
@@ -253,7 +258,7 @@ var AddDifferenceWin = Ext.extend(Ext.Window,{
 				deviceIds = deviceIds.concat(record.get('device_id'),',')
 		});
 		if(deviceIds.length === 0){
-			Alert('请正确输入设备信息！');
+			Alert(MSG_LU.pleaseInputCorrectDevInfo);
 			return;
 		}
 		deviceIds = deviceIds.substring(0,deviceIds.length-1);
@@ -266,7 +271,7 @@ var AddDifferenceWin = Ext.extend(Ext.Window,{
 			success:function(res,opt){
 				msg.hide();
 				msg = null;
-				Alert('添加成功',function(){
+				Alert(COMMON_LU.addSuccess,function(){
 					this.hide();
 					Ext.getCmp('differenceGridId').getStore().reload();
 				},this);
@@ -287,7 +292,7 @@ var AddFileDifferenceWin = Ext.extend(Ext.Window,{
 		this.fileForm = new DiffFileForm();
  		AddFileDifferenceWin.superclass.constructor.call(this,{
 			id : 'fileDifferenceWinId',
-			title:'文件增加差异',
+			title:DIFF_LU.titleFileAddDiff,
 			closeAction:'hide',
 			maximizable:false,
 			width: 650,
@@ -295,8 +300,8 @@ var AddFileDifferenceWin = Ext.extend(Ext.Window,{
 			layout:'border',
 			items:[this.fileForm],
 			buttonAlign:'right',
-			buttons:[{text:'保存',iconCls:'icon-save',scope:this,handler:this.doSave},
-				{text:'关闭',iconCls:'icon-close',scope:this,handler:function(){
+			buttons:[{text:COMMON_LU.saveBtn,iconCls:'icon-save',scope:this,handler:this.doSave},
+				{text:COMMON_LU.cancel,iconCls:'icon-close',scope:this,handler:function(){
 					this.hide();
 				}}],
 			listeners:{
@@ -327,14 +332,14 @@ var AddFileDifferenceWin = Ext.extend(Ext.Window,{
 						if(data.msg){//错误信息
 							Alert(data.msg);
 						}else{
-							Alert('差异文件上传成功!',function(){
+							Alert(MSG_LU.fileUploadSuccess,function(){
 								this.hide();
 							},this);
 						}
 					}
 				},  
 				failure : function(form, action) {  
-					alert("差异文件上传失败!");  
+					alert(MSG_LU.fileUploadFailure);  
 				}
 			});
 		}
@@ -353,7 +358,7 @@ DifferenceManage = Ext.extend(Ext.Panel,{
 		queryDeviceGrid = new QueryDeviceGrid();
 		DifferenceManage.superclass.constructor.call(this,{
 			id:'DifferenceManage',
-			title:'差异管理',
+			title:DIFF_LU._title,
 			closable: true,
 			border : false ,
 			layout:'border',

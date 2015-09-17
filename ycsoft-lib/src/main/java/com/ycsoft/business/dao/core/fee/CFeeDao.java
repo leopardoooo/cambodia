@@ -107,16 +107,17 @@ public class CFeeDao extends BaseEntityDao<CFee> {
 					" case when fa.begin_date is not null and fa.prod_invalid_date is not null ",
 					"          then to_char(fa.begin_date,'yyyymmdd')||'-'||to_char(fa.prod_invalid_date,'yyyymmdd') ",
 					"      when cf.fee_id is not null and cf.fee_type='DEVICE' then vdtm.model_name",
-					"      when cf.disct_info is not null and cf.fee_type='BUSI' then cf.disct_info end count_text, cfb.buy_num ",
+					"      when cf.disct_info is not null and cf.fee_type='BUSI' then cf.disct_info end count_text, cfb.buy_num, u.user_type ",
 					" from c_fee cf join c_done_code_unpay un on cf.create_done_code=un.done_code",
+					" left join c_user u on cf.user_id=u.user_id",
 					" left join c_fee_acct fa on fa.fee_sn=cf.fee_sn ",              
 					" left join c_fee_device cfb on cfb.fee_sn=cf.fee_sn",
 					" left join t_busi_fee bf on bf.fee_id=cf.fee_id",
 					" left join vew_device_typemodel vdtm on cfb.device_type||'_'||cfb.device_model=vdtm.device_type_model",
 					" left join vew_acctitem atm on atm.acctitem_id=cf.acctitem_id",
-				" where un.cust_id=? and un.optr_id=? and cf.status<> ? ",
+				" where un.cust_id=? and cf.status<> ? ",
 				" order by cf.create_time ");
-		return this.createQuery(FeeDto.class, sql, cust_id,optr_id,StatusConstants.INVALID).list();
+		return this.createQuery(FeeDto.class, sql, cust_id, StatusConstants.INVALID).list();
 	}
 	/**
 	 * 根据业务流水号查询未支付费用信息
