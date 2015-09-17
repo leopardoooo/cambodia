@@ -16,18 +16,21 @@ import com.ycsoft.beans.core.common.CDoneCodeDetail;
 import com.ycsoft.beans.core.common.CDoneCodeInfo;
 import com.ycsoft.beans.core.common.CDoneCodeUnpay;
 import com.ycsoft.beans.core.fee.CFee;
+import com.ycsoft.beans.core.user.CUser;
 import com.ycsoft.business.commons.abstracts.BaseBusiComponent;
 import com.ycsoft.business.dao.config.TBusiConfirmDao;
 import com.ycsoft.business.dao.core.common.CDoneCodeInfoDao;
 import com.ycsoft.business.dao.core.common.CDoneCodeUnpayDao;
 import com.ycsoft.business.dao.core.cust.CCustDao;
 import com.ycsoft.business.dao.core.fee.CFeeDao;
+import com.ycsoft.business.dao.core.user.CUserDao;
 import com.ycsoft.business.dto.core.cust.DoneCodeDto;
 import com.ycsoft.business.dto.core.cust.DoneCodeExtAttrDto;
 import com.ycsoft.business.dto.core.cust.DoneInfoDto;
 import com.ycsoft.business.dto.core.cust.ExtAttributeDto;
 import com.ycsoft.business.dto.core.fee.FeeDto;
 import com.ycsoft.business.dto.core.fee.QueryFeeInfo;
+import com.ycsoft.commons.constants.BusiCodeConstants;
 import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.exception.ComponentException;
@@ -55,6 +58,8 @@ public class DoneCodeComponent extends BaseBusiComponent {
 	private CCustDao cCustDao;
 	@Autowired
 	private CFeeDao cFeeDao;
+	@Autowired
+	private CUserDao cUserDao;
 	/**
 	 * 给业务增加用户锁，防止并发临界时数据不一致。
 	 * @param cust_id
@@ -302,6 +307,16 @@ public class DoneCodeComponent extends BaseBusiComponent {
 					tempQ.setAttr_remark(str.toString());
 				}
 				tempQ.getExtAttrs().add(temp);
+			}
+			if(doneCodeDto.getBusi_code().equals(BusiCodeConstants.USER_OPEN)){
+				CUser user = cUserDao.findByKey(doneCodeDto.getUser_id());
+				String str = user.getUser_type();
+				if(str.equals(SystemConstants.USER_TYPE_BAND) && StringHelper.isNotEmpty(user.getModem_mac())){
+					str += " Modem: "+user.getModem_mac();
+				}else  if(StringHelper.isNotEmpty(user.getStb_id())){
+					str += " Stb: "+user.getStb_id();
+				}
+				tempQ.setRemark(str);
 			}
 		}
 		return pageTarget;
