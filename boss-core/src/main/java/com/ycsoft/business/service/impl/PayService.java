@@ -322,12 +322,42 @@ public class PayService extends BaseBusiService implements IPayService {
 		//删除c_prod_order_fee
 		cProdOrderFeeDao.deleteOrderFeeByOrderSn(order_sn);
 		//移除订单到历史表
-		orderComponent.saveCancelProdOrder(order, doneCode);
+		List<CProdOrder> cancelOrders=orderComponent.saveCancelProdOrder(order, doneCode);
 
 		//作废缴费信息
 		feeComponent.saveCancelFeeUnPay(fee, doneCode);
 		//作废业务
 		doneCodeComponent.cancelDoneCode(fee.getCreate_done_code());
+		//取消授权
+		sendProdAtuh(cancelOrders,fee.getCust_id(),doneCode);
+	}
+	/**
+	 * 加减授权都能正确处理
+	 * @param orders
+	 * @param custId
+	 * @param doneCode
+	 * @throws Exception
+	 */
+	private void sendProdAtuh(List<CProdOrder> orders,String custId,Integer doneCode) throws Exception{
+		Map<String,CUser> userMap=userComponent.queryUserMap(custId);
+		Map<CUser,List<CProdOrder>> atvMap=new HashMap<>();
+		//查询待支付的订单(含套餐和套餐子产品)
+		for(CProdOrder order:orders){ 
+				CUser user=userMap.get(order.getUser_id());
+				if(user==null){
+					throw new ServicesException(ErrorCode.OrderDateException,order.getOrder_sn());
+				}
+				List<CProdOrder> list=atvMap.get(user);
+				if(list==null){
+					list=new ArrayList<>();
+					atvMap.put(user, list);
+				}
+				list.add(order);		
+		}	
+		//发授权
+		for(CUser user:atvMap.keySet()){
+			authComponent.sendAuth(user, atvMap.get(user),  BusiCmdConstants.ACCTIVATE_PROD, doneCode);
+		}
 	}
 	/**
 	 * 检查是否按顺序取消
