@@ -1413,9 +1413,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		}
 		
 		//cancel task
-		String[] taskIds = new String[1];
-		taskIds[0] = taskId;
-		taskComponent.cancelTask(taskIds, "muanual cancel");
+		snTaskComponent.cancelTask(doneCode, taskId);;
 		
 	}
 	
