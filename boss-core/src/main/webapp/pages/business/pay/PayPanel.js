@@ -152,11 +152,13 @@ PayPanel = Ext.extend( Ext.Panel ,{
 		var records = this.paySm.getSelections();
 		if(records.length > 0){
 			if(records.length == this.feeStore.getCount()){
+				this.feeStore.removeAll();
 				this.realFeeStore.add(records);
 				this.doCalFee();
 			}else{
 				var recordArray = this.getSameTypeProd(this.feeStore, records);
 				this.realFeeStore.add(recordArray);
+				this.feeStore.remove(recordArray);
 				this.doCalFee();
 			}
 		}
@@ -166,10 +168,12 @@ PayPanel = Ext.extend( Ext.Panel ,{
 		if(records.length > 0){
 			if(records.length == this.realFeeStore.getCount()){
 				this.realFeeStore.removeAll();
+				this.feeStore.add(records);
 				this.doCalFee();
 			}else{
 				var recordArray = this.getSameTypeProd(this.feeStore, records);
 				this.realFeeStore.remove(recordArray);
+				this.feeStore.add(recordArray);
 				this.doCalFee();
 			}
 		}
@@ -180,6 +184,7 @@ PayPanel = Ext.extend( Ext.Panel ,{
 			return;
 		var recordArray = this.getSameTypeProd(this.feeStore, record);
 		
+		this.feeStore.remove(recordArray);
 		this.realFeeStore.add(recordArray);
 		this.doCalFee();
 	},
@@ -190,6 +195,7 @@ PayPanel = Ext.extend( Ext.Panel ,{
 		var recordArray = this.getSameTypeProd(this.realFeeStore, record);
 		
 		this.realFeeStore.remove(recordArray);
+		this.feeStore.add(recordArray);
 		this.doCalFee();
 	},
 	doCalFee: function(){
@@ -269,6 +275,12 @@ PayPanel = Ext.extend( Ext.Panel ,{
 					if(!flag){
 						this.loadBaseData();
 						App.getApp().refreshPayInfo(parent);
+						this.realFeeStore.each(function(record){
+							if(record.get('fee_sn') == rec.get('fee_sn')){
+								this.realFeeStore.remove(record);
+								return false;
+							}
+						},this);
 					}
 				}
 			});
