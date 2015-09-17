@@ -154,13 +154,12 @@ PayPanel = Ext.extend( Ext.Panel ,{
 			if(records.length == this.feeStore.getCount()){
 				this.feeStore.removeAll();
 				this.realFeeStore.add(records);
-				this.doCalFee();
 			}else{
 				var recordArray = this.getSameTypeProd(this.feeStore, records);
 				this.realFeeStore.add(recordArray);
 				this.feeStore.remove(recordArray);
-				this.doCalFee();
 			}
+				this.doCalFee();
 		}
 	},
 	doDelete: function(){
@@ -169,13 +168,12 @@ PayPanel = Ext.extend( Ext.Panel ,{
 			if(records.length == this.realFeeStore.getCount()){
 				this.realFeeStore.removeAll();
 				this.feeStore.add(records);
-				this.doCalFee();
 			}else{
 				var recordArray = this.getSameTypeProd(this.feeStore, records);
 				this.realFeeStore.remove(recordArray);
 				this.feeStore.add(recordArray);
-				this.doCalFee();
 			}
+				this.doCalFee();
 		}
 	},
 	doRowClick: function(grid, rowIndex){
