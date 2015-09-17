@@ -42,6 +42,7 @@ import com.ycsoft.beans.task.WTaskBaseInfo;
 import com.ycsoft.beans.task.WTaskUser;
 import com.ycsoft.business.commons.pojo.BusiParameter;
 import com.ycsoft.business.component.task.SnTaskComponent;
+import com.ycsoft.business.dao.core.fee.CFeeDao;
 import com.ycsoft.business.dao.core.prod.CProdOrderDao;
 import com.ycsoft.business.dao.core.prod.CProdOrderFeeDao;
 import com.ycsoft.business.dao.task.WTaskBaseInfoDao;
@@ -81,6 +82,8 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 	private WTaskUserDao wTaskUserDao;
 	@Autowired
 	private CProdOrderFeeDao cProdOrderFeeDao;
+	@Autowired
+	private CFeeDao cFeeDao;
 	
 	public void createUser(CUser user, String deviceCode, String deviceType, String deviceModel, String deviceBuyMode,
 			FeeInfoDto deviceFee) throws Exception {
@@ -1328,6 +1331,12 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 	@Override
 	public void cancelInstallTask(String taskId) throws Exception {
 		WTaskBaseInfo task = wTaskBaseInfoDao.findByKey(taskId);
+		List<WTaskUser> userList = wTaskUserDao.queryByTaskId(taskId);
+		String[] userIds = new String[userList.size()];
+		int i=0;
+		for(WTaskUser user:userList){
+			userIds[i]=user.getUser_id();
+		}
 		int busiDoneCode = task.getDone_code();
 		// 获取业务流水
 		Integer doneCode = doneCodeComponent.gDoneCode();
@@ -1364,28 +1373,30 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		}
 		
 		//cacel users all unpay acctfee
-		List<CFeeAcct> acctFeeList = null;
-		for (CFeeAcct fee:acctFeeList){
-			String order_sn=fee.getProd_sn();
-			CProdOrder order=cProdOrderDao.findByKey(order_sn);
-			//检查套餐类要按订购顺序取消，同一个用户的宽带类单产品要按订购顺序取消，用户一个用户的非宽带单产品按相同产品订购顺序取消。
-			//目的是保证c_fee_acct中pre_invalid_date和begin_date准确
-			//恢复被覆盖转移的订单
-			orderComponent.recoverTransCancelOrder(order.getDone_code(),order.getCust_id(),doneCode);
-			//删除c_prod_order_fee
-			cProdOrderFeeDao.deleteOrderFeeByOrderSn(order_sn);
-			//移除订单到历史表
-			List<CProdOrder> cancelOrders=orderComponent.saveCancelProdOrder(order, doneCode);
-			//作废缴费信息
-			feeComponent.saveCancelFeeUnPay(fee, doneCode);
-			//作废业务
-			doneCodeComponent.cancelDoneCode(fee.getCreate_done_code());
-
+		List<CFeeAcct> acctFeeList = cFeeDao.queryUserUnPayOrderFee(task.getCust_id(), userIds);
+		if (acctFeeList != null){
+			for (CFeeAcct fee:acctFeeList){
+				String order_sn=fee.getProd_sn();
+				CProdOrder order=cProdOrderDao.findByKey(order_sn);
+				//检查套餐类要按订购顺序取消，同一个用户的宽带类单产品要按订购顺序取消，用户一个用户的非宽带单产品按相同产品订购顺序取消。
+				//目的是保证c_fee_acct中pre_invalid_date和begin_date准确
+				//恢复被覆盖转移的订单
+				orderComponent.recoverTransCancelOrder(order.getDone_code(),order.getCust_id(),doneCode);
+				//删除c_prod_order_fee
+				cProdOrderFeeDao.deleteOrderFeeByOrderSn(order_sn);
+				//移除订单到历史表
+				List<CProdOrder> cancelOrders=orderComponent.saveCancelProdOrder(order, doneCode);
+				//作废缴费信息
+				feeComponent.saveCancelFeeUnPay(fee, doneCode);
+				//作废业务
+				doneCodeComponent.cancelDoneCode(fee.getCreate_done_code());
+			}
 		}
 		
+		//refund all pay order
 		
 		//update device status to idle,write off user
-		List<WTaskUser> userList = wTaskUserDao.queryByTaskId(taskId);
+		
 		for (WTaskUser user:userList){
 			if (StringHelper.isNotEmpty(user.getDevice_id())){
 				DeviceDto device = deviceComponent.queryDeviceByDeviceCode(user.getDevice_id());

@@ -14,7 +14,6 @@ import java.util.Map;
 import org.springframework.stereotype.Component;
 
 import com.ycsoft.beans.core.bill.BillDto;
-import com.ycsoft.beans.core.common.CDoneCodeUnpay;
 import com.ycsoft.beans.core.fee.CFee;
 import com.ycsoft.beans.core.fee.CFeeAcct;
 import com.ycsoft.beans.core.fee.CFeeDevice;
@@ -641,6 +640,23 @@ public class CFeeDao extends BaseEntityDao<CFee> {
 				"and  f.county_id =?  and p.county_id=? and a.county_id=? and f.create_done_code=?";
 		return createQuery(CProd.class,sql, countyId,countyId,countyId,doneCode).list();
 	}
+	
+	public List<CFeeAcct> queryUserUnPayOrderFee(String custId,String[] userIds) throws JDBCException {
+		String sql = "select a.*,b.prod_sn from c_fee a,c_fee_acct b where a.fee_sn = b.fee_sn "+
+			  "	and b.prod_sn in ( "+
+			  "	select order_sn "+
+			  "	  from c_prod_order "+
+			  "	 where cust_id = ?  "+
+			  "	   and user_id in ("+sqlGenerator.in(userIds)+"') "+
+			  "	   and package_sn is null "+
+			  "	union "+
+			  "	select package_sn order_sn "+
+			  "	  from c_prod_order "+
+			  "	 where cust_id = ? "+
+			  "	   and user_id in ("+sqlGenerator.in(userIds)+") "+
+			  "	   and package_sn is not null) and status='UNPAY'";	
+		return createQuery(CFeeAcct.class,sql,custId,custId).list();
+	} 
 
 
 }
