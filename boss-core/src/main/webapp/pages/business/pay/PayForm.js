@@ -54,13 +54,13 @@ PayForm = Ext.extend( Ext.form.FormPanel , {
 				disabled: true,
 				xtype: 'textfield',
 				name: 'pay.receipt_id'
-			},{
+			}/*,{
 				fieldLabel: lc[6],
 				editable:false,
 				xtype:'datefield',
 				format:'Y-m-d',
 				name: 'pay.acct_date'
-			},{
+			}*/,{
 				fieldLabel: lc[7],
 				xtype: 'numberfield',
 				decimalPrecision: 0,
@@ -128,7 +128,7 @@ PayForm = Ext.extend( Ext.form.FormPanel , {
 	},
 	getValues:function(){
 		var all = this.getForm().getValues();
-		
+		all['pay.acct_date'] = nowDate();
 		return all;
 	}
 });

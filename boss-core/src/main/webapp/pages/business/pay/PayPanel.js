@@ -5,26 +5,32 @@ PayPanel = Ext.extend( Ext.Panel ,{
 	feeStore: null ,
 	payForm: null,
 	feeGrid:null,
+	feeData: null,
 	constructor: function(){
 		// 缴费信息的表单
 		this.payForm = new PayForm(this);
 		//实例化fee store
-		this.feeStore = new Ext.data.JsonStore({
-			data: [],
-			fields: [
+		var fields = [
 				'fee_sn','busi_name','fee_text','count_text','optr_name','create_time',
 				{name: 'real_pay', type: 'int'}, 'create_done_code',
-				'prod_sn', 'begin_date','prod_invalid_date','fee_type','buy_num'
+				'prod_sn', 'begin_date','prod_invalid_date','fee_type','buy_num', 
+				'user_id','acctitem_id','user_type','busi_code'
 			]
+		this.feeStore = new Ext.data.JsonStore({
+			data: [],
+			fields: fields
 		});
 		var lc = langUtils.main("cashPay.pay.columns");
 		var bt = langUtils.main("cashPay.pay.buttons");
+		this.paySm = new Ext.grid.CheckboxSelectionModel();
 		//费用表格
 		this.feeGrid = new Ext.grid.GridPanel({
-			title: langUtils.main('cashPay.pay._title'),
+			title: langUtils.main('cashPay.pay._stayTitle'),
 			region: 'center',
 			border: false,
+			sm: this.paySm,
 			columns: [
+				this.paySm,
 			    { header: lc[0], width: 50,renderer: function(v , md, record , i  ){
 					return "<DIV><a href='#' onclick=Ext.getCmp('PayPanelId').deletePay()>取消</a></DIV>";
 				}},
@@ -39,21 +45,66 @@ PayPanel = Ext.extend( Ext.Panel ,{
 				{ header: lc[9], dataIndex: 'create_done_code', width: 80}
 				
 			],
-			ds: this.feeStore
+			ds: this.feeStore,
+			listeners: {
+				scope: this,
+				rowdblclick: this.doRowClick
+			}
+		});
+		
+		this.realPaySm = new Ext.grid.CheckboxSelectionModel();
+		this.realFeeStore = new Ext.data.JsonStore({
+			fields: fields
+		});
+		this.realFeeGrid = new Ext.grid.GridPanel({
+			title: langUtils.main('cashPay.pay._title'),
+			border: false,
+			sm: this.realPaySm,
+			columns: [
+				this.realPaySm,
+				{ header: lc[1], dataIndex: 'busi_name', width: 80},
+				{ header: lc[2], dataIndex: 'fee_text',width: 120, renderer:App.qtipValue},
+				{ header: lc[3], dataIndex: 'real_pay', width: 70, xtype: 'moneycolumn'},
+				{ header: lc[4], dataIndex: 'prod_sn', width: 70},
+				{ header: lc[5], dataIndex: 'count_text', width:150, renderer: App.qtipValue},
+				{ header: lc[6], dataIndex: 'buy_num', width: 70},
+				{ header: lc[7], dataIndex: 'create_time', width: 130},
+				{ header: lc[8], dataIndex: 'fee_sn', width: 80},
+				{ header: lc[9], dataIndex: 'create_done_code', width: 80}
+				
+			],
+			ds: this.realFeeStore,
+			listeners: {
+				scope: this,
+				rowdblclick: this.doRealRowClick
+			}
 		});
 		
 		PayPanel.superclass.constructor.call(this,{
 			id:'PayPanelId',
 			border: false,
 			layout: 'border',
-			region: 'center',
 			items: [
+			
 				{
-				region: 'center',
-				layout: 'border',
-				items: [this.feeGrid ]
-			},
-				{
+					region: 'center',
+					layout: 'border',
+					border: false,
+					items:[{
+						region: 'center',
+						layout: 'border',
+						items: [this.feeGrid ],
+						bbar:['-',
+							{text: '确认', iconCls: 'icon-confirm', scope:this, handler: this.doConfirm},'-',
+							{text: '移除', iconCls: 'icon-del', scope:this, handler: this.doDelete},'-']
+					},
+					{
+						region: 'south',
+						layout: 'fit',
+						height: 200,
+						items: [this.realFeeGrid ]
+					}]
+				},{
 				region: 'east',
 				split: true,
 				layout: 'fit',
@@ -69,6 +120,130 @@ PayPanel = Ext.extend( Ext.Panel ,{
 			}]
 		});
 		this.loadBaseData();
+	},
+	loadBaseData: function(){
+		// 请求后台的数据
+		Ext.Ajax.request({
+			scope: this,
+			url: Constant.ROOT_PATH + "/core/x/Pay!queryUnPayDetail.action",
+			params: {cust_id: App.getCustId()},
+			success: function(res, ops){
+				var data = Ext.decode(res.responseText);
+				this.feeStore.loadData(data["records"]);
+				this.feeData = data["simpleObj"];
+				Ext.getCmp("labelExchange").setText("1USD=" + this.feeData["EXC"] + "KHR");
+				/*var dollar = this.feeData["FEE"]/100.0;
+				Ext.getCmp("nfDollar").setValue(dollar);
+				Ext.getCmp("nfJianYuan").setValue(0);
+				var substrIndex = 1, append = "";
+				if(dollar < 0){
+					substrIndex = 2;
+					append = "-";
+				} 
+				Ext.getCmp("labelDollor").setText(append+ Ext.util.Format.usMoney(dollar).substr(substrIndex));
+				var jianYuan = Ext.util.Format.usMoney(dollar * this.feeData["EXC"]);
+				Ext.getCmp("LabelJian").setText(append+jianYuan.substr(substrIndex));
+				Ext.getCmp("labelExchange").setText("1USD=" + this.feeData["EXC"] + "KHR");
+				Ext.getCmp("hdExchange").setValue(this.feeData["EXC"]);*/
+			}
+		});
+	},
+	doConfirm: function(){
+		var records = this.paySm.getSelections();
+		if(records.length > 0){
+			if(records.length == this.feeStore.getCount()){
+				this.realFeeStore.add(records);
+				this.doCalFee();
+			}else{
+				var recordArray = this.getSameTypeProd(this.feeStore, records);
+				this.realFeeStore.add(recordArray);
+				this.doCalFee();
+			}
+		}
+	},
+	doDelete: function(){
+		var records = this.realPaySm.getSelections();
+		if(records.length > 0){
+			if(records.length == this.realFeeStore.getCount()){
+				this.realFeeStore.removeAll();
+				this.doCalFee();
+			}else{
+				var recordArray = this.getSameTypeProd(this.feeStore, records);
+				this.realFeeStore.remove(recordArray);
+				this.doCalFee();
+			}
+		}
+	},
+	doRowClick: function(grid, rowIndex){
+		var record = this.feeStore.getAt(rowIndex);
+		if(this.realFeeStore.indexOf(record) > 0)
+			return;
+		var recordArray = this.getSameTypeProd(this.feeStore, record);
+		
+		this.realFeeStore.add(recordArray);
+		this.doCalFee();
+	},
+	doRealRowClick: function(grid, rowIndex){
+		var record = this.realFeeStore.getAt(rowIndex);
+		if(this.realFeeStore.indexOf(record) > 0)
+			return;
+		var recordArray = this.getSameTypeProd(this.realFeeStore, record);
+		
+		this.realFeeStore.remove(recordArray);
+		this.doCalFee();
+	},
+	doCalFee: function(){
+		var dollar = 0;
+		this.realFeeStore.each(function(record){
+			dollar += record.get('real_pay');
+		}, this);
+		dollar = dollar / 100.0;
+		Ext.getCmp("nfDollar").setValue(dollar);
+		Ext.getCmp("nfJianYuan").setValue(0);
+		var substrIndex = 1, append = "";
+		if(dollar < 0){
+			substrIndex = 2;
+			append = "-";
+		} 
+		Ext.getCmp("labelDollor").setText(append+ Ext.util.Format.usMoney(dollar).substr(substrIndex));
+		var jianYuan = Ext.util.Format.usMoney(dollar * this.feeData["EXC"]);
+		Ext.getCmp("LabelJian").setText(append+jianYuan.substr(substrIndex));
+		Ext.getCmp("labelExchange").setText("1USD=" + this.feeData["EXC"] + "KHR");
+		Ext.getCmp("hdExchange").setValue(this.feeData["EXC"]);
+	},
+	getSameTypeProd: function(store, records){
+		var recordArray = [];
+		Ext.each(records, function(record){
+			var userType = record.get('user_type');
+			var prodId = record.get('acctitem_id');
+			var userId = record.get('user_id')
+			var feeSn = record.get('fee_sn');
+			var busiCode = record.get('busi_code');
+			if(userType == 'BAND' && prodId){
+				//相同用户的宽带订单必须一起支付
+				store.each(function(r){
+					if(userId == r.get('user_id')){
+						recordArray.push(r);
+					}
+				}, this);
+			}else if(busiCode == '1015'){
+				//套餐订单，必须一起支付
+				store.each(function(r){
+					if(r.get('busi_code') == busiCode){
+						recordArray.push(r);
+					}
+				}, this);
+			}else{
+				//相同用户相同产品必须一起支付
+				store.each(function(r){
+					if(userId == r.get('user_id') && prodId == r.get('acctitem_id')){
+						recordArray.push(r);
+					}
+				}, this);
+			}
+		}, this);
+		
+		return recordArray;
 	},
 	deletePay : function() {
 		var rec = this.feeGrid.getSelectionModel().getSelected();
@@ -103,43 +278,8 @@ PayPanel = Ext.extend( Ext.Panel ,{
 			func(false);
 		});
 	},
-	feeData: null,
-	loadBaseData: function(){
-		// 请求后台的数据
-		Ext.Ajax.request({
-			scope: this,
-			url: Constant.ROOT_PATH + "/core/x/Pay!queryUnPayDetail.action",
-			params: {cust_id: App.getCustId()},
-			success: function(res, ops){
-				var data = Ext.decode(res.responseText);
-				this.feeStore.loadData(data["records"]);
-				this.feeData = data["simpleObj"];
-				var dollar = this.feeData["FEE"]/100.0;
-				Ext.getCmp("nfDollar").setValue(dollar);
-				Ext.getCmp("nfJianYuan").setValue(0);
-				var substrIndex = 1, append = "";
-				if(dollar < 0){
-					substrIndex = 2;
-					append = "-";
-				} 
-				Ext.getCmp("labelDollor").setText(append+ Ext.util.Format.usMoney(dollar).substr(substrIndex));
-				var jianYuan = Ext.util.Format.usMoney(dollar * this.feeData["EXC"]);
-				Ext.getCmp("LabelJian").setText(append+jianYuan.substr(substrIndex));
-				Ext.getCmp("labelExchange").setText("1USD=" + this.feeData["EXC"] + "KHR");
-				Ext.getCmp("hdExchange").setValue(this.feeData["EXC"]);
-			}
-		});
-	},
 	doSaveAndPrint: function(){
-//		var params = this.getValues();
 		this.doSave(params);
-//		this.doSave(function(){
-//			var invoiceId =this.payForm.find("name", "pay.invoice_id")[0].getValue();
-//			var invoiceBookId =this.payForm.find("hiddenName", "pay.invoice_book_id")[0].getValue();
-//			var menu = App.getApp().menu;
-//			menu.bigWindow.toggleUrl( "打印" , {width: 700, height: 450},
-//					"/pages/business/pay/Print.jsp?type=through&invoiceId="+invoiceId+"&invoiceBookId="+invoiceBookId );
-//		}, params);
 	},
 	doSave: function(){
 		if(!this.payForm.getForm().isValid()){ 
