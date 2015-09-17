@@ -4,7 +4,7 @@ UserDetailGrid = Ext.extend(Ext.grid.GridPanel, {
 	constructor : function() {
 		this.userDetailStore = new Ext.data.JsonStore({
 					fields : ['user_type', 'user_type_text','user_name', 'device_model','device_model_text','task_id',
-							'device_code', 'password']
+							'device_code', 'password','device_id','band']
 				});
 		UserDetailGrid.superclass.constructor.call(this, {
 			ds : this.userDetailStore,
@@ -17,8 +17,8 @@ UserDetailGrid = Ext.extend(Ext.grid.GridPanel, {
 						header : '用户名',dataIndex : 'user_name',renderer : App.qtipValue}, {
 						header : '密码',dataIndex : 'password',renderer : App.qtipValue}, {
 						header : '设备型号',dataIndex : 'device_model_text',renderer : App.qtipValue}, {
-						header : '设备号',dataIndex : 'device_code',renderer : App.qtipValue}, {
-						header : '带宽',dataIndex : 'task_id',renderer : App.qtipValue}])
+						header : '设备号',dataIndex : 'device_id',renderer : App.qtipValue}, {
+						header : '带宽',dataIndex : 'band',renderer : App.qtipValue}])
 		})
 	}
 })
@@ -40,7 +40,7 @@ TaskDetailGrid = Ext.extend(Ext.grid.GridPanel, {
 				header : '操作类型',dataIndex : 'busi_name',renderer : App.qtipValue}, {
 				header : '操作人',dataIndex : 'optr_name',renderer : App.qtipValue}, {
 				header : '同步状态',dataIndex : 'syn_status_text',renderer : App.qtipValue}, {
-				header : '错误描述',dataIndex : 'error_remark',renderer :  App.qtipValue
+				header : '描述',dataIndex : 'error_remark',renderer :  App.qtipValue
 			}])
 		})
 	}
@@ -120,13 +120,11 @@ var TaskDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 					scope:this,
 					success:function(res,opt){
 						var data = Ext.decode(res.responseText);
-						dRecord.set('device_id',data['device_id']);
 						dRecord.set('device_code',data['device_code']);
 						dRecord.set('device_type_text',data['device_type_text']);
 						dRecord.set('device_type',data['device_type']);
 					},
 					clearData:function(){
-						dRecord.set('device_id','');
 						dRecord.set('device_code','');
 						dRecord.set('device_type_text','');
 						dRecord.set('device_type','');
@@ -140,7 +138,7 @@ var TaskDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 			var store = this.getStore();
 			store.each(function(record){
 				var values = {};
-				values["deviceId"] = record.get('device_id');
+				values["oldDeviceCode"] = record.get('device_id');
 				values["deviceModel"] =record.get('device_model');
 				values["deviceCode"] = record.get('device_code');
 				arr.push(values);

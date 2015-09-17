@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import com.ycsoft.beans.config.TAddress;
 import com.ycsoft.beans.config.TNetType;
 import com.ycsoft.beans.config.TPayType;
+import com.ycsoft.beans.config.TProvince;
 import com.ycsoft.beans.config.TUpdateCfg;
 import com.ycsoft.beans.core.cust.CCustAddrNote;
 import com.ycsoft.beans.core.job.JOdscntRecord;
@@ -34,6 +35,7 @@ import com.ycsoft.business.dto.config.BusiDocDto;
 import com.ycsoft.business.dto.config.ExtendAttributeDto;
 import com.ycsoft.business.dto.config.ExtendTableAttributeDto;
 import com.ycsoft.business.dto.config.TAddressDto;
+import com.ycsoft.business.dto.config.TAddressSysDto;
 import com.ycsoft.business.dto.config.TaskWorkDto;
 import com.ycsoft.business.dto.core.fee.BusiFeeDto;
 import com.ycsoft.business.service.IQueryCfgService;
@@ -329,6 +331,37 @@ public class QueryCfgService extends BaseService implements IQueryCfgService{
 	 */
 	public void setMemoryComponent(MemoryComponent memoryComponent) {
 		this.memoryComponent = memoryComponent;
+	}
+
+	@Override
+	public List queryAddressTree(String queryText, String addrId, SOptr optr) throws Exception {
+		return simpleComponent.queryAddressTree(queryText, addrId, optr);
+	}
+
+	@Override
+	public List queryDistrictByPid(String districtId) throws Exception {
+		return simpleComponent.queryDistrictByPid(districtId);
+	}
+
+	@Override
+	public TAddress saveAddress(TAddressSysDto addrDto, String type) throws Exception {
+		return simpleComponent.saveAddress(addrDto, type);
+	}
+
+	@Override
+	public List<TProvince> queryProvince() throws Exception {
+		return simpleComponent.queryProvince();
+	}
+
+	@Override
+	public void updateAddressStatus(String addrId, String status) throws Exception {
+		 simpleComponent.updateAddressStatus(addrId, status);
+		
+	}
+
+	@Override
+	public void editAddress(TAddressSysDto addrDto) throws Exception {
+		 simpleComponent.editAddress(addrDto);
 	}
 
 

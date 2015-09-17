@@ -1,6 +1,7 @@
 package com.ycsoft.business.component.resource;
 
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -11,18 +12,23 @@ import org.springframework.stereotype.Component;
 
 import com.ycsoft.beans.config.TAddress;
 import com.ycsoft.beans.config.TDistrict;
+import com.ycsoft.beans.config.TProvince;
 import com.ycsoft.beans.core.cust.CCustAddrNote;
 import com.ycsoft.beans.system.SDept;
 import com.ycsoft.beans.system.SDeptAddr;
+import com.ycsoft.beans.system.SOptr;
 import com.ycsoft.business.commons.abstracts.BaseBusiComponent;
 import com.ycsoft.business.dao.config.TAddressDao;
 import com.ycsoft.business.dao.config.TDistrictDao;
+import com.ycsoft.business.dao.config.TProvinceDao;
 import com.ycsoft.business.dao.core.cust.CCustAddrDao;
 import com.ycsoft.business.dao.system.SDeptAddrDao;
 import com.ycsoft.business.dao.system.SDeptDao;
 import com.ycsoft.business.dao.system.SParamDao;
 import com.ycsoft.business.dto.config.TAddressDto;
+import com.ycsoft.business.dto.config.TAddressSysDto;
 import com.ycsoft.commons.constants.DataRight;
+import com.ycsoft.commons.constants.SequenceConstants;
 import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.exception.ComponentException;
 import com.ycsoft.commons.exception.ErrorCode;
@@ -48,6 +54,8 @@ public class SimpleComponent extends BaseBusiComponent {
 	private SDeptDao sDeptDao;
 	@Autowired
 	private CCustAddrDao cCustAddrDao;
+	@Autowired
+	private TProvinceDao tProvinceDao;
 
 	public List<TAddressDto> queryAddrByName(String q,String pId) throws Exception{
 		String dataRight = "";
@@ -170,6 +178,134 @@ public class SimpleComponent extends BaseBusiComponent {
 
 	public void saveParamValue(String name, Integer value) throws JDBCException {
 		sParamDao.saveParamValue(name,value);
+	}
+	
+	
+	public List queryAddressTree(String name, String pId, SOptr optr) throws Exception{
+		List<TAddressSysDto> list = new ArrayList<TAddressSysDto>();
+		if(StringHelper.isNotEmpty(pId)){
+			list = tAddressDao.queryAllAddrById(pId);
+		}else{
+		
+			List<SDeptAddr> sList = sDeptAddrDao.getAddrByDept(optr.getDept_id());
+			String[] addrIds = null;
+			if(sList.size()>0){
+				addrIds = CollectionHelper.converValueToArray(sList, "addr_id");
+			}else{
+				SDept dept= sDeptDao.findByKey(optr.getDept_id());
+				if(StringHelper.isNotEmpty(dept.getAgent_id())){
+					throw new ComponentException(ErrorCode.DeptAddrIsNull,dept.getDept_name());
+				}
+				//tAddressDao.queryAddrByAllowPids(levelId, addrPid)
+				String[] pids={SystemConstants.ADDRESS_ROOT_ID};
+				addrIds= CollectionHelper.converValueToArray(tAddressDao.queryAllAddrByPids(SystemConstants.ADDR_TREE_LEVEL_ONE,pids),"addr_id");
+			}
+			if(StringHelper.isEmpty(name)){
+				list = tAddressDao.queryAllAddrByIds(null);
+			}else{
+				name = name.toLowerCase();
+				name = name.replaceAll(" ", "");
+				list=tAddressDao.queryAddrSysTreeByLvOneAndName(addrIds,name);
+				
+			}
+		}
+		
+		List<TDistrict> districtList = tDistrictDao.findAll();
+		Map<String,TDistrict> map = CollectionHelper.converToMapSingle(districtList, "district_id");
+		for(TAddressSysDto dto:list){
+			TDistrict t = map.get(dto.getDistrict_id());
+			if(t != null && StringHelper.isNotEmpty(t.getDistrict_name())){
+				dto.setDistrict_name(t.getDistrict_name());
+			}
+		}
+		if(list.size()>2000){
+			throw new ComponentException(ErrorCode.DataNumTooMuch);
+		}
+		return list;
+	}
+	
+	public List<TProvince> queryProvince() throws Exception{
+		return tProvinceDao.queryProvince();
+	}
+	
+	public List queryDistrictByPid(String pId) throws Exception{
+		if(StringHelper.isEmpty(pId)){
+			throw new ComponentException(ErrorCode.ParamIsNull);
+		}
+		return tDistrictDao.queryDistrictListByPid(pId);
+	}
+	
+	private String getNextAddrId() throws JDBCException{
+		return tAddressDao.findSequence(SequenceConstants.SEQ_ADDR_ID).toString();
+	}
+	
+	public void updateAddressStatus(String addrId, String status) throws Exception{
+		TAddress addr = tAddressDao.findByKey(addrId);
+		addr.setStatus(status);
+		tAddressDao.update(addr);
+	}
+	
+	public void editAddress(TAddressSysDto addr) throws JDBCException{
+		TAddress  newAddr = new TAddress();
+		newAddr.setAddr_id(addr.getAddr_id());
+		newAddr.setAddr_name(addr.getAddr_name());
+		newAddr.setNet_type(addr.getNet_type());
+		newAddr.setSort_num(addr.getSort_num());
+		newAddr.setDistrict_id(addr.getDistrict_id());
+		tAddressDao.update(newAddr);
+	}
+
+	/**
+	 * 增加地区
+	 * @param treeLevel 
+	 * @return
+	 * @throws Exception
+	 */
+	public TAddress saveAddress(TAddressSysDto addr,String type) throws Exception{
+		TAddress  newAddr = new TAddress();
+		newAddr.setAddr_pid(addr.getAddr_pid());
+		newAddr.setArea_id(addr.getArea_id());
+		newAddr.setTree_level(addr.getTree_level());
+		newAddr.setCounty_id(addr.getCounty_id());
+		newAddr.setAddr_name(addr.getAddr_name());
+		newAddr.setAddr_id(getNextAddrId());
+		newAddr.setNet_type(addr.getNet_type());
+		newAddr.setDistrict_id(addr.getDistrict_id());
+		newAddr.setIs_leaf(SystemConstants.BOOLEAN_TRUE);
+		float  b = (float) 0.00;
+		if("leveladd".equals(type)){//新增平级算排序值
+			TAddress lastAddr = tAddressDao.findByKey(addr.getAddr_last_id());
+			TAddress nextAddr = tAddressDao.querySortNumByNextId(lastAddr.getAddr_pid(), lastAddr.getSort_num());
+			if(nextAddr == null){
+				b = lastAddr.getSort_num()+1000;
+			}else{
+				b  = (float)(Math.round((lastAddr.getSort_num()+nextAddr.getSort_num())/2*100))/100;
+			}
+		}else if("add".equals(type)){//新增下级算排序值，默认最大值+1000
+			String maxSortNum =	tAddressDao.queryMaxSortNumByPid(addr.getAddr_pid());
+			b = Float.parseFloat(maxSortNum)  + 1000;
+		}
+
+		newAddr.setSort_num(b);
+		tAddressDao.save(newAddr);
+		
+		
+		//修改父节点is_leaf为F
+		updateAddress(addr.getAddr_pid(), SystemConstants.BOOLEAN_FALSE);
+		
+		return newAddr;
+	}
+
+	/**
+	 * 修改地址is_leaf属性
+	 * @param addrId
+	 * @param isLeaf
+	 * @throws JDBCException
+	 */
+	private void updateAddress(String addrId,String isLeaf) throws JDBCException{
+		TAddress addr = tAddressDao.findByKey(addrId);
+		addr.setIs_leaf(isLeaf);
+		tAddressDao.update(addr);
 	}
 
 	public void setTAddressDao(TAddressDao addressDao) {

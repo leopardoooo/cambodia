@@ -508,15 +508,15 @@ public class PayAction extends BaseBusiAction{
 	 */
 	public String saveInvoiceInfo()throws Exception{
 		String param = request.getParameter("invoiceInfo");
-		try{
-			if(param != null){
+//		try{
+//			if(param != null){
 				Type t = new TypeToken<List<InvoiceFromDto>>(){}.getType();
 				List<InvoiceFromDto> invoices = JsonHelper.gson.fromJson( param , t);
 				docService.saveInvoice(invoice_id,invoice_code,invoices);
-			}
-		}catch (Exception e) {
-			LoggerHelper.error(this.getClass(), "发票号保存出错"+e.getMessage()+" param="+param+"");
-		}
+//			}
+//		}catch (Exception e) {
+//			LoggerHelper.error(this.getClass(), "发票号保存出错"+e.getMessage()+" param="+param+"");
+//		}
 		return JSON_SUCCESS;
 	}
 

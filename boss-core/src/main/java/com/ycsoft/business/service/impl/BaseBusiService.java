@@ -1910,7 +1910,7 @@ public class BaseBusiService extends BaseService {
 		CCust cust = null;
 		for (WTaskUser userDevice:deviceList){
 			CUser user = userComponent.queryUserById(userDevice.getUser_id());
-			DeviceDto device = deviceComponent.queryDeviceByDeviceId(userDevice.getDevice_id());
+			DeviceDto device = deviceComponent.queryDeviceByDeviceCode(userDevice.getDevice_id());
 			setUserDeviceInfo(user, device);
 			userComponent.updateDevice(doneCode, user);
 			//发送授权
@@ -1933,7 +1933,7 @@ public class BaseBusiService extends BaseService {
 				ownership = SystemConstants.OWNERSHIP_CUST;
 			if (cust == null)
 				cust = custComponent.queryCustById(user.getCust_id());
-			this.buyDevice(device, user.getStr10(), ownership, null, getBusiParam().getBusiCode(), cust, doneCode);
+			this.buyDevice(device, user.getStr10(), ownership, null, BusiCodeConstants.TASK_FILL, cust, doneCode);
 		}
 	}
 	
