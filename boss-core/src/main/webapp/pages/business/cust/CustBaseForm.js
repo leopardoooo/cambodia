@@ -326,7 +326,8 @@ AddrCustSelectWin = Ext.extend( Ext.Window , {
  */
 LinkPanel = Ext.extend(Ext.Panel,{
 	parent : null,
-	constructor : function(){
+	constructor : function(p){
+		this.parent = p;
 		LinkPanel.superclass.constructor.call(this,{
 			layout : 'form',
 			anchor: '100%',
@@ -383,7 +384,11 @@ LinkPanel = Ext.extend(Ext.Panel,{
 						width : 130,
 						allowBlank:false,
 						name:'linkman.cert_num',
-						id: 'linkman_cert_num_el'
+						id: 'linkman_cert_num_el',
+						listeners: {
+							scope: this,
+							change: this.parent.generatePwd
+						}
 					},{
 						fieldLabel: langUtils.main("cust.base.mobile"),
 						name:'linkman.mobile',
@@ -559,16 +564,23 @@ CustBaseForm = Ext.extend( BaseForm , {
 						xtype:'paramcombo',
 						hiddenName: 'cust.str9',
 						paramName:'OPTR',
-						editable:true
+						editable:true,
+						allowBlank:false
 					}]
 				},{
 					id:'addCustItemsTwo',
 					items:[{
+							id: 'cust_pwd_id',
 							fieldLabel: langUtils.bc("common.pswd"),
-							allowBlank:false,
 							vtype : 'loginName',
 							xtype:'textfield',
 							name:'cust.password'
+						},{
+							fieldLabel: langUtils.main("cust.base.languageType"),
+							xtype: 'paramcombo',
+							paramName: 'LANGUAGE_TYPE',
+							allowBlank: false,
+							hiddenName:'cust.str6'
 						}]
 				}]
 			},{
@@ -723,5 +735,27 @@ CustBaseForm = Ext.extend( BaseForm , {
 			return obj;
 		}
 		return CustBaseForm.superclass.doValid.call(this);
+	},
+	generatePwd: function(field, custCertNum){
+		//如果没有输入密码，则根据证件号生成
+		//证件号后六位数字，如果数字不足6位就前补零补满六位，无证件号默认为'000000'
+		var pwdComp = Ext.getCmp('cust_pwd_id');
+		//新建开户时生成，修改客户不改变
+		if(pwdComp && App.getData().currentResource.busicode == '1001'){
+			var pwd = '000000';
+			if(custCertNum){
+					custCertNum = custCertNum.substring(custCertNum.length-6, custCertNum.length);
+					var ss = '';
+					for(var i=0,len=custCertNum.length;i<len;i++){
+						var s = custCertNum[i];
+						if(/[0-9]/.test(s)){
+							ss+=s;
+						}
+					}
+					pwd = String.leftPad(ss, 6, '0');
+			}
+			pwdComp.setValue(pwd);
+		}
+		
 	}
 });

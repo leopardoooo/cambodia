@@ -4,6 +4,12 @@
  * @class
  * @extends Ext.grid.GridPanel
  */
+
+var COMMON_LU = lsys('common');
+var DEV_COMMON_LU = lsys('DeviceCommon');
+var AUD_LU = lsys('AppUseDevice');
+var MSG_LU = lsys('msgBox');
+
 var AppUseGrid = Ext.extend(Ext.grid.GridPanel,{
 	appUseStore: null,
 	constructor:function(){
@@ -19,18 +25,18 @@ var AppUseGrid = Ext.extend(Ext.grid.GridPanel,{
 		var sm = new Ext.grid.RowSelectionModel({singleSelect:true});
 		var currentOptrId = App.data.optr['optr_id'];
 		var columns = [
-			{header:'领用单号',dataIndex:'procure_no',width:70},
-			{header:'领用部门',dataIndex:'procure_dept',width:80},
-			{header:'领用人',dataIndex:'procurer',width:75},
-			{header:'领用类型',dataIndex:'procure_type_text',width:65},
-			{header:'创建日期',dataIndex:'create_time',width:70,renderer:Ext.util.Format.dateFormat},
-			{header:'设备类型',dataIndex:'device_type_text',width:65},
-			{header:'型号',dataIndex:'device_model_text',width:150,renderer:App.qtipValue},
-			{header:'数量',dataIndex:'count',width:60},
-			{id:'appUse_remark_id',header:'备注',dataIndex:'remark',width:200},
-			{header:'操作',dataIndex:'device_done_code',width:65,renderer:function(v,meta,record){
+			{header:AUD_LU.labelProcureNo,dataIndex:'procure_no',width:70},
+			{header:AUD_LU.labelProcureDept,dataIndex:'procure_dept',width:80},
+			{header:AUD_LU.labelProcurer,dataIndex:'procurer',width:75},
+			{header:AUD_LU.labelProcureType,dataIndex:'procure_type_text',width:65},
+			{header:COMMON_LU.createDate,dataIndex:'create_time',width:70,renderer:Ext.util.Format.dateFormat},
+			{header:DEV_COMMON_LU.labelDeviceType,dataIndex:'device_type_text',width:65},
+			{header:DEV_COMMON_LU.labelDeviceModel,dataIndex:'device_model_text',width:150,renderer:App.qtipValue},
+			{header:DEV_COMMON_LU.labelNum,dataIndex:'count',width:60},
+			{id:'appUse_remark_id',header:COMMON_LU.remarkTxt,dataIndex:'remark',width:200},
+			{header:COMMON_LU.doActionBtn,dataIndex:'device_done_code',width:65,renderer:function(v,meta,record){
 					if(currentOptrId == record.get('optr_id')){
-						return "<a href='#' onclick=Ext.getCmp('appUseGridId').editProcureNo("+v+")>修改单号</a>";
+						return "<a href='#' onclick=Ext.getCmp('appUseGridId').editProcureNo("+v+")>" + DEV_COMMON_LU.titleModifyOrderNum + "</a>";
 					}
 					return null;
 				}
@@ -38,20 +44,20 @@ var AppUseGrid = Ext.extend(Ext.grid.GridPanel,{
 		];
 		AppUseGrid.superclass.constructor.call(this,{
 			id:'appUseGridId',
-			title:'领用信息',
+			title:DEV_COMMON_LU.labelApplyInfo,
 			border:false,
 			ds:this.appUseStore,
 			columns:columns,
 			autoExpandColumn:'appUse_remark_id',
 			sm:sm,
-			tbar:['-','输入关键字&nbsp;',
+			tbar:['-', COMMON_LU.inputKeyWork,
 				new Ext.ux.form.SearchField({  
 	                store: this.appUseStore,
 	                width: 200,
 	                hasSearch : true,
-	                emptyText: '支持领用编号模糊查询'
+	                emptyText: DEV_COMMON_LU.tipSupportFuzzyQuery
 	            }),'-','->','-',
-				{text:'设备领用',iconCls:'icon-hand',scope:this,handler:this.procureDevice},'-'
+				{text:AUD_LU._title,iconCls:'icon-hand',scope:this,handler:this.procureDevice},'-'
 			],
 			bbar: new Ext.PagingToolbar({store:this.appUseStore,pageSize:Constant.DEFAULT_PAGE_SIZE}),
 			listeners:{
@@ -97,11 +103,11 @@ var ProcureDetailWin = Ext.extend(Ext.Window,{
 				'device_model','device_model_text']
 		});
 		var columns = [
-			{header:'设备型号',dataIndex:'device_model_text',width:150,renderer:App.qtipValue},
-			{header:'设备编号',dataIndex:'device_code',width:150,renderer:App.qtipValue},
-			{header:'领用时间',dataIndex:'create_time',width:120},
-			{header:'领用人',dataIndex:'optr_name',width:90},
-			{header:'操作',dataIndex:'device_done_code',width:80,renderer:function(value){
+			{header:DEV_COMMON_LU.labelDeviceModel,dataIndex:'device_model_text',width:150,renderer:App.qtipValue},
+			{header:DEV_COMMON_LU.labelDevCode,dataIndex:'device_code',width:150,renderer:App.qtipValue},
+			{header:AUD_LU.labelProcureTime,dataIndex:'create_time',width:120},
+			{header:AUD_LU.labelProcurer,dataIndex:'optr_name',width:90},
+			{header:COMMON_LU.doActionBtn,dataIndex:'device_done_code',width:80,renderer:function(value){
 					return "<a href='#' onclick=Ext.getCmp('procureDetailInfoWinId').cancelProcure()>取消领用</a>";
 				}
 			}
@@ -110,8 +116,8 @@ var ProcureDetailWin = Ext.extend(Ext.Window,{
 			border:false,
 			store:this.dsStore,
 			columns:columns,
-			tbar:['输入设备编号：',
-				{xtype:'textfield',emptyText:'输入设备编号回车查询',scope:this,width:200,
+			tbar:[AUD_LU.deviceCodeNeeded,
+				{xtype:'textfield',emptyText:MSG_LU.needDevCode2Query,scope:this,width:200,
 					listeners:{
 						scope:this,
 						specialkey:this.doQuery
@@ -121,14 +127,14 @@ var ProcureDetailWin = Ext.extend(Ext.Window,{
 		});
 		ProcureDetailWin.superclass.constructor.call(this,{
 			id:'procureDetailInfoWinId',
-			title:'详细信息',
+			title:COMMON_LU.detailInfo,
 			closeAction:'close',
 			maximizable:false,
 			width:650,
 			height:300,
 			layout:'fit',
 			items:[this.grid],
-			buttons:[{text:'关闭',iconCls:'icon-close',scope:this,handler:function(){
+			buttons:[{text:COMMON_LU.cancel,iconCls:'icon-close',scope:this,handler:function(){
 					this.close();
 				}
 			}],
@@ -156,7 +162,7 @@ var ProcureDetailWin = Ext.extend(Ext.Window,{
 		}
 	},
 	cancelProcure:function(){
-		Confirm("确定取消领用吗?",this,function(){
+		Confirm(MSG_LU.confirmCancelApply,this,function(){
 			var record = this.grid.getSelectionModel().getSelected();
 			var deviceId = record.get('device_id');
 			var deviceDoneCode = record.get('device_done_code');
@@ -168,14 +174,14 @@ var ProcureDetailWin = Ext.extend(Ext.Window,{
 				},
 				scope:this,
 				success:function(res){
-					Alert('取消领用成功');
+					Alert(COMMON_LU.msg.actionSuccess);
 					this.dsStore.remove(record);
 				}
 			});
 		});
 	},
 	doCancelAll:function(){
-		Confirm("确定取消所有领用吗?",this,function(){
+		Confirm(MSG_LU.confirmCancelAllApply,this,function(){
 			var deviceDoneCode = this.dsStore.getAt(0).get('device_done_code');
 			Ext.Ajax.request({
 				url:'resource/Device!saveCancelProcure.action',
@@ -184,7 +190,7 @@ var ProcureDetailWin = Ext.extend(Ext.Window,{
 				},
 				scope:this,
 				success:function(res){
-					Alert('取消领用成功');
+					Alert(COMMON_LU.msg.actionSuccess);
 					this.close();
 				}
 			});
@@ -196,7 +202,7 @@ var ProcureNoWin = Ext.extend(Ext.Window, {
 	constructor: function(){
 		ProcureNoWin.superclass.constructor.call(this,{
 			id:'procureNoWinId',
-			title:'修改单号',
+			title:DEV_COMMON_LU.titleModifyOrderNum,
 			closeAction:'hide',
 			border:false,
 			maximizable:false,
@@ -205,13 +211,13 @@ var ProcureNoWin = Ext.extend(Ext.Window, {
 			items:[{id:'procureNoFormId',xtype:'form',border:false,
 				bodyStyle:'padding-top:10px',labelWidth:65,items:[
 					{xtype:'hidden',name:'deviceDoneCode'},
-					{xtype:'textfield',fieldLabel:'新单号',name:'procureNo',vtype:'alphanum',allowBlank:false}
+					{xtype:'textfield',fieldLabel:DEV_COMMON_LU.labelNewOrderNo,name:'procureNo',vtype:'alphanum',allowBlank:false}
 				]
 			}],
 			buttonAlign:'right',
 			buttons:[
-				{text:'保存',iconCls:'icon-save',scope:this,handler:this.doSave},
-				{text:'关闭',iconCls:'icon-close',scope:this,handler:function(){
+				{text:COMMON_LU.saveBtn,iconCls:'icon-save',scope:this,handler:this.doSave},
+				{text:COMMON_LU.cancel,iconCls:'icon-close',scope:this,handler:function(){
 						this.hide();
 					}
 				}
@@ -271,25 +277,25 @@ var ProcureForm = Ext.extend(Ext.form.FormPanel,{
 			items:[{
 					columnWidth:.5,layout:'form',defaults:{xtype:'textfield'},
 					items:[
-						{fieldLabel:'领用单号',name:'deviceProcure.procure_no',vtype:'alphanum',allowBlank:false},
-						{fieldLabel:'领用部门',name:'deviceProcure.procure_dept',allowBlank:false},
-						{fieldLabel:'领用人',name:'deviceProcure.procurer',allowBlank:false}
+						{fieldLabel:AUD_LU.labelProcureNo,name:'deviceProcure.procure_no',vtype:'alphanum',allowBlank:false},
+						{fieldLabel:AUD_LU.labelProcureDept,name:'deviceProcure.procure_dept',allowBlank:false},
+						{fieldLabel:AUD_LU.labelProcurer,name:'deviceProcure.procurer',allowBlank:false}
 					]
 				},
 				{
 					columnWidth:.5,layout:'form',
 					items:[
-						{fieldLabel:'领用类型',hiddenName:'deviceProcure.procure_type',xtype:'paramcombo'
+						{fieldLabel:AUD_LU.labelProcureType,hiddenName:'deviceProcure.procure_type',xtype:'paramcombo'
 							,paramName:'DEPOT_BUY_MODE',allowBlank:false},
-						{fieldLabel:'凭证类型',hiddenName:'deviceProcure.doc_type',xtype:'combo',allowBlank:false,
+						{fieldLabel:COMMON_LU.certType,hiddenName:'deviceProcure.doc_type',xtype:'combo',allowBlank:false,
 							store:new Ext.data.ArrayStore({
-								fields:['doc_type'],data:[['销售单'],['领导批条']]
+								fields:['doc_type'],data:AUD_LU.arrayDocType
 							}),displayField:'doc_type',valueField:'doc_type',triggerAction:'all',mode:'local'},
-						{fieldLabel:'缴费单号',name:'deviceProcure.doc_no',xtype:'textfield',vtype:'alphanum'}
+						{fieldLabel:AUD_LU.labelFeeNo,name:'deviceProcure.doc_no',xtype:'textfield',vtype:'alphanum'}
 					]
 				},{columnWidth:1,layout:'form',
 					items:[
-						{fieldLabel:'备注',name:'deviceProcure.remark',xtype:'textarea',height:65,anchor:'90%'}
+						{fieldLabel:COMMON_LU.remarkTxt,name:'deviceProcure.remark',xtype:'textarea',height:65,anchor:'90%'}
 					]}
 			]
 		});
@@ -357,7 +363,7 @@ var ProcureWin = Ext.extend(Ext.Window,{
 		this.procureGrid = new ProcureQueryDeviceGrid();
 		ProcureWin.superclass.constructor.call(this,{
 			id : 'procureWinId',
-			title:'设备领用',
+			title:AUD_LU._title,
 			closeAction:'hide',
 			maximizable:false,
 			width: 800,
@@ -366,8 +372,8 @@ var ProcureWin = Ext.extend(Ext.Window,{
 			layout:'border',
 			items:[this.procureForm,this.procureGrid],
 			buttonAlign:'right',
-			buttons:[{text:'保存',iconCls:'icon-save',scope:this,handler:this.doSave},
-				{text:'关闭',iconCls:'icon-close',scope:this,handler:function(){
+			buttons:[{text:COMMON_LU.saveBtn,iconCls:'icon-save',scope:this,handler:this.doSave},
+				{text:COMMON_LU.cancel,iconCls:'icon-close',scope:this,handler:function(){
 					this.hide();
 				}}],
 			listeners:{
@@ -396,7 +402,7 @@ var ProcureWin = Ext.extend(Ext.Window,{
 		},this);
 		
 		if(arr.length === 0 || Ext.isEmpty(arr[0]['device_code']) ){
-			Alert('请正确输入设备信息！');
+			Alert(MSG_LU.pleaseInputCorrectDevInfo);
 			return;
 		}
 		
@@ -411,7 +417,7 @@ var ProcureWin = Ext.extend(Ext.Window,{
 			success:function(res,opt){
 				mb.hide();// 隐藏提示框
 				mb = null;
-				Alert('添加成功',function(){
+				Alert(COMMON_LU.addSuccess,function(){
 					this.hide();
 					Ext.getCmp('appUseGridId').getStore().reload();
 				},this);
@@ -426,7 +432,7 @@ AppUseDevice = Ext.extend(Ext.Panel,{
 //		appUseDeviceGrid = new DeviceGrid();
 		CheckIn.superclass.constructor.call(this,{
 			id:'AppUseDevice',
-			title:'设备领用',
+			title:AUD_LU._title,
 			closable: true,
 			border : false ,
 			baseCls: "x-plain",

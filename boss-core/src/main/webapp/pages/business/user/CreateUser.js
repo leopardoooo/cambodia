@@ -208,11 +208,13 @@ UserBaseForm = Ext.extend( BaseForm , {
 			deviceCategoryEl.setEditable(true);
 			var deviceCodeEl = Ext.getCmp("deviceCodeEl");
 			deviceCodeEl.disable(true);
+			deviceCodeEl.allowBlank = true;
 		}else{
 			var deviceCategoryEl = Ext.getCmp("deviceCategoryEl");
 			deviceCategoryEl.setEditable(false);
 			var deviceCodeEl = Ext.getCmp("deviceCodeEl");
 			deviceCodeEl.enable(true);
+			deviceCodeEl.allowBlank = false;
 		}
 	},
 	doSelectUserType: function(c,r,i){
@@ -257,6 +259,15 @@ UserBaseForm = Ext.extend( BaseForm , {
 		}else{
 			fs.setVisible(false);
 			isAllowBlank(false);
+		}
+		
+		if(type == 'DTT'){
+			//施工回填选择框默认不勾选，且禁用掉，必须输入设备号
+			Ext.getCmp('boxTaskEl').setValue(false);
+			Ext.getCmp('boxTaskEl').setDisabled(true);
+		}else{
+			Ext.getCmp('boxTaskEl').setValue(true);
+			Ext.getCmp('boxTaskEl').setDisabled(false);
 		}
 		
 		// 手机终端

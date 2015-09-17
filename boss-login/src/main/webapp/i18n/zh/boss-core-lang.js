@@ -81,6 +81,7 @@ BCLang.home = {
 		cashPay: {
 			_title: '支付~',
 			pay: {
+				_stayTitle: '待支付项目~',
 				_title: '支付项目~',
 				columns: ['操作~', '业务名称~', '费用名称~', '实付金额~', '订单号~', '备注~', '数量~', '操作时间~', '费用编号~', '流水号~'],
 				buttons: ['保存~', '关闭~']
@@ -93,12 +94,12 @@ BCLang.home = {
 		// 客户面板
 		cust: {
 			base: {_title: "基本信息~",name: "客户名称~",busiId: "受理编号~",openDate: "开户日期~",addr: "地址~",status: "客户状态~",
-				type: "客户类型~",certType: "证件类型~",certNum: "证件号码~",linkMan: "联系人~",tel: "固定电话~",barthday: "出生日期~",
-				mobile: "手机号码~",areaCateory: "区域小区~",houseNetType: "服务类型~",houseManager: "小区客户经理~",
+				type: "客户类型~",certType: "证件类型~",certNum: "证件号码~",linkMan: "联系人~",tel: "手机号码1~",barthday: "出生日期~",
+				mobile: "手机号码2~",areaCateory: "区域小区~",houseNetType: "服务类型~",houseManager: "小区客户经理~",
 				houseOptr: "小区运维人员~",postalAddr: "邮寄地址~", remark: "备注~",
 				email: "邮箱~", sex: "性别~",postcode: '邮编~', blackList: '黑名单~',
 				agentName: "代理商~", deptName: "开户部门~", developName: "发展人~", businessLicence: "营业执照~", unitNumber: "单位税号~",
-				spkgSn: "协议编号~", cust_level: "客户级别~",switchCustTitle: '选择客户~'
+				spkgSn: "协议编号~", cust_level: "客户级别~",switchCustTitle: '选择客户~', languageType: '服务语言~'
 			},
 			_form: {
 				thinkCust: '意向客户~',
@@ -510,6 +511,7 @@ BCLang.msgBox = {
 	confirmEditBankPay:'确定该产品',
 	confirmBankResume:'确定要恢复卡扣吗?~',
 	confirmRenewCust:'去顶恢复客户状态吗?~',
+	commonSuccess: '业务操作成功!~',
 	
 	custHasUnSuitableDev:'该用户现在不能进行设备互换~',
 	custCantExchangeDev:'该用户现在不能进行设备互换~',
@@ -582,10 +584,10 @@ BCLang.msgBox = {
 	confirmSwitchThisCust: '确定要选择该客户吗?~',
 	confirmInvalidInvoice: "确定作废发票吗?~",
 	confirmRefreshCmd: '确定发送刷新指令吗?~',
-	confirmResendCmd: '确定重发开户指令?~',
+	confirmResendCmd: '确定指令重发吗?~',
 	noPreStopUser: '该用户没有进行预报停操作!~',
 	
-	phoneOrFixedPhoneMustBeEnterOne: '电话号码或固定电话必须输入一个!~',
+	phoneOrFixedPhoneMustBeEnterOne: '手机号码必须输入一个!~',
 	invalidAddressPlsReInput: '无效的客户地址，请重新输入!~',
 	intentionCustPlsChooseProvince: '意向客户请选择省!~',
 	rechargeCountMustBeGreaterThanZero: '金额需要大于0!~',

@@ -6,7 +6,7 @@ var CHECK_COMMON = lsys('DeviceCommon');
 var inputNo = {fieldLabel:CHECK_LU.labelInputNo,name:'deviceInput.input_no',xtype:'textfield',vtype:'alphanum',allowBlank:false}
 
 //备机
-var backup = {fieldLabel:CHECK_LU.labelBackUp,xtype:'paramcombo',paramName:'BOOLEAN',
+var backup = {fieldLabel:CHECK_COMMON.labelBackUp,xtype:'paramcombo',paramName:'BOOLEAN',
 		hiddenName:'deviceInput.backup',defaultValue:'F'
 };
 //新机
@@ -266,7 +266,7 @@ var FileForm = Ext.extend(Ext.form.FormPanel,{
 					]
 				},{columnWidth:1,layout:'form',
 					items:[
-						{id:'checkInFielId',fieldLabel:CHECK_LU.labelDevFile,name:'files',xtype:'textfield',inputType:'file',allowBlank:false,anchor:'95%',emptyText:''}	
+						{id:'checkInFielId',fieldLabel:CHECK_COMMON.labelDevFile,name:'files',xtype:'textfield',inputType:'file',allowBlank:false,anchor:'95%',emptyText:''}	
 						,remark
 				]}
 			]

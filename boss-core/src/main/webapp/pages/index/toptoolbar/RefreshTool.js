@@ -415,7 +415,7 @@ Ext.apply( App, {
  	},
  	openPay:function(){
  		App.getApp().menu.bigWindow.show({ text: langUtils.main("cashPay._title"),  attrs: {busiCode:'1027',
-					url: 'pages/business/pay/PayForm.js,pages/business/pay/PayPanel.js'}} ,{width: 790, height: 460});
+					url: 'pages/business/pay/PayForm.js,pages/business/pay/PayPanel.js'}} ,{width: 790, height: 550});
  	},
  	openBankPayment:function(){
 		App.getApp().data.currentResource = {busicode:'2000'};
@@ -523,4 +523,4 @@ Ext.apply( App, {
  		var btn = Ext.getCmp('doc_print_btn');
  		btn.setDisabled(shouldDisabled);
  	}
-});
+});	
