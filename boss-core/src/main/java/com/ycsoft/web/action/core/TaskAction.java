@@ -44,6 +44,7 @@ public class TaskAction extends BaseBusiAction{
 	private String resultType;
 	private String deviceCode;
 	private String deviceModel;
+	private String custId;
 
 
 	public String saveBugTask()throws Exception{
@@ -177,6 +178,11 @@ public class TaskAction extends BaseBusiAction{
 		return JSON_SUCCESS;
 	}
 	
+	
+	public String queryTaskByCustId()throws Exception{
+		getRoot().setRecords(snTaskService.queryTaskByCustId(custId));
+		return JSON_RECORDS;
+	}
 	/**
 	 * @return the cust_ids
 	 */
@@ -372,6 +378,16 @@ public class TaskAction extends BaseBusiAction{
 
 	public void setDeviceModel(String deviceModel) {
 		this.deviceModel = deviceModel;
+	}
+
+
+	public String getCustId() {
+		return custId;
+	}
+
+
+	public void setCustId(String custId) {
+		this.custId = custId;
 	}
 
 

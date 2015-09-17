@@ -38,12 +38,11 @@ public class WTaskBaseInfoDao extends BaseEntityDao<WTaskBaseInfo> {
 	 * @param county_id
 	 * @return
 	 */
-	public List<WTaskBaseInfo> queryTaskByCustId(String custId, String countyId) throws JDBCException {
-		String sql = " select t.*,tt.task_type_name,ttd.detail_type_name task_detail_type_name " +
-				" from w_task_base_info t ,t_task_detail_type ttd,t_task_type tt  " +
-				" where ttd.task_type_id=tt.task_type_id and ttd.detail_type_id =t.task_detail_type_id  " +
-				" and t.cust_id=? and t.county_id=? order by t.task_create_time desc";
-		return createQuery(sql, custId,countyId).list();
+	public List<TaskBaseInfoDto> queryTaskByCustId(String custId) throws JDBCException {
+		String sql = " select t.* " +
+				" from w_task_base_info t  " +
+				" where  t.cust_id=?  order by t.task_create_time desc";
+		return createQuery(TaskBaseInfoDto.class,sql, custId).list();
 	}
 
 	/**
