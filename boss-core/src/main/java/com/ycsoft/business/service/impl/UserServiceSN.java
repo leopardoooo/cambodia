@@ -1357,7 +1357,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		for (CFeeDevice fee:deviceFeeList){
 			if (fee.getReal_pay()>0 && fee.getStatus().equals(StatusConstants.PAY)){
 				feeComponent.saveDeviceFee(task.getCust_id(), fee.getAddr_id(), fee.getFee_id(), null, 
-						fee.getPay_type(), fee.getDevice_type(), fee.getDevice_id(),
+						SystemConstants.PAY_TYPE_UNPAY, fee.getDevice_type(), fee.getDevice_id(),
 						fee.getDevice_code(), null, null, null, null, fee.getDevice_model(), fee.getReal_pay()*-1,
 						doneCode, busiDoneCode, BusiCodeConstants.TASK_CANCEL, -1);
 			}
