@@ -4,6 +4,12 @@
  * @class
  * @extends Ext.grid.GridPanel
  */
+
+var COMMON_LU = lsys('common');
+var DEV_COMMON_LU = lsys('DeviceCommon');
+var CHE_OUT_LU = lsys('CheckOut');
+var MSG_LU = lsys('msgBox');
+
 var DeviceGrid = Ext.extend(Ext.grid.GridPanel,{
 	deviceGridStore :null,
 	constructor:function(cfg){
@@ -14,12 +20,12 @@ var DeviceGrid = Ext.extend(Ext.grid.GridPanel,{
 		});
 		
 		var columns = [
-			{header:'设备类型',dataIndex:'device_type_text',width:120},
-			{header:'型号',dataIndex:'device_model_text',width:120},
-			{header:'数量',dataIndex:'count',width:120}
+			{header:DEV_COMMON_LU.labelDeviceType,dataIndex:'device_type_text',width:120},
+			{header:DEV_COMMON_LU.labelDeviceModel,dataIndex:'device_model_text',width:120},
+			{header:DEV_COMMON_LU.labelNum,dataIndex:'count',width:120}
 		];
 		DeviceGrid.superclass.constructor.call(this,{
-			title:'设备明细',
+			title:DEV_COMMON_LU.labelDevDetail,
 			autoDestory:false,
 			region:'south',
 			height:150,
@@ -50,33 +56,33 @@ var QueryDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 		});
 		
 		doDel = function(){
-			Confirm('确定删除吗?',this,function(){
+			Confirm(MSG_LU.confirmDelete,this,function(){
 				that.getStore().remove(that.getSelectionModel().getSelected());
 			});
 		};
 		
 		var columns = [
-			{header:'编号(Modem_mac)',dataIndex:'device_code',width:150},//,editor:deviceCodeComp
-			{header:'类型',dataIndex:'device_type_text',width:70},
-			{header:'型号',dataIndex:'device_model_text',width:90},
+			{header:DEV_COMMON_LU.labelDevCode2,dataIndex:'device_code',width:150},//,editor:deviceCodeComp
+			{header:DEV_COMMON_LU.labelDeviceType,dataIndex:'device_type_text',width:70},
+			{header:DEV_COMMON_LU.labelDeviceModel,dataIndex:'device_model_text',width:90},
 			{header:'modem_mac',dataIndex:'modem_mac',width:75,hidden:true},
-			{header:'配对卡型号',dataIndex:'pair_device_model_text',width:90},
-			{header:'配对卡号',dataIndex:'pair_device_code',width:120},
-			{header:'配对MODEM型号',dataIndex:'pair_device_modem_model_text',width:90},
-			{header:'配对MODEM号',dataIndex:'pair_device_modem_code',width:120},
-			{header:'操作',dataIndex:'',width:40,renderer:function(value,metavalue,record,i){
-				return "<a href='#' onclick=doDel()>删除</a>";
+			{header:DEV_COMMON_LU.labelPairCardType,dataIndex:'pair_device_model_text',width:90},
+			{header:DEV_COMMON_LU.labelPairCardCode,dataIndex:'pair_device_code',width:120},
+			{header:DEV_COMMON_LU.labelPairModemType,dataIndex:'pair_device_modem_model_text',width:90},
+			{header:DEV_COMMON_LU.labelPairModemCode,dataIndex:'pair_device_modem_code',width:120},
+			{header:COMMON_LU.doActionBtn,dataIndex:'',width:40,renderer:function(value,metavalue,record,i){
+				return "<a href='#' onclick=doDel()>" + COMMON_LU.remove + "</a>";
 			}}
 		];
 		
 		QueryDeviceGrid.superclass.constructor.call(this,{
-			title:'设备信息',
+			title:DEV_COMMON_LU.titleDeviceInfo,
 			region:'center',
 			ds:this.queryDeviceGridStore,
 			clicksToEdit:1,
 			columns:columns,
 			sm:new Ext.grid.RowSelectionModel({}),
-			tbar:[{text:'添加',iconCls:'icon-add',scope:this,handler:this.doAdd}]
+			tbar:[{text:COMMON_LU.addNewOne,iconCls:'icon-add',scope:this,handler:this.doAdd}]
 		});
 	},
 	queryAndAddDevice:function(field,e){
@@ -124,12 +130,12 @@ var DeviceDetailGrid = Ext.extend(Ext.grid.GridPanel,{
 		});
 		
 		var columns = [
-			{header:'设备编号',dataIndex:'device_code',width:150,renderer:App.qtipValue},
-			{header:'所在仓库',dataIndex:'depot_id_text',width:120},
-			{header:'所在县市',dataIndex:'county_id_text',width:120}
+			{header:DEV_COMMON_LU.labelDevCode,dataIndex:'device_code',width:150,renderer:App.qtipValue},
+			{header:COMMON_LU.depotText,dataIndex:'depot_id_text',width:120},
+			{header:COMMON_LU.countyText,dataIndex:'county_id_text',width:120}
 		];
 		DeviceGrid.superclass.constructor.call(this,{
-			title:'操作明细',
+			title:COMMON_LU.optrDetail,
 			autoDestory:false,
 			region:'south',
 			height:250,
@@ -143,16 +149,16 @@ var DeviceDetailGrid = Ext.extend(Ext.grid.GridPanel,{
 });
 
 //设备类型
-var deviceType = {id:'device_type_id',fieldLabel:'设备类型',xtype:'paramcombo',
+var deviceType = {id:'device_type_id',fieldLabel:DEV_COMMON_LU.labelDeviceType,xtype:'paramcombo',
 		typeAhead:false,paramName:'DEVICE_TYPE',hiddenName:'deviceInput.device_type'
 };
 
 var checkFileType = function(fileText){
 	if(fileText.lastIndexOf('xlsx')>0 || fileText.lastIndexOf('.xlsx')==fileText.length-5){
-		Alert('请选择excel2003文件进行上传,文件后缀名为.xls!');
+		Alert(MSG_LU.pleaseUploadExcel2003);
 		return false;
 	}else if(fileText.lastIndexOf('.xls') ==-1 || fileText.lastIndexOf('.xls')!=fileText.length-4){
-		Alert('请选择excel文件进行上传！');
+		Alert(MSG_LU.pleaseUploadExcelFile);
 		return false;
 	}
 	return true;
