@@ -532,7 +532,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 		Confirm("确定要作废选中的工单吗?", this , function(){
 			App.sendRequest(
 				Constant.ROOT_PATH + "/core/x/Task!cancelTaskSn.action",
-				{task_id : rs.get('task_id')},
+				{task_id : rs.get('task_id'),taskType:rs.get('task_type_id')},
 				function(res,opt){
 					Alert('工单已作废!');
 					for(var i = 0; i< rs.length ; i++){
