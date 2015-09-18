@@ -1,9 +1,12 @@
 package com.ycsoft.business.component.core;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -1284,54 +1287,34 @@ public class UserComponent extends BaseBusiComponent {
 		pSpkgOpenuserDao.updateOpenUserDoneCode(spkgSn, doneCode);
 	}
 	
-//	public String toUtilValue(String custId,String userId,String tariffId,List<ProdTariffDto> tariffList) throws Exception{
-//		//查找用户基本信息
-//		CUser user = cUserDao.findByKey(userId);
-//		if (user == null)
-//			throw new ComponentException("用户不存在userId="+userId);
-//		CCust cust = cCustDao.findByKey(custId);
-//		if (cust == null)
-//			throw new ComponentException("客户不存在custId="+user.getCust_id());
-//		CUserAtv userAtv = new CUserAtv();
-//		CUserDtv userDtv = new CUserDtv();
-//		CUserBroadband userBroadband = new CUserBroadband();
-//		if (user.getUser_type().equals(SystemConstants.USER_TYPE_ATV))
-//			userAtv = cUserAtvDao.queryAtvById(user.getUser_id());
-//		else if (user.getUser_type().equals(SystemConstants.USER_TYPE_DTV))
-//			userDtv =  cUserDtvDao.queryDtvById(user.getUser_id());
-//		else if (user.getUser_type().equals(SystemConstants.USER_TYPE_BAND))
-//			userBroadband = cUserBroadbandDao.queryBandById(user.getUser_id());
-//		List<CFee> feeList = cFeeDao.queryUserFee(user.getCust_id(),userId);
-//		List<AcctitemDto> balanceList = cAcctAcctitemDao.queryAcctAndAcctItemByUserId(custId,userId,user.getCounty_id());
-//		List<CProdDto> prodList = cProdDao.queryUserProd(userId, user.getCounty_id());
-//		expressionUtil.setAllValue(cust, user, userDtv, userAtv,userBroadband, feeList, balanceList,prodList);
-//		expressionUtil.setCuserStb(cUserDao.queryUserStbByUserId(userId));
-//		String flag = "F";
-//		for (int i = tariffList.size() - 1; i >= 0; i--) {
-//			ProdTariffDto tariff = tariffList.get(i);
-//			if(StringHelper.isNotEmpty(tariff.getRule_id())){
-//				if (expressionUtil.parseBoolean(tariff.getRule_id_text())){
-//					if( tariff.getTariff_id().equals(tariffId)){
-//						flag = "T";
-//						break;
-//					}else{
-//						flag = tariff.getTariff_id();
-//					}
-//				}
-//			}else{
-//				if( tariff.getTariff_id().equals(tariffId)){
-//					flag = "T";
-//					break;
-//				}else{
-//					flag = tariff.getTariff_id();
-//				}
-//			}
-//		}
-//		return flag;
-//	}
-	
+	/**
+	 * ".用户开户和批量用户开户修改
+		开宽带用户时，自动生成的宽带账号。密码默认 c_cust.password
+		       生成规则 第一个宽带  cust_no+01+@+域名
+		                     第二个宽带  cust_no+02+@+域名
+		域名提取方法跟  cust_no的序列号一致。
+		OTT、OTT_MOBILE用户 账号生成规则  : 第一个OTT cust_no+61
+		                                     第二个OTT cust_no+62"
+
+	 */
 	public int queryMaxNumByLoginName(String custId, String custNo, String userType) throws Exception {
-		return cUserDao.queryMaxNumByLoginName(custId, custNo, userType);
+		List<String> list = cUserDao.queryLoginNameByUserType(custId, userType);
+		List<Integer> loginNameList = new ArrayList<Integer>();
+		boolean flag = userType.equals(SystemConstants.USER_TYPE_BAND);
+		for(String loginName : list){
+			if(flag && loginName.indexOf("@") > 0){
+				loginName = loginName.substring(0, loginName.indexOf("@"));
+			}
+			if(loginName.length() > custNo.length()){
+				loginName = loginName.substring(custNo.length());
+				String regex=".*[a-zA-Z]+.*";
+				Matcher m=Pattern.compile(regex).matcher(loginName);
+				if(!m.matches())
+					loginNameList.add( Integer.parseInt(loginName) );
+			}
+		}
+		return Collections.max(loginNameList);
+		
 	}
 	
 	public boolean validAccount(String name) throws Exception{
