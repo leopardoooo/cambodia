@@ -43,14 +43,14 @@ UserBaseForm = Ext.extend( BaseForm , {
 							select:this.doSelectUserType
 						}
 					}]
-				},{
+				}/*,{
 					items:[{
 						id:'userNameId',
 						fieldLabel: lmain("user.base.name"),
 						xtype:'textfield',
 						name:'user_name'
 					}]
-				}]
+				}*/]
 			},{
 				xtype:'panel',
 				anchor:'100%',
@@ -253,9 +253,12 @@ UserBaseForm = Ext.extend( BaseForm , {
 			
 			fs.setVisible(true);
 			isAllowBlank(false);
-		}else if(type === "OTT_MOBILE" || type === "OTT"){
+		}else if(type === "OTT_MOBILE"){
 			fs.setVisible(true);
 			isAllowBlank(true);
+		}else if(type === "OTT"){
+			fs.setVisible(true);
+			isAllowBlank(false);
 		}else{
 			fs.setVisible(false);
 			isAllowBlank(false);
