@@ -648,7 +648,7 @@ CustBaseForm = Ext.extend( BaseForm , {
 		this.remove(this.linkPanel,true);
 		this.remove(this.extAttrForm,true);
 		
-		this.linkPanel = new LinkPanel();
+		this.linkPanel = new LinkPanel(this);
 		if (custType == 'RESIDENT'){
 			this.doInitAttrForm(2);
 			this.add(this.linkPanel);
