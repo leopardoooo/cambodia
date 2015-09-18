@@ -144,6 +144,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		doneCodeComponent.lockCust(cust.getCust_id());
 		Integer doneCode = doneCodeComponent.gDoneCode();
 		List<CUser> users = new ArrayList<CUser>();
+		List<CUser> updateUsers = new ArrayList<CUser>();
 		
 		if(SystemConstants.BOOLEAN_TRUE.equals(isHand)){
 			// 获取客户信息
@@ -166,8 +167,13 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 					
 					user.setStop_type(stopType);
 					
-					int num = getUserCount(cust, user.getUser_type());
-					CUser newUser = this.openBatchSingle(cust, user, doneCode, null, deviceType, deviceModel, deviceBuyMode, deviceFee, num);
+					CUser newUser = this.openSingle(cust, user, doneCode, null, deviceType, deviceModel, deviceBuyMode, deviceFee);
+					if(!newUser.getUser_type().equals(SystemConstants.USER_TYPE_DTT)){
+						CUser cuser = new CUser();
+						cuser.setUser_id(newUser.getUser_id());
+						cuser.setLogin_name( generateUserName(cust.getCust_id(), user.getUser_type()) );
+						userComponent.updateUser(cuser);
+					}
 					users.add(newUser);
 				}
 			}
@@ -193,8 +199,13 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 					
 					user.setStop_type(stopType);
 					
-					int num = getUserCount(cust, user.getUser_type());
-					CUser newUser = this.openBatchSingle(cust, user, doneCode, null, deviceType, deviceModel, deviceBuyMode, deviceFee, num);
+					CUser newUser = this.openSingle(cust, user, doneCode, null, deviceType, deviceModel, deviceBuyMode, deviceFee);
+					if(!newUser.getUser_type().equals(SystemConstants.USER_TYPE_DTT)){
+						CUser cuser = new CUser();
+						cuser.setUser_id(newUser.getUser_id());
+						cuser.setLogin_name( generateUserName(cust.getCust_id(), user.getUser_type()) );
+						userComponent.updateUser(cuser);
+					}
 					users.add(newUser);
 				}
 			}
@@ -206,7 +217,6 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 			}
 			userComponent.updateOpenUserDoneCode(cust.getSpkg_sn(), doneCode);
 		}
-		
 		snTaskComponent.createOpenTask(doneCode, cust, users, getBusiParam().getWorkBillAsignType());
 		
 		saveAllPublic(doneCode, getBusiParam());
@@ -216,7 +226,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		int num = userComponent.queryMaxNumByLoginName(cust.getCust_id(), cust.getCust_no(), userType);
 		if(userType.equals(USER_TYPE_BAND)){
 			num += SystemConstants.USER_TYPE_BAND_NUM;
-		}else{
+		}else if(userType.equals(USER_TYPE_OTT) || userType.equals(USER_TYPE_OTT_MOBILE)){
 			if(num == 0){
 				num += SystemConstants.USER_TYPE_OTT_NUM;
 			}else{
@@ -226,13 +236,6 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		return num;
 	}
 	
-	private CUser openBatchSingle(CCust cust, CUser user, Integer doneCode, String deviceCode, String deviceType,
-			String deviceModel, String deviceBuyMode, FeeInfoDto deviceFee, int num) throws Exception, JDBCException {
-		openSingle(cust, user, doneCode, deviceCode, deviceType, deviceModel, deviceBuyMode, deviceFee);
-		user.setUser_name( generateUserName(cust.getCust_id(), user.getUser_type()) );
-		return user;
-	}
-
 	private CUser openSingle(CCust cust, CUser user, Integer doneCode, String deviceCode, String deviceType,
 			String deviceModel, String deviceBuyMode, FeeInfoDto deviceFee) throws Exception, JDBCException {
 		String custId = cust.getCust_id();
@@ -309,8 +312,6 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		return user;
 	}
 	
-	
-
 	/**
 	 * 验证ott_mobile账户是否唯一
 	 * @param name

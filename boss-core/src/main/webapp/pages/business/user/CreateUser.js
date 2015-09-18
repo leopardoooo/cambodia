@@ -246,14 +246,14 @@ UserBaseForm = Ext.extend( BaseForm , {
 				bandCount = "0" + bandCount;
 			}
 			
-			// 密码，默认证件号后六位
+			/*// 密码，默认证件号后六位
 			var newPswd = App.getApp().data.custFullInfo.cust.password;
 			Ext.getCmp("txtLoginName").setValue(App.getApp().data.custFullInfo.cust.cust_no + bandCount);
-			Ext.getCmp("txtLoginPswd").setValue(newPswd);
+			Ext.getCmp("txtLoginPswd").setValue(newPswd);*/
 			
-			fs.setVisible(false);
+			fs.setVisible(true);
 			isAllowBlank(false);
-		}else if(type === "OTT_MOBILE"){
+		}else if(type === "OTT_MOBILE" || type === "OTT"){
 			fs.setVisible(true);
 			isAllowBlank(true);
 		}else{
@@ -285,7 +285,22 @@ UserBaseForm = Ext.extend( BaseForm , {
 		Ext.getCmp("txtFeeEl").setRawValue("");
 		Ext.getCmp("dfFeeNameEl").setRawValue("");
 		Ext.getCmp('txtLoginName').setValue('');
-		Ext.getCmp('txtLoginPswd').setValue('');
+		Ext.getCmp('txtLoginPswd').setValue(App.getCust()['password']);
+		
+		if(type != 'DTT'){
+			Ext.Ajax.request({
+				scope : this,
+				url : root + '/core/x/User!generateUserName.action',
+				params : { 
+					custId: App.getCust()['cust_id'],
+					userType: type 
+				},
+				success : function(response,opts){
+					var obj = Ext.decode(response.responseText);
+					Ext.getCmp('txtLoginName').setValue(obj);
+				}
+			});
+		}
 		
 	},
 	setDisplayItems: function(bool){
@@ -439,6 +454,7 @@ UserBaseForm = Ext.extend( BaseForm , {
 				loginName: loginName
 			},
 			success: function(res,opt){
+				field.focus();
 			}
 		});
 	},

@@ -148,7 +148,7 @@ UserBaseBatchForm = Ext.extend( BaseForm , {
 						allowBlank: false,
 			            minValue: 1,
 			            maxValue: 5000,
-			            value: 2
+			            value: 1
 					},{
 						xtype:'checkbox',
 					    fieldLabel: lmain("user._form.manualOpen"),

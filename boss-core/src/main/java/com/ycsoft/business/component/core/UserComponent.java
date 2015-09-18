@@ -957,6 +957,10 @@ public class UserComponent extends BaseBusiComponent {
 //		this.removeUserWithHis(doneCode, oldUser);
 	}
 	
+	public void updateUser(CUser user) throws Exception {
+		cUserDao.update(user);
+	}
+	
 	/**
 	 * 加一点说明,以前的要求就是所有的都修改为主终端.
 	 * @param doneCode
