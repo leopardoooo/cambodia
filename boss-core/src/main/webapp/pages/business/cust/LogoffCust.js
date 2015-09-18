@@ -38,7 +38,7 @@ NewAcctItemGrid = Ext.extend(Ext.grid.GridPanel,{
 		});
 		
 		var publicAcctInfo;
-		var acctStore = App.getApp().main.infoPanel.acctPanel.acctGrid.getStore();
+		var acctStore = App.getApp().main.infoPanel.custPanel.acctItemGrid.getStore();
 		for(var i=0;i<acctStore.getCount();i++){
 			if(acctStore.getAt(i).get('acct_type') == 'PUBLIC'){
 				publicAcctInfo = acctStore.getAt(i).data;
@@ -46,8 +46,8 @@ NewAcctItemGrid = Ext.extend(Ext.grid.GridPanel,{
 			}
 		}
 		
-		if(publicAcctInfo.acctitems){
-			this.acctItemStore.loadData(publicAcctInfo.acctitems);
+		if(publicAcctInfo){
+			this.acctItemStore.loadData(publicAcctInfo);
 		}
 		
 		var cm = [
@@ -145,12 +145,12 @@ LogoffCust = new Ext.extend(BaseForm,{
 			}]
 		
 		});
-		var custDeviceGrid = App.getApp().main.infoPanel.getCustPanel().custDeviceGrid;
+		/*var custDeviceGrid = App.getApp().main.infoPanel.getCustPanel().custDeviceGrid;
 		if(custDeviceGrid.CustDeviceArray.length > 0){
 			this.confirmMsg = "确定回收自购的设备？";
 			this.yesBtn = true;
 			this.isCloseBigWin = true;
-		}
+		}*/
 	},
 	doSelectDealType : function(combo){
 		this.items.itemAt(1).remove(Ext.getCmp('refundFeeValue'));

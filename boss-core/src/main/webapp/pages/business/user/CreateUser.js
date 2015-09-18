@@ -43,14 +43,14 @@ UserBaseForm = Ext.extend( BaseForm , {
 							select:this.doSelectUserType
 						}
 					}]
-				},{
+				}/*,{
 					items:[{
 						id:'userNameId',
 						fieldLabel: lmain("user.base.name"),
 						xtype:'textfield',
 						name:'user_name'
 					}]
-				}]
+				}*/]
 			},{
 				xtype:'panel',
 				anchor:'100%',
@@ -200,6 +200,16 @@ UserBaseForm = Ext.extend( BaseForm , {
 			    }]
 			}]
 		});
+		
+		this.buyModeStore.on('load',function(){
+			this.buyModeStore.each(function(record){
+				if(record.get('buy_mode') == 'PRESENT'){
+					Ext.getCmp('deviceBuyMode').setValue('PRESENT');
+					this.doBuyModeSelect();
+					return false;
+				}
+			}, this);
+		}, this);
 	},
 	// 施工回填
 	doCheckedChangeTask: function(box, checked){
@@ -246,28 +256,39 @@ UserBaseForm = Ext.extend( BaseForm , {
 				bandCount = "0" + bandCount;
 			}
 			
-			// 密码，默认证件号后六位
+			/*// 密码，默认证件号后六位
 			var newPswd = App.getApp().data.custFullInfo.cust.password;
 			Ext.getCmp("txtLoginName").setValue(App.getApp().data.custFullInfo.cust.cust_no + bandCount);
-			Ext.getCmp("txtLoginPswd").setValue(newPswd);
+			Ext.getCmp("txtLoginPswd").setValue(newPswd);*/
 			
-			fs.setVisible(false);
+			fs.setVisible(true);
 			isAllowBlank(false);
 		}else if(type === "OTT_MOBILE"){
 			fs.setVisible(true);
 			isAllowBlank(true);
+		}else if(type === "OTT"){
+			fs.setVisible(true);
+			isAllowBlank(false);
 		}else{
 			fs.setVisible(false);
 			isAllowBlank(false);
+			
 		}
 		
 		if(type == 'DTT'){
 			//施工回填选择框默认不勾选，且禁用掉，必须输入设备号
 			Ext.getCmp('boxTaskEl').setValue(false);
 			Ext.getCmp('boxTaskEl').setDisabled(true);
+			
+			//DTT不用生成工单
+			if(Ext.getCmp('radioAssignWay'))
+				Ext.getCmp('radioAssignWay').allowBlank = true;
 		}else{
 			Ext.getCmp('boxTaskEl').setValue(true);
 			Ext.getCmp('boxTaskEl').setDisabled(false);
+			
+			if(Ext.getCmp('radioAssignWay'))
+				Ext.getCmp('radioAssignWay').allowBlank = false;
 		}
 		
 		// 手机终端
@@ -285,7 +306,22 @@ UserBaseForm = Ext.extend( BaseForm , {
 		Ext.getCmp("txtFeeEl").setRawValue("");
 		Ext.getCmp("dfFeeNameEl").setRawValue("");
 		Ext.getCmp('txtLoginName').setValue('');
-		Ext.getCmp('txtLoginPswd').setValue('');
+		Ext.getCmp('txtLoginPswd').setValue(App.getCust()['password']);
+		
+		if(type != 'DTT'){
+			Ext.Ajax.request({
+				scope : this,
+				url : root + '/core/x/User!generateUserName.action',
+				params : { 
+					custId: App.getCust()['cust_id'],
+					userType: type 
+				},
+				success : function(response,opts){
+					var obj = Ext.decode(response.responseText);
+					Ext.getCmp('txtLoginName').setValue(obj);
+				}
+			});
+		}
 		
 	},
 	setDisplayItems: function(bool){
@@ -439,6 +475,7 @@ UserBaseForm = Ext.extend( BaseForm , {
 				loginName: loginName
 			},
 			success: function(res,opt){
+				field.focus();
 			}
 		});
 	},

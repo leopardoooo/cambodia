@@ -219,7 +219,7 @@
         <!-- <parameter name="threadKeepAliveTimeUnit">MILLISECONDS</parameter>            -->
     </transportReceiver>
 	
-	<transportReceiver name="https" class="org.apache.axis2.transport.http.SimpleHTTPServer">
+	<transportReceiver name="https" class="org.apache.axis2.transport.http.AxisServletListener">
 	    <parameter name="port">8443</parameter>
 	</transportReceiver>
     

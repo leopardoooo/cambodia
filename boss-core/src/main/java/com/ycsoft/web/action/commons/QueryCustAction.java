@@ -18,6 +18,7 @@ import com.ycsoft.business.service.IQueryCustService;
 import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.helper.StringHelper;
+import com.ycsoft.daos.core.JDBCException;
 import com.ycsoft.daos.core.Pager;
 import com.ycsoft.web.commons.abstracts.BaseBusiAction;
 
@@ -516,6 +517,11 @@ public class QueryCustAction extends BaseBusiAction {
 	 */
 	public String queryCustBillWriteOff() throws Exception{
 		getRoot().setRecords(queryCustService.queryCustBillWriteOff(query));
+		return JSON_RECORDS;
+	}
+	
+	public String queryUnit() throws Exception {
+		getRoot().setRecords(queryCustService.queryUnit());
 		return JSON_RECORDS;
 	}
 	
