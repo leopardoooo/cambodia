@@ -72,4 +72,6 @@ https://boss.supernet.com.kh:8443/boss-core/services/BOSSWebServiceSoapImplServi
 === 
 以上配置不影响之前http端口的使用，包括winpay相关的支付接口：
 http://boss.supernet.com.kh:8080/boss-core/services/AgentPaymentService?wsdl
+
+如果不需要浏览器来测试，只需要1、2步骤即可。
     
