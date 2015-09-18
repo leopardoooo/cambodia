@@ -14,7 +14,6 @@ import java.util.Map;
 import org.springframework.stereotype.Component;
 
 import com.ycsoft.beans.core.bill.BillDto;
-import com.ycsoft.beans.core.common.CDoneCodeUnpay;
 import com.ycsoft.beans.core.fee.CFee;
 import com.ycsoft.beans.core.fee.CFeeAcct;
 import com.ycsoft.beans.core.fee.CFeeDevice;
@@ -52,25 +51,28 @@ public class CFeeDao extends BaseEntityDao<CFee> {
 	 */
 	public CFeeDao() {}
 
+	public FeeDto queryUnPayFeeDto(String feeSn) throws JDBCException{
+		String sql="select cf.*,fa.prod_sn from c_fee cf left join c_fee_acct fa on fa.fee_sn=cf.fee_sn where cf.fee_sn=? ";
+		return  this.createQuery(FeeDto.class, sql, feeSn).first();
+	}
 	/**
 	 * 更新缴费记录的未支付状态
 	 * @param cust_id
 	 * @param done_code
 	 * @throws JDBCException 
 	 */
-	public void updateCFeeToPay(CDoneCodeUnpay unpay,CFeePayDto pay,String isDoc) throws JDBCException{
+	public void updateCFeeToPay(String feeSn,String pay_optr_id,CFeePayDto pay,String isDoc) throws JDBCException{
 		String sql=StringHelper.append(
 				"update c_fee set status=? ,pay_type=?,",
 				" invoice_mode=?,invoice_id=?,invoice_book_id=?,invoice_code=?,",
-				" pay_sn=?,acct_date=?,busi_optr_id=?,",
+				" pay_sn=?,acct_date=sysdate,busi_optr_id=?,",
 				" is_doc=? ",
-				" where create_done_code=? and cust_id=? and optr_id=? and status=? ");
+				" where fee_sn=? and status=? ");
 		this.executeUpdate(sql, 
 				StatusConstants.PAY,pay.getPay_type(),
 				pay.getInvoice_mode(),pay.getInvoice_id(),pay.getInvoice_book_id(),pay.getInvoice_code(),
-				pay.getPay_sn(),pay.getAcct_date(),pay.getBusi_optr_id(),
-				isDoc,
-				unpay.getDone_code(),unpay.getCust_id(),unpay.getOptr_id(),StatusConstants.UNPAY);
+				pay.getPay_sn(),pay_optr_id,
+				isDoc,feeSn,StatusConstants.UNPAY);
 	}
 	/**
 	 * 查询待支付的总额
@@ -310,6 +312,12 @@ public class CFeeDao extends BaseEntityDao<CFee> {
 
 	}
 	
+	public List<CFee> queryByBusiDoneCode(Integer busiDoneCode,String countyId) throws Exception{
+		String sql = "select * from c_fee where busi_done_code=? and county_id=? ";
+		return createQuery(sql,busiDoneCode,countyId).list();
+
+	}
+	
 	public List<CFee> queryByInvoiceId(String feeSn,CInvoiceDto oldInvoice,String countyId) throws Exception{
 		String sql = "select * from c_fee where fee_sn <> ? and invoice_id = ? and invoice_code = ? and county_id = ? ";
 		return createQuery(sql,feeSn,oldInvoice.getInvoice_id(),oldInvoice.getInvoice_code(),countyId).list();
@@ -317,19 +325,19 @@ public class CFeeDao extends BaseEntityDao<CFee> {
 	}
 	
 	public List<CFee> querySumFeeByDoneCode(String custId,Integer doneCode, String countyId) throws Exception{
-		String sql = "select fee_id,null addr_id,sum(decode(status,'PAY',real_pay,'UNPAY',real_pay,0)) real_pay,sum(fd.buy_num) buy_num" +
+		String sql = "select fee_type,fee_id,null addr_id,sum(decode(status,'PAY',real_pay,'UNPAY',real_pay,0)) real_pay,sum(fd.buy_num) buy_num" +
 				" from c_fee f,c_fee_device fd " +
 				" where f.fee_sn=fd.fee_sn and f.cust_id=?" +
 				" and f.busi_done_code=? and f.county_id=? and fd.county_id=?" +
 				" and f.fee_type<> ?" +
-				" group by f.fee_id" +
+				" group by fee_type,f.fee_id" +
 				" union all " +
-				"select fee_id,max(f.addr_id) addr_id,sum(decode(status,'PAY',real_pay,'UNPAY',real_pay,0)) real_pay,1 buy_num" +
+				"select fee_type,fee_id,max(f.addr_id) addr_id,sum(decode(status,'PAY',real_pay,'UNPAY',real_pay,0)) real_pay,1 buy_num" +
 				" from c_fee f,c_fee_busi fd " +
 				" where f.fee_sn=fd.fee_sn and f.cust_id=?" +
 				" and f.busi_done_code=? and f.county_id=? and fd.county_id=?" +
 				" and f.fee_type<> ?" +
-				" group by f.fee_id";
+				" group by fee_type,f.fee_id";
 		return createQuery(sql, custId, doneCode, countyId, countyId,
 				SystemConstants.FEE_TYPE_ACCT, custId, doneCode, countyId,
 				countyId, SystemConstants.FEE_TYPE_ACCT).list();
@@ -632,6 +640,23 @@ public class CFeeDao extends BaseEntityDao<CFee> {
 				"and  f.county_id =?  and p.county_id=? and a.county_id=? and f.create_done_code=?";
 		return createQuery(CProd.class,sql, countyId,countyId,countyId,doneCode).list();
 	}
+	
+	public List<CFeeAcct> queryUserUnPayOrderFee(String custId,String[] userIds) throws JDBCException {
+		String sql = "select a.*,b.prod_sn from c_fee a,c_fee_acct b where a.fee_sn = b.fee_sn "+
+			  "	and b.prod_sn in ( "+
+			  "	select order_sn "+
+			  "	  from c_prod_order "+
+			  "	 where cust_id = ?  "+
+			  "	   and user_id in ("+sqlGenerator.in(userIds)+") "+
+			  "	   and package_sn is null "+
+			  "	union "+
+			  "	select package_sn order_sn "+
+			  "	  from c_prod_order "+
+			  "	 where cust_id = ? "+
+			  "	   and user_id in ("+sqlGenerator.in(userIds)+") "+
+			  "	   and package_sn is not null) and status='UNPAY'";	
+		return createQuery(CFeeAcct.class,sql,custId,custId).list();
+	} 
 
 
 }

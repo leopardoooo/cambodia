@@ -9,6 +9,7 @@ import java.util.Map;
 
 import com.ycsoft.beans.config.TAddress;
 import com.ycsoft.beans.config.TPayType;
+import com.ycsoft.beans.config.TProvince;
 import com.ycsoft.beans.config.TUpdateCfg;
 import com.ycsoft.beans.core.cust.CCustAddrNote;
 import com.ycsoft.beans.core.job.JOdscntRecord;
@@ -22,6 +23,7 @@ import com.ycsoft.beans.system.SSubSystem;
 import com.ycsoft.business.commons.abstracts.IBaseService;
 import com.ycsoft.business.dto.config.ExtendTableAttributeDto;
 import com.ycsoft.business.dto.config.TAddressDto;
+import com.ycsoft.business.dto.config.TAddressSysDto;
 import com.ycsoft.daos.core.JDBCException;
 import com.ycsoft.daos.core.Pager;
 import com.ycsoft.sysmanager.dto.system.SDeptDto;
@@ -249,4 +251,16 @@ public interface IQueryCfgService extends IBaseService {
 	public Map<String, String> queryProdFreeDay() throws Exception;
 
 	public Pager<CCustAddrNote> queryNoteCust(String addrId, Integer start, Integer limit)throws Exception;
+
+	public List queryAddressTree(String queryText, String addrId, SOptr optr)throws Exception;
+
+	public List queryDistrictByPid(String districtId)throws Exception;
+
+	public TAddress saveAddress(TAddressSysDto addrDto, String type)throws Exception;
+
+	public List<TProvince> queryProvince()throws Exception;
+
+	public void updateAddressStatus(String addrId, String status)throws Exception;
+
+	public void editAddress(TAddressSysDto addrDto)throws Exception;
 }

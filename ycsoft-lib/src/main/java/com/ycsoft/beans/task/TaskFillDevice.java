@@ -5,7 +5,7 @@ public class TaskFillDevice {
 	private String deviceModel;
 	private String deviceCode;
 	
-	String oldDeviceCode;
+	private String oldDeviceCode;
 
 	public String getDeviceId() {
 		return deviceId;

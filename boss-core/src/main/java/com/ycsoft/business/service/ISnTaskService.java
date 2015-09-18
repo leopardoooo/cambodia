@@ -62,7 +62,7 @@ public interface ISnTaskService {
 	 * @throws Exception
 	 */
 	public Pager<TaskBaseInfoDto> queryTask(String taskTypes,String addrIds,String beginDate,String endDate,
-			String taskId,String teamId,String status,
+			String taskId,String teamId,String status, 
 			String custNo,String custName,String custAddr,String mobile, Integer start, Integer limit) throws Exception;
 	
 	/**

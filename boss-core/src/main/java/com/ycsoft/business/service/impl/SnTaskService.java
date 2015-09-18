@@ -201,19 +201,19 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 	public Map<String , Object> queryTaskDetail(String task_id)throws Exception{
 		Map<String , Object> map = new HashMap<String, Object>();
 		List<TaskUserDto> userList = wTaskUserDao.queryUserDetailByTaskId(task_id);
-		if(userList.size()>0){
-			List<DeviceSmallDto> list = deviceComponent.getDeviceCodeByDeviceId(CollectionHelper.converValueToArray(userList, "device_id"));
-			if(list!=null && list.size()>0){
-				Map<String, DeviceSmallDto> deviceMap = CollectionHelper.converToMapSingle(list, "device_id");
-				if(deviceMap != null)
-				for(TaskUserDto dto: userList){
-					DeviceSmallDto device = deviceMap.get(dto.getDevice_id());
-					if(device != null){
-						dto.setDevice_code(device.getDevice_code());
-					}
-				}
-			}
-		}
+//		if(userList.size()>0){
+//			List<DeviceSmallDto> list = deviceComponent.getDeviceCodeByDeviceId(CollectionHelper.converValueToArray(userList, "device_id"));
+//			if(list!=null && list.size()>0){
+//				Map<String, DeviceSmallDto> deviceMap = CollectionHelper.converToMapSingle(list, "device_id");
+//				if(deviceMap != null)
+//				for(TaskUserDto dto: userList){
+//					DeviceSmallDto device = deviceMap.get(dto.getDevice_id());
+//					if(device != null){
+//						dto.setDevice_code(device.getDevice_code());
+//					}
+//				}
+//			}
+//		}
 		List<WTaskLog> logList = wTaskLogDao.queryByTaskId(task_id);
 		map.put("taskUserList", userList);
 		map.put("taskLogList", logList);	

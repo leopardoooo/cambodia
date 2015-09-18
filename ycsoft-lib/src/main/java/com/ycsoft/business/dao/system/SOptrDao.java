@@ -154,7 +154,7 @@ public class SOptrDao extends BaseEntityDao<SOptr> {
 	}
 	
 	public List<OptrDto> queryBusiOptrByCountyId(String countyId) throws Exception {
-		String sql = "select t.optr_id,t.optr_name from s_optr t where t.county_id=? and t.status=? and is_busi_optr='T'  ";
+		String sql = "select t.optr_id,t.optr_name from s_optr t where t.county_id=? and t.status=?";
 		return createQuery(OptrDto.class, sql, countyId, StatusConstants.ACTIVE).list();
 	}
 	

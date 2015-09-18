@@ -61,7 +61,12 @@ BCLang.common = {
 	yes: '是~',
 	print: '打印~',
 	cancel: '取消~',
-	no: '否~'
+	no: '否~',
+	update:'修改~',
+	forbiddenBtn:'禁用~',
+	enableBtn:'启用~',
+	cancelBtn:'取消~',
+	doActionBtn:'操作~'
 }
 //主页模块
 BCLang.home = {
@@ -256,12 +261,12 @@ BCLang.home = {
 			payfee: {
 				_title: "预存费用~",
 				columns: ["流水号~","业务名称~","账户类型~","账目名称~","用户类型~", "用户名~","设备编号~","状态~","金额~","缴费前预计到期日~",
-				        "缴费后预计到期日~","打印状态~","付款方式~","受理日期~","账务日期~","受理人~","受理部门~","发票~","出票方式~", "发票类型~"]
+				        "缴费后预计到期日~","打印状态~","付款方式~","受理日期~","账务日期~","受理人~","受理部门~","发票~","出票方式~", "发票类型~","发展人~"]
 			},
 			busifee: {
 				_title: "业务费用~",
 				columns: ["流水号~","费用名称~","设备类型~","设备编号~","状态~","打印状态~",
-				          "应付~","实付~","付款方式~","受理日期~","受理人~","受理部门~","发票~","出票方式~","发票类型~","购买数量~","设备型号~","备注~"]
+				          "应付~","实付~","付款方式~","受理日期~","受理人~","受理部门~","发票~","出票方式~","发票类型~","购买数量~","设备型号~","备注~","发展人~"]
 			},
 			detail: {
 				_title: '支付记录~',
@@ -271,7 +276,11 @@ BCLang.home = {
 			feePayDetail: {
 				_title: '费用明细~',
 				columns: ['费用项目~', '金额~']
-			}
+			},
+			_form: {
+					oldOptrName: '旧发展人~',
+					newOptrName: '新发展人~'
+				}
 		},
 		// 单据信息
 		doc: {
@@ -431,6 +440,44 @@ BCLang.home = {
 			stillEmptyInvoiceField:"还有为空的发票输入框!~",
 			hasDuplcateInvoice:"有重复的发票，请确认!~"
 			
+		},
+		AddressNodeManage: {//地址节点配置
+			panelTitle:'地址管理',//面板主标题
+			msg:{//各种提示消息
+				actionFailed:'操作失败',
+				actionSuccess:'操作成功',
+				confirmSave:'确认保存?',
+				confirmInvalid:'确认要禁用?',
+				confirmDelete:'确认要删除?',
+				confirmActivate:'确认要激活?',
+				cantDelete:'还有客户在使用，暂不能删除。',
+				cantBeInvalided:'存在子级别,无法禁用!',
+				maxDepthText: '不能再往下添加',
+				noSingleQuoteAllowed:'请不要输入单引号'
+				
+			},
+			formWin:{
+				labelSortNum:'序号',
+				labelProvince:'省',
+				labelDistrict:'行政区域',
+				labelNetType:'网络类型',
+				emptyTxtProvince:'请选择省',
+				emptyTxtBlurQuery:'支持模糊查询',
+				btnTxtClose:'关闭',
+				btnTxtSave:'保存',
+				labelRoadNum:'路号名称',
+				titleNewSaveLevelRoadNum:'平级新增路号',
+				labelStreatName:'街道名称',
+				titleNewSaveLevelStreet:'平级新增街道',
+				labelCityName:'城市名称',
+				titleNewSaveLevelCity:'平级新增城市',
+				labelShowName:'显示名称',
+				labelParentName:'上级名称',
+				
+				labelNewAddChild:'新增下级',
+				labelNewAddBrother:'新增平级',
+				labelAddrTree:'地址树'
+			}
 		}
 	}
 	

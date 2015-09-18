@@ -1693,7 +1693,7 @@ public class BaseBusiService extends BaseService {
 					hasUnpay=true;
 				}
 			}
-			if(hasUnpay&&doneCodeComponent.queryDoneCodeUnPayByKey(doneCode)==null){
+			if(hasUnpay){
 				//保存未支付业务
 				doneCodeComponent.saveDoneCodeUnPay(cust.getCust_id(), doneCode,this.getOptr().getOptr_id());
 			}
@@ -1832,9 +1832,8 @@ public class BaseBusiService extends BaseService {
 			String payType = SystemConstants.PAY_TYPE_UNPAY;
 			if (this.getBusiParam().getPay()!= null && this.getBusiParam().getPay().getPay_type() !=null)
 				payType = this.getBusiParam().getPay().getPay_type();
-			if(doneCodeComponent.queryDoneCodeUnPayByKey(doneCode)==null){
-				doneCodeComponent.saveDoneCodeUnPay(cust.getCust_id(), doneCode, getBusiParam().getOptr().getOptr_id());
-			}
+			doneCodeComponent.saveDoneCodeUnPay(cust.getCust_id(), doneCode, getBusiParam().getOptr().getOptr_id());
+			
 			feeComponent.saveDeviceFee( cust.getCust_id(), cust.getAddr_id(),fee.getFee_id(),fee.getFee_std_id(), 
 					payType,device.getDevice_type(), device.getDevice_id(), device.getDevice_code(),
 					null,
@@ -1911,7 +1910,7 @@ public class BaseBusiService extends BaseService {
 		CCust cust = null;
 		for (WTaskUser userDevice:deviceList){
 			CUser user = userComponent.queryUserById(userDevice.getUser_id());
-			DeviceDto device = deviceComponent.queryDeviceByDeviceId(userDevice.getDevice_id());
+			DeviceDto device = deviceComponent.queryDeviceByDeviceCode(userDevice.getDevice_id());
 			setUserDeviceInfo(user, device);
 			userComponent.updateDevice(doneCode, user);
 			//发送授权
@@ -1934,7 +1933,7 @@ public class BaseBusiService extends BaseService {
 				ownership = SystemConstants.OWNERSHIP_CUST;
 			if (cust == null)
 				cust = custComponent.queryCustById(user.getCust_id());
-			this.buyDevice(device, user.getStr10(), ownership, null, getBusiParam().getBusiCode(), cust, doneCode);
+			this.buyDevice(device, user.getStr10(), ownership, null, BusiCodeConstants.TASK_FILL, cust, doneCode);
 		}
 	}
 	

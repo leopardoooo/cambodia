@@ -377,5 +377,7 @@ public interface IUserService extends IBaseService{
 	List<PSpkgOpenuser> querySpkgUser(String custId) throws Exception;
 
 	List<PSpkgOpenbusifee> querySpkgOpenFee(String custId) throws Exception;
+	
+	public void cancelInstallTask(String taskId) throws Exception;
 
 }

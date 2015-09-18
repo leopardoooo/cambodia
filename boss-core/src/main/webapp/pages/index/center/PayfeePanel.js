@@ -43,7 +43,8 @@ AcctFeeGrid = Ext.extend(Ext.ux.Grid, {
 				{header:lc[16],dataIndex:'dept_name',width:80},
 				{header:lc[17],dataIndex:'invoice_id',width:80},
 				{header:lc[18],dataIndex:'invoice_mode_text',width:80},
-				{header:lc[19],dataIndex:'doc_type_text',width:80}
+				{header:lc[19],dataIndex:'doc_type_text',width:80},
+				{header:lc[20],dataIndex:'busi_optr_name',width:80, renderer:App.qtipValue}
 	        ]
 	     });
 		
@@ -166,7 +167,8 @@ BusiFeeGrid = Ext.extend(Ext.ux.Grid, {
 				{header:lc[11],dataIndex:'dept_name',width:80},
 				{header:lc[12],dataIndex:'invoice_id',width:90},
 				{header:lc[13],dataIndex:'invoice_mode_text',width:80},
-				{header:lc[14],dataIndex:'doc_type_text',width:80}
+				{header:lc[14],dataIndex:'doc_type_text',width:80},
+				{header:lc[18],dataIndex:'busi_optr_name',width:80, renderer:App.qtipValue}
 	        ]
 	      });
 		

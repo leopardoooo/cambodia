@@ -379,6 +379,13 @@ TopToolbar = Ext.extend(Ext.Toolbar , {
 			});
 		}
 		win.show();
+	},
+	showAddressViewWin : function(){
+		var win = Ext.getCmp('AddressViewWinId');
+		if(!win)
+			win = new AddressViewWin();
+		win.show();
+//		new AddressViewWin().show();
 	}
 	
 });

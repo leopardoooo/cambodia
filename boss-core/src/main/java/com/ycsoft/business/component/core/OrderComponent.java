@@ -48,6 +48,7 @@ import com.ycsoft.business.dao.core.user.CUserDao;
 import com.ycsoft.business.dao.prod.PPackageProdDao;
 import com.ycsoft.business.dao.prod.PProdDao;
 import com.ycsoft.business.dao.prod.PProdTariffDisctDao;
+import com.ycsoft.business.dto.core.fee.FeeDto;
 import com.ycsoft.business.dto.core.prod.OrderProd;
 import com.ycsoft.business.dto.core.prod.OrderProdPanel;
 import com.ycsoft.business.dto.core.prod.PackageGroupUser;
@@ -1426,10 +1427,12 @@ public class OrderComponent extends BaseBusiComponent {
 	 * @param feeType
 	 * @throws Exception 
 	 */
-	public void updateOrderFeeTypeByPayType(List<CDoneCodeUnpay> upPayDoneCodes,String payType) throws Exception{
+	public void updateOrderFeeTypeByPayType(List<FeeDto> feeList,String payType) throws Exception{
 		String feeType=tPayTypeDao.findByKey(payType).getAcct_feetype();
-		for(CDoneCodeUnpay unPay:upPayDoneCodes){
-			cProdOrderFeeDao.updateFeeType(unPay.getDone_code(), feeType);
+		for(FeeDto fee:feeList){
+			if(StringHelper.isNotEmpty(fee.getProd_sn())){
+				cProdOrderFeeDao.updateFeeType(fee.getProd_sn(),fee.getCreate_done_code(), feeType);
+			}
 		}
 	}
 	
