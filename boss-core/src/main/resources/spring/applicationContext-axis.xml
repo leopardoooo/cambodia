@@ -15,6 +15,7 @@
 	</bean>
 	
 	<bean id="bossWebServiceSoapImplServiceSkeleton" class="com.sysway.outwardtps.service.cfocn.BOSSWebServiceSoapImplServiceSkeleton">
+		<property name="snTaskService" ref="snTaskService"></property>
 	</bean>
 	
 </beans>
