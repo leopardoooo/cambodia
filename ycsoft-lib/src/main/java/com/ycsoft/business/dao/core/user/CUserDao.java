@@ -494,31 +494,20 @@ public class CUserDao extends BaseEntityDao<CUser> {
 		return this.count(sql, name) > 0;
 	}
 	
-	public int queryMaxNumByLoginName(String custId, String custNo, String userType) throws Exception {
-		/**
-		 * ".用户开户和批量用户开户修改
-			开宽带用户时，自动生成的宽带账号。密码默认 c_cust.password
-			       生成规则 第一个宽带  cust_no+01+@+域名
-			                     第二个宽带  cust_no+02+@+域名
-			域名提取方法跟  cust_no的序列号一致。
-			OTT用户 账号生成规则  : 第一个OTT cust_no+61
-			                                     第二个OTT cust_no+62"
-
-		 */
-		String sql = "";
-		if(userType.equals(SystemConstants.USER_TYPE_BAND)) {
-			sql = "select nvl(max(num),0) from ("
-				+ " select to_number(substr(t.login_name, length(?)+2, instr(t.login_name, '@')-length(?)-2)) num from c_user t where t.cust_id=? and user_type=?"
-				+ " union all "
-				+ " select to_number(substr(t.login_name, length(?)+2, instr(t.login_name, '@')-length(?)-2)) num from c_user_his t where t.cust_id=? and user_type=?)";
-			return Integer.parseInt( this.findUnique(sql, custNo, custNo, custId, userType, custNo, custNo, custId, userType) );
+	public List<String> queryLoginNameByUserType(String custId, String userType) throws Exception {
+		String sql = "select t.login_name from c_user t where t.cust_id=? and t.user_type=? and t.login_name is not null"
+				+ " union all"
+				+ " select t.login_name from c_user_his t where t.cust_id=? and t.user_type=? and t.login_name is not null";
+		if(!userType.equals(SystemConstants.USER_TYPE_BAND)){
+			sql = "select t.login_name from c_user t where t.cust_id=? and t.user_type in (?,?) and t.login_name is not null"
+					+ " union all"
+					+ " select t.login_name from c_user_his t where t.cust_id=? and t.user_type in (?,?) and t.login_name is not null";
+			return this.findUniques(sql, custId, SystemConstants.USER_TYPE_OTT, SystemConstants.USER_TYPE_OTT_MOBILE, 
+					custId, SystemConstants.USER_TYPE_OTT, SystemConstants.USER_TYPE_OTT_MOBILE);
 		}else{
-			sql = "select nvl(max(num),0) from ("
-					+ " select to_number(substr(t.login_name, length(?)+1,length(t.login_name)-length(?))) num from c_user t where t.cust_id=? and user_type=?"
-					+ " union all "
-					+ " select to_number(substr(t.login_name, length(?)+1,length(t.login_name)-length(?))) num from c_user_his t where t.cust_id=? and user_type=?)";
-			return Integer.parseInt( this.findUnique(sql, custNo, custNo, custId, userType, custNo, custNo, custId, userType) );
+			return this.findUniques(sql, custId, userType, custId, userType);
 		}
+		
 	}
 	
 	/**

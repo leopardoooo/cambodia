@@ -6,12 +6,17 @@
  */
 package com.sysway.outwardtps.service.cfocn;
 
+import com.ycsoft.business.service.impl.SnTaskService;
+
 /**
  *  BOSSWebServiceSoapImplServiceSkeleton java skeleton for the axisService
  */
 public class BOSSWebServiceSoapImplServiceSkeleton
     implements BOSSWebServiceSoapImplServiceSkeletonInterface {
-    /**
+    
+	private SnTaskService snTaskService;
+	
+	/**
      * Auto generated method signature
      *
      * @param replyManuallyInfluencedWorkOrder0
@@ -45,8 +50,13 @@ public class BOSSWebServiceSoapImplServiceSkeleton
      */
     public com.sysway.outwardtps.service.cfocn.DeviceFeedBackResponseE deviceFeedBack(
         com.sysway.outwardtps.service.cfocn.DeviceFeedBackE deviceFeedBack4) {
+    	
         //TODO : fill this with the necessary business logic
         throw new java.lang.UnsupportedOperationException("Please implement " +
             this.getClass().getName() + "#deviceFeedBack");
     }
+
+	public void setSnTaskService(SnTaskService snTaskService) {
+		this.snTaskService = snTaskService;
+	}
 }

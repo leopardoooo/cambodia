@@ -1,4 +1,3 @@
-
 package com.ycsoft.business.service.impl;
 
 import static com.ycsoft.commons.constants.SystemConstants.ACCT_TYPE_SPEC;
@@ -96,8 +95,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		doneCodeComponent.lockCust(cust.getCust_id());
 		
 		Integer doneCode = doneCodeComponent.gDoneCode();
-		int num = getUserCount(cust, user.getUser_type());
-		openSingle(cust, user, doneCode, deviceCode, deviceType, deviceModel, deviceBuyMode, deviceFee, num);
+		openSingle(cust, user, doneCode, deviceCode, deviceType, deviceModel, deviceBuyMode, deviceFee);
 		
 		String userType = user.getUser_type();
 		//若没有设备号，新增工单
@@ -114,6 +112,23 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		getBusiParam().addUser(user);
 		saveAllPublic(doneCode, getBusiParam());
 
+	}
+	
+	public String generateUserName(String custId, String userType) {
+		String userName = "";
+		try {
+			CCust cust = custComponent.queryCustById(custId);
+			int num = getUserCount(cust, userType);
+			if (userType.equals(USER_TYPE_BAND)) {
+				String domainName = custComponent.getDomainByAddr(cust.getAddr_id());
+				userName = cust.getCust_no() + "0" + num + "@" + domainName;
+			} else {
+				userName = cust.getCust_no() + "" + num;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return userName;
 	}
 	
 	private void canOpenUser(CCust cust) throws Exception {
@@ -152,7 +167,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 					user.setStop_type(stopType);
 					
 					int num = getUserCount(cust, user.getUser_type());
-					CUser newUser = this.openSingle(cust, user, doneCode, null, deviceType, deviceModel, deviceBuyMode, deviceFee, num);
+					CUser newUser = this.openBatchSingle(cust, user, doneCode, null, deviceType, deviceModel, deviceBuyMode, deviceFee, num);
 					users.add(newUser);
 				}
 			}
@@ -179,7 +194,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 					user.setStop_type(stopType);
 					
 					int num = getUserCount(cust, user.getUser_type());
-					CUser newUser = this.openSingle(cust, user, doneCode, null, deviceType, deviceModel, deviceBuyMode, deviceFee, num);
+					CUser newUser = this.openBatchSingle(cust, user, doneCode, null, deviceType, deviceModel, deviceBuyMode, deviceFee, num);
 					users.add(newUser);
 				}
 			}
@@ -201,7 +216,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		int num = userComponent.queryMaxNumByLoginName(cust.getCust_id(), cust.getCust_no(), userType);
 		if(userType.equals(USER_TYPE_BAND)){
 			num += SystemConstants.USER_TYPE_BAND_NUM;
-		}else if(userType.equals(USER_TYPE_OTT)){
+		}else{
 			if(num == 0){
 				num += SystemConstants.USER_TYPE_OTT_NUM;
 			}else{
@@ -210,9 +225,16 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		}
 		return num;
 	}
+	
+	private CUser openBatchSingle(CCust cust, CUser user, Integer doneCode, String deviceCode, String deviceType,
+			String deviceModel, String deviceBuyMode, FeeInfoDto deviceFee, int num) throws Exception, JDBCException {
+		openSingle(cust, user, doneCode, deviceCode, deviceType, deviceModel, deviceBuyMode, deviceFee);
+		user.setUser_name( generateUserName(cust.getCust_id(), user.getUser_type()) );
+		return user;
+	}
 
 	private CUser openSingle(CCust cust, CUser user, Integer doneCode, String deviceCode, String deviceType,
-			String deviceModel, String deviceBuyMode, FeeInfoDto deviceFee, int num) throws Exception, JDBCException {
+			String deviceModel, String deviceBuyMode, FeeInfoDto deviceFee) throws Exception, JDBCException {
 		String custId = cust.getCust_id();
 		
 		String user_id = userComponent.gUserId();
@@ -234,6 +256,12 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 			device.setDevice_model(deviceModel);
 		}
 		
+		//验证band账号名
+		if(StringHelper.isNotEmpty(user.getLogin_name()))
+			this.validAccount(user.getLogin_name());
+		if(StringHelper.isEmpty(user.getPassword()))
+			user.setPassword(cust.getPassword());
+		
 		//设置OTT用户终端类型和默认用户名
 		String userType = user.getUser_type();
 		if (userType.equals(USER_TYPE_OTT)) {
@@ -254,13 +282,8 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 					user.setTerminal_type(SystemConstants.USER_TERMINAL_TYPE_ZZD);
 				}
 			}
-			
-			user.setLogin_name(cust.getCust_no()+""+num);
-		}else if(userType.equals(USER_TYPE_BAND)){
-			String domainName = custComponent.getDomainByAddr(cust.getAddr_id());
-			user.setLogin_name(cust.getCust_no()+"0"+num+"@"+domainName);
 		}
-		user.setPassword(cust.getPassword());
+		
 		TDeviceBuyMode buyModeCfg = busiConfigComponent.queryBuyMode(deviceBuyMode);
 		//处理设备和授权
 		if (!user.getUser_type().equals(USER_TYPE_OTT_MOBILE)){
@@ -274,9 +297,6 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 				Integer months = Integer.parseInt( userComponent.queryTemplateConfig(TemplateConfigDto.Config.PROTOCOL_DATE_MONTHS.toString()) );
 				user.setProtocol_date( DateHelper.addTypeDate(DateHelper.now(), "MONTH", months) );
 			}
-//			if(buyModeCfg != null){
-//				user.setStr9(buyModeCfg.getBuy_mode());
-//			}
 		}
 		
 		userComponent.createUser(user);

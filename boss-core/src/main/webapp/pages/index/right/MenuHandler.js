@@ -767,7 +767,7 @@ Ext.apply(MenuHandler, {
 	},
 	EditPay : function() {
 		return {
-			width : 600,
+			width : 650,
 			height : 400
 		};
 	},

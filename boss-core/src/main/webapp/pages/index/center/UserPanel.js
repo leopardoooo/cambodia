@@ -80,7 +80,7 @@ UserGrid = Ext.extend(Ext.ux.Grid,{
     		columns : [
             sm,
 			{header:lmain("user.base.type"),dataIndex:'user_type_text',width:80},
-			{header:lmain("user.base.name"),dataIndex:'user_name',	width:80, renderer:App.qtipValue},
+			{header:lmain("user.base.name"),dataIndex:'user_name',	width:120, renderer:App.qtipValue},
 			{header:lmain("user.base.status"),dataIndex:'status_text',	width:60,renderer:Ext.util.Format.statusShow},
 			{header:lmain("user.base.statusTime"),dataIndex:'status_date',	width:100,renderer:Ext.util.Format.dateFormat},
 			{header:lmain("user.base.stbId"),dataIndex:'stb_id',	width:130,renderer:App.qtipValue},

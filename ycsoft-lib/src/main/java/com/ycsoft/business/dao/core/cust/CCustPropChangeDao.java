@@ -56,14 +56,14 @@ public class CCustPropChangeDao extends BaseEntityDao<CCustPropChange> {
 				",case when a.column_name='addr_id' then (select adr.addr_name from  t_address adr where adr.addr_id=a.new_value) else a.new_value end new_value,a.change_time,b.comments column_name_text,b.param_name " +
 				" from c_cust_prop_change a,t_tab_define b " +
 				" where a.column_name=b.column_name " +
-				" and b.table_name='CCUST' and b.status =? " +
+				" and b.table_name='CCUST' and a.column_name<>'password' and b.status =? " +
 				" and a.cust_id=?" +
 				" and a.county_id=?" +
 				" union " +
 				"select a.column_name,a.old_value,a.new_value,a.change_time,t.attribute_name column_name_text,t.param_name"+
 				" from c_cust_prop_change a,  t_extend_attribute t,t_extend e"+
 				" where a.column_name = t.col_name and t.extend_id=e.extend_id" + custTypeSql +
-				" and e.extend_table='C_CUST' and a.cust_id=? and a.county_id=?"+
+				" and e.extend_table='C_CUST' and a.column_name<>'password' and a.cust_id=? and a.county_id=?"+
 				" ) order by change_time desc";
 		return this.createQuery(CCustPropChange.class , sql, StatusConstants.ACTIVE,custId, countyId, custId, countyId).list();
 

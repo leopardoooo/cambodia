@@ -601,8 +601,8 @@ Ext.apply(App.func,{
 					return true;
 				}
 				if (data['status']=='INVALID' || (data['busi_fee']=='F' && data['busi_code'] !='1007' 
-				&& data['busi_code'] !='1008' && data['busi_code'] !='1009' 
-				&& data['busi_code'] !='1013' && data['busi_code'] !='1108'
+				&& data['busi_code'] !='1008'  && data['busi_code'] !='1013' && data['busi_code'] !='1009'
+				 && data['busi_code'] !='1108' && data['busi_code'] !='1109'
 				) || App.getCust().status=='RELOCATE' || (Ext.isEmpty(data['real_pay']) && Ext.isEmpty(data['fee_id'])) )
 					return false;
 			}

@@ -99,7 +99,7 @@ public enum ErrorCode {
 	DTTIsNotDouble("DTT用户不能使用双向设备!"),
 	
 	UserLoginNameIsNotExistsOrIsNotOttMobile("账号不存在或不是ott_mobile用户"),
-	
+	EditFeeUnPayError("未支付中存在购买配件或批量购买配件操作，请使用取消订单功能"),
 	BusiCodeCanNotCancel("该业务不能回退（%s）"),
 	
 	/**OTT接口相关错误码**/
