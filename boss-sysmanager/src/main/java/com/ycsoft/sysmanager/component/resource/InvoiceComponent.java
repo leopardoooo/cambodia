@@ -411,6 +411,19 @@ public class InvoiceComponent extends BaseComponent {
 			dto.setInvoiceDetailList(detail);	
 		return dto;
 	}
+	
+	/**
+	 * 根据发票id查询发票详细信息
+	 * @param invoiceId
+	 * @return
+	 * @throws Exception
+	 */
+	public InvoiceDto queryInvoiceDetailByInvoiceId(String invoiceId,String invoiceCode) throws Exception {
+		InvoiceDto invoice = rInvoiceDao.queryInvoiceById(invoiceId,invoiceCode);
+		List<InvoiceDetailDto> detail = rInvoiceDao.queryDetail(invoiceId,invoice.getInvoice_book_id(),invoice.getInvoice_code());
+		invoice.setInvoiceDetailList(detail);
+		return invoice;
+	}
 
 	/**
 	 * 多条件查询发票及客户信息
