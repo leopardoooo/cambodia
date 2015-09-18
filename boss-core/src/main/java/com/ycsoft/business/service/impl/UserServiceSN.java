@@ -1,4 +1,3 @@
-
 package com.ycsoft.business.service.impl;
 
 import static com.ycsoft.commons.constants.SystemConstants.ACCT_TYPE_SPEC;
@@ -48,6 +47,7 @@ import com.ycsoft.business.dao.core.prod.CProdOrderFeeDao;
 import com.ycsoft.business.dao.task.WTaskBaseInfoDao;
 import com.ycsoft.business.dao.task.WTaskUserDao;
 import com.ycsoft.business.dto.config.TemplateConfigDto;
+import com.ycsoft.business.dto.core.acct.PayDto;
 import com.ycsoft.business.dto.core.cust.CustFullInfoDto;
 import com.ycsoft.business.dto.core.fee.BusiFeeDto;
 import com.ycsoft.business.dto.core.fee.FeeInfoDto;
@@ -69,6 +69,7 @@ import com.ycsoft.commons.helper.DateHelper;
 import com.ycsoft.commons.helper.JsonHelper;
 import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.daos.core.JDBCException;
+import com.ycsoft.daos.helper.BeanHelper;
 @Service
 public class UserServiceSN extends BaseBusiService implements IUserService {
 
@@ -93,8 +94,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		doneCodeComponent.lockCust(cust.getCust_id());
 		
 		Integer doneCode = doneCodeComponent.gDoneCode();
-		int num = getUserCount(cust, user.getUser_type());
-		openSingle(cust, user, doneCode, deviceCode, deviceType, deviceModel, deviceBuyMode, deviceFee, num);
+		openSingle(cust, user, doneCode, deviceCode, deviceType, deviceModel, deviceBuyMode, deviceFee);
 		
 		String userType = user.getUser_type();
 		//若没有设备号，新增工单
@@ -111,6 +111,23 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		getBusiParam().addUser(user);
 		saveAllPublic(doneCode, getBusiParam());
 
+	}
+	
+	public String generateUserName(String custId, String userType) {
+		String userName = "";
+		try {
+			CCust cust = custComponent.queryCustById(custId);
+			int num = getUserCount(cust, userType);
+			if (userType.equals(USER_TYPE_BAND)) {
+				String domainName = custComponent.getDomainByAddr(cust.getAddr_id());
+				userName = cust.getCust_no() + "0" + num + "@" + domainName;
+			} else {
+				userName = cust.getCust_no() + "" + num;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return userName;
 	}
 	
 	private void canOpenUser(CCust cust) throws Exception {
@@ -149,7 +166,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 					user.setStop_type(stopType);
 					
 					int num = getUserCount(cust, user.getUser_type());
-					CUser newUser = this.openSingle(cust, user, doneCode, null, deviceType, deviceModel, deviceBuyMode, deviceFee, num);
+					CUser newUser = this.openBatchSingle(cust, user, doneCode, null, deviceType, deviceModel, deviceBuyMode, deviceFee, num);
 					users.add(newUser);
 				}
 			}
@@ -176,7 +193,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 					user.setStop_type(stopType);
 					
 					int num = getUserCount(cust, user.getUser_type());
-					CUser newUser = this.openSingle(cust, user, doneCode, null, deviceType, deviceModel, deviceBuyMode, deviceFee, num);
+					CUser newUser = this.openBatchSingle(cust, user, doneCode, null, deviceType, deviceModel, deviceBuyMode, deviceFee, num);
 					users.add(newUser);
 				}
 			}
@@ -198,7 +215,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		int num = userComponent.queryMaxNumByLoginName(cust.getCust_id(), cust.getCust_no(), userType);
 		if(userType.equals(USER_TYPE_BAND)){
 			num += SystemConstants.USER_TYPE_BAND_NUM;
-		}else if(userType.equals(USER_TYPE_OTT)){
+		}else{
 			if(num == 0){
 				num += SystemConstants.USER_TYPE_OTT_NUM;
 			}else{
@@ -207,9 +224,16 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		}
 		return num;
 	}
+	
+	private CUser openBatchSingle(CCust cust, CUser user, Integer doneCode, String deviceCode, String deviceType,
+			String deviceModel, String deviceBuyMode, FeeInfoDto deviceFee, int num) throws Exception, JDBCException {
+		openSingle(cust, user, doneCode, deviceCode, deviceType, deviceModel, deviceBuyMode, deviceFee);
+		user.setUser_name( generateUserName(cust.getCust_id(), user.getUser_type()) );
+		return user;
+	}
 
 	private CUser openSingle(CCust cust, CUser user, Integer doneCode, String deviceCode, String deviceType,
-			String deviceModel, String deviceBuyMode, FeeInfoDto deviceFee, int num) throws Exception, JDBCException {
+			String deviceModel, String deviceBuyMode, FeeInfoDto deviceFee) throws Exception, JDBCException {
 		String custId = cust.getCust_id();
 		
 		String user_id = userComponent.gUserId();
@@ -231,6 +255,12 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 			device.setDevice_model(deviceModel);
 		}
 		
+		//验证band账号名
+		if(StringHelper.isNotEmpty(user.getLogin_name()))
+			this.validAccount(user.getLogin_name());
+		if(StringHelper.isEmpty(user.getPassword()))
+			user.setPassword(cust.getPassword());
+		
 		//设置OTT用户终端类型和默认用户名
 		String userType = user.getUser_type();
 		if (userType.equals(USER_TYPE_OTT)) {
@@ -251,13 +281,8 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 					user.setTerminal_type(SystemConstants.USER_TERMINAL_TYPE_ZZD);
 				}
 			}
-			
-			user.setLogin_name(cust.getCust_no()+""+num);
-		}else if(userType.equals(USER_TYPE_BAND)){
-			String domainName = custComponent.getDomainByAddr(cust.getAddr_id());
-			user.setLogin_name(cust.getCust_no()+"0"+num+"@"+domainName);
 		}
-		user.setPassword(cust.getPassword());
+		
 		TDeviceBuyMode buyModeCfg = busiConfigComponent.queryBuyMode(deviceBuyMode);
 		//处理设备和授权
 		if (!user.getUser_type().equals(USER_TYPE_OTT_MOBILE)){
@@ -271,9 +296,6 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 				Integer months = Integer.parseInt( userComponent.queryTemplateConfig(TemplateConfigDto.Config.PROTOCOL_DATE_MONTHS.toString()) );
 				user.setProtocol_date( DateHelper.addTypeDate(DateHelper.now(), "MONTH", months) );
 			}
-//			if(buyModeCfg != null){
-//				user.setStr9(buyModeCfg.getBuy_mode());
-//			}
 		}
 		
 		userComponent.createUser(user);
@@ -1394,7 +1416,47 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		}
 		
 		//refund all pay order
+		List<CProdOrderFee> orderFeeList = cProdOrderFeeDao.queryPayedOrderFeeByUser(task.getCust_id(), userIds);
+		boolean hasUnpay = false;
+		if (orderFeeList != null){
+			for (CProdOrderFee orderFee:orderFeeList){
+				if (orderFee.getInput_type().equals(SystemConstants.ORDER_FEE_TYPE_CFEE) && orderFee.getInput_fee()>0){
+					hasUnpay = true;
+					CProdOrder order = cProdOrderDao.findByKey(orderFee.getOrder_sn());
+					CFeeAcct fee = cFeeDao.queryAcctFeeByOrderSn(orderFee.getOrder_sn());
+					PayDto pay=new PayDto();
+					pay.setCust_id(task.getCust_id());
+					pay.setUser_id(order.getUser_id());
+					pay.setAcct_id(fee.getAcct_id());
+					pay.setAcctitem_id(fee.getAcctitem_id());
+					pay.setFee(orderFee.getInput_fee()*-1);
+					pay.setPresent_fee(0);
+					
+					pay.setProd_sn(orderFee.getOrder_sn());
+					pay.setInvalid_date(DateHelper.dateToStr(DateHelper.today().before(order.getEff_date())? order.getEff_date():DateHelper.today()));
+					pay.setBegin_date(DateHelper.dateToStr(order.getExp_date()));
+					CFeeAcct refundFee = feeComponent.saveAcctFee(task.getCust_id(), fee.getArea_id(), pay, doneCode, getBusiParam().getBusiCode(), StatusConstants.UNPAY);
+					orderFee.setOutput_sn(refundFee.getFee_sn());
+					orderFee.setOutput_fee(orderFee.getInput_fee());
+					orderFee.setOutput_type(SystemConstants.ORDER_FEE_TYPE_CFEE);
+					cProdOrderFeeDao.update(orderFee);
+				} else if (orderFee.getInput_type().equals(SystemConstants.ORDER_FEE_TYPE_ACCT) && orderFee.getInput_fee()>0){
+					CFeeAcct fee = cFeeDao.queryAcctFeeByOrderSn(orderFee.getOrder_sn());
+					String acct_change_sn=acctComponent.saveAcctAddFee(fee.getCust_id(), fee.getAcct_id(), fee.getAcctitem_id(),
+							SystemConstants.ACCT_CHANGE_TRANS, orderFee.getInput_fee(), orderFee.getFee_type(), 
+							getBusiParam().getBusiCode(), doneCode,orderFee.getProd_name()).getAcct_change_sn();
+					
+					orderFee.setOutput_sn(acct_change_sn);
+					orderFee.setOutput_fee(orderFee.getInput_fee());
+					orderFee.setOutput_type(SystemConstants.ORDER_FEE_TYPE_ACCT);
+					cProdOrderFeeDao.update(orderFee);
+				}
+			}
+		}
 		
+		if (hasUnpay){
+			
+		}
 		//update device status to idle,write off user
 		
 		for (WTaskUser user:userList){

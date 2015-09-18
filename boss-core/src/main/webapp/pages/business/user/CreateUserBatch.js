@@ -323,19 +323,32 @@ UserBaseBatchForm = Ext.extend( BaseForm , {
 		var fee = Ext.getCmp("nfFee").getValue();
 		var userType = Ext.getCmp("boxUserType").getValue();
 		
-		var TMPRecord = Ext.data.Record.create(this.newUserRecordFields);
-		this.newUserStore.add([new TMPRecord({
-			user_type: userType,
-			buy_mode: boxBuyMode.getValue(),
-			buy_mode_text: App.form.getCmbDisplayValue(boxBuyMode),
-			open_amount: amount,
-			fee_id: (fd ? fd["fee_id"] : 0),
-			fee: fee,
-			sub_total: amount * (fee || 0),
-			device_type: Ext.getCmp("boxDeviceCategory").getValue(),
-			device_type_text: Ext.getCmp("boxDeviceCategory").getRawValue(),
-			fee_name: this.currentFeeData['fee_name']
-		})]);
+		var flag = true;
+		this.newUserStore.each(function(record){
+			if(record.get('user_type') == userType && record.get('device_type') == Ext.getCmp("boxDeviceCategory").getValue()
+				&& record.get('buy_mode') == boxBuyMode.getValue() && record.get('fee') == fee ){
+				record.set('open_amount', record.get('open_amount') + amount);
+				record.set('sub_total', record.get('sub_total') + amount * (fee || 0));
+				record.commit();
+				flag = false;
+				return false;
+			}
+		},this);
+		if(flag){
+			var TMPRecord = Ext.data.Record.create(this.newUserRecordFields);
+			this.newUserStore.add([new TMPRecord({
+				user_type: userType,
+				buy_mode: boxBuyMode.getValue(),
+				buy_mode_text: App.form.getCmbDisplayValue(boxBuyMode),
+				open_amount: amount,
+				fee_id: (fd ? fd["fee_id"] : 0),
+				fee: fee,
+				sub_total: amount * (fee || 0),
+				device_type: Ext.getCmp("boxDeviceCategory").getValue(),
+				device_type_text: Ext.getCmp("boxDeviceCategory").getRawValue(),
+				fee_name: fd ? fd['fee_name'] : ''
+			})]);
+		}
 		
 		// 计算费用总额
 		var total = 0;
