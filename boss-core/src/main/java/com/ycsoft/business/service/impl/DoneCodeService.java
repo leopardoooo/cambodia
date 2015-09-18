@@ -3,25 +3,12 @@
  */
 package com.ycsoft.business.service.impl;
 
-import static com.ycsoft.commons.constants.BusiCodeConstants.ACCT_TRANS;
-import static com.ycsoft.commons.constants.BusiCodeConstants.CUST_CHANGE_ADDR;
-import static com.ycsoft.commons.constants.BusiCodeConstants.CUST_EDIT;
 import static com.ycsoft.commons.constants.BusiCodeConstants.CUST_OPEN;
-import static com.ycsoft.commons.constants.BusiCodeConstants.CUST_RELOCATE;
-import static com.ycsoft.commons.constants.BusiCodeConstants.CUST_TRANS;
 import static com.ycsoft.commons.constants.BusiCodeConstants.DEVICE_BUY;
 import static com.ycsoft.commons.constants.BusiCodeConstants.DEVICE_CHANGE;
-import static com.ycsoft.commons.constants.BusiCodeConstants.DEVICE_RECLAIM;
-import static com.ycsoft.commons.constants.BusiCodeConstants.DEVICE_SALE;
-import static com.ycsoft.commons.constants.BusiCodeConstants.EDIT_INVALID_DATE;
-import static com.ycsoft.commons.constants.BusiCodeConstants.PROD_CHANGE_TARIFF;
 import static com.ycsoft.commons.constants.BusiCodeConstants.PROD_PACKAGE_ORDER;
-import static com.ycsoft.commons.constants.BusiCodeConstants.USER_DTOI;
-import static com.ycsoft.commons.constants.BusiCodeConstants.USER_EDIT;
-import static com.ycsoft.commons.constants.BusiCodeConstants.USER_EDIT_LEVEL;
 import static com.ycsoft.commons.constants.BusiCodeConstants.USER_OPEN;
 import static com.ycsoft.commons.constants.BusiCodeConstants.USER_PROMOTION;
-import static com.ycsoft.commons.constants.BusiCodeConstants.USER_REQUIRE_STOP;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -55,7 +42,6 @@ import com.ycsoft.business.dto.core.cust.DoneCodeExtAttrDto;
 import com.ycsoft.business.dto.core.cust.DoneInfoDto;
 import com.ycsoft.business.dto.core.fee.BusiFeeDto;
 import com.ycsoft.business.dto.core.fee.QueryFeeInfo;
-import com.ycsoft.business.dto.core.user.UserDto;
 import com.ycsoft.business.service.IDoneCodeService;
 import com.ycsoft.commons.constants.BusiCmdConstants;
 import com.ycsoft.commons.constants.BusiCodeConstants;
@@ -103,6 +89,8 @@ public class DoneCodeService extends BaseBusiService implements IDoneCodeService
 								busiFee.setSum_fee(fee.getReal_pay());
 								busiFee.setBuy_num(fee.getBuy_num());
 								busiFee.setAddr_id(fee.getAddr_id());
+								busiFee.setKeyname(SystemConstants.FEE_TYPE_DEVICE);
+								busiFee.setDevice_model_text(device.getDevice_model_text());
 								feeList.add(busiFee);
 								break;
 							}
@@ -110,10 +98,13 @@ public class DoneCodeService extends BaseBusiService implements IDoneCodeService
 					} else {
 						for (BusiFeeDto busiFee:list){
 							if (busiFee.getFee_id().equals(device.getFee_id())){
+								busiFee.setDevice_model(device.getDevice_model());
 								busiFee.setDefault_value(0);
 								busiFee.setSum_fee(fee.getReal_pay());
 								busiFee.setBuy_num(fee.getBuy_num());
 								busiFee.setAddr_id(fee.getAddr_id());
+								busiFee.setKeyname(SystemConstants.FEE_TYPE_DEVICE);
+								busiFee.setDevice_model_text(device.getDevice_model_text());
 								feeList.add(busiFee);
 								break;
 							}
