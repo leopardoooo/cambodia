@@ -102,16 +102,12 @@ public class UserComponent extends BaseBusiComponent {
 	private CUserAtvDao cUserAtvDao;
 	private CUserDtvDao cUserDtvDao;
 	private CUserBroadbandDao cUserBroadbandDao;
-	private CUserAtvHisDao cUserAtvHisDao;
-	private CUserDtvHisDao cUserDtvHisDao;
-	private CUserBroadbandHisDao cUserBroadbandHisDao;
 	private CUserPropChangeDao cUserPropChangeDao;
 	private SOptrDao sOptrDao;
 	private CRejectResDao cRejectResDao;
 	private JUserStopDao jUserStopDao;
 	private CPromotionDao cPromotionDao;
 	private CCustDao cCustDao;
-	private CFeeDao cFeeDao;
 	
 	private PPromFeeDao pPromFeeDao;
 	private PPromFeeUserDao pPromFeeUserDao;
@@ -1199,18 +1195,6 @@ public class UserComponent extends BaseBusiComponent {
 		sOptrDao = optrDao;
 	}
 
-	public void setCUserAtvHisDao(CUserAtvHisDao userAtvHisDao) {
-		cUserAtvHisDao = userAtvHisDao;
-	}
-
-	public void setCUserDtvHisDao(CUserDtvHisDao userDtvHisDao) {
-		cUserDtvHisDao = userDtvHisDao;
-	}
-
-	public void setCUserBroadbandHisDao(CUserBroadbandHisDao userBroadbandHisDao) {
-		cUserBroadbandHisDao = userBroadbandHisDao;
-	}
-
 	public void setCRejectResDao(CRejectResDao rejectResDao) {
 		cRejectResDao = rejectResDao;
 	}
@@ -1324,10 +1308,6 @@ public class UserComponent extends BaseBusiComponent {
 
 	public void setExpressionUtil(ExpressionUtil expressionUtil) {
 		this.expressionUtil = expressionUtil;
-	}
-
-	public void setCFeeDao(CFeeDao feeDao) {
-		cFeeDao = feeDao;
 	}
 
 	/**
