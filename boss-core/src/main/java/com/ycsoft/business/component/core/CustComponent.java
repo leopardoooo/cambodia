@@ -11,6 +11,7 @@ import java.util.Map;
 
 import org.apache.commons.beanutils.PropertyUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.ycsoft.beans.config.TAddress;
@@ -36,6 +37,7 @@ import com.ycsoft.beans.core.cust.CCustLinkman;
 import com.ycsoft.beans.core.cust.CCustLinkmanHis;
 import com.ycsoft.beans.core.cust.CCustPropChange;
 import com.ycsoft.beans.core.cust.CCustUnitToResident;
+import com.ycsoft.beans.core.cust.CUnit;
 import com.ycsoft.beans.system.SAgent;
 import com.ycsoft.beans.system.SOptr;
 import com.ycsoft.business.commons.abstracts.BaseBusiComponent;
@@ -59,6 +61,7 @@ import com.ycsoft.business.dao.core.cust.CCustLinkmanDao;
 import com.ycsoft.business.dao.core.cust.CCustLinkmanHisDao;
 import com.ycsoft.business.dao.core.cust.CCustPropChangeDao;
 import com.ycsoft.business.dao.core.cust.CCustUnitToResidentDao;
+import com.ycsoft.business.dao.core.cust.CUnitDao;
 import com.ycsoft.business.dto.config.TAddressDto;
 import com.ycsoft.business.dto.core.cust.CustDeviceDto;
 import com.ycsoft.business.dto.core.cust.CustFullInfoDto;
@@ -102,6 +105,8 @@ public class CustComponent extends BaseBusiComponent {
 	private TNonresCustApprovalDao tNonresCustApprovalDao;
 	private TDistrictDao tDistrictDao;
 	private TProvinceDao tProvinceDao;
+	@Autowired
+	private CUnitDao cUnitDao;
 	
 	/**
 	 * 查询变更产权的设备销售方式
@@ -1285,7 +1290,7 @@ public class CustComponent extends BaseBusiComponent {
 		return seq;
 	}
 
-	private void setPropText(CCustPropChange change) {
+	private void setPropText(CCustPropChange change) throws Exception {
 		change.setColumn_name_text( MemoryDict.getTransData(change.getColumn_name_text()) );
 		//属性值有对应的系统参数
 		if (StringHelper.isNotEmpty(change.getParam_name())){
@@ -1294,6 +1299,10 @@ public class CustComponent extends BaseBusiComponent {
 		} else {
 			change.setOld_value_text( MemoryDict.getTransData( change.getOld_value() ));
 			change.setNew_value_text( MemoryDict.getTransData( change.getNew_value() ));
+			if(change.getColumn_name().equals("unit_id")){
+				change.setOld_value_text( cUnitDao.findByKey(change.getOld_value()).getUnit_name() );
+				change.setNew_value_text( cUnitDao.findByKey(change.getNew_value()).getUnit_name() );
+			}
 		}
 	}
 	
@@ -1723,6 +1732,10 @@ public class CustComponent extends BaseBusiComponent {
 		addCustColony(cust.getCust_id());
 		
 		return custFullInfo;
+	}
+	
+	public List<CUnit> queryUnit() throws Exception {
+		return cUnitDao.findAll();
 	}
 	
 	

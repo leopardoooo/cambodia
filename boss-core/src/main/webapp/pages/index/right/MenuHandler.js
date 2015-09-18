@@ -95,7 +95,7 @@ Ext.apply(MenuHandler, {
 	NewCust : function() {
 		return {
 			width : 580,
-			height : 470
+			height : 510
 		};
 	},
 	/**
@@ -146,11 +146,11 @@ Ext.apply(MenuHandler, {
 			Alert(lmsg('needLogOffUser'));
 			return false;
 		}
-		var custDeviceGrid = App.getApp().main.infoPanel.getCustPanel().custDeviceGrid;
-		if (custDeviceGrid.GDDeviceArray.length > 0) {
-			Alert(lmsg('recycleGdDevice'));
-			return false;
-		}
+//		var custDeviceGrid = App.getApp().main.infoPanel.getCustPanel().custDeviceGrid;
+//		if (custDeviceGrid.GDDeviceArray.length > 0) {
+//			Alert(lmsg('recycleGdDevice'));
+//			return false;
+//		}
 		// alert(custDeviceGrid.CustDeviceArray.length);
 		// if(custDeviceGrid.CustDeviceArray.length > 0){
 		// var o = {};

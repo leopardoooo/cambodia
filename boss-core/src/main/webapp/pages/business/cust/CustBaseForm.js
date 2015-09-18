@@ -582,6 +582,18 @@ CustBaseForm = Ext.extend( BaseForm , {
 							allowBlank: false,
 							hiddenName:'cust.str6'
 						}]
+				},{
+					items:[{
+							fieldLabel: langUtils.main("cust.base.unitName"),
+							xtype: 'combo',
+							store: new Ext.data.JsonStore({
+								url: Constant.ROOT_PATH+'/commons/x/QueryCust!queryUnit.action',
+								fields: ['unit_id', 'unit_name'],
+								autoLoad: true
+							}),
+							displayField: 'unit_name', valueField: 'unit_id',
+							hiddenName:'cust.unit_id'
+						}]
 				}]
 			},{
 				xtype : 'hidden',
