@@ -767,7 +767,7 @@ Ext.apply(MenuHandler, {
 	},
 	EditPay : function() {
 		return {
-			width : 600,
+			width : 650,
 			height : 400
 		};
 	},
@@ -2910,6 +2910,24 @@ Ext.apply(MenuHandler, {
 			width : 450,
 			height : 400
 		};
+	},
+	removeTaskBtnId:function(){
+		var record = App.main.infoPanel.docPanel.taskGrid.getSelectionModel().getSelected();
+		// 回调函数
+		function callback(res, opt) {
+			var result = Ext.decode(res.responseText);
+			if (result.success == true) {
+				Alert('工单作废成功!');
+				App.getApp().main.infoPanel.docPanel.taskGrid.remoteRefresh();
+						
+			}
+		}
+		var url = Constant.ROOT_PATH + "/core/x/Task!cancelTaskSn.action";
+
+		Confirm("确定作废工单吗?", this, function() {
+			// 调用请求函数,详细参数请看busi-helper.js
+			App.sendRequest(url, {task_id : record.get('task_id'),taskType:record.get('task_type_id')}, callback);
+		});
 	}
 	
 });
