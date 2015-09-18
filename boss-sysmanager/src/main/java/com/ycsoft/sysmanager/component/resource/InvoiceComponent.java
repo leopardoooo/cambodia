@@ -215,7 +215,6 @@ public class InvoiceComponent extends BaseComponent {
 			invoice.setStatus(SystemConstants.INVOICE_STATUS_IDLE);
 			invoice.setFinance_status(SystemConstants.INVOICE_STATUS_IDLE);
 			invoice.setInvoice_amount(invoice_amount);
-			invoice.setOptr_id(optr.getOptr_id());
 			invoiceList.add(invoice);
 		}
 		rInvoiceDao.save(invoiceList.toArray(new RInvoice[invoiceList.size()]));
