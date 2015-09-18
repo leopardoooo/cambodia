@@ -1297,6 +1297,7 @@ public class UserComponent extends BaseBusiComponent {
 					loginNameList.add( Integer.parseInt(loginName) );
 			}
 		}
+		if(loginNameList.size() == 0) return 0;
 		return Collections.max(loginNameList);
 		
 	}
