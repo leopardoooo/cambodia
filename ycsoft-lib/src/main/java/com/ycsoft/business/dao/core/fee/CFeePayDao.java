@@ -199,24 +199,24 @@ public class CFeePayDao extends BaseEntityDao<CFeePay> {
 	public List<Map<String, Object>> queryFeeByFeeSn(String custId,String optrId,
 			String countyId)throws Exception {
 		String sql = append(" SELECT T1.FEE_SN, T1.REAL_PAY AMOUNT, T2.PRINTITEM_ID,t3.doc_type,t1.acct_id,'' prom_fee_sn",
-				"   FROM C_FEE T1, T_BUSI_FEE T2,t_invoice_printitem t3,t_template_county t4,t_pay_type t5 ",
+				"   FROM C_FEE T1, T_BUSI_FEE T2,t_invoice_printitem t3,t_template_county t4,t_pay_type t5,c_fee_pay fp ",
 				"  WHERE T1.FEE_ID = T2.FEE_ID AND t3.printitem_id=t2.printitem_id  AND t4.template_id=t3.template_id AND t4.county_id= ?" +
 				"    AND t4.template_type= ?",
 				"    AND T1.COUNTY_ID =  ?  ",
 				"    AND T1.cust_id=? ",
 				"    AND T1.STATUS = ? AND t1.pay_type=t5.pay_type and t5.is_print='T'",
 				"    AND T1.is_doc= ? ",
-				"    AND T1.optr_id= ? ",
+				"    AND fp.pay_sn=t1.pay_sn and  fp.optr_id= ? ",
 				" UNION ALL ",
 				" SELECT T1.FEE_SN, T1.REAL_PAY AMOUNT, T2.PRINTITEM_ID,t3.doc_type,t1.acct_id,'' prom_fee_sn",
-				"   FROM C_FEE T1, VEW_ACCTITEM T2,t_invoice_printitem t3,t_template_county t4,t_pay_type t5  ",
+				"   FROM C_FEE T1, VEW_ACCTITEM T2,t_invoice_printitem t3,t_template_county t4,t_pay_type t5 ,c_fee_pay fp ",
 				"  WHERE t3.printitem_id=t2.printitem_id AND t4.county_id= ? " +
 				"     AND t4.template_id=t3.template_id AND t4.template_type= ? AND T1.COUNTY_ID = ?  ",
 				"    AND T1.cust_id= ?  ",
 				"    AND T1.STATUS = ? AND t1.pay_type=t5.pay_type and t5.is_print='T' ",
 				"    AND T1.is_doc= ? ",
 				"    AND T1.ACCTITEM_ID = T2.ACCTITEM_ID  ",
-				"    AND T1.FEE_TYPE=? AND T1.optr_id= ?"
+				"    AND T1.FEE_TYPE=? and fp.pay_sn=t1.pay_sn AND fp.optr_id= ?"
 				);
 		
 		return findToList(sql, 
