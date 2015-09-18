@@ -273,6 +273,9 @@ PayPanel = Ext.extend( Ext.Panel ,{
 					if(!flag){
 						this.loadBaseData();
 						App.getApp().refreshPayInfo(parent);
+						App.getApp().main.infoPanel.getPayfeePanel().acctFeeGrid.remoteRefresh();
+						App.getApp().main.infoPanel.getPayfeePanel().busiFeeGrid.remoteRefresh();
+						App.getApp().main.infoPanel.getDoneCodePanel().doneCodeGrid.remoteRefresh();
 						this.realFeeStore.each(function(record){
 							if(record.get('fee_sn') == rec.get('fee_sn')){
 								this.realFeeStore.remove(record);

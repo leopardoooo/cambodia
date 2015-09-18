@@ -3,7 +3,6 @@ package com.ycsoft.business.service.impl;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -20,7 +19,6 @@ import com.ycsoft.beans.core.bank.CBankReturn;
 import com.ycsoft.beans.core.bank.CBankReturnPayerror;
 import com.ycsoft.beans.core.common.CDoneCode;
 import com.ycsoft.beans.core.common.CDoneCodeDetail;
-import com.ycsoft.beans.core.common.CDoneCodeUnpay;
 import com.ycsoft.beans.core.cust.CCust;
 import com.ycsoft.beans.core.fee.CFee;
 import com.ycsoft.beans.core.fee.CFeeAcct;
@@ -803,6 +801,19 @@ public class PayService extends BaseBusiService implements IPayService {
 			//出入未支付业务
 			doneCodeComponent.saveDoneCodeUnPay(cust.getCust_id(), doneCode, this.getOptr().getOptr_id());
 		}
+		
+		//检查是否存在未支付 busicode = 1108,1109，可以使用取消支付 功能
+		CDoneCode cd = doneCodeComponent.queryByKey(busiDoneCode);
+		boolean isCanDoDevice = true;
+		if(cd.getBusi_code().equals(BusiCodeConstants.DEVICE_BUY_PJ) || cd.getBusi_code().equals(BusiCodeConstants.DEVICE_BUY_PJ_BACTH)){
+			List<FeeDto> unPayList = feeComponent.queryUnPay(getBusiParam().getCust().getCust_id(),this.getOptr().getOptr_id());
+			for(FeeDto dto : unPayList){
+				if(dto.getBusi_code().equals(BusiCodeConstants.DEVICE_BUY_PJ) || dto.getBusi_code().equals(BusiCodeConstants.DEVICE_BUY_PJ_BACTH)){
+					isCanDoDevice = false;
+					throw new ServicesException(ErrorCode.EditFeeUnPayError);
+				}
+			}
+		}
 		for (FeeBusiFormDto feeDto:feeList){
 			
 			if (feeDto.getFee_type().equals(SystemConstants.FEE_TYPE_BUSI) || feeDto.getFee_type().equals(SystemConstants.FEE_TYPE_CONTRACT)){
@@ -832,10 +843,12 @@ public class PayService extends BaseBusiService implements IPayService {
 						device.getPair_modem_code(),device.getDevice_model(), feeDto.getReal_pay(),
 						doneCode,busiDoneCode, busiCode, feeDto.getBuy_num());
 				//配件处理数量
-				CDoneCode cd = doneCodeComponent.queryByKey(busiDoneCode);
-				if(cd.getBusi_code().equals(BusiCodeConstants.DEVICE_BUY_PJ) || cd.getBusi_code().equals(BusiCodeConstants.DEVICE_BUY_PJ_BACTH)){
-					
-					
+				if(isCanDoDevice){
+					//回退配件库存,修改费用的话，buy_num大于0=再次购买配件，总数要-buy_num;小于0=	退回总数
+					if(feeDto.getBuy_num() != 0){
+						device.setBuy_num(-1*feeDto.getBuy_num());
+						deviceComponent.updateDeviceNum(device);
+					}
 				}
 			}
 		}

@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import com.ycsoft.beans.config.TBusiFee;
 import com.ycsoft.beans.config.TDeviceBuyMode;
 import com.ycsoft.beans.config.TDeviceChangeReason;
+import com.ycsoft.beans.core.acct.CAcct;
 import com.ycsoft.beans.core.cust.CCust;
 import com.ycsoft.beans.core.cust.CCustDevice;
 import com.ycsoft.beans.core.fee.CFee;
@@ -1358,10 +1359,12 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		int i=0;
 		for(WTaskUser user:userList){
 			userIds[i]=user.getUser_id();
+			i++;
 		}
 		int busiDoneCode = task.getDone_code();
 		// 获取业务流水
 		Integer doneCode = doneCodeComponent.gDoneCode();
+		boolean hasUnpay = false;
 		//find unpay busi fee
 		List<CFee> feeList= feeComponent.queryByBusiDoneCode(busiDoneCode);
 		for (CFee fee:feeList){
@@ -1375,11 +1378,13 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 			} 
 		}
 		// find pay busi fee
-		feeList = feeComponent.querySumFeeByDoneCode(task.getTask_id(), busiDoneCode);
+		feeList = feeComponent.querySumFeeByDoneCode(task.getCust_id(), busiDoneCode);
 		for (CFee fee:feeList){
 			if (fee.getReal_pay()>0 && fee.getFee_type().equals(SystemConstants.FEE_TYPE_BUSI)){
 				feeComponent.saveBusiFee(task.getCust_id(), fee.getAddr_id(), fee.getFee_id(), 
-						fee.getReal_pay()*-1, doneCode, busiDoneCode, BusiCodeConstants.TASK_CANCEL, new CFeeBusi());
+						1, SystemConstants.PAY_TYPE_UNPAY, fee.getReal_pay()*-1, doneCode, busiDoneCode, 
+						BusiCodeConstants.TASK_CANCEL,null, null);
+				hasUnpay = true;
 			}
 		}
 		
@@ -1391,6 +1396,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 						SystemConstants.PAY_TYPE_UNPAY, fee.getDevice_type(), fee.getDevice_id(),
 						fee.getDevice_code(), null, null, null, null, fee.getDevice_model(), fee.getReal_pay()*-1,
 						doneCode, busiDoneCode, BusiCodeConstants.TASK_CANCEL, -1);
+				hasUnpay = true;
 			}
 		}
 		
@@ -1417,7 +1423,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		
 		//refund all pay order
 		List<CProdOrderFee> orderFeeList = cProdOrderFeeDao.queryPayedOrderFeeByUser(task.getCust_id(), userIds);
-		boolean hasUnpay = false;
+		
 		if (orderFeeList != null){
 			for (CProdOrderFee orderFee:orderFeeList){
 				if (orderFee.getInput_type().equals(SystemConstants.ORDER_FEE_TYPE_CFEE) && orderFee.getInput_fee()>0){
@@ -1435,16 +1441,20 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 					pay.setProd_sn(orderFee.getOrder_sn());
 					pay.setInvalid_date(DateHelper.dateToStr(DateHelper.today().before(order.getEff_date())? order.getEff_date():DateHelper.today()));
 					pay.setBegin_date(DateHelper.dateToStr(order.getExp_date()));
-					CFeeAcct refundFee = feeComponent.saveAcctFee(task.getCust_id(), fee.getArea_id(), pay, doneCode, getBusiParam().getBusiCode(), StatusConstants.UNPAY);
+					CFeeAcct refundFee = feeComponent.saveAcctFee(task.getCust_id(), fee.getArea_id(), pay, doneCode, BusiCodeConstants.TASK_CANCEL, StatusConstants.UNPAY);
 					orderFee.setOutput_sn(refundFee.getFee_sn());
 					orderFee.setOutput_fee(orderFee.getInput_fee());
 					orderFee.setOutput_type(SystemConstants.ORDER_FEE_TYPE_CFEE);
 					cProdOrderFeeDao.update(orderFee);
 				} else if (orderFee.getInput_type().equals(SystemConstants.ORDER_FEE_TYPE_ACCT) && orderFee.getInput_fee()>0){
-					CFeeAcct fee = cFeeDao.queryAcctFeeByOrderSn(orderFee.getOrder_sn());
-					String acct_change_sn=acctComponent.saveAcctAddFee(fee.getCust_id(), fee.getAcct_id(), fee.getAcctitem_id(),
+					//账户
+					CAcct acct=acctComponent.queryCustAcctByCustId(task.getCust_id());
+					//按订单转账到公用账目中
+					String acctItemId=SystemConstants.ACCTITEM_PUBLIC_ID;
+					String acctId=acct.getAcct_id();
+					String acct_change_sn=acctComponent.saveAcctAddFee(task.getCust_id(), acct.getAcct_id(), acctItemId,
 							SystemConstants.ACCT_CHANGE_TRANS, orderFee.getInput_fee(), orderFee.getFee_type(), 
-							getBusiParam().getBusiCode(), doneCode,orderFee.getProd_name()).getAcct_change_sn();
+							 BusiCodeConstants.TASK_CANCEL, doneCode,orderFee.getProd_name()).getAcct_change_sn();
 					
 					orderFee.setOutput_sn(acct_change_sn);
 					orderFee.setOutput_fee(orderFee.getInput_fee());
@@ -1455,7 +1465,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		}
 		
 		if (hasUnpay){
-			
+			doneCodeComponent.saveDoneCodeUnPay(task.getCust_id(),doneCode , getOptr().getOptr_id());
 		}
 		//update device status to idle,write off user
 		
@@ -1475,7 +1485,9 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		}
 		
 		//cancel task
-		snTaskComponent.cancelTask(doneCode, taskId);;
+		snTaskComponent.cancelTask(doneCode, taskId);
+		getBusiParam().setBusiCode(BusiCodeConstants.TASK_CANCEL);
+		saveAllPublic(doneCode, getBusiParam());
 		
 	}
 	
