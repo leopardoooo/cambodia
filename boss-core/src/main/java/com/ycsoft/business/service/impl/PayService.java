@@ -250,8 +250,9 @@ public class PayService extends BaseBusiService implements IPayService {
 		if(StringHelper.isEmpty(infoDesc)){
 			infoDesc=info;
 		}
-		
-		this.saveAllPublic(doneCode, this.getBusiParam());
+		if(!onlyShowInfo){
+			this.saveAllPublic(doneCode, this.getBusiParam());
+		}
 	    return infoDesc;
 	}
 	/**
