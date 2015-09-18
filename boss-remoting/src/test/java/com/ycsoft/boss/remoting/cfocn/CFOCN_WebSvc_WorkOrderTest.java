@@ -1,5 +1,5 @@
 /**
-applyTemplate * CFOCN_WebSvc_WorkOrderTest.java
+ * CFOCN_WebSvc_WorkOrderTest.java
  *
  * This file was auto-generated from WSDL
  * by the Apache Axis2 version: 1.6.3  Built on : Jun 27, 2015 (11:17:49 BST)
