@@ -200,6 +200,16 @@ UserBaseForm = Ext.extend( BaseForm , {
 			    }]
 			}]
 		});
+		
+		this.buyModeStore.on('load',function(){
+			this.buyModeStore.each(function(record){
+				if(record.get('buy_mode') == 'PRESENT'){
+					Ext.getCmp('deviceBuyMode').setValue('PRESENT');
+					this.doBuyModeSelect();
+					return false;
+				}
+			}, this);
+		}, this);
 	},
 	// 施工回填
 	doCheckedChangeTask: function(box, checked){
