@@ -73,8 +73,9 @@ CommonInvoiceForm = Ext.extend(Ext.form.FormPanel,{
 						Alert(lsys('msgBox.invoiceNotFoundTryReSearch'));
 						this.parent.grid.setTitle(lsys('InvoiceCommon.titleInvoiceInfo'));
 					}else{
-						this.doSuccess(data);
+						this.parent.grid.doReset();
 						this.parent.grid.setTitle(lsys('InvoiceCommon.titleInvoiceCount',null,[data.length]));
+						this.doSuccess(data);
 					}
 				},
 				failure:function(){
@@ -85,8 +86,6 @@ CommonInvoiceForm = Ext.extend(Ext.form.FormPanel,{
 		}
 	},
 	doSuccess:function(data){//查询成功后调用函数
-
-		this.parent.grid.doReset();
 		this.parent.grid.getStore().loadData(data);
 	}
 });
@@ -95,7 +94,9 @@ CommonInvoiceGrid = Ext.extend(Ext.grid.GridPanel,{
 	store:null,
 	amount:0,
 	rowCount:0,
-	constructor:function(){
+	parent:null,
+	constructor:function(parent){
+		this.parent = parent;
 		this.store = new Ext.data.JsonStore({
 			fields:['invoice_id','invoice_code','invoice_type','status','status_text','amount',
 				'invoice_mode','invoice_mode_text','finance_status','finance_status_text',
@@ -114,9 +115,9 @@ CommonInvoiceGrid = Ext.extend(Ext.grid.GridPanel,{
 				rowdeselect:this.doRowdeSelect
 			}
 		});
-		var columns = new Ext.grid.ColumnModel({
-			defaults:{sortable:false},
-			columns:[
+		commonInvoiceGridThat = this;
+		
+		var columns = [
 				sm,
 				{header:lsys('InvoiceCommon.commonGridColls')[0],dataIndex:'invoice_id',align:'center',width:90},
 				{header:lsys('InvoiceCommon.commonGridColls')[1],dataIndex:'invoice_code',align:'center',width:90},
@@ -128,15 +129,31 @@ CommonInvoiceGrid = Ext.extend(Ext.grid.GridPanel,{
 				{header:lsys('InvoiceCommon.commonGridColls')[6],dataIndex:'finance_status_text',align:'center',width:60},
 				{header:lsys('InvoiceCommon.commonGridColls')[7],dataIndex:'depot_name',align:'center',width:80},
 				{header:lsys('InvoiceCommon.commonGridColls')[8],dataIndex:'optr_name',align:'center',width:80}
-			]
-		});
+			];
+		
+		if(this.parent.optrType == 'CHECK' || this.parent.optrType == 'CANCELCHECK'){
+			var newColumns = [
+					{ header:lsys('common.doActionBtn'), width: 50,renderer: function(v , md, record , i  ){
+						var rs = Ext.encode(record.data);
+						return String.format("&nbsp;<a href='#' onclick='commonInvoiceGridThat.doQueryDetail({0},{1});' style='color:blue'> 明细 </a>",rs, i);
+					}}
+				];
+			columns = columns.concat(newColumns);
+		}
+		
 		CommonInvoiceGrid.superclass.constructor.call(this,{
 			title:lsys('InvoiceCommon.titleInvoiceInfo'),
 			border:false,
 			ds:this.store,
-			cm:columns,
+			cm:new Ext.grid.ColumnModel({
+				defaults:{sortable:false},
+				columns:columns
+			}),
 			sm:sm
 		});
+	},
+	doQueryDetail:function(rs,i){
+		this.parent.doQueryDetail(rs);
 	},
 	doLoadData:function(){//store load加载完事件
 		this.getSelectionModel().selectAll();
@@ -209,26 +226,108 @@ CommonInvoiceGrid = Ext.extend(Ext.grid.GridPanel,{
 	}
 });
 
+
+InvoiceBaseDetailGrid = Ext.extend(Ext.grid.GridPanel, {
+	invoiceDetailStore : null,
+	constructor : function() {
+		this.invoiceDetailStore = new Ext.data.JsonStore({
+					fields : ['cust_name', 'cust_no', 'busi_name','optr_id','optr_name',
+							'fee_name', 'real_pay', 'create_time', 'status', 'status_text']
+				});
+		InvoiceBaseDetailGrid.superclass.constructor.call(this, {
+				ds : this.invoiceDetailStore,
+				viewConfig : {
+					forceFit :true
+				},
+				title:'发票明细',
+				border:false,
+				sm : new Ext.grid.CheckboxSelectionModel(),
+				cm : new Ext.grid.ColumnModel([{
+							header : '费用项',
+							dataIndex : 'fee_name',
+							renderer : App.qtipValue
+						}, {
+							header : '金额',
+							dataIndex : 'real_pay',
+							renderer : Ext.util.Format.formatFee
+						}])
+			})
+	}
+})
+
+
 CommonInvoicePanel = Ext.extend(Ext.Panel,{
 	form:null,
 	grid:null,
 	optrType:null,//保存对应的类型 发票(调拨,核销,结账)
 	valueArr:null,
+	detail:null,
 	constructor:function(type){
 		this.optrType = type;
 		this.form = new CommonInvoiceForm(this);
 		this.grid = new CommonInvoiceGrid(this);
+		var items= [];
+		if(this.optrType == 'CHECK' || this.optrType == 'CANCELCHECK'){
+			this.detail = new InvoiceBaseDetailGrid(this);
+			items = [{region : 'center',layout : 'fit',items : [this.grid]},
+				{region : 'east',width : '30%',split : true,layout : 'fit',items : [this.detail]}];
+		}else{
+			items = [{region : 'center',layout : 'fit',items : [this.grid]}];
+		}
+		
 		CommonInvoicePanel.superclass.constructor.call(this,{
 			border:false,
 			region:'center',
 			layout:'anchor',
 			items:[
 				{anchor:'100% 20%',border:false,layout:'fit',items:[this.form]},
-				{anchor:'100% 80%',border:false,layout:'fit',autoScroll:true,items:[this.grid]}
+				{anchor:'100% 80%',border:false,layout:'border',autoScroll:true,items:items}
 			],
 			buttonAlign:'center',
 			buttons:[{text:lsys('common.saveBtn'),iconCls:'icon-save',scope:this,handler:this.doSave}]
 		});
+	},
+	doQueryDetail:function(rs){
+		var panelId = Ext.getCmp('sysMainTabPanelId').getActiveTab().getId();
+		if(panelId == 'CheckInvoice' || panelId == 'CancelCheck'){
+			deatilThat = this;
+			Ext.Ajax.request({
+				url : 'resource/Invoice!queryInvoiceDetailByInvoiceId.action',
+				params : {
+					invoiceId : rs['invoice_id'],
+					invoiceCode : rs['invoice_code']
+				},
+				scope : deatilThat,
+				success : function(res, opt) {
+					var data = Ext.decode(res.responseText);
+					if (data) {
+						var invoiceDetailGrid = Ext.getCmp(panelId).panel.detail;
+						var detail = data.invoiceDetailList;
+						invoiceDetailGrid.getStore().removeAll();
+						if(detail && detail.length > 0){
+							 var detaildata = [];
+							 for(var i=0;i<detail.length;i++){
+								 var obj = {};
+								 obj['cust_name'] = detail[i].cust_name;
+								 obj['cust_no'] = detail[i].cust_no;
+								 obj['busi_name'] = detail[i].busi_name;
+								 obj['fee_name'] = detail[i].fee_name;
+								 obj['real_pay'] = detail[i].real_pay;
+								 obj['create_time'] = detail[i].create_time;
+								 obj['status'] = detail[i].status;
+								 obj['status_text'] = detail[i].status_text;
+								 obj['optr_id'] = detail[i].optr_id;
+								 obj['optr_name'] = detail[i].optr_name;
+								 detaildata.push(obj);
+							 }
+							 invoiceDetailGrid.getStore().loadData(detaildata);
+						 }
+
+						
+					}
+				}
+			});
+		}
 	},
 	doSave:function(){
 		var values = this.grid.getSelectedValues();

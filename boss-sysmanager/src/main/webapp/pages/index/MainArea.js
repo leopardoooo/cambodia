@@ -7,6 +7,7 @@ MainArea = Ext.extend(Ext.TabPanel,{
 			deferredRender:false,
 			minTabWidth: 115,
 			tabWidth:135,
+			id:'sysMainTabPanelId',
 			enableTabScroll:true,
 			activeTab:0,
 			listeners:{
