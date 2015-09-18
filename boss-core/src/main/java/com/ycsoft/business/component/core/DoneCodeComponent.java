@@ -24,6 +24,7 @@ import com.ycsoft.business.dao.core.common.CDoneCodeUnpayDao;
 import com.ycsoft.business.dao.core.cust.CCustDao;
 import com.ycsoft.business.dao.core.fee.CFeeDao;
 import com.ycsoft.business.dao.core.user.CUserDao;
+import com.ycsoft.business.dao.core.user.CUserHisDao;
 import com.ycsoft.business.dto.core.cust.DoneCodeDto;
 import com.ycsoft.business.dto.core.cust.DoneCodeExtAttrDto;
 import com.ycsoft.business.dto.core.cust.DoneInfoDto;
@@ -60,6 +61,8 @@ public class DoneCodeComponent extends BaseBusiComponent {
 	private CFeeDao cFeeDao;
 	@Autowired
 	private CUserDao cUserDao;
+	@Autowired
+	private CUserHisDao cUserHisDao;
 	/**
 	 * 给业务增加用户锁，防止并发临界时数据不一致。
 	 * @param cust_id
@@ -310,13 +313,15 @@ public class DoneCodeComponent extends BaseBusiComponent {
 			}
 			if(doneCodeDto.getBusi_code().equals(BusiCodeConstants.USER_OPEN)){
 				CUser user = cUserDao.findByKey(doneCodeDto.getUser_id());
-				String str = user.getUser_type();
-				if(str.equals(SystemConstants.USER_TYPE_BAND) && StringHelper.isNotEmpty(user.getModem_mac())){
-					str += " Modem: "+user.getModem_mac();
-				}else  if(StringHelper.isNotEmpty(user.getStb_id())){
-					str += " Stb: "+user.getStb_id();
+				if(user != null ){
+					String str = user.getUser_type();
+					if(str.equals(SystemConstants.USER_TYPE_BAND) && StringHelper.isNotEmpty(user.getModem_mac())){
+						str += " Modem: "+user.getModem_mac();
+					}else  if(StringHelper.isNotEmpty(user.getStb_id())){
+						str += " Stb: "+user.getStb_id();
+					}
+					tempQ.setRemark(str);
 				}
-				tempQ.setRemark(str);
 			}
 		}
 		return pageTarget;

@@ -535,10 +535,8 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 				{task_id : rs.get('task_id'),taskType:rs.get('task_type_id')},
 				function(res,opt){
 					Alert('工单已作废!');
-					for(var i = 0; i< rs.length ; i++){
-						rs.set("task_status", "CANCEL");
-						rs.set("task_status_text", "作废");
-					}
+					rs.set("task_status", "CANCEL");
+					rs.set("task_status_text", "作废");
 				});
 		}); 
 	},
