@@ -24,7 +24,6 @@ import com.ycsoft.beans.core.cust.CCust;
 import com.ycsoft.beans.core.cust.CCustDevice;
 import com.ycsoft.beans.core.fee.CFee;
 import com.ycsoft.beans.core.fee.CFeeAcct;
-import com.ycsoft.beans.core.fee.CFeeBusi;
 import com.ycsoft.beans.core.fee.CFeeDevice;
 import com.ycsoft.beans.core.job.JUserStop;
 import com.ycsoft.beans.core.prod.CProdOrder;
@@ -70,7 +69,7 @@ import com.ycsoft.commons.helper.DateHelper;
 import com.ycsoft.commons.helper.JsonHelper;
 import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.daos.core.JDBCException;
-import com.ycsoft.daos.helper.BeanHelper;
+
 @Service
 public class UserServiceSN extends BaseBusiService implements IUserService {
 
@@ -144,7 +143,6 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		doneCodeComponent.lockCust(cust.getCust_id());
 		Integer doneCode = doneCodeComponent.gDoneCode();
 		List<CUser> users = new ArrayList<CUser>();
-		List<CUser> updateUsers = new ArrayList<CUser>();
 		
 		if(SystemConstants.BOOLEAN_TRUE.equals(isHand)){
 			// 获取客户信息
@@ -168,12 +166,6 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 					user.setStop_type(stopType);
 					
 					CUser newUser = this.openSingle(cust, user, doneCode, null, deviceType, deviceModel, deviceBuyMode, deviceFee);
-					if(!newUser.getUser_type().equals(SystemConstants.USER_TYPE_DTT)){
-						CUser cuser = new CUser();
-						cuser.setUser_id(newUser.getUser_id());
-						cuser.setLogin_name( generateUserName(cust.getCust_id(), user.getUser_type()) );
-						userComponent.updateUser(cuser);
-					}
 					users.add(newUser);
 				}
 			}
@@ -200,12 +192,6 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 					user.setStop_type(stopType);
 					
 					CUser newUser = this.openSingle(cust, user, doneCode, null, deviceType, deviceModel, deviceBuyMode, deviceFee);
-					if(!newUser.getUser_type().equals(SystemConstants.USER_TYPE_DTT)){
-						CUser cuser = new CUser();
-						cuser.setUser_id(newUser.getUser_id());
-						cuser.setLogin_name( generateUserName(cust.getCust_id(), user.getUser_type()) );
-						userComponent.updateUser(cuser);
-					}
 					users.add(newUser);
 				}
 			}
@@ -300,6 +286,10 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 				Integer months = Integer.parseInt( userComponent.queryTemplateConfig(TemplateConfigDto.Config.PROTOCOL_DATE_MONTHS.toString()) );
 				user.setProtocol_date( DateHelper.addTypeDate(DateHelper.now(), "MONTH", months) );
 			}
+		}
+		
+		if(!user.getUser_type().equals(SystemConstants.USER_TYPE_DTT) && StringHelper.isEmpty(user.getLogin_name())){
+			user.setLogin_name( generateUserName(cust.getCust_id(), user.getUser_type()) );
 		}
 		
 		userComponent.createUser(user);
