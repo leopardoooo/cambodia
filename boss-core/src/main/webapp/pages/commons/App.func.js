@@ -493,13 +493,13 @@ Ext.apply(App.func,{
 					return false;
 				}
 			}else if(busicode =='1151'){//修改业务员
-				var date = Date.parseDate(data['create_time'].substring(0,10),'Y-m-d');
+				/*var date = Date.parseDate(data['create_time'].substring(0,10),'Y-m-d');
 				var cfgData = App.getApp().findCfgData('ALLOW_DAY_MOD_OPTR');
 				if(cfgData){
 					date = date.add(Date.DAY,parseInt(cfgData.config_value));
 				if(nowDate().format('Y-m-d') > date.format('Y-m-d'))
 					return false;
-				}
+				}*/
 			}
 		}else if(panelName === 'A_ITEM'){//账目信息面板
 			//客户状态资料隔离，用户状态 休眠和关模隔离 都不能进行账目操作,待销户
