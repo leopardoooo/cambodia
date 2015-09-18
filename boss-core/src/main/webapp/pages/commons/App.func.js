@@ -555,6 +555,11 @@ Ext.apply(App.func,{
 		
 		}else if(panelName === 'A_ACCT'){
 		
+		}else if(panelName ==='D_TASK'){
+			if(busicode =='2261'){//工单作废
+				if(data['task_status'] != 'INIT' )
+					return false;
+			}
 		}else if(panelName === 'D_BUSI'){
 			if(busicode == '1163'){//重打业务单只能打当前操作员打印过的
 				/*if (data['optr_id'] != App.getData().optr.optr_id){

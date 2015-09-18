@@ -178,32 +178,42 @@ TaskGrid = Ext.extend(Ext.ux.Grid,{
 					,'bug_detail','zte_status','zte_status_text','task_create_time']
 		}); 
 		var lc = langUtils.main("doc.task.columns");
-		var cm = [
-			{header:"工单编号",dataIndex:'task_id',width:80,renderer:function(value,metaData,record){
-				that = this;
-				if(value != ''){
-					return '<div style="text-decoration:underline;font-weight:bold"  onclick="Ext.getCmp(\'D_TASK\').doTaskWin();"  ext:qtitle="" ext:qtip="' + value + '">' + value +'</div>';
-				}else{
-					return '<div ext:qtitle="" ext:qtip="' + value + '">' + value +'</div>';
-				}
-			}},
-			{header:lc[0],dataIndex:'task_type_id_text',	width:60},
-			{header:lc[1],dataIndex:'task_status_text',	width:60},
-			{header:"施工队",dataIndex:'team_id_text',	width:80},
-			{header:"故障原因",dataIndex:'bug_type_text',width:120},
-			{header:"故障明细",dataIndex:'bug_detail',	width:120},
-			{header:"ZTE授权状态",dataIndex:'zte_status_text',	width:80},
-			{header:lc[4],dataIndex:'task_create_time',	width:100}
-		];
+		var cm = new Ext.ux.grid.LockingColumnModel({
+			columns : [
+				{header:"工单编号",dataIndex:'task_id',width:80,renderer:function(value,metaData,record){
+					that = this;
+					if(value != ''){
+						return '<div style="text-decoration:underline;font-weight:bold"  onclick="Ext.getCmp(\'D_TASK\').doTaskWin();"  ext:qtitle="" ext:qtip="' + value + '">' + value +'</div>';
+					}else{
+						return '<div ext:qtitle="" ext:qtip="' + value + '">' + value +'</div>';
+					}
+				}},
+				{header:lc[0],dataIndex:'task_type_id_text',	width:60},
+				{header:lc[1],dataIndex:'task_status_text',	width:60,renderer:Ext.util.Format.statusShow},
+				{header:"施工队",dataIndex:'team_id_text',	width:80},
+				{header:"故障原因",dataIndex:'bug_type_text',width:120},
+				{header:"故障明细",dataIndex:'bug_detail',	width:120},
+				{header:"ZTE授权状态",dataIndex:'zte_status_text',	width:80},
+				{header:lc[4],dataIndex:'task_create_time',	width:100}
+			]
+		})
 		var pageTbar = new Ext.PagingToolbar({store: this.taskStore ,pageSize : App.pageSize});
 		pageTbar.refresh.hide();
 		TaskGrid.superclass.constructor.call(this,{
 			id:'D_TASK',
 			store:this.taskStore,
 			sm:new Ext.grid.RowSelectionModel(),
-			columns:cm,
+			view: new Ext.ux.grid.ColumnLockBufferView(),
+			cm:cm,
 			bbar: pageTbar
 		})
+	},
+	initEvents: function(){
+		this.on("afterrender",function(){
+			this.swapViews();
+		},this,{delay:10});
+		
+		TaskGrid.superclass.initEvents.call(this);
 	},
 	remoteRefresh:function(){
 		this.refresh();
