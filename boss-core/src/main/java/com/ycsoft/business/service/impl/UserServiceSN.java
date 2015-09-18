@@ -47,6 +47,7 @@ import com.ycsoft.business.dao.core.prod.CProdOrderFeeDao;
 import com.ycsoft.business.dao.task.WTaskBaseInfoDao;
 import com.ycsoft.business.dao.task.WTaskUserDao;
 import com.ycsoft.business.dto.config.TemplateConfigDto;
+import com.ycsoft.business.dto.core.acct.PayDto;
 import com.ycsoft.business.dto.core.cust.CustFullInfoDto;
 import com.ycsoft.business.dto.core.fee.BusiFeeDto;
 import com.ycsoft.business.dto.core.fee.FeeInfoDto;
@@ -68,6 +69,7 @@ import com.ycsoft.commons.helper.DateHelper;
 import com.ycsoft.commons.helper.JsonHelper;
 import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.daos.core.JDBCException;
+import com.ycsoft.daos.helper.BeanHelper;
 @Service
 public class UserServiceSN extends BaseBusiService implements IUserService {
 
@@ -1414,7 +1416,47 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		}
 		
 		//refund all pay order
+		List<CProdOrderFee> orderFeeList = cProdOrderFeeDao.queryPayedOrderFeeByUser(task.getCust_id(), userIds);
+		boolean hasUnpay = false;
+		if (orderFeeList != null){
+			for (CProdOrderFee orderFee:orderFeeList){
+				if (orderFee.getInput_type().equals(SystemConstants.ORDER_FEE_TYPE_CFEE) && orderFee.getInput_fee()>0){
+					hasUnpay = true;
+					CProdOrder order = cProdOrderDao.findByKey(orderFee.getOrder_sn());
+					CFeeAcct fee = cFeeDao.queryAcctFeeByOrderSn(orderFee.getOrder_sn());
+					PayDto pay=new PayDto();
+					pay.setCust_id(task.getCust_id());
+					pay.setUser_id(order.getUser_id());
+					pay.setAcct_id(fee.getAcct_id());
+					pay.setAcctitem_id(fee.getAcctitem_id());
+					pay.setFee(orderFee.getInput_fee()*-1);
+					pay.setPresent_fee(0);
+					
+					pay.setProd_sn(orderFee.getOrder_sn());
+					pay.setInvalid_date(DateHelper.dateToStr(DateHelper.today().before(order.getEff_date())? order.getEff_date():DateHelper.today()));
+					pay.setBegin_date(DateHelper.dateToStr(order.getExp_date()));
+					CFeeAcct refundFee = feeComponent.saveAcctFee(task.getCust_id(), fee.getArea_id(), pay, doneCode, getBusiParam().getBusiCode(), StatusConstants.UNPAY);
+					orderFee.setOutput_sn(refundFee.getFee_sn());
+					orderFee.setOutput_fee(orderFee.getInput_fee());
+					orderFee.setOutput_type(SystemConstants.ORDER_FEE_TYPE_CFEE);
+					cProdOrderFeeDao.update(orderFee);
+				} else if (orderFee.getInput_type().equals(SystemConstants.ORDER_FEE_TYPE_ACCT) && orderFee.getInput_fee()>0){
+					CFeeAcct fee = cFeeDao.queryAcctFeeByOrderSn(orderFee.getOrder_sn());
+					String acct_change_sn=acctComponent.saveAcctAddFee(fee.getCust_id(), fee.getAcct_id(), fee.getAcctitem_id(),
+							SystemConstants.ACCT_CHANGE_TRANS, orderFee.getInput_fee(), orderFee.getFee_type(), 
+							getBusiParam().getBusiCode(), doneCode,orderFee.getProd_name()).getAcct_change_sn();
+					
+					orderFee.setOutput_sn(acct_change_sn);
+					orderFee.setOutput_fee(orderFee.getInput_fee());
+					orderFee.setOutput_type(SystemConstants.ORDER_FEE_TYPE_ACCT);
+					cProdOrderFeeDao.update(orderFee);
+				}
+			}
+		}
 		
+		if (hasUnpay){
+			
+		}
 		//update device status to idle,write off user
 		
 		for (WTaskUser user:userList){

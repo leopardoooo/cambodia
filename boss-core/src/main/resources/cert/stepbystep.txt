@@ -1,0 +1,77 @@
+
+	关于BOSS提供的工单接口进行双向认证环境配置，以下证书符合了cfocn的证书要求，
+	也满足了cfocn持有自己的证书访问boss回单接口，
+	更详细的文档，请参考我的个人博客：
+	http://leopardoooo.iteye.com/
+
+
+===
+1、复制相关的证书到本地某个目录，
+只需要$boss-core/src/main/resources/cert/server/目录下的两个文件。
+
+===
+2、配置$tomcat/conf/server.xml，从原有被注释的配置增加如下：
+<Connector SSLEnabled="true" 
+    acceptCount="100" 
+    clientAuth="true" 
+    disableUploadTimeout="true" 
+    enableLookups="false" 
+    
+    // 修改成您的本地地址
+    keystoreFile="/Users/killer/Downloads/SignedCerts/v11/certificates/server.p12" 
+    keystorePass="a1234567" 
+    keystoreType="PKCS12" 
+    
+    maxThreads="25" 
+    port="8443" 
+    protocol="org.apache.coyote.http11.Http11NioProtocol" 
+    scheme="https" 
+    secure="true" 
+    sslProtocol="TLS" 
+    
+    // 修改您的本地地址
+    truststoreFile="/Users/killer/Downloads/SignedCerts/v11/certificates/ca.jks" 
+    truststorePass="a1234567" 
+    truststoreType="JKS">
+    
+    </Connector>
+    
+===
+3、配置hosts
+127.0.0.1 boss.supernet.com.kh
+这一步骤不是必须的，如果没有配置，
+浏览器会提示服务器端的证书不被信息，因为网址不一致。
+如果没有配置，直接点击继续访问网页
+
+===
+4、访问boss工单WS接口时：当使用浏览器客户端访问WS接口时安装两个证书，
+$boss-core/src/main/resources/cert/client/:
+机构证书：ca.cer（这个需要安装至信任的机构）
+个人证书：client.p12（客户端访问时必须持有的证书）
+
+访问地址：
+https://boss.supernet.com.kh:8443/boss-core/services/BOSSWebServiceSoapImplService?wsdl
+如果使用8080端口访问时，会被重定向至https的地址，强制SSL
+
+
+===
+5、凡是需要访问CFOCN的工单接口时（也就是依赖boss-remoting的cfocn相关api），
+需要设置java或tomcat的启动参数：vm/arguments：新增如下：
+-Djavax.net.debug=ssl,handshake
+-Djavax.net.ssl.keyStore=/Users/killer/Downloads/工单/admin.pfx
+-Djavax.net.ssl.keyStorePassword=123456
+-Djavax.net.ssl.keyStoreType=PKCS12
+-Djavax.net.ssl.trustStore=/Users/killer/Downloads/工单/cfocn.ca.jks
+-Djavax.net.ssl.trustStorePassword=a1234567
+-Djavax.net.ssl.trustStoreType=JKS
+
+*** 注意上面的两个文件需要替换成你本地的文件路径，
+文件位于$boss-core/main/resources/cert/cfocn/目录下
+
+
+=== 
+以上配置不影响之前http端口的使用，包括winpay相关的支付接口：
+http://boss.supernet.com.kh:8080/boss-core/services/AgentPaymentService?wsdl
+
+如果不需要浏览器来测试，只需要1、2步骤即可。
+    

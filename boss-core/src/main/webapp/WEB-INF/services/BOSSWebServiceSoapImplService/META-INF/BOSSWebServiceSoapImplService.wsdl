@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions name="BOSSWebServiceSoapImplService" targetNamespace="http://cfocn.service.outwardtps.sysway.com/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://cfocn.service.outwardtps.sysway.com/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
+  <wsdl:types>
+    <xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://cfocn.service.outwardtps.sysway.com/" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xs:complexType name="resultHead">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="headCode" type="xs:string"/>
+          <xs:element minOccurs="0" name="headMsg" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="workOrderResp">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="attachData" type="xs:string"/>
+          <xs:element minOccurs="0" name="ISPCode" type="xs:string"/>
+          <xs:element minOccurs="0" name="orderNo" type="xs:string"/>
+          <xs:element minOccurs="0" name="respMsg" type="xs:string"/>
+          <xs:element minOccurs="0" name="respType" type="xs:string"/>
+          <xs:element minOccurs="0" name="userNo" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="productInfo">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="deviceInfos" nillable="true" type="tns:deviceInfo"/>
+          <xs:element minOccurs="0" name="productCode" type="xs:string"/>
+          <xs:element minOccurs="0" name="productName" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="deviceInfo">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="deviceName" type="xs:string"/>
+          <xs:element minOccurs="0" name="deviceSN" type="xs:string"/>
+          <xs:element minOccurs="0" name="deviceSpecCode" type="xs:string"/>
+          <xs:element name="isFCPort" type="xs:boolean"/>
+          <xs:element minOccurs="0" name="OCCSerialCode" type="xs:string"/>
+          <xs:element minOccurs="0" name="originalDeviceName" type="xs:string"/>
+          <xs:element minOccurs="0" name="originalDeviceSN" type="xs:string"/>
+          <xs:element minOccurs="0" name="originalDeviceSpecCode" type="xs:string"/>
+          <xs:element minOccurs="0" name="POSSerialCode" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType final="#all" name="deviceInfoArray">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="item" nillable="true" type="tns:deviceInfo"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:element name="replyManuallyInfluencedWorkOrder" type="tns:replyManuallyInfluencedWorkOrder"/>
+      <xs:complexType name="replyManuallyInfluencedWorkOrder">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="arg0" type="xs:string"/>
+          <xs:element minOccurs="0" name="arg1" type="xs:string"/>
+          <xs:element minOccurs="0" name="arg2" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:element name="replyManuallyInfluencedWorkOrderResponse" type="tns:replyManuallyInfluencedWorkOrderResponse"/>
+      <xs:complexType name="replyManuallyInfluencedWorkOrderResponse">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="return" type="tns:resultHead"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:element name="returnWorkOrder" type="tns:returnWorkOrder"/>
+      <xs:complexType name="returnWorkOrder">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="arg0" type="tns:workOrderResp"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:element name="returnWorkOrderResponse" type="tns:returnWorkOrderResponse"/>
+      <xs:complexType name="returnWorkOrderResponse">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="return" type="tns:resultHead"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:element name="deviceFeedBack" type="tns:deviceFeedBack"/>
+      <xs:complexType name="deviceFeedBack">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="arg0" type="xs:string"/>
+          <xs:element minOccurs="0" name="arg1" type="xs:string"/>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="arg2" type="tns:productInfo"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:element name="deviceFeedBackResponse" type="tns:deviceFeedBackResponse"/>
+      <xs:complexType name="deviceFeedBackResponse">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="return" type="tns:resultHead"/>
+        </xs:sequence>
+      </xs:complexType>
+    </xs:schema>
+  </wsdl:types>
+  <wsdl:message name="deviceFeedBack">
+    <wsdl:part name="parameters" element="tns:deviceFeedBack">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="deviceFeedBackResponse">
+    <wsdl:part name="parameters" element="tns:deviceFeedBackResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="returnWorkOrderResponse">
+    <wsdl:part name="parameters" element="tns:returnWorkOrderResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="returnWorkOrder">
+    <wsdl:part name="parameters" element="tns:returnWorkOrder">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="replyManuallyInfluencedWorkOrderResponse">
+    <wsdl:part name="parameters" element="tns:replyManuallyInfluencedWorkOrderResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="replyManuallyInfluencedWorkOrder">
+    <wsdl:part name="parameters" element="tns:replyManuallyInfluencedWorkOrder">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="BOSSWebServiceSoap">
+    <wsdl:operation name="replyManuallyInfluencedWorkOrder">
+      <wsdl:input name="replyManuallyInfluencedWorkOrder" message="tns:replyManuallyInfluencedWorkOrder">
+    </wsdl:input>
+      <wsdl:output name="replyManuallyInfluencedWorkOrderResponse" message="tns:replyManuallyInfluencedWorkOrderResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="returnWorkOrder">
+      <wsdl:input name="returnWorkOrder" message="tns:returnWorkOrder">
+    </wsdl:input>
+      <wsdl:output name="returnWorkOrderResponse" message="tns:returnWorkOrderResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="deviceFeedBack">
+      <wsdl:input name="deviceFeedBack" message="tns:deviceFeedBack">
+    </wsdl:input>
+      <wsdl:output name="deviceFeedBackResponse" message="tns:deviceFeedBackResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="BOSSWebServiceSoapImplServiceSoapBinding" type="tns:BOSSWebServiceSoap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="replyManuallyInfluencedWorkOrder">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="replyManuallyInfluencedWorkOrder">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="replyManuallyInfluencedWorkOrderResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="returnWorkOrder">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="returnWorkOrder">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="returnWorkOrderResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="deviceFeedBack">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="deviceFeedBack">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="deviceFeedBackResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="BOSSWebServiceSoapImplService">
+    <wsdl:port name="BOSSWebServiceSoapImplPort" binding="tns:BOSSWebServiceSoapImplServiceSoapBinding">
+      <soap:address location="https://103.242.13.56:7004/sysway-boss-service/cxf/BOSS_WebService"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

@@ -60,14 +60,14 @@ public class CFOCN_WebSvc_WorkOrderStub extends org.apache.axis2.client.Stub {
         org.apache.axis2.context.ConfigurationContext configurationContext)
         throws org.apache.axis2.AxisFault {
         this(configurationContext,
-            "http://omis.cfocn.com.kh/boss/CFOCN_WebSvc_WorkOrder.asmx");
+            "https://omis.cfocn.com.kh/BOSS/CFOCN_WebSvc_WorkOrder.asmx");
     }
 
     /**
      * Default Constructor
      */
     public CFOCN_WebSvc_WorkOrderStub() throws org.apache.axis2.AxisFault {
-        this("http://omis.cfocn.com.kh/boss/CFOCN_WebSvc_WorkOrder.asmx");
+        this("https://omis.cfocn.com.kh/BOSS/CFOCN_WebSvc_WorkOrder.asmx");
     }
 
     /**
@@ -1375,7 +1375,7 @@ public class CFOCN_WebSvc_WorkOrderStub extends org.apache.axis2.client.Stub {
         return null;
     }
 
-    //http://omis.cfocn.com.kh/boss/CFOCN_WebSvc_WorkOrder.asmx
+    //https://omis.cfocn.com.kh/BOSS/CFOCN_WebSvc_WorkOrder.asmx
     public static class ArrayOfWorkOrder implements org.apache.axis2.databinding.ADBBean {
         /* This type was generated from the piece of schema that had
            name = ArrayOfWorkOrder
