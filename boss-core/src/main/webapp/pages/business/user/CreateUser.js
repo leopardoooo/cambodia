@@ -43,14 +43,14 @@ UserBaseForm = Ext.extend( BaseForm , {
 							select:this.doSelectUserType
 						}
 					}]
-				},{
+				}/*,{
 					items:[{
 						id:'userNameId',
 						fieldLabel: lmain("user.base.name"),
 						xtype:'textfield',
 						name:'user_name'
 					}]
-				}]
+				}*/]
 			},{
 				xtype:'panel',
 				anchor:'100%',
@@ -200,6 +200,19 @@ UserBaseForm = Ext.extend( BaseForm , {
 			    }]
 			}]
 		});
+		
+		this.buyModeStore.on('load',function(){
+			this.buyModeStore.each(function(record){
+				if(record.get('buy_mode') == 'PRESENT'){
+					Ext.getCmp('deviceBuyMode').setValue('PRESENT');
+					return false;
+				}
+			}, this);
+		}, this);
+	},
+	isInputTask: function(flag){
+		if(Ext.getCmp('radioAssignWay'))
+			Ext.getCmp('radioAssignWay').allowBlank = !flag;
 	},
 	// 施工回填
 	doCheckedChangeTask: function(box, checked){
@@ -216,6 +229,7 @@ UserBaseForm = Ext.extend( BaseForm , {
 			deviceCodeEl.enable(true);
 			deviceCodeEl.allowBlank = false;
 		}
+		this.isInputTask(checked);
 	},
 	doSelectUserType: function(c,r,i){
 		var type = c.getValue();
@@ -246,25 +260,25 @@ UserBaseForm = Ext.extend( BaseForm , {
 				bandCount = "0" + bandCount;
 			}
 			
-			// 密码，默认证件号后六位
-			var newPswd = App.getApp().data.custFullInfo.cust.password;
-			Ext.getCmp("txtLoginName").setValue(App.getApp().data.custFullInfo.cust.cust_no + bandCount);
-			Ext.getCmp("txtLoginPswd").setValue(newPswd);
-			
-			fs.setVisible(false);
+			fs.setVisible(true);
 			isAllowBlank(false);
 		}else if(type === "OTT_MOBILE"){
 			fs.setVisible(true);
 			isAllowBlank(true);
+		}else if(type === "OTT"){
+			fs.setVisible(true);
+			isAllowBlank(false);
 		}else{
 			fs.setVisible(false);
 			isAllowBlank(false);
+			
 		}
 		
 		if(type == 'DTT'){
 			//施工回填选择框默认不勾选，且禁用掉，必须输入设备号
 			Ext.getCmp('boxTaskEl').setValue(false);
 			Ext.getCmp('boxTaskEl').setDisabled(true);
+			
 		}else{
 			Ext.getCmp('boxTaskEl').setValue(true);
 			Ext.getCmp('boxTaskEl').setDisabled(false);
@@ -277,15 +291,31 @@ UserBaseForm = Ext.extend( BaseForm , {
 			this.setDisplayItems(true);
 			// 过滤设备类型
 			this.doFilterDeviceModel(type);
+			this.doBuyModeSelect();
 		}
 		
 		// 表单重置
 		Ext.getCmp("deviceCodeEl").setValue("");
-		Ext.getCmp("deviceBuyMode").setRawValue("");
-		Ext.getCmp("txtFeeEl").setRawValue("");
-		Ext.getCmp("dfFeeNameEl").setRawValue("");
+//		Ext.getCmp("deviceBuyMode").setRawValue("");
+//		Ext.getCmp("txtFeeEl").setRawValue("");
+//		Ext.getCmp("dfFeeNameEl").setRawValue("");
 		Ext.getCmp('txtLoginName').setValue('');
-		Ext.getCmp('txtLoginPswd').setValue('');
+		Ext.getCmp('txtLoginPswd').setValue(App.getCust()['password']);
+		
+		if(type != 'DTT'){
+			Ext.Ajax.request({
+				scope : this,
+				url : root + '/core/x/User!generateUserName.action',
+				params : { 
+					custId: App.getCust()['cust_id'],
+					userType: type 
+				},
+				success : function(response,opts){
+					var obj = Ext.decode(response.responseText);
+					Ext.getCmp('txtLoginName').setValue(obj);
+				}
+			});
+		}
 		
 	},
 	setDisplayItems: function(bool){
@@ -302,9 +332,9 @@ UserBaseForm = Ext.extend( BaseForm , {
 		var REF = {"DTT": "1", "OTT": "2", "BAND": "3" }
 		var type = REF[userType] || "";
 		var cmb = Ext.getCmp("deviceCategoryEl");
-		cmb.setRawValue("");
+		/*cmb.setRawValue("");
 		cmb.focus();
-		cmb.expand();
+		cmb.expand();*/
 		var store = cmb.getStore();
 		// 先清除过滤
 		if(!this.deviceDataBak){
@@ -323,6 +353,9 @@ UserBaseForm = Ext.extend( BaseForm , {
 		}
 		store.removeAll();
 		store.loadData(data);
+		if(data.length > 0)
+			cmb.setValue(data[0]['item_value']);
+		Ext.getCmp("deviceBuyMode").focus();
 	},
 	//设备号发生变化
 	doDeviceCodeChange : function(field){
@@ -439,6 +472,7 @@ UserBaseForm = Ext.extend( BaseForm , {
 				loginName: loginName
 			},
 			success: function(res,opt){
+				field.focus();
 			}
 		});
 	},
@@ -483,7 +517,6 @@ UserBaseForm = Ext.extend( BaseForm , {
 	getValues : function(){
 		var values = {};
 		// 基本参数
-		values["user.user_name"] = Ext.getCmp("userNameId").getValue();
 		values["user.user_type"] = Ext.getCmp("boxUserType").getValue();
 		values["user.stop_type"] = Ext.getCmp("boxStopType").getValue();
 		values["user.login_name"] = Ext.getCmp("txtLoginName").getValue();

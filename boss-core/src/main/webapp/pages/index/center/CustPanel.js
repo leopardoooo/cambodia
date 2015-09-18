@@ -53,6 +53,10 @@ var custInfoHTML =
 		'<td class="label">'+ langUtils.main("cust.base.developName") +':</td>' +
 		'<td class="input">&nbsp;{[values.cust.develop_optr_name || ""]}</td>'+
 	'</tr>'+
+	'</tr>'+'<tr height=24>'+
+		'<td class="label">'+ langUtils.main("cust.base.unitName") +':</td>' +
+		'<td class="input">&nbsp;{[values.cust.unit_name || ""]}</td>'+
+	'</tr>'+
 	'</tr>'+
 	'<tpl if="values.cust.cust_type==\'NONRES\'">'+
 		'<tr height=24>'+

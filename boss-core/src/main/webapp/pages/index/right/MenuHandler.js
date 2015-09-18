@@ -95,7 +95,7 @@ Ext.apply(MenuHandler, {
 	NewCust : function() {
 		return {
 			width : 580,
-			height : 470
+			height : 510
 		};
 	},
 	/**
@@ -146,11 +146,11 @@ Ext.apply(MenuHandler, {
 			Alert(lmsg('needLogOffUser'));
 			return false;
 		}
-		var custDeviceGrid = App.getApp().main.infoPanel.getCustPanel().custDeviceGrid;
-		if (custDeviceGrid.GDDeviceArray.length > 0) {
-			Alert(lmsg('recycleGdDevice'));
-			return false;
-		}
+//		var custDeviceGrid = App.getApp().main.infoPanel.getCustPanel().custDeviceGrid;
+//		if (custDeviceGrid.GDDeviceArray.length > 0) {
+//			Alert(lmsg('recycleGdDevice'));
+//			return false;
+//		}
 		// alert(custDeviceGrid.CustDeviceArray.length);
 		// if(custDeviceGrid.CustDeviceArray.length > 0){
 		// var o = {};
@@ -767,7 +767,7 @@ Ext.apply(MenuHandler, {
 	},
 	EditPay : function() {
 		return {
-			width : 600,
+			width : 650,
 			height : 400
 		};
 	},
@@ -791,7 +791,7 @@ Ext.apply(MenuHandler, {
 		}
 		return {
 			width : 550,
-			height : 360
+			height : 400
 		};
 	},
 	//派单开户
@@ -2910,6 +2910,24 @@ Ext.apply(MenuHandler, {
 			width : 450,
 			height : 400
 		};
+	},
+	removeTaskBtnId:function(){
+		var record = App.main.infoPanel.docPanel.taskGrid.getSelectionModel().getSelected();
+		// 回调函数
+		function callback(res, opt) {
+			var result = Ext.decode(res.responseText);
+			if (result.success == true) {
+				Alert('工单作废成功!');
+				App.getApp().main.infoPanel.docPanel.taskGrid.remoteRefresh();
+						
+			}
+		}
+		var url = Constant.ROOT_PATH + "/core/x/Task!cancelTaskSn.action";
+
+		Confirm("确定作废工单吗?", this, function() {
+			// 调用请求函数,详细参数请看busi-helper.js
+			App.sendRequest(url, {task_id : record.get('task_id'),taskType:record.get('task_type_id')}, callback);
+		});
 	}
 	
 });

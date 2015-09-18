@@ -1,0 +1,170 @@
+/**
+ * BOSSWebServiceSoapImplServiceSkeleton.java
+ *
+ * This file was auto-generated from WSDL
+ * by the Apache Axis2 version: 1.6.3  Built on : Jun 27, 2015 (11:17:49 BST)
+ */
+package com.sysway.outwardtps.service.cfocn;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import com.ycsoft.beans.task.TaskFillDevice;
+import com.ycsoft.business.service.impl.SnTaskService;
+
+/**
+ *  BOSSWebServiceSoapImplServiceSkeleton java skeleton for the axisService
+ */
+public class BOSSWebServiceSoapImplServiceSkeleton
+    implements BOSSWebServiceSoapImplServiceSkeletonInterface {
+    
+	private SnTaskService snTaskService;
+	
+	/**
+     * @param replyManuallyInfluencedWorkOrder0
+     * @return replyManuallyInfluencedWorkOrderResponse1
+     */
+    public com.sysway.outwardtps.service.cfocn.ReplyManuallyInfluencedWorkOrderResponseE replyManuallyInfluencedWorkOrder(
+        com.sysway.outwardtps.service.cfocn.ReplyManuallyInfluencedWorkOrderE replyManuallyInfluencedWorkOrder0) {
+        throw new java.lang.UnsupportedOperationException("Please implement " +
+            this.getClass().getName() + "#replyManuallyInfluencedWorkOrder");
+    }
+
+    /**
+     * 工单完成后，会调用该接口通知boss
+     * 
+     * RespType	回执类号	String	QC工单完成 QD工单未完成 
+     * WorkerOrderNo	工单号	String	
+     * ISPCode	运营商编号	String	
+     * UserNo	用户编号	String	
+     * RespMsg	回执描述	String	
+     * AttachData	附加数据	String	便于以后扩展，数据格式未定
+     * 
+     * HeadCode	返回代码	String	SUCCESS接收通知成功。FAIL接收通知失败。原因在HeadMsg说明
+     * HeadMsg	代码描述	String	
+     * 
+     * @param returnWorkOrder2
+     * @return returnWorkOrderResponse3
+     */
+    public com.sysway.outwardtps.service.cfocn.ReturnWorkOrderResponseE returnWorkOrder(
+        com.sysway.outwardtps.service.cfocn.ReturnWorkOrderE returnWorkOrder2) {
+    	WorkOrderResp resp = returnWorkOrder2.getReturnWorkOrder().getArg0();
+    	// 工单编号
+    	String taskId = resp.getOrderNo();
+    	// 完工类型
+    	String resultType = resp.getRespType();
+    	// 回执消息, 如果失败的情况
+    	String msg = resp.getRespMsg();
+    	
+    	try{
+    		// 调用boss接口完成工单
+    		snTaskService.finishTask(taskId, resultType);
+    		// 返回成功的结果
+    		return createReturnWorkOrderResponse(createResultHeadForSuccess());
+    	}catch(Exception e){
+    		e.printStackTrace();
+    		// 返回失败的结果
+    		return createReturnWorkOrderResponse(createResultHeadForFail(e));
+    	}
+    }
+    
+    private ReturnWorkOrderResponseE createReturnWorkOrderResponse(ResultHead head){
+    	ReturnWorkOrderResponseE response = new ReturnWorkOrderResponseE();
+    	
+    	ReturnWorkOrderResponse body = new ReturnWorkOrderResponse();
+    	body.set_return(head);
+    	
+    	response.setReturnWorkOrderResponse(body);
+    	
+    	return response;
+    }
+    
+
+    /**
+     * 
+     * 设备回填
+     * 
+     * workOrderNo： 单号
+     * type = Normal 正常设备回填  （需要回填全部设备）
+     * type = Replace 正常回填后，需要再次更换设备（比如调试过程发现设备坏了，只需要回填更换的设备） 
+     * 
+     * productInfos ProductInfo[] : 见收单的参数说明
+     * ProductName	产品名称	String	产品名称	不为空	
+     * ProductCode	产品编码	String		不为空	
+     * 
+     * DeviceInfos		DeviceInfo[]		可为空	
+     * DeviceName	备名称	String	设备名称	不为空
+     * DeviceSN	设备标识号	String	设备标识号	不为空
+     * OriginalDeviceType	原设备名称	String	原设备名称	可空（更换设备时不为空）	
+     * OriginalDeviceSN	原设备标识号	String	原设备标识号	可空（更换设备时不为空）	
+     * 
+     * @param deviceFeedBack4
+     * @return deviceFeedBackResponse5
+     */
+    public com.sysway.outwardtps.service.cfocn.DeviceFeedBackResponseE deviceFeedBack(
+        com.sysway.outwardtps.service.cfocn.DeviceFeedBackE deviceFeedBack4) {
+    	DeviceFeedBack dfb = deviceFeedBack4.getDeviceFeedBack();
+    	
+    	// 工单编号
+    	String taskId = dfb.getArg0();
+    	// TODO 该参数不知道有什么处理
+    	// Normal 正常设备回填  （需要回填全部设备）
+    	// Replace 正常回填后，需要再次更换设备（比如调试过程发现设备坏了，只需要回填更换的设备）
+    	String type = dfb.getArg1();
+    	
+    	// 设备信息
+    	ProductInfo[] prodArray = dfb.getArg2();
+    	List<TaskFillDevice> devices = new ArrayList<>();
+    	for (DeviceInfo deviceInfo : prodArray[0].getDeviceInfos()) {
+    		TaskFillDevice d = new TaskFillDevice();
+    		d.setDeviceId(deviceInfo.getDeviceSN());
+    		d.setDeviceCode(deviceInfo.getDeviceSpecCode());
+    		d.setOldDeviceCode(deviceInfo.getOriginalDeviceSpecCode());
+    		
+    		// TODO 不知道怎么对应
+    		// d.setDeviceModel(deviceModel);
+    		
+    		devices.add(d);
+    	}
+    	
+    	try {
+			snTaskService.fillTask(taskId, null, null, devices);
+			return createDeviceFeedBackResponse(createResultHeadForSuccess());
+		} catch (Exception e) {
+			e.printStackTrace();
+			return createDeviceFeedBackResponse(createResultHeadForFail(e));
+		}
+    }
+    
+    private DeviceFeedBackResponseE createDeviceFeedBackResponse(ResultHead head){
+    	DeviceFeedBackResponseE dfbre = new DeviceFeedBackResponseE();
+    	DeviceFeedBackResponse dfbr = new DeviceFeedBackResponse();
+    	dfbr.set_return(head);
+    	dfbre.setDeviceFeedBackResponse(dfbr);
+    	
+    	return dfbre;
+    }
+    
+    /**
+     * 创建一个返回头信息
+     */
+    private ResultHead createResultHead(boolean result, String msg){
+    	ResultHead rh = new ResultHead();
+    	rh.setHeadCode(result ? "SUCCESS" : "FAIL");
+    	rh.setHeadMsg(msg);
+    	
+    	return rh;
+    }
+    
+    private ResultHead createResultHeadForSuccess(){
+    	return createResultHead(true, null);
+    }
+    
+    private ResultHead createResultHeadForFail(Exception e){
+    	return createResultHead(false, e.getMessage());
+    }
+
+	public void setSnTaskService(SnTaskService snTaskService) {
+		this.snTaskService = snTaskService;
+	}
+}

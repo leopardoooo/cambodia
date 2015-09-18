@@ -493,13 +493,13 @@ Ext.apply(App.func,{
 					return false;
 				}
 			}else if(busicode =='1151'){//修改业务员
-				var date = Date.parseDate(data['create_time'].substring(0,10),'Y-m-d');
+				/*var date = Date.parseDate(data['create_time'].substring(0,10),'Y-m-d');
 				var cfgData = App.getApp().findCfgData('ALLOW_DAY_MOD_OPTR');
 				if(cfgData){
 					date = date.add(Date.DAY,parseInt(cfgData.config_value));
 				if(nowDate().format('Y-m-d') > date.format('Y-m-d'))
 					return false;
-				}
+				}*/
 			}
 		}else if(panelName === 'A_ITEM'){//账目信息面板
 			//客户状态资料隔离，用户状态 休眠和关模隔离 都不能进行账目操作,待销户
@@ -555,6 +555,11 @@ Ext.apply(App.func,{
 		
 		}else if(panelName === 'A_ACCT'){
 		
+		}else if(panelName ==='D_TASK'){
+			if(busicode =='2261'){//工单作废
+				if(data['task_status'] != 'INIT' )
+					return false;
+			}
 		}else if(panelName === 'D_BUSI'){
 			if(busicode == '1163'){//重打业务单只能打当前操作员打印过的
 				/*if (data['optr_id'] != App.getData().optr.optr_id){
@@ -601,8 +606,8 @@ Ext.apply(App.func,{
 					return true;
 				}
 				if (data['status']=='INVALID' || (data['busi_fee']=='F' && data['busi_code'] !='1007' 
-				&& data['busi_code'] !='1008' && data['busi_code'] !='1009' 
-				&& data['busi_code'] !='1013' && data['busi_code'] !='1108'
+				&& data['busi_code'] !='1008'  && data['busi_code'] !='1013' && data['busi_code'] !='1009'
+				 && data['busi_code'] !='1108' && data['busi_code'] !='1109'
 				) || App.getCust().status=='RELOCATE' || (Ext.isEmpty(data['real_pay']) && Ext.isEmpty(data['fee_id'])) )
 					return false;
 			}

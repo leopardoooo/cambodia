@@ -172,6 +172,7 @@ public class TBusiFeeStd extends TBusiFee implements Serializable {
 
 	public void setDevice_model(String device_model) {
 		this.device_model = device_model;
+		device_model_text=MemoryDict.getDictName(getDevice_type()+"_MODEL", device_model);
 	}
 
 

@@ -50,6 +50,7 @@ import com.ycsoft.business.dao.system.SCountyDao;
 import com.ycsoft.business.dto.config.TemplateConfigDto;
 import com.ycsoft.commons.abstracts.BaseComponent;
 import com.ycsoft.commons.constants.DataRight;
+import com.ycsoft.commons.constants.DictKey;
 import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.exception.ServicesException;
@@ -57,6 +58,7 @@ import com.ycsoft.commons.helper.BeanHelper;
 import com.ycsoft.commons.helper.DateHelper;
 import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.commons.pojo.UserTypeDto;
+import com.ycsoft.commons.store.MemoryDict;
 import com.ycsoft.commons.store.TemplateConfig;
 import com.ycsoft.commons.store.TemplateConfig.Template;
 import com.ycsoft.daos.core.JDBCException;
@@ -100,14 +102,29 @@ public class BaseBusiComponent extends BaseComponent{
 	 * @param user
 	 */
 	public String getFillUserName(CUser user){
-		if(StringHelper.isEmpty(user.getUser_name())){
+		String userName = "";
+		if(user.getUser_type().equals(SystemConstants.USER_TYPE_DTT)){
+			userName = MemoryDict.getTransData( MemoryDict.getDictName(DictKey.TERMINAL_TYPE, SystemConstants.USER_TERMINAL_TYPE_ZZD) );
+		}else if(user.getUser_type().equals(SystemConstants.USER_TYPE_OTT)){
+			if(StringHelper.isNotEmpty(user.getUser_name())){
+				userName = userName +"("+MemoryDict.getTransData( MemoryDict.getDictName(DictKey.TERMINAL_TYPE, user.getTerminal_type()) )+")";
+			}else{
+				userName = MemoryDict.getTransData( MemoryDict.getDictName(DictKey.TERMINAL_TYPE, user.getTerminal_type()) );
+			}
+		}else{
+			if(StringHelper.isEmpty(user.getUser_name())){
+				userName = user.getLogin_name();
+			}
+		}
+		
+		/*if(StringHelper.isEmpty(user.getUser_name())){
 			if(StringHelper.isEmpty(user.getLogin_name())){
 				return user.getUser_type();
 			}else{
 				return user.getLogin_name();
 			}
-		}
-		return user.getUser_name();
+		}*/
+		return userName;
 	}
 	/**
 	 * 创建包多月产品的按月账单

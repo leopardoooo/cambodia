@@ -4,9 +4,9 @@
  * @extends Ext.Panel
  */
 CheckInvoice = Ext.extend(Ext.Panel,{
-	checkInvoicePanel:null,
+	panel:null,
 	constructor:function(){
-		this.checkInvoicePanel = new CommonInvoicePanel("CHECK");
+		this.panel = new CommonInvoicePanel("CHECK");
 		CheckInvoice.superclass.constructor.call(this,{
 			id:'CheckInvoice',
 			title:'发票结账',
@@ -15,7 +15,7 @@ CheckInvoice = Ext.extend(Ext.Panel,{
 			baseCls: "x-plain",
 			layout:'border',
 			items:[
-				this.checkInvoicePanel
+				this.panel
 			]
 		});
 	}

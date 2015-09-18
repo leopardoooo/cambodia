@@ -66,4 +66,20 @@ public class CProdOrderFeeDao extends BaseEntityDao<CProdOrderFee>  {
 		
 		return this.createQuery(sql, orderSn, SystemConstants.ORDER_FEE_TYPE_TRANSFEE, SystemConstants.ORDER_FEE_TYPE_TRANSFEE).setStart(start).setLimit(limit).page();
 	}
+	
+	public List<CProdOrderFee> queryPayedOrderFeeByUser(String custId,String[] userIds) throws Exception{
+		String sql ="select b.* from c_prod_order a,c_prod_order_Fee b where a.order_sn in ( "+
+					"	select order_sn "+
+					"	  from c_prod_order "+
+					"	 where cust_id = ? "+
+					"	   and user_id in ("+sqlGenerator.in(userIds)+") "+
+					"	   and package_sn is null "+
+					"	union "+
+					"	select package_sn order_sn "+
+					"	  from c_prod_order "+
+					"	 where cust_id = ? "+
+					"	   and user_id in ("+sqlGenerator.in(userIds)+") "+
+					"	   and package_sn is not null) and a.is_pay='T' and a.order_sn = b.order_sn";
+		return this.createQuery(sql, custId,custId).list();
+	}
 }

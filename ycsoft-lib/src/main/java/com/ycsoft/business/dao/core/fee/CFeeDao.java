@@ -657,6 +657,13 @@ public class CFeeDao extends BaseEntityDao<CFee> {
 			  "	   and package_sn is not null) and status='UNPAY'";	
 		return createQuery(CFeeAcct.class,sql,custId,custId).list();
 	} 
+	
+	public CFeeAcct queryAcctFeeByOrderSn(String orderSn)throws JDBCException {
+		String sql ="select a.* from c_fee a,c_fee_acct b "
+				+ " where a.fee_sn=b.fee_sn and b.prod_sn = ?";
+		
+		return createQuery(CFeeAcct.class,sql,orderSn).list().get(0);
+	}
 
 
 }
