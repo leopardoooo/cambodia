@@ -864,32 +864,32 @@ public class OrderService extends BaseBusiService implements IOrderService{
 	 * @throws JDBCException
 	 */
 	private void atvProd(CProdOrder cProdOrder,PProd prodConfig,Integer doneCode) throws Exception{
-		if(cProdOrder.getIs_pay().equals(SystemConstants.BOOLEAN_TRUE)
-				&&!SystemConstants.SERVICE_CHANNEL_MOBILE.equals(this.getBusiParam().getService_channel())){
-			
-			if(prodConfig.getProd_type().equals(SystemConstants.PROD_TYPE_BASE)){
-				List<CProdOrder> list=new ArrayList<>();
-				list.add(cProdOrder);
-				authComponent.sendAuth(cUserDao.findByKey(cProdOrder.getUser_id()), list, BusiCmdConstants.ACCTIVATE_PROD, doneCode);
-			}else{
-				//套餐的授权
-				Map<String,CUser> userMap=CollectionHelper.converToMapSingle(cUserDao.queryUserByCustId(cProdOrder.getCust_id()), "user_id");
-				Map<CUser,List<CProdOrder>> atvMap=new HashMap<>();
-				for(CProdOrder order: cProdOrderDao.queryPakDetailOrder(cProdOrder.getOrder_sn())){
-					CUser user=userMap.get(order.getUser_id());
-					if(user==null){
-						throw new ServicesException(ErrorCode.OrderDateException,order.getOrder_sn());
-					}
-					List<CProdOrder> list=atvMap.get(user);
-					if(list==null){
-						list=new ArrayList<>();
-						atvMap.put(user, list);
-					}
-					list.add(order);
+		if(SystemConstants.SERVICE_CHANNEL_MOBILE.equals(this.getBusiParam().getService_channel())){
+			//移动渠道走直接授权，不通过异步指令授权
+			return;
+		}
+		if(prodConfig.getProd_type().equals(SystemConstants.PROD_TYPE_BASE)){
+			List<CProdOrder> list=new ArrayList<>();
+			list.add(cProdOrder);
+			authComponent.sendAuth(cUserDao.findByKey(cProdOrder.getUser_id()), list, BusiCmdConstants.ACCTIVATE_PROD, doneCode);
+		}else{
+			//套餐的授权
+			Map<String,CUser> userMap=CollectionHelper.converToMapSingle(cUserDao.queryUserByCustId(cProdOrder.getCust_id()), "user_id");
+			Map<CUser,List<CProdOrder>> atvMap=new HashMap<>();
+			for(CProdOrder order: cProdOrderDao.queryPakDetailOrder(cProdOrder.getOrder_sn())){
+				CUser user=userMap.get(order.getUser_id());
+				if(user==null){
+					throw new ServicesException(ErrorCode.OrderDateException,order.getOrder_sn());
 				}
-				for(CUser user:atvMap.keySet()){
-					authComponent.sendAuth(user, atvMap.get(user),  BusiCmdConstants.ACCTIVATE_PROD, doneCode);
+				List<CProdOrder> list=atvMap.get(user);
+				if(list==null){
+					list=new ArrayList<>();
+					atvMap.put(user, list);
 				}
+				list.add(order);
+			}
+			for(CUser user:atvMap.keySet()){
+				authComponent.sendAuth(user, atvMap.get(user),  BusiCmdConstants.ACCTIVATE_PROD, doneCode);
 			}
 		}
 	}

@@ -70,6 +70,7 @@ import com.ycsoft.commons.helper.DateHelper;
 import com.ycsoft.commons.helper.JsonHelper;
 import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.daos.core.JDBCException;
+
 @Service
 public class UserServiceSN extends BaseBusiService implements IUserService {
 
@@ -143,7 +144,6 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		doneCodeComponent.lockCust(cust.getCust_id());
 		Integer doneCode = doneCodeComponent.gDoneCode();
 		List<CUser> users = new ArrayList<CUser>();
-		List<CUser> updateUsers = new ArrayList<CUser>();
 		
 		if(SystemConstants.BOOLEAN_TRUE.equals(isHand)){
 			// 获取客户信息
@@ -167,12 +167,6 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 					user.setStop_type(stopType);
 					
 					CUser newUser = this.openSingle(cust, user, doneCode, null, deviceType, deviceModel, deviceBuyMode, deviceFee);
-					if(!newUser.getUser_type().equals(SystemConstants.USER_TYPE_DTT)){
-						CUser cuser = new CUser();
-						cuser.setUser_id(newUser.getUser_id());
-						cuser.setLogin_name( generateUserName(cust.getCust_id(), user.getUser_type()) );
-						userComponent.updateUser(cuser);
-					}
 					users.add(newUser);
 				}
 			}
@@ -199,12 +193,6 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 					user.setStop_type(stopType);
 					
 					CUser newUser = this.openSingle(cust, user, doneCode, null, deviceType, deviceModel, deviceBuyMode, deviceFee);
-					if(!newUser.getUser_type().equals(SystemConstants.USER_TYPE_DTT)){
-						CUser cuser = new CUser();
-						cuser.setUser_id(newUser.getUser_id());
-						cuser.setLogin_name( generateUserName(cust.getCust_id(), user.getUser_type()) );
-						userComponent.updateUser(cuser);
-					}
 					users.add(newUser);
 				}
 			}
@@ -248,6 +236,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		user.setCust_id(custId);
 		user.setStr10(deviceBuyMode);//用户开始时设备购买方式
 		user.setDevice_model(deviceModel);//工单需要记录设备型号
+		user.setStr3(deviceModel);
 		DeviceDto device = null;
 		if (StringHelper.isNotEmpty(deviceCode)){
 			device = deviceComponent.queryDeviceByDeviceCode(deviceCode);
@@ -299,6 +288,10 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 				Integer months = Integer.parseInt( userComponent.queryTemplateConfig(TemplateConfigDto.Config.PROTOCOL_DATE_MONTHS.toString()) );
 				user.setProtocol_date( DateHelper.addTypeDate(DateHelper.now(), "MONTH", months) );
 			}
+		}
+		
+		if(!user.getUser_type().equals(SystemConstants.USER_TYPE_DTT) && StringHelper.isEmpty(user.getLogin_name())){
+			user.setLogin_name( generateUserName(cust.getCust_id(), user.getUser_type()) );
 		}
 		
 		userComponent.createUser(user);

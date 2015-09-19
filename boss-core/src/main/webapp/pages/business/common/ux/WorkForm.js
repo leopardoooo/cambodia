@@ -34,7 +34,9 @@ WorkForm = Ext.extend( BaseForm, {
 	},
 	getValues:function(){
 		var obj = {};
-		obj["workBillAsignType"] = Ext.getCmp("radioAssignWay").getValue().inputValue;
+		var value = Ext.getCmp("radioAssignWay").getValue();
+		if(value)
+			obj["workBillAsignType"] = value.inputValue;
 		return obj;
 	}
 });

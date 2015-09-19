@@ -61,7 +61,7 @@ public class CFeeDao extends BaseEntityDao<CFee> {
 	 * @param done_code
 	 * @throws JDBCException 
 	 */
-	public void updateCFeeToPay(String feeSn,String pay_optr_id,CFeePayDto pay,String isDoc) throws JDBCException{
+	public void updateCFeeToPay(String feeSn,String busi_optr_id,CFeePayDto pay,String isDoc) throws JDBCException{
 		String sql=StringHelper.append(
 				"update c_fee set status=? ,pay_type=?,",
 				" invoice_mode=?,invoice_id=?,invoice_book_id=?,invoice_code=?,",
@@ -71,7 +71,7 @@ public class CFeeDao extends BaseEntityDao<CFee> {
 		this.executeUpdate(sql, 
 				StatusConstants.PAY,pay.getPay_type(),
 				pay.getInvoice_mode(),pay.getInvoice_id(),pay.getInvoice_book_id(),pay.getInvoice_code(),
-				pay.getPay_sn(),pay_optr_id,
+				pay.getPay_sn(),busi_optr_id,
 				isDoc,feeSn,StatusConstants.UNPAY);
 	}
 	/**

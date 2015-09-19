@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.omg.PortableInterceptor.USER_EXCEPTION;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -416,8 +417,20 @@ public class UserComponent extends BaseBusiComponent {
 					}
 				}
 			}
-			
-			
+			if(!user.getUser_type().equals(SystemConstants.USER_TYPE_OTT_MOBILE)){
+				if(StringHelper.isEmpty(userdto.getDevice_model()) && StringHelper.isNotEmpty(user.getStr3())){
+					userdto.setDevice_model(user.getStr3());
+					if(user.getUser_type().equals(SystemConstants.USER_TYPE_BAND)){
+						userdto.setDevice_model_text( MemoryDict.getTransName(DictKey.MODEM_MODEL, user.getStr3()) );
+					}else{
+						userdto.setDevice_model_text( MemoryDict.getTransName(DictKey.STB_MODEL, user.getStr3()) );
+					}
+				}
+				if(StringHelper.isEmpty(userdto.getBuy_model()) && StringHelper.isNotEmpty(user.getStr10())){
+					userdto.setBuy_model(user.getStr10());
+					userdto.setBuy_model_text( MemoryDict.getTransName(DictKey.DEVICE_BUY_MODE, user.getStr10()) );
+				}
+			}
 			
 			result.add(userdto);
 		}
