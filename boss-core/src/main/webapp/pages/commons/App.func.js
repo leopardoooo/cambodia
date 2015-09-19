@@ -71,6 +71,10 @@ Ext.apply(App.func,{
 					}
 				}
 				
+			}else if(busicode === '2262'){//销售设备
+				if(Ext.isEmpty(data['device_model'])){
+					return false;
+				}
 			}else if(busicode === '1030'){//模拟转数(模拟电视)
 				if(data['user_type'] != 'ATV' || data['status'] == 'CUSTLINE')
 					return false;

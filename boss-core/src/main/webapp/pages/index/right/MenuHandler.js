@@ -2928,6 +2928,16 @@ Ext.apply(MenuHandler, {
 			// 调用请求函数,详细参数请看busi-helper.js
 			App.sendRequest(url, {task_id : record.get('task_id'),taskType:record.get('task_type_id')}, callback);
 		});
+	},
+	SaleDeviceFee:function(){
+		if (!hasCust())
+			return false;
+		var record = App.main.infoPanel.getUserPanel().userGrid.getSelectionModel().getSelected();
+		return {
+			width : 450,
+			height : 400
+		};
+		
 	}
 	
 });

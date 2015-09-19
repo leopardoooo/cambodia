@@ -896,6 +896,12 @@ public class UserAction extends BaseBusiAction {
 		return JSON_SIMPLEOBJ;
 	}
 	
+	
+	public String saveSaleDevice() throws Exception{
+		userServiceSN.saveSaleDevice(userId,deviceModel,deviceBuyMode,deviceFee);
+		return JSON;
+	}
+	
 	/**
 	 * @param userService
 	 *            the userService to set

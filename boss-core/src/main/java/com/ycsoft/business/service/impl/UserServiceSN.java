@@ -22,9 +22,9 @@ import com.ycsoft.beans.config.TDeviceChangeReason;
 import com.ycsoft.beans.core.acct.CAcct;
 import com.ycsoft.beans.core.cust.CCust;
 import com.ycsoft.beans.core.cust.CCustDevice;
+import com.ycsoft.beans.core.cust.CCustDeviceChange;
 import com.ycsoft.beans.core.fee.CFee;
 import com.ycsoft.beans.core.fee.CFeeAcct;
-import com.ycsoft.beans.core.fee.CFeeBusi;
 import com.ycsoft.beans.core.fee.CFeeDevice;
 import com.ycsoft.beans.core.job.JUserStop;
 import com.ycsoft.beans.core.prod.CProdOrder;
@@ -70,7 +70,6 @@ import com.ycsoft.commons.helper.DateHelper;
 import com.ycsoft.commons.helper.JsonHelper;
 import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.daos.core.JDBCException;
-import com.ycsoft.daos.helper.BeanHelper;
 @Service
 public class UserServiceSN extends BaseBusiService implements IUserService {
 
@@ -1488,6 +1487,95 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		//cancel task
 		snTaskComponent.cancelTask(doneCode, taskId);
 		getBusiParam().setBusiCode(BusiCodeConstants.TASK_CANCEL);
+		saveAllPublic(doneCode, getBusiParam());
+		
+	}
+
+	public void saveSaleDevice(String userId, String deviceModel, String deviceBuyMode, FeeInfoDto deviceFee) throws Exception{
+		//获取客户用户信息
+		CCust cust = getBusiParam().getCust();
+		String  custId = cust.getCust_id();
+		doneCodeComponent.lockCust(custId);
+		String busiCode = getBusiParam().getBusiCode();
+		List<CUser> userList = getBusiParam().getSelectedUsers();
+		CUser user = null;
+		for(CUser u : userList){
+			if(userId.equals(u.getUser_id())){
+				user=userComponent.queryUserById(userId);
+			}
+		}
+		if(user == null){
+			throw new ServicesException(ErrorCode.CustDataException);
+		}
+		if(!user.getCust_id().equals(custId)){
+			throw new ServicesException(ErrorCode.CustDataException);
+		}
+		Integer doneCode = doneCodeComponent.gDoneCode();
+		List<CCustDeviceChange> deviceChanges = new ArrayList<CCustDeviceChange>();
+		
+		//查询设备
+		String deviceCode = null;
+		if(StringHelper.isNotEmpty(user.getStb_id())){
+			deviceCode = user.getStb_id();
+		}else if(StringHelper.isNotEmpty(user.getModem_mac())){
+			deviceCode = user.getModem_mac();
+		}
+		DeviceDto device = deviceComponent.queryDeviceByDeviceCode(deviceCode);
+		if(device == null || !device.getDevice_model().equals(deviceModel)){
+			throw new ServicesException(ErrorCode.DeviceNotExists);
+		}
+		
+		
+		TDeviceBuyMode buyModeCfg = busiConfigComponent.queryBuyMode(deviceBuyMode);
+		//处理设备和授权
+		if (!user.getUser_type().equals(USER_TYPE_OTT_MOBILE)){
+			String ownership = SystemConstants.OWNERSHIP_GD;
+			if (buyModeCfg!= null && buyModeCfg.getChange_ownship().equals(SystemConstants.BOOLEAN_TRUE))
+				ownership = SystemConstants.OWNERSHIP_CUST;
+			//更新设备产权
+			if (SystemConstants.OWNERSHIP_CUST.equals(ownership)){
+				//修改产权并记录设备异动
+				deviceComponent.updateDeviceOwnership(doneCode, busiCode, device.getDevice_id(),device.getOwnership(),SystemConstants.OWNERSHIP_CUST,true);
+			}
+//			//非自购模式 设置协议截止日期，读取模板配置数据
+//			if(buyModeCfg!= null && !buyModeCfg.getBuy_mode().equals(SystemConstants.BUSI_BUY_MODE_BUY) && StringHelper.isNotEmpty(deviceModel)){
+//				Integer months = Integer.parseInt( userComponent.queryTemplateConfig(TemplateConfigDto.Config.PROTOCOL_DATE_MONTHS.toString()) );
+//				user.setProtocol_date( DateHelper.addTypeDate(DateHelper.now(), "MONTH", months) );
+//			}
+		}
+		
+		//保存设备费用
+		if (deviceFee != null && deviceFee.getFee_id()!= null && deviceFee.getFee()>0){
+			String payType = SystemConstants.PAY_TYPE_UNPAY;
+			if (this.getBusiParam().getPay()!= null && this.getBusiParam().getPay().getPay_type() !=null)
+				payType = this.getBusiParam().getPay().getPay_type();
+			doneCodeComponent.saveDoneCodeUnPay(cust.getCust_id(), doneCode, getBusiParam().getOptr().getOptr_id());
+
+			feeComponent.saveDeviceFee( cust.getCust_id(), cust.getAddr_id(),deviceFee.getFee_id(),deviceFee.getFee_std_id(), 
+					payType,device.getDevice_type(), device.getDevice_id(), device.getDevice_code(),
+					null,null,null,null,device.getDevice_model(),deviceFee.getFee(), doneCode,doneCode, busiCode, 1);
+		}
+		
+		//客户设备异动
+		CCustDevice oldDevice = custComponent.queryCustDeviceByDeviceId(device.getDevice_id());
+		if(!deviceBuyMode.equals(oldDevice.getBuy_mode())){
+			CCustDeviceChange modeChange = new CCustDeviceChange();
+			modeChange.setColumn_name("BUSI_BUY_MODE");
+			modeChange.setDevice_id(device.getDevice_id());
+			modeChange.setOld_value(oldDevice.getBuy_mode());
+			modeChange.setNew_value(deviceBuyMode);
+			deviceChanges.add(modeChange);
+			
+			CCustDeviceChange timeChange = new CCustDeviceChange();
+			timeChange.setColumn_name("buy_time");
+			timeChange.setDevice_id(device.getDevice_id());
+			timeChange.setOld_value(DateHelper.format(oldDevice.getBuy_time()));
+			timeChange.setNew_value(DateHelper.format(new Date()));
+			deviceChanges.add(timeChange);
+		}
+		if(deviceChanges.size()>0){
+			custComponent.editCustDevice(doneCode,device.getDevice_id(),deviceChanges);
+		}
 		saveAllPublic(doneCode, getBusiParam());
 		
 	}
