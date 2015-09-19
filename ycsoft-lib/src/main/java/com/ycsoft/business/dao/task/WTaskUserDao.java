@@ -25,7 +25,7 @@ public class WTaskUserDao extends BaseEntityDao<WTaskUser> {
 	}
 
 	public List<TaskUserDto> queryUserDetailByTaskId(String taskId) throws JDBCException {
-		String sql = "select t.*,cu.password password,cu.user_name user_name"
+		String sql = "select t.*,cu.*"
 				+ " from w_task_user t,c_user cu  where t.task_id=? and t.user_id = cu.user_id ";
 		return this.createQuery(TaskUserDto.class,sql, taskId).list();
 	}

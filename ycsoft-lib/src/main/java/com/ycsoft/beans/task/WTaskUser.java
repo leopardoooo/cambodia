@@ -1,11 +1,17 @@
 package com.ycsoft.beans.task;
 
+import java.io.Serializable;
+
 import com.ycsoft.commons.constants.DictKey;
 import com.ycsoft.commons.store.MemoryDict;
 import com.ycsoft.daos.config.POJO;
 
 @POJO(tn = "W_TASK_USER", sn = "", pk = "task_id,user_id")
-public class WTaskUser {
+public class WTaskUser implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -3877059523414671043L;
 	private String task_id;
 	private String user_id;
 	private String device_model;
