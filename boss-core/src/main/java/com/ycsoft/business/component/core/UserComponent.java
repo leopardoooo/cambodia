@@ -366,7 +366,7 @@ public class UserComponent extends BaseBusiComponent {
 		List<CUser> users = queryUserByCustId(custId);
 		for (CUser user :users){
 			UserDto userdto = new UserDto();
-
+			BeanUtils.copyProperties(user, userdto);
 			if(userdto.getUser_type().equals(SystemConstants.USER_TYPE_BAND)){
 				if(StringHelper.isNotEmpty(userdto.getModem_mac())){
 					RModemModel modemModel = rModemModelDao.queryByModemMac(userdto.getModem_mac());
