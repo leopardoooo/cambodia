@@ -340,7 +340,6 @@ public class SnTaskComponent extends BaseBusiComponent{
 	
 	private void createTaskLog(String taskId,String busiCode,Integer doneCode,String logDetail,String synStatus) throws Exception{
 		if(StringHelper.isNotEmpty(taskId)){
-
 			WTaskLog log = new WTaskLog();
 			log.setTask_id(taskId);
 			log.setBusi_code(busiCode);
@@ -351,7 +350,6 @@ public class SnTaskComponent extends BaseBusiComponent{
 			log.setLog_detail(logDetail);
 			wTaskLogDao.save(log);
 		}
-		
 	}
 
 	public WTaskBaseInfoDao getwTaskBaseInfoDao() {

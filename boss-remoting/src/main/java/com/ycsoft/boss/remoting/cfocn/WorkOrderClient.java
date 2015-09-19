@@ -9,9 +9,16 @@ import org.slf4j.LoggerFactory;
 
 import com.ycsoft.beans.task.WTaskBaseInfo;
 import com.ycsoft.beans.task.WTaskUser;
+import com.ycsoft.boss.remoting.cfocn.CFOCN_WebSvc_WorkOrderStub.ArrayOfDeviceInfo;
+import com.ycsoft.boss.remoting.cfocn.CFOCN_WebSvc_WorkOrderStub.ArrayOfProductInfo;
+import com.ycsoft.boss.remoting.cfocn.CFOCN_WebSvc_WorkOrderStub.DeviceInfo;
 import com.ycsoft.boss.remoting.cfocn.CFOCN_WebSvc_WorkOrderStub.ManuallyInfluencedWorkOrder;
+import com.ycsoft.boss.remoting.cfocn.CFOCN_WebSvc_WorkOrderStub.ProductInfo;
 import com.ycsoft.boss.remoting.cfocn.CFOCN_WebSvc_WorkOrderStub.ReceiveWorkOrder;
 import com.ycsoft.boss.remoting.cfocn.CFOCN_WebSvc_WorkOrderStub.ResultHead;
+import com.ycsoft.boss.remoting.cfocn.CFOCN_WebSvc_WorkOrderStub.WorkOrder;
+import com.ycsoft.commons.constants.SystemConstants;
+import com.ycsoft.commons.helper.DateHelper;
 
 
 
@@ -34,9 +41,57 @@ public class WorkOrderClient {
 		}
 	}
 	
-	private boolean createTaskService(WTaskBaseInfo task,String custNo,List<WTaskUser> userList) throws WordOrderException{
-		ReceiveWorkOrder workOrder = new ReceiveWorkOrder();
-		return createTaskService(workOrder);
+	public boolean createTaskService(WTaskBaseInfo task,String custNo,String areaCode,List<WTaskUser> userList) throws WordOrderException{
+		ReceiveWorkOrder receiveWorkOrder = new ReceiveWorkOrder();
+		//设置工单基本信息
+		WorkOrder workOrder = getWorkOrderBaseInfo(task, areaCode);
+		//设置设备信息
+		ArrayOfProductInfo productArray = getDeviceInfo(userList);
+		workOrder.setProductInfos(productArray);
+		receiveWorkOrder.setMWorkOrder(workOrder);
+		return createTaskService(receiveWorkOrder);
+	}
+
+	private ArrayOfProductInfo getDeviceInfo(List<WTaskUser> userList) {
+		ArrayOfProductInfo productArray = new ArrayOfProductInfo();
+		ProductInfo product = new ProductInfo();
+		product.setProductName("supernet");
+		product.setProductName("supernet");
+		
+		ArrayOfDeviceInfo deviceArray = new ArrayOfDeviceInfo();
+		for (WTaskUser user:userList){
+			DeviceInfo deviceInfo = new DeviceInfo();
+			deviceInfo.setDeviceName(user.getDevice_model()+"("+user.getDevice_model_text()+")");
+			deviceArray.addDeviceInfo(deviceInfo);
+		}
+		product.setDeviceInfos(deviceArray);
+		productArray.addProductInfo(product);
+		return productArray;
+	}
+
+	private WorkOrder getWorkOrderBaseInfo(WTaskBaseInfo task, String areaCode) {
+		WorkOrder order = new WorkOrder();
+		order.setOrderType(Integer.parseInt(task.getTask_type_id()));
+		order.setAreaCode(areaCode);
+		order.setISPCode(ISP_CODE);
+		order.setUserAddress(task.getOld_addr());
+		order.setUserName(task.getCust_name());
+		order.setUserTel(task.getMobile());
+		if (task.getTask_type_id().equals(SystemConstants.TASK_TYPE_INSTALL))
+			order.setOrderContent("install");
+		else if (task.getTask_type_id().equals(SystemConstants.TASK_TYPE_MOVE))
+			order.setOrderContent("move");
+		else if (task.getTask_type_id().equals(SystemConstants.TASK_TYPE_WRITEOFF))
+			order.setOrderContent("writeoff");
+		else if (task.getTask_type_id().equals(SystemConstants.TASK_TYPE_FAULT))
+			order.setOrderContent(task.getBug_detail());
+		else 
+			order.setOrderContent("other");
+		
+		order.setArriveTime(DateHelper.formatNowTime());
+		order.setOrderStatus("0");
+		order.setPublisherNo("admin");
+		return order;
 	}
 	
 	private boolean createTaskService(final ReceiveWorkOrder workOrder) throws WordOrderException{
