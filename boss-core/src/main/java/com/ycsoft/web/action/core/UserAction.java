@@ -357,6 +357,16 @@ public class UserAction extends BaseBusiAction {
 	}
 	
 	/**
+	 * 拆机
+	 * @return
+	 * @throws Exception
+	 */
+	public String untuckUsers() throws Exception {
+		userServiceSN.untuckUsers(userIds);
+		return JSON_SUCCESS;
+	}
+	
+	/**
 	 * 验证用户是否可以报停
 	 * @throws Exception
 	 */
