@@ -235,6 +235,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		user.setCust_id(custId);
 		user.setStr10(deviceBuyMode);//用户开始时设备购买方式
 		user.setDevice_model(deviceModel);//工单需要记录设备型号
+		user.setStr3(deviceModel);
 		DeviceDto device = null;
 		if (StringHelper.isNotEmpty(deviceCode)){
 			device = deviceComponent.queryDeviceByDeviceCode(deviceCode);
