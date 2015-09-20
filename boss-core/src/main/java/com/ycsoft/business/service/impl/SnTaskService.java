@@ -7,6 +7,7 @@ import java.util.Map;
 
 import javax.transaction.SystemException;
 
+import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -35,10 +36,12 @@ import com.ycsoft.business.dto.device.DeviceDto;
 import com.ycsoft.business.dto.device.DeviceSmallDto;
 import com.ycsoft.business.service.ISnTaskService;
 import com.ycsoft.commons.constants.BusiCmdConstants;
+import com.ycsoft.commons.constants.DictKey;
 import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.helper.CollectionHelper;
 import com.ycsoft.commons.helper.StringHelper;
+import com.ycsoft.commons.store.MemoryDict;
 import com.ycsoft.daos.core.Pager;
 @Service
 public class SnTaskService  extends BaseBusiService implements ISnTaskService{
@@ -201,19 +204,23 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 	public Map<String , Object> queryTaskDetail(String task_id)throws Exception{
 		Map<String , Object> map = new HashMap<String, Object>();
 		List<TaskUserDto> userList = wTaskUserDao.queryUserDetailByTaskId(task_id);
-//		if(userList.size()>0){
-//			List<DeviceSmallDto> list = deviceComponent.getDeviceCodeByDeviceId(CollectionHelper.converValueToArray(userList, "device_id"));
-//			if(list!=null && list.size()>0){
-//				Map<String, DeviceSmallDto> deviceMap = CollectionHelper.converToMapSingle(list, "device_id");
-//				if(deviceMap != null)
-//				for(TaskUserDto dto: userList){
-//					DeviceSmallDto device = deviceMap.get(dto.getDevice_id());
-//					if(device != null){
-//						dto.setDevice_code(device.getDevice_code());
-//					}
-//				}
-//			}
-//		}
+
+		for(TaskUserDto task: userList){
+			CUser user = userComponent.queryUserById(task.getUser_id());
+			task.setUser_name( taskComponent.getFillUserName(user) );
+			
+			if(!user.getUser_type().equals(SystemConstants.USER_TYPE_OTT_MOBILE)){
+				if(StringHelper.isEmpty(user.getDevice_model()) && StringHelper.isNotEmpty(user.getStr3())){
+					user.setDevice_model(user.getStr3());
+					if(user.getUser_type().equals(SystemConstants.USER_TYPE_BAND)){
+						task.setDevice_model_text( MemoryDict.getTransName(DictKey.MODEM_MODEL, user.getStr3()) );
+					}else{
+						task.setDevice_model_text( MemoryDict.getTransName(DictKey.STB_MODEL, user.getStr3()) );
+					}
+				}
+			}
+		}
+		
 		List<WTaskLog> logList = wTaskLogDao.queryByTaskId(task_id);
 		map.put("taskUserList", userList);
 		map.put("taskLogList", logList);	

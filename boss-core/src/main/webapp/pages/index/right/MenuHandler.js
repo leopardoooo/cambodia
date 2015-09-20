@@ -1353,6 +1353,37 @@ Ext.apply(MenuHandler, {
 			height : 500
 		};
 	},
+	UserUntuck: function(){
+		if (!hasCust()) {
+			return false;
+		}
+		var userRecords = App.main.infoPanel.getUserPanel().userGrid
+				.getSelections();
+		var typecout = 0;
+		if (userRecords.length == 0) {
+			Alert(lmsg("needUser"));
+			return false;
+		}
+		var userIds = [];
+		for (i = 0; i < userRecords.length; i++) {
+			if (userRecords[i].get("status") != "ACTIVE") {
+				Alert(lmsg("userNotActive"));
+				return false;
+			}
+			userIds.push(userRecords[i].get("user_id"));
+		}
+		
+		var url = Constant.ROOT_PATH + "/core/x/User!untuckUsers.action";
+		Confirm(lmsg("confirmUntuckUser"), this, function() {
+			App.sendRequest(url, {userIds: userIds}, function(res, opt){
+				var data = Ext.decode(res.responseText);
+				if (data == true) {
+					App.getApp().main.infoPanel.getUserPanel().userGrid.remoteRefresh();
+				}
+			});
+		});
+		return false;
+	},
 	// 报停
 	UserStop : function() {
 		if (!hasCust()) return false;
@@ -2928,6 +2959,16 @@ Ext.apply(MenuHandler, {
 			// 调用请求函数,详细参数请看busi-helper.js
 			App.sendRequest(url, {task_id : record.get('task_id'),taskType:record.get('task_type_id')}, callback);
 		});
+	},
+	SaleDeviceFee:function(){
+		if (!hasCust())
+			return false;
+		var record = App.main.infoPanel.getUserPanel().userGrid.getSelectionModel().getSelected();
+		return {
+			width : 450,
+			height : 400
+		};
+		
 	}
 	
 });

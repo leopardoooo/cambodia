@@ -213,6 +213,9 @@
 .stopUser {
 	background-image: url(./../images/menu2/stop.png) !important;
 }
+.userUntuck {
+	background-image: url(./../images/menu2/untuck.png) !important;
+}
 .cancelStopUser {
 	background-image: url(./../images/menu2/stopuser.gif) !important;
 }

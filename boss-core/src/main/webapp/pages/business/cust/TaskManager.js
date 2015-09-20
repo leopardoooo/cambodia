@@ -8,17 +8,14 @@ UserDetailGrid = Ext.extend(Ext.grid.GridPanel, {
 				});
 		UserDetailGrid.superclass.constructor.call(this, {
 			ds : this.userDetailStore,
-			viewConfig : {
-				forceFit :true
-			},
 			sm : new Ext.grid.CheckboxSelectionModel(),
 			cm : new Ext.grid.ColumnModel([{
-						header : '用户类型',dataIndex : 'user_type_text',width : 100,renderer : App.qtipValue}, {
-						header : '用户名',dataIndex : 'user_name',renderer : App.qtipValue}, {
-						header : '密码',dataIndex : 'password',renderer : App.qtipValue}, {
-						header : '设备型号',dataIndex : 'device_model_text',renderer : App.qtipValue}, {
-						header : '设备号',dataIndex : 'device_id',renderer : App.qtipValue}, {
-						header : '带宽',dataIndex : 'band',renderer : App.qtipValue}])
+						header : '用户类型',dataIndex : 'user_type_text',width : 60,renderer : App.qtipValue}, {
+						header : '用户名',dataIndex : 'user_name',width : 130,renderer : App.qtipValue}, {
+						header : '密码',dataIndex : 'password',width : 60,renderer : App.qtipValue}, {
+						header : '设备型号',dataIndex : 'device_model_text',width : 150,renderer : App.qtipValue}, {
+						header : '设备号',dataIndex : 'device_id',width : 120,renderer : App.qtipValue}, {
+						header : '带宽',dataIndex : 'band',width: 80,renderer : App.qtipValue}])
 		})
 	}
 })
@@ -31,16 +28,13 @@ TaskDetailGrid = Ext.extend(Ext.grid.GridPanel, {
 							'syn_status','error_remark','syn_status_text']});
 		TaskDetailGrid.superclass.constructor.call(this, {
 			ds : this.taskDetailStore,
-			viewConfig : {
-				forceFit :true
-			},
 			sm : new Ext.grid.CheckboxSelectionModel(),
 			cm : new Ext.grid.ColumnModel([{
 				header : '操作时间',dataIndex : 'log_time',width : 100,renderer : Ext.util.Format.dateFormat}, {
-				header : '操作类型',dataIndex : 'busi_name',renderer : App.qtipValue}, {
-				header : '操作人',dataIndex : 'optr_name',renderer : App.qtipValue}, {
-				header : '同步状态',dataIndex : 'syn_status_text',renderer : App.qtipValue}, {
-				header : '描述',dataIndex : 'error_remark',renderer :  App.qtipValue
+				header : '操作类型',dataIndex : 'busi_name',width:80,renderer : App.qtipValue}, {
+				header : '操作人',dataIndex : 'optr_name',width:80,renderer : App.qtipValue}, {
+				header : '同步状态',dataIndex : 'syn_status_text',width:80,renderer : App.qtipValue}, {
+				header : '描述',dataIndex : 'error_remark',width:150,renderer :  App.qtipValue
 			}])
 		})
 	}

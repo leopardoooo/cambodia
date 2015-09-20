@@ -582,6 +582,7 @@ BCLang.msgBox = {
 	onlyOneUser: '请选择一个用户!~',
 	needStopUser: '请选择【报停】状态的用户~',
 	confirmOpenUser: '确定要报开吗?~',
+	confirmUntuckUser: '确定要拆机吗?~',
 	searchCustTip1: '查询客户请输入至少一个关键字~',
 	searchCustTip2: '请不要输入单引号~',
 	searchNoCust: '没有查询到符合条件的客户，请确认后重新输入!~',

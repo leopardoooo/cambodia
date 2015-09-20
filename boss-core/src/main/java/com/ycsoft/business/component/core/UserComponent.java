@@ -364,30 +364,9 @@ public class UserComponent extends BaseBusiComponent {
 	public List<UserDto> queryUser(String custId) throws Exception {
 		List<UserDto> result = new ArrayList<UserDto>();
 		List<CUser> users = queryUserByCustId(custId);
-		List<UserRes> resList = cRejectResDao.queryRejectResByCustId(custId);
-		List<JUserStop> stopList = jUserStopDao.findAll();
-		Map<String,List<UserRes>> map = CollectionHelper.converToMap(resList, "user_id");
-		Map<String,List<JUserStop>> stopmap = CollectionHelper.converToMap(stopList, "user_id");
 		for (CUser user :users){
 			UserDto userdto = new UserDto();
-			
-			List<UserRes> list = map.get(user.getUser_id());
-			List<JUserStop> stoplist = stopmap.get(user.getUser_id());
-			String rejectRes = "";
-			if(list!=null){
-				for(UserRes res : list){
-					rejectRes +=res.getRes_name()+",";
-				}
-				rejectRes = rejectRes.substring(0,rejectRes.length()-1);
-			}
-			user.setIs_rstop_fee(isStopFee());
 			BeanUtils.copyProperties(user, userdto);
-			if(stoplist!=null){
-				userdto.setStop_date(stoplist.get(0).getStop_date());
-			}
-			if(StringHelper.isNotEmpty(rejectRes))
-				userdto.setRejectRes(rejectRes);
-			
 			if(userdto.getUser_type().equals(SystemConstants.USER_TYPE_BAND)){
 				if(StringHelper.isNotEmpty(userdto.getModem_mac())){
 					RModemModel modemModel = rModemModelDao.queryByModemMac(userdto.getModem_mac());

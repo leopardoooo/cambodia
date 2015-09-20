@@ -105,6 +105,8 @@ public interface IUserService extends IBaseService{
 	 * @throws Exception
 	 */
 	public void checkStopUser(String[] userIds) throws Exception;
+	
+	public void untuckUsers(String[] userIds) throws Exception;
 
 	/**
 	 * 报停(支持多用户)
