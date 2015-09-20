@@ -638,8 +638,73 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		// TODO Auto-generated method stub
 		
 	}
+	
 	@Override
-	public void checkStopUser(String[] userIds) throws Exception{
+	public void untuckUsers(String[] userIds) throws Exception{
+		CCust cust = getBusiParam().getCust();
+		doneCodeComponent.lockCust(cust.getCust_id());
+		Integer doneCode = doneCodeComponent.gDoneCode();
+		List<CUser> users = userComponent.queryAllUserByUserIds(userIds);
+		if (users == null || users.size() == 0 || users.get(0) == null)
+			throw new ServicesException("请选择用户");
+		
+		Map<Integer, CUser> map = checkUserStatus(userIds);
+		for(Integer code : map.keySet()){
+			if(code == 1){
+				throw new ServicesException("用户["+map.get(code).getUser_id()+"]还在协议期内，不能拆机!");
+			} else if (code == 2){
+					throw new ServicesException("用户["+map.get(code).getUser_id()+"]不是正常状态，不能拆机!");
+			}else if(code == 3){
+				throw new ServicesException("归属套餐的用户必须同时拆机");
+			} else if (code == 4){
+				throw new ServicesException("OTT副机报停,主机必须拆机");
+			}
+		}
+		
+		List<CProdOrderDto> orderList = cProdOrderDao.queryCustEffOrderDto(cust.getCust_id());
+		boolean isCustPkgStop = false;
+		for(CUser user : users){
+			//清除原有未执行的预报停
+			removeStopByUserId(user.getUser_id());
+			//修改用户状态
+			updateUserStatus(doneCode, user.getUser_id(), user.getStatus(), StatusConstants.UNTUCK);
+			
+			//修改用户订单状态为报停状态
+			
+			for (CProdOrderDto order:orderList){
+				if (StringHelper.isNotEmpty(order.getUser_id()) && order.getUser_id().equals(user.getUser_id())){
+					stopProd(doneCode, order, StatusConstants.UNTUCK);
+					if (StringHelper.isNotEmpty(order.getPackage_sn())){
+						isCustPkgStop = true;
+					}
+				}
+			}
+			
+			//生成钝化用户JOB
+			authComponent.sendAuth(user, null, BusiCmdConstants.PASSVATE_USER, doneCode);
+			//产品减授权
+			List<CProdOrder> prodList = orderComponent.queryOrderProdByUserId(user.getUser_id());
+			if(prodList.size() > 0){
+				authComponent.sendAuth(user, prodList, BusiCmdConstants.PASSVATE_PROD, doneCode);
+			}
+			
+		}
+		
+		if (isCustPkgStop){
+			//修改套餐状态
+			for (CProdOrderDto order:orderList){
+				if (!order.getProd_type().equals(SystemConstants.PROD_TYPE_BASE)){
+					stopProd(doneCode, order, StatusConstants.UNTUCK);
+				}
+			}
+		}
+		
+		snTaskComponent.createWriteOffTask(doneCode, cust, users, getBusiParam().getWorkBillAsignType());
+		
+		saveAllPublic(doneCode,getBusiParam());
+	}
+	
+	private Map<Integer, CUser> checkUserStatus(String[] userIds) throws Exception{
 		//获取操作的客户、用户信息
 		//CCust cust = getBusiParam().getCust();
 		List<CUser> users = userComponent.queryAllUserByUserIds(userIds);
@@ -659,11 +724,16 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		boolean hasZzd = false; //有OTT主终端用户
 		boolean hasFzd = false; //有OTT副终端用户
 		int count=0;
+		Map<Integer, CUser> map = new HashMap<Integer, CUser>();
 		for (CUser user:users){
 			if (user.getProtocol_date() != null && user.getProtocol_date().after(new Date())){
-				throw new ServicesException("用户["+user.getUser_id()+"]还在协议期内，不能报停!");
+//				throw new ServicesException("用户["+user.getUser_id()+"]还在协议期内，不能报停!");
+				map.put(1, user);
+				return map;
 			} else if (!user.getStatus().equals(StatusConstants.ACTIVE)){
-				throw new ServicesException("用户["+user.getUser_id()+"]不是正常状态，不能报停!");
+//				throw new ServicesException("用户["+user.getUser_id()+"]不是正常状态，不能报停!");
+				map.put(2, user);
+				return map;
 			}
 			if (packageUserIdS.get(user.getUser_id()) != null){
 				hasPkgUser =true;
@@ -681,11 +751,31 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		}
 		
 		if (hasPkgUser && (count<packageUserIdS.size())){
-			throw new ServicesException("归属套餐的用户必须同时报停");
+//			throw new ServicesException("归属套餐的用户必须同时报停");
+			map.put(3, null);
+			return map;
 		} else if (hasFzd && !hasZzd){
-			throw new ServicesException("OTT副机报停,主机必须报停");
+//			throw new ServicesException("OTT副机报停,主机必须报停");
+			map.put(4, null);
+			return map;
 		}
-		
+		return map;
+	}
+	
+	@Override
+	public void checkStopUser(String[] userIds) throws Exception{
+		Map<Integer, CUser> map = checkUserStatus(userIds);
+		for(Integer code : map.keySet()){
+			if(code == 1){
+				throw new ServicesException("用户["+map.get(code).getUser_id()+"]还在协议期内，不能报停!");
+			} else if (code == 2){
+					throw new ServicesException("用户["+map.get(code).getUser_id()+"]不是正常状态，不能报停!");
+			}else if(code == 3){
+				throw new ServicesException("归属套餐的用户必须同时报停");
+			} else if (code == 4){
+				throw new ServicesException("OTT副机报停,主机必须报停");
+			}
+		}
 	}
 
 
@@ -713,7 +803,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 				
 				for (CProdOrderDto order:orderList){
 					if (StringHelper.isNotEmpty(order.getUser_id()) && order.getUser_id().equals(user.getUser_id())){
-						stopProd(doneCode, order);
+						stopProd(doneCode, order, StatusConstants.REQSTOP);
 						if (StringHelper.isNotEmpty(order.getPackage_sn())){
 							isCustPkgStop = true;
 						}
@@ -723,7 +813,8 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 				authComponent.sendAuth(user, null, BusiCmdConstants.PASSVATE_USER, doneCode);
 				//产品减授权
 				List<CProdOrder> prodList = orderComponent.queryOrderProdByUserId(user.getUser_id());
-				authComponent.sendAuth(user, prodList, BusiCmdConstants.PASSVATE_PROD, doneCode);
+				if(prodList.size() > 0)
+					authComponent.sendAuth(user, prodList, BusiCmdConstants.PASSVATE_PROD, doneCode);
 				
 			}
 			
@@ -731,7 +822,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 				//修改套餐状态
 				for (CProdOrderDto order:orderList){
 					if (!order.getProd_type().equals(SystemConstants.PROD_TYPE_BASE)){
-						stopProd(doneCode, order);
+						stopProd(doneCode, order, StatusConstants.REQSTOP);
 					}
 				}
 			}
@@ -1235,10 +1326,10 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		return userComponent.querySpkgOpenFee(spkgSn);
 	}
 	
-	private void stopProd(Integer doneCode, CProdOrderDto order) throws Exception {
+	private void stopProd(Integer doneCode, CProdOrderDto order, String status) throws Exception {
 		List<CProdPropChange> changeList = new ArrayList<CProdPropChange>();
 		changeList.add(new CProdPropChange("status",
-				order.getStatus(),StatusConstants.REQSTOP));
+				order.getStatus(), status));
 		changeList.add(new CProdPropChange("status_date",
 				DateHelper.dateToStr(order.getStatus_date()),DateHelper.dateToStr(new Date())));
 		
