@@ -137,16 +137,23 @@ InvoiceDepotDetailGrid = Ext.extend(Ext.grid.GridPanel, {
 							cm : new Ext.grid.ColumnModel([{
 										header : lsys('InvoiceDetail.InvoiceDepotDetailGridColls')[0],
 										dataIndex : 'optr_type',
-										width : 100
-									}, {
-										header : lsys('InvoiceDetail.InvoiceDepotDetailGridColls')[0],
-										dataIndex : 'depot_name'
+										width : 70,
+										renderer: App.qtipValue
 									}, {
 										header : lsys('InvoiceDetail.InvoiceDepotDetailGridColls')[1],
-										dataIndex : 'optr_name'
+										dataIndex : 'depot_name',
+										width: 120,
+										renderer: App.qtipValue
 									}, {
 										header : lsys('InvoiceDetail.InvoiceDepotDetailGridColls')[2],
-										dataIndex : 'create_time'
+										dataIndex : 'optr_name',
+										width: 80,
+										renderer: App.qtipValue
+									}, {
+										header : lsys('InvoiceDetail.InvoiceDepotDetailGridColls')[3],
+										dataIndex : 'create_time',
+										width: 130,
+										renderer: App.qtipValue
 									}])
 						})
 			}
@@ -168,34 +175,42 @@ InvoiceDepotDetailGrid = Ext.extend(Ext.grid.GridPanel, {
 							cm : new Ext.grid.ColumnModel([{
 										header : lsys('InvoiceDetail.InvoiceDetailGridColls')[0],
 										dataIndex : 'cust_name',
-										width : 100,
+										width : 80,
 										renderer : App.qtipValue
 									}, {
 										header : lsys('InvoiceDetail.InvoiceDetailGridColls')[1],
 										dataIndex : 'cust_no',
+										width: 80,
 										renderer : App.qtipValue
 									}, {
 										header : lsys('InvoiceDetail.InvoiceDetailGridColls')[2],
 										dataIndex : 'busi_name',
+										width: 80,
 										renderer : App.qtipValue
 									}, {
 										header : lsys('InvoiceDetail.InvoiceDetailGridColls')[3],
 										dataIndex : 'fee_name',
+										width: 120,
 										renderer : App.qtipValue
 									}, {
 										header : lsys('InvoiceDetail.InvoiceDetailGridColls')[4],
 										dataIndex : 'real_pay',
+										width: 80,
 										renderer : Ext.util.Format.formatFee
 									}, {
 										header : lsys('InvoiceDetail.InvoiceDetailGridColls')[5],
 										dataIndex : 'create_time',
+										width: 130,
 										renderer : App.qtipValue
 									},{
 										header:lsys('InvoiceDetail.InvoiceDetailGridColls')[6],
-										dataIndex:'optr_name'
+										dataIndex:'optr_name',
+										width: 80,
+										renderer : App.qtipValue
 									}, {
 										header : lsys('InvoiceDetail.InvoiceDetailGridColls')[7],
 										dataIndex : 'status_text',
+										width: 70,
 										renderer : Ext.util.Format.statusShow
 									}])
 						})
