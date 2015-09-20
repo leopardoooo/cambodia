@@ -299,6 +299,10 @@ PayPanel = Ext.extend( Ext.Panel ,{
 			Alert("含有验证不通过的输入项");
 			return ;
 		}
+		if(this.realFeeStore.getCount() == 0){
+			Alert("请从待选支付框中选择要支付的记录!");
+			return;
+		}
 		Confirm("确定要保存信息吗?", this, function(){
 			var params = this.getValues()
 			var comomonParams = App.getValues();
