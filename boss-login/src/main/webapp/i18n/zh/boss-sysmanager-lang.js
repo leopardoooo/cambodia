@@ -362,7 +362,7 @@ Sys = {
 		labelTransHistory:'历史调拨~',
 		titleTransInfo:'调拨信息~',
 		tipSupportFuzzyQuery:'支持编号模糊查询~',
-		labelDevBatchNum:'设备批号...~',
+		labelDevBatchNum:'设备批号~',
 		labelTotalStoreNum:'库存数量~',
 		labelMateralInfo:'器材信息~',
 		labelDevDetail:'设备明细~',
