@@ -534,15 +534,15 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 												
 		}
 
+		List<CProdOrder> prodList = orderComponent.queryOrderProdByUserId(user.getUser_id());
 		//直接解除授权，不等支付（因为不能取消）
 		if(user.getUser_type().equals(USER_TYPE_DTT)
 				&&!SystemConstants.BOOLEAN_TRUE.equals(reclaim)){
 			//DTT用户不回收设备，发产品减授权
-			List<CProdOrder> prodList = orderComponent.queryOrderProdByUserId(user.getUser_id());
 			authComponent.sendAuth(user, prodList, BusiCmdConstants.PASSVATE_PROD, doneCode);
 		}else{
 			//发销户指令
-			authComponent.sendAuth(user, null, BusiCmdConstants.DEL_USER, doneCode);
+			authComponent.sendAuth(user, prodList, BusiCmdConstants.DEL_USER, doneCode);
 		}
 		
 		//是否高级权限
