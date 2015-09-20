@@ -55,31 +55,26 @@ var TransferGrid = Ext.extend(Ext.grid.GridPanel,{
 		var sm = new Ext.grid.RowSelectionModel({singleselect:true});
 		var currentOptrId = App.data.optr['optr_id'];
 		var columns = [
-			{header:DEV_COMMON_LU.labelTransNo,dataIndex:'transfer_no',width:75,renderer:function(value,metaData,record){
-				that = this;
-				if(record.get('device_type') == 'STB' || record.get('device_type') == 'CARD' && record.get('device_type') == 'MODEM'){
-					return '<div style="text-decoration:underline;font-weight:bold"  onclick="Ext.getCmp(\'transferGridId\').doDblclick();"  ext:qtitle="" ext:qtip="' + value + '">' + value +'</div>';
-				}else{
-					return '<div ext:qtitle="" ext:qtip="' + value + '">' + value +'</div>';
-				}
+			{header:DEV_COMMON_LU.labelTransNo,dataIndex:'transfer_no',width:70,renderer:function(value,metaData,record){
+				return '<div style="text-decoration:underline;font-weight:bold"  onclick="Ext.getCmp(\'transferGridId\').doDblclick();"  ext:qtitle="" ext:qtip="' + value + '">' + value +'</div>';
 			}},
-			{header:CHE_OUT_LU.labelTransType,dataIndex:'tran_type_text',width:55},
+			{header:CHE_OUT_LU.labelTransType,dataIndex:'tran_type_text',width:65},
 			{header:DEV_COMMON_LU.labelDepot,dataIndex:'depot_text',width:100,renderer:App.qtipValue},
 			{header:COMMON_LU.status,dataIndex:'status_text',width:50,renderer:Ext.util.Format.statusShow},
-			{header:COMMON_LU.createDate,dataIndex:'create_time',width:105,renderer:Ext.util.Format.timeFormat},
-			{header:CHE_OUT_LU.labelConfirmDate,dataIndex:'confirm_date',width:105,renderer:Ext.util.Format.timeFormat},
-			{header:DEV_COMMON_LU.labelDeviceType,dataIndex:'device_type_text',width:55},
-			{header:DEV_COMMON_LU.labelTransStatus,dataIndex:'transfer_status_text',width:55},
-			{header:DEV_COMMON_LU.labelDeviceModel,dataIndex:'device_model_text',width:120,renderer:App.qtipValue},
+			{header:COMMON_LU.createDate,dataIndex:'create_time',width:125,renderer:Ext.util.Format.timeFormat},
+			{header:CHE_OUT_LU.labelConfirmDate,dataIndex:'confirm_date',width:125,renderer:Ext.util.Format.timeFormat},
+			{header:DEV_COMMON_LU.labelDeviceType,dataIndex:'device_type_text',width:65,renderer:App.qtipValue},
+			{header:DEV_COMMON_LU.labelTransStatus,dataIndex:'transfer_status_text',width:65},
+			{header:DEV_COMMON_LU.labelDeviceModel,dataIndex:'device_model_text',width:130,renderer:App.qtipValue},
 			{header:DEV_COMMON_LU.labelNum,dataIndex:'count',width:40},
-			{id:'checkout_remark_id',header:lsys('common.remarkTxt'),dataIndex:'remark'},
+			{id:'checkout_remark_id',header:lsys('common.remarkTxt'),dataIndex:'remark',renderer:App.qtipValue},
 			{header:COMMON_LU.doActionBtn,dataIndex:'device_done_code',width:200,renderer:function(value,meta,record){
 				var result = "";
 				if(currentOptrId == record.get('optr_id')){
-					result = "<a href='#' title='"+ DEV_COMMON_LU.titleModifyOrderNum + "' onclick=Ext.getCmp('transferGridId').editTransferNo("+value+")>" + DEV_COMMON_LU.titleTransConfirm + "</a>";
+					result = "<a href='#' title='"+ DEV_COMMON_LU.titleModifyOrderNum + "' onclick=Ext.getCmp('transferGridId').editTransferNo("+value+")>" + DEV_COMMON_LU.titleModifyOrderNum + "</a>";
 				}
 				if(record.get('status') === 'UNCONFIRM' && record.get('tran_type') === 'TRANIN'){
-					result += "&nbsp;&nbsp;<a href='#' title='" + DEV_COMMON_LU.titleTransConfirm + "' onclick=Ext.getCmp('transferGridId').transferConfirm("+value+")>" + CHE_OUT_LU.titleModifyOrderNum + "</a>";
+					result += "&nbsp;&nbsp;<a href='#' title='" + DEV_COMMON_LU.titleTransConfirm + "' onclick=Ext.getCmp('transferGridId').transferConfirm("+value+")>" + CHE_OUT_LU.titleTransConfirm + "</a>";
 				}
 				if(record.get('status') === 'CONFIRM' && record.get('tran_type') === 'TRANIN'){
 					if(record.get('device_type') == 'STB' || record.get('device_type') == 'CARD' && record.get('device_type') == 'MODEM'){
@@ -120,7 +115,6 @@ var TransferGrid = Ext.extend(Ext.grid.GridPanel,{
 			title:DEV_COMMON_LU.titleTransInfo,
 			region:'center',
 			autoExpandColumn:'checkout_remark_id',
-			autoScroll:true,
 			border:false,
 			ds:this.transferGridStore,
 			columns:columns,
@@ -194,10 +188,10 @@ var TransferGrid = Ext.extend(Ext.grid.GridPanel,{
 										store : this.transferGridStore,
 										pageSize : Constant.DEFAULT_PAGE_SIZE
 									})
-//			,listeners:{
-//				scope:this,
-//				rowdblclick:this.doDblclick
-//			}
+			,listeners:{
+				scope:this,
+				rowdblclick:this.doDblclick
+			}
 		});
 	},
 	doDblclick:function(){
@@ -1303,8 +1297,8 @@ var TransferDetailWin = Ext.extend(Ext.Window,{
 			fields:['device_model_text','device_code','is_new_stb_text','device_status_text']
 		});
 		var columns = [
-			{header:DEV_COMMON_LU.labelDeviceModel,dataIndex:'device_model_text',width:150,renderer:App.qtipValue},
-			{header:DEV_COMMON_LU.labelDevCode,dataIndex:'device_code',width:120,renderer:App.qtipValue},
+			{header:DEV_COMMON_LU.labelDeviceModel,dataIndex:'device_model_text',width:200,renderer:App.qtipValue},
+			{header:DEV_COMMON_LU.labelDevCode,dataIndex:'device_code',width:150,renderer:App.qtipValue},
 			{header:DEV_COMMON_LU.labelDevStatus,dataIndex:'device_status_text',width:120,renderer:App.qtipValue},
 			{header:DEV_COMMON_LU.labelIsNewStb,dataIndex:'is_new_stb_text',width:120,renderer:App.qtipValue}
 

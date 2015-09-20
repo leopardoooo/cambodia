@@ -336,7 +336,7 @@ Sys = {
 		labelInteractiveType:'交互方式~',
 		labelInputDate:'入库日期~',
 		labelDevInputDepot:'入库仓库~',
-		labelNum:'数量!~',
+		labelNum:'数量~',
 		labelBatchNum:'批号~',
 		labelPairStbCode:'配对机顶盒号~',
 		labelPairStbType:'配对机顶盒型号~',
@@ -437,7 +437,7 @@ Sys = {
 		labelCheckBatchNum:'入库批号~',
 		titleCheckInGrid:'入库信息~',
 		labelFileInput:'文件入库~',
-		labelManualInput:'手工入库!~',
+		labelManualInput:'手工入库~',
 		labelMateralCheckIn:'器材入库~',
 		labelInputOptr:'入库人~',
 		labelInputBatchNum:'入库批号~'

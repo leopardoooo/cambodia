@@ -803,14 +803,20 @@ public class RDeviceDao extends BaseEntityDao<RDevice> {
 	public Pager<DeviceDto> queryTransferDeviceDetail(
 			int deviceDoneCode,String deviceType,Integer start, Integer limit) throws JDBCException {
 		String sql = "";
-		if (deviceType.equals(SystemConstants.DEVICE_TYPE_STB)) {
-			sql += "SELECT r.*,b.stb_id device_code FROM r_device r ,r_stb b,r_device_done_deviceid di ";
-		} else if (deviceType.equals(SystemConstants.DEVICE_TYPE_CARD)) {
-			sql += "SELECT r.*,b.card_id device_code FROM r_device r ,r_card b,r_device_done_deviceid di ";
-		} else if (deviceType.equals(SystemConstants.DEVICE_TYPE_MODEM)) {
-			sql += "SELECT r.*,b.modem_id device_code FROM r_device r ,r_modem b,r_device_done_deviceid di ";
+		
+		if(deviceType.equals(SystemConstants.DEVICE_TYPE_FITTING)){
+			sql = "SELECT r.*,'' device_code FROM r_device r,r_device_done_deviceid di"
+					+ " where r.device_id=di.device_id and di.device_done_code=? order by r.device_id";
+		}else{
+			if (deviceType.equals(SystemConstants.DEVICE_TYPE_STB)) {
+				sql += "SELECT r.*,b.stb_id device_code FROM r_device r ,r_stb b,r_device_done_deviceid di ";
+			} else if (deviceType.equals(SystemConstants.DEVICE_TYPE_CARD)) {
+				sql += "SELECT r.*,b.card_id device_code FROM r_device r ,r_card b,r_device_done_deviceid di ";
+			} else if (deviceType.equals(SystemConstants.DEVICE_TYPE_MODEM)) {
+				sql += "SELECT r.*,b.modem_id device_code FROM r_device r ,r_modem b,r_device_done_deviceid di ";
+			}
+			sql += "  where  di.device_id = b.device_id and b.device_id=r.device_id and  di.device_done_code=?  order by device_code";
 		}
-		sql += "  where  di.device_id = b.device_id and b.device_id=r.device_id and  di.device_done_code=?  order by device_code";
 		return createQuery(DeviceDto.class,sql, deviceDoneCode)
 				.setStart(start).setLimit(limit).page();
 	}
