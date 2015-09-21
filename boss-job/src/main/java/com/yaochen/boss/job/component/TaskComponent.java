@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import com.ycsoft.beans.core.cust.CCust;
 import com.ycsoft.beans.core.job.JBandCommand;
@@ -21,7 +22,7 @@ import com.ycsoft.business.dao.task.WTaskUserDao;
 import com.ycsoft.commons.abstracts.BaseComponent;
 import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.constants.SystemConstants;
-
+@Component
 public class TaskComponent extends BaseComponent {
 	@Autowired
 	private WTaskBaseInfoDao wTaskBaseInfoDao;
