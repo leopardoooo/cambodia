@@ -7,6 +7,9 @@ import org.apache.axis2.AxisFault;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.gson.JsonObject;
+import com.ycsoft.beans.system.SOptr;
+import com.ycsoft.beans.task.TaskCustExtInfo;
 import com.ycsoft.beans.task.WTaskBaseInfo;
 import com.ycsoft.beans.task.WTaskUser;
 import com.ycsoft.boss.remoting.cfocn.CFOCN_WebSvc_WorkOrderStub.ArrayOfDeviceInfo;
@@ -41,10 +44,10 @@ public class WorkOrderClient {
 		}
 	}
 	
-	public boolean createTaskService(WTaskBaseInfo task,String custNo,String areaCode,List<WTaskUser> userList) throws WordOrderException{
+	public boolean createTaskService(WTaskBaseInfo task,List<WTaskUser> userList,TaskCustExtInfo extInfo) throws WordOrderException{
 		ReceiveWorkOrder receiveWorkOrder = new ReceiveWorkOrder();
 		//设置工单基本信息
-		WorkOrder workOrder = getWorkOrderBaseInfo(task, areaCode);
+		WorkOrder workOrder = getWorkOrderBaseInfo(task, extInfo.getCust_no(),extInfo.getArea_code(),extInfo.getCustManager());
 		//设置设备信息
 		ArrayOfProductInfo productArray = getDeviceInfo(userList);
 		workOrder.setProductInfos(productArray);
@@ -69,18 +72,21 @@ public class WorkOrderClient {
 		return productArray;
 	}
 
-	private WorkOrder getWorkOrderBaseInfo(WTaskBaseInfo task, String areaCode) {
+	private WorkOrder getWorkOrderBaseInfo(WTaskBaseInfo task, String custNo,String areaCode,SOptr custManager) {
 		WorkOrder order = new WorkOrder();
 		order.setOrderType(Integer.parseInt(task.getTask_type_id()));
 		order.setAreaCode(areaCode);
 		order.setISPCode(ISP_CODE);
 		order.setUserAddress(task.getOld_addr());
+		order.setUserNo(custNo);
 		order.setUserName(task.getCust_name());
 		order.setUserTel(task.getMobile());
 		if (task.getTask_type_id().equals(SystemConstants.TASK_TYPE_INSTALL))
 			order.setOrderContent("install");
-		else if (task.getTask_type_id().equals(SystemConstants.TASK_TYPE_MOVE))
-			order.setOrderContent("move");
+		else if (task.getTask_type_id().equals(SystemConstants.TASK_TYPE_MOVE)){
+			order.setOrderContent("move to "+task.getNew_addr());
+			order.setUserAddress(task.getNew_addr());
+		}
 		else if (task.getTask_type_id().equals(SystemConstants.TASK_TYPE_WRITEOFF_LINE))
 			order.setOrderContent("writeoff");
 		else if (task.getTask_type_id().equals(SystemConstants.TASK_TYPE_FAULT))
@@ -91,6 +97,13 @@ public class WorkOrderClient {
 		order.setArriveTime(DateHelper.formatNowTime());
 		order.setOrderStatus("0");
 		order.setPublisherNo("admin");
+		//设置客户经理信息
+		if (custManager != null){
+			JsonObject managerInfo = new JsonObject();
+			managerInfo.addProperty("custManagerName", custManager.getOptr_name());
+			managerInfo.addProperty("mobile", custManager.getTel());
+			order.setAttachData(managerInfo.toString());
+		}
 		return order;
 	}
 	
