@@ -709,9 +709,8 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 						resultType : finishCombo.getValue()
 					};
 					App.sendRequest( url, o, function(res,opt){
-						this.grid.getStore().reload();
-//						rs.set("task_status",teamCombo.getValue());
-//						rs.set("task_status_text",teamCombo.getStore().getAt(index).get('dept_name'));							
+						rs.set("task_status", "END");
+						rs.set("task_status_text", "完工");
 						win.close();
 					});
 				}
