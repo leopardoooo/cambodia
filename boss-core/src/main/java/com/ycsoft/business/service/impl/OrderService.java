@@ -864,32 +864,32 @@ public class OrderService extends BaseBusiService implements IOrderService{
 	 * @throws JDBCException
 	 */
 	private void atvProd(CProdOrder cProdOrder,PProd prodConfig,Integer doneCode) throws Exception{
-		if(cProdOrder.getIs_pay().equals(SystemConstants.BOOLEAN_TRUE)
-				&&!SystemConstants.SERVICE_CHANNEL_MOBILE.equals(this.getBusiParam().getService_channel())){
-			
-			if(prodConfig.getProd_type().equals(SystemConstants.PROD_TYPE_BASE)){
-				List<CProdOrder> list=new ArrayList<>();
-				list.add(cProdOrder);
-				authComponent.sendAuth(cUserDao.findByKey(cProdOrder.getUser_id()), list, BusiCmdConstants.ACCTIVATE_PROD, doneCode);
-			}else{
-				//套餐的授权
-				Map<String,CUser> userMap=CollectionHelper.converToMapSingle(cUserDao.queryUserByCustId(cProdOrder.getCust_id()), "user_id");
-				Map<CUser,List<CProdOrder>> atvMap=new HashMap<>();
-				for(CProdOrder order: cProdOrderDao.queryPakDetailOrder(cProdOrder.getOrder_sn())){
-					CUser user=userMap.get(order.getUser_id());
-					if(user==null){
-						throw new ServicesException(ErrorCode.OrderDateException,order.getOrder_sn());
-					}
-					List<CProdOrder> list=atvMap.get(user);
-					if(list==null){
-						list=new ArrayList<>();
-						atvMap.put(user, list);
-					}
-					list.add(order);
+		if(SystemConstants.SERVICE_CHANNEL_MOBILE.equals(this.getBusiParam().getService_channel())){
+			//移动渠道走直接授权，不通过异步指令授权
+			return;
+		}
+		if(prodConfig.getProd_type().equals(SystemConstants.PROD_TYPE_BASE)){
+			List<CProdOrder> list=new ArrayList<>();
+			list.add(cProdOrder);
+			authComponent.sendAuth(cUserDao.findByKey(cProdOrder.getUser_id()), list, BusiCmdConstants.ACCTIVATE_PROD, doneCode);
+		}else{
+			//套餐的授权
+			Map<String,CUser> userMap=CollectionHelper.converToMapSingle(cUserDao.queryUserByCustId(cProdOrder.getCust_id()), "user_id");
+			Map<CUser,List<CProdOrder>> atvMap=new HashMap<>();
+			for(CProdOrder order: cProdOrderDao.queryPakDetailOrder(cProdOrder.getOrder_sn())){
+				CUser user=userMap.get(order.getUser_id());
+				if(user==null){
+					throw new ServicesException(ErrorCode.OrderDateException,order.getOrder_sn());
 				}
-				for(CUser user:atvMap.keySet()){
-					authComponent.sendAuth(user, atvMap.get(user),  BusiCmdConstants.ACCTIVATE_PROD, doneCode);
+				List<CProdOrder> list=atvMap.get(user);
+				if(list==null){
+					list=new ArrayList<>();
+					atvMap.put(user, list);
 				}
+				list.add(order);
+			}
+			for(CUser user:atvMap.keySet()){
+				authComponent.sendAuth(user, atvMap.get(user),  BusiCmdConstants.ACCTIVATE_PROD, doneCode);
 			}
 		}
 	}
@@ -1074,6 +1074,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 			rent=tariff.getRent();
 		}
 		//订购期数(包天=round(order_months*30))
+		//TODO 这个不足一个周期需要如何修改
 		int order_cycles=tariff.getBilling_type().equals(SystemConstants.BILLING_TYPE_DAY)?
 				Math.round(orderProd.getOrder_months()*30):orderProd.getOrder_months().intValue();
 		//记录资费计费类型和订购周期数（后面要使用）
@@ -1083,14 +1084,16 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		if(orderProd.getOrder_months()==0&&!busi_code.equals(BusiCodeConstants.PROD_UPGRADE)){
 			throw new  ComponentException(ErrorCode.OrderDateOrderMonthError);
 		}
-		if(order_cycles%billing_cycle!=0){
+		if(order_cycles%billing_cycle!=0 && !busi_code.equals(BusiCodeConstants.PROD_UPGRADE)){
 			throw new  ComponentException(ErrorCode.OrderDateOrderMonthError);
 		}
 		
-		//订购支付金额验证
-		if( (rent*order_cycles/billing_cycle) !=(orderProd.getPay_fee()+orderProd.getTransfer_fee())){
-			throw new ComponentException(ErrorCode.OrderDateFeeError);
-		}
+		//订购支付金额验证:如果是升级且根据转移支付金额折算到期日，不验证。
+		if(!(busi_code.equals(BusiCodeConstants.PROD_UPGRADE) && orderProd.getPay_fee()==0)){
+			if( (rent*order_cycles/billing_cycle) !=(orderProd.getPay_fee()+orderProd.getTransfer_fee())){
+				throw new ComponentException(ErrorCode.OrderDateFeeError);
+			}
+		} 
 		
 		//结束计费日校检
 		if(busi_code.equals(BusiCodeConstants.PROD_UPGRADE)&&orderProd.getOrder_months()==0){
@@ -1099,18 +1102,22 @@ public class OrderService extends BaseBusiService implements IOrderService{
 				throw new ServicesException(ErrorCode.OrderDateExpDateError);
 			}
 		}else{
-			//包月 结束计费日=开始计费日+订购月数 -1天。
-			if(tariff.getBilling_type().equals(SystemConstants.BILLING_TYPE_MONTH)
-					&& !DateHelper.getNextMonthPreviousDay(orderProd.getEff_date(), order_cycles)
-						.equals(orderProd.getExp_date())){
-				throw new ServicesException(ErrorCode.OrderDateExpDateError);
-			}
-			//包天 结束计费日=开始计费日+订购天数-1天
-			if(tariff.getBilling_type().equals(SystemConstants.BILLING_TYPE_DAY)
-				&& !DateHelper.addDate(orderProd.getEff_date(), order_cycles-1)
-				.equals(orderProd.getExp_date())){
+			if(!(busi_code.equals(BusiCodeConstants.PROD_UPGRADE) && orderProd.getPay_fee()==0)){
+				//包月 结束计费日=开始计费日+订购月数 -1天。
+				if(tariff.getBilling_type().equals(SystemConstants.BILLING_TYPE_MONTH)
+						&& !DateHelper.getNextMonthPreviousDay(orderProd.getEff_date(), order_cycles)
+							.equals(orderProd.getExp_date())){
 					throw new ServicesException(ErrorCode.OrderDateExpDateError);
 				}
+				//包天 结束计费日=开始计费日+订购天数-1天
+				if(tariff.getBilling_type().equals(SystemConstants.BILLING_TYPE_DAY)
+					&& !DateHelper.addDate(orderProd.getEff_date(), order_cycles-1)
+					.equals(orderProd.getExp_date())){
+						throw new ServicesException(ErrorCode.OrderDateExpDateError);
+					}
+			} else {
+				//TODO 如果是升级且根据转移支付金额折算到期日
+			}
 		}		
 		//支付类型判断
 		if(orderProd.getOrder_fee_type()!=null){

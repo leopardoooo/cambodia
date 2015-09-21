@@ -117,7 +117,7 @@ var CheckInGrid = Ext.extend(Ext.grid.GridPanel,{
 			{header:CHECK_LU.labelOrderNo,dataIndex:'order_no',width:80,renderer:App.qtipValue},
 			{header:CHECK_LU.labelInputNo,dataIndex:'batch_num',width:80,renderer:App.qtipValue},
 			{header:CHECK_COMMON.labelSupplier,dataIndex:'supplier_name',width:85},
-			{header:CHECK_COMMON.labelInputDate,dataIndex:'create_time',width:75},
+			{header:CHECK_COMMON.labelInputDate,dataIndex:'create_time',width:135},
 			{header:lsys('DeviceCommon.labelDeviceType'),dataIndex:'device_type_text',width:80},
 			{header:lsys('DeviceCommon.labelDeviceModel'),dataIndex:'device_model_text',width:150,renderer:App.qtipValue},
 			{header:lsys('DeviceCommon.labelNum'),dataIndex:'count',width:50},
@@ -917,7 +917,7 @@ var MateralHandForm = Ext.extend(Ext.form.FormPanel,{
 							id : 'materalDeviceModelId',
 							xtype:'paramcombo',
 							paramName:'FITTING_MODEL',
-							name : 'device_model',
+							hiddenName : 'device_model',
 							emptyText: COM_LU.pleaseSelect,
 							listeners:{
 								scope:this,

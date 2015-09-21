@@ -1,16 +1,23 @@
 package com.ycsoft.beans.task;
 
+import java.io.Serializable;
+
 import com.ycsoft.commons.constants.DictKey;
 import com.ycsoft.commons.store.MemoryDict;
 import com.ycsoft.daos.config.POJO;
 
 @POJO(tn = "W_TASK_USER", sn = "", pk = "task_id,user_id")
-public class WTaskUser {
+public class WTaskUser implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -3877059523414671043L;
 	private String task_id;
 	private String user_id;
 	private String device_model;
 	private String device_id;
-	private String is_valid;
+	private String recycle_device;
+	private String recycle_result;
 	private String user_type;
 	
 	private String user_type_text;
@@ -56,11 +63,19 @@ public class WTaskUser {
 	public void setDevice_id(String device_id) {
 		this.device_id = device_id;
 	}
-	public String getIs_valid() {
-		return is_valid;
+	
+	
+	public String getRecycle_device() {
+		return recycle_device;
 	}
-	public void setIs_valid(String is_valid) {
-		this.is_valid = is_valid;
+	public void setRecycle_device(String recycle_device) {
+		this.recycle_device = recycle_device;
+	}
+	public String getRecycle_result() {
+		return recycle_result;
+	}
+	public void setRecycle_result(String recycle_result) {
+		this.recycle_result = recycle_result;
 	}
 	public String getUser_type() {
 		return user_type;

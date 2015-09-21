@@ -27,9 +27,9 @@ CancelReceiveInvoicePanel = Ext.extend(CommonInvoicePanel,{
 });
 
 CancelReceiveInvoice = Ext.extend(Ext.Panel,{
-	CancelReceiveInvoicePanel:null,
+	panel:null,
 	constructor:function(){
-		this.cancelReceiveInvoicePanel = new CancelReceiveInvoicePanel("CANCEL_RECEIVE");
+		this.panel = new CancelReceiveInvoicePanel("CANCEL_RECEIVE");
 		CancelReceiveInvoice.superclass.constructor.call(this,{
 			id:'CancelReceiveInvoice',
 			title:lsys('CancelReceiveInvoice._title'),
@@ -37,7 +37,7 @@ CancelReceiveInvoice = Ext.extend(Ext.Panel,{
 			border : false ,
 			baseCls: "x-plain",
 			layout:'border',
-			items:[this.cancelReceiveInvoicePanel]
+			items:[this.panel]
 		});
 	}
 });

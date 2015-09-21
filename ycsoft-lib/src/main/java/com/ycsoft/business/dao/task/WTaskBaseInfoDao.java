@@ -102,5 +102,15 @@ public class WTaskBaseInfoDao extends BaseEntityDao<WTaskBaseInfo> {
 			.setStart(start)
 			.page();
 	}
+	
+	public String queryTaskProvinceCode(String custId) throws JDBCException{
+		String sql = "select d.task_code "+
+					"  from c_cust a, t_address b, t_district c, t_province d "+
+					" where a.addr_id = b.addr_id "+
+					"   and b.district_id = c.district_id "+
+					"   and c.province_id = d.id "+
+					"   and a.cust_id = ?";
+		return this.findUnique(sql, custId);
+	}
 
 }

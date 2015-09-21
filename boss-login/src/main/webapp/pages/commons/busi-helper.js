@@ -390,7 +390,7 @@ Ext.apply( App, {
 			panel.getUserPanel().userGrid.remoteRefresh();
 		}
 /****************用户面板相关业务*************************/		
-		else if(busiCode == '1021' || busiCode == '111' || busiCode == '1130'){//销户，高级销户，加挂IP
+		else if(busiCode == '1021' || busiCode == '111' || busiCode == '1130' || busiCode == '2262'){//销户，高级销户，加挂IP,销售设备
 			panel.getUserPanel().userGrid.remoteRefresh();
 		}else if(busiCode == '1020'){//用户开户、刷新用户和设备，账户
 			//panel.getCustPanel().custDeviceGrid.remoteRefresh();
@@ -495,8 +495,7 @@ Ext.apply( App, {
 				for(var k=0;k<busiCodes.length;k++){
 					var item = tBar.items.itemAt(i);
 					if(item.attrs && item.disabled !== bool && item.attrs.busicode == busiCodes[k]){
-//						tBar.items.itemAt(i).setDisabled(bool);
-						tBar.items.itemAt(i).hide()
+						tBar.items.itemAt(i).setDisabled(bool);
 					}
 				}
 			}

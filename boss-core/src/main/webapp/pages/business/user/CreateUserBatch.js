@@ -148,7 +148,7 @@ UserBaseBatchForm = Ext.extend( BaseForm , {
 						allowBlank: false,
 			            minValue: 1,
 			            maxValue: 5000,
-			            value: 2
+			            value: 1
 					},{
 						xtype:'checkbox',
 					    fieldLabel: lmain("user._form.manualOpen"),
@@ -286,7 +286,7 @@ UserBaseBatchForm = Ext.extend( BaseForm , {
 	},
 	doFiltDeviceModel: function(){
 		var userType = Ext.getCmp("boxUserType").getValue();
-		var REF = {"OTT": "1", "DTT": "2", "BAND": "3" }
+		var REF = {"DTT": "1", "OTT": "2", "BAND": "3" }
 		var type = REF[userType] || "";
 		var cmb = Ext.getCmp("boxDeviceCategory");
 		cmb.setRawValue("");

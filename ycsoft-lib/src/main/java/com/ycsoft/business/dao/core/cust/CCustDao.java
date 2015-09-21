@@ -200,6 +200,7 @@ public class CCustDao extends BaseEntityDao<CCust> {
 	public Pager<CCust> complexSearchCust(CCust cust, Integer start,
 			Integer limit, String dataType, String countyId) throws Exception {
 		String sql = " SELECT t1.* from c_cust t1 where t1.county_id =? " ;
+		Pager<CCust> resultPager = null;
 		if(StringHelper.isNotEmpty(cust.getCust_name())){
 			sql = append(sql," and t1.cust_name like '" + cust.getCust_name() + "%'");
 		}
@@ -218,9 +219,12 @@ public class CCustDao extends BaseEntityDao<CCust> {
 		if(StringHelper.isNotEmpty(cust.getLogin_name())){
 			sql = append(sql, " and t1.cust_id in (select cust_id from c_user where login_name='"+cust.getLogin_name()+"')");
 		}
+		if(StringHelper.isNotEmpty(cust.getNet_type())){
+			sql = append(sql, " and exists (select 1 from c_cust_linkman l where t1.cust_id=l.cust_id and t1.county_id=l.county_id",
+					" and l.cert_num='"+cust.getNet_type()+"')");
+		}
 		sql += " and "+dataType;
-		Pager<CCust> resultPager = createQuery(sql, countyId).setStart(start).setLimit(limit).page();
-		
+		resultPager = createQuery(sql, countyId).setStart(start).setLimit(limit).page();
 		//查找已销户的客户
 		if (resultPager.getRecords()== null ||resultPager.getRecords().size()==0){
 			sql = " SELECT t1.* from c_cust_his t1 where t1.county_id =? " ;
@@ -386,7 +390,7 @@ public class CCustDao extends BaseEntityDao<CCust> {
 			+ " PASSWORD, cust_type, cust_level, cust_class, cust_colony, t1.net_type, is_black, open_time,"
 			+ " t1.area_id, t1.county_id, t1.remark, str1, str2, str3, str4, str5, str6, str7, str8, str9, str10 ,b.addr_name addr_id_text,c.t1,c.t2,c.t3,c.t4,c.t5,c.note "
 			+ " from c_cust_his t1 ,t_address b ,c_cust_addr_his c "
-			+ " where t1.cust_id=? and t1.addr_id=b.addr_id and t1.cust_id=c.cust_id and "+addData;
+			+ " where t1.cust_id=? and t1.addr_id=b.addr_id and t1.cust_id=c.cust_id and t1.unit_id=u.unit_id(+) and "+addData;
 			return createQuery(sql, custId).first();
 		}
 	}

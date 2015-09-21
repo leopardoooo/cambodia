@@ -95,7 +95,7 @@ Ext.apply(MenuHandler, {
 	NewCust : function() {
 		return {
 			width : 580,
-			height : 470
+			height : 510
 		};
 	},
 	/**
@@ -146,11 +146,11 @@ Ext.apply(MenuHandler, {
 			Alert(lmsg('needLogOffUser'));
 			return false;
 		}
-		var custDeviceGrid = App.getApp().main.infoPanel.getCustPanel().custDeviceGrid;
-		if (custDeviceGrid.GDDeviceArray.length > 0) {
-			Alert(lmsg('recycleGdDevice'));
-			return false;
-		}
+//		var custDeviceGrid = App.getApp().main.infoPanel.getCustPanel().custDeviceGrid;
+//		if (custDeviceGrid.GDDeviceArray.length > 0) {
+//			Alert(lmsg('recycleGdDevice'));
+//			return false;
+//		}
 		// alert(custDeviceGrid.CustDeviceArray.length);
 		// if(custDeviceGrid.CustDeviceArray.length > 0){
 		// var o = {};
@@ -791,7 +791,7 @@ Ext.apply(MenuHandler, {
 		}
 		return {
 			width : 550,
-			height : 360
+			height : 400
 		};
 	},
 	//派单开户
@@ -1352,6 +1352,37 @@ Ext.apply(MenuHandler, {
 			width : 540,
 			height : 500
 		};
+	},
+	UserUntuck: function(){
+		if (!hasCust()) {
+			return false;
+		}
+		var userRecords = App.main.infoPanel.getUserPanel().userGrid
+				.getSelections();
+		var typecout = 0;
+		if (userRecords.length == 0) {
+			Alert(lmsg("needUser"));
+			return false;
+		}
+		var userIds = [];
+		for (i = 0; i < userRecords.length; i++) {
+			if (userRecords[i].get("status") != "ACTIVE") {
+				Alert(lmsg("userNotActive"));
+				return false;
+			}
+			userIds.push(userRecords[i].get("user_id"));
+		}
+		
+		var url = Constant.ROOT_PATH + "/core/x/User!untuckUsers.action";
+		Confirm(lmsg("confirmUntuckUser"), this, function() {
+			App.sendRequest(url, {userIds: userIds}, function(res, opt){
+				var data = Ext.decode(res.responseText);
+				if (data == true) {
+					App.getApp().main.infoPanel.getUserPanel().userGrid.remoteRefresh();
+				}
+			});
+		});
+		return false;
 	},
 	// 报停
 	UserStop : function() {
@@ -2928,6 +2959,16 @@ Ext.apply(MenuHandler, {
 			// 调用请求函数,详细参数请看busi-helper.js
 			App.sendRequest(url, {task_id : record.get('task_id'),taskType:record.get('task_type_id')}, callback);
 		});
+	},
+	SaleDeviceFee:function(){
+		if (!hasCust())
+			return false;
+		var record = App.main.infoPanel.getUserPanel().userGrid.getSelectionModel().getSelected();
+		return {
+			width : 450,
+			height : 400
+		};
+		
 	}
 	
 });

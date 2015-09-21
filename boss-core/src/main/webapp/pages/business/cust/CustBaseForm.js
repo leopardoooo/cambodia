@@ -395,6 +395,13 @@ LinkPanel = Ext.extend(Ext.Panel,{
 						xtype:'numberfield',						
 						id: 'linkmanMobile'
 					},{
+						id: 'cust_pwd_id',
+						fieldLabel: langUtils.bc("common.pswd"),
+						vtype : 'loginName',
+						xtype:'textfield',
+						value: '000000',
+						name:'cust.password'
+					},{
 						fieldLabel: langUtils.main("cust.base.barthday"),
 						width : 125,
 						id : 'linkmanBirthday',
@@ -570,12 +577,6 @@ CustBaseForm = Ext.extend( BaseForm , {
 				},{
 					id:'addCustItemsTwo',
 					items:[{
-							id: 'cust_pwd_id',
-							fieldLabel: langUtils.bc("common.pswd"),
-							vtype : 'loginName',
-							xtype:'textfield',
-							name:'cust.password'
-						},{
 							fieldLabel: langUtils.main("cust.base.languageType"),
 							xtype: 'paramcombo',
 							paramName: 'LANGUAGE_TYPE',
@@ -648,7 +649,7 @@ CustBaseForm = Ext.extend( BaseForm , {
 		this.remove(this.linkPanel,true);
 		this.remove(this.extAttrForm,true);
 		
-		this.linkPanel = new LinkPanel();
+		this.linkPanel = new LinkPanel(this);
 		if (custType == 'RESIDENT'){
 			this.doInitAttrForm(2);
 			this.add(this.linkPanel);

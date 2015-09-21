@@ -967,9 +967,9 @@ public class CustComponent extends BaseBusiComponent {
 			bonuspoint = cCustBonuspointDao.findByKey(custId);
 			acctBank = cAcctBankDao.findByCustId(custId);
 		}else{
-//			cust = cCustHisDao.findByKey(custId);
-//			CCustAddr custAddr = cCustAddrHisDao.findByKey(custId);
-//			BeanUtils.copyProperties(custAddr, cust);
+			cust = cCustHisDao.findByKey(custId);
+			CCustAddr custAddr = cCustAddrHisDao.findByKey(custId);
+			BeanUtils.copyProperties(custAddr, cust);
 			linkman = cCustLinkmanHisDao.findByKey(custId);
 		}
 		//设置客户单位信息
@@ -1285,7 +1285,7 @@ public class CustComponent extends BaseBusiComponent {
 		return seq;
 	}
 
-	private void setPropText(CCustPropChange change) {
+	private void setPropText(CCustPropChange change) throws Exception {
 		change.setColumn_name_text( MemoryDict.getTransData(change.getColumn_name_text()) );
 		//属性值有对应的系统参数
 		if (StringHelper.isNotEmpty(change.getParam_name())){
@@ -1724,7 +1724,6 @@ public class CustComponent extends BaseBusiComponent {
 		
 		return custFullInfo;
 	}
-	
 	
 	public List<TProvince> queryProvince() throws Exception{
 		return tProvinceDao.queryProvince();

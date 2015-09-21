@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.omg.PortableInterceptor.USER_EXCEPTION;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -363,30 +364,9 @@ public class UserComponent extends BaseBusiComponent {
 	public List<UserDto> queryUser(String custId) throws Exception {
 		List<UserDto> result = new ArrayList<UserDto>();
 		List<CUser> users = queryUserByCustId(custId);
-		List<UserRes> resList = cRejectResDao.queryRejectResByCustId(custId);
-		List<JUserStop> stopList = jUserStopDao.findAll();
-		Map<String,List<UserRes>> map = CollectionHelper.converToMap(resList, "user_id");
-		Map<String,List<JUserStop>> stopmap = CollectionHelper.converToMap(stopList, "user_id");
 		for (CUser user :users){
 			UserDto userdto = new UserDto();
-			
-			List<UserRes> list = map.get(user.getUser_id());
-			List<JUserStop> stoplist = stopmap.get(user.getUser_id());
-			String rejectRes = "";
-			if(list!=null){
-				for(UserRes res : list){
-					rejectRes +=res.getRes_name()+",";
-				}
-				rejectRes = rejectRes.substring(0,rejectRes.length()-1);
-			}
-			user.setIs_rstop_fee(isStopFee());
 			BeanUtils.copyProperties(user, userdto);
-			if(stoplist!=null){
-				userdto.setStop_date(stoplist.get(0).getStop_date());
-			}
-			if(StringHelper.isNotEmpty(rejectRes))
-				userdto.setRejectRes(rejectRes);
-			
 			if(userdto.getUser_type().equals(SystemConstants.USER_TYPE_BAND)){
 				if(StringHelper.isNotEmpty(userdto.getModem_mac())){
 					RModemModel modemModel = rModemModelDao.queryByModemMac(userdto.getModem_mac());
@@ -416,8 +396,20 @@ public class UserComponent extends BaseBusiComponent {
 					}
 				}
 			}
-			
-			
+			if(!user.getUser_type().equals(SystemConstants.USER_TYPE_OTT_MOBILE)){
+				if(StringHelper.isEmpty(userdto.getDevice_model()) && StringHelper.isNotEmpty(user.getStr3())){
+					userdto.setDevice_model(user.getStr3());
+					if(user.getUser_type().equals(SystemConstants.USER_TYPE_BAND)){
+						userdto.setDevice_model_text( MemoryDict.getTransName(DictKey.MODEM_MODEL, user.getStr3()) );
+					}else{
+						userdto.setDevice_model_text( MemoryDict.getTransName(DictKey.STB_MODEL, user.getStr3()) );
+					}
+				}
+				if(StringHelper.isEmpty(userdto.getBuy_model()) && StringHelper.isNotEmpty(user.getStr10())){
+					userdto.setBuy_model(user.getStr10());
+					userdto.setBuy_model_text( MemoryDict.getTransName(DictKey.DEVICE_BUY_MODE, user.getStr10()) );
+				}
+			}
 			
 			result.add(userdto);
 		}
@@ -957,6 +949,10 @@ public class UserComponent extends BaseBusiComponent {
 //		this.removeUserWithHis(doneCode, oldUser);
 	}
 	
+	public void updateUser(CUser user) throws Exception {
+		cUserDao.update(user);
+	}
+	
 	/**
 	 * 加一点说明,以前的要求就是所有的都修改为主终端.
 	 * @param doneCode
@@ -1297,6 +1293,7 @@ public class UserComponent extends BaseBusiComponent {
 					loginNameList.add( Integer.parseInt(loginName) );
 			}
 		}
+		if(loginNameList.size() == 0) return 0;
 		return Collections.max(loginNameList);
 		
 	}

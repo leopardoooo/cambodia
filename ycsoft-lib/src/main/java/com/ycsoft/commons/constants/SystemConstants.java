@@ -566,8 +566,9 @@ public class SystemConstants {
 	public static final String TASK_TYPE_FAULT="2";//故障工单
 	public static final String TASK_TYPE_MOVE="3";//迁移工单
 	public static final String TASK_TYPE_CHANGE="5";//变动工单
-	public static final String TASK_TYPE_WRITEOFF="7";//拆除工单
+	public static final String TASK_TYPE_WRITEOFF_LINE="7";//拆除工单
 	public static final String TASK_TYPE_PROJECT="8";//工程工单
+	public static final String TASK_TYPE_WRITEOFF_TERMINAL="9";//工程工单
 	
 	public static final String TASK_FINISH_TYPE_SUCCESS="QC";//正常完工
 	public static final String TASK_FINISH_TYPE_FAILURE="QD";//施工失败

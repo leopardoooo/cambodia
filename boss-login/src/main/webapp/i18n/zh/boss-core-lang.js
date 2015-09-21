@@ -99,7 +99,7 @@ BCLang.home = {
 				houseOptr: "小区运维人员~",postalAddr: "邮寄地址~", remark: "备注~",
 				email: "邮箱~", sex: "性别~",postcode: '邮编~', blackList: '黑名单~',
 				agentName: "代理商~", deptName: "开户部门~", developName: "发展人~", businessLicence: "营业执照~", unitNumber: "单位税号~",
-				spkgSn: "协议编号~", cust_level: "客户级别~",switchCustTitle: '选择客户~', languageType: '服务语言~'
+				spkgSn: "协议编号~", cust_level: "客户级别~",switchCustTitle: '选择客户~', languageType: '服务语言~', unitName: '所属单位~'
 			},
 			_form: {
 				thinkCust: '意向客户~',
@@ -261,12 +261,13 @@ BCLang.home = {
 			payfee: {
 				_title: "预存费用~",
 				columns: ["流水号~","业务名称~","账户类型~","账目名称~","用户类型~", "用户名~","设备编号~","状态~","金额~","缴费前预计到期日~",
-				        "缴费后预计到期日~","打印状态~","付款方式~","受理日期~","账务日期~","受理人~","受理部门~","发票~","出票方式~", "发票类型~","发展人~"]
+				        "缴费后预计到期日~","打印状态~","付款方式~","受理日期~","支付日期~","受理人~","受理部门~","发票~","出票方式~", "发票类型~","发展人~"]
 			},
 			busifee: {
 				_title: "业务费用~",
 				columns: ["流水号~","费用名称~","设备类型~","设备编号~","状态~","打印状态~",
-				          "应付~","实付~","付款方式~","受理日期~","受理人~","受理部门~","发票~","出票方式~","发票类型~","购买数量~","设备型号~","备注~","发展人~"]
+				          "应付~","实付~","付款方式~","受理日期~","受理人~","受理部门~","发票~","出票方式~","发票类型~","购买数量~","设备型号~",
+				          "备注~","发展人~","支付日期~"]
 			},
 			detail: {
 				_title: '支付记录~',
@@ -424,7 +425,8 @@ BCLang.home = {
 			labelCustName:'客户名称~',
 			labelStatus:'意向客户~',
 			labelAddress:'客户地址~',
-			labelLoginName:'账号~'
+			labelLoginName:'账号~',
+			certNum:'证件号码~'
 		},
 		InvoicePrint:{//发票打印
 			_title:'发票打印~',
@@ -581,6 +583,7 @@ BCLang.msgBox = {
 	onlyOneUser: '请选择一个用户!~',
 	needStopUser: '请选择【报停】状态的用户~',
 	confirmOpenUser: '确定要报开吗?~',
+	confirmUntuckUser: '确定要拆机吗?~',
 	searchCustTip1: '查询客户请输入至少一个关键字~',
 	searchCustTip2: '请不要输入单引号~',
 	searchNoCust: '没有查询到符合条件的客户，请确认后重新输入!~',

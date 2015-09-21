@@ -211,10 +211,10 @@ LogoffUserForm = Ext.extend(BaseForm,{
 		all['userId'] = this.userId;
 		var cmp = Ext.getCmp('refundFeeValue');
 		if(cmp){
-			all['cancelFee'] = -Ext.util.Format.formatToFen(cmp.getValue());
+			all['cancelFee'] = -1*Ext.util.Format.formatToFen(cmp.getValue());
 		}
 		
-		all['refundFee'] =Ext.util.Format.formatToFen(Ext.getCmp('cfeeTotalAmountId').getValue());
+		all['refundFee'] =-1*Ext.util.Format.formatToFen(Ext.getCmp('cfeeTotalAmountId').getValue());
 		
 		if(Ext.getCmp('newAcctItemId')){
 			all['transAcctId'] = this.publicAcctInfo.acct_id;

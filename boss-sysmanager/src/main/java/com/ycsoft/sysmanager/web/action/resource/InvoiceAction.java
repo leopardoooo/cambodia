@@ -105,6 +105,12 @@ public class InvoiceAction extends BaseAction {
 		return JSON_SIMPLEOBJ;
 	}
 	
+	public String queryInvoiceDetailByInvoiceId() throws Exception {
+		String invoiceId = request.getParameter("invoiceId");
+		getRoot().setSimpleObj(invoiceComponent.queryInvoiceDetailByInvoiceId(invoiceId,invoiceCode));
+		return JSON_SIMPLEOBJ;
+	}
+	
 	/**
 	 * 多条件查询发票及客户信息
 	 * @param invoiceDto

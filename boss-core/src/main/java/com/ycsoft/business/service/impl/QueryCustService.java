@@ -11,10 +11,8 @@ import com.ycsoft.beans.config.TProvince;
 import com.ycsoft.beans.core.acct.CAcctAcctitem;
 import com.ycsoft.beans.core.bill.BBillWriteoff;
 import com.ycsoft.beans.core.bill.BillDto;
-import com.ycsoft.beans.core.common.CDoneCodeUnpay;
 import com.ycsoft.beans.core.cust.CCust;
 import com.ycsoft.beans.core.cust.CCustPropChange;
-import com.ycsoft.beans.core.fee.CFee;
 import com.ycsoft.beans.core.fee.CFeeUnprint;
 import com.ycsoft.beans.core.job.JBandCommand;
 import com.ycsoft.beans.core.job.JCaCommand;
@@ -44,7 +42,6 @@ import com.ycsoft.business.dto.core.prod.JCaCommandDto;
 import com.ycsoft.business.dto.core.prod.JVodCommandDto;
 import com.ycsoft.business.dto.core.user.UserDto;
 import com.ycsoft.business.service.IQueryCustService;
-import com.ycsoft.commons.constants.BusiCodeConstants;
 import com.ycsoft.commons.constants.DictKey;
 import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.constants.SystemConstants;
@@ -52,7 +49,6 @@ import com.ycsoft.commons.exception.ServicesException;
 import com.ycsoft.commons.helper.CollectionHelper;
 import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.commons.store.MemoryDict;
-import com.ycsoft.commons.store.MemoryPrintData;
 import com.ycsoft.daos.core.JDBCException;
 import com.ycsoft.daos.core.Pager;
 
@@ -549,8 +545,6 @@ public class QueryCustService extends BaseService implements IQueryCustService {
 		// TODO Auto-generated method stub
 		return jobComponent.syncServerTime();
 	}
-
-
 
 	
 }

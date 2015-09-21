@@ -18,7 +18,6 @@ ModifyBusiOptrForm = Ext.extend(BaseForm,{
 			fields:['optr_id','optr_name','attr']
 		});
 		this.busiOptrStore.load();
-//		this.busiOptrStore.on('load',this.doLoad,this);		//多选修改可能选择其中几个相同的业务员
 		ModifyBusiOptrForm.superclass.constructor.call(this,{
 			border:false,
 			labelWidth:75,
@@ -32,7 +31,7 @@ ModifyBusiOptrForm = Ext.extend(BaseForm,{
 					xtype:'lovcombo',width:200,
 					store:this.busiOptrStore,
 					valueField:'optr_id',displayField:'optr_name',boxMaxHeight:500,
-					editable:true,forceSelection:true,allowBlank:true,
+					editable:true,forceSelection:true,allowBlank:false,
 					beforeBlur:function(){},
 					listeners:{
 						beforequery:function(e){

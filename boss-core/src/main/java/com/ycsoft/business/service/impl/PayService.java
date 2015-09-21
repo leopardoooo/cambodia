@@ -581,15 +581,13 @@ public class PayService extends BaseBusiService implements IPayService {
 	 */
 	
 	/**
-	 * 更新产品订单的支付属性并发加授权
+	 * 更新产品订单的支付属性
 	 * @param unPayDoneCodes
 	 * @param cust_id
 	 * @param done_code
 	 * @throws Exception
 	 */
 	private void updateOrder(List<FeeDto> feeList,String cust_id,Integer done_code) throws Exception{
-		
-		Map<String,CUser> userMap=userComponent.queryUserMap(cust_id);
 		//被支付的订单SN
 		Set<String> payOrderSnSet=new HashSet<String>();
 		for(FeeDto fee:feeList){
@@ -597,8 +595,6 @@ public class PayService extends BaseBusiService implements IPayService {
 				payOrderSnSet.add(fee.getProd_sn());
 			}
 		}
-		
-		Map<CUser,List<CProdOrder>> atvMap=new HashMap<>();
 		//查询待支付的订单(含套餐和套餐子产品)
 		for(CProdOrder order:cProdOrderDao.queryUnPayOrder(cust_id)){ 
 			if(!payOrderSnSet.contains(order.getOrder_sn())&&
@@ -607,26 +603,7 @@ public class PayService extends BaseBusiService implements IPayService {
 			}
 			//更改订单支付属性
 			cProdOrderDao.updateOrderToPay(order.getOrder_sn(), cust_id);
-			//订单状态是正常的才要授权
-			if(StringHelper.isNotEmpty(order.getUser_id())
-					&&order.getStatus().equals(StatusConstants.ACTIVE)){
-				CUser user=userMap.get(order.getUser_id());
-				if(user==null){
-					throw new ServicesException(ErrorCode.OrderDateException,order.getOrder_sn());
-				}
-				List<CProdOrder> list=atvMap.get(user);
-				if(list==null){
-					list=new ArrayList<>();
-					atvMap.put(user, list);
-				}
-				list.add(order);
-			}
-		}	
-		//发授权
-		for(CUser user:atvMap.keySet()){
-			authComponent.sendAuth(user, atvMap.get(user),  BusiCmdConstants.ACCTIVATE_PROD, done_code);
 		}
-		
 	}
 	
 	/**
@@ -1239,12 +1216,13 @@ public class PayService extends BaseBusiService implements IPayService {
 			feeComponent.updateIsDocByDoneCode(fee.getCreate_done_code(),SystemConstants.BOOLEAN_NO);
 		}else{
 			feeComponent.savePrintStatus(fee_sn);
+			cFeeUnprintDao.remove(fee_sn);
 		}
 		
 		String optrId = getOptr().getOptr_id();
 		//重载操作员未打印的费用
-		List<String> feeSnList = feeComponent.queryUnPrintFeeByOptr(optrId);
-		MemoryPrintData.reloadOptrFee(optrId, feeSnList);
+		//List<String> feeSnList = feeComponent.queryUnPrintFeeByOptr(optrId);
+		//MemoryPrintData.reloadOptrFee(optrId, feeSnList);
 		
 		Integer doneCode = doneCodeComponent.gDoneCode();
 		BusiParameter p = getBusiParam();
@@ -1265,8 +1243,8 @@ public class PayService extends BaseBusiService implements IPayService {
 		
 		String optrId = getOptr().getOptr_id();
 		//重载操作员未打印的费用
-		List<String> feeSnList = feeComponent.queryUnPrintFeeByOptr(optrId);
-		MemoryPrintData.reloadOptrFee(optrId, feeSnList);
+		//List<String> feeSnList = feeComponent.queryUnPrintFeeByOptr(optrId);
+		//MemoryPrintData.reloadOptrFee(optrId, feeSnList);
 		
 		Integer doneCode = doneCodeComponent.gDoneCode();
 		BusiParameter p = getBusiParam();

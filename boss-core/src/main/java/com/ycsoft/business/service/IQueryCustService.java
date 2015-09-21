@@ -410,5 +410,4 @@ public interface IQueryCustService extends IBaseService{
 
 	public List<TProvince> queryProvince()throws Exception;
 
-
 }
