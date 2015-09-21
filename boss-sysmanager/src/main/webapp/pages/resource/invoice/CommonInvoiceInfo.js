@@ -238,6 +238,14 @@ InvoiceBaseDetailGrid = Ext.extend(Ext.grid.GridPanel, {
 				border:false,
 				sm : new Ext.grid.CheckboxSelectionModel(),
 				cm : new Ext.grid.ColumnModel([{
+							header : '客户编号',
+							dataIndex : 'cust_no',
+							renderer : App.qtipValue
+						},{
+							header : '客户名称',
+							dataIndex : 'cust_name',
+							renderer : App.qtipValue
+						},{
 							header : '费用项',
 							dataIndex : 'fee_name',
 							renderer : App.qtipValue

@@ -495,8 +495,7 @@ Ext.apply( App, {
 				for(var k=0;k<busiCodes.length;k++){
 					var item = tBar.items.itemAt(i);
 					if(item.attrs && item.disabled !== bool && item.attrs.busicode == busiCodes[k]){
-//						tBar.items.itemAt(i).setDisabled(bool);
-						tBar.items.itemAt(i).hide()
+						tBar.items.itemAt(i).setDisabled(bool);
 					}
 				}
 			}

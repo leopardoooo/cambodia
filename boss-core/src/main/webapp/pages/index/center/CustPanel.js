@@ -53,11 +53,12 @@ var custInfoHTML =
 		'<td class="label">'+ langUtils.main("cust.base.developName") +':</td>' +
 		'<td class="input">&nbsp;{[values.cust.develop_optr_name || ""]}</td>'+
 	'</tr>'+
-	'</tr>'+'<tr height=24>'+
-		'<td class="label">'+ langUtils.main("cust.base.unitName") +':</td>' +
-		'<td class="input">&nbsp;{[values.cust.unit_name || ""]}</td>'+
-	'</tr>'+
-	'</tr>'+
+	'<tpl if="values.cust.unit_id">'+
+		'<tr height=24>'+
+			'<td class="label">'+ langUtils.main("cust.base.unitName") +':</td>' +
+			'<td class="input">&nbsp;{[values.cust.unit_name || ""]}</td>'+
+		'</tr>'+
+	'</tpl>'+
 	'<tpl if="values.cust.cust_type==\'NONRES\'">'+
 		'<tr height=24>'+
 			'<td class="label">'+ langUtils.main("cust.base.businessLicence") +':</td>' +
@@ -96,12 +97,7 @@ CustInfoPanel = Ext.extend( Ext.ux.Gpanel , {
 			title:"<font style='font-family:微软雅黑;font-size:12'>" + langUtils.main("cust.base._title") +"</font>",
 			border: false,
 			layout: 'anchor',
-			anchor: '100%',
 			autoScroll:true,
-			bodyStyle: "background:#F9F9F9",
-			defaults: {
-					bodyStyle: "background:#F9F9F9"
-				},
 			items : [{xtype : "panel",
 						border : false,
 						bodyStyle: "background:#F9F9F9; padding: 10px;padding-top: 4px;padding-bottom: 0px;",
@@ -182,16 +178,22 @@ CustInfoPanel = Ext.extend( Ext.ux.Gpanel , {
 			var cust = App.getCust();
 			var custType = cust.cust_type;
 			if(custType=='RESIDENT'){//居民
+				var arr = ['1003','1010','1005','1006','1119','2001'];
 				if(cust.unit_name){//已加入单位
 					App.disableBarByBusiCode(custTBar,['1005'],true);//隐藏加入单位
+					arr.remove('1005');
 				}else{//未加入单位
 					App.disableBarByBusiCode(custTBar,['1006'],true);//隐藏退出单位
+					arr.remove('1006');
 				}
 				if(cust.mn_cust_id){//已加入模拟大客户
 					App.disableBarByBusiCode(custTBar,['1105'],true);//隐藏 加入模拟大客户
+					arr.remove('1105');
 				}else{//未加入模拟大客户
 					App.disableBarByBusiCode(custTBar,['1106'],true);//隐藏 退出模拟大客户
+					arr.remove('1106');
 				}
+				App.disableBarByBusiCode(custTBar, arr, false);
 			}else if(custType=='UNIT'){//单位
 				//隐藏过户、移机、加入单位、退出单位、拆迁
 				App.disableBarByBusiCode(custTBar,['1003','1010','1005','1006','1119','2001'],true);
