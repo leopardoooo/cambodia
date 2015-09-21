@@ -307,7 +307,7 @@ DetailWin = Ext.extend(Ext.Window,{
 			title: langUtils.sys('QueryInvoice.common.titlaQueryInvoick'),
 
 			layout: 'fit',
-			width: 800,
+			width: 1000,
 			height: 500,
 			closeAction:'close',
 			autoDestroy:true,
