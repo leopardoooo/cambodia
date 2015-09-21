@@ -425,7 +425,8 @@ BCLang.home = {
 			labelCustName:'客户名称~',
 			labelStatus:'意向客户~',
 			labelAddress:'客户地址~',
-			labelLoginName:'账号~'
+			labelLoginName:'账号~',
+			certNum:'证件号码~'
 		},
 		InvoicePrint:{//发票打印
 			_title:'发票打印~',
