@@ -1850,7 +1850,7 @@ public class BaseBusiService extends BaseService {
 			deviceComponent.updateDeviceDepotStatus(doneCode, busiCode, device.getDevice_id(),
 					device.getDepot_status(), StatusConstants.USE,true);
 			//更新设备产权
-			if (SystemConstants.OWNERSHIP_CUST.equals(ownership)){
+			if (!SystemConstants.OWNERSHIP_CUST.equals(ownership)){
 				deviceComponent.updateDeviceOwnership(doneCode, busiCode, device.getDevice_id(),device.getOwnership(),SystemConstants.OWNERSHIP_CUST,true);
 			}
 			//更新设备为旧设备

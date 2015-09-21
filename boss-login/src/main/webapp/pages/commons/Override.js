@@ -609,11 +609,14 @@ Ext.util.Format.formatToFen = function(value){
 		return finalFee;
 	}
 }
-
+/**四舍五入*/
 Ext.util.Format.round = function(num,n){
 	return Math.round(num*Math.pow(10,n))/Math.pow(10,n);
 }
-
+/**不小余它的最小整数*/
+Ext.util.Format.ceil = function(num,n){
+	return Math.ceil(num*Math.pow(10,n))/Math.pow(10,n);
+}
 /**
  * 状态字体显示
  * @param {} v
