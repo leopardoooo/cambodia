@@ -444,14 +444,10 @@ ProdOrderForm = Ext.extend( BaseForm, {
 	doPayOrderType:function(v){
 		if(v == 'TRANSFER'){
 			Ext.getCmp('orderMonthItemsId').hide();
-//			Ext.getCmp('sfOrderCycle').disable();
-//			var boxProdTariff = Ext.getCmp("boxProdTariff");
-//			boxProdTariff.reset();
 			this.doTransferAmount()
 			this.doTransferDate()
 		}else{
 			Ext.getCmp('orderMonthItemsId').show();
-//			Ext.getCmp('sfOrderCycle').enable();
 			// 结算结束计费日
 			this.doChangeEndDate();
 			// 计算结算金额
@@ -479,7 +475,9 @@ ProdOrderForm = Ext.extend( BaseForm, {
 		
 		var tAmount = this.transferAmount;
 		var disctRent = tariffRecord.get("disct_rent");
-		var mothAllNum = Ext.util.Format.round((tAmount/disctRent)*tariffRecord.get("billing_cycle"),2);
+		var mothAllNum = Ext.util.Format.ceil((tAmount/disctRent)*tariffRecord.get("billing_cycle"),2);
+		//月数赋值
+		Ext.getCmp("sfOrderCycle").setValue(mothAllNum);
 		var mothNum = parseInt(mothAllNum);
 		var dayNum = Math.ceil((mothAllNum - mothNum)*30);
 		var startDate = Ext.getCmp("dfStartDate").getValue();
