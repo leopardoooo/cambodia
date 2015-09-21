@@ -57,9 +57,11 @@ public class WTaskBaseInfoDao extends BaseEntityDao<WTaskBaseInfo> {
 
 	public Pager<TaskBaseInfoDto> queryTask(String taskTypes, String addrIds, String beginDate, String endDate,
 			String taskId, String teamId, String status, String custNo, String custName, String custAddr,String mobile, Integer start, Integer limit) throws Exception {
+		
 		String sql = "select t.* "
-				+ " from w_task_base_info t, C_CUST c "
-				+ " where t.cust_id = c.cust_id "
+				+ " from w_task_base_info t, C_CUST c  "+(StringHelper.isEmpty(addrIds)?"":", t_district td, t_address ta,t_province tp")
+				+ " where t.cust_id = c.cust_id "+(StringHelper.isEmpty(addrIds)?"":" and c.addr_id = ta.addr_id "
+				+ "and ta.district_id = td.district_id  and td.province_id=tp.id and  tp.id in ("+sqlGenerator.in(addrIds.split(","))+")")
 				+ "  AND t.task_create_time >= to_date(?, 'yyyy-MM-dd') "
 				+ "  AND t.task_create_time < to_date(?, 'yyyy-MM-dd') ";
 		List<Object> params = new ArrayList<Object>();

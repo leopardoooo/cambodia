@@ -15,7 +15,7 @@ public class WTaskLogDao extends BaseEntityDao<WTaskLog> {
 	private static final long serialVersionUID = 8483966061975110281L;
 	
 	public List<WTaskLog> queryByTaskId(String taskId) throws JDBCException {
-		String sql = "select * from w_task_log where task_id=?";
+		String sql = "select * from w_task_log where task_id=? order by log_time desc";
 		return this.createQuery(sql, taskId).list();
 	}
 	
