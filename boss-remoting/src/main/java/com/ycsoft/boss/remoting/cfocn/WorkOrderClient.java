@@ -81,7 +81,7 @@ public class WorkOrderClient {
 			order.setOrderContent("install");
 		else if (task.getTask_type_id().equals(SystemConstants.TASK_TYPE_MOVE))
 			order.setOrderContent("move");
-		else if (task.getTask_type_id().equals(SystemConstants.TASK_TYPE_WRITEOFF))
+		else if (task.getTask_type_id().equals(SystemConstants.TASK_TYPE_WRITEOFF_LINE))
 			order.setOrderContent("writeoff");
 		else if (task.getTask_type_id().equals(SystemConstants.TASK_TYPE_FAULT))
 			order.setOrderContent(task.getBug_detail());

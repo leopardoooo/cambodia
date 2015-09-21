@@ -14,6 +14,7 @@ import com.google.gson.JsonObject;
 import com.ycsoft.beans.core.cust.CCust;
 import com.ycsoft.beans.core.cust.CCustLinkman;
 import com.ycsoft.beans.core.user.CUser;
+import com.ycsoft.beans.device.RDevice;
 import com.ycsoft.beans.task.TaskFillDevice;
 import com.ycsoft.beans.task.WTaskBaseInfo;
 import com.ycsoft.beans.task.WTaskLog;
@@ -22,6 +23,7 @@ import com.ycsoft.beans.task.WTeam;
 import com.ycsoft.business.commons.abstracts.BaseBusiComponent;
 import com.ycsoft.business.dao.core.cust.CCustLinkmanDao;
 import com.ycsoft.business.dao.core.user.CUserDao;
+import com.ycsoft.business.dao.resource.device.RDeviceDao;
 import com.ycsoft.business.dao.task.WTaskBaseInfoDao;
 import com.ycsoft.business.dao.task.WTaskLogDao;
 import com.ycsoft.business.dao.task.WTaskUserDao;
@@ -53,6 +55,8 @@ public class SnTaskComponent extends BaseBusiComponent{
 	private WTaskLogDao wTaskLogDao;
 	@Autowired
 	private CUserDao cUserDao;
+	@Autowired
+	private RDeviceDao rDeviceDao;
 	
 	//创建开户工单
 	public void createOpenTask(Integer doneCode,CCust cust,List<CUser> userList,String assignType) throws Exception{
@@ -61,10 +65,33 @@ public class SnTaskComponent extends BaseBusiComponent{
 	
 	//创建销户工单
 	public void createWriteOffTask(Integer doneCode,CCust cust,List<CUser> userList,String assignType) throws Exception{
-		this.createTaskWithUser(doneCode, cust, userList, SystemConstants.TASK_TYPE_WRITEOFF, assignType);
+		List<CUser> bandList = new ArrayList<CUser>();
+		List<CUser> tvUserList = new ArrayList<CUser>();
+		for (Iterator<CUser> it = userList.iterator();it.hasNext();){
+			CUser user = it.next();
+			if (user.getUser_type().equals(SystemConstants.USER_TYPE_OTT_MOBILE)){
+				it.remove();
+			} else if (user.getUser_type().equals(SystemConstants.USER_TYPE_BAND)){
+				bandList.add(user);
+			} else {
+				tvUserList.add(user);
+			}
+		}
+		if (bandList.size() ==0 && tvUserList.size() ==0){
+			return;//no user
+		}
+		//创建终端回收单
+		createSingleTaskWithUser(doneCode, cust, userList, getTeamId(SystemConstants.TEAM_TYPE_SUPERNET), SystemConstants.TASK_TYPE_WRITEOFF_TERMINAL);
+		//创建拆线路单
+		String teamType = SystemConstants.TEAM_TYPE_SUPERNET;
+		if(assignType.equals(SystemConstants.TASK_ASSIGN_CFOCN))
+			teamType = SystemConstants.TEAM_TYPE_CFOCN;
+		String teamId = getTeamId(teamType);
+		for(CUser user:bandList){
+			this.saveTaskBaseInfo(cust, doneCode, SystemConstants.TASK_TYPE_WRITEOFF_LINE, teamId, null, null);
+		}		
 	}
-	
-	
+
 	//创建需要记录用户信息的工单
 	private void createTaskWithUser(Integer doneCode,CCust cust,List<CUser> userList,String taskType,String assignType) throws Exception{
 		if (StringHelper.isEmpty(assignType))
@@ -132,6 +159,19 @@ public class SnTaskComponent extends BaseBusiComponent{
 			taskUser.setUser_id(user.getUser_id());
 			taskUser.setDevice_model(user.getDevice_model());
 			taskUser.setUser_type(user.getUser_type());
+			
+			if (taskType.equals(SystemConstants.TASK_TYPE_WRITEOFF_TERMINAL)){
+				taskUser.setDevice_id(user.getUser_type().equals(SystemConstants.USER_TYPE_BAND)?user.getModem_mac():user.getStb_id());
+				//如果产品是广电的设备，需要回收
+				RDevice device = rDeviceDao.findByDeviceCode(taskUser.getDevice_id());
+				if (device.getOwnership().equals(SystemConstants.OWNERSHIP_GD)){
+					taskUser.setRecycle_device(SystemConstants.BOOLEAN_TRUE);
+				} else {
+					taskUser.setRecycle_device(SystemConstants.BOOLEAN_FALSE);
+					taskUser.setRecycle_result(SystemConstants.BOOLEAN_FALSE);
+				}
+			}
+			
 			wTaskUserDao.save(taskUser);
 		}
 		

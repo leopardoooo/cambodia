@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 
 import com.ycsoft.beans.task.WTaskLog;
+import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.daos.abstracts.BaseEntityDao;
 import com.ycsoft.daos.core.JDBCException;
 
@@ -16,5 +17,12 @@ public class WTaskLogDao extends BaseEntityDao<WTaskLog> {
 	public List<WTaskLog> queryByTaskId(String taskId) throws JDBCException {
 		String sql = "select * from w_task_log where task_id=?";
 		return this.createQuery(sql, taskId).list();
+	}
+	
+	public List<WTaskLog> querySynLog() throws JDBCException {
+		String sql = "select * from w_task_log a,w_task_base_info b where "
+				+ " b.task_id=? "
+				+ " and syn_status =? and b.task_status=? order by a.done_code";
+		return this.createQuery(sql, StatusConstants.NOT_EXEC,StatusConstants.TASK_INIT).list();
 	}
 }
