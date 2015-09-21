@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.ycsoft.beans.core.cust.CCust;
-import com.ycsoft.beans.core.job.JBandCommand;
 import com.ycsoft.beans.system.SOptr;
 import com.ycsoft.beans.task.TaskCustExtInfo;
 import com.ycsoft.beans.task.WTaskBaseInfo;
@@ -21,7 +20,6 @@ import com.ycsoft.business.dao.task.WTaskLogDao;
 import com.ycsoft.business.dao.task.WTaskUserDao;
 import com.ycsoft.commons.abstracts.BaseComponent;
 import com.ycsoft.commons.constants.StatusConstants;
-import com.ycsoft.commons.constants.SystemConstants;
 @Component
 public class TaskComponent extends BaseComponent {
 	@Autowired
@@ -31,7 +29,7 @@ public class TaskComponent extends BaseComponent {
 	@Autowired
 	private WTaskLogDao wTaskLogDao;
 	@Autowired
-	private SOptrDao SOptrDao;
+	private SOptrDao sOptrDao;
 	@Autowired
 	private CCustDao cCustDao;
 	
@@ -70,7 +68,7 @@ public class TaskComponent extends BaseComponent {
 		log.setError_code(result.getErr());
 		log.setError_remark(result.getReason());
 		log.setSyn_time(new Date());
-		wTaskLogDao.save(log);
+		wTaskLogDao.update(log);
 		
 	}
 }

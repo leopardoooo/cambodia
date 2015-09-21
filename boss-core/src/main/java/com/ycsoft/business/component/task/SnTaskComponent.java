@@ -275,7 +275,7 @@ public class SnTaskComponent extends BaseBusiComponent{
 			}
 		}
 		for (TaskFillDevice device:deviceList){
-			updateUSerDevice(device,userList,doneCode,taskId);
+			updateUserDevice(device,userList,doneCode,taskId);
 		}
 		
 		return userList;
@@ -283,7 +283,7 @@ public class SnTaskComponent extends BaseBusiComponent{
 	
 	
 
-	private void updateUSerDevice(TaskFillDevice device, List<WTaskUser> userList, Integer doneCode, String taskId) throws Exception{
+	private void updateUserDevice(TaskFillDevice device, List<WTaskUser> userList, Integer doneCode, String taskId) throws Exception{
 		WTaskUser user = null;
 		if (StringHelper.isNotEmpty(device.getOldDeviceCode())){
 			for (WTaskUser tu:userList){

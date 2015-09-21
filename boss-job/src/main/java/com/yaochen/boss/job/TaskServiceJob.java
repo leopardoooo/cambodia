@@ -75,7 +75,7 @@ public class TaskServiceJob implements Job2 {
 				}
 				
 				if(result.getStatus()==null){
-					result.setStatus("0");
+					result.setErr("0");
 					result.setReason("成功");
 				}
 			} catch (WordOrderException e){

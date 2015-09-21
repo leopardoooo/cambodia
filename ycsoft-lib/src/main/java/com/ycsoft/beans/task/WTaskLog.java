@@ -8,7 +8,7 @@ import com.ycsoft.commons.constants.DictKey;
 import com.ycsoft.commons.store.MemoryDict;
 import com.ycsoft.daos.config.POJO;
 
-@POJO(tn = "W_TASK_LOG", sn = "", pk = "task_id")
+@POJO(tn = "W_TASK_LOG", sn = "", pk = "done_code")
 public class WTaskLog  extends BusiBase  implements Serializable {
 	/**
 	 * 

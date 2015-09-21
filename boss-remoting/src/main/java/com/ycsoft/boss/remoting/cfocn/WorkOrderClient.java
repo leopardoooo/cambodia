@@ -127,7 +127,7 @@ public class WorkOrderClient {
 	public boolean cancelTaskService(int doneCode,String taskId) throws WordOrderException{
 		ManuallyInfluencedWorkOrder influence = new ManuallyInfluencedWorkOrder();
 		influence.setWorkOrderNo(taskId);
-		influence.setNo(""+doneCode);
+		influence.setNo(taskId);
 		influence.setType(INFL_TYPE_CANCEL);
 		influence.setContent("cancel work order "+taskId);
 		return cancelTaskService(influence);
@@ -147,6 +147,7 @@ public class WorkOrderClient {
 		ResultHead result = null;
 		try {
 			result = callback.doCallback();
+			System.out.println("============================="+result.getHeadCode()+"      "+result.getHeadMsg());
 		} catch (RemoteException e) {
 			throw new WordOrderException(e);
 		}

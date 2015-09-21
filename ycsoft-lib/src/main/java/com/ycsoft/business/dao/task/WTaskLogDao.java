@@ -21,7 +21,7 @@ public class WTaskLogDao extends BaseEntityDao<WTaskLog> {
 	
 	public List<WTaskLog> querySynLog() throws JDBCException {
 		String sql = "select * from w_task_log a,w_task_base_info b where "
-				+" syn_status =? and b.task_status=? order by a.done_code";
-		return this.createQuery(sql, StatusConstants.NOT_EXEC,StatusConstants.TASK_INIT).list();
+				+" syn_status =?  order by a.done_code";
+		return this.createQuery(sql, StatusConstants.NOT_EXEC).list();
 	}
 }
