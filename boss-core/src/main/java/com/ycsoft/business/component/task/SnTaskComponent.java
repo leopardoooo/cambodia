@@ -210,7 +210,7 @@ public class SnTaskComponent extends BaseBusiComponent{
 			if (cfonTeamId.equals(deptId))
 				jo.addProperty("synType", "add");
 			else 
-				jo.addProperty("synType", "remove");
+				jo.addProperty("synType", "cancel");
 			createTaskLog(taskId,BusiCodeConstants.TASK_ASSIGN, doneCode, jo.toString(), StatusConstants.NOT_EXEC);
 		} else {
 			createTaskLog(taskId,BusiCodeConstants.TASK_ASSIGN, doneCode, jo.toString(), StatusConstants.NONE);

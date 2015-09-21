@@ -100,6 +100,14 @@ public class BandAuthJob implements Job2 {
 				result.setReason(e.getMessage());
 				logger.error("未知严重错误，暂停发送!",e);
 			}
+			//保存发送结果
+			try{
+				authComponent.saveBandSendResult(cmd, result);
+			} catch(Exception e){
+				e.printStackTrace();
+				logger.error("保存指令发送结果失败",e);
+				return;
+			}
 			//网络错误或系统未知错误额外休眠5秒
 			if (!result.isSuccess()&&(result.isConnectionError()||result.isUndefinedError())){
 				try {
@@ -108,14 +116,7 @@ public class BandAuthJob implements Job2 {
 					logger.error("网络错误和未知错误休眠失败",e);
 				}
 			}
-				//保存发送结果
-			try{
-				authComponent.saveBandSendResult(cmd, result);
-			} catch(Exception e){
-				e.printStackTrace();
-				logger.error("保存指令发送结果失败",e);
-				return;
-			}
+			
 			
 			
 		}

@@ -5,7 +5,6 @@ package com.ycsoft.boss.remoting.cfocn;
 
 import java.rmi.RemoteException;
 
-import com.ycsoft.boss.remoting.aaa.AAAInterfaceBusinessMgrServiceStub.ResultHeader;
 import com.ycsoft.boss.remoting.cfocn.CFOCN_WebSvc_WorkOrderStub.ResultHead;
 
 /**
