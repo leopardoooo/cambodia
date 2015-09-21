@@ -74,6 +74,7 @@ public class WorkOrderClient {
 
 	private WorkOrder getWorkOrderBaseInfo(WTaskBaseInfo task, String custNo,String areaCode,SOptr custManager) {
 		WorkOrder order = new WorkOrder();
+		order.setOrderNo(task.getTask_id());
 		order.setOrderType(Integer.parseInt(task.getTask_type_id()));
 		order.setAreaCode(areaCode);
 		order.setISPCode(ISP_CODE);
@@ -127,7 +128,7 @@ public class WorkOrderClient {
 	public boolean cancelTaskService(int doneCode,String taskId) throws WordOrderException{
 		ManuallyInfluencedWorkOrder influence = new ManuallyInfluencedWorkOrder();
 		influence.setWorkOrderNo(taskId);
-		influence.setNo(taskId);
+		influence.setNo(""+doneCode);
 		influence.setType(INFL_TYPE_CANCEL);
 		influence.setContent("cancel work order "+taskId);
 		return cancelTaskService(influence);
