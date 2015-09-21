@@ -9,7 +9,6 @@ import com.ycsoft.beans.core.bill.BBillWriteoff;
 import com.ycsoft.beans.core.bill.BillDto;
 import com.ycsoft.beans.core.cust.CCust;
 import com.ycsoft.beans.core.cust.CCustPropChange;
-import com.ycsoft.beans.core.cust.CUnit;
 import com.ycsoft.beans.core.job.JBandCommand;
 import com.ycsoft.beans.core.job.JCaCommand;
 import com.ycsoft.beans.core.promotion.CPromFee;
@@ -410,7 +409,5 @@ public interface IQueryCustService extends IBaseService{
 	public List<FeeDto> queryFeePayDetail(String paySn) throws Exception;
 
 	public List<TProvince> queryProvince()throws Exception;
-	public List<CUnit> queryUnit() throws Exception;
-
 
 }

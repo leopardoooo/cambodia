@@ -26,7 +26,6 @@ NewCustForm = Ext.extend( CustBaseForm , {
 		this.provinceStore.load();
 		CustBaseForm.superclass.doInit.call(this);
 		this.removeCustLevel();
-		this.removeCustType();
 	},
 	doValid:function(){
 		if(!Ext.getCmp('tempCustAddress').getValue()){

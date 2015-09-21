@@ -13,7 +13,6 @@ import com.ycsoft.beans.core.bill.BBillWriteoff;
 import com.ycsoft.beans.core.bill.BillDto;
 import com.ycsoft.beans.core.cust.CCust;
 import com.ycsoft.beans.core.cust.CCustPropChange;
-import com.ycsoft.beans.core.cust.CUnit;
 import com.ycsoft.beans.core.fee.CFeeUnprint;
 import com.ycsoft.beans.core.job.JBandCommand;
 import com.ycsoft.beans.core.job.JCaCommand;
@@ -545,10 +544,6 @@ public class QueryCustService extends BaseService implements IQueryCustService {
 	public String syncServerTime() throws JDBCException, Exception {
 		// TODO Auto-generated method stub
 		return jobComponent.syncServerTime();
-	}
-
-	public List<CUnit> queryUnit() throws Exception {
-		return custComponent.queryUnit();
 	}
 
 	
