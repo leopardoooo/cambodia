@@ -567,6 +567,11 @@ Ext.util.Format.addMoth = function(d, m) {
 	return date.format("Y-m-d");
 }
 
+Ext.util.Format.addTime = function(time, m,d) {
+	var date = Date.parseDate(time,"Y-m-d");
+	var nextM = new Date(date.getFullYear(), date.getMonth()+m, date.getDate()+d);
+	return nextM.format("Y-m-d");
+}
 
 Ext.util.Format.toChangep = function(s) {
     return s < 10 ? '0' + s: s;
@@ -603,6 +608,10 @@ Ext.util.Format.formatToFen = function(value){
 		}
 		return finalFee;
 	}
+}
+
+Ext.util.Format.round = function(num,n){
+	return Math.round(num*Math.pow(10,n))/Math.pow(10,n);
 }
 
 /**

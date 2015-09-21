@@ -100,8 +100,9 @@ ProdOrderForm = Ext.extend( BaseForm, {
 				},{
 					region: 'center',
 					layout: 'form',
-					labelAlign: 'top',
-					labelPad: 20,
+//					labelAlign: 'top',
+//					labelPad: 20,
+					labelWidth:90,
 					defaults: {anchor: "90%"},
 					title: lmain("user._form.titleOrderInfo"),
 					bodyStyle: 'padding: 15px 0 0 20px;border-bottom: none;',
@@ -121,7 +122,30 @@ ProdOrderForm = Ext.extend( BaseForm, {
 							scope: this,
 							select: this.doSelectTariff
 						}
-					},orderMonthField,{
+					},{
+						id:'orderTypeItemsId',
+						border: false,
+						layout: 'form',
+						items:[
+						{ id:'order_type_id',hiddenName:'order_type',xtype:'combo',allowBlank:true,
+						 fieldLabel: '订购方式',value:'ORDER',width:100,
+           				 store:new Ext.data.ArrayStore({
+              						fields:['order_type','order_name'],
+             						data:[['ORDER','按月'],['TRANSFER','按转移支付']]
+						}),
+						displayField:'order_name',valueField:'order_type',
+						listeners:{
+							scope:this,
+							select:function(box,record,index){
+								this.doPayOrderType(box.getValue());
+							}
+						}
+					}]},{
+						id:'orderMonthItemsId',
+						border: false,
+						layout: 'form',
+						items:[orderMonthField]
+					},{
 						xtype: 'panel',
 						anchor: '100%',
 						baseCls: 'x-plain',
@@ -174,7 +198,7 @@ ProdOrderForm = Ext.extend( BaseForm, {
          				},{
          				columnWidth:.35,
          				layout : 'form',
-         				labelWidth:40,  
+         				labelWidth:50,  
          				items:[{
 								fieldLabel : lbc("common.pay"),
 								id : 'orderFeeTypeId',
@@ -219,6 +243,9 @@ ProdOrderForm = Ext.extend( BaseForm, {
 				this.userId = prodGrid.userId;
 			}
 			filterOrderSn  = prodData["order_sn"];
+		}
+		if(this.busiCode === "101" || this.busiCode === "102"){
+			Ext.getCmp('orderTypeItemsId').hide();
 		}
 		
 		Ext.Ajax.request({
@@ -414,6 +441,50 @@ ProdOrderForm = Ext.extend( BaseForm, {
 			this.selectUserPanel.loadSingleUser(user);
 		}
 	},
+	doPayOrderType:function(v){
+		if(v == 'TRANSFER'){
+			Ext.getCmp('orderMonthItemsId').hide();
+//			Ext.getCmp('sfOrderCycle').disable();
+//			var boxProdTariff = Ext.getCmp("boxProdTariff");
+//			boxProdTariff.reset();
+			this.doTransferAmount()
+			this.doTransferDate()
+		}else{
+			Ext.getCmp('orderMonthItemsId').show();
+//			Ext.getCmp('sfOrderCycle').enable();
+			// 结算结束计费日
+			this.doChangeEndDate();
+			// 计算结算金额
+			this.doLoadTransferAmount();
+		}
+		
+	},
+	doTransferAmount:function(){
+		this.totalAmount = 0;
+		this.addAmount = this.transferAmount;
+		Ext.get("totalAmount").update(String(this.totalAmount/100));
+		Ext.get("addAmount").update(String(this.addAmount/100));
+		// 转移支付
+		Ext.get("transferAmount").update(String(this.transferAmount/100));
+	},
+	doTransferDate:function(){
+		var boxProdTariff = Ext.getCmp("boxProdTariff");
+		var disctId = boxProdTariff.getValue();
+		if(Ext.isEmpty(disctId)){
+			Alert(lmsg('chooseTariff'));
+			return false;
+		}
+		var index = boxProdTariff.getStore().find("tariff_id", disctId);
+		var tariffRecord = boxProdTariff.getStore().getAt(index);
+		
+		var tAmount = this.transferAmount;
+		var disctRent = tariffRecord.get("disct_rent");
+		var mothAllNum = Ext.util.Format.round((tAmount/disctRent)*tariffRecord.get("billing_cycle"),2);
+		var mothNum = parseInt(mothAllNum);
+		var dayNum = Math.ceil((mothAllNum - mothNum)*30);
+		var startDate = Ext.getCmp("dfStartDate").getValue();
+		Ext.getCmp("dfExpDate").setValue(Ext.util.Format.addTime(startDate.format("Y-m-d"),mothNum,dayNum));
+	},
 	// 资费下拉框选中事件
 	doSelectTariff: function(box, record, index){
 		var billingCycle = record.get("billing_cycle");
@@ -434,10 +505,21 @@ ProdOrderForm = Ext.extend( BaseForm, {
 		}else{
 			sfOrderCycle.setMaxValue(null);
 		}
-		// 结算结束计费日
-		this.doChangeEndDate();
-		// 计算结算金额
-		this.doLoadTransferAmount();
+		//0资费的话，按月算
+		if(record.get('disct_rent') == 0){
+			Ext.getCmp('order_type_id').setValue('ORDER');
+			Ext.getCmp('orderMonthItemsId').show();
+		}
+		var orderType = Ext.getCmp('order_type_id').getValue();
+		if(orderType == 'TRANSFER'){
+			this.doTransferAmount()
+			this.doTransferDate()
+		}else{
+			// 结算结束计费日
+			this.doChangeEndDate();
+			// 计算结算金额
+			this.doLoadTransferAmount();
+		}
 	},
 	// 上期结束计费日
 	getLastProdEndDate: function(prodId){
@@ -560,18 +642,18 @@ ProdOrderForm = Ext.extend( BaseForm, {
 		}
 		
 		// 升级业务，失效日期必须比上期结束日大
-		var prodId = this.currentSelectedProd.get("prod_id");
-		var lastOrderProdDate = this.getLastProdEndDate(prodId);
-		if( lastOrderProdDate && this.busiCode == "100"){
-			var tmpDate = Date.parseDate(lastOrderProdDate, "Y-m-d");
-			// 如果失效日期小雨上期结束日，则不给于提交
-			if(Date.parseDate(Ext.getCmp("dfExpDate").getValue(), "Y-m-d").getTime() < tmpDate.getTime()){
-				return {
-					isValid: false,
-					msg: lmsg('upgradeEndDateMoreThanBeginDate')
-				}
-			}
-		}
+//		var prodId = this.currentSelectedProd.get("prod_id");
+//		var lastOrderProdDate = this.getLastProdEndDate(prodId);
+//		if( lastOrderProdDate && this.busiCode == "100"){
+//			var tmpDate = Date.parseDate(lastOrderProdDate, "Y-m-d");
+//			// 如果失效日期小雨上期结束日，则不给于提交
+//			if(Date.parseDate(Ext.getCmp("dfExpDate").getValue(), "Y-m-d").getTime() < tmpDate.getTime()){
+//				return {
+//					isValid: false,
+//					msg: lmsg('upgradeEndDateMoreThanBeginDate')
+//				}
+//			}
+//		}
 		
 		if(this.totalAmount < 0){
 			return {

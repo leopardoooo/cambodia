@@ -265,6 +265,7 @@ UserBaseForm = Ext.extend( BaseForm , {
 		}else if(type === "OTT_MOBILE"){
 			fs.setVisible(true);
 			isAllowBlank(true);
+			this.isInputTask(false);
 		}else if(type === "OTT"){
 			fs.setVisible(true);
 			isAllowBlank(false);
