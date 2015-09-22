@@ -1,5 +1,5 @@
 <%@ page language="java"  pageEncoding="UTF-8"%>
-<%@page import="com.ycsoft.daos.helper.StringHelper"%>
+<%@page import="com.ycsoft.daos.helper.StringHelper, java.util.Date"%>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
   <head>
@@ -16,6 +16,7 @@
 	     String [] jsFile = scriptFiles.toString().split(",");
 	     for(String fUrl : jsFile){
 	     	if("".equals(fUrl)) continue;
+	     	fUrl+="?d="+new Date().getTime();
 	     	out.println(StringHelper.formatIgnoreType(url , root+ "/" + fUrl));
 	     }
      }

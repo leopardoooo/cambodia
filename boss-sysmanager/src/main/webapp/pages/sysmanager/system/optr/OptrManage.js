@@ -89,7 +89,7 @@ var OptrManageForm = Ext.extend(Ext.form.FormPanel, {
 									fieldLabel : '电话',
 									name : 'tel',
 									xtype: 'numberfield'									
-								},
+								}/*,
 								{
 						            fieldLabel: '业务员',
 						            hiddenName: 'is_busi_optr',
@@ -99,7 +99,7 @@ var OptrManageForm = Ext.extend(Ext.form.FormPanel, {
 						            defaultValue: 'F',
 						            disabled : false,
 						            width: 120
-						        }]
+						        }*/]
 					}, {
 						labelWidth : 90,
 						items : [{
@@ -191,7 +191,7 @@ var OptrManageForm = Ext.extend(Ext.form.FormPanel, {
 		// 初始化下拉框的参数
 		var comboes = this.findByType("paramcombo");
 		App.form.initComboData(comboes,this.doInit, this);
-//		this.doInit();
+		this.doInit();
 	},
 	doInit : function(){
 		var record = new Ext.data.Record(this.storeData);

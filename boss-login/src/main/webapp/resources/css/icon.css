@@ -97,6 +97,21 @@
 .move-to-right {
     background-image: url(./../images/icon/move_to_right.gif) !important;
 }
+.gaoJiXiuGai {
+    background-image: url(./../images/menu2/jpz-xiugai-gaoji.png) !important;
+}
+.custLevelXiuGai {
+    background-image: url(./../images/menu2/jpz-xiugai-kehudengji.png) !important;
+}
+.acctRefund {
+    background-image: url(./../images/menu2/jpz-tuikuan.png) !important;
+}
+.batchOpenUser {
+    background-image: url(./../images/menu2/jpz-piliangkaihu.png) !important;
+}
+.prodTaoCanDingGou {
+    background-image: url(./../images/menu2/jpz-taocandinggou2.png) !important;
+}
 
 /** 以下是菜单样式 ***/
 .btn-panel {
@@ -212,6 +227,9 @@
 }
 .stopUser {
 	background-image: url(./../images/menu2/stop.png) !important;
+}
+.userUntuck {
+	background-image: url(./../images/menu2/untuck.png) !important;
 }
 .cancelStopUser {
 	background-image: url(./../images/menu2/stopuser.gif) !important;

@@ -129,7 +129,7 @@ UnitPanel = Ext.extend( BaseInfoPanel , {
 			},{
 				region:"east",
 				split:true,
-				width:"60%",
+				width:"50%",
 				layout:"anchor",
 				border: false,
 				items:[{

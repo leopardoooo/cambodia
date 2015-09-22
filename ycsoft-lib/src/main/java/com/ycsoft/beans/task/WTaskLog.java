@@ -8,12 +8,13 @@ import com.ycsoft.commons.constants.DictKey;
 import com.ycsoft.commons.store.MemoryDict;
 import com.ycsoft.daos.config.POJO;
 
-@POJO(tn = "W_TASK_LOG", sn = "", pk = "task_id")
+@POJO(tn = "W_TASK_LOG", sn = "seq_task_log_sn", pk = "log_sn")
 public class WTaskLog  extends BusiBase  implements Serializable {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -2596878257039088702L;
+	private int log_sn;
 	private String task_id;
 	private Date log_time;
 	private String log_detail;
@@ -25,6 +26,12 @@ public class WTaskLog  extends BusiBase  implements Serializable {
 	
 	
 	
+	public int getLog_sn() {
+		return log_sn;
+	}
+	public void setLog_sn(int log_sn) {
+		this.log_sn = log_sn;
+	}
 	public String getSyn_status_text() {
 		return syn_status_text;
 	}

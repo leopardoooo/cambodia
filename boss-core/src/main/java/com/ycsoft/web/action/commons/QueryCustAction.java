@@ -520,11 +520,6 @@ public class QueryCustAction extends BaseBusiAction {
 		return JSON_RECORDS;
 	}
 	
-	public String queryUnit() throws Exception {
-		getRoot().setRecords(queryCustService.queryUnit());
-		return JSON_RECORDS;
-	}
-	
 	public String getSearch_type() {
 		return search_type;
 	}

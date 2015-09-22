@@ -15,11 +15,11 @@ public class SSLTest {
 	public static void main(String[] args) throws Exception{
 		
 		System.setProperty("javax.net.debug", "ssl,handshake");
-        System.setProperty("javax.net.ssl.keyStore", "/Users/killer/Downloads/工单/admin.pfx");
+        System.setProperty("javax.net.ssl.keyStore", "/Users/killer/Documents/MyWorks/GitHub/cambodia/boss-core/src/main/resources/cert/cfocn/admin.pfx");
         System.setProperty("javax.net.ssl.keyStorePassword", "123456");
         System.setProperty("javax.net.ssl.keyStoreType", "PKCS12");
 		
-		System.setProperty("javax.net.ssl.trustStore", "/Users/killer/Downloads/工单/cfocn.ca.jks");
+		System.setProperty("javax.net.ssl.trustStore", "/Users/killer/Documents/MyWorks/GitHub/cambodia/boss-core/src/main/resources/cert/cfocn/cfocn.ca.jks");
         System.setProperty("javax.net.ssl.trustStorePassword", "a1234567");
         System.setProperty("javax.net.ssl.trustStoreType", "JKS");
 		

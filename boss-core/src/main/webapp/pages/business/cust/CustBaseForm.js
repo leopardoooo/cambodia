@@ -395,6 +395,13 @@ LinkPanel = Ext.extend(Ext.Panel,{
 						xtype:'numberfield',						
 						id: 'linkmanMobile'
 					},{
+						id: 'cust_pwd_id',
+						fieldLabel: langUtils.bc("common.pswd"),
+						vtype : 'loginName',
+						xtype:'textfield',
+						value: '000000',
+						name:'cust.password'
+					},{
 						fieldLabel: langUtils.main("cust.base.barthday"),
 						width : 125,
 						id : 'linkmanBirthday',
@@ -570,29 +577,11 @@ CustBaseForm = Ext.extend( BaseForm , {
 				},{
 					id:'addCustItemsTwo',
 					items:[{
-							id: 'cust_pwd_id',
-							fieldLabel: langUtils.bc("common.pswd"),
-							vtype : 'loginName',
-							xtype:'textfield',
-							name:'cust.password'
-						},{
 							fieldLabel: langUtils.main("cust.base.languageType"),
 							xtype: 'paramcombo',
 							paramName: 'LANGUAGE_TYPE',
 							allowBlank: false,
 							hiddenName:'cust.str6'
-						}]
-				},{
-					items:[{
-							fieldLabel: langUtils.main("cust.base.unitName"),
-							xtype: 'combo',
-							store: new Ext.data.JsonStore({
-								url: Constant.ROOT_PATH+'/commons/x/QueryCust!queryUnit.action',
-								fields: ['unit_id', 'unit_name'],
-								autoLoad: true
-							}),
-							displayField: 'unit_name', valueField: 'unit_id',
-							hiddenName:'cust.unit_id'
 						}]
 				}]
 			},{

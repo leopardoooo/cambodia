@@ -22,35 +22,4 @@
 		<property name="qrtzJobDetailBuilder" ref="qrtzJobDetailBuilder" />
 	</bean>
 	
-	
-	<!-- 扣款 -->
-	<bean id="createBankFeedsGoJob" class="com.yaochen.boss.job.CreateBankFeedsJob">
-		<property name="busiComponent" ref="busiComponent" />
-		<property name="ftpBuilder" ref="ftpBuilder" />
-		<property name="jobType" value="GO" />
-	</bean>
-	
-	<!-- 退款 -->
-	<bean id="createBankFeedsRefundJob" class="com.yaochen.boss.job.CreateBankFeedsJob">
-		<property name="busiComponent" ref="busiComponent" />
-		<property name="ftpBuilder" ref="ftpBuilder" />
-		<property name="jobType" value="REFUND" />
-	</bean>
-	
-	<bean id="ftpBuilder" class="com.yaochen.boss.commons.FtpUtilBuilder">
-		<property name="hostname" value="${ftp.hostname}"></property>
-		<property name="port" value="${ftp.port}"></property>
-		<property name="username" value="${ftp.username}"></property>
-		<property name="password" value="${ftp.password}"></property>
-		<property name="localDownloadPath" value="${ftp.localDownloadPath}"></property>
-		<property name="remoteBankPath" value="${ftp.remoteBankPath}"></property>
-		<property name="localTempPath" value="${ftp.localTempPath}"></property>
-		<property name="remoteUploadPath" value="${ftp.remoteUploadPath}"></property>
-		<property name="localHistoryPath" value="${ftp.localHistoryPath}"></property>
-	</bean>
-	
-	<bean id="taskServiceJob" class="com.yaochen.boss.job.TaskServiceJob">
-		<property name="jobComponent" ref="jobComponent" />
-		<property name="wsUrl" value="${callcenter.wsUrl}" />
-	</bean>	
 </beans>

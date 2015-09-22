@@ -272,6 +272,10 @@ SearchCustWindow = Ext.extend( Ext.Window , {//复杂查询
 				width : 140,
 				name : 'cust.address'
 			},{
+				fieldLabel : this.LU_CS['certNum'],
+				width : 140,
+				name : 'cust.net_type'
+			},{
 				fieldLabel : this.LU_CS['labelLoginName'],
 				width : 140,
 				name : 'cust.login_name'
@@ -284,7 +288,7 @@ SearchCustWindow = Ext.extend( Ext.Window , {//复杂查询
 			maximizable : false,
 			layout : 'fit',
 			width : 300,
-			height : 200,
+			height : 220,
 			closeAction : 'close',
 			items : [this.form],
 			buttons : [{
@@ -306,7 +310,8 @@ SearchCustWindow = Ext.extend( Ext.Window , {//复杂查询
 			return;
 		}
 		var all = this.form.getForm().getValues();
-		if(Ext.isEmpty(all['cust.cust_name']) && Ext.isEmpty(all['cust.address']) && Ext.isEmpty(all['cust.login_name']) && Ext.isEmpty(all['cust.status'])){
+		if(Ext.isEmpty(all['cust.cust_name']) && Ext.isEmpty(all['cust.address']) && Ext.isEmpty(all['cust.login_name'])
+			&& Ext.isEmpty(all['cust.status']) && Ext.isEmpty(all['cust.net_type'])){
 			Alert(this.LU_CS['tipInputAnyField']);
 		}else{
 			all['search_type'] = 'MULTIPLE';

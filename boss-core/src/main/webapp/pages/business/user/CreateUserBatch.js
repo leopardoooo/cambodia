@@ -286,7 +286,7 @@ UserBaseBatchForm = Ext.extend( BaseForm , {
 	},
 	doFiltDeviceModel: function(){
 		var userType = Ext.getCmp("boxUserType").getValue();
-		var REF = {"OTT": "1", "DTT": "2", "BAND": "3" }
+		var REF = {"DTT": "1", "OTT": "2", "BAND": "3" }
 		var type = REF[userType] || "";
 		var cmb = Ext.getCmp("boxDeviceCategory");
 		cmb.setRawValue("");

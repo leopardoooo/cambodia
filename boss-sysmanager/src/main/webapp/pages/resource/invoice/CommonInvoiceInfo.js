@@ -124,22 +124,11 @@ CommonInvoiceGrid = Ext.extend(Ext.grid.GridPanel,{
 				{header:lsys('InvoiceCommon.commonGridColls')[2],dataIndex:'invoice_type_text',align:'center',width:80},
 				{header:lsys('InvoiceCommon.commonGridColls')[3],dataIndex:'status_text',align:'center',width:80},
 				{header:lsys('InvoiceCommon.commonGridColls')[4],dataIndex:'amount',align:'center',width:70,renderer:Ext.util.Format.formatFee},
-//				{header:'定额票面额',dataIndex:'invoice_amount',align:'center',width:70,renderer:Ext.util.Format.formatFee},
 				{header:lsys('InvoiceCommon.commonGridColls')[5],dataIndex:'invoice_mode_text',align:'center',width:70},
 				{header:lsys('InvoiceCommon.commonGridColls')[6],dataIndex:'finance_status_text',align:'center',width:60},
 				{header:lsys('InvoiceCommon.commonGridColls')[7],dataIndex:'depot_name',align:'center',width:80},
 				{header:lsys('InvoiceCommon.commonGridColls')[8],dataIndex:'optr_name',align:'center',width:80}
 			];
-		
-		if(this.parent.optrType == 'CHECK' || this.parent.optrType == 'CANCELCHECK'){
-			var newColumns = [
-					{ header:lsys('common.doActionBtn'), width: 50,renderer: function(v , md, record , i  ){
-						var rs = Ext.encode(record.data);
-						return String.format("&nbsp;<a href='#' onclick='commonInvoiceGridThat.doQueryDetail({0},{1});' style='color:blue'> 明细 </a>",rs, i);
-					}}
-				];
-			columns = columns.concat(newColumns);
-		}
 		
 		CommonInvoiceGrid.superclass.constructor.call(this,{
 			title:lsys('InvoiceCommon.titleInvoiceInfo'),
@@ -149,11 +138,17 @@ CommonInvoiceGrid = Ext.extend(Ext.grid.GridPanel,{
 				defaults:{sortable:false},
 				columns:columns
 			}),
-			sm:sm
+			sm:sm,
+			listeners:{
+				scope: this,
+				rowclick: this.doQueryDetail
+			}
 		});
 	},
-	doQueryDetail:function(rs,i){
-		this.parent.doQueryDetail(rs);
+	doQueryDetail:function(grid, rowIndex){
+		var record = grid.getStore().getAt(rowIndex);
+		if(record && (this.parent.optrType == 'CHECK' || this.parent.optrType == 'CANCELCHECK') )
+			this.parent.doQueryDetail(record.data);
 	},
 	doLoadData:function(){//store load加载完事件
 		this.getSelectionModel().selectAll();
@@ -243,6 +238,14 @@ InvoiceBaseDetailGrid = Ext.extend(Ext.grid.GridPanel, {
 				border:false,
 				sm : new Ext.grid.CheckboxSelectionModel(),
 				cm : new Ext.grid.ColumnModel([{
+							header : '客户编号',
+							dataIndex : 'cust_no',
+							renderer : App.qtipValue
+						},{
+							header : '客户名称',
+							dataIndex : 'cust_name',
+							renderer : App.qtipValue
+						},{
 							header : '费用项',
 							dataIndex : 'fee_name',
 							renderer : App.qtipValue
