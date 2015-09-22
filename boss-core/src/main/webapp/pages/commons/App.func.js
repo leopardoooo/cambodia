@@ -282,7 +282,7 @@ Ext.apply(App.func,{
 /**************************************用户产品信息开始************************************************/
 		else if(panelName.indexOf('U_PROD')>=0){//用户产品信息
 			// 如果是套餐所有按钮在基本产品列表中都不显示
-			if(data["package_id"] || data['status'] != 'ACTIVE'){
+			if(data["package_id"]!=null || (data['status'] != 'ACTIVE' && data['status'] != 'INSTALL')){
 				return false; 
 			}
 			
