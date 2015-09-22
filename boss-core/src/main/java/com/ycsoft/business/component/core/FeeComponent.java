@@ -286,8 +286,12 @@ public class FeeComponent extends BaseBusiComponent {
 				//记录未打印的费用信息，用于营业员未打印提示
 				cFeeUnprintDao.insertByUnPayDoneCode(fee.getFee_sn(),this.getOptr().getOptr_id());
 			}
-			CCust cust = cCustDao.findByKey(pay.getCust_id());
-			cFeeDao.updateCFeeToPay(fee.getFee_sn(), cust.getStr9(), pay,isDoc);
+			String busiOptrId = fee.getBusi_optr_id();
+			if(StringHelper.isEmpty(busiOptrId)){
+				CCust cust = cCustDao.findByKey(pay.getCust_id());
+				busiOptrId = cust.getStr9();
+			}
+			cFeeDao.updateCFeeToPay(fee.getFee_sn(), busiOptrId, pay,isDoc);
 		}
 		
 		/**

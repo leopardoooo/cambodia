@@ -337,35 +337,42 @@ public class RDeviceDao extends BaseEntityDao<RDevice> {
 		if(StringHelper.isNotEmpty(mode)){
 			if(mode.equals(SystemConstants.DEVICE_TYPE_STB)){
 				sql += "select r.*,t.stb_id device_code,"+
-						" '' pair_device_code,'' pair_device_model,'' modem_mac"+
-						" from r_device r,r_stb t"+
-						" where r.device_id=t.device_id and t.pair_card_id is null and t.pair_modem_id is null"+
+						" d.card_id pair_device_code,d.device_model pair_device_model,t.mac modem_mac"+
+						" from r_device r,r_stb t,r_card d"+
+						" where r.device_id=t.device_id and t.pair_card_id=d.device_id(+) "+
 						" and r.depot_id=?";
-			}else if(mode.equals(SystemConstants.DEVICE_TYPE_CARD)){
-				sql += " select r.*,t.card_id device_code,"+
-						"'' pair_device_code,'' pair_device_model,'' modem_mac"+
-						" from r_device r,r_card t"+
-						" where r.device_id=t.device_id " +
-						" and not exists (select s.device_id from r_stb s where s.pair_card_id = t.device_id )"+
-						" and r.depot_id=?";
+//			}else if(mode.equals(SystemConstants.DEVICE_TYPE_CARD)){
+//				sql += " select r.*,t.card_id device_code,"+
+//						"'' pair_device_code,'' pair_device_model,'' modem_mac"+
+//						" from r_device r,r_card t"+
+//						" where r.device_id=t.device_id " +
+//						" and not exists (select s.device_id from r_stb s where s.pair_card_id = t.device_id )"+
+//						" and r.depot_id=?";
 			}else if(mode.equals(SystemConstants.DEVICE_TYPE_MODEM)){
 				sql += " select r.*,t.modem_mac device_code,"+
 						"'' pair_device_code,'' pair_device_model,t.modem_mac"+
 						" from r_device r,r_modem t"+
 						" where r.device_id=t.device_id"+
-						" and not exists (select s.device_id from r_stb s where s.pair_modem_id = t.device_id ) "+
+//						" and not exists (select s.device_id from r_stb s where s.pair_modem_id = t.device_id ) "+
 						" and r.depot_id=?";
 			}else if(mode.equals("STBCARD")){
 				sql += "select r.*,t.stb_id device_code,"+
 						"d.card_id pair_device_code,d.device_model pair_device_model,'' modem_mac"+
 						" from r_device r,r_stb t,r_card d"+
-						" where r.device_id=t.device_id and t.pair_card_id=d.device_id"+
+						" where r.device_id=t.device_id and t.pair_card_id=d.device_id and t.mac is null "+
+						" and r.depot_id=?";
+			}else if(mode.equals("STBCARDMODEM")){
+				sql += "select r.*,t.stb_id device_code,"+
+						" d.card_id pair_device_code,d.device_model pair_device_model,t.mac modem_mac"+
+						" from r_device r,r_stb t,r_card d"+
+						" where r.device_id=t.device_id and t.pair_card_id=d.device_id "
+						+ " and t.pair_card_id is not null and t.mac is not null "+
 						" and r.depot_id=?";
 			}else{
 				sql += "select r.*,t.stb_id device_code,"+
-					"d.modem_mac pair_device_modem_code,d.device_model pair_device_modem_model,'' modem_mac"+
-					" from r_device r,r_stb t,r_modem d"+
-					" where r.device_id=t.device_id and t.pair_modem_id=d.device_id"+
+					" t.mac modem_mac"+
+					" from r_device r,r_stb t"+
+					" where r.device_id=t.device_id and t.mac is not null "+
 					" and r.depot_id=?";
 			}
 		}
@@ -430,6 +437,38 @@ public class RDeviceDao extends BaseEntityDao<RDevice> {
 				sql," ) a,c_cust_device cd,c_cust cc ",
 				" where cd.device_id(+)=a.device_id and cc.cust_id(+)=cd.cust_id order by a.device_type");
 		return this.createQuery(DeviceDto.class, sql,depotId).setStart(start).setLimit(limit).page();
+	}
+	
+	
+	public List<DeviceDto> queryDeviceByMultiCriteria(String deviceModel,String depotId,String status,
+			String mode,String depotStatus,String modemType, String backup, String batch_num,String start_input_time,String end_input_time) 
+		throws Exception {
+		String sql = getSql(deviceModel, depotId, status, mode, depotStatus, backup, batch_num);
+		//如果是猫
+		if(SystemConstants.DEVICE_TYPE_MODEM.equals(mode)){
+			//猫类型不为空，猫型号为空时
+			if(StringHelper.isNotEmpty(modemType) && StringHelper.isEmpty(deviceModel)){
+				sql = StringHelper.append(sql," and t.modem_type='",modemType,"'");
+			}
+		}
+		if(StringHelper.isNotEmpty(start_input_time) || StringHelper.isNotEmpty(end_input_time)){
+			sql = StringHelper.append(sql, " and r.device_id in ( select tdd.device_id from r_device_done_deviceid tdd,r_device_input rdi " +
+					" where tdd.device_done_code = rdi.device_done_code  ");
+			if (StringHelper.isNotEmpty(start_input_time)) {
+				sql = StringHelper.append(sql, " and rdi.create_time>=to_date('",
+						start_input_time, " 00:00:00','yyyy-mm-dd hh24:mi:ss')");
+			}
+			if (StringHelper.isNotEmpty(end_input_time)) {
+				sql = StringHelper.append(sql, " and rdi.create_time<=to_date('",
+						end_input_time, " 23:59:59','yyyy-mm-dd hh24:mi:ss')");
+			}
+			sql = StringHelper.append(sql,")");
+		}
+	
+		sql =StringHelper.append("select a.*,cc.cust_no cust_id,cc.cust_name from ( ",
+				sql," ) a,c_cust_device cd,c_cust cc ",
+				" where cd.device_id(+)=a.device_id and cc.cust_id(+)=cd.cust_id order by a.device_type");
+		return this.createQuery(DeviceDto.class, sql,depotId).list();
 	}
 	
 	public List<DeviceDto> queryIDLEDeviceByMultiCriteria(String deviceModel,String depotId,String status,

@@ -294,7 +294,7 @@ Sys = {
 	},
 	InvoiceInput:{//发票领用
 		startInvoiceId:'开始发票号~',
-		endInvoiceId:'开始发票号~',
+		endInvoiceId:'截止发票号~',
 		invoiceCount:'发票共 {0} 张~',
 		_title:'发票入库~',
 		btnRecord:'录入~'
@@ -312,7 +312,8 @@ Sys = {
 		_title:'取消领用~'
 	},
 	EditStatusInvoice:{//修改发票状态
-		_title:'修改状态~'
+		_title:'修改状态~',
+		editStatus:'修改状态为~'
 		
 	},
 	
@@ -344,7 +345,7 @@ Sys = {
 		labelPairCardType:'配对卡型号~',
 		labelPairCardType2:'配对卡类型~',
 		labelPairModemType:'配对MODEM型号~',
-		labelPairModemCode:'配对MODEM号~',
+		labelPairModemCode:'MAC~',
 		labelDeviceModel:'设备型号~',
 		labelDevCode:'设备编号~',
 		labelDevCode2:'编号(Modem_mac)~',
@@ -374,7 +375,8 @@ Sys = {
 		labelOperateTime:'操作时间~',
 		labelFileOperate:'文件操作~',
 		labelManualInput:'手工录入~',
-		labelSingleStb:'单机顶盒~',
+		labelSingleStb:'所有机顶盒~',
+		labelStbCardModemPair:'盒卡MODEM配对~',
 		labelSingleCard:'单智能卡~',
 		labelStbCardPair:'机卡配对~',
 		labelSingleModem:'单MODEM~',

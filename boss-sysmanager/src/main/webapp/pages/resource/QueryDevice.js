@@ -17,26 +17,15 @@ QueryDeviceForm = Ext.extend(Ext.form.FormPanel,{
 			border:false,
 			bodyStyle:'padding-top:10px',
 			layout:'column',
-			labelWidth:75,
+			labelWidth:80,
 			items:[
 				{columnWidth:.33,layout:'form',border:false,items:[
-					{xtype:'treecombo',fieldLabel:DEV_COMMON_LU.labelDepot,hiddenName:'depotId',
-						width:150,
-						treeWidth:400,
-//						minChars:2,
-						height: 22,
-						allowBlank: false,
-						onlySelectLeaf:false,
-						emptyText :MSG_LU.emptyTextSelectStore,
-						blankText:MSG_LU.emptyTextSelectStore,
-						treeUrl: 'resource/Device!queryChildDepot.action',
-						listeners : {
-							'focus' : function(){
-								if(this.list){
-									this.expand();
-								}
-							}
-						}
+					{fieldLabel:DEV_COMMON_LU.labelDepot,hiddenName:'depotId',xtype:'combo',allowBlank:false,
+							store:new Ext.data.JsonStore({
+								url:'resource/Device!queryAllDept.action',
+								autoLoad:true,
+								fields:['dept_id','dept_name']
+							}),displayField:'dept_name',valueField:'dept_id',triggerAction:'all',mode:'local',width :150,minListWidth :250
 					},
 					{fieldLabel:DEV_COMMON_LU.labelDevStatus,hiddenName:'status',xtype:'paramcombo',width:150,
 						forceSelection:true,selectOnFocus:true,editable:true,
@@ -51,7 +40,8 @@ QueryDeviceForm = Ext.extend(Ext.form.FormPanel,{
 					{fieldLabel:DEV_COMMON_LU.labelDeviceType,hiddenName:'mode',xtype:'combo',allowBlank:false,
 						store:new Ext.data.ArrayStore({
 							fields:['mode','mode_name'],
-							data:[['STB',DEV_COMMON_LU.labelSingleStb],['CARD',DEV_COMMON_LU.labelSingleCard],
+							data:[['STB',DEV_COMMON_LU.labelSingleStb],
+//							['STBCARDMODEM',DEV_COMMON_LU.labelStbCardModemPair],
 								['MODEM',DEV_COMMON_LU.labelSingleModem],['STBCARD',DEV_COMMON_LU.labelStbCardPair],['STBMODEM',DEV_COMMON_LU.labelStbModemPair]]
 						}),
 						displayField:'mode_name',valueField:'mode',width:150,
@@ -123,7 +113,7 @@ QueryDeviceForm = Ext.extend(Ext.form.FormPanel,{
 			buttonAlign : 'center',
 			buttons : [{id:'queryDeviceBtnId',xtype:'button',text:COMMON_LU.query,iconCls:'icon-query',disableSelfCtrl:true,
 						scope:this,handler:this.doQuery},
-					{id:'downloadBtnId',xtype:'button',hidden:true,text:COMMON_LU.downLoad,iconCls:'icon-excel',
+					{id:'downloadBtnId',xtype:'button',text:COMMON_LU.downLoad,iconCls:'icon-excel',
 						scope:this,handler:this.doDownload}]
 		});
 	},
@@ -159,7 +149,7 @@ QueryDeviceForm = Ext.extend(Ext.form.FormPanel,{
 		var values = this.getForm().getValues();
 		var mode = values['mode'];
 		var columns = grid.currColumns;
-		if(mode == 'STB' || mode == 'STBCARD'){//单机或机卡配对
+		if(mode == 'STB' || mode == 'STBCARD' || mode =='STBMODEM' || mode =='STBCARDMODEM'){//单机或机卡配对
 			columns = grid.stbColumns;
 		}else if(mode == 'CARD'){//单卡
 			columns = grid.cardColumns;
@@ -184,7 +174,7 @@ QueryDeviceForm = Ext.extend(Ext.form.FormPanel,{
 			return ;
 		}
 		var values = Ext.Ajax.serializeForm(this.getForm().getEl().dom);
-		window.open(root+'/resource/Device!downloadQueryDevice.action?'+values);
+		window.open(root+'/resource/Device!downloadQueryDeviceDetail.action?'+values);
 	}
 });
 
@@ -215,8 +205,7 @@ QueryDeviceGrid = Ext.extend(Ext.grid.GridPanel,{
 			{header:DEV_COMMON_LU.labelStbType,dataIndex:'device_model_text',width:100,renderer:App.qtipValue},
 			{header:DEV_COMMON_LU.labelCardCode,dataIndex:'pair_device_code',width:120,renderer:App.qtipValue},
 			{header:DEV_COMMON_LU.labelCardType,dataIndex:'pair_device_model_text',width:100,renderer:App.qtipValue},
-			{header:DEV_COMMON_LU.labelPairModemCode,dataIndex:'pair_device_modem_code',width:120,renderer:App.qtipValue},
-			{header:DEV_COMMON_LU.labelPairModemType2,dataIndex:'pair_device_modem_model_text',width:100,renderer:App.qtipValue},
+			{header:DEV_COMMON_LU.labelPairModemCode,dataIndex:'modem_mac',width:120,renderer:App.qtipValue},
 			{header:DEV_COMMON_LU.labelDevStatus,dataIndex:'device_status_text',width:75,renderer:App.qtipValue},
 			{header:DEV_COMMON_LU.labelDevStatus,dataIndex:'depot_status_text',width:75,renderer:App.qtipValue},
 			{header:COMMON_LU.depotText,dataIndex:'depot_id_text',width:100,renderer:App.qtipValue},

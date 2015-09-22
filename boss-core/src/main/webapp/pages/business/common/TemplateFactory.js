@@ -69,7 +69,7 @@
 	 		docForm["region"] = 'center';
  			rItems.push(docForm);
 	 		if(feeForm){
-	 			Ext.apply( feeForm, { region: 'north', height: 140, split: true});
+	 			Ext.apply( feeForm, { region: 'north', height: 230, split: true});
 	 			rItems.push(feeForm);
 	 		}
 	 		if(extForm){
@@ -96,7 +96,7 @@
  			bigItems.push({region: 'center',layout: 'border',border: false,items: lItems});
  		}
  		if(rItems.length > 0){
- 			winW = 220;
+ 			winW = 250;
  			bigItems.push({region: 'east',width: winW,split: true,layout: 'border',border: false,items: rItems});
  		}
  		if(lItems.length == 0 && rItems.length > 0){

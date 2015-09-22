@@ -450,6 +450,11 @@ CustBaseForm = Ext.extend( BaseForm , {
  				url: root + '/commons/x/QueryCust!queryProvince.action',
  				fields : ['name','cust_code']
  		});
+ 		this.busiOptrStore = new Ext.data.JsonStore({
+			url:root+'/system/x/Index!queryOptrByCountyId.action',
+			fields:['optr_id','optr_name','attr'],
+			autoLoad: true
+		});
 		//居民信息扩展
 		this.doInitAttrForm(2);
 		this.linkPanel = new LinkPanel(this);
@@ -568,9 +573,10 @@ CustBaseForm = Ext.extend( BaseForm , {
 						}
 					},{
 						fieldLabel: langUtils.main("cust.base.developName"),
-						xtype:'paramcombo',
+						xtype:'combo',
 						hiddenName: 'cust.str9',
-						paramName:'OPTR',
+						store: this.busiOptrStore,
+						valueField:'optr_id',displayField:'optr_name',
 						editable:true,
 						allowBlank:false
 					}]
