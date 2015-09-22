@@ -22,6 +22,7 @@ import com.ycsoft.boss.remoting.cfocn.WordOrderException;
 import com.ycsoft.boss.remoting.cfocn.WorkOrderClient;
 import com.ycsoft.boss.remoting.ott.Result;
 import com.ycsoft.commons.constants.BusiCodeConstants;
+import com.ycsoft.commons.helper.StringHelper;
 
 /**
  * 发送工单创建信息
@@ -43,13 +44,16 @@ public class TaskServiceJob implements Job2 {
 		try{
 			taskLogList = taskComponent.querySynTaskLog();
 		}catch(Exception e){
+			e.printStackTrace();
 			logger.error("读取工单同步信息错误"+e.getMessage());
 			return;
 		}
 		
 		for (WTaskLog taskLog:taskLogList){
 			Result result = new Result();
-			JsonObject params =new JsonParser().parse(taskLog.getLog_detail()).getAsJsonObject();
+			JsonObject params =null;
+			if (StringHelper.isNotEmpty(taskLog.getLog_detail()))
+				params = new JsonParser().parse(taskLog.getLog_detail()).getAsJsonObject();
 			try{
 				if (taskLog.getBusi_code().equals(BusiCodeConstants.TASK_CANCEL)){
 					client.cancelTaskService(taskLog.getDone_code(), taskLog.getTask_id());
@@ -71,7 +75,7 @@ public class TaskServiceJob implements Job2 {
 				}
 				
 				if(result.getStatus()==null){
-					result.setStatus("0");
+					result.setErr("0");
 					result.setReason("成功");
 				}
 			} catch (WordOrderException e){

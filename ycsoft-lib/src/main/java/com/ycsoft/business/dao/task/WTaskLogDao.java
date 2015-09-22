@@ -15,14 +15,13 @@ public class WTaskLogDao extends BaseEntityDao<WTaskLog> {
 	private static final long serialVersionUID = 8483966061975110281L;
 	
 	public List<WTaskLog> queryByTaskId(String taskId) throws JDBCException {
-		String sql = "select * from w_task_log where task_id=?";
+		String sql = "select * from w_task_log where task_id=? order by log_time desc";
 		return this.createQuery(sql, taskId).list();
 	}
 	
 	public List<WTaskLog> querySynLog() throws JDBCException {
-		String sql = "select * from w_task_log a,w_task_base_info b where "
-				+ " b.task_id=? "
-				+ " and syn_status =? and b.task_status=? order by a.done_code";
-		return this.createQuery(sql, StatusConstants.NOT_EXEC,StatusConstants.TASK_INIT).list();
+		String sql = "select * from w_task_log a where "
+				+" syn_status =?  order by a.done_code";
+		return this.createQuery(sql, StatusConstants.NOT_EXEC).list();
 	}
 }

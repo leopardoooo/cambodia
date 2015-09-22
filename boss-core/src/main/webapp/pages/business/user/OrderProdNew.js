@@ -444,14 +444,23 @@ ProdOrderForm = Ext.extend( BaseForm, {
 	doPayOrderType:function(v){
 		if(v == 'TRANSFER'){
 			Ext.getCmp('orderMonthItemsId').hide();
-//			Ext.getCmp('sfOrderCycle').disable();
-//			var boxProdTariff = Ext.getCmp("boxProdTariff");
-//			boxProdTariff.reset();
+			//转移支付的金额和到期日变动
 			this.doTransferAmount()
 			this.doTransferDate()
 		}else{
 			Ext.getCmp('orderMonthItemsId').show();
-//			Ext.getCmp('sfOrderCycle').enable();
+			//设置订购月的默认值			
+			var sfOrderCycle = Ext.getCmp("sfOrderCycle");
+			var boxProdTariff = Ext.getCmp("boxProdTariff");
+			var disctId = boxProdTariff.getValue();
+			if(Ext.isEmpty(disctId)){
+				Alert(lmsg('chooseTariff'));
+				return false;
+			}
+			var index = boxProdTariff.getStore().find("tariff_id", disctId);
+			var tariffRecord = boxProdTariff.getStore().getAt(index);
+			sfOrderCycle.setValue(tariffRecord.get('billing_cycle'));
+			
 			// 结算结束计费日
 			this.doChangeEndDate();
 			// 计算结算金额
@@ -479,11 +488,15 @@ ProdOrderForm = Ext.extend( BaseForm, {
 		
 		var tAmount = this.transferAmount;
 		var disctRent = tariffRecord.get("disct_rent");
-		var mothAllNum = Ext.util.Format.round((tAmount/disctRent)*tariffRecord.get("billing_cycle"),2);
+		//根据转移支付的金额计算出多少月（带小数，小数再转换为天）
+		var mothAllNum = Ext.util.Format.ceil((tAmount/disctRent)*tariffRecord.get("billing_cycle"),2);
+		//月数赋值
+		Ext.getCmp("sfOrderCycle").setValue(mothAllNum);
 		var mothNum = parseInt(mothAllNum);
 		var dayNum = Math.ceil((mothAllNum - mothNum)*30);
 		var startDate = Ext.getCmp("dfStartDate").getValue();
-		Ext.getCmp("dfExpDate").setValue(Ext.util.Format.addTime(startDate.format("Y-m-d"),mothNum,dayNum));
+		//开始日期加mothNum月，dayNum天,,startDate是+1天的，所以到期日要-1天，dayNum-1;
+		Ext.getCmp("dfExpDate").setValue(Ext.util.Format.addTime(startDate.format("Y-m-d"),mothNum,dayNum-1));
 	},
 	// 资费下拉框选中事件
 	doSelectTariff: function(box, record, index){

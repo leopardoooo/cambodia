@@ -211,7 +211,14 @@ TaskDeviceWin = Ext.extend(Ext.Window,{
 		};
 		var that = this;
 		App.sendRequest( url, o, function(res,opt){
-			Ext.getCmp('taskManagerPanelId').loadTaskData(that.task_id);
+			Ext.getCmp('taskManagerPanelId').grid.getStore().reload({
+				callback:function(records, options, success){
+					var panel = Ext.getCmp('taskManagerPanelId');
+	           		var index = panel.grid.getStore().find('task_id',that.task_id);	           		
+	           		panel.grid.getSelectionModel().selectRow(index);
+	           		panel.loadTaskData(that.task_id);
+				}
+	         });
 			that.close();
 		});
 	},
@@ -381,7 +388,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 				triggerAction:'all',mode:'local'
 		});
 		
-		this.taskAddrCombo = new Ext.form.ComboBox({
+		this.taskAddrCombo = new Ext.ux.LovCombo({
 			typeAhead: true,
 			width: 120,
 		    triggerAction: 'all',
@@ -389,13 +396,13 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 		    emptyText: '地区',
 		    editable : true,
 		    store: new Ext.data.JsonStore({
-//		    	url: root + '/core/x/Task!queryTaskAddr.action' ,
-//		    	autoLoad : true,
-//		   	 	autoDestroy:true,
-		        fields: [ 'item_value', 'item_name' ]
+		    	url: root + '/commons/x/QueryCust!queryProvince.action',
+		    	autoLoad : true,
+		   	 	autoDestroy:true,
+		        fields: ['name','id']
 		    }),
-		    valueField: 'item_value',
-		    displayField: 'item_name'
+		    valueField: 'id',
+		    displayField: 'name'
 		});
 		
 		this.taskTeamCombo = new Ext.ux.LovCombo({
@@ -524,13 +531,21 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 			return ;
 		}
 		Confirm("确定要作废选中的工单吗?", this , function(){
+			var taskId = rs.get("task_id");
+			var that = this;
 			App.sendRequest(
 				Constant.ROOT_PATH + "/core/x/Task!cancelTaskSn.action",
-				{task_id : rs.get('task_id'),taskType:rs.get('task_type_id')},
+				{task_id : taskId,taskType:rs.get('task_type_id')},
 				function(res,opt){
-					Alert('工单已作废!');
-					rs.set("task_status", "CANCEL");
-					rs.set("task_status_text", "作废");
+					Ext.getCmp('taskManagerPanelId').grid.getStore().reload({
+					callback:function(records, options, success){  
+		           		    var panel = Ext.getCmp('taskManagerPanelId');
+				           	var index = panel.grid.getStore().find('task_id',taskId);	           		
+				           	panel.grid.getSelectionModel().selectRow(index);
+				           	panel.loadTaskData(taskId);
+						}
+			         });
+					that.close();
 				});
 		}); 
 	},
@@ -539,27 +554,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 		if(rs === false){
 			return ;
 		}
-//		var taskIds = [];
-//		for(var i = 0; i< rs.length ; i++){
-//			if(rs[i].get("task_status") != 'CREATE'){
-//				Alert("只有新建的工单才能提交呼叫!");
-//				return ;
-//			}
-//			taskIds.push(rs[i].get("task_id"));
-//		}
-//		
-//		var that = this;
-//		Confirm("确定要提交呼叫吗?", this , function(){
-//			App.sendRequest(
-//				Constant.ROOT_PATH + "/core/x/Task!assignTask.action",
-//				{task_ids : taskIds},
-//				function(res,opt){
-//					Alert('提交成功!', function(){
-//						that.close();
-//					});
-//					that.doSearchTask();					
-//				});
-//		});
+
 	},
 	doTeamTask:function(){//分配施工队
 		var rs = this.getSelections();
@@ -627,21 +622,21 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 						Alert("故障类型不能为空");return false;
 					}
 					var url = Constant.ROOT_PATH + "/core/x/Task!editTaskTeam.action";
+					var taskId = rs.get("task_id");
 					var o = {
-						task_id : rs.get("task_id"), 
+						task_id : taskId, 
 						deptId: teamCombo.getValue(),
 						bugType : bugCauseCombo?bugCauseCombo.getValue():null
 					};
 					App.sendRequest( url, o, function(res,opt){
-						rs.set("team_id",teamCombo.getValue());
-						var index = 0;
-						index = teamCombo.getStore().find('dept_id',teamCombo.getValue());
-						rs.set("team_id_text",teamCombo.getStore().getAt(index).get('dept_name'));	
-						if(bugCauseCombo){
-							rs.set("bug_type",bugCauseCombo.getValue());
-							index = bugCauseCombo.getStore().find('item_value',bugCauseCombo.getValue());
-							rs.set("bug_type_text",bugCauseCombo.getStore().getAt(index).get('item_name'));
-						}
+						Ext.getCmp('taskManagerPanelId').grid.getStore().reload({
+							callback:function(records, options, success){  
+				           		 var panel = Ext.getCmp('taskManagerPanelId');
+					           	var index = panel.grid.getStore().find('task_id',taskId);	           		
+					           	panel.grid.getSelectionModel().selectRow(index);
+					           	panel.loadTaskData(taskId);
+							}
+				         });
 						win.close();
 					});
 				}
@@ -704,13 +699,20 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 						Alert("完工类型不能为空");return false;
 					}
 					var url = Constant.ROOT_PATH + "/core/x/Task!endTask.action";
+					var taskId = rs.get("task_id");
 					var o = {
-						task_id : rs.get("task_id"), 
+						task_id : taskId, 
 						resultType : finishCombo.getValue()
 					};
 					App.sendRequest( url, o, function(res,opt){
-						rs.set("task_status", "END");
-						rs.set("task_status_text", "完工");
+						Ext.getCmp('taskManagerPanelId').grid.getStore().reload({
+							callback:function(records, options, success){  
+				           		 var panel = Ext.getCmp('taskManagerPanelId');
+					           	var index = panel.grid.getStore().find('task_id',taskId);	           		
+					           	panel.grid.getSelectionModel().selectRow(index);
+					           	panel.loadTaskData(taskId);
+							}
+				         });
 						win.close();
 					});
 				}
@@ -745,6 +747,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 			"taskCond.addr": this.newaddrField.getValue(),
 			"taskCond.custName":this.custNameField.getValue(),
 			"taskCond.taskTeam":this.taskTeamCombo.getValue(),
+			"taskCond.addrIds":this.taskAddrCombo.getValue(),
 			"taskCond.taskId":this.taskNoField.getValue(),
 			"taskCond.taskType":this.taskDetailTypeCombo.getValue()
 		};

@@ -74,6 +74,7 @@ public class WorkOrderClient {
 
 	private WorkOrder getWorkOrderBaseInfo(WTaskBaseInfo task, String custNo,String areaCode,SOptr custManager) {
 		WorkOrder order = new WorkOrder();
+		order.setOrderNo(task.getTask_id());
 		order.setOrderType(Integer.parseInt(task.getTask_type_id()));
 		order.setAreaCode(areaCode);
 		order.setISPCode(ISP_CODE);
@@ -147,6 +148,7 @@ public class WorkOrderClient {
 		ResultHead result = null;
 		try {
 			result = callback.doCallback();
+			System.out.println("============================="+result.getHeadCode()+"      "+result.getHeadMsg());
 		} catch (RemoteException e) {
 			throw new WordOrderException(e);
 		}
