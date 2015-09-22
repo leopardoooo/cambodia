@@ -114,18 +114,18 @@ ServiceGrid = Ext.extend( Ext.grid.EditorGridPanel, {
 				defaults: { width: 55 },
 				columns: [this.checkSm,
 					{ id : 'e',header: cm[0], dataIndex: 'fee_name',renderer:App.qtipValue},
-					{ header: cm[1], dataIndex: 'count', width: 40,
+					{ header: cm[1], dataIndex: 'count', width: 25,
 						editor : new Ext.form.NumberField({
 							allowBlank : false,
 							minValue : 1,
 							allowNegative : false
 						})},
-					{ header: cm[2], dataIndex: 'default_value',width : 40,
+					{ header: cm[2], dataIndex: 'default_value',width : 25,
 						editor : new Ext.form.NumberField({
 							allowBlank : false,
 							allowNegative : false
 						})},
-					{ header : cm[3], dataIndex: 'feeValue',width : 40}
+					{ header : cm[3], dataIndex: 'feeValue',width : 25}
 				]
 			}),
 			tbar : [langUtils.bc("common.fee.tbar0"),'->',langUtils.bc("common.total"),":",{

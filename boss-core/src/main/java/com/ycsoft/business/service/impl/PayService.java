@@ -561,6 +561,7 @@ public class PayService extends BaseBusiService implements IPayService {
 				throw new ServicesException(ErrorCode.CFeeAndProdOrderIsNotOne);
 			}
 			needPayFee=needPayFee+fee.getReal_pay();
+			fee.setBusi_optr_id(pay.getBusi_optr_id());
 		}
 		
 		//int needPayFee=feeComponent.queryUnPaySum(cust_id,this.getOptr().getOptr_id()).get("FEE").intValue();
