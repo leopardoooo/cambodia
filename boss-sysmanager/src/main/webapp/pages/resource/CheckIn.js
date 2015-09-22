@@ -20,7 +20,16 @@ var ownership = {fieldLabel:CHECK_COMMON.labelOwnerShip,xtype:'paramcombo',param
 
 //设备类型
 var deviceType = {fieldLabel:CHECK_COMMON.labelDeviceType,xtype:'paramcombo',
-		typeAhead:false,paramName:'DEVICE_TYPE',hiddenName:'deviceType',allowBlank:false,defaultValue:'STB'
+		typeAhead:false,paramName:'DEVICE_TYPE',hiddenName:'deviceType',allowBlank:false,defaultValue:'STB',
+		listeners:{
+			scope:this,
+			expand:function(combo){
+				var store = combo.getStore();
+				store.filterBy(function(record){
+					return record.get('item_value').indexOf('CARD')<0;
+				})
+			}
+		}
 };
 
 //供应商下拉框
@@ -228,7 +237,7 @@ var FileForm = Ext.extend(Ext.form.FormPanel,{
 	constructor:function(){
 		FileForm.superclass.constructor.call(this,{
 			id:'fileFormId',
-			labelWidth: 70,
+			labelWidth: 80,
 			layout : 'column',
 			fileUpload: true,
 			trackResetOnLoad:true,
@@ -514,6 +523,10 @@ var CheckInDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 								}
 							},this);
 						},this);
+					}else{
+						store.filterBy(function(record){
+							return record.get('item_value').indexOf('CARD')<0;
+						})
 					}
 				}
 			}
@@ -599,9 +612,10 @@ var CheckInDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 				return false;
 			}
 		}else if(colIndex === modemMacIndex){
-			if(deviceType !== 'STB'){
-				return false;
-			}
+//			if(deviceType !== 'STB'){
+//				return false;
+//			}
+			
 			//"modem_mac"列只能在设备类型为MODEM或者机猫一体机时，才能编辑
 //			if(deviceType !== 'MODEM'){
 //				if(deviceType == 'STB')&& devModcfg && devModcfg.virtual_modem_model){
@@ -641,6 +655,17 @@ var CheckInDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 	},
 	initEvents:function(){
 		CheckInDeviceGrid.superclass.initEvents.call(this);
+		this.on('afteredit',function(obj){
+			var record = obj.record;
+			var fieldName = obj.field;
+			if(fieldName == 'device_code'){
+				if(record.get('device_type') == 'MODEM'){
+					record.set('modem_mac',record.get('device_code'));
+				}
+			}
+		});
+		
+		
 		this.on('beforeedit',function(obj){
 			var record = obj.record;
 			var fieldName = obj.field;//编辑的column对应的dataIndex
@@ -817,7 +842,7 @@ var HandCheckInWin = Ext.extend(Ext.Window,{
 			if(deviceModel){
 				if((deviceType == 'STB' || deviceType == 'CARD') && deviceCode){
 					arr.push(record.data);	
-				}else if(deviceType == 'MODEM' && modemMac){
+				}else if(deviceType == 'MODEM' && deviceCode){
 					arr.push(record.data);	
 				}
 			}

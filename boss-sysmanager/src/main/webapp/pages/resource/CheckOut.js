@@ -181,7 +181,7 @@ var TransferGrid = Ext.extend(Ext.grid.GridPanel,{
 				{text:CHE_OUT_LU.labelFileTrans,iconCls:'icon-excel',scope:this,handler:this.fileTransfer,tooltip:MSG_LU.tipDevCheckFileFormat},'-',
 				{text:CHE_OUT_LU.labelManualTrans,iconCls:'icon-hand',scope:this,handler:this.handTransfer},'-',
 				{text:CHE_OUT_LU.labelBatchNumTrans,iconCls:'icon-batch-number',scope:this,handler:this.batchNumTransfer},
-				{text:CHE_OUT_LU.labelMateralTrans,iconCls:'icon-batch-number',scope:this,handler:this.materalTransfer}
+				{text:CHE_OUT_LU.labelMateralTrans,iconCls:'icon-hand',scope:this,handler:this.materalTransfer}
 				
 			],
 			bbar : new Ext.PagingToolbar({
@@ -309,7 +309,7 @@ var TransferFileForm = Ext.extend(Ext.form.FormPanel,{
 	constructor:function(){
 		TransferFileForm.superclass.constructor.call(this,{
 			id:'transferFileFormId',
-			labelWidth: 70,
+			labelWidth: 80,
 			fileUpload: true,
 			bodyStyle:'padding-top:10px',
 			defaults:{
@@ -318,7 +318,16 @@ var TransferFileForm = Ext.extend(Ext.form.FormPanel,{
 			items:[
 				transferNo,
 				{fieldLabel:DEV_COMMON_LU.labelDeviceType,xtype:'paramcombo',typeAhead:false,paramName:'DEVICE_TYPE',
-					hiddenName:'deviceType',allowBlank:false
+					hiddenName:'deviceType',allowBlank:false,
+					listeners:{
+						scope:this,
+						expand:function(combo){
+							var store = combo.getStore();
+							store.filterBy(function(record){
+								return record.get('item_value').indexOf('CARD')<0;
+							})
+						}
+					}
 				},
 				depot,statusCmp,
 				{id:'checkOutFileId',fieldLabel:DEV_COMMON_LU.labelDevFile,name:'files',xtype:'textfield',inputType:'file',allowBlank:false,anchor:'95%'},
@@ -905,7 +914,7 @@ var MateralTransferDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 			});
 		};
 		var cm = new Ext.grid.ColumnModel([
-				{id:'device_model_text_id',header:DEV_COMMON_LU.labelDeviceModel,dataIndex:'device_model_text',width:120,editor:new Ext.form.ComboBox({
+				{id:'device_model_text_id',header:DEV_COMMON_LU.labelDeviceModel,dataIndex:'device_model_text',width:240,editor:new Ext.form.ComboBox({
 					store:new Ext.data.JsonStore({
 						fields:['device_model_text','device_model','total_num','device_id']
 					}),displayField:'device_model_text',valueField:'device_model_text',triggerAction:'all',mode: 'local'

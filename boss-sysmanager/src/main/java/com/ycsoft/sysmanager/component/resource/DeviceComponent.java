@@ -655,6 +655,12 @@ public class DeviceComponent extends BaseDeviceComponent {
 				status, mode, depotStatus,backup);
 	}
 	
+	
+	public List<DeviceDto> queryDeviceDetailByMultiCriteria(String deviceModel, String depotId, String status,
+			String mode, String depotStatus, String modemType, String backup, String batch_num, String start_input_time,
+			String end_input_time) throws Exception {
+		return rDeviceDao.queryDeviceByMultiCriteria(deviceModel, depotId, status, mode, depotStatus, modemType, backup, batch_num, start_input_time, end_input_time);
+	}
 	/**
 	 * 检查盒号是否存在
 	 * @param cardId
@@ -2546,8 +2552,6 @@ public class DeviceComponent extends BaseDeviceComponent {
 	public void setRDeviceTypeDao(RDeviceTypeDao deviceTypeDao) {
 		this.rDeviceTypeDao = deviceTypeDao;
 	}
-
-
 
 	
 }
