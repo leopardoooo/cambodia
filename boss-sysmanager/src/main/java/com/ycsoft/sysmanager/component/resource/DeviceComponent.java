@@ -1003,6 +1003,9 @@ public class DeviceComponent extends BaseDeviceComponent {
 				if (StringHelper.isNotEmpty(d.getPair_device_code())) {
 //					if (cardModelList.get(d.getPair_device_model())==null)
 //						throw new ComponentException("错误的设备类型：" + d.getPair_device_model_text()+",请检查该型号是否适用当前地区");
+					if(StringHelper.isEmpty(pairCardModel)){
+						throw new ComponentException(ErrorCode.DevicePairModelNotExists,d.getDevice_model());
+					}
 					// 有配对卡，保存配对卡
 					String carDeivceId = gDeviceId();
 					stb.setPair_card_id(carDeivceId);
@@ -1015,7 +1018,7 @@ public class DeviceComponent extends BaseDeviceComponent {
 					cardDevice.setDepot_id(depotId);
 					cardDevice.setOwnership(input.getOwnership());
 					cardDevice.setOwnership_depot(depotId);
-					cardDevice.setIs_virtual(cardModelList.get(pairCardModel).getIs_virtual());
+					cardDevice.setIs_virtual(cardModelList.get(pairCardModel)!=null?cardModelList.get(pairCardModel).getIs_virtual():SystemConstants.BOOLEAN_FALSE);
 					deviceList.add(cardDevice);
 					// 卡信息
 					RCard card = new RCard();

@@ -77,6 +77,7 @@ public enum ErrorCode {
 	DeviceTotalNumIsNull("设备数量不够"),
 	DeviceTotalNumIsTooBig("设备入库数量超出了订货数量"),
 	DeviceDateException("设备数据异常，请联系管理员!(device_id=%s)"),
+	DevicePairModelNotExists("设备对应的智能卡型号不存在!(device_model=%s)"),
 	
 	AcctPublicNotExists("客户缺失公用账户，请联系管理员！"),
 	AcctItemNotExists("账目不存在，请联系管理员！"),

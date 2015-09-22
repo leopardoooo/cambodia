@@ -294,7 +294,7 @@ Sys = {
 	},
 	InvoiceInput:{//发票领用
 		startInvoiceId:'开始发票号~',
-		endInvoiceId:'开始发票号~',
+		endInvoiceId:'截止发票号~',
 		invoiceCount:'发票共 {0} 张~',
 		_title:'发票入库~',
 		btnRecord:'录入~'
@@ -312,7 +312,8 @@ Sys = {
 		_title:'取消领用~'
 	},
 	EditStatusInvoice:{//修改发票状态
-		_title:'修改状态~'
+		_title:'修改状态~',
+		editStatus:'修改状态为~'
 		
 	},
 	
