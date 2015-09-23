@@ -34,8 +34,9 @@ var OptrManageForm = Ext.extend(Ext.form.FormPanel, {
 			id : 'optrManageFormId',
 			region : 'south',
 			split : true,
-			height : 200,
+			height : 220,
 			layout : 'column',
+			border:false,
 			bodyStyle : 'padding: 5px',
 			defaults : {
 				columnWidth : .5,
@@ -43,13 +44,10 @@ var OptrManageForm = Ext.extend(Ext.form.FormPanel, {
 				baseCls : 'x-plain',
 				defaultType : 'textfield'
 			},
-			items : [{
-						xtype : 'hidden',
-						name : 'optr_id',
-						id : 'optr_id'
+			items : [{xtype : 'hidden',name : 'optr_id',id : 'optr_id'
 					},{xtype:'hidden',name:'dept_id',value:this.deptId},
 						{
-						labelWidth : 120,
+						labelWidth : 90,
 						items : [{
 									fieldLabel : '操作员姓名',
 									name : 'optr_name',
@@ -173,16 +171,23 @@ var OptrManageForm = Ext.extend(Ext.form.FormPanel, {
 									displayField:'optr_name',valueField:'optr_id',value:'',
 									forceSelection:true,editable:true,allowBlank:false,
 									disabled:true
-								},
-								{
-									fieldLabel : '备注',
-									name : 'remark',
-									maxLength : 32,
-									id:'remark',
-									xtype : 'textfield'
+								},{
+									fieldLabel : '电话2',
+									name : 'mobile',
+									xtype: 'numberfield'									
 								}
-								
 								]
+					},{
+						labelWidth : 90,
+						columnWidth : 1,
+						items:[{
+								fieldLabel : '备注',
+								name : 'remark',
+								height : 40,
+								width : 350,
+								id:'remark',
+								xtype : 'textarea'
+							}]
 					}]
 		})
 	},
@@ -385,6 +390,7 @@ CfgRoleGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 			id:'cfgRoleGridId',
 			region:'center',
 			title:'角色配置',
+			border:false,
 			ds:this.optrRoleStore,
 			enableColumnMove :false,
 			clicksToEdit:1,
@@ -608,7 +614,7 @@ OptrWindow = Ext.extend(Ext.Window, {
 		this.cfgRoleGrid = new CfgRoleGrid(v);
 		OptrWindow.superclass.constructor.call(this, {
 					width : 600,
-					height : 450,
+					height : 500,
 					layout : 'border',
 					id:'optrwindow',
 					closeAction : 'close',
@@ -620,11 +626,14 @@ OptrWindow = Ext.extend(Ext.Window, {
 								region : 'north',
 								title : '基本信息【默认登录系统与下面角色配置的子系统关联】',
 								collapsible : true,
-								height : 205,
+								height : 210,
+								split : true,
+								border:false,
 								items : [this.optrManageForm]
 							}, {
 								region : 'center',
 								spilt : true,
+								border:false,
 								items : [this.cfgRoleGrid]
 							}],
 					buttons : [{
@@ -910,7 +919,7 @@ var OptrManagePanel = Ext.extend( Ext.grid.GridPanel , {
 				{name: 'status_text'},
 				{name: 'creator_name'},
 				{name: 'report_data_level'},
-				{name: 'tel'},
+				{name: 'tel'},{name:'mobile'},
 				{name: 'sub_system_text'},
 				{name: 'position'},
 				{name: 'is_busi_optr'},
@@ -929,7 +938,8 @@ var OptrManagePanel = Ext.extend( Ext.grid.GridPanel , {
 				{header: '操作员姓名', dataIndex: 'optr_name',width: 70,renderer:App.qtipValue},
 				{id:'login_name', header: '工号', dataIndex: 'login_name',width: 80},
 				{header: '状态', dataIndex: 'status_text',width: 40,renderer:Ext.util.Format.statusShow},
-				{header: '电话号码', dataIndex: 'tel',width: 80},
+				{header: '电话1', dataIndex: 'tel',width: 80},
+				{header: '电话2', dataIndex: 'mobile',width: 80},
 				{header: '职位', dataIndex: 'position',width: 60,renderer:App.qtipValue},
 				{header: '所在部门', dataIndex: 'dept_name',width: 80,renderer:App.qtipValue},
 				{header: '所属县市', dataIndex: 'county_name',width: 80,renderer:App.qtipValue},

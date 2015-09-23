@@ -24,8 +24,8 @@ public class TestMain {
 	 * @throws InvocationTargetException
 	 */
 	public static void main(String[] args) throws IllegalAccessException, InvocationTargetException {
-		calInvalidDate();
-		
+//		calInvalidDate();
+		System.out.println(DateHelper.isToday(DateHelper.strToDate("2015-09-23")));
 	}
 	
 	private void printName(A a){
