@@ -415,7 +415,7 @@ Ext.apply( App, {
  	},
  	openPay:function(){
  		App.getApp().menu.bigWindow.show({ text: langUtils.main("cashPay._title"),  attrs: {busiCode:'1027',
-					url: 'pages/business/pay/PayForm.js,pages/business/pay/PayPanel.js'}} ,{width: 790, height: 550});
+					url: 'pages/business/pay/PayForm.js,pages/business/pay/PayPanel.js'}} ,{width: 850, height: 600});
  	},
  	openBankPayment:function(){
 		App.getApp().data.currentResource = {busicode:'2000'};

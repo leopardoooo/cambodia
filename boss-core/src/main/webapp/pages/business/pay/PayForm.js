@@ -82,14 +82,6 @@ PayForm = Ext.extend( Ext.form.FormPanel , {
 				decimalPrecision: 0,
 				id: 'nfJianYuan'
 			},{
-				fieldLabel: lc[9],
-				xtype: 'combo',
-				hiddenName: 'pay.busi_optr_id',
-				store: this.busiOptrStore,
-				valueField:'optr_id',displayField:'optr_name',
-				value: App.getCust()['str9'],
-				id:'payBusiOptrId'
-			},{
 				xtype: 'hidden',
 				id: 'hdExchange',
 				name: 'pay.exchange'

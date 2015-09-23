@@ -376,7 +376,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 			throw new ServicesException(ErrorCode.NotCancelStatusException);
 		}
 		//订购时间=今天或状态是施工中的或高级权限，都可以退订
-		if(DateHelper.isToday(order.getCreate_time())
+		if(DateHelper.isToday(order.getOrder_time())
 				||order.getStatus().equals(StatusConstants.INSTALL)
 				||orderComponent.isHighCancel(busi_code)){
 			return;
