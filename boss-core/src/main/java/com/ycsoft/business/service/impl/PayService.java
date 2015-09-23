@@ -591,6 +591,19 @@ public class PayService extends BaseBusiService implements IPayService {
 		return feeList;
 	}
 	/**
+	 * 回退支付恢复未支付的业务，删除未打印记录
+	 */
+	private void canlePayToUnPayDoneCode(List<FeeDto> feeList) throws Exception{
+		Map<Integer,CFee> feeMap=new HashMap<>();
+		for(FeeDto fee:feeList){
+			feeMap.put(fee.getCreate_done_code(), fee);
+			cFeeUnprintDao.remove(fee.getFee_sn());
+		}
+		for(CFee fee: feeMap.values()){
+			doneCodeComponent.saveDoneCodeUnPay(fee.getCust_id(), fee.getCreate_done_code(), fee.getOptr_id());
+		}
+	}
+	/**
 	 * 回退支付记录（含处理缴费记录、发票、订单支付状态和订单费用明细）
 	 */
 	public void saveCanclePay(String paySn,String[] invoiceIds)throws Exception{
@@ -607,12 +620,16 @@ public class PayService extends BaseBusiService implements IPayService {
 		}
 		//恢复缴费记录未支付状态
 		feeComponent.updateCFeeToUnPay(paySn);
+		//恢复未支付的业务和删除未打印信息
+		canlePayToUnPayDoneCode(feeList);
+		
 		//更新订单费用记录对应的缴费转入费用费用类型为未支付
 		orderComponent.updateOrderFeeTypeByPayType(feeList,SystemConstants.PAY_TYPE_UNPAY);
 		//更新缴费相关的订单状态=未支付
 		updateOrderIsPay(feeList,custId,SystemConstants.BOOLEAN_FALSE);
 		//作废支付记录
 		feeComponent.saveCancelPayFee(paySn, doneCode);
+		
 		
 		this.saveAllPublic(doneCode, this.getBusiParam());
 	}
@@ -990,10 +1007,17 @@ public class PayService extends BaseBusiService implements IPayService {
 	private void invalidInvoiceByinvoiceId(String invoice_id, String invoice_code,Integer doneCode) throws Exception{
 		List<CFee> list=feeComponent.queryFeeByInvoice(invoice_code, invoice_id);
 		String optrId=this.getOptr().getOptr_id();
+		Map<String,CFeePay> payMap=new HashMap<>();
+		
 		for(CFee cfee:list){
-			if(!optrId.equals(cfee.getOptr_id())){
+			if(payMap.containsKey(cfee.getPay_sn())){
+				continue;
+			}
+			CFeePay pay=feeComponent.queryCFeePayByPaySn(cfee.getPay_sn());
+			if(!optrId.equals(pay.getOptr_id())){
 				throw new ServicesException(ErrorCode.InvoiceIsNotYou);
 			}
+			payMap.put(cfee.getPay_sn(), pay);
 		}
 		//检查发票状态是否缴销
 		RInvoice invoice= invoiceComponent.queryById(invoice_id, invoice_code);
@@ -1005,15 +1029,9 @@ public class PayService extends BaseBusiService implements IPayService {
 		}
 		
 		invoiceComponent.invalidInvoiceAndClearFeeInfo(doneCode, invoice_id, invoice_code);
-		
 		//插入费用记录未打印
 		for(CFee cfee:list){
-			CFeeUnprint un=new CFeeUnprint();
-			un.setCreate_done_code(cfee.getCreate_done_code());
-			un.setFee_sn(cfee.getFee_sn());
-			un.setCust_id(cfee.getCust_id());
-			un.setOptr_id(cfee.getOptr_id());
-			cFeeUnprintDao.save(un);
+			cFeeUnprintDao.insertByUnPayDoneCode(cfee.getFee_sn(), optrId);
 		}
 	}
 	/**

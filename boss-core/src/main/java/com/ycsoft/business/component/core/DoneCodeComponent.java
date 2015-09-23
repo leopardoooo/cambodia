@@ -82,12 +82,8 @@ public class DoneCodeComponent extends BaseBusiComponent {
 	 * @throws JDBCException
 	 */
 	public void saveDoneCodeUnPay(String cust_id,Integer done_code,String optr_id) throws Exception{
-		
-		for(CDoneCodeUnpay unPay: cDoneCodeUnpayDao.queryUnPay(cust_id)){
-			if(unPay.getDone_code().equals(done_code)){
-				//已经保存过，不需要重复保存
-				return;
-			}
+		if(cDoneCodeUnpayDao.findByKey(done_code)!=null){
+				return;//已经保存过，不需要重复保存
 		}
 		cDoneCodeUnpayDao.saveUnpay(cust_id, done_code,optr_id);
 		
