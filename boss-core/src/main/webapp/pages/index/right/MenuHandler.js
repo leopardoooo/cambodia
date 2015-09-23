@@ -90,6 +90,43 @@ Ext.apply(MenuHandler, {
 			height : 470
 		};
 	},
+	//支付回退  
+	CancelPayFee : function(){
+		record = App.main.infoPanel.getPayfeePanel().feePayGrid.getSelectionModel().getSelected();
+		// 回调函数
+		function callback(res, opt) {
+			Alert(LU_MSG['cancelPayFeeSuccess']);
+			App.main.infoPanel.setReload(true);
+			App.main.infoPanel.getPayfeePanel().refresh();
+			App.main.infoPanel.getDocPanel().setReload(true);
+			App.main.infoPanel.getDoneCodePanel().setReload(true);
+		}
+		
+		
+		function callbackSave(res, opt) {
+			var rec = Ext.decode(res.responseText);
+			var saveParams = {invoiceIds:rec,paySn:record.get("pay_sn")};
+			var txt = LU_FM('msgBox.confirmCancelPayFeeWithNoParam');
+			if(rec.length>0){
+				txt = LU_FM('msgBox.confirmCancelPayFeeWithParam',null,[saveParams["invoiceIds"]]);
+			}
+			Confirm( txt, this, function() {
+				App.sendRequest(Constant.ROOT_PATH + "/core/x/Pay!canclePay.action", saveParams, callback);
+			});
+		}
+	
+		if (record) {
+			var params = {};
+			console.log(record.data);
+			params["paySn"] = record.get("pay_sn");
+			var url = Constant.ROOT_PATH + "/core/x/Pay!queryPayToCancel.action";
+			App.sendRequest(url, params, callbackSave);
+		} else {
+			Alert(LU_MSG('selectRecCancelPayFee'));
+			return false;
+		}
+		return false;
+	},
 	// --------------------客户信息------------------------------------------------
 	// 开户
 	NewCust : function() {
@@ -2750,6 +2787,7 @@ Ext.apply(MenuHandler, {
 			height : 300
 		};
 	},
+	//新增保障单
 	NewRepairTask: function(){
 	    if(!hasCust()) return false;
 	    return {width: 450 , height: 300};
