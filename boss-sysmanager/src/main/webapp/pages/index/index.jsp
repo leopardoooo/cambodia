@@ -125,7 +125,7 @@
 		<script type="text/javascript">document.getElementById('titleId').innerHTML = '仓库管理';</script>
 		<jsp:include page = "/pages/index/depotLibrary.jsp" />
 	<%}else if("6".equals(sub_system_id)){ %>
-		<script type="text/javascript">document.getElementById('titleId').innerHTML = '发票管理';</script>
+		<script type="text/javascript">document.getElementById('titleId').innerHTML = '收据管理';</script>
 		<jsp:include page = "/pages/index/invoiceLibrary.jsp" />
 	<%}else if("8".equals(sub_system_id)){ %>
 		<script type="text/javascript">document.getElementById('titleId').innerHTML = '项目管理';</script>
