@@ -272,17 +272,19 @@ CfeePayWindow = Ext.extend(Ext.Window, {
 	constructor: function(){
 		this.feeStore = new Ext.data.JsonStore({
 			url : Constant.ROOT_PATH+ "/commons/x/QueryCust!queryFeePayDetail.action",
-			fields: ["real_pay","fee_text"]
+			fields: ["real_pay","fee_text","invoice_id","create_done_code"]
 		})
 		var lc = langUtils.main("pay.feePayDetail.columns");
 		var columns = [
-		               {header: lc[0], width: 200,sortable:true, dataIndex: 'fee_text'},
-		               {header: lc[1], width: 70, sortable:true, dataIndex: 'real_pay',renderer:Ext.util.Format.formatFee}
+					   {header: lc[0], width: 80,sortable:true, dataIndex: 'create_done_code'},
+					   {header: lc[1], width: 80,sortable:true, dataIndex: 'invoice_id'},
+		               {header: lc[2],sortable:true, dataIndex: 'fee_text'},
+		               {header: lc[3], width: 70, sortable:true, dataIndex: 'real_pay',renderer:Ext.util.Format.formatFee}
            ];
 		return CfeePayWindow.superclass.constructor.call(this, {
 			layout:"fit",
 			title: langUtils.main("pay.feePayDetail._title"),
-			width: 450,
+			width: 500,
 			height: 200,
 			resizable: false,
 			maximizable: false,

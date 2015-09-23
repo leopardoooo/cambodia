@@ -100,6 +100,7 @@ Ext.apply(MenuHandler, {
 			App.main.infoPanel.getPayfeePanel().refresh();
 			App.main.infoPanel.getDocPanel().setReload(true);
 			App.main.infoPanel.getDoneCodePanel().setReload(true);
+			App.getApp().refreshPayInfo();
 		}
 		
 		

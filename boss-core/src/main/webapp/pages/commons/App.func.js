@@ -564,6 +564,22 @@ Ext.apply(App.func,{
 				if(data['task_status'] != 'INIT' )
 					return false;
 			}
+		}else if(panelName ==='P_FEE_PAY'){
+			if(busicode =='2263'){//支付回退
+				if(nowDate().format('Y-m') != data['create_time'].substring(0,7)){
+					return false;
+				}
+				if (data['optr_id'] != App.getData().optr.optr_id || data['is_valid'] == 'F'){
+					return false;
+				}
+			}else if(busicode =='2264'){//隔月支付回退
+				if(nowDate().format('Y-m') == data['create_time'].substring(0,7)){
+					return false;
+				}
+				if (data['optr_id'] != App.getData().optr.optr_id || data['is_valid'] == 'F'){
+					return false;
+				}
+			}
 		}else if(panelName === 'D_BUSI'){
 			if(busicode == '1163'){//重打业务单只能打当前操作员打印过的
 				/*if (data['optr_id'] != App.getData().optr.optr_id){
