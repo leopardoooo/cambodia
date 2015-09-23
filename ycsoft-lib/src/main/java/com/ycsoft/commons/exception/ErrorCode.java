@@ -45,6 +45,7 @@ public enum ErrorCode {
 	PayHasCancel("支付已回退，不能再次回退"),
 	PayFeeStatusError("支付对应的缴费记录状态异常，不能回退"),
 	PayCancelInvoiceParamError("前后台发票不一致"),
+	PayFeeHasCancelOrder("支付关联的订购订单费用或修改订单费用存在订单被退订情况，不能回退"),
 	
 	FeeDateException("前后台金额不一致"),
 	CFeeAndProdOrderIsNotOne("费用记录和订单信息不一致"),

@@ -37,6 +37,9 @@ public final class BusiCodeConstants {
 	public final static String PROD_HIGH_TERMINATE="110";//高级退订
 	public final static String PROD_SUPER_TERMINATE="109";//超级退订
 	
+	public final static String PROD_CHANGE="131";//订单修改
+	public final static String PROD_HIGH_CHANGE="132";//高级订单修改
+	
 	public final static String USER_HIGH_WRITE_OFF="111";//高级销户
 	
 	public final static String PROD_CHANGE_TARIFF = "1028";//资费变更

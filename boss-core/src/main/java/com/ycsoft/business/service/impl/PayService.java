@@ -506,7 +506,9 @@ public class PayService extends BaseBusiService implements IPayService {
 		}
 		return invoices;
 	}
-	
+	/**
+	 * 检查回退支付的业务参数
+	 */
 	private List<FeeDto> checkCancelPayParam(String custId,String paySn,String[] invoiceIds) throws Exception{
 		CFeePay pay=feeComponent.queryCFeePayByPaySn(paySn);
 		//检查客户
@@ -547,6 +549,21 @@ public class PayService extends BaseBusiService implements IPayService {
 					throw new ServicesException(ErrorCode.PayCancelInvoiceParamError);
 				}
 			}
+			//检查费用记录是订购业务的费用记录 或是 修改订单的费用记录 有无被退订,被退订则不能取消支付
+			if(StringHelper.isNotEmpty(fee.getProd_sn())&&
+					(fee.getReal_pay()>0
+							||fee.getBusi_code().equals(BusiCodeConstants.PROD_CHANGE)
+							||fee.getBusi_code().equals(BusiCodeConstants.PROD_HIGH_CHANGE))){
+				if(cProdOrderDao.findByKey(fee.getProd_sn())==null){
+					throw new ServicesException(ErrorCode.PayFeeHasCancelOrder);
+				}
+				/**这个判断重复了
+				for(CProdOrderFee orderfee: cProdOrderFeeDao.queryByOrderSn(fee.getProd_sn())){
+					if(orderfee.getOutput_fee()>0){
+						throw new ServicesException(ErrorCode.PayFeeHasCancelOrder);
+					}
+				}**/
+			}
 			payFee=payFee+fee.getReal_pay();
 		}
 		if(payFee!=pay.getFee()){//缴费记录金额和支付记录金额不一致
@@ -571,7 +588,6 @@ public class PayService extends BaseBusiService implements IPayService {
 				 throw new ServicesException(ErrorCode.InvoiceCheckStatusIsNotIdle);
 			}
 		}
-		
 		return feeList;
 	}
 	/**
