@@ -248,13 +248,13 @@ Sys = {
 			
 		}
 	},//目前工单系统里的三个功能结束 ~.
-	//发票子系统
+	//收据子系统
 	InvoiceCommon:{
-		  titleInvoiceInfo:'发票信息~',
-			titleInvoiceCount:'发票信息  数量：{0} ~',
-			titleInvoiceCountAndAmount:"发票信息 共选中{0}行,金额总和为{1}",
+		  titleInvoiceInfo:'收据信息~',
+			titleInvoiceCount:'收据信息  数量：{0} ~',
+			titleInvoiceCountAndAmount:"收据信息 共选中{0}行,金额总和为{1}",
 			
-			tipInvoiceCountAndAmount:"一共:{0} 张发票，总额:{1} 元，",
+			tipInvoiceCountAndAmount:"一共:{0} 张收据，总额:{1} 元，",
 			
 		  namount: "金额~",
 			check_time: "结账时间~",
@@ -263,10 +263,10 @@ Sys = {
 			depot_name: "仓&nbsp;&nbsp;&nbsp;&nbsp;库~",
 			check_depot_id:'结账仓库~',
 			finance_status: "结存状态~",
-			invoice_code: "发票代码~",
-			invoice_id: "发票号码~",
+			invoice_code: "收据代码~",
+			invoice_id: "收据号码~",
 			invoice_mode:'出票方式~',
-			invoice_type: "发票类型~",
+			invoice_type: "收据类型~",
 			finance_status: "结存状态~",
 			optr_name: "所属营业员~",
 			status: "使用状态~",
@@ -274,44 +274,44 @@ Sys = {
 			use_optr:'领&nbsp;用&nbsp;人~',
 			use_time: "开票时间~",
 			//好多个功能下面的表格使用了同样的column
-			commonGridColls:['发票号码~','发票代码~','发票类型~','使用状态~','金额~','出票方式~','结存状态~','仓库~','领用人~']
+			commonGridColls:['收据号码~','收据代码~','收据类型~','使用状态~','金额~','出票方式~','结存状态~','仓库~','领用人~']
 	},
-	QueryInvoice:{//查询发票
+	QueryInvoice:{//查询收据
 			common:{
-				titlaQueryInvoick:'发票查询~',
-				winTitleInvoiceDetail:'发票明细~',
+				titlaQueryInvoick:'收据查询~',
+				winTitleInvoiceDetail:'收据明细~',
 				titleMoneyCountPrefix:'有效总金额~'				
 			}
 			
 	},
-	InvoiceDetail:{//发票详细信息
-		InvoiceDepotDetailGridColls:['操作类型~','发票流转~','操作员~','操作时间~'],
+	InvoiceDetail:{//收据详细信息
+		InvoiceDepotDetailGridColls:['操作类型~','收据流转~','操作员~','操作时间~'],
 		InvoiceDetailGridColls:['客户名称~','客户编号~','业务名称~','费用名称~','实际金额~','操作时间~','操作员~','状态~'],
-		titleInvoiceBaseInfo:'发票基础信息~',
-		titleInvoiceOptrRec:'发票操作记录~',
+		titleInvoiceBaseInfo:'收据基础信息~',
+		titleInvoiceOptrRec:'收据操作记录~',
 		titleFeeDetail:'费用明细~',
 		titleDetailQuery:'详细查询~'
 	},
-	InvoiceInput:{//发票领用
-		startInvoiceId:'开始发票号~',
-		endInvoiceId:'截止发票号~',
-		invoiceCount:'发票共 {0} 张~',
-		_title:'发票入库~',
+	InvoiceInput:{//收据领用
+		startInvoiceId:'开始收据号~',
+		endInvoiceId:'截止收据号~',
+		invoiceCount:'收据共 {0} 张~',
+		_title:'收据入库~',
 		btnRecord:'录入~'
 	},
-	TransferInvoice:{//发票调拨
-		_title:'发票调拨~',
+	TransferInvoice:{//收据调拨
+		_title:'收据调拨~',
 		_titleSimple:'调拨~',
 		transDepotId:'调拨对象~'
 	},
-	ReceiveInvoice:{//发票领用
+	ReceiveInvoice:{//收据领用
 		optrId:'领用营业员~',
 		_title:'领用~'
 	},
-	CancelReceiveInvoice:{//发票取消领用
+	CancelReceiveInvoice:{//收据取消领用
 		_title:'取消领用~'
 	},
-	EditStatusInvoice:{//修改发票状态
+	EditStatusInvoice:{//修改收据状态
 		_title:'修改状态~',
 		editStatus:'修改状态为~'
 		
@@ -572,14 +572,14 @@ Sys = {
 /** 设备管理结束~.~ **/	
 	//消息内容
 	msgBox:{
-		invoiceNotExists:'{0} 发票不存在~',
-		selectInvoiceCode:'请选择发票代码~',
+		invoiceNotExists:'{0} 收据不存在~',
+		selectInvoiceCode:'请选择收据代码~',
 		emptyTextSelectStore:'请选择仓库~',
-		invoiceIdLengthNotEquals:"发票开始号和发票结束号长度不一致~",
-		needCorrectInvoiceId:'请正确输入发票号!~',
-		needInputAtLeastOneInvoice:'请至少输入一个发票号码~',
+		invoiceIdLengthNotEquals:"收据开始号和收据结束号长度不一致~",
+		needCorrectInvoiceId:'请正确输入收据号!~',
+		needInputAtLeastOneInvoice:'请至少输入一个收据号码~',
 		linkFailure:'连接异常!查询失败~',
-		invoiceNotFoundTryReSearch:'未查询到发票信息，请重新输入发票号查询！~',
+		invoiceNotFoundTryReSearch:'未查询到收据信息，请重新输入收据号查询！~',
 		selectTransDepotId:'请选择调拨仓库~',
 		selectStatus2BeModify:'请选择要修改的状态~',
 		confirmSaveBusiWithInvoice:'{0} 确定要保存业务吗?~',
