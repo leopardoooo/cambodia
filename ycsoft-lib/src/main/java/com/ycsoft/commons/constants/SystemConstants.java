@@ -609,4 +609,6 @@ public class SystemConstants {
 	public static final String LANGUAGE_EN = "en";		//英文
 	
 	public static final String PROMOTION_TYPE_OTT_MOBILE_EXTERNAL="ott_mobile_external";
+	
+	public static final String BASE_INVOICE_CODE="AAA";//发票固定代码
  }

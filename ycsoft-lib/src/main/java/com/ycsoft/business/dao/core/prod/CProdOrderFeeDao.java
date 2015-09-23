@@ -48,8 +48,8 @@ public class CProdOrderFeeDao extends BaseEntityDao<CProdOrderFee>  {
 	}
 
 	public void updateFeeType(String order_sn,Integer done_code,String fee_type) throws JDBCException{
-		String sql="update c_prod_order_fee set fee_type=? where done_code=? and fee_type=? and order_sn=?";
-		this.executeUpdate(sql, fee_type,done_code,StatusConstants.UNPAY,order_sn);
+		String sql="update c_prod_order_fee set fee_type=? where done_code=?  and order_sn=?";
+		this.executeUpdate(sql, fee_type,done_code,order_sn);
 	}
 	
 	public Pager<CProdOrderFee> queryOrderFeeDetail(String orderSn, Integer start, Integer limit) throws Exception {

@@ -5,6 +5,7 @@ package com.ycsoft.business.service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.ycsoft.beans.config.TBusiFee;
 import com.ycsoft.beans.core.fee.CFee;
@@ -61,6 +62,16 @@ public interface IPayService extends IBaseService{
 	 */
 	public List<CFeeUnitpre> queryFeeUnitpre(String countyId) throws Exception;
 
+	/**
+	 * 查询支付记录的取消信息(发票信息)
+	 * @param paySn
+	 * @throws Exception 
+	 */
+	public Set<String> queryPayToCancel(String paySn) throws Exception;
+	/**
+	 * 回退支付记录（含处理缴费记录、发票、订单支付状态和订单费用明细）
+	 */
+	public void saveCanclePay(String paySn,String[] invoiceIds)throws Exception;
 	/**
 	 * 保存支付信息
 	 * @param pay 支付信息
