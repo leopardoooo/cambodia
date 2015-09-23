@@ -277,9 +277,9 @@ CfeePayWindow = Ext.extend(Ext.Window, {
 		var lc = langUtils.main("pay.feePayDetail.columns");
 		var columns = [
 					   {header: lc[0], width: 80,sortable:true, dataIndex: 'create_done_code'},
-					   {header: lc[1], width: 80,sortable:true, dataIndex: 'invoice_id'},
-		               {header: lc[2],sortable:true, dataIndex: 'fee_text'},
-		               {header: lc[3], width: 70, sortable:true, dataIndex: 'real_pay',renderer:Ext.util.Format.formatFee}
+		               {header: lc[1],sortable:true, dataIndex: 'fee_text'},
+		               {header: lc[2], width: 70, sortable:true, dataIndex: 'real_pay',renderer:Ext.util.Format.formatFee},
+					   {header: lc[3], width: 80,sortable:true, dataIndex: 'invoice_id'}
            ];
 		return CfeePayWindow.superclass.constructor.call(this, {
 			layout:"fit",
@@ -340,10 +340,10 @@ FeePayGrid = Ext.extend(Ext.ux.Grid, {
 						}
 					}},
 				{header:lc[1],dataIndex:'usd',width:50,renderer:Ext.util.Format.formatFee},
+				{header:lc[5],dataIndex:'is_valid_text',width:55,renderer:Ext.util.Format.statusShow},
 				{header:lc[2],dataIndex:'khr',width:50,renderer:Ext.util.Format.formatFee},
 				{header:lc[3],dataIndex:'exchange',width:50},
 				{header:lc[4],dataIndex:'cos',width:70,renderer:Ext.util.Format.formatFee},
-				{header:lc[5],dataIndex:'is_valid_text',width:55,renderer:Ext.util.Format.statusShow},
 				{header:lc[6],dataIndex:'pay_type_text',width:70},
 				{header:lc[7],dataIndex:'payer',width:70},
 				{header:lc[8],dataIndex:'done_code',width:80},

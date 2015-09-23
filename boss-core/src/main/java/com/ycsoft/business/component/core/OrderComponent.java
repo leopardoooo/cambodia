@@ -556,7 +556,7 @@ public class OrderComponent extends BaseBusiComponent {
 		//Date cancelDate=DateHelper.today();
 		//当天订购或订单状态是施工中
 		if(cancelOrder.getStatus().equals(StatusConstants.INSTALL)
-				||DateHelper.isToday(cancelOrder.getCreate_time())){
+				||DateHelper.isToday(cancelOrder.getOrder_time())){
 			return cancelOrder.getOrder_fee();
 		}
 		
@@ -837,11 +837,11 @@ public class OrderComponent extends BaseBusiComponent {
 		prod.setOptr_id(optr_id);
 		prod.setArea_id(area_id);
 		prod.setCounty_id(county_id);
-		prod.setCreate_time(new Date());
+		prod.setOrder_time(new Date());
 		prod.setPublic_acctitem_type(SystemConstants.PUBLIC_ACCTITEM_TYPE_NONE);
 		prod.setOrder_type(SystemConstants.PROD_ORDER_TYPE_ORDER);
 		if(orderProd.getEff_date().equals(DateHelper.today())){
-			prod.setCheck_time(prod.getCreate_time());
+			prod.setCheck_time(prod.getOrder_time());
 		}
 		return prod;
 	}

@@ -276,7 +276,7 @@ BCLang.home = {
 			},
 			feePayDetail: {
 				_title: '费用明细~',
-				columns: ['流水号','收据','费用项目~', '金额~']
+				columns: ['流水号','费用项目~', '金额~','收据']
 			},
 			_form: {
 					oldOptrName: '旧发展人~',
