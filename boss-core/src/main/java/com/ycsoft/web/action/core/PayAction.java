@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Controller;
@@ -92,7 +93,9 @@ public class PayAction extends BaseBusiAction{
 	
 	private String cust_id;
 	
+	private String paySn;
 	
+	private String[] invoiceIds;
 	
 	public void setCust_id(String cust_id) {
 		this.cust_id = cust_id;
@@ -139,6 +142,25 @@ public class PayAction extends BaseBusiAction{
 		payService.savePay(pay,feeSn);
 		return JSON_SUCCESS;
 	}
+	
+	/**
+	 * 查询支付记录的取消信息(发票信息)
+	 * @param paySn
+	 * @throws Exception 
+	 */
+	public String queryPayToCancel() throws Exception{
+		getRoot().setSimpleObj(payService.queryPayToCancel(paySn));
+		return JSON_SIMPLEOBJ;
+		
+	}
+	/**
+	 * 回退支付记录（含处理缴费记录、发票、订单支付状态和订单费用明细）
+	 */
+	public String canclePay()throws Exception{
+		payService.saveCanclePay(paySn, invoiceIds);
+		return JSON_SUCCESS;
+	}
+	
 	/**
 	 * 取消一个费用
 	 * 当onlyShowInfo=true只返回提示，但不执行取消
@@ -959,6 +981,14 @@ public class PayAction extends BaseBusiAction{
 	public void setPayFeesData(String payFeesData) {
 		this.payFeesData = payFeesData;
 	}
-	
+	public void setPaySn(String paySn) {
+		this.paySn = paySn;
+	}
+	public String[] getInvoiceIds() {
+		return invoiceIds;
+	}
+	public void setInvoiceIds(String[] invoiceIds) {
+		this.invoiceIds = invoiceIds;
+	}
 	
 }

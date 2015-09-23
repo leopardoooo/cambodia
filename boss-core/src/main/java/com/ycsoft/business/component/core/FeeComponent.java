@@ -262,7 +262,27 @@ public class FeeComponent extends BaseBusiComponent {
 		}
 		return list;
 	}
+	/**
+	 * 查询支付对应的缴费记录
+	 * @param paySn
+	 * @return
+	 * @throws Exception
+	 */
+	public List<FeeDto> queryPayFeeDtoByPaySn(String paySn) throws Exception{
+		return cFeeDao.queryPayFeeDto(paySn);
+	}
 	
+	public CFeePay queryCFeePayByPaySn(String paySn) throws JDBCException{
+		return cFeePayDao.findByKey(paySn);
+	}
+	/**
+	 * 恢复缴费费用记录的未支付状态，支付信息去掉，发票去掉
+	 * @param paySn
+	 * @throws JDBCException
+	 */
+	public void updateCFeeToUnPay(String paySn) throws JDBCException{
+		cFeeDao.updateCFeeToUnPayByPaySn(paySn);
+	}
 	/**
 	 * 缴费记录更新支付信息,并记录未打印的信息
 	 * 状态，发票，打印，支付方式，等等
