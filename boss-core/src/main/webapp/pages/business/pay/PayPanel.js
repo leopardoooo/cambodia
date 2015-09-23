@@ -349,6 +349,7 @@ PayPanel = Ext.extend( Ext.Panel ,{
 		return 0;
 	},
 	success:function(){
+		App.getApp().main.infoPanel.getPayfeePanel().feePayGrid.remoteRefresh();
 		App.getApp().data.currentResource = {busicode:'1068'};//打印业务编号
 		App.getApp().menu.bigWindow.show({ text: '发票打印',  attrs: {busiCode:'8888',
 					url: 'pages/business/pay/Print.jsp?type=through'}} ,{width: 710, height: 460});
