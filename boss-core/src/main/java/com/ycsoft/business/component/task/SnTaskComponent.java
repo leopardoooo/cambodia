@@ -359,6 +359,7 @@ public class SnTaskComponent extends BaseBusiComponent{
 		task.setCounty_id(cust.getCounty_id());
 		task.setArea_id(cust.getArea_id());
 		task.setOptr_id(getOptr().getOptr_id());
+		task.setBug_detail(bugDetail);
 		wTaskBaseInfoDao.save(task);
 		return task.getTask_id();
 	}

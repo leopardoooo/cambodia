@@ -37,6 +37,7 @@ import com.ycsoft.beans.device.RStbModel;
 import com.ycsoft.beans.system.SOptr;
 import com.ycsoft.business.commons.pojo.BusiParameter;
 import com.ycsoft.business.component.core.OrderComponent;
+import com.ycsoft.business.component.task.SnTaskComponent;
 import com.ycsoft.business.dto.config.TAddressDto;
 import com.ycsoft.business.dto.core.acct.AcctAcctitemActiveDto;
 import com.ycsoft.business.dto.core.acct.AcctitemDto;
@@ -70,6 +71,8 @@ import com.ycsoft.sysmanager.dto.resource.RDeviceModelTotalDto;
 public class CustService extends BaseBusiService implements ICustService {
 	@Autowired
 	private OrderComponent orderComponent;
+	@Autowired
+	private SnTaskComponent snTaskComponent;
 	/**
 	 * 创建新客户
 	 * @param busiCode
@@ -2197,6 +2200,22 @@ public class CustService extends BaseBusiService implements ICustService {
 		}
 		
 		saveAllPublic(doneCode,getBusiParam());
+	}
+	
+	/**
+	 * 生成故障单
+	 * @param bugDetail
+	 * @throws Exception
+	 */
+	public void saveBugTask(String bugDetail) throws Exception{
+		CCust cust = getBusiParam().getCust();
+		String  custId = cust.getCust_id();
+		doneCodeComponent.lockCust(custId);
+		Integer doneCode = doneCodeComponent.gDoneCode();
+		
+		snTaskComponent.createBugTask(doneCode, cust, bugDetail);
+		
+		saveAllPublic(doneCode, getBusiParam());
 	}
 	
 }

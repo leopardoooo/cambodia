@@ -2752,7 +2752,7 @@ Ext.apply(MenuHandler, {
 	},
 	NewRepairTask: function(){
 	    if(!hasCust()) return false;
-	    return {width: 340 , height: 420};
+	    return {width: 450 , height: 300};
 	  },
 	PrintRepairTask: function(){
 	  	var record = App.getApp().main.infoPanel.getDocPanel().taskGrid.getSelectionModel().getSelected();

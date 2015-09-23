@@ -1664,7 +1664,6 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		saveAllPublic(doneCode, getBusiParam());
 		
 	}
-	
-	
+
 	
 }

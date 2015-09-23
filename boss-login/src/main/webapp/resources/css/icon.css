@@ -313,6 +313,9 @@
 .cancelBill {
 	background-image: url(./../images/menu2/cancel.png) !important;
 }
+.taskRepair {
+	background-image: url(./../images/menu2/task_repair.png) !important;
+}
 
 /**面板图标**/
 .cust {
