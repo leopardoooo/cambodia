@@ -3,13 +3,14 @@ package com.ycsoft.beans.core.prod;
 import java.io.Serializable;
 import java.util.Date;
 
-import com.ycsoft.beans.base.BusiBase;
+import com.ycsoft.beans.base.OptrBase;
 import com.ycsoft.commons.constants.DictKey;
 import com.ycsoft.commons.store.MemoryDict;
 import com.ycsoft.daos.config.POJO;
 
 @POJO(tn = "C_PROD_ORDER", sn = "SEQ_ORDER_SN", pk = "ORDER_SN")
-public class CProdOrder extends BusiBase implements Serializable {
+public class CProdOrder extends OptrBase implements Serializable {
+	private Integer done_code;
 	private String order_sn;//display(0)
     private String	 package_sn;
     private String package_id;
@@ -182,6 +183,12 @@ public class CProdOrder extends BusiBase implements Serializable {
 	}
 	public void setPublic_acctitem_type(String public_acctitem_type) {
 		this.public_acctitem_type = public_acctitem_type;
+	}
+	public Integer getDone_code() {
+		return done_code;
+	}
+	public void setDone_code(Integer done_code) {
+		this.done_code = done_code;
 	}
     
 }
