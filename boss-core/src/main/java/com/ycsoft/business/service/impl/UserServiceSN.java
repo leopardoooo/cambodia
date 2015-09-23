@@ -641,9 +641,11 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 	}
 	
 	@Override
-	public void untuckUsers(String[] userIds) throws Exception{
+	public void untuckUsers() throws Exception{
 		CCust cust = getBusiParam().getCust();
 		doneCodeComponent.lockCust(cust.getCust_id());
+		List<String> userIdList = getBusiParam().getSelectedUserIds();
+		String[] userIds = userIdList.toArray(new String[userIdList.size()]);
 		Integer doneCode = doneCodeComponent.gDoneCode();
 		List<CUser> users = userComponent.queryAllUserByUserIds(userIds);
 		if (users == null || users.size() == 0 || users.get(0) == null)
