@@ -95,11 +95,12 @@ Ext.apply(MenuHandler, {
 		record = App.main.infoPanel.getPayfeePanel().feePayGrid.getSelectionModel().getSelected();
 		// 回调函数
 		function callback(res, opt) {
-			Alert(LU_MSG['cancelPayFeeSuccess']);
+			Alert(LU_MSG('cancelPayFeeSuccess'));
 			App.main.infoPanel.setReload(true);
 			App.main.infoPanel.getPayfeePanel().refresh();
 			App.main.infoPanel.getDocPanel().setReload(true);
 			App.main.infoPanel.getDoneCodePanel().setReload(true);
+			App.getApp().refreshPayInfo();
 		}
 		
 		
@@ -117,7 +118,6 @@ Ext.apply(MenuHandler, {
 	
 		if (record) {
 			var params = {};
-			console.log(record.data);
 			params["paySn"] = record.get("pay_sn");
 			var url = Constant.ROOT_PATH + "/core/x/Pay!queryPayToCancel.action";
 			App.sendRequest(url, params, callbackSave);

@@ -276,7 +276,7 @@ BCLang.home = {
 			},
 			feePayDetail: {
 				_title: '费用明细~',
-				columns: ['费用项目~', '金额~']
+				columns: ['流水号','费用项目~', '金额~','收据']
 			},
 			_form: {
 					oldOptrName: '旧发展人~',
@@ -591,7 +591,7 @@ BCLang.msgBox = {
 	searchCustTip1: '查询客户请输入至少一个关键字~',
 	searchCustTip2: '请不要输入单引号~',
 	searchNoCust: '没有查询到符合条件的客户，请确认后重新输入!~',
-	searchToPayOrPrint: '请处理未支付或未打印收据客户，点击确定后跳转，请为该客户支付费用和打印收据~',
+	searchToPayOrPrint: '请处理未打印收据的客户，点击确定后跳转，请为该客户打印收据',
 	confirmSwitchThisCust: '确定要选择该客户吗?~',
 	confirmInvalidInvoice: "确定作废收据吗?~",
 	confirmRefreshCmd: '确定发送刷新指令吗?~',
