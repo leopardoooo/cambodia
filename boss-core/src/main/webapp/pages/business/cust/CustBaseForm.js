@@ -674,13 +674,13 @@ CustBaseForm = Ext.extend( BaseForm , {
 					id:'cust_str7_id',
 					fieldLabel: langUtils.main("cust.base.businessLicence"),
 					xtype:'textfield',
-					name:'cust.str7',
-					allowBlank:false
+					name:'cust.str7'
 				});
 			Ext.getCmp('addCustItemsTwo').add({
 					id:'cust_str8_id',
 					fieldLabel: langUtils.main("cust.base.unitNumber"),
 					xtype:'textfield',
+					allowBlank: false,
 					name:'cust.str8'
 				});
 			Ext.getCmp('addCustItemsTwo').add({
