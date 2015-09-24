@@ -36,7 +36,7 @@ public interface ISnTaskService {
 	 * @param ponNo 网络参数
 	 * @param deviceList 设备列表
 	 */
-	public void fillTask(String taskId,String otlNo,String ponNo,List<TaskFillDevice> deviceList)throws Exception;
+	public void fillTask(String taskId,List<TaskFillDevice> deviceList)throws Exception;
 	
 	/**
 	 * 完工

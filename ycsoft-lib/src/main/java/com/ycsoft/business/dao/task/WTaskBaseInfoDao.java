@@ -115,4 +115,9 @@ public class WTaskBaseInfoDao extends BaseEntityDao<WTaskBaseInfo> {
 		return this.findUnique(sql, custId);
 	}
 
+	public List<WTaskBaseInfo> queryTaskByDoneCode(Integer doneCode) throws JDBCException{
+		String sql = "select * from w_task_base_info where doneCode = ?";
+		return this.createQuery(sql,doneCode).list();
+	}
+
 }

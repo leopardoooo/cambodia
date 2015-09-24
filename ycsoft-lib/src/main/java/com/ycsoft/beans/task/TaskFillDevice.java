@@ -1,27 +1,20 @@
 package com.ycsoft.beans.task;
 
+import com.ycsoft.business.dto.device.DeviceDto;
+
 public class TaskFillDevice {
-	private String deviceId;
-	private String deviceModel;
-	private String deviceCode;
 	
-	private String oldDeviceCode;
-
-	public String getDeviceId() {
-		return deviceId;
-	}
-
-	public void setDeviceId(String deviceId) {
-		this.deviceId = deviceId;
-	}
-
-	public String getDeviceModel() {
-		return deviceModel;
-	}
-
-	public void setDeviceModel(String deviceModel) {
-		this.deviceModel = deviceModel;
-	}
+	private String deviceCode;//设备编号
+	private String oldDeviceCode;//老设备编号
+	
+	private boolean fcPort;//是不是光口设备 如果有是光猫，如果没有是OTT机顶盒
+	private String occNo;//交接箱编号  CFOCN工单有光口的设备必须设置
+	private String posNo;//分光器编号 CFOCN工单有光口的设备必须设置
+	
+	private DeviceDto device;
+	private DeviceDto oldDevice;
+	
+	private String userId;
 
 	public String getDeviceCode() {
 		return deviceCode;
@@ -40,4 +33,53 @@ public class TaskFillDevice {
 	}
 
 	
+
+	public boolean isFcPort() {
+		return fcPort;
+	}
+
+	public void setFcPort(boolean fcPort) {
+		this.fcPort = fcPort;
+	}
+
+	public String getOccNo() {
+		return occNo;
+	}
+
+	public void setOccNo(String occNo) {
+		this.occNo = occNo;
+	}
+
+	public String getPosNo() {
+		return posNo;
+	}
+
+	public void setPosNo(String posNo) {
+		this.posNo = posNo;
+	}
+
+	public DeviceDto getDevice() {
+		return device;
+	}
+
+	public void setDevice(DeviceDto device) {
+		this.device = device;
+	}
+
+	public DeviceDto getOldDevice() {
+		return oldDevice;
+	}
+
+	public void setOldDevice(DeviceDto oldDevice) {
+		this.oldDevice = oldDevice;
+	}
+
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+
 }

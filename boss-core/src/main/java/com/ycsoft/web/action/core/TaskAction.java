@@ -178,11 +178,9 @@ public class TaskAction extends BaseBusiAction{
 	
 	public String fillTask() throws Exception{
 		String devices = request.getParameter("devices");
-		String otlNo = request.getParameter("otlNo");
-		String ponNo = request.getParameter("ponNo");
 		Type t = new TypeToken<List<TaskFillDevice>>(){}.getType();
 		List<TaskFillDevice> list = JsonHelper.gson.fromJson( devices , t);
-		snTaskService.fillTask(task_id,otlNo,ponNo,list);
+		snTaskService.fillTask(task_id,list);
 		return JSON_SUCCESS;
 	}
 	

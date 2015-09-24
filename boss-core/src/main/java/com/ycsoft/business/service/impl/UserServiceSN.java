@@ -1439,13 +1439,19 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 	@Override
 	public void cancelInstallTask(String taskId) throws Exception {
 		WTaskBaseInfo task = wTaskBaseInfoDao.findByKey(taskId);
-		List<WTaskUser> userList = wTaskUserDao.queryByTaskId(taskId);
-		String[] userIds = new String[userList.size()];
-		int i=0;
-		for(WTaskUser user:userList){
-			userIds[i]=user.getUser_id();
-			i++;
+		List<WTaskBaseInfo> taskList = wTaskBaseInfoDao.queryTaskByDoneCode(task.getDone_code());
+		
+		List<String> userIdList = new ArrayList<String> ();
+		List<WTaskUser> allUserList = new ArrayList<>();
+		for(WTaskBaseInfo tb:taskList){
+			List<WTaskUser> userList = wTaskUserDao.queryByTaskId(tb.getTask_id());
+			for(WTaskUser user:userList){
+				userIdList.add(user.getUser_id());
+				allUserList.add(user);
+			}
 		}
+		
+		String[] userIds = userIdList.toArray(new String[userIdList.size()]);
 		int busiDoneCode = task.getDone_code();
 		// 获取业务流水
 		Integer doneCode = doneCodeComponent.gDoneCode();
@@ -1554,7 +1560,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		}
 		//update device status to idle,write off user
 		
-		for (WTaskUser user:userList){
+		for (WTaskUser user:allUserList){
 			if (StringHelper.isNotEmpty(user.getDevice_id())){
 				DeviceDto device = deviceComponent.queryDeviceByDeviceCode(user.getDevice_id());
 				deviceComponent.updateDeviceDepotStatus(doneCode, BusiCodeConstants.TASK_CANCEL, device.getDevice_id(), 
@@ -1570,7 +1576,9 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		}
 		
 		//cancel task
-		snTaskComponent.cancelTask(doneCode, taskId);
+		for (WTaskBaseInfo tb:taskList){
+			snTaskComponent.cancelTask(doneCode, tb.getTask_id());
+		}
 		getBusiParam().setBusiCode(BusiCodeConstants.TASK_CANCEL);
 		saveAllPublic(doneCode, getBusiParam());
 		

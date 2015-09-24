@@ -583,10 +583,6 @@ public class UserComponent extends BaseBusiComponent {
 		}
 		//修改用户信息
 		cUserDao.update(user);
-		//处理授权
-		if (user.getUser_type().equals(SystemConstants.USER_TYPE_OTT)){
-			
-		}
 		//记录异动
 		cUserPropChangeDao.save(upcList.toArray(new CUserPropChange[upcList.size()]));
 	}

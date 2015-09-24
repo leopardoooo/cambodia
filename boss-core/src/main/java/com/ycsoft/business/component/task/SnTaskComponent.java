@@ -35,6 +35,7 @@ import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.exception.ComponentException;
 import com.ycsoft.commons.exception.ErrorCode;
 import com.ycsoft.commons.helper.StringHelper;
+import com.ycsoft.daos.core.JDBCException;
 
 /**
  * supernet 工单
@@ -65,21 +66,11 @@ public class SnTaskComponent extends BaseBusiComponent{
 	
 	//创建销户工单
 	public void createWriteOffTask(Integer doneCode,CCust cust,List<CUser> userList,String assignType) throws Exception{
-		List<CUser> bandList = new ArrayList<CUser>();
-		List<CUser> tvUserList = new ArrayList<CUser>();
-		for (Iterator<CUser> it = userList.iterator();it.hasNext();){
-			CUser user = it.next();
-			if (user.getUser_type().equals(SystemConstants.USER_TYPE_OTT_MOBILE)){
-				it.remove();
-			} else if (user.getUser_type().equals(SystemConstants.USER_TYPE_BAND)){
-				bandList.add(user);
-			} else {
-				tvUserList.add(user);
-			}
-		}
-		if (bandList.size() ==0 && tvUserList.size() ==0){
+		filterUserList(userList);
+		if (userList.size() ==0 ){
 			return;//no user
 		}
+		List<CUser> bandList = getUserByTyoe(userList, SystemConstants.USER_TYPE_BAND);
 		//创建终端回收单
 		createSingleTaskWithUser(doneCode, cust, userList, getTeamId(SystemConstants.TEAM_TYPE_SUPERNET), SystemConstants.TASK_TYPE_WRITEOFF_TERMINAL);
 		//创建拆线路单
@@ -87,9 +78,184 @@ public class SnTaskComponent extends BaseBusiComponent{
 		if(assignType.equals(SystemConstants.TASK_ASSIGN_CFOCN))
 			teamType = SystemConstants.TEAM_TYPE_CFOCN;
 		String teamId = getTeamId(teamType);
-		for(CUser user:bandList){
-			this.saveTaskBaseInfo(cust, doneCode, SystemConstants.TASK_TYPE_WRITEOFF_LINE, teamId, null, null);
-		}		
+		String taskId = this.saveTaskBaseInfo(cust, doneCode, SystemConstants.TASK_TYPE_WRITEOFF_LINE, teamId, null, null);
+		this.saveTaskUser(bandList, SystemConstants.TASK_TYPE_WRITEOFF_LINE, taskId);
+	}
+	
+	//创建故障单
+	public void createBugTask(Integer doneCode,CCust cust,String bugDetail) throws Exception{
+		String taskId = this.saveTaskBaseInfo(cust, doneCode, SystemConstants.TASK_TYPE_FAULT, 
+				getTeamId(SystemConstants.TEAM_TYPE_SUPERNET), null, bugDetail);
+		List<CUser> userList = cUserDao.queryUserByCustId(cust.getCust_id());
+		List<CUser> bandList = getUserByTyoe(userList, SystemConstants.USER_TYPE_BAND);
+		saveTaskUser(bandList, SystemConstants.TASK_TYPE_FAULT, taskId);
+		
+	}
+	//生成移机工单
+	public void createMoveTask(Integer doneCode,CCust cust,String newAddrId,String newAddr,String assignType) throws Exception{
+		String teamType = SystemConstants.TEAM_TYPE_SUPERNET;
+		if(assignType.equals(SystemConstants.TASK_ASSIGN_CFOCN))
+			teamType = SystemConstants.TEAM_TYPE_CFOCN;
+		String taskId = this.saveTaskBaseInfo(cust, doneCode, SystemConstants.TASK_TYPE_MOVE, getTeamId(teamType), newAddr,null);
+		List<CUser> userList = cUserDao.queryUserByCustId(cust.getCust_id());
+		List<CUser> bandList = getUserByTyoe(userList, SystemConstants.USER_TYPE_BAND);
+		saveTaskUser(bandList, SystemConstants.TASK_TYPE_MOVE, taskId);
+	}
+	
+	//修改施工队
+	public void changeTaskTeam(Integer doneCode,String taskId,String deptId,String buyType)  throws Exception{
+		//修改工单对应的施工队
+		WTaskBaseInfo task = wTaskBaseInfoDao.findByKey(taskId);
+		String oldTeamId = task.getTeam_id();
+		task.setBug_type(buyType);
+		task.setTeam_id(deptId);
+		wTaskBaseInfoDao.update(task);
+		//记录操作日志
+		JsonObject jo = new JsonObject();
+		jo.addProperty("oldTeamId", oldTeamId);
+		jo.addProperty("newTeamId", deptId);
+		String cfonTeamId = getTeamId(SystemConstants.TEAM_TYPE_CFOCN);
+		if (StringHelper.isNotEmpty(cfonTeamId) && (cfonTeamId.equals(deptId) || cfonTeamId.equals(oldTeamId))){
+			if (cfonTeamId.equals(deptId))
+				jo.addProperty("synType", "add");
+			else 
+				jo.addProperty("synType", "cancel");
+			createTaskLog(taskId,BusiCodeConstants.TASK_ASSIGN, doneCode, jo.toString(), StatusConstants.NOT_EXEC);
+		} else {
+			createTaskLog(taskId,BusiCodeConstants.TASK_ASSIGN, doneCode, jo.toString(), StatusConstants.NONE);
+		}
+	}
+
+	//作废工单
+	public void cancelTask(Integer doneCode,String taskId) throws Exception{
+		WTaskBaseInfo task = new WTaskBaseInfo();
+		task.setTask_id(taskId);
+		task.setTask_status(StatusConstants.CANCEL);
+		task.setTask_invalide_time(new Date());
+		wTaskBaseInfoDao.update(task);
+		//如果是CFON的工单需要同步
+		task = wTaskBaseInfoDao.findByKey(taskId);
+		String synStatus=StatusConstants.NONE;
+		if (StringHelper.isNotEmpty(task.getTeam_id()) && task.getTeam_id().equals(getTeamId(SystemConstants.TEAM_TYPE_CFOCN)))
+			synStatus = StatusConstants.NOT_EXEC;
+		createTaskLog(taskId,BusiCodeConstants.TASK_CANCEL, doneCode,null, synStatus);
+	}
+	
+	//保存开户、移机、故障单的回填信息
+	public void fillTaskInfo(Integer doneCode, WTaskBaseInfo task, List<WTaskUser> userList,
+			List<TaskFillDevice> deviceList) throws Exception{
+		if (task.getTask_type_id().equals(SystemConstants.TASK_TYPE_INSTALL)){
+			//更新工单用户对应的设备信息
+			for (TaskFillDevice fillDevice:deviceList){
+				wTaskUserDao.updateTaskUserDevice(fillDevice.getDeviceCode(),fillDevice.getUserId(),task.getTask_id());
+				if (fillDevice.isFcPort()){
+					updateBandFc(fillDevice, task);
+				}
+			}
+		} else {
+			for (TaskFillDevice fillDevice:deviceList){
+				updateBandFc(fillDevice, task);
+			}
+		}
+		
+		//记录工单操作日志
+		createTaskLog(task.getTask_id(),BusiCodeConstants.TASK_FILL, doneCode, null, StatusConstants.NONE);
+	}
+	
+	//更新宽带用的光路信息
+	private void updateBandFc(TaskFillDevice fillDevice,WTaskBaseInfo task)throws Exception{
+		CUser user = new CUser();
+		user.setUser_id(fillDevice.getUserId());
+		user.setStr7(fillDevice.getOccNo());
+		user.setStr8(fillDevice.getPosNo());
+		
+		cUserDao.update(user);
+		//更新工单修改中兴配置的状态
+		task.setZte_status(StatusConstants.NOT_EXEC);
+		wTaskBaseInfoDao.update(task);
+		
+	}
+	
+	//回填工单
+	public List<WTaskUser> fillOpenTaskInfo(Integer doneCode,String taskId,String otlNo,String ponNo,List<TaskFillDevice> deviceList) throws Exception{
+		WTaskBaseInfo task = wTaskBaseInfoDao.findByKey(taskId);
+		if (task.getTask_status().equals(StatusConstants.CANCEL)){
+			throw new SystemException("工单已经被取消，不能回填");
+		}
+		
+		task.setTask_id(gTaskId());
+		List<WTaskUser> userList = wTaskUserDao.queryByTaskId(taskId);
+		if (StringHelper.isNotEmpty(otlNo)){
+			//判断工单是否有对应的宽带用户
+			CUser band = null;
+			for (WTaskUser tu:userList){
+				if (tu.getUser_type().equals(SystemConstants.USER_TYPE_BAND)){
+					band = cUserDao.findByKey(tu.getUser_id());
+				}
+			}
+			
+			if (band != null){
+				//更新用户信息
+				band.setStr7(otlNo);
+				band.setStr8(ponNo);
+				
+				cUserDao.update(band);
+				//更新工单修改中兴配置的状态
+				task.setZte_status(StatusConstants.NOT_EXEC);
+				wTaskBaseInfoDao.update(task);
+				
+				//记录操作日志
+				JsonObject jo = new JsonObject();
+				jo.addProperty("Zte_status", StatusConstants.NOT_EXEC);
+				jo.addProperty("str7", otlNo);
+				jo.addProperty("str8", ponNo);
+				createTaskLog(taskId,BusiCodeConstants.TASK_FILL, doneCode, jo.toString(), StatusConstants.NONE);
+
+			}
+		}
+		for (TaskFillDevice device:deviceList){
+			updateUserDevice(device,userList,doneCode,taskId);
+		}
+		
+		return userList;
+	}
+	
+	//完工
+	public void finishTask(Integer doneCode,String taskId,String resultType) throws Exception{
+		//检查设备是否已经回填
+		if (wTaskUserDao.queryUnFillUserCount(taskId)>0)
+			throw new ComponentException(ErrorCode.TaskDeviceIsNull);
+		WTaskBaseInfo task = new WTaskBaseInfo();
+		task.setTask_id(taskId);
+		task.setTask_status(StatusConstants.TASK_END);
+		task.setTask_finish_type(resultType);
+		task.setTask_finish_time(new Date());
+		
+		wTaskBaseInfoDao.update(task);
+		//记录操作日志
+		JsonObject jo = new JsonObject();
+		jo.addProperty("resultType", resultType);
+		createTaskLog(taskId,BusiCodeConstants.TASK_FINISH, doneCode, jo.toString(), StatusConstants.NONE);
+		
+	}
+	//删除ott_mobile和dtt用户
+	private void filterUserList(List<CUser> userList){
+		for (Iterator<CUser> it = userList.iterator();it.hasNext();){
+			CUser user = it.next();
+			if (user.getUser_type().equals(SystemConstants.USER_TYPE_OTT_MOBILE)|| user.getUser_type().equals(SystemConstants.USER_TYPE_DTT)){
+				it.remove();
+			}
+		}
+	}
+	
+	private List<CUser> getUserByTyoe(List<CUser> userList,String userType){
+		List<CUser> ul = new ArrayList<CUser>();
+		for (CUser user:userList){
+			if (user.getUser_type().equals(userType)){
+				ul.add(user);
+			}
+		}
+		return ul;
 	}
 
 	//创建需要记录用户信息的工单
@@ -153,13 +319,20 @@ public class SnTaskComponent extends BaseBusiComponent{
 		if (userList == null || userList.size()==0)
 			return null;
 		String taskId = this.saveTaskBaseInfo(cust, doneCode,taskType, deptId, null,null);
+		saveTaskUser(userList, taskType, taskId);
+		return taskId;
+	}
+	
+	//保存工单用户
+	private void saveTaskUser(List<CUser> userList, String taskType, String taskId) throws JDBCException {
 		for (CUser user:userList){
 			WTaskUser taskUser = new WTaskUser();
 			taskUser.setTask_id(taskId);
 			taskUser.setUser_id(user.getUser_id());
 			taskUser.setDevice_model(user.getDevice_model());
 			taskUser.setUser_type(user.getUser_type());
-			
+			taskUser.setDevice_id(user.getUser_type().equals(SystemConstants.USER_TYPE_BAND)?user.getModem_mac():user.getStb_id());
+			//如果是销终端工单，则需要指定哪些设备需要回收
 			if (taskType.equals(SystemConstants.TASK_TYPE_WRITEOFF_TERMINAL)){
 				taskUser.setDevice_id(user.getUser_type().equals(SystemConstants.USER_TYPE_BAND)?user.getModem_mac():user.getStb_id());
 				//如果产品是广电的设备，需要回收
@@ -171,134 +344,33 @@ public class SnTaskComponent extends BaseBusiComponent{
 					taskUser.setRecycle_result(SystemConstants.BOOLEAN_FALSE);
 				}
 			}
-			
 			wTaskUserDao.save(taskUser);
 		}
-		
-		return taskId;
-	}
-	
-	//创建故障单
-	public void createBugTask(Integer doneCode,CCust cust,String bugDetail) throws Exception{
-		this.saveTaskBaseInfo(cust, doneCode, SystemConstants.TASK_TYPE_FAULT, 
-				getTeamId(SystemConstants.TEAM_TYPE_SUPERNET), null, bugDetail);
-		
-	}
-	//生成移机工单
-	public void createMoveTask(Integer doneCode,CCust cust,String newAddrId,String newAddr,String assignType) throws Exception{
-		String teamType = SystemConstants.TEAM_TYPE_SUPERNET;
-		if(assignType.equals(SystemConstants.TASK_ASSIGN_CFOCN))
-			teamType = SystemConstants.TEAM_TYPE_CFOCN;
-		this.saveTaskBaseInfo(cust, doneCode, SystemConstants.TASK_TYPE_MOVE, getTeamId(teamType), newAddr,null);
 	}
 	
 	
-	//修改施工队
-	public void changeTaskTeam(Integer doneCode,String taskId,String deptId,String buyType)  throws Exception{
-		//修改工单对应的施工队
-		WTaskBaseInfo task = wTaskBaseInfoDao.findByKey(taskId);
-		String oldTeamId = task.getTeam_id();
-		task.setBug_type(buyType);
-		task.setTeam_id(deptId);
-		wTaskBaseInfoDao.update(task);
-		//记录操作日志
-		JsonObject jo = new JsonObject();
-		jo.addProperty("oldTeamId", oldTeamId);
-		jo.addProperty("newTeamId", deptId);
-		String cfonTeamId = getTeamId(SystemConstants.TEAM_TYPE_CFOCN);
-		if (StringHelper.isNotEmpty(cfonTeamId) && (cfonTeamId.equals(deptId) || cfonTeamId.equals(oldTeamId))){
-			if (cfonTeamId.equals(deptId))
-				jo.addProperty("synType", "add");
-			else 
-				jo.addProperty("synType", "cancel");
-			createTaskLog(taskId,BusiCodeConstants.TASK_ASSIGN, doneCode, jo.toString(), StatusConstants.NOT_EXEC);
-		} else {
-			createTaskLog(taskId,BusiCodeConstants.TASK_ASSIGN, doneCode, jo.toString(), StatusConstants.NONE);
-		}
-	}
 	
-	//删除开户工单的用户
-	public void deleteTaskUser(Integer doneCode,String taskId,List<Integer> userList){
-		
-	}
 	
-	//作废工单
-	public void cancelTask(Integer doneCode,String taskId) throws Exception{
-		WTaskBaseInfo task = new WTaskBaseInfo();
-		task.setTask_id(taskId);
-		task.setTask_status(StatusConstants.CANCEL);
-		task.setTask_invalide_time(new Date());
-		wTaskBaseInfoDao.update(task);
-		//如果是CFON的工单需要同步
-		task = wTaskBaseInfoDao.findByKey(taskId);
-		String synStatus=StatusConstants.NONE;
-		if (StringHelper.isNotEmpty(task.getTeam_id()) && task.getTeam_id().equals(getTeamId(SystemConstants.TEAM_TYPE_CFOCN)))
-			synStatus = StatusConstants.NOT_EXEC;
-		createTaskLog(taskId,BusiCodeConstants.TASK_CANCEL, doneCode,null, synStatus);
-	}
 	
-	//回填工单
-	public List<WTaskUser> fillOpenTaskInfo(Integer doneCode,String taskId,String otlNo,String ponNo,List<TaskFillDevice> deviceList) throws Exception{
-		WTaskBaseInfo task = wTaskBaseInfoDao.findByKey(taskId);
-		if (task.getTask_status().equals(StatusConstants.CANCEL)){
-			throw new SystemException("工单已经被取消，不能回填");
-		}
-		
-		task.setTask_id(gTaskId());
-		List<WTaskUser> userList = wTaskUserDao.queryByTaskId(taskId);
-		if (StringHelper.isNotEmpty(otlNo)){
-			//判断工单是否有对应的宽带用户
-			CUser band = null;
-			for (WTaskUser tu:userList){
-				if (tu.getUser_type().equals(SystemConstants.USER_TYPE_BAND)){
-					band = cUserDao.findByKey(tu.getUser_id());
-				}
-			}
-			
-			if (band != null){
-				//更新用户信息
-				band.setStr7(otlNo);
-				band.setStr8(ponNo);
-				
-				cUserDao.update(band);
-				//更新工单修改中兴配置的状态
-				task.setZte_status(StatusConstants.NOT_EXEC);
-				wTaskBaseInfoDao.update(task);
-				
-				//记录操作日志
-				JsonObject jo = new JsonObject();
-				jo.addProperty("Zte_status", StatusConstants.NOT_EXEC);
-				jo.addProperty("str7", otlNo);
-				jo.addProperty("str8", ponNo);
-				createTaskLog(taskId,BusiCodeConstants.TASK_FILL, doneCode, jo.toString(), StatusConstants.NONE);
-
-			}
-		}
-		for (TaskFillDevice device:deviceList){
-			updateUserDevice(device,userList,doneCode,taskId);
-		}
-		
-		return userList;
-	}
 	
 	
 
-	private void updateUserDevice(TaskFillDevice device, List<WTaskUser> userList, Integer doneCode, String taskId) throws Exception{
+	private void updateUserDevice(TaskFillDevice fillDevice, List<WTaskUser> userList, Integer doneCode, String taskId) throws Exception{
 		WTaskUser user = null;
-		if (StringHelper.isNotEmpty(device.getOldDeviceCode())){
+		if (StringHelper.isNotEmpty(fillDevice.getOldDeviceCode())){
 			for (WTaskUser tu:userList){
-				if (device.getOldDeviceCode().equals(tu.getDevice_id())){
+				if (fillDevice.getOldDeviceCode().equals(tu.getDevice_id())){
 					user = tu;
-					tu.setDevice_id(device.getDeviceCode());
+					tu.setDevice_id(fillDevice.getDeviceCode());
 					break;
 				}
 			}
 		} else {
 			for (WTaskUser tu:userList){
 				if (StringHelper.isEmpty(tu.getDevice_id())){
-					if (tu.getDevice_model().equals(device.getDeviceModel())){
+					if (tu.getDevice_model().equals(fillDevice.getDevice().getDeviceModel())){
 						user = tu;
-						tu.setDevice_id(device.getDeviceCode());
+						tu.setDevice_id(fillDevice.getDeviceCode());
 						break;
 					}
 				}
@@ -306,34 +378,17 @@ public class SnTaskComponent extends BaseBusiComponent{
 		}
 		
 		if (user != null){
-			user.setDevice_id(device.getDeviceCode());
+			user.setDevice_id(fillDevice.getDeviceCode());
 			//更新设备号
 			wTaskUserDao.updateTaskUserDevice(user.getDevice_id(),user.getUser_id(),user.getTask_id());
 			//记录操作日志
 			JsonObject jo = new JsonObject();
-			jo.addProperty("device_id", device.getDeviceCode()+"->"+user.getDevice_id());
+			jo.addProperty("device_id", fillDevice.getDeviceCode()+"->"+user.getDevice_id());
 			createTaskLog(taskId,BusiCodeConstants.TASK_FILL, doneCode, jo.toString(), StatusConstants.NONE);
 		}
 	}
 
-	//完工
-	public void finishTask(Integer doneCode,String taskId,String resultType) throws Exception{
-		//检查设备是否已经回填
-		if (wTaskUserDao.queryUnFillUserCount(taskId)>0)
-			throw new ComponentException(ErrorCode.TaskDeviceIsNull);
-		WTaskBaseInfo task = new WTaskBaseInfo();
-		task.setTask_id(taskId);
-		task.setTask_status(StatusConstants.TASK_END);
-		task.setTask_finish_type(resultType);
-		task.setTask_finish_time(new Date());
-		
-		wTaskBaseInfoDao.update(task);
-		//记录操作日志
-		JsonObject jo = new JsonObject();
-		jo.addProperty("resultType", resultType);
-		createTaskLog(taskId,BusiCodeConstants.TASK_FINISH, doneCode, jo.toString(), StatusConstants.NONE);
-		
-	}
+	
 	
 	//保存工单基本信息
 	private String saveTaskBaseInfo(CCust cust,Integer doneCode,String taskType,String teamId,String newAddr,String bugDetail) throws Exception{
@@ -433,5 +488,7 @@ public class SnTaskComponent extends BaseBusiComponent{
 	public void setwTaskLogDao(WTaskLogDao wTaskLogDao) {
 		this.wTaskLogDao = wTaskLogDao;
 	}
+
+	
 	
 }
