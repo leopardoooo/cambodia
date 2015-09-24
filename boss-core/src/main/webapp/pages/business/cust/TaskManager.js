@@ -85,8 +85,8 @@ var TaskDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 						{header:'设备编号',dataIndex:'device_code',width:130,editor:new Ext.form.TextField({
 							vtype:'alphanum',
 							listeners:{
-								scope:this,
-								change:this.queryAndAddDevice
+								scope:this
+//								,change:this.queryAndAddDevice
 							}
 						})},
 						{header:'occNo',dataIndex:'occNo',width:80,editor:new Ext.form.TextField({
