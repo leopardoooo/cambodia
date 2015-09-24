@@ -271,6 +271,39 @@ public class DeviceAction extends BaseAction {
         return EXCEL;
 	}
 	
+	
+	public String downloadQueryDeviceDetail() throws Exception {
+		ByteArrayOutputStream os = new ByteArrayOutputStream();
+		try{
+			
+			String batch_num = request.getParameter("batch_num");
+			String start_input_time = request.getParameter("start_input_time");
+			String end_input_time = request.getParameter("end_input_time");
+			List<DeviceDto> list = deviceComponent.queryDeviceDetailByMultiCriteria(deviceModel, depotId, status, mode, 
+					depotStatus,modemType,backup,batch_num,start_input_time,end_input_time);
+			Map<String,String> map = new HashMap<String,String>();
+			map.put("device_code", "01设备编号");
+			map.put("device_type_text", "02设备类型");
+			map.put("device_model_text", "03设备型号");
+			map.put("device_status_text", "04设备状态");
+			map.put("depot_status_text", "05库存状态");
+			map.put("depot_id_text", "06所在仓库");
+			map.put("cust_id", "07客户编号");
+			map.put("cust_name", "08客户名称");
+			
+			List<Map.Entry<String, String>> resultList = sortList(map);
+			FileHelper.writeExecel(os, list, resultList, ServletActionContext.getServletContext().getRealPath("/"), "设备查询");
+			this.excelStream = new ByteArrayInputStream(os.toByteArray());
+		} catch(Exception e){
+        	e.printStackTrace();
+        }finally{
+        	if(os != null){
+        		os.close();
+        	}
+        }
+        return EXCEL;
+	}
+	
 	private InputStream excelStream;
 	/**
 	 * 查询调拨详细信息

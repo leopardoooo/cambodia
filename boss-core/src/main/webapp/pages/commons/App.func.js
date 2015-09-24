@@ -282,7 +282,7 @@ Ext.apply(App.func,{
 /**************************************用户产品信息开始************************************************/
 		else if(panelName.indexOf('U_PROD')>=0){//用户产品信息
 			// 如果是套餐所有按钮在基本产品列表中都不显示
-			if(data["package_id"] || data['status'] != 'ACTIVE'){
+			if(data["package_id"]!=null || (data['status'] != 'ACTIVE' && data['status'] != 'INSTALL')){
 				return false; 
 			}
 			
@@ -563,6 +563,22 @@ Ext.apply(App.func,{
 			if(busicode =='2261'){//工单作废
 				if(data['task_status'] != 'INIT' )
 					return false;
+			}
+		}else if(panelName ==='P_FEE_PAY'){
+			if(busicode =='2263'){//支付回退
+				if(nowDate().format('Y-m') != data['create_time'].substring(0,7)){
+					return false;
+				}
+				if (data['optr_id'] != App.getData().optr.optr_id || data['is_valid'] == 'F'){
+					return false;
+				}
+			}else if(busicode =='2264'){//隔月支付回退
+				if(nowDate().format('Y-m') == data['create_time'].substring(0,7)){
+					return false;
+				}
+				if (data['optr_id'] != App.getData().optr.optr_id || data['is_valid'] == 'F'){
+					return false;
+				}
 			}
 		}else if(panelName === 'D_BUSI'){
 			if(busicode == '1163'){//重打业务单只能打当前操作员打印过的

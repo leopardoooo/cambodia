@@ -8,6 +8,11 @@ PayForm = Ext.extend( Ext.form.FormPanel , {
 	parent: null,
 	constructor: function(parent){
 		this.parent = parent;
+		this.busiOptrStore = new Ext.data.JsonStore({
+			url:root+'/system/x/Index!queryOptrByCountyId.action',
+			fields:['optr_id','optr_name','attr'],
+			autoLoad: true
+		});
 		var lc = langUtils.main("cashPay.charge.columns");
 		PayForm.superclass.constructor.call(this, {
 			border: false,
@@ -83,8 +88,11 @@ PayForm = Ext.extend( Ext.form.FormPanel , {
 			}]
 			
 		});
-		var acctdatecmp = this.find("name","pay.acct_date")[0];
-		App.acctDate(acctdatecmp);
+		/*var acctdatecmp = this.find("name","pay.acct_date")[0];
+		App.acctDate(acctdatecmp);*/
+		this.busiOptrStore.on('load', function(){
+			Ext.getCmp('payBusiOptrId').setValue(App.getCust()['str9']);
+		}, this);
 	},
 	initComponent: function(){
 		PayForm.superclass.initComponent.call(this);

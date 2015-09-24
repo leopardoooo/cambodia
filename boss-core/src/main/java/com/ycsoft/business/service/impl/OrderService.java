@@ -86,6 +86,21 @@ public class OrderService extends BaseBusiService implements IOrderService{
 	private TPayTypeDao tPayTypeDao;
 
 	/**
+	 * 查询订单修改需要初始化数据
+	 * @param orderSn
+	 */
+	public void queryOrderToChange(String orderSn){
+		
+	}
+	/**
+	 * 订单修改功能
+	 * 普通修改和高级修改
+	 */
+	public void saveChangeOrder(){
+		
+	}
+	
+	/**
 	 * 产品终止退订
 	 * 查询退订\销户可退的订单金额
 	 * 当天订购的订单退全部金额（可能误操作的情况）
@@ -361,7 +376,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 			throw new ServicesException(ErrorCode.NotCancelStatusException);
 		}
 		//订购时间=今天或状态是施工中的或高级权限，都可以退订
-		if(DateHelper.isToday(order.getCreate_time())
+		if(DateHelper.isToday(order.getOrder_time())
 				||order.getStatus().equals(StatusConstants.INSTALL)
 				||orderComponent.isHighCancel(busi_code)){
 			return;

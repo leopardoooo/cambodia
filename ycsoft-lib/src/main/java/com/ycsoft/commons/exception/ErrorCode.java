@@ -40,6 +40,13 @@ public enum ErrorCode {
 	UnPayLock("客户被锁定,请等待%s(%s)完成支付!"),
 	UnPayIsOld("待支付金额已失效，请重新打开待支付界面"),
 	
+	PayCancelOnlyPayOptr("只有支付操作员可以操作回退支付"),
+	//PayCancelInvoiceIsCheck("发票已结账，不能回退支付"),InvoiceCheckStatusIsNotIdle
+	PayHasCancel("支付已回退，不能再次回退"),
+	PayFeeStatusError("支付对应的缴费记录状态异常，不能回退"),
+	PayCancelInvoiceParamError("前后台发票不一致"),
+	PayFeeHasCancelOrder("支付关联的订购订单费用或修改订单费用存在订单被退订情况，不能回退"),
+	
 	FeeDateException("前后台金额不一致"),
 	CFeeAndProdOrderIsNotOne("费用记录和订单信息不一致"),
 	
@@ -77,6 +84,7 @@ public enum ErrorCode {
 	DeviceTotalNumIsNull("设备数量不够"),
 	DeviceTotalNumIsTooBig("设备入库数量超出了订货数量"),
 	DeviceDateException("设备数据异常，请联系管理员!(device_id=%s)"),
+	DevicePairModelNotExists("设备对应的智能卡型号不存在!(device_model=%s)"),
 	
 	AcctPublicNotExists("客户缺失公用账户，请联系管理员！"),
 	AcctItemNotExists("账目不存在，请联系管理员！"),
@@ -90,6 +98,8 @@ public enum ErrorCode {
 	InvoiceIsNotYou("只有开票人可以操作"),
 	InvoiceCheckStatusIsNotIdle("发票已结账或缴销，不能操作"),
 	InvoiceTemplateDeptIsNull("模板缺失发票缴销仓库配置，请联系管理员"),
+	InvoiceNotExists("发票不存在"),
+	InvoiceNotUse("发票未使用或已作废"),
 	
 	TemplateNotConfigBuseFee("该地区费用模板未配置该费用项(%s)"),
 	CustUserIpAddressFeeCoinfigError("客户宽带IP收费存在多个费用项目，请联系管理员！"),

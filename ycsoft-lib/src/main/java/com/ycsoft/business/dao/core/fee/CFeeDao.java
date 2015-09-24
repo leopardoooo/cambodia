@@ -56,6 +56,28 @@ public class CFeeDao extends BaseEntityDao<CFee> {
 		return  this.createQuery(FeeDto.class, sql, feeSn).first();
 	}
 	/**
+	 * 按支付编号查询缴费记录
+	 * @param paySn
+	 * @return
+	 * @throws JDBCException 
+	 */
+	public List<FeeDto> queryPayFeeDto(String paySn) throws JDBCException{
+		String sql="select cf.*,fa.prod_sn from c_fee cf left join c_fee_acct fa on fa.fee_sn=cf.fee_sn where cf.pay_sn=? ";
+		return  this.createQuery(FeeDto.class, sql, paySn).list();
+	}
+	/**
+	 * 恢复费用记录的未支付状态
+	 * @param paySn
+	 * @throws JDBCException
+	 */
+	public void updateCFeeToUnPayByPaySn(String paySn) throws JDBCException{
+		String sql="update c_fee set status=? ,pay_type=?,is_doc=decode(is_doc,'N','N','F'), "
+				+" invoice_id=null,invoice_book_id=null,invoice_code=null,pay_sn=null  "
+				+" where pay_sn=? ";
+		this.executeUpdate(sql, StatusConstants.UNPAY,SystemConstants.PAY_TYPE_UNPAY,paySn);
+	}
+	
+	/**
 	 * 更新缴费记录的未支付状态
 	 * @param cust_id
 	 * @param done_code
@@ -114,9 +136,9 @@ public class CFeeDao extends BaseEntityDao<CFee> {
 					" left join t_busi_fee bf on bf.fee_id=cf.fee_id",
 					" left join vew_device_typemodel vdtm on cfb.device_type||'_'||cfb.device_model=vdtm.device_type_model",
 					" left join vew_acctitem atm on atm.acctitem_id=cf.acctitem_id",
-				" where un.cust_id=? and cf.status<> ? ",
+				" where un.cust_id=? and cf.status=? ",
 				" order by cf.create_time ");
-		return this.createQuery(FeeDto.class, sql, cust_id, StatusConstants.INVALID).list();
+		return this.createQuery(FeeDto.class, sql, cust_id, StatusConstants.UNPAY).list();
 	}
 	/**
 	 * 根据业务流水号查询未支付费用信息

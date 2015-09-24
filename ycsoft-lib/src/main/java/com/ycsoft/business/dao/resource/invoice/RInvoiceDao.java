@@ -629,8 +629,8 @@ public class RInvoiceDao extends BaseEntityDao<RInvoice> {
 	 */
 	public List<RInvoice> queryInvoiceByCountyId(String invoiceId,
 			String countyId) throws JDBCException {
-		String sql = "select * from r_invoice where invoice_id=? AND depot_id in(select dept_id from s_dept where county_id=? )";
-		return createQuery(RInvoice.class, sql, invoiceId, countyId).list();
+		String sql = "select * from r_invoice where invoice_id=? ";
+		return createQuery(RInvoice.class, sql, invoiceId).list();
 	}
 
 	public List<RInvoice> queryInvoiceByDepot(String invoiceId, String docType,

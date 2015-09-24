@@ -639,6 +639,13 @@ public class CustAction extends BaseBusiAction{
 		return JSON_PAGE;
 	}
 	
+	public String saveBugTask() throws Exception{
+		String bugDetail = request.getParameter("bugDetail");
+		custService.saveBugTask(bugDetail);
+		return JSON_SUCCESS;
+	}
+	
+	
 	public void setCustService(ICustService custService) {
 		this.custService = custService;
 	}

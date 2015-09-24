@@ -6,7 +6,7 @@ CheckInInvoiceForm = Ext.extend(Ext.form.FormPanel,{
 			layout:'column',
 			border:false,
 			labelWidth: 120,
-			labelAlign:'left',
+//			labelAlign:'left',
 			trackResetOnLoad:true,
 			bodyStyle:'padding-top:10px;padding-left:10px',
 			defaults:{
@@ -17,7 +17,13 @@ CheckInInvoiceForm = Ext.extend(Ext.form.FormPanel,{
 					{id: 'invoidType_checkIn',fieldLabel:lsys('InvoiceCommon.invoice_type'),hiddenName:'invoiceDto.invoice_type',xtype:'paramcombo',
 						paramName:'INVOICE_TYPE',defaultValue:'2',listeners:{
 							scope:this,
-							select:this.setAmountDisable
+							select:this.setAmountDisable,
+							expand:function(combo){
+								var store = combo.getStore();
+								store.filterBy(function(record){
+									return record.get('item_value').indexOf('2')>=0;
+								})
+							}
 						}},
 					{fieldLabel:lsys('InvoiceCommon.invoice_code'),xtype:'textfield',name:'invoiceDto.invoice_code',allowBlank:false,value:'AAA',readOnly:true},
 					{fieldLabel:lsys('InvoiceInput.startInvoiceId'),name:'invoiceDto.start_invoice_id',allowBlank:false,
@@ -61,14 +67,16 @@ CheckInInvoiceForm = Ext.extend(Ext.form.FormPanel,{
 	},setAmountDisable:function(v){
 		var form = this.getForm();
 		var comp = form.findField('invoiceDto.invoice_amount');
-		if(v.value=='100'){
-			comp.allowBlank=false;
-			comp.minValue=1;
-			comp.enable();
-		}else{
-			comp.allowBlank=true;
-			comp.minValue=0;
-			comp.disable();
+		if(comp){
+			if(v.value=='100'){
+				comp.allowBlank=false;
+				comp.minValue=1;
+				comp.enable();
+			}else{
+				comp.allowBlank=true;
+				comp.minValue=0;
+				comp.disable();
+			}
 		}
  	},
 	showInvoiceDetail:function(){

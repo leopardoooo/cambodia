@@ -362,7 +362,7 @@ public class UserAction extends BaseBusiAction {
 	 * @throws Exception
 	 */
 	public String untuckUsers() throws Exception {
-		userServiceSN.untuckUsers(userIds);
+		userServiceSN.untuckUsers();
 		return JSON_SUCCESS;
 	}
 	
@@ -911,6 +911,7 @@ public class UserAction extends BaseBusiAction {
 		userServiceSN.saveSaleDevice(userId,deviceModel,deviceBuyMode,deviceFee);
 		return JSON;
 	}
+	
 	
 	/**
 	 * @param userService

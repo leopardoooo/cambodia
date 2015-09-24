@@ -42,7 +42,8 @@ PayPanel = Ext.extend( Ext.Panel ,{
 				{ header: lc[6], dataIndex: 'buy_num', width: 70},
 				{ header: lc[7], dataIndex: 'create_time', width: 130},
 				{ header: lc[8], dataIndex: 'fee_sn', width: 80},
-				{ header: lc[9], dataIndex: 'create_done_code', width: 80}
+				{ header: lc[9], dataIndex: 'create_done_code', width: 80},
+				{ header: lc[9], dataIndex: 'optr_name', width: 80}
 				
 			],
 			ds: this.feeStore,
@@ -70,7 +71,8 @@ PayPanel = Ext.extend( Ext.Panel ,{
 				{ header: lc[6], dataIndex: 'buy_num', width: 70},
 				{ header: lc[7], dataIndex: 'create_time', width: 130},
 				{ header: lc[8], dataIndex: 'fee_sn', width: 80},
-				{ header: lc[9], dataIndex: 'create_done_code', width: 80}
+				{ header: lc[9], dataIndex: 'create_done_code', width: 80},
+				{ header: lc[9], dataIndex: 'optr_name', width: 80}
 				
 			],
 			ds: this.realFeeStore,
@@ -169,7 +171,7 @@ PayPanel = Ext.extend( Ext.Panel ,{
 				this.realFeeStore.removeAll();
 				this.feeStore.add(records);
 			}else{
-				var recordArray = this.getSameTypeProd(this.feeStore, records);
+				var recordArray = this.getSameTypeProd(this.realFeeStore, records);
 				this.realFeeStore.remove(recordArray);
 				this.feeStore.add(recordArray);
 			}
@@ -188,7 +190,7 @@ PayPanel = Ext.extend( Ext.Panel ,{
 	},
 	doRealRowClick: function(grid, rowIndex){
 		var record = this.realFeeStore.getAt(rowIndex);
-		if(this.realFeeStore.indexOf(record) > 0)
+		if(this.feeStore.indexOf(record) > 0)
 			return;
 		var recordArray = this.getSameTypeProd(this.realFeeStore, record);
 		
@@ -216,6 +218,7 @@ PayPanel = Ext.extend( Ext.Panel ,{
 		Ext.getCmp("hdExchange").setValue(this.feeData["EXC"]);
 	},
 	getSameTypeProd: function(store, records){
+		console.log(records);
 		var recordArray = [];
 		Ext.each(records, function(record){
 			var userType = record.get('user_type');
@@ -237,13 +240,15 @@ PayPanel = Ext.extend( Ext.Panel ,{
 						recordArray.push(r);
 					}
 				}, this);
-			}else{
+			}else if(prodId){
 				//相同用户相同产品必须一起支付
 				store.each(function(r){
 					if(userId == r.get('user_id') && prodId == r.get('acctitem_id')){
 						recordArray.push(r);
 					}
 				}, this);
+			}else{
+				recordArray.push(record);
 			}
 		}, this);
 		
@@ -349,6 +354,7 @@ PayPanel = Ext.extend( Ext.Panel ,{
 		return 0;
 	},
 	success:function(){
+		App.getApp().main.infoPanel.getPayfeePanel().feePayGrid.remoteRefresh();
 		App.getApp().data.currentResource = {busicode:'1068'};//打印业务编号
 		App.getApp().menu.bigWindow.show({ text: '发票打印',  attrs: {busiCode:'8888',
 					url: 'pages/business/pay/Print.jsp?type=through'}} ,{width: 710, height: 460});

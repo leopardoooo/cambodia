@@ -284,10 +284,11 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 			this.buyDevice(device, deviceBuyMode,ownership, deviceFee, getBusiParam().getBusiCode(), cust, doneCode);
 			
 			//非自购模式 设置协议截止日期，读取模板配置数据
-			if(buyModeCfg!= null && !buyModeCfg.getBuy_mode().equals(SystemConstants.BUSI_BUY_MODE_BUY) && StringHelper.isNotEmpty(deviceModel)){
+			//去掉协议期
+			/*if(buyModeCfg!= null && !buyModeCfg.getBuy_mode().equals(SystemConstants.BUSI_BUY_MODE_BUY) && StringHelper.isNotEmpty(deviceModel)){
 				Integer months = Integer.parseInt( userComponent.queryTemplateConfig(TemplateConfigDto.Config.PROTOCOL_DATE_MONTHS.toString()) );
 				user.setProtocol_date( DateHelper.addTypeDate(DateHelper.now(), "MONTH", months) );
-			}
+			}*/
 		}
 		
 		if(!user.getUser_type().equals(SystemConstants.USER_TYPE_DTT) && StringHelper.isEmpty(user.getLogin_name())){
@@ -641,9 +642,11 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 	}
 	
 	@Override
-	public void untuckUsers(String[] userIds) throws Exception{
+	public void untuckUsers() throws Exception{
 		CCust cust = getBusiParam().getCust();
 		doneCodeComponent.lockCust(cust.getCust_id());
+		List<String> userIdList = getBusiParam().getSelectedUserIds();
+		String[] userIds = userIdList.toArray(new String[userIdList.size()]);
 		Integer doneCode = doneCodeComponent.gDoneCode();
 		List<CUser> users = userComponent.queryAllUserByUserIds(userIds);
 		if (users == null || users.size() == 0 || users.get(0) == null)
@@ -767,9 +770,9 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 	public void checkStopUser(String[] userIds) throws Exception{
 		Map<Integer, CUser> map = checkUserStatus(userIds);
 		for(Integer code : map.keySet()){
-			if(code == 1){
+			/*if(code == 1){
 				throw new ServicesException("用户["+map.get(code).getUser_id()+"]还在协议期内，不能报停!");
-			} else if (code == 2){
+			} else */if (code == 2){
 					throw new ServicesException("用户["+map.get(code).getUser_id()+"]不是正常状态，不能报停!");
 			}else if(code == 3){
 				throw new ServicesException("归属套餐的用户必须同时报停");
@@ -1672,7 +1675,6 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		saveAllPublic(doneCode, getBusiParam());
 		
 	}
-	
-	
+
 	
 }

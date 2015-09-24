@@ -655,6 +655,12 @@ public class DeviceComponent extends BaseDeviceComponent {
 				status, mode, depotStatus,backup);
 	}
 	
+	
+	public List<DeviceDto> queryDeviceDetailByMultiCriteria(String deviceModel, String depotId, String status,
+			String mode, String depotStatus, String modemType, String backup, String batch_num, String start_input_time,
+			String end_input_time) throws Exception {
+		return rDeviceDao.queryDeviceByMultiCriteria(deviceModel, depotId, status, mode, depotStatus, modemType, backup, batch_num, start_input_time, end_input_time);
+	}
 	/**
 	 * 检查盒号是否存在
 	 * @param cardId
@@ -1003,6 +1009,9 @@ public class DeviceComponent extends BaseDeviceComponent {
 				if (StringHelper.isNotEmpty(d.getPair_device_code())) {
 //					if (cardModelList.get(d.getPair_device_model())==null)
 //						throw new ComponentException("错误的设备类型：" + d.getPair_device_model_text()+",请检查该型号是否适用当前地区");
+					if(StringHelper.isEmpty(pairCardModel)){
+						throw new ComponentException(ErrorCode.DevicePairModelNotExists,d.getDevice_model());
+					}
 					// 有配对卡，保存配对卡
 					String carDeivceId = gDeviceId();
 					stb.setPair_card_id(carDeivceId);
@@ -1015,7 +1024,7 @@ public class DeviceComponent extends BaseDeviceComponent {
 					cardDevice.setDepot_id(depotId);
 					cardDevice.setOwnership(input.getOwnership());
 					cardDevice.setOwnership_depot(depotId);
-					cardDevice.setIs_virtual(cardModelList.get(pairCardModel).getIs_virtual());
+					cardDevice.setIs_virtual(cardModelList.get(pairCardModel)!=null?cardModelList.get(pairCardModel).getIs_virtual():SystemConstants.BOOLEAN_FALSE);
 					deviceList.add(cardDevice);
 					// 卡信息
 					RCard card = new RCard();
@@ -2543,8 +2552,6 @@ public class DeviceComponent extends BaseDeviceComponent {
 	public void setRDeviceTypeDao(RDeviceTypeDao deviceTypeDao) {
 		this.rDeviceTypeDao = deviceTypeDao;
 	}
-
-
 
 	
 }

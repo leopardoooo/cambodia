@@ -90,11 +90,48 @@ Ext.apply(MenuHandler, {
 			height : 470
 		};
 	},
+	//支付回退  
+	CancelPayFee : function(){
+		record = App.main.infoPanel.getPayfeePanel().feePayGrid.getSelectionModel().getSelected();
+		// 回调函数
+		function callback(res, opt) {
+			Alert(LU_MSG('cancelPayFeeSuccess'));
+			App.main.infoPanel.setReload(true);
+			App.main.infoPanel.getPayfeePanel().refresh();
+			App.main.infoPanel.getDocPanel().setReload(true);
+			App.main.infoPanel.getDoneCodePanel().setReload(true);
+			App.getApp().refreshPayInfo();
+		}
+		
+		
+		function callbackSave(res, opt) {
+			var rec = Ext.decode(res.responseText);
+			var saveParams = {invoiceIds:rec,paySn:record.get("pay_sn")};
+			var txt = LU_FM('msgBox.confirmCancelPayFeeWithNoParam');
+			if(rec.length>0){
+				txt = LU_FM('msgBox.confirmCancelPayFeeWithParam',null,[saveParams["invoiceIds"]]);
+			}
+			Confirm( txt, this, function() {
+				App.sendRequest(Constant.ROOT_PATH + "/core/x/Pay!canclePay.action", saveParams, callback);
+			});
+		}
+	
+		if (record) {
+			var params = {};
+			params["paySn"] = record.get("pay_sn");
+			var url = Constant.ROOT_PATH + "/core/x/Pay!queryPayToCancel.action";
+			App.sendRequest(url, params, callbackSave);
+		} else {
+			Alert(LU_MSG('selectRecCancelPayFee'));
+			return false;
+		}
+		return false;
+	},
 	// --------------------客户信息------------------------------------------------
 	// 开户
 	NewCust : function() {
 		return {
-			width : 580,
+			width : 630,
 			height : 510
 		};
 	},
@@ -790,8 +827,8 @@ Ext.apply(MenuHandler, {
 			return false;
 		}
 		return {
-			width : 550,
-			height : 400
+			width : 580,
+			height : 480
 		};
 	},
 	//派单开户
@@ -1373,7 +1410,7 @@ Ext.apply(MenuHandler, {
 			userIds.push(userRecords[i].get("user_id"));
 		}
 		
-		var url = Constant.ROOT_PATH + "/core/x/User!untuckUsers.action";
+		/*var url = Constant.ROOT_PATH + "/core/x/User!untuckUsers.action";
 		Confirm(lmsg("confirmUntuckUser"), this, function() {
 			App.sendRequest(url, {userIds: userIds}, function(res, opt){
 				var data = Ext.decode(res.responseText);
@@ -1381,8 +1418,11 @@ Ext.apply(MenuHandler, {
 					App.getApp().main.infoPanel.getUserPanel().userGrid.remoteRefresh();
 				}
 			});
-		});
-		return false;
+		});*/
+		return {
+			width: 450,
+			height: 400
+		};
 	},
 	// 报停
 	UserStop : function() {
@@ -2750,9 +2790,10 @@ Ext.apply(MenuHandler, {
 			height : 300
 		};
 	},
+	//新增保障单
 	NewRepairTask: function(){
 	    if(!hasCust()) return false;
-	    return {width: 340 , height: 420};
+	    return {width: 450 , height: 300};
 	  },
 	PrintRepairTask: function(){
 	  	var record = App.getApp().main.infoPanel.getDocPanel().taskGrid.getSelectionModel().getSelected();

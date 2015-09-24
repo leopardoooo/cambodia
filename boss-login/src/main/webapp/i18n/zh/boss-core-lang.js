@@ -71,8 +71,8 @@ BCLang.common = {
 //主页模块
 BCLang.home = {
 	topWelcome: "当前操作员~",
-	searchTabs:["名称编号~","设备编号~","安装地址~","电话号码~","多条件搜索~"],
-	invoicePrintTitle:'发票打印~',
+	searchTabs:["名称编号~","设备|账号~","安装地址~","电话号码~","多条件搜索~"],
+	invoicePrintTitle:'收据打印~',
 	searchTip:"客户编号|受理编号~",
 	searchBtns:["搜索~","缴费~"],
 	main: {
@@ -83,12 +83,12 @@ BCLang.home = {
 			pay: {
 				_stayTitle: '待支付项目~',
 				_title: '支付项目~',
-				columns: ['操作~', '业务名称~', '费用名称~', '实付金额~', '订单号~', '备注~', '数量~', '操作时间~', '费用编号~', '流水号~'],
+				columns: ['操作~', '业务名称~', '费用名称~', '实付金额~', '订单号~', '备注~', '数量~', '操作时间~', '费用编号~', '流水号~', '操作员~'],
 				buttons: ['保存~', '关闭~']
 			},
 			charge:{
 				_title: '收费信息~',
-				columns: ['总额USD~', '当日汇率~', '柬埔寨KHR~', '付款人~', '缴费方式~', '票据编号~', '账务日期~', '实收USD~', '实际收KHR~']
+				columns: ['总额USD~', '当日汇率~', '柬埔寨KHR~', '付款人~', '缴费方式~', '票据编号~', '账务日期~', '实收USD~', '实际收KHR~','发展人~']
 			}
 		},
 		// 客户面板
@@ -261,12 +261,12 @@ BCLang.home = {
 			payfee: {
 				_title: "预存费用~",
 				columns: ["流水号~","业务名称~","账户类型~","账目名称~","用户类型~", "用户名~","设备编号~","状态~","金额~","缴费前预计到期日~",
-				        "缴费后预计到期日~","打印状态~","付款方式~","受理日期~","支付日期~","受理人~","受理部门~","发票~","出票方式~", "发票类型~","发展人~"]
+				        "缴费后预计到期日~","打印状态~","付款方式~","受理日期~","支付日期~","受理人~","受理部门~","收据~","出票方式~", "收据类型~","发展人~"]
 			},
 			busifee: {
 				_title: "业务费用~",
 				columns: ["流水号~","费用名称~","设备类型~","设备编号~","状态~","打印状态~",
-				          "应付~","实付~","付款方式~","受理日期~","受理人~","受理部门~","发票~","出票方式~","发票类型~","购买数量~","设备型号~",
+				          "应付~","实付~","付款方式~","受理日期~","受理人~","受理部门~","收据~","出票方式~","收据类型~","购买数量~","设备型号~",
 				          "备注~","发展人~","支付日期~"]
 			},
 			detail: {
@@ -276,7 +276,7 @@ BCLang.home = {
 			},
 			feePayDetail: {
 				_title: '费用明细~',
-				columns: ['费用项目~', '金额~']
+				columns: ['流水号','费用项目~', '金额~','收据']
 			},
 			_form: {
 					oldOptrName: '旧发展人~',
@@ -286,8 +286,8 @@ BCLang.home = {
 		// 单据信息
 		doc: {
 			invoice: {
-				_title: '发票~',
-				columns: ["发票号码~","发票代码~","金额~","打印时间~","出票方式~","发票类型~","使用状态~","结存状态~","操作员~","费用生成时间~"]
+				_title: '收据~',
+				columns: ["收据号码~","收据代码~","金额~","打印时间~","出票方式~","收据类型~","使用状态~","结存状态~","操作员~","费用生成时间~"]
 			},
 			task: {
 				_title: '施工单~',
@@ -298,12 +298,12 @@ BCLang.home = {
 				columns: ["操作员~","最后打印~","业务名称~"]
 			},
 			_form: {
-				oldInvoiceId: '原发票号码~',
-				oldInvoiceCode: '原发票代码~',
-				oldInvoiceType: '原发票类型~',
-				oldStatus: '原发票状态~',
-				newInvoiceId: '新发票号码~',
-				newInvoiceCode: '新发票代码~'
+				oldInvoiceId: '原收据号码~',
+				oldInvoiceCode: '原收据代码~',
+				oldInvoiceType: '原收据类型~',
+				oldStatus: '原收据状态~',
+				newInvoiceId: '新收据号码~',
+				newInvoiceCode: '新收据代码~'
 			}
 		},
 		//受理记录
@@ -386,27 +386,27 @@ BCLang.home = {
             tipDevNotExists:'查询设备不存在!~'
 			
 		},
-		invoiceQuery:{//发票查询
-			_title:'发票查询~',
-			titleInvoiceInfo:'发票信息~',
+		invoiceQuery:{//收据查询
+			_title:'收据查询~',
+			titleInvoiceInfo:'收据信息~',
 			btnShowInvoiceDetail:'费用明细~',
 			btnChangeStatus:'修改状态~',
 			btnChangeStatusIdel:'修改为空闲~',
 			btnChangeStatusInvalid:'修改为失效~',
 			btnChangeStatusUsed:'已被使用~',
 			
-			confirmChangeStatus:'是否将发票状态修改为~',
-			tipInvoiceNotExists:'  发票不存在!~',
-			tipInvoiceNotExists2:'查询发票不存在!~',
+			confirmChangeStatus:'是否将收据状态修改为~',
+			tipInvoiceNotExists:'  收据不存在!~',
+			tipInvoiceNotExists2:'查询收据不存在!~',
 			statusInvalid:'失效~',
 			statusIdel:'空闲~',
 			
 			cols:['客户名称~', '客户编号~', '业务名称~', '费用名称~', '实际金额~', '操作时间~', '操作员~'],
 			
-			labelInvoiceId:'发票号码~',
-			labelInvoiceId2:'发&nbsp;票&nbsp;号&nbsp;~',
-			labelInvoiceCode:'发票代码~',
-			labelInvoiceType:'发票类型~',
+			labelInvoiceId:'收据号码~',
+			labelInvoiceId2:'收&nbsp;据&nbsp;号&nbsp;~',
+			labelInvoiceCode:'收据代码~',
+			labelInvoiceType:'收据类型~',
 			labelDeptName:'所在仓库~',
 			labelUseStatus:'使用状态~',
 			labelMoneyAmount2:'金&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;额~',
@@ -428,19 +428,19 @@ BCLang.home = {
 			labelLoginName:'账号~',
 			certNum:'证件号码~'
 		},
-		InvoicePrint:{//发票打印
-			_title:'发票打印~',
+		InvoicePrint:{//收据打印
+			_title:'收据打印~',
 			titleDocGrid:'打印列表~',
-			titleInvoiceGrid:'发票项~',
+			titleInvoiceGrid:'收据项~',
 			titlePrintDetail:'打印明细~',
 			titlePrintPreview:'打印预览~',
-			titleInvoiceWindow:'打印共需要 {0} 张发票~',
+			titleInvoiceWindow:'打印共需要 {0} 张收据~',
 			wdxj:'网点现金~',
 			printGridColumns:['流水号~','单据名称~','创建时间~'],
-			invoiceGridColumns:['顺序号~','发票号码~','发票代码~'],
+			invoiceGridColumns:['顺序号~','收据号码~','收据代码~'],
 			printItemGridColumns:['名称~','金额~'],
-			stillEmptyInvoiceField:"还有为空的发票输入框!~",
-			hasDuplcateInvoice:"有重复的发票，请确认!~"
+			stillEmptyInvoiceField:"还有为空的收据输入框!~",
+			hasDuplcateInvoice:"有重复的收据，请确认!~"
 			
 		},
 		AddressNodeManage: {//地址节点配置
@@ -468,11 +468,11 @@ BCLang.home = {
 				btnTxtClose:'关闭',
 				btnTxtSave:'保存',
 				labelRoadNum:'路号名称',
-				titleNewSaveLevelRoadNum:'平级新增路号',
+				titleNewSaveLevelRoadNum:'新增路号',
 				labelStreatName:'街道名称',
-				titleNewSaveLevelStreet:'平级新增街道',
+				titleNewSaveLevelStreet:'新增街道',
 				labelCityName:'城市名称',
-				titleNewSaveLevelCity:'平级新增城市',
+				titleNewSaveLevelCity:'新增城市',
 				labelShowName:'显示名称',
 				labelParentName:'上级名称',
 				
@@ -488,20 +488,24 @@ BCLang.home = {
 BCLang.msgBox = {
 	payInfo: '您有<b>{0}</b>笔待支付,共<b>{1}</b>$',
 	payButton: '现金支付',
-	selectInvoice2Print:"请选择要打印的发票!~",
-	selectInvicePrintItem:"请选择发票的打印项~",
+	selectInvoice2Print:"请选择要打印的收据!~",
+	selectInvicePrintItem:"请选择收据的打印项~",
 	templateReplaceError:"模板变量替换时出错! error:{0}~",
 	printCmpError:'打印控件调用异常，请检查是否安装了打印控件 {0}~',
-	invoiceIdNeeded:'请输入发票号码~',
-	confirmSaveInvoiceInfo:"确定保存发票信息吗?~",
+	invoiceIdNeeded:'请输入收据号码~',
+	confirmSaveInvoiceInfo:"确定保存收据信息吗?~",
 	waitMsg:'操作中,请稍候~',
 	needCust:'请先查找要操作的客户!~',
 	needUser:'请选择用户!~',
 	cancelFeeSuccess:'冲正成功!~',
-	confirmCancelFeeAndInvaidInvoice:'发票{0}将作废!该发票上的费用项需要重打，确定冲正?~',
+	confirmCancelFeeAndInvaidInvoice:'收据{0}将作废!该收据上的费用项需要重打，确定冲正?~',
 	confirmCancelFee:'确定冲正吗?~',
 	selectRec4CancelFee:'请选择要冲正的费用记录!~',
 	confirmUnPayWithParam:'确定要回退【金额：{0} 】吗?~',
+	selectRecCancelPayFee:'请选择要回退的支付记录!',
+	confirmCancelPayFeeWithParam:'确定要支付回退并作废发票:{0}',
+	confirmCancelPayFeeWithNoParam:'确定要支付回退?',
+	cancelPayFeeSuccess:'支付回退冲正成功!',
 	confirmRestoreCust:'是否确定返销户?~',
 	restoreCustSuccess:'返销户成功!~',
 	restoreCustFailed:'返销户失败,请联系管理员.~',
@@ -587,9 +591,9 @@ BCLang.msgBox = {
 	searchCustTip1: '查询客户请输入至少一个关键字~',
 	searchCustTip2: '请不要输入单引号~',
 	searchNoCust: '没有查询到符合条件的客户，请确认后重新输入!~',
-	searchToPayOrPrint: '请处理未支付或未打印发票客户，点击确定后跳转，请为该客户支付费用和打印发票~',
+	searchToPayOrPrint: '请处理未打印收据的客户，点击确定后跳转，请为该客户打印收据',
 	confirmSwitchThisCust: '确定要选择该客户吗?~',
-	confirmInvalidInvoice: "确定作废发票吗?~",
+	confirmInvalidInvoice: "确定作废收据吗?~",
 	confirmRefreshCmd: '确定发送刷新指令吗?~',
 	confirmResendCmd: '确定指令重发吗?~',
 	noPreStopUser: '该用户没有进行预报停操作!~',

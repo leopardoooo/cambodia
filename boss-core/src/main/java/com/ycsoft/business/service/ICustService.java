@@ -473,4 +473,6 @@ public interface ICustService extends IBaseService{
 
 	public void editCustLevel(String parameter) throws Exception;
 
+	public void saveBugTask(String bugDetail)throws Exception;
+
 }
