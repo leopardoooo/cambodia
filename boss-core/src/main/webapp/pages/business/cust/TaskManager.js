@@ -71,27 +71,29 @@ TaskAllInfo = Ext.extend(Ext.Panel,{
 var TaskDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 	taskDeviceGridStore:null,
 	taskId:null,
-	otlNoField:null,
-	ponNoField:null,
 	constructor:function(){
 		var that = this;
 		this.taskDeviceGridStore = new Ext.data.JsonStore({
 			fields:['device_id','device_type','device_type_text','device_model','device_model_text',
-				'device_code','user_type', 'user_type_text','user_name','task_id']
+				'device_code','user_type', 'user_type_text','user_name','task_id','occNo','posNo']
 		});
 		
-		this.otlNoField = new Ext.form.TextField({xtype: 'textfield',width: 90});
-		this.ponNoField = new Ext.form.TextField({xtype: 'textfield',width: 90});
 		var columns = [{
-						header : '用户类型',dataIndex : 'user_type_text',width : 80,renderer : App.qtipValue}, {
+						header : '用户类型',dataIndex : 'user_type_text',width : 70,renderer : App.qtipValue}, {
 						header : '用户名',dataIndex : 'user_name',renderer : App.qtipValue},
-						{header:'型号',dataIndex:'device_model_text',width:150},	
-						{header:'设备编号',dataIndex:'device_code',width:150,editor:new Ext.form.TextField({
+						{header:'型号',dataIndex:'device_model_text',width:130},	
+						{header:'设备编号',dataIndex:'device_code',width:130,editor:new Ext.form.TextField({
 							vtype:'alphanum',
 							listeners:{
 								scope:this,
 								change:this.queryAndAddDevice
 							}
+						})},
+						{header:'occNo',dataIndex:'occNo',width:80,editor:new Ext.form.TextField({
+							vtype:'alphanum'
+						})},
+						{header:'posNo',dataIndex:'posNo',width:80,editor:new Ext.form.TextField({
+							vtype:'alphanum'							
 						})},
 						{header:'类型',dataIndex:'device_type_text',width:70}
 		];
@@ -102,8 +104,19 @@ var TaskDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 			clicksToEdit:1,
 			columns:columns,
 			sm:new Ext.grid.RowSelectionModel({}),
-			tbar: ['otlNo:',this.otlNoField,'-','ponNo:',this.ponNoField]
+			listeners:{
+				scope:this,
+				beforeedit: this.beforeEdit
+			}
+//			tbar: ['otlNo:',this.otlNoField,'-','ponNo:',this.ponNoField]
 		});
+		},beforeEdit: function(obj){
+			if(obj.field == 'occNo' || obj.field == 'posNo'){
+				var value = obj.record.get('user_type');
+				if(value !='BAND'){
+					return false;
+				}
+			}
 		},
 		queryAndAddDevice:function(field,newValue,oldValue){
 			if(newValue && newValue!==oldValue){
@@ -135,6 +148,12 @@ var TaskDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 				values["oldDeviceCode"] = record.get('device_id');
 				values["deviceModel"] =record.get('device_model');
 				values["deviceCode"] = record.get('device_code');
+				values["posNo"] = record.get('posNo');
+				values["occNo"] = record.get('occNo');
+				values["fcPort"] = false;
+				if(record.get('user_type') == 'BAND'){
+					values["fcPort"] = true;
+				}
 				arr.push(values);
 			},this);
 			return arr;
@@ -179,7 +198,7 @@ TaskDeviceWin = Ext.extend(Ext.Window,{
 			title : '设备回填',
 			layout : 'fit',
 			height : 400,
-			width : 600,
+			width : 700,
 			id:'TaskDeviceWinId',
 			closeAction : 'close',
 			items : [this.deviceGrid],
@@ -205,9 +224,7 @@ TaskDeviceWin = Ext.extend(Ext.Window,{
 		var url = Constant.ROOT_PATH + "/core/x/Task!fillTask.action";
 		var o = {
 			task_id:this.task_id,
-			devices : Ext.encode(data), 
-			otlNo: this.deviceGrid.otlNoField.getValue(),
-			ponNo : this.deviceGrid.ponNoField.getValue()
+			devices : Ext.encode(data)
 		};
 		var that = this;
 		App.sendRequest( url, o, function(res,opt){
