@@ -164,15 +164,17 @@ public class SnTaskComponent extends BaseBusiComponent{
 	
 	//更新宽带用的光路信息
 	private void updateBandFc(TaskFillDevice fillDevice,WTaskBaseInfo task)throws Exception{
-		CUser user = new CUser();
-		user.setUser_id(fillDevice.getUserId());
-		user.setStr7(fillDevice.getOccNo());
-		user.setStr8(fillDevice.getPosNo());
-		
-		cUserDao.update(user);
-		//更新工单修改中兴配置的状态
-		task.setZte_status(StatusConstants.NOT_EXEC);
-		wTaskBaseInfoDao.update(task);
+		if (StringHelper.isNotEmpty(fillDevice.getOccNo())){
+			CUser user = new CUser();
+			user.setUser_id(fillDevice.getUserId());
+			user.setStr7(fillDevice.getOccNo());
+			user.setStr8(fillDevice.getPosNo());
+			
+			cUserDao.update(user);
+			//更新工单修改中兴配置的状态
+			task.setZte_status(StatusConstants.NOT_EXEC);
+			wTaskBaseInfoDao.update(task);
+		}
 		
 	}
 	
