@@ -7,6 +7,7 @@ import static com.ycsoft.commons.constants.SystemConstants.USER_TYPE_OTT;
 import static com.ycsoft.commons.constants.SystemConstants.USER_TYPE_OTT_MOBILE;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -47,7 +48,6 @@ import com.ycsoft.business.dao.core.prod.CProdOrderDao;
 import com.ycsoft.business.dao.core.prod.CProdOrderFeeDao;
 import com.ycsoft.business.dao.task.WTaskBaseInfoDao;
 import com.ycsoft.business.dao.task.WTaskUserDao;
-import com.ycsoft.business.dto.config.TemplateConfigDto;
 import com.ycsoft.business.dto.core.acct.PayDto;
 import com.ycsoft.business.dto.core.cust.CustFullInfoDto;
 import com.ycsoft.business.dto.core.fee.BusiFeeDto;
@@ -768,18 +768,68 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 	
 	@Override
 	public void checkStopUser(String[] userIds) throws Exception{
-		Map<Integer, CUser> map = checkUserStatus(userIds);
-		for(Integer code : map.keySet()){
-			/*if(code == 1){
-				throw new ServicesException("用户["+map.get(code).getUser_id()+"]还在协议期内，不能报停!");
-			} else */if (code == 2){
-					throw new ServicesException("用户["+map.get(code).getUser_id()+"]不是正常状态，不能报停!");
-			}else if(code == 3){
-				throw new ServicesException("归属套餐的用户必须同时报停");
-			} else if (code == 4){
-				throw new ServicesException("OTT副机报停,主机必须报停");
+		//获取操作的客户、用户信息
+		CCust cust = getBusiParam().getCust();
+		List<CUser> users = userComponent.queryAllUserByUserIds(userIds);
+		if (users == null || users.size() == 0 || users.get(0) == null)
+			throw new ServicesException("请选择用户");
+		
+		//查找客户名下所有有效的产品
+		Map<String,String> packageUserIdS = new HashMap<String,String>();
+		List<CProdOrder> orderList = cProdOrderDao.queryCustEffOrder(users.get(0).getCust_id());
+		for (CProdOrder order:orderList){
+			if (StringHelper.isNotEmpty(order.getPackage_sn()) && StringHelper.isNotEmpty(order.getUser_id())){
+				packageUserIdS.put(order.getUser_id(),order.getPackage_sn());
 			}
 		}
+		
+		boolean hasPkgUser = false; //报停的用户有归属于客户套餐的
+		boolean hasZzd = false; //有OTT主终端用户
+		boolean hasBand = false; //有宽带用户
+		int count=0;
+		Map<Integer, CUser> map = new HashMap<Integer, CUser>();
+		for (CUser user:users){
+			if (user.getProtocol_date() != null && user.getProtocol_date().after(new Date())){
+				throw new ServicesException("用户["+user.getUser_id()+"]还在协议期内，不能报停!");
+				
+			} else if (!user.getStatus().equals(StatusConstants.ACTIVE)){
+				throw new ServicesException("用户["+user.getUser_id()+"]不是正常状态，不能报停!");
+				
+			}
+			if (packageUserIdS.get(user.getUser_id()) != null){
+				hasPkgUser =true;
+				count ++;
+			}
+			if (StringHelper.isNotEmpty(user.getTerminal_type())){
+				if (user.getUser_type().equals(USER_TYPE_OTT)){
+					if(user.getTerminal_type().equals(SystemConstants.USER_TERMINAL_TYPE_ZZD)){
+						hasZzd = true;
+					} 
+				}
+			}
+			
+			if (user.getUser_type().equals(USER_TYPE_BAND)){
+				hasBand = true;
+			}
+		
+		}
+		
+		if (hasPkgUser && (count<packageUserIdS.size())){
+			throw new ServicesException("归属套餐的用户必须同时报停");
+			
+		}
+		
+		if(hasBand && cust.getCust_type().equals(SystemConstants.CUST_TYPE_RESIDENT)){
+			List<CUser> allUusers = userComponent.queryUserByCustId(cust.getCust_id());
+			List<String> selectUser = Arrays.asList(userIds);
+			for(CUser user : allUusers){
+				if(!selectUser.contains(user)){
+					throw new ServicesException("宽带用户报停,其他用户都需要报停");
+				}
+			}
+			
+		}
+		
 	}
 
 
