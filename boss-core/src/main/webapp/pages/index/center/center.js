@@ -161,6 +161,8 @@ InfoPanel = Ext.extend( CommonTab , {
 				this.hideTabStripItem('COMMAND_PANEL');
 				this.hideTabStripItem('ACCT_PANEL');
 				this.hideTabStripItem('BILL_PANEL');
+				this.hideTabStripItem('PAY_PANEL');
+				this.hideTabStripItem('DOC_PANEL');
 				this.unhideTabStripItem('UNIT_PANEL');
 				this.DEFAULT_PANEL='UNIT_PANEL';
 				
@@ -172,6 +174,8 @@ InfoPanel = Ext.extend( CommonTab , {
 				this.unhideTabStripItem('USER_PANEL');
 				this.unhideTabStripItem('ACCT_PANEL');
 				this.unhideTabStripItem('BILL_PANEL');
+				this.unhideTabStripItem('PAY_PANEL');
+				this.unhideTabStripItem('DOC_PANEL');
 				this.unhideTabStripItem('COMMAND_PANEL');
 				this.DEFAULT_PANEL='CUST_PANEL';
 				
