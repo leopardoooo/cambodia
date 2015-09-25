@@ -9,6 +9,9 @@ UserUntuckForm = Ext.extend(BaseForm,{
 				}
 
 		);
+	},
+	success : function(form, res) {
+		App.getApp().refreshPanel(App.getApp().getData().currentResource.busicode);
 	}
 });
 

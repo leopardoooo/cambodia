@@ -281,18 +281,6 @@ public class DoneCodeComponent extends BaseBusiComponent {
 					doneCodeDto.setReal_pay(0-realPay);
 				}
 				
-				//ip外挂费用
-				List<DoneCodeDto> busiFeeList = busiFeeMap.get(doneCodeDto.getDone_code().toString());
-				if(CollectionHelper.isNotEmpty(busiFeeList)){
-					for(DoneCodeDto dto : busiFeeList){
-						if(StringHelper.isNotEmpty(dto.getFee_id()) && dto.getFee_id().equals(SystemConstants.USER_IP_FEE_ID)){
-							doneCodeDto.setFee_id(dto.getFee_id());
-							break;
-						}
-					}
-				}
-				
-				
 				BeanUtils.copyProperties(doneCodeDto, tempQ);
 				target.add(tempQ);
 			}
