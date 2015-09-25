@@ -433,7 +433,7 @@ public class RDeviceDao extends BaseEntityDao<RDevice> {
 			sql = StringHelper.append(sql,")");
 		}
 	
-		sql =StringHelper.append("select a.*,cc.cust_no cust_id,cc.cust_name from ( ",
+		sql =StringHelper.append("select a.*,cc.cust_no cust_id,cc.cust_name,cc.str9 from ( ",
 				sql," ) a,c_cust_device cd,c_cust cc ",
 				" where cd.device_id(+)=a.device_id and cc.cust_id(+)=cd.cust_id order by a.device_type");
 		return this.createQuery(DeviceDto.class, sql,depotId).setStart(start).setLimit(limit).page();

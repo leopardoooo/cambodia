@@ -364,9 +364,15 @@ public class UserComponent extends BaseBusiComponent {
 	public List<UserDto> queryUser(String custId) throws Exception {
 		List<UserDto> result = new ArrayList<UserDto>();
 		List<CUser> users = queryUserByCustId(custId);
+		List<JUserStop> stopList = jUserStopDao.findAll();
+		Map<String,List<JUserStop>> stopmap = CollectionHelper.converToMap(stopList, "user_id");
 		for (CUser user :users){
 			UserDto userdto = new UserDto();
 			BeanUtils.copyProperties(user, userdto);
+			List<JUserStop> stoplist = stopmap.get(user.getUser_id());
+			if(stoplist!=null){
+				userdto.setStop_date(stoplist.get(0).getStop_date());
+			}
 			if(userdto.getUser_type().equals(SystemConstants.USER_TYPE_BAND)){
 				if(StringHelper.isNotEmpty(userdto.getModem_mac())){
 					RModemModel modemModel = rModemModelDao.queryByModemMac(userdto.getModem_mac());

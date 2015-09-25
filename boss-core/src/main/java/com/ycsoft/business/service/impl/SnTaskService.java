@@ -39,6 +39,7 @@ import com.ycsoft.commons.constants.BusiCodeConstants;
 import com.ycsoft.commons.constants.DictKey;
 import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.constants.SystemConstants;
+import com.ycsoft.commons.exception.ServicesException;
 import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.commons.store.MemoryDict;
 import com.ycsoft.daos.core.Pager;
@@ -112,7 +113,7 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 		//验证设备信息
 		WTaskBaseInfo task = wTaskBaseInfoDao.findByKey(taskId);
 		if (task == null){
-			throw new SystemException("工单不存在!");
+			throw new ServicesException("工单不存在!");
 		}
 		List<WTaskUser> userList = wTaskUserDao.queryByTaskId(taskId);
 		//验证回填设备并设置设备信息
@@ -343,13 +344,13 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 	public Pager<TaskBaseInfoDto> queryTask(String taskTypes, String addrIds, String beginDate, String endDate,
 			String taskId, String teamId, String status, String custNo, String custName, String custAddr,String mobile, Integer start, Integer limit)
 					throws Exception {
-		return wTaskBaseInfoDao.queryTask(taskTypes,addrIds,beginDate,endDate,taskId,teamId,status,custNo,custName,custAddr,mobile, start, limit);
+		return wTaskBaseInfoDao.queryTask(taskTypes,addrIds,beginDate,endDate,taskId,teamId,status,custNo,custName
+				,custAddr,mobile,null, start, limit);
 	}
 
-	@Override
-	public List<WTaskBaseInfo> queryUnProcessTask() throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+	public Pager<TaskBaseInfoDto> queryUnProcessTask(Integer start, Integer limit) throws Exception {
+		return wTaskBaseInfoDao.queryTask(null,null,null,null,null,getOptr().getDept_id(),StatusConstants.TASK_INIT,
+				null,null,null,null,StatusConstants.NOT_EXEC,start, limit);
 	}
 
 	
@@ -360,7 +361,8 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 		for(TaskUserDto task: userList){
 			CUser user = userComponent.queryUserById(task.getUser_id());
 			task.setUser_name( taskComponent.getFillUserName(user) );
-			
+			task.setOccNo(user.getStr7());
+			task.setPosNo(user.getStr8());
 			if(!user.getUser_type().equals(SystemConstants.USER_TYPE_OTT_MOBILE)){
 				if(StringHelper.isEmpty(user.getDevice_model()) && StringHelper.isNotEmpty(user.getStr3())){
 					user.setDevice_model(user.getStr3());
@@ -391,6 +393,7 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 		// TODO Auto-generated method stub
 		return wTaskBaseInfoDao.queryTaskByCustId(custId);
 	}
+
 	
 
 }
