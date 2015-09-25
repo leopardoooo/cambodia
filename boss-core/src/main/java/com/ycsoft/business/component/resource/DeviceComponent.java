@@ -118,9 +118,9 @@ public class DeviceComponent extends BaseBusiComponent {
 //				break;
 //			}
 //		}
-		if(!models.equals(dto.getDevice_model())){
-			throw new ComponentException(ErrorCode.TaskDeviceModelIsWrong,dto.getDevice_model_text());
-		}
+//		if(!models.equals(dto.getDevice_model())){
+//			throw new ComponentException(ErrorCode.TaskDeviceModelIsWrong,dto.getDevice_model_text());
+//		}
 		return dto;
 	}
 

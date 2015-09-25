@@ -4,17 +4,20 @@ UserDetailGrid = Ext.extend(Ext.grid.GridPanel, {
 	constructor : function() {
 		this.userDetailStore = new Ext.data.JsonStore({
 					fields : ['user_type', 'user_type_text','user_name', 'device_model','device_model_text','task_id',
-							'device_code', 'password','device_id','band']
+							'device_code', 'password','device_id','band','posNo','occNo']
 				});
 		UserDetailGrid.superclass.constructor.call(this, {
 			ds : this.userDetailStore,
+			border: false,
 			sm : new Ext.grid.CheckboxSelectionModel(),
 			cm : new Ext.grid.ColumnModel([{
 						header : '用户类型',dataIndex : 'user_type_text',width : 60,renderer : App.qtipValue}, {
-						header : '用户名',dataIndex : 'user_name',width : 130,renderer : App.qtipValue}, {
+						header : '用户名',dataIndex : 'user_name',width : 120,renderer : App.qtipValue}, {
 						header : '密码',dataIndex : 'password',width : 60,renderer : App.qtipValue}, {
-						header : '设备型号',dataIndex : 'device_model_text',width : 150,renderer : App.qtipValue}, {
+						header : '设备型号',dataIndex : 'device_model_text',width : 120,renderer : App.qtipValue}, {
 						header : '设备号',dataIndex : 'device_id',width : 120,renderer : App.qtipValue}, {
+						header : 'posNo',dataIndex : 'posNo',width : 100,renderer : App.qtipValue}, {
+						header : 'occNo',dataIndex : 'occNo',width : 100,renderer : App.qtipValue}, {
 						header : '带宽',dataIndex : 'band',width: 80,renderer : App.qtipValue}])
 		})
 	}
@@ -29,6 +32,7 @@ TaskDetailGrid = Ext.extend(Ext.grid.GridPanel, {
 		TaskDetailGrid.superclass.constructor.call(this, {
 			ds : this.taskDetailStore,
 			sm : new Ext.grid.CheckboxSelectionModel(),
+			border: false,
 			cm : new Ext.grid.ColumnModel([{
 				header : '操作时间',dataIndex : 'log_time',width : 100,renderer : Ext.util.Format.dateFormat}, {
 				header : '操作类型',dataIndex : 'busi_name',width:80,renderer : App.qtipValue}, {
@@ -40,7 +44,7 @@ TaskDetailGrid = Ext.extend(Ext.grid.GridPanel, {
 	}
 })
 
-TaskAllInfo = Ext.extend(Ext.Panel,{
+TaskAllInfo = Ext.extend(Ext.TabPanel,{
 	panel : null,
 	userGrid : null,
 	detail : null,
@@ -49,21 +53,19 @@ TaskAllInfo = Ext.extend(Ext.Panel,{
 		this.detail = new TaskDetailGrid();
 		TaskAllInfo.superclass.constructor.call(this, {
 				border : false,
-				layout : 'border',
+				activeTab: 0,
 				closable : true,
-				items : [{
-							region : 'west',
-							layout : 'fit',
-							width : '55%',
-							split : true,
-							title : '用户信息',
-							items : [this.userGrid]
-						}, {
-							region : 'center',
-							layout : 'fit',
-							title : '操作明细',
-							items : [this.detail]
-						}]
+				defaults : {
+					border: false,
+					layout : 'fit'
+				},
+				items:[{
+					title : '用户信息',
+					items:[this.userGrid]
+				},{
+					title : '操作明细',
+					items:[this.detail]
+				}]
 		})
 	}
 })
@@ -106,7 +108,8 @@ var TaskDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 			sm:new Ext.grid.RowSelectionModel({}),
 			listeners:{
 				scope:this,
-				beforeedit: this.beforeEdit
+				beforeedit: this.beforeEdit,
+				afteredit:this.afteredit
 			}
 //			tbar: ['otlNo:',this.otlNoField,'-','ponNo:',this.ponNoField]
 		});
@@ -118,27 +121,31 @@ var TaskDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 				}
 			}
 		},
-		queryAndAddDevice:function(field,newValue,oldValue){
-			if(newValue && newValue!==oldValue){
-				var dRecord = this.getSelectionModel().getSelected();
-				Ext.Ajax.request({
-					url:Constant.ROOT_PATH + "/core/x/Task!queryDeviceInfoByCodeAndModel.action",
-					params:{deviceCode:newValue,deviceModel:dRecord.get('device_model')},
-					scope:this,
-					success:function(res,opt){
-						var data = Ext.decode(res.responseText);
-						dRecord.set('device_code',data['device_code']);
-						dRecord.set('device_type_text',data['device_type_text']);
-						dRecord.set('device_type',data['device_type']);
-					},
-					clearData:function(){
-						dRecord.set('device_code','');
-						dRecord.set('device_type_text','');
-						dRecord.set('device_type','');
-						//清空组件
-					}
-				});
+		afteredit:function(obj){
+			if(obj.field == 'device_code'){
+				var record =obj.record;
+				this.queryAndAddDevice(record);
+				
 			}
+		},
+		queryAndAddDevice:function(record){
+			Ext.Ajax.request({
+				url:Constant.ROOT_PATH + "/core/x/Task!queryDeviceInfoByCodeAndModel.action",
+				params:{deviceCode:newValue,deviceModel:record.get('device_model')},
+				scope:this,
+				success:function(res,opt){
+					var data = Ext.decode(res.responseText);
+					record.set('device_code',data['device_code']);
+					record.set('device_type_text',data['device_type_text']);
+					record.set('device_type',data['device_type']);
+				},
+				clearData:function(){
+					record.set('device_code','');
+					record.set('device_type_text','');
+					record.set('device_type','');
+					//清空组件
+				}
+			});
 		},
 		getValues:function(){
 			var arr=[];
@@ -365,7 +372,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 		var tomorrow = new Date();
 		tomorrow.setDate(tomorrow.getDate() + 1);
 		var startDate = new Date();
-		startDate.setDate(startDate.getDate() - 1);
+		startDate.setDate(startDate.getDate() - 7);
 		this.createStartDateField = new Ext.form.DateField({
 				xtype: 'datefield',width: 90,format: 'Y-m-d',allowBlank: false,value: startDate
 			});
@@ -452,8 +459,8 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 				text: '待处理工单',
 				pressed: true,
 				scope: this,
-				width: 100
-//				handler: this.doSearchTask
+				width: 100,
+				handler: this.doWaitTask
 			}]
 		});
 		
@@ -464,13 +471,11 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 	        cm: new Ext.ux.grid.LockingColumnModel({
 	        	columns:[
 				//{header: '工单编号',		dataIndex : 'task_id', 				width: 100},
-				{header: '工单类型',		dataIndex : 'task_type_id_text', 	width: 100, renderer: function(v, m ,rs){
+				{header: '工单类型',		dataIndex : 'task_type_id_text', 	width: 70, renderer: function(v, m ,rs){
 					return "<span style='font-weight: bold;'>"+ v +"</span>";
 				}},
 				{header: '客户名称', 	dataIndex: 'cust_name', width: 80},
-				{header: '地址', 		dataIndex : 'address', width: 200,renderer:App.qtipValue},
-				{header: '联系电话', 	dataIndex : 'tel', 				width: 100},
-				{header: '工单状态', 		dataIndex: 'task_status', width: 100, renderer: function(v, m ,rs){
+				{header: '工单状态', 		dataIndex: 'task_status', width: 70, renderer: function(v, m ,rs){
 					var text = rs.get("task_status_text");
 					var color = "black";
 					if(v == 'INIT'){
@@ -483,10 +488,12 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 					return "<span style='font-weight: bold;color: "+ color +";'>"+ text +"</span>";
 				}},
 				{header:'施工队', dataIndex:'team_id_text',width:100,renderer:App.qtipValue},
+				{header: 'ZTE状态',dataIndex: 'zte_status_text', width: 70, renderer:App.qtipValue},
+				{header: '地址', 		dataIndex : 'address', width: 200,renderer:App.qtipValue},
+				{header: '联系电话', 	dataIndex : 'tel', 				width: 100},
+				{header: '创建时间', dataIndex: 'task_create_time', 	width: 80, renderer: Ext.util.Format.dateFormat},					
 				{header:'故障类型',dataIndex:'bug_type_text',width:85},
-				{header:'故障详细信息',dataIndex:'bug_detail',width:120,renderer:App.qtipValue},
-				{header: 'ZTE授权状态',dataIndex: 'zte_status_text', width: 100, renderer:App.qtipValue},
-				{header: '创建时间', dataIndex: 'task_create_time', 	width: 165, renderer: Ext.util.Format.dateFormat}					
+				{header:'故障详细信息',dataIndex:'bug_detail',width:120,renderer:App.qtipValue}
 	        ]}),
 	        sm: sm,
 	        stripeRows: true,
@@ -775,5 +782,18 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 				"limit": this.pageSize
 			}
 		});
+	},
+	doWaitTask:function(){
+		var o = {
+			"isWaitTask": 'T'
+		};
+		this.taskStore.baseParams = o;
+		this.taskStore.load({
+			params: {
+				"start": 0, 
+				"limit": this.pageSize
+			}
+		});
+	
 	}
 });		
