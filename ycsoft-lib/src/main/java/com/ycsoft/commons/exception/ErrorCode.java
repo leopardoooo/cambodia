@@ -140,6 +140,7 @@ public enum ErrorCode {
 	//======================未翻译===========================
 	NoStopRecord("找不到产品报停记录，请联系管理员"),
 	TaskDeviceUnFill("有未回填设备的用户，不能完工"),
+	OttFzdNotMoreThanTwo("OTT主终端下只能挂2个副终端!"),
 	;
 	
 	

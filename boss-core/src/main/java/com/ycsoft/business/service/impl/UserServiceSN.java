@@ -47,7 +47,6 @@ import com.ycsoft.business.dao.core.prod.CProdOrderDao;
 import com.ycsoft.business.dao.core.prod.CProdOrderFeeDao;
 import com.ycsoft.business.dao.task.WTaskBaseInfoDao;
 import com.ycsoft.business.dao.task.WTaskUserDao;
-import com.ycsoft.business.dto.config.TemplateConfigDto;
 import com.ycsoft.business.dto.core.acct.PayDto;
 import com.ycsoft.business.dto.core.cust.CustFullInfoDto;
 import com.ycsoft.business.dto.core.fee.BusiFeeDto;
@@ -267,11 +266,23 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 							break;
 						}
 					}
+					
+					int fzdNum = 0;
+					for(CUser cu:userList){
+						if(SystemConstants.USER_TERMINAL_TYPE_FZD.equals(cu.getTerminal_type())){
+							fzdNum += 1;
+						}
+						if(fzdNum >= 2){
+							throw new ServicesException(ErrorCode.OttFzdNotMoreThanTwo);
+						}
+					}
 				}
 				
 				if (StringHelper.isEmpty(user.getTerminal_type())){
 					user.setTerminal_type(SystemConstants.USER_TERMINAL_TYPE_ZZD);
 				}
+				
+				
 			}
 		}
 		
@@ -291,7 +302,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 			}*/
 		}
 		
-		if(!user.getUser_type().equals(SystemConstants.USER_TYPE_DTT) && StringHelper.isEmpty(user.getLogin_name())){
+		if(!user.getUser_type().equals(USER_TYPE_DTT) && StringHelper.isEmpty(user.getLogin_name())){
 			user.setLogin_name( generateUserName(cust.getCust_id(), user.getUser_type()) );
 		}
 		
