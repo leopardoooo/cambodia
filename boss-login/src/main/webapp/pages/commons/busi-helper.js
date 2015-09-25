@@ -350,7 +350,7 @@ Ext.apply( App, {
 //			if (!unitRefresh)
 //				panel.getCustPanel().custDeviceGrid.remoteRefresh();
 		}else if(busiCode == '1008' || busiCode == '1009' || busiCode == '1011' || busiCode == '1223'
-		|| busiCode == '1014' || busiCode == '1013'|| busiCode == '1231' || busiCode == '2002'){//更换、销售或回收设备,刷新设备,修改购买方式、设备互换
+		|| busiCode == '1014' || busiCode == '1013'|| busiCode == '1231' || busiCode == '2002' || busiCode == '2123'){//更换、销售或回收设备,刷新设备,修改购买方式、设备互换
 			if (!unitRefresh){
 //				panel.getCustPanel().custDeviceGrid.remoteRefresh();
 //				panel.getCustPanel().deviceDetailTab.resetPanel();

@@ -117,7 +117,7 @@ public class AuthComponent extends BaseComponent{
 		}else if(authCmdType.equals(BusiCmdConstants.REFRESH_TERMINAL)){
 			//宽带刷新设备要发销户、开户、2个指令
 			this.deleteBandUser(user, doneCode);
-			this.openBandUser(user, doneCode);
+			this.createBandUser(user, doneCode);
 			//如果用户是报停状态，则钝化用户
 			if(user.getStatus().equals(StatusConstants.REQSTOP)){
 				this.stopBandUser(user, doneCode);

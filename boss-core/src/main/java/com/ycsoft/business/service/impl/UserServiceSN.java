@@ -985,30 +985,42 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 
 
 	@Override
-	public void saveEditPwd(String newPwd) throws Exception {
-
-		//获取客户用户信息
-		String  custId = getBusiParam().getCust().getCust_id();
-		CUser user = getBusiParam().getSelectedUsers().get(0);
-		//获取业务流水
+	public void saveEditPwd(String newLoginName, String newPwd) throws Exception {
 		Integer doneCode = doneCodeComponent.gDoneCode();
-		//生成计算用户信用度的JOB
-		jobComponent.createCreditCalJob(doneCode, custId, null,SystemConstants.BOOLEAN_TRUE);
+		CUser selectedUser = getBusiParam().getSelectedUsers().get(0);
+		CUser user = queryUserById(selectedUser.getUser_id());
 		List<CUserPropChange> propChangeList = new ArrayList<CUserPropChange>();
-		CUser userDto = queryUserById(user.getUser_id());
 
-		userDto.setNewPassword(newPwd);
-		jobComponent.createBusiCmdJob(doneCode, BusiCmdConstants.BAND_EDIT_PWD, custId, user.getUser_id(), null, null, user.getModem_mac(), null, null, JsonHelper.fromObject(userDto));
-	
-		
 		CUserPropChange propChange = new CUserPropChange();
 		propChange.setColumn_name("password");
-		propChange.setOld_value(userDto.getPassword());
+		propChange.setOld_value(user.getPassword());
 		propChange.setNew_value(newPwd);
 		propChangeList.add(propChange);
-		userComponent.editUser(doneCode, getBusiParam().getSelectedUserIds().get(0), propChangeList);
 		
-		authComponent.sendAuth(user, null, BusiCmdConstants.CHANGE_USER, doneCode);
+		user.setPassword(newPwd);
+		
+		if(!user.getLogin_name().equals(newLoginName)){
+			propChange = new CUserPropChange();
+			propChange.setColumn_name("login_name");
+			propChange.setOld_value(user.getLogin_name());
+			propChange.setNew_value(newLoginName);
+			propChangeList.add(propChange);
+			
+			user.setLogin_name(newLoginName);
+			
+			List<CProdOrder> orderList = orderComponent.queryNotExpAllOrderByUser(user.getUser_id());
+			authComponent.sendAuth(selectedUser, orderList, BusiCmdConstants.DEL_USER, doneCode);
+			if(user.getUser_type().equals(USER_TYPE_BAND)){
+				authComponent.sendAuth(user, null, BusiCmdConstants.REFRESH_TERMINAL, doneCode);
+			}else{
+				authComponent.sendAuth(user, orderList, BusiCmdConstants.CREAT_USER, doneCode);
+			}
+			authComponent.sendAuth(user, orderList, BusiCmdConstants.ACCTIVATE_PROD, doneCode);
+		}else{
+			authComponent.sendAuth(user, null, BusiCmdConstants.CHANGE_USER, doneCode);
+		}
+		
+		userComponent.editUser(doneCode, user.getUser_id(), propChangeList);
 		
 		saveAllPublic(doneCode,getBusiParam());
 	}

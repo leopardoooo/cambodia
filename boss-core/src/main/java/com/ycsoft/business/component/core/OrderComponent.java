@@ -440,6 +440,10 @@ public class OrderComponent extends BaseBusiComponent {
 		return cProdOrderDao.queryOrderProdByUserId(user_id);
 	}
 	
+	public List<CProdOrder> queryNotExpAllOrderByUser(String user_id)throws Exception {
+		return cProdOrderDao.queryNotExpAllOrderByUser(user_id);
+	}
+	
 	
 	/**
 	 * 退出一个所有资金（含已使用部分）明细
