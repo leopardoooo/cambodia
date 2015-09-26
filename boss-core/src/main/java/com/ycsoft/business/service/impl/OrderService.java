@@ -46,6 +46,7 @@ import com.ycsoft.business.dto.core.prod.OrderProdEdit;
 import com.ycsoft.business.dto.core.prod.OrderProdPanel;
 import com.ycsoft.business.dto.core.prod.PackageGroupPanel;
 import com.ycsoft.business.dto.core.prod.PackageGroupUser;
+import com.ycsoft.business.dto.core.prod.ProdTariffDto;
 import com.ycsoft.business.service.IOrderService;
 import com.ycsoft.commons.constants.BusiCmdConstants;
 import com.ycsoft.commons.constants.BusiCodeConstants;
@@ -109,12 +110,44 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		//提取可用的产品和资费列表
 		orderComponent.queryOrderableEdit(custComponent.queryCustById(order.getCust_id()), order.getOrder_sn(), edit);
 		
-		if(edit.getProdList()==null||edit.getProdList().size()==0||edit.getTariffMap()==null||edit.getTariffMap().size()==0){
-			//不能修改，没有可用的产品资费
-			throw new ServicesException(ErrorCode.OrderEditNoProd);
-		}
+		//如果当前产品不可用，则装入当前产品和资费
+		orderEditSetCurrentProdTariff(edit,order);
 		
 		return edit;
+	}
+	/**
+	 * 如果当前产品资费、折扣不可用，则装入当前产品和资费、折扣
+	 * @param edit
+	 * @param order
+	 * @throws Exception
+	 */
+	private void orderEditSetCurrentProdTariff(OrderProdEdit edit,CProdOrderDto order) throws Exception{
+		Map<String,PProd> prodMap=CollectionHelper.converToMapSingle(edit.getProdList(), "prod_id");
+		if(!prodMap.containsKey(edit.getProd_id())){
+			prodMap.put(edit.getProd_id(), pProdDao.findByKey(edit.getProd_id()));
+			edit.getTariffMap().put(edit.getProd_id(), new ArrayList<PProdTariffDisct>());
+		}
+		Map<String,PProdTariffDisct> tariffDisctMap=CollectionHelper.converToMapSingle(edit.getTariffMap().get(edit.getProd_id()), "prod_id");
+		if(!tariffDisctMap.containsKey(edit.getTariff_id())){
+			
+			PProdTariff pt=pProdTariffDao.findByKey(order.getTariff_id());
+			
+			PProdTariffDisct tariff=new PProdTariffDisct();
+			tariff.setTariff_id(pt.getTariff_id());
+			tariff.setBilling_cycle(pt.getBilling_cycle());
+			tariff.setDisct_rent(pt.getRent());
+			tariff.setDisct_name(pt.getTariff_name());
+			tariff.setBilling_type(pt.getBilling_type());
+			
+			if(StringHelper.isNotEmpty(order.getDisct_id())){
+				PProdTariffDisct disct=pProdTariffDisctDao.findByKey(order.getDisct_id());
+				tariff.setTariff_id(disct.getTariff_id()+"_"+disct.getDisct_id());
+				tariff.setBilling_cycle(disct.getBilling_cycle());
+				tariff.setDisct_rent(disct.getDisct_rent());
+				tariff.setDisct_name(disct.getDisct_name());
+			}
+			edit.getTariffMap().get(edit.getProd_id()).add(tariff);
+		}
 	}
 	/**
 	 * 订单修改功能
