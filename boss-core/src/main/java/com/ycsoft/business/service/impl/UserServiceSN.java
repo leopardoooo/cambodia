@@ -651,19 +651,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		List<CUser> users = userComponent.queryAllUserByUserIds(userIds);
 		if (users == null || users.size() == 0 || users.get(0) == null)
 			throw new ServicesException("请选择用户");
-		
-		Map<Integer, CUser> map = checkUserStatus(userIds);
-		for(Integer code : map.keySet()){
-			if(code == 1){
-				throw new ServicesException("用户["+map.get(code).getUser_id()+"]还在协议期内，不能拆机!");
-			} else if (code == 2){
-					throw new ServicesException("用户["+map.get(code).getUser_id()+"]不是正常状态，不能拆机!");
-			}else if(code == 3){
-				throw new ServicesException("归属套餐的用户必须同时拆机");
-			} else if (code == 4){
-				throw new ServicesException("OTT副机报停,主机必须拆机");
-			}
-		}
+		checkUntruckUsers(userIds);
 		
 		List<CProdOrderDto> orderList = cProdOrderDao.queryCustEffOrderDto(cust.getCust_id());
 		boolean isCustPkgStop = false;
@@ -708,66 +696,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		saveAllPublic(doneCode,getBusiParam());
 	}
 	
-	private Map<Integer, CUser> checkUserStatus(String[] userIds) throws Exception{
-		//获取操作的客户、用户信息
-		//CCust cust = getBusiParam().getCust();
-		List<CUser> users = userComponent.queryAllUserByUserIds(userIds);
-		if (users == null || users.size() == 0 || users.get(0) == null)
-			throw new ServicesException("请选择用户");
-		
-		//查找客户名下所有有效的产品
-		Map<String,String> packageUserIdS = new HashMap<String,String>();
-		List<CProdOrder> orderList = cProdOrderDao.queryCustEffOrder(users.get(0).getCust_id());
-		for (CProdOrder order:orderList){
-			if (StringHelper.isNotEmpty(order.getPackage_sn()) && StringHelper.isNotEmpty(order.getUser_id())){
-				packageUserIdS.put(order.getUser_id(),order.getPackage_sn());
-			}
-		}
-		
-		boolean hasPkgUser = false; //报停的用户有归属于客户套餐的
-		boolean hasZzd = false; //有OTT主终端用户
-		boolean hasFzd = false; //有OTT副终端用户
-		int count=0;
-		Map<Integer, CUser> map = new HashMap<Integer, CUser>();
-		for (CUser user:users){
-			if (user.getProtocol_date() != null && user.getProtocol_date().after(new Date())){
-//				throw new ServicesException("用户["+user.getUser_id()+"]还在协议期内，不能报停!");
-				map.put(1, user);
-				return map;
-			} else if (!user.getStatus().equals(StatusConstants.ACTIVE)){
-//				throw new ServicesException("用户["+user.getUser_id()+"]不是正常状态，不能报停!");
-				map.put(2, user);
-				return map;
-			}
-			if (packageUserIdS.get(user.getUser_id()) != null){
-				hasPkgUser =true;
-				count ++;
-			}
-			if (StringHelper.isNotEmpty(user.getTerminal_type())){
-				if (user.getUser_type().equals(USER_TYPE_OTT)){
-					if(user.getTerminal_type().equals(SystemConstants.USER_TERMINAL_TYPE_ZZD)){
-						hasZzd = true;
-					} else {
-						hasFzd = true;
-					}
-				}
-			}
-		}
-		
-		if (hasPkgUser && (count<packageUserIdS.size())){
-//			throw new ServicesException("归属套餐的用户必须同时报停");
-			map.put(3, null);
-			return map;
-		} else if (hasFzd && !hasZzd){
-//			throw new ServicesException("OTT副机报停,主机必须报停");
-			map.put(4, null);
-			return map;
-		}
-		return map;
-	}
-	
-	@Override
-	public void checkStopUser(String[] userIds) throws Exception{
+	private void checkUntruckUsers(String[] userIds) throws Exception{
 		//获取操作的客户、用户信息
 		CCust cust = getBusiParam().getCust();
 		List<CUser> users = userComponent.queryAllUserByUserIds(userIds);
@@ -783,29 +712,73 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 			}
 		}
 		
-		boolean hasPkgUser = false; //报停的用户有归属于客户套餐的
-		boolean hasZzd = false; //有OTT主终端用户
+		boolean hasPkgUser = false; //销户的用户有归属于客户套餐的
 		boolean hasBand = false; //有宽带用户
 		int count=0;
-		Map<Integer, CUser> map = new HashMap<Integer, CUser>();
 		for (CUser user:users){
-			if (user.getProtocol_date() != null && user.getProtocol_date().after(new Date())){
-				throw new ServicesException("用户["+user.getUser_id()+"]还在协议期内，不能报停!");
-				
-			} else if (!user.getStatus().equals(StatusConstants.ACTIVE)){
-				throw new ServicesException("用户["+user.getUser_id()+"]不是正常状态，不能报停!");
+			if (!user.getStatus().equals(StatusConstants.ACTIVE)){
+				throw new ServicesException("用户["+user.getUser_id()+"]不是正常状态，不能拆机!");
 				
 			}
 			if (packageUserIdS.get(user.getUser_id()) != null){
 				hasPkgUser =true;
 				count ++;
 			}
-			if (StringHelper.isNotEmpty(user.getTerminal_type())){
-				if (user.getUser_type().equals(USER_TYPE_OTT)){
-					if(user.getTerminal_type().equals(SystemConstants.USER_TERMINAL_TYPE_ZZD)){
-						hasZzd = true;
-					} 
+			
+			if (user.getUser_type().equals(USER_TYPE_BAND)){
+				hasBand = true;
+			}
+		
+		}
+		
+		if (hasPkgUser && (count<packageUserIdS.size())){
+			throw new ServicesException("归属套餐的用户必须同时拆机");
+			
+		}
+		
+		if(hasBand && cust.getCust_type().equals(SystemConstants.CUST_TYPE_RESIDENT)){
+			List<CUser> allUusers = userComponent.queryUserByCustId(cust.getCust_id());
+			List<String> selectUser = Arrays.asList(userIds);
+			for(CUser user : allUusers){
+				if (!user.getStatus().equals(StatusConstants.REQSTOP)){
+					if(!selectUser.contains(user.getUser_id())){
+						throw new ServicesException("宽带用户拆机,其他用户都需要拆机");
+					}
 				}
+			}
+		}
+	}
+
+	
+	@Override
+	public void checkStopUser(String[] userIds) throws Exception{
+		//获取操作的客户、用户信息
+		List<CUser> users = userComponent.queryAllUserByUserIds(userIds);
+		CCust cust = custComponent.queryCustById(users.get(0).getCust_id());
+		if (users == null || users.size() == 0 || users.get(0) == null)
+			throw new ServicesException("请选择用户");
+		
+		//查找客户名下所有有效的产品
+		Map<String,String> packageUserIdS = new HashMap<String,String>();
+		List<CProdOrder> orderList = cProdOrderDao.queryCustEffOrder(users.get(0).getCust_id());
+		for (CProdOrder order:orderList){
+			if (StringHelper.isNotEmpty(order.getPackage_sn()) && StringHelper.isNotEmpty(order.getUser_id())){
+				packageUserIdS.put(order.getUser_id(),order.getPackage_sn());
+			}
+		}
+		
+		boolean hasPkgUser = false; //报停的用户有归属于客户套餐的
+		boolean hasBand = false; //有宽带用户
+		int count=0;
+		Map<Integer, CUser> map = new HashMap<Integer, CUser>();
+		for (CUser user:users){
+			if (!user.getStatus().equals(StatusConstants.ACTIVE)){
+				throw new ServicesException("用户["+user.getUser_id()+"]不是正常状态，不能报停!");
+				
+			}
+			if (packageUserIdS.get(user.getUser_id()) != null){
+				hasPkgUser =true;
+				count ++;
 			}
 			
 			if (user.getUser_type().equals(USER_TYPE_BAND)){
@@ -823,11 +796,12 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 			List<CUser> allUusers = userComponent.queryUserByCustId(cust.getCust_id());
 			List<String> selectUser = Arrays.asList(userIds);
 			for(CUser user : allUusers){
-				if(!selectUser.contains(user)){
-					throw new ServicesException("宽带用户报停,其他用户都需要报停");
+				if (!user.getStatus().equals(StatusConstants.REQSTOP)){
+					if(!selectUser.contains(user.getUser_id())){
+						throw new ServicesException("宽带用户报停,其他用户都需要报停");
+					}
 				}
 			}
-			
 		}
 		
 	}

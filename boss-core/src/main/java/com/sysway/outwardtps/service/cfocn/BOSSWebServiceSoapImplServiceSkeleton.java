@@ -56,9 +56,10 @@ public class BOSSWebServiceSoapImplServiceSkeleton
     	// 回执消息, 如果失败的情况
     	String msg = resp.getRespMsg();
     	
+    	
     	try{
     		// 调用boss接口完成工单
-    		snTaskService.finishTask(taskId, resultType);
+    		snTaskService.finishTask(taskId, resultType,null);
     		// 返回成功的结果
     		return createReturnWorkOrderResponse(createResultHeadForSuccess());
     	}catch(Exception e){

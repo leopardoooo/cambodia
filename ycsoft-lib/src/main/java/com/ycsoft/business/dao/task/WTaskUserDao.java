@@ -35,4 +35,24 @@ public class WTaskUserDao extends BaseEntityDao<WTaskUser> {
 		this.executeUpdate(sql,deviceId,taskId,userId);
 	}
 
+	public List<WTaskUser> queryByUserIds(String taskId, String[] userIds) throws JDBCException{
+		String sql ="select * from w_task_user where user_id in ("+sqlGenerator.in(userIds)+")"
+				+ " and task_id =?";
+		return this.createQuery(sql, userIds,taskId).list();
+	}
+	
+	public void updateRecycle(String taskId, String[] userIds)throws JDBCException{
+		//更新所有需要回收的设备为未回收
+		String sql ="update w_task_user set recycle_result='F' where task_id =? "
+				+ "and recycle_device='T'";
+		this.executeUpdate(sql, taskId);
+		//更新回收信息
+		 
+		sql ="update w_task_user set recycle_result='T' where task_id =? "
+				+ " and user_id in ("+sqlGenerator.in(userIds)+")"
+					+ "and recycle_device='T'";
+		this.executeUpdate(sql, taskId);
+	}
+	
+
 }

@@ -38,12 +38,21 @@ public interface ISnTaskService {
 	 */
 	public void fillTask(String taskId,List<TaskFillDevice> deviceList)throws Exception;
 	
+	
+	/**
+	 * 回填拆机工单的设备回收信息
+	 * @param taskId
+	 * @param userIds
+	 * @throws Exception
+	 */
+	public void fillWriteOffTerminalTask(String taskId,String[] userIds) throws Exception;
+	
 	/**
 	 * 完工
 	 * @param taskId
 	 * @param resultType 完工类型
 	 */
-	public void finishTask(String taskId,String resultType)throws Exception;
+	public void finishTask(String taskId,String resultType,String remark)throws Exception;
 	
 	/**
 	 * 工单查询
