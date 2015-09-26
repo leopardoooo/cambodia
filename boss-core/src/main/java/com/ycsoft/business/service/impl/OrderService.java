@@ -155,6 +155,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		//处理授权
 		this.authProdNoPackage(orderChangeList, userMap, done_code);
 		
+		this.saveAllPublic(done_code, this.getBusiParam());
 	}
 	
 	private CProdOrderDto checkOrderEditParam(String cust_id,OrderProd orderProd) throws Exception{
