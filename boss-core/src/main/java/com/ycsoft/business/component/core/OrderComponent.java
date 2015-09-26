@@ -129,6 +129,26 @@ public class OrderComponent extends BaseBusiComponent {
 		}
 		edit.setOld_transfer_fee(transFee);
 		//套餐子产品的选择情况,在编辑面板异步加载
+		if(!order.getProd_type().equals(SystemConstants.PROD_TYPE_BASE)){
+			
+			Map<String,Set<String>> groupUserMap=new HashMap<>();
+			for(CProdOrder detail: cProdOrderDao.queryPakDetailOrder(order.getOrder_sn())){
+				Set<String> set=groupUserMap.get(detail.getPackage_group_id());
+				if(set==null){
+					set=new HashSet<String>();
+					groupUserMap.put(detail.getPackage_group_id(), set);
+				}
+				set.add(detail.getUser_id());
+			}
+			List<PackageGroupUser> groupSelected=new ArrayList<>();
+			for(String group_id:   groupUserMap.keySet()){
+				PackageGroupUser pgu=new PackageGroupUser();
+				groupSelected.add(pgu);
+				pgu.setPackage_group_id(group_id);
+				pgu.setUserSelectList(Arrays.asList(groupUserMap.get(group_id).toArray(new String[groupUserMap.get(group_id).size()])));
+			}
+			edit.setGroupSelected(groupSelected);
+		}
 		return edit;
 	}
 	/**
