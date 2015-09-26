@@ -246,7 +246,7 @@ public class OrderComponent extends BaseBusiComponent {
 			//退款的情况
 			//取INPUT_TYPE=CFEE的记录进行扣费
 			List<CProdOrderFee> orderFeeOuts=new ArrayList<>();
-			int tempFee=payFee;
+			int tempFee=payFee*-1;
 			for(CProdOrderFee orderFee:cProdOrderFeeDao.queryByOrderSn(cProdorder.getOrder_sn())){
 				if(tempFee<=0) break;
 				if(orderFee.getInput_type().equals(SystemConstants.ORDER_FEE_TYPE_CFEE)){
@@ -1329,7 +1329,7 @@ public class OrderComponent extends BaseBusiComponent {
 			out.setPre_fee(orderFee.getFee());
 			out.setFee(orderFee.getFee()-out.getOutput_fee());
 			out.setCreate_time(new Date());
-			cProdOrderFeeDao.updateOrderFee(orderFee.getOrder_fee_sn(), orderFee.getOutput_fee());
+			cProdOrderFeeDao.updateOrderFee(orderFee.getOrder_fee_sn(), out.getOutput_fee());
 		}
 		cProdOrderFeeOutDao.save(outList.toArray(new CProdOrderFeeOut[outList.size()]));
 	}

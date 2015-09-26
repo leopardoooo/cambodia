@@ -221,9 +221,14 @@ public class SnTaskComponent extends BaseBusiComponent{
 		
 		return userList;
 	}
+	public void fillWriteOffTerminalTask(int doneCode,String taskId, String[] userIds) throws Exception{
+		wTaskUserDao.updateRecycle(taskId, userIds);
+		createTaskLog(taskId,BusiCodeConstants.TASK_FILL, doneCode, null, StatusConstants.NONE);
+	}
+
 	
 	//完工
-	public void finishTask(Integer doneCode,String taskId,String resultType) throws Exception{
+	public void finishTask(Integer doneCode,String taskId,String resultType,String finishDesc) throws Exception{
 		//检查设备是否已经回填
 		if (wTaskUserDao.queryUnFillUserCount(taskId)>0)
 			throw new ComponentException(ErrorCode.TaskDeviceIsNull);
@@ -231,6 +236,7 @@ public class SnTaskComponent extends BaseBusiComponent{
 		task.setTask_id(taskId);
 		task.setTask_status(StatusConstants.TASK_END);
 		task.setTask_finish_type(resultType);
+		task.setTask_finish_desc(finishDesc);
 		task.setTask_finish_time(new Date());
 		
 		wTaskBaseInfoDao.update(task);
@@ -336,7 +342,6 @@ public class SnTaskComponent extends BaseBusiComponent{
 			taskUser.setDevice_id(user.getUser_type().equals(SystemConstants.USER_TYPE_BAND)?user.getModem_mac():user.getStb_id());
 			//如果是销终端工单，则需要指定哪些设备需要回收
 			if (taskType.equals(SystemConstants.TASK_TYPE_WRITEOFF_TERMINAL)){
-				taskUser.setDevice_id(user.getUser_type().equals(SystemConstants.USER_TYPE_BAND)?user.getModem_mac():user.getStb_id());
 				//如果产品是广电的设备，需要回收
 				RDevice device = rDeviceDao.findByDeviceCode(taskUser.getDevice_id());
 				if (device.getOwnership().equals(SystemConstants.OWNERSHIP_GD)){
@@ -492,6 +497,7 @@ public class SnTaskComponent extends BaseBusiComponent{
 		this.wTaskLogDao = wTaskLogDao;
 	}
 
+	
 	
 	
 }

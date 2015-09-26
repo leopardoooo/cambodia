@@ -86,6 +86,9 @@ public class OrderService extends BaseBusiService implements IOrderService{
 
 	/**
 	 * 查询订单修改需要初始化数据
+	 * 未支付的，宽带和套餐可以改产品，资费，订购期限，套餐终端选择
+	 * 已支付的，只有协议套餐能修改
+	 * 先实现未支付的修改
 	 * @param orderSn
 	 * @throws Exception 
 	 */
@@ -97,6 +100,11 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		if(order==null){
 			throw new ServicesException(ErrorCode.ParamIsNull);
 		}
+		if(order.getIs_pay().equals(SystemConstants.BOOLEAN_TRUE)
+				&&!order.getProd_type().equals(SystemConstants.PROD_TYPE_SPKG)){
+			 //已支付的，只有协议套餐能修改
+			throw new ServicesException(ErrorCode.OrderEditNoProd);
+		}
 		OrderProdEdit edit=orderComponent.createOrderEdit(order);
 		
 		orderComponent.queryOrderableEdit(custComponent.queryCustById(order.getCust_id()), order.getOrder_sn(), edit);
@@ -105,6 +113,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 			//不能修改，没有可用的产品资费
 			throw new ServicesException(ErrorCode.OrderEditNoProd);
 		}
+		
 		return edit;
 	}
 	/**
@@ -130,6 +139,8 @@ public class OrderService extends BaseBusiService implements IOrderService{
 			//插入CFEE记录
 			String feeSn=feeComponent.saveOrderEdittoCFee(order, orderProd.getPay_fee(), cust, done_code, this.getBusiParam().getBusiCode());
 			orderComponent.saveOrderEditFee(order, orderProd.getPay_fee(), feeSn, done_code);
+			//记录未支付业务
+			doneCodeComponent.saveDoneCodeUnPay(cust_id, done_code, this.getOptr().getOptr_id());
 		}
 		
 		//记录异动
@@ -211,7 +222,12 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		orderProd.setBilling_type(tariff.getBilling_type());
 		orderProd.setOrder_cycle(order_cycles);
 		
+		if(orderProd.getTransfer_fee()==null){
+			orderProd.setTransfer_fee(0);
+		}
+		
 		int new_order_fee=order.getOrder_fee()+orderProd.getPay_fee();
+		
 		if(new_order_fee<0){//订单费用不能小于0
 			throw new ComponentException(ErrorCode.OrderDateFeeError);
 		}

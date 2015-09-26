@@ -68,18 +68,11 @@ public class CProdOrderFeeDao extends BaseEntityDao<CProdOrderFee>  {
 	}
 	
 	public Pager<CProdOrderFee> queryOrderFeeDetail(String orderSn, Integer start, Integer limit) throws Exception {
-		String sql = "select t.*, inprod.prod_id input_prod_id, nvl(output1.prod_id, output2.prod_id) output_prod_id,"
-				+ " (select prod_name from p_prod p where p.prod_id=inprod.prod_id) input_prod_name,"
-				+ " (select prod_name from p_prod p where p.prod_id=nvl(output1.prod_id, output2.prod_id)) output_prod_name"
+		String sql = "select t.done_code,t.order_fee_sn,t.input_type,t.fee_type,t.fee input_fee,t.create_time, t.remark input_prod_name "
 				+ " from (select * from c_prod_order_fee where order_sn=?) t"
-				+ " left join c_prod_order_fee input on t.input_type = ? and t.input_sn = input.order_fee_sn"
-				+ " left join c_prod_order_his inprod on inprod.order_sn = input.order_sn"
-				+ " left join c_prod_order_fee output on t.output_type = ? and t.output_sn = output.order_fee_sn"
-				+ " left join c_prod_order output1 on output1.order_sn = output.order_sn"
-				+ " left join c_prod_order_his output2 on output2.order_sn = output.order_sn"
 				+ " order by t.create_time desc";
 		
-		return this.createQuery(sql, orderSn, SystemConstants.ORDER_FEE_TYPE_TRANSFEE, SystemConstants.ORDER_FEE_TYPE_TRANSFEE).setStart(start).setLimit(limit).page();
+		return this.createQuery(sql, orderSn).setStart(start).setLimit(limit).page();
 	}
 	
 	public List<CProdOrderFee> queryPayedOrderFeeByUser(String custId,String[] userIds) throws Exception{

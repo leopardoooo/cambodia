@@ -8,6 +8,7 @@ import com.ycsoft.beans.core.prod.CProdOrderFollowPay;
 import com.ycsoft.business.commons.abstracts.IBaseService;
 import com.ycsoft.business.dto.core.fee.FeeBusiFormDto;
 import com.ycsoft.business.dto.core.prod.OrderProd;
+import com.ycsoft.business.dto.core.prod.OrderProdEdit;
 import com.ycsoft.business.dto.core.prod.OrderProdPanel;
 import com.ycsoft.business.dto.core.prod.PackageGroupPanel;
 
@@ -37,6 +38,9 @@ public interface IOrderService extends IBaseService{
 
 	public void savePublicRefund(Integer fee)throws Exception;
 
+	public OrderProdEdit queryOrderToEdit(String orderSn)throws Exception;
+	
+	public void saveOrderEdit(OrderProd orderProd) throws Exception;
 	public void savePayOtherFee()throws Exception;
 
 }
