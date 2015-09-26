@@ -169,6 +169,11 @@ public class ProdOrderAction extends BaseBusiAction {
 		return JSON;
 	}
 	
+	public String savePayOtherFee() throws Exception{
+		orderService.savePayOtherFee();
+		return JSON;
+	} 
+	
 	
 	public String savePublicRefund() throws Exception{
 		orderService.savePublicRefund(fee);

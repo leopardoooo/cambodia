@@ -41,4 +41,6 @@ public interface IOrderService extends IBaseService{
 	public OrderProdEdit queryOrderToEdit(String orderSn)throws Exception;
 	
 	public void saveOrderEdit(OrderProd orderProd) throws Exception;
+	public void savePayOtherFee()throws Exception;
+
 }

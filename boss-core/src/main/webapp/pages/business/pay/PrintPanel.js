@@ -481,7 +481,7 @@ InvoiceWindow = Ext.extend( Ext.Window ,{
 				{name: 'invoiceId', type: 'number'},
 				{name: 'invoice_book_id', type: 'number'},
 				{name: 'invoice_code', type: 'number'},
-				{name: 'optr_name', type: 'string'}
+				{name: 'open_optr_name', type: 'string'}
 			]
 		});
 		
@@ -507,7 +507,7 @@ InvoiceWindow = Ext.extend( Ext.Window ,{
             }, {
                 header: LU_PI.invoiceGridColumns[2],
                 align: 'center',
-                dataIndex: 'optr_name',
+                dataIndex: 'open_optr_name',
                 width: 130
         	}],
         	listeners : {
@@ -585,14 +585,14 @@ InvoiceWindow = Ext.extend( Ext.Window ,{
 				if (data.length==1){
 					o.record.set('invoice_code',data[0]['invoice_code']);
 					o.record.set('invoice_book_id',data[0]['invoice_book_id']);
-					o.record.set('optr_name',data[0]['optr_name']);
+					o.record.set('open_optr_name',data[0]['open_optr_name']);
 				}
 			};
 			var clearFunc = function(){
 				o.record.set('invoiceId','');
 				o.record.set('invoice_code','AAA');
 				o.record.set('invoice_book_id','AAA');
-				o.record.set('optr_name','');
+				o.record.set('open_optr_name','');
 			};
 			this.checkInvoice(o.value,successFunc,clearFunc);
 		}
