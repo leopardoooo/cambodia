@@ -242,7 +242,7 @@ QueryInvoiceGrid = Ext.extend(Ext.grid.GridPanel,{
 				'invoice_mode','invoice_mode_text','finance_status','finance_status_text',
 				'invoice_book_id','invoice_type_text','depot_id','depot_name',
 				'county_id','county_id_text','create_time','use_time','check_time','close_time',
-				'invoice_amount','optr_id','optr_name','is_loss','is_loss_text'
+				'invoice_amount','optr_id','optr_name','is_loss','is_loss_text','open_optr_name','cust_name'
 				]
 		});
 		this.store.on("load",function(store){
@@ -258,14 +258,14 @@ QueryInvoiceGrid = Ext.extend(Ext.grid.GridPanel,{
 			defaults:{sortable:false},
 			
 			columns:[
-				{header:lsys('InvoiceCommon.invoice_id'),dataIndex:'invoice_id',width:70,align:'center',renderer:App.qtipValue},
-				{header:lsys('InvoiceCommon.invoice_code'),dataIndex:'invoice_code',width:80,align:'center',renderer:App.qtipValue},
-				{header:lsys('InvoiceCommon.invoice_type'),dataIndex:'invoice_type_text',width:65,align:'center',renderer:App.qtipValue},
-				{header:lsys('InvoiceCommon.status'),dataIndex:'status_text',width:65,align:'center',renderer:App.qtipValue},
-				{header:lsys('InvoiceCommon.finance_status'),dataIndex:'finance_status_text',width:60,align:'center',renderer:App.qtipValue},
-				{header:lsys('InvoiceCommon.amount'),dataIndex:'amount',width:45,align:'center',renderer:Ext.util.Format.formatFee},
+				{header:lsys('InvoiceCommon.invoice_id'),dataIndex:'invoice_id',width:75,align:'center',renderer:App.qtipValue},
+				{header:lsys('InvoiceCommon.invoice_type'),dataIndex:'invoice_type_text',width:70,align:'center',renderer:App.qtipValue},
+				{header:lsys('InvoiceCommon.status'),dataIndex:'status_text',width:70,align:'center',renderer:App.qtipValue},
+				{header:lsys('InvoiceCommon.finance_status'),dataIndex:'finance_status_text',width:70,align:'center',renderer:App.qtipValue},
+				{header:lsys('InvoiceCommon.amount'),dataIndex:'amount',width:65,align:'center',renderer:Ext.util.Format.formatFee},
 				{header:lsys('InvoiceCommon.optr_name'),dataIndex:'optr_name',width:90,align:'center'},
-				{header:lsys('InvoiceCommon.depot_name'),dataIndex:'depot_name',width:80,align:'center',renderer:App.qtipValue},
+				{header:lsys('InvoiceCommon.open_optr_name'),dataIndex:'open_optr_name',width:90,align:'center'},
+				{header:lsys('InvoiceCommon.depot_name'),dataIndex:'depot_name',width:120,align:'center',renderer:App.qtipValue},
 				{header:lsys('InvoiceCommon.create_time'),dataIndex:'create_time',width:120,align:'center',renderer:App.qtipValue},
 				{header:lsys('InvoiceCommon.use_time'),dataIndex:'use_time',width:120,align:'center',renderer:App.qtipValue},
 				{header:lsys('InvoiceCommon.check_time'),dataIndex:'check_time',width:120,align:'center',renderer:App.qtipValue},
