@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 
 import com.ycsoft.beans.task.WTaskUser;
 import com.ycsoft.business.dto.config.TaskUserDto;
+import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.daos.abstracts.BaseEntityDao;
 import com.ycsoft.daos.core.JDBCException;
 
@@ -25,14 +26,18 @@ public class WTaskUserDao extends BaseEntityDao<WTaskUser> {
 	}
 
 	public List<TaskUserDto> queryUserDetailByTaskId(String taskId) throws JDBCException {
-		String sql = "select t.*,cu.*"
-				+ " from w_task_user t,c_user cu  where t.task_id=? and t.user_id = cu.user_id ";
+		String sql = "select t.*  from w_task_user t where t.task_id=? ";
 		return this.createQuery(TaskUserDto.class,sql, taskId).list();
 	}
 	
 	public void updateTaskUserDevice(String deviceId,String userId,String taskId) throws Exception {
 		String sql = "update w_task_user set device_id=? where task_id=? and user_id=?";
 		this.executeUpdate(sql,deviceId,taskId,userId);
+	}
+
+	public List<TaskUserDto> queryTaskWriteoffTerminal(String task_id) throws Exception {
+		String sql = "select t.*  from w_task_user t where t.task_id=? and t.recycle_device = ?";
+		return this.createQuery(TaskUserDto.class,sql, task_id,SystemConstants.BOOLEAN_TRUE).list();
 	}
 
 }

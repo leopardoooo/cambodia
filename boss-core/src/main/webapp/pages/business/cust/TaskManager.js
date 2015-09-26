@@ -72,19 +72,42 @@ TaskAllInfo = Ext.extend(Ext.TabPanel,{
 
 var TaskDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 	taskDeviceGridStore:null,
-	taskId:null,
-	constructor:function(){
-		var that = this;
+	taskTypeId:null,
+	constructor:function(rs){
 		this.taskDeviceGridStore = new Ext.data.JsonStore({
+			url: root + '/core/x/Task!queryTaskDevice.action' ,
 			fields:['device_id','device_type','device_type_text','device_model','device_model_text',
-				'device_code','user_type', 'user_type_text','user_name','task_id','occNo','posNo']
+				'device_code','user_type', 'user_type_text','user_name','task_id','occNo','posNo','recycle_result'
+				,'recycle_result_text']
 		});
-		
-		var columns = [{
-						header : '用户类型',dataIndex : 'user_type_text',width : 70,renderer : App.qtipValue}, {
-						header : '用户名',dataIndex : 'user_name',renderer : App.qtipValue},
-						{header:'型号',dataIndex:'device_model_text',width:130},	
-						{header:'设备编号',dataIndex:'device_code',width:130,editor:new Ext.form.TextField({
+		var taskId = rs.get('task_id');
+		this.taskTypeId = rs.get('task_type_id');
+		this.taskDeviceGridStore.load({
+			params : {
+				task_id :taskId
+			}
+		});
+		var columns = [],nextColums = [];	
+		var baseColumns = [{
+				header : '用户类型',dataIndex : 'user_type_text',width : 70,renderer : App.qtipValue}, {
+				header : '用户名',dataIndex : 'user_name',renderer : App.qtipValue},
+				{header:'型号',dataIndex:'device_model_text',width:130}];
+		if(this.taskTypeId == '9'){
+			this.resultCombo = new Ext.ux.ParamCombo({
+				paramName:'BOOLEAN',typeAhead:false,valueField:'item_name',
+				forceSelection:true,selectOnFocus:true,editable:true,
+					listeners:{
+						scope:this,
+						select:function(combo,record){
+							this.getSelectionModel().getSelected().set('change_ownship',record.get('item_value'));
+						}
+					}
+				});
+			App.form.initComboData([this.resultCombo]);
+			nextColums = [{header:'设备编号',dataIndex:'device_id',width:130},
+				{header:'设备回收',dataIndex:'recycle_result_text',width:80,editor:this.resultCombo}]; 
+		}else{
+			nextColums = [{header:'设备编号',dataIndex:'device_code',width:130,editor:new Ext.form.TextField({
 							vtype:'alphanum'
 						})},
 						{header:'occNo',dataIndex:'occNo',width:80,editor:new Ext.form.TextField({
@@ -92,8 +115,9 @@ var TaskDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 						})},
 						{header:'posNo',dataIndex:'posNo',width:80,editor:new Ext.form.TextField({
 							vtype:'alphanum'							
-						})}
-		];
+						})}]
+		}
+		columns  = baseColumns.concat(nextColums)
 		
 		TaskDeviceGrid.superclass.constructor.call(this,{
 			region:'center',
@@ -194,8 +218,9 @@ var TaskDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 TaskDeviceWin = Ext.extend(Ext.Window,{
 	deviceGrid : null,
 	task_id:null,
-	constructor : function(){
-		this.deviceGrid = new TaskDeviceGrid();
+	task_type_id:null,
+	constructor : function(rs){
+		this.deviceGrid = new TaskDeviceGrid(rs);
 		TaskDeviceWin.superclass.constructor.call(this,{
 			title : '设备回填',
 			layout : 'fit',
@@ -241,9 +266,9 @@ TaskDeviceWin = Ext.extend(Ext.Window,{
 			that.close();
 		});
 	},
-	show:function(t,data){
-		this.task_id = t;
-		this.deviceGrid.taskDeviceGridStore.loadData(data);
+	show:function(rs,data){
+		this.task_id = rs.get('task_id');
+		this.task_type_id = rs.get('task_type_id');
 		TaskDeviceWin.superclass.show.call(this);
 	}
 });
@@ -259,8 +284,6 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 	taskDetailsWin:null,
 	iconCls: 'doc',
 	taskAllInfo:null,
-	taskUserData:null,
-	taskLogData:null,
 	constructor:function(item){
 		this.initWidgets(item);	
 		this.taskAllInfo = new TaskAllInfo();
@@ -441,7 +464,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 		    displayField: 'dept_name'
 		});
 		//初始化下拉框的数据 
-		App.form.initComboData([this.taskStatusCombo,this.taskDetailTypeCombo]);
+		App.form.initComboData([this.taskStatusCombo,this.taskDetailTypeCombo],function(){this.doWaitTask();},this);
 		
 		var twoTbar = new Ext.Toolbar({
 			items : [this.taskNoField,'-',this.custNoField,'-',this.mobileField,'-',this.custNameField,'-',this.newaddrField,'-',{
@@ -526,8 +549,6 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 			},
 			success : function(res,opt){
 				var rs = Ext.decode(res.responseText);
-				this.taskUserData = rs.taskUserList;
-				this.taskLogData = rs.taskLogList;
 				this.taskAllInfo.userGrid.getStore().loadData(rs.taskUserList);
 				this.taskAllInfo.detail.getStore().loadData(rs.taskLogList);
 			}
@@ -675,8 +696,8 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 		}
 		var win = Ext.getCmp('TaskDeviceWinId');
 		if(!win)
-			win = new TaskDeviceWin();
-		win.show(rs.get('task_id'),this.taskUserData);
+			win = new TaskDeviceWin(rs);
+		win.show(rs);
 	},
 	doEndTask:function(){//完成工单
 		var rs = this.getSelections();

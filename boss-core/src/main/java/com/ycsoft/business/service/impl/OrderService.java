@@ -324,7 +324,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 	 * 用户销户查询该用户的所有产品信息包含退款金额（高级销户，普通销户）
 	 */
 	public List<CProdOrderDto> queryLogoffUserProd(String busi_code,String user_id) throws Exception{
-		
+		List<CUser> userList = this.getBusiParam().getSelectedUsers();
 		List<CProdOrderDto> orderList=orderComponent.queryLogoffProdOrderDtoByUserId(user_id);
 		//是否高级权限
 		boolean isHigh=orderComponent.isHighCancel(busi_code);

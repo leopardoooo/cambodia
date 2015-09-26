@@ -55,7 +55,6 @@ public class WTaskUser implements Serializable {
 	}
 	public void setDevice_model(String device_model) {
 		this.device_model = device_model;
-		device_model_text = MemoryDict.getDictName(DictKey.DEVICE_MODEL, this.device_model);
 	}
 	public String getDevice_id() {
 		return device_id;

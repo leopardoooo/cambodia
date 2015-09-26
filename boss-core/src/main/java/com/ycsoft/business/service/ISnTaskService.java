@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 
 import com.ycsoft.beans.task.TaskFillDevice;
-import com.ycsoft.beans.task.WTaskBaseInfo;
 import com.ycsoft.beans.task.WTeam;
 import com.ycsoft.business.dto.config.TaskBaseInfoDto;
+import com.ycsoft.business.dto.config.TaskUserDto;
 import com.ycsoft.business.dto.device.DeviceDto;
 import com.ycsoft.daos.core.Pager;
 
@@ -75,6 +75,8 @@ public interface ISnTaskService {
 	public List<TaskBaseInfoDto> queryTaskByCustId(String custId) throws Exception;
 
 	public Pager<TaskBaseInfoDto> queryUnProcessTask(Integer start, Integer limit)throws Exception;
+
+	public List<TaskUserDto> queryTaskDevice(String task_id) throws Exception;
 	
 	
 
