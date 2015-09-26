@@ -39,6 +39,7 @@ public enum ErrorCode {
 	UnPayAcctRefundFeeAndChangeIsDiffer("账户退款和资金异动明细不一致"),
 	UnPayLock("客户被锁定,请等待%s(%s)完成支付!"),
 	UnPayIsOld("待支付金额已失效，请重新打开待支付界面"),
+	UnPayHasEdit("对应订单金额被修改，不能取消，请使用订单修改功能更正费用"),
 	
 	PayCancelOnlyPayOptr("只有支付操作员可以操作回退支付"),
 	//PayCancelInvoiceIsCheck("发票已结账，不能回退支付"),InvoiceCheckStatusIsNotIdle
@@ -73,6 +74,9 @@ public enum ErrorCode {
 	OrderTransUnPayPleaseCancel("被覆盖的订单存在未支付记录，请先取消订单号=%s的费用才能升级"),
 	OrderDateCanNotUpWhyPak("产品不能升级,因为存在有效的套餐子产品"),
 
+	OrderStatusException("订单状态异常"),
+	OrderEditOnlyUnPay("只有未支付的订单才可以修改退款"),
+	OrderEditNoProd("没有可用的产品资费"),
 	//task
 	TaskDeviceIsNull("设备未回填"),
 	TaskDeviceModelIsNull("该工单用户的设备型号不存在"),

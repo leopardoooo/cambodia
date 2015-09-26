@@ -679,6 +679,30 @@ public class CFeeDao extends BaseEntityDao<CFee> {
 			  "	   and package_sn is not null) and status='UNPAY'";	
 		return createQuery(CFeeAcct.class,sql,custId,custId).list();
 	} 
+	/**
+	 * 提取和工单相关的缴费记录
+	 * a类：所有单产品订单（退订） 、 b类：在工单创建之后订购的套餐（套餐退订）
+	 * @param custId
+	 * @param userIds
+	 * @return
+	 * @throws JDBCException
+	 */
+	public List<CFeeAcct> queryTaskUserUnPayCFeeAcct(String custId,String[] userIds,Integer taskDoneCode) throws JDBCException {
+		String sql = "select a.*,b.prod_sn from c_fee a,c_fee_acct b where a.fee_sn = b.fee_sn "+
+			  "and a.status = 'UNPAY'	and b.prod_sn in ( "+
+				  "	select order_sn "+
+				  "	  from c_prod_order "+
+				  "	 where cust_id = ?  "+
+				  "	   and user_id in ("+sqlGenerator.in(userIds)+") "+
+				  "	   and package_sn is null "+
+				  "	union "+
+				  "	select pak.order_sn "+
+				  "	  from c_prod_order a,c_prod_order pak "+
+				  "	 where a.cust_id = ? "+
+				  "	   and a.user_id in ("+sqlGenerator.in(userIds)+") "+
+				  "	   and a.package_sn=pak.order_sn and pak.done_code>? )";
+		return createQuery(CFeeAcct.class,sql,custId,custId,taskDoneCode).list();
+	}
 	
 	public CFeeAcct queryAcctFeeByOrderSn(String orderSn)throws JDBCException {
 		String sql ="select a.* from c_fee a,c_fee_acct b "
