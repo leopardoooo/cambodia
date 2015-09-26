@@ -791,7 +791,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		Map<Integer, CUser> map = new HashMap<Integer, CUser>();
 		for (CUser user:users){
 			if (!user.getStatus().equals(StatusConstants.ACTIVE)){
-				throw new ServicesException("用户["+user.getUser_id()+"]不是正常状态，不能报停!");
+				throw new ServicesException("用户["+user.getUser_id()+"]不是正常状态，不能拆机!");
 				
 			}
 			if (packageUserIdS.get(user.getUser_id()) != null){
