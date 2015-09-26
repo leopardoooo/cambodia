@@ -145,7 +145,7 @@ public interface IUserService extends IBaseService{
 	 * @param newPwd   新密码
 	 * @throws Exception
 	 */
-	public void saveEditPwd(String newPwd) throws Exception;
+	public void saveEditPwd(String loginName, String newPwd) throws Exception;
 	
 	/**
 	 * 修改连接数

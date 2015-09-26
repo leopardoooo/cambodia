@@ -19,7 +19,10 @@ EditPasswordForm = Ext.extend(BaseForm, {
 			items : [{
 				xtype : 'textfield',
 				fieldLabel : lmain("user._form.loginId"),
-				style : Constant.TEXTFIELD_STYLE,
+//				style : Constant.TEXTFIELD_STYLE,
+				name: 'login_name',
+				id: 'loginNameId',
+				allowBlank: false,
 				value : record.get('user_name')
 			},{
 						fieldLabel : lbc("common.newPswd"),
@@ -53,12 +56,12 @@ EditPasswordForm = Ext.extend(BaseForm, {
 	},
 	getValues : function() {
 		var obj = {};
+		obj['login_name'] = Ext.getCmp('loginNameId').getValue();
 		obj['login_password'] = Ext.getCmp('password').getValue();
 		return obj;
 	},
 	success : function() {
-		App.getApp()
-				.refreshPanel(App.getApp().getData().currentResource.busicode);
+		App.getApp().refreshPanel(App.getApp().getData().currentResource.busicode);
 	}
 });
 

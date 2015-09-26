@@ -2815,4 +2815,11 @@ public class UserService extends BaseBusiService implements IUserService {
 		
 	}
 
+
+	@Override
+	public void saveEditPwd(String loginName, String newPwd) throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+
 }
