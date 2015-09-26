@@ -44,6 +44,7 @@ public class RInvoice implements Serializable {
 	private Integer invoice_amount;
 	private String optr_id;
 	private String is_loss;
+	private String open_optr_id;
 
 	private String check_depot_id_text;
 	private String invoice_type_text;
@@ -53,6 +54,7 @@ public class RInvoice implements Serializable {
 	private String invoice_mode_text ;
 	private String optr_name;
 	private String is_loss_text;
+	private String open_optr_name;
 	
 
 	public Integer getInvoice_amount() {
@@ -280,7 +282,20 @@ public class RInvoice implements Serializable {
 	public String getIs_loss_text() {
 		return is_loss_text;
 	}
+	
+	public String getOpen_optr_id() {
+		return open_optr_id;
+	}
 
+
+	public void setOpen_optr_id(String open_optr_id) {
+		this.open_optr_id = open_optr_id;
+		this.open_optr_name= MemoryDict.getDictName(DictKey.OPTR, open_optr_id);
+	}
+	
+	public String getOpen_optr_name() {
+		return open_optr_name;
+	}
 
 
 }

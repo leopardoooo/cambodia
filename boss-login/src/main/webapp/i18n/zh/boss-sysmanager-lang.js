@@ -268,11 +268,13 @@ Sys = {
 			invoice_mode:'出票方式~',
 			invoice_type: "收据类型~",
 			finance_status: "结存状态~",
-			optr_name: "所属营业员~",
+			optr_name: "领用人~",
+			open_optr_name: "开票人~",
 			status: "使用状态~",
 			amount:'金&nbsp;&nbsp;额~',
 			use_optr:'领&nbsp;用&nbsp;人~',
 			use_time: "开票时间~",
+			cust_name: "客户名称~",
 			//好多个功能下面的表格使用了同样的column
 			commonGridColls:['收据号码~','收据代码~','收据类型~','使用状态~','金额~','出票方式~','结存状态~','仓库~','领用人~']
 	},
