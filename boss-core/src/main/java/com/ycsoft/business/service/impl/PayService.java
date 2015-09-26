@@ -968,15 +968,15 @@ public class PayService extends BaseBusiService implements IPayService {
 		
 		//检查是否存在未支付 busicode = 1108,1109，可以使用取消支付 功能
 		CDoneCode cd = doneCodeComponent.queryByKey(busiDoneCode);
-		boolean isCanDoDevice = true;
+		boolean isCanDoDevice = false;
 		if(cd.getBusi_code().equals(BusiCodeConstants.DEVICE_BUY_PJ) || cd.getBusi_code().equals(BusiCodeConstants.DEVICE_BUY_PJ_BACTH)){
 			List<FeeDto> unPayList = feeComponent.queryUnPay(getBusiParam().getCust().getCust_id(),this.getOptr().getOptr_id());
 			for(FeeDto dto : unPayList){
 				if(dto.getBusi_code().equals(BusiCodeConstants.DEVICE_BUY_PJ) || dto.getBusi_code().equals(BusiCodeConstants.DEVICE_BUY_PJ_BACTH)){
-					isCanDoDevice = false;
 					throw new ServicesException(ErrorCode.EditFeeUnPayError);
 				}
 			}
+			isCanDoDevice = true;
 		}
 		for (FeeBusiFormDto feeDto:feeList){
 			

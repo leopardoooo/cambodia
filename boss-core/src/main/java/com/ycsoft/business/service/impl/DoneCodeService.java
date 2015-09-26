@@ -113,18 +113,18 @@ public class DoneCodeService extends BaseBusiService implements IDoneCodeService
 				}
 			} 
 //		}  else {
-			List<BusiFeeDto> busiList = feeComponent.getBusiFeeAndIpFeeItems();
+			List<BusiFeeDto> busiList = feeComponent.getBusiFeeItems();
 			for (BusiFeeDto busiFee:busiList){
-				//IP费用
-				if(busiFee.getFee_id().equals(SystemConstants.USER_IP_FEE_ID)){
-					CFee fee = feeMap.get(busiFee.getFee_id());
-					if(fee != null){
-						busiFee.setSum_fee(fee.getReal_pay());
-						busiFee.setBuy_num(0);
-						busiFee.setAddr_id(fee.getAddr_id());
-						feeList.add(busiFee);
-					}
-				}else{
+//				//IP费用
+//				if(busiFee.getFee_id().equals(SystemConstants.USER_IP_FEE_ID)){
+//					CFee fee = feeMap.get(busiFee.getFee_id());
+//					if(fee != null){
+//						busiFee.setSum_fee(fee.getReal_pay());
+//						busiFee.setBuy_num(0);
+//						busiFee.setAddr_id(fee.getAddr_id());
+//						feeList.add(busiFee);
+//					}
+//				}else{
 					if (busiFee.getBusi_code().equals(busiCode)){
 						for (CFee fee:sumFeeList){
 							if (fee.getFee_id().equals(busiFee.getFee_id())){
@@ -136,7 +136,7 @@ public class DoneCodeService extends BaseBusiService implements IDoneCodeService
 						}
 						feeList.add(busiFee);
 					}					
-				}
+//				}
 			}
 			
 //		}

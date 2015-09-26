@@ -112,7 +112,9 @@
 .prodTaoCanDingGou {
     background-image: url(./../images/menu2/jpz-taocandinggou2.png) !important;
 }
-
+.otherPay { 
+	background-image: url(./../images/menu2/pay_cost.png) !important;
+}
 /** 以下是菜单样式 ***/
 .btn-panel {
 	background-color:#E7EEFE;/**E0E9FE*/

@@ -85,19 +85,14 @@ var TaskDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 						header : '用户名',dataIndex : 'user_name',renderer : App.qtipValue},
 						{header:'型号',dataIndex:'device_model_text',width:130},	
 						{header:'设备编号',dataIndex:'device_code',width:130,editor:new Ext.form.TextField({
-							vtype:'alphanum',
-							listeners:{
-								scope:this
-//								,change:this.queryAndAddDevice
-							}
+							vtype:'alphanum'
 						})},
 						{header:'occNo',dataIndex:'occNo',width:80,editor:new Ext.form.TextField({
 							vtype:'alphanum'
 						})},
 						{header:'posNo',dataIndex:'posNo',width:80,editor:new Ext.form.TextField({
 							vtype:'alphanum'							
-						})},
-						{header:'类型',dataIndex:'device_type_text',width:70}
+						})}
 		];
 		
 		TaskDeviceGrid.superclass.constructor.call(this,{
@@ -111,7 +106,6 @@ var TaskDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 				beforeedit: this.beforeEdit,
 				afteredit:this.afteredit
 			}
-//			tbar: ['otlNo:',this.otlNoField,'-','ponNo:',this.ponNoField]
 		});
 		},beforeEdit: function(obj){
 			if(obj.field == 'occNo' || obj.field == 'posNo'){
@@ -122,13 +116,14 @@ var TaskDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 			}
 		},
 		afteredit:function(obj){
-			if(obj.field == 'device_code'){
-				var record =obj.record;
-				this.queryAndAddDevice(record);
-				
-			}
+			//暂时不验证
+//			if(obj.field == 'device_code'){
+//				var record =obj.record;
+//				this.queryAndAddDevice(obj.value,record);
+//				
+//			}
 		},
-		queryAndAddDevice:function(record){
+		queryAndAddDevice:function(newValue,record){
 			Ext.Ajax.request({
 				url:Constant.ROOT_PATH + "/core/x/Task!queryDeviceInfoByCodeAndModel.action",
 				params:{deviceCode:newValue,deviceModel:record.get('device_model')},
@@ -488,7 +483,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 					return "<span style='font-weight: bold;color: "+ color +";'>"+ text +"</span>";
 				}},
 				{header:'施工队', dataIndex:'team_id_text',width:100,renderer:App.qtipValue},
-				{header: 'ZTE状态',dataIndex: 'zte_status_text', width: 70, renderer:App.qtipValue},
+				{header: 'ZTE状态',dataIndex: 'zte_status_text', width: 70, renderer:Ext.util.Format.statusShow},
 				{header: '地址', 		dataIndex : 'address', width: 200,renderer:App.qtipValue},
 				{header: '联系电话', 	dataIndex : 'tel', 				width: 100},
 				{header: '创建时间', dataIndex: 'task_create_time', 	width: 80, renderer: Ext.util.Format.dateFormat},					

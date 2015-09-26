@@ -37,4 +37,6 @@ public interface IOrderService extends IBaseService{
 
 	public void savePublicRefund(Integer fee)throws Exception;
 
+	public void savePayOtherFee()throws Exception;
+
 }

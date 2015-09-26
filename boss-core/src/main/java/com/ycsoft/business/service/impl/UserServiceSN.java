@@ -1523,69 +1523,9 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 			}
 		}
 		
-		//cacel users all unpay acctfee
-		List<CFeeAcct> acctFeeList = cFeeDao.queryUserUnPayOrderFee(task.getCust_id(), userIds);
-		if (acctFeeList != null){
-			for (CFeeAcct fee:acctFeeList){
-				String order_sn=fee.getProd_sn();
-				CProdOrder order=cProdOrderDao.findByKey(order_sn);
-				//检查套餐类要按订购顺序取消，同一个用户的宽带类单产品要按订购顺序取消，用户一个用户的非宽带单产品按相同产品订购顺序取消。
-				//目的是保证c_fee_acct中pre_invalid_date和begin_date准确
-				//恢复被覆盖转移的订单
-				orderComponent.recoverTransCancelOrder(order.getDone_code(),order.getCust_id(),doneCode);
-				//删除c_prod_order_fee
-				cProdOrderFeeDao.deleteOrderFeeByOrderSn(order_sn);
-				//移除订单到历史表
-				List<CProdOrder> cancelOrders=orderComponent.saveCancelProdOrder(order, doneCode);
-				//作废缴费信息
-				feeComponent.saveCancelFeeUnPay(fee, doneCode);
-				//作废业务
-				doneCodeComponent.cancelDoneCode(fee.getCreate_done_code());
-			}
-		}
-		
-		//refund all pay order
-		List<CProdOrderFee> orderFeeList = cProdOrderFeeDao.queryPayedOrderFeeByUser(task.getCust_id(), userIds);
-		
-		if (orderFeeList != null){
-			for (CProdOrderFee orderFee:orderFeeList){
-				if (orderFee.getInput_type().equals(SystemConstants.ORDER_FEE_TYPE_CFEE) && orderFee.getFee()>0){
-					hasUnpay = true;
-					CProdOrder order = cProdOrderDao.findByKey(orderFee.getOrder_sn());
-					CFeeAcct fee = cFeeDao.queryAcctFeeByOrderSn(orderFee.getOrder_sn());
-					PayDto pay=new PayDto();
-					pay.setCust_id(task.getCust_id());
-					pay.setUser_id(order.getUser_id());
-					pay.setAcct_id(fee.getAcct_id());
-					pay.setAcctitem_id(fee.getAcctitem_id());
-					pay.setFee(orderFee.getFee()*-1);
-					pay.setPresent_fee(0);
-					
-					pay.setProd_sn(orderFee.getOrder_sn());
-					pay.setInvalid_date(DateHelper.dateToStr(DateHelper.today().before(order.getEff_date())? order.getEff_date():DateHelper.today()));
-					pay.setBegin_date(DateHelper.dateToStr(order.getExp_date()));
-					CFeeAcct refundFee = feeComponent.saveAcctFee(task.getCust_id(), fee.getArea_id(), pay, doneCode, BusiCodeConstants.TASK_CANCEL, StatusConstants.UNPAY);
-					orderFee.setOutput_sn(refundFee.getFee_sn());
-					orderFee.setOutput_fee(orderFee.getFee());
-					orderFee.setOutput_type(SystemConstants.ORDER_FEE_TYPE_CFEE);
-					cProdOrderFeeDao.update(orderFee);
-					
-				} else if (orderFee.getInput_type().equals(SystemConstants.ORDER_FEE_TYPE_ACCT) && orderFee.getFee()>0){
-					//账户
-					CAcct acct=acctComponent.queryCustAcctByCustId(task.getCust_id());
-					//按订单转账到公用账目中
-					String acctItemId=SystemConstants.ACCTITEM_PUBLIC_ID;
-					String acctId=acct.getAcct_id();
-					String acct_change_sn=acctComponent.saveAcctAddFee(task.getCust_id(), acct.getAcct_id(), acctItemId,
-							SystemConstants.ACCT_CHANGE_TRANS, orderFee.getFee(), orderFee.getFee_type(), 
-							 BusiCodeConstants.TASK_CANCEL, doneCode,orderFee.getRemark()).getAcct_change_sn();
-					
-					orderFee.setOutput_sn(acct_change_sn);
-					orderFee.setOutput_fee(orderFee.getFee());
-					orderFee.setOutput_type(SystemConstants.ORDER_FEE_TYPE_ACCT);
-					cProdOrderFeeDao.update(orderFee);
-				}
-			}
+		//取消工单用户相关的产品订单
+		if(cancelInstallTaskOrder(task,userIds,doneCode)){
+			hasUnpay=true;
 		}
 		
 		if (hasUnpay){
@@ -1624,7 +1564,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 	 * c类只做移除子产品。
 	 * @throws Exception 
 	 */
-	private void cancelInstallTaskOrder(WTaskBaseInfo task,String[] userIds,Integer doneCode) throws Exception{
+	private boolean cancelInstallTaskOrder(WTaskBaseInfo task,String[] userIds,Integer doneCode) throws Exception{
 		boolean hasUnpay=false;
 		List<CProdOrder> changeOrderList=new ArrayList<>();
 		
@@ -1722,6 +1662,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		orderComponent.moveOrderByCancelOrder(changeOrderList, userMap, doneCode);
 		//处理授权
 		this.authProdNoPackage(changeOrderList, userMap, doneCode);
+		return hasUnpay;
 	}
 
 	public void saveSaleDevice(String userId, String deviceModel, String deviceBuyMode, FeeInfoDto deviceFee) throws Exception{
