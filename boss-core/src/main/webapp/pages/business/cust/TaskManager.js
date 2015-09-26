@@ -245,22 +245,15 @@ TaskDeviceWin = Ext.extend(Ext.Window,{
 		if(!this.deviceGrid.checkDeviceCode()){
 			return false;
 		}
-		
 		var o ={},url;
 		if(this.task_type_id == '9'){//销终端工单
 			var data = this.deviceGrid.getUserIds();
 			url = Constant.ROOT_PATH + "/core/x/Task!fillWriteOffTerminalTask.action";
-			o = {
-				task_id:this.task_id,
-				userIds : data.join(",")
-			};
+			o = {task_id:this.task_id,userIds : data.join(",")};
 		}else{
 			var data = this.deviceGrid.getValues();
 			url = Constant.ROOT_PATH + "/core/x/Task!fillTask.action";
-			o = {
-				task_id:this.task_id,
-				devices : Ext.encode(data)
-			};
+			o = {task_id:this.task_id,devices : Ext.encode(data)};
 		}
 		var that = this;
 		App.sendRequest( url, o, function(res,opt){
@@ -289,9 +282,6 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 	taskStore:null,
 	grid: null,
 	pageSize: 20,
-	taskFinishWin: null,
-	taskDetailsWin:null,
-	iconCls: 'doc',
 	taskAllInfo:null,
 	constructor:function(item){
 		this.initWidgets(item);	
@@ -358,7 +348,6 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 				id:'send_btn_id',
 				text: '发送ZTE授权',
 				width: 80,
-//				tooltip: '工单传给呼叫',
 				disabled:true,
 				height: 30,
 				scope: this,
@@ -477,18 +466,8 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 		
 		var twoTbar = new Ext.Toolbar({
 			items : [this.taskNoField,'-',this.custNoField,'-',this.mobileField,'-',this.custNameField,'-',this.newaddrField,'-',{
-				text: '查询',
-				pressed: true,
-				scope: this,
-				width: 80,
-				handler: this.doSearchTask
-			},'-',{
-				text: '待处理工单',
-				pressed: true,
-				scope: this,
-				width: 100,
-				handler: this.doWaitTask
-			}]
+				text: '查询',pressed: true,scope: this,width: 80,handler: this.doSearchTask
+			},'-',{text: '待处理工单',pressed: true,scope: this,width: 100,handler: this.doWaitTask}]
 		});
 		
     	// create the Grid
@@ -539,7 +518,6 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 	},
 	initEvents: function(){
 		this.grid.on("rowclick", this.doClickRecord, this );
-		
 		TaskManagerPanel.superclass.initEvents.call(this);
 	},
 	doClickRecord:function(g, i, e){
@@ -553,9 +531,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 		Ext.Ajax.request({
 			scope : this,
 			url: root + '/core/x/Task!queryTaskDetail.action' ,
-			params : {
-				task_id : taskId
-			},
+			params : {task_id : taskId},
 			success : function(res,opt){
 				var rs = Ext.decode(res.responseText);
 				this.taskAllInfo.userGrid.getStore().loadData(rs.taskUserList);
@@ -571,13 +547,8 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 	newaddrField: null,
 	doCancelTask: function(){
 		var rs = this.getSelections();
-		if(rs === false){
-			return ;
-		}
-		if(this.checkViald() === false){
-			return;
-		}
-		
+		if(rs === false){return ;}
+		if(this.checkViald(rs) === false){return;}
 		var ts = rs.get("task_status");
 		if(ts == 'WAITEND' || ts == 'CANCEL' || ts == 'END'){
 			Alert("不允许取消!");
@@ -604,19 +575,13 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 	},
 	doSendTask: function(){
 		var rs = this.getSelections();
-		if(rs === false){
-			return ;
-		}
+		if(rs === false){return ;}
 
 	},
 	doTeamTask:function(){//分配施工队
 		var rs = this.getSelections();
-		if(rs === false){
-			return ;
-		}
-		if(this.checkViald() === false){
-			return;
-		}
+		if(rs === false){return ;}
+		if(this.checkViald(rs) === false){return;}
 		var arr = [];
 		this.taskTeamCombo.getStore().each(function(record){
 			if(record.get('dept_id') != rs.get('team_id')){
@@ -639,13 +604,11 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 		    displayField: 'dept_name'
 		});
 		teamCombo.getStore().loadData(arr);
-		
 		var form = new Ext.form.FormPanel({
 			labelWidth: 90,
 			bodyStyle: 'padding-top: 10px;',
 			items: [teamCombo]
 		});
-	
 		if(rs.get('task_type_id') == '2'){
 			var bugCauseCombo = new Ext.ux.ParamCombo({
 				fieldLabel:'故障类型',
@@ -657,7 +620,6 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 			App.form.initComboData([bugCauseCombo]);
 			form.add(bugCauseCombo);
 		}
-		
 		var win = new Ext.Window({
 			width: 320,
 			height: 250,
@@ -697,22 +659,15 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 					});
 				}
 			},{
-				text: '取消',
-				handler: function(){
-					win.hide();
-				}
+				text: '取消',handler: function(){win.hide();}
 			}]
 		});
 		win.show();
 	},
 	doDeviceTask:function(){//回填设备
 		var rs = this.getSelections();
-		if(rs === false){
-			return ;
-		}
-		if(this.checkViald() === false){
-			return;
-		}
+		if(rs === false){return ;}
+		if(this.checkViald(rs) === false){return;}
 		var win = Ext.getCmp('TaskDeviceWinId');
 		if(!win)
 			win = new TaskDeviceWin(rs);
@@ -720,12 +675,8 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 	},
 	doEndTask:function(){//完成工单
 		var rs = this.getSelections();
-		if(rs === false){
-			return ;
-		}
-		if(this.checkViald() === false){
-			return;
-		}
+		if(rs === false){return ;}
+		if(this.checkViald(rs) === false){return;}
 		var finishCombo = new Ext.form.ComboBox({
 			width: 120,
 			fieldLabel:'完工类型',
@@ -841,16 +792,9 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 		});
 	},
 	doWaitTask:function(){
-		var o = {
-			"isWaitTask": 'T'
-		};
+		var o = {"isWaitTask": 'T'};
 		this.taskStore.baseParams = o;
-		this.taskStore.load({
-			params: {
-				"start": 0, 
-				"limit": this.pageSize
-			}
-		});
+		this.taskStore.load({params: {"start": 0, "limit": this.pageSize}});
 	
 	}
 });		

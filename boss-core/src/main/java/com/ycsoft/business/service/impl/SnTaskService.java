@@ -320,7 +320,13 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 					//删除客户设备
 					custComponent.removeDevice(task.getCust_id(), device.getDevice_id(), doneCode, SystemConstants.BOOLEAN_FALSE);
 					//更新用户设备信息为空
-					cUserDao.updateDevice(user.getUser_id(), null, null, null);
+					CUser cuser = new CUser();
+					cuser.setUser_id(user.getUser_id());
+					cuser.setStb_id("");
+					cuser.setCard_id("");
+					cuser.setModem_mac("");
+					cuser.setStatus(StatusConstants.UNTUCKEND);
+					cUserDao.update(cuser);
 				}
 			}
 			

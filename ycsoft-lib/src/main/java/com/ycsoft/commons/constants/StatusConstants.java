@@ -25,6 +25,7 @@ public class StatusConstants {
     public static String CANCEL = "CANCEL";//失效  红
     public static String INSTALL_FAILURE = "INSTALL_FAILURE";//施工失败
     public static String UNTUCK = "UNTUCK";//拆机
+    public static String UNTUCKEND = "UNTUCKEND";//拆机完成
  
 	public static String IDLE = "IDLE";//空闲       黑
 	public static String USE = "USE";//使用		   红
