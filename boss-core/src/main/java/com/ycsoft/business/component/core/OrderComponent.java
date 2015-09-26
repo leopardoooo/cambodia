@@ -622,9 +622,10 @@ public class OrderComponent extends BaseBusiComponent {
 		List<CProdOrder> moveResult=new ArrayList<>();
 		for(CProdOrder order:moveList){
 			//第一个订购记录必须是今天之前(含今天)开始，后面的订购是接续在上一条订购之后
-			if((start.equals(today)&&order.getEff_date().after(start))
-				||(!start.equals(today)&&!start.equals(order.getEff_date()))){
-				
+			if((start.equals(today)&&!order.getEff_date().after(start))
+				||(!start.equals(today)&&start.equals(order.getEff_date()))){
+				start=DateHelper.addDate(order.getExp_date(), 1);
+			}else{				
 				Date eff_date=new Date(start.getTime());
 				PProdTariff tariff=pProdTariffDao.findByKey(order.getTariff_id());
 				Date exp_date=null;
