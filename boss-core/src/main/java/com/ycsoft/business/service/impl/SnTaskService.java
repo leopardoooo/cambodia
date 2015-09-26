@@ -345,12 +345,11 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 			String taskId, String teamId, String status, String custNo, String custName, String custAddr,String mobile, Integer start, Integer limit)
 					throws Exception {
 		return wTaskBaseInfoDao.queryTask(taskTypes,addrIds,beginDate,endDate,taskId,teamId,status,custNo,custName
-				,custAddr,mobile,null, start, limit);
+				,custAddr,mobile, start, limit);
 	}
 
 	public Pager<TaskBaseInfoDto> queryUnProcessTask(Integer start, Integer limit) throws Exception {
-		return wTaskBaseInfoDao.queryTask(null,null,null,null,null,getOptr().getDept_id(),StatusConstants.TASK_INIT,
-				null,null,null,null,StatusConstants.NOT_EXEC,start, limit);
+		return wTaskBaseInfoDao.queryUnProcessTask(getOptr().getDept_id(),StatusConstants.TASK_INIT,StatusConstants.NOT_EXEC,start, limit);
 	}
 
 	

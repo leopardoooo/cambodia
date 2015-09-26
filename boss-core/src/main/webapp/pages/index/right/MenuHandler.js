@@ -3010,6 +3010,14 @@ Ext.apply(MenuHandler, {
 			height : 400
 		};
 		
+	},
+	PayOtherFee:function(){
+		if (!hasCust())
+			return false;
+		return {
+			width : 450,
+			height : 400
+		};
 	}
 	
 });

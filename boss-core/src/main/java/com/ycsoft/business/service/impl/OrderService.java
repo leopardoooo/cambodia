@@ -1267,5 +1267,12 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		}
 		this.saveAllPublic(doneCode, this.getBusiParam());
 	}
+	@Override
+	public void savePayOtherFee() throws Exception {
+		String custId=this.getBusiParam().getCust().getCust_id();
+		doneCodeComponent.lockCust(custId);		
+		Integer doneCode=doneCodeComponent.gDoneCode();
+		this.saveAllPublic(doneCode, this.getBusiParam());
+	}
 	
 }
