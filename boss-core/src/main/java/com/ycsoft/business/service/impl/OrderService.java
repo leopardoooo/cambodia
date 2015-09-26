@@ -106,7 +106,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 			throw new ServicesException(ErrorCode.OrderEditNoProd);
 		}
 		OrderProdEdit edit=orderComponent.createOrderEdit(order);
-		
+		//提取可用的产品和资费列表
 		orderComponent.queryOrderableEdit(custComponent.queryCustById(order.getCust_id()), order.getOrder_sn(), edit);
 		
 		if(edit.getProdList()==null||edit.getProdList().size()==0||edit.getTariffMap()==null||edit.getTariffMap().size()==0){
@@ -120,7 +120,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 	 * 订单修改功能
 	 * 差额只能使用现金来退款或补收（减少处理难度）
 	 * 新的订单金额不能小于转移支付金额
-	 * 普通修改，高级修改  可以修改差额，修改到期日
+	 * 可以修改差额，修改到期日
 	 * 已支付的订单不能退款
 	 * 未支付的订单可以退款
 	 * 套餐 不搞转移支付了，如果还存在被覆盖的独立子产品（可以使用超级退订更正，超级退订可以修改退任意金额）
@@ -263,38 +263,6 @@ public class OrderService extends BaseBusiService implements IOrderService{
 			}
 		}
 		
-		//普通修改 校检订购月数，订购金额， 订购月数是标准周期数的倍数
-		if(!orderComponent.isHighEdit(this.getBusiParam().getBusiCode())){
-			//订购月数校检
-			if(orderProd.getOrder_months()==0){
-				throw new  ComponentException(ErrorCode.OrderDateOrderMonthError);
-			}
-			if(order_cycles%billing_cycle!=0 ){
-				throw new  ComponentException(ErrorCode.OrderDateOrderMonthError);
-			}
-			
-			//订购支付金额验证, orderProd.getPay_fee() 表示两次修改的差额
-			int check_order_fee=rent*order_cycles/billing_cycle;
-			
-			if(new_order_fee !=check_order_fee){
-				throw new ComponentException(ErrorCode.OrderDateFeeError);
-			}
-			
-			//结束计费日校检	
-			//包月 结束计费日=开始计费日+订购月数 -1天。
-			if(tariff.getBilling_type().equals(SystemConstants.BILLING_TYPE_MONTH)){
-				Date newExpDate=DateHelper.getNextMonthPreviousDay(orderProd.getEff_date(), order_cycles);
-				if(!newExpDate.equals(orderProd.getExp_date()))
-					throw new ServicesException(ErrorCode.OrderDateExpDateError);
-			}
-			//包天 结束计费日=开始计费日+订购天数-1天
-			if(tariff.getBilling_type().equals(SystemConstants.BILLING_TYPE_DAY)){
-				Date newExpDate=DateHelper.addDate(orderProd.getEff_date(), order_cycles-1);
-				if(!newExpDate.equals(orderProd.getExp_date()))
-					throw new ServicesException(ErrorCode.OrderDateExpDateError);
-			}
-		
-		}
 		return order;
 	}
 	

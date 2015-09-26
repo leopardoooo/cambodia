@@ -1598,8 +1598,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		List<CFeeAcct> acctFeeList = cFeeDao.queryTaskUserUnPayCFeeAcct(task.getCust_id(),userIds,task.getDone_code());
 		for(CFeeAcct feeAcct:acctFeeList){
 			//先取消订单修改
-			if(feeAcct.getBusi_code().equals(BusiCodeConstants.ORDER_EDIT)
-					||feeAcct.getBusi_code().equals(BusiCodeConstants.ORDER_HIGH_EDIT)){
+			if(feeAcct.getBusi_code().equals(BusiCodeConstants.ORDER_EDIT)){
 				//回退订单修改的费用
 				List<CProdOrderFeeOut> outList=cProdOrderFeeOutDao.queryByDoneCodeTransFee(feeAcct.getCreate_done_code());
 				orderComponent.saveOrderFeeOutToBack(outList,doneCode);

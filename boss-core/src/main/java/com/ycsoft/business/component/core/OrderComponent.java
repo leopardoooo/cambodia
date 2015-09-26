@@ -593,14 +593,6 @@ public class OrderComponent extends BaseBusiComponent {
 				||BusiCodeConstants.PROD_SUPER_TERMINATE.equals(busi_code)
 				?true:false;
 	}
-	/**
-	 * 是否高级订单修改权限
-	 * @param busi_code
-	 * @return
-	 */
-	public boolean isHighEdit(String busi_code){
-		return BusiCodeConstants.ORDER_HIGH_EDIT.equals(busi_code)?true:false;
-	}
 	
 	/**
 	 * 因为产品退订而重新计算套餐订单的计费时间段（不处理子产品）
