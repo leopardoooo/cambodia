@@ -78,7 +78,7 @@ public enum ErrorCode {
 	OrderEditOnlyUnPay("只有未支付的订单才可以修改退款"),
 	OrderEditNoProd("没有可用的产品资费"),
 	
-	OttFzdNotMoreThanTwo("???"),
+	OttFzdNotMoreThanTwo("OTT主终端下只能挂2个副终端"),
 	//task
 	TaskDeviceIsNull("设备未回填"),
 	TaskDeviceModelIsNull("该工单用户的设备型号不存在"),
