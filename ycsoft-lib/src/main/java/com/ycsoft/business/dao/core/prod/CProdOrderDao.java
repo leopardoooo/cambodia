@@ -21,8 +21,8 @@ public class CProdOrderDao extends BaseEntityDao<CProdOrder> {
 	 * @throws JDBCException
 	 */
 	public void updateOrderEdit(CProdOrder order) throws JDBCException{
-		String sql="update c_prod_order set prod_id=?,tariff_id=?,disct_id=?,exp_date=?,order_months=?,order_fee=? where order_sn=?";
-		this.executeUpdate(sql, order.getProd_id(),order.getTariff_id(),order.getDisct_id(),order.getExp_date(),order.getOrder_months(),order.getOrder_fee(),order.getOrder_sn());
+		String sql="update c_prod_order set prod_id=?,tariff_id=?,disct_id=?,exp_date=?,order_months=?,order_fee=?,remark=? where order_sn=?";
+		this.executeUpdate(sql, order.getProd_id(),order.getTariff_id(),order.getDisct_id(),order.getExp_date(),order.getOrder_months(),order.getOrder_fee(),order.getRemark(),order.getOrder_sn());
 	}
 	/**
 	 * 查询可以续费的订单记录

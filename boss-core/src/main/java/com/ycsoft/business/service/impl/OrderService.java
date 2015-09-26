@@ -145,8 +145,12 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		
 		//记录异动
 		CProdOrder editOrder=orderComponent.createCProdOrder(orderProd, null, null, null, null);
+		if(StringHelper.isNotEmpty(this.getBusiParam().getRemark())){
+			order.setRemark(this.getBusiParam().getRemark());
+		}
 	    editOrder.setOrder_fee(order.getOrder_fee()+orderProd.getPay_fee()+orderProd.getTransfer_fee());
 		orderComponent.saveOrderEditChange(order, editOrder,done_code);
+		
 		//更新订单，返回有变化的订单信息,套餐会重新处理子产品
 		List<CProdOrder> orderChangeList=orderComponent.saveOrderEditBean(order, done_code, orderProd);
 		//移动订单接续，套餐子产品先排，然后排非套餐子产品，使用生效时间排
@@ -863,7 +867,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 	/**
 	 * 订单的业务参数
 	 */
-	public static  String getOrderProdRemark(OrderProd orderProd,String busi_code) throws Exception{
+	public static  String getOrderProdRemark(OrderProd orderProd,String busi_code,String order_sn,Integer done_code) throws Exception{
 		Map<String,Object> busiMap=new HashMap<>();
 		busiMap.put("busi_code", busi_code);
 		busiMap.put("cust_id", orderProd.getCust_id());
@@ -877,6 +881,8 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		busiMap.put("eff_date", orderProd.getEff_date());
 		busiMap.put("exp_date", orderProd.getExp_date());
 		busiMap.put("order_fee_type", orderProd.getOrder_fee_type());
+		busiMap.put("order_sn", order_sn);
+		busiMap.put("done_code", done_code);
 		
 	    if(orderProd.getGroupSelected()!=null&&orderProd.getGroupSelected().size()>0){
 	    	
@@ -947,8 +953,6 @@ public class OrderService extends BaseBusiService implements IOrderService{
 	 */
 	protected String saveOrderProd(OrderProd orderProd,String busi_code,Integer doneCode) throws Exception{
 
-		//订单的业务参数
-		String remark=getOrderProdRemark(orderProd,busi_code);
 		
 		PProd prodConfig=pProdDao.findByKey(orderProd.getProd_id());
 		//参数检查
@@ -966,8 +970,10 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		//业务是否需要支付判断                     
 		cProdOrder.setIs_pay(orderProd.getPay_fee()>0&&!SystemConstants.ORDER_FEE_TYPE_ACCT.equals(orderProd.getOrder_fee_type())
 				?SystemConstants.BOOLEAN_FALSE:SystemConstants.BOOLEAN_TRUE);
-		if(LoggerHelper.isDebugEnabled(this.getClass())){
-			cProdOrder.setRemark(remark);
+		cProdOrder.setRemark(this.getBusiParam().getRemark());
+		
+		if(LoggerHelper.isDebugEnabled(this.getClass())){//日志记录业务参数，可能核对需要使用
+			LoggerHelper.debug(this.getClass(), getOrderProdRemark(orderProd,busi_code,cProdOrder.getOrder_sn(),doneCode));
 		}
 		
 		//保存订购记录
