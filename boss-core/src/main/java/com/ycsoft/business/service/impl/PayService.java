@@ -27,11 +27,11 @@ import com.ycsoft.beans.core.fee.CFeeDevice;
 import com.ycsoft.beans.core.fee.CFeePay;
 import com.ycsoft.beans.core.fee.CFeePropChange;
 import com.ycsoft.beans.core.fee.CFeeUnitpre;
-import com.ycsoft.beans.core.fee.CFeeUnprint;
 import com.ycsoft.beans.core.job.JCustWriteoff;
 import com.ycsoft.beans.core.prod.CProdMobileBill;
 import com.ycsoft.beans.core.prod.CProdOrder;
 import com.ycsoft.beans.core.prod.CProdOrderFee;
+import com.ycsoft.beans.core.prod.CProdOrderFeeOut;
 import com.ycsoft.beans.core.user.CUser;
 import com.ycsoft.beans.invoice.RInvoice;
 import com.ycsoft.beans.prod.PProd;
@@ -45,6 +45,7 @@ import com.ycsoft.business.dao.core.bank.CBankReturnPayerrorDao;
 import com.ycsoft.business.dao.core.fee.CFeeUnprintDao;
 import com.ycsoft.business.dao.core.prod.CProdOrderDao;
 import com.ycsoft.business.dao.core.prod.CProdOrderFeeDao;
+import com.ycsoft.business.dao.core.prod.CProdOrderFeeOutDao;
 import com.ycsoft.business.dao.prod.PProdDao;
 import com.ycsoft.business.dto.core.acct.PayDto;
 import com.ycsoft.business.dto.core.fee.CFeePayDto;
@@ -89,7 +90,8 @@ public class PayService extends BaseBusiService implements IPayService {
 	private CProdOrderFeeDao cProdOrderFeeDao;
 	@Autowired
 	private CFeeUnprintDao cFeeUnprintDao;
-	
+	@Autowired
+	private CProdOrderFeeOutDao cProdOrderFeeOutDao;
 	/**
 	 * 查询汇率
 	 * @return
@@ -171,8 +173,18 @@ public class PayService extends BaseBusiService implements IPayService {
 			this.checkCanclUpPayFeeParam(fee, cust_id);
 
 			if(!fee.getAcctitem_id().equals(SystemConstants.ACCTITEM_PUBLIC_ID)){
-				if(fee.getReal_pay()>0){
+				if(fee.getBusi_code().equals(BusiCodeConstants.ORDER_EDIT)
+						||fee.getBusi_code().equals(BusiCodeConstants.ORDER_HIGH_EDIT)){
+					//订单修改，不能取消
+					throw new ServicesException(ErrorCode.UnPayHasEdit);
+				}else if(fee.getReal_pay()>0){
 					//产品订购，业务回退
+					for(CProdOrderFee orderFee: cProdOrderFeeDao.queryByOrderSn(fee.getProd_sn())){
+						if(!orderFee.getInput_fee().equals(orderFee.getFee())){
+							//被修改过费用记录不允许取消
+							throw new ServicesException(ErrorCode.UnPayHasEdit);
+						}
+					}
 					if(!onlyShowInfo){
 						this.cancelUnPayProdOrderPay(fee,doneCode);
 					}
@@ -316,7 +328,7 @@ public class PayService extends BaseBusiService implements IPayService {
 		
 		CProdOrder order=cProdOrderDao.findByKey(order_sn);
 		//检查套餐类要按订购顺序取消，同一个用户的宽带类单产品要按订购顺序取消，用户一个用户的非宽带单产品按相同产品订购顺序取消。
-		//目的是保证c_fee_acct中pre_invalid_date和begin_date准确
+		//TODO 操作过订单编辑且费用发生变化费用记录不允许取消 目的是保证c_fee_acct中pre_invalid_date和begin_date准确
 		this.checkUnPayOrderCancel(order,fee);
 		//恢复被覆盖转移的订单
 		orderComponent.recoverTransCancelOrder(order.getDone_code(),order.getCust_id(),doneCode);
@@ -344,16 +356,18 @@ public class PayService extends BaseBusiService implements IPayService {
 		Map<CUser,List<CProdOrder>> atvMap=new HashMap<>();
 		//查询待支付的订单(含套餐和套餐子产品)
 		for(CProdOrder order:orders){ 
-				CUser user=userMap.get(order.getUser_id());
-				if(user==null){
-					throw new ServicesException(ErrorCode.OrderDateException,order.getOrder_sn());
-				}
-				List<CProdOrder> list=atvMap.get(user);
-				if(list==null){
-					list=new ArrayList<>();
-					atvMap.put(user, list);
-				}
-				list.add(order);		
+			if(StringHelper.isEmpty(order.getUser_id()))
+				continue;
+			CUser user=userMap.get(order.getUser_id());
+			if(user==null){
+				throw new ServicesException(ErrorCode.OrderDateException,order.getOrder_sn());
+			}
+			List<CProdOrder> list=atvMap.get(user);
+			if(list==null){
+				list=new ArrayList<>();
+				atvMap.put(user, list);
+			}
+			list.add(order);		
 		}	
 		//发授权
 		for(CUser user:atvMap.keySet()){
@@ -385,6 +399,17 @@ public class PayService extends BaseBusiService implements IPayService {
 		
 		if(!order.getDone_code().equals(cfee.getCreate_done_code())||!order.getProd_id().equals(cfee.getAcctitem_id())){
 			throw new ServicesException(ErrorCode.CFeeAndProdOrderIsNotOne);
+		}
+		//发生订单费用修改不能取消
+		if(cfee.getBusi_code().equals(BusiCodeConstants.ORDER_EDIT)
+				||cfee.getBusi_code().equals(BusiCodeConstants.ORDER_EDIT)){
+			throw new ServicesException(ErrorCode.UnPayHasEdit);
+		}
+		for(CProdOrderFee orderFee: cProdOrderFeeDao.queryByOrderSn(order.getOrder_sn())){
+			if(!orderFee.getInput_fee().equals(orderFee.getFee())){
+				//被修改过费用记录不允许取消
+				throw new ServicesException(ErrorCode.UnPayHasEdit);
+			}
 		}
 		
 		PProd prod=pProdDao.findByKey(order.getProd_id());
@@ -424,17 +449,24 @@ public class PayService extends BaseBusiService implements IPayService {
 			throw new ServicesException(ErrorCode.ParamIsNull);
 		}
 		PProd prod=prodComponent.queryById(fee.getAcctitem_id());
-		//提取资金转出到缴费的 订单金额明细
-		List<CProdOrderFee> orderFees=cProdOrderFeeDao.queryByOutPutInfo(order_sn, SystemConstants.ORDER_FEE_TYPE_CFEE, fee_sn);
-		for(CProdOrderFee orderFee:orderFees){
-			orderFee.setOutput_type(SystemConstants.ORDER_FEE_TYPE_ACCT);//更新转出类型为账户
-			orderFee.setOutput_sn(null);
-			orderFee.setProd_name(prod.getProd_name());
+		//TODO 提取资金转出到缴费的 订单金额明细
+		//List<CProdOrderFee> orderFees=cProdOrderFeeDao.queryByOutPutInfo(order_sn, SystemConstants.ORDER_FEE_TYPE_CFEE, fee_sn);
+		List<CProdOrderFeeOut> outList=cProdOrderFeeOutDao.queryByDoneCodeAndSn(fee.getCreate_done_code(), fee.getFee_sn());
+		//处理费用转出到缴费记录的回退
+		orderComponent.saveOrderFeeOutToBack(outList,doneCode);
+		
+		for(CProdOrderFeeOut out:outList){
+			out.setOutput_type(SystemConstants.ORDER_FEE_TYPE_ACCT);//更新转出类型为账户
+			out.setOutput_sn(null);
+			out.setPre_fee(null);
+			out.setFee(null);
+			out.setRemark(prod.getProd_name());
 		}
 		//原来转给缴费的金额现在转给公用账目
-		acctComponent.saveCancelFeeToAcct(orderFees, fee.getCust_id(), doneCode, this.getBusiParam().getBusiCode());
+		acctComponent.saveCancelFeeToAcct(outList, fee.getCust_id(), doneCode, this.getBusiParam().getBusiCode());
 		//更新资金明细
-		cProdOrderFeeDao.update(orderFees.toArray(new CProdOrderFee[orderFees.size()]));
+		//cProdOrderFeeDao.update(orderFees.toArray(new CProdOrderFee[orderFees.size()]));
+		orderComponent.saveOrderFeeOut(outList, doneCode);
 		//作废缴费
 		feeComponent.saveCancelFeeUnPay(fee, doneCode);
 	}
@@ -552,8 +584,8 @@ public class PayService extends BaseBusiService implements IPayService {
 			//检查费用记录是订购业务的费用记录 或是 修改订单的费用记录 有无被退订,被退订则不能取消支付
 			if(StringHelper.isNotEmpty(fee.getProd_sn())&&
 					(fee.getReal_pay()>0
-							||fee.getBusi_code().equals(BusiCodeConstants.PROD_CHANGE)
-							||fee.getBusi_code().equals(BusiCodeConstants.PROD_HIGH_CHANGE))){
+							||fee.getBusi_code().equals(BusiCodeConstants.ORDER_EDIT)
+							||fee.getBusi_code().equals(BusiCodeConstants.ORDER_HIGH_EDIT))){
 				if(cProdOrderDao.findByKey(fee.getProd_sn())==null){
 					throw new ServicesException(ErrorCode.PayFeeHasCancelOrder);
 				}
@@ -936,15 +968,15 @@ public class PayService extends BaseBusiService implements IPayService {
 		
 		//检查是否存在未支付 busicode = 1108,1109，可以使用取消支付 功能
 		CDoneCode cd = doneCodeComponent.queryByKey(busiDoneCode);
-		boolean isCanDoDevice = true;
+		boolean isCanDoDevice = false;
 		if(cd.getBusi_code().equals(BusiCodeConstants.DEVICE_BUY_PJ) || cd.getBusi_code().equals(BusiCodeConstants.DEVICE_BUY_PJ_BACTH)){
 			List<FeeDto> unPayList = feeComponent.queryUnPay(getBusiParam().getCust().getCust_id(),this.getOptr().getOptr_id());
 			for(FeeDto dto : unPayList){
 				if(dto.getBusi_code().equals(BusiCodeConstants.DEVICE_BUY_PJ) || dto.getBusi_code().equals(BusiCodeConstants.DEVICE_BUY_PJ_BACTH)){
-					isCanDoDevice = false;
 					throw new ServicesException(ErrorCode.EditFeeUnPayError);
 				}
 			}
+			isCanDoDevice = true;
 		}
 		for (FeeBusiFormDto feeDto:feeList){
 			

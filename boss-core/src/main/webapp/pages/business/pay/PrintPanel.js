@@ -480,7 +480,8 @@ InvoiceWindow = Ext.extend( Ext.Window ,{
 				{name: 'serialNum', type: 'number'},
 				{name: 'invoiceId', type: 'number'},
 				{name: 'invoice_book_id', type: 'number'},
-				{name: 'invoice_code', type: 'number'}
+				{name: 'invoice_code', type: 'number'},
+				{name: 'open_optr_name', type: 'string'}
 			]
 		});
 		
@@ -506,30 +507,18 @@ InvoiceWindow = Ext.extend( Ext.Window ,{
             }, {
                 header: LU_PI.invoiceGridColumns[2],
                 align: 'center',
-                id : 'col_invoiceCode',
-                dataIndex: 'invoice_code',
-                hidden:true,
-                width: 130,
-                editor: new Ext.form.ComboBox({
-                	store : this.invoiceEditStore,
-                	displayField : 'invoice_code',
-                	valueField : 'invoice_code',
-                	allowBlank : false,
-					mode: 'local',
-					triggerAction : "all"
-                })
+                dataIndex: 'open_optr_name',
+                width: 130
         	}],
         	listeners : {
         		scope : this,
-        		beforeedit : this.beforeEdit,
         		afteredit : this.afterEdit
         	}
 		});
 		
 		InvoiceWindow.superclass.constructor.call(this,{
-			width: 300,
-			height: 300,
-			autoScroll: true,
+			width: 350,
+			height: 200,
 			modal: true,
 			layout: 'fit',
 			items: this.invoiceGrid,
@@ -541,7 +530,7 @@ InvoiceWindow = Ext.extend( Ext.Window ,{
 				text: lbc('common.cancel'),
 				scope: this,
 				handler: function(){
-					this.hide();
+					this.close();
 				}
 			}]
 		});
@@ -576,63 +565,36 @@ InvoiceWindow = Ext.extend( Ext.Window ,{
 			}
 		});
 	},
-	beforeEdit : function(obj){
-//		if(obj.field == 'invoice_code'){
-//			obj.record.set('invoice_code',null);
-//			if(!obj.record.get('invoiceId')){
-//				Alert(lmsg('invoiceIdNeeded'));
-//				return false;
-//			}
-//			var invoiceId = obj.record.get('invoiceId');
-//			var successFunc = function(data){
-//				var store = this.invoiceGrid.getColumnModel().getColumnById('col_invoiceCode').editor.getStore();
-//				store.loadData(data);
-//			};
-//			var clearFunc = function(){
-//				obj.record.set('invoiceId','');
-//				obj.record.set('invoice_code','');
-//				obj.record.set('invoice_book_id','');
-//			};
-//			this.checkInvoice(invoiceId,successFunc,clearFunc);
-//		}
-	},
 	afterEdit : function(o){
 		if(o.column == 1){
 			var currentVal=  Ext.util.Format.lpad(parseInt(o.value , 10),o.value.length,'0');
 			var invoiceLength = o.value.length;//发票长度
 			if("" == currentVal) return ;
-			var fm = Ext.util.Format;
 			o.record.set('invoiceId', o.value );
-//			var store = this.invoiceGrid.getColumnModel().getColumnById('col_invoiceCode').editor.getStore();
 			var successFunc = function(data){
 //				store.loadData(data);
 				// 发票号码如果为1，则发票号码累加
-				for(var i = o.row + 1,count=this.invoiceStore.getCount(); i< count;i++){
+				/*for(var i = o.row + 1,count=this.invoiceStore.getCount(); i< count;i++){
 					currentVal++;
 					this.invoiceStore.getAt(i).set("invoiceId", Ext.util.Format.lpad(currentVal,invoiceLength,'0'));
 					this.invoiceStore.getAt(i).set("invoice_code", 'AAA');
 					this.invoiceStore.getAt(i).set("invoice_book_id", 'AAA');
-				}
+				}*/
 				o.record.set('invoice_code','AAA');
 				o.record.set('invoice_book_id','AAA');
 				if (data.length==1){
 					o.record.set('invoice_code',data[0]['invoice_code']);
 					o.record.set('invoice_book_id',data[0]['invoice_book_id']);
+					o.record.set('open_optr_name',data[0]['open_optr_name']);
 				}
-//				this.invoiceGrid.startEditing(o.row+1, 2);
 			};
 			var clearFunc = function(){
 				o.record.set('invoiceId','');
 				o.record.set('invoice_code','AAA');
 				o.record.set('invoice_book_id','AAA');
+				o.record.set('open_optr_name','');
 			};
 			this.checkInvoice(o.value,successFunc,clearFunc);
-//		}else if(o.column == 2){//本号
-//			var index = this.invoiceEditStore.find('invoice_code',o.value);
-//			if(index >-1){
-//				o.record.set('invoice_code',this.invoiceEditStore.getAt(index).get('invoice_code'));
-//				o.record.set('invoice_book_id',this.invoiceEditStore.getAt(index).get('invoice_book_id'));
-//			}
 		}
 	},
 	show: function( record , docType,printType, p ){
@@ -672,12 +634,12 @@ InvoiceWindow = Ext.extend( Ext.Window ,{
 //					var store = this.invoiceGrid.getColumnModel().getColumnById('col_invoiceCode').editor.getStore();
 //					store.loadData(data);
 					// 发票号码如果为1，则发票号码累加
-					for(var i = o.row + 1; i< this.invoiceStore.getCount() ;i++){
+					/*for(var i = o.row + 1; i< this.invoiceStore.getCount() ;i++){
 						currentVal++;
 						this.invoiceStore.getAt(i).set("invoiceId", currentVal );
 						this.invoiceStore.getAt(i).set("invoice_code", "AAA");
 						this.invoiceStore.getAt(i).set("invoice_book_id", "AAA");
-					}
+					}*/
 					var record = this.invoiceGrid.getSelectionModel().selectFirstRow();
 					if(record){
 						record.set('invoice_code',data[0]['invoice_code']);
@@ -789,8 +751,6 @@ InvoiceWindow = Ext.extend( Ext.Window ,{
 					invoice_id: rs.get('invoiceId'),
 					invoice_code:'AAA',
 					invoice_book_id:'AAA',
-//					invoice_code: rs.get('invoice_code'),
-//					invoice_book_id: rs.get('invoice_book_id'),
 					doc_type: this.docType,
 					doc_sn: this.record.get('doc_sn')
 				}; 

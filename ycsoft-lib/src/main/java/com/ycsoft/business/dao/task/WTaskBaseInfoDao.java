@@ -61,13 +61,17 @@ public class WTaskBaseInfoDao extends BaseEntityDao<WTaskBaseInfo> {
 		String sql = "select t.* "
 				+ " from w_task_base_info t, C_CUST c  "+(StringHelper.isEmpty(addrIds)?"":", t_district td, t_address ta,t_province tp")
 				+ " where t.cust_id = c.cust_id "+(StringHelper.isEmpty(addrIds)?"":" and c.addr_id = ta.addr_id "
-				+ "and ta.district_id = td.district_id  and td.province_id=tp.id and  tp.id in ("+sqlGenerator.in(addrIds.split(","))+")")
-				+ "  AND t.task_create_time >= to_date(?, 'yyyy-MM-dd') "
-				+ "  AND t.task_create_time < to_date(?, 'yyyy-MM-dd') ";
+				+ "and ta.district_id = td.district_id  and td.province_id=tp.id and  tp.id in ("+sqlGenerator.in(addrIds.split(","))+")") ;
 		List<Object> params = new ArrayList<Object>();
-		params.add(beginDate);
-		params.add(endDate);
 		
+		if(StringHelper.isNotEmpty(beginDate)){
+			sql += " AND t.task_create_time >= to_date(?, 'yyyy-MM-dd') ";
+			params.add(beginDate);
+		}
+		if(StringHelper.isNotEmpty(endDate)){
+			sql += " AND t.task_create_time < to_date(?, 'yyyy-MM-dd') ";
+			params.add(endDate);
+		}	
 		if(StringHelper.isNotEmpty(taskTypes)){
 			sql += "  AND  t.task_type_id in ("+sqlGenerator.in(taskTypes.split(","))+")";
 		}
@@ -118,6 +122,33 @@ public class WTaskBaseInfoDao extends BaseEntityDao<WTaskBaseInfo> {
 	public List<WTaskBaseInfo> queryTaskByDoneCode(Integer doneCode) throws JDBCException{
 		String sql = "select * from w_task_base_info where doneCode = ?";
 		return this.createQuery(sql,doneCode).list();
+	}
+
+	public Pager<TaskBaseInfoDto> queryUnProcessTask(String deptId, String taskStatus, String zteStatus, Integer start,
+			Integer limit) throws JDBCException {
+		
+		String sql = "select t.* "
+				+ " from w_task_base_info t, C_CUST c  "
+				+ " where t.cust_id = c.cust_id " ;
+		
+		if(StringHelper.isNotEmpty(taskStatus)){
+			sql += "  AND T.TASK_STATUS in ("+sqlGenerator.in(taskStatus.split(","))+")";
+		}
+		if(StringHelper.isNotEmpty(zteStatus) && StringHelper.isEmpty(deptId)){
+			sql += "  AND  t.zte_status in ("+sqlGenerator.in(zteStatus.split(","))+")";
+		}		
+		if(StringHelper.isNotEmpty(deptId) && StringHelper.isEmpty(zteStatus)){
+			sql += "  AND t.team_id in ("+sqlGenerator.in(deptId.split(","))+")";
+		}
+		if(StringHelper.isNotEmpty(deptId) && StringHelper.isNotEmpty(zteStatus)){
+			sql += "  AND  (t.team_id in ("+sqlGenerator.in(deptId.split(","))+") or t.zte_status in ("+sqlGenerator.in(zteStatus.split(","))+"))";
+		}
+		
+		sql += " ORDER BY t.task_create_time DESC ";
+		return this.createQuery(TaskBaseInfoDto.class,sql)
+			.setLimit(limit)
+			.setStart(start)
+			.page();
 	}
 
 }

@@ -112,6 +112,37 @@ public class BaseBusiService extends BaseService {
 	protected AuthComponent authComponent;
 	
 	/**
+	 * 处理产品授权（不处理套餐，但是一个产品如果是套餐子产品则会被处理）
+	 * 加减授权都会正确处理
+	 * @param cancelList
+	 * @throws Exception 
+	 */
+	public void authProdNoPackage(List<CProdOrder> cancelResultList,Map<String,CUser> userMap,Integer done_code) throws Exception{
+	
+		Map<CUser,List<CProdOrder>> pstProdMap=new HashMap<>();
+		for(CProdOrder pstorder:cancelResultList){
+			if(StringHelper.isNotEmpty(pstorder.getUser_id())){
+				CUser user=userMap.get(pstorder.getUser_id());
+			    if(user==null){
+			    	user=userComponent.queryUserById(pstorder.getUser_id());
+			    	userMap.put(pstorder.getUser_id(), user);
+			    	if(user==null){
+			    		throw new ServicesException(ErrorCode.OrderDateException,pstorder.getOrder_sn());
+			    	}
+			    }
+			    List<CProdOrder> pstlist=pstProdMap.get(user);
+			    if(pstlist==null){
+			    	pstlist=new ArrayList<>();
+			    	pstProdMap.put(user, pstlist);
+			    }
+			    pstlist.add(pstorder);
+			}
+		}
+		for(CUser user:  pstProdMap.keySet()){
+			authComponent.sendAuth(user, pstProdMap.get(user), BusiCmdConstants.ACCTIVATE_PROD, done_code);
+		}
+	}
+	/**
 	 * 初始化接口的业务参数
 	 * @param busiCode
 	 * @throws Exception 

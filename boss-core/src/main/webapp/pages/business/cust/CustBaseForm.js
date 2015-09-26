@@ -400,6 +400,7 @@ LinkPanel = Ext.extend(Ext.Panel,{
 						vtype : 'loginName',
 						xtype:'textfield',
 						value: '000000',
+						inputType: 'password',
 						name:'cust.password'
 					},{
 						fieldLabel: langUtils.main("cust.base.barthday"),

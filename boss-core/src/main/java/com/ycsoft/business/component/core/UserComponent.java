@@ -196,21 +196,12 @@ public class UserComponent extends BaseBusiComponent {
 	public void editUser(Integer doneCode,String userId,List<CUserPropChange> propChangeList) throws Exception{
 		if(propChangeList == null || propChangeList.size() == 0) return ;
 		CUser user = new CUser();
-		CUserAtv atv = new CUserAtv();
-		CUserDtv dtv = new CUserDtv();
-		CUserBroadband bBand = new CUserBroadband();
 		user.setUser_id(userId);
-		atv.setUser_id(userId);
-		dtv.setUser_id(userId);
-		bBand.setUser_id(userId);
 		for (CUserPropChange change:propChangeList){
 			try{
 				String newValue = StringHelper.isEmpty(change.getNew_value()) ? ""
 						: change.getNew_value();
 				BeanHelper.setPropertyString(user, change.getColumn_name(), newValue);
-				BeanHelper.setPropertyString(atv, change.getColumn_name(), newValue);
-				BeanHelper.setPropertyString(dtv, change.getColumn_name(), newValue);
-				BeanHelper.setPropertyString(bBand, change.getColumn_name(), newValue);
 				if (change.getColumn_name().equalsIgnoreCase("status")){
 					user.setStatus_date(new Date());
 				}
@@ -236,9 +227,6 @@ public class UserComponent extends BaseBusiComponent {
 		}
 		//保存信息修改
 		cUserDao.update(user);
-		cUserAtvDao.update(atv);
-		cUserDtvDao.update(dtv);
-		cUserBroadbandDao.update(bBand);
 		//保存异动信息
 		cUserPropChangeDao.save(propChangeList.toArray(new CUserPropChange[propChangeList.size()]));
 
@@ -364,9 +352,15 @@ public class UserComponent extends BaseBusiComponent {
 	public List<UserDto> queryUser(String custId) throws Exception {
 		List<UserDto> result = new ArrayList<UserDto>();
 		List<CUser> users = queryUserByCustId(custId);
+		List<JUserStop> stopList = jUserStopDao.findAll();
+		Map<String,List<JUserStop>> stopmap = CollectionHelper.converToMap(stopList, "user_id");
 		for (CUser user :users){
 			UserDto userdto = new UserDto();
 			BeanUtils.copyProperties(user, userdto);
+			List<JUserStop> stoplist = stopmap.get(user.getUser_id());
+			if(stoplist!=null){
+				userdto.setStop_date(stoplist.get(0).getStop_date());
+			}
 			if(userdto.getUser_type().equals(SystemConstants.USER_TYPE_BAND)){
 				if(StringHelper.isNotEmpty(userdto.getModem_mac())){
 					RModemModel modemModel = rModemModelDao.queryByModemMac(userdto.getModem_mac());

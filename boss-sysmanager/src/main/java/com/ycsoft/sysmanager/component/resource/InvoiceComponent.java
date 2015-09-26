@@ -503,6 +503,11 @@ public class InvoiceComponent extends BaseComponent {
 			optrId = null;
 		}
 		rInvoiceDao.saveTrans(doneCode, transDepotId, optrId);
+		if(InvoiceOptrType.RECEIVE.toString().equals(transType)){
+			rInvoiceDao.updateInvoiceOpenOptrId(doneCode, optrId);
+		}else if(InvoiceOptrType.CANCEL_RECEIVE.toString().equals(transType)){
+			rInvoiceDao.updateInvoiceOpenOptrId(doneCode, null);
+		}
 	}
 
 	//保存发票结账

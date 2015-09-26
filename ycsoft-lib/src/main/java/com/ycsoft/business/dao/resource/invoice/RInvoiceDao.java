@@ -290,7 +290,8 @@ public class RInvoiceDao extends BaseEntityDao<RInvoice> {
 				.append(
 						"select nvl(SUM(decode(c.status,'PAY',c.real_pay,0)), 0) amount,r.invoice_id,r.invoice_book_id,r.invoice_code,",
 						" r.invoice_type,r.depot_id,r.status,r.invoice_mode,r.use_time,r.finance_status,r.check_time, ",
-						" r.check_depot_id,r.close_time,r.create_time,r.invoice_amount,r.optr_id,is_loss from r_invoice r,c_fee c ",
+						" r.check_depot_id,r.close_time,r.create_time,r.invoice_amount,r.optr_id,is_loss,r.open_optr_id",
+						" from r_invoice r,c_fee c ",
 						" where r.invoice_id=c.invoice_id(+) and r.invoice_book_id=c.invoice_book_id(+) ");
 
 		if (StringHelper.isNotEmpty(depotId)) {
@@ -376,9 +377,10 @@ public class RInvoiceDao extends BaseEntityDao<RInvoice> {
 		sql = StringHelper
 				.append(
 						sql,
-						"group by r.invoice_id,r.invoice_book_id,r.invoice_code,r.invoice_type,",
+						" group by r.invoice_id,r.invoice_book_id,r.invoice_code,r.invoice_type,",
 						" r.depot_id,r.status,r.invoice_mode,r.use_time,r.finance_status,r.check_time,",
-						" r.check_depot_id,r.close_time,r.create_time,r.invoice_amount,r.optr_id,is_loss order by r.invoice_id");
+						" r.check_depot_id,r.close_time,r.create_time,r.invoice_amount,r.optr_id,is_loss,r.open_optr_id",
+						" order by r.invoice_id");
 		return this.createQuery(RInvoice.class, sql).setStart(start).setLimit(
 				limit).page();
 	}
@@ -394,6 +396,14 @@ public class RInvoiceDao extends BaseEntityDao<RInvoice> {
 		String sql = "update r_invoice set depot_id=?, optr_id=? "
 				+ " where (invoice_id,invoice_code) in (select invoice_id,invoice_code from r_invoice_detail where done_code=?)";
 		this.executeUpdate(sql, depotId, optrId, doneCode);
+
+	}
+	//修改开票人
+	public void updateInvoiceOpenOptrId(Integer doneCode, String optrId)
+			throws Exception {
+		String sql = "update r_invoice set open_optr_id=? "
+				+ " where (invoice_id,invoice_code) in (select invoice_id,invoice_code from r_invoice_detail where done_code=?)";
+		this.executeUpdate(sql, optrId, doneCode);
 
 	}
 
@@ -553,6 +563,12 @@ public class RInvoiceDao extends BaseEntityDao<RInvoice> {
 				+ "  WHERE  i.invoice_code=? AND i.invoice_id=?  and i.FINANCE_STATUS=?";
 		return executeUpdate(sql, StatusConstants.USE, invoiceMode, amount,
 				invoiceCode, invoiceId, StatusConstants.IDLE);
+	}
+	
+	public void updateInvoiceInfo(String invoiceCode, String invoiceId, String invoiceMode, int amount, String optrId) throws Exception {
+		String sql = "UPDATE r_invoice i SET i.status=?,i.invoice_mode=? ,amount=amount+?, optr_id=?,use_time=sysdate"
+				+ "  WHERE  i.invoice_code=? AND i.invoice_id=?  and i.FINANCE_STATUS=?";
+		executeUpdate(sql, StatusConstants.USE, invoiceMode, amount, optrId, invoiceCode, invoiceId, StatusConstants.IDLE);
 	}
 
 	/**

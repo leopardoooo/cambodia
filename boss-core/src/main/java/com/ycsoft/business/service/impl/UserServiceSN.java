@@ -31,6 +31,7 @@ import com.ycsoft.beans.core.job.JUserStop;
 import com.ycsoft.beans.core.prod.CProdOrder;
 import com.ycsoft.beans.core.prod.CProdOrderDto;
 import com.ycsoft.beans.core.prod.CProdOrderFee;
+import com.ycsoft.beans.core.prod.CProdOrderFeeOut;
 import com.ycsoft.beans.core.prod.CProdPropChange;
 import com.ycsoft.beans.core.user.CUser;
 import com.ycsoft.beans.core.user.CUserPropChange;
@@ -46,6 +47,7 @@ import com.ycsoft.business.component.task.SnTaskComponent;
 import com.ycsoft.business.dao.core.fee.CFeeDao;
 import com.ycsoft.business.dao.core.prod.CProdOrderDao;
 import com.ycsoft.business.dao.core.prod.CProdOrderFeeDao;
+import com.ycsoft.business.dao.core.prod.CProdOrderFeeOutDao;
 import com.ycsoft.business.dao.task.WTaskBaseInfoDao;
 import com.ycsoft.business.dao.task.WTaskUserDao;
 import com.ycsoft.business.dto.core.acct.PayDto;
@@ -86,6 +88,8 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 	private CProdOrderFeeDao cProdOrderFeeDao;
 	@Autowired
 	private CFeeDao cFeeDao;
+	@Autowired
+	private CProdOrderFeeOutDao cProdOrderFeeOutDao;
 	
 	public void createUser(CUser user, String deviceCode, String deviceType, String deviceModel, String deviceBuyMode,
 			FeeInfoDto deviceFee) throws Exception {
@@ -267,11 +271,23 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 							break;
 						}
 					}
+					
+					int fzdNum = 0;
+					for(CUser cu:userList){
+						if(SystemConstants.USER_TERMINAL_TYPE_FZD.equals(cu.getTerminal_type())){
+							fzdNum += 1;
+						}
+						if(fzdNum >= 2){
+							throw new ServicesException(ErrorCode.OttFzdNotMoreThanTwo);
+						}
+					}
 				}
 				
 				if (StringHelper.isEmpty(user.getTerminal_type())){
 					user.setTerminal_type(SystemConstants.USER_TERMINAL_TYPE_ZZD);
 				}
+				
+				
 			}
 		}
 		
@@ -291,7 +307,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 			}*/
 		}
 		
-		if(!user.getUser_type().equals(SystemConstants.USER_TYPE_DTT) && StringHelper.isEmpty(user.getLogin_name())){
+		if(!user.getUser_type().equals(USER_TYPE_DTT) && StringHelper.isEmpty(user.getLogin_name())){
 			user.setLogin_name( generateUserName(cust.getCust_id(), user.getUser_type()) );
 		}
 		
@@ -552,17 +568,19 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		List<CProdOrderFee> orderFees=new ArrayList<>();
 		//检查数据
 		List<CProdOrderDto> cancelList=checkCancelProdOrderParm(orderFees,isHigh, userId, cancelFee,refundFee);
-		
+		List<CProdOrderFeeOut> outList=orderComponent.getOrderFeeOutFromOrderFee(orderFees);
 		if(refundFee<0){
 			//记录未支付业务
 			doneCodeComponent.saveDoneCodeUnPay(custId, doneCode, this.getOptr().getOptr_id());
 			//保存缴费信息
-			feeComponent.saveCancelFee(cancelList,orderFees, this.getBusiParam().getCust(), doneCode, this.getBusiParam().getBusiCode());
+			feeComponent.saveCancelFee(cancelList,outList, this.getBusiParam().getCust(), doneCode, this.getBusiParam().getBusiCode());
 		}
 		if(cancelFee-refundFee!=0){
 			//余额转回公用账目
-			acctComponent.saveCancelFeeToAcct(orderFees, custId, doneCode, this.getBusiParam().getBusiCode());
+			acctComponent.saveCancelFeeToAcct(outList, custId, doneCode, this.getBusiParam().getBusiCode());
 		}
+		//记录费用转出记录
+		orderComponent.saveOrderFeeOut(outList, doneCode);
 		
 		List<CProdOrder> cancelResultList=new ArrayList<>();
 		
@@ -998,30 +1016,42 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 
 
 	@Override
-	public void saveEditPwd(String newPwd) throws Exception {
-
-		//获取客户用户信息
-		String  custId = getBusiParam().getCust().getCust_id();
-		CUser user = getBusiParam().getSelectedUsers().get(0);
-		//获取业务流水
+	public void saveEditPwd(String newLoginName, String newPwd) throws Exception {
 		Integer doneCode = doneCodeComponent.gDoneCode();
-		//生成计算用户信用度的JOB
-		jobComponent.createCreditCalJob(doneCode, custId, null,SystemConstants.BOOLEAN_TRUE);
+		CUser selectedUser = getBusiParam().getSelectedUsers().get(0);
+		CUser user = queryUserById(selectedUser.getUser_id());
 		List<CUserPropChange> propChangeList = new ArrayList<CUserPropChange>();
-		CUser userDto = queryUserById(user.getUser_id());
 
-		userDto.setNewPassword(newPwd);
-		jobComponent.createBusiCmdJob(doneCode, BusiCmdConstants.BAND_EDIT_PWD, custId, user.getUser_id(), null, null, user.getModem_mac(), null, null, JsonHelper.fromObject(userDto));
-	
-		
 		CUserPropChange propChange = new CUserPropChange();
 		propChange.setColumn_name("password");
-		propChange.setOld_value(userDto.getPassword());
+		propChange.setOld_value(user.getPassword());
 		propChange.setNew_value(newPwd);
 		propChangeList.add(propChange);
-		userComponent.editUser(doneCode, getBusiParam().getSelectedUserIds().get(0), propChangeList);
 		
-		authComponent.sendAuth(user, null, BusiCmdConstants.CHANGE_USER, doneCode);
+		user.setPassword(newPwd);
+		
+		if(!user.getLogin_name().equals(newLoginName)){
+			propChange = new CUserPropChange();
+			propChange.setColumn_name("login_name");
+			propChange.setOld_value(user.getLogin_name());
+			propChange.setNew_value(newLoginName);
+			propChangeList.add(propChange);
+			
+			user.setLogin_name(newLoginName);
+			
+			List<CProdOrder> orderList = orderComponent.queryNotExpAllOrderByUser(user.getUser_id());
+			authComponent.sendAuth(selectedUser, orderList, BusiCmdConstants.DEL_USER, doneCode);
+			if(user.getUser_type().equals(USER_TYPE_BAND)){
+				authComponent.sendAuth(user, null, BusiCmdConstants.REFRESH_TERMINAL, doneCode);
+			}else{
+				authComponent.sendAuth(user, orderList, BusiCmdConstants.CREAT_USER, doneCode);
+			}
+			authComponent.sendAuth(user, orderList, BusiCmdConstants.ACCTIVATE_PROD, doneCode);
+		}else{
+			authComponent.sendAuth(user, null, BusiCmdConstants.CHANGE_USER, doneCode);
+		}
+		
+		userComponent.editUser(doneCode, user.getUser_id(), propChangeList);
 		
 		saveAllPublic(doneCode,getBusiParam());
 	}
@@ -1518,68 +1548,9 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 			}
 		}
 		
-		//cacel users all unpay acctfee
-		List<CFeeAcct> acctFeeList = cFeeDao.queryUserUnPayOrderFee(task.getCust_id(), userIds);
-		if (acctFeeList != null){
-			for (CFeeAcct fee:acctFeeList){
-				String order_sn=fee.getProd_sn();
-				CProdOrder order=cProdOrderDao.findByKey(order_sn);
-				//检查套餐类要按订购顺序取消，同一个用户的宽带类单产品要按订购顺序取消，用户一个用户的非宽带单产品按相同产品订购顺序取消。
-				//目的是保证c_fee_acct中pre_invalid_date和begin_date准确
-				//恢复被覆盖转移的订单
-				orderComponent.recoverTransCancelOrder(order.getDone_code(),order.getCust_id(),doneCode);
-				//删除c_prod_order_fee
-				cProdOrderFeeDao.deleteOrderFeeByOrderSn(order_sn);
-				//移除订单到历史表
-				List<CProdOrder> cancelOrders=orderComponent.saveCancelProdOrder(order, doneCode);
-				//作废缴费信息
-				feeComponent.saveCancelFeeUnPay(fee, doneCode);
-				//作废业务
-				doneCodeComponent.cancelDoneCode(fee.getCreate_done_code());
-			}
-		}
-		
-		//refund all pay order
-		List<CProdOrderFee> orderFeeList = cProdOrderFeeDao.queryPayedOrderFeeByUser(task.getCust_id(), userIds);
-		
-		if (orderFeeList != null){
-			for (CProdOrderFee orderFee:orderFeeList){
-				if (orderFee.getInput_type().equals(SystemConstants.ORDER_FEE_TYPE_CFEE) && orderFee.getInput_fee()>0){
-					hasUnpay = true;
-					CProdOrder order = cProdOrderDao.findByKey(orderFee.getOrder_sn());
-					CFeeAcct fee = cFeeDao.queryAcctFeeByOrderSn(orderFee.getOrder_sn());
-					PayDto pay=new PayDto();
-					pay.setCust_id(task.getCust_id());
-					pay.setUser_id(order.getUser_id());
-					pay.setAcct_id(fee.getAcct_id());
-					pay.setAcctitem_id(fee.getAcctitem_id());
-					pay.setFee(orderFee.getInput_fee()*-1);
-					pay.setPresent_fee(0);
-					
-					pay.setProd_sn(orderFee.getOrder_sn());
-					pay.setInvalid_date(DateHelper.dateToStr(DateHelper.today().before(order.getEff_date())? order.getEff_date():DateHelper.today()));
-					pay.setBegin_date(DateHelper.dateToStr(order.getExp_date()));
-					CFeeAcct refundFee = feeComponent.saveAcctFee(task.getCust_id(), fee.getArea_id(), pay, doneCode, BusiCodeConstants.TASK_CANCEL, StatusConstants.UNPAY);
-					orderFee.setOutput_sn(refundFee.getFee_sn());
-					orderFee.setOutput_fee(orderFee.getInput_fee());
-					orderFee.setOutput_type(SystemConstants.ORDER_FEE_TYPE_CFEE);
-					cProdOrderFeeDao.update(orderFee);
-				} else if (orderFee.getInput_type().equals(SystemConstants.ORDER_FEE_TYPE_ACCT) && orderFee.getInput_fee()>0){
-					//账户
-					CAcct acct=acctComponent.queryCustAcctByCustId(task.getCust_id());
-					//按订单转账到公用账目中
-					String acctItemId=SystemConstants.ACCTITEM_PUBLIC_ID;
-					String acctId=acct.getAcct_id();
-					String acct_change_sn=acctComponent.saveAcctAddFee(task.getCust_id(), acct.getAcct_id(), acctItemId,
-							SystemConstants.ACCT_CHANGE_TRANS, orderFee.getInput_fee(), orderFee.getFee_type(), 
-							 BusiCodeConstants.TASK_CANCEL, doneCode,orderFee.getProd_name()).getAcct_change_sn();
-					
-					orderFee.setOutput_sn(acct_change_sn);
-					orderFee.setOutput_fee(orderFee.getInput_fee());
-					orderFee.setOutput_type(SystemConstants.ORDER_FEE_TYPE_ACCT);
-					cProdOrderFeeDao.update(orderFee);
-				}
-			}
+		//取消工单用户相关的产品订单
+		if(cancelInstallTaskOrder(task,userIds,doneCode)){
+			hasUnpay=true;
 		}
 		
 		if (hasUnpay){
@@ -1609,6 +1580,114 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		getBusiParam().setBusiCode(BusiCodeConstants.TASK_CANCEL);
 		saveAllPublic(doneCode, getBusiParam());
 		
+	}
+	/**
+	 * 取消工单相关的订单
+	 * 订单提取跟工单相关的订单，a类：所有单产品订单（退订） 、 b类：在工单创建之后订购的套餐（套餐退订）、 c类：在工单创建之前订购的套餐的相关用户子产品(子产品移除)
+	 * 提取a和b订单的未支付费用做取消操作，并恢复被覆盖产品
+	 * a,b如果订单费用已支付，则操作退款，退所有钱（可退的现金退款，不可退的退账户）
+	 * c类只做移除子产品。
+	 * @throws Exception 
+	 */
+	private boolean cancelInstallTaskOrder(WTaskBaseInfo task,String[] userIds,Integer doneCode) throws Exception{
+		boolean hasUnpay=false;
+		List<CProdOrder> changeOrderList=new ArrayList<>();
+		
+		//List<CFeeAcct> acctFeeList = cFeeDao.queryUserUnPayOrderFee(task.getCust_id(), userIds);
+		//提取a类和b类的未支付费用记录 
+		List<CFeeAcct> acctFeeList = cFeeDao.queryTaskUserUnPayCFeeAcct(task.getCust_id(),userIds,task.getDone_code());
+		for(CFeeAcct feeAcct:acctFeeList){
+			//先取消订单修改
+			if(feeAcct.getBusi_code().equals(BusiCodeConstants.ORDER_EDIT)
+					||feeAcct.getBusi_code().equals(BusiCodeConstants.ORDER_HIGH_EDIT)){
+				//回退订单修改的费用
+				List<CProdOrderFeeOut> outList=cProdOrderFeeOutDao.queryByDoneCodeTransFee(feeAcct.getCreate_done_code());
+				orderComponent.saveOrderFeeOutToBack(outList,doneCode);
+				//作废缴费信息
+				feeComponent.saveCancelFeeUnPay(feeAcct, doneCode);
+				//作废业务
+				doneCodeComponent.cancelDoneCode(feeAcct.getCreate_done_code());
+			}
+		}
+		for(CFeeAcct feeAcct:acctFeeList){
+			if(feeAcct.getReal_pay()>0&&
+					(feeAcct.getBusi_code().equals(BusiCodeConstants.PROD_PACKAGE_ORDER)
+					||feeAcct.getBusi_code().equals(BusiCodeConstants.PROD_UPGRADE)
+					||feeAcct.getBusi_code().equals(BusiCodeConstants.PROD_CONTINUE)
+					||feeAcct.getBusi_code().equals(BusiCodeConstants.PROD_SINGLE_ORDER))){
+				//套餐订购，续订，升级,单用户订购存在覆盖转移支付的情况，恢复被覆盖的订单
+				CProdOrder order=cProdOrderDao.findByKey(feeAcct.getProd_sn());
+				changeOrderList.addAll(orderComponent.recoverTransCancelOrder(order.getDone_code(),order.getCust_id(),doneCode));
+				cProdOrderFeeDao.deleteOrderFeeByOrderSn(feeAcct.getProd_sn());
+				//移除订单到历史表
+				changeOrderList.addAll(orderComponent.saveCancelProdOrder(order, doneCode));
+				//作废缴费信息
+				feeComponent.saveCancelFeeUnPay(feeAcct, doneCode);
+				//作废业务
+				doneCodeComponent.cancelDoneCode(feeAcct.getCreate_done_code());
+			}
+		}
+		//处理已支付的订单退款
+		List<CProdOrderFee> orderFeeList = cProdOrderFeeDao.queryTaskPayedOrderFeeByUser(task.getCust_id(), userIds, task.getDone_code());
+		
+		for (CProdOrderFee orderFee:orderFeeList){
+			if (orderFee.getInput_type().equals(SystemConstants.ORDER_FEE_TYPE_CFEE) && orderFee.getFee()>0){
+				hasUnpay = true;
+				CProdOrder order = cProdOrderDao.findByKey(orderFee.getOrder_sn());
+				CFeeAcct fee = cFeeDao.queryAcctFeeByOrderSn(orderFee.getOrder_sn());
+				PayDto pay=new PayDto();
+				pay.setCust_id(task.getCust_id());
+				pay.setUser_id(order.getUser_id());
+				pay.setAcct_id(fee.getAcct_id());
+				pay.setAcctitem_id(fee.getAcctitem_id());
+				pay.setFee(orderFee.getFee()*-1);
+				pay.setPresent_fee(0);
+				
+				pay.setProd_sn(orderFee.getOrder_sn());
+				pay.setInvalid_date(DateHelper.dateToStr(DateHelper.today().before(order.getEff_date())? order.getEff_date():DateHelper.today()));
+				pay.setBegin_date(DateHelper.dateToStr(order.getExp_date()));
+				CFeeAcct refundFee = feeComponent.saveAcctFee(task.getCust_id(), fee.getArea_id(), pay, doneCode, BusiCodeConstants.TASK_CANCEL, StatusConstants.UNPAY);
+				orderFee.setOutput_sn(refundFee.getFee_sn());
+				orderFee.setOutput_fee(orderFee.getFee());
+				orderFee.setOutput_type(SystemConstants.ORDER_FEE_TYPE_CFEE);
+			} else if (orderFee.getInput_type().equals(SystemConstants.ORDER_FEE_TYPE_ACCT) && orderFee.getFee()>0){
+				//账户
+				CAcct acct=acctComponent.queryCustAcctByCustId(task.getCust_id());
+				//按订单转账到公用账目中
+				String acctItemId=SystemConstants.ACCTITEM_PUBLIC_ID;
+				String acctId=acct.getAcct_id();
+				String acct_change_sn=acctComponent.saveAcctAddFee(task.getCust_id(), acct.getAcct_id(), acctItemId,
+						SystemConstants.ACCT_CHANGE_TRANS, orderFee.getFee(), orderFee.getFee_type(), 
+						 BusiCodeConstants.TASK_CANCEL, doneCode,orderFee.getRemark()).getAcct_change_sn();
+				
+				orderFee.setOutput_sn(acct_change_sn);
+				orderFee.setOutput_fee(orderFee.getFee());
+				orderFee.setOutput_type(SystemConstants.ORDER_FEE_TYPE_ACCT);
+				//cProdOrderFeeDao.update(orderFee);
+			}
+		}
+		//已支付的费用转出记录
+		orderComponent.saveOrderFeeOut(orderComponent.getOrderFeeOutFromOrderFee(orderFeeList), doneCode);
+		//退订相关所有订单
+		List<CProdOrder> taskCancelOrders=cProdOrderDao.queryTaskCancelOrder(task.getCust_id(), userIds, task.getDone_code());
+		for(CProdOrder order:taskCancelOrders){
+			//先退订单产品和套餐子产品
+			if(StringHelper.isEmpty(order.getPackage_sn())){
+				changeOrderList.addAll(orderComponent.saveCancelProdOrder(order, doneCode));
+			}
+		}
+		for(CProdOrder order:taskCancelOrders){
+			//再退订套餐
+			if(StringHelper.isNotEmpty(order.getPackage_sn())){
+				changeOrderList.addAll(orderComponent.saveCancelProdOrder(order, doneCode));
+			}
+		}
+		//移动剩余订单接续
+		Map<String,CUser> userMap=userComponent.queryUserMap(task.getCust_id());
+		orderComponent.moveOrderByCancelOrder(changeOrderList, userMap, doneCode);
+		//处理授权
+		this.authProdNoPackage(changeOrderList, userMap, doneCode);
+		return hasUnpay;
 	}
 
 	public void saveSaleDevice(String userId, String deviceModel, String deviceBuyMode, FeeInfoDto deviceFee) throws Exception{
