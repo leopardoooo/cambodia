@@ -64,7 +64,8 @@ public class WorkOrderClient {
 		ArrayOfDeviceInfo deviceArray = new ArrayOfDeviceInfo();
 		for (WTaskUser user:userList){
 			DeviceInfo deviceInfo = new DeviceInfo();
-			deviceInfo.setDeviceName(user.getDevice_model()+"("+user.getDevice_model_text()+")");
+			deviceInfo.setDeviceName(user.getDevice_model());
+			deviceInfo.setIsFCPort(SystemConstants.USER_TYPE_BAND.equals(user.getUser_type())?true:false);
 			deviceArray.addDeviceInfo(deviceInfo);
 		}
 		product.setDeviceInfos(deviceArray);

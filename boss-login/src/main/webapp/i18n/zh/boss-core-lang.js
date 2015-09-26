@@ -71,7 +71,7 @@ BCLang.common = {
 //主页模块
 BCLang.home = {
 	topWelcome: "当前操作员~",
-	searchTabs:["名称编号~","设备编号~","安装地址~","电话号码~","多条件搜索~"],
+	searchTabs:["名称编号~","设备|账号~","安装地址~","电话号码~","多条件搜索~"],
 	invoicePrintTitle:'收据打印~',
 	searchTip:"客户编号|受理编号~",
 	searchBtns:["搜索~","缴费~"],
@@ -83,7 +83,7 @@ BCLang.home = {
 			pay: {
 				_stayTitle: '待支付项目~',
 				_title: '支付项目~',
-				columns: ['操作~', '业务名称~', '费用名称~', '实付金额~', '订单号~', '备注~', '数量~', '操作时间~', '费用编号~', '流水号~'],
+				columns: ['操作~', '业务名称~', '费用名称~', '实付金额~', '订单号~', '备注~', '数量~', '操作时间~', '费用编号~', '流水号~', '操作员~'],
 				buttons: ['保存~', '关闭~']
 			},
 			charge:{
@@ -468,11 +468,11 @@ BCLang.home = {
 				btnTxtClose:'关闭',
 				btnTxtSave:'保存',
 				labelRoadNum:'路号名称',
-				titleNewSaveLevelRoadNum:'平级新增路号',
+				titleNewSaveLevelRoadNum:'新增路号',
 				labelStreatName:'街道名称',
-				titleNewSaveLevelStreet:'平级新增街道',
+				titleNewSaveLevelStreet:'新增街道',
 				labelCityName:'城市名称',
-				titleNewSaveLevelCity:'平级新增城市',
+				titleNewSaveLevelCity:'新增城市',
 				labelShowName:'显示名称',
 				labelParentName:'上级名称',
 				

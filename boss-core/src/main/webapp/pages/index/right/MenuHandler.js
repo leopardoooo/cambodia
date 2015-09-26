@@ -1410,7 +1410,7 @@ Ext.apply(MenuHandler, {
 			userIds.push(userRecords[i].get("user_id"));
 		}
 		
-		var url = Constant.ROOT_PATH + "/core/x/User!untuckUsers.action";
+		/*var url = Constant.ROOT_PATH + "/core/x/User!untuckUsers.action";
 		Confirm(lmsg("confirmUntuckUser"), this, function() {
 			App.sendRequest(url, {userIds: userIds}, function(res, opt){
 				var data = Ext.decode(res.responseText);
@@ -1418,8 +1418,11 @@ Ext.apply(MenuHandler, {
 					App.getApp().main.infoPanel.getUserPanel().userGrid.remoteRefresh();
 				}
 			});
-		});
-		return false;
+		});*/
+		return {
+			width: 450,
+			height: 400
+		};
 	},
 	// 报停
 	UserStop : function() {

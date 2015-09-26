@@ -49,7 +49,6 @@ import com.ycsoft.business.dao.core.prod.CProdOrderFeeDao;
 import com.ycsoft.business.dao.core.prod.CProdOrderFeeOutDao;
 import com.ycsoft.business.dao.task.WTaskBaseInfoDao;
 import com.ycsoft.business.dao.task.WTaskUserDao;
-import com.ycsoft.business.dto.config.TemplateConfigDto;
 import com.ycsoft.business.dto.core.acct.PayDto;
 import com.ycsoft.business.dto.core.cust.CustFullInfoDto;
 import com.ycsoft.business.dto.core.fee.BusiFeeDto;
@@ -271,11 +270,23 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 							break;
 						}
 					}
+					
+					int fzdNum = 0;
+					for(CUser cu:userList){
+						if(SystemConstants.USER_TERMINAL_TYPE_FZD.equals(cu.getTerminal_type())){
+							fzdNum += 1;
+						}
+						if(fzdNum >= 2){
+							throw new ServicesException(ErrorCode.OttFzdNotMoreThanTwo);
+						}
+					}
 				}
 				
 				if (StringHelper.isEmpty(user.getTerminal_type())){
 					user.setTerminal_type(SystemConstants.USER_TERMINAL_TYPE_ZZD);
 				}
+				
+				
 			}
 		}
 		
@@ -288,13 +299,14 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 			this.buyDevice(device, deviceBuyMode,ownership, deviceFee, getBusiParam().getBusiCode(), cust, doneCode);
 			
 			//非自购模式 设置协议截止日期，读取模板配置数据
-			if(buyModeCfg!= null && !buyModeCfg.getBuy_mode().equals(SystemConstants.BUSI_BUY_MODE_BUY) && StringHelper.isNotEmpty(deviceModel)){
+			//去掉协议期
+			/*if(buyModeCfg!= null && !buyModeCfg.getBuy_mode().equals(SystemConstants.BUSI_BUY_MODE_BUY) && StringHelper.isNotEmpty(deviceModel)){
 				Integer months = Integer.parseInt( userComponent.queryTemplateConfig(TemplateConfigDto.Config.PROTOCOL_DATE_MONTHS.toString()) );
 				user.setProtocol_date( DateHelper.addTypeDate(DateHelper.now(), "MONTH", months) );
-			}
+			}*/
 		}
 		
-		if(!user.getUser_type().equals(SystemConstants.USER_TYPE_DTT) && StringHelper.isEmpty(user.getLogin_name())){
+		if(!user.getUser_type().equals(USER_TYPE_DTT) && StringHelper.isEmpty(user.getLogin_name())){
 			user.setLogin_name( generateUserName(cust.getCust_id(), user.getUser_type()) );
 		}
 		
@@ -647,9 +659,11 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 	}
 	
 	@Override
-	public void untuckUsers(String[] userIds) throws Exception{
+	public void untuckUsers() throws Exception{
 		CCust cust = getBusiParam().getCust();
 		doneCodeComponent.lockCust(cust.getCust_id());
+		List<String> userIdList = getBusiParam().getSelectedUserIds();
+		String[] userIds = userIdList.toArray(new String[userIdList.size()]);
 		Integer doneCode = doneCodeComponent.gDoneCode();
 		List<CUser> users = userComponent.queryAllUserByUserIds(userIds);
 		if (users == null || users.size() == 0 || users.get(0) == null)
@@ -773,9 +787,9 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 	public void checkStopUser(String[] userIds) throws Exception{
 		Map<Integer, CUser> map = checkUserStatus(userIds);
 		for(Integer code : map.keySet()){
-			if(code == 1){
+			/*if(code == 1){
 				throw new ServicesException("用户["+map.get(code).getUser_id()+"]还在协议期内，不能报停!");
-			} else if (code == 2){
+			} else */if (code == 2){
 					throw new ServicesException("用户["+map.get(code).getUser_id()+"]不是正常状态，不能报停!");
 			}else if(code == 3){
 				throw new ServicesException("归属套餐的用户必须同时报停");
@@ -977,30 +991,42 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 
 
 	@Override
-	public void saveEditPwd(String newPwd) throws Exception {
-
-		//获取客户用户信息
-		String  custId = getBusiParam().getCust().getCust_id();
-		CUser user = getBusiParam().getSelectedUsers().get(0);
-		//获取业务流水
+	public void saveEditPwd(String newLoginName, String newPwd) throws Exception {
 		Integer doneCode = doneCodeComponent.gDoneCode();
-		//生成计算用户信用度的JOB
-		jobComponent.createCreditCalJob(doneCode, custId, null,SystemConstants.BOOLEAN_TRUE);
+		CUser selectedUser = getBusiParam().getSelectedUsers().get(0);
+		CUser user = queryUserById(selectedUser.getUser_id());
 		List<CUserPropChange> propChangeList = new ArrayList<CUserPropChange>();
-		CUser userDto = queryUserById(user.getUser_id());
 
-		userDto.setNewPassword(newPwd);
-		jobComponent.createBusiCmdJob(doneCode, BusiCmdConstants.BAND_EDIT_PWD, custId, user.getUser_id(), null, null, user.getModem_mac(), null, null, JsonHelper.fromObject(userDto));
-	
-		
 		CUserPropChange propChange = new CUserPropChange();
 		propChange.setColumn_name("password");
-		propChange.setOld_value(userDto.getPassword());
+		propChange.setOld_value(user.getPassword());
 		propChange.setNew_value(newPwd);
 		propChangeList.add(propChange);
-		userComponent.editUser(doneCode, getBusiParam().getSelectedUserIds().get(0), propChangeList);
 		
-		authComponent.sendAuth(user, null, BusiCmdConstants.CHANGE_USER, doneCode);
+		user.setPassword(newPwd);
+		
+		if(!user.getLogin_name().equals(newLoginName)){
+			propChange = new CUserPropChange();
+			propChange.setColumn_name("login_name");
+			propChange.setOld_value(user.getLogin_name());
+			propChange.setNew_value(newLoginName);
+			propChangeList.add(propChange);
+			
+			user.setLogin_name(newLoginName);
+			
+			List<CProdOrder> orderList = orderComponent.queryNotExpAllOrderByUser(user.getUser_id());
+			authComponent.sendAuth(selectedUser, orderList, BusiCmdConstants.DEL_USER, doneCode);
+			if(user.getUser_type().equals(USER_TYPE_BAND)){
+				authComponent.sendAuth(user, null, BusiCmdConstants.REFRESH_TERMINAL, doneCode);
+			}else{
+				authComponent.sendAuth(user, orderList, BusiCmdConstants.CREAT_USER, doneCode);
+			}
+			authComponent.sendAuth(user, orderList, BusiCmdConstants.ACCTIVATE_PROD, doneCode);
+		}else{
+			authComponent.sendAuth(user, null, BusiCmdConstants.CHANGE_USER, doneCode);
+		}
+		
+		userComponent.editUser(doneCode, user.getUser_id(), propChangeList);
 		
 		saveAllPublic(doneCode,getBusiParam());
 	}
@@ -1445,13 +1471,19 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 	@Override
 	public void cancelInstallTask(String taskId) throws Exception {
 		WTaskBaseInfo task = wTaskBaseInfoDao.findByKey(taskId);
-		List<WTaskUser> userList = wTaskUserDao.queryByTaskId(taskId);
-		String[] userIds = new String[userList.size()];
-		int i=0;
-		for(WTaskUser user:userList){
-			userIds[i]=user.getUser_id();
-			i++;
+		List<WTaskBaseInfo> taskList = wTaskBaseInfoDao.queryTaskByDoneCode(task.getDone_code());
+		
+		List<String> userIdList = new ArrayList<String> ();
+		List<WTaskUser> allUserList = new ArrayList<>();
+		for(WTaskBaseInfo tb:taskList){
+			List<WTaskUser> userList = wTaskUserDao.queryByTaskId(tb.getTask_id());
+			for(WTaskUser user:userList){
+				userIdList.add(user.getUser_id());
+				allUserList.add(user);
+			}
 		}
+		
+		String[] userIds = userIdList.toArray(new String[userIdList.size()]);
 		int busiDoneCode = task.getDone_code();
 		// 获取业务流水
 		Integer doneCode = doneCodeComponent.gDoneCode();
@@ -1561,7 +1593,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		}
 		//update device status to idle,write off user
 		
-		for (WTaskUser user:userList){
+		for (WTaskUser user:allUserList){
 			if (StringHelper.isNotEmpty(user.getDevice_id())){
 				DeviceDto device = deviceComponent.queryDeviceByDeviceCode(user.getDevice_id());
 				deviceComponent.updateDeviceDepotStatus(doneCode, BusiCodeConstants.TASK_CANCEL, device.getDevice_id(), 
@@ -1577,7 +1609,9 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		}
 		
 		//cancel task
-		snTaskComponent.cancelTask(doneCode, taskId);
+		for (WTaskBaseInfo tb:taskList){
+			snTaskComponent.cancelTask(doneCode, tb.getTask_id());
+		}
 		getBusiParam().setBusiCode(BusiCodeConstants.TASK_CANCEL);
 		saveAllPublic(doneCode, getBusiParam());
 		

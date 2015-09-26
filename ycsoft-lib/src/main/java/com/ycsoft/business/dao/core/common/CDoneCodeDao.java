@@ -94,7 +94,7 @@ public class CDoneCodeDao extends BaseEntityDao<CDoneCode> {
 	public Pager<DoneCodeDto> queryCustDoneCode(String custId, QueryFeeInfo queryFeeInfo,String countyId,Integer start,Integer limit)throws Exception{
 		
 		String sql = append("select distinct t2.attribute_id,t.attribute_value,t2.param_name,t2.input_type,t2.attribute_name,a.done_code,b.user_id, ",
-				" a.remark,a.busi_code,a.done_date,a.optr_id,a.status,t3.cancel,t3.ignore,t3.busi_fee,a.dept_id,(select sum(real_pay) from c_fee f where f.create_done_code =a.done_code) real_pay,t5.fee_id ",
+				" a.remark,a.busi_code,a.done_date,a.optr_id,a.status,t3.cancel,t3.ignore,t3.busi_fee,a.dept_id,(select sum(real_pay) from c_fee f where f.create_done_code =a.done_code) real_pay ",
 				" from c_done_code a, c_done_code_detail b, Ext_c_Done_Code t,t_extend_attribute t2,t_busi_code t3 ,T_BUSI_CODE_FEE t5 ",
 				" where t3.busi_type(+)='1' and a.done_code = b.done_code",
 				" and a.done_code = t.done_code(+)",

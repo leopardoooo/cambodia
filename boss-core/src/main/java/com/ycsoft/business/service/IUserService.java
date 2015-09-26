@@ -106,7 +106,7 @@ public interface IUserService extends IBaseService{
 	 */
 	public void checkStopUser(String[] userIds) throws Exception;
 	
-	public void untuckUsers(String[] userIds) throws Exception;
+	public void untuckUsers() throws Exception;
 
 	/**
 	 * 报停(支持多用户)
@@ -145,7 +145,7 @@ public interface IUserService extends IBaseService{
 	 * @param newPwd   新密码
 	 * @throws Exception
 	 */
-	public void saveEditPwd(String newPwd) throws Exception;
+	public void saveEditPwd(String loginName, String newPwd) throws Exception;
 	
 	/**
 	 * 修改连接数

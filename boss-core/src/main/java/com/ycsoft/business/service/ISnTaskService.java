@@ -36,7 +36,7 @@ public interface ISnTaskService {
 	 * @param ponNo 网络参数
 	 * @param deviceList 设备列表
 	 */
-	public void fillTask(String taskId,String otlNo,String ponNo,List<TaskFillDevice> deviceList)throws Exception;
+	public void fillTask(String taskId,List<TaskFillDevice> deviceList)throws Exception;
 	
 	/**
 	 * 完工
@@ -65,12 +65,6 @@ public interface ISnTaskService {
 			String taskId,String teamId,String status, 
 			String custNo,String custName,String custAddr,String mobile, Integer start, Integer limit) throws Exception;
 	
-	/**
-	 * 查询待处理工单
-	 * @return
-	 * @throws Exception
-	 */
-	public List<WTaskBaseInfo> queryUnProcessTask() throws Exception;
 
 	public Map<String, ?> queryTaskDetail(String task_id) throws Exception;
 
@@ -79,6 +73,8 @@ public interface ISnTaskService {
 	public DeviceDto queryDeviceInfoByCodeAndModel(String deviceCode, String deviceModel) throws Exception;
 
 	public List<TaskBaseInfoDto> queryTaskByCustId(String custId) throws Exception;
+
+	public Pager<TaskBaseInfoDto> queryUnProcessTask(Integer start, Integer limit)throws Exception;
 	
 	
 

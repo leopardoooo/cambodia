@@ -2810,7 +2810,14 @@ public class UserService extends BaseBusiService implements IUserService {
 
 
 	@Override
-	public void untuckUsers(String[] userIds) throws Exception {
+	public void untuckUsers() throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void saveEditPwd(String loginName, String newPwd) throws Exception {
 		// TODO Auto-generated method stub
 		
 	}

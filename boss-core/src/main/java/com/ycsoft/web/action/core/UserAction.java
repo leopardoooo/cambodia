@@ -311,7 +311,8 @@ public class UserAction extends BaseBusiAction {
 	
 	public String saveEditPwd() throws Exception {
 		String pwd = request.getParameter("login_password");
-		userServiceSN.saveEditPwd(pwd);
+		String loginName = request.getParameter("login_name");
+		userServiceSN.saveEditPwd(loginName, pwd);
 		return JSON_SUCCESS;
 	}
 	
@@ -362,7 +363,7 @@ public class UserAction extends BaseBusiAction {
 	 * @throws Exception
 	 */
 	public String untuckUsers() throws Exception {
-		userServiceSN.untuckUsers(userIds);
+		userServiceSN.untuckUsers();
 		return JSON_SUCCESS;
 	}
 	

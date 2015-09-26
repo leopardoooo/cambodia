@@ -41,6 +41,7 @@ import com.ycsoft.beans.prod.PProd;
 import com.ycsoft.beans.prod.PProdTariff;
 import com.ycsoft.beans.prod.PProdTariffDisct;
 import com.ycsoft.beans.system.SOptr;
+import com.ycsoft.beans.task.TaskFillDevice;
 import com.ycsoft.beans.task.WTaskUser;
 import com.ycsoft.business.cache.PrintContentConfiguration;
 import com.ycsoft.business.commons.abstracts.BaseService;
@@ -1936,37 +1937,7 @@ public class BaseBusiService extends BaseService {
 		
 	}
 	
-	//回填用户设备
-	protected void fillUserDevice(int doneCode,List<WTaskUser> deviceList) throws Exception {
-		CCust cust = null;
-		for (WTaskUser userDevice:deviceList){
-			CUser user = userComponent.queryUserById(userDevice.getUser_id());
-			DeviceDto device = deviceComponent.queryDeviceByDeviceCode(userDevice.getDevice_id());
-			setUserDeviceInfo(user, device);
-			userComponent.updateDevice(doneCode, user);
-			//发送授权
-			if(user.getUser_type().equals(SystemConstants.USER_TYPE_DTT)||
-					user.getUser_type().equals(SystemConstants.USER_TYPE_OTT)){
-				//开户指令
-				this.createUserJob(user, user.getCust_id(), doneCode);
-			}
-			//发产品授权
-			List<CProdOrder> prodList = orderComponent.queryOrderProdByUserId(user.getUser_id());
-			authComponent.sendAuth(user, prodList, BusiCmdConstants.ACCTIVATE_PROD, doneCode);
-			
-			
-			//TODO DTT回填有变更设备处理，要对换下的设备发销户指令DEL_USER
-			
-			//处理设备
-			TDeviceBuyMode buyModeCfg = busiConfigComponent.queryBuyMode(user.getStr10());
-			String ownership = SystemConstants.OWNERSHIP_GD;
-			if (buyModeCfg.getChange_ownship().equals(SystemConstants.BOOLEAN_TRUE))
-				ownership = SystemConstants.OWNERSHIP_CUST;
-			if (cust == null)
-				cust = custComponent.queryCustById(user.getCust_id());
-			this.buyDevice(device, user.getStr10(), ownership, null, BusiCodeConstants.TASK_FILL, cust, doneCode);
-		}
-	}
+	
 	
 	protected void setUserDeviceInfo(CUser user, DeviceDto device) throws Exception{
 		if (user.getUser_type().equals(SystemConstants.USER_TYPE_BAND)){

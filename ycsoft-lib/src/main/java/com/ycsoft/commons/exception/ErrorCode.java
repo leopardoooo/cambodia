@@ -77,6 +77,8 @@ public enum ErrorCode {
 	OrderStatusException("订单状态异常"),
 	OrderEditOnlyUnPay("只有未支付的订单才可以修改退款"),
 	OrderEditNoProd("没有可用的产品资费"),
+	
+	OttFzdNotMoreThanTwo("???"),
 	//task
 	TaskDeviceIsNull("设备未回填"),
 	TaskDeviceModelIsNull("该工单用户的设备型号不存在"),

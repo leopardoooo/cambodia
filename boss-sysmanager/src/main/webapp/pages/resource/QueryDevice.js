@@ -41,8 +41,8 @@ QueryDeviceForm = Ext.extend(Ext.form.FormPanel,{
 						store:new Ext.data.ArrayStore({
 							fields:['mode','mode_name'],
 							data:[['STB',DEV_COMMON_LU.labelSingleStb],
-//							['STBCARDMODEM',DEV_COMMON_LU.labelStbCardModemPair],
-								['MODEM',DEV_COMMON_LU.labelSingleModem],['STBCARD',DEV_COMMON_LU.labelStbCardPair],['STBMODEM',DEV_COMMON_LU.labelStbModemPair]]
+//							['STBCARDMODEM',DEV_COMMON_LU.labelStbCardModemPair],['STBCARD',DEV_COMMON_LU.labelStbCardPair],['STBMODEM',DEV_COMMON_LU.labelStbModemPair],
+								['MODEM',DEV_COMMON_LU.labelSingleModem]]
 						}),
 						displayField:'mode_name',valueField:'mode',width:150,
 						listeners:{
@@ -193,7 +193,7 @@ QueryDeviceGrid = Ext.extend(Ext.grid.GridPanel,{
 			totalProperty: 'totalProperty',
 			fields:['device_id','device_status','device_status_text','device_code',
 				'device_model','device_model_text','modem_mac','pair_device_code',
-				'pair_device_model','pair_device_model_text','depot_status_text', 'batch_num',
+				'pair_device_model','pair_device_model_text','depot_status_text', 'batch_num','develop_optr_name',
 				'depot_id','depot_id_text','cust_id','cust_name','pair_device_modem_code','pair_device_modem_model_text']
 		});
 		this.store.on('load',function(){
@@ -204,14 +204,15 @@ QueryDeviceGrid = Ext.extend(Ext.grid.GridPanel,{
 			{header:DEV_COMMON_LU.labelStbCode,dataIndex:'device_code',width:130,renderer:App.qtipValue},
 			{header:DEV_COMMON_LU.labelStbType,dataIndex:'device_model_text',width:100,renderer:App.qtipValue},
 			{header:DEV_COMMON_LU.labelCardCode,dataIndex:'pair_device_code',width:120,renderer:App.qtipValue},
-			{header:DEV_COMMON_LU.labelCardType,dataIndex:'pair_device_model_text',width:100,renderer:App.qtipValue},
+//			{header:DEV_COMMON_LU.labelCardType,dataIndex:'pair_device_model_text',width:100,renderer:App.qtipValue},
 			{header:DEV_COMMON_LU.labelPairModemCode,dataIndex:'modem_mac',width:120,renderer:App.qtipValue},
 			{header:DEV_COMMON_LU.labelDevStatus,dataIndex:'device_status_text',width:75,renderer:App.qtipValue},
 			{header:DEV_COMMON_LU.labelDevStatus,dataIndex:'depot_status_text',width:75,renderer:App.qtipValue},
 			{header:COMMON_LU.depotText,dataIndex:'depot_id_text',width:100,renderer:App.qtipValue},
 			{header:DEV_COMMON_LU.labelCustNo,dataIndex:'cust_id',width:75,renderer:App.qtipValue},
 			{header:DEV_COMMON_LU.labelCustName,dataIndex:'cust_name',width:100,renderer:App.qtipValue},
-			{header:DEV_COMMON_LU.labelBatchNum,dataIndex:'batch_num',width:100,renderer:App.qtipValue}
+			{header:DEV_COMMON_LU.labelCustStr9,dataIndex:'develop_optr_name',width:100,renderer:App.qtipValue},
+			{header:DEV_COMMON_LU.labelBatchNum,dataIndex:'batch_num',width:80,renderer:App.qtipValue}
 			
 		];
 		this.cardColumns = [

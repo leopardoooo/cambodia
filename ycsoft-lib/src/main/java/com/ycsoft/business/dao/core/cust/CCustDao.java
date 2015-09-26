@@ -68,13 +68,20 @@ public class CCustDao extends BaseEntityDao<CCust> {
 		if(key.equals("device_id")){
 			String deviceId = value.replace(":","").replace("：", "");
 			sql = append(
-					" SELECT t1.* FROM c_cust t1,c_cust_device t2",
-					" where t1.cust_id = t2.cust_id and t1.county_id=? ",
+					" SELECT t1.cust_id,t1. cust_name,t1. cust_no,t1. old_cust_no,t1. addr_id,t1. address,t1. status,t1. password,t1. cust_type,t1. cust_level,t1. cust_class,t1. cust_colony,t1. net_type,t1. is_black,t1. open_time,t1. area_id,t1. county_id,t1. remark,t1. str1,t1. str2,t1. str3,t1. str4,t1. str5,t1. str6,t1. str7,t1. str8,t1. str9,t1. str10,t1. cust_count,t1. app_code,t1. cust_class_date,t1. optr_id,t1. dept_id,t1. spkg_sn,t1. spkg_text",
+					" FROM c_cust t1,c_cust_device t2",
+					" where t1.cust_id = t2.cust_id",
 					" and t2.device_code = ? ",
 					dataType.trim().equals("1=1")?"":" and t1."+dataType.trim(),
-					" order by cust_no"		
+					" union all",
+					" SELECT t1.cust_id,t1. cust_name,t1. cust_no,t1. old_cust_no,t1. addr_id,t1. address,t1. status,t1. password,t1. cust_type,t1. cust_level,t1. cust_class,t1. cust_colony,t1. net_type,t1. is_black,t1. open_time,t1. area_id,t1. county_id,t1. remark,t1. str1,t1. str2,t1. str3,t1. str4,t1. str5,t1. str6,t1. str7,t1. str8,t1. str9,t1. str10,t1. cust_count,t1. app_code,t1. cust_class_date,t1. optr_id,t1. dept_id,t1. spkg_sn,t1. spkg_text",
+					" FROM c_cust t1,c_user t2",
+					" where t1.cust_id=t2.cust_id and t2.login_name=?",
+					dataType.trim().equals("1=1")?"":" and t1."+dataType.trim(),
+					" order by cust_no"
+					
 			);
-			resultPager = createQuery(sql, countyId,deviceId).setStart(p.getStart()).setLimit(p.getLimit()).page();	
+			resultPager = createQuery(sql,deviceId,deviceId).setStart(p.getStart()).setLimit(p.getLimit()).page();	
 		}else if(key.equals("addr_name")){
 			sql = append("SELECT t1.* FROM c_cust t1 ",
 					" where  t1.county_id=? ",
