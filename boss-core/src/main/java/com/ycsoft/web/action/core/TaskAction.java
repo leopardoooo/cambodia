@@ -114,6 +114,11 @@ public class TaskAction extends BaseBusiAction{
 		return JSON_OTHER;
 	}
 	
+	public String queryTaskDevice()  throws Exception{
+		getRoot().setRecords(snTaskService.queryTaskDevice(task_id));
+		return JSON_RECORDS;
+	}
+	
 	public String queryTaskTeam() throws Exception{
 		getRoot().setRecords(snTaskService.queryTaskTeam());
 		return JSON_RECORDS;
@@ -173,7 +178,8 @@ public class TaskAction extends BaseBusiAction{
 	 * @throws Exception
 	 */
 	public String endTask() throws Exception{
-		snTaskService.finishTask(task_id,resultType);
+		String finishRemark = request.getParameter("finishRemark");
+		snTaskService.finishTask(task_id,resultType,finishRemark);
 		return JSON_SUCCESS;
 	}
 	

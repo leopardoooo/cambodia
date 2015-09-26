@@ -1,5 +1,6 @@
 package com.ycsoft.business.service.impl;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -103,6 +104,13 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 		Integer doneCode = doneCodeComponent.gDoneCode();
 		snTaskComponent.cancelTask(doneCode, taskId);
 		
+	}
+	
+	//回填销户回收设备
+	public void fillWriteOffTerminalTask(String taskId,String[] userIds) throws Exception{
+		//获取业务流水
+		Integer doneCode = doneCodeComponent.gDoneCode();
+		snTaskComponent.fillWriteOffTerminalTask(doneCode,taskId,userIds);
 	}
 
 	//回填开户、移机、故障单
@@ -272,7 +280,7 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 	/**
 	 * 完工
 	 */
-	public void finishTask(String taskId, String resultType)  throws Exception{
+	public void finishTask(String taskId, String resultType,String remark)  throws Exception{
 		WTaskBaseInfo task = wTaskBaseInfoDao.findByKey(taskId);
 		if (task == null)
 			throw new SystemException("工单不存在!");
@@ -282,7 +290,7 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 			throw new SystemException("工单已完工");	
 		//获取业务流水
 		Integer doneCode = doneCodeComponent.gDoneCode();
-		snTaskComponent.finishTask(doneCode, taskId, resultType);
+		snTaskComponent.finishTask(doneCode, taskId, resultType,remark);
 		List<CUser> users = cUserDao.queryTaskUser(taskId);
 		if (task.getTask_type_id().equals(SystemConstants.TASK_TYPE_INSTALL) && 
 				resultType.equals(SystemConstants.TASK_FINISH_TYPE_SUCCESS)){
@@ -297,6 +305,26 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 				List<CProdOrder> prodList = orderComponent.queryOrderProdByUserId(user.getUser_id());
 				authComponent.sendAuth(user, prodList, BusiCmdConstants.PASSVATE_USER, doneCode);
 			}
+		} else if (task.getTask_type_id().equals(SystemConstants.TASK_TYPE_WRITEOFF_TERMINAL)){
+			//回收设备
+			List<WTaskUser> userList = wTaskUserDao.queryByTaskId(taskId);
+			for (WTaskUser user:userList){
+				if (user.getRecycle_device().equals(SystemConstants.BOOLEAN_TRUE) && 
+						user.getRecycle_result().equals(SystemConstants.BOOLEAN_TRUE) ){
+					//更新设备状态和仓库
+					DeviceDto device = deviceComponent.queryDeviceByDeviceCode(user.getDevice_id());
+					deviceComponent.updateDeviceDepotId(doneCode, BusiCodeConstants.TASK_FINISH, device.getDevice_id(), 
+							device.getDepot_id(), getOptr().getDept_id(), true);
+					deviceComponent.updateDeviceDepotStatus(doneCode, BusiCodeConstants.TASK_FINISH, device.getDevice_id(),
+							device.getDepot_status(), StatusConstants.IDLE, true);
+					//删除客户设备
+					custComponent.removeDevice(task.getCust_id(), device.getDevice_id(), doneCode, SystemConstants.BOOLEAN_FALSE);
+					//更新用户设备信息为空
+					cUserDao.updateDevice(user.getUser_id(), null, null, null);
+				}
+			}
+			
+			
 		}
 	}
 	
@@ -359,6 +387,9 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 
 		for(TaskUserDto task: userList){
 			CUser user = userComponent.queryUserById(task.getUser_id());
+			if(user == null){
+				throw new ServicesException("用户不存在");
+			}
 			task.setUser_name( taskComponent.getFillUserName(user) );
 			task.setOccNo(user.getStr7());
 			task.setPosNo(user.getStr8());
@@ -391,6 +422,33 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 	public List<TaskBaseInfoDto> queryTaskByCustId(String custId) throws Exception {
 		// TODO Auto-generated method stub
 		return wTaskBaseInfoDao.queryTaskByCustId(custId);
+	}
+
+	public List<TaskUserDto> queryTaskDevice(String task_id) throws Exception {
+		WTaskBaseInfo taskBase = wTaskBaseInfoDao.findByKey(task_id);
+		List<TaskUserDto> userList = new ArrayList<TaskUserDto>();
+		if(taskBase.getTask_type_id().equals(SystemConstants.TASK_TYPE_WRITEOFF_TERMINAL)){
+			userList = wTaskUserDao.queryTaskWriteoffTerminal(task_id);
+		}else{
+			userList = wTaskUserDao.queryUserDetailByTaskId(task_id);
+		}
+		for(TaskUserDto task: userList){
+			CUser user = userComponent.queryUserById(task.getUser_id());
+			task.setUser_name( taskComponent.getFillUserName(user) );
+			task.setOccNo(user.getStr7());
+			task.setPosNo(user.getStr8());
+			if(!user.getUser_type().equals(SystemConstants.USER_TYPE_OTT_MOBILE)){
+				if(StringHelper.isEmpty(user.getDevice_model()) && StringHelper.isNotEmpty(user.getStr3())){
+					user.setDevice_model(user.getStr3());
+					if(user.getUser_type().equals(SystemConstants.USER_TYPE_BAND)){
+						task.setDevice_model_text( MemoryDict.getTransName(DictKey.MODEM_MODEL, user.getStr3()) );
+					}else{
+						task.setDevice_model_text( MemoryDict.getTransName(DictKey.STB_MODEL, user.getStr3()) );
+					}
+				}
+			}
+		}
+		return userList;
 	}
 
 	

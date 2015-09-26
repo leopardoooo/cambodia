@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 
 import com.ycsoft.beans.task.TaskFillDevice;
-import com.ycsoft.beans.task.WTaskBaseInfo;
 import com.ycsoft.beans.task.WTeam;
 import com.ycsoft.business.dto.config.TaskBaseInfoDto;
+import com.ycsoft.business.dto.config.TaskUserDto;
 import com.ycsoft.business.dto.device.DeviceDto;
 import com.ycsoft.daos.core.Pager;
 
@@ -38,12 +38,21 @@ public interface ISnTaskService {
 	 */
 	public void fillTask(String taskId,List<TaskFillDevice> deviceList)throws Exception;
 	
+	
+	/**
+	 * 回填拆机工单的设备回收信息
+	 * @param taskId
+	 * @param userIds
+	 * @throws Exception
+	 */
+	public void fillWriteOffTerminalTask(String taskId,String[] userIds) throws Exception;
+	
 	/**
 	 * 完工
 	 * @param taskId
 	 * @param resultType 完工类型
 	 */
-	public void finishTask(String taskId,String resultType)throws Exception;
+	public void finishTask(String taskId,String resultType,String remark)throws Exception;
 	
 	/**
 	 * 工单查询
@@ -75,6 +84,8 @@ public interface ISnTaskService {
 	public List<TaskBaseInfoDto> queryTaskByCustId(String custId) throws Exception;
 
 	public Pager<TaskBaseInfoDto> queryUnProcessTask(Integer start, Integer limit)throws Exception;
+
+	public List<TaskUserDto> queryTaskDevice(String task_id) throws Exception;
 	
 	
 

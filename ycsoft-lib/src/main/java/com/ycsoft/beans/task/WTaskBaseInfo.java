@@ -32,6 +32,7 @@ public class WTaskBaseInfo implements Serializable{
 	private Date task_invalide_time;
 	private Date task_finish_time;
 	private String task_finish_type;
+	private String task_finish_desc;
 	private String cust_id;
 	private String cust_name;
 	private String new_addr;
@@ -351,5 +352,15 @@ public class WTaskBaseInfo implements Serializable{
 	public void setBug_type_text(String bug_type_text) {
 		this.bug_type_text = bug_type_text;
 	}
+
+	public String getTask_finish_desc() {
+		return task_finish_desc;
+	}
+
+	public void setTask_finish_desc(String task_finish_desc) {
+		this.task_finish_desc = task_finish_desc;
+	}
+	
+	
 	
 }
