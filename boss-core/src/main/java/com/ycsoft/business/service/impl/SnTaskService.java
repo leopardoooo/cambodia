@@ -1,5 +1,6 @@
 package com.ycsoft.business.service.impl;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -319,7 +320,13 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 					//删除客户设备
 					custComponent.removeDevice(task.getCust_id(), device.getDevice_id(), doneCode, SystemConstants.BOOLEAN_FALSE);
 					//更新用户设备信息为空
-					cUserDao.updateDevice(user.getUser_id(), null, null, null);
+					CUser cuser = new CUser();
+					cuser.setUser_id(user.getUser_id());
+					cuser.setStb_id("");
+					cuser.setCard_id("");
+					cuser.setModem_mac("");
+					cuser.setStatus(StatusConstants.UNTUCKEND);
+					cUserDao.update(cuser);
 				}
 			}
 			
@@ -386,6 +393,9 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 
 		for(TaskUserDto task: userList){
 			CUser user = userComponent.queryUserById(task.getUser_id());
+			if(user == null){
+				throw new ServicesException("用户不存在");
+			}
 			task.setUser_name( taskComponent.getFillUserName(user) );
 			task.setOccNo(user.getStr7());
 			task.setPosNo(user.getStr8());
@@ -418,6 +428,33 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 	public List<TaskBaseInfoDto> queryTaskByCustId(String custId) throws Exception {
 		// TODO Auto-generated method stub
 		return wTaskBaseInfoDao.queryTaskByCustId(custId);
+	}
+
+	public List<TaskUserDto> queryTaskDevice(String task_id) throws Exception {
+		WTaskBaseInfo taskBase = wTaskBaseInfoDao.findByKey(task_id);
+		List<TaskUserDto> userList = new ArrayList<TaskUserDto>();
+		if(taskBase.getTask_type_id().equals(SystemConstants.TASK_TYPE_WRITEOFF_TERMINAL)){
+			userList = wTaskUserDao.queryTaskWriteoffTerminal(task_id);
+		}else{
+			userList = wTaskUserDao.queryUserDetailByTaskId(task_id);
+		}
+		for(TaskUserDto task: userList){
+			CUser user = userComponent.queryUserById(task.getUser_id());
+			task.setUser_name( taskComponent.getFillUserName(user) );
+			task.setOccNo(user.getStr7());
+			task.setPosNo(user.getStr8());
+			if(!user.getUser_type().equals(SystemConstants.USER_TYPE_OTT_MOBILE)){
+				if(StringHelper.isEmpty(user.getDevice_model()) && StringHelper.isNotEmpty(user.getStr3())){
+					user.setDevice_model(user.getStr3());
+					if(user.getUser_type().equals(SystemConstants.USER_TYPE_BAND)){
+						task.setDevice_model_text( MemoryDict.getTransName(DictKey.MODEM_MODEL, user.getStr3()) );
+					}else{
+						task.setDevice_model_text( MemoryDict.getTransName(DictKey.STB_MODEL, user.getStr3()) );
+					}
+				}
+			}
+		}
+		return userList;
 	}
 
 	

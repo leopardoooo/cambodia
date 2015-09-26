@@ -8,7 +8,7 @@
    String nowDate = DateHelper.format(new Date(),"yyyy/MM/dd HH:mm:ss");
    String basePath = request.getLocalAddr()+":"+request.getServerPort();
    String lang = session.getAttribute(Environment.USER_IN_SESSION_LANG).toString();
-   String version = "2";
+   String version = "1";
 %>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>

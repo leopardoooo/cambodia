@@ -12,7 +12,6 @@ import com.ycsoft.beans.task.WTaskBaseInfo;
 import com.ycsoft.business.dto.core.cust.QueryTaskConditionDto;
 import com.ycsoft.business.service.ISnTaskService;
 import com.ycsoft.business.service.ITaskService;
-import com.ycsoft.business.service.IUserService;
 import com.ycsoft.business.service.impl.UserServiceSN;
 import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.helper.JsonHelper;
@@ -114,6 +113,11 @@ public class TaskAction extends BaseBusiAction{
 		return JSON_OTHER;
 	}
 	
+	public String queryTaskDevice()  throws Exception{
+		getRoot().setRecords(snTaskService.queryTaskDevice(task_id));
+		return JSON_RECORDS;
+	}
+	
 	public String queryTaskTeam() throws Exception{
 		getRoot().setRecords(snTaskService.queryTaskTeam());
 		return JSON_RECORDS;
@@ -173,7 +177,8 @@ public class TaskAction extends BaseBusiAction{
 	 * @throws Exception
 	 */
 	public String endTask() throws Exception{
-		snTaskService.finishTask(task_id,resultType);
+		String finishRemark = request.getParameter("finishRemark");
+		snTaskService.finishTask(task_id,resultType,finishRemark);
 		return JSON_SUCCESS;
 	}
 	
@@ -190,6 +195,11 @@ public class TaskAction extends BaseBusiAction{
 		return JSON_SUCCESS;
 	}
 	
+	public String fillWriteOffTerminalTask() throws Exception{
+		String userIds = request.getParameter("userIds");
+		snTaskService.fillWriteOffTerminalTask(task_id, userIds.split(","));
+		return JSON_SUCCESS;
+	}
 	
 	public String queryTaskByCustId()throws Exception{
 		getRoot().setRecords(snTaskService.queryTaskByCustId(custId));

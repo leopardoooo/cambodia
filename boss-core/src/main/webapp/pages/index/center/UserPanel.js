@@ -305,7 +305,11 @@ ProdGrid = Ext.extend(Ext.TabPanel,{
 			store:this.userProdStore,
 			sm:new Ext.grid.RowSelectionModel(),
 			view: new Ext.ux.grid.ColumnLockBufferView(),
-			cm: this.baseProdCm
+			cm: this.baseProdCm,
+			listeners: {
+				scope: this,
+				rowclick: this.doClickRecord
+			}
 		});
 		
 		// 客户套餐
@@ -338,7 +342,11 @@ ProdGrid = Ext.extend(Ext.TabPanel,{
 			store:this.custPkgStore,
 			sm:new Ext.grid.RowSelectionModel(),
 			view: new Ext.ux.grid.ColumnLockBufferView(),
-			cm: this.custPkgCm
+			cm: this.custPkgCm,
+			listeners: {
+				scope: this,
+				rowclick: this.doClickRecord
+			}
 		});
 		
 		ProdGrid.superclass.constructor.call(this,{
@@ -366,7 +374,6 @@ ProdGrid = Ext.extend(Ext.TabPanel,{
 		})
 	},
 	initEvents: function(){
-		this.baseProdGrid.on("rowclick", this.doClickRecord, this );
 		this.baseProdGrid.on("afterrender",function(){
 			this.baseProdGrid.swapViews();
 		},this,{delay:10});
@@ -412,9 +419,7 @@ ProdGrid = Ext.extend(Ext.TabPanel,{
 		prodDetailTab.refreshPanel(prodDetailTab.getActiveTab());
 	},
 	getSelections:function(){
-		var panelId = App.getData().currentPanelId;
-		var prodGrid = null;
-		// 套餐
+		var panelId = App.getData().currentPanelId || this.getActiveTab().items.itemAt(0).getId();
 		if(panelId === "U_CUST_PKG"){
 			return this.custPkgGrid.getSelectionModel().getSelections();
 		}else{

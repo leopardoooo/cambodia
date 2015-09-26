@@ -303,6 +303,9 @@ Ext.apply( App, {
 			panel.getPayfeePanel().refresh();
 		}else if(busiCode == '1113' || busiCode == '2261'){	//取消支付
 			panel.getUserPanel().refresh();
+			panel.getPayfeePanel().acctFeeGrid.remoteRefresh();
+			panel.getPayfeePanel().busiFeeGrid.remoteRefresh();
+			panel.getDoneCodePanel().doneCodeGrid.remoteRefresh();
 		}else if(busiCode == '1001' || busiCode == '1002' || busiCode == '2001'){//客户开户、客户销户，刷新客户，重置其他面板isReload为true
 			Ext.getDom('q').value='';
 			if (unitRefresh){

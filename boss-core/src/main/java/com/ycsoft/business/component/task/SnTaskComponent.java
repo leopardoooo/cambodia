@@ -337,7 +337,7 @@ public class SnTaskComponent extends BaseBusiComponent{
 			WTaskUser taskUser = new WTaskUser();
 			taskUser.setTask_id(taskId);
 			taskUser.setUser_id(user.getUser_id());
-			taskUser.setDevice_model(user.getDevice_model());
+			taskUser.setDevice_model(user.getStr3());
 			taskUser.setUser_type(user.getUser_type());
 			taskUser.setDevice_id(user.getUser_type().equals(SystemConstants.USER_TYPE_BAND)?user.getModem_mac():user.getStb_id());
 			//如果是销终端工单，则需要指定哪些设备需要回收

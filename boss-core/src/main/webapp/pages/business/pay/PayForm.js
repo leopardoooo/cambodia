@@ -88,11 +88,6 @@ PayForm = Ext.extend( Ext.form.FormPanel , {
 			}]
 			
 		});
-		/*var acctdatecmp = this.find("name","pay.acct_date")[0];
-		App.acctDate(acctdatecmp);*/
-		this.busiOptrStore.on('load', function(){
-			Ext.getCmp('payBusiOptrId').setValue(App.getCust()['str9']);
-		}, this);
 	},
 	initComponent: function(){
 		PayForm.superclass.initComponent.call(this);

@@ -129,6 +129,26 @@ public class OrderComponent extends BaseBusiComponent {
 		}
 		edit.setOld_transfer_fee(transFee);
 		//套餐子产品的选择情况,在编辑面板异步加载
+		if(!order.getProd_type().equals(SystemConstants.PROD_TYPE_BASE)){
+			
+			Map<String,Set<String>> groupUserMap=new HashMap<>();
+			for(CProdOrder detail: cProdOrderDao.queryPakDetailOrder(order.getOrder_sn())){
+				Set<String> set=groupUserMap.get(detail.getPackage_group_id());
+				if(set==null){
+					set=new HashSet<String>();
+					groupUserMap.put(detail.getPackage_group_id(), set);
+				}
+				set.add(detail.getUser_id());
+			}
+			List<PackageGroupUser> groupSelected=new ArrayList<>();
+			for(String group_id:   groupUserMap.keySet()){
+				PackageGroupUser pgu=new PackageGroupUser();
+				groupSelected.add(pgu);
+				pgu.setPackage_group_id(group_id);
+				pgu.setUserSelectList(Arrays.asList(groupUserMap.get(group_id).toArray(new String[groupUserMap.get(group_id).size()])));
+			}
+			edit.setGroupSelected(groupSelected);
+		}
 		return edit;
 	}
 	/**
@@ -573,14 +593,6 @@ public class OrderComponent extends BaseBusiComponent {
 				||BusiCodeConstants.PROD_SUPER_TERMINATE.equals(busi_code)
 				?true:false;
 	}
-	/**
-	 * 是否高级订单修改权限
-	 * @param busi_code
-	 * @return
-	 */
-	public boolean isHighEdit(String busi_code){
-		return BusiCodeConstants.ORDER_HIGH_EDIT.equals(busi_code)?true:false;
-	}
 	
 	/**
 	 * 因为产品退订而重新计算套餐订单的计费时间段（不处理子产品）
@@ -622,9 +634,10 @@ public class OrderComponent extends BaseBusiComponent {
 		List<CProdOrder> moveResult=new ArrayList<>();
 		for(CProdOrder order:moveList){
 			//第一个订购记录必须是今天之前(含今天)开始，后面的订购是接续在上一条订购之后
-			if((start.equals(today)&&order.getEff_date().after(start))
-				||(!start.equals(today)&&!start.equals(order.getEff_date()))){
-				
+			if((start.equals(today)&&!order.getEff_date().after(start))
+				||(!start.equals(today)&&start.equals(order.getEff_date()))){
+				start=DateHelper.addDate(order.getExp_date(), 1);
+			}else{				
 				Date eff_date=new Date(start.getTime());
 				PProdTariff tariff=pProdTariffDao.findByKey(order.getTariff_id());
 				Date exp_date=null;

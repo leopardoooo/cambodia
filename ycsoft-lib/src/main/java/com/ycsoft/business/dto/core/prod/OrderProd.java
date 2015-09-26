@@ -31,8 +31,8 @@ public class OrderProd implements Serializable{
 	//支付类型 :ACCT 账户支付，CFEE 缴费支付
 	private String order_fee_type;
 	
-	private Integer order_cycle;//订购周期数（内部使用）
-	private String billing_type;//资费计费类型(内部使用)
+	//private Integer order_cycle;//订购周期数（内部使用）
+	//private String billing_type;//资费计费类型(内部使用)
 	
 	
 	public String getOrder_fee_type() {
@@ -41,18 +41,18 @@ public class OrderProd implements Serializable{
 	public void setOrder_fee_type(String order_fee_type) {
 		this.order_fee_type = order_fee_type;
 	}
-	public Integer getOrder_cycle() {
-		return order_cycle;
-	}
-	public void setOrder_cycle(Integer order_cycle) {
-		this.order_cycle = order_cycle;
-	}
-	public String getBilling_type() {
-		return billing_type;
-	}
-	public void setBilling_type(String billing_type) {
-		this.billing_type = billing_type;
-	}
+//	public Integer getOrder_cycle() {
+//		return order_cycle;
+//	}
+//	public void setOrder_cycle(Integer order_cycle) {
+//		this.order_cycle = order_cycle;
+//	}
+//	public String getBilling_type() {
+//		return billing_type;
+//	}
+//	public void setBilling_type(String billing_type) {
+//		this.billing_type = billing_type;
+//	}
 	public Date getExp_date() {
 		return exp_date;
 	}
