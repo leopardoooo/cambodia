@@ -143,6 +143,12 @@ public class OrderService extends BaseBusiService implements IOrderService{
 			doneCodeComponent.saveDoneCodeUnPay(cust_id, done_code, this.getOptr().getOptr_id());
 		}
 		
+		//TODO 客户套餐自动选终端处理，因为前台先不提供客户套餐用户变更功能，如果套餐变更了产品，自动更新用户对应的套餐内容
+		if(order.getProd_type().equals(SystemConstants.PROD_TYPE_CUSTPKG)
+				&&!order.getProd_id().equals(orderProd.getProd_id())){
+			this.editCustOrderAutoSelectUser(orderProd);
+		}
+		
 		//记录异动
 		CProdOrder editOrder=orderComponent.createCProdOrder(orderProd, null, null, null, null);
 		if(StringHelper.isNotEmpty(this.getBusiParam().getRemark())){
@@ -161,7 +167,44 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		
 		this.saveAllPublic(done_code, this.getBusiParam());
 	}
-	
+	/**
+	 * 订单修改，客户套餐自动选择终端
+	 * @throws Exception 
+	 */
+	private void editCustOrderAutoSelectUser(OrderProd orderProd) throws Exception{
+		List<PPackageProd> newPakProds= pPackageProdDao.queryPackProdById(orderProd.getProd_id());
+		if(newPakProds.size()!= orderProd.getGroupSelected().size()){
+			throw new ServicesException(ErrorCode.OrderDatePackageConfig);
+		}
+		for(PackageGroupUser pgu: orderProd.getGroupSelected()){
+			PPackageProd oldPakProd=pPackageProdDao.findByKey(pgu.getPackage_group_id());
+			if(oldPakProd==null){
+				throw new ServicesException(ErrorCode.OrderDatePackageConfig);
+			}
+			PPackageProd selectPakProd=null;//使用套餐终端适用条件去匹配，应该匹配到唯一一条配置
+			for(PPackageProd newPakProd:newPakProds){
+				if(newPakProd.getUser_type().equals(oldPakProd.getUser_type())){
+					if(StringHelper.isEmpty(newPakProd.getTerminal_type())
+							&&StringHelper.isEmpty(oldPakProd.getTerminal_type())){
+						if(selectPakProd!=null){//找到多个对应配置错误
+							throw new ServicesException(ErrorCode.OrderDatePackageConfig);
+						}
+						selectPakProd=newPakProd;
+					}else if(StringHelper.isNotEmpty(newPakProd.getTerminal_type())
+							&&newPakProd.getTerminal_type().equals(oldPakProd.getTerminal_type())){
+						if(selectPakProd!=null){//找到多个对应配置错误
+							throw new ServicesException(ErrorCode.OrderDatePackageConfig);
+						}
+						selectPakProd=newPakProd;
+					}
+				}
+			}
+			if(selectPakProd==null){//找不到对应配置
+				throw new ServicesException(ErrorCode.OrderDatePackageConfig);
+			}
+			pgu.setPackage_group_id(selectPakProd.getPackage_group_id());
+		}
+	}
 	private CProdOrderDto checkOrderEditParam(String cust_id,OrderProd orderProd) throws Exception{
 		if(StringHelper.isEmpty(cust_id)||orderProd==null||StringHelper.isEmpty(orderProd.getLast_order_sn())){
 			throw new ServicesException(ErrorCode.ParamIsNull);
@@ -208,42 +251,25 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		}
 	
 		String[] tmpTariff=orderProd.getTariff_id().split("_");
-		int billing_cycle=0;
-		int rent=0;
 		PProdTariff tariff=pProdTariffDao.findByKey(tmpTariff[0]);		
-		if(tmpTariff.length==2){		
-			PProdTariffDisct disct= pProdTariffDisctDao.findByKey(tmpTariff[1]);
-			billing_cycle=disct.getBilling_cycle();
-			rent=disct.getDisct_rent();
-		}else{
-			billing_cycle=tariff.getBilling_cycle();
-			rent=tariff.getRent();
-		}
-		//订购期数(包天=round(order_months*30))
-		//TODO 这个不足一个周期需要如何修改
-		int order_cycles=tariff.getBilling_type().equals(SystemConstants.BILLING_TYPE_DAY)?
-				Math.round(orderProd.getOrder_months()*30):orderProd.getOrder_months().intValue();
-		//记录资费计费类型和订购周期数（后面要使用）
-		orderProd.setBilling_type(tariff.getBilling_type());
-		orderProd.setOrder_cycle(order_cycles);
-		
+
 		if(orderProd.getTransfer_fee()==null){
 			orderProd.setTransfer_fee(0);
 		}
-		
+		//新订单金额
 		int new_order_fee=order.getOrder_fee()+orderProd.getPay_fee();
 		
 		if(new_order_fee<0){//订单费用不能小于0
 			throw new ComponentException(ErrorCode.OrderDateFeeError);
 		}
 		
-		//新的订单金额不能小于（原始转移支付金额）
 		int oldTransFee=0;
 		for(CProdOrderFee orderFee: cProdOrderFeeDao.queryByOrderSn(order.getOrder_sn())){
 			if(orderFee.getInput_type().equals(SystemConstants.ORDER_FEE_TYPE_TRANSFEE)){
 				oldTransFee=oldTransFee+orderFee.getFee();
 			}
 		}
+		//新的订单金额不能小于（原始转移支付金额）
 		if(new_order_fee<oldTransFee){
 			throw new ComponentException(ErrorCode.OrderDateFeeError);
 		}
@@ -1188,8 +1214,8 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		int order_cycles=tariff.getBilling_type().equals(SystemConstants.BILLING_TYPE_DAY)?
 				Math.round(orderProd.getOrder_months()*30):orderProd.getOrder_months().intValue();
 		//记录资费计费类型和订购周期数（后面要使用）
-		orderProd.setBilling_type(tariff.getBilling_type());
-		orderProd.setOrder_cycle(order_cycles);
+		//orderProd.setBilling_type(tariff.getBilling_type());
+		//orderProd.setOrder_cycle(order_cycles);
 		
 		if(orderProd.getOrder_months()==0&&!busi_code.equals(BusiCodeConstants.PROD_UPGRADE)){
 			throw new  ComponentException(ErrorCode.OrderDateOrderMonthError);
