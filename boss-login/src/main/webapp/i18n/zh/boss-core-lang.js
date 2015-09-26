@@ -437,7 +437,7 @@ BCLang.home = {
 			titleInvoiceWindow:'打印共需要 {0} 张收据~',
 			wdxj:'网点现金~',
 			printGridColumns:['流水号~','单据名称~','创建时间~'],
-			invoiceGridColumns:['顺序号~','收据号码~','领用人~'],
+			invoiceGridColumns:['顺序号~','收据号码~','开票人~'],
 			printItemGridColumns:['名称~','金额~'],
 			stillEmptyInvoiceField:"还有为空的收据输入框!~",
 			hasDuplcateInvoice:"有重复的收据，请确认!~"
