@@ -174,7 +174,7 @@ public class PayService extends BaseBusiService implements IPayService {
 
 			if(!fee.getAcctitem_id().equals(SystemConstants.ACCTITEM_PUBLIC_ID)){
 				if(fee.getBusi_code().equals(BusiCodeConstants.ORDER_EDIT)
-						||fee.getBusi_code().equals(BusiCodeConstants.ORDER_EDIT)){
+						||fee.getBusi_code().equals(BusiCodeConstants.ORDER_HIGH_EDIT)){
 					//订单修改，不能取消
 					throw new ServicesException(ErrorCode.UnPayHasEdit);
 				}else if(fee.getReal_pay()>0){

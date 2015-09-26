@@ -1,5 +1,7 @@
 package com.ycsoft.business.dto.core.prod;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -16,9 +18,9 @@ public class OrderProdEdit extends OrderProd {
 	 */
 	private String userDesc;
 	//可用产品
-	private List<PProd> prodList;
+	private List<PProd> prodList =new ArrayList<>(); 
 	//可用资费Map<prod_id,List<资费折扣定义>>
-	private Map<String,List<PProdTariffDisct>> tariffMap;
+	private Map<String,List<PProdTariffDisct>> tariffMap=new HashMap<>();
 	//原始订单订购金额，
 	private Integer old_order_fee;
 	//原始转移支付金额

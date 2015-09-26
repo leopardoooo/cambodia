@@ -10,6 +10,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.ycsoft.business.dto.core.prod.OrderProd;
+import com.ycsoft.business.dto.core.prod.OrderProdEdit;
 import com.ycsoft.business.service.IOrderService;
 import com.ycsoft.commons.helper.JsonHelper;
 import com.ycsoft.commons.helper.StringHelper;
@@ -47,6 +48,27 @@ public class ProdOrderAction extends BaseBusiAction {
 	private Integer fee;
 	//客户订单清单加载类型: ALL(所有),EFF(有效订单),不填(取有效订单，无有效则取最近一条订单)
 	private String loadType;
+	
+	/**
+	 * 查询订单编辑的初始化数据
+	 * @return
+	 * @throws Exception
+	 */
+	public String queryOrderToEdit()throws Exception{
+		getRoot().setSimpleObj(orderService.queryOrderToEdit(order_sn));
+		return JSON_SIMPLEOBJ;
+	}
+	/**
+	 * 保存订单修改
+	 * @param orderProd
+	 * @return
+	 * @throws Exception
+	 */
+	public String saveOrderEdit() throws Exception{
+		OrderProd o=JsonHelper.toObject(orderProd, OrderProd.class);
+		orderService.saveOrderEdit(o);
+		return JSON_SUCCESS;
+	}
 	
 	/**
 	 * 退订界面数据初始化查询

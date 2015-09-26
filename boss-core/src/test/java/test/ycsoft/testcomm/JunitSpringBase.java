@@ -13,7 +13,7 @@ import com.ycsoft.business.dao.system.SItemvalueDao;
 import com.ycsoft.commons.store.MemoryDict;
 
 @ContextConfiguration(locations={"classpath*:spring/*.xml"})
-@TransactionConfiguration(transactionManager="transactionManager",defaultRollback=true)
+@TransactionConfiguration(transactionManager="transactionManager",defaultRollback=false)
 public abstract class JunitSpringBase extends AbstractTransactionalJUnit4SpringContextTests  {
 
 	@Autowired
