@@ -1,7 +1,9 @@
 package com.ycsoft.business.service.impl;
 
 import static com.ycsoft.commons.constants.SystemConstants.ACCT_TYPE_SPEC;
+import static com.ycsoft.commons.constants.SystemConstants.BOOLEAN_TRUE;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Service;
 import com.ycsoft.beans.config.TBusiFee;
 import com.ycsoft.beans.config.TDeviceBuyMode;
 import com.ycsoft.beans.core.cust.CCust;
+import com.ycsoft.beans.core.cust.CCustDevice;
 import com.ycsoft.beans.core.job.JUserStop;
 import com.ycsoft.beans.core.prod.CProdOrder;
 import com.ycsoft.beans.core.prod.CProdOrderDto;
@@ -26,9 +29,11 @@ import com.ycsoft.beans.system.SOptr;
 import com.ycsoft.business.component.core.OrderComponent;
 import com.ycsoft.business.dao.core.prod.CProdOrderDao;
 import com.ycsoft.business.dao.core.prod.CProdPropChangeDao;
+import com.ycsoft.business.dto.core.acct.PayDto;
 import com.ycsoft.business.dto.core.fee.FeeInfoDto;
 import com.ycsoft.business.dto.core.prod.DisctFeeDto;
 import com.ycsoft.business.dto.core.prod.PromotionDto;
+import com.ycsoft.business.dto.core.user.UserDto;
 import com.ycsoft.business.dto.core.user.UserRes;
 import com.ycsoft.business.dto.device.DeviceDto;
 import com.ycsoft.business.service.IUserService;
@@ -36,12 +41,14 @@ import com.ycsoft.commons.constants.BusiCmdConstants;
 import com.ycsoft.commons.constants.BusiCodeConstants;
 import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.constants.SystemConstants;
+import com.ycsoft.commons.exception.ErrorCode;
 import com.ycsoft.commons.exception.ServicesException;
 import com.ycsoft.commons.helper.CollectionHelper;
 import com.ycsoft.commons.helper.DateHelper;
 import com.ycsoft.commons.helper.JsonHelper;
 import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.daos.core.JDBCException;
+import com.ycsoft.daos.helper.BeanHelper;
 @Service
 public class UserServiceSN extends BaseBusiService implements IUserService {
 	@Autowired
@@ -231,13 +238,163 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 
 
 	@Override
-	public void saveRemoveUser(String banlanceDealType, String transAcctId, String transAcctItemId) throws Exception {
+	public void saveRemoveUser(String userId,String banlanceDealType,String reclaim,Integer cancelFee, String transAcctId, String transAcctItemId) throws Exception {
 		// TODO Auto-generated method stub
+		//获取客户用户信息
+		CCust cust = getBusiParam().getCust();
+		String  custId = cust.getCust_id();
+		List<CUser> userList = getBusiParam().getSelectedUsers();
+		CUser user = null;
+		for(CUser u : userList){
+			if(userId.equals(u.getUser_id())){
+				user = u;
+			}
+		}
+		if(user == null){
+			throw new ServicesException(ErrorCode.CustDataException);
+		}
+		//获取业务流水
+		Integer doneCode = doneCodeComponent.gDoneCode();
+		String busiCode = getBusiParam().getBusiCode();
+		//生成销帐任务
+		int jobId = jobComponent.createCustWriteOffJob(doneCode, custId,BOOLEAN_TRUE);
+
+		List<String> devoceList = new ArrayList<String>();
+		if(user.getStb_id() != null){
+			devoceList.add(user.getStb_id());
+		}
+		if(user.getCard_id()!=null){
+			devoceList.add(user.getCard_id());
+		}
+		if(user.getModem_mac() != null){
+			devoceList.add(user.getModem_mac());
+		}
 		
+		List<CCustDevice> buyModeList = null;
+		if(devoceList.size()>0){
+			buyModeList = custComponent.findBuyModeById(custId, devoceList.toArray(new String[devoceList.size()]));
+		}
+		Map<String, CCustDevice> map = CollectionHelper.converToMapSingle(buyModeList, "device_code");
+		Map<String, UserDto> userMap = new HashMap<String, UserDto>();
+		
+		if(CollectionHelper.isNotEmpty(userList)){
+			List<UserDto> allUsers = userComponent.queryUser(custId);
+			userMap = CollectionHelper.converToMapSingle(allUsers, "user_id");
+		}
+		
+		//处理用户销户
+		Map<String, Object> info = new HashMap<String, Object>();
+		info.put("user_type", user.getUser_type_text());
+		info.put("user", userMap.get(userId));
+		
+		//销户后保存原来的设备购买方式
+		user.setStb_buy(map.get(user.getStb_id()) != null?map.get(user.getStb_id()).getBuy_mode():null);
+		user.setCard_buy(map.get(user.getCard_id()) != null?map.get(user.getCard_id()).getBuy_mode():null);
+		user.setModem_buy(map.get(user.getModem_mac()) != null?map.get(user.getModem_mac()).getBuy_mode():null);
+		
+		
+		//柬埔寨 用户销户 回收设备
+		if(SystemConstants.BOOLEAN_TRUE.equals(reclaim)){
+			DeviceDto stbDevice = null;
+			//回收机顶盒
+			if(StringHelper.isNotEmpty(user.getStb_id())){
+				stbDevice = deviceComponent.queryDeviceByDeviceCode(user.getStb_id());
+				reclaimDevice(stbDevice.getDevice_id(), null,SystemConstants.RECLAIM_REASON_XHTH, 0, cust, doneCode, busiCode);
+			}
+			if(StringHelper.isNotEmpty(user.getCard_id()) && (stbDevice.getPairCard() == null  || !user.getCard_id().equals(stbDevice.getPairCard().getCard_id()))){
+				DeviceDto device = deviceComponent.queryDeviceByDeviceCode(user.getCard_id());
+				reclaimDevice(device.getDevice_id(), null,SystemConstants.RECLAIM_REASON_XHTH, 0, cust, doneCode, busiCode);
+			}
+			if(StringHelper.isNotEmpty(user.getModem_mac()) && (stbDevice.getPairModem() == null  || !user.getModem_mac().equals(stbDevice.getPairModem().getModem_mac()))){
+				DeviceDto device = deviceComponent.queryDeviceByDeviceCode(user.getModem_mac());
+				reclaimDevice(device.getDevice_id(), null,SystemConstants.RECLAIM_REASON_XHTH, 0, cust, doneCode, busiCode);
+			}
+												
+		}
+		//是否高级权限
+		boolean isHigh=orderComponent.isHighCancel(busiCode);
+		//检查数据
+		List<CProdOrderDto> cancelList=checkCancelProdOrderParm(isHigh, userId, cancelFee);
+		
+		if(cancelFee<0){
+			//记录未支付业务
+			doneCodeComponent.saveDoneCodeUnPay(custId, doneCode, this.getOptr().getOptr_id());
+			//保存缴费信息
+			this.saveCancelFee(cancelList, this.getBusiParam().getCust(), doneCode, this.getBusiParam().getBusiCode());
+		}
+		
+		List<CProdOrder> cancelResultList=new ArrayList<>();
+		
+		for(CProdOrderDto dto:cancelList){
+			//执行退订 返回被退订的用户订单清单
+			cancelResultList.addAll(orderComponent.saveCancelProdOrder(dto, doneCode));
+		}
+		
+		//直接解除授权，不等支付（因为不能取消）
+		if(cancelResultList.size()>0){
+			authComponent.sendAuth(user, cancelResultList, BusiCmdConstants.PASSVATE_PROD, doneCode);
+		}
+		
+		//记录用户到历史表
+		userComponent.removeUserWithHis(doneCode, user);
+		
+		doneCodeComponent.saveDoneCodeInfo(doneCode, custId, null, info);
+		saveAllPublic(doneCode,getBusiParam());
 	}
 
+	
+	
+	private List<CProdOrderDto> checkCancelProdOrderParm(boolean isHigh,String userId,Integer cancelFee) throws Exception{
+		
+		if(StringHelper.isEmpty(userId)||cancelFee==null){
+			throw new ServicesException(ErrorCode.ParamIsNull);
+		}
 
+		List<CProdOrderDto> cancelList=new ArrayList<>();
+		//参数检查
+		//退款总额核对
+		int fee=0;
+		List<CProdOrderDto> orderList = cProdOrderDao.queryProdOrderDtoByUserId(userId);
+		
+		for(CProdOrderDto order:orderList){
+			cancelList.add(order);
+			//可退费用计算
+			order.setActive_fee(orderComponent.getOrderCancelFee(order));
+			fee=fee+order.getActive_fee();
+			
+		}
+		//金额核对
+		if(cancelFee!=fee*-1){
+			throw new ServicesException(ErrorCode.FeeDateException);
+		}		
+		return cancelList;
+	}
 
+	/**
+	 * 保存订单退款费用信息
+	 * @param cancelList
+	 * @param cust
+	 * @param doneCode
+	 * @param busi_code
+	 * @throws InvocationTargetException 
+	 * @throws Exception 
+	 */
+	private void saveCancelFee(List<CProdOrderDto> cancelList,CCust cust,Integer doneCode,String busi_code) throws Exception{
+		//按订单退款
+		for(CProdOrderDto order:cancelList){
+			if(order.getActive_fee()>0){
+				PayDto pay=new PayDto();
+				BeanHelper.copyProperties(pay, order);
+				pay.setProd_sn(order.getOrder_sn());
+				pay.setAcctitem_id(order.getProd_id());
+				pay.setBegin_date(DateHelper.dateToStr(DateHelper.today().before(order.getEff_date())? order.getEff_date():DateHelper.today()));
+				pay.setInvalid_date(DateHelper.dateToStr(order.getExp_date()));
+				pay.setPresent_fee(0);
+				pay.setFee(order.getActive_fee()*-1);
+				feeComponent.saveAcctFee(cust.getCust_id(), cust.getAddr_id(), pay, doneCode, busi_code, StatusConstants.UNPAY);
+			}
+		}
+	}
 
 	@Override
 	public void saveOpenInteractive(String netType, String modemMac, String password, String vodUserType,

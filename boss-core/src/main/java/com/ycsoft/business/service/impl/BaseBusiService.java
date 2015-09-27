@@ -102,6 +102,7 @@ public class BaseBusiService extends BaseService {
 	@Autowired
 	protected AuthComponent authComponent;
 	
+	
 	/**
 	 * 保存订购产品受理单
 	 * @param doneCode
@@ -1026,7 +1027,9 @@ public class BaseBusiService extends BaseService {
 		//如果还有不是报亭状态用户在使用这个设备，提示操作员数据
 		if(userList!=null && userList.size() > 0){
 			for(CUser cuser : userList){
-				if(!StatusConstants.REQSTOP.equals(cuser.getStatus())){
+				//柬埔寨 销户回收设备，过滤这个判断
+				if(!BusiCodeConstants.USER_WRITE_OFF.equals(busiCode) && !BusiCodeConstants.USER_HIGH_WRITE_OFF.equals(busiCode) 
+						&& !StatusConstants.REQSTOP.equals(cuser.getStatus())){
 					throw new ServicesException("该设备还在被用户使用，不能回收");
 				}
 				String stb_id = cuser.getStb_id();
@@ -1646,7 +1649,7 @@ public class BaseBusiService extends BaseService {
 			boolean hasUnpay=false;
 			for (FeeBusiFormDto feeDto : busiParam.getFees()) {
 				if(feeDto.getReal_pay() > 0){
-					feeComponent.saveBusiFee(custId,cust!=null?cust.getAddr_id():null, feeDto.getFee_id(), feeDto.getCount(),SystemConstants.PAY_TYPE_UNPAY,feeDto
+					feeComponent.saveBusiFee(cust.getCust_id(),cust!=null?cust.getAddr_id():null, feeDto.getFee_id(), feeDto.getCount(),SystemConstants.PAY_TYPE_UNPAY,feeDto
 							.getReal_pay(), busiParam.getDoneCode(),busiParam.getDoneCode(), busiParam.getBusiCode(),
 							busiParam.getSelectedUsers());
 					hasUnpay=true;
@@ -1654,7 +1657,7 @@ public class BaseBusiService extends BaseService {
 			}
 			if(hasUnpay&&doneCodeComponent.queryDoneCodeUnPayByKey(doneCode)==null){
 				//保存未支付业务
-				doneCodeComponent.saveDoneCodeUnPay(custId, doneCode,this.getOptr().getOptr_id());
+				doneCodeComponent.saveDoneCodeUnPay(cust.getCust_id(), doneCode,this.getOptr().getOptr_id());
 			}
 		}
 		
