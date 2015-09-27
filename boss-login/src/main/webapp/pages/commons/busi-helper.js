@@ -400,9 +400,9 @@ Ext.apply( App, {
 		}else if(busiCode == '1024' || busiCode == '1025' 
 			|| busiCode == '1222' || busiCode == '1129' || busiCode == '1031' || busiCode == '1236'){
 				//报停、报开、开通双向或取消双向、修改接入方式，刷新用户和设备,账户
-			panel.getCustPanel().custDeviceGrid.remoteRefresh();
+			//panel.getCustPanel().custDeviceGrid.remoteRefresh();
 			panel.getUserPanel().userGrid.remoteRefresh();
-			panel.getAcctPanel().acctGrid.remoteRefresh();
+			//panel.getAcctPanel().acctGrid.remoteRefresh();
 		}else if(busiCode == '1500'){//订购，刷新产品和账户
 			panel.getUserPanel().prodGrid.remoteRefresh();
 			panel.getAcctPanel().acctGrid.remoteRefresh();

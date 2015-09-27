@@ -22,6 +22,7 @@ import com.ycsoft.beans.core.bill.BBill;
 import com.ycsoft.beans.core.job.JProdNextTariff;
 import com.ycsoft.beans.core.job.JRecordChange;
 import com.ycsoft.beans.core.prod.CProd;
+import com.ycsoft.beans.core.prod.CProdOrder;
 import com.ycsoft.beans.core.prod.CProdPropChange;
 import com.ycsoft.beans.core.prod.CProdStatusChange;
 import com.ycsoft.beans.core.user.CUser;
@@ -39,6 +40,7 @@ import com.ycsoft.business.dao.core.common.CDoneCodeDetailDao;
 import com.ycsoft.business.dao.core.job.JProdNextTariffDao;
 import com.ycsoft.business.dao.core.job.JRecordChangeDao;
 import com.ycsoft.business.dao.core.prod.CProdDao;
+import com.ycsoft.business.dao.core.prod.CProdOrderDao;
 import com.ycsoft.business.dao.core.prod.CProdPropChangeDao;
 import com.ycsoft.business.dao.core.prod.CProdStatusChangeDao;
 import com.ycsoft.business.dao.prod.PProdDao;
@@ -78,6 +80,8 @@ public class BaseBusiComponent extends BaseComponent{
 	protected PProdTariffDao pProdTariffDao;
 	protected CProdDao cProdDao;
 	protected CProdPropChangeDao cProdPropChangeDao;
+	@Autowired
+	protected CProdOrderDao cProdOrderDao;
 	@Autowired
 	protected CProdStatusChangeDao cProdStatusChangeDao;
 	protected CAcctAcctitemDao cAcctAcctitemDao;
@@ -482,28 +486,31 @@ public class BaseBusiComponent extends BaseComponent{
 	 * @param propChangeList
 	 * @throws Exception
 	 */
-	public void editProd(Integer doneCode,String prodSn,List<CProdPropChange> propChangeList) throws Exception{
+	public void editProd(Integer doneCode,String orderSn,List<CProdPropChange> propChangeList) throws Exception{
 		if(propChangeList == null || propChangeList.size() == 0) return ;
-		CProd prod = new CProd();
-		prod.setProd_sn(prodSn);
+		CProdOrder order = new CProdOrder();
+		order.setOrder_sn(orderSn);
 		
 		CProdStatusChange statusChange =null;
 		for (CProdPropChange change:propChangeList){
-			BeanHelper.setPropertyString(prod, change.getColumn_name(), change
+			BeanHelper.setPropertyString(order, change.getColumn_name(), change
 					.getNew_value());
 
-			change.setProd_sn(prodSn);
+			change.setProd_sn(orderSn);
 			change.setDone_code(doneCode);
 			change.setArea_id(getOptr().getArea_id());
 			change.setCounty_id(getOptr().getCounty_id());
 			
 			if (change.getColumn_name().equals("status")){
 				statusChange = new CProdStatusChange();
-				BeanUtils.copyProperties(change, statusChange);
+				statusChange.setOrder_sn(orderSn);
+				statusChange.setDone_code(doneCode);
+				statusChange.setStatus_date(new Date());
+				statusChange.setStatus(change.getNew_value());
 			}
 		}
 		//修改产品信息
-		cProdDao.update(prod);
+		cProdOrderDao.update(order);
 		
 		
 		//保存产品异动信息
@@ -868,4 +875,5 @@ public class BaseBusiComponent extends BaseComponent{
 	public void setTTabDefineDao(TTabDefineDao tabDefineDao) {
 		tTabDefineDao = tabDefineDao;
 	}
+	
 }

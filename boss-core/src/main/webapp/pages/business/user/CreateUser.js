@@ -321,7 +321,7 @@ UserBaseForm = Ext.extend( BaseForm , {
 						return ;
 					}
 				}else if(dtype === "MODEM" ){
-					if(currUserType !== ""){
+					if(currUserType !== "BAND"){
 						Alert("设备为Modem猫，不支持所选"+ currUserType +"用户类型");
 						field.setRawValue("");
 						return;

@@ -1,0 +1,13 @@
+2015-09-27 18:16:01,947 [INFO ] com.ycsoft.http.HttpClientOrderly  - A total of 1 HTTP requests.
+2015-09-27 18:16:02,396 [DEBUG] org.apache.http.client.protocol.RequestAddCookies  - CookieSpec selected: best-match
+2015-09-27 18:16:02,412 [DEBUG] org.apache.http.client.protocol.RequestAuthCache  - Auth cache not set in the context
+2015-09-27 18:16:02,415 [DEBUG] org.apache.http.impl.conn.PoolingHttpClientConnectionManager  - Connection request: [route: {}->http://172.18.21.100:80][total kept alive: 0; route allocated: 0 of 2; total allocated: 0 of 20]
+2015-09-27 18:16:02,440 [DEBUG] org.apache.http.impl.conn.PoolingHttpClientConnectionManager  - Connection leased: [id: 0][route: {}->http://172.18.21.100:80][total kept alive: 0; route allocated: 1 of 2; total allocated: 1 of 20]
+2015-09-27 18:16:02,443 [DEBUG] org.apache.http.impl.execchain.MainClientExec  - Opening connection {}->http://172.18.21.100:80
+2015-09-27 18:16:02,446 [DEBUG] org.apache.http.impl.conn.HttpClientConnectionOperator  - Connecting to /172.18.21.100:80
+2015-09-27 18:16:23,449 [DEBUG] org.apache.http.impl.conn.DefaultManagedHttpClientConnection  - http-outgoing-0: Shutdown connection
+2015-09-27 18:16:23,450 [DEBUG] org.apache.http.impl.execchain.MainClientExec  - Connection discarded
+2015-09-27 18:16:23,450 [DEBUG] org.apache.http.impl.conn.DefaultManagedHttpClientConnection  - http-outgoing-0: Close connection
+2015-09-27 18:16:23,450 [DEBUG] org.apache.http.impl.conn.PoolingHttpClientConnectionManager  - Connection released: [id: 0][route: {}->http://172.18.21.100:80][total kept alive: 0; route allocated: 0 of 2; total allocated: 0 of 20]
+2015-09-27 18:16:23,450 [DEBUG] org.apache.http.impl.conn.PoolingHttpClientConnectionManager  - Connection manager is shutting down
+2015-09-27 18:16:23,450 [DEBUG] org.apache.http.impl.conn.PoolingHttpClientConnectionManager  - Connection manager shut down
