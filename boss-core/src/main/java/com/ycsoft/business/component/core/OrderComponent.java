@@ -125,7 +125,9 @@ public class OrderComponent extends BaseBusiComponent {
 		//转移支付费用
 		int transFee=0;
 		for(CProdOrderFee orderFee:cProdOrderFeeDao.queryByOrderSn(order.getOrder_sn())){
-			transFee=transFee+orderFee.getFee();
+			if(orderFee.getInput_type().equals(SystemConstants.ORDER_FEE_TYPE_TRANSFEE)){
+				transFee=transFee+orderFee.getFee();
+			}
 		}
 		edit.setOld_transfer_fee(transFee);
 		//套餐子产品的选择情况,在编辑面板异步加载
