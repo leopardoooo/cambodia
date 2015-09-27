@@ -127,7 +127,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 			prodMap.put(edit.getProd_id(), pProdDao.findByKey(edit.getProd_id()));
 			edit.getTariffMap().put(edit.getProd_id(), new ArrayList<PProdTariffDisct>());
 		}
-		Map<String,PProdTariffDisct> tariffDisctMap=CollectionHelper.converToMapSingle(edit.getTariffMap().get(edit.getProd_id()), "prod_id");
+		Map<String,PProdTariffDisct> tariffDisctMap=CollectionHelper.converToMapSingle(edit.getTariffMap().get(edit.getProd_id()), "tariff_id");
 		if(!tariffDisctMap.containsKey(edit.getTariff_id())){
 			
 			PProdTariff pt=pProdTariffDao.findByKey(order.getTariff_id());
@@ -274,7 +274,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		}
 		
 		//开始计费日校检，开始计费日不能变化
-		if(!order.getEff_date().equals(orderProd.getEff_date())){
+		if(order.getEff_date().getTime() != orderProd.getEff_date().getTime()){
 			throw new ServicesException(ErrorCode.OrderDateEffDateError);
 		}
 		//结束计费日，必须大于等今天
