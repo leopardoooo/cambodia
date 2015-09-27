@@ -791,7 +791,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		Map<Integer, CUser> map = new HashMap<Integer, CUser>();
 		for (CUser user:users){
 			if (!user.getStatus().equals(StatusConstants.ACTIVE)){
-				throw new ServicesException("用户["+user.getUser_id()+"]不是正常状态，不能报停!");
+				throw new ServicesException("用户["+user.getUser_id()+"]不是正常状态，不能拆机!");
 				
 			}
 			if (packageUserIdS.get(user.getUser_id()) != null){
@@ -1598,8 +1598,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		List<CFeeAcct> acctFeeList = cFeeDao.queryTaskUserUnPayCFeeAcct(task.getCust_id(),userIds,task.getDone_code());
 		for(CFeeAcct feeAcct:acctFeeList){
 			//先取消订单修改
-			if(feeAcct.getBusi_code().equals(BusiCodeConstants.ORDER_EDIT)
-					||feeAcct.getBusi_code().equals(BusiCodeConstants.ORDER_HIGH_EDIT)){
+			if(feeAcct.getBusi_code().equals(BusiCodeConstants.ORDER_EDIT)){
 				//回退订单修改的费用
 				List<CProdOrderFeeOut> outList=cProdOrderFeeOutDao.queryByDoneCodeTransFee(feeAcct.getCreate_done_code());
 				orderComponent.saveOrderFeeOutToBack(outList,doneCode);

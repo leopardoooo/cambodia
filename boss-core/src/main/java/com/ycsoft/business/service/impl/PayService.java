@@ -173,8 +173,7 @@ public class PayService extends BaseBusiService implements IPayService {
 			this.checkCanclUpPayFeeParam(fee, cust_id);
 
 			if(!fee.getAcctitem_id().equals(SystemConstants.ACCTITEM_PUBLIC_ID)){
-				if(fee.getBusi_code().equals(BusiCodeConstants.ORDER_EDIT)
-						||fee.getBusi_code().equals(BusiCodeConstants.ORDER_HIGH_EDIT)){
+				if(fee.getBusi_code().equals(BusiCodeConstants.ORDER_EDIT)){
 					//订单修改，不能取消
 					throw new ServicesException(ErrorCode.UnPayHasEdit);
 				}else if(fee.getReal_pay()>0){
@@ -584,8 +583,7 @@ public class PayService extends BaseBusiService implements IPayService {
 			//检查费用记录是订购业务的费用记录 或是 修改订单的费用记录 有无被退订,被退订则不能取消支付
 			if(StringHelper.isNotEmpty(fee.getProd_sn())&&
 					(fee.getReal_pay()>0
-							||fee.getBusi_code().equals(BusiCodeConstants.ORDER_EDIT)
-							||fee.getBusi_code().equals(BusiCodeConstants.ORDER_HIGH_EDIT))){
+							||fee.getBusi_code().equals(BusiCodeConstants.ORDER_EDIT))){
 				if(cProdOrderDao.findByKey(fee.getProd_sn())==null){
 					throw new ServicesException(ErrorCode.PayFeeHasCancelOrder);
 				}

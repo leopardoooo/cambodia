@@ -45,7 +45,7 @@ public class testOrderAction extends JunitSpringBase {
 		
 		BusiParameter parm=new BusiParameter();
 		parm.setOptr(soptr);
-		parm.setBusiCode(BusiCodeConstants.ORDER_HIGH_EDIT);
+		parm.setBusiCode(BusiCodeConstants.ORDER_EDIT);
 		CustFullInfoDto custInfo=new CustFullInfoDto();
 		custInfo.setCust(cCustDao.findByKey(edit.getCust_id()));
 		parm.setCustFullInfo(custInfo);

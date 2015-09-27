@@ -46,6 +46,7 @@ import com.ycsoft.business.dto.core.prod.OrderProdEdit;
 import com.ycsoft.business.dto.core.prod.OrderProdPanel;
 import com.ycsoft.business.dto.core.prod.PackageGroupPanel;
 import com.ycsoft.business.dto.core.prod.PackageGroupUser;
+import com.ycsoft.business.dto.core.prod.ProdTariffDto;
 import com.ycsoft.business.service.IOrderService;
 import com.ycsoft.commons.constants.BusiCmdConstants;
 import com.ycsoft.commons.constants.BusiCodeConstants;
@@ -106,21 +107,53 @@ public class OrderService extends BaseBusiService implements IOrderService{
 			throw new ServicesException(ErrorCode.OrderEditNoProd);
 		}
 		OrderProdEdit edit=orderComponent.createOrderEdit(order);
-		
+		//提取可用的产品和资费列表
 		orderComponent.queryOrderableEdit(custComponent.queryCustById(order.getCust_id()), order.getOrder_sn(), edit);
 		
-		if(edit.getProdList()==null||edit.getProdList().size()==0||edit.getTariffMap()==null||edit.getTariffMap().size()==0){
-			//不能修改，没有可用的产品资费
-			throw new ServicesException(ErrorCode.OrderEditNoProd);
-		}
+		//如果当前产品不可用，则装入当前产品和资费
+		orderEditSetCurrentProdTariff(edit,order);
 		
 		return edit;
+	}
+	/**
+	 * 如果当前产品资费、折扣不可用，则装入当前产品和资费、折扣
+	 * @param edit
+	 * @param order
+	 * @throws Exception
+	 */
+	private void orderEditSetCurrentProdTariff(OrderProdEdit edit,CProdOrderDto order) throws Exception{
+		Map<String,PProd> prodMap=CollectionHelper.converToMapSingle(edit.getProdList(), "prod_id");
+		if(!prodMap.containsKey(edit.getProd_id())){
+			prodMap.put(edit.getProd_id(), pProdDao.findByKey(edit.getProd_id()));
+			edit.getTariffMap().put(edit.getProd_id(), new ArrayList<PProdTariffDisct>());
+		}
+		Map<String,PProdTariffDisct> tariffDisctMap=CollectionHelper.converToMapSingle(edit.getTariffMap().get(edit.getProd_id()), "prod_id");
+		if(!tariffDisctMap.containsKey(edit.getTariff_id())){
+			
+			PProdTariff pt=pProdTariffDao.findByKey(order.getTariff_id());
+			
+			PProdTariffDisct tariff=new PProdTariffDisct();
+			tariff.setTariff_id(pt.getTariff_id());
+			tariff.setBilling_cycle(pt.getBilling_cycle());
+			tariff.setDisct_rent(pt.getRent());
+			tariff.setDisct_name(pt.getTariff_name());
+			tariff.setBilling_type(pt.getBilling_type());
+			
+			if(StringHelper.isNotEmpty(order.getDisct_id())){
+				PProdTariffDisct disct=pProdTariffDisctDao.findByKey(order.getDisct_id());
+				tariff.setTariff_id(disct.getTariff_id()+"_"+disct.getDisct_id());
+				tariff.setBilling_cycle(disct.getBilling_cycle());
+				tariff.setDisct_rent(disct.getDisct_rent());
+				tariff.setDisct_name(disct.getDisct_name());
+			}
+			edit.getTariffMap().get(edit.getProd_id()).add(tariff);
+		}
 	}
 	/**
 	 * 订单修改功能
 	 * 差额只能使用现金来退款或补收（减少处理难度）
 	 * 新的订单金额不能小于转移支付金额
-	 * 普通修改，高级修改  可以修改差额，修改到期日
+	 * 可以修改差额，修改到期日
 	 * 已支付的订单不能退款
 	 * 未支付的订单可以退款
 	 * 套餐 不搞转移支付了，如果还存在被覆盖的独立子产品（可以使用超级退订更正，超级退订可以修改退任意金额）
@@ -143,6 +176,12 @@ public class OrderService extends BaseBusiService implements IOrderService{
 			doneCodeComponent.saveDoneCodeUnPay(cust_id, done_code, this.getOptr().getOptr_id());
 		}
 		
+		//TODO 客户套餐自动选终端处理，因为前台先不提供客户套餐用户变更功能，如果套餐变更了产品，自动更新用户对应的套餐内容
+		if(order.getProd_type().equals(SystemConstants.PROD_TYPE_CUSTPKG)
+				&&!order.getProd_id().equals(orderProd.getProd_id())){
+			this.editCustOrderAutoSelectUser(orderProd);
+		}
+		
 		//记录异动
 		CProdOrder editOrder=orderComponent.createCProdOrder(orderProd, null, null, null, null);
 		if(StringHelper.isNotEmpty(this.getBusiParam().getRemark())){
@@ -161,7 +200,44 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		
 		this.saveAllPublic(done_code, this.getBusiParam());
 	}
-	
+	/**
+	 * 订单修改，客户套餐自动选择终端
+	 * @throws Exception 
+	 */
+	private void editCustOrderAutoSelectUser(OrderProd orderProd) throws Exception{
+		List<PPackageProd> newPakProds= pPackageProdDao.queryPackProdById(orderProd.getProd_id());
+		if(newPakProds.size()!= orderProd.getGroupSelected().size()){
+			throw new ServicesException(ErrorCode.OrderDatePackageConfig);
+		}
+		for(PackageGroupUser pgu: orderProd.getGroupSelected()){
+			PPackageProd oldPakProd=pPackageProdDao.findByKey(pgu.getPackage_group_id());
+			if(oldPakProd==null){
+				throw new ServicesException(ErrorCode.OrderDatePackageConfig);
+			}
+			PPackageProd selectPakProd=null;//使用套餐终端适用条件去匹配，应该匹配到唯一一条配置
+			for(PPackageProd newPakProd:newPakProds){
+				if(newPakProd.getUser_type().equals(oldPakProd.getUser_type())){
+					if(StringHelper.isEmpty(newPakProd.getTerminal_type())
+							&&StringHelper.isEmpty(oldPakProd.getTerminal_type())){
+						if(selectPakProd!=null){//找到多个对应配置错误
+							throw new ServicesException(ErrorCode.OrderDatePackageConfig);
+						}
+						selectPakProd=newPakProd;
+					}else if(StringHelper.isNotEmpty(newPakProd.getTerminal_type())
+							&&newPakProd.getTerminal_type().equals(oldPakProd.getTerminal_type())){
+						if(selectPakProd!=null){//找到多个对应配置错误
+							throw new ServicesException(ErrorCode.OrderDatePackageConfig);
+						}
+						selectPakProd=newPakProd;
+					}
+				}
+			}
+			if(selectPakProd==null){//找不到对应配置
+				throw new ServicesException(ErrorCode.OrderDatePackageConfig);
+			}
+			pgu.setPackage_group_id(selectPakProd.getPackage_group_id());
+		}
+	}
 	private CProdOrderDto checkOrderEditParam(String cust_id,OrderProd orderProd) throws Exception{
 		if(StringHelper.isEmpty(cust_id)||orderProd==null||StringHelper.isEmpty(orderProd.getLast_order_sn())){
 			throw new ServicesException(ErrorCode.ParamIsNull);
@@ -208,42 +284,25 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		}
 	
 		String[] tmpTariff=orderProd.getTariff_id().split("_");
-		int billing_cycle=0;
-		int rent=0;
 		PProdTariff tariff=pProdTariffDao.findByKey(tmpTariff[0]);		
-		if(tmpTariff.length==2){		
-			PProdTariffDisct disct= pProdTariffDisctDao.findByKey(tmpTariff[1]);
-			billing_cycle=disct.getBilling_cycle();
-			rent=disct.getDisct_rent();
-		}else{
-			billing_cycle=tariff.getBilling_cycle();
-			rent=tariff.getRent();
-		}
-		//订购期数(包天=round(order_months*30))
-		//TODO 这个不足一个周期需要如何修改
-		int order_cycles=tariff.getBilling_type().equals(SystemConstants.BILLING_TYPE_DAY)?
-				Math.round(orderProd.getOrder_months()*30):orderProd.getOrder_months().intValue();
-		//记录资费计费类型和订购周期数（后面要使用）
-		orderProd.setBilling_type(tariff.getBilling_type());
-		orderProd.setOrder_cycle(order_cycles);
-		
+
 		if(orderProd.getTransfer_fee()==null){
 			orderProd.setTransfer_fee(0);
 		}
-		
+		//新订单金额
 		int new_order_fee=order.getOrder_fee()+orderProd.getPay_fee();
 		
 		if(new_order_fee<0){//订单费用不能小于0
 			throw new ComponentException(ErrorCode.OrderDateFeeError);
 		}
 		
-		//新的订单金额不能小于（原始转移支付金额）
 		int oldTransFee=0;
 		for(CProdOrderFee orderFee: cProdOrderFeeDao.queryByOrderSn(order.getOrder_sn())){
 			if(orderFee.getInput_type().equals(SystemConstants.ORDER_FEE_TYPE_TRANSFEE)){
 				oldTransFee=oldTransFee+orderFee.getFee();
 			}
 		}
+		//新的订单金额不能小于（原始转移支付金额）
 		if(new_order_fee<oldTransFee){
 			throw new ComponentException(ErrorCode.OrderDateFeeError);
 		}
@@ -263,38 +322,6 @@ public class OrderService extends BaseBusiService implements IOrderService{
 			}
 		}
 		
-		//普通修改 校检订购月数，订购金额， 订购月数是标准周期数的倍数
-		if(!orderComponent.isHighEdit(this.getBusiParam().getBusiCode())){
-			//订购月数校检
-			if(orderProd.getOrder_months()==0){
-				throw new  ComponentException(ErrorCode.OrderDateOrderMonthError);
-			}
-			if(order_cycles%billing_cycle!=0 ){
-				throw new  ComponentException(ErrorCode.OrderDateOrderMonthError);
-			}
-			
-			//订购支付金额验证, orderProd.getPay_fee() 表示两次修改的差额
-			int check_order_fee=rent*order_cycles/billing_cycle;
-			
-			if(new_order_fee !=check_order_fee){
-				throw new ComponentException(ErrorCode.OrderDateFeeError);
-			}
-			
-			//结束计费日校检	
-			//包月 结束计费日=开始计费日+订购月数 -1天。
-			if(tariff.getBilling_type().equals(SystemConstants.BILLING_TYPE_MONTH)){
-				Date newExpDate=DateHelper.getNextMonthPreviousDay(orderProd.getEff_date(), order_cycles);
-				if(!newExpDate.equals(orderProd.getExp_date()))
-					throw new ServicesException(ErrorCode.OrderDateExpDateError);
-			}
-			//包天 结束计费日=开始计费日+订购天数-1天
-			if(tariff.getBilling_type().equals(SystemConstants.BILLING_TYPE_DAY)){
-				Date newExpDate=DateHelper.addDate(orderProd.getEff_date(), order_cycles-1);
-				if(!newExpDate.equals(orderProd.getExp_date()))
-					throw new ServicesException(ErrorCode.OrderDateExpDateError);
-			}
-		
-		}
 		return order;
 	}
 	
@@ -1220,8 +1247,8 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		int order_cycles=tariff.getBilling_type().equals(SystemConstants.BILLING_TYPE_DAY)?
 				Math.round(orderProd.getOrder_months()*30):orderProd.getOrder_months().intValue();
 		//记录资费计费类型和订购周期数（后面要使用）
-		orderProd.setBilling_type(tariff.getBilling_type());
-		orderProd.setOrder_cycle(order_cycles);
+		//orderProd.setBilling_type(tariff.getBilling_type());
+		//orderProd.setOrder_cycle(order_cycles);
 		
 		if(orderProd.getOrder_months()==0&&!busi_code.equals(BusiCodeConstants.PROD_UPGRADE)){
 			throw new  ComponentException(ErrorCode.OrderDateOrderMonthError);

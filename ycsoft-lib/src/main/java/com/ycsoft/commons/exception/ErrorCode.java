@@ -76,7 +76,7 @@ public enum ErrorCode {
 
 	OrderStatusException("订单状态异常"),
 	OrderEditOnlyUnPay("只有未支付的订单才可以修改退款"),
-	OrderEditNoProd("没有可用的产品资费"),
+	OrderEditNoProd("订单已支付，不能修改"),
 	
 	OttFzdNotMoreThanTwo("OTT主终端下只能挂2个副终端"),
 	//task
