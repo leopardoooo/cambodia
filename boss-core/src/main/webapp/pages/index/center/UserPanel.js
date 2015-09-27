@@ -1099,8 +1099,8 @@ ProdPropChangeGrid = Ext.extend(Ext.grid.GridPanel,{
 		var cm = [
 			{header:lc[0],dataIndex:'busi_name', width:60,renderer:App.qtipValue},
 			{header:lc[1],dataIndex:'column_name_text', width:90,renderer:App.qtipValue},
-			{header:lc[2],dataIndex:'old_value', width:90},
-			{header:lc[3],dataIndex:'new_value',width:90},
+			{header:lc[2],dataIndex:'old_value', width:120,renderer:App.qtipValue},
+			{header:lc[3],dataIndex:'new_value',width:120,renderer:App.qtipValue},
 			{header:lc[4],dataIndex:'change_time',width:130},
 			{header:lc[5],dataIndex:'optr_name',width:80}
 		];
