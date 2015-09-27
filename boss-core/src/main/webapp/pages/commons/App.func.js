@@ -311,7 +311,11 @@ Ext.apply(App.func,{
 					},store);
 					if(!flag)return false;
 				}
-			}else */if(busicode == '1028'){//资费变更
+			}else */
+			if(busicode == '131'){	//订单修改
+				if(data['is_pay'] == 'T')
+					return false;
+			}else if(busicode == '1028'){//资费变更
 				var userId = data['user_id'];
 				var acctItemData = App.getAcctItemByProdId(data['prod_id'],userId);
 				if(acctItemData){

@@ -290,7 +290,7 @@ ProdGrid = Ext.extend(Ext.TabPanel,{
 			         "order_sn","package_sn","package_id","cust_id","user_id","prod_id","tariff_id","disct_id",
 			         "status","status_text","status_date","eff_date","exp_date","active_fee","bill_fee",
 			         "rent_fee","last_bill_date","next_bill_date","order_months","order_fee","order_time",
-			         "order_type","package_group_id","remark","public_acctitem_type","done_code"],			
+			         "order_type","package_group_id","remark","public_acctitem_type","done_code","is_pay"],			
 			sortInfo : {
 				field : 'prod_name',
 				direction:'DESC'
@@ -333,7 +333,7 @@ ProdGrid = Ext.extend(Ext.TabPanel,{
 			         "order_sn","package_sn","package_id","cust_id","user_id","prod_id","tariff_id","disct_id",
 			         "status","status_text","status_date","eff_date","exp_date","active_fee","bill_fee",
 			         "rent_fee","last_bill_date","next_bill_date","order_months","order_fee","order_time",
-			         "order_type","package_group_id","remark","public_acctitem_type"]
+			         "order_type","package_group_id","remark","public_acctitem_type","is_pay"]
 		});
 		this.custPkgGrid = new Ext.ux.Grid({
 			id:'U_CUST_PKG',

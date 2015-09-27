@@ -402,7 +402,7 @@ Ext.apply( App, {
 			panel.getUserPanel().userGrid.remoteRefresh();
 			panel.getCustPanel().acctItemGrid.remoteRefresh();
 		}else if(busiCode == '102' || busiCode == '101' || busiCode == '100' ||busiCode == '1015' ||busiCode =='1040'
-			|| busiCode == '110' ||busiCode == '109' || busiCode == '1027'){//订购，续订，升级,套餐订购,缴费,高级退订,超级退订，退订
+			|| busiCode == '110' ||busiCode == '109' || busiCode == '1027' || busiCode == '131'){//订购，续订，升级,套餐订购,缴费,高级退订,超级退订，退订
 			panel.getUserPanel().userGrid.remoteRefresh();
 			panel.getUserPanel().prodGrid.remoteRefresh();
 			panel.getCustPanel().acctItemGrid.remoteRefresh();
