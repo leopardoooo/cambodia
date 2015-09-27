@@ -246,6 +246,9 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		if(order==null){
 			throw new ServicesException(ErrorCode.OrderNotExists);
 		}
+		if(StringHelper.isNotEmpty(order.getPackage_sn())){
+			throw new ServicesException(ErrorCode.OrderEditIsPakDetail);
+		}
 		if(!cust_id.equals(orderProd.getCust_id())||
 				!cust_id.equals(order.getCust_id())){
 			throw new ServicesException(ErrorCode.CustDataException);
