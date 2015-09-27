@@ -32,7 +32,11 @@ OrderProdEditForm = Ext.extend(BaseForm, {
 				xtype: 'combo',
 				store: this.tariffStore,
 				displayField: 'disct_name', valueField: 'tariff_id',
-				allowBlank: false
+				allowBlank: false,
+				listeners: {
+					scope: this,
+					select: this.doSelectTariff
+				}
 			},{
 				id: 'nfMonthId',
 				fieldLabel: '订购月数',
@@ -40,7 +44,7 @@ OrderProdEditForm = Ext.extend(BaseForm, {
 				allowNegative: false,
 				allowDecimals: false,
 				allowBlank: false,
-				minValue: 1,
+				minValue: 0.01,
 				value: 1,
 				listeners: {
 					scope: this,
@@ -57,6 +61,7 @@ OrderProdEditForm = Ext.extend(BaseForm, {
 				format: 'Y-m-d',
 				editable: false,
 				allowBlank: false,
+				listWidth: 200,
 				listeners: {
 					scope: this,
 					select: this.doSelectEndDate
@@ -70,11 +75,6 @@ OrderProdEditForm = Ext.extend(BaseForm, {
 				id: 'oldTransFeeId',
 				fieldLabel: '原转移支付',
 				xtype: 'textfield',
-				readOnly: true
-			},{
-				id: 'newOrderFeeId',
-				fieldLabel: '新订单金额',
-				xtype: 'hidden',
 				readOnly: true
 			},{
 				id: 'dfDiffFeeId',
@@ -140,15 +140,15 @@ OrderProdEditForm = Ext.extend(BaseForm, {
 		
 		Ext.getCmp('dfEndDateId').setValue( Date.parseDate(this.baseData['exp_date'], 'Y-m-d H:i:s') );
 	},
+	doSelectTariff: function(){
+		this.calRealOrderFee();
+	},
 	doSelectEndDate: function(df, endDate){
 		//选择结束计费日期，计算包月数
 		//下个月的前一天算整月(开始日期2015-09-27，结束日期2015-10-26算一个月)
-		var endDateTom = endDate.add(Date.DAY, 1);
-		var months = Ext.util.Format.getMonths( this.baseData['eff_date'], endDateTom.format('Y-m-d') );
-		var days = Ext.util.Format.getDays( this.baseData['eff_date'], endDateTom.add(Date.MONTH, months*-1).format('Y-m-d') );
 		
-		var orderMonths = Ext.util.Format.round((days/30+months),2);
-		Ext.getCmp('nfMonthId').setValue( orderMonths );
+		var orderMonths = this.calOrderMonths();
+		Ext.getCmp('nfMonthId').setValue( Ext.util.Format.round(orderMonths,2) );
 		this.calRealOrderFee();
 	},
 	doChangeOrderMonth: function(filed, newValue, oldValue){
@@ -157,17 +157,26 @@ OrderProdEditForm = Ext.extend(BaseForm, {
 		Ext.getCmp('dfEndDateId').setValue( date.add(Date.MONTH, newValue).add(Date.DAY, -1).format('Y-m-d') );
 		this.calRealOrderFee();
 	},
+	calOrderMonths: function(){
+		var endDate = Ext.getCmp('dfEndDateId').getValue();
+		var endDateTom = endDate.add(Date.DAY, 1);
+		var months = Ext.util.Format.getMonths( this.baseData['eff_date'], endDateTom.format('Y-m-d') )*1.0;
+		var days = Ext.util.Format.getDays( this.baseData['eff_date'], endDateTom.add(Date.MONTH, months*-1).format('Y-m-d') )*1.0;
+		
+		return days/30.0 + months;
+	},
 	calRealOrderFee: function(){
 		//计算新订单金额
 		var tariffComb = Ext.getCmp('cmTariffId');
 		var tariffRecord = this.tariffStore.getAt( this.tariffStore.find('tariff_id', tariffComb.getValue()) );
-		var orderMonths = Ext.getCmp('nfMonthId').getValue();
-		var realOrderFee = Ext.util.Format.round(orderMonths*tariffRecord.get('disct_rent')/tariffRecord.get('billing_cycle')/100.0,2);
-		Ext.getCmp('newOrderFeeId').setValue( realOrderFee );
+		var orderMonths = this.calOrderMonths();
+
+		var realOrderFee = orderMonths*(tariffRecord.get('disct_rent')/100.0)/(tariffRecord.get('billing_cycle')*1.0);
+		realOrderFee = Ext.util.Format.round(realOrderFee, 2);
 		
 		//新、旧订单差额; 差额为负表示退款，为正表示补收费用
 		Ext.getCmp('dfDiffFeeId').setValue( realOrderFee - Ext.getCmp('oldOrderFeeId').getValue()*1.0 );
-		Ext.getCmp('realOrderFeeId').setValue( Ext.getCmp('dfDiffFeeId').getValue()*1.0 + Ext.getCmp('oldOrderFeeId').getValue()*1.0 );
+		Ext.getCmp('realOrderFeeId').setValue( realOrderFee );
 	},
 	doChangeDiffFee: function(field, newValue){
 		Ext.getCmp('realOrderFeeId').setValue('');
