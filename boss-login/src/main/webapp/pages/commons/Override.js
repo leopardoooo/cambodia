@@ -392,10 +392,8 @@ Ext.util.Format.convertToYuan = function( v ){
 //		}
 //	}
 // 	return parseFloat(v*100)/10000;
-	if(v > 0){
-		v = parseInt(v*100)/10000;
-		return v.toFixed(2);
-	}
+	v = parseInt(v*100)/10000;
+	return v.toFixed(2);
 	return 0;
 
 }
