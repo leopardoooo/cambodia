@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import com.google.gson.JsonObject;
 import com.ycsoft.beans.core.job.BusiCmdParam;
 import com.ycsoft.beans.core.job.JBandCommand;
+import com.ycsoft.beans.core.job.JBusiCmd;
 import com.ycsoft.beans.core.job.JCaCommand;
 import com.ycsoft.beans.core.job.JVodCommand;
 import com.ycsoft.beans.core.job.SmsxCmd;
@@ -227,6 +228,27 @@ public class AuthComponent extends BaseComponent{
 		JCaCommand caCommand = gDttCmd(user, doneCode);
 		caCommand.setCmd_type(SmsxCmd.OpenICC.name());
 		jCaCommandDao.save(caCommand);
+	}
+	/**
+	 * 仓库DTT设备指令
+	 * @param busiCmd
+	 */
+	public void authSingleDttByBusiCmd(JBusiCmd cmd){
+		if(StringHelper.isEmpty(cmd.getStb_id())){
+			cmd.setStb_id("11111111111111111111");
+		}
+		if(cmd.getBusi_cmd_type().equals(BusiCmdConstants.OSD)
+				||cmd.getBusi_cmd_type().equals(BusiCmdConstants.MAIL)
+				){
+			cmd.setBusi_cmd_type("MSG10000000");
+			cmd.setPriority(SystemConstants.PRIORITY_XXTZ);
+		}else {
+			cmd.setPriority(SystemConstants.PRIORITY_SSSQ);
+		}
+		
+		if(cmd.getDetail_params()!=null){
+			String[] resIdArr = cmd.getDetail_params().split(":")[1].replaceAll("'", "").replace("\"", "").replace("[", "").replace("]", "").split(",");
+		}
 	}
 	
 	//销户
