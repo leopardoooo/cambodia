@@ -395,8 +395,9 @@ Ext.apply( App, {
 			panel.getUserPanel().userGrid.remoteRefresh();
 		}
 /****************用户面板相关业务*************************/		
-		else if(busiCode == '1021' || busiCode == '111' || busiCode == '1130' || busiCode == '2262'){//销户，高级销户，加挂IP,销售设备
+		else if(busiCode == '1021' || busiCode == '1913' || busiCode == '111' || busiCode == '1130' || busiCode == '2262'){//销户，高级销户，加挂IP,销售设备
 			panel.getUserPanel().userGrid.remoteRefresh();
+			panel.getPayfeePanel().refresh();
 		}else if(busiCode == '1020'){//用户开户、刷新用户和设备，账户
 			//panel.getCustPanel().custDeviceGrid.remoteRefresh();
 			panel.getUserPanel().userGrid.remoteRefresh();

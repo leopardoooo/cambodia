@@ -48,6 +48,7 @@ import com.ycsoft.beans.core.fee.CFee;
 import com.ycsoft.beans.core.job.JUserStop;
 import com.ycsoft.beans.core.prod.CProd;
 import com.ycsoft.beans.core.prod.CProdPropChange;
+import com.ycsoft.beans.core.prod.CancelUserDto;
 import com.ycsoft.beans.core.promotion.CPromotion;
 import com.ycsoft.beans.core.promotion.CPromotionAcct;
 import com.ycsoft.beans.core.promotion.CPromotionHis;
@@ -2817,6 +2818,13 @@ public class UserService extends BaseBusiService implements IUserService {
 
 	@Override
 	public void saveEditPwd(String loginName, String newPwd) throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void batchLogoffUser(List<CancelUserDto> cancelUserList) throws Exception {
 		// TODO Auto-generated method stub
 		
 	}
