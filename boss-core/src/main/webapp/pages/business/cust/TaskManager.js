@@ -59,13 +59,8 @@ TaskAllInfo = Ext.extend(Ext.TabPanel,{
 					border: false,
 					layout : 'fit'
 				},
-				items:[{
-					title : '用户信息',
-					items:[this.userGrid]
-				},{
-					title : '操作明细',
-					items:[this.detail]
-				}]
+				items:[{title : '用户信息',items:[this.userGrid]
+				},{title : '操作明细',items:[this.detail]}]
 		})
 	}
 })
@@ -88,7 +83,7 @@ var TaskDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 				header : '用户类型',dataIndex : 'user_type_text',width : 70,renderer : App.qtipValue}, {
 				header : '用户名',dataIndex : 'user_name',renderer : App.qtipValue},
 				{header:'型号',dataIndex:'device_model_text',width:130}];
-		if(this.taskTypeId == '9'){
+		if(this.taskTypeId == '9'){//销终端工单
 			this.resultCombo = new Ext.ux.ParamCombo({
 				paramName:'BOOLEAN',typeAhead:false,valueField:'item_name',
 				forceSelection:true,selectOnFocus:true,editable:true
@@ -132,11 +127,11 @@ var TaskDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 				record.set('recycle_result',data.get('item_value'));
 			}
 			//暂时不验证
-//			if(obj.field == 'device_code'){
-//				var record =obj.record;
-//				this.queryAndAddDevice(obj.value,record);
-//				
-//			}
+			if(obj.field == 'device_code'){
+				var record =obj.record;
+				this.queryAndAddDevice(obj.value,record);
+				
+			}
 		},
 		queryAndAddDevice:function(newValue,record){
 			Ext.Ajax.request({
@@ -293,7 +288,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 			items : [{
 						region : 'south',
 						layout : 'fit',
-						height : 160,
+						height : 140,
 						border: false,
 						split : true,
 						items : [this.taskAllInfo]

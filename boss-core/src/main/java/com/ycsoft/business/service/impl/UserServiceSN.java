@@ -381,8 +381,8 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 			custComponent.saveChangeDevice(oldCustDevice, changeReason.getReason_type());
 		
 		if(changeReason.getIs_reclaim().equals(SystemConstants.BOOLEAN_TRUE)){
-			deviceComponent.saveDeviceReclaim(doneCode,  getBusiParam().getBusiCode(),
-					oldDevice.getDevice_id(), cust.getCust_id(), reasonType);
+			deviceComponent.saveDeviceToReclaim(doneCode,  getBusiParam().getBusiCode(),
+					oldDevice, cust.getCust_id(), reasonType);
 		}else{
 			//不回收，直接修改旧设备在库状态，删除用户使用设备记录
 			deviceComponent.updateDeviceDepotStatus(doneCode, busiCode, oldDevice.getDevice_id(),

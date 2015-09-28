@@ -225,10 +225,10 @@ public class RDeviceDao extends BaseEntityDao<RDevice> {
 	public DeviceDto queryByDeviceCode(String deviceCode) throws JDBCException {
 		String sql = "SELECT d.*,s.device_model,s.stb_id device_code,"
 				+ "r.card_id pair_device_code,r.device_model pair_device_model,"
-				+ " m.MODEM_MAC pair_device_modem_code,m.DEVICE_MODEL pair_device_modem_model,'' modem_mac,s.pair_card_id,s.pair_modem_id"
-				+ " FROM R_STB S, R_CARD r,r_device d,r_modem m"
+				+ " s.MAC pair_device_modem_code,'','' modem_mac,s.pair_card_id,s.pair_modem_id"
+				+ " FROM R_STB S, R_CARD r,r_device d "
 				+ " WHERE s.device_id=d.device_id AND s.pair_card_id= r.DEVICE_ID(+)" 
-				+ " AND s.pair_modem_id=m.device_id(+) AND S.STB_ID = :deviceCode"
+				+ "  AND S.STB_ID = :deviceCode"
 				+ " UNION SELECT d.*,c.device_model,c.card_id device_code,'','','','','','',''"
 				+ " FROM R_CARD C,r_device d"
 				+ " WHERE c.device_id=d.device_id AND C.CARD_ID = :deviceCode "
@@ -598,9 +598,9 @@ public class RDeviceDao extends BaseEntityDao<RDevice> {
 		}
 		String sql = "SELECT d.*,s.stb_id device_code,"
 				+ "r.card_id pair_device_code,r.device_model pair_device_model,"
-				+ " m.modem_mac pair_device_modem_code,m.device_model pair_device_modem_model,'' modem_mac "
-				+ " FROM R_STB S, R_CARD r ,R_modem m ,r_device d"
-				+ " WHERE s.pair_card_id= r.DEVICE_ID(+) AND s.pair_modem_id= m.DEVICE_ID(+)"
+				+ " s.mac pair_device_modem_code,'' pair_device_modem_model,'' modem_mac "
+				+ " FROM R_STB S, R_CARD r  ,r_device d"
+				+ " WHERE s.pair_card_id= r.DEVICE_ID(+) "
 				+ " AND s.device_id=d.device_id  AND d.diffence_type in (:uncheck,:diff) " + depotSql + stbSql
 				+ " UNION SELECT d.*,c.card_id device_code,'','','','','' "
 				+ " FROM R_CARD C,r_device d"
@@ -869,7 +869,7 @@ public class RDeviceDao extends BaseEntityDao<RDevice> {
 	
 	public List<RDevice> queryMateralDeviceByDepotId(String depotId) throws Exception {
 		String sql = "select * from r_device where depot_id=? and device_type =? and device_status=? "
-				+ "and depot_status=? and tran_status=?";
+				+ "and depot_status=? and tran_status=? order by device_model";
 		return createQuery(RDevice.class, sql,depotId,SystemConstants.DEVICE_TYPE_FITTING
 				,StatusConstants.ACTIVE,StatusConstants.IDLE,StatusConstants.IDLE).list();
 	}

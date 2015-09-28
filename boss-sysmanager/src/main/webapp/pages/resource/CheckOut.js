@@ -318,16 +318,16 @@ var TransferFileForm = Ext.extend(Ext.form.FormPanel,{
 			items:[
 				transferNo,
 				{fieldLabel:DEV_COMMON_LU.labelDeviceType,xtype:'paramcombo',typeAhead:false,paramName:'DEVICE_TYPE',
-					hiddenName:'deviceType',allowBlank:false,
-					listeners:{
-						scope:this,
-						expand:function(combo){
-							var store = combo.getStore();
-							store.filterBy(function(record){
-								return record.get('item_value').indexOf('CARD')<0;
-							})
-						}
-					}
+					hiddenName:'deviceType',allowBlank:false
+//					,listeners:{
+//						scope:this,
+//						expand:function(combo){
+//							var store = combo.getStore();
+//							store.filterBy(function(record){
+//								return record.get('item_value').indexOf('CARD')<0;
+//							})
+//						}
+//					}
 				},
 				depot,statusCmp,
 				{id:'checkOutFileId',fieldLabel:DEV_COMMON_LU.labelDevFile,name:'files',xtype:'textfield',inputType:'file',allowBlank:false,anchor:'95%'},

@@ -190,8 +190,8 @@ var DeviceStatusFileForm = Ext.extend(Ext.form.FormPanel, {
 										fieldLabel : COMMON_LU.remarkTxt,
 										xtype : 'textarea',
 										name : 'remark',
-										width : 375,
-										height : 80
+										width : 450,
+										height : 60
 									}]
 						});
 			},
@@ -316,9 +316,9 @@ var DeviceStatusHandForm = Ext.extend(Ext.form.FormPanel, {
 		this.parent = p;
 		DeviceStatusHandForm.superclass.constructor.call(this, {
 			id : 'deviceStatusHandFormId',
-			region:'north',
+			region:'south',
 			labelWidth : 80,
-			height:130,
+			height:150,
 			bodyStyle : 'padding-top:10px',
 			fileUpload : true,
 			defaults : {

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.google.gson.reflect.TypeToken;
@@ -16,11 +17,13 @@ import com.ycsoft.beans.core.fee.CFeeDevice;
 import com.ycsoft.beans.core.valuable.CValuableCard;
 import com.ycsoft.beans.core.valuable.CValuableCardFee;
 import com.ycsoft.beans.core.valuable.CValuableCardHis;
+import com.ycsoft.beans.device.RCard;
 import com.ycsoft.beans.device.RDevice;
 import com.ycsoft.beans.device.RDeviceFee;
 import com.ycsoft.beans.device.RDeviceModel;
 import com.ycsoft.beans.device.RDeviceReclaim;
 import com.ycsoft.beans.device.RDeviceUseRecords;
+import com.ycsoft.beans.device.RModem;
 import com.ycsoft.beans.device.RStb;
 import com.ycsoft.beans.device.RStbModel;
 import com.ycsoft.beans.system.SOptr;
@@ -28,6 +31,7 @@ import com.ycsoft.business.commons.abstracts.BaseBusiComponent;
 import com.ycsoft.business.dao.config.TBusiFeeDeviceDao;
 import com.ycsoft.business.dao.config.TDeviceBuyModeDao;
 import com.ycsoft.business.dao.core.cust.CCustDeviceDao;
+import com.ycsoft.business.dao.core.cust.CCustDeviceHisDao;
 import com.ycsoft.business.dao.core.valuable.CValuableCardDao;
 import com.ycsoft.business.dao.core.valuable.CValuableCardFeeDao;
 import com.ycsoft.business.dao.core.valuable.CValuableCardHisDao;
@@ -92,6 +96,8 @@ public class DeviceComponent extends BaseBusiComponent {
 	private TBusiFeeDeviceDao tBusiFeeDeviceDao;
 	private CCustDeviceDao cCustDeviceDao;
 	private RDeviceModelDao rDeviceModelDao;
+	@Autowired
+	private CCustDeviceHisDao cCustDeviceHisDao;
 	/**
 	 * 根据设备编号查询设备及客户信息
 	 * @param deviceCode
@@ -176,6 +182,100 @@ public class DeviceComponent extends BaseBusiComponent {
 		rd.setReclaim_reason(reclaimReason);
 		rDeviceReclaimDao.save(rd);
 	}
+	
+	
+	/**
+	 * 更换设备直接回收
+	 * @param doneCode
+	 * @param busiCode
+	 * @param oldDevice
+	 * @param custId
+	 * @param reclaimReason
+	 * @throws Exception
+	 */
+	public void saveDeviceToReclaim(Integer doneCode, String busiCode,
+			DeviceDto oldDevice, String custId,String reclaimReason) throws Exception {
+		
+		CCustDevice cDevice = cCustDeviceDao.findByDeviceId(oldDevice.getDevice_id(),getOptr().getCounty_id());
+		
+		//以前的回收记录转成历史
+		rDeviceReclaimDao.updateReclaimHistory(oldDevice.getDevice_id(), getOptr().getDept_id());
+		
+		
+		List<String> deviceIds = new ArrayList<String>();
+		deviceIds.add(oldDevice.getDevice_id());
+		RCard pairCard = null;
+		RModem pairModem = null;
+		if(oldDevice != null){
+			pairCard = oldDevice.getPairCard();
+			if(null !=pairCard && SystemConstants.BOOLEAN_FALSE.equals(pairCard.getIs_virtual()) ){
+				deviceIds.add(pairCard.getDevice_id());
+			}else{
+				pairCard = null;
+			}
+			
+			pairModem = oldDevice.getPairModem();
+			if(null !=pairModem && SystemConstants.BOOLEAN_FALSE.equals(pairModem.getIs_virtual())){
+				deviceIds.add(pairModem.getDevice_id());
+			}else{
+				pairModem = null;
+			}
+		}
+		
+		for(String devId:deviceIds){
+			RDeviceReclaim reclaim = new RDeviceReclaim();
+			reclaim.setDone_code(doneCode);
+			reclaim.setDevice_id(devId);
+			reclaim.setBusi_code(busiCode);	
+			if(cDevice!=null){
+				reclaim.setBuy_mode(cDevice.getBuy_mode());
+			}
+			reclaim.setDepot_id(getOptr().getDept_id());
+			reclaim.setOptr_id(getOptr().getOptr_id());
+			reclaim.setDept_id(getOptr().getDept_id());
+			reclaim.setStatus(StatusConstants.CONFIRM);
+			reclaim.setCust_id(custId);
+			reclaim.setReclaim_reason(reclaimReason);
+			reclaim.setConfirm_optr(getOptr().getOptr_id());
+			reclaim.setConfirm_time(DateHelper.now());
+			rDeviceReclaimDao.save(reclaim);
+			
+			CCustDevice custDevice = cCustDeviceDao.queryCustDeviceByDeviceId(custId, devId);
+			if(custDevice != null){
+				cCustDeviceDao.removeDevice(custId, devId, doneCode, SystemConstants.BOOLEAN_TRUE);
+			}else{
+				cCustDeviceHisDao.updateRecliam(custId, devId);
+			}
+			
+			RDevice device = new RDevice();
+			device.setDevice_id(devId);
+			device.setDepot_status(StatusConstants.IDLE);
+			device.setOwnership(SystemConstants.OWNERSHIP_GD);
+			rDeviceDao.update(device);
+			
+		}
+		saveDeviceChange(doneCode, busiCode, oldDevice.getDevice_id(), "depot_status",
+				oldDevice.getDepot_status(), StatusConstants.IDLE);
+		saveDeviceChange(doneCode, busiCode, oldDevice.getDevice_id(), "ownership",
+				oldDevice.getOwnership(), SystemConstants.OWNERSHIP_GD);
+		if(pairCard !=null){
+			saveDeviceChange(doneCode, busiCode, pairCard.getDevice_id(), "depot_status",
+					pairCard.getDepot_status(), StatusConstants.IDLE);
+			saveDeviceChange(doneCode, busiCode, pairCard.getDevice_id(), "ownership",
+					pairCard.getOwnership(), SystemConstants.OWNERSHIP_GD);
+		}
+		if(pairModem !=null){
+			saveDeviceChange(doneCode, busiCode, pairModem.getDevice_id(), "depot_status",
+					pairModem.getDepot_status(), StatusConstants.IDLE);
+			saveDeviceChange(doneCode, busiCode, pairModem.getDevice_id(), "ownership",
+					pairModem.getOwnership(), SystemConstants.OWNERSHIP_GD);
+		}
+		
+		
+		
+	}
+	
+	
 	
 	public void saveLossDevice(Integer doneCode, String busiCode, String deviceCode) throws Exception {
 		RDevice rd = rDeviceDao.findByDeviceCode(deviceCode);

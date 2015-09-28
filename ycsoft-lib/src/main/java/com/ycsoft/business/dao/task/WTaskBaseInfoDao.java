@@ -120,7 +120,7 @@ public class WTaskBaseInfoDao extends BaseEntityDao<WTaskBaseInfo> {
 	}
 
 	public List<WTaskBaseInfo> queryTaskByDoneCode(Integer doneCode) throws JDBCException{
-		String sql = "select * from w_task_base_info where doneCode = ?";
+		String sql = "select * from w_task_base_info where done_code = ?";
 		return this.createQuery(sql,doneCode).list();
 	}
 

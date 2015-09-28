@@ -47,7 +47,7 @@ ExchangeDevicePanel = Ext.extend(BaseForm,{
 							change: this.checkDevice
 						}
 					},
-					{xtype:'displayfield',fieldLabel:lmain("user._form.newStdModel"),id:'newStbModel'},
+					{xtype:'displayfield',fieldLabel:lmain("user._form.newStdModel"),id:'newStbModel'}
 					
 			]},{
 				id: 'modemPanleId',

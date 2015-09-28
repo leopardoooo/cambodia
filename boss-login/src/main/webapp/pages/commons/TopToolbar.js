@@ -370,8 +370,8 @@ TopToolbar = Ext.extend(Ext.Toolbar , {
 		if(!win){
 			win = new Ext.Window({
 				id: 'taskManagerWinId',
-				width: 950,
-				height: 580,
+				width: 900,
+				height: 520,
 				border: false,
 				closeAction:'hide',
 				html: "<iframe id='Task_Manager_Window_Frame' width=100% height=100%"

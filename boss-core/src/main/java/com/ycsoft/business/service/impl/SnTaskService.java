@@ -6,8 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.transaction.SystemException;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -82,16 +80,16 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 	public void editTaskTeam(String taskId, String deptId, String bugType) throws Exception{
 		WTaskBaseInfo task = wTaskBaseInfoDao.findByKey(taskId);
 		if (task == null)
-			throw new SystemException("工单不存在!");
+			throw new ServicesException("工单不存在!");
 		if (task.getTask_type_id().equals(SystemConstants.TASK_TYPE_FAULT) && 
 				StringHelper.isEmpty(bugType))
-			throw new SystemException("请指定故障类型!");	
+			throw new ServicesException("请指定故障类型!");	
 		if (task.getTeam_id().equals(deptId))
-			throw new SystemException("施工队不能相同!");	
+			throw new ServicesException("施工队不能相同!");	
 		if (task.getTask_status().equals(StatusConstants.TASK_CANCEL))
-			throw new SystemException("工单已取消，不能修改");	
+			throw new ServicesException("工单已取消，不能修改");	
 		if (task.getTask_status().equals(StatusConstants.TASK_END))
-			throw new SystemException("工单已完工，不能修改");	
+			throw new ServicesException("工单已完工，不能修改");	
 		//获取业务流水
 		Integer doneCode = doneCodeComponent.gDoneCode();
 		snTaskComponent.changeTaskTeam(doneCode, taskId, deptId,bugType);
@@ -179,19 +177,19 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 		//验证工单状态是施工中状态
 		if (task.getTask_status().equals(StatusConstants.TASK_INIT)){
 			if (task.getTask_status().equals(StatusConstants.TASK_CANCEL))
-				throw new SystemException("工单已取消");	
+				throw new ServicesException("工单已取消");	
 			if (task.getTask_status().equals(StatusConstants.TASK_END))
-				throw new SystemException("工单已完工");	
+				throw new ServicesException("工单已完工");	
 		}
 		
 		//判断设备是否正确
 		int index=0;
 		for (TaskFillDevice fillDevice:deviceList){
 			if (StringHelper.isEmpty(fillDevice.getDeviceCode()))
-				throw new SystemException("所有设备编号不能为空");
+				throw new ServicesException("所有设备编号不能为空");
 			if (!task.getTask_type_id().equals(SystemConstants.TASK_TYPE_INSTALL) && 
 					!fillDevice.isFcPort()){
-				throw new SystemException("非安装工单不能回填OTT设备");
+				throw new ServicesException("非安装工单不能回填OTT设备");
 			}
 			
 			if(fillDevice.isFcPort()){
@@ -199,30 +197,30 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 						StringHelper.isEmpty(fillDevice.getPosNo()))
 					//判断是否是柬光施工
 					if (snTaskComponent.getTeamId(SystemConstants.TEAM_TYPE_CFOCN).equals(task.getTeam_id()))
-						throw new SystemException("光口设备"+fillDevice.getDeviceCode()+"没有交接箱或分光器编号");
+						throw new ServicesException("光口设备"+fillDevice.getDeviceCode()+"没有交接箱或分光器编号");
 			}
 			//查找欣赏设备信息
 			DeviceDto device = deviceComponent.queryDeviceByDeviceCode(fillDevice.getDeviceCode());
 			if (device == null)
-				throw new SystemException(fillDevice.getDeviceCode()+"不存在");
+				throw new ServicesException(fillDevice.getDeviceCode()+"不存在");
 			//设备类型是否正确
 			if (!fillDevice.isFcPort() == device.getDevice_type().equals(SystemConstants.DEVICE_TYPE_MODEM))
-				throw new SystemException(fillDevice.getDeviceCode()+"设备类型不正确");
+				throw new ServicesException(fillDevice.getDeviceCode()+"设备类型不正确");
 			//检查更换设备操作中，旧设备是否存在;设置设备对应的用户id
 			if (task.getTask_type_id().equals(SystemConstants.TASK_TYPE_INSTALL)){
 				//判断设备是否被其他用户使用
 				CUser cu = cUserDao.queryUserByDeviceCode(fillDevice.getDeviceCode());
 				if (cu != null)
-					throw new SystemException(fillDevice.getDeviceCode()+"已被其他用户使用");
+					throw new ServicesException(fillDevice.getDeviceCode()+"已被其他用户使用");
 				
 				if (StringHelper.isNotEmpty(fillDevice.getOldDeviceCode())){
 					//更换设备
 					DeviceDto oldDevice = deviceComponent.queryDeviceByDeviceCode(fillDevice.getOldDeviceCode());
 					if (oldDevice == null)
-						throw new SystemException(fillDevice.getOldDeviceCode()+"不存在");
+						throw new ServicesException(fillDevice.getOldDeviceCode()+"不存在");
 					//检查新旧设备设备类型是否一致
 					if (!oldDevice.getDevice_type().equals(device.getDevice_type()))
-						throw new SystemException(fillDevice.getOldDeviceCode()+"和"+fillDevice.getDeviceCode()+"设备类型不一致");
+						throw new ServicesException(fillDevice.getOldDeviceCode()+"和"+fillDevice.getDeviceCode()+"设备类型不一致");
 					
 					//判断旧设备是否是本次施工用户使用的设备
 					boolean  exists = false;
@@ -235,7 +233,7 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 					}
 					
 					if (!exists){
-						throw new SystemException("没有用户使用"+fillDevice.getOldDeviceCode()+",不能更换");
+						throw new ServicesException("没有用户使用"+fillDevice.getOldDeviceCode()+",不能更换");
 					}
 					fillDevice.setOldDevice(oldDevice);
 				} else {
@@ -252,9 +250,9 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 					}
 					if (!exists){
 						if (fillDevice.isFcPort())
-							throw new SystemException("回填的光猫过多");
+							throw new ServicesException("回填的光猫过多");
 						else 
-							throw new SystemException("回填的机顶盒过多");
+							throw new ServicesException("回填的机顶盒过多");
 					}
 						
 				}
@@ -283,11 +281,11 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 	public void finishTask(String taskId, String resultType,String remark)  throws Exception{
 		WTaskBaseInfo task = wTaskBaseInfoDao.findByKey(taskId);
 		if (task == null)
-			throw new SystemException("工单不存在!");
+			throw new ServicesException("工单不存在!");
 		if (task.getTask_status().equals(StatusConstants.TASK_CANCEL))
-			throw new SystemException("工单已取消");	
+			throw new ServicesException("工单已取消");	
 		if (task.getTask_status().equals(StatusConstants.TASK_END))
-			throw new SystemException("工单已完工");	
+			throw new ServicesException("工单已完工");	
 		//获取业务流水
 		Integer doneCode = doneCodeComponent.gDoneCode();
 		snTaskComponent.finishTask(doneCode, taskId, resultType,remark);

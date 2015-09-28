@@ -52,19 +52,19 @@ public class RDeviceEditDao extends BaseEntityDao<RDeviceEdit> {
 			sql = "select d.*,b.stb_id device_code,dpt.county_id" +
 			" from r_device d,r_device_done_deviceid di,r_stb b,s_dept dpt"+
 			" where d.device_id=di.device_id and d.device_id=b.device_id and d.depot_id=dpt.dept_id"+
-			" and (dpt.dept_type='FGS' or dpt.dept_type='YYT') and dpt.status='ACTIVE'" +
+			"  and dpt.status='ACTIVE'" +
 			" and di.device_done_code=?";
 		}else if(deviceType.equals(SystemConstants.DEVICE_TYPE_CARD)){
 			sql = "select d.*,b.card_id device_code,dpt.county_id" +
 			" from r_device d,r_device_done_deviceid di,r_card b,s_dept dpt"+
 			" where d.device_id=di.device_id and d.device_id=b.device_id and d.depot_id=dpt.dept_id"+
-			" and (dpt.dept_type='FGS' or dpt.dept_type='YYT') and dpt.status='ACTIVE'" +
+			"  and dpt.status='ACTIVE'" +
 			" and di.device_done_code=?";
 		}else if(deviceType.equals(SystemConstants.DEVICE_TYPE_MODEM)){
 			sql = "select d.*,b.modem_mac device_code,dpt.county_id" +
 			" from r_device d,r_device_done_deviceid di,r_modem b,s_dept dpt"+
 			" where d.device_id=di.device_id and d.device_id=b.device_id and d.depot_id=dpt.dept_id"+
-			" and (dpt.dept_type='FGS' or dpt.dept_type='YYT') and dpt.status='ACTIVE'" +
+			"  and dpt.status='ACTIVE'" +
 			" and di.device_done_code=?";
 		}
 		return this.createQuery(DeviceDto.class, sql, deviceDoneCode).setStart(

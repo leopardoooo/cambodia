@@ -29,7 +29,7 @@ var DifferenceGrid = Ext.extend(Ext.grid.GridPanel,{
 			{header:DIFF_LU.labelDiffType,dataIndex:'diffence_type_text',width:75},
 			{header:COMMON_LU.depotText,dataIndex:'depot_id_text',width:120},
 			{header:DIFF_LU.labelDiffTime,dataIndex:'create_time',width:120},
-			{header:DEV_COMMON_LU.labelVitualModemModel,dataIndex:'pair_device_modem_model_text',width:100},
+//			{header:DEV_COMMON_LU.labelVitualModemModel,dataIndex:'pair_device_modem_model_text',width:100},
 			{header:DEV_COMMON_LU.labelVitualModemCode,dataIndex:'pair_device_modem_code',width:120},
 			{header:DEV_COMMON_LU.labelPairCardType,dataIndex:'pair_device_model',width:100},
 			{header:DEV_COMMON_LU.labelPairCardCode,dataIndex:'pair_device_code',width:120}
@@ -50,32 +50,24 @@ var DifferenceGrid = Ext.extend(Ext.grid.GridPanel,{
 	                width: 200,
 	                hasSearch : true,
 	                emptyText: MSG_LU.supportDevCodeQuery
-	            }),'-',
-	            {xtype:'treecombo',fieldLabel:DEV_COMMON_LU.labelDepot,id:'diff_depot_id',
-					width:150,
-					treeWidth:400,
-					height: 22,
-					allowBlank: false,
-					onlySelectLeaf:false,
-					emptyText :DEV_COMMON_LU.labelSwitchDepot,
-					blankText:MSG_LU.emptyTextSelectStore,
-					treeUrl: 'resource/Device!queryChildDepot.action',
-					listeners : {
-						scope:this,
-						'focus' : function(combo){
-							if(combo.list){
-								combo.expand();
+	            }),'-',{fieldLabel:DEV_COMMON_LU.labelDepot,id:'diff_depot_id',hiddenName:'depotId',xtype:'combo',allowBlank:false,
+							store:new Ext.data.JsonStore({
+								url:'resource/Device!queryAllDept.action',
+								autoLoad:true,
+								fields:['dept_id','dept_name']
+							}),displayField:'dept_name',valueField:'dept_id',triggerAction:'all',mode:'local',width :150,minListWidth :250
+							,listeners : {
+								scope:this,
+								select:function(combo,record){
+									this.differenceGridStore.baseParams['depotId'] = combo.getValue();
+									this.differenceGridStore.load({params:{start:0,limit:Constant.DEFAULT_PAGE_SIZE}});
+								}
 							}
-						},
-						select:function(tree,node,attr){
-							this.differenceGridStore.baseParams['depotId'] = node.id;
-							this.differenceGridStore.load({params:{start:0,limit:Constant.DEFAULT_PAGE_SIZE}});
-						}
-					}
-				},'-',
+					},
+	            '-',
 				{text:DIFF_LU.labelManualDiff,iconCls:'icon-add',scope:this,handler:this.addDifference},'-',
 				{text:DIFF_LU.labelFileDiff,iconCls:'icon-add',scope:this,tooltip:MSG_LU.tipDevFileDiffInfo ,handler:this.addFileDifference},'-',
-				{text:DIFF_LU.labelConfirmDiff,iconCls:'icon-confirm',scope:this,handler:function(){this.callProcess('confirmDifference',['UNCHECK','NODIFF'],MSG_LU.tipDevHasNoDiff)}},'-',
+//				{text:DIFF_LU.labelConfirmDiff,iconCls:'icon-confirm',scope:this,handler:function(){this.callProcess('confirmDifference',['UNCHECK','NODIFF'],MSG_LU.tipDevHasNoDiff)}},'-',
 				{text:DIFF_LU.labelCancelDiff,iconCls:'icon-cancel',scope:this,handler:function(){this.callProcess('cancelDifference',['DIFF'],MSG_LU.tipDevNotDiffCantCancel)}},'-'
 			]
 		});
