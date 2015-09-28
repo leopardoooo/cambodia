@@ -394,8 +394,6 @@ Ext.util.Format.convertToYuan = function( v ){
 // 	return parseFloat(v*100)/10000;
 	v = parseInt(v*100)/10000;
 	return v.toFixed(2);
-	return 0;
-
 }
 Ext.util.Format.toDecimal= function (x) {   
     var f = parseFloat(x);   
