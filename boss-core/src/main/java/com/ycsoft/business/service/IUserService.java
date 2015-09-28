@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.ycsoft.beans.config.TBusiFee;
 import com.ycsoft.beans.config.TDeviceChangeReason;
+import com.ycsoft.beans.core.prod.CancelUserDto;
 import com.ycsoft.beans.core.user.CUser;
 import com.ycsoft.beans.core.user.CUserPropChange;
 import com.ycsoft.beans.prod.PPromotionAcct;
@@ -369,7 +370,7 @@ public interface IUserService extends IBaseService{
 	/**
 	 * @param userIdList
 	 */
-	public void batchLogoffUser(List<String> userIdList,String isReclaimDevice,String deviceStatus,String remark) throws Exception;
+	public void batchLogoffUser(List<CancelUserDto> cancelUserList) throws Exception;
 
 	public void editFreeUser(String userId, String prodId, String tariffId,String type,Date tariffStartDate )throws Exception;
 	public void transferUsers(String toCustId) throws Exception  ;

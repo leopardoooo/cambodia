@@ -33,6 +33,7 @@ import com.ycsoft.beans.core.prod.CProdOrderDto;
 import com.ycsoft.beans.core.prod.CProdOrderFee;
 import com.ycsoft.beans.core.prod.CProdOrderFeeOut;
 import com.ycsoft.beans.core.prod.CProdPropChange;
+import com.ycsoft.beans.core.prod.CancelUserDto;
 import com.ycsoft.beans.core.user.CUser;
 import com.ycsoft.beans.core.user.CUserPropChange;
 import com.ycsoft.beans.device.RDeviceFee;
@@ -56,7 +57,6 @@ import com.ycsoft.business.dto.core.fee.BusiFeeDto;
 import com.ycsoft.business.dto.core.fee.FeeInfoDto;
 import com.ycsoft.business.dto.core.prod.DisctFeeDto;
 import com.ycsoft.business.dto.core.prod.PromotionDto;
-import com.ycsoft.business.dto.core.user.UserDto;
 import com.ycsoft.business.dto.core.user.UserInfo;
 import com.ycsoft.business.dto.core.user.UserRes;
 import com.ycsoft.business.dto.device.DeviceDto;
@@ -69,7 +69,6 @@ import com.ycsoft.commons.exception.ErrorCode;
 import com.ycsoft.commons.exception.ServicesException;
 import com.ycsoft.commons.helper.CollectionHelper;
 import com.ycsoft.commons.helper.DateHelper;
-import com.ycsoft.commons.helper.JsonHelper;
 import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.daos.core.JDBCException;
 
@@ -469,35 +468,27 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 	}
 
 
-
-
-	@Override
-	public void saveRemoveUser(String userId, Integer cancelFee,Integer refundFee) throws Exception {
-		// TODO Auto-generated method stub
-		//获取客户用户信息
-		CCust cust = getBusiParam().getCust();
-		String  custId = cust.getCust_id();
-		doneCodeComponent.lockCust(custId);
-		
-		List<CUser> userList = getBusiParam().getSelectedUsers();
-		CUser user = null;
-		for(CUser u : userList){
-			if(userId.equals(u.getUser_id())){
-				//user = u;
-				user=userComponent.queryUserById(userId);
-			}
-		}
+	private void logoffUser(Integer doneCode, String busiCode, CCust cust, String userId, 
+			Integer cancelFee, Integer refundFee) throws Exception {
+		String custId = cust.getCust_id();
+		CUser user = userComponent.queryUserById(userId);
 		if(user == null){
 			throw new ServicesException(ErrorCode.CustDataException);
 		}
 		if(!user.getCust_id().equals(custId)){
 			throw new ServicesException(ErrorCode.CustDataException);
 		}
-		//获取业务流水
-		Integer doneCode = doneCodeComponent.gDoneCode();
-		String busiCode = getBusiParam().getBusiCode();
-		//生成销帐任务
-		//int jobId = jobComponent.createCustWriteOffJob(doneCode, custId,BOOLEAN_TRUE);
+		
+		DeviceDto device = null;
+		if( (user.getUser_type().equals(USER_TYPE_DTT) || user.getUser_type().equals(USER_TYPE_OTT)) && StringHelper.isNotEmpty(user.getStb_id()) ){
+			device = deviceComponent.queryDeviceByDeviceCode(user.getStb_id());
+		}else if(user.getUser_type().equals(USER_TYPE_BAND) && StringHelper.isNotEmpty(user.getModem_mac())){
+			device = deviceComponent.queryDeviceByDeviceCode(user.getModem_mac());
+		}
+		
+		if(device != null && device.getOwnership().equals(SystemConstants.OWNERSHIP_GD)){
+			throw new ServicesException(ErrorCode.GDDEviceNotOff);
+		}
 
 		List<String> devoceList = new ArrayList<String>();
 		if(user.getStb_id() != null){
@@ -514,35 +505,13 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		if(devoceList.size()>0){
 			buyModeList = custComponent.findBuyModeById(custId, devoceList.toArray(new String[devoceList.size()]));
 		}
+		
 		Map<String, CCustDevice> map = CollectionHelper.converToMapSingle(buyModeList, "device_code");
-		Map<String, UserDto> userMap = new HashMap<String, UserDto>();
-		
-		if(CollectionHelper.isNotEmpty(userList)){
-			List<UserDto> allUsers = userComponent.queryUser(custId);
-			userMap = CollectionHelper.converToMapSingle(allUsers, "user_id");
-		}
-		
-		//处理用户销户
-		Map<String, Object> info = new HashMap<String, Object>();
-		info.put("user_type", user.getUser_type_text());
-		info.put("user", userMap.get(userId));
-		
 		//销户后保存原来的设备购买方式
 		user.setStb_buy(map.get(user.getStb_id()) != null?map.get(user.getStb_id()).getBuy_mode():null);
 		user.setCard_buy(map.get(user.getCard_id()) != null?map.get(user.getCard_id()).getBuy_mode():null);
 		user.setModem_buy(map.get(user.getModem_mac()) != null?map.get(user.getModem_mac()).getBuy_mode():null);
 		
-		DeviceDto device = null;
-		if( (user.getUser_type().equals(USER_TYPE_DTT) || user.getUser_type().equals(USER_TYPE_OTT)) && StringHelper.isNotEmpty(user.getStb_id()) ){
-			device = deviceComponent.queryDeviceByDeviceCode(user.getStb_id());
-		}else if(user.getUser_type().equals(USER_TYPE_BAND) && StringHelper.isNotEmpty(user.getModem_mac())){
-			device = deviceComponent.queryDeviceByDeviceCode(user.getModem_mac());
-		}
-		
-		if(device != null && device.getOwnership().equals(SystemConstants.OWNERSHIP_GD)){
-			throw new ServicesException(ErrorCode.GDDEviceNotOff);
-		}
-
 		//是否高级权限
 		boolean isHigh=orderComponent.isHighCancel(busiCode);
 		List<CProdOrderFee> orderFees=new ArrayList<>();
@@ -553,7 +522,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 			//记录未支付业务
 			doneCodeComponent.saveDoneCodeUnPay(custId, doneCode, this.getOptr().getOptr_id());
 			//保存缴费信息
-			feeComponent.saveCancelFee(cancelList,outList, this.getBusiParam().getCust(), doneCode, this.getBusiParam().getBusiCode());
+			feeComponent.saveCancelFee(cancelList,outList, cust, doneCode, this.getBusiParam().getBusiCode());
 		}
 		if(cancelFee-refundFee!=0){
 			//余额转回公用账目
@@ -573,8 +542,18 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		
 		//记录用户到历史表
 		userComponent.removeUserWithHis(doneCode, user);
+	}
+
+	@Override
+	public void saveRemoveUser(String userId, Integer cancelFee,Integer refundFee) throws Exception {
+		//获取客户用户信息
+		CCust cust = getBusiParam().getCust();
+		String  custId = cust.getCust_id();
+		doneCodeComponent.lockCust(custId);
+		Integer doneCode = doneCodeComponent.gDoneCode();
 		
-		//doneCodeComponent.saveDoneCodeInfo(doneCode, custId, null, info);
+		logoffUser(doneCode, getBusiParam().getBusiCode(), getBusiParam().getCust(), userId, cancelFee, refundFee);
+		
 		saveAllPublic(doneCode,getBusiParam());
 	}
 
@@ -1309,14 +1288,20 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		
 	}
 
-
-
-
-	@Override
-	public void batchLogoffUser(List<String> userIdList, String isReclaimDevice, String deviceStatus, String remark)
-			throws Exception {
-		// TODO Auto-generated method stub
-		
+	public void batchLogoffUser(List<CancelUserDto> cancelUserList) throws Exception {
+		Integer doneCode = doneCodeComponent.gDoneCode();
+		CCust cust = getBusiParam().getCust();
+		String busiCode = getBusiParam().getBusiCode();
+		for(CancelUserDto cancelUser : cancelUserList){
+			String userId = cancelUser.getUser_id();
+			CUser user = userComponent.queryUserById(userId);
+			if(user == null){
+				throw new ServicesException(ErrorCode.CustDataException);
+			}
+			
+			logoffUser(doneCode, busiCode, cust, userId, cancelUser.getActive_fee(), cancelUser.getActive_fee());
+		}
+		saveAllPublic(doneCode,getBusiParam());
 	}
 
 

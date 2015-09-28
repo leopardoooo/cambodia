@@ -392,8 +392,11 @@ Ext.util.Format.convertToYuan = function( v ){
 //		}
 //	}
 // 	return parseFloat(v*100)/10000;
-	v = parseInt(v*100)/10000;
-	return v.toFixed(2);
+	if(v > 0){
+		v = parseInt(v*100)/10000;
+		return v.toFixed(2);
+	}
+	return 0;
 
 }
 Ext.util.Format.toDecimal= function (x) {   
@@ -418,7 +421,7 @@ Ext.util.Format.booleanRenderer = function( v ){
  * 封装一个金额的渲染函数，包含￥字符，{@link Ext.ux.MoneyColumn}
  */
 Ext.util.Format.moneyRenderer = function( v ){
-	if(!v || isNaN(v)) return "" ;
+	if(isNaN(v)) return "" ;
 	return "￥" + Ext.util.Format.convertToYuan(v) ;
 }
 /**
