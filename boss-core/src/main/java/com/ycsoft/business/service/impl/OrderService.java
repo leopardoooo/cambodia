@@ -278,7 +278,8 @@ public class OrderService extends BaseBusiService implements IOrderService{
 			throw new ServicesException(ErrorCode.OrderDateEffDateError);
 		}
 		//结束计费日，必须大于等今天
-		if(order.getExp_date().before(DateHelper.today())){
+		if(orderProd.getExp_date().before(DateHelper.today())
+				||orderProd.getExp_date().before(orderProd.getEff_date())){
 			throw new ServicesException(ErrorCode.OrderDateExpDateError);
 		}
 		//支付类型判断，退款只能现金方式 
