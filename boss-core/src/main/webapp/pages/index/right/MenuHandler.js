@@ -855,6 +855,17 @@ Ext.apply(MenuHandler, {
 			Alert(lmsg('userNotActive'));
 			return false;
 		}
+		
+		var store = userGrid.getStore();
+		
+		for(var i=0,count=store.getCount();i<count;i++){
+			var record = store.getAt(i);
+			if(userRecords[0].get('user_type') == 'OTT' && userRecords[0].get('terminal_type') == 'FZD'
+				&& userRecords[0].get('user_id') != record.get('user_id') && record.get('user_type') == 'OTT' && record.get('terminal_type') == 'ZZD'){
+					Alert('请先销户OTT主终端!');
+					return false;
+			}
+		}
 			
 		return {
 				width : 650,
@@ -1677,6 +1688,33 @@ Ext.apply(MenuHandler, {
 			}
 		}
 		return windowSize;
+	},
+	OrderProdEdit: function(){
+		if(!hasCust())	return false;
+		var userRecords =  App.main.infoPanel.getUserPanel().userGrid.getSelections();
+		var len = userRecords.length;
+		if (len == 0) {
+			Alert('请先选择用户!');
+			return false;
+		}
+		for (var i = 0; i < len; i++) {
+			if (userRecords[i].get("status") != "ACTIVE" && userRecords[i].get("status") != "INSTALL" ) {
+				Alert("所选用户的状态必须是正常");
+				return false;
+			}
+			for (var j = i + 1; j < len; j++) {
+				if (userRecords[i].get('user_type') != userRecords[j]
+						.get('user_type')) {
+
+					Alert("用户的类型必须一致");
+					return false;
+				}
+			}
+		}
+		return {
+			width: 450,
+			height: 350
+		};
 	},
 	// 取消套餐
 	CancelPromFee : function() {

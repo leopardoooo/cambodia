@@ -76,7 +76,8 @@ public enum ErrorCode {
 
 	OrderStatusException("订单状态异常"),
 	OrderEditOnlyUnPay("只有未支付的订单才可以修改退款"),
-	OrderEditNoProd("没有可用的产品资费"),
+	OrderEditNoProd("订单已支付，不能修改"),
+	OrderEditIsPakDetail("订单是套餐子产品，不能修改"),
 	
 	OttFzdNotMoreThanTwo("OTT主终端下只能挂2个副终端"),
 	//task
@@ -146,6 +147,7 @@ public enum ErrorCode {
 	//======================未翻译===========================
 	NoStopRecord("找不到产品报停记录，请联系管理员"),
 	TaskDeviceUnFill("有未回填设备的用户，不能完工"),
+	GDDEviceNotOff("广电产权的设备不能销户，请先拆机或购买设备!")
 	;
 	
 	

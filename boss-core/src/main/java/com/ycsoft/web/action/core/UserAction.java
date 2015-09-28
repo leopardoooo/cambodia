@@ -200,7 +200,7 @@ public class UserAction extends BaseBusiAction {
 	 * @throws Exception
 	 */
 	public String logoffUser() throws Exception{
-		userServiceSN.saveRemoveUser(userId,banlanceDealType,reclaim,cancelFee,refundFee, transAcctId, transAcctItemId);
+		userServiceSN.saveRemoveUser(userId,cancelFee,refundFee);
 		return JSON_SUCCESS;
 	}
 

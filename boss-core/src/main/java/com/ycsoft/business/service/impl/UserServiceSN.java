@@ -472,7 +472,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 
 
 	@Override
-	public void saveRemoveUser(String userId,String banlanceDealType,String reclaim,Integer cancelFee,Integer refundFee, String transAcctId, String transAcctItemId) throws Exception {
+	public void saveRemoveUser(String userId, Integer cancelFee,Integer refundFee) throws Exception {
 		// TODO Auto-generated method stub
 		//获取客户用户信息
 		CCust cust = getBusiParam().getCust();
@@ -532,37 +532,17 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		user.setCard_buy(map.get(user.getCard_id()) != null?map.get(user.getCard_id()).getBuy_mode():null);
 		user.setModem_buy(map.get(user.getModem_mac()) != null?map.get(user.getModem_mac()).getBuy_mode():null);
 		
-		
-//		//柬埔寨 用户销户 回收设备
-//		if(SystemConstants.BOOLEAN_TRUE.equals(reclaim)){
-//			DeviceDto stbDevice = null;
-//			//回收机顶盒
-//			if(StringHelper.isNotEmpty(user.getStb_id())){
-//				stbDevice = deviceComponent.queryDeviceByDeviceCode(user.getStb_id());
-//				reclaimDevice(stbDevice.getDevice_id(), null,SystemConstants.RECLAIM_REASON_XHTH, 0, cust, doneCode, busiCode);
-//			}
-//			if(StringHelper.isNotEmpty(user.getCard_id()) && (stbDevice != null && (stbDevice.getPairCard() == null  || !user.getCard_id().equals(stbDevice.getPairCard().getCard_id())))){
-//				DeviceDto device = deviceComponent.queryDeviceByDeviceCode(user.getCard_id());
-//				reclaimDevice(device.getDevice_id(), null,SystemConstants.RECLAIM_REASON_XHTH, 0, cust, doneCode, busiCode);
-//			}
-//			if(StringHelper.isNotEmpty(user.getModem_mac()) && (stbDevice != null && (stbDevice.getPairModem() == null  || !user.getModem_mac().equals(stbDevice.getPairModem().getModem_mac())))){
-//				DeviceDto device = deviceComponent.queryDeviceByDeviceCode(user.getModem_mac());
-//				reclaimDevice(device.getDevice_id(), null,SystemConstants.RECLAIM_REASON_XHTH, 0, cust, doneCode, busiCode);
-//			}
-//												
-//		}
-
-		List<CProdOrder> prodList = orderComponent.queryOrderProdByUserId(user.getUser_id());
-		//直接解除授权，不等支付（因为不能取消）
-		if(user.getUser_type().equals(USER_TYPE_DTT)
-				&&!SystemConstants.BOOLEAN_TRUE.equals(reclaim)){
-			//DTT用户不回收设备，发产品减授权
-			authComponent.sendAuth(user, prodList, BusiCmdConstants.PASSVATE_PROD, doneCode);
-		}else{
-			//发销户指令
-			authComponent.sendAuth(user, prodList, BusiCmdConstants.DEL_USER, doneCode);
+		DeviceDto device = null;
+		if( (user.getUser_type().equals(USER_TYPE_DTT) || user.getUser_type().equals(USER_TYPE_OTT)) && StringHelper.isNotEmpty(user.getStb_id()) ){
+			device = deviceComponent.queryDeviceByDeviceCode(user.getStb_id());
+		}else if(user.getUser_type().equals(USER_TYPE_BAND) && StringHelper.isNotEmpty(user.getModem_mac())){
+			device = deviceComponent.queryDeviceByDeviceCode(user.getModem_mac());
 		}
 		
+		if(device != null && device.getOwnership().equals(SystemConstants.OWNERSHIP_GD)){
+			throw new ServicesException(ErrorCode.GDDEviceNotOff);
+		}
+
 		//是否高级权限
 		boolean isHigh=orderComponent.isHighCancel(busiCode);
 		List<CProdOrderFee> orderFees=new ArrayList<>();
@@ -589,7 +569,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 			cancelResultList.addAll(orderComponent.saveCancelProdOrder(dto, doneCode));
 		}
 		
-		
+		authComponent.sendAuth(user, cancelResultList, BusiCmdConstants.PASSVATE_PROD, doneCode);
 		
 		//记录用户到历史表
 		userComponent.removeUserWithHis(doneCode, user);
@@ -791,7 +771,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		Map<Integer, CUser> map = new HashMap<Integer, CUser>();
 		for (CUser user:users){
 			if (!user.getStatus().equals(StatusConstants.ACTIVE)){
-				throw new ServicesException("用户["+user.getUser_id()+"]不是正常状态，不能报停!");
+				throw new ServicesException("用户["+user.getUser_id()+"]不是正常状态，不能拆机!");
 				
 			}
 			if (packageUserIdS.get(user.getUser_id()) != null){
@@ -1598,8 +1578,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		List<CFeeAcct> acctFeeList = cFeeDao.queryTaskUserUnPayCFeeAcct(task.getCust_id(),userIds,task.getDone_code());
 		for(CFeeAcct feeAcct:acctFeeList){
 			//先取消订单修改
-			if(feeAcct.getBusi_code().equals(BusiCodeConstants.ORDER_EDIT)
-					||feeAcct.getBusi_code().equals(BusiCodeConstants.ORDER_HIGH_EDIT)){
+			if(feeAcct.getBusi_code().equals(BusiCodeConstants.ORDER_EDIT)){
 				//回退订单修改的费用
 				List<CProdOrderFeeOut> outList=cProdOrderFeeOutDao.queryByDoneCodeTransFee(feeAcct.getCreate_done_code());
 				orderComponent.saveOrderFeeOutToBack(outList,doneCode);

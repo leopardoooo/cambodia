@@ -68,7 +68,8 @@ PayForm = Ext.extend( Ext.form.FormPanel , {
 			}*/,{
 				fieldLabel: lc[7],
 				xtype: 'numberfield',
-				decimalPrecision: 0,
+				allowDecimals: false,
+				allowNegative: false,
 				id: 'nfDollar',
 				name: 'pay.usd',
 				listeners: {

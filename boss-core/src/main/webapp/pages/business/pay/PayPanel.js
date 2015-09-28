@@ -204,8 +204,15 @@ PayPanel = Ext.extend( Ext.Panel ,{
 			dollar += record.get('real_pay');
 		}, this);
 		dollar = dollar / 100.0;
+		
+		var arr = dollar.toString().split('.'), jy = 0;
+		if(arr.length > 1){
+			dollar = parseInt(arr[0]);
+			jy = parseFloat('0.'+arr[1]);
+		}
+		
 		Ext.getCmp("nfDollar").setValue(dollar);
-		Ext.getCmp("nfJianYuan").setValue(0);
+		Ext.getCmp("nfJianYuan").setValue(Ext.util.Format.round(jy * this.feeData["EXC"], 2));
 		var substrIndex = 1, append = "";
 		if(dollar < 0){
 			substrIndex = 2;

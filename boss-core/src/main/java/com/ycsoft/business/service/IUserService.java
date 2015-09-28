@@ -78,7 +78,7 @@ public interface IUserService extends IBaseService{
 	 * 用户销户(支持多用户)
 	 * @param logoffUserDto
 	 */
-	public void saveRemoveUser(String userId ,String banlanceDealType,String reclaim,Integer cancelFee,Integer refundFee,String transAcctId,String transAcctItemId) throws Exception;
+	public void saveRemoveUser(String userId, Integer cancelFee, Integer refundFee) throws Exception;
 
 	/**
 	 * 开通双向

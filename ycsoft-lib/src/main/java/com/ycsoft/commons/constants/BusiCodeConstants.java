@@ -38,7 +38,6 @@ public final class BusiCodeConstants {
 	public final static String PROD_SUPER_TERMINATE="109";//超级退订
 	
 	public final static String ORDER_EDIT="131";//订单修改
-	public final static String ORDER_HIGH_EDIT="132";//高级订单修改
 	
 	public final static String USER_HIGH_WRITE_OFF="111";//高级销户
 	

@@ -125,10 +125,32 @@ public class OrderComponent extends BaseBusiComponent {
 		//转移支付费用
 		int transFee=0;
 		for(CProdOrderFee orderFee:cProdOrderFeeDao.queryByOrderSn(order.getOrder_sn())){
-			transFee=transFee+orderFee.getFee();
+			if(orderFee.getInput_type().equals(SystemConstants.ORDER_FEE_TYPE_TRANSFEE)){
+				transFee=transFee+orderFee.getFee();
+			}
 		}
 		edit.setOld_transfer_fee(transFee);
 		//套餐子产品的选择情况,在编辑面板异步加载
+		if(!order.getProd_type().equals(SystemConstants.PROD_TYPE_BASE)){
+			
+			Map<String,Set<String>> groupUserMap=new HashMap<>();
+			for(CProdOrder detail: cProdOrderDao.queryPakDetailOrder(order.getOrder_sn())){
+				Set<String> set=groupUserMap.get(detail.getPackage_group_id());
+				if(set==null){
+					set=new HashSet<String>();
+					groupUserMap.put(detail.getPackage_group_id(), set);
+				}
+				set.add(detail.getUser_id());
+			}
+			List<PackageGroupUser> groupSelected=new ArrayList<>();
+			for(String group_id:   groupUserMap.keySet()){
+				PackageGroupUser pgu=new PackageGroupUser();
+				groupSelected.add(pgu);
+				pgu.setPackage_group_id(group_id);
+				pgu.setUserSelectList(Arrays.asList(groupUserMap.get(group_id).toArray(new String[groupUserMap.get(group_id).size()])));
+			}
+			edit.setGroupSelected(groupSelected);
+		}
 		return edit;
 	}
 	/**
@@ -572,14 +594,6 @@ public class OrderComponent extends BaseBusiComponent {
 				||BusiCodeConstants.USER_HIGH_WRITE_OFF.equals(busi_code)
 				||BusiCodeConstants.PROD_SUPER_TERMINATE.equals(busi_code)
 				?true:false;
-	}
-	/**
-	 * 是否高级订单修改权限
-	 * @param busi_code
-	 * @return
-	 */
-	public boolean isHighEdit(String busi_code){
-		return BusiCodeConstants.ORDER_HIGH_EDIT.equals(busi_code)?true:false;
 	}
 	
 	/**
