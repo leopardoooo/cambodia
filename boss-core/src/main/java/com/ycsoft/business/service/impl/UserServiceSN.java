@@ -567,7 +567,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 
 		List<CProdOrderDto> orderList = cProdOrderDao.queryProdOrderDtoByUserId(userId);
 		
-		orderFees=orderComponent.getLogoffOrderFee(orderList, isHigh);
+		orderFees.addAll(orderComponent.getLogoffOrderFee(orderList, isHigh));
 		if(refundFee==0){
 			for(CProdOrderDto order:orderList){
 				if(order.getBalance_cfee()!=null&&order.getBalance_cfee()>0){

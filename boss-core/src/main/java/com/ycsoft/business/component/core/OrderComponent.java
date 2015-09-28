@@ -555,7 +555,9 @@ public class OrderComponent extends BaseBusiComponent {
 				//order.setActive_fee(getOrderCancelFee(order,DateHelper.today()));
 				cancelFeeList=getOrderCacelFeeDetail(order,DateHelper.today());
 			}else if(StringHelper.isNotEmpty(order.getPackage_sn())
-					||order.getBilling_cycle()>1){
+					||(order.getBilling_cycle()>1
+							&&!DateHelper.isToday(order.getOrder_time())
+							&&!order.getStatus().equals(StatusConstants.INSTALL))){
 				//套餐子产品和包多月产品，低权限人员退款金额=0
 				order.setActive_fee(0);
 			}else if(order.getProd_type().equals(SystemConstants.PROD_TYPE_BASE)
