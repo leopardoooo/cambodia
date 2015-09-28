@@ -875,7 +875,7 @@ Ext.apply(MenuHandler, {
 	BatchLogoffUser: function(){
 		if(!hasCust()) return false;
 		return {
-			width:400,
+			width:440,
 			height:450
 		}
 	},

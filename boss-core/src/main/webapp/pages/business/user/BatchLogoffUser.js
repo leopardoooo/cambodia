@@ -8,7 +8,7 @@ var BatchLogoffUserForm = Ext.extend(BaseForm, {
 			border: false,
 			columns: [
 				{header:'产品名称',dataIndex:'prod_name',width:250},
-				{header:'退款金额',dataIndex:'active_fee',width:120, renderer: Ext.util.Format.moneyRenderer}
+				{header:'退款金额',dataIndex:'active_fee',width:150, renderer: Ext.util.Format.moneyRenderer}
 			],
 			store: new Ext.data.JsonStore({
 				fields: ['prod_name', 'active_fee']
