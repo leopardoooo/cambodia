@@ -20,16 +20,16 @@ var ownership = {fieldLabel:CHECK_COMMON.labelOwnerShip,xtype:'paramcombo',param
 
 //设备类型
 var deviceType = {fieldLabel:CHECK_COMMON.labelDeviceType,xtype:'paramcombo',
-		typeAhead:false,paramName:'DEVICE_TYPE',hiddenName:'deviceType',allowBlank:false,defaultValue:'STB',
-		listeners:{
-			scope:this,
-			expand:function(combo){
-				var store = combo.getStore();
-				store.filterBy(function(record){
-					return record.get('item_value').indexOf('CARD')<0;
-				})
-			}
-		}
+		typeAhead:false,paramName:'DEVICE_TYPE',hiddenName:'deviceType',allowBlank:false,defaultValue:'STB'
+//		,listeners:{
+//			scope:this,
+//			expand:function(combo){
+//				var store = combo.getStore();
+//				store.filterBy(function(record){
+//					return record.get('item_value').indexOf('CARD')<0;
+//				})
+//			}
+//		}
 };
 
 //供应商下拉框
@@ -523,10 +523,10 @@ var CheckInDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 								}
 							},this);
 						},this);
-					}else{
-						store.filterBy(function(record){
-							return record.get('item_value').indexOf('CARD')<0;
-						})
+//					}else{
+//						store.filterBy(function(record){
+//							return record.get('item_value').indexOf('CARD')<0;
+//						})
 					}
 				}
 			}

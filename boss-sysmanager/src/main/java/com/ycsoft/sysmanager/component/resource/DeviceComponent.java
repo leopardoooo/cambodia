@@ -1830,11 +1830,13 @@ public class DeviceComponent extends BaseDeviceComponent {
 		devices = removeRepeatDeviceCodes(devices);
  		if(null!=devices && devices.size()>0){
 			for(DeviceDto dd : devices){
-				RDevice device = queryDiffDevice(optr, dd.getDevice_code(),depotId);
-				if (!SystemConstants.DEVICE_DIFFENCN_TYPE_NODIFF.equals(device.getDiffence_type())){
-					throw new ComponentException("设备【"+dd.getDevice_code()+"】有差异或差异待确认");
+				if(StringHelper.isNotEmpty(dd.getDevice_code())){
+					RDevice device = queryDiffDevice(optr, dd.getDevice_code(),depotId);
+					if (!SystemConstants.DEVICE_DIFFENCN_TYPE_NODIFF.equals(device.getDiffence_type())){
+						throw new ComponentException("设备【"+dd.getDevice_code()+"】有差异或差异待确认");
+					}
+					deviceIds+=device.getDevice_id()+",";
 				}
-				deviceIds+=device.getDevice_id()+",";
 			}
 			Integer doneCode = gDoneCode();
 			deviceIds = deviceIds.substring(0,deviceIds.lastIndexOf(","));
@@ -2059,8 +2061,10 @@ public class DeviceComponent extends BaseDeviceComponent {
 		Map<String, DeviceDto> map = CollectionHelper.converToMapSingle(
 				deviceList, "device_code");
 		for (DeviceDto d : devices) {
-			DeviceDto e = map.get(d.getDevice_code());
-			checkDevice(depotId, e,d.getDevice_code(),false);	
+			if(StringHelper.isNotEmpty(d.getDevice_code())){
+				DeviceDto e = map.get(d.getDevice_code());
+				checkDevice(depotId, e,d.getDevice_code(),false);
+			}
 		}
 		saveDeviceOutput(optr, output, deviceList);
 	}

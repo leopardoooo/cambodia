@@ -5,8 +5,6 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.transaction.SystemException;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -182,7 +180,7 @@ public class SnTaskComponent extends BaseBusiComponent{
 	public List<WTaskUser> fillOpenTaskInfo(Integer doneCode,String taskId,String otlNo,String ponNo,List<TaskFillDevice> deviceList) throws Exception{
 		WTaskBaseInfo task = wTaskBaseInfoDao.findByKey(taskId);
 		if (task.getTask_status().equals(StatusConstants.CANCEL)){
-			throw new SystemException("工单已经被取消，不能回填");
+			throw new ComponentException("工单已经被取消，不能回填");
 		}
 		
 		task.setTask_id(gTaskId());

@@ -318,16 +318,16 @@ var TransferFileForm = Ext.extend(Ext.form.FormPanel,{
 			items:[
 				transferNo,
 				{fieldLabel:DEV_COMMON_LU.labelDeviceType,xtype:'paramcombo',typeAhead:false,paramName:'DEVICE_TYPE',
-					hiddenName:'deviceType',allowBlank:false,
-					listeners:{
-						scope:this,
-						expand:function(combo){
-							var store = combo.getStore();
-							store.filterBy(function(record){
-								return record.get('item_value').indexOf('CARD')<0;
-							})
-						}
-					}
+					hiddenName:'deviceType',allowBlank:false
+//					,listeners:{
+//						scope:this,
+//						expand:function(combo){
+//							var store = combo.getStore();
+//							store.filterBy(function(record){
+//								return record.get('item_value').indexOf('CARD')<0;
+//							})
+//						}
+//					}
 				},
 				depot,statusCmp,
 				{id:'checkOutFileId',fieldLabel:DEV_COMMON_LU.labelDevFile,name:'files',xtype:'textfield',inputType:'file',allowBlank:false,anchor:'95%'},
@@ -426,7 +426,7 @@ var TransferHandForm = Ext.extend(Ext.form.FormPanel,{
 	constructor:function(){
 		TransferHandForm.superclass.constructor.call(this,{
 			id:'transferHandFormId',
-			region:'north',
+			region:'south',
 			height:140,
 			labelWidth: 80,
 			fileUpload: true,
@@ -905,71 +905,44 @@ var MateralTransferDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 		this.parent = parent;
 		materalThat = this;
 		this.materalStore = new Ext.data.JsonStore({
+			url:'resource/Device!queryMateralTransferDeviceByDepotId.action',
 			fields:['device_model','device_model_text','total_num','num','device_id']
 		});	
 		
-		doDel = function(){
-			Confirm(MSG_LU.confirmDelete,this,function(){
-				materalThat.getStore().remove(materalThat.getSelectionModel().getSelected());
-			});
-		};
 		var cm = new Ext.grid.ColumnModel([
-				{id:'device_model_text_id',header:DEV_COMMON_LU.labelDeviceModel,dataIndex:'device_model_text',width:240,editor:new Ext.form.ComboBox({
-					store:new Ext.data.JsonStore({
-						fields:['device_model_text','device_model','total_num','device_id']
-					}),displayField:'device_model_text',valueField:'device_model_text',triggerAction:'all',mode: 'local'
-					,listeners:{
-						scope:this,
-						select:function(combo,record){
-							this.getSelectionModel().getSelected().set('device_model',record.get('device_model'));
-							this.getSelectionModel().getSelected().set('total_num',record.get('total_num'));
-							this.getSelectionModel().getSelected().set('device_id',record.get('device_id'));
-						}
-					}
-				})},
+				{id:'device_model_text_id',header:DEV_COMMON_LU.labelDeviceModel,dataIndex:'device_model_text',width:240
+				},
 				{header:DEV_COMMON_LU.labelTotalStoreNum,dataIndex:'total_num',width:70,renderer:App.qtipValue},
 				{id:'num_id',header:DEV_COMMON_LU.labelNum,dataIndex:'num',width:100,
 					scope:this
 					,editor: new Ext.form.NumberField({
 						allowDecimals:false,//不允许输入小数 
 		    			allowNegative:false,
-		    			minValue:1//enableKeyEvents: true,
+		    			minValue:0//enableKeyEvents: true,
 					})
 				},
-				{header:DEV_COMMON_LU.labelDevCode,dataIndex:'device_id',hidden:true},
-				{header:COMMON_LU.doActionBtn,dataIndex:'',width:40,renderer:function(value,metavalue,record,i){
-					return "<a href='#' onclick=doDel()>" +COMMON_LU.remove + "</a>";
-				}}
+				{header:DEV_COMMON_LU.labelDevCode,dataIndex:'device_id',hidden:true}
+				
 			]
 		);
 		cm.isCellEditable = this.cellEditable;
 		MateralTransferDeviceGrid.superclass.constructor.call(this,{
-			title:DEV_COMMON_LU.labelMateralInfo,
+//			title:DEV_COMMON_LU.labelMateralInfo,
 			region:'center',
 			id:'MateralTransferDeviceGridId',
 			ds:this.materalStore,
 			clicksToEdit:1,
 			cm:cm,
-			sm:new Ext.grid.RowSelectionModel({}),
-			tbar:[
-				'-',
-				{text:COMMON_LU.addNewOne,iconCls:'icon-add',handler:this.doAdd,scope:this},'-'
-			]
+			sm:new Ext.grid.RowSelectionModel({})
+//			tbar:[
+//				'-',
+//				{text:COMMON_LU.addNewOne,iconCls:'icon-add',handler:this.doAdd,scope:this},'-'
+//			]
 		});
 	},//是否可编辑
 	cellEditable:function(colIndex,rowIndex){
 		var record = materalThat.getStore().getAt(rowIndex);//当前编辑行对应record
-		if(colIndex == this.getIndexById('device_model_text_id')){
-			var store = this.getCellEditor(colIndex,rowIndex).field.getStore();
-			store.removeAll();//清空上一次选中行中 该列的数据
-			var data =  Ext.getCmp('MateralTransferDeviceGridId').remoteData;
-			var arr = [];
-			for(var i= 0;i < data.length; i++){
-				arr.push(data[i]);
-			}
-			store.loadData(arr);
-			
-		}else if(colIndex == this.getIndexById('num_id')){
+		if(colIndex == this.getIndexById('num_id')){
 			if(Ext.isEmpty(record.get('device_model_text'))){
 				return false;
 			}
@@ -1063,13 +1036,8 @@ TransferMateralWin = Ext.extend(Ext.Window,{
 	},
 	show:function(){
 		TransferMateralWin.superclass.show.call(this);
-		var that = this;
-		Ext.Ajax.request({
-			url:'resource/Device!queryMateralTransferDeviceByDepotId.action',
-			success: function(res, ops){
-				that.queryDeviceGrid.remoteData = Ext.decode(res.responseText);
-			}
-		});
+		this.queryDeviceGrid.materalStore.load();
+		
 	},
 	doSave:function(){
 		var form = this.materalForm.getForm();
@@ -1080,30 +1048,16 @@ TransferMateralWin = Ext.extend(Ext.Window,{
 		
 		var store = this.queryDeviceGrid.getStore();
 		
-		var arrCode = [];
-		for(var i=0;i<store.getCount();i++){
-			var data = store.getAt(i).data;
-			if(data['device_id']){
-				//过滤掉重复调拨的设备
-				if(arrCode.indexOf(data['device_id']) >=0){
-					Alert(MSG_LU.tipHasSameMateral);
-					return ;
-				}
-				if(Ext.isEmpty(data['num'])){
-					Alert(MSG_LU.tipTransNumCantBeEmpty);
-					return;
-				}
-				arrCode.push(data);
-			}
-		}
 		var arr = [];//只传递device_id到后台
-		Ext.each(arrCode,function(d){
-			var obj = {};
-			obj['device_id'] = d['device_id'];
-			obj['device_type'] = d['device_type'];
-			obj['device_model'] = d['device_model'];
-			obj['total_num'] = d['num'];
-			arr.push(obj);
+		store.each(function(record){
+			if(!Ext.isEmpty(record.get('num'))  && record.get('num')>0){
+				var obj = {};
+				obj['device_id'] = record.get('device_id');
+				obj['device_type'] = record.get('device_type');
+				obj['device_model'] = record.get('device_model');
+				obj['total_num'] = record.get('num');
+				arr.push(obj);
+			}
 		});
 		
 		if(arr.length === 0){

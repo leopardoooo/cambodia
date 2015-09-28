@@ -13,6 +13,15 @@ DownloadDeviceInfo = Ext.extend(Ext.Panel,{
 				fileUpload: true,items:[
 					{fieldLabel:lsys('DeviceCommon.labelDeviceType'),xtype:'paramcombo',typeAhead:false,paramName:'DEVICE_TYPE',
 						hiddenName:'deviceType',allowBlank:false
+//						,listeners:{
+//							scope:this,
+//							expand:function(combo){
+//								var store = combo.getStore();
+//								store.filterBy(function(record){
+//									return record.get('item_value').indexOf('CARD')<0;
+//								})
+//							}
+//						}
 					},
 					{fieldLabel:lsys('DeviceCommon.labelDevFile'),name:'files',xtype:'textfield',inputType:'file',allowBlank:false,anchor:'95%'}
 				],

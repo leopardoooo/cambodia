@@ -68,7 +68,6 @@ var QueryDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 			{header:'modem_mac',dataIndex:'modem_mac',width:75,hidden:true},
 			{header:DEV_COMMON_LU.labelPairCardType,dataIndex:'pair_device_model_text',width:90},
 			{header:DEV_COMMON_LU.labelPairCardCode,dataIndex:'pair_device_code',width:120},
-			{header:DEV_COMMON_LU.labelPairModemType,dataIndex:'pair_device_modem_model_text',width:90},
 			{header:DEV_COMMON_LU.labelPairModemCode,dataIndex:'pair_device_modem_code',width:120},
 			{header:COMMON_LU.doActionBtn,dataIndex:'',width:40,renderer:function(value,metavalue,record,i){
 				return "<a href='#' onclick=doDel()>" + COMMON_LU.remove + "</a>";
@@ -150,16 +149,16 @@ var DeviceDetailGrid = Ext.extend(Ext.grid.GridPanel,{
 
 //设备类型
 var deviceType = {id:'device_type_id',fieldLabel:DEV_COMMON_LU.labelDeviceType,xtype:'paramcombo',
-		typeAhead:false,paramName:'DEVICE_TYPE',hiddenName:'deviceInput.device_type',
-		listeners:{
-			scope:this,
-			expand:function(combo){
-				var store = combo.getStore();
-				store.filterBy(function(record){
-					return record.get('item_value').indexOf('CARD')<0;
-				})
-			}
-		}
+		typeAhead:false,paramName:'DEVICE_TYPE',hiddenName:'deviceInput.device_type'
+//		,listeners:{
+//			scope:this,
+//			expand:function(combo){
+//				var store = combo.getStore();
+//				store.filterBy(function(record){
+//					return record.get('item_value').indexOf('CARD')<0;
+//				})
+//			}
+//		}
 };
 
 var checkFileType = function(fileText){
