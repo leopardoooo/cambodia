@@ -719,8 +719,11 @@ public class PayService extends BaseBusiService implements IPayService {
 		//验证汇率是否一致
 		//List list=MemoryDict.getDicts(DictKey.EXCHANGE,DictKey.ex);
 		Integer exchange=tExchangeDao.getExchange();
-		if(exchange==null||exchange<=0||!exchange.equals(pay.getExchange())){
+		if(exchange==null||exchange<=0){
 			throw new ServicesException(ErrorCode.ExchangeConfigError);
+		}
+		if(!exchange.equals(pay.getExchange())){
+			throw new ServicesException(ErrorCode.UnPayIsOld);
 		}
 
 		//验证支付金额和待支付金额是否一致

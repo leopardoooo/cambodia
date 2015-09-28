@@ -63,6 +63,7 @@ public class TExchangeDao extends BaseEntityDao<TExchange> {
 				+ ( StringHelper.isNotEmpty(status) ? " AND t.status = '" + status + "' " : " "  )
 				+ ( exchange != null ? " AND t.exchange = " + exchange + " " : " "  )
 				+ ( eff_date != null ? " AND t.eff_date >= ? " : " "  )
+				+" order by eff_date desc "
 				;
 		Object [] params = null;
 		if(null != eff_date){
