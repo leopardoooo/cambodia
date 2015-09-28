@@ -855,6 +855,17 @@ Ext.apply(MenuHandler, {
 			Alert(lmsg('userNotActive'));
 			return false;
 		}
+		
+		var store = userGrid.getStore();
+		
+		for(var i=0,count=store.getCount();i<count;i++){
+			var record = store.getAt(i);
+			if(userRecords[0].get('user_type') == 'OTT' && userRecords[0].get('terminal_type') == 'FZD'
+				&& userRecords[0].get('user_id') != record.get('user_id') && record.get('user_type') == 'OTT' && record.get('terminal_type') == 'ZZD'){
+					Alert('请先销户OTT主终端!');
+					return false;
+			}
+		}
 			
 		return {
 				width : 650,

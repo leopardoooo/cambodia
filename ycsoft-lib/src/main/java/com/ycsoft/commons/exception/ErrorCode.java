@@ -147,6 +147,7 @@ public enum ErrorCode {
 	//======================未翻译===========================
 	NoStopRecord("找不到产品报停记录，请联系管理员"),
 	TaskDeviceUnFill("有未回填设备的用户，不能完工"),
+	GDDEviceNotOff("广电产权的设备不能销户，请先拆机或购买设备!")
 	;
 	
 	

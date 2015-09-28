@@ -2765,8 +2765,7 @@ public class UserService extends BaseBusiService implements IUserService {
 	}
 
 	@Override
-	public void saveRemoveUser(String userId, String banlanceDealType, String reclaim, Integer cancelFee,
-			Integer refundFee, String transAcctId, String transAcctItemId) throws Exception {
+	public void saveRemoveUser(String userId, Integer cancelFee, Integer refundFee) throws Exception {
 		// TODO Auto-generated method stub
 		
 	}
