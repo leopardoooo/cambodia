@@ -578,11 +578,12 @@ public class OrderService extends BaseBusiService implements IOrderService{
 				unPayCheckMap.put("NOBAND", order);
 			}
 		}
+		
 		//金额核对
-		if(cancel_fee!=fee*-1){
+		if(cancel_fee*-1 > fee){
 			throw new ServicesException(ErrorCode.FeeDateException);
 		}
-		if(refund_fee!=cfeeTotal*-1){
+		if(refund_fee*-1 > cfeeTotal){
 			throw new ServicesException(ErrorCode.FeeDateException);
 		}
 		//订单相关的所有订单的未支付判断,判断各类订单的相关所有订单的未支付状态
@@ -592,6 +593,20 @@ public class OrderService extends BaseBusiService implements IOrderService{
 					throw new ServicesException(ErrorCode.NotCancleHasUnPay);
 				}
 			}
+		}
+		int tem_refund_fee=refund_fee*-1 ;
+		for(CProdOrderDto order:cancelList){
+			if(tem_refund_fee==0){
+				order.setBalance_cfee(0);
+			}
+			int kf=0;
+			if(tem_refund_fee>order.getBalance_cfee()){
+				kf=order.getBalance_cfee();
+			}else{
+				kf=tem_refund_fee;
+				order.setBalance_cfee(kf);
+			}
+			tem_refund_fee=tem_refund_fee-kf;
 		}
 		return cancelList;
 	}
