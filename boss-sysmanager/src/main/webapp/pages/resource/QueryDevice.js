@@ -235,7 +235,7 @@ QueryDeviceGrid = Ext.extend(Ext.grid.GridPanel,{
 		];
 		this.currColumns = this.stbColumns;
 		QueryDeviceGrid.superclass.constructor.call(this,{
-			title:DEV_COMMON_LU.titleDeviceInfo,
+//			title:DEV_COMMON_LU.titleDeviceInfo,
 			border:false,
 			ds:this.store,
 			columns:this.stbColumns,

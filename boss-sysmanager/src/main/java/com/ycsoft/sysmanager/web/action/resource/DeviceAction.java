@@ -619,7 +619,7 @@ public class DeviceAction extends BaseAction {
 	 * @throws Exception
 	 */
 	public String addDeviceDiffence() throws Exception {
-		deviceComponent.addDeviceDiffence(optr,deviceIds);
+		deviceComponent.addDeviceDiffence(optr,deviceIds,remark);
 		return JSON_SUCCESS;
 	}
 	/**
@@ -883,8 +883,16 @@ public class DeviceAction extends BaseAction {
 	public String saveDeviceInputFile() throws Exception,ComponentException{
 		String msg = "";
 		try{
-			List<DeviceDto> devices = check(files, deviceType);
-			deviceComponent.saveDeviceInputFile(optr, deviceInput, devices,deviceType);
+			if(StringHelper.isEmpty(deviceModel)){
+				throw new ComponentException("设备型号不能为空");
+			}
+			if(StringHelper.isEmpty(deviceType)){
+				throw new ComponentException("设备类型不能为空");
+			}
+			String[] colName = deviceComponent.getColumnName(deviceType,deviceModel);
+			List<DeviceDto> devices = FileHelper.txtToBean(files, colName, DeviceDto.class);
+			String batchNum = request.getParameter("batch_num");
+			deviceComponent.saveDeviceInputFile(optr, deviceInput, devices,deviceType,deviceModel,batchNum);
 		}catch(Exception e){
 			e.printStackTrace();
 			msg = e.getMessage();
@@ -1070,6 +1078,12 @@ public class DeviceAction extends BaseAction {
 	public String queryMateralTransferDeviceByDepotId() throws Exception {
 		getRoot().setRecords(deviceComponent.queryMateralTransferDeviceByDepotId(getOptr()));
 		return JSON_RECORDS;
+	}
+	
+	public String queryDeviceStbModem() throws Exception {
+		getRoot().setOthers(deviceComponent.queryDeviceStbModem());
+		return JSON_OTHER;
+		
 	}
 	
 	public void setDeviceDoneCode(int deviceDoneCode) {

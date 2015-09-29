@@ -15,7 +15,7 @@ var DifferenceGrid = Ext.extend(Ext.grid.GridPanel,{
 			url:'resource/Device!queryDeviceDiffence.action',
 			totalProperty:'totalProperty',
 			root:'records',
-			fields:['device_id','device_code','pair_device_model','pair_device_code','depot_id',
+			fields:['device_id','device_code','pair_device_model','pair_device_code','depot_id','remark',
 				'depot_id_text','device_type_text','device_type','device_model','device_model_text','diffence_type',
 				'diffence_type_text','create_time','pair_device_modem_code','pair_device_modem_model','pair_device_modem_model_text']
 		});
@@ -25,14 +25,15 @@ var DifferenceGrid = Ext.extend(Ext.grid.GridPanel,{
 			sm,
 			{header:DEV_COMMON_LU.labelDevCode,dataIndex:'device_code',width:180},
 			{header:DEV_COMMON_LU.labelDeviceType,dataIndex:'device_type_text',width:75},
-			{header:DEV_COMMON_LU.labelDeviceModel,dataIndex:'device_model_text',width:120},
+			{header:DEV_COMMON_LU.labelDeviceModel,dataIndex:'device_model_text',width:120,renderer:App.qtipValue},
 			{header:DIFF_LU.labelDiffType,dataIndex:'diffence_type_text',width:75},
 			{header:COMMON_LU.depotText,dataIndex:'depot_id_text',width:120},
 			{header:DIFF_LU.labelDiffTime,dataIndex:'create_time',width:120},
 //			{header:DEV_COMMON_LU.labelVitualModemModel,dataIndex:'pair_device_modem_model_text',width:100},
-			{header:DEV_COMMON_LU.labelVitualModemCode,dataIndex:'pair_device_modem_code',width:120},
-			{header:DEV_COMMON_LU.labelPairCardType,dataIndex:'pair_device_model',width:100},
-			{header:DEV_COMMON_LU.labelPairCardCode,dataIndex:'pair_device_code',width:120}
+			{header:'MAC',dataIndex:'pair_device_modem_code',width:120},
+//			{header:DEV_COMMON_LU.labelPairCardType,dataIndex:'pair_device_model',width:100},
+			{header:'卡号',dataIndex:'pair_device_code',width:120},
+			{header:'备注',dataIndex:'remark',width:120,renderer:App.qtipValue}
 		];
 		
 		DifferenceGrid.superclass.constructor.call(this,{
@@ -228,7 +229,22 @@ var AddDifferenceWin = Ext.extend(Ext.Window,{
 			width: 800,
 			height: 350,
 			layout:'border',
-			items:[this.grid],
+			border: false,
+			items:[{region:'center',border: false,layout:'fit',items:[this.grid]},
+				{
+					region: 'south',
+					layout:'form',
+					height:80,
+					bodyStyle:'padding-top:10px',
+					border: false,
+					labelWidth: 80,
+					labelAlign:'right', 
+					defaults : {
+						baseCls: 'x-plain',
+						border : false
+					},
+					items:[{fieldLabel:COMMON_LU.remarkTxt,name:'remark',id:'differenceRemarkId',xtype:'textarea',anchor:'80%',height:50}]
+				}],
 			buttonAlign:'right',
 			buttons:[{text:COMMON_LU.saveBtn,iconCls:'icon-save',scope:this,handler:this.doSave},
 				{text:COMMON_LU.cancel,iconCls:'icon-close',scope:this,handler:function(){
@@ -258,7 +274,7 @@ var AddDifferenceWin = Ext.extend(Ext.Window,{
 		var msg = Show();
 		Ext.Ajax.request({
 			url:'resource/Device!addDeviceDiffence.action',
-			params:{deviceIds:deviceIds},
+			params:{deviceIds:deviceIds,remark:Ext.getCmp('differenceRemarkId').getValue()},
 			scope:this,
 			success:function(res,opt){
 				msg.hide();

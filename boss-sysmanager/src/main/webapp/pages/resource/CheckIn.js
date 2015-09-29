@@ -21,15 +21,6 @@ var ownership = {fieldLabel:CHECK_COMMON.labelOwnerShip,xtype:'paramcombo',param
 //设备类型
 var deviceType = {fieldLabel:CHECK_COMMON.labelDeviceType,xtype:'paramcombo',
 		typeAhead:false,paramName:'DEVICE_TYPE',hiddenName:'deviceType',allowBlank:false,defaultValue:'STB'
-//		,listeners:{
-//			scope:this,
-//			expand:function(combo){
-//				var store = combo.getStore();
-//				store.filterBy(function(record){
-//					return record.get('item_value').indexOf('CARD')<0;
-//				})
-//			}
-//		}
 };
 
 //供应商下拉框
@@ -192,39 +183,6 @@ var CheckInGrid = Ext.extend(Ext.grid.GridPanel,{
 			win = new MateralCheckInWin(this);
 		}
 		win.show();
-	
-	},
-	loadOrderInfo: function(store,key){
-		Ext.Ajax.request({
-			url:'resource/Device!queryDeviceOrder.action',
-			success:function(res,opt){
-				var result = Ext.decode(res.responseText).records;
-				if(result && result.length>0){
-					var doneCodeArr=[],data=[];
-					Ext.each(result,function(d){
-						if(key){
-							if(d['device_type'] == 'STB' || d['device_type'] == 'CARD' || d['device_type'] == 'MODEM' ){
-								//去掉重复的记录
-								if(doneCodeArr.indexOf(d['device_done_code']) == -1 ){
-									data.push(d);
-									doneCodeArr.push(d['device_done_code']);
-								}
-							}
-						}else{
-							if(d['device_type'] != 'STB' && d['device_type'] != 'CARD' && d['device_type'] != 'MODEM' ){
-								//去掉重复的记录
-								if(doneCodeArr.indexOf(d['device_done_code']) == -1 ){
-									data.push(d);
-									doneCodeArr.push(d['device_done_code']);
-								}
-							}
-							
-						}
-					});
-					store.loadData(data);
-				}
-			}
-		});
 	}
 });
 
@@ -234,6 +192,7 @@ var CheckInGrid = Ext.extend(Ext.grid.GridPanel,{
  * @extends Ext.form.FormPanel
  */
 var FileForm = Ext.extend(Ext.form.FormPanel,{
+	modelData:null,
 	constructor:function(){
 		FileForm.superclass.constructor.call(this,{
 			id:'fileFormId',
@@ -254,24 +213,45 @@ var FileForm = Ext.extend(Ext.form.FormPanel,{
 					isNewStb
 				]},
 				{columnWidth:.5,layout:'form',defaults:{anchor:'95%'},
-					items:[
-						{fieldLabel:lsys('OrderManager.labelOrderNo'),hiddenName:'deviceInput.order_done_code',xtype:'combo',
-							store:new Ext.data.JsonStore({
-								fields:['order_no','device_done_code','supplier_id','supplier_name','order_info']
-							}),displayField:'order_info',valueField:'device_done_code',
-							mode:'local',triggerAction:'all',forceSelection:true,editable:true,
-							listeners:{
-								select:function(combo,record){
-									var fileForm = Ext.getCmp('fileFormId');
-									var supCombo= fileForm.getForm().findField('deviceInput.supplier_id');
-									supCombo.setRawValue(record.get('supplier_name'));
-									supCombo.setValue(record.get('supplier_id'));
-									supCombo.setReadOnly(true);
+					items:[{
+							xtype: 'textfield',
+							fieldLabel: CHECK_COMMON.labelBatchNum,
+							name: 'batch_num'
+						},
+						{fieldLabel:DEV_COMMON_LU.labelDeviceType,xtype:'paramcombo',typeAhead:false,paramName:'DEVICE_TYPE',
+							hiddenName:'deviceType',allowBlank:false,defaultValue:'STB',id:'deviceTypeInId'
+							,listeners:{
+								scope:this,
+								select:function(combo){
+									Ext.getCmp('ctlDeviceModelInId').reset();
 								}
 							}
-					},
-						backup,
-						deviceType
+						},{
+							fieldLabel : '设备型号',
+							allowBlank : false,
+							id : 'ctlDeviceModelInId',
+							xtype:'combo',
+							width:250,
+							name:'device_model',
+							emptyText: langUtils.bc("common.plsSwitch"),
+							store: new Ext.data.JsonStore({
+								fields : ['device_model', 'model_name', 'device_type']
+							}),
+							model: 'local',
+							displayField: 'model_name',
+							valueField: 'device_model',
+							listWidth: 250
+							,listeners:{
+								scope:this,
+								expand:function(combo){
+									combo.getStore().loadData(this.modelData[Ext.get('deviceTypeInId').getValue()]);
+								},
+								select:function(combo){
+									Ext.getCmp('deviceModelInId').setValue(combo.getValue());
+								}
+								
+							}
+						},backup,{name:'deviceModel',xtype:'textfield',id:'deviceModelInId',hidden:true}						
 					]
 				},{columnWidth:1,layout:'form',
 					items:[
@@ -285,6 +265,14 @@ var FileForm = Ext.extend(Ext.form.FormPanel,{
 		FileForm.superclass.initComponent.call(this);
 		App.form.initComboData( this.findByType("paramcombo"));
 		this.getForm().findField('deviceInput.supplier_id').getStore().load();
+		Ext.Ajax.request({
+			url:'resource/Device!queryDeviceStbModem.action',
+			scope:this,
+			success: function(res, ops){
+				var rs = Ext.decode(res.responseText);
+				this.modelData = rs;
+			}
+		});
 	}
 });
 
@@ -327,15 +315,12 @@ var FileCheckInWin = Ext.extend(Ext.Window,{
 	},
 	show:function(){
 		FileCheckInWin.superclass.show.call(this);
-		//订单管理模块中随时会添加订单，故show window时查询订单
-		var store = this.fileForm.getForm().findField('deviceInput.order_done_code').getStore();
-		this.parent.loadOrderInfo(store,true);
 		this.fileForm.getForm().findField('deviceInput.input_no').focus(true,500);
 	},
 	doSave:function(){
 		if(this.fileForm.getForm().isValid()){
 			var file = Ext.getCmp('checkInFielId').getValue();
-			var flag = checkFileType(file);
+			var flag = checkTxtFileType(file);
 			if(!flag)return;
 			var msg = Show();
 			this.fileForm.getForm().submit({
@@ -396,61 +381,15 @@ var HandForm = Ext.extend(Ext.form.FormPanel,{
 				{
 					columnWidth:.5,layout:'form',defaults:{anchor:'95%'},
 					items:[
-						{fieldLabel:lsys('OrderManager.labelOrderNo'),hiddenName:'deviceInput.order_done_code',xtype:'combo',
-								store:new Ext.data.JsonStore({
-									fields:['order_no','device_done_code','supplier_id','supplier_name','order_info']
-								}),displayField:'order_info',valueField:'device_done_code',
-								mode:'local',triggerAction:'all',forceSelection:true,editable:true,
-								listeners:{
-									scope:this,
-									select:function(combo,record){
-										var handForm = Ext.getCmp('handFormId');
-										var supCombo= handForm.getForm().findField('deviceInput.supplier_id');
-										supCombo.setRawValue(record.get('supplier_name'));
-										supCombo.setValue(record.get('supplier_id'));
-										supCombo.setReadOnly(true);
-										
-										var checkInStore = this.parent.checkInDeviceGrid.getStore();
-										if(checkInStore.getCount()>0)
-											checkInStore.removeAll();
-										
-										this.parent.deviceTypeArr = [];
-										this.parent.deviceModelArr = [];
-										
-										var doneCode = combo.getValue();
-										Ext.Ajax.request({
-											url:'resource/Device!queryDeviceOrderDetail.action',
-											params:{deviceDoneCode:doneCode},
-											scope:this,
-											success:function(res,opt){
-												var data = Ext.decode(res.responseText);
-												if(data && data.length>0){
-													Ext.each(data,function(d){
-														if(this.parent.deviceTypeArr.indexOf(d['device_type'])==-1)
-															this.parent.deviceTypeArr.push(d['device_type']);
-														if(this.parent.deviceModelArr.indexOf(d['device_model'])==-1)
-															this.parent.deviceModelArr.push(d['device_model']);
-													},this);
-												}
-											}
-										});
-										
-									}
-								}
+						{
+							xtype: 'textfield',
+							fieldLabel: CHECK_COMMON.labelBatchNum,
+							name: 'batch_num',
+							width: 240
 						},
 						backup,
 						isNewStb
-//						deviceType
 					]
-				},{
-					columnWidth:1,
-					layout:'form',
-					items:[{
-						xtype: 'textfield',
-						fieldLabel: CHECK_COMMON.labelBatchNum,
-						name: 'batch_num',
-						width: 240
-					}]
 				},{
 					columnWidth:1,
 					layout:'form',
@@ -574,10 +513,11 @@ var CheckInDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 		
 		CheckInDeviceGrid.superclass.constructor.call(this,{
 			id:'checkInDeviceGridId',
-			title:CHECK_COMMON.titleDeviceInfo,
+//			title:CHECK_COMMON.titleDeviceInfo,
 			region:'center',
 			ds:this.checkInDeviceGridStore,
 			clicksToEdit:1,
+			border: false,
 			cm:cm,
 			sm:sm,
 			tbar:[{text:lsys('common.addNewOne'),iconCls:'icon-add',scope:this,handler:this.doAdd}]
@@ -804,7 +744,7 @@ var HandCheckInWin = Ext.extend(Ext.Window,{
 	show:function(){
 		HandCheckInWin.superclass.show.call(this);
 		//订单管理模块中随时会添加订单，故show window时查询订单
-		var store = this.handForm.getForm().findField('deviceInput.order_done_code').getStore();
+//		var store = this.handForm.getForm().findField('deviceInput.order_done_code').getStore();
 //		Ext.Ajax.request({
 //			url:'resource/Device!queryDeviceOrder.action',
 //			success:function(res,opt){
@@ -820,7 +760,7 @@ var HandCheckInWin = Ext.extend(Ext.Window,{
 //				store.loadData(data);
 //			}
 //		});
-		this.parent.loadOrderInfo(store,true);
+//		this.parent.loadOrderInfo(store,true);
 		this.handForm.getForm().findField('deviceInput.input_no').focus(true,500);
 	},
 	doSave:function(){
@@ -901,42 +841,43 @@ var MateralHandForm = Ext.extend(Ext.form.FormPanel,{
 				{
 					columnWidth:.5,layout:'form',defaults:{anchor:'95%'},
 					items:[
-						{fieldLabel:lsys('OrderManager.labelOrderNo'),hiddenName:'deviceInput.order_done_code',xtype:'combo',
-								store:new Ext.data.JsonStore({
-									fields:['order_no','device_done_code','supplier_id','supplier_name','order_info']
-								}),displayField:'order_info',valueField:'device_done_code',
-								mode:'local',triggerAction:'all',forceSelection:true,editable:true,
-								listeners:{
-									scope:this,
-									select:function(combo,record){
-										var handForm = Ext.getCmp('materalHandFormId');
-										var supCombo= handForm.getForm().findField('deviceInput.supplier_id');
-										supCombo.setRawValue(record.get('supplier_name'));
-										supCombo.setValue(record.get('supplier_id'));
-										supCombo.setReadOnly(true);									
-										
-										Ext.getCmp("materalDeviceModelId").reset();
-										this.parent.deviceModelArr = [];
-										
-										var doneCode = combo.getValue();
-										Ext.Ajax.request({
-											url:'resource/Device!queryDeviceOrderDetail.action',
-											params:{deviceDoneCode:doneCode},
-											scope:this,
-											success:function(res,opt){
-												var data = Ext.decode(res.responseText);
-												if(data && data.length>0){
-													Ext.each(data,function(d){
-														if(this.parent.deviceModelArr.indexOf(d['device_model'])==-1)
-															this.parent.deviceModelArr.push(d['device_model']);
-													},this);
-												}
-											}
-										});
-										
-									}
-								}
-						},{
+//						{fieldLabel:lsys('OrderManager.labelOrderNo'),hiddenName:'deviceInput.order_done_code',xtype:'combo',
+//								store:new Ext.data.JsonStore({
+//									fields:['order_no','device_done_code','supplier_id','supplier_name','order_info']
+//								}),displayField:'order_info',valueField:'device_done_code',
+//								mode:'local',triggerAction:'all',forceSelection:true,editable:true,
+//								listeners:{
+//									scope:this,
+//									select:function(combo,record){
+//										var handForm = Ext.getCmp('materalHandFormId');
+//										var supCombo= handForm.getForm().findField('deviceInput.supplier_id');
+//										supCombo.setRawValue(record.get('supplier_name'));
+//										supCombo.setValue(record.get('supplier_id'));
+//										supCombo.setReadOnly(true);									
+//										
+//										Ext.getCmp("materalDeviceModelId").reset();
+//										this.parent.deviceModelArr = [];
+//										
+//										var doneCode = combo.getValue();
+//										Ext.Ajax.request({
+//											url:'resource/Device!queryDeviceOrderDetail.action',
+//											params:{deviceDoneCode:doneCode},
+//											scope:this,
+//											success:function(res,opt){
+//												var data = Ext.decode(res.responseText);
+//												if(data && data.length>0){
+//													Ext.each(data,function(d){
+//														if(this.parent.deviceModelArr.indexOf(d['device_model'])==-1)
+//															this.parent.deviceModelArr.push(d['device_model']);
+//													},this);
+//												}
+//											}
+//										});
+//										
+//									}
+//								}
+//						},
+						{
 							fieldLabel : CHECK_COMMON.labelDeviceModel,
 							allowBlank : false,
 							id : 'materalDeviceModelId',
@@ -1032,8 +973,8 @@ var MateralCheckInWin = Ext.extend(Ext.Window,{
 	show:function(){
 		MateralCheckInWin.superclass.show.call(this);
 		//订单管理模块中随时会添加订单，故show window时查询订单
-		var store = this.handForm.getForm().findField('deviceInput.order_done_code').getStore();
-		this.parent.loadOrderInfo(store,false);
+//		var store = this.handForm.getForm().findField('deviceInput.order_done_code').getStore();
+//		this.parent.loadOrderInfo(store,false);
 		this.handForm.getForm().findField('deviceInput.input_no').focus(true,500);
 	},
 	doSave:function(){

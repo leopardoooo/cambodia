@@ -2,6 +2,7 @@ package com.ycsoft.sysmanager.component.resource;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -852,22 +853,19 @@ public class DeviceComponent extends BaseDeviceComponent {
 	 * 保存入库信息 (文件)
 	 * @param optrId
 	 * @param input
+	 * @param deviceModel 
+	 * @param batchNum 
 	 * @param devices
 	 * @throws Exception
 	 */
 	public void saveDeviceInputFile(SOptr optr, RDeviceInput input,
-			List<DeviceDto> deviceDtoList,String deviceType) throws Exception, ComponentException{
+			List<DeviceDto> deviceDtoList,String deviceType, String deviceModel, String batchNum) throws Exception, ComponentException{
 		List<DeviceDto> devices = new ArrayList<DeviceDto>();
 		for(DeviceDto d : deviceDtoList){
-			if ( (!d.getDevice_type().equals(SystemConstants.DEVICE_TYPE_MODEM)
-					&& StringHelper.isNotEmpty(d.getDevice_code())) || (d.getDevice_type().equals(
-							SystemConstants.DEVICE_TYPE_MODEM)
-							&& StringHelper.isNotEmpty(d.getModem_mac())) ) {
-				if(d.getDevice_type().equals(SystemConstants.DEVICE_TYPE_MODEM)){
-					d.setModem_mac(d.getModem_mac().replace(":",""));
-				}
-				devices.add(d);
-			}
+			d.setDevice_type(deviceType);
+			d.setDevice_model(deviceModel);
+			d.setBatch_num(batchNum);
+			devices.add(d);
 		}
 		String[] deviceCodes = null;
 		if(deviceType.equals(SystemConstants.DEVICE_TYPE_MODEM)){
@@ -1089,7 +1087,8 @@ public class DeviceComponent extends BaseDeviceComponent {
 			device.setDevice_id(deivceId);
 			device.setDevice_model(d.getDevice_model());
 			device.setDepot_id(depotId);
-			device.setBatch_num(d.getBatch_num());
+			device.setBatch_num(d.getBatch_num());//批号
+			device.setBox_no(d.getBox_no());//箱号
 			device.setOwnership(input.getOwnership());
 			device.setBackup(input.getBackup());
 			device.setOwnership_depot(depotId);
@@ -1798,13 +1797,14 @@ public class DeviceComponent extends BaseDeviceComponent {
 
 	/**
 	 * 添加差异
+	 * @param remark 
 	 * @param devices
 	 * @throws Exception
 	 */
-	public void addDeviceDiffence(SOptr optr ,String deviceIds) throws Exception {
+	public void addDeviceDiffence(SOptr optr ,String deviceIds, String remark) throws Exception {
 		String [] deviceId = deviceIds.split(",");
 		Integer doneCode = gDoneCode();
-		rDeviceEditDao.saveDeviceEdit(doneCode,optr.getOptr_id(),deviceIds,"手工添加差异");
+		rDeviceEditDao.saveDeviceEdit(doneCode,optr.getOptr_id(),deviceIds,remark);
 		List<RDeviceDoneDeviceid> deviceList = new ArrayList<RDeviceDoneDeviceid>();
 		for (String d : deviceId) {
 			RDeviceDoneDeviceid device = new RDeviceDoneDeviceid();
@@ -1815,7 +1815,7 @@ public class DeviceComponent extends BaseDeviceComponent {
 		rDeviceDoneDeviceidDao.save(deviceList
 				.toArray(new RDeviceDoneDeviceid[deviceList.size()]));
 		rDeviceDoneDetailDao.updateByDoneDeviceid(doneCode);
-		rDeviceDifeenceDao.saveDiffence(doneCode,optr,deviceIds,"手工添加差异");
+		rDeviceDifeenceDao.saveDiffence(doneCode,optr,deviceIds,remark);
 		rDeviceDao.updateDiffenceType(deviceId,
 				SystemConstants.DEVICE_DIFFENCN_TYPE_DIFF);
 	}
@@ -2395,6 +2395,37 @@ public class DeviceComponent extends BaseDeviceComponent {
 		return list;
 	}
 	
+	public Map<String , Object> queryDeviceStbModem() throws Exception {
+		List<RDeviceModel> list = rDeviceDao.queryDeviceStbModem();
+		Map<String, List<RDeviceModel>> deviceMap = CollectionHelper.converToMap(list, "device_type");
+		Map<String , Object> map = new HashMap<String, Object>();
+		map.put("STB", deviceMap.get("STB")); //机顶盒型号
+		map.put("MODEM", deviceMap.get("MODEM")); //modem型号
+		return map;
+	}
+	
+	
+	public String[] getColumnName(String deviceType, String deviceModel) throws Exception{
+		if(deviceType.equals(SystemConstants.DEVICE_TYPE_MODEM)){
+			return new String[]{"box_no","device_code"};
+		}else if(deviceType.equals(SystemConstants.DEVICE_TYPE_STB)){
+			RStbModel model =  rStbModelDao.findByKey(deviceModel);
+			if(model == null){
+				throw new ComponentException(deviceModel+"设备型号不存在");	
+			}
+			if(SystemConstants.DTV_SERV_TYPE_SINGLE.equals(model.getInteractive_type())){
+				return new String[]{"box_no","device_code","pair_device_code"};
+			}else if(SystemConstants.DTV_SERV_TYPE_DOUBLE.equals(model.getInteractive_type())){
+				return new String[]{"box_no","device_code","modem_mac"};
+			}else{
+				throw new ComponentException("暂时不支持"+deviceModel+"设备型号的入库");	
+			}
+		}else{
+			throw new ComponentException("暂时不支持"+deviceType+"设备类型的入库");
+		}
+		
+	}
+	
 	/**
 	 * @param deviceTransferDao
 	 *            the rDeviceTransferDao to set
@@ -2556,6 +2587,8 @@ public class DeviceComponent extends BaseDeviceComponent {
 	public void setRDeviceTypeDao(RDeviceTypeDao deviceTypeDao) {
 		this.rDeviceTypeDao = deviceTypeDao;
 	}
+
+	
 
 	
 }

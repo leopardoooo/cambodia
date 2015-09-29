@@ -30,6 +30,10 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.beanutils.BeanUtils;
+
+import com.sun.rowset.CachedRowSetImpl;
+
 import jxl.Cell;
 import jxl.CellType;
 import jxl.DateCell;
@@ -47,10 +51,6 @@ import jxl.write.WritableWorkbook;
 import jxl.write.WriteException;
 import jxl.write.biff.RowsExceededException;
 
-import org.apache.commons.beanutils.BeanUtils;
-
-import com.sun.rowset.CachedRowSetImpl;
-
 /**
  * 基本类型的文件操作功能
  *
@@ -58,6 +58,8 @@ import com.sun.rowset.CachedRowSetImpl;
  * @date Dec 3, 2009 1:09:25 PM
  */
 public class FileHelper {
+
+	private static BufferedReader bufferedReader;
 
 	private FileHelper() {
 	}
@@ -551,9 +553,48 @@ public class FileHelper {
 		return list;
 	}
 
+    public static final List<String> readTxtFile(File file) throws Exception { 
+    	List<String> list = new ArrayList<String>();
+    	InputStreamReader read = null;
+		BufferedReader br = null;
+        try {  
+            String encoding="GBK";  
+            if(file.isFile() && file.exists()){ //判断文件是否存在  
+                read = new InputStreamReader(new FileInputStream(file),encoding);//考虑到编码格式  
+                br = new BufferedReader(read);  
+                String lineTxt = null;
+                while((lineTxt = br.readLine()) != null){  
+                	lineTxt = lineTxt.replaceAll("，", ",");  
+                    list.add(lineTxt);
+                }  
+	        } 
+        } catch (Exception e) {  
+        	throw new Exception("读取文件内容出错", e);
+        } finally {
+			if (read != null)
+				read.close();
+			if (br != null)
+				br.close();
+		}
+        return list;
+    } 
+	
+	
 	public static final <T> List<T> txtToBean(File f, String[] colName,
-			Class<T> t) {
-		return null;
+			Class<T> t) throws Exception {
+		List<T> list = new ArrayList<T>();
+		List<String> txtList = readTxtFile(f);
+		txtList.remove(0);//去掉第一行
+		for (int i = 0; i < txtList.size(); i++) {
+			T bean = t.newInstance();
+			String txt = txtList.get(i);
+			String[] row =  txt.split(",");
+			for (int j = 0; j < row.length && j < colName.length; j++) {
+				BeanHelper.setPropertyString(bean, colName[j],row[j] );
+			}
+			list.add(bean);
+		}
+		return list;
 	}
 
 	public static final <T> List<T> execlToBean(File f, String[] colName,

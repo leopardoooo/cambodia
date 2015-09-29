@@ -236,11 +236,11 @@ public class ResourceCfgComponent extends BaseComponent {
 		map.put("stbList", queryRStbModel()); //机顶盒型号
 		map.put("supplierList", queryRDeviceSupplier()); //供应商配置
 		map.put("buyModeList", queryDeviceBuyMode());//设备购买方式
-		map.put("cardList", queryRCardModel());//智能卡型号
+//		map.put("cardList", queryRCardModel());//智能卡型号
 		map.put("modemList", queryRModemModel());//modem型号
 		map.put("modelList", queryDeviceModel());//器材型号
-		map.put("typeList", queryDeviceType());//设备类型
-		map.put("countyModelList", queryCountyModel(optr));//设备适用地区
+//		map.put("typeList", queryDeviceType());//设备类型
+//		map.put("countyModelList", queryCountyModel(optr));//设备适用地区
 		return map;
 	}
 

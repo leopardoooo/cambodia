@@ -9,7 +9,7 @@ var transferNo = {
 };
 
 //仓库
-var depot = {fieldLabel:DEV_COMMON_LU.labelDepot,hiddenName:'deviceTransfer.depot_order',xtype:'combo',allowBlank:false,
+var depot = {fieldLabel:"目标仓库",hiddenName:'deviceTransfer.depot_order',xtype:'combo',allowBlank:false,
 		store:new Ext.data.JsonStore({
 			url:'resource/Device!queryDeptByOptr.action',
 			fields:['dept_id','dept_name']
@@ -20,7 +20,7 @@ var depot = {fieldLabel:DEV_COMMON_LU.labelDepot,hiddenName:'deviceTransfer.depo
 var outRemark = {fieldLabel:lsys('common.remarkTxt'),name:'deviceTransfer.remark',xtype:'textarea',anchor:'90%',height:45};
 //调拨状态
 var statusCmp = {fieldLabel:DEV_COMMON_LU.labelDevStatus,xtype:'paramcombo',paramName:'TRANSFER_STATUS',allowBlank:false,
-		hiddenName:'deviceTransfer.transfer_status'
+		hiddenName:'deviceTransfer.transfer_status',defaultValue:'NEWD'
 };
 
 /**
@@ -306,6 +306,7 @@ var TransferGrid = Ext.extend(Ext.grid.GridPanel,{
  * @extends Ext.form.FormPanel
  */
 var TransferFileForm = Ext.extend(Ext.form.FormPanel,{
+	modelData:null,
 	constructor:function(){
 		TransferFileForm.superclass.constructor.call(this,{
 			id:'transferFileFormId',
@@ -318,16 +319,34 @@ var TransferFileForm = Ext.extend(Ext.form.FormPanel,{
 			items:[
 				transferNo,
 				{fieldLabel:DEV_COMMON_LU.labelDeviceType,xtype:'paramcombo',typeAhead:false,paramName:'DEVICE_TYPE',
-					hiddenName:'deviceType',allowBlank:false
-//					,listeners:{
-//						scope:this,
-//						expand:function(combo){
-//							var store = combo.getStore();
-//							store.filterBy(function(record){
-//								return record.get('item_value').indexOf('CARD')<0;
-//							})
-//						}
-//					}
+					hiddenName:'deviceType',allowBlank:false,defaultValue:'STB',id:'deviceTypeItemId'
+					,listeners:{
+						scope:this,
+						select:function(combo){
+							Ext.getCmp('ctlDeviceModel').reset();
+						}
+					}
+				},{
+					fieldLabel : '设备型号',
+					allowBlank : false,
+					id : 'ctlDeviceModel',
+					xtype:'combo',
+					width:250,
+					name:'device_model',
+					emptyText: langUtils.bc("common.plsSwitch"),
+					store: new Ext.data.JsonStore({
+						fields : ['device_model', 'model_name', 'device_type']
+					}),
+					model: 'local',
+					displayField: 'model_name',
+					valueField: 'device_model',
+					listWidth: 250
+					,listeners:{
+						scope:this,
+						expand:function(combo){
+							combo.getStore().loadData(this.modelData[Ext.get('deviceTypeItemId').getValue()]);
+						}
+					}
 				},
 				depot,statusCmp,
 				{id:'checkOutFileId',fieldLabel:DEV_COMMON_LU.labelDevFile,name:'files',xtype:'textfield',inputType:'file',allowBlank:false,anchor:'95%'},
@@ -337,11 +356,20 @@ var TransferFileForm = Ext.extend(Ext.form.FormPanel,{
 	},
 	initComponent:function(){
 		TransferFileForm.superclass.initComponent.call(this);
+		Ext.Ajax.request({
+			url:'resource/Device!queryDeviceStbModem.action',
+			scope:this,
+			success: function(res, ops){
+				var rs = Ext.decode(res.responseText);
+				this.modelData = rs;
+			}
+		});
+		
 		App.form.initComboData( this.findByType("paramcombo"));
 		var comboes = this.findByType('combo');
 		if(comboes.length>0)
 			for(var i=0;i<comboes.length;i++){
-				if(comboes[i].hiddenName !='deviceTransfer.transfer_status'){
+				if(comboes[i].hiddenName !='deviceTransfer.transfer_status' && comboes[i].name !='device_model'){
 					if(!(comboes[i] instanceof Ext.ux.ParamCombo))
 						comboes[i].getStore().load();
 				}
@@ -410,7 +438,7 @@ var TransferFileWin = Ext.extend(Ext.Window,{
 					}
 				},  
 				failure : function(form, action) {  
-					alert(MSG_LU.fileUploadFailure);  
+					Alert(MSG_LU.fileUploadFailure);  
 				}
 			});
 		}

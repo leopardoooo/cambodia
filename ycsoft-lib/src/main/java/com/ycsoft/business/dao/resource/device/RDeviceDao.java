@@ -611,13 +611,13 @@ public class RDeviceDao extends BaseEntityDao<RDevice> {
 		Map<String, Serializable> paramers = new HashMap<String, Serializable>();
 		paramers.put("uncheck", SystemConstants.DEVICE_DIFFENCN_TYPE_UNCHECK);
 		paramers.put("diff", SystemConstants.DEVICE_DIFFENCN_TYPE_DIFF);
-		sql = "select d.*, max(rdd.create_time) create_time from ( " + sql + " ) d, R_DEVICE_DIFEENCE rdd"
+		sql = "select d.*, max(rdd.create_time) create_time ,rdd.remark from ( " + sql + " ) d, R_DEVICE_DIFEENCE rdd"
 			+" where d.device_id = rdd.device_id(+)" + diffDepotSql
 			+" group by d.device_id,d.device_type,"
 			+" d.device_model,d.device_status,d.depot_status,d.tran_status,d.used,d.backup,d.freezed,"
 			+" d.diffence_type,d.depot_id,d.ownership,d.ownership_depot,d.warranty_date,d.is_virtual,"
 			+" d.is_local,d.is_loss,d.is_new_stb,device_code,pair_device_code,pair_device_model,"
-			+" pair_device_modem_code,pair_device_modem_model,modem_mac,batch_num,total_num order by create_time desc";
+			+" pair_device_modem_code,pair_device_modem_model,modem_mac,batch_num,total_num, rdd.remark order by create_time desc";
 		return createNameQuery(DeviceDto.class, sql, paramers).setStart(start).setLimit(limit).page();
 
 	}
@@ -929,5 +929,11 @@ public class RDeviceDao extends BaseEntityDao<RDevice> {
 				+ "UNION select t.modem_mac device_code,t.device_model,r.* from r_modem T,r_device r WHERE r.device_id=t.device_id and t.modem_mac = ?  ";
 		return createQuery(com.ycsoft.business.dto.device.DeviceDto.class, sql,deviceCode,deviceCode,deviceCode).first();
 	}
-	
+	public List<RDeviceModel> queryDeviceStbModem() throws Exception {
+		String sql = "select 'MODEM' device_type,t.device_model,t.model_name from r_modem_model t "
+				+ "union select 'STB' device_type,t.device_model,"
+				+ " case when t.interactive_type='SINGLE' then '(DTT)'||''||t.model_name else '(OTT)'||''||t.model_name end model_name "
+				+ " from r_stb_model t order by model_name ";
+		return this.createQuery(RDeviceModel.class, sql ).list();
+	}
 }

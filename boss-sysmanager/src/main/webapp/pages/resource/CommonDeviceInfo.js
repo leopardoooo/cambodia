@@ -75,7 +75,7 @@ var QueryDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 		];
 		
 		QueryDeviceGrid.superclass.constructor.call(this,{
-			title:DEV_COMMON_LU.titleDeviceInfo,
+//			title:DEV_COMMON_LU.titleDeviceInfo,
 			region:'center',
 			ds:this.queryDeviceGridStore,
 			clicksToEdit:1,
@@ -167,6 +167,15 @@ var checkFileType = function(fileText){
 		return false;
 	}else if(fileText.lastIndexOf('.xls') ==-1 || fileText.lastIndexOf('.xls')!=fileText.length-4){
 		Alert(MSG_LU.pleaseUploadExcelFile);
+		return false;
+	}
+	return true;
+}
+
+
+var checkTxtFileType = function(fileText){
+	if(fileText.lastIndexOf('txt') ==-1 || fileText.lastIndexOf('.txt')!=fileText.length-4){
+		Alert("请选择txt文件进行上传,文件后缀名为.txt!");
 		return false;
 	}
 	return true;
