@@ -555,7 +555,9 @@ public class OrderComponent extends BaseBusiComponent {
 				//order.setActive_fee(getOrderCancelFee(order,DateHelper.today()));
 				cancelFeeList=getOrderCacelFeeDetail(order,DateHelper.today());
 			}else if(StringHelper.isNotEmpty(order.getPackage_sn())
-					||order.getBilling_cycle()>1){
+					||(order.getBilling_cycle()>1
+							&&!DateHelper.isToday(order.getOrder_time())
+							&&!order.getStatus().equals(StatusConstants.INSTALL))){
 				//套餐子产品和包多月产品，低权限人员退款金额=0
 				order.setActive_fee(0);
 			}else if(order.getProd_type().equals(SystemConstants.PROD_TYPE_BASE)
@@ -593,6 +595,7 @@ public class OrderComponent extends BaseBusiComponent {
 		return BusiCodeConstants.PROD_HIGH_TERMINATE.equals(busi_code)
 				||BusiCodeConstants.USER_HIGH_WRITE_OFF.equals(busi_code)
 				||BusiCodeConstants.PROD_SUPER_TERMINATE.equals(busi_code)
+				||BusiCodeConstants.BATCH_USER_WRITE_OFF.equals(busi_code)
 				?true:false;
 	}
 	
@@ -742,6 +745,10 @@ public class OrderComponent extends BaseBusiComponent {
 			}
 		}
 		return list;
+	}
+	
+	public List<CProdOrderDto> queryLogoffProdOrderDtoByUserIds(List<String> userIdList) throws Exception {
+		return cProdOrderDao.queryProdOrderDtoByUserIdList(userIdList.toArray(new String[userIdList.size()]));
 	}
 	
 	public List<CProdOrder> queryOrderProdByUserId(String user_id) throws Exception {

@@ -5,8 +5,8 @@ import java.util.Map;
 
 import com.ycsoft.beans.core.prod.CProdOrderDto;
 import com.ycsoft.beans.core.prod.CProdOrderFollowPay;
+import com.ycsoft.beans.core.prod.CancelUserDto;
 import com.ycsoft.business.commons.abstracts.IBaseService;
-import com.ycsoft.business.dto.core.fee.FeeBusiFormDto;
 import com.ycsoft.business.dto.core.prod.OrderProd;
 import com.ycsoft.business.dto.core.prod.OrderProdEdit;
 import com.ycsoft.business.dto.core.prod.OrderProdPanel;
@@ -26,7 +26,7 @@ public interface IOrderService extends IBaseService{
 	//public String saveOrderProd(OrderProd orderProd,String busi_code) throws Exception;
 	
 	
-	public void saveCancelProd(String[] orderSns,Integer cancelFee,Integer refundFee)throws Exception;;
+	public void saveCancelProd(String[] orderSns,Integer cancelFee,Integer refundFee, String orderFeeType)throws Exception;;
 	
 	public List<CProdOrderDto> queryCancelFeeByCancelOrder(String busi_code,String cust_id,String order_sn)throws Exception;
 
@@ -42,5 +42,6 @@ public interface IOrderService extends IBaseService{
 	
 	public void saveOrderEdit(OrderProd orderProd) throws Exception;
 	public void savePayOtherFee()throws Exception;
+	public Map<String, Object> queryLogoffUserProdList(String custId, List<String> userIdList) throws Exception;
 
 }

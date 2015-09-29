@@ -10,8 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.google.gson.JsonObject;
+import com.ycsoft.beans.config.TServerRes;
 import com.ycsoft.beans.core.job.BusiCmdParam;
 import com.ycsoft.beans.core.job.JBandCommand;
+import com.ycsoft.beans.core.job.JBusiCmd;
 import com.ycsoft.beans.core.job.JCaCommand;
 import com.ycsoft.beans.core.job.JVodCommand;
 import com.ycsoft.beans.core.job.SmsxCmd;
@@ -21,6 +23,7 @@ import com.ycsoft.business.dao.core.job.JBandCommandDao;
 import com.ycsoft.business.dao.core.job.JCaCommandDao;
 import com.ycsoft.business.dao.core.job.JVodCommandDao;
 import com.ycsoft.business.dao.prod.PProdStaticResDao;
+import com.ycsoft.business.dao.prod.TServerResDao;
 import com.ycsoft.commons.abstracts.BaseComponent;
 import com.ycsoft.commons.constants.BusiCmdConstants;
 import com.ycsoft.commons.constants.StatusConstants;
@@ -41,6 +44,8 @@ public class AuthComponent extends BaseComponent{
 	private JBandCommandDao jBandCommandDao;
 	@Autowired
 	private PProdStaticResDao pProdStaticResDao;
+	@Autowired
+	private TServerResDao tServerResDao;
 	
 	public void sendAuth(CUser user,List<CProdOrder> orderList,String authCmdType,Integer doneCode) throws Exception{
 	
@@ -228,7 +233,7 @@ public class AuthComponent extends BaseComponent{
 		caCommand.setCmd_type(SmsxCmd.OpenICC.name());
 		jCaCommandDao.save(caCommand);
 	}
-	
+		
 	//销户
 	private void StopTerminal(CUser user,Integer doneCode) throws Exception{
 		JCaCommand dttCommand = gDttCmd(user, doneCode);
@@ -405,8 +410,8 @@ public class AuthComponent extends BaseComponent{
 		dttCmd.setUser_id(user.getUser_id());
 		dttCmd.setCard_id(user.getCard_id());
 		dttCmd.setStb_id(user.getStb_id());
-		dttCmd.setCas_type("SUMA");
-		dttCmd.setCas_id("sumacam");
+		dttCmd.setCas_type("SMSX");
+		dttCmd.setCas_id("SMSX");
 		dttCmd.setCreate_time(new Date());
 		dttCmd.setIs_sent("N");
 		dttCmd.setCounty_id(user.getCounty_id());

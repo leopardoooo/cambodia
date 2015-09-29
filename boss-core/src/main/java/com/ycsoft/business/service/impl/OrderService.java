@@ -24,6 +24,7 @@ import com.ycsoft.beans.core.prod.CProdOrderDto;
 import com.ycsoft.beans.core.prod.CProdOrderFee;
 import com.ycsoft.beans.core.prod.CProdOrderFeeOut;
 import com.ycsoft.beans.core.prod.CProdOrderFollowPay;
+import com.ycsoft.beans.core.prod.CancelUserDto;
 import com.ycsoft.beans.core.user.CUser;
 import com.ycsoft.beans.prod.PPackageProd;
 import com.ycsoft.beans.prod.PProd;
@@ -46,7 +47,6 @@ import com.ycsoft.business.dto.core.prod.OrderProdEdit;
 import com.ycsoft.business.dto.core.prod.OrderProdPanel;
 import com.ycsoft.business.dto.core.prod.PackageGroupPanel;
 import com.ycsoft.business.dto.core.prod.PackageGroupUser;
-import com.ycsoft.business.dto.core.prod.ProdTariffDto;
 import com.ycsoft.business.service.IOrderService;
 import com.ycsoft.commons.constants.BusiCmdConstants;
 import com.ycsoft.commons.constants.BusiCodeConstants;
@@ -385,6 +385,76 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		return orderList;
 	}
 	
+	public Map<String, Object> queryLogoffUserProdList(String custId, List<String> userIdList) throws Exception {
+		
+		if(null != userIdList && userIdList.size() == 0){
+			throw new ServicesException("表格数据为空");
+		}else if(userIdList.size() > 1000){
+			throw new ServicesException("请一次性录入小于1000条数据");
+		}
+		//过滤重复用户ID
+		List<String> userIds = new ArrayList<String>();
+		for(String userId : userIdList){
+			if(!userIds.contains(userId)){
+				userIds.add(userId);
+			}
+		}
+		List<CUser> userList = userComponent.queryUserByUserIds(userIds);
+		if(userList.size() == 0){
+			throw new ServicesException("无效用户ID");
+		}
+		for(CUser user : userList){
+			if(!user.getCust_id().equals(custId)){
+				throw new ServicesException("用户【"+user.getUser_id()+"】不在当前客户下!");
+			}
+		}
+		
+		List<CProdOrderDto> prodOrderList = orderComponent.queryLogoffProdOrderDtoByUserIds(userIds);
+		orderComponent.getLogoffOrderFee(prodOrderList, false);
+		List<CancelUserDto> cancelList = new ArrayList<CancelUserDto>();
+		for(CProdOrderDto order : prodOrderList){
+			CancelUserDto cancelUser = new CancelUserDto();
+			cancelUser.setUser_id(order.getUser_id());
+			cancelUser.setProd_name(order.getProd_name());
+			cancelUser.setActive_fee(order.getActive_fee());
+			cancelList.add(cancelUser);
+		}
+		Map<String, List<CancelUserDto>> orderMap = CollectionHelper.converToMap(cancelList, "user_id");
+		List<CancelUserDto> returnCancelUserList = new ArrayList<CancelUserDto>();
+		for(String key : orderMap.keySet()){
+			List<CancelUserDto> list = orderMap.get(key);
+			int fee = 0;
+			for(CancelUserDto order : list){
+				fee += order.getActive_fee();
+			}
+			CancelUserDto cancelUserDto = new CancelUserDto();
+			cancelUserDto.setUser_id(key);
+			cancelUserDto.setActive_fee(fee*-1);
+			returnCancelUserList.add(cancelUserDto);
+		}
+		
+		Map<String, List<CancelUserDto>> map = CollectionHelper.converToMap(cancelList, "prod_name");
+		
+		List<CancelUserDto> showCancelUserList = new ArrayList<CancelUserDto>();
+		for(String key : map.keySet()){
+			List<CancelUserDto> list = map.get(key);
+			int fee = 0;
+			CancelUserDto cancelUser = new CancelUserDto();
+			for(CancelUserDto order : list){
+				fee += order.getActive_fee();
+			}
+			cancelUser.setProd_name(key);
+			cancelUser.setActive_fee(fee);
+			showCancelUserList.add(cancelUser);
+		}
+		
+		Map<String, Object> returnMap = new HashMap<String, Object>();
+		returnMap.put("showData", showCancelUserList);
+		returnMap.put("returnData", returnCancelUserList);
+		returnMap.put("userCount", userList.size());
+		return returnMap;
+	}
+	
 
 		
 	/**
@@ -392,7 +462,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 	 * @param 
 	 * @throws Exception 
 	 */
-	public void saveCancelProd(String[] orderSns,Integer cancelFee,Integer refundFee) throws Exception{
+	public void saveCancelProd(String[] orderSns,Integer cancelFee,Integer refundFee, String orderFeeType) throws Exception{
 		
 		String cust_id=this.getBusiParam().getCust().getCust_id();
 		doneCodeComponent.lockCust(cust_id);
@@ -508,11 +578,12 @@ public class OrderService extends BaseBusiService implements IOrderService{
 				unPayCheckMap.put("NOBAND", order);
 			}
 		}
+		
 		//金额核对
-		if(cancel_fee!=fee*-1){
+		if(cancel_fee*-1 > fee){
 			throw new ServicesException(ErrorCode.FeeDateException);
 		}
-		if(refund_fee!=cfeeTotal*-1){
+		if(refund_fee*-1 > cfeeTotal){
 			throw new ServicesException(ErrorCode.FeeDateException);
 		}
 		//订单相关的所有订单的未支付判断,判断各类订单的相关所有订单的未支付状态
@@ -522,6 +593,20 @@ public class OrderService extends BaseBusiService implements IOrderService{
 					throw new ServicesException(ErrorCode.NotCancleHasUnPay);
 				}
 			}
+		}
+		int tem_refund_fee=refund_fee*-1 ;
+		for(CProdOrderDto order:cancelList){
+			if(tem_refund_fee==0){
+				order.setBalance_cfee(0);
+			}
+			int kf=0;
+			if(tem_refund_fee>order.getBalance_cfee()){
+				kf=order.getBalance_cfee();
+			}else{
+				kf=tem_refund_fee;
+				order.setBalance_cfee(kf);
+			}
+			tem_refund_fee=tem_refund_fee-kf;
 		}
 		return cancelList;
 	}

@@ -872,6 +872,13 @@ Ext.apply(MenuHandler, {
 				height : 550
 			};
 	},
+	BatchLogoffUser: function(){
+		if(!hasCust()) return false;
+		return {
+			width:440,
+			height:450
+		}
+	},
 	// 用户销户
 	LogoffUser : function() {
 		if (!hasCust())

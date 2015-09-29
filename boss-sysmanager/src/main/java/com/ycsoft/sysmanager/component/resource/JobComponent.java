@@ -5,15 +5,18 @@ import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.ycsoft.beans.config.TServer;
+import com.ycsoft.beans.config.TServerRes;
 import com.ycsoft.beans.core.common.CDoneCode;
 import com.ycsoft.beans.core.job.JBusiCmd;
 import com.ycsoft.beans.core.job.JBusiCmdSendosd;
 import com.ycsoft.beans.core.job.JBusiCmdSendosdCfg;
 import com.ycsoft.beans.core.job.JBusiCmdSendosdHis;
 import com.ycsoft.beans.core.job.JCaCommand;
+import com.ycsoft.beans.core.job.SmsxCmd;
 import com.ycsoft.beans.core.user.CUser;
 import com.ycsoft.beans.device.RCard;
 import com.ycsoft.beans.device.RStb;
@@ -25,6 +28,7 @@ import com.ycsoft.business.dao.core.job.JBusiCmdSendosdDao;
 import com.ycsoft.business.dao.core.job.JBusiCmdSendosdHisDao;
 import com.ycsoft.business.dao.core.job.JCaCommandDao;
 import com.ycsoft.business.dao.core.user.CUserDao;
+import com.ycsoft.business.dao.prod.TServerResDao;
 import com.ycsoft.business.dao.resource.device.RCardDao;
 import com.ycsoft.business.dao.resource.device.RDeviceChangeDao;
 import com.ycsoft.business.dao.resource.device.RDeviceDao;
@@ -41,6 +45,7 @@ import com.ycsoft.commons.helper.DateHelper;
 import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.daos.core.JDBCException;
 import com.ycsoft.daos.core.Pager;
+import com.ycsoft.daos.helper.BeanHelper;
 import com.ycsoft.sysmanager.dto.resource.DeviceDto;
 import com.ycsoft.sysmanager.web.commons.interceptor.WebOptr;
 
@@ -56,6 +61,8 @@ public class JobComponent extends BaseComponent{
 	private RCardDao rCardDao;
 	private CUserDao cUserDao;
 	private RDeviceChangeDao rDeviceChangeDao;
+	@Autowired
+	private TServerResDao tServerResDao;
 	
 	public List<SLog> queryCurrentDateLog(String cardId) throws Exception {
 		return sLogDao.queryCurrDateLog(FuncCode.STB_FILLED.toString(),cardId);
@@ -352,25 +359,9 @@ public class JobComponent extends BaseComponent{
 	 */
 	public void createBusiCmd(JBusiCmd cmd,SOptr optr) throws Exception {
 		Integer doneCode = gDoneCode();
-		cmd.setJob_id(getJobId());
 		cmd.setDone_code(doneCode);
-		cmd.setCreate_time(DateHelper.now());
-		if(StringHelper.isEmpty(cmd.getStb_id())){
-			cmd.setStb_id("11111111111111111111");
-		}
-		if(cmd.getBusi_cmd_type().equals(BusiCmdConstants.OSD)){
-			cmd.setBusi_cmd_type("MSG10000000");
-			cmd.setPriority(SystemConstants.PRIORITY_XXTZ);
-		}else if(cmd.getBusi_cmd_type().equals(BusiCmdConstants.MAIL)){
-			cmd.setBusi_cmd_type("MSG01000000");
-			cmd.setPriority(SystemConstants.PRIORITY_XXTZ);
-		}else if(cmd.getBusi_cmd_type().equals(BusiCmdConstants.EMS)){
-			cmd.setBusi_cmd_type("MSG00100000");
-			cmd.setPriority(SystemConstants.PRIORITY_XXTZ);
-		}else {
-			cmd.setPriority(SystemConstants.PRIORITY_SSSQ);
-		}
-		jBusiCmdDao.save(cmd);
+		
+		authSingleDttByBusiCmd(cmd);
 		
 		//保存流水
 		CDoneCode cDoneCode = new CDoneCode();
@@ -384,82 +375,101 @@ public class JobComponent extends BaseComponent{
 		cDoneCodeDao.save(cDoneCode);
 	}
 	
+	private JCaCommand createDttCmdByJBuisCmd(JBusiCmd cmd) throws Exception{
+		JCaCommand dttCmd = new JCaCommand();
+		dttCmd.setDone_code(cmd.getDone_code());
+		dttCmd.setTransnum(Long.parseLong(jCaCommandDao.findSequence().toString()));
+		dttCmd.setCust_id(cmd.getCust_id());
+		dttCmd.setUser_id(cmd.getUser_id());
+		dttCmd.setCard_id(cmd.getCard_id());
+		dttCmd.setStb_id(cmd.getStb_id());
+		dttCmd.setCas_type("SMSX");
+		dttCmd.setCas_id("SMSX");
+		dttCmd.setCreate_time(new Date());
+		dttCmd.setIs_sent("N");
+		dttCmd.setCounty_id(cmd.getCounty_id());
+		dttCmd.setArea_id(cmd.getArea_id());
+		return dttCmd;
+	}
+	/**
+	 * 仓库DTT设备指令
+	 * @param busiCmd
+	 * @throws Exception 
+	 */
+	public void authSingleDttByBusiCmd(JBusiCmd cmd) throws Exception{
+		
+		if(StringHelper.isEmpty(cmd.getStb_id())){
+			cmd.setStb_id("11111111");
+		}
+		if(cmd.getBusi_cmd_type().equals(BusiCmdConstants.CREAT_USER)||//创建用户
+				cmd.getBusi_cmd_type().equals(BusiCmdConstants.ACCTIVATE_TERMINAL)){
+			JCaCommand dttCmd =this.createDttCmdByJBuisCmd(cmd);
+			dttCmd.setCmd_type(SmsxCmd.OpenICC.name());
+			jCaCommandDao.save(dttCmd);
+		}else if(cmd.getBusi_cmd_type().equals(BusiCmdConstants.DEL_USER)||
+				cmd.getBusi_cmd_type().equals(BusiCmdConstants.PASSVATE_TERMINAL)) {
+			JCaCommand dttCmd =this.createDttCmdByJBuisCmd(cmd);
+			dttCmd.setCmd_type(SmsxCmd.StopICC.name());
+			jCaCommandDao.save(dttCmd);
+		}else if(cmd.getBusi_cmd_type().equals(BusiCmdConstants.ACCTIVATE_RES)){
+			String[] resIdArr = cmd.getDetail_params().split(";")[0].split(":")[1].replaceAll("'", "").split(",");
+			String endDate = cmd.getDetail_params().split(";")[1].split(":")[1].replaceAll("'", "").toString();
+			endDate=DateHelper.format(DateHelper.strToDate(endDate),"yyyyMMddHHmmss");
+			
+			for(String resId:resIdArr){
+				JCaCommand dttCmd =this.createDttCmdByJBuisCmd(cmd);
+				dttCmd.setCmd_type(SmsxCmd.AddProduct.name());
+				dttCmd.setAuth_begin_date(DateHelper.format(new Date(), DateHelper.FORMAT_TIME_VOD));
+				dttCmd.setAuth_end_date(endDate);
+				TServerRes controlRes=tServerResDao.queryServerRes(resId, dttCmd.getCas_id());
+				dttCmd.setControl_id(controlRes.getExternal_res_id());
+				dttCmd.setBoss_res_id(resId);
+				dttCmd.setPrg_name(controlRes.getRes_name());
+				jCaCommandDao.save(dttCmd);
+			}
+		}else if(cmd.getBusi_cmd_type().equals(BusiCmdConstants.PASSVATE_RES)){
+			String[] resIdArr = cmd.getDetail_params().split(";")[0].split(":")[1].replaceAll("'", "").split(",");
+			for(String resId:resIdArr){
+					JCaCommand dttCmd =this.createDttCmdByJBuisCmd(cmd);
+					dttCmd.setCmd_type(SmsxCmd.CancelProduct.name());
+					TServerRes controlRes=tServerResDao.queryServerRes(resId, dttCmd.getCas_id());
+					dttCmd.setControl_id(controlRes.getExternal_res_id());
+					dttCmd.setBoss_res_id(resId);
+					dttCmd.setPrg_name(controlRes.getRes_name());
+					jCaCommandDao.save(dttCmd);
+			}	
+		}else if(cmd.getBusi_cmd_type().equals(BusiCmdConstants.OSD)){
+			JCaCommand dttCmd =this.createDttCmdByJBuisCmd(cmd);
+			dttCmd.setDetail_params(cmd.getDetail_params().replaceAll("'", "''"));
+			dttCmd.setCmd_type(BusiCmdConstants.OSD);
+			jCaCommandDao.save(dttCmd);
+		}
+	}
+	
 	public List<JBusiCmd> createBusiCmdFile(List<String> cardList, JBusiCmd cmd,SOptr optr) throws Exception {
 		Integer doneCode = gDoneCode();
 		cmd.setDone_code(doneCode);
-		cmd.setCreate_time(DateHelper.now());
-		if(cmd.getBusi_cmd_type().equals(BusiCmdConstants.OSD)){
-			cmd.setBusi_cmd_type("MSG10000000");
-			cmd.setPriority(SystemConstants.PRIORITY_XXTZ);
-		}else if(cmd.getBusi_cmd_type().equals(BusiCmdConstants.MAIL)){
-			cmd.setBusi_cmd_type("MSG01000000");
-			cmd.setPriority(SystemConstants.PRIORITY_XXTZ);
-		}else if(cmd.getBusi_cmd_type().equals(BusiCmdConstants.EMS)){
-			cmd.setBusi_cmd_type("MSG00100000");
-			cmd.setPriority(SystemConstants.PRIORITY_XXTZ);
-		}else {
-			cmd.setPriority(SystemConstants.PRIORITY_SSSQ);
-		}
-		
-		List<JBusiCmd> busiCmdList = new ArrayList<JBusiCmd>();
-//		Map<String, List<String>> map = new HashMap<String,List<String>>();
+
 		List<JBusiCmd> list = new ArrayList<JBusiCmd>();
 		for(String cardId : cardList){
 			DeviceDto device = rDeviceDao.queryDeviceByCard(cardId);
 			if (device == null) {
 				throw new ComponentException("设备【"+cardId+"】不存在");
 			}
-			String deviceCaType = device.getCa_type();
-			String cmdCaType = cmd.getSupplier_id();
-			//加授权、减授权
-			boolean flag = cmd.getBusi_cmd_type().equals(BusiCmdConstants.ACCTIVATE_RES) || 
-				cmd.getBusi_cmd_type().equals(BusiCmdConstants.PASSVATE_RES);
-			if( (flag && deviceCaType.equals(cmdCaType) && device.getCounty_id().equals(cmd.getCounty_id()))
-					||  (!flag && deviceCaType.equals(cmdCaType)) ){
-				RStb stb = rStbDao.findPairStbByCardDeviceId(cardId);
-				String stbId = "";
-				if(stb != null){
-					stbId = stb.getStb_id();
-				}else{
-					List<CUser> user = cUserDao.queryUserByCardId(cardId);
-					if(user.size()>0){
-						stbId = user.get(0).getStb_id();
-					}
-				}
-				
-				cmd.setJob_id(getJobId());
-				JBusiCmd busiCmd = new JBusiCmd();
-				BeanUtils.copyProperties(cmd, busiCmd);
-				busiCmd.setCard_id(cardId);
-				
-				if(StringHelper.isEmpty(stbId)){
-					busiCmd.setStb_id("111111111111111111");
-				}else{
-					busiCmd.setStb_id(stbId);
-				}
-				
-				busiCmdList.add(busiCmd);
-				
-				JBusiCmd jBusiCmd = new JBusiCmd();
-				jBusiCmd.setCard_id(cardId);
-				list.add(jBusiCmd);
+			cmd.setCard_id(cardId);
+			RStb stb = rStbDao.findPairStbByCardDeviceId(device.getDevice_id());
+			if(stb!=null){
+				cmd.setStb_id(stb.getStb_id());
 			}else{
-				if(!deviceCaType.equals(cmdCaType)){
-					JBusiCmd jBusiCmd = new JBusiCmd();
-					jBusiCmd.setSupplier_id(cardId);
-					list.add(jBusiCmd);
-				}
-				
-				if(flag && !device.getCounty_id().equals(cmd.getCounty_id())){
-					JBusiCmd jBusiCmd = new JBusiCmd();
-					jBusiCmd.setCounty_id(cardId);
-					list.add(jBusiCmd);
-				}
+				cmd.setStb_id("111111111");
 			}
+			JBusiCmd copyCmd=new JBusiCmd();
+			BeanHelper.copyProperties(copyCmd, cmd);
+			authSingleDttByBusiCmd(copyCmd);
+			list.add(copyCmd);
 		}
 		
-		if(busiCmdList.size() > 0){
-			jBusiCmdDao.save(busiCmdList.toArray(new JBusiCmd[busiCmdList.size()]));
+		if(list.size() > 0){
 			//保存流水
 			CDoneCode cDoneCode = new CDoneCode();
 			cDoneCode.setDone_code(doneCode);

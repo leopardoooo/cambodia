@@ -272,7 +272,7 @@ import com.ycsoft.sysmanager.dto.prod.ProdDto;
 	}
 	
 	public String queryResByCountyId() throws Exception{
-		getRoot().setRecords(prodComponent.getStaticByServId(SystemConstants.USER_TYPE_OTT+","+SystemConstants.USER_TYPE_DTT,countyId));
+		getRoot().setRecords(prodComponent.getStaticByServId(SystemConstants.USER_TYPE_DTT,countyId));
 		return JSON_RECORDS;
 	} 
 	/**

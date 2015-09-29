@@ -259,6 +259,21 @@ public class CProdOrderDao extends BaseEntityDao<CProdOrder> {
 		
 		return this.createQuery(CProdOrderDto.class,sql, user_id).list();
 	}
+	
+	public List<CProdOrderDto> queryProdOrderDtoByUserIdList(String[] userIds) throws JDBCException{
+
+		String sql=StringHelper.append(
+				" select p.prod_name,p.prod_type,p.serv_id, p.is_base, cu.protocol_date, nvl(d.billing_cycle,ppt.billing_cycle) billing_cycle,ppt.billing_type,"
+				," case when cu.user_id is null then null when   cu.user_type in ('OTT_MOBILE','BAND') then cu.login_name else nvl(cu.stb_id,'INSTALL') end user_name ,nvl(d.disct_name,ppt.tariff_name) tariff_name,p.prod_name, o.* ",
+				" from c_prod_order o,p_prod p,p_prod_tariff ppt ,p_prod_tariff_disct d,c_user cu ",
+			    " where p.prod_id=o.prod_id and ppt.tariff_id=o.tariff_id and d.disct_id(+)=o.disct_id and cu.user_id(+)=o.user_id ",
+			    " and o.user_id in ("+sqlGenerator.in(userIds)+") ",
+			    " and trunc(o.exp_date)>=trunc(sysdate)",
+			    " order by o.exp_date "); 
+		
+		return this.createQuery(CProdOrderDto.class,sql).list();
+	}
+	
 	/**
 	 * 查询一个套餐的子产品详细信息
 	 * @param package_sn
