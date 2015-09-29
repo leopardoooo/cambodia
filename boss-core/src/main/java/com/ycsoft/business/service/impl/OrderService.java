@@ -462,7 +462,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 	 * @param 
 	 * @throws Exception 
 	 */
-	public void saveCancelProd(String[] orderSns,Integer cancelFee,Integer refundFee) throws Exception{
+	public void saveCancelProd(String[] orderSns,Integer cancelFee,Integer refundFee, String orderFeeType) throws Exception{
 		
 		String cust_id=this.getBusiParam().getCust().getCust_id();
 		doneCodeComponent.lockCust(cust_id);

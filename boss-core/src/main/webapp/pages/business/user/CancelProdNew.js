@@ -246,7 +246,8 @@ CancelProdNewForm = Ext.extend(BaseForm,{
 		var obj = {};
 		var realFee = Ext.util.Format.formatToFen(Ext.getCmp('reallFeeId').getValue());
 		obj['cancelFee'] = (this.cancelProdGrid.totalAcctNum + realFee)*-1;
-		if(Ext.getCmp('CancelFeeTypeId').getValue() == 'REFUND'){
+		obj['orderFeeType'] = Ext.getCmp('CancelFeeTypeId').getValue();
+		if(obj['orderFeeType'] == 'REFUND'){
 			obj['refundFee'] = realFee*-1;
 		}else{
 			obj['refundFee'] = 0;
