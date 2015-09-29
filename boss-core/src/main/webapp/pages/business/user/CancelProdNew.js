@@ -252,7 +252,6 @@ CancelProdNewForm = Ext.extend(BaseForm,{
 			obj['refundFee'] = 0;
 		}
 		obj['orderSns'] = this.cancelProdGrid.checkSm.orderSns;
-		alert(Ext.encode(obj));
 		return obj;
 	},
 	success: function(){
