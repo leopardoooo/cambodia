@@ -1366,6 +1366,9 @@ public class OrderComponent extends BaseBusiComponent {
 			if(orderFee.getOutput_fee()==null){
 				throw new ComponentException(ErrorCode.ParamIsNull);
 			}
+			if(orderFee.getOutput_fee()==0){
+				continue;
+			}
 			CProdOrderFeeOut out=new CProdOrderFeeOut();
 			out.setOrder_sn(orderFee.getOrder_sn());
 			out.setOrder_fee_sn(orderFee.getOrder_fee_sn());

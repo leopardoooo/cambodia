@@ -187,7 +187,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		if(StringHelper.isNotEmpty(this.getBusiParam().getRemark())){
 			order.setRemark(this.getBusiParam().getRemark());
 		}
-	    editOrder.setOrder_fee(order.getOrder_fee()+orderProd.getPay_fee()+orderProd.getTransfer_fee());
+	    editOrder.setOrder_fee(order.getOrder_fee()+orderProd.getPay_fee());
 		orderComponent.saveOrderEditChange(order, editOrder,done_code);
 		
 		//更新订单，返回有变化的订单信息,套餐会重新处理子产品
@@ -462,32 +462,45 @@ public class OrderService extends BaseBusiService implements IOrderService{
 	 * @param 
 	 * @throws Exception 
 	 */
-	public void saveCancelProd(String[] orderSns,Integer cancelFee,Integer refundFee, String orderFeeType) throws Exception{
+	public void saveCancelProd(String[] orderSns,Integer cancelFee,Integer refundFee, String acctBalanceType) throws Exception{
 		
 		String cust_id=this.getBusiParam().getCust().getCust_id();
 		doneCodeComponent.lockCust(cust_id);
-		
+		if(StringHelper.isEmpty(acctBalanceType)
+				||(!acctBalanceType.equals(SystemConstants.ACCT_BALANCE_REFUND)&&
+						!acctBalanceType.equals(SystemConstants.ACCT_BALANCE_TRANS))){
+			throw new ServicesException(ErrorCode.ParamIsNull);
+		}
 		//退订的费用明细
 		List<CProdOrderFee> orderFees=new ArrayList<>();
 		//参数检查，返回退订订单详细信息列表
-		List<CProdOrderDto> cancelList=checkCancelProdOrderParm(cust_id, orderSns, cancelFee,refundFee,orderFees);
+		List<CProdOrderDto> cancelList=checkCancelProdOrderParm(cust_id, orderSns, cancelFee,refundFee,orderFees,acctBalanceType);
 		
 		Integer done_code=doneCodeComponent.gDoneCode();
 		List<CProdOrderFeeOut> outList=orderComponent.getOrderFeeOutFromOrderFee(orderFees);
-		if(refundFee<0){
+		if(refundFee<0&&acctBalanceType.equals(SystemConstants.ACCT_BALANCE_REFUND)){
+			//现金部分退款
+
 			//记录未支付业务
 			doneCodeComponent.saveDoneCodeUnPay(cust_id, done_code, this.getOptr().getOptr_id());
 			//保存缴费信息
 			feeComponent.saveCancelFee(cancelList,outList, this.getBusiParam().getCust(), done_code, this.getBusiParam().getBusiCode());
 		}
+		if(acctBalanceType.equals(SystemConstants.ACCT_BALANCE_TRANS)){
+			//现金部分转账到公用
+			for(CProdOrderFeeOut orderFee:outList){
+				if(orderFee.getOutput_type().equals(SystemConstants.ORDER_FEE_TYPE_CFEE)){
+					orderFee.setOutput_type(SystemConstants.ORDER_FEE_TYPE_ACCT);
+				}
+			}
+		}
 		
-		if(cancelFee-refundFee!=0){
+		if(cancelFee-refundFee!=0||acctBalanceType.equals(SystemConstants.ACCT_BALANCE_TRANS)){
 			//余额转回公用账目
 			acctComponent.saveCancelFeeToAcct(outList, cust_id, done_code, this.getBusiParam().getBusiCode());
 		}
 		
 		//更新订单费用明细的转出信息
-		//cProdOrderFeeDao.update(orderFees.toArray(new CProdOrderFee[orderFees.size()]));
 		orderComponent.saveOrderFeeOut(outList, done_code);
 		
 		List<CProdOrder> cancelResultList=new ArrayList<>();
@@ -518,7 +531,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 	 * @throws Exception
 	 */
 	private List<CProdOrderDto> checkCancelProdOrderParm(String cust_id,String[] orderSns
-			,Integer cancel_fee,Integer refund_fee,List<CProdOrderFee> orderFees) throws Exception{
+			,Integer cancel_fee,Integer refund_fee,List<CProdOrderFee> orderFees,String acctBalanceType) throws Exception{
 		
 		if(StringHelper.isEmpty(cust_id)||cancel_fee==null||orderSns==null||orderSns.length==0){
 			throw new ServicesException(ErrorCode.ParamIsNull);
@@ -532,6 +545,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		int cfeeTotal=0;
 		//相关订单的未支付核对
 		Map<String,CProdOrderDto> unPayCheckMap=new HashMap<String,CProdOrderDto>();
+		int needRefundee=refund_fee*-1;//现金退款总额
 		for(String order_sn:orderSns){
 			CProdOrderDto order= cProdOrderDao.queryCProdOrderDtoByKey(order_sn);
 			if(order==null){
@@ -548,17 +562,32 @@ public class OrderService extends BaseBusiService implements IOrderService{
 				cancelFeeList=orderComponent.getOrderCacelFeeDetail(order,DateHelper.today());
 			}
 			
-			orderFees.addAll(cancelFeeList);
+			for(CProdOrderFee orderFee: cancelFeeList){
+				fee=fee+orderFee.getOutput_fee();//可退总额计算
+				if(orderFee.getOutput_type().equals(SystemConstants.ORDER_FEE_TYPE_CFEE)){
+					cfeeTotal=cfeeTotal+orderFee.getOutput_fee();//可退现金总额计算
+				}
+				//计算订单资金的可退现金部分要退多少钱
+				if(orderFee.getOutput_type().equals(SystemConstants.ORDER_FEE_TYPE_CFEE)){
+					if(needRefundee==0){
+						orderFee.setOutput_fee(0);
+					}
+					if(needRefundee>orderFee.getOutput_fee()){
+						needRefundee=needRefundee-orderFee.getOutput_fee();
+					}else{
+						orderFee.setOutput_fee(needRefundee);
+						needRefundee=0;
+					}
+				}
+			}
+			
+			//设置订单的实际现金退款和 强制转账金额
 			int outTotalFee=0;
 			int balanceCfee=0;
 			for(CProdOrderFee orderFee:cancelFeeList){
 				outTotalFee=outTotalFee+orderFee.getOutput_fee();
 				if(orderFee.getOutput_type().equals(SystemConstants.ORDER_FEE_TYPE_CFEE)){
-					if(refund_fee<0){
-						balanceCfee=balanceCfee+orderFee.getOutput_fee();
-					}else{
-						orderFee.setOutput_type(SystemConstants.ORDER_FEE_TYPE_ACCT);
-					}
+					balanceCfee=balanceCfee+orderFee.getOutput_fee();
 				}
 				//后面账户扣款异动要使用
 				orderFee.setRemark(order.getProd_name());
@@ -567,8 +596,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 			order.setBalance_cfee(balanceCfee);
 			order.setBalance_acct(outTotalFee-balanceCfee);
 			
-			fee=fee+order.getActive_fee();
-			cfeeTotal=cfeeTotal+order.getBalance_cfee();
+			orderFees.addAll(cancelFeeList);
 			
 			if(!order.getProd_type().equals(SystemConstants.PROD_TYPE_BASE)){
 				unPayCheckMap.put("PACKAGE", order);
@@ -586,6 +614,9 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		if(refund_fee*-1 > cfeeTotal){
 			throw new ServicesException(ErrorCode.FeeDateException);
 		}
+		if(needRefundee!=0){
+			throw new ServicesException(ErrorCode.FeeDateException);
+		}
 		//订单相关的所有订单的未支付判断,判断各类订单的相关所有订单的未支付状态
 		for(CProdOrderDto checkOrder: unPayCheckMap.values()){
 			for(CProdOrderDto unPayOrder: orderComponent.queryOrderByCancelOrder(checkOrder)){
@@ -593,20 +624,6 @@ public class OrderService extends BaseBusiService implements IOrderService{
 					throw new ServicesException(ErrorCode.NotCancleHasUnPay);
 				}
 			}
-		}
-		int tem_refund_fee=refund_fee*-1 ;
-		for(CProdOrderDto order:cancelList){
-			if(tem_refund_fee==0){
-				order.setBalance_cfee(0);
-			}
-			int kf=0;
-			if(tem_refund_fee>order.getBalance_cfee()){
-				kf=order.getBalance_cfee();
-			}else{
-				kf=tem_refund_fee;
-				order.setBalance_cfee(kf);
-			}
-			tem_refund_fee=tem_refund_fee-kf;
 		}
 		return cancelList;
 	}
