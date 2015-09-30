@@ -90,6 +90,7 @@ var TransferGrid = Ext.extend(Ext.grid.GridPanel,{
 				if(record.get('device_type') == 'STB' || record.get('device_type') == 'CARD' && record.get('device_type') == 'MODEM'){
 					result += "&nbsp;&nbsp;<a href='#' title='"+COMMON_LU.downLoadDetail+"' onclick=Ext.getCmp('transferGridId').downloadExcel("+value+")>"+COMMON_LU.downLoad+"</a>";
 				}
+				result += "&nbsp;&nbsp;<a href='#' title='打印' onclick=Ext.getCmp('transferGridId').print("+value+")>打印</a>";
 				return result;
 			}}
 		];
@@ -297,6 +298,26 @@ var TransferGrid = Ext.extend(Ext.grid.GridPanel,{
 			materalWin = new TransferMateralWin();
 		}
 		materalWin.show();
+	},
+	print: function(deviceDoneCode){
+		if(!PrintTools.isIE){
+			Confirm('确定打印吗?',this,function(){
+				Ext.Ajax.request({
+					url:root+'/resource/Device!queryTransferdevicePrintInfo.action',
+					params:{deviceDoneCode:deviceDoneCode},
+					scope:this,
+					success:function(res){
+						var data = Ext.decode(res.responseText);
+						if(data){
+							var content = PrintTools.getContent( data["content"] , data['data'] );
+							PrintTools.noiePrint(content);
+						}
+					}
+				});
+			});
+		}else{
+			Alert('请使用谷歌chrome浏览器打印!');
+		}
 	}
 });
 
