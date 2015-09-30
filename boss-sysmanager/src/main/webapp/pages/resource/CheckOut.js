@@ -68,7 +68,7 @@ var TransferGrid = Ext.extend(Ext.grid.GridPanel,{
 			{header:DEV_COMMON_LU.labelDeviceModel,dataIndex:'device_model_text',width:130,renderer:App.qtipValue},
 			{header:DEV_COMMON_LU.labelNum,dataIndex:'count',width:40},
 			{id:'checkout_remark_id',header:lsys('common.remarkTxt'),dataIndex:'remark',renderer:App.qtipValue},
-			{header:COMMON_LU.doActionBtn,dataIndex:'device_done_code',width:200,renderer:function(value,meta,record){
+			{header:COMMON_LU.doActionBtn,dataIndex:'device_done_code',width:240,renderer:function(value,meta,record){
 				var result = "";
 				if(currentOptrId == record.get('optr_id')){
 					result = "<a href='#' title='"+ DEV_COMMON_LU.titleModifyOrderNum + "' onclick=Ext.getCmp('transferGridId').editTransferNo("+value+")>" + DEV_COMMON_LU.titleModifyOrderNum + "</a>";
@@ -111,6 +111,13 @@ var TransferGrid = Ext.extend(Ext.grid.GridPanel,{
 			}
 			win.show(deviceDoneCode);
 		}
+		
+		var twoTbar = new Ext.Toolbar({
+			items : [{text:CHE_OUT_LU.labelFileTrans,iconCls:'icon-excel',scope:this,handler:this.fileTransfer,tooltip:MSG_LU.tipDevCheckFileFormat},'-',
+				{text:CHE_OUT_LU.labelManualTrans,iconCls:'icon-hand',scope:this,handler:this.handTransfer},'-',
+				{text:CHE_OUT_LU.labelBatchNumTrans,iconCls:'icon-batch-number',scope:this,handler:this.batchNumTransfer},
+				{text:CHE_OUT_LU.labelMateralTrans,iconCls:'icon-hand',scope:this,handler:this.materalTransfer}]
+		});
 		TransferGrid.superclass.constructor.call(this,{
 			id:'transferGridId',
 			title:DEV_COMMON_LU.titleTransInfo,
@@ -178,20 +185,20 @@ var TransferGrid = Ext.extend(Ext.grid.GridPanel,{
 	            			}
 	            		}
 	            	}},'-',
-	            {xtype:'button',text:COMMON_LU.query,iconCls:'icon-query',scope:this,handler:this.doDateQuery},'-',
-				{text:CHE_OUT_LU.labelFileTrans,iconCls:'icon-excel',scope:this,handler:this.fileTransfer,tooltip:MSG_LU.tipDevCheckFileFormat},'-',
-				{text:CHE_OUT_LU.labelManualTrans,iconCls:'icon-hand',scope:this,handler:this.handTransfer},'-',
-				{text:CHE_OUT_LU.labelBatchNumTrans,iconCls:'icon-batch-number',scope:this,handler:this.batchNumTransfer},
-				{text:CHE_OUT_LU.labelMateralTrans,iconCls:'icon-hand',scope:this,handler:this.materalTransfer}
+	            {xtype:'button',text:COMMON_LU.query,iconCls:'icon-query',scope:this,handler:this.doDateQuery},'-'
+				
 				
 			],
 			bbar : new Ext.PagingToolbar({
-										store : this.transferGridStore,
-										pageSize : Constant.DEFAULT_PAGE_SIZE
-									})
+						store : this.transferGridStore,
+						pageSize : Constant.DEFAULT_PAGE_SIZE
+					})
 			,listeners:{
 				scope:this,
-				rowdblclick:this.doDblclick
+				rowdblclick:this.doDblclick,
+				'render' : function() {
+					twoTbar.render(this.tbar);
+				}
 			}
 		});
 	},
@@ -327,7 +334,6 @@ var TransferGrid = Ext.extend(Ext.grid.GridPanel,{
  * @extends Ext.form.FormPanel
  */
 var TransferFileForm = Ext.extend(Ext.form.FormPanel,{
-	modelData:null,
 	constructor:function(){
 		TransferFileForm.superclass.constructor.call(this,{
 			id:'transferFileFormId',
@@ -340,36 +346,14 @@ var TransferFileForm = Ext.extend(Ext.form.FormPanel,{
 			items:[
 				transferNo,
 				{fieldLabel:DEV_COMMON_LU.labelDeviceType,xtype:'paramcombo',typeAhead:false,paramName:'DEVICE_TYPE',
-					hiddenName:'deviceType',allowBlank:false,defaultValue:'STB',id:'deviceTypeItemId'
-					,listeners:{
-						scope:this,
-						select:function(combo){
-							Ext.getCmp('ctlDeviceModel').reset();
-						}
-					}
-				},{
-					fieldLabel : '设备型号',
-					allowBlank : false,
-					id : 'ctlDeviceModel',
-					xtype:'combo',
-					width:250,
-					name:'device_model',
-					emptyText: langUtils.bc("common.plsSwitch"),
-					store: new Ext.data.JsonStore({
-						fields : ['device_model', 'model_name', 'device_type']
-					}),
-					model: 'local',
-					displayField: 'model_name',
-					valueField: 'device_model',
-					listWidth: 250
-					,listeners:{
-						scope:this,
-						expand:function(combo){
-							combo.getStore().loadData(this.modelData[Ext.get('deviceTypeItemId').getValue()]);
-						}
-					}
+					hiddenName:'deviceType',allowBlank:false,defaultValue:'STB',id:'deviceTypeItemId'					
 				},
 				depot,statusCmp,
+				{
+	                xtype: 'displayfield',
+	                width : 400,
+	                value:"<font style='font-size:14px;color:red'>支持xls和txt,格式为：第一行为空,共1列：设备号</font>"
+				},
 				{id:'checkOutFileId',fieldLabel:DEV_COMMON_LU.labelDevFile,name:'files',xtype:'textfield',inputType:'file',allowBlank:false,anchor:'95%'},
 				outRemark
 				]
@@ -377,20 +361,11 @@ var TransferFileForm = Ext.extend(Ext.form.FormPanel,{
 	},
 	initComponent:function(){
 		TransferFileForm.superclass.initComponent.call(this);
-		Ext.Ajax.request({
-			url:'resource/Device!queryDeviceStbModem.action',
-			scope:this,
-			success: function(res, ops){
-				var rs = Ext.decode(res.responseText);
-				this.modelData = rs;
-			}
-		});
-		
 		App.form.initComboData( this.findByType("paramcombo"));
 		var comboes = this.findByType('combo');
 		if(comboes.length>0)
 			for(var i=0;i<comboes.length;i++){
-				if(comboes[i].hiddenName !='deviceTransfer.transfer_status' && comboes[i].name !='device_model'){
+				if(comboes[i].hiddenName !='deviceTransfer.transfer_status'){
 					if(!(comboes[i] instanceof Ext.ux.ParamCombo))
 						comboes[i].getStore().load();
 				}
@@ -412,8 +387,8 @@ var TransferFileWin = Ext.extend(Ext.Window,{
 			title:CHE_OUT_LU.labelFileTrans,
 			closeAction:'hide',
 			maximizable:false,
-			width: 450,
-			height: 300,
+			width: 500,
+			height: 340,
 			layout: 'fit',
 			border: false,
 			items:[this.transferFileForm],
@@ -436,16 +411,20 @@ var TransferFileWin = Ext.extend(Ext.Window,{
 		if(this.transferFileForm.getForm().isValid()){
 			
 			var file = Ext.getCmp('checkOutFileId').getValue();
-			var flag = checkFileType(file);
-			if(!flag)return;
+			var flag = checkTxtXlsFileType(file);
+			if(flag === false)return;
+//			var flag = checkFileType(file);
+//			if(!flag)return;
 			
 			var values = this.transferFileForm.getForm().getValues();
+			var msg = Show();
 			this.transferFileForm.getForm().submit({
-				url:'resource/Device!saveTransferFile.action',
-				waitTitle:COMMON_LU.tipTxt,
-				waitMsg:COMMON_LU.waitForUpload,
+				url:'resource/Device!saveTransferFile.action?fileType='+flag,
+//				waitTitle:COMMON_LU.tipTxt,
+//				waitMsg:COMMON_LU.waitForUpload,
 				scope:this,
 				success:function(form,action){
+					msg.hide();
 					var data = action.result;
 					if(data.success == true){
 						if(data.msg){//错误信息
@@ -476,14 +455,24 @@ var TransferHandForm = Ext.extend(Ext.form.FormPanel,{
 		TransferHandForm.superclass.constructor.call(this,{
 			id:'transferHandFormId',
 			region:'south',
-			height:140,
+			height:100,
 			labelWidth: 80,
-			fileUpload: true,
 			bodyStyle:'padding-top:10px',	
-			defaults : {
-				baseCls : 'x-plain'
+			layout:'column',
+			anchor: '100%',
+			defaults:{
+				baseCls: 'x-plain',
+				columnWidth:0.5,
+				layout: 'form',
+				labelWidth: 75
 			},
-			items:[transferNo,depot,statusCmp,outRemark]
+			items:[{
+				columnWidth:0.4,
+				items:[transferNo,depot]
+			},{
+				columnWidth:0.6,
+				items:[statusCmp,outRemark]
+			}]
 		});
 	},
 	initComponent:function(){
@@ -652,14 +641,14 @@ ReTransferHandWin = Ext.extend(Ext.Window,{
 		
 		this.transferInfoTemplate = '<table width="100%" border="0" cellpadding="0" cellspacing="0">' +
 			'<tr height=24>'+
-				'<td class="label" width=20%>' +
+				'<td class="label" width=25%>' +
 				CHE_OUT_LU.labelOldTransStbNum +
 				':</td>' +
-				'<td class="input_bold" width=30%>&nbsp;{[values.old.STB || 0]}</td>'+
-				'<td class="label" width=20%>' +
+				'<td class="input_bold" width=25%>&nbsp;{[values.old.STB || 0]}</td>'+
+				'<td class="label" width=25%>' +
 				CHE_OUT_LU.labelNewTransStbNum +
 				':</td>' +
-				'<td class="input_bold" width=30%>&nbsp;{[values.now.STB || 0]}</td>'+
+				'<td class="input_bold" width=25%>&nbsp;{[values.now.STB || 0]}</td>'+
 			'</tr>'+
 			'<tr height=24>'+
 			'<td class="label">' +
@@ -728,7 +717,7 @@ ReTransferHandWin = Ext.extend(Ext.Window,{
 				msg = null;
 				var data = Ext.decode(res.responseText);
 				if(!data || !data.now || 
-						(data.now.STB ==0 && data.now.CARD ==0 && data.now.MODEM ==0) ){
+						(!data.now.STB && !data.now.CARD && !data.now.MODEM) ){
 					Alert(MSG_LU.notSuitableDev4Trans);
 					return;
 				}
@@ -773,15 +762,26 @@ var TransferBatchForm = Ext.extend(Ext.form.FormPanel,{
 	constructor:function(){
 		TransferBatchForm.superclass.constructor.call(this,{
 			id:'transferBatchNumFormId',
-			region:'north',
-			height:140,
+			region:'south',
+			height:100,
 			labelWidth: 80,
 			fileUpload: true,
-			bodyStyle:'padding-top:10px',		
-			defaults : {
-				baseCls : 'x-plain'
+			bodyStyle:'padding-top:10px',
+			layout:'column',
+			anchor: '100%',
+			defaults:{
+				baseCls: 'x-plain',
+				columnWidth:0.5,
+				layout: 'form',
+				labelWidth: 75
 			},
-			items:[transferNo,depot,statusCmp,outRemark]
+			items:[{
+				columnWidth:0.4,
+				items:[transferNo,depot]
+			},{
+				columnWidth:0.6,
+				items:[statusCmp,outRemark]
+			}]
 		});
 	},
 	initComponent:function(){
@@ -826,18 +826,18 @@ BatchNumTransferDeviceGrid = Ext.extend(Ext.grid.GridPanel,{
 		var sm = new Ext.grid.CheckboxSelectionModel();
 		var columns = [new Ext.grid.RowNumberer(), sm,
    			{header:DEV_COMMON_LU.labelDevCode2,dataIndex:'device_code',width:150},//,editor:deviceCodeComp
-   			{header:DEV_COMMON_LU.labelDeviceType,dataIndex:'device_type_text',width:70},
-   			{header:DEV_COMMON_LU.labelDeviceModel,dataIndex:'device_model_text',width:90},
-   			{header:'modem_mac',dataIndex:'modem_mac',width:75,hidden:true},
-   			{header:DEV_COMMON_LU.labelPairCardType,dataIndex:'pair_device_model_text',width:90},
-   			{header:DEV_COMMON_LU.labelPairCardCode,dataIndex:'pair_device_code',width:120},
-   			{header:DEV_COMMON_LU.labelPairModemType,dataIndex:'pair_device_modem_model_text',width:90},
-   			{header:DEV_COMMON_LU.labelPairModemCode,dataIndex:'pair_device_modem_code',width:120}
+   			{header:DEV_COMMON_LU.labelDeviceType,dataIndex:'device_type_text',width:90},
+   			{header:DEV_COMMON_LU.labelDeviceModel,dataIndex:'device_model_text',width:200},
+   			{header:'卡号或MAC',dataIndex:'pair_device_code',width:150}
+//   			{header:'modem_mac',dataIndex:'modem_mac',width:75,hidden:true},
+//   			{header:DEV_COMMON_LU.labelPairCardType,dataIndex:'pair_device_model_text',width:90},
+//   			{header:DEV_COMMON_LU.labelPairModemType,dataIndex:'pair_device_modem_model_text',width:90},
+//   			{header:DEV_COMMON_LU.labelPairModemCode,dataIndex:'pair_device_modem_code',width:120}
    		];
 		
 		BatchNumTransferDeviceGrid.superclass.constructor.call(this, {
 			region: 'center',
-			title:DEV_COMMON_LU.titleDeviceInfo,
+//			title:DEV_COMMON_LU.titleDeviceInfo,
 			store: this.queryDeviceGridStore,
 			columns: columns,
 			maskDisabled: true,
@@ -959,9 +959,9 @@ var MateralTransferDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 		});	
 		
 		var cm = new Ext.grid.ColumnModel([
-				{id:'device_model_text_id',header:DEV_COMMON_LU.labelDeviceModel,dataIndex:'device_model_text',width:240
+				{id:'device_model_text_id',header:DEV_COMMON_LU.labelDeviceModel,dataIndex:'device_model_text',width:300
 				},
-				{header:DEV_COMMON_LU.labelTotalStoreNum,dataIndex:'total_num',width:70,renderer:App.qtipValue},
+				{header:DEV_COMMON_LU.labelTotalStoreNum,dataIndex:'total_num',width:100,renderer:App.qtipValue},
 				{id:'num_id',header:DEV_COMMON_LU.labelNum,dataIndex:'num',width:100,
 					scope:this
 					,editor: new Ext.form.NumberField({
@@ -1064,7 +1064,7 @@ TransferMateralWin = Ext.extend(Ext.Window,{
 			title:CHE_OUT_LU.labelMateralTrans,
 			closeAction:'hide',
 			maximizable:false,
-			width: 600,
+			width: 650,
 			height: 500,
 			border: false,
 			layout:'border',

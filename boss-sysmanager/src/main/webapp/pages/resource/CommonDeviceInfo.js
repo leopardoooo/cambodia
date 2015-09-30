@@ -63,12 +63,12 @@ var QueryDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 		
 		var columns = [
 			{header:DEV_COMMON_LU.labelDevCode2,dataIndex:'device_code',width:150},//,editor:deviceCodeComp
-			{header:DEV_COMMON_LU.labelDeviceType,dataIndex:'device_type_text',width:70},
-			{header:DEV_COMMON_LU.labelDeviceModel,dataIndex:'device_model_text',width:90},
-			{header:'modem_mac',dataIndex:'modem_mac',width:75,hidden:true},
-			{header:DEV_COMMON_LU.labelPairCardType,dataIndex:'pair_device_model_text',width:90},
-			{header:DEV_COMMON_LU.labelPairCardCode,dataIndex:'pair_device_code',width:120},
-			{header:DEV_COMMON_LU.labelPairModemCode,dataIndex:'pair_device_modem_code',width:120},
+			{header:DEV_COMMON_LU.labelDeviceType,dataIndex:'device_type_text',width:80},
+			{header:DEV_COMMON_LU.labelDeviceModel,dataIndex:'device_model_text',width:200},
+//			{header:'modem_mac',dataIndex:'modem_mac',width:75,hidden:true},
+//			{header:DEV_COMMON_LU.labelPairCardType,dataIndex:'pair_device_model_text',width:90},
+			{header:'卡号或MAC',dataIndex:'pair_device_code',width:120},
+//			{header:DEV_COMMON_LU.labelPairModemCode,dataIndex:'pair_device_modem_code',width:120},
 			{header:COMMON_LU.doActionBtn,dataIndex:'',width:40,renderer:function(value,metavalue,record,i){
 				return "<a href='#' onclick=doDel()>" + COMMON_LU.remove + "</a>";
 			}}
@@ -180,6 +180,18 @@ var checkTxtFileType = function(fileText){
 	}
 	return true;
 }
+
+var checkTxtXlsFileType = function(fileText){
+	if(fileText.lastIndexOf('txt') >0 || fileText.lastIndexOf('.txt')==fileText.length-4){
+		return 'TXT';
+	}
+	if(fileText.lastIndexOf('xlsx') == -1 &&(fileText.lastIndexOf('xls') >0 ||fileText.lastIndexOf('.xls') ==fileText.length-4)){
+		return 'XLS';
+	}
+	Alert("请选择txt,xls文件进行上传,文件后缀名为.txt,.xls!");
+	return false;
+}
+
 
 /**
  * 清空上传文件内容
