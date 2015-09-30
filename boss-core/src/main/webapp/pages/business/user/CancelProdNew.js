@@ -154,7 +154,7 @@ CancelProdNewForm = Ext.extend(BaseForm,{
          				items:[{
 								fieldLabel : lbc("common.busiWay"),
 								id : 'CancelFeeTypeId',
-								name:'order_fee_type',
+								name:'acct_balance_type',
 								allowBlank : false,
 								xtype:'paramcombo',
 								width: 80,
@@ -246,12 +246,8 @@ CancelProdNewForm = Ext.extend(BaseForm,{
 		var obj = {};
 		var realFee = Ext.util.Format.formatToFen(Ext.getCmp('reallFeeId').getValue());
 		obj['cancelFee'] = (this.cancelProdGrid.totalAcctNum + realFee)*-1;
-		obj['orderFeeType'] = Ext.getCmp('CancelFeeTypeId').getValue();
-		if(obj['orderFeeType'] == 'REFUND'){
-			obj['refundFee'] = realFee*-1;
-		}else{
-			obj['refundFee'] = 0;
-		}
+		obj['acctBalanceType'] = Ext.getCmp('CancelFeeTypeId').getValue();		
+		obj['refundFee'] = realFee*-1;	
 		obj['orderSns'] = this.cancelProdGrid.checkSm.orderSns;
 		return obj;
 	},

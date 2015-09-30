@@ -126,8 +126,8 @@ public class ProdOrderAction extends BaseBusiAction {
 	 * @throws Exception 
 	 */
 	public String cancelProd() throws Exception{
-		String orderFeeType = request.getParameter("orderFeeType");
-		orderService.saveCancelProd(orderSns, cancelFee,refundFee,orderFeeType);
+		String acctBalanceType = request.getParameter("acctBalanceType");
+		orderService.saveCancelProd(orderSns, cancelFee,refundFee,acctBalanceType);
 		return JSON_SUCCESS;
 	}
 	/**

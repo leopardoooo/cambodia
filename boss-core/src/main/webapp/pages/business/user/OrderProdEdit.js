@@ -45,7 +45,6 @@ OrderProdEditForm = Ext.extend(BaseForm, {
 				allowDecimals: false,
 				allowBlank: false,
 				minValue: 0.01,
-				value: 1,
 				listeners: {
 					scope: this,
 					change: this.doChangeOrderMonth
@@ -113,6 +112,7 @@ OrderProdEditForm = Ext.extend(BaseForm, {
 				
 				Ext.getCmp('cmProdId').getStore().loadData(prodList);
 				Ext.getCmp('cmProdId').setValue(data['prod_id']);
+				Ext.getCmp('nfMonthId').setValue(data['order_months']);
 				this.doSelectedProd();
 			}
 		});

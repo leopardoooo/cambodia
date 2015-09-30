@@ -26,7 +26,7 @@ public interface IOrderService extends IBaseService{
 	//public String saveOrderProd(OrderProd orderProd,String busi_code) throws Exception;
 	
 	
-	public void saveCancelProd(String[] orderSns,Integer cancelFee,Integer refundFee, String orderFeeType)throws Exception;;
+	public void saveCancelProd(String[] orderSns,Integer cancelFee,Integer refundFee, String acctBalanceType)throws Exception;;
 	
 	public List<CProdOrderDto> queryCancelFeeByCancelOrder(String busi_code,String cust_id,String order_sn)throws Exception;
 
