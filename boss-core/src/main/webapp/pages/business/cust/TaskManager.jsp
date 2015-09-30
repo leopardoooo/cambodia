@@ -22,16 +22,18 @@
 		}, 200);
 		
 		var resources = App.getData().resources;
-		/* for(var i=0,len=resources.length;i<len;i++){
+	 	for(var i=0,len=resources.length;i<len;i++){
 			var res = resources[i];
-			if(res['handler'] == 'ivalid_btn_id'){
-				Ext.getCmp('ivalid_btn_id').enable();
-			}else if(res['handler'] == 'send_btn_id'){
-				Ext.getCmp('send_btn_id').enable();
-			}else if(res['handler'] == 'add_btn_id'){
-				Ext.getCmp('add_btn_id').enable();
+			if(res['handler'] == 'removeTaskBtnId'){//作废
+				Ext.getCmp('removeTaskBtnId').enable();
+			}else if(res['handler'] == 'device_btn_id'){//回填
+				Ext.getCmp('device_btn_id').enable();
+			}else if(res['handler'] == 'end_btn_id'){//完工
+				Ext.getCmp('end_btn_id').enable();
+			}else if(res['handler'] == 'team_btn_id'){//施工队
+				Ext.getCmp('team_btn_id').enable();
 			}
-		} */
+		} 
 	});
   </script>
 </html>

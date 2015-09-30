@@ -54,13 +54,13 @@ public class RDeviceInputDao extends BaseEntityDao<RDeviceInput> {
 	 */
 	public Pager<RDeviceInput> queryByDepotId(String depotId, String query,
 			Integer start, Integer limit) throws JDBCException {
-		String sql = "SELECT s.supplier_name,o.order_no,t.*,d.device_type,d.device_model,d.count" +
-				" FROM r_device_input t ,r_device_supplier s,r_device_done_detail d," +
-				" r_device_order o WHERE t.supplier_id=s.supplier_id(+)" +
-				" and t.order_done_code=o.device_done_code(+) and t.device_done_code=d.device_done_code(+)" +
+		String sql = "SELECT s.supplier_name,t.*,d.device_type,d.device_model,d.count" +
+				" FROM r_device_input t ,r_device_supplier s,r_device_done_detail d" +
+				"  WHERE t.supplier_id=s.supplier_id(+)" +
+				" and  t.device_done_code=d.device_done_code(+)" +
 				" and t.depot_id=?";
 		if(StringHelper.isNotEmpty(query)){
-			sql += " and (t.input_no like '%"+query+"%' or o.order_no like '%"+query+"%')";
+			sql += " and (t.input_no like '%"+query+"%' or t.batch_num like '%"+query+"%' or d.device_type like '%"+query.toUpperCase()+"%')";
 		}
 		sql += " order by t.create_time desc";
 		return createQuery(sql, depotId).setStart(start).setLimit(limit).page();

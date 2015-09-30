@@ -117,7 +117,7 @@ public class CustAction extends BaseBusiAction{
 		}
 		try{
 			if(file != null){
-				addrList.remove(0);
+//				addrList.remove(0);
 				if(addrList.size() != custNum)
 					throw new Exception("文件中地址数量必须等于开户数量!");
 				if(addrList.size() > 2000)

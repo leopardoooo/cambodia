@@ -92,6 +92,55 @@ DeviceCodeField = Ext.extend(Ext.form.TextField,{
 	}
 });
 
+var CheckInDetailWin = Ext.extend(Ext.Window,{
+	dsStore:null,
+	constructor:function(){
+		this.dsStore = new Ext.data.JsonStore({
+			url:'resource/Device!queryInputDeviceDetail.action',
+			totalProperty:'totalProperty',
+			root:'records',
+			fields:['device_model_text','device_code','pair_device_code','box_no']
+		});
+		var columns = [
+			{header:'箱号',dataIndex:'box_no',width:120,renderer:App.qtipValue},
+			{header:DEV_COMMON_LU.labelDevCode,dataIndex:'device_code',width:150,renderer:App.qtipValue},
+			{header:DEV_COMMON_LU.labelDeviceModel,dataIndex:'device_model_text',width:200,renderer:App.qtipValue},
+			{header:'卡或MAC',dataIndex:'pair_device_code',width:120,renderer:App.qtipValue}
+
+		];
+		this.grid = new Ext.grid.GridPanel({
+			border:false,
+			store:this.dsStore,
+			columns:columns,
+			bbar:new Ext.PagingToolbar({store:this.dsStore,pageSize:Constant.DEFAULT_PAGE_SIZE})
+		});
+		CheckInDetailWin.superclass.constructor.call(this,{
+			id:'CheckInDetailInfoWinId',
+			title:COMMON_LU.detailInfo,
+			closeAction:'close',
+			maximizable:false,
+			width:850,
+			height:400,
+			layout:'fit',
+			items:[this.grid],
+			buttons:[{text:COMMON_LU.cancel,iconCls:'icon-close',scope:this,handler:function(){
+					this.close();
+				}
+			}]
+		});
+	},
+	show:function(deviceDoneCode){
+		this.dsStore.removeAll();
+		this.dsStore.baseParams={
+			deviceDoneCode:deviceDoneCode
+		};
+		this.dsStore.load({
+			params:{start:0,limit:Constant.DEFAULT_PAGE_SIZE}
+		});
+		CheckInDetailWin.superclass.show.call(this);
+	}
+});
+
 /**
  * 入库信息
  * @class
@@ -104,7 +153,7 @@ var CheckInGrid = Ext.extend(Ext.grid.GridPanel,{
 			url:'resource/Device!queryDeviceInput.action',
 			totalProperty:'totalProperty',
 			root:'records',
-			fields:['device_done_code','input_no','depot_id','order_done_code','order_no','batch_num',
+			fields:['device_done_code','input_no','depot_id','batch_num',
 				'supplier_id','backup','ownership','create_time','optr_id',
 				'remark','supplier_name','depot_name','optr_name','ownership_text',
 				'device_type','device_model','count','device_model_text','device_type_text']
@@ -115,14 +164,13 @@ var CheckInGrid = Ext.extend(Ext.grid.GridPanel,{
 		var columns = [
 			{header:CHECK_LU.labelInputNo,dataIndex:'input_no',width:80,renderer:App.qtipValue},
 			{header:'批号',dataIndex:'batch_num',width:80,renderer:App.qtipValue},
-			{header:CHECK_LU.labelInputNo,dataIndex:'batch_num',width:80,renderer:App.qtipValue},
 			{header:CHECK_COMMON.labelSupplier,dataIndex:'supplier_name',width:85},
 			{header:CHECK_COMMON.labelInputDate,dataIndex:'create_time',width:135},
 			{header:lsys('DeviceCommon.labelDeviceType'),dataIndex:'device_type_text',width:80},
-			{header:lsys('DeviceCommon.labelDeviceModel'),dataIndex:'device_model_text',width:150,renderer:App.qtipValue},
+			{header:lsys('DeviceCommon.labelDeviceModel'),dataIndex:'device_model_text',width:200,renderer:App.qtipValue},
 			{header:lsys('DeviceCommon.labelNum'),dataIndex:'count',width:50},
 			{id:'checkIn_remark_id',header:lsys('common.remarkTxt'),dataIndex:'remark',renderer:App.qtipValue},
-			{header:lsys('common.doActionBtn'),dataIndex:'device_done_code',renderer:function(v,meta,record){
+			{header:lsys('common.doActionBtn'),dataIndex:'device_done_code',width:80,renderer:function(v,meta,record){
 					if(currentOptrId == record.get('optr_id')){
 						return "<a href='#' onclick=Ext.getCmp('checkInGridId').editInputNo("+v+")>修改单号</a>";
 					}
@@ -151,7 +199,7 @@ var CheckInGrid = Ext.extend(Ext.grid.GridPanel,{
 	                store: this.checkInGridStore,
 	                width: 210,
 	                hasSearch : true,
-	                emptyText: lsys('msgBox.supportDevCodeOrderNoFuzzyQuery')
+	                emptyText: '入库单号,批号,设备类型模糊查询'
 	            }),'-','->','-',
 				{text:CHECK_LU.labelFileInput,iconCls:'icon-excel',scope:this,handler:this.fileCheckIn,tooltip:lsys('msgBox.tipCheckInFileInput')},'-',
 				{text:CHECK_LU.labelManualInput,iconCls:'icon-hand',scope:this,handler:this.handCheckIn},
@@ -162,6 +210,19 @@ var CheckInGrid = Ext.extend(Ext.grid.GridPanel,{
 										pageSize : Constant.DEFAULT_PAGE_SIZE
 									})
 		});
+	},
+	initEvents:function(){
+		CheckInGrid.superclass.initEvents.call(this);
+		this.on("rowdblclick",this.doRecordClick,this);
+	},
+	doRecordClick:function(){
+		var record = this.getSelectionModel().getSelected();
+		var deviceDoneCode = record.get('device_done_code');
+		var win = Ext.getCmp('CheckInDetailInfoWinId');
+		if(!win){
+			win = new CheckInDetailWin();
+		}
+		win.show(deviceDoneCode);
 	},
 	fileCheckIn:function(){
 		var fileWin = Ext.getCmp('fileCheckInWinId');
@@ -826,9 +887,6 @@ var MateralCheckInWin = Ext.extend(Ext.Window,{
 	},
 	show:function(){
 		MateralCheckInWin.superclass.show.call(this);
-		//订单管理模块中随时会添加订单，故show window时查询订单
-//		var store = this.handForm.getForm().findField('deviceInput.order_done_code').getStore();
-//		this.parent.loadOrderInfo(store,false);
 		this.handForm.getForm().findField('deviceInput.input_no').focus(true,500);
 	},
 	doSave:function(){
