@@ -1,5 +1,6 @@
 package com.ycsoft.sysmanager.component.resource;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -16,7 +17,6 @@ import com.ycsoft.beans.core.common.CDoneCode;
 import com.ycsoft.beans.core.common.CDoneCodeDetail;
 import com.ycsoft.beans.core.cust.CCust;
 import com.ycsoft.beans.core.cust.CCustDevice;
-import com.ycsoft.beans.core.job.JBusiCmd;
 import com.ycsoft.beans.core.user.CUser;
 import com.ycsoft.beans.depot.RDepotDefine;
 import com.ycsoft.beans.device.RCard;
@@ -76,17 +76,16 @@ import com.ycsoft.business.dao.system.SCountyDao;
 import com.ycsoft.business.dao.system.SDeptDao;
 import com.ycsoft.business.dto.core.cust.CustFullInfoDto;
 import com.ycsoft.business.service.externalImpl.ICustServiceExternal;
-import com.ycsoft.commons.constants.BusiCmdConstants;
 import com.ycsoft.commons.constants.BusiCodeConstants;
 import com.ycsoft.commons.constants.DataRight;
 import com.ycsoft.commons.constants.DataRightLevel;
-import com.ycsoft.commons.constants.SequenceConstants;
 import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.exception.ComponentException;
 import com.ycsoft.commons.exception.ErrorCode;
 import com.ycsoft.commons.helper.CollectionHelper;
 import com.ycsoft.commons.helper.DateHelper;
+import com.ycsoft.commons.helper.FileHelper;
 import com.ycsoft.commons.helper.LoggerHelper;
 import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.daos.core.JDBCException;
@@ -867,12 +866,7 @@ public class DeviceComponent extends BaseDeviceComponent {
 			d.setBatch_num(batchNum);
 			devices.add(d);
 		}
-		String[] deviceCodes = null;
-		if(deviceType.equals(SystemConstants.DEVICE_TYPE_MODEM)){
-			deviceCodes = CollectionHelper.converValueToArray(devices, "modem_mac");
-		}else{
-			deviceCodes = CollectionHelper.converValueToArray(devices, "device_code");
-		}
+		String[] deviceCodes =  CollectionHelper.converValueToArray(devices, "device_code");
 		if(deviceCodes.length==0){
 			throw new ComponentException("文件中设备编号都是空的!");
 		}
@@ -889,7 +883,7 @@ public class DeviceComponent extends BaseDeviceComponent {
 			str = StringHelper.delEndChar( str ,  1 );
 			throw new ComponentException("库里已存在的设备共:"+deviceList.size()+"个,明细:"+str+",...");
 		}
-		saveDeviceInput(optr, input, devices,SystemConstants.DEVICE_CFG_TYPE_FILE);
+		saveDeviceInput(optr, input, devices);
 	}
 
 	
@@ -903,7 +897,7 @@ public class DeviceComponent extends BaseDeviceComponent {
 	 * @throws Exception
 	 */
 	public void saveDeviceInput(SOptr optr, RDeviceInput input,
-			List<DeviceDto> devices,String deviceType) throws Exception ,ComponentException{
+			List<DeviceDto> devices) throws Exception ,ComponentException{
 		if(devices.size()==0){
 			throw new ComponentException("无可入库的设备");
 		}
@@ -912,27 +906,10 @@ public class DeviceComponent extends BaseDeviceComponent {
 		//验证设备是否重复
 		checkDeviceIsNull(CollectionHelper.converValueToArray(devices, "device_code"),"设备号");
 		//验证卡是否重复
-		checkDeviceIsNull(CollectionHelper.converValueToArray(devices, "pair_device_code"),"智能卡号");
-		//验证猫是否重复
-		checkDeviceIsNull(CollectionHelper.converValueToArray(devices, "modem_mac"),"modem_mac");
+		checkDeviceIsNull(CollectionHelper.converValueToArray(devices, "pair_device_code"),"关联号");
 		
 		String depotId = findDepot(optr);
-		Integer orderDoneCode = input.getOrder_done_code();
-		if(orderDoneCode != null){
-			List<RDeviceOrderDetail> orderList = rDeviceOrderDetailDao.queryByDoneCode(orderDoneCode);
-			int orderNum = 0;//订单数
-			
-			for(RDeviceOrderDetail orderDetail : orderList){
-				orderNum += orderDetail.getOrder_num();
-			}
-			
-			int inputNum = devices.size();//入库数
-			//到货数应当小于等于订货数
-			if(inputNum > orderNum){
-				throw new ComponentException("入库数应当小于等于订货数！订货数："
-						+ orderNum + "，入库数：" + inputNum);
-			}
-		}
+
 		Integer doneCode = gDoneCode();
 		input.setDevice_done_code(doneCode);
 		input.setOptr_id(optr.getOptr_id());
@@ -950,8 +927,20 @@ public class DeviceComponent extends BaseDeviceComponent {
 		Map<String, RCardModel> cardModelList = CollectionHelper.converToMapSingle(rCardModelDao.findAll(), "device_model");
 		Map<String ,RModemModel> modemModelList = CollectionHelper.converToMapSingle(rModemModelDao.findAll(), "device_model");
 		
-//		List<RPairCfg> pairs = rPairCfgDao.findAll();
 		for (DeviceDto d : devices) {
+			if(StringHelper.isEmpty(d.getDevice_model())){
+				throw new ComponentException("设备型号缺失");
+			}
+			if(StringHelper.isEmpty(d.getDevice_type())){
+				throw new ComponentException("设备类型缺失");
+			}
+			if(StringHelper.isEmpty(d.getDevice_code())){
+				throw new ComponentException("设备编号缺失");
+			}
+			if(StringHelper.isEmpty(d.getBox_no())){
+				throw new ComponentException("箱号缺失");
+			}
+			
 			String deivceId = gDeviceId();
 			if(d.getDevice_type().equals(SystemConstants.DEVICE_TYPE_STB) ||
 					d.getDevice_type().equals(SystemConstants.DEVICE_TYPE_CARD) ||
@@ -960,53 +949,23 @@ public class DeviceComponent extends BaseDeviceComponent {
 			}
 			
 			if (d.getDevice_type().equals(SystemConstants.DEVICE_TYPE_STB)) {
-				//fillDeviceModel(stbModelList,cardModelList,modemModelList,pairs,d);
-				if(StringHelper.isEmpty(d.getDevice_code()))
-					throw new ComponentException("设备编号存在空值!");
+				RStbModel stbCfg = stbModelList.get(d.getDevice_model());
+				if(stbCfg == null){
+					throw new ComponentException("设备型号不存在");
+				}
+				if(StringHelper.isEmpty(d.getPair_device_code())){
+					throw new ComponentException("设备智能卡号或MAC缺失");
+				}
+				
+				//根据配置信息取已经配置了的配置型号,
+				String pairCardModel = stbCfg.getVirtual_card_model();//与当前机顶盒型号配对的虚拟智能卡类型 
 				RStb stb = new RStb();
 				stb.setDevice_id(deivceId);
 				stb.setStb_id(d.getDevice_code());
 				stb.setDevice_model(d.getDevice_model());
 				
-				RStbModel stbCfg = stbModelList.get(d.getDevice_model());
-				
-				//根据配置信息取已经配置了的配置型号,
-				String pairCardModel = stbCfg.getVirtual_card_model();//与当前机顶盒型号配对的虚拟智能卡类型 
-				//jpz 机顶盒管理mac号的
-				stb.setMac(d.getModem_mac());
-				
-//				String pairModemModel = stbCfg.getVirtual_modem_model();//与当前机顶盒型号配对的虚拟猫类型
-//				
-//				if(StringHelper.isNotEmpty(d.getModem_mac())  ){
-//					if(modemModelList.get(pairModemModel) == null){
-//						throw new ComponentException("虚拟猫的设备类型错误：" + MemoryDict.getDictName(DictKey.MODEM_MODEL, pairModemModel) );
-//					}
-//					String modeMeivceId = gDeviceId();
-//					stb.setPair_modem_id(modeMeivceId);
-//					// 猫设备信息
-//					RDevice modemDevice = new RDevice(
-//							SystemConstants.DEVICE_TYPE_MODEM,
-//							StatusConstants.ACTIVE, StatusConstants.IDLE);
-//					modemDevice.setDevice_id(modeMeivceId);
-//					modemDevice.setDevice_model(pairModemModel);
-//					modemDevice.setDepot_id(depotId);
-//					modemDevice.setOwnership(input.getOwnership());
-//					modemDevice.setOwnership_depot(depotId);
-//					modemDevice.setIs_virtual(modemModelList.get(pairModemModel).getIs_virtual());
-//					deviceList.add(modemDevice);
-//					// 猫信息
-//					RModem modem = new RModem();
-//					modem.setDevice_id(modeMeivceId);
-//					modem.setModem_mac(d.getModem_mac().replace(":","").replace("：", ""));
-//					modem.setDevice_model(pairModemModel);
-//					modem.setModem_type(modemModelList.get(pairModemModel).getModem_type());
-//					modemList.add(modem);
-//					
-//				}
-				
-				if (StringHelper.isNotEmpty(d.getPair_device_code())) {
-//					if (cardModelList.get(d.getPair_device_model())==null)
-//						throw new ComponentException("错误的设备类型：" + d.getPair_device_model_text()+",请检查该型号是否适用当前地区");
+				//根据机顶盒设备型号判断DTT还是OTT, DTT设备插入卡,OTT设置MAC
+				if(stbCfg.getInteractive_type().equals(SystemConstants.DTV_SERV_TYPE_SINGLE)){
 					if(StringHelper.isEmpty(pairCardModel)){
 						throw new ComponentException(ErrorCode.DevicePairModelNotExists,d.getDevice_model());
 					}
@@ -1030,54 +989,25 @@ public class DeviceComponent extends BaseDeviceComponent {
 					card.setCard_id(d.getPair_device_code());
 					card.setDevice_model(pairCardModel);
 					cardList.add(card);
-					
-					//对机卡发送灌装指令
-					JBusiCmd cmd = new JBusiCmd();
-
-					cmd.setJob_id(Integer.parseInt(jBusiCmdDao.findSequence(SequenceConstants.SEQ_JOB_ID).toString()));
-					cmd.setDone_code(doneCode);
-					cmd.setCard_id(d.getPair_device_code());
-					cmd.setStb_id(d.getDevice_code());
-					cmd.setOptr_id(optr.getOptr_id());
-					cmd.setDept_id(optr.getDept_id());
-					cmd.setCounty_id(optr.getCounty_id());
-					cmd.setArea_id(optr.getArea_id());
-					cmd.setBusi_cmd_type(BusiCmdConstants.ACCTIVATE_TERMINAL);
-					cmd.setCreate_time(DateHelper.now());
-
-					jBusiCmdDao.save(cmd);
-
-					cmd.setJob_id(Integer.parseInt(jBusiCmdDao.findSequence(SequenceConstants.SEQ_JOB_ID).toString()));
-					cmd.setBusi_cmd_type(BusiCmdConstants.STB_FILLED);
-					cmd.setCreate_time(DateHelper.now());
-
-					jBusiCmdDao.save(cmd);
-					
+				}else if(stbCfg.getInteractive_type().equals(SystemConstants.DTV_SERV_TYPE_SINGLE)){
+					//jpz OTT机顶盒管理mac号的
+					stb.setMac(d.getPair_device_code());
 				}
 				
 				stbList.add(stb);
-			} else if (d.getDevice_type().equals(SystemConstants.DEVICE_TYPE_CARD)) {
-				RCardModel model = cardModelList.get(d.getDevice_model());
-				if(StringHelper.isEmpty(d.getDevice_code()))
-					throw new ComponentException("设备编号存在空值!");
-				if (model == null)
-					throw new ComponentException("错误的设备类型：" + d.getDevice_model()+",请检查该型号是否适用当前地区");
-				RCard card = new RCard();
-				card.setDevice_id(deivceId);
-				card.setCard_id(d.getDevice_code());
-				card.setDevice_model(d.getDevice_model());
-				cardList.add(card);
 			} else if (d.getDevice_type().equals(SystemConstants.DEVICE_TYPE_MODEM)) {
 				RModemModel model = modemModelList.get(d.getDevice_model());
 				if (model == null)
 					throw new ComponentException("错误的设备类型：" + d.getDevice_model());
-				if(StringHelper.isEmpty(d.getModem_mac()))
-					throw new ComponentException("Modem_mac编号存在空值!");
 				RModem modem = new RModem();
 				modem.setDevice_id(deivceId);
 				modem.setDepot_id(depotId);
 				modem.setModem_id(d.getDevice_code());
-				modem.setModem_mac(d.getModem_mac().replace(":","").replace("：", ""));
+				if(StringHelper.isEmpty(d.getPair_device_code())){
+					modem.setModem_mac(d.getDevice_code());
+				}else{
+					modem.setModem_mac(d.getPair_device_code());
+				}
 				modem.setDevice_model(d.getDevice_model());
 				modem.setModem_type(model.getModem_type());
 				modemList.add(modem);
@@ -1105,29 +1035,9 @@ public class DeviceComponent extends BaseDeviceComponent {
 		}
 		
 		String[] stbCodes = null;
-		/*String[] cardCodes = null;
-		String[] modemCodes = null;*/
 		if(stbList.size()>0){
 			stbCodes = CollectionHelper.converValueToArray(stbList, "stb_id");
 		}
-		/*if(cardList.size()>0){
-			cardCodes = CollectionHelper.converValueToArray(cardList, "card_id");
-		}
-		if(modemList.size()>0){
-			modemCodes = CollectionHelper.converValueToArray(modemList, "modem_mac");
-		}
-		//手工入库判断设备是否已经入库
-		if(deviceType.equals(SystemConstants.DEVICE_CFG_TYPE_HAND)){
-			if(stbCodes != null){
-				checkDeviceIsNull(stbCodes,SystemConstants.DEVICE_TYPE_STB);
-			}
-			if(cardCodes != null){
-				checkDeviceIsNull(cardCodes,SystemConstants.DEVICE_TYPE_CARD);
-			}
-			if(modemCodes != null){
-				checkDeviceIsNull(modemCodes,SystemConstants.DEVICE_TYPE_MODEM);
-			}
-		}*/
 		//退库后又入库的机顶盒，默认是旧机
 		if(stbCodes != null){
 			List<String> deviceHisStr = rDeviceHisDao.queryByStbId(stbCodes);
@@ -1158,8 +1068,8 @@ public class DeviceComponent extends BaseDeviceComponent {
 		rDeviceDoneDeviceidDao.save(doneDeviceidList
 				.toArray(new RDeviceDoneDeviceid[doneDeviceidList.size()]));
 		rDeviceDoneDetailDao.updateByDoneDeviceid(doneCode);
-		if(input.getOrder_done_code()!=null && input.getOrder_done_code()>0 )
-			rDeviceOrderDetailDao.updateSupplyNum(input.getOrder_done_code(),doneCode);
+//		if(input.getOrder_done_code()!=null && input.getOrder_done_code()>0 )
+//			rDeviceOrderDetailDao.updateSupplyNum(input.getOrder_done_code(),doneCode);
 		
 		//记录异动
 		rDeviceChangeDao.saveInputChange(doneCode, BusiCodeConstants.DEVICE_INPUT, optr.getCounty_id(), optr.getArea_id());
@@ -2235,7 +2145,10 @@ public class DeviceComponent extends BaseDeviceComponent {
 		changeDeviceStatus(optr, deviceStatus, isNewStb,
 				deviceIdList.toArray(new String[deviceIdList.size()]),remark);
 		msg = "共执行 " + devices.size() + " 条记录,成功 " + (devices.size() - ignored.size() )
-				+ " 条,因部分设备不在当前仓库或者状态不是空闲,忽略 " +ignored.size() + " 条!";  
+				+ " 条";  
+		if(ignored.size()>0){
+			msg = msg + ",因部分设备不在当前仓库或者状态不是空闲,忽略 " +ignored.size() + " 条!";
+		}
 		return msg;
 	}
 
@@ -2406,17 +2319,16 @@ public class DeviceComponent extends BaseDeviceComponent {
 	
 	
 	public String[] getColumnName(String deviceType, String deviceModel) throws Exception{
-		if(deviceType.equals(SystemConstants.DEVICE_TYPE_MODEM)){
-			return new String[]{"box_no","device_code"};
-		}else if(deviceType.equals(SystemConstants.DEVICE_TYPE_STB)){
+		if(SystemConstants.DEVICE_TYPE_MODEM.equals(deviceType)){
+			return new String[]{"box_no","device_code","pair_device_code"};
+		}else if(SystemConstants.DEVICE_TYPE_STB.equals(deviceType)){
 			RStbModel model =  rStbModelDao.findByKey(deviceModel);
 			if(model == null){
 				throw new ComponentException(deviceModel+"设备型号不存在");	
 			}
-			if(SystemConstants.DTV_SERV_TYPE_SINGLE.equals(model.getInteractive_type())){
+			if(SystemConstants.DTV_SERV_TYPE_SINGLE.equals(model.getInteractive_type()) 
+					||SystemConstants.DTV_SERV_TYPE_DOUBLE.equals(model.getInteractive_type())){
 				return new String[]{"box_no","device_code","pair_device_code"};
-			}else if(SystemConstants.DTV_SERV_TYPE_DOUBLE.equals(model.getInteractive_type())){
-				return new String[]{"box_no","device_code","modem_mac"};
 			}else{
 				throw new ComponentException("暂时不支持"+deviceModel+"设备型号的入库");	
 			}
@@ -2424,6 +2336,26 @@ public class DeviceComponent extends BaseDeviceComponent {
 			throw new ComponentException("暂时不支持"+deviceType+"设备类型的入库");
 		}
 		
+	}
+	
+	public List<DeviceDto> queryDevicesByFiles(File files, String type, String[] colName, String deviceType, String deviceModel) throws Exception{
+		if(colName == null){
+			colName = getColumnName(deviceType,deviceModel);
+		}
+		if(StringHelper.isEmpty(type)){
+			type = "TXT";
+		}
+		List<DeviceDto> devices = new ArrayList<DeviceDto>();
+		if("TXT".equals(type)){
+			//txt txtToBean中去掉第一行
+			devices = FileHelper.txtToBean(files, colName, DeviceDto.class);
+		}else if("XLS".equals(type)){
+			devices = FileHelper.fileToBean(files, colName, DeviceDto.class);
+		}
+		if(devices.size()==0){
+			throw new ComponentException("找不到设备,请检查文件");
+		}
+		return devices;
 	}
 	
 	/**
@@ -2587,6 +2519,8 @@ public class DeviceComponent extends BaseDeviceComponent {
 	public void setRDeviceTypeDao(RDeviceTypeDao deviceTypeDao) {
 		this.rDeviceTypeDao = deviceTypeDao;
 	}
+
+
 
 	
 

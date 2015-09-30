@@ -32,7 +32,7 @@ var supplierCombo = {fieldLabel:CHECK_COMMON.labelSupplier,hiddenName:'deviceInp
 };
 
 //备注
-var remark = {fieldLabel:lsys('common.remarkTxt'),name:'deviceInput.remark',xtype:'textarea',anchor:'95%',height:50};
+var remark = {fieldLabel:lsys('common.remarkTxt'),name:'deviceInput.remark',xtype:'textarea',anchor:'95%',height:40};
 
 /**
  * 设备类型对应的设备ID长度.
@@ -69,7 +69,7 @@ DeviceCodeField = Ext.extend(Ext.form.TextField,{
 					}else if( (devType == 'CARD' && this.fieldName == 'device_code') 
 						|| (devType == 'STB' && this.fieldName == 'pair_device_code') ){
 						url = 'resource/Device!isExistsCard.action';
-					}else if((devType == 'MODEM' || devType == 'STB') && this.fieldName == 'modem_mac'){
+					}else if(devType == 'MODEM' && this.fieldName == 'device_code'){
 						url = 'resource/Device!isExistsModem.action';
 					}
 					if(!Ext.isEmpty(url)){
@@ -114,7 +114,7 @@ var CheckInGrid = Ext.extend(Ext.grid.GridPanel,{
 		var currentOptrId = App.data.optr['optr_id'];
 		var columns = [
 			{header:CHECK_LU.labelInputNo,dataIndex:'input_no',width:80,renderer:App.qtipValue},
-			{header:CHECK_LU.labelOrderNo,dataIndex:'order_no',width:80,renderer:App.qtipValue},
+			{header:'批号',dataIndex:'batch_num',width:80,renderer:App.qtipValue},
 			{header:CHECK_LU.labelInputNo,dataIndex:'batch_num',width:80,renderer:App.qtipValue},
 			{header:CHECK_COMMON.labelSupplier,dataIndex:'supplier_name',width:85},
 			{header:CHECK_COMMON.labelInputDate,dataIndex:'create_time',width:135},
@@ -205,18 +205,19 @@ var FileForm = Ext.extend(Ext.form.FormPanel,{
 				baseCls:'x-plain'
 			},
 			items:[{
-				columnWidth:.5,layout:'form',defaults:{anchor:'95%'},
+				columnWidth:.45,layout:'form',defaults:{anchor:'95%'},
 				items:[
 					inputNo,
 					supplierCombo,
 					ownership,
 					isNewStb
 				]},
-				{columnWidth:.5,layout:'form',defaults:{anchor:'95%'},
+				{columnWidth:.55,layout:'form',defaults:{anchor:'95%'},
 					items:[{
 							xtype: 'textfield',
 							fieldLabel: CHECK_COMMON.labelBatchNum,
-							name: 'batch_num'
+							name: 'batch_num',
+							allowBlank:false
 						},
 						{fieldLabel:DEV_COMMON_LU.labelDeviceType,xtype:'paramcombo',typeAhead:false,paramName:'DEVICE_TYPE',
 							hiddenName:'deviceType',allowBlank:false,defaultValue:'STB',id:'deviceTypeInId'
@@ -224,6 +225,7 @@ var FileForm = Ext.extend(Ext.form.FormPanel,{
 								scope:this,
 								select:function(combo){
 									Ext.getCmp('ctlDeviceModelInId').reset();
+									Ext.getCmp('filesDescId').reset();
 								}
 							}
 						},{
@@ -235,26 +237,43 @@ var FileForm = Ext.extend(Ext.form.FormPanel,{
 							name:'device_model',
 							emptyText: langUtils.bc("common.plsSwitch"),
 							store: new Ext.data.JsonStore({
-								fields : ['device_model', 'model_name', 'device_type']
+								fields : ['device_model', 'model_name', 'device_type','interactive_type']
 							}),
 							model: 'local',
 							displayField: 'model_name',
 							valueField: 'device_model',
-							listWidth: 250
+							listWidth: 400
 							,listeners:{
 								scope:this,
 								expand:function(combo){
 									combo.getStore().loadData(this.modelData[Ext.get('deviceTypeInId').getValue()]);
 								},
-								select:function(combo){
+								select:function(combo,record,i){
 									Ext.getCmp('deviceModelInId').setValue(combo.getValue());
+									var str = "";
+									if(record.get('device_type') == 'STB'){
+										if(record.get('interactive_type') == 'SINGLE'){
+											str = "支持xls和txt,格式为：第一行为空,共3列：箱号,设备号,卡号"
+										}else{
+											str = "支持xls和txt,格式为：第一行为空,共3列：箱号,设备号,MAC"
+										}
+									}else{
+										str = "支持xls和txt,格式为：第一行为空,可以2或3列,(2列的话系统默认MAC=设备号)<br>2列:箱号,设备号;3列：箱号,设备号,MAC"
+									}
+									if(!Ext.isEmpty(str)){
+										Ext.getCmp('filesInDescId').setValue("<font style='font-size:14px;color:red'>"+str+"</font>");
+									}
 								}
 								
 							}
 						},backup,{name:'deviceModel',xtype:'textfield',id:'deviceModelInId',hidden:true}						
 					]
 				},{columnWidth:1,layout:'form',
-					items:[
+					items:[{
+			                xtype: 'displayfield',
+			                width : 400,
+			                id:'filesInDescId'
+						},
 						{id:'checkInFielId',fieldLabel:CHECK_COMMON.labelDevFile,name:'files',xtype:'textfield',inputType:'file',allowBlank:false,anchor:'95%',emptyText:''}	
 						,remark
 				]}
@@ -292,8 +311,8 @@ var FileCheckInWin = Ext.extend(Ext.Window,{
 			title:CHECK_LU.labelFileInput,
 			closeAction:'hide',
 			maximizable:false,
-			width: 550,
-			height: 300,
+			width: 600,
+			height: 340,
 			border: false,
 			layout:'fit',
 			items:[this.fileForm],
@@ -320,11 +339,14 @@ var FileCheckInWin = Ext.extend(Ext.Window,{
 	doSave:function(){
 		if(this.fileForm.getForm().isValid()){
 			var file = Ext.getCmp('checkInFielId').getValue();
-			var flag = checkTxtFileType(file);
-			if(!flag)return;
+//			var flag = checkTxtFileType(file);
+//			if(!flag)return;
+			var flag = checkTxtXlsFileType(file);
+			if(flag === false)return;
+			
 			var msg = Show();
 			this.fileForm.getForm().submit({
-				url:'resource/Device!saveDeviceInputFile.action',
+				url:'resource/Device!saveDeviceInputFile.action?fileType='+flag,
 //				waitTitle:'提示',
 //				waitMsg:'正在上传中,请稍后...',
 				scope:this,
@@ -362,7 +384,7 @@ var HandForm = Ext.extend(Ext.form.FormPanel,{
 		HandForm.superclass.constructor.call(this,{
 			id:'handFormId',
 			labelWidth: 80,
-			height: 170,
+			height: 140,
 			region: 'north',
 			layout:'column',
 			fileUpload: true,
@@ -372,30 +394,22 @@ var HandForm = Ext.extend(Ext.form.FormPanel,{
 			},
 			items:[{
 					columnWidth:.5,layout:'form',defaults:{anchor:'95%'},
-					items:[
-						inputNo,
-						supplierCombo,
-						ownership
-					]
+					items:[inputNo,supplierCombo,ownership]
 				},
 				{
 					columnWidth:.5,layout:'form',defaults:{anchor:'95%'},
-					items:[
-						{
+					items:[{
 							xtype: 'textfield',
 							fieldLabel: CHECK_COMMON.labelBatchNum,
 							name: 'batch_num',
+							allowBlank:false,
 							width: 240
-						},
-						backup,
-						isNewStb
+						},backup,isNewStb
 					]
 				},{
 					columnWidth:1,
 					layout:'form',
-					items:[
-						remark
-					]
+					items:[remark]
 				}
 			]
 		});
@@ -410,21 +424,20 @@ var HandForm = Ext.extend(Ext.form.FormPanel,{
 
 var CheckInDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 	checkInDeviceGridStore:null,
-	
-	deviceTypeCombo :null,deviceTypeData:[],//设备类型所有数据 
-	deviceModelCombo :null,deviceModelData:[],//设备型号所有数据
+	deviceTypeCombo :null,
+	deviceModelCombo :null,
 	cardModelCombo :null,
 	parent:null,
 	constructor:function(p){
 		this.parent = p;
 		checkInDeviceGrid = this;
 		this.checkInDeviceGridStore = new Ext.data.JsonStore({
-			fields:['device_type','device_model','modem_mac','device_code','pair_device_model','pair_device_code']
+			fields:['device_type','device_model','device_code','pair_device_model','pair_device_code','box_no']
 		});
 		var sm = new Ext.grid.CheckboxSelectionModel();
 		
 		this.deviceModelCombo = new Ext.ux.ParamCombo({typeAhead:false,
-			forceSelection:true,selectOnFocus:true,editable:true,listWidth:200
+			forceSelection:true,selectOnFocus:true,editable:true,listWidth:300
 		});
 		this.cardModelCombo = new Ext.ux.ParamCombo({typeAhead:false,paramName:'CARD_MODEL',
 			forceSelection:true,selectOnFocus:true,editable:true});
@@ -438,34 +451,7 @@ var CheckInDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 					var record = this.getSelectionModel().getSelected();
 					record.set('device_model','');
 					if(combo.getValue() !== 'STB'){
-						record.set('pair_device_model','');
 						record.set('pair_device_code','');
-						record.set('modem_mac','');
-					}
-				},
-				afterrender:function(combo){
-					this.deviceTypeData = [];
-					var store = combo.getStore();
-					store.each(function(record){
-						this.deviceTypeData.push(record.data);
-					},this);
-				}
-				,
-				expand:function(combo){
-					var store = combo.getStore();
-					if(this.parent.deviceTypeArr.length>0){//如果选择了订单
-						store.removeAll();//下拉时清空数据 
-						Ext.each(this.deviceTypeData,function(deviceType){
-							Ext.each(this.parent.deviceTypeArr,function(data){
-								if(deviceType['item_value'] == data){
-									store.loadData([deviceType],true);
-								}
-							},this);
-						},this);
-//					}else{
-//						store.filterBy(function(record){
-//							return record.get('item_value').indexOf('CARD')<0;
-//						})
 					}
 				}
 			}
@@ -496,14 +482,9 @@ var CheckInDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 				,renderer:this.paramComboRender.createDelegate(this.deviceModelCombo.getStore())
 				,scope:this},
 			{header:COM_LU.orderNum,dataIndex:'device_code',width:130,editor:new DeviceCodeField({parent:this,fieldName:'device_code',vtype:'alphanum'})},
-			{id:'modem_mac_id',header:'modem_mac',dataIndex:'modem_mac',width:120
-				,editor:new DeviceCodeField({parent:this,fieldName:'modem_mac',vtype:'alphanum'})},
-			/*{id:'pair_device_model_id',header:'配对卡型号',dataIndex:'pair_device_model',width:110,
-				editor:this.cardModelCombo
-				,renderer:this.paramComboRender.createDelegate(this.cardModelCombo.getStore())
-				,scope:this},*/
-			{id:'pair_device_code_id',header:CHECK_COMMON.labelPairCardCode,dataIndex:'pair_device_code',width:120,
+			{id:'pair_device_code_id',header:'卡号或MAC',dataIndex:'pair_device_code',width:120,
 				editor:new DeviceCodeField({parent:this,fieldName:'pair_device_code',vtype:'alphanum'})},
+			{header:'箱号',dataIndex:'box_no',width:120,editor:new Ext.form.TextField({vtype:'alphanum'})},
 			{header:lsys('common.doActionBtn'),dataIndex:'',width:50,renderer:function(value,metavalue,record,i){
 				return "<a href='#' onclick=doCheckInDel()>" + COM_LU.remove + "</a>";
 			}}
@@ -533,38 +514,18 @@ var CheckInDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 	},
 	cellEditable:function(colIndex, rowIndex){
 		var pdcIndex = this.getIndexById('pair_device_code_id');
-		var modemMacIndex = this.getIndexById('modem_mac_id');
+//		var modemMacIndex = this.getIndexById('modem_mac_id');
 		var deviceModeIndex = this.getIndexById('device_model_id');
 		
 		var deviceType = checkInDeviceGrid.getStore().getAt(rowIndex).get('device_type');
+//		var devoceModel = checkInDeviceGrid.getStore().getAt(rowIndex).get('device_model');
+//		var deviceTypeGroupedCfg = devTypeLenCfg[deviceType];
+//		var devModcfg = false;
+//		if(!Ext.isEmpty(deviceTypeGroupedCfg)){
+//			devModcfg = deviceTypeGroupedCfg[devoceModel];//当前选中的设备的配置
+//		}
 		
-		var deviceType = checkInDeviceGrid.getStore().getAt(rowIndex).get('device_type');
-		var devoceModel = checkInDeviceGrid.getStore().getAt(rowIndex).get('device_model');
-		var deviceTypeGroupedCfg = devTypeLenCfg[deviceType];
-		var devModcfg = false;
-		if(!Ext.isEmpty(deviceTypeGroupedCfg)){
-			devModcfg = deviceTypeGroupedCfg[devoceModel];//当前选中的设备的配置
-		}
-		
-		if(colIndex === pdcIndex){
-			//只有设备类型为机顶盒时，才能输入卡号
-			if(deviceType !== 'STB'){
-				return false;
-			}
-		}else if(colIndex === modemMacIndex){
-//			if(deviceType !== 'STB'){
-//				return false;
-//			}
-			
-			//"modem_mac"列只能在设备类型为MODEM或者机猫一体机时，才能编辑
-//			if(deviceType !== 'MODEM'){
-//				if(deviceType == 'STB')&& devModcfg && devModcfg.virtual_modem_model){
-//					return true;
-//				}else{
-//					return false;
-//				}
-//			}
-		}else if(colIndex === deviceModeIndex){
+		if(colIndex === deviceModeIndex){
 			//"设备类型"列为空时，不能选择"型号"列
 			if(Ext.isEmpty(deviceType))
 				return false;
@@ -600,40 +561,16 @@ var CheckInDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 			var fieldName = obj.field;
 			if(fieldName == 'device_code'){
 				if(record.get('device_type') == 'MODEM'){
-					record.set('modem_mac',record.get('device_code'));
+					record.set('pair_device_code',record.get('device_code'));
+					
 				}
 			}
 		});
-		
-		
 		this.on('beforeedit',function(obj){
 			var record = obj.record;
 			var fieldName = obj.field;//编辑的column对应的dataIndex
 			
 			if(fieldName == 'device_model'){
-				/*this.deviceModelCombo.paramName = record.get('device_type')+'_MODEL';
-				App.form.initComboData( [this.deviceModelCombo],function(){
-					if(this.parent.deviceModelArr.length>0){
-						this.deviceModelData = [];
-						var store = this.deviceModelCombo.getStore();
-						
-						if(store.getCount()>0){
-							store.each(function(record){
-								this.deviceModelData.push(record.data);
-							},this);
-						}
-						
-						store.removeAll();//下拉时清空数据 
-						Ext.each(this.deviceModelData,function(deviceModel){
-							Ext.each(this.parent.deviceModelArr,function(data){
-								if(deviceModel['item_value'] == data){
-									store.loadData([deviceModel],true);
-								}
-							},this);
-						},this);
-					}
-					
-				},this);*/
 				var paramName = record.get('device_type')+'_MODEL';
 				Ext.Ajax.request({
 					url:root + '/ps.action',
@@ -650,28 +587,10 @@ var CheckInDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 							arr.push(obj);
 						});
 						this.deviceModelCombo.getStore().loadData(arr);
-						
-						if(this.parent.deviceModelArr.length>0){
-							this.deviceModelData = [];
-							var store = this.deviceModelCombo.getStore();
-							
-							if(store.getCount()>0){
-								store.each(function(record){
-									this.deviceModelData.push(record.data);
-								},this);
-							}
-							
-							store.removeAll();//下拉时清空数据 
-							Ext.each(this.deviceModelData,function(deviceModel){
-								Ext.each(this.parent.deviceModelArr,function(data){
-									if(deviceModel['item_value'] == data){
-										store.loadData([deviceModel],true);
-									}
-								},this);
-							},this);
-						}
 					}
 				});
+			}else if(fieldName == 'pair_device_code'){
+				
 			}
 		},this);
 	},
@@ -685,11 +604,11 @@ var CheckInDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 			
 			Ext.apply(obj,record.data);
 			obj['device_code'] = '';
-			obj['modem_mac'] = '';
+			obj['pair_device_code'] = '';
 			this.getStore().add(new recordType(obj));
 		}else{
 			var record = new recordType({
-				device_type:'',device_model:'',modem_mac:'',device_code:'',pair_device_model:'',pair_device_code:''
+				device_type:'',device_model:'',device_code:'',pair_device_code:'',box_no:''
 			});
 			this.stopEditing();
 			this.getStore().add(record);
@@ -721,7 +640,7 @@ var HandCheckInWin = Ext.extend(Ext.Window,{
 			closeAction:'close',
 			maximizable:false,
 			width: 700,
-			height: 500,
+			height: 460,
 			border: false,
 			layout:'border',
 			items:[this.handForm,this.checkInDeviceGrid],
@@ -743,24 +662,6 @@ var HandCheckInWin = Ext.extend(Ext.Window,{
 	},
 	show:function(){
 		HandCheckInWin.superclass.show.call(this);
-		//订单管理模块中随时会添加订单，故show window时查询订单
-//		var store = this.handForm.getForm().findField('deviceInput.order_done_code').getStore();
-//		Ext.Ajax.request({
-//			url:'resource/Device!queryDeviceOrder.action',
-//			success:function(res,opt){
-//				var result = Ext.decode(res.responseText).records;
-//				var doneCodeArr=[],data=[];
-//				Ext.each(result,function(d){
-//					//去掉重复的记录
-//					if(doneCodeArr.indexOf(d['device_done_code']) == -1){
-//						data.push(d);
-//						doneCodeArr.push(d['device_done_code']);
-//					}
-//				});
-//				store.loadData(data);
-//			}
-//		});
-//		this.parent.loadOrderInfo(store,true);
 		this.handForm.getForm().findField('deviceInput.input_no').focus(true,500);
 	},
 	doSave:function(){
@@ -775,17 +676,7 @@ var HandCheckInWin = Ext.extend(Ext.Window,{
 		
 		var arr = [];
 		store.each(function(record){
-			var deviceType = record.get('device_type');
-			var deviceModel = record.get('device_model');
-			var deviceCode = record.get('device_code');
-			var modemMac = record.get('modem_mac');
-			if(deviceModel){
-				if((deviceType == 'STB' || deviceType == 'CARD') && deviceCode){
-					arr.push(record.data);	
-				}else if(deviceType == 'MODEM' && deviceCode){
-					arr.push(record.data);	
-				}
-			}
+			arr.push(record.data);	
 		},this);
 		
 		if(arr.length === 0){
@@ -818,13 +709,11 @@ var HandCheckInWin = Ext.extend(Ext.Window,{
 
 var MateralHandForm = Ext.extend(Ext.form.FormPanel,{
 	parent:null,
-	deviceModelData:[],
 	constructor:function(p){
 		this.parent = p;
 		MateralHandForm.superclass.constructor.call(this,{
 			id:'materalHandFormId',
 			labelWidth: 80,
-			height: 170,
 			region:'center',
 			layout:'column',
 			fileUpload: true,
@@ -833,50 +722,14 @@ var MateralHandForm = Ext.extend(Ext.form.FormPanel,{
 				baseCls:'x-plain'
 			},
 			items:[{
-					columnWidth:.5,layout:'form',defaults:{anchor:'95%'},
+					columnWidth:.45,layout:'form',defaults:{anchor:'95%'},
 					items:[
 						inputNo,supplierCombo
 					]
 				},
 				{
-					columnWidth:.5,layout:'form',defaults:{anchor:'95%'},
+					columnWidth:.55,layout:'form',defaults:{anchor:'95%'},
 					items:[
-//						{fieldLabel:lsys('OrderManager.labelOrderNo'),hiddenName:'deviceInput.order_done_code',xtype:'combo',
-//								store:new Ext.data.JsonStore({
-//									fields:['order_no','device_done_code','supplier_id','supplier_name','order_info']
-//								}),displayField:'order_info',valueField:'device_done_code',
-//								mode:'local',triggerAction:'all',forceSelection:true,editable:true,
-//								listeners:{
-//									scope:this,
-//									select:function(combo,record){
-//										var handForm = Ext.getCmp('materalHandFormId');
-//										var supCombo= handForm.getForm().findField('deviceInput.supplier_id');
-//										supCombo.setRawValue(record.get('supplier_name'));
-//										supCombo.setValue(record.get('supplier_id'));
-//										supCombo.setReadOnly(true);									
-//										
-//										Ext.getCmp("materalDeviceModelId").reset();
-//										this.parent.deviceModelArr = [];
-//										
-//										var doneCode = combo.getValue();
-//										Ext.Ajax.request({
-//											url:'resource/Device!queryDeviceOrderDetail.action',
-//											params:{deviceDoneCode:doneCode},
-//											scope:this,
-//											success:function(res,opt){
-//												var data = Ext.decode(res.responseText);
-//												if(data && data.length>0){
-//													Ext.each(data,function(d){
-//														if(this.parent.deviceModelArr.indexOf(d['device_model'])==-1)
-//															this.parent.deviceModelArr.push(d['device_model']);
-//													},this);
-//												}
-//											}
-//										});
-//										
-//									}
-//								}
-//						},
 						{
 							fieldLabel : CHECK_COMMON.labelDeviceModel,
 							allowBlank : false,
@@ -884,6 +737,7 @@ var MateralHandForm = Ext.extend(Ext.form.FormPanel,{
 							xtype:'paramcombo',
 							paramName:'FITTING_MODEL',
 							hiddenName : 'device_model',
+							listWidth: 300,
 							emptyText: COM_LU.pleaseSelect,
 							listeners:{
 								scope:this,
@@ -951,7 +805,7 @@ var MateralCheckInWin = Ext.extend(Ext.Window,{
 			closeAction:'close',
 			maximizable:false,
 			width: 600,
-			height: 400,
+			height: 250,
 			border: false,
 			layout:'border',
 			items:[this.handForm],

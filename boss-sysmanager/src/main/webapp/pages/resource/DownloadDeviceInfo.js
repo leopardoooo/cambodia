@@ -23,7 +23,7 @@ DownloadDeviceInfo = Ext.extend(Ext.Panel,{
 //							}
 //						}
 					},
-					{fieldLabel:lsys('DeviceCommon.labelDevFile'),name:'files',xtype:'textfield',inputType:'file',allowBlank:false,anchor:'95%'}
+					{id:'downDeviceFilesId',fieldLabel:lsys('DeviceCommon.labelDevFile'),name:'files',xtype:'textfield',inputType:'file',allowBlank:false,anchor:'95%'}
 				],
 				buttonAlign:'center',
 				buttons:[
@@ -44,9 +44,11 @@ DownloadDeviceInfo = Ext.extend(Ext.Panel,{
 	doDownload:function(){
 		var form = Ext.getCmp('downLoadFormId').getForm();
 		if(!form.isValid())return;
-		
+		var file = Ext.getCmp('downDeviceFilesId').getValue();
+		var flag = checkTxtXlsFileType(file);
+		if(flag === false)return;
 		form.submit({
-				url:'resource/Device!downloadDeviceInfo.action',
+				url:'resource/Device!downloadDeviceInfo.action?fileType='+flag,
 				scope:this,
 				success:function(form,action){
 					var data = action.result;

@@ -224,7 +224,7 @@ public class RDeviceDao extends BaseEntityDao<RDevice> {
 	 */
 	public DeviceDto queryByDeviceCode(String deviceCode) throws JDBCException {
 		String sql = "SELECT d.*,s.device_model,s.stb_id device_code,"
-				+ "r.card_id pair_device_code,r.device_model pair_device_model,"
+				+ "case when r.card_id is null then s.mac else r.card_id  end pair_device_code,r.device_model pair_device_model,"
 				+ " s.MAC pair_device_modem_code,'','' modem_mac,s.pair_card_id,s.pair_modem_id"
 				+ " FROM R_STB S, R_CARD r,r_device d "
 				+ " WHERE s.device_id=d.device_id AND s.pair_card_id= r.DEVICE_ID(+)" 
@@ -257,14 +257,14 @@ public class RDeviceDao extends BaseEntityDao<RDevice> {
 	
 	public List<DeviceDto> queryByBatchNum(String batchNum,String depotId) throws JDBCException {
 		String sql = "SELECT d.*,s.device_model,s.stb_id device_code,"
-				+ "r.card_id pair_device_code,r.device_model pair_device_model,"
+				+ " case when r.card_id is null then s.mac else r.card_id  end pair_device_code,r.device_model pair_device_model,"
 				+ " m.MODEM_MAC pair_device_modem_code,m.DEVICE_MODEL pair_device_modem_model,'' modem_mac,s.pair_card_id,s.pair_modem_id"
 				+ " FROM R_STB S, R_CARD r,r_device d,r_modem m"
 				+ " WHERE s.device_id=d.device_id AND s.pair_card_id= r.DEVICE_ID(+)" 
 				+ " AND s.pair_modem_id=m.device_id(+) AND d.Batch_Num = :batchNum AND d.depot_id=:depotId AND d.tran_status='IDLE'"
 				+ " UNION SELECT d.*,c.device_model,c.card_id device_code,'','','','','','',''"
 				+ " FROM R_CARD C,r_device d"
-				+ " WHERE c.device_id=d.device_id AND d.Batch_Num = :batchNum AND d.depot_id=:depotId AND d.tran_status='IDLE'"
+				+ " WHERE c.device_id=d.device_id  and d.is_virtual='F' AND d.Batch_Num = :batchNum AND d.depot_id=:depotId AND d.tran_status='IDLE'"
 				+ " UNION SELECT d.*,m.device_model,m.modem_mac device_code,'','','','',m.modem_mac,'',''"
 				+ " FROM R_MODEM M,r_device d WHERE m.device_id=d.device_id AND d.Batch_Num = :batchNum AND d.depot_id=:depotId AND d.tran_status='IDLE'";
 
@@ -617,7 +617,7 @@ public class RDeviceDao extends BaseEntityDao<RDevice> {
 			+" d.device_model,d.device_status,d.depot_status,d.tran_status,d.used,d.backup,d.freezed,"
 			+" d.diffence_type,d.depot_id,d.ownership,d.ownership_depot,d.warranty_date,d.is_virtual,"
 			+" d.is_local,d.is_loss,d.is_new_stb,device_code,pair_device_code,pair_device_model,"
-			+" pair_device_modem_code,pair_device_modem_model,modem_mac,batch_num,total_num, rdd.remark order by create_time desc";
+			+" pair_device_modem_code,pair_device_modem_model,modem_mac,batch_num,total_num,box_no, rdd.remark order by create_time desc";
 		return createNameQuery(DeviceDto.class, sql, paramers).setStart(start).setLimit(limit).page();
 
 	}
@@ -689,9 +689,9 @@ public class RDeviceDao extends BaseEntityDao<RDevice> {
 	public void removeToHis(Integer doneCode) throws JDBCException {
 		String sql = "insert into r_device_his"+
 				"    (device_id, device_type, device_status, depot_status, used, backup, freezed, diffence_type, depot_id, ownership, warranty_date, is_virtual, is_local, "+
-				"      stb_id, pair_card_id, card_id, modem_id, modem_mac, is_new_stb, device_model, pair_modem_id, batch_num,total_num)"+
+				"      stb_id, pair_card_id, card_id, modem_id, modem_mac, is_new_stb, device_model, pair_modem_id, batch_num,total_num,box_no)"+
 				" select r.device_id, r.device_type, r.device_status, r.depot_status, r.used, r.backup, r.freezed, r.diffence_type, r.depot_id, r.ownership, r.warranty_date, r.is_virtual, r.is_local,"+
-				" rs.stb_id,rs.pair_card_id,rc.card_id,rm.modem_id,rm.modem_mac,r.is_new_stb,r.device_model,rs.pair_modem_id,r.batch_num,r.total_num"+
+				" rs.stb_id,rs.pair_card_id,rc.card_id,rm.modem_id,rm.modem_mac,r.is_new_stb,r.device_model,rs.pair_modem_id,r.batch_num,r.total_num,r.box_no"+
 				" from r_device_output o,r_device_done_deviceid d,r_device r,r_stb rs,r_card rc,r_modem rm"+
 				" where o.device_done_code=d.device_done_code "+
 				" and r.device_id=d.device_id and rs.device_id=r.device_id"+
@@ -699,7 +699,7 @@ public class RDeviceDao extends BaseEntityDao<RDevice> {
 				" and o.device_done_code=?"+
 				" union all"+
 				" select r.device_id, r.device_type, r.device_status, r.depot_status, r.used, r.backup, r.freezed, r.diffence_type, r.depot_id, r.ownership, r.warranty_date, r.is_virtual, r.is_local,"+
-				" null stb_id,null pair_card_id,rc.card_id,null modem_id,null modem_mac,r.is_new_stb,r.device_model,null pair_modem_id,r.batch_num,r.total_num"+
+				" null stb_id,null pair_card_id,rc.card_id,null modem_id,null modem_mac,r.is_new_stb,r.device_model,null pair_modem_id,r.batch_num,r.total_num,r.box_no"+
 				" from r_device_output o,r_device_done_deviceid d,r_device r,r_stb rs,r_card rc"+
 				" where o.device_done_code=d.device_done_code "+
 				" and rs.device_id=d.device_id and rs.pair_card_id=r.device_id"+
@@ -707,7 +707,7 @@ public class RDeviceDao extends BaseEntityDao<RDevice> {
 				" and o.device_done_code=? "+
 				" union all"+
 				" select r.device_id, r.device_type, r.device_status, r.depot_status, r.used, r.backup, r.freezed, r.diffence_type, r.depot_id, r.ownership, r.warranty_date, r.is_virtual, r.is_local,"+
-				" null stb_id,null pair_card_id, null card_id,rm.modem_id,rm.modem_mac,r.is_new_stb,r.device_model,null pair_modem_id,r.batch_num,r.total_num"+
+				" null stb_id,null pair_card_id, null card_id,rm.modem_id,rm.modem_mac,r.is_new_stb,r.device_model,null pair_modem_id,r.batch_num,r.total_num,r.box_no"+
 				" from r_device_output o,r_device_done_deviceid d,r_device r,r_stb rs,r_modem rm"+
 				" where o.device_done_code=d.device_done_code "+
 				" and d.device_id=rs.device_id "+
@@ -715,14 +715,14 @@ public class RDeviceDao extends BaseEntityDao<RDevice> {
 				" and o.device_done_code=?"+
 				" union all"+
 				" select r.device_id, r.device_type, r.device_status, r.depot_status, r.used, r.backup, r.freezed, r.diffence_type, r.depot_id, r.ownership, r.warranty_date, r.is_virtual, r.is_local,"+
-				" null stb_id,null pair_card_id,rc.card_id,null modem_id,null modem_mac,r.is_new_stb,r.device_model,null pair_modem_id,r.batch_num,r.total_num"+
+				" null stb_id,null pair_card_id,rc.card_id,null modem_id,null modem_mac,r.is_new_stb,r.device_model,null pair_modem_id,r.batch_num,r.total_num,r.box_no"+
 				" from r_device_output o,r_device_done_deviceid d,r_device r,r_card rc"+
 				" where o.device_done_code=d.device_done_code "+
 				" and r.device_id=d.device_id and  d.device_id=rc.device_id"+
 				" and o.device_done_code=?"+
 				" union all"+
 				" select r.device_id, r.device_type, r.device_status, r.depot_status, r.used, r.backup, r.freezed, r.diffence_type, r.depot_id, r.ownership, r.warranty_date, r.is_virtual, r.is_local,"+
-				" null stb_id,null pair_card_id, null card_id,rm.modem_id,rm.modem_mac,r.is_new_stb,r.device_model,null pair_modem_id,r.batch_num,r.total_num"+
+				" null stb_id,null pair_card_id, null card_id,rm.modem_id,rm.modem_mac,r.is_new_stb,r.device_model,null pair_modem_id,r.batch_num,r.total_num,r.box_no"+
 				" from r_device_output o,r_device_done_deviceid d,r_device r,r_modem rm"+
 				" where o.device_done_code=d.device_done_code "+
 				" and d.device_id=r.device_id"+
@@ -888,9 +888,9 @@ public class RDeviceDao extends BaseEntityDao<RDevice> {
 	public void removeDeviceToHis(String deviceId) throws JDBCException {
 		String sql = "insert into r_device_his"+
 				"    (device_id, device_type, device_status, depot_status, used, backup, freezed, diffence_type, depot_id, ownership, warranty_date, is_virtual, is_local, "+
-				"       is_new_stb, device_model, batch_num,total_num)"+
+				"       is_new_stb, device_model, batch_num,total_num,box_no)"+
 				" select r.device_id, r.device_type, r.device_status, r.depot_status, r.used, r.backup, r.freezed, r.diffence_type, r.depot_id, r.ownership, r.warranty_date, r.is_virtual, r.is_local,"+
-				" r.is_new_stb,r.device_model,r.batch_num,r.total_num"+
+				" r.is_new_stb,r.device_model,r.batch_num,r.total_num,r.box_no"+
 				" from r_device_done_deviceid d,r_device r"+
 				" where r.device_id=? ";
 		executeUpdate(sql, deviceId);	
@@ -930,10 +930,11 @@ public class RDeviceDao extends BaseEntityDao<RDevice> {
 		return createQuery(com.ycsoft.business.dto.device.DeviceDto.class, sql,deviceCode,deviceCode,deviceCode).first();
 	}
 	public List<RDeviceModel> queryDeviceStbModem() throws Exception {
-		String sql = "select 'MODEM' device_type,t.device_model,t.model_name from r_modem_model t "
+		String sql = "select 'MODEM' device_type,t.device_model,t.model_name,'' interactive_type from r_modem_model t "
 				+ "union select 'STB' device_type,t.device_model,"
-				+ " case when t.interactive_type='SINGLE' then '(DTT)'||''||t.model_name else '(OTT)'||''||t.model_name end model_name "
+				+ " case when t.interactive_type=? then '(DTT)'||''||t.model_name||'('||t.device_model||')'"
+				+ " else '(OTT)'||''||t.model_name||'('||t.device_model||')' end model_name, t.interactive_type "
 				+ " from r_stb_model t order by model_name ";
-		return this.createQuery(RDeviceModel.class, sql ).list();
+		return this.createQuery(RDeviceModel.class, sql,SystemConstants.DTV_SERV_TYPE_SINGLE ).list();
 	}
 }

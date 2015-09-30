@@ -13,6 +13,7 @@ public class RDeviceModel {
 	private String is_virtual;
 	private String is_virtual_text;
 
+	private String interactive_type;
 	private String modem_type_name;
 	private String supplier_name;
 	private String device_type_text;
@@ -23,6 +24,15 @@ public class RDeviceModel {
 	 */
 	public String getDevice_type_text() {
 		return device_type_text;
+	}
+
+	
+	public String getInteractive_type() {
+		return interactive_type;
+	}
+
+	public void setInteractive_type(String interactive_type) {
+		this.interactive_type = interactive_type;
 	}
 
 	/**

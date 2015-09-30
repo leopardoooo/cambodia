@@ -187,7 +187,7 @@ var DiffFileForm = Ext.extend(Ext.form.FormPanel,{
 		DiffFileForm.superclass.constructor.call(this,{
 			border:false,
 			region:"center",
-			labelWidth: 70,
+			labelWidth: 90,
 			layout : 'column',
 			fileUpload: true,
 			trackResetOnLoad:true,
@@ -324,12 +324,13 @@ var AddFileDifferenceWin = Ext.extend(Ext.Window,{
 		
 		 if(this.fileForm.getForm().isValid()){
 			var file = Ext.getCmp('differenceManageFielId').getValue();
-			var flag = checkFileType(file);
-			if(!flag)return;
- 			 Ext.getCmp('depotId').setValue(Ext.getCmp('diff_depot_id').getValue());
+			var flag = checkTxtXlsFileType(file);
+			if(flag === false)return;
+			
+ 			Ext.getCmp('depotId').setValue(Ext.getCmp('diff_depot_id').getValue());
  			var msg = Show();
 			this.fileForm.getForm().submit({
-				url:'resource/Device!addFileDeviceDiffence.action',
+				url:'resource/Device!addFileDeviceDiffence.action?fileType='+flag,
 //				waitTitle:'提示',
 //				waitMsg:'正在上传中,请稍后...',
 				scope:this,
