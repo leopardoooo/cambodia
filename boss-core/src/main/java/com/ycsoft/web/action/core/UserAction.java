@@ -327,7 +327,7 @@ public class UserAction extends BaseBusiAction {
 		
 		String[] colName = new String[]{"user_name","stb_id"};
 		List<CUser> userList = FileHelper.fileToBean(files, colName, CUser.class);
-		userList.remove(0);
+//		userList.remove(0);
 		String result = "操作成功!";
 		try {
 			userServiceSN.saveBatchUpdateUserName(userList,custId);

@@ -219,7 +219,11 @@ public class DeviceAction extends BaseAction {
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
 		try{
 			String[] colName = {"device_code"};
-			List<DeviceDto> devices = FileHelper.fileToBean(files, colName, DeviceDto.class);
+//			List<DeviceDto> devices = FileHelper.fileToBean(files, colName, DeviceDto.class);
+			
+			String type = request.getParameter("fileType");
+			List<DeviceDto> devices = deviceComponent.queryDevicesByFiles(files,type,colName,null,null);
+
 			CollectionHelper.setValues(devices,"device_type",deviceType);
 			
 			List<DeviceDto> list = deviceComponent.queryDeviceInfo( devices, deviceType);
@@ -341,6 +345,11 @@ public class DeviceAction extends BaseAction {
 	 */
 	public String queryTransferDeviceDetail() throws Exception {
 		getRoot().setPage(deviceComponent.queryTransferDeviceDetail(deviceDoneCode, deviceType, start, limit));
+		return JSON_PAGE;
+	}
+	
+	public String queryInputDeviceDetail() throws Exception {
+		getRoot().setPage(deviceComponent.queryInputDeviceDetail(deviceDoneCode, start, limit));
 		return JSON_PAGE;
 	}
 
@@ -480,7 +489,8 @@ public class DeviceAction extends BaseAction {
 	 */
 	public String saveDeviceOutputFile() throws Exception {
 		String[] colName = {"device_code"};
-		List<DeviceDto> devices = FileHelper.fileToBean(files, colName, DeviceDto.class);
+		String type = request.getParameter("fileType");
+		List<DeviceDto> devices = deviceComponent.queryDevicesByFiles(files,type,colName,null,null);
 		CollectionHelper.setValues(devices,"device_type",deviceType);
 		
 		String msg = "";
@@ -521,7 +531,10 @@ public class DeviceAction extends BaseAction {
 	public String changeDeviceStatusFile() throws Exception {
 
 		String[] colName = {"device_code"};
-		List<DeviceDto> devices = FileHelper.fileToBean(files, colName, DeviceDto.class);
+//		List<DeviceDto> devices = FileHelper.fileToBean(files, colName, DeviceDto.class);
+		String type = request.getParameter("fileType");
+		List<DeviceDto> devices = deviceComponent.queryDevicesByFiles(files,type,colName,null,null);
+
 		CollectionHelper.setValues(devices,"device_type",deviceType);
 		String msg = "";
 		try{
@@ -631,7 +644,9 @@ public class DeviceAction extends BaseAction {
 		String msg="";
 		try{
 			String[] colName = {"device_code"};
-			List<DeviceDto> devices = FileHelper.fileToBean(files, colName, DeviceDto.class);
+//			List<DeviceDto> devices = FileHelper.fileToBean(files, colName, DeviceDto.class);
+			String type = request.getParameter("fileType");
+			List<DeviceDto> devices = deviceComponent.queryDevicesByFiles(files,type,colName,null,null);
 			deviceComponent.addFileDeviceDiffence(devices,optr,depotId,remark);
 		}catch(Exception e ){
 			msg = e.getMessage();
@@ -835,7 +850,12 @@ public class DeviceAction extends BaseAction {
 	 */
 	public String saveTransferFile() throws Exception {
 		String[] colName = {"device_code"};
-		List<DeviceDto> devices = FileHelper.fileToBean(files, colName, DeviceDto.class);
+//		List<DeviceDto> devices = FileHelper.fileToBean(files, colName, DeviceDto.class);
+//		List<DeviceDto> devices = FileHelper.txtToBean(files, colName, DeviceDto.class);
+		
+		String type = request.getParameter("fileType");
+		List<DeviceDto> devices = deviceComponent.queryDevicesByFiles(files,type,colName,null,null);
+		
 		CollectionHelper.setValues(devices,"device_type",deviceType);
 		String msg = "";
 		try{
@@ -847,34 +867,6 @@ public class DeviceAction extends BaseAction {
 		return retrunNone(msg);
 	}
 	
-	private List<DeviceDto> check(File files,String deviceType) throws ComponentException,Exception{
-		List<DeviceDto> devices = null;
-		try {
-			String[] colName = getColumnName(deviceType);
-			devices = FileHelper.fileToBean(files, colName, DeviceDto.class);
-			boolean key = false;
-			CollectionHelper.setValues(devices,"device_type",deviceType);
-			if(colName.length==3){
-				if(StringHelper.isEmpty(devices.get(0).getDevice_model())||StringHelper.isEmpty(devices.get(0).getDevice_code())){
-					key = true;
-				}
-			}
-			if(colName.length==4){
-				if(StringHelper.isEmpty(devices.get(0).getDevice_model())||StringHelper.isEmpty(devices.get(0).getModem_mac())){
-					key = true;
-				}
-			}
-			if(key){
-				throw new ComponentException("导入格式不对!【机顶盒】：第一列：机顶盒型号,第二列：机顶盒编号,第三列：配对智能卡编号,第四列：配对MODEM编号" +
-				"【智能卡】:第一列：设备型号,第二列：设备编号【modem】：第一列：modem型号,第二列：mac地址, 第三列：modem编号；最后一列为批号");
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw e;
-		}
-		return devices;
-	}
-
 	/**
 	 * 保存入库信息 (文件)
 	 * @return
@@ -889,8 +881,8 @@ public class DeviceAction extends BaseAction {
 			if(StringHelper.isEmpty(deviceType)){
 				throw new ComponentException("设备类型不能为空");
 			}
-			String[] colName = deviceComponent.getColumnName(deviceType,deviceModel);
-			List<DeviceDto> devices = FileHelper.txtToBean(files, colName, DeviceDto.class);
+			String type = request.getParameter("fileType");
+			List<DeviceDto> devices = deviceComponent.queryDevicesByFiles(files,type,null,deviceType,deviceModel);
 			String batchNum = request.getParameter("batch_num");
 			deviceComponent.saveDeviceInputFile(optr, deviceInput, devices,deviceType,deviceModel,batchNum);
 		}catch(Exception e){
@@ -914,7 +906,7 @@ public class DeviceAction extends BaseAction {
 				deviceDto.setBatch_num(batch_num);
 			}
 		}
-		deviceComponent.saveDeviceInput(optr, deviceInput, list,SystemConstants.DEVICE_CFG_TYPE_HAND);
+		deviceComponent.saveDeviceInput(optr, deviceInput, list);
 		return JSON_SUCCESS;
 	}
 	

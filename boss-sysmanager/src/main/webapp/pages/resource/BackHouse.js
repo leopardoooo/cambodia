@@ -262,13 +262,47 @@ var MateralBackDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 	}
 });
 
+var BackMateralForm = Ext.extend(Ext.form.FormPanel,{
+	constructor:function(){
+		BackHandForm.superclass.constructor.call(this,{
+			labelWidth: 80,
+			height:155,
+			region:'north',
+			fileUpload: true,
+			bodyStyle:'padding-top:10px',
+			defaults:{
+				baseCls:'x-plain'
+			},
+			items:[
+				outputNo,
+				backSupplierCombo,
+				outputType,
+				backRemark
+			]
+		});
+	},
+	initComponent:function(){
+		BackMateralForm.superclass.initComponent.call(this);
+		
+		App.form.initComboData( this.findByType("paramcombo"));
+		
+		var comboes = this.findByType('combo');
+		if(comboes.length>0)
+			for(var i=0;i<comboes.length;i++){
+				if(!(comboes[i] instanceof Ext.ux.ParamCombo)){
+					comboes[i].getStore().load();	
+				}
+			}
+			
+	}
+});
 
 //器材退库
 BackMateralWin = Ext.extend(Ext.Window,{
 	handForm:null,
 	queryDeviceGrid:null,
 	constructor:function(){
-		this.handForm = new BackHandForm();
+		this.handForm = new BackMateralForm();
 		this.queryDeviceGrid = new MateralBackDeviceGrid();
 		BackMateralWin.superclass.constructor.call(this,{
 			id : 'backMateralWinId',
@@ -362,18 +396,22 @@ var BackFileForm = Ext.extend(Ext.form.FormPanel,{
 				baseCls:'x-plain'
 			},
 			items:[{
-				columnWidth:.5,layout:'form',
+				columnWidth:.45,layout:'form',
 				items:[
 					outputNo,
 					backSupplierCombo
 				]},
-				{columnWidth:.5,layout:'form',
+				{columnWidth:.55,layout:'form',
 					items:[
-						backDeviceType,
-						outputType
+						backDeviceType
+						,outputType
 					]
 				},{columnWidth:1,layout:'form',
-					items:[
+					items:[{
+			                xtype: 'displayfield',
+			                width : 400,
+			                value:"<font style='font-size:14px;color:red'>支持xls和txt,格式为：第一行为空,共1列：设备号</font>"
+						},
 						{id:'backHouseFileId',fieldLabel:DEV_COMMON_LU.labelDevFile,name:'files',xtype:'textfield',inputType:'file',allowBlank:false,anchor:'95%'},//,width:367},
 						backRemark
 				]}
@@ -382,9 +420,8 @@ var BackFileForm = Ext.extend(Ext.form.FormPanel,{
 	},
 	initComponent:function(){
 		BackFileForm.superclass.initComponent.call(this);
-		
 		App.form.initComboData( this.findByType("paramcombo"));
-		
+
 		var comboes = this.findByType('combo');
 		if(comboes.length>0)
 			for(var i=0;i<comboes.length;i++){
@@ -409,7 +446,7 @@ var BackFileWin = Ext.extend(Ext.Window,{
 			title:BH_LU.fileOutput,
 			closeAction:'hide',
 			maximizable:false,
-			width: 500,
+			width: 600,
 			height: 300,
 			layout: 'fit',
 			border: false,
@@ -429,17 +466,17 @@ var BackFileWin = Ext.extend(Ext.Window,{
 	},
 	doSave:function(){
 		if(this.fileForm.getForm().isValid()){
-			
 			var file = Ext.getCmp('backHouseFileId').getValue();
-			var flag = checkFileType(file);
-			if(!flag)return;
-			
+			var flag = checkTxtXlsFileType(file);
+			if(flag === false)return;
+			var msg = Show();
 			this.fileForm.getForm().submit({
-				url:'resource/Device!saveDeviceOutputFile.action',
-				waitTitle:COMMON_LU.tipTxt,
-				waitMsg:COMMON_LU.waitForUpload,
+				url:'resource/Device!saveDeviceOutputFile.action?fileType='+flag,
+//				waitTitle:COMMON_LU.tipTxt,
+//				waitMsg:COMMON_LU.waitForUpload,
 				scope:this,
 				success:function(form,action){
+					msg.hide();
 					var data = action.result;
 					if(data.success == true){
 						if(data.msg){//错误信息

@@ -4,6 +4,8 @@ import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * 
@@ -23,10 +25,15 @@ public class CC {
 //		System.out.print(p);
 //		CFee c = new CFee();
 //		System.out.println(PropertyUtils.getProperty(c, "optr_id"));
-		
-		String filePath = "E:\\work\\TCL1009台机顶盒入库文件.txt";  
-//      "res/";  
-        readTxtFile(filePath);  
+		String one = "装箱号1";
+		String one1 = "CSS0001";
+		String one2 = "A1中";
+		Pattern p = Pattern.compile("[^a-zA-Z0-9]"); 
+		Matcher m = p.matcher(one); 
+		String newFrist = m.replaceAll("");
+		System.out.println(newFrist.length()+"-"+one1.length()+"-"+one2.length());
+//		String filePath = "E:\\work\\TCL1009台机顶盒入库文件.txt";  
+//        readTxtFile(filePath);  
 	}
 
 	

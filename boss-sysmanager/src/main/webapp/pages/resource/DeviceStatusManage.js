@@ -190,8 +190,8 @@ var DeviceStatusFileForm = Ext.extend(Ext.form.FormPanel, {
 										fieldLabel : COMMON_LU.remarkTxt,
 										xtype : 'textarea',
 										name : 'remark',
-										width : 450,
-										height : 60
+										width : 300,
+										height : 100
 									}]
 						});
 			},
@@ -211,7 +211,7 @@ var DeviceStatusFileWin = Ext.extend(Ext.Window, {
 							closeAction : 'hide',
 							maximizable : false,
 							width : 500,
-							height : 290,
+							height : 350,
 							layout : 'fit',
 							border : false,
 							items : [this.statusForm],
@@ -243,23 +243,23 @@ var DeviceStatusFileWin = Ext.extend(Ext.Window, {
 				if (this.statusForm.getForm().isValid()) {
 
 					var file = Ext.getCmp('deviceStatusFielId').getValue();
-					var flag = checkFileType(file);
-					if (!flag)
-						return;
-
+					var flag = checkTxtXlsFileType(file);
+					if(flag === false)return;
+					var msg = Show();
 					this.statusForm.getForm().submit({
-						url : 'resource/Device!changeDeviceStatusFile.action',
-						waitTitle : '提示',
-						waitMsg : '正在上传中,请稍后...',
+						url : 'resource/Device!changeDeviceStatusFile.action?fileType='+flag,
+//						waitTitle : '提示',
+//						waitMsg : '正在上传中,请稍后...',
 						scope : this,
 						success : function(form, action) {
+							msg.hide();
 							var data = action.result;
 							if (data.success == true) {
-								var msg = '文件上传处理成功!';
+								var msgtxt = '文件上传处理成功!';
 								if (data.msg) {// 错误信息
-									msg = data.msg;
+									msgtxt = data.msg;
 								}
-								Alert(msg,function(){
+								Alert(msgtxt,function(){
 										this.hide();
 												Ext.getCmp('deviceStatusGridId')
 														.getStore().reload();
