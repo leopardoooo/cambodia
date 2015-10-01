@@ -63,6 +63,7 @@ import com.ycsoft.commons.helper.CollectionHelper;
 import com.ycsoft.commons.helper.DateHelper;
 import com.ycsoft.commons.helper.JsonHelper;
 import com.ycsoft.commons.helper.StringHelper;
+import com.ycsoft.commons.store.MemoryDict;
 import com.ycsoft.daos.core.JDBCException;
 import com.ycsoft.daos.core.Pager;
 import com.ycsoft.sysmanager.dto.resource.RDeviceModelTotalDto;
@@ -864,9 +865,13 @@ public class DeviceComponent extends BaseBusiComponent {
 	 */
 	public List<TDeviceBuyMode> queryDeviceBuyModel() throws Exception {
 		String dataRight = this.queryDataRightCon(getOptr(), DataRight.BUY_MODE.toString());
-		return tDeviceBuyModeDao.queryDeviceBuyModeByParams(
+		List<TDeviceBuyMode> list = tDeviceBuyModeDao.queryDeviceBuyModeByParams(
 				SystemConstants.BUY_TYPE_BUSI,
 				SystemConstants.BUSI_BUY_MODE_BUY, dataRight);
+		for(TDeviceBuyMode buyMode : list){
+			buyMode.setBuy_mode_name( MemoryDict.getTransData(buyMode.getBuy_mode_name()) );
+		}
+		return list;
 	}
 	
 	
