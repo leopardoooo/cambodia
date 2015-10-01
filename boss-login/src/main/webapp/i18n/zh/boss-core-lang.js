@@ -497,6 +497,7 @@ BCLang.msgBox = {
 	waitMsg:'操作中,请稍候~',
 	needCust:'请先查找要操作的客户!~',
 	needUser:'请选择用户!~',
+	needOneUser:'请选择单个用户!',
 	cancelFeeSuccess:'冲正成功!~',
 	confirmCancelFeeAndInvaidInvoice:'收据{0}将作废!该收据上的费用项需要重打，确定冲正?~',
 	confirmCancelFee:'确定冲正吗?~',

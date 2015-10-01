@@ -1277,8 +1277,7 @@ public class DeviceComponent extends BaseDeviceComponent {
 	public List<RDepotDto> queryChildDepot(SOptr optr) throws Exception{
 		String[] depotIds=null;
 		String dataRight = this.queryDataRightCon(optr, DataRight.DEVICE_MNG.toString());
-		if (dataRight.equals(DataRightLevel.AREA.toString())
-				&& optr.getArea_id().equals(SystemConstants.WH_AREA_ID)) {
+		if (dataRight.equals(DataRightLevel.AREA.toString())) {
 			depotIds = new String[2];
 			depotIds[0] = SystemConstants.WH_COUNTY_ID;
 			depotIds[1] = SystemConstants.ZS_COUNTY_ID;
@@ -1291,6 +1290,15 @@ public class DeviceComponent extends BaseDeviceComponent {
 		return rDepotDefineDao.queryChildDepot(depotIds);
 	}
 
+	public List<SDept> queryChildDept(SOptr optr) throws Exception{
+		String dataRight = this.queryDataRightCon(optr, DataRight.DEVICE_MNG.toString());
+		if (dataRight.equals(DataRightLevel.AREA.toString()) || optr.getCounty_id().equals(SystemConstants.COUNTY_ALL)) {
+			return sDeptDao.queryAllDept();
+		}
+		String depotId = findDepot(optr);
+		return sDeptDao.queryChildDept(depotId);
+	}
+	
 
 	/**
 	 * 查询当前仓库可以流转的上下级仓库

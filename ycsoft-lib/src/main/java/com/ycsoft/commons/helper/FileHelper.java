@@ -34,6 +34,7 @@ import org.apache.commons.beanutils.BeanUtils;
 
 import com.sun.rowset.CachedRowSetImpl;
 import com.ycsoft.commons.exception.ComponentException;
+import com.ycsoft.sysmanager.dto.resource.DeviceDto;
 
 import jxl.Cell;
 import jxl.CellType;
@@ -557,6 +558,24 @@ public class FileHelper {
 		return list;
 	}
 
+    public static final List<String> fileToArrayByType(File file,String type) throws Exception { 
+    	List<String> list = new ArrayList<String>();
+    	if(StringHelper.isEmpty(type)){
+			type = "TXT";
+		}
+		if("TXT".equals(type)){
+			list = readTxtFile(file);
+		}else if("XLS".equals(type)){
+			list = fileToArray(file);
+		}
+		if(list.size()==0 || list.size() == 1){
+			throw new ComponentException("操作失败,请检查文件");
+		}
+		//去掉第一行
+		list.remove(0);
+        return list;
+    } 
+	
     public static final List<String> readTxtFile(File file) throws Exception { 
     	List<String> list = new ArrayList<String>();
     	InputStreamReader read = null;
@@ -626,7 +645,7 @@ public class FileHelper {
 //				if(colNum -rowNum == 1 && j == colNum-1){//文件只有2列的情况下，默认系统字段有3列，第三列为文件第二列的值，主要是modem入库mac和modem_id一样的
 //					BeanHelper.setPropertyString(bean, colName[j],row[j-1] );
 //				}else{
-					BeanHelper.setPropertyString(bean, colName[j],row[j] );
+					BeanHelper.setPropertyString(bean, colName[j],row[j].trim() );
 //				}
 			}
 			list.add(bean);

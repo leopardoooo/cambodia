@@ -110,11 +110,11 @@ public class SDeptDao extends BaseEntityDao<SDept> {
 		String sql = "select level , s.*  from s_dept s "
 			+ " where s.status = ? start with s.dept_id in ( " +
 					" select dept_id from  (select  a.* ,RANK ()over(partition by  '' order by a.lv ) lvl "
-+" from (select level lv,  sc.* from s_dept sc "
-+" start with sc.dept_id='"+SystemConstants.COUNTY_ALL+"' "
-+" connect by prior sc.dept_id = sc.dept_pid) a "
-+" where "+getSqlGenerator().setWhereInArray("a.dept_id",countyIds)+
-" ) b where b.lvl=1 "
+			+" from (select level lv,  sc.* from s_dept sc "
+			+" start with sc.dept_id='"+SystemConstants.COUNTY_ALL+"' "
+			+" connect by prior sc.dept_id = sc.dept_pid) a "
+			+" where "+getSqlGenerator().setWhereInArray("a.dept_id",countyIds)+
+			" ) b where b.lvl=1 "
 		+") connect by prior s.dept_id = s.dept_pid  order by level,s.dept_type desc";
 		return createQuery(SDeptDto.class,sql, StatusConstants.ACTIVE).list();
 	}
@@ -124,5 +124,11 @@ public class SDeptDao extends BaseEntityDao<SDept> {
 		return createQuery(SDept.class,sql).list();
 	}
 	
+	public List<SDept> queryChildDept(String deptId) throws Exception{
+		String sql = "  select dept_id,( case when level=2 then '|-' when level=3 then '|----' when level=4 then '|-----'end) ||dept_name dept_name "
+				+ "from (select dept_id,dept_name,dept_pid from busi.s_dept t where t.status='ACTIVE') "
+				+ "start with dept_id=? connect by prior dept_id = dept_pid  ";
+		return createQuery(SDept.class,sql,deptId).list();
+	}
 
 }

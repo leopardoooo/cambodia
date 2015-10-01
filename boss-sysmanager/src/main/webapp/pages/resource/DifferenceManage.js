@@ -196,7 +196,11 @@ var DiffFileForm = Ext.extend(Ext.form.FormPanel,{
 				baseCls:'x-plain'
 			},
 			items:[ {columnWidth:1,layout:'form',
-					items:[
+					items:[{
+			                xtype: 'displayfield',
+			                width : 400,
+			                value:"<font style='font-size:13px;color:red'>支持xls和txt,格式为：第一行为空,共1列：设备号</font>"
+						},
 						{id:'differenceManageFielId',fieldLabel:DEV_COMMON_LU.labelDevFile,name:'files',xtype:'textfield',inputType:'file',allowBlank:false,anchor:'80%',emptyText:''},
 						 {fieldLabel:COMMON_LU.remarkTxt,name:'remark',xtype:'textarea',anchor:'80%',height:50},
 						{id:'depotId',name:'depotId',xtype:'hidden'}

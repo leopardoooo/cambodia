@@ -19,6 +19,7 @@ import com.ycsoft.commons.helper.FileHelper;
 import com.ycsoft.commons.helper.JsonHelper;
 import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.sysmanager.component.resource.JobComponent;
+import com.ycsoft.sysmanager.dto.resource.DeviceDto;
 
 @Controller
 public class JobAction extends BaseAction {
@@ -132,8 +133,9 @@ public class JobAction extends BaseAction {
 		List<String> cardList = new ArrayList<String>();
 		String msg = "";
 		List<JBusiCmd> list =  new ArrayList<JBusiCmd>();
+		String type = request.getParameter("fileType");
 		if(files != null){
-			cardList = FileHelper.fileToArray(files);
+			cardList = FileHelper.fileToArrayByType(files,type);
 		}
 		try{
 			if(cardList.size() > 500){

@@ -478,6 +478,10 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		if(!user.getCust_id().equals(custId)){
 			throw new ServicesException(ErrorCode.CustDataException);
 		}
+		//拆机完成后才能销户
+		if(!user.getUser_type().equals(USER_TYPE_OTT_MOBILE) || !user.getStatus().equals(StatusConstants.UNTUCKEND)){
+			throw new ServicesException(ErrorCode.UserStatusNotOff);
+		}
 		
 		DeviceDto device = null;
 		if( (user.getUser_type().equals(USER_TYPE_DTT) || user.getUser_type().equals(USER_TYPE_OTT)) && StringHelper.isNotEmpty(user.getStb_id()) ){

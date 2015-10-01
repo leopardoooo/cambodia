@@ -233,7 +233,7 @@ public class DeviceAction extends BaseAction {
 					+ "WEB-INF" + File.separator + "classes" + File.separator + PROP_FILE_NAME;
 			map = FileHelper.getPropertiesMap(filePath);
 			if(SystemConstants.DEVICE_TYPE_STB.equals(deviceType)){//如果是机顶盒,增加显示配对智能卡号
-				map.put("pair_device_code", "00配对智能卡号");
+				map.put("pair_device_code", "00智能卡或MAC");
 			}
 			
 			List<Map.Entry<String, String>> resultList = sortList(map);
@@ -771,6 +771,11 @@ public class DeviceAction extends BaseAction {
 	
 	public String queryAllDept() throws Exception {
 		getRoot().setRecords(deviceComponent.queryAllDept());
+		return JSON_RECORDS;
+	}
+	
+	public String queryChildDept() throws Exception {
+		getRoot().setRecords(deviceComponent.queryChildDept(optr));
 		return JSON_RECORDS;
 	}
 

@@ -851,8 +851,12 @@ Ext.apply(MenuHandler, {
 			Alert(lmsg('needUser'));
 			return false;
 		}
-		if (userRecords[0].get("status") != "ACTIVE" &&  userRecords[0].get("status") != "INSTALL") {
-			Alert(lmsg('userNotActive'));
+		if(userRecords.length>1){
+			Alert(lmsg('needOneUser'));
+			return false;
+		}
+		if (userRecords[0].get("user_type") !='OTT_MOBILE' && userRecords[0].get("status") != "UNTUCKEND") {
+			Alert('用户还未拆机完成或者工单未作废');
 			return false;
 		}
 		

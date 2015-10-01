@@ -513,7 +513,7 @@ Sys = {
 		titleOutputInfo:'退库信息~',
 		fileOutput:'文件退库~',
 		manualOutput:'手工退库~',
-		materalOutPut:'材料退库~'
+		materalOutPut:'器材退库~'
 		
 	},
 	Deploy : {// 基本配置

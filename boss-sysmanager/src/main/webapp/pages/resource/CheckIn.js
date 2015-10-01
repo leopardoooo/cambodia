@@ -201,7 +201,7 @@ var CheckInGrid = Ext.extend(Ext.grid.GridPanel,{
 	                hasSearch : true,
 	                emptyText: '入库单号,批号,设备类型模糊查询'
 	            }),'-','->','-',
-				{text:CHECK_LU.labelFileInput,iconCls:'icon-excel',scope:this,handler:this.fileCheckIn,tooltip:lsys('msgBox.tipCheckInFileInput')},'-',
+				{text:CHECK_LU.labelFileInput,iconCls:'icon-excel',scope:this,handler:this.fileCheckIn},'-',
 				{text:CHECK_LU.labelManualInput,iconCls:'icon-hand',scope:this,handler:this.handCheckIn},
 					{text:CHECK_LU.labelMateralCheckIn,iconCls:'icon-hand',scope:this,handler:this.materalCheckIn},'-'
 			],

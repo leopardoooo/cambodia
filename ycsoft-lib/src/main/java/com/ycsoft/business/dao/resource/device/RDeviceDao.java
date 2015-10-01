@@ -342,13 +342,13 @@ public class RDeviceDao extends BaseEntityDao<RDevice> {
 						" from r_device r,r_stb t,r_card d"+
 						" where r.device_id=t.device_id and t.pair_card_id=d.device_id(+) "+
 						" and r.depot_id=?";
-//			}else if(mode.equals(SystemConstants.DEVICE_TYPE_CARD)){
-//				sql += " select r.*,t.card_id device_code,"+
-//						"'' pair_device_code,'' pair_device_model,'' modem_mac"+
-//						" from r_device r,r_card t"+
-//						" where r.device_id=t.device_id " +
-//						" and not exists (select s.device_id from r_stb s where s.pair_card_id = t.device_id )"+
-//						" and r.depot_id=?";
+			}else if(mode.equals(SystemConstants.DEVICE_TYPE_CARD)){
+				sql += " select r.*,t.card_id device_code,"+
+						"'' pair_device_code,'' pair_device_model,'' modem_mac"+
+						" from r_device r,r_card t"+
+						" where r.device_id=t.device_id " +
+						" and not exists (select s.device_id from r_stb s where s.pair_card_id = t.device_id )"+
+						" and r.depot_id=?";
 			}else if(mode.equals(SystemConstants.DEVICE_TYPE_MODEM)){
 				sql += " select r.*,t.modem_mac device_code,"+
 						"'' pair_device_code,'' pair_device_model,t.modem_mac"+
@@ -356,18 +356,11 @@ public class RDeviceDao extends BaseEntityDao<RDevice> {
 						" where r.device_id=t.device_id"+
 //						" and not exists (select s.device_id from r_stb s where s.pair_modem_id = t.device_id ) "+
 						" and r.depot_id=?";
-			}else if(mode.equals("STBCARD")){
-				sql += "select r.*,t.stb_id device_code,"+
-						"d.card_id pair_device_code,d.device_model pair_device_model,'' modem_mac"+
-						" from r_device r,r_stb t,r_card d"+
-						" where r.device_id=t.device_id and t.pair_card_id=d.device_id and t.mac is null "+
-						" and r.depot_id=?";
-			}else if(mode.equals("STBCARDMODEM")){
-				sql += "select r.*,t.stb_id device_code,"+
-						" d.card_id pair_device_code,d.device_model pair_device_model,t.mac modem_mac"+
-						" from r_device r,r_stb t,r_card d"+
-						" where r.device_id=t.device_id and t.pair_card_id=d.device_id "
-						+ " and t.pair_card_id is not null and t.mac is not null "+
+			}else if(mode.equals(SystemConstants.DEVICE_TYPE_FITTING)){
+				sql += " select r.*, ''  device_code,"+
+						"'' pair_device_code,'' pair_device_model,'' modem_mac"+
+						" from r_device r "+
+						" where  r.device_type  = '"+SystemConstants.DEVICE_TYPE_FITTING+"' "+
 						" and r.depot_id=?";
 			}else{
 				sql += "select r.*,t.stb_id device_code,"+
