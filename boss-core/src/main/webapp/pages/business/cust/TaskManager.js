@@ -303,14 +303,16 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 				text: '分配施工队',
 				height: 30,
 				width: 80,
+				disabled:true,
 				style: 'color: red;',
 				scope: this,
 				handler: this.doTeamTask
 			},{
-				id:'ivalid_btn_id',
+				id:'removeTaskBtnId',
 				text: '工单作废',
 				height: 30,
 				width: 80,
+				disabled:true,
 				style: 'color: red;',
 				scope: this,
 				handler: this.doCancelTask
@@ -319,6 +321,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 				text: '回填设备',
 				height: 30,
 				width: 80,
+				disabled:true,
 				style: 'color: red;',
 				scope: this,
 				handler: this.doDeviceTask
@@ -327,6 +330,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 				text: '完工',
 				height: 30,
 				width: 80,
+				disabled:true,
 				style: 'color: red;',
 				scope: this,
 				handler: this.doEndTask

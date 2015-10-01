@@ -25,6 +25,7 @@ import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.daos.abstracts.BaseEntityDao;
 import com.ycsoft.daos.core.JDBCException;
 import com.ycsoft.daos.core.Pager;
+import com.ycsoft.sysmanager.dto.resource.DeviceDetailInputDto;
 import com.ycsoft.sysmanager.dto.resource.DeviceDto;
 
 
@@ -959,5 +960,16 @@ public class RDeviceDao extends BaseEntityDao<RDevice> {
 				+ " group by sm.model_name,ds.supplier_name,d.batch_num, d.box_no"
 				+ " ) order by box_no desc";
 		return this.createQuery(sql, deviceDoneCode, deviceDoneCode, deviceDoneCode).list();
+	}
+
+	public Pager<DeviceDetailInputDto> queryInputDeviceDetail(int deviceDoneCode, Integer start, Integer limit) throws Exception {
+		String sql = "select r.box_no,t.stb_id device_code,t.device_model,case when t2.card_id is null then t.mac else t2.card_id  end pair_device_code "
+				+ "from r_stb t, r_device_done_deviceid t1,r_card t2,r_device r "
+				+ "where t.device_id = t1.device_id and t.device_id = r.device_id "
+				+ "and t.pair_card_id = t2.device_id(+) and t1.device_done_code = ? "
+				+ "union select r.box_no,t.modem_id device_code,t.device_model,t.modem_mac pair_device_code "
+				+ "from r_modem t, r_device_done_deviceid t1,r_device r "
+				+ "where t.device_id = t1.device_id and t.device_id = r.device_id and t1.device_done_code = ?  ";
+		return this.createQuery(DeviceDetailInputDto.class, sql,deviceDoneCode,deviceDoneCode ).setStart(start).setLimit(limit).page();
 	}
 }

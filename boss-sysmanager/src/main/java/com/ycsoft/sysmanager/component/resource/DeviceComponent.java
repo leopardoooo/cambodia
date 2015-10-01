@@ -91,6 +91,7 @@ import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.daos.core.JDBCException;
 import com.ycsoft.daos.core.Pager;
 import com.ycsoft.sysmanager.dto.depot.RDeviceTransferDto;
+import com.ycsoft.sysmanager.dto.resource.DeviceDetailInputDto;
 import com.ycsoft.sysmanager.dto.resource.DeviceDto;
 import com.ycsoft.sysmanager.dto.resource.DeviceInputDetailDto;
 import com.ycsoft.sysmanager.dto.resource.DeviceProcureDto;
@@ -2358,6 +2359,11 @@ public class DeviceComponent extends BaseDeviceComponent {
 		return devices;
 	}
 	
+	public Pager<DeviceDetailInputDto> queryInputDeviceDetail(int deviceDoneCode, Integer start, Integer limit) throws Exception{
+		return rDeviceDao.queryInputDeviceDetail(deviceDoneCode,start, limit);
+	}
+
+	
 	/**
 	 * @param deviceTransferDao
 	 *            the rDeviceTransferDao to set
@@ -2519,6 +2525,7 @@ public class DeviceComponent extends BaseDeviceComponent {
 	public void setRDeviceTypeDao(RDeviceTypeDao deviceTypeDao) {
 		this.rDeviceTypeDao = deviceTypeDao;
 	}
+
 
 
 

@@ -349,6 +349,11 @@ public class DeviceAction extends BaseAction {
 		getRoot().setPage(deviceComponent.queryTransferDeviceDetail(deviceDoneCode, deviceType, start, limit));
 		return JSON_PAGE;
 	}
+	
+	public String queryInputDeviceDetail() throws Exception {
+		getRoot().setPage(deviceComponent.queryInputDeviceDetail(deviceDoneCode, start, limit));
+		return JSON_PAGE;
+	}
 
 	/**
 	 * 根据设备类型查询型号

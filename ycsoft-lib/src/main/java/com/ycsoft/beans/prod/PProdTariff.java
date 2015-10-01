@@ -40,6 +40,8 @@ public class PProdTariff extends OptrBase implements Serializable {
 	private String rule_id;
 	private String tariff_type;
 	private String spkg_sn;
+	private Date eff_date;
+	private Date exp_date;
 
 	private String billing_type_text;
 	private String status_text;
@@ -49,6 +51,23 @@ public class PProdTariff extends OptrBase implements Serializable {
 	private String use_fee_rule_text;
 	private String bill_rule_text;
 	private String tariff_type_text;
+
+	
+	public Date getEff_date() {
+		return eff_date;
+	}
+
+	public void setEff_date(Date eff_date) {
+		this.eff_date = eff_date;
+	}
+
+	public Date getExp_date() {
+		return exp_date;
+	}
+
+	public void setExp_date(Date exp_date) {
+		this.exp_date = exp_date;
+	}
 
 	public String getRule_id_text() {
 		return rule_id_text;
