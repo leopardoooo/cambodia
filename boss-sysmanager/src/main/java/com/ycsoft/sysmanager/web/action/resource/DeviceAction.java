@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.struts2.ServletActionContext;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
 import com.google.gson.Gson;
@@ -35,6 +36,7 @@ import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.commons.tree.TreeBuilder;
 import com.ycsoft.daos.core.JDBCException;
 import com.ycsoft.sysmanager.component.resource.DeviceComponent;
+import com.ycsoft.sysmanager.component.resource.DevicePrintComponent;
 import com.ycsoft.sysmanager.component.resource.JobComponent;
 import com.ycsoft.sysmanager.dto.depot.RDeviceTransferDto;
 import com.ycsoft.sysmanager.dto.resource.DeviceDto;
@@ -47,6 +49,8 @@ public class DeviceAction extends BaseAction {
 	 */
 	private static final long serialVersionUID = 732231340135621730L;
 	private DeviceComponent deviceComponent;
+	@Autowired
+	private DevicePrintComponent devicePrintComponent;
 	private JobComponent jobComponent;
 
 	private int deviceDoneCode;
@@ -233,7 +237,7 @@ public class DeviceAction extends BaseAction {
 					+ "WEB-INF" + File.separator + "classes" + File.separator + PROP_FILE_NAME;
 			map = FileHelper.getPropertiesMap(filePath);
 			if(SystemConstants.DEVICE_TYPE_STB.equals(deviceType)){//如果是机顶盒,增加显示配对智能卡号
-				map.put("pair_device_code", "00智能卡或MAC");
+				map.put("pair_device_code", "00配对智能卡号");
 			}
 			
 			List<Map.Entry<String, String>> resultList = sortList(map);
@@ -773,11 +777,14 @@ public class DeviceAction extends BaseAction {
 		getRoot().setRecords(deviceComponent.queryAllDept());
 		return JSON_RECORDS;
 	}
-	
+
+
 	public String queryChildDept() throws Exception {
 		getRoot().setRecords(deviceComponent.queryChildDept(optr));
 		return JSON_RECORDS;
 	}
+
+
 
 	/**
 	 * 根据设备编号查询信息
@@ -1081,6 +1088,12 @@ public class DeviceAction extends BaseAction {
 		getRoot().setOthers(deviceComponent.queryDeviceStbModem());
 		return JSON_OTHER;
 		
+	}
+	
+
+	public String queryTransferdevicePrintInfo() throws Exception {
+		getRoot().setSimpleObj( devicePrintComponent.queryTransferdevicePrintInfo(deviceDoneCode) );
+		return JSON_SIMPLEOBJ;
 	}
 	
 	public void setDeviceDoneCode(int deviceDoneCode) {

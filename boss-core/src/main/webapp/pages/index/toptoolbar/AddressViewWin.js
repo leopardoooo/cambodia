@@ -125,7 +125,7 @@ AddressTree = Ext.extend(Ext.ux.tree.TreeGridEditor,{
 	        columns: [{
 	            header: langUtils.bc('home.tools.AddressNodeManage.formWin.labelAddrTree'),
 	            dataIndex: 'text',
-	            width:250,
+	            width:200,
 	            displayTip: true
 	        }],
 	        // 设置Obar
@@ -133,7 +133,7 @@ AddressTree = Ext.extend(Ext.ux.tree.TreeGridEditor,{
 	            column: {
 	                header: langUtils.bc('common.doActionBtn'),
 	                dataIndex: 'id',
-	                width:200
+	                width:250
 	            },
 	            btns: [{
 	                id: 'add',
@@ -151,17 +151,17 @@ AddressTree = Ext.extend(Ext.ux.tree.TreeGridEditor,{
 	                }
 	            },{
 	                id: 'edit',
-	                text:langUtils.bc('common.update'),
+	                text: lbc('common.update'),
 	                handler : function(n){
 	                	new AddressWin('edit',n).show();
 	                }
 	            }, {
 	                id: 'statusActive',
-	                text:langUtils.bc('common.enableBtn'),
+	                text: lbc('common.enableBtn'),
 	                handler : this.doStatusActive
 	            }, {
 	                id: 'statusInvalid',
-	                text:langUtils.bc('common.forbiddenBtn') ,
+	                text: lbc('common.forbiddenBtn') ,
 	                handler : this.doStatusInvalid,
 	                validator: this.checkRemove
 	            }]
@@ -653,13 +653,13 @@ AddressViewWin = Ext.extend(Ext.Window,{
 		AddressViewWin.superclass.constructor.call(this,{
 			id:'AddressViewWinId',
 			layout : 'fit',
-			title : "地址管理",
+			title : lbc('home.tools.AddressNodeManage.panelTitle'),
 			border : false ,
 			closeAction : 'hide',
 			width:800,
 			height : 450,
 			items : [this.addrTree],
-			buttons : [{text : '关闭',scope : this,handler : function() {this.hide();}}]
+			buttons : [{text : lbc('common.close'),scope : this,handler : function() {this.hide();}}]
 		});
 	}
 });

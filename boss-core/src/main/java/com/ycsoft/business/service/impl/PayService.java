@@ -189,11 +189,12 @@ public class PayService extends BaseBusiService implements IPayService {
 					}
 					info=SystemConstants.UNPAY_CANCEL_PROMPT_FEEANDBUSI;
 				}else{
-					//产品退订，退款转到账户，业务正常
-					if(!onlyShowInfo){
-						this.cancelUnPayProdUnsubscribePay(fee,doneCode);
-					}
-					info=SystemConstants.UNPAY_CANCEL_PROMPT_ONLYACCT;
+					//产品退订，不能取消
+					throw new ServicesException(ErrorCode.UnPayOrderCancelUnsubscribe);
+					//if(!onlyShowInfo){
+					//	this.cancelUnPayProdUnsubscribePay(fee,doneCode);
+					//}
+					//info=SystemConstants.UNPAY_CANCEL_PROMPT_ONLYACCT;
 				}
 			}else{
 				if(fee.getReal_pay()>0){
@@ -439,7 +440,7 @@ public class PayService extends BaseBusiService implements IPayService {
 	}
 	/**
 	 * 取消订单退订金额：  退款转给账户，业务正常
-	 */
+	 
 	private void cancelUnPayProdUnsubscribePay(CFeeAcct fee,Integer doneCode) throws Exception{
 		
 		String order_sn=fee.getProd_sn();
@@ -468,7 +469,7 @@ public class PayService extends BaseBusiService implements IPayService {
 		orderComponent.saveOrderFeeOut(outList, doneCode);
 		//作废缴费
 		feeComponent.saveCancelFeeUnPay(fee, doneCode);
-	}
+	}*/
 	
 	/**
 	 * 只取消设备费用,业务正常

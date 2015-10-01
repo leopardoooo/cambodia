@@ -17,16 +17,17 @@ var FeeUnitpreGrid = Ext.extend(Ext.grid.GridPanel,{
 		});
 		
 		var sm = new Ext.grid.CheckboxSelectionModel();
+		var cols = lbc('home.tools.feeUnitpre.cols');
 		var columns = [
-			{header:'合同类型',dataIndex:'fee_type_text',width:100},
-			{header:'合同号',dataIndex:'contract_no',width:100,renderer : App.qtipValue},
-			{header:'合同名称',dataIndex:'contract_name',width:120},
-			{header:'客户名称',dataIndex:'cust_name',width:120},
-			{header:'合同金额',dataIndex:'nominal_amount',width:100,renderer:Ext.util.Format.formatFee},
-//			{header:'已付金额',dataIndex:'payed_amount',width:80,renderer:Ext.util.Format.formatFee},
-			{header:'发票号码',dataIndex:'invoice_id',width:120,renderer : App.qtipValue},
-			{header:'发票代码',dataIndex:'invoice_code',width:60,renderer : App.qtipValue,hidden:true},
-		    {   header: '操作',
+			{header:cols[0],dataIndex:'fee_type_text',width:100},
+			{header:cols[1],dataIndex:'contract_no',width:100,renderer : App.qtipValue},
+			{header:cols[2],dataIndex:'contract_name',width:120},
+			{header:cols[3],dataIndex:'cust_name',width:120},
+			{header:cols[4],dataIndex:'nominal_amount',width:100,renderer:Ext.util.Format.formatFee},
+//			{header:cols,dataIndex:'payed_amount',width:80,renderer:Ext.util.Format.formatFee},
+			{header:cols[5],dataIndex:'invoice_id',width:120,renderer : App.qtipValue},
+//			{header:cols[6],dataIndex:'invoice_code',width:60,renderer : App.qtipValue,hidden:true},
+		    {   header: cols[7],
 		        dataIndex: 'contract_id',
 		        width:200,
 		        scope:this,
@@ -46,16 +47,16 @@ var FeeUnitpreGrid = Ext.extend(Ext.grid.GridPanel,{
 			loadMask : true,
 			sm : sm,
 			tbar:[
-				{text:'添加',sope:this,handler:this.doAdd}
+				{text: lbc('common.add'),sope:this,handler:this.doAdd}
 			],
-			tbar : [' ',' ','输入关键字' , ' ',       //搜索功能
+			tbar : [' ',' ',lbc('home.tools.feeUnitpre.msg.enterKeywords'), ' ',       //搜索功能
 				new Ext.ux.form.SearchField({  
 	                store: this.feeUnitpreStore,
 	                width: 200,
 	                hasSearch : true,
-	                emptyText: '支持客户名称或合同号模糊查询'
+	                emptyText: lbc('home.tools.feeUnitpre.msg.custNameOrContractNoQuery')
 	            }),'->','-',{
-	        	text : '添加',
+	        	text : lbc('common.add'),
 	        	iconCls : 'icon-add',
 	        	scope : this,
 	        	handler : this.doAdd
@@ -491,7 +492,7 @@ var FeeUnitpreWin = Ext.extend(Ext.Window,{
 		FeeUnitpreWin.superclass.constructor.call(this,{
 			id:'feeUnitpreWinId',
 			closeAction : 'close',
-			title:'非营业收费信息',
+			title: lbc('home.tools.feeUnitpre._title'),
 			width:850,
 			height : 450,
 			border:false,

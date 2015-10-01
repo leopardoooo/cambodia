@@ -3,6 +3,7 @@ BCLang = {}
 BCLang.common = {
 	optr: "操作~",
 	confirm: '确认~',
+	remove: '移除~',
 	switchor: '选择~',
 	pswd: '密码~',
 	newPswd: '新密码~',
@@ -66,7 +67,8 @@ BCLang.common = {
 	forbiddenBtn:'禁用~',
 	enableBtn:'启用~',
 	cancelBtn:'取消~',
-	doActionBtn:'操作~'
+	doActionBtn:'操作~',
+	add: '添加~'
 }
 //主页模块
 BCLang.home = {
@@ -444,41 +446,114 @@ BCLang.home = {
 			
 		},
 		AddressNodeManage: {//地址节点配置
-			panelTitle:'地址管理',//面板主标题
+			panelTitle:'地址管理~',//面板主标题
 			msg:{//各种提示消息
-				actionFailed:'操作失败',
-				actionSuccess:'操作成功',
-				confirmSave:'确认保存?',
-				confirmInvalid:'确认要禁用?',
-				confirmDelete:'确认要删除?',
-				confirmActivate:'确认要激活?',
-				cantDelete:'还有客户在使用，暂不能删除。',
-				cantBeInvalided:'存在子级别,无法禁用!',
-				maxDepthText: '不能再往下添加',
-				noSingleQuoteAllowed:'请不要输入单引号'
+				actionFailed:'操作失败~',
+				actionSuccess:'操作成功~',
+				confirmSave:'确认保存?~',
+				confirmInvalid:'确认要禁用?~',
+				confirmDelete:'确认要删除?~',
+				confirmActivate:'确认要激活?~',
+				cantDelete:'还有客户在使用，暂不能删除。~',
+				cantBeInvalided:'存在子级别,无法禁用!~',
+				maxDepthText: '不能再往下添加~',
+				noSingleQuoteAllowed:'请不要输入单引号~'
 				
 			},
 			formWin:{
-				labelSortNum:'序号',
-				labelProvince:'省',
-				labelDistrict:'行政区域',
-				labelNetType:'网络类型',
-				emptyTxtProvince:'请选择省',
-				emptyTxtBlurQuery:'支持模糊查询',
-				btnTxtClose:'关闭',
-				btnTxtSave:'保存',
-				labelRoadNum:'路号名称',
-				titleNewSaveLevelRoadNum:'新增路号',
-				labelStreatName:'街道名称',
-				titleNewSaveLevelStreet:'新增街道',
-				labelCityName:'城市名称',
-				titleNewSaveLevelCity:'新增城市',
-				labelShowName:'显示名称',
-				labelParentName:'上级名称',
+				labelSortNum:'序号~',
+				labelProvince:'省~',
+				labelDistrict:'行政区域~',
+				labelNetType:'网络类型~',
+				emptyTxtProvince:'请选择省~',
+				emptyTxtBlurQuery:'支持模糊查询~',
+				btnTxtClose:'关闭~',
+				btnTxtSave:'保存~',
+				labelRoadNum:'路号名称~',
+				titleNewSaveLevelRoadNum:'新增路号~',
+				labelStreatName:'街道名称~',
+				titleNewSaveLevelStreet:'新增街道~',
+				labelCityName:'城市名称~',
+				titleNewSaveLevelCity:'新增城市~',
+				labelShowName:'显示名称~',
+				labelParentName:'上级名称~',
 				
-				labelNewAddChild:'新增下级',
-				labelNewAddBrother:'新增平级',
-				labelAddrTree:'地址树'
+				labelNewAddChild:'新增下级~',
+				labelNewAddBrother:'新增平级~',
+				labelAddrTree:'地址树~'
+			}
+		},
+		TaskManager : {
+			_title : '工单管理~',
+			_operateTitle : '操作明细~',
+			_userTitle : '用户明细~',
+			_winTitle : '工单完工~',
+			forms : {
+				custNo : '客户编号~',
+				taskNo : '工单编号~',
+				custName : '客户名称~',
+				mobile : '联系电话~',
+				newaddr : '地址~',
+				taskStatus : '工单状态~',
+				taskDetailType : '工单类型~',
+				taskAddr : '地区~',
+				taskTeam : '施工队~',
+				faultType : '故障类型~',
+				finishType : '完工类型~',
+				finishExplan : '完工说明~'
+			},
+			buttons : {
+				query : '查询~',
+				pendingOrder : '待处理工单~',
+				accptTime : '受理时间:~',
+				distTeam : '分配施工队~',
+				invalidTeam : '工单作废~',
+				backDevice : '回填设备~',
+				finish : '完工~',
+				returning : '回访~',
+				sendAuth : '发送ZTE授权~'
+			},
+			taskCols : ['工单类型~', '客户名称~', '工单状态~', '施工队~', 'ZTE状态~', '地址~',
+					'联系电话~', '创建时间~', '故障类型~', '故障详细信息~'],
+			userCols : ['用户类型~', '用户名~', '密码~', '设备型号~', '设备号~', 'posNo~',
+					'occNo~', '带宽~'],
+			operateCols : ['操作时间~', '操作类型~', '操作人~', '同步状态~', '描述~'],
+			taskDeviceCols : ['用户类型~', '用户名~', '型号~', '设备编号~', '设备回收~'],
+			msg : {
+				enterDeviceNo : '请输入设备号~',
+				noCancel : '不允许取消!~',
+				sureWantSelectedWork : '确定要作废选中的工单吗?~',
+				teamCantEmpty : '施工队不能为空~',
+				faultTypeCantEmpty : '故障类型不能为空~',
+				finishTypeCantEmpty : '完工类型不能为空~',
+				selectRecord : '请选择需要操作的记录!~',
+				roderHaveBeenCompletedOrObsolete : '工单已完工或已作废~',
+				teamIsnotSingleWork : '该工单施工队不是本部门~'
+			}
+		},
+		feeUnitpre : {
+			_title : '非营业费收费信息~',
+			cols : ['合同类型~', '合同号~', '合同名称~', '客户名称~', '合同金额~', '发票号码~', '操作~'],
+			forms : {
+				cust_name : '客户名称~',
+				contract_no : '合同号~',
+				nominal_amount : '合同金额~',
+				fee_name : '费用名称~',
+				contract_name : '合同名称~',
+				addr_district : '所属城市~',
+				lblFee : '总额USD~',
+				LabelJian : '柬埔寨KHR~',
+				nfDollar : '实收USD~',
+				nfJianYuan : '实收KHR~',
+				labelExchange : '当日汇率~',
+				pay_type : '缴费方式~',
+				receipt_id : '票据编号~',
+				invoice_id : '收据号~'
+			},
+			msg : {
+				enterKeywords : '输入关键字~',
+				receiptCantUsed : '该收据无法使用~',
+				custNameOrContractNoQuery : '支持客户名称或合同号模糊查询~'
 			}
 		}
 	}

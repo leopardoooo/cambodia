@@ -251,15 +251,15 @@ Ext.apply( App, {
 				});
 			}else if('TaskManager' == App.data.resources[i].handler){
 				menuItems.push({
-					itemId: App.data.resources[i].handler,
-					text: App.data.resources[i].text,
+					itemId: 'TaskManager',
+					text: text,
 					iconCls: App.data.resources[i].iconCls,
 					attrs : App.data.resources[i]
 				});
 			}else if('AddressViewWin' == App.data.resources[i].handler){
 				menuItems.push({
-					itemId: App.data.resources[i].handler,
-					text: App.data.resources[i].text,
+					itemId: 'AddressViewWin',
+					text: text,
 					iconCls: App.data.resources[i].iconCls,
 					attrs : App.data.resources[i]
 				});
@@ -359,8 +359,7 @@ Ext.apply( App, {
 		var pLeft = Ext.isIE ? 'padding-left:10px':'';
 		var toolstr = "<div style='width:"+width+"px;float:left;padding-left:50px' >" +
 				"<div class='top_button print_big' onClick='App.openPrint()'></div>" +
-				"<div style='font:11px'>" +
-				"发票打印</div></div>";
+				"<div style='font:11px'>"+lbc('home.tools.InvoicePrint._title')+"</div></div>";
 //		toolstr +="<div style='width:"+width+"px;float:left;padding-left:"+leftWidth+"px;' >" +
 //				"<div class='top_button print_big' onClick='App.openBankPayment()'>" +
 //				"</div><div style='font:11px'>银行打印</div></div>";
@@ -396,13 +395,8 @@ Ext.apply( App, {
  	},
  	openPrint:function(){
  		App.getApp().data.currentResource = {busicode:'1068'};
- 		if (App.data.custFullInfo.cust.cust_type=='UNIT'){
- 			App.getApp().menu.bigWindow.show({ text: '发票打印',  attrs: {busiCode:'1068',
-					url: 'pages/business/pay/Print.jsp?type=unit'}} ,{width: 710, height: 460});
- 		}else{
- 			App.getApp().menu.bigWindow.show({ text: '发票打印',  attrs: {busiCode:'1068',
-					url: 'pages/business/pay/Print.jsp?type=through'}} ,{width: 710, height: 460});
- 		}
+		App.getApp().menu.bigWindow.show({ text: lbc('home.tools.InvoicePrint._title'),  attrs: {busiCode:'1068',
+				url: 'pages/business/pay/Print.jsp?type=through'}} ,{width: 710, height: 460});
  		
  	},
  	openConfigPrint:function(){
