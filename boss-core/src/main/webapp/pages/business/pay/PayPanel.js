@@ -24,6 +24,7 @@ PayPanel = Ext.extend( Ext.Panel ,{
 		var bt = langUtils.main("cashPay.pay.buttons");
 		this.paySm = new Ext.grid.CheckboxSelectionModel();
 		//费用表格
+		var cancelText = lbc('common.cancel');
 		this.feeGrid = new Ext.grid.GridPanel({
 			title: langUtils.main('cashPay.pay._stayTitle'),
 			region: 'center',
@@ -32,7 +33,7 @@ PayPanel = Ext.extend( Ext.Panel ,{
 			columns: [
 				this.paySm,
 			    { header: lc[0], width: 50,renderer: function(v , md, record , i  ){
-					return "<DIV><a href='#' onclick=Ext.getCmp('PayPanelId').deletePay()>取消</a></DIV>";
+					return "<DIV><a href='#' onclick=Ext.getCmp('PayPanelId').deletePay()>"+cancelText+"</a></DIV>";
 				}},
 				{ header: lc[1], dataIndex: 'busi_name', width: 80},
 				{ header: lc[2], dataIndex: 'fee_text',width: 120, renderer:App.qtipValue},
@@ -97,8 +98,8 @@ PayPanel = Ext.extend( Ext.Panel ,{
 						layout: 'border',
 						items: [this.feeGrid ],
 						bbar:['-',
-							{text: '确认', iconCls: 'icon-confirm', scope:this, handler: this.doConfirm},'-',
-							{text: '移除', iconCls: 'icon-del', scope:this, handler: this.doDelete},'-']
+							{text: lbc('common.confirm'), iconCls: 'icon-confirm', scope:this, handler: this.doConfirm},'-',
+							{text: lbc('common.remove'), iconCls: 'icon-del', scope:this, handler: this.doDelete},'-']
 					},
 					{
 						region: 'south',

@@ -3,6 +3,7 @@ BCLang = {}
 BCLang.common = {
 	optr: "operation~",
 	confirm: 'Confirm~',
+	remove: 'Remove~',
 	switchor: 'select~',
 	pswd: 'password~',
 	newPswd: 'new password~',
@@ -23,7 +24,7 @@ BCLang.common = {
 	filterTitle: 'condition filtration~',
 	tipExistsSystem:'Are you sure to exist~',
 	queryBtn:'Inquiry~',
-	queryBtnWithBackSpace:' Inquiry ~',
+	queryBtnWithBackSpace:' Inquiry~',
 	total: 'Total~',
 	subTotal: 'sub-total~',
 	price: 'unit price~',
@@ -61,7 +62,13 @@ BCLang.common = {
 	yes: 'yes~',
 	print: 'print~',
 	cancel: 'cancel~',
-	no: 'no~'
+	no: 'no~',
+	update: 'Modify~',
+	forbiddenBtn: 'disabled~',
+	enableBtn: 'Enable~',
+	cancelBtn: 'Cancel~',
+	doActionBtn: 'Manipulation~',
+	add: 'Add~'
 }
 //home page module
 BCLang.home = {
@@ -71,7 +78,7 @@ BCLang.home = {
 	searchTip:"Customer No.|Reception No.~",
 	searchBtns:["Search~","Pay~"],
 	main: {
-		tabs: ["Customer Information~","Unit Information~", "User Information~", "Account Information~", "Payment Record~", "Reception Information~", "Service Serial Order ~","Instruction Information~", "Bill Information~"],
+		tabs: ["Customer Information~","Unit Information~", "User Information~", "Account Information~", "Payment Record~", "Reception Information~", "Service Serial Order~","Instruction Information~", "Bill Information~"],
 		//cash payment page
 		cashPay: {
 			_title: 'Pay~',
@@ -87,13 +94,13 @@ BCLang.home = {
 		},
 		// customer page
 		cust: {
-			base: {_title: "Basic Information~",name: "Customer Name~",busiId: "Reception No.~",OpenDate: "Open Account Date~",addr: "Address~",status: "Customer Status~",
+			base: {_title: "Basic Information~",name: "Customer Name~",busiId: "Reception No.~",openDate: "Open Account Date~",addr: "Address~",status: "Customer Status~",
 				type: "Customer Type~",certType: "ID Type~",certNum: "ID No.~",linkMan: "Contact~",tel: " fixed-line telephone~",barthday: "Birthday~",
 				mobile: "mobile phone number~",areaCateory: "Area Community~",houseNetType: "service Type~",houseManager: "Community Customer Manager~",
 				houseOptr: "Community Maintenance Staff~",postalAddr: "Post Address~", remark: "Remark~",
 				email: "email~", sex: "sex~",postcode: 'postcode~', blackList: 'black list~',
 				agentName: "Agent~", deptName: "Open Account Department~", developName: "Developer~", BusinessLicence: "Business License~", unitNumber: "Unit Taxation Number~",
-				spkgSn: "Agreement No.~", cust_level: "Customer Level~",switchCustTitle: 'Select Customer~'
+				spkgSn: "Agreement No.~", cust_level: "Customer Level~",switchCustTitle: 'Select Customer~', languageType: 'Service language~', unitName: 'Subordinate unit~'
 			},
 			_form: {
 				thinkCust: 'Intending Customer~',
@@ -101,12 +108,12 @@ BCLang.home = {
 				oldCustLevel: 'Former Customer Level~',
 				newCustLevel: 'New Customer Level~',
 				deviceType: 'Equipment Type~',
-				deviceModel: ' Device Model ~',
+				deviceModel: ' Device Model~',
 				storeCount: 'Storage Quantity~',
 				buyWay: 'Purchase Way~',
-				buyCount: ' Purchased Quantity ~',
+				buyCount: ' Purchased Quantity~',
 				titleBatchBuyMaterial: 'Material Information~',
-				titleAcctRefund: 'Refunding ~',
+				titleAcctRefund: 'Refunding~',
 				refundTotal: 'Refunding Money Amount~',
 				rechargeWay: 'Recharging Method~',
 				byTicket: 'On Reception~',
@@ -147,7 +154,7 @@ BCLang.home = {
 		// Customer Page
 		user: {
 			base:{
-				type: ' Customer Type ~', name: ' Customer Name~', status: 'Status~', statusTime: ' Status Time ~',
+				type: ' Customer Type~', name: ' Customer Name~', status: 'Status~', statusTime: ' Status Time~',
 				stbId: 'Set-Top Box~', cardId: 'Smart Card~', modem: 'Modem No.~', createTime: 'Create Time~',
 				loginName: 'Account~', terminal: 'Terminal Type~', deviceModel: 'Equipment Type~', buyWay: 'Buy Way~',
 				stopDate: 'Termination Pre-Report Time~', stopType: 'Calling Fee Type~', protocolDate: 'Agreement Date~', 
@@ -156,18 +163,18 @@ BCLang.home = {
 			_form: {
 				taskBackFill: ' backfilling construction~',
 				deviceCode: 'Equipment Code~',
-				feeName: ' Fee Name ~',
+				feeName: ' Fee Name~',
 				feeAmount: 'Fee Money Amount $~',
 				protocolInfo: 'Agreement Information~',
 				openAmount: 'Opening Account Quantity~',
 				manualOpen: 'Manual Open Account~',
-				addToOpenUserGrid: 'Add to Temporary Saving Table ~',
+				addToOpenUserGrid: 'Add to Temporary Saving Table~',
 				titleOpenUserGrid: 'User Temporary Storage~',
 				titleSwitchProd: 'Step One：select Product~',
 				prodName: 'Product Name~',
 				prodDesc: 'Product Description~',
 				titleDetemineUser: ' Step Two: Sure for Purchasing User~',
-				switchUsers: 'Select Customer ~',
+				switchUsers: 'Select Customer~',
 				titleOrderInfo: ' Step Three: Purchase Information~',
 				prodTariff: 'Product Fee~',
 				prodOrderMonths: 'Purchase Month Quantity~',
@@ -188,8 +195,8 @@ BCLang.home = {
 				prodFeeCM: ["Product Name~","Former Fee~","New Fee~","Former Expiry Date~","Billing Date~",
 				          "Payment Month Quantity~","New Expiry Date~","Transfer Payment Money Amount~","Payment Money Amount~"],
 				prodTitle: 'Product Information~',
-				prodGroupText: 'User Name:{0}  User Type:{1} ~',
-				templateDown: ' Template Download ~',
+				prodGroupText: 'User Name:{0}  User Type:{1}~',
+				templateDown: ' Template Download~',
 				templateDownTip: 'Please do not operate when service is busy; Please do not cancel the first line of template;~',
 				loginId: 'Login~',
 				orderFee: 'Order Balance~',
@@ -221,7 +228,7 @@ BCLang.home = {
 				ipFee: 'IP fee~',
 				
 				titleTransferPayDetailGrid: 'transfer paymentDetails~',
-				transferPayCM: ['Product Name~', 'Fee~', 'User~', ' Billing Starting Date ~', 'Ending Billing Date~', 'Transfer Money Amount$~'],
+				transferPayCM: ['Product Name~', 'Fee~', 'User~', ' Billing Starting Date~', 'Ending Billing Date~', 'Transfer Money Amount$~'],
 				transferDetailDate: ' Transferring Details（Billing Starting Date：{0} "）~'
 			},
 			list: {
@@ -237,16 +244,16 @@ BCLang.home = {
 					_title: 'Customer Package~',
 					columns: ["Purchased No.~","Product Name~","Current Fee~","Status~"," Effective Date~" ,"Invalid Date~","Product Type~","Purchase Time~"]
 				},
-				tools: ["Default Order ~","History Oder~"]
+				tools: ["Default Order~","History Oder~"]
 			},
 			userDetail: {
 				tabs: ["Details~","Abnormal Information~"],
 				detail: ["User Type~","User Name~","Equipment Type~","Buy Way~","Status~","Status Time~","Pre-termination Report Time~","Creation Time~","Calling Fee Type~","During Agreement Period~","Account~",
-				         "Terminal Type~","Account~","Terminal Type~","IP Information~","IP Fee Amount ~"],
+				         "Terminal Type~","Account~","Terminal Type~","IP Information~","IP Fee Amount~"],
 				change: ["Service~","Feature~","Prior to Change~","After Change~","Change Date~","Operator~"]
 			},
 			prodDetail: {
-				tabs: ["Order Amount in Details ~","Abnormal Information~"],
+				tabs: ["Order Amount in Details~","Abnormal Information~"],
 				detail: ["No.~","Fund Type~"," Import Product~"," Import Type~"," Import Money Amount~"," Export Product~","Export Type~","Import Money Amount~","serial number~" ]
 			}
 		},
@@ -292,7 +299,7 @@ BCLang.home = {
 				oldInvoiceType: ' Former Invoice Type~',
 				oldStatus: ' Former Invoice Status~',
 				newInvoiceId: 'New Invoice No.~',
-				newInvoiceCode: 'New Invoice Code ~'
+				newInvoiceCode: 'New Invoice Code~'
 			}
 		},
 		//Reception Record
@@ -335,23 +342,23 @@ BCLang.home = {
 	// Homepage Tool  Column Service
 	tools: {
 		countySwitch:{//Branch Switch			titleSelectDept:'Select Department~',
-			confirmSwitchDept:'Sure to switch Department ~'
+			confirmSwitchDept:'Sure to switch Department~'
 		},
 		ad: {//Declaration
-			_title: ' Declaration Information ~',
+			_title: ' Declaration Information~',
 			tplPublishTme:'Published on~',
 			columns: [' Declaration Subject~','Publisher~','Effective Time~','Invalid Time~']
 		},
 		grxg:{//Personal Amendment
-			_title:' Personal Information Amendment ~',
+			_title:' Personal Information Amendment~',
 			labelNewPwd:'new code~',
-            labelNewPwdConfirm:'confirm new code ~',
+            labelNewPwdConfirm:'confirm new code~',
             labelDefaultSystem:'Default Login System~'
 		},
 		queryDevice:{//Equipment Inquiry
-			_title:' Equipment Inquiry ~',
+			_title:' Equipment Inquiry~',
 			titleDevInfo:' Equipment Information~',
-			labelDevNo:' Equipment Serial Number ~',
+			labelDevNo:' Equipment Serial Number~',
 			labelDevType:'Equipment Type~',
 			labelDevModel:'Equipment Type~',
 			labelModelName:'Type Name~',
@@ -389,7 +396,7 @@ BCLang.home = {
 			statusInvalid:'invalid~',
 			statusIdel:'unused~',
 			
-			cols:['Customer Name~', ' Customer No.~', 'Service Name ~', 'Fee Name~', 'Actual Amount~', 'Operation Time~', 'Operator~'],
+			cols:['Customer Name~', ' Customer No.~', 'Service Name~', 'Fee Name~', 'Actual Amount~', 'Operation Time~', 'Operator~'],
 			
 			labelInvoiceId:'Invoice No.~',
 			labelInvoiceId2:'Inv&nbsp;oice&nbsp;No.&nbsp;~',
@@ -428,7 +435,116 @@ BCLang.home = {
 			printItemGridColumns:['Name~','Money Amount~'],
 			stillEmptyInvoiceField:"Still empty invoice input frame!~",
 			hasDuplcateInvoice:"There is repeated Invoice，Please confirm!~"
-			
+		},
+		AddressNodeManage : {
+			panelTitle : 'Address Management~',
+			msg : {
+				actionFailed : 'Operation failed~',
+				actionSuccess : 'Operation Successful~',
+				confirmSave : 'Confirm save?~',
+				confirmInvalid : 'sure you want to disable?~',
+				confirmDelete : 'you sure you want to delete?~',
+				confirmActivate : 'confirmation to activate?~',
+				cantDelete : 'There are customers in the use, temporarily can not be deleted.~',
+				cantBeInvalided : 'the presence of sub-level, can not be disabled!~',
+				maxDepthText : 'can not be down to add~',
+				noSingleQuoteAllowed : 'Do not enter single quotation marks~'
+
+			},
+			formWin : {
+				labelSortNum : 'No.~',
+				labelProvince : 'province~',
+				labelDistrict : 'administrative area~',
+				labelNetType : 'Network type~',
+				emptyTxtProvince : 'Please select the province~',
+				emptyTxtBlurQuery : 'support fuzzy queries~',
+				btnTxtClose : 'close~',
+				btnTxtSave : 'save~',
+				labelRoadNum : 'Road Name~',
+				titleNewSaveLevelRoadNum : 'New Road~',
+				labelStreatName : 'street name~',
+				titleNewSaveLevelStreet : 'New Street~',
+				labelCityName : 'city name~',
+				titleNewSaveLevelCity : 'new city~',
+				labelShowName : 'show name~',
+				labelParentName : 'superiors name~',
+
+				labelNewAddChild : 'new subordinate~',
+				labelNewAddBrother : 'new flat level~',
+				labelAddrTree : 'address tree~'
+			}
+		},
+		TaskManager : {
+			_title : 'Work Order Management~',
+			_operateTitle : 'Operation Details~',
+			_userTitle : 'User Details~',
+			_winTitle : 'Work Order completion~',
+			forms : {
+				custNo : 'Customer ID~',
+				taskNo : 'ticket number~',
+				custName : 'Customer Name~',
+				mobile : 'Tel~',
+				newaddr : 'address~',
+				taskStatus : 'work order status~',
+				taskDetailType : 'ticket type~',
+				taskAddr : 'area~',
+				taskTeam : 'construction team~',
+				faultType : 'fault type~',
+				finishType : 'completion type~',
+				finishExplan : 'completed Description~'
+			},
+			buttons : {
+				query : 'Query~',
+				pendingOrder : 'pending work orders~',
+				accptTime : 'Hours:~',
+				distTeam : 'distribution construction team~',
+				invalidTeam : 'ticket invalid~',
+				backDevice : 'backfill equipment~',
+				finish : 'completed~',
+				returning : 'visit~',
+				sendAuth : 'Send ZTE authorized~'
+			},
+			taskCols : ['ticket type~', 'customer name~', 'work order status~', 'construction team~',
+					'ZTE state~', 'address~', 'Tel~', 'creation time~ ', ' fault type~ ', ' fault details~ '],
+			userCols : ['user type~', '~ username', 'password~', 'device model~', 'device number~', 'posNo~', 'occNo~', 'Bandwidth~'],
+			operateCols : ['operating time~', 'operation type~', 'operator~,', 'synchronization status~', 'description~'],
+			taskDeviceCols : ['user type~', '~ username', 'model~', 'Device number~', 'equipment recycling~'],
+			msg : {
+				enterDeviceNo : 'Please enter the device number~',
+				noCancel : 'No cancellations~!',
+				sureWantSelectedWork : 'sure you want to void the selected work order you~?',
+				teamCantEmpty : 'construction team can not be empty~',
+				faultTypeCantEmpty : 'fault type can not be empty~',
+				finishTypeCantEmpty : 'completion type can not be empty~',
+				selectRecord : 'Please select the records need to operate!~',
+				roderHaveBeenCompletedOrObsolete : 'ticket have been completed or obsolete~',
+				teamIsnotSingleWork : 'This work is not a single construction team of the department~'
+			}
+		},
+		feeUnitpre : {
+			_title : 'non-business TOLL information~',
+			cols : ['contract type~', 'contract number~', 'contract name~', 'customer name~', 'contract amount~', 'invoice number~', 'operator~'],
+			forms : {
+				cust_name : 'Customer Name~',
+				contract_no : 'Contract No.~',
+				nominal_amount : 'contract amount~',
+				fee_name : 'expense name~',
+				contract_name : 'Contract name~',
+				addr_district : 'to your city~',
+				lblFee : 'total USD~',
+				LabelJian : 'Cambodia KHR~',
+				nfDollar : 'Paid USD~',
+				nfJianYuan : 'Paid KHR~',
+				labelExchange : 'the date of the exchange rate~',
+				pay_type : 'payment method~',
+				receipt_id : 'bill number~',
+				invoice_id : 'receipt number~'
+			},
+			msg : {
+				enterKeywords : 'keywords~',
+				receiptCantUsed : 'The receipt can not be used~',
+				custNameOrContractNoQuery : 'supports the customer name or contract number fuzzy search~'
+			}
 		}
 	}
 	
@@ -468,12 +584,12 @@ BCLang.msgBox = {
 	confirmRenewCust:'Restore Customer Status?~',
 	
 	custHasUnSuitableDev:'This User cannot do Equipment exchange now~',
-	custCantExchangeDev:' This User cannot do Equipment exchange now ~',
+	custCantExchangeDev:' This User cannot do Equipment exchange now~',
 	
 	confirmRegLoss:'Are you sure to loss report?~',
 	regLossSuccess:'Successful loss report!~',
 	
-	selectDev2RegLoss:'Please select to cancel lost report equipment ~',
+	selectDev2RegLoss:'Please select to cancel lost report equipment~',
 	selectDevIsRegLossAlready:'Please select lost report equipment~',
 	unRegLossSuccess:'successful cancellation of loss report!~',
 	confirmUnRegLoss:'Sure to cancel lost report?~',
@@ -494,7 +610,7 @@ BCLang.msgBox = {
 	cangeOwnerSuccess:'change ownership successfully!~',
 	//Equipment recycling
 	selectDev2Recycle:'Please select recycled Equipment!~',
-	devCantRecycleStillInUse:"Equipment is in using, cannot be recycled ~",
+	devCantRecycleStillInUse:"Equipment is in using, cannot be recycled~",
 	onlyResidentCanNonResiCust:'Only Resident Customer can be turned to Group Customer~',
 	depositUnPaySuccess:'Deposit refunded successfully!~',
 	unPayed:'unpaid！~',
@@ -508,7 +624,7 @@ BCLang.msgBox = {
 	
 	cantPayIpUserFee:'Broadband User has no Product Please Purchase Product at first~',
 	
-	freeUsersOver2:"Free Terminals cannot be more than 2 ~",
+	freeUsersOver2:"Free Terminals cannot be more than 2~",
 	
 	singleInteractiveDevCantOpenDuplex:'This User’s Set-Top Box is one-way，cannot open two-way~',
 	custMustHaveDuplexDev:'User must have two-way Set-Top Box~',
@@ -532,7 +648,7 @@ BCLang.msgBox = {
 	searchCustTip1: 'Please input at least one key word to Inquiry Customer~',
 	searchCustTip2: 'Please do not input single quotation mark~',
 	searchNoCust: 'No Customer in line with Inquiry conditions，Please make sure and input again!~',
-	searchToPayOrPrint: 'Please deal with unpaid or unprinted Invoice Customer，click Sure to switch，Please Print unpaid Fee and Invoice for this Customer ~',
+	searchToPayOrPrint: 'Please deal with unpaid or unprinted Invoice Customer，click Sure to switch，Please Print unpaid Fee and Invoice for this Customer~',
 	confirmSwitchThisCust: 'Are you sure to select this customer?~',
 	confirmInvalidInvoice: "Sure to cancel Invoice?~",
 	confirmRefreshCmd: 'Sure to send New instruction?~',

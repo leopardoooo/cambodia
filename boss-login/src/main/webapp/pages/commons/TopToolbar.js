@@ -71,8 +71,9 @@ TopToolbar = Ext.extend(Ext.Toolbar , {
 				var data = Ext.decode(res.responseText);
 				for(var i=0;i<data.length;i++){
 					var obj={};
-					obj["text"]=data[i]["sub_system_name"];
+//					obj["text"]=data[i]["sub_system_name"];
 					obj["itemId"]=data[i]["sub_system_id"];
+					obj['text'] = langUtils.tools('subsystem')[data[i]["sub_system_id"]];
 					obj["url"]=data[i]["sub_system_url"];
 					obj["root"]=data[i]["sub_system_host"];
 					obj["iconCls"]=data[i]["iconcls"];
@@ -370,6 +371,7 @@ TopToolbar = Ext.extend(Ext.Toolbar , {
 		if(!win){
 			win = new Ext.Window({
 				id: 'taskManagerWinId',
+				title: lbc('home.tools.TaskManager._title'),
 				width: 900,
 				height: 520,
 				border: false,
