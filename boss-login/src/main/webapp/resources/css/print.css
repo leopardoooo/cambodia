@@ -1,5 +1,5 @@
 body, dl, dt, dd, ul, ol, li, pre, code, form, fieldset, legend, input, textarea, p, blockquote, h1{margin:0;padding:0;}
-body{font-size:21px;font-family:"Arial";background: #ffffff;}
+/*body{font-size:21px;font-family:"Arial";background: #ffffff;}*/
 img{border:none;}
 a{color:#666666;text-decoration:none; cursor:pointer;}
 a:hover{text-decoration:underline;}

@@ -939,17 +939,25 @@ public class RDeviceDao extends BaseEntityDao<RDevice> {
 	}
 	
 	public List<RDevice> queryDeviceInfoByDoneCode(Integer deviceDoneCode) throws Exception {
-		String sql = "select sm.model_name,ds.supplier_name,d.* from r_device_done_deviceid di, r_device d, r_stb_model sm, r_device_supplier ds"
+		String sql = "select  * from ("
+				+ " select sm.model_name,ds.supplier_name,d.batch_num, d.box_no,sum(d.total_num) total_num"
+				+ " from r_device_done_deviceid di, r_device d, r_stb_model sm, r_device_supplier ds"
 				+ " where di.device_id=d.device_id and d.device_model=sm.device_model and sm.supplier_id=ds.supplier_id(+)"
 				+ " and di.device_done_code=?"
+				+ " group by sm.model_name,ds.supplier_name,d.batch_num, d.box_no"
 				+ " union all"
-				+ " select sm.model_name,ds.supplier_name,d.* from r_device_done_deviceid di, r_device d, r_modem_model sm, r_device_supplier ds"
+				+ " select sm.model_name,ds.supplier_name,d.batch_num, d.box_no,sum(d.total_num) total_num"
+				+ " from r_device_done_deviceid di, r_device d, r_modem_model sm, r_device_supplier ds"
 				+ " where di.device_id=d.device_id and d.device_model=sm.device_model and sm.supplier_id=ds.supplier_id(+)"
 				+ " and di.device_done_code=?"
+				+ " group by sm.model_name,ds.supplier_name,d.batch_num, d.box_no"
 				+ " union all"
-				+ " select sm.model_name,ds.supplier_name,d.* from r_device_done_deviceid di, r_device d, r_device_model sm, r_device_supplier ds"
+				+ " select sm.model_name,ds.supplier_name,d.batch_num, d.box_no,sum(d.total_num) total_num"
+				+ " from r_device_done_deviceid di, r_device d, r_device_model sm, r_device_supplier ds"
 				+ " where di.device_id=d.device_id and d.device_model=sm.device_model and sm.supplier_id=ds.supplier_id(+)"
-				+ " and di.device_done_code=?";
+				+ " and di.device_done_code=?"
+				+ " group by sm.model_name,ds.supplier_name,d.batch_num, d.box_no"
+				+ " ) order by box_no desc";
 		return this.createQuery(sql, deviceDoneCode, deviceDoneCode, deviceDoneCode).list();
 	}
 }

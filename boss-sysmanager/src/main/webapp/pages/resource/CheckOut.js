@@ -307,7 +307,8 @@ var TransferGrid = Ext.extend(Ext.grid.GridPanel,{
 		materalWin.show();
 	},
 	print: function(deviceDoneCode){
-		if(!PrintTools.isIE){
+		if(PrintTools.isIE){
+			
 			Confirm('确定打印吗?',this,function(){
 				Ext.Ajax.request({
 					url:root+'/resource/Device!queryTransferdevicePrintInfo.action',
@@ -316,14 +317,45 @@ var TransferGrid = Ext.extend(Ext.grid.GridPanel,{
 					success:function(res){
 						var data = Ext.decode(res.responseText);
 						if(data){
-							var content = PrintTools.getContent( data["content"] , data['data'] );
-							PrintTools.noiePrint(content);
+							var printMothod = function(deviceData){
+								var content = PrintTools.getContent( data["content"] , deviceData );
+								PrintTools.webPrint(content);
+							}
+							var deviceList = data['data']['deviceListInfo']; 
+							if(deviceList.length <=4){
+								printMothod(data['data']);
+							}else{
+								var deviceDataList = [], list = [], deviceInfo = {};
+								var xmlContent = data['content'];
+								deviceInfo['transferDevice'] = data['data']['transferDevice'];
+								
+								for(var i=0,len=deviceList.length;i<len;i++){
+									list.push(deviceList[i]);
+									if(list.length == 4){
+										deviceDataList.push(list);
+										list = [];
+									}
+								}
+								if(list.length > 0){
+									deviceDataList.push(list);
+								}
+								var timeInvokeMothod = function(deviceListInfo, i){
+									deviceInfo['deviceListInfo'] = deviceListInfo;
+									var obj = {};
+									Ext.apply(obj, deviceInfo);
+									setTimeout(function(){printMothod(obj);},5000*i);
+								}
+								for(var i=0,len=deviceDataList.length;i<len;i++){
+									timeInvokeMothod(deviceDataList[i], i);
+								}
+								
+							}
 						}
 					}
 				});
 			});
 		}else{
-			Alert('请使用谷歌chrome浏览器打印!');
+			Alert('请使用IE浏览器打印!');
 		}
 	}
 });

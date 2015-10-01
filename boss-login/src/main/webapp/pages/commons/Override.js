@@ -442,6 +442,14 @@ Ext.util.Format.dateFormat = function(v){
 	var date = Date.parseDate(v,'Y-m-d h:i:s');
 	return date.format('Y-m-d');
 }
+Ext.util.Format.dateFormatHIS = function(v){
+	if(!v) return "" ;
+	if(Ext.isDate(v)){
+		return v.format('Y-m-d h:i:s');
+	}
+	var date = Date.parseDate(v,'Y-m-d h:i:s');
+	return date.format('Y-m-d h:i:s');
+}
 /**
  * 计算当前日期与传入日期的天数
  */
