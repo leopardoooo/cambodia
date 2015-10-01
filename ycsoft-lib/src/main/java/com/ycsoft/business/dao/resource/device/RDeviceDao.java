@@ -938,6 +938,29 @@ public class RDeviceDao extends BaseEntityDao<RDevice> {
 				+ " from r_stb_model t order by model_name ";
 		return this.createQuery(RDeviceModel.class, sql,SystemConstants.DTV_SERV_TYPE_SINGLE ).list();
 	}
+	
+	public List<RDevice> queryDeviceInfoByDoneCode(Integer deviceDoneCode) throws Exception {
+		String sql = "select  * from ("
+				+ " select sm.model_name,ds.supplier_name,d.batch_num, d.box_no,sum(d.total_num) total_num"
+				+ " from r_device_done_deviceid di, r_device d, r_stb_model sm, r_device_supplier ds"
+				+ " where di.device_id=d.device_id and d.device_model=sm.device_model and sm.supplier_id=ds.supplier_id(+)"
+				+ " and di.device_done_code=?"
+				+ " group by sm.model_name,ds.supplier_name,d.batch_num, d.box_no"
+				+ " union all"
+				+ " select sm.model_name,ds.supplier_name,d.batch_num, d.box_no,sum(d.total_num) total_num"
+				+ " from r_device_done_deviceid di, r_device d, r_modem_model sm, r_device_supplier ds"
+				+ " where di.device_id=d.device_id and d.device_model=sm.device_model and sm.supplier_id=ds.supplier_id(+)"
+				+ " and di.device_done_code=?"
+				+ " group by sm.model_name,ds.supplier_name,d.batch_num, d.box_no"
+				+ " union all"
+				+ " select sm.model_name,ds.supplier_name,d.batch_num, d.box_no,sum(d.total_num) total_num"
+				+ " from r_device_done_deviceid di, r_device d, r_device_model sm, r_device_supplier ds"
+				+ " where di.device_id=d.device_id and d.device_model=sm.device_model and sm.supplier_id=ds.supplier_id(+)"
+				+ " and di.device_done_code=?"
+				+ " group by sm.model_name,ds.supplier_name,d.batch_num, d.box_no"
+				+ " ) order by box_no desc";
+		return this.createQuery(sql, deviceDoneCode, deviceDoneCode, deviceDoneCode).list();
+	}
 
 	public Pager<DeviceDetailInputDto> queryInputDeviceDetail(int deviceDoneCode, Integer start, Integer limit) throws Exception {
 		String sql = "select r.box_no,t.stb_id device_code,t.device_model,case when t2.card_id is null then t.mac else t2.card_id  end pair_device_code "

@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.struts2.ServletActionContext;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
 import com.google.gson.Gson;
@@ -35,6 +36,7 @@ import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.commons.tree.TreeBuilder;
 import com.ycsoft.daos.core.JDBCException;
 import com.ycsoft.sysmanager.component.resource.DeviceComponent;
+import com.ycsoft.sysmanager.component.resource.DevicePrintComponent;
 import com.ycsoft.sysmanager.component.resource.JobComponent;
 import com.ycsoft.sysmanager.dto.depot.RDeviceTransferDto;
 import com.ycsoft.sysmanager.dto.resource.DeviceDto;
@@ -1076,6 +1078,13 @@ public class DeviceAction extends BaseAction {
 		getRoot().setOthers(deviceComponent.queryDeviceStbModem());
 		return JSON_OTHER;
 		
+	}
+	
+	@Autowired
+	private DevicePrintComponent devicePrintComponent;
+	public String queryTransferdevicePrintInfo() throws Exception {
+		getRoot().setSimpleObj( devicePrintComponent.queryTransferdevicePrintInfo(deviceDoneCode) );
+		return JSON_SIMPLEOBJ;
 	}
 	
 	public void setDeviceDoneCode(int deviceDoneCode) {

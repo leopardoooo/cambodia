@@ -9,6 +9,7 @@
 	String root = request.getContextPath(),b_res = Environment.ROOT_PATH_BOSS_LOGIN; 
 %>
 	<!-- 扩展属性 -->
+	<script type="text/javascript" src="<%=b_res %>/pages/commons/ux/PrintTools.js"></script>
 	<script type="text/javascript" src="<%=root %>/pages/resource/DepotIndexManager.js"></script>
 	<!-- <script type="text/javascript" src="<%=root %>/pages/sysmanager/config/custextend/custextend.js" charset="UTF-8" ></script> -->
 	<script type="text/javascript" src="<%=root %>/pages/resource/CommonDeviceInfo.js"></script>

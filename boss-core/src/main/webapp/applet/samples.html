@@ -4,29 +4,29 @@
    </head>
    <body style="padding: 50px;">
    <h1 id="title">Print Applet Samples</h1><hr />
-   <h3 id="status" style="">ÕıÔÚ°²×°¿Ø¼ş...</h3>
+   <h3 id="status" style="">æ­£åœ¨å®‰è£…æ§ä»¶...</h3>
    <p style=" background: #fceb9f; width: 600px;padding: 20px; line-height: 26px; border-radius: 5px;">
-	ĞèÒªĞ¡Ğ¡µÄÉèÖÃÒ»ÏÂ£¬ÇëÏÂÔØ<a href="./java.policy">java.policy</a>£¬<br />
-	´ò¿ªÄúä¯ÀÀÆ÷°²×°JREÊ±µÄÄ¿Â¼Èç£ºC:\Program Files (x86)\Java\jre7 <br />
-	È»ºóÇĞ»»ÖÁ\lib\securityÄ¿Â¼£¬½«Ä¿Â¼ÏÂµÄjava.policy¸²¸Ç¼´¿É¡£   
+	éœ€è¦å°å°çš„è®¾ç½®ä¸€ä¸‹ï¼Œè¯·ä¸‹è½½<a href="./java.policy">java.policy</a>ï¼Œ<br />
+	æ‰“å¼€æ‚¨æµè§ˆå™¨å®‰è£…JREæ—¶çš„ç›®å½•å¦‚ï¼šC:\Program Files (x86)\Java\jre7 <br />
+	ç„¶ååˆ‡æ¢è‡³\lib\securityç›®å½•ï¼Œå°†ç›®å½•ä¸‹çš„java.policyè¦†ç›–å³å¯ã€‚   
    </p>
       <br />
-   <button onclick="doPrint()" style="border: 1px solid #a10101; background: #a11212;padding: 0px 20px; cursor: pointer; height: 40px; font-size: 15px; color: #fff; font-weight: bold;">ÔÙ´Î´òÓ¡ £¿</button>
+   <button onclick="doPrint()" style="border: 1px solid #a10101; background: #a11212;padding: 0px 20px; cursor: pointer; height: 40px; font-size: 15px; color: #fff; font-weight: bold;">å†æ¬¡æ‰“å° ï¼Ÿ</button>
 
    <applet id="jsteak" code="com.jsteak.PrintApplet.class" archive="./JSteak.jar" style="position: absolute; left: -100px; top: -100px;" width="1" height="1">
    </applet>
    <script type="text/javascript">
 		function jsteakReady(){
-			document.getElementById("status").innerHTML = "°²×°Íê³É£¬ÕıÔÚ´òÓ¡...";
+			document.getElementById("status").innerHTML = "å®‰è£…å®Œæˆï¼Œæ­£åœ¨æ‰“å°...";
 			doPrint();
 		}
 		
 		function doPrint(){
 			var obj = document.getElementById("jsteak");
-			var data = "text=2012Äê&posX=70&posY=10^text=12ÔÂ&posX=170&posY=170^text=27ÈÕ&posX=245&posY=170^text=¿Í»§Ãû³Æ:ÎÒÊÇ´óÃÀÅ®&posX=70&posY=220^"+
-					"text=¿Í»§±àºÅ:0101010101&posX=630&posY=170^text=¿Í»§µØÖ·:º¼ÖİÊĞÎ÷ºşÇøÎÄ¶şÎ÷Â·1ºÅÔªÃ¯´óÏÃ&posX=70&posY=260^"+
-					"text=Êı×ÖµçÊÓÔ¤´æ·Ñ&posX=70&posY=305^text=01010023201321&posX=470&posY=305^text=120.00&posX=780&posY=305^"+
-					"text=Ò¼°Û·¡Ê°Ô²Õû&posX=210&posY=520^text=120.00&posX=780&posY=520^text=ÓªÒµÔ±&posX=780&posY=553";
+			var data = "text=2012å¹´&posX=70&posY=10^text=12æœˆ&posX=170&posY=170^text=27æ—¥&posX=245&posY=170^text=å®¢æˆ·åç§°:æˆ‘æ˜¯å¤§ç¾å¥³&posX=70&posY=220^"+
+					"text=å®¢æˆ·ç¼–å·:0101010101&posX=630&posY=170^text=å®¢æˆ·åœ°å€:æ­å·å¸‚è¥¿æ¹–åŒºæ–‡äºŒè¥¿è·¯1å·å…ƒèŒ‚å¤§å¦&posX=70&posY=260^"+
+					"text=æ•°å­—ç”µè§†é¢„å­˜è´¹&posX=70&posY=305^text=01010023201321&posX=470&posY=305^text=120.00&posX=780&posY=305^"+
+					"text=å£¹ä½°è´°æ‹¾åœ†æ•´&posX=210&posY=520^text=120.00&posX=780&posY=520^text=è¥ä¸šå‘˜&posX=780&posY=553";
 					
 			var batchData = data + "|" + data + "|" + data; 
 			//obj.print(data, 900, 600);

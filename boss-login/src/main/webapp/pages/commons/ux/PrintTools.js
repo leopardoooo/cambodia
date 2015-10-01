@@ -43,14 +43,11 @@ Ext.apply( PrintTools , {
 		PrintCtrl.XMLDoc = xmlStr;
 		PrintCtrl.Print();
 	},
-	noiePrint: function(xmlStr){
-		var url = root + "/pages/business/pay/ChromePrint.html";
-		window["__chromeWebPrintData"] = xmlStr;
+	webPrint: function(xmlStr){
+		var url = root + "/pages/print/Print.html";
+		window.returnValue = xmlStr;
 		
-		var width = screen.width - 10;
-		var height = screen.height - 100;
-		
-		window.showModalDialog(url, "noiePrintWin", "dialogLeft=1;dialogTop=1;dialogWidth="+width+"px;dialogHeight="+height+"px;center=1;resizable=0;help=0;scroll=0;edge=sunken;");
+		window.open(url, 'noiePrintWin', "left=1px,top=1px,height=10px,width=10px,status=no,toolbar=no,menubar=no,location=no,resizable:no,titlebar: 0,directories: 0");
 	},
 	appletPrint: function(papers){
 		var paperData = [];
@@ -80,6 +77,29 @@ Ext.apply( PrintTools , {
 	isIE: function(){
 		return !!(window.attachEvent && navigator.userAgent.indexOf('Opera') === -1);
 	}(),
+	parsePrintXML: function(xmlStr){
+		var root = (new DOMParser()).parseFromString(xmlStr, "text/xml");
+		
+		var settingNode = root.getElementsByTagName("page-setting")[0];
+		var width = settingNode.getElementsByTagName("width")[0].childNodes[0].nodeValue.trim();
+		var height = settingNode.getElementsByTagName("height")[0].childNodes[0].nodeValue.trim();
+		
+		var items = root.getElementsByTagName("item");
+		var values = [];
+		for(var i = 0; i< items.length; i++){
+			var text = items[i].childNodes[0].nodeValue.trim();
+			var left = items[i].getAttribute("left").trim();
+			var top = items[i].getAttribute("top").trim();
+			values.push("text=" + text + "&posX=" + left + "&posY=" + top);
+		}
+		values.join("^");
+		
+		return {
+			width: width,
+			height: height,
+			dataString: values.join("^")
+		}
+	},
 	parsePrintXML: function(xmlStr){
 		var root = (new DOMParser()).parseFromString(xmlStr, "text/xml");
 		
