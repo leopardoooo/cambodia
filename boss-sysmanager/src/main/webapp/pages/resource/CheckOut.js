@@ -77,20 +77,20 @@ var TransferGrid = Ext.extend(Ext.grid.GridPanel,{
 					result += "&nbsp;&nbsp;<a href='#' title='" + DEV_COMMON_LU.titleTransConfirm + "' onclick=Ext.getCmp('transferGridId').transferConfirm("+value+")>" + CHE_OUT_LU.titleTransConfirm + "</a>";
 				}
 				if(record.get('status') === 'CONFIRM' && record.get('tran_type') === 'TRANIN'){
-					if(record.get('device_type') == 'STB' || record.get('device_type') == 'CARD' && record.get('device_type') == 'MODEM'){
+					if(record.get('device_type') == 'STB'&& record.get('device_type') == 'MODEM'){
 						result += "&nbsp;&nbsp;<a href='#' title='" + CHE_OUT_LU.labelTransIn + "' onclick=Ext.getCmp('transferGridId').retransfer("+record.get('device_done_code')+")>" + CHE_OUT_LU.labelTransIn + "</a>";
 					}
 				}
 				var isHistory = record.get('is_history');
 				if(isHistory == 'F'){
-						result += "&nbsp;&nbsp;<a href='#' title='"+CHE_OUT_LU.labelTransHistory+"' onclick=Ext.getCmp('transferGridId').editHisTransfer("+value+",'T')>"+COMMON_LU.labelHistory+"</a>";
+						result += "&nbsp;&nbsp;<a href='#' title='"+DEV_COMMON_LU.labelTransHistory+"' onclick=Ext.getCmp('transferGridId').editHisTransfer("+value+",'T')>"+COMMON_LU.labelHistory+"</a>";
 				}else{
-					result += "&nbsp;&nbsp;<a href='#' title='"+DEV_COMMON_LU.labelRestoreTrans.restore+"' onclick=Ext.getCmp('transferGridId').editHisTransfer("+value+",'F')>"+COMMON_LU.restore+"</a>";
+					result += "&nbsp;&nbsp;<a href='#' title='"+DEV_COMMON_LU.labelRestoreTrans+"' onclick=Ext.getCmp('transferGridId').editHisTransfer("+value+",'F')>"+COMMON_LU.restore+"</a>";
 				}
-				if(record.get('device_type') == 'STB' || record.get('device_type') == 'CARD' && record.get('device_type') == 'MODEM'){
+				if(record.get('device_type') == 'STB' && record.get('device_type') == 'MODEM'){
 					result += "&nbsp;&nbsp;<a href='#' title='"+COMMON_LU.downLoadDetail+"' onclick=Ext.getCmp('transferGridId').downloadExcel("+value+")>"+COMMON_LU.downLoad+"</a>";
 				}
-				result += "&nbsp;&nbsp;<a href='#' title='打印' onclick=Ext.getCmp('transferGridId').print("+value+")>打印</a>";
+				result += "&nbsp;&nbsp;<a href='#' title='"+CHE_OUT_LU.labelPrint+"' onclick=Ext.getCmp('transferGridId').print("+value+")>"+CHE_OUT_LU.labelPrint+"</a>";
 				return result;
 			}}
 		];

@@ -472,7 +472,8 @@ Sys = {
 		labelOldTransCardNum:'原调拨智能卡数量~',
 		labelNewTransCardNum:'本次调拨智能卡数量~',
 		labelOldTransModemNum :'原调拨猫数量~',
-		labelNewTransModemNum:'本次调拨猫数量~'
+		labelNewTransModemNum:'本次调拨猫数量~',
+		labelPrint: '打印~'
 	},
 	AppUseDevice : {// 设备领用
 		_title:'设备领用~',
