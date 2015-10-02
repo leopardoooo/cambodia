@@ -83,6 +83,7 @@ BCLang.home = {
 		cashPay: {
 			_title: 'Pay~',
 			pay: {
+				_stayTitle: 'Items to be paid~',
 				_title: 'Payment~',
 				columns: ['Operate~', 'Service Name~', 'Fee Name~', 'Paid Money Amount~', 'Order No.~', 'Remark~', 'Quantity~', 'Operate Time~', 'Fee No.~', 'serial number~'],
 				buttons: ['Save~', 'Close~']
@@ -95,8 +96,8 @@ BCLang.home = {
 		// customer page
 		cust: {
 			base: {_title: "Basic Information~",name: "Customer Name~",busiId: "Reception No.~",openDate: "Open Account Date~",addr: "Address~",status: "Customer Status~",
-				type: "Customer Type~",certType: "ID Type~",certNum: "ID No.~",linkMan: "Contact~",tel: " fixed-line telephone~",barthday: "Birthday~",
-				mobile: "mobile phone number~",areaCateory: "Area Community~",houseNetType: "service Type~",houseManager: "Community Customer Manager~",
+				type: "Customer Type~",certType: "ID Type~",certNum: "ID No.~",linkMan: "Contact~",tel: "mobile phone number1~",barthday: "Birthday~",
+				mobile: "mobile phone number2~",areaCateory: "Area Community~",houseNetType: "service Type~",houseManager: "Community Customer Manager~",
 				houseOptr: "Community Maintenance Staff~",postalAddr: "Post Address~", remark: "Remark~",
 				email: "email~", sex: "sex~",postcode: 'postcode~', blackList: 'black list~',
 				agentName: "Agent~", deptName: "Open Account Department~", developName: "Developer~", BusinessLicence: "Business License~", unitNumber: "Unit Taxation Number~",
@@ -262,7 +263,7 @@ BCLang.home = {
 			payfee: {
 				_title: "prepaid money~",
 				columns: ["serial number~","Service Name~","Account Type~","Account Name~","User Type~", "User Name~","Equipment No.~","Status~","Money Amount~","Estimated Expiry Date before Payment~",
-				        "Expiry Date after Payment~","Print Status~","Payment Way~","Reception Date~","Account Date~","Receptionist~","Reception Department~","Invoice~","Invoice Issuance Way~", "Invoice Type~"]
+				        "Expiry Date after Payment~","Print Status~","Payment Way~","Reception Date~","Account Date~","Receptionist~","Reception Department~","Invoice~","Invoice Issuance Way~", "Invoice Type~", "Development of Human ~"]
 			},
 			busifee: {
 				_title: "Service Fee~",
@@ -645,6 +646,7 @@ BCLang.msgBox = {
 	onlyOneUser: 'Please select one customer!~',
 	needStopUser: 'Please select User in【Termination Report】Status~',
 	confirmOpenUser: 'Sure to open?~',
+	confirmUntuckUser: 'You sure you want to disassemble?~',
 	searchCustTip1: 'Please input at least one key word to Inquiry Customer~',
 	searchCustTip2: 'Please do not input single quotation mark~',
 	searchNoCust: 'No Customer in line with Inquiry conditions，Please make sure and input again!~',
@@ -655,7 +657,7 @@ BCLang.msgBox = {
 	confirmResendCmd: 'Sure to repeat Open Account instruction?~',
 	noPreStopUser: 'This User does not pre-report Termination!~',
 	
-	phoneOrFixedPhoneMustBeEnterOne: 'Must input one Telephone Number or fixed-line telephone Number!~',
+	phoneOrFixedPhoneMustBeEnterOne: 'You must enter a phone number!~',
 	invalidAddressPlsReInput: 'Useless Customer Address，Please input again!~',
 	intentionCustPlsChooseProvince: 'Intending Customer Please select province!~',
 	rechargeCountMustBeGreaterThanZero: 'Money Amount is more than 0!~',
