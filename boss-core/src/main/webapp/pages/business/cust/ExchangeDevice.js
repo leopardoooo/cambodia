@@ -78,15 +78,15 @@ ExchangeDevicePanel = Ext.extend(BaseForm,{
 		]});
 	},
 	doSelectReason: function(combo, record){
-		var comp = Ext.getCmp('promptInfoId'), str='本次更换需要';
+		var comp = Ext.getCmp('promptInfoId'), str = lmain('user._form.labelChangeDeviceResion');
 		if(record.get('is_charge') == 'T'){
-			str += ' 收自购费用';
+			str += lmain('user._form.labelChangeBuyDevice');
 		}
 		if(record.get('is_reclaim') == 'T'){
-			str += ' 回收设备';
+			str += lmain('user._form.labelChangeBuyDevice');
 		}
 		if(record.get('is_lost') == 'T'){
-			str += ' 挂失设备';
+			str += lmain('user._form.labelChangeBuyDevice');
 		}
 		comp.setValue("<font color='red'>"+str+"</font>");
 	},
