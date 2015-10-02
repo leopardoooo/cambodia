@@ -446,6 +446,8 @@ ProdGrid = Ext.extend(Ext.TabPanel,{
 				}
 			}
 		}
+		if(this.prodMap['CUST'])
+			this.custPkgGrid.getStore().loadData(this.prodMap['CUST']);
 	},
 	remoteRefresh:function(loadType){
 		var cust = App.getData().custFullInfo.cust;
@@ -473,6 +475,7 @@ ProdGrid = Ext.extend(Ext.TabPanel,{
 				App.hideTip();
 				if(data["CUST"]){
 					this.custPkgGrid.getStore().loadData(data["CUST"]);
+					this.prodMap['CUST'] = data["CUST"];
 				}
 //				this.setActiveTab(0);
 			}
