@@ -45,7 +45,7 @@
   	
 	<div id="header"">
 		<div class="logo">
-			<img src="<%=boss_res %>/resources/images/index/logo33.gif"/>
+			<img src="<%=boss_res %>/resources/images/index/logo.jpg"/>
 		</div><div id="titleId" class="title">系统管理</div>
 	</div>
 	<div id="loading"><div>

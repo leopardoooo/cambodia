@@ -152,11 +152,14 @@ a {text-decoration: none; color: #f50;}a:hover {text-decoration: underline;color
 .site-nav-search .logo{
 	float:left;
 	clear:left;
-	width: 108px;
 	padding:0px;
 	padding-left:0px;
 	padding-top:11px;
 	padding-bottom:0px;
+}
+.logo img {
+	width: 145px;
+	height: 50px;
 }
 .content {
 	padding:2px;

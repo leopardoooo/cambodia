@@ -50,7 +50,7 @@ a:hover {
 	background-repeat:repeat-x;
 }
 #login-info .input .logfrom{
-	margin-left: 26px;
+	margin-left: 15px;
 }
 #login-info .mr{
 	background-image:url(./../images/login/body-bg.jpg);
@@ -83,10 +83,10 @@ a:hover {
 .logo{
 	background-position:left top;
 	background-repeat:no-repeat;
-	height:72px;
+	height:81px;
 	margin-bottom:5px;
-	margin-top:45px;
-	margin-left:23px;
+	margin-top:25px;
+	margin-left:5px;
 	background-image:url(./../images/login/logo.jpg);
 }
 .logTab th{

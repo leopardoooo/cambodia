@@ -34,7 +34,7 @@
 	font	:normal 26px tahoma, arial, sans-serif;
 	color	:#2b4a8c;
 	padding-top: 8px;
-	margin-left: 150px;
+	margin-left: 165px;
 	width   :80%;
 	font-weight:bolder;
 }
@@ -42,11 +42,14 @@
 #header .logo{
 	float:left;
 	clear:left;
-	width: 108px;
 	padding:0px;
 	padding-left:8px;
 	padding-top:5px;
 	padding-bottom:0px;
+}
+.logo img {
+	width: 145px;
+	height: 50px;
 }
 
 .top-toolbar{
