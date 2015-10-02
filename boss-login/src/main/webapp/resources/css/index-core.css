@@ -22,7 +22,7 @@ a {text-decoration: none; color: #f50;}a:hover {text-decoration: underline;color
 	margin:0px;
 	padding-left:154px !important;
 	padding-left:10px;
-	width: 630; 
+	width: 650px; 
 }#search .search-tablist{
 	position:absolute;
 	padding-top:1px;
@@ -30,8 +30,8 @@ a {text-decoration: none; color: #f50;}a:hover {text-decoration: underline;color
 .search-tablist li{
 	float: left;
 	padding-top:6px;
-	padding-left:15px;
-	padding-right:15px;
+	padding-left:10px;
+	padding-right:10px;
 } .search-tablist li a , .search-panel-right li a{
 	color: #153679;  
 } .search-tablist .first {
@@ -152,11 +152,14 @@ a {text-decoration: none; color: #f50;}a:hover {text-decoration: underline;color
 .site-nav-search .logo{
 	float:left;
 	clear:left;
-	width: 108px;
 	padding:0px;
 	padding-left:0px;
 	padding-top:11px;
 	padding-bottom:0px;
+}
+.logo img {
+	width: 145px;
+	height: 50px;
 }
 .content {
 	padding:2px;

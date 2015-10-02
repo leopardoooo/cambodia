@@ -1,6 +1,5 @@
 package com.ycsoft.sysmanager.component.resource;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,7 +13,6 @@ import com.ycsoft.business.dao.resource.device.RDeviceDao;
 import com.ycsoft.business.dao.resource.device.RDeviceTransferDao;
 import com.ycsoft.commons.abstracts.BaseComponent;
 import com.ycsoft.sysmanager.print.PrintContentConfiguration;
-import com.ycsoft.sysmanager.web.commons.interceptor.WebOptr;
 
 /**
  * @author danjp
@@ -38,7 +36,6 @@ public class DevicePrintComponent extends BaseComponent {
 		
 		
 		//xml文件内容
-		PrintContentConfiguration.configure("E:/MyWork/workspace_st/.metadata/.plugins/org.eclipse.wst.server.core/tmp1/wtpwebapps/boss-sysmanager/");
 		String content = PrintContentConfiguration.getTemplate("transferDevice.xml");
 		map.put("content", content);
 		map.put("data", data);

@@ -17,7 +17,7 @@ OrderProdEditForm = Ext.extend(BaseForm, {
 			labelWidth: 120,
 			items: [{
 				id: 'cmProdId',
-				fieldLabel: '产品',
+				fieldLabel: lmain("user._form.prodName"),
 				xtype: 'combo',
 				store: this.prodStore,
 				displayField: 'prod_name', valueField: 'prod_id',
@@ -28,7 +28,7 @@ OrderProdEditForm = Ext.extend(BaseForm, {
 				}
 			},{
 				id: 'cmTariffId',
-				fieldLabel: '资费',
+				fieldLabel: lmain("user._form.prodTariff"),
 				xtype: 'combo',
 				store: this.tariffStore,
 				displayField: 'disct_name', valueField: 'tariff_id',
@@ -39,7 +39,7 @@ OrderProdEditForm = Ext.extend(BaseForm, {
 				}
 			},{
 				id: 'nfMonthId',
-				fieldLabel: '订购月数',
+				fieldLabel: lmain("user._form.prodOrderMonths"),
 				xtype: 'numberfield',
 				allowNegative: false,
 				allowDecimals: false,
@@ -51,11 +51,11 @@ OrderProdEditForm = Ext.extend(BaseForm, {
 				}
 			},{
 				id: 'dfStartDateId',
-				fieldLabel: '开始计费日期',
+				fieldLabel: lmain("user._form.prodStartDate"),
 				xtype: 'displayfield'
 			},{
 				id: 'dfEndDateId',
-				fieldLabel: '结束计费日期',
+				fieldLabel: lmain("user._form.prodExpDate"),
 				xtype: 'datefield',
 				format: 'Y-m-d',
 				editable: false,
@@ -67,22 +67,22 @@ OrderProdEditForm = Ext.extend(BaseForm, {
 				}
 			},{
 				id: 'oldOrderFeeId',
-				fieldLabel: '原订单金额',
+				fieldLabel: lmain("user._form.oldOrderFee"),
 				xtype: 'textfield',
 				readOnly: true
 			},{
 				id: 'oldTransFeeId',
-				fieldLabel: '原转移支付',
+				fieldLabel: lmain("user._form.oldTransFee"),
 				xtype: 'textfield',
 				readOnly: true
 			},{
 				id: 'realOrderFeeId',
-				fieldLabel: '新订单金额',
+				fieldLabel: lmain("user._form.realOrderFee"),
 				xtype: 'textfield',
 				readOnly: true
 			},{
 				id: 'dfDiffFeeId',
-				fieldLabel: '补收费用',
+				fieldLabel: lmain("user._form.newAddFee"),
 				xtype: 'numberfield',
 				allowBlank: false,
 				listeners: {
@@ -180,11 +180,11 @@ OrderProdEditForm = Ext.extend(BaseForm, {
 		Ext.getCmp('realOrderFeeId').setValue('');
 		var realOrderFee = newValue*1.0 + Ext.getCmp('oldOrderFeeId').getValue()*1.0;
 		if(realOrderFee < 0){
-			Alert('新订单金额不能小于零!');
+			Alert(lmsg("user._form.newOrderAmountCantBeLessThanZero"));
 			return;
 		}
 		if(realOrderFee < Ext.getCmp('oldTransFeeId').getValue()*1.0){
-			Alert('新订单金额不能小于转移金额!');
+			Alert(lmsg("user._form.newOrderAmountCantBeLessThanTransAmount"));
 			return;
 		}
 		Ext.getCmp('realOrderFeeId').setValue( realOrderFee );

@@ -230,7 +230,16 @@ BCLang.home = {
 				
 				titleTransferPayDetailGrid: '转移支付明细~',
 				transferPayCM: ['产品名称~', '资费~', '用户~', '开始计费日~', '结束计费日~', '转移金额$~'],
-				transferDetailDate: '转移明细（开始计费日：{0} "）~'
+				transferDetailDate: '转移明细（开始计费日：{0} "）~',
+				labelChangeDeviceResion: '本次更换需要~',
+				labelChangeBuyDevice: ' 收自购费用~',
+				labelChangeBuyDevice: ' 回收设备~',
+				labelChangeBuyDevice: ' 挂失设备~',
+				
+				oldOrderFee: '原订单金额~',
+				oldTransFee: '原转移支付~',
+				realOrderFee: '新订单金额~',
+				newAddFee: '补收金额~'
 			},
 			list: {
 				_title: '用户信息~',
@@ -704,5 +713,7 @@ BCLang.msgBox = {
 	spkgPkgCanContinueChooseUser: '协议套餐已选用户小于套餐内容最大用户数，可继续选择用户!~',
 	chooseInUsers: '请选择要参加套餐的终端用户!~',
 	exceedPkgMaxUserNum: '已超过套餐最大用户数限制!~',
-	completeChooseUserTerminal: '请完整选择需要参加的每种用户类型终端!~'
+	completeChooseUserTerminal: '请完整选择需要参加的每种用户类型终端!~',
+	newOrderAmountCantBeLessThanZero: '新订单金额不能小于零!~',
+	newOrderAmountCantBeLessThanTransAmount: '新订单金额不能小于转移金额~'
 }

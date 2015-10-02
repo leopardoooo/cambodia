@@ -288,7 +288,7 @@ SearchCustWindow = Ext.extend( Ext.Window , {//复杂查询
 			maximizable : false,
 			layout : 'fit',
 			width : 300,
-			height : 220,
+			height : 250,
 			closeAction : 'close',
 			items : [this.form],
 			buttons : [{

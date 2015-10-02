@@ -1702,11 +1702,14 @@ Ext.apply(MenuHandler, {
 	},
 	OrderProdEdit: function(){
 		if(!hasCust())	return false;
-		var userRecords =  App.main.infoPanel.getUserPanel().userGrid.getSelections();
-		var len = userRecords.length;
-		if (len == 0) {
-			Alert('请先选择用户!');
-			return false;
+		var prodRecord = App.main.infoPanel.getUserPanel().prodGrid.custPkgGrid.getSelectionModel().getSelected();
+		if(prodRecord.get('prod_type') == 'BASE'){
+			var userRecords =  App.main.infoPanel.getUserPanel().userGrid.getSelections();
+			var len = userRecords.length;
+			if (len == 0) {
+				Alert('请先选择用户!');
+				return false;
+			}
 		}
 		for (var i = 0; i < len; i++) {
 			if (userRecords[i].get("status") != "ACTIVE" && userRecords[i].get("status") != "INSTALL" ) {
@@ -1724,7 +1727,7 @@ Ext.apply(MenuHandler, {
 		}
 		return {
 			width: 450,
-			height: 350
+			height: 450
 		};
 	},
 	// 取消套餐
