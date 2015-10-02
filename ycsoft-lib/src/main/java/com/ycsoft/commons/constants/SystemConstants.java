@@ -555,8 +555,8 @@ public class SystemConstants {
 	public static final String EXT_ATTRID_PROTOCOL = "100"; 
 	
 	
-	public static final String TEAM_TYPE_SUPERNET="SUPERNET";
-	public static final String TEAM_TYPE_CFOCN="CFOCN";
+	public static final String TEAM_TYPE_SUPERNET="SUPERNET";//工程运维部
+	public static final String TEAM_TYPE_CFOCN="CFOCN"; //柬光施工
 	
 	public static final String TASK_ASSIGN_SUPPERNET="SUPERNET";
 	public static final String TASK_ASSIGN_CFOCN="CFOCN";

@@ -3039,6 +3039,7 @@ Ext.apply(MenuHandler, {
 			var result = Ext.decode(res.responseText);
 			if (result.success == true) {
 				Alert('工单作废成功!');
+				App.getApp().main.infoPanel.getUserPanel().userGrid.remoteRefresh();
 				App.getApp().main.infoPanel.docPanel.taskGrid.remoteRefresh();
 						
 			}

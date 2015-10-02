@@ -693,16 +693,16 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 			triggerAction:'all',mode:'local'
 		});
 		App.form.initComboData([finishCombo]);
-		var form = new Ext.form.FormPanel({
-			labelWidth: 90,
-			bodyStyle: 'padding-top: 10px;',
+		var endForm = new Ext.form.FormPanel({
+			layout : 'form',
+			border : false,
+			labelWidth : 100,
+			bodyStyle : 'padding : 5px;padding-top : 10px;',
 			items: [finishCombo,{
 				fieldLabel: lbc('home.tools.TaskManager.forms.finishExplan'),
 				name:'finishRemark',
-				id:'finishRemarkId',
-				preventScrollbars : true,
 				height : 100,
-				width : 300,
+				width : 240,
 				xtype:'textarea'
 			}]
 		});
@@ -713,7 +713,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 			border: false,
 			closeAction:'close',
 			layout: 'fit',
-			items: form,
+			items: endForm,
 			buttons: [{
 				text: lbc('common.save'),
 				scope: this,
@@ -727,12 +727,12 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 					var o = {
 						task_id : taskId, 
 						resultType : finishCombo.getValue(),
-						finishRemark : form.findById('finishRemarkId').getValue()
+						finishRemark : endForm.getForm().findField('finishRemark').getValue()
 					};
 					App.sendRequest( url, o, function(res,opt){
 						Ext.getCmp('taskManagerPanelId').grid.getStore().reload({
 							callback:function(records, options, success){  
-				           		 var panel = Ext.getCmp('taskManagerPanelId');
+				           		var panel = Ext.getCmp('taskManagerPanelId');
 					           	var index = panel.grid.getStore().find('task_id',taskId);	           		
 					           	panel.grid.getSelectionModel().selectRow(index);
 					           	panel.loadTaskData(taskId);

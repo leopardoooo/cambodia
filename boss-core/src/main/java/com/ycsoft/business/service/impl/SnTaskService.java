@@ -39,6 +39,7 @@ import com.ycsoft.commons.constants.DictKey;
 import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.exception.ServicesException;
+import com.ycsoft.commons.helper.CollectionHelper;
 import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.commons.store.MemoryDict;
 import com.ycsoft.daos.core.Pager;
@@ -307,24 +308,34 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 			//回收设备
 			List<WTaskUser> userList = wTaskUserDao.queryByTaskId(taskId);
 			for (WTaskUser user:userList){
-				if (user.getRecycle_device().equals(SystemConstants.BOOLEAN_TRUE) && 
-						user.getRecycle_result().equals(SystemConstants.BOOLEAN_TRUE) ){
-					//更新设备状态和仓库
-					DeviceDto device = deviceComponent.queryDeviceByDeviceCode(user.getDevice_id());
-					deviceComponent.updateDeviceDepotId(doneCode, BusiCodeConstants.TASK_FINISH, device.getDevice_id(), 
-							device.getDepot_id(), getOptr().getDept_id(), true);
-					deviceComponent.updateDeviceDepotStatus(doneCode, BusiCodeConstants.TASK_FINISH, device.getDevice_id(),
-							device.getDepot_status(), StatusConstants.IDLE, true);
-					//删除客户设备
-					custComponent.removeDevice(task.getCust_id(), device.getDevice_id(), doneCode, SystemConstants.BOOLEAN_FALSE);
-					//更新用户设备信息为空
-					CUser cuser = new CUser();
-					cuser.setUser_id(user.getUser_id());
-					cuser.setStb_id("");
-					cuser.setCard_id("");
-					cuser.setModem_mac("");
-					cuser.setStatus(StatusConstants.UNTUCKEND);
-					cUserDao.update(cuser);
+				if(StringHelper.isEmpty(user.getRecycle_result())){
+					throw new ServicesException("需要先回填设备，确认是否回收");
+				}
+				if (user.getRecycle_device().equals(SystemConstants.BOOLEAN_TRUE)){
+					if(user.getRecycle_result().equals(SystemConstants.BOOLEAN_TRUE) ){
+						//更新设备状态和仓库
+						DeviceDto device = deviceComponent.queryDeviceByDeviceCode(user.getDevice_id());
+						deviceComponent.updateDeviceDepotId(doneCode, BusiCodeConstants.TASK_FINISH, device.getDevice_id(), 
+								device.getDepot_id(), getOptr().getDept_id(), true);
+						deviceComponent.updateDeviceDepotStatus(doneCode, BusiCodeConstants.TASK_FINISH, device.getDevice_id(),
+								device.getDepot_status(), StatusConstants.IDLE, true);
+						//删除客户设备
+						custComponent.removeDevice(task.getCust_id(), device.getDevice_id(), doneCode, SystemConstants.BOOLEAN_FALSE);
+						//更新用户设备信息为空
+						CUser cuser = new CUser();
+						cuser.setUser_id(user.getUser_id());
+						cuser.setStb_id("");
+						cuser.setCard_id("");
+						cuser.setModem_mac("");
+						cuser.setStatus(StatusConstants.UNTUCKEND);
+						cUserDao.update(cuser);
+					}else{
+						//supernet的设备，但是没有回收，需要前台收取设备费用
+						CUser cuser = new CUser();
+						cuser.setUser_id(user.getUser_id());
+						cuser.setStatus(StatusConstants.UNTUCKEND);
+						cUserDao.update(cuser);
+					}
 				}
 			}
 			
@@ -389,21 +400,27 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 		Map<String , Object> map = new HashMap<String, Object>();
 		List<TaskUserDto> userList = wTaskUserDao.queryUserDetailByTaskId(task_id);
 
-		for(TaskUserDto task: userList){
-			CUser user = userComponent.queryUserById(task.getUser_id());
-			if(user == null){
-				throw new ServicesException("用户不存在");
-			}
-			task.setUser_name( taskComponent.getFillUserName(user) );
-			task.setOccNo(user.getStr7());
-			task.setPosNo(user.getStr8());
-			if(!user.getUser_type().equals(SystemConstants.USER_TYPE_OTT_MOBILE)){
-				if(StringHelper.isEmpty(user.getDevice_model()) && StringHelper.isNotEmpty(user.getStr3())){
-					user.setDevice_model(user.getStr3());
-					if(user.getUser_type().equals(SystemConstants.USER_TYPE_BAND)){
-						task.setDevice_model_text( MemoryDict.getTransName(DictKey.MODEM_MODEL, user.getStr3()) );
-					}else{
-						task.setDevice_model_text( MemoryDict.getTransName(DictKey.STB_MODEL, user.getStr3()) );
+		if(userList.size()>0){
+			String[] userIds = CollectionHelper.converValueToArray(userList, "user_id"); 
+					
+			List<CUser> users = userComponent.queryAllUserAndHisByUserIds(userIds);
+			Map<String,CUser> userMap = CollectionHelper.converToMapSingle(users, "user_id");
+			for(TaskUserDto task: userList){
+				CUser user = userMap.get(task.getUser_id());
+				if(user == null){
+					throw new ServicesException("用户不存在");
+				}
+				task.setUser_name( taskComponent.getFillUserName(user) );
+				task.setOccNo(user.getStr7());
+				task.setPosNo(user.getStr8());
+				if(!user.getUser_type().equals(SystemConstants.USER_TYPE_OTT_MOBILE)){
+					if(StringHelper.isEmpty(user.getDevice_model()) && StringHelper.isNotEmpty(user.getStr3())){
+						user.setDevice_model(user.getStr3());
+						if(user.getUser_type().equals(SystemConstants.USER_TYPE_BAND)){
+							task.setDevice_model_text( MemoryDict.getTransName(DictKey.MODEM_MODEL, user.getStr3()) );
+						}else{
+							task.setDevice_model_text( MemoryDict.getTransName(DictKey.STB_MODEL, user.getStr3()) );
+						}
 					}
 				}
 			}

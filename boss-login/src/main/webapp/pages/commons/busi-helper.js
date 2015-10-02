@@ -301,7 +301,7 @@ Ext.apply( App, {
 		if(busiCode == '2000'){			//支付
 			panel.getUserPanle().prodGrid.remoteRefresh();
 			panel.getPayfeePanel().refresh();
-		}else if(busiCode == '1113' || busiCode == '2261'){	//取消支付
+		}else if(busiCode == '1113' ){	//取消支付
 			panel.getUserPanel().refresh();
 			panel.getPayfeePanel().acctFeeGrid.remoteRefresh();
 			panel.getPayfeePanel().busiFeeGrid.remoteRefresh();
@@ -483,7 +483,10 @@ Ext.apply( App, {
 //			panel.getAcctPanel().acctGrid.remoteRefresh();
 			panel.getUserPanel().prodGrid.remoteRefresh();
 			panel.getCustPanel().refreshPromFeeGrid();
-//			panel.getBillPanel().billGrid.remoteRefresh();
+//			panel.getBillPanel().billGrid.remoteRefresh();9014
+		}else if(busiCode == '9014' || busiCode == '2261'){//新增故障单,工单作废
+			panel.getUserPanel().userGrid.remoteRefresh();
+			panel.getDocPanel().taskGrid.remoteRefresh();
 		}
 		
 		App.getApp().refreshFeeView();

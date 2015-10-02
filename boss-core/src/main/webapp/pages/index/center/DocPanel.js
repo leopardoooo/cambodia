@@ -74,21 +74,20 @@ UserDetailGrid = Ext.extend(Ext.grid.GridPanel, {
 	constructor : function() {
 		this.userDetailStore = new Ext.data.JsonStore({
 					fields : ['user_type', 'user_type_text','user_name', 'device_model','device_model_text','task_id',
-							'device_code', 'password']
+							'device_code', 'password','device_id','band','posNo','occNo']
 				});
 		UserDetailGrid.superclass.constructor.call(this, {
 			ds : this.userDetailStore,
-			viewConfig : {
-				forceFit :true
-			},
 			sm : new Ext.grid.CheckboxSelectionModel(),
 			cm : new Ext.grid.ColumnModel([{
 						header : '用户类型',dataIndex : 'user_type_text',width : 80,renderer : App.qtipValue}, {
 						header : '用户名',dataIndex : 'user_name',renderer : App.qtipValue}, {
 						header : '密码',dataIndex : 'password',renderer : App.qtipValue}, {
 						header : '设备型号',dataIndex : 'device_model_text',renderer : App.qtipValue}, {
-						header : '设备号',dataIndex : 'device_code',renderer : App.qtipValue}, {
-						header : '带宽',dataIndex : 'task_id',renderer : App.qtipValue}])
+						header : '设备号',dataIndex : 'device_id',renderer : App.qtipValue},{
+						header : 'posNo',dataIndex : 'posNo',width : 100,renderer : App.qtipValue}, {
+						header : 'occNo',dataIndex : 'occNo',width : 100,renderer : App.qtipValue}, {
+						header : '带宽',dataIndex : 'band',renderer : App.qtipValue}])
 		})
 	}
 })
@@ -101,16 +100,14 @@ TaskDetailGrid = Ext.extend(Ext.grid.GridPanel, {
 							'syn_status','error_remark','syn_status_text']});
 		TaskDetailGrid.superclass.constructor.call(this, {
 			ds : this.taskDetailStore,
-			viewConfig : {
-				forceFit :true
-			},
 			sm : new Ext.grid.CheckboxSelectionModel(),
+			
 			cm : new Ext.grid.ColumnModel([{
 				header : '操作时间',dataIndex : 'log_time',width : 100,renderer : Ext.util.Format.dateFormat}, {
 				header : '操作类型',dataIndex : 'busi_name',renderer : App.qtipValue}, {
 				header : '操作人',dataIndex : 'optr_name',renderer : App.qtipValue}, {
 				header : '同步状态',dataIndex : 'syn_status_text',renderer : App.qtipValue}, {
-				header : '错误描述',dataIndex : 'error_remark',renderer :  App.qtipValue
+				header : '错误描述',dataIndex : 'error_remark',sortable: true,renderer :  App.qtipValue
 			}])
 		})
 	}
@@ -130,16 +127,18 @@ TaskDetailWindow = Ext.extend(Ext.Window, {
 //				title: '工单明细',
 				border: false,
 				items : [{
-							region : 'west',
-							layout : 'fit',
-							width : '55%',
-							split : true,
-							title : '用户信息',
-							items : [this.userGrid]
-						}, {
 							region : 'center',
 							layout : 'fit',
+							split : true,
+							title : '用户信息',
+							border: false,
+							items : [this.userGrid]
+						}, {
+							region : 'north',
+							layout : 'fit',
+							height: 150,
 							title : '操作明细',
+							border: false,
 							items : [this.detail]
 						}]
 		});

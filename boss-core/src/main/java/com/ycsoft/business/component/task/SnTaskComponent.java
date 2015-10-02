@@ -26,12 +26,14 @@ import com.ycsoft.business.dao.task.WTaskBaseInfoDao;
 import com.ycsoft.business.dao.task.WTaskLogDao;
 import com.ycsoft.business.dao.task.WTaskUserDao;
 import com.ycsoft.business.dao.task.WTeamDao;
+import com.ycsoft.business.dto.device.DeviceDto;
 import com.ycsoft.commons.constants.BusiCodeConstants;
 import com.ycsoft.commons.constants.SequenceConstants;
 import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.exception.ComponentException;
 import com.ycsoft.commons.exception.ErrorCode;
+import com.ycsoft.commons.exception.ServicesException;
 import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.daos.core.JDBCException;
 
@@ -64,14 +66,20 @@ public class SnTaskComponent extends BaseBusiComponent{
 	
 	//创建销户工单
 	public void createWriteOffTask(Integer doneCode,CCust cust,List<CUser> userList,String assignType) throws Exception{
-		filterUserList(userList);
+		//去除OTT_MOBILE
+		filterUserList(userList,SystemConstants.USER_TYPE_OTT_MOBILE);
 		if (userList.size() ==0 ){
 			return;//no user
 		}
-		List<CUser> bandList = getUserByTyoe(userList, SystemConstants.USER_TYPE_BAND);
 		//创建终端回收单
 		createSingleTaskWithUser(doneCode, cust, userList, getTeamId(SystemConstants.TEAM_TYPE_SUPERNET), SystemConstants.TASK_TYPE_WRITEOFF_TERMINAL);
+		//去除DTT
+		filterUserList(userList,SystemConstants.USER_TYPE_DTT);
+		if (userList.size() ==0 ){
+			return;//no user
+		}
 		//创建拆线路单
+		List<CUser> bandList = getUserByTyoe(userList, SystemConstants.USER_TYPE_BAND);
 		String teamType = SystemConstants.TEAM_TYPE_SUPERNET;
 		if(assignType.equals(SystemConstants.TASK_ASSIGN_CFOCN))
 			teamType = SystemConstants.TEAM_TYPE_CFOCN;
@@ -92,7 +100,7 @@ public class SnTaskComponent extends BaseBusiComponent{
 	//生成移机工单
 	public void createMoveTask(Integer doneCode,CCust cust,String newAddrId,String newAddr,String assignType) throws Exception{
 		String teamType = SystemConstants.TEAM_TYPE_SUPERNET;
-		if(assignType.equals(SystemConstants.TASK_ASSIGN_CFOCN))
+		if(SystemConstants.TASK_ASSIGN_CFOCN.equals(assignType))
 			teamType = SystemConstants.TEAM_TYPE_CFOCN;
 		String taskId = this.saveTaskBaseInfo(cust, doneCode, SystemConstants.TASK_TYPE_MOVE, getTeamId(teamType), newAddr,null);
 		List<CUser> userList = cUserDao.queryUserByCustId(cust.getCust_id());
@@ -126,6 +134,24 @@ public class SnTaskComponent extends BaseBusiComponent{
 
 	//作废工单
 	public void cancelTask(Integer doneCode,String taskId) throws Exception{
+		WTaskBaseInfo oldTask = wTaskBaseInfoDao.findByKey(taskId);
+		if(oldTask == null){
+			throw new ComponentException("工单不存在");
+		}
+		if(oldTask.getTask_status().equals(StatusConstants.TASK_END)){
+			throw new ComponentException("工单已经完工");
+		}
+		//作废销终端工单，用户状态还原
+		if(oldTask.getTask_type_id().equals(SystemConstants.TASK_TYPE_WRITEOFF_TERMINAL)){
+			List<WTaskUser> userList = wTaskUserDao.queryByTaskId(taskId);
+			for (WTaskUser user:userList){
+				CUser cuser = new CUser();
+				cuser.setUser_id(user.getUser_id());
+				cuser.setStatus(StatusConstants.ACTIVE);
+				cUserDao.update(cuser);
+			}
+		}
+		
 		WTaskBaseInfo task = new WTaskBaseInfo();
 		task.setTask_id(taskId);
 		task.setTask_status(StatusConstants.CANCEL);
@@ -244,11 +270,11 @@ public class SnTaskComponent extends BaseBusiComponent{
 		createTaskLog(taskId,BusiCodeConstants.TASK_FINISH, doneCode, jo.toString(), StatusConstants.NONE);
 		
 	}
-	//删除ott_mobile和dtt用户
-	private void filterUserList(List<CUser> userList){
+	//删除ott_mobile和dtt用户   ,dtt用户还是需要生成销终端工单，否则销户的时候还得判断设备回收  
+	private void filterUserList(List<CUser> userList,String userType){
 		for (Iterator<CUser> it = userList.iterator();it.hasNext();){
 			CUser user = it.next();
-			if (user.getUser_type().equals(SystemConstants.USER_TYPE_OTT_MOBILE)|| user.getUser_type().equals(SystemConstants.USER_TYPE_DTT)){
+			if (user.getUser_type().equals(userType)){
 				it.remove();
 			}
 		}

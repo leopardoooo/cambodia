@@ -1307,6 +1307,30 @@ public class UserComponent extends BaseBusiComponent {
 	public int updateUserNameByDeviceCode(CUser user, String custId) throws Exception {
 		return cUserDao.updateUserNameByDeviceCode(user,custId);
 	}
+
+	public List<CUser> queryAllUserAndHisByUserIds(String[] userIds) throws Exception {
+		List<CUser> list = new ArrayList<CUser>();
+		List<CUser> userList = cUserDao.queryUserByUserIds(userIds);
+		if(userList.size()>0){
+			list.addAll(userList);
+		}
+		if(list.size()!=userIds.length){
+			List<String> userHis = new ArrayList<String>();
+			List<String> userIdList = CollectionHelper.converValueToList(list, "user_id");
+			for(int i = 0 ;i<userIds.length;i++){
+				if(!userIdList.contains(userIds[i])){
+					userHis.add(userIds[i]);
+				}
+			}
+			if(userHis.size()>0){
+				List<CUserHis> userHisList = cUserHisDao.queryAllUserHisByUserIds(userIds);
+				if(userHisList.size()>0){
+					list.addAll(userHisList);
+				}
+			}
+		}
+		return list;
+	}
 	
 	
 	

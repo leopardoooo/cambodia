@@ -479,7 +479,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 			throw new ServicesException(ErrorCode.CustDataException);
 		}
 		//拆机完成后才能销户
-		if(!user.getUser_type().equals(USER_TYPE_OTT_MOBILE) || !user.getStatus().equals(StatusConstants.UNTUCKEND)){
+		if(!user.getUser_type().equals(USER_TYPE_OTT_MOBILE) && !user.getStatus().equals(StatusConstants.UNTUCKEND)){
 			throw new ServicesException(ErrorCode.UserStatusNotOff);
 		}
 		
@@ -1536,6 +1536,8 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 			
 			// send write off cmd
 			CUser cuser = userComponent.queryUserById(user.getUser_id());
+			if(cuser == null)
+				continue;
 			authComponent.sendAuth(cuser, null, BusiCmdConstants.DEL_USER, doneCode);
 			
 			//write off user

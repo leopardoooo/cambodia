@@ -537,4 +537,6 @@ public class CUserDao extends BaseEntityDao<CUser> {
 		String sql="select * from c_user where  stb_id=? or card_id=? or modem_mac=? ";
 		return this.createQuery(sql, DeviceCode,DeviceCode,DeviceCode).first();
 	}
+
+
 }
