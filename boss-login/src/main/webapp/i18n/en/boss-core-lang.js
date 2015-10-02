@@ -73,7 +73,7 @@ BCLang.common = {
 //home page module
 BCLang.home = {
 	topWelcome: "operator at present~",
-	searchTabs:["Name No.~","EquipmentNo.|Account number~","Installation Address~","Telephone Number~","multi-condition search~"],
+	searchTabs:["Name No.","Device|Account","Install Address","Phone","multi-condition"],
 	invoicePrintTitle:'Invoice Print~',
 	searchTip:"Customer No.|Reception No.~",
 	searchBtns:["Search~","Pay~"],
