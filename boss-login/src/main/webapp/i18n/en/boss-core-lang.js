@@ -230,7 +230,11 @@ BCLang.home = {
 				
 				titleTransferPayDetailGrid: 'transfer paymentDetails~',
 				transferPayCM: ['Product Name~', 'Fee~', 'User~', ' Billing Starting Date~', 'Ending Billing Date~', 'Transfer Money Amount$~'],
-				transferDetailDate: ' Transferring Details（Billing Starting Date：{0} "）~'
+				transferDetailDate: ' Transferring Details（Billing Starting Date：{0} "）~',
+				labelChangeDeviceResion: 'The replacement need~',
+				labelChangeBuyDevice: ' Income from the purchase cost~',
+				labelChangeBuyDevice: ' Recycling Equipment~',
+				labelChangeBuyDevice: ' Report the loss of equipment~'
 			},
 			list: {
 				_title: 'Customer Information~',

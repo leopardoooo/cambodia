@@ -230,7 +230,11 @@ BCLang.home = {
 				
 				titleTransferPayDetailGrid: '转移支付明细~',
 				transferPayCM: ['产品名称~', '资费~', '用户~', '开始计费日~', '结束计费日~', '转移金额$~'],
-				transferDetailDate: '转移明细（开始计费日：{0} "）~'
+				transferDetailDate: '转移明细（开始计费日：{0} "）~',
+				labelChangeDeviceResion: '本次更换需要~',
+				labelChangeBuyDevice: ' 收自购费用~',
+				labelChangeBuyDevice: ' 回收设备~',
+				labelChangeBuyDevice: ' 挂失设备~'
 			},
 			list: {
 				_title: '用户信息~',
