@@ -234,7 +234,12 @@ BCLang.home = {
 				labelChangeDeviceResion: 'The replacement need~',
 				labelChangeBuyDevice: ' Income from the purchase cost~',
 				labelChangeBuyDevice: ' Recycling Equipment~',
-				labelChangeBuyDevice: ' Report the loss of equipment~'
+				labelChangeBuyDevice: ' Report the loss of equipment~',
+				
+				oldOrderFee: 'original order amount~',
+				oldTransFee: 'original transfer payments~',
+				realOrderFee: 'new orders amount~',
+				newAddFee: 'up close to the amount of~'
 			},
 			list: {
 				_title: 'Customer Information~',
@@ -691,5 +696,7 @@ BCLang.msgBox = {
 	spkgPkgCanContinueChooseUser: 'Agreement package is selected, Users less than max quantity  of package，you can continue to select User!~',
 	chooseInUsers: 'Please select Terminal User to join package!~',
 	exceedPkgMaxUserNum: 'More than max quantity limit of package!~',
-	completeChooseUserTerminal: 'Please fully select every User Type Terminal!~'
+	completeChooseUserTerminal: 'Please fully select every User Type Terminal!~',
+	newOrderAmountCantBeLessThanZero: 'new orders amount can not be less than zero ~!',
+	newOrderAmountCantBeLessThanTransAmount: 'new orders can not be less than the amount of the transfer amount ~'
 }
