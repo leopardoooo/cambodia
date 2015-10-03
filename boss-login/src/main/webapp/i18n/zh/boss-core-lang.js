@@ -203,6 +203,7 @@ BCLang.home = {
 				orderFee: '订单余额~',
 				canRetrunFee: '可退金额~',
 				canTransferFee: '转账金额~',
+				canRefundRealFee: '实退金额~',
 				returnDevice: '回收设备~',
 				retrunInfo: '可退~',
 				transferInfo: '可转~',
