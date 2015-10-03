@@ -55,7 +55,7 @@
 								<tr>
 									<th>用户名</th>
 									<td class="inner-input-cmp">
-										<input class="input-blur"  maxlength="20" id="loginName" value='admin'
+										<input class="input-blur"  maxlength="20" id="loginName" 
 											   onfocus="this.select();this.className='input-focus';" 
 											   onblur="this.className='input-blur';"/>
 									</td>
@@ -64,7 +64,7 @@
 								<tr>
 									<th>密&nbsp;&nbsp;&nbsp;&nbsp;码</th>
 									<td width="90" class="inner-input-cmp">
-										<input class="input-blur" maxlength="20" id="pwd" type="password"  value='123shyc'
+										<input class="input-blur" maxlength="20" id="pwd" type="password" 
 											   onfocus="this.select();this.className='input-focus';" 
 											   onblur="this.className='input-blur';"/>
 									</td>
