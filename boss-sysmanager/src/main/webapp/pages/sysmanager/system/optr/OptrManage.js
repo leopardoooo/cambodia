@@ -936,15 +936,15 @@ var OptrManagePanel = Ext.extend( Ext.grid.GridPanel , {
 			sm:sm,
 			cm: new Ext.grid.ColumnModel([
 				{header: '操作员姓名', dataIndex: 'optr_name',width: 70,renderer:App.qtipValue},
-				{id:'login_name', header: '工号', dataIndex: 'login_name',width: 80},
+				{id:'login_name', header: '工号', dataIndex: 'login_name',width: 80,renderer:App.qtipValue},
 				{header: '状态', dataIndex: 'status_text',width: 40,renderer:Ext.util.Format.statusShow},
-				{header: '电话1', dataIndex: 'tel',width: 80},
-				{header: '电话2', dataIndex: 'mobile',width: 80},
+				{header: '电话1', dataIndex: 'tel',width: 80,renderer:App.qtipValue},
+				{header: '电话2', dataIndex: 'mobile',width: 80,renderer:App.qtipValue},
 				{header: '职位', dataIndex: 'position',width: 60,renderer:App.qtipValue},
 				{header: '所在部门', dataIndex: 'dept_name',width: 80,renderer:App.qtipValue},
 				{header: '所属县市', dataIndex: 'county_name',width: 80,renderer:App.qtipValue},
-				{header: '复制操作员', dataIndex:'copy_optr_name',width:80},
-				{header: '备注', dataIndex:'remark',width:100},
+				{header: '复制操作员', dataIndex:'copy_optr_name',width:80,renderer:App.qtipValue},
+				{header: '备注', dataIndex:'remark',width:100,renderer:App.qtipValue},
 				{header: '操作', dataIndex: 'status',width: 250, renderer: function(v, md, record , i ){
 					var txt = null;
 					if(v =='INVALID'){
