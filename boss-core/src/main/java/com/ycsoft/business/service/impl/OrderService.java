@@ -166,15 +166,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		CProdOrderDto order=checkOrderEditParam(cust_id,orderProd);
 		Integer done_code=doneCodeComponent.gDoneCode();
 		
-		//处理费用
-		if(orderProd.getPay_fee()!=0){
-			CCust cust=custComponent.queryCustById(cust_id);
-			//插入CFEE记录
-			String feeSn=feeComponent.saveOrderEdittoCFee(order, orderProd.getPay_fee(), cust, done_code, this.getBusiParam().getBusiCode());
-			orderComponent.saveOrderEditFee(order, orderProd.getPay_fee(), feeSn, done_code);
-			//记录未支付业务
-			doneCodeComponent.saveDoneCodeUnPay(cust_id, done_code, this.getOptr().getOptr_id());
-		}
+
 		
 		//TODO 客户套餐自动选终端处理，因为前台先不提供客户套餐用户变更功能，如果套餐变更了产品，自动更新用户对应的套餐内容
 		if(order.getProd_type().equals(SystemConstants.PROD_TYPE_CUSTPKG)
@@ -189,6 +181,16 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		}
 	    editOrder.setOrder_fee(order.getOrder_fee()+orderProd.getPay_fee());
 		orderComponent.saveOrderEditChange(order, editOrder,done_code);
+		
+		//处理费用
+		if(orderProd.getPay_fee()!=0){
+			CCust cust=custComponent.queryCustById(cust_id);
+			//插入CFEE记录
+			String feeSn=feeComponent.saveOrderEdittoCFee(order, orderProd.getPay_fee(), cust, done_code, this.getBusiParam().getBusiCode());
+			orderComponent.saveOrderEditFee(order, orderProd.getPay_fee(), feeSn, done_code);
+			//记录未支付业务
+			doneCodeComponent.saveDoneCodeUnPay(cust_id, done_code, this.getOptr().getOptr_id());
+		}
 		
 		//更新订单，返回有变化的订单信息,套餐会重新处理子产品
 		List<CProdOrder> orderChangeList=orderComponent.saveOrderEditBean(order, done_code, orderProd);
