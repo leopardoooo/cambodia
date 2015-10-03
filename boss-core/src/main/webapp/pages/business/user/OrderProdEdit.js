@@ -134,8 +134,7 @@ OrderProdEditForm = Ext.extend(BaseForm, {
 		this.baseData['eff_date'] = this.baseData['eff_date'].substring(0, 10);
 		Ext.getCmp('dfStartDateId').setValue( this.baseData['eff_date'] );
 		
-		var minEndDate = Ext.util.Format.getDays(this.baseData['eff_date'], nowDate().format('Y-m-d')) > 0 ? nowDate().format('Y-m-d') : this.baseData['eff_date'];
-		Ext.getCmp('dfEndDateId').minValue = Date.parseDate(minEndDate, 'Y-m-d');
+		Ext.getCmp('dfEndDateId').minValue = Date.parseDate( this.baseData['eff_date'], 'Y-m-d' );
 		
 		Ext.getCmp('dfEndDateId').setValue( Date.parseDate(this.baseData['exp_date'], 'Y-m-d H:i:s') );
 	},
