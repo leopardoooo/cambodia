@@ -511,14 +511,13 @@ CustBaseForm = Ext.extend( BaseForm , {
 						},{
 							xtype:'combo',
 							id : 'provinceId',
-							fieldLabel: "省",
+							fieldLabel: langUtils.main("cust._form.province"),
 							forceSelection : true,
 							store : this.provinceStore,
 							triggerAction : 'all',
 							mode: 'local',
 							displayField : 'name',
 							valueField : 'cust_code',
-							emptyText: '请选择省',
 							disabled:true,
 							editable : false,
 							listeners:{
