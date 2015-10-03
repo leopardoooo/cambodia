@@ -280,6 +280,9 @@ Ext.apply(App.func,{
 		
 /**************************************用户产品信息开始************************************************/
 		else if(panelName.indexOf('U_PROD')>=0){//用户产品信息
+			if(busicode == '131' && (data['is_pay'] == 'T' || data["package_id"]!=null)){
+				return false;
+			}
 			// 如果是套餐所有按钮在基本产品列表中都不显示
 			if(data["package_id"]!=null || (data['status'] != 'ACTIVE' && data['status'] != 'INSTALL')){
 				return false; 
@@ -312,10 +315,7 @@ Ext.apply(App.func,{
 					if(!flag)return false;
 				}
 			}else */
-			if(busicode == '131'){	//订单修改
-				if(data['is_pay'] == 'T')
-					return false;
-			}else if(busicode == '1028'){//资费变更
+			if(busicode == '1028'){//资费变更
 				var userId = data['user_id'];
 				var acctItemData = App.getAcctItemByProdId(data['prod_id'],userId);
 				if(acctItemData){
