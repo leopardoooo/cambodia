@@ -1702,8 +1702,8 @@ Ext.apply(MenuHandler, {
 	},
 	OrderProdEdit: function(){
 		if(!hasCust())	return false;
-		var prodRecord = App.main.infoPanel.getUserPanel().prodGrid.custPkgGrid.getSelectionModel().getSelected();
-		if(prodRecord.get('prod_type') == 'BASE'){
+		var prodRecord = App.main.infoPanel.getUserPanel().prodGrid.getSelections();
+		if(prodRecord[0].get('prod_type') == 'BASE'){
 			var userRecords =  App.main.infoPanel.getUserPanel().userGrid.getSelections();
 			var len = userRecords.length;
 			if (len == 0) {
