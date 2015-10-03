@@ -189,12 +189,20 @@ public class PayService extends BaseBusiService implements IPayService {
 					}
 					info=SystemConstants.UNPAY_CANCEL_PROMPT_FEEANDBUSI;
 				}else{
-					//产品退订，不能取消
-					throw new ServicesException(ErrorCode.UnPayOrderCancelUnsubscribe);
-					//if(!onlyShowInfo){
-					//	this.cancelUnPayProdUnsubscribePay(fee,doneCode);
-					//}
-					//info=SystemConstants.UNPAY_CANCEL_PROMPT_ONLYACCT;
+					if(StringHelper.isNotEmpty(fee.getProd_sn())){
+						//产品订单退订，不能取消
+						throw new ServicesException(ErrorCode.UnPayOrderCancelUnsubscribe);
+					}else{
+						//不对应有订单，则可以取消费用
+						if(!onlyShowInfo){
+							//作废缴费信息
+							feeComponent.saveCancelFeeUnPay(fee, doneCode);
+							//作废业务
+							doneCodeComponent.cancelDoneCode(fee.getCreate_done_code());
+						}
+						info=SystemConstants.UNPAY_CANCEL_PROMPT_ONLYFEE;
+					}
+					
 				}
 			}else{
 				if(fee.getReal_pay()>0){
@@ -325,24 +333,24 @@ public class PayService extends BaseBusiService implements IPayService {
 	private void cancelUnPayProdOrderPay(CFeeAcct fee,Integer doneCode) throws Exception{
 		
 		String order_sn=fee.getProd_sn();
-		
-		CProdOrder order=cProdOrderDao.findByKey(order_sn);
-		//检查套餐类要按订购顺序取消，同一个用户的宽带类单产品要按订购顺序取消，用户一个用户的非宽带单产品按相同产品订购顺序取消。
-		//TODO 操作过订单编辑且费用发生变化费用记录不允许取消 目的是保证c_fee_acct中pre_invalid_date和begin_date准确
-		this.checkUnPayOrderCancel(order,fee);
-		//恢复被覆盖转移的订单
-		orderComponent.recoverTransCancelOrder(order.getDone_code(),order.getCust_id(),doneCode);
-		//删除c_prod_order_fee
-		cProdOrderFeeDao.deleteOrderFeeByOrderSn(order_sn);
-		//移除订单到历史表
-		List<CProdOrder> cancelOrders=orderComponent.saveCancelProdOrder(order, doneCode);
-
+		if(StringHelper.isNotEmpty(order_sn)){
+			CProdOrder order=cProdOrderDao.findByKey(order_sn);
+			//检查套餐类要按订购顺序取消，同一个用户的宽带类单产品要按订购顺序取消，用户一个用户的非宽带单产品按相同产品订购顺序取消。
+			//TODO 操作过订单编辑且费用发生变化费用记录不允许取消 目的是保证c_fee_acct中pre_invalid_date和begin_date准确
+			this.checkUnPayOrderCancel(order,fee);
+			//恢复被覆盖转移的订单
+			orderComponent.recoverTransCancelOrder(order.getDone_code(),order.getCust_id(),doneCode);
+			//删除c_prod_order_fee
+			cProdOrderFeeDao.deleteOrderFeeByOrderSn(order_sn);
+			//移除订单到历史表
+			List<CProdOrder> cancelOrders=orderComponent.saveCancelProdOrder(order, doneCode);
+			//取消授权
+			sendProdAtuh(cancelOrders,fee.getCust_id(),doneCode);
+		}
 		//作废缴费信息
 		feeComponent.saveCancelFeeUnPay(fee, doneCode);
 		//作废业务
 		doneCodeComponent.cancelDoneCode(fee.getCreate_done_code());
-		//取消授权
-		sendProdAtuh(cancelOrders,fee.getCust_id(),doneCode);
 	}
 	/**
 	 * 加减授权都能正确处理
@@ -550,9 +558,10 @@ public class PayService extends BaseBusiService implements IPayService {
 		if(!custId.equals(pay.getCust_id())){
 			throw new ServicesException(ErrorCode.CustDataException);
 		}
-		//检查操作员
+		//检查操作员,超级退订不限制 支付操作员本人回退
 		String optr_id=this.getOptr().getOptr_id();
-		if(!optr_id.equals(pay.getOptr_id())){
+		if(!BusiCodeConstants.SUPER_CANCEL_PAY.equals(this.getBusiParam().getBusiCode())
+				&&!optr_id.equals(pay.getOptr_id())){
 			throw new ServicesException(ErrorCode.PayCancelOnlyPayOptr);
 		}
 		if(!SystemConstants.BOOLEAN_TRUE.equals(pay.getIs_valid())){
@@ -610,7 +619,8 @@ public class PayService extends BaseBusiService implements IPayService {
 			if(invoice==null){//发票不存在
 				 throw new ServicesException(ErrorCode.InvoiceNotExists);
 			}
-			if(!optr_id.equals(invoice.getOptr_id())){//发票不是支付人的
+			if(!BusiCodeConstants.SUPER_CANCEL_PAY.equals(this.getBusiParam().getBusiCode())
+					&&!optr_id.equals(invoice.getOptr_id())){//发票不是支付人的
 				 throw new ServicesException(ErrorCode.InvoiceIsNotYou);
 			}
 			if(!StatusConstants.USE.equals(invoice.getStatus())){//发票不是使用状态
@@ -644,6 +654,8 @@ public class PayService extends BaseBusiService implements IPayService {
 		doneCodeComponent.lockCust(custId);
 		List<FeeDto> feeList=checkCancelPayParam(custId,paySn,invoiceIds);
 		Integer doneCode=doneCodeComponent.gDoneCode();
+		String busiCode=this.getBusiParam().getBusiCode();
+		String optrId=this.getBusiParam().getOptr().getOptr_id();
 		//先处理发票,涉及未其他费用的未打印
 		if(invoiceIds!=null&&invoiceIds.length>0){
 			for(String invoice_id:invoiceIds){
@@ -660,7 +672,7 @@ public class PayService extends BaseBusiService implements IPayService {
 		//更新订单费用记录对应的缴费转入费用费用类型为未支付
 		orderComponent.updateOrderFeeTypeByPayType(feeList,SystemConstants.PAY_TYPE_UNPAY);
 		//更新缴费相关的订单状态=未支付
-		updateOrderIsPay(feeList,custId,SystemConstants.BOOLEAN_FALSE);
+		updateOrderIsPay(feeList,custId,SystemConstants.BOOLEAN_FALSE,busiCode);
 		//作废支付记录
 		feeComponent.saveCancelPayFee(paySn, doneCode);
 		
@@ -694,7 +706,7 @@ public class PayService extends BaseBusiService implements IPayService {
 		orderComponent.updateOrderFeeTypeByPayType(feeList, pay.getPay_type());
 		
 		//更新订单的支付状态
-		updateOrderIsPay(feeList,cust_id,SystemConstants.BOOLEAN_TRUE);
+		updateOrderIsPay(feeList,cust_id,SystemConstants.BOOLEAN_TRUE,this.getBusiParam().getBusiCode());
 		
 		//删除未支付业务信息
 		doneCodeComponent.deleteDoneCodeUnPay(feeList);
@@ -778,11 +790,13 @@ public class PayService extends BaseBusiService implements IPayService {
 	 * @param done_code
 	 * @throws Exception
 	 */
-	private void updateOrderIsPay(List<FeeDto> feeList,String cust_id,String is_pay) throws Exception{
+	private void updateOrderIsPay(List<FeeDto> feeList,String cust_id,String is_pay,String busiCode) throws Exception{
 		//被支付的订单SN
 		Set<String> payOrderSnSet=new HashSet<String>();
 		for(FeeDto fee:feeList){
-			if(StringHelper.isNotEmpty(fee.getProd_sn())){
+			if(StringHelper.isNotEmpty(fee.getProd_sn())
+					&&fee.getReal_pay()>0
+					&&!BusiCodeConstants.ORDER_EDIT.equals(busiCode)){
 				payOrderSnSet.add(fee.getProd_sn());
 			}
 		}
@@ -1051,14 +1065,16 @@ public class PayService extends BaseBusiService implements IPayService {
 				continue;
 			}
 			CFeePay pay=feeComponent.queryCFeePayByPaySn(cfee.getPay_sn());
-			if(!optrId.equals(pay.getOptr_id())){
+			if(!BusiCodeConstants.SUPER_CANCEL_PAY.equals(this.getBusiParam().getBusiCode())
+					&&!optrId.equals(pay.getOptr_id())){
 				throw new ServicesException(ErrorCode.InvoiceIsNotYou);
 			}
 			payMap.put(cfee.getPay_sn(), pay);
 		}
 		//检查发票状态是否缴销
 		RInvoice invoice= invoiceComponent.queryById(invoice_id, invoice_code);
-		if(!optrId.equals(invoice.getOptr_id())){
+		if(!BusiCodeConstants.SUPER_CANCEL_PAY.equals(this.getBusiParam().getBusiCode())
+				&&!optrId.equals(invoice.getOptr_id())){
 			throw new ServicesException(ErrorCode.InvoiceIsNotYou);
 		}
 		if(!StatusConstants.IDLE.equals(invoice.getFinance_status())){
