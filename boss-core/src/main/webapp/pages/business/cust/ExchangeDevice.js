@@ -83,10 +83,10 @@ ExchangeDevicePanel = Ext.extend(BaseForm,{
 			str += lmain('user._form.labelChangeBuyDevice');
 		}
 		if(record.get('is_reclaim') == 'T'){
-			str += lmain('user._form.labelChangeBuyDevice');
+			str += lmain('user._form.labelChangeReclaimDevice');
 		}
 		if(record.get('is_lost') == 'T'){
-			str += lmain('user._form.labelChangeBuyDevice');
+			str += lmain('user._form.labelChangeLossDevice');
 		}
 		comp.setValue("<font color='red'>"+str+"</font>");
 	},
