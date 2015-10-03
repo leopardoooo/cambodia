@@ -192,7 +192,7 @@ CustInfoPanel = Ext.extend( Ext.ux.Gpanel , {
 				App.disableBarByBusiCode(custTBar, arr, false);
 			}else if(custType=='UNIT'){//单位
 				//隐藏过户、移机、加入单位、退出单位、拆迁
-				App.disableBarByBusiCode(custTBar,['1003','1010','1005','1006','1119','2001'],true);
+				App.disableBarByBusiCode(custTBar,['1003','1010','1005','1006','1119','2001','1108','1109','2265'],true);
 			}else{//集团
 				//加入单位、退出单位
 				App.disableBarByBusiCode(custTBar,['1005','1006','2001'],true);

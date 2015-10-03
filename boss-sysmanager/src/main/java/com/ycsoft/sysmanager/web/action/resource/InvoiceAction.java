@@ -128,8 +128,7 @@ public class InvoiceAction extends BaseAction {
 	 * @throws Exception
 	 */
 	public String queryChildInvoiceDepot() throws Exception {
-		List list = invoiceComponent.queryChildInvoiceDepot(optr);
-		getRoot().setRecords(TreeBuilder.createTree(list));
+		getRoot().setRecords(invoiceComponent.queryChildInvoiceDepot(optr));
 		return JSON_RECORDS;
 	}
 	
