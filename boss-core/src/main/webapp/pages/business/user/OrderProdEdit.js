@@ -172,7 +172,8 @@ OrderProdEditForm = Ext.extend(BaseForm, {
 		realOrderFee = Ext.util.Format.round(realOrderFee, 2);
 		
 		//新、旧订单差额; 差额为负表示退款，为正表示补收费用
-		Ext.getCmp('dfDiffFeeId').setValue( realOrderFee - Ext.getCmp('oldOrderFeeId').getValue()*1.0 );
+		var orderFee = Ext.getCmp('oldOrderFeeId').getValue()*1.0
+		Ext.getCmp('dfDiffFeeId').setValue( Ext.util.Format.round(realOrderFee - orderFee, 2) );
 		Ext.getCmp('realOrderFeeId').setValue( realOrderFee );
 	},
 	doChangeDiffFee: function(field, newValue){
