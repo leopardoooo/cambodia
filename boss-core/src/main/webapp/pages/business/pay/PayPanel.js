@@ -226,7 +226,6 @@ PayPanel = Ext.extend( Ext.Panel ,{
 		Ext.getCmp("hdExchange").setValue(this.feeData["EXC"]);
 	},
 	getSameTypeProd: function(store, records){
-		console.log(records);
 		var recordArray = [];
 		Ext.each(records, function(record){
 			var userType = record.get('user_type');
@@ -325,7 +324,6 @@ PayPanel = Ext.extend( Ext.Panel ,{
 				feeSns.push(record.get('fee_sn'));
 			},this);
 			params['feeSn'] = feeSns;
-			console.log(feeSns);
 			
 			var mb = Show();
 			//提交
