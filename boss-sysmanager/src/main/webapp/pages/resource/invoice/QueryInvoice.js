@@ -52,7 +52,7 @@ QueryInvoiceForm = Ext.extend(Ext.form.FormPanel,{
 				{columnWidth:.5,layout:'form',border:false,items:[
 					{xtype:'combo',fieldLabel:lsys('InvoiceCommon.depot_name'),hiddenName:'invoiceDto.depot_id',width :150,minListWidth :250,
 						store:new Ext.data.JsonStore({
-							url:'resource/Device!queryAllDept.action',
+							url:'resource/Device!queryChildDept.action',
 							autoLoad:true,
 							fields:['dept_id','dept_name']
 						}),displayField:'dept_name',valueField:'dept_id',allowBlank:false,

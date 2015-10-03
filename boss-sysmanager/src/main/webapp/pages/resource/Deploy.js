@@ -1146,27 +1146,15 @@ var CountyModelGrid = Ext.extend(Ext.grid.GridPanel,{
 var MateralCfgGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 	modemStore:null,
 //	supplierCombo:null,
-	deviceTypeCombo:null,
+//	deviceTypeCombo:null,
 	constructor:function(){
 		modemGrid = this;
 		this.modemStore = new Ext.data.JsonStore({
 			url:'resource/ResourceCfg!queryDeviceModelCfg.action',
 			pruneModifiedRecords:true,
-			fields:['device_model','device_type','model_name','device_type_text'
-//			,'supplier_id','supplier_name'
-			]
+			fields:['device_model','device_type','model_name','device_type_text']
 		});
-//		this.modemStore.load();
-		
-		this.deviceTypeCombo = new Ext.ux.ParamCombo({paramName:'OTHER_DEVICE_TYPE',valueField:'item_name',
-			forceSelection:true,selectOnFocus:true,editable:true,
-			listeners:{
-				scope:this,
-				select:function(combo,record){
-					this.getSelectionModel().getSelected().set('device_type',record.get('item_value'));
-				}
-			}
-		});
+
 		
 //		this.supplierCombo = new Ext.form.ComboBox({
 //			store:new Ext.data.JsonStore({
@@ -1183,7 +1171,6 @@ var MateralCfgGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 //		});
 		
 		var cm = new Ext.grid.ColumnModel([
-			{id:'device_type_id',header:BASE_CFG_LU.labelMateralType,dataIndex:'device_type_text',width:80,editor:this.deviceTypeCombo},
 			{id:'device_model_id',header:COMMON_LU.modelSimple,dataIndex:'device_model',width:300,editor:new Ext.form.TextField({vtype:'singleChar'})},
 			{header:BASE_CFG_LU.labelModelName,dataIndex:'model_name',width:300,editor:new Ext.form.TextField({})}
 //			{header:BASE_CFG_LU.labelProducer,dataIndex:'supplier_name',width:70,editor:this.supplierCombo}
@@ -1206,8 +1193,6 @@ var MateralCfgGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 	},
 	initComponent:function(){
 		MateralCfgGrid.superclass.initComponent.call(this);
-//		this.supplierCombo.getStore().load();
-		App.form.initComboData([this.deviceTypeCombo]);
 	},
 	initEvents:function(){
 		MateralCfgGrid.superclass.initEvents.call(this);
@@ -1215,8 +1200,7 @@ var MateralCfgGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 	},
 	doAdd:function(){
 		commonDoAdd(this,{
-			device_model:'',device_type:'',model_name:'',device_type_text:''
-//			,supplier_id:'',supplier_name:''				
+			device_model:'',model_name:''
 		});
 	},
 	doSave:function(){
