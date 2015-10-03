@@ -108,7 +108,7 @@ public class CDoneCodeDao extends BaseEntityDao<CDoneCode> {
 				sql += " and a.status='" + queryFeeInfo.getStatus() + "'";
 			}
 			if(StringHelper.isNotEmpty(queryFeeInfo.getBusi_name())){
-				sql += " and t3.busi_name(+) like '%" + queryFeeInfo.getBusi_name() + "%'";
+				sql += " and t3.busi_name like '%" + queryFeeInfo.getBusi_name() + "%'";
 			}
 			if(StringHelper.isNotEmpty(queryFeeInfo.getOptr_name())){
 				sql += " and a.optr_id in (select optr_id from s_optr where county_id='"+countyId+"' and optr_name like '%"+queryFeeInfo.getOptr_name()+"%')";

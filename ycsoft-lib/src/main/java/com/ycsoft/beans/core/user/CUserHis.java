@@ -11,7 +11,7 @@ import com.ycsoft.daos.config.POJO;
 /**
  * CUserHis -> C_USER_HIS mapping
  */
-@POJO(tn = "C_USER_HIS", sn = "", pk = "")
+@POJO(tn = "C_USER_HIS", sn = "", pk = "USER_ID")
 public class CUserHis extends CUser implements Serializable {
 	// CUserHis all properties
 
