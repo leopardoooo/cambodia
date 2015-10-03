@@ -288,8 +288,10 @@ Ext.apply(App.func,{
 				return false; 
 			}
 			
-			if(data['user_status'] == 'DORMANCY' || data['user_status'] == 'ATVCLOSE' || data['user_status'] == 'WAITLOGOFF' )
+			if( (busicode == '1027' || busicode == '109' || busicode == '110') && data['is_pay'] == 'F' ){
 				return false;
+			}
+			
 			/*if(busicode == '1027'){//产品退订
 				var userId = data['user_id'];
 				var acctItemData = App.getAcctItemByProdId(data['prod_id'],userId);
