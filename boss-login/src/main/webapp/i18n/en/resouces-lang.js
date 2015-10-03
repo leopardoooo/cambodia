@@ -133,7 +133,7 @@ ResLang = {
 	'610': ['senior sales households ~', 'senior sales households ~'],
 	'10010': ['order modification ~', 'order modification ~'],
 	'820': ['modify development of human ~', 'Modify develop people ~'],
-	'123': ['bimonthly pay rollback ~', 'bimonthly pay rollback ~'],
+	'123': ['Super pay rollback ~', 'Super pay rollback ~'],
 	'122': ['pay rollback ~', 'pay rollback ~'],
 	'121': ['new ticket ~', 'new ticket ~']
 }
