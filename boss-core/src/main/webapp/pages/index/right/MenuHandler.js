@@ -382,8 +382,8 @@ Ext.apply(MenuHandler, {
 			return false;
 		}
 		return {
-			width : 580,
-			height : 470
+			width : 630,
+			height : 510
 		};
 	},
 	EditCustClass: function(){//修改优惠类型
