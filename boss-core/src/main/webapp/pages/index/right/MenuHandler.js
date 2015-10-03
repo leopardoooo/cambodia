@@ -1702,7 +1702,12 @@ Ext.apply(MenuHandler, {
 	},
 	OrderProdEdit: function(){
 		if(!hasCust())	return false;
-		var prodRecord = App.main.infoPanel.getUserPanel().prodGrid.custPkgGrid.getSelectionModel().getSelected();
+		var prodRecord = null;
+		if(App.data.currentPanelId === "U_CUST_PKG"){
+			prodRecord = App.main.infoPanel.getUserPanel().prodGrid.custPkgGrid.getSelectionModel().getSelected();
+		}else{
+			prodRecord = App.main.infoPanel.getUserPanel().prodGrid.baseProdGrid.getSelectionModel().getSelected();
+		}
 		if(prodRecord.get('prod_type') == 'BASE'){
 			var userRecords =  App.main.infoPanel.getUserPanel().userGrid.getSelections();
 			var len = userRecords.length;
