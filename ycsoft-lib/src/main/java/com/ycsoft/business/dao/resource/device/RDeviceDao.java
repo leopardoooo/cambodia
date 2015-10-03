@@ -314,11 +314,11 @@ public class RDeviceDao extends BaseEntityDao<RDevice> {
 				" case when (r.device_id is  null) then c.cust_id end cust_id," +
 				"case when (r.device_id is  null) then c.cust_name end cust_name,dp.county_id from ("+
 				"SELECT d.*,s.stb_id device_code,"+
-				"r.card_id pair_device_code,r.device_model pair_device_model,m.modem_mac pair_device_modem_code,m.device_model pair_device_modem_model," +
+				"case when r.card_id is null then s.mac else r.card_id  end pair_device_code,r.device_model pair_device_model,'' pair_device_modem_code,'' pair_device_modem_model," +
 				" '' modem_mac,'' modem_type"+
-				" FROM R_STB S, R_CARD r,r_modem m,r_device d"+
+				" FROM R_STB S, R_CARD r,r_device d"+
 				" WHERE s.device_id=d.device_id AND s.pair_card_id= r.DEVICE_ID(+)" +
-				" AND s.pair_modem_id= m.DEVICE_ID(+) AND S.STB_ID=:deviceCode"+
+				" AND S.STB_ID=:deviceCode"+
 				" UNION SELECT d.*,c.card_id device_code,'','','','','',''"+
 				" FROM R_CARD C,r_device d"+
 				" WHERE c.device_id=d.device_id AND C.CARD_ID=:deviceCode"+
@@ -338,7 +338,7 @@ public class RDeviceDao extends BaseEntityDao<RDevice> {
 		if(StringHelper.isNotEmpty(mode)){
 			if(mode.equals(SystemConstants.DEVICE_TYPE_STB)){
 				sql += "select r.*,t.stb_id device_code,"+
-						" d.card_id pair_device_code,d.device_model pair_device_model,t.mac modem_mac"+
+						" case when d.card_id is null then t.mac else d.card_id  end pair_device_code,d.device_model pair_device_model,t.mac modem_mac"+
 						" from r_device r,r_stb t,r_card d"+
 						" where r.device_id=t.device_id and t.pair_card_id=d.device_id(+) "+
 						" and r.depot_id=?";
@@ -520,7 +520,7 @@ public class RDeviceDao extends BaseEntityDao<RDevice> {
 			sql = StringHelper
 					.append(
 							"SELECT d.*,s.device_model,s.stb_id device_code,",
-							"r.card_id pair_device_code,r.device_model pair_device_model,'' modem_mac",
+							"case when r.card_id is null then s.mac else r.card_id  end pair_device_code,r.device_model pair_device_model,'' modem_mac",
 							" FROM R_STB S, R_CARD r,r_device d",
 							" WHERE s.device_id=d.device_id AND s.pair_card_id= r.DEVICE_ID(+) and("+getSqlGenerator().setWhereInArray("S.STB_ID",deviceCodes)+") ");
 		}

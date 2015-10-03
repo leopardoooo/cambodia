@@ -226,9 +226,9 @@ QueryDeviceGrid = Ext.extend(Ext.grid.GridPanel,{
 		this.stbColumns = [
 			{header:DEV_COMMON_LU.labelStbCode,dataIndex:'device_code',width:130,renderer:App.qtipValue},
 			{header:DEV_COMMON_LU.labelStbType,dataIndex:'device_model_text',width:100,renderer:App.qtipValue},
-			{header:DEV_COMMON_LU.labelCardCode,dataIndex:'pair_device_code',width:120,renderer:App.qtipValue},
+			{header:DEV_COMMON_LU.labelPairCardCode,dataIndex:'pair_device_code',width:120,renderer:App.qtipValue},
 //			{header:DEV_COMMON_LU.labelCardType,dataIndex:'pair_device_model_text',width:100,renderer:App.qtipValue},
-			{header:DEV_COMMON_LU.labelPairModemCode,dataIndex:'modem_mac',width:120,renderer:App.qtipValue},
+//			{header:DEV_COMMON_LU.labelPairModemCode,dataIndex:'modem_mac',width:120,renderer:App.qtipValue},
 			{header:DEV_COMMON_LU.labelDevStatus,dataIndex:'device_status_text',width:75,renderer:App.qtipValue},
 			{header:DEV_COMMON_LU.labelDevStatus,dataIndex:'depot_status_text',width:75,renderer:App.qtipValue},
 			{header:COMMON_LU.depotText,dataIndex:'depot_id_text',width:100,renderer:App.qtipValue},
@@ -239,8 +239,8 @@ QueryDeviceGrid = Ext.extend(Ext.grid.GridPanel,{
 			
 		];
 		this.fittingColumns = [
-			{header:'器材型号',dataIndex:'device_model_text',width:400,renderer:App.qtipValue},
-			{header:'库存数量',dataIndex:'total_num',width:120,renderer:App.qtipValue}
+			{header:DEV_COMMON_LU.labelFittingModel,dataIndex:'device_model_text',width:400,renderer:App.qtipValue},
+			{header:DEV_COMMON_LU.labelTotalNum,dataIndex:'total_num',width:120,renderer:App.qtipValue}
 		];
 		this.modemColumns = [
 			{header:DEV_COMMON_LU.labelModemCode,dataIndex:'modem_mac',width:160,renderer:App.qtipValue},
