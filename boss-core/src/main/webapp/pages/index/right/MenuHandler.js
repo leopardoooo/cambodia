@@ -3040,7 +3040,7 @@ Ext.apply(MenuHandler, {
 		// 回调函数
 		function callback(res, opt) {
 			var result = Ext.decode(res.responseText);
-			if (result.success == true) {
+			if (result == true) {
 				Alert('工单作废成功!');
 				App.getApp().main.infoPanel.getUserPanel().userGrid.remoteRefresh();
 				App.getApp().main.infoPanel.docPanel.taskGrid.remoteRefresh();

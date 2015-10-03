@@ -564,7 +564,8 @@ public class PayService extends BaseBusiService implements IPayService {
 		Map<String,Boolean> invoiceMap=new HashMap<>();
 		if(invoiceIds!=null){
 			for(String invoiceId:invoiceIds){
-				invoiceMap.put(invoiceId, false);
+				if(StringHelper.isNotEmpty(invoiceId))
+					invoiceMap.put(invoiceId, false);
 			}
 		}
 		for(FeeDto fee:feeList){
@@ -646,7 +647,9 @@ public class PayService extends BaseBusiService implements IPayService {
 		//先处理发票,涉及未其他费用的未打印
 		if(invoiceIds!=null&&invoiceIds.length>0){
 			for(String invoice_id:invoiceIds){
-				invalidInvoiceByinvoiceId(invoice_id,SystemConstants.BASE_INVOICE_CODE,doneCode);
+				if(StringHelper.isNotEmpty(invoice_id)){
+					invalidInvoiceByinvoiceId(invoice_id,SystemConstants.BASE_INVOICE_CODE,doneCode);
+				}
 			}				
 		}
 		//恢复缴费记录未支付状态

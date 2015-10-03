@@ -253,9 +253,9 @@ public class OrderService extends BaseBusiService implements IOrderService{
 				!cust_id.equals(order.getCust_id())){
 			throw new ServicesException(ErrorCode.CustDataException);
 		}
-		if(!order.getStatus().equals(StatusConstants.ACTIVE)&&!order.getStatus().equals(StatusConstants.INSTALL)){
-			throw new ServicesException(ErrorCode.OrderStatusException);
-		}
+//		if(!order.getStatus().equals(StatusConstants.ACTIVE)&&!order.getStatus().equals(StatusConstants.INSTALL)){
+//			throw new ServicesException(ErrorCode.OrderStatusException);
+//		}
 		if(order.getStatus().equals(StatusConstants.ACTIVE)&&order.getExp_date().before(DateHelper.today())){
 			throw new ServicesException(ErrorCode.ProdIsInvalid);//正常状态的订单 但是已过期
 		}
@@ -277,9 +277,8 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		if(order.getEff_date().getTime() != orderProd.getEff_date().getTime()){
 			throw new ServicesException(ErrorCode.OrderDateEffDateError);
 		}
-		//结束计费日，必须大于等今天
-		if(orderProd.getExp_date().before(DateHelper.today())
-				||orderProd.getExp_date().before(orderProd.getEff_date())){
+		//结束计费日，必须大于等于开始计费日
+		if(orderProd.getExp_date().before(orderProd.getEff_date())){
 			throw new ServicesException(ErrorCode.OrderDateExpDateError);
 		}
 		//支付类型判断，退款只能现金方式 
