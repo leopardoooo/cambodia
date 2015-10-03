@@ -1654,8 +1654,8 @@ public class AcctComponent  extends BusiConfigComponent {
 	
 	public CAcct queryCustAcctByCustId(String custId) throws Exception {
 		CAcct acct = cAcctDao.findCustAcctByCustId(custId,getOptr().getCounty_id());
-		if (acct == null)
-			throw new ComponentException(ErrorCode.AcctPublicNotExists);
+//		if (acct == null)
+//			throw new ComponentException(ErrorCode.AcctPublicNotExists);
 		return acct;
 	}
 	/**

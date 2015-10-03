@@ -165,14 +165,12 @@ Ext.apply(TopSearch.prototype , {
 		App.main.infoPanel.getCustPanel().refresh();
 		App.main.infoPanel.getUnitPanel().refresh();
 	  	App.main.infoPanel.getUserPanel().refresh();
-//	  	App.main.infoPanel.getAcctPanel().refresh();
 	  	App.refreshFeeView();
 	  	App.refreshPayInfo();
 	    
 	    App.main.infoPanel.getCustPanel().setReload(false);
 	    App.main.infoPanel.getUnitPanel().setReload(false);
 	  	App.main.infoPanel.getUserPanel().setReload(false);
-//	  	App.main.infoPanel.getAcctPanel().setReload(false);
 	  	App.main.infoPanel.getPayfeePanel().setReload(true);
 	  	App.main.infoPanel.getBillPanel().setReload(true);
 	  	App.main.infoPanel.getDocPanel().setReload(true);

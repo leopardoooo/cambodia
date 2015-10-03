@@ -114,8 +114,6 @@ CustInfoPanel = Ext.extend( Ext.ux.Gpanel , {
 	},
 	remoteRefresh:function(custId){
 		if(App.getCust().cust_id){
-			//显示数据加载提示框
-			App.showTip();
 			Ext.Ajax.request({
 				scope : this,
 				url:  root + '/commons/x/QueryCust!searchCustById.action',
@@ -132,8 +130,6 @@ CustInfoPanel = Ext.extend( Ext.ux.Gpanel , {
 					}
 					
 					this.refresh();
-					//隐藏数据加载提示框
-					App.hideTip();
 	  			 }
 			});
 		}else{
@@ -241,71 +237,6 @@ CustInfoPanel = Ext.extend( Ext.ux.Gpanel , {
 /**
  * 单位信息表格
  */ 
-UnitGrid = Ext.extend(Ext.ux.Grid,{
-	region:'center',
-	border:false,
-	unitStore:null,
-	tbar:[],
-	isReload : true,
-	isReQuery : true,
-	constructor:function(){
-		this.unitStore = new Ext.data.JsonStore({
-			url:Constant.ROOT_PATH + "/commons/x/QueryCust!queryCustUnit.action",
-			fields: ["cust_id","cust_name","address","create_time"]
-		}); 
-		var sm = new Ext.grid.CheckboxSelectionModel();
-		
-		var cm = [
-			sm,
-			{header:'单位名称',dataIndex:'cust_name',width:110	},
-			{header:'地址',dataIndex:'address',	width:140},
-			{header:'加入时间',dataIndex:'create_time',	width:80}
-		];
-		UnitGrid.superclass.constructor.call(this,{
-			id:'C_UNIT',
-			region: 'center',
-			title: '单位信息',
-			loadMask: null,
-			store:this.unitStore,
-			sm:sm,
-			view: new Ext.ux.grid.ColumnLockBufferView(),
-			columns:cm
-			,tools:[{id:'search',qtip:'查询',cls:'tip-target',scope:this,handler:function(){
-				
-				var comp = this.tools.search;
-				if(this.unitStore.getCount()>0){
-					if(win)win.close();
-						win = FilterWindow.addComp(this,[
-							{text:'单位名称',field:'cust_name'},
-							{text:'地址',field:'address',type:'textfield'}
-							],300,null,false);
-					if(win){
-						win.setPosition(comp.getX()-win.width, comp.getY()-50);//弹出框右对齐
-						win.show();
-					}
-				}else{
-					Alert('请先查询数据！');
-				}
-		    }}]
-			
-		})
-	},
-	remoteRefresh:function(){
-		this.unitStore.baseParams.residentCustId=App.data.custFullInfo.cust.cust_id;
-		this.unitStore.load();
-	},
-	localRefresh:function(){
-		var unitRecords = this.getSelectionModel().getSelections();
-		for (var i in unitRecords){
-			this.unitStore.remove(unitRecords[i]);
-		}
-	},
-	reset : function(){
-		this.getStore().removeAll();
-		this.isReload = true;
-	}
-});
-
 
 /**
  * 异动信息表格
@@ -362,115 +293,7 @@ PropChangeGrid = Ext.extend(Ext.grid.GridPanel,{
 });
 
 
-
 //PromFeeGrid = Ext.extend(Ext.grid.GridPanel,{
-PromFeeGrid = Ext.extend(Ext.ux.Grid,{
-	region:'center',
-	border:false,
-	promStore:null,
-	isReload : true,
-	showJDJE:function(){//查看解冻金额
-		var record = App.getApp().main.infoPanel.custPanel.custDetailTab.promFeeGrid.selModel.getSelected();
-		if(!record || Ext.isEmpty(record.get('done_code'))){
-			Alert('未能正确获取数据！');return false;
-		}
-		Ext.Ajax.request({
-			url : Constant.ROOT_PATH+"/core/x/Acct!queryPromAcctItemInactive.action",
-			params:{doneCode:record.get('done_code'),custId:App.getCustId(),query:'T'},
-			scope:this,
-			timeout:99999999999999,//12位 报异常
-			success:function(res,opt){
-				var datas = Ext.decode(res.responseText);
-				var actInfo = '';
-				var prodMap = App.getApp().main.infoPanel.userPanel.prodGrid.prodMap;
-				if(!datas || datas.length <=0){
-					datas = [];
-				}
-				for(var index =0;index<datas.length;index++){
-					for(var userid in prodMap){
-						var arr = prodMap[userid];
-						if(arr && arr.length>0){
-							if(datas[index].acct_id != arr[0].acct_id){
-								continue;
-							}
-							for(var idx =0;idx<arr.length;idx++){
-								var item = arr[idx];
-								if(datas[index].acct_id == item.acct_id && datas[index].acctitem_id == item.prod_id){
-									actInfo += '' + item.prod_name + ' 冻结总金额  '  + datas[index].init_amount/100 + ' 元,其中已解冻 ' + datas[index].use_amount + ' 元</br>';
-								}
-							}
-						}
-					}
-				}
-				Alert(actInfo);
-			}
-		})
-	},
-	showDetail:function() {
-					var record = this.selModel.getSelections()[0];
-					var busiCode = record.get('busi_code');
-					var doneCode = record.get('done_code');
-					new DoneCodeInfoWindow(doneCode,busiCode).show();
-				},
-	constructor:function(){
-		this.promStore = new Ext.data.JsonStore({
-			fields: ['prom_fee_sn','prom_fee_id','status',"status_text","done_code","prom_fee_name","prom_fee","optr_name","create_time","busi_code"]
-		}); 
-		this.columns = [
-			{header:'流水号',dataIndex:'done_code',width:100,renderer:function(value,metaData,record){
-				 return '<div style="text-decoration:underline;font-weight:bold" onclick="App.getApp().main.infoPanel.custPanel.custDetailTab.promFeeGrid.showDetail();" ext:qtitle="" ext:qtip="' + value + '">' + value +'</div>';
-				}},
-			{header:'套餐名称',	dataIndex:'prom_fee_name',width:120},
-			{header:'状态',	dataIndex:'status_text',width:60,renderer:Ext.util.Format.statusShow},
-			{header:'金额',	dataIndex:'prom_fee',width:100,renderer : Ext.util.Format.formatFee},
-			{header:'日期',dataIndex:'create_time',width:130},
-			{header:'操作员',	dataIndex:'optr_name',width:120},
-			{header:'查看',dataIndex:'done_code',width:80,renderer:function(value,metaData,record){
-				if(record.get('status') == 'ACTIVE'){
-					return '';
-				}
-				 return '<div style="text-decoration:underline;font-weight:bold" ext:qtitle="" ext:qtip="' + value + '">' +
-				 		'<a href="#" onclick="App.getApp().main.infoPanel.custPanel.custDetailTab.promFeeGrid.showJDJE();">已解冻金额</a>' +
-				 		'</div>';
-				}}
-		];
-		var cm = new Ext.ux.grid.LockingColumnModel({ 
-    		columns : this.columns });
-    	this.selM = new Ext.grid.CheckboxSelectionModel();
-		var pageTbar = new Ext.PagingToolbar({store: this.promStore ,pageSize : App.pageSize});
-		pageTbar.refresh.hide();
-		PromFeeGrid.superclass.constructor.call(this,{
-			region: 'center',
-			id:'C_PROMFEE',
-			store:this.promStore,
-			bbar:pageTbar,
-			sm:this.selM,
-			cm:cm,
-			view: new Ext.ux.grid.ColumnLockBufferView()
-		})
-	},
-	remoteRefresh:function(){
-		if(App.getCustId()){
-			Ext.Ajax.request({
-				url:Constant.ROOT_PATH + "/commons/x/QueryCust!queryCustPromFee.action",
-				scope:this,
-				params:{custId:App.getCustId()},
-				success:function(res,opt){
-					var data = Ext.decode(res.responseText);
-					//PagingMemoryProxy() 一次性读取数据
-					this.promStore.proxy = new Ext.data.PagingMemoryProxy(data),
-					//本地分页
-					this.promStore.load({params:{start:0,limit:App.pageSize}});
-				}
-			});
-		}
-	},
-	reset : function(){
-		this.getStore().removeAll();
-		this.isReload = true;
-	}
-});
-
 /**
  * 客户设备信息表
  * @class DeviceGrid
@@ -572,8 +395,6 @@ CustDeviceGrid = Ext.extend(Ext.ux.Grid,{
 		
 	},
 	getGDDevices : function(store,records){//查询产权是广电的设备
-		//隐藏数据加载提示框
-		App.hideTip();
 		this.GDDeviceArray = [];
 		this.CustDeviceArray = [];
 		for(var i=0;i<records.length;i++){
@@ -590,8 +411,6 @@ CustDeviceGrid = Ext.extend(Ext.ux.Grid,{
 		this.CustDeviceArray = [];
 		this.custDeviceStore.baseParams.custId=App.getCustId();
 		this.custDeviceStore.load();
-		//显示数据加载提示框
-		App.showTip();
 		
 		var status = App.getCust().status;
 		//过滤tbar按钮
@@ -618,8 +437,6 @@ CustDeviceGrid = Ext.extend(Ext.ux.Grid,{
 	}
 });
 
-
-
 /**
  * 扩展信息面板 
  */
@@ -645,7 +462,6 @@ ExtInfoPanel = Ext.extend( Ext.Panel , {
 		   columnWidth: .5,
 		   layout: 'form',
 		   baseCls: 'x-plain',
-//		   labelWidth: 80,
 		   labelAlign: 'right'
 	    }];
 	    
@@ -666,190 +482,6 @@ ExtInfoPanel = Ext.extend( Ext.Panel , {
 	}
 });
 
-var GeneralInfoHtml = 
-'<table width="100%" border="0" cellpadding="0" cellspacing="0">' +
-	'<tr height=24>'+
-		'<td class="label" width="20%">用户数:</td>' +
-		'<td class="input_bold">&nbsp;{[values.users.totalAmount|| "0"]}</td>'+
-		'<td class="label">正常:</td>' +
-		'<td class="input_bold">&nbsp;{[values.users.activeAmount|| "0"]}</td>'+
-		'<td class="label">报停:</td>' +
-		'<td class="input_bold">&nbsp;{[values.users.stopAmount || "0"]}</td>'+
-		'<td class="label">&nbsp;</td>' +
-		'<td class="input_bold">&nbsp;</td>'+
-	'</tr>' +
-	'<tr height=24>'+
-		'<td class="label">模拟:</td>' +
-		'<td class="input_bold">&nbsp;{[values.users.atvAmount|| "0"]}</td>'+
-		'<td class="label">数字:</td>' +
-		'<td class="input_bold">&nbsp;{[values.users.dtvAmount|| "0"]}</td>'+
-		'<td class="label">宽带:</td>' +
-		'<td class="input_bold">&nbsp;{[values.users.bandAmount|| "0"]}</td>'+
-	'</tr>' +
-	'<tr height=24>'+
-		'<td class="label">产品总数:</td>' +
-		'<td class="input_bold">&nbsp;{[values.prods.totalAmount || "0"]}</td>'+
-		'<td class="label">正常:</td>' +
-		'<td class="input_bold">&nbsp;{[values.prods.activeAmount || "0"]}</td>'+
-		'<td class="label">机顶盒:</td>' +
-		'<td class="input_bold">&nbsp;{[values.devices.stbs|| "0"]}</td>'+
-	'</tr>' +
-	'<tr height=24>'+
-		'<td class="label">欠费未停:</td>' +
-		'<td class="input_bold">&nbsp;{[values.prods.ownNotStopAmount || "0"]}</td>'+
-		'<td class="label">欠费停:</td>' +
-		'<td class="input_bold">&nbsp;{[values.prods.ownStopAmount || "0"]}</td>'+
-		'<td class="label">智能卡:</td>' +
-		'<td class="input_bold">&nbsp;{[values.devices.cards|| "0"]}</td>'+
-	'</tr>' +
-	'<tr height=24>'+
-		'<td class="label">当前积分:</td>' +
-		'<td class="input_bold">&nbsp;{[values.custs.balance || "0"]}</td>'+
-		'<td class="label">历史积分:</td>' +
-		'<td class="input_bold">&nbsp;{[values.custs.his_balance || "0"]}</td>'+
-		'<td class="label">猫:</td>' +
-		'<td class="input_bold">&nbsp;{[values.devices.modem|| "0"]}</td>'+
-	'</tr>' +
-	'<tr height=24>'+
-		'<td class="label">挂失设备:</td>' +
-		'<td class="input_bold">&nbsp;{[values.devices.regLoss|| "0"]}</td>'+
-	'</tr>' +
-'</table>';
-/**
- * 客户综合信息
- * @class GeneralPanel
- * @extends Ext.Panel
- */
-GeneralPanel = Ext.extend(Ext.Panel,{
-	tpl : null,
-	constructor : function(){
-		this.tpl = new Ext.XTemplate( GeneralInfoHtml );
-		this.tpl.compile();
-		GeneralPanel.superclass.constructor.call(this,{
-			id : 'GeneralPanel',
-			layout : 'fit',
-			border : false,
-			autoScroll:true,
-			bodyStyle: "background:#F9F9F9",
-			html : this.tpl.applyTemplate( App.getData().custGeneralInfo)
-		})
-	},
-	refresh : function(){
-		this.tpl.overwrite( this.body, App.getData().custGeneralInfo);
-	},
-	remoteRefresh : function(){
-		var users = App.data.custGeneralInfo.users;
-		var prods = App.data.custGeneralInfo.prods;
-		var accts = App.data.custGeneralInfo.accts;
-		var custs = App.data.custGeneralInfo.custs;
-		var devices = App.data.custGeneralInfo.devices;
-		var store = Ext.getCmp('C_DEVICE').custDeviceStore;//设备store
-//		var store = App.main.infoPanel.custPanel.custDeviceGrid.custDeviceStore;
-		Ext.apply(devices,{stbs:0,cards:0,modem:0,regLoss:0});
-		
-		store.each(function(rec){
-			var data = rec.data;
-			if(data.is_virtual_modem == 'T' || data.is_virtual_card== 'T'){
-				return;
-			}
-			if(data.loss_reg == "T"){
-				devices.regLoss +=1;
-			}
-			if(data.device_type == 'STB'){
-				devices.stbs +=1;
-			}else if(data.device_type == 'CARD'){
-				devices.cards +=1;
-			}else if(data.device_type == 'MODEM'){
-				devices.modem +=1;
-			}
-		});
-		
-		var bonuspoint = App.data.custFullInfo.bonuspoint;
-		if(bonuspoint){
-			custs['balance'] = bonuspoint['balance'];
-			custs['his_balance'] = bonuspoint['his_balance'];
-		}else{
-			custs['balance'] = custs['his_balance'] = 0;
-		}
-		var userStore = Ext.getCmp('U_USER').getStore();
-		var prodData = Ext.getCmp('U_PROD').prodMap;
-		var acctStore = Ext.getCmp('A_ACCT').getStore();
-		
-		if(userStore.getCount() == 0){
-			for(var key in users){
-				users[key] = 0;
-			}
-		}else{
-			users.totalAmount = userStore.getCount();
-			users.dtvAmount = 0;
-			users.atvAmount = 0;
-			users.bandAmount = 0;
-			users.activeAmount = 0;
-			users.stopAmount = 0;
-			
-			userStore.each(function(rec){
-				var userType = rec.get('user_type');
-				if(userType == 'DTV'){
-					users.dtvAmount = users.dtvAmount + 1;
-				}else if(userType == 'ATV'){
-					users.atvAmount = users.atvAmount + 1;
-				}else if (userType == 'BAND'){
-					users.bandAmount == users.bandAmount + 1;
-				}
-				
-				var status = rec.get('status');
-				if(status == 'ACTIVE'){
-					users.activeAmount = users.activeAmount + 1;
-				}else{
-					users.stopAmount = users.stopAmount + 1;
-				}
-			})
-		}
-		
-		var hasProd = false;
-		prods.totalAmount = 0;
-		prods.activeAmount = 0;
-		prods.ownNotStopAmount = 0;
-		prods.ownStopAmount = 0;
-		
-		for(var key in prodData){
-			prods.totalAmount = prods.totalAmount + prodData[key].length;
-			for(var i=0;i<prodData[key].length;i++){
-				
-				if(prodData[key][i].status == 'ACTIVE'){
-					prods.activeAmount = prods.activeAmount + 1;
-				}else if(prodData[key][i].status == 'OUNSTOP'){//欠费未停
-					prods.ownNotStopAmount = prods.ownNotStopAmount + 1;
-				}else{//停机
-					prods.ownStopAmount = prods.ownStopAmount + 1;
-				}
-			}
-			hasProd = true;
-		}
-		if(!hasProd){
-			for(var key in prods){
-				prods[key] = 0;
-			}
-		}
-		
-		accts.totalBalance = 0;
-		accts.totalOwn = 0;
-		
-		acctStore.each(function(rec){
-			var acctitems = rec.get('acctitems');
-			if(acctitems){
-				for(var i=0;i<acctitems.length;i++){
-					accts.totalBalance = accts.totalBalance
-						+ acctitems[i].real_balance
-						+ (acctitems[i].order_balance > 0 ? acctitems[i].order_balance : 0);
-					accts.totalOwn = accts.totalOwn + acctitems[i].owe_fee;
-				}
-			}
-		});
-		
-		this.refresh();
-	}
-});
 
 CustDetailTab = Ext.extend(Ext.TabPanel,{
 	propChangeGrid : null,
@@ -977,8 +609,7 @@ DeviceDetailTab = Ext.extend(Ext.TabPanel,{
 	refreshPanel: function(){
 		this.deviceDetailPanel.refresh(this.deviceRecord);
 	}
-})
-
+});
 
 AcctItemGrid = Ext.extend(Ext.ux.Grid,{
 	border:false,
@@ -1097,8 +728,6 @@ AcctItemGrid = Ext.extend(Ext.ux.Grid,{
           
 	},
 	doLoadResult : function(_store, _rs, ops){
-		//隐藏数据加载提示框
-		App.hideTip();
 		if(this.parent){
 			var acctId = this.parent.acctItemDetailTab.acctId;
 			var acctItemId = this.parent.acctItemDetailTab.acctItemId;
@@ -1120,12 +749,9 @@ AcctItemGrid = Ext.extend(Ext.ux.Grid,{
 		}
 	},
 	remoteRefresh:function(){
-		//显示数据加载提示框
-		App.showTip();
 		this.acctItemStore.baseParams.custId=App.getApp().getCustId();
 		this.acctItemStore.load();
 		this.parent.acctItemDetailTab.resetPanel();
-//		this.doLoadAcctItem(acctstore,this.acctId);
 	},
 	doDbClickRecord : function(grid,index,e){
 		if(this.parent){
@@ -1367,12 +993,8 @@ CustPanel = Ext.extend( BaseInfoPanel , {
 		//子面板实例化
 		this.custInfoPanel =new CustInfoPanel('C_CUST');
 		this.custDetailTab = new CustDetailTab();
-//		this.custDeviceGrid = new CustDeviceGrid(this);
-//		this.deviceDetailTab = new DeviceDetailTab();
-//		this.unitGrid = new UnitGrid(); 
 		this.acctItemGrid = new AcctItemGrid(this);
 		this.acctItemDetailTab = new AcctItemDetailTab(this);
-//		this.acctPanel = new AcctPanel();
 		
 		CustPanel.superclass.constructor.call(this, {
 			layout:"border",
@@ -1413,31 +1035,26 @@ CustPanel = Ext.extend( BaseInfoPanel , {
 					bodyStyle: 'border-left-width: 1px;',
 					items:[this.acctItemDetailTab]
 				}]
-//				,items:[{
-//					anchor:"100% 62%",
-//					layout:'fit',
-//					border: false,
-//					bodyStyle: 'border-left-width: 1px',	
-//					items:[this.custDeviceGrid]
-//				},{
-//					anchor:"100% 38%",
-//					layout:'fit',
-//					items:[this.deviceDetailTab]
-//				}]
 			}]
 		});
 	},
 	refresh:function(){
-		this.custInfoPanel.remoteRefresh();
-		this.refreshPropChangeGrid();
-		this.acctItemDetailTab.resetPanel();
-		this.acctItemGrid.remoteRefresh();
+		try{
+			App.showTip();
+			this.custInfoPanel.remoteRefresh();
+			this.refreshPropChangeGrid();
+			this.acctItemDetailTab.resetPanel();
+			this.acctItemGrid.remoteRefresh();
+		}catch(e){
+			console.log(e)
+		}finally{
+			App.hideTip();
+		}
 	},
 	refreshPropChangeGrid : function(){
 		this.custDetailTab.propChangeGrid.remoteRefresh();
 	},
 	refreshPromFeeGrid : function(){
-		//this.custDetailTab.promFeeGrid.remoteRefresh();
 	}
 });
 Ext.reg( "custpanel" , CustPanel );

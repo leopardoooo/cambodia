@@ -1618,10 +1618,13 @@ public class AcctService extends BaseBusiService implements IAcctService {
 	 */
 	public List<AcctitemDto> queryPublicAcctItemByCustId(String custId) throws Exception{
 		CAcct acct= acctComponent.queryCustAcctByCustId(custId);
-		List<AcctitemDto> list = new ArrayList<AcctitemDto>();
-		AcctitemDto  t = acctComponent.queryAcctItemDtoByAcctitemId(acct.getAcct_id(), SystemConstants.ACCTITEM_PUBLIC_ID);
-		list.add(t);
-		return list;
+		if(acct != null){
+			List<AcctitemDto> list = new ArrayList<AcctitemDto>();
+			AcctitemDto  t = acctComponent.queryAcctItemDtoByAcctitemId(acct.getAcct_id(), SystemConstants.ACCTITEM_PUBLIC_ID);
+			list.add(t);
+			return list;
+		}
+		return null;
 	}
 	
 	public List<AcctitemDto> queryAcctitemToCallCenter(Map<String,Object> params) throws Exception{
