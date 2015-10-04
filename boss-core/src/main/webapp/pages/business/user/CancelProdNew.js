@@ -84,14 +84,14 @@ CancelProdGrid = Ext.extend(Ext.grid.GridPanel,{
 			Ext.get("cfeeTotalAmount").update(String(this.totalFeeNum/100.0));
 			Ext.getCmp('reallFeeId').maxValue = this.totalFeeNum/100.0;
 			Ext.getCmp('reallFeeId').setValue(this.totalFeeNum/100.0);
+		}else{
+			Ext.getCmp('reallFeeId').maxValue = 0;
+			Ext.getCmp('reallFeeId').setValue(0);
 		}
 		if(this.totalAcctNum>0){
 			Ext.get("acctTotalAmount").update(String(this.totalAcctNum/100.0));
 		}
 		this.totalFee = this.totalFeeNum + this.totalAcctNum;
-//		if(this.totalFee>0){
-//			Ext.get("totalFeeAmount").update(String(this.totalFee/100));
-//		}
 	},
 	refresh:function(orderSn){
 		this.selectProdStore.load({
@@ -174,7 +174,7 @@ CancelProdNewForm = Ext.extend(BaseForm,{
          				labelWidth: 120,
          				bodyStyle:'padding-top:10px;',
          				items:[{
-         						id:'reallFeeId', fieldLabel: '实退金额', xtype: 'numberfield', 
+         						id:'reallFeeId', fieldLabel: lmain("user._form.canRefundRealFee"), xtype: 'numberfield', 
          						allowNegative: false, allowBlank: false, minValue: 0
 			         		}]
          				}]

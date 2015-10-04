@@ -203,6 +203,7 @@ BCLang.home = {
 				orderFee: 'Order Balance~',
 				canRetrunFee: 'refundable Money Amount~',
 				canTransferFee: 'transferable Money Amount~',
+				canRefundRealFee: 'Real refund amount~',
 				returnDevice: 'Recycle Equipment~',
 				retrunInfo: 'Refundable~',
 				transferInfo: 'transferable~',
