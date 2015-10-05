@@ -179,6 +179,7 @@ BCLang.home = {
 				switchUsers: '选用户~',
 				titleOrderInfo: '第三步：订购信息~',
 				prodTariff: '产品资费~',
+				prodOrderType: '订购方式~',
 				prodOrderMonths: '订购月数~',
 				prodStartDate: '开始计费日~',
 				prodExpDate: '结束计费日~',

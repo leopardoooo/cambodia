@@ -179,6 +179,7 @@ BCLang.home = {
 				switchUsers: 'Select Customer~',
 				titleOrderInfo: ' Step Three: Purchase Information~',
 				prodTariff: 'Product Fee~',
+				prodOrderType: 'order method~',
 				prodOrderMonths: 'Purchase Month Quantity~',
 				prodStartDate: 'Billing Starting Date~',
 				prodExpDate: ' Billing Ending Date~',

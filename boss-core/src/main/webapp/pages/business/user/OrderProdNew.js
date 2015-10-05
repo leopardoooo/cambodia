@@ -127,20 +127,22 @@ ProdOrderForm = Ext.extend( BaseForm, {
 						border: false,
 						layout: 'form',
 						items:[
-						{ id:'order_type_id',hiddenName:'order_type',xtype:'combo',allowBlank:true,
-						 fieldLabel: '订购方式',value:'ORDER',width:100,
-           				 store:new Ext.data.ArrayStore({
-              						fields:['order_type','order_name'],
-             						data:[['ORDER','按月'],['TRANSFER','按转移支付']]
-						}),
-						displayField:'order_name',valueField:'order_type',
-						listeners:{
-							scope:this,
-							select:function(box,record,index){
-								this.doPayOrderType(box.getValue());
+						{
+							id:'order_type_id',
+							fieldLabel: lmain("user._form.prodOrderType"),
+							xtype:'paramcombo',
+							allowBlank:false,
+							hiddenName:'order_type',
+							paramName:'ORDER_TYPE',
+							defaultValue:'ORDER',
+							listeners : {
+								scope : this,
+								select:function(box,record,index){
+									this.doPayOrderType(box.getValue());
+								}
 							}
 						}
-					}]},{
+						]},{
 						id:'orderMonthItemsId',
 						border: false,
 						layout: 'form',
