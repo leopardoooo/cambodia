@@ -837,7 +837,7 @@ Ext.apply(MenuHandler, {
 			return false;
 		}
 		return {
-			width: 580,
+			width: 650,
 			height: 550
 		}
 	},
