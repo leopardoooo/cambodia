@@ -126,8 +126,9 @@ BCLang.home = {
 				roomStatus: '房间状态~',
 				roomTitle: '房间信息~',
 				roomTitle2: '行政区域:{0} 服务类型:{1}',
-				addRoom: '新增房间~'
-				
+				addRoom: '新增房间~',
+				unitName:'单位名称~',
+				unitAddress:'单位地址~'
 			},
 			acct: {
 				_title: "账目信息~",

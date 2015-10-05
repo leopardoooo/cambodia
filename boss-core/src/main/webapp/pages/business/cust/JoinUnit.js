@@ -28,16 +28,16 @@ JoinUnit = Ext.extend( BaseForm ,{
             },
             {columnWidth:1,layout:'form',border:false,items:[{
             	xtype:'displayfield',
-            	fieldLabel:'客户名称',
+            	fieldLabel:langUtils.bc('home.tools.CustSearch.labelCustName'),
             	value:App.getData().custFullInfo.cust.cust_name
             }]}	
             ,{columnWidth:1,layout:'form',border:false,items:[{
-            	fieldLabel:'单位名称',
+            	fieldLabel:lmain("cust._form.unitName"),
             	name:'unit_name',
             	allowBlank: false
             }]},
-            {columnWidth:.5,layout:'form',border:false,items:[{fieldLabel:'单位地址',name:'address'}]},
-            {columnWidth:.5,layout:'form',border:false,items:[{xtype:'button',text:'查  询',iconCls:'icon-query',scope:this,handler:this.doQuery}]},
+            {columnWidth:.5,layout:'form',border:false,items:[{fieldLabel:lmain("cust._form.unitAddress"),name:'address'}]},
+            {columnWidth:.5,layout:'form',border:false,items:[{xtype:'button',text:langUtils.bc('common.queryBtnWithBackSpace'),iconCls:'icon-query',scope:this,handler:this.doQuery}]},
             {columnWidth:1,layout:'fit',border:false,items:[
             	new Ext.grid.GridPanel({
             		id:'unitGridId',
@@ -45,12 +45,12 @@ JoinUnit = Ext.extend( BaseForm ,{
             		store:this.unitStore,
             		sm:sm,
             		height:200,
-            		title:'单位信息',
+            		title:langUtils.bc("home.main.tabs.[1]"),
             		columns:[
             			sm,
-            			{header:'单位名称',dataIndex:'cust_name',width:150,renderer:App.qtipValue},
-            			{header:'地址',dataIndex:'address',width:200,renderer:App.qtipValue},
-            			{header:'状态',dataIndex:'status_text',width:75,renderer:Ext.util.Format.statusShow}
+            			{header:lmain("cust._form.unitName"),dataIndex:'cust_name',width:150,renderer:App.qtipValue},
+            			{header:langUtils.main("cust.base.addr"),dataIndex:'address',width:200,renderer:App.qtipValue},
+            			{header:langUtils.main("cust.base.status"),dataIndex:'status_text',width:75,renderer:Ext.util.Format.statusShow}
             		]
             	})
             ]}

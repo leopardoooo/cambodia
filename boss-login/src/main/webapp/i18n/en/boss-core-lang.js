@@ -126,8 +126,9 @@ BCLang.home = {
 				roomStatus: 'Room Status~',
 				roomTitle: 'Room Information~',
 				roomTitle2: 'Administrative area:{0} service type:{1}',
-				addRoom: 'increased room~'
-				
+				addRoom: 'increased room~',
+				unitName:'unit name~',
+				unitAddress:'unit address~'
 			},
 			acct: {
 				_title: "Account Information~",
