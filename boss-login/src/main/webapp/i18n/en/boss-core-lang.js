@@ -595,6 +595,9 @@ BCLang.msgBox = {
 	confirmEditBankPay:'Confirm the Product',
 	confirmBankResume:'Sure to restore fee deduction from card?~',
 	confirmRenewCust:'Restore Customer Status?~',
+	confirmCancelPayFeeWithParam:'Determined to pay rollback and void an invoice:{0}',
+	confirmCancelPayFeeWithNoParam:'Determined to pay rollback?',
+	cancelPayFeeSuccess:'Payment rollback Reversal Success!',
 	
 	custHasUnSuitableDev:'This User cannot do Equipment exchange now~',
 	custCantExchangeDev:' This User cannot do Equipment exchange now~',
