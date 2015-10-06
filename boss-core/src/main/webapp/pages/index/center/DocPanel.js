@@ -187,11 +187,11 @@ TaskGrid = Ext.extend(Ext.ux.Grid,{
 						return '<div ext:qtitle="" ext:qtip="' + value + '">' + value +'</div>';
 					}
 				}},
-				{header:lc[0],dataIndex:'task_type_id_text',	width:60},
-				{header:lc[1],dataIndex:'task_status_text',	width:60,renderer:Ext.util.Format.statusShow},
-				{header:"施工队",dataIndex:'team_id_text',	width:80},
-				{header:"故障原因",dataIndex:'bug_type_text',width:120},
-				{header:"故障明细",dataIndex:'bug_detail',	width:120},
+				{header:lc[0],dataIndex:'task_type_id_text',	width:80},
+				{header:lc[1],dataIndex:'task_status_text',	width:80,renderer:Ext.util.Format.statusShow},
+				{header:"施工队",dataIndex:'team_id_text',	width:80,renderer : App.qtipValue},
+				{header:"故障原因",dataIndex:'bug_type_text',width:120,renderer : App.qtipValue},
+				{header:"故障明细",dataIndex:'bug_detail',	width:120,renderer : App.qtipValue},
 				{header:"ZTE授权状态",dataIndex:'zte_status_text',	width:80},
 				{header:lc[4],dataIndex:'task_create_time',	width:100}
 			]
