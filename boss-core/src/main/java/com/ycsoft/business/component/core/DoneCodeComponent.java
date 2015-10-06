@@ -299,10 +299,12 @@ public class DoneCodeComponent extends BaseBusiComponent {
 					user = (CUser)cUserHisDao.findByKey(doneCodeDto.getUser_id());
 				}
 				String str = "";
-				if(str.equals(SystemConstants.USER_TYPE_BAND) && StringHelper.isNotEmpty(user.getModem_mac())){
-					str += user.getUser_type()+" Modem: "+user.getModem_mac();
-				}else  if(StringHelper.isNotEmpty(user.getStb_id())){
-					str += user.getUser_type()+" Stb: "+user.getStb_id();
+				if(user!=null){
+					if(str.equals(SystemConstants.USER_TYPE_BAND) && StringHelper.isNotEmpty(user.getModem_mac())){
+						str += user.getUser_type()+" Modem: "+user.getModem_mac();
+					}else  if(StringHelper.isNotEmpty(user.getStb_id())){
+						str += user.getUser_type()+" Stb: "+user.getStb_id();
+					}
 				}
 				tempQ.setRemark(str);
 			}
