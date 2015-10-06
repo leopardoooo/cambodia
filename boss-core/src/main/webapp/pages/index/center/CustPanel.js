@@ -174,7 +174,7 @@ CustInfoPanel = Ext.extend( Ext.ux.Gpanel , {
 			var cust = App.getCust();
 			var custType = cust.cust_type;
 			if(custType=='RESIDENT'){//居民
-				var arr = ['1003','1010','1005','1006','1119','2001'];
+				var arr = ['1003','1010','1005','1006','1119','2001','1108','1109','2265'];
 				if(cust.unit_name){//已加入单位
 					App.disableBarByBusiCode(custTBar,['1005'],true);//隐藏加入单位
 					arr.remove('1005');
