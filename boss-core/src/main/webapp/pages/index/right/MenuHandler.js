@@ -512,8 +512,8 @@ Ext.apply(MenuHandler, {
 		if (!hasCust())
 			return false
 		return {
-			width : 450,
-			height : 300
+			width : 500,
+			height : 350
 		};
 	},
 	//批量购买配件
