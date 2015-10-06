@@ -290,7 +290,11 @@ BCLang.home = {
 			feePayDetail: {
 				_title: 'Fee Details~',
 				columns: ['Fee Item~', 'Amount~']
-			}
+			},
+			_form: {
+					oldOptrName: 'Old Development~',
+					newOptrName: 'New development~'
+				}
 		},
 		// Reception Information
 		doc: {
