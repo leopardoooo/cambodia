@@ -11,8 +11,16 @@ NavigationMenu = Ext.extend( Ext.Panel , {
 		this.dvStore = new Ext.data.JsonStore({
 	        fields:['res_id','res_name','res_pid','url','panel_name','show_name','handler','iconcls']
 	    });
-	    this.dvStore.loadData(data);
+		this.dvStore.on('load', function(){
+			this.dvStore.each(function(record){
+				record.set('res_name', langUtils.resSys(record.get('res_id')));
+				record.commit();
+			}, this);
+			this.dvStore.commitChanges();
+		}, this);
 		
+	    this.dvStore.loadData(data);
+	    
 		this.dataView = new Ext.DataView({
 	        store: this.dvStore,
 	        tpl  : new Ext.XTemplate(
@@ -20,7 +28,7 @@ NavigationMenu = Ext.extend( Ext.Panel , {
 	                '<tpl for=".">',
 	                    '<li id="{handler}" class="thumb-wrap">',
 							"<div onclick=javascript:nMenuThiz.menuClick({res_name:'{res_name}',handler:'{handler}'})>",
-							'<div style="width:70px;height:75px">',
+							'<div style="width:75px;height:75px">',
 								'<img width="48px" height="48px" src="/'+Constant.ROOT_PATH_LOGIN+'/resources/images/sysMenu/{iconcls}" />',
 		                        '<span class="x-editable"><font color="#555555" style="font-family:微软雅黑;font-size:13"><b>{res_name}</b></font></span>',
 	                        '</div>',
@@ -42,7 +50,7 @@ NavigationMenu = Ext.extend( Ext.Panel , {
 		
 		NavigationMenu.superclass.constructor.call(this, {
 			region: 'west',
-	        width: 200,
+	        width: 210,
 			split	: true,
 			minSize	: 200,         
 	        maxSize	: 290,
