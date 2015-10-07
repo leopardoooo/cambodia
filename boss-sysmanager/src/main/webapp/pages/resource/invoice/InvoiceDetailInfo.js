@@ -6,14 +6,14 @@ var InvoiceDetailForm = Ext.extend(Ext.form.FormPanel, {
 		this.invoiceStore = new Ext.data.JsonStore({
 					fields : ['invoice_id', 'invoice_book_id', 'invoice_code']
 				});
-		InvoiceDetailThis = this;
 		InvoiceDetailForm.superclass.constructor.call(this, {
 			border : false,
 			layout : 'column',
 			labelWidth : 75,
 			bodyStyle : 'padding:5px;padding-top : 10px',
 			items : [{
-						columnWidth : .25,
+						style: 'margin-left: 300px',
+						columnWidth : .6,
 						layout : 'form',
 						border : false,
 						items : [{
@@ -21,7 +21,7 @@ var InvoiceDetailForm = Ext.extend(Ext.form.FormPanel, {
 									fieldLabel : lsys('InvoiceCommon.invoice_id'),
 									allowBlank : false,
 									name : 'invoice_id',
-									width:100,
+									width:150,
 									vtype : 'invoiceId',
 									enableKeyEvents : true,
 									listeners : {
@@ -35,7 +35,7 @@ var InvoiceDetailForm = Ext.extend(Ext.form.FormPanel, {
 										change : this.checkInvoice
 									}
 								}]
-					},{
+					},/*{
 						columnWidth : .3,
 						layout : 'form',
 						border : false,
@@ -54,8 +54,8 @@ var InvoiceDetailForm = Ext.extend(Ext.form.FormPanel, {
 										select : this.changeCode
 									}
 								}]
-					}, {
-						columnWidth : .15,
+					},*/ {
+						columnWidth : .2,
 						border : false,
 						items : [{
 									xtype : 'button',
@@ -74,7 +74,7 @@ var InvoiceDetailForm = Ext.extend(Ext.form.FormPanel, {
 		if (!Ext.form.VTypes.invoiceId(invoiceId))
 			return;
 
-		var invoiceCodeCmp = this.getForm().findField('invoice_code');
+//		var invoiceCodeCmp = this.getForm().findField('invoice_code');
 		Ext.Ajax.request({
 					url : 'resource/Invoice!queryInvoiceById.action',
 					params : {
@@ -85,16 +85,16 @@ var InvoiceDetailForm = Ext.extend(Ext.form.FormPanel, {
 						var data = Ext.decode(res.responseText);
 						if (data.length == 0) {
 							Alert(lsys('msgBox.invoiceNotExists',null,[invoiceId]), function() {
-										invoiceCodeCmp.setReadOnly(false);
+										/*invoiceCodeCmp.setReadOnly(false);
 										invoiceCodeCmp.getStore().removeAll();
-										invoiceCodeCmp.setValue('');
+										invoiceCodeCmp.setValue('');*/
 										invoiceIdCmp.focus(true, 10);
 									});
 						} else {
-							InvoiceDetailThis.invoiceStore.loadData(data);
-							invoiceCodeCmp.getStore().loadData(data);
+							this.invoiceStore.loadData(data);
+							/*invoiceCodeCmp.getStore().loadData(data);
 							invoiceCodeCmp.setValue(invoiceCodeCmp.getStore()
-									.getAt(0).get('invoice_code'));
+									.getAt(0).get('invoice_code'));*/
 						}
 					}
 				});
@@ -109,13 +109,13 @@ var InvoiceDetailForm = Ext.extend(Ext.form.FormPanel, {
 		if (!this.getForm().isValid())
 			return;
 		var invoiceCodeCmp = this.getForm().findField('invoice_code');
-		var invoice_code = invoiceCodeCmp.getValue();
+		/*var invoice_code = invoiceCodeCmp.getValue();
 		if(!invoice_code){
 			Alert(lsys('msgBox.selectInvoiceCode'));
 			return false;
-		}
+		}*/
 		var invoiceIdCmp = this.getForm().findField('invoice_id');
-		this.parent.queryInvoiceDetail(invoiceIdCmp.getValue(),invoice_code);
+		this.parent.queryInvoiceDetail(invoiceIdCmp.getValue(),'AAA');
 
 		}
 	});
@@ -223,47 +223,50 @@ var InvoiceDetailPanel = Ext.extend(Ext.Panel, {
 		this.invoiceTpl = new Ext.XTemplate(
 				'<table width="100%" border="0" cellpadding="0" cellspacing="0">',
 				'<tr height=24>',
-				'<td class="label" width=20%>'+lsys('InvoiceCommon.invoice_id')+'：</td>',
-				'<td class="input_bold" width=30%>&nbsp;{invoice_id}</td>',
-				'<td class="label" width=20%>'+lsys('InvoiceCommon.invoice_type')+'：</td>',
-				'<td class="input_bold" width=30%>&nbsp;{invoice_type_text}</td>',
+					'<td class="label" width=20%>'+lsys('InvoiceCommon.invoice_id')+'：</td>',
+					'<td class="input_bold" width=30%>&nbsp;{invoice_id}</td>',
+					'<td class="label" width=20%>'+lsys('InvoiceCommon.invoice_type')+'：</td>',
+					'<td class="input_bold" width=30%>&nbsp;{invoice_type_text}</td>',
 				'</tr>',
-				'<tr height=24>',
+				/*'<tr height=24>',
 				'<td class="label" width=20%>'+lsys('InvoiceCommon.invoice_code')+'：</td>',
 				'<td class="input_bold" width=30%>&nbsp;{invoice_code}</td>',
 				'<td class="label" width=20%>'+lsys('InvoiceCommon.invoice_mode')+'：</td>',
 				'<td class="input_bold" width=30%>&nbsp;{invoice_mode_text}</td>',
+				'</tr>',*/
+				'<tr height=24>',
+					'<td class="label" width=20%>'+lsys('InvoiceCommon.status')+'：</td>',
+					'<td class="input_bold" width=30%>&nbsp;{status_text}</td>',
+					'<td class="label" width=20%>'+lsys('InvoiceCommon.finance_status')+'：</td>',
+					'<td class="input_bold" width=30%>&nbsp;{finance_status_text}</td>',
 				'</tr>',
 				'<tr height=24>',
-				'<td class="label" width=20%>'+lsys('InvoiceCommon.status')+'：</td>',
-				'<td class="input_bold" width=30%>&nbsp;{status_text}</td>',
-				'<td class="label" width=20%>'+lsys('InvoiceCommon.finance_status')+'：</td>',
-				'<td class="input_bold" width=30%>&nbsp;{finance_status_text}</td>',
+					'<td class="label" width=20%>'+lsys('InvoiceCommon.depot_name')+'：</td>',
+					'<td class="input_bold" width=30%>&nbsp;{depot_name}</td>',
+					'<td class="label" width=20%>'+lsys('InvoiceCommon.check_depot_id')+'：</td>',
+					'<td class="input_bold" width=30%>&nbsp;{check_depot_id_text}</td>',
 				'</tr>',
 				'<tr height=24>',
-				'<td class="label" width=20%>'+lsys('InvoiceCommon.depot_name')+'：</td>',
-				'<td class="input_bold" width=30%>&nbsp;{depot_name}</td>',
-				'<td class="label" width=20%>'+lsys('InvoiceCommon.check_depot_id')+'：</td>',
-				'<td class="input_bold" width=30%>&nbsp;{check_depot_id_text}</td>',
+					'<td class="label" width=20%>'+lsys('InvoiceCommon.create_time')+'：</td>',
+					'<td class="input_bold" width=30%>&nbsp;{create_time}</td>',
+					'<td class="label" width=20%>'+lsys('InvoiceCommon.close_time')+'：</td>',
+					'<td class="input_bold" width=30%>&nbsp;{[values.close_time|| ""]}</td>',// fm.dateFormat(
 				'</tr>',
 				'<tr height=24>',
-				'<td class="label" width=20%>'+lsys('InvoiceCommon.create_time')+'：</td>',
-				'<td class="input_bold" width=30%>&nbsp;{create_time}</td>',
-				'<td class="label" width=20%>'+lsys('InvoiceCommon.close_time')+'：</td>',
-				'<td class="input_bold" width=30%>&nbsp;{[values.close_time|| ""]}</td>',// fm.dateFormat(
+					'<td class="label" width=20%>'+lsys('InvoiceCommon.check_time')+'：</td>',
+					'<td class="input_bold" width=30%>&nbsp;{[values.check_time|| ""]}</td>',
+					'<td class="label" width=20%>'+lsys('InvoiceCommon.use_time')+'：</td>',
+					'<td class="input_bold" width=30%>&nbsp;{[values.use_time|| ""]}</td>',
 				'</tr>',
 				'<tr height=24>',
-				'<td class="label" width=20%>'+lsys('InvoiceCommon.check_time')+'：</td>',
-				'<td class="input_bold" width=30%>&nbsp;{[values.check_time|| ""]}</td>',
-				'<td class="label" width=20%>'+lsys('InvoiceCommon.use_time')+'：</td>',
-				'<td class="input_bold" width=30%>&nbsp;{[values.use_time|| ""]}</td>',
+					'<td class="label" width=20%>'+lsys('InvoiceCommon.amount')+'：</td>',
+					'<td class="input_bold" width=30%>&nbsp;{[this.checkAmount(values)]}</td>',
+					'<td class="label" width=20%>'+lsys('InvoiceCommon.use_optr')+'：</td>',
+					'<td class="input_bold" width=30%>&nbsp;{[values.optr_name||""]}</td>',
 				'</tr>',
 				'<tr height=24>',
-				'<td class="label" width=20%>'+lsys('InvoiceCommon.amount')+'：</td>',
-				'<td class="input_bold" width=30%>&nbsp;{[this.checkAmount(values)]}</td>',
-				
-				'<td class="label" width=20%>'+lsys('InvoiceCommon.use_optr')+'：</td>',
-				'<td class="input_bold" width=30%>&nbsp;{[values.optr_name||""]}</td>',
+					'<td class="label" width=20%>'+lsys('InvoiceCommon.open_optr_name')+'：</td>',
+					'<td class="input_bold" width=30%>&nbsp;{[values.open_optr_name||""]}</td>',
 				'</tr>',
 				'</table>', {
 					checkAmount : function(values) {
