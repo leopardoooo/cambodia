@@ -282,22 +282,33 @@ PayPanel = Ext.extend( Ext.Panel ,{
 				async : false,
 				success: function(res, ops){
 					info = Ext.decode(res.responseText);
-					if(!flag){
-						this.loadBaseData();
-						App.getApp().refreshPayInfo(parent);
-						App.getApp().refreshPanel('1113');
-						this.realFeeStore.each(function(record){
-							if(record.get('fee_sn') == rec.get('fee_sn')){
-								this.realFeeStore.remove(record);
-								return false;
-							}
-						},this);
+					
+					if(info['success']== false &&info['exception']){
+//						info = info['exception']['content'];
+					}else{
+						if(!flag){
+							this.loadBaseData();
+							App.getApp().refreshPayInfo(parent);
+							App.getApp().refreshPanel('1113');
+							this.realFeeStore.each(function(record){
+								if(record.get('fee_sn') == rec.get('fee_sn')){
+									this.realFeeStore.remove(record);
+									return false;
+								}
+							},this);
+						}
 					}
 				}
 			});
 			return info;
 		}
-		Confirm( func(true), this ,function(){
+		
+		var msg = func(true);
+		if(msg['success']== false && msg['exception']){
+			Alert(msg['exception']['content']);
+			return false;
+		}
+		Confirm( msg, this ,function(){
 			func(false);
 		});
 	},
