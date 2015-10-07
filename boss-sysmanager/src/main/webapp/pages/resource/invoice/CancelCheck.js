@@ -9,7 +9,7 @@ CancelCheck = Ext.extend(Ext.Panel,{
 		this.panel = new CommonInvoicePanel("CANCELCHECK");
 		CancelCheck.superclass.constructor.call(this,{
 			id:'CancelCheck',
-			title:'取消结账',
+			title:lsys('CancelCheck._title'),
 			closable: true,
 			border : false ,
 			baseCls: "x-plain",

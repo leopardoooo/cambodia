@@ -88,7 +88,7 @@ Sys = {
 		commons:{
 			exchange_id: '汇率编号~',
 			effective_time :'生效时间~',
-			exchange_rate:'汇率`',
+			exchange_rate:'汇率',
 			status:'状态~',
 			query:'查询~',
 			addNewOne:'新增~',
@@ -319,6 +319,18 @@ Sys = {
 		_title:'修改状态~',
 		editStatus:'修改状态为~'
 		
+	},
+	CheckInvoice: {
+		_title: '发票结账~'
+	},
+	CancelCheck: {
+		_title: '取消结账~'
+	},
+	CloseInvoice: {
+		_title: '发票核销~'
+	},
+	CancelCloseInvoice: {
+		_title: '取消核销'
 	},
 	
 /** 设备管理开始 **/
@@ -624,7 +636,7 @@ Sys = {
 		tipHasSameMateral:'器材有相同的，请检查！~',
 		tipTransNumCantBeEmpty:'调拨数量不能为空！~',
 		tipOutputNumCantBeEmpty:'退库数量不能为空~',
-		pleaseUploadExcelFile:'请选择excel文件进行上传！~',
+		pleaseUploadExcelFile:'请选择excel文件进行上传~',
 		pleaseUploadExcel2003:'请选择excel2003文件进行上传,文件后缀名为.xls!~',
 		needDevCode2Query:'输入设备编号回车查询~',
 		confirmCancelApply:"确定取消领用吗?~",
@@ -637,11 +649,11 @@ Sys = {
 		tipCalcenDiffSuccess:'取消差异成功!~',
 		tipSelectTragetDevStatus : '请先选择要修改的设备状态类型!~',
 		fileDownloadFailed:'文件下载失败~',
-		confirmCancelRecycle:'确认取消回收吗？~',
+		confirmCancelRecycle:'确认取消回收吗?~',
 		tipDevDosNotExists:'查询的设备不存在~',
 		tipQueryDateBeforeDownLoad:'请先查询出数据，方能下载!!~',
 		tipPleaseEditWell:'请编辑完整~',
-		duplicateRows:"第 {0} 行和第 {1} 行相同,请重新编辑！"
+		duplicateRows:"第 {0} 行和第 {1} 行相同,请重新编辑~"
     
 		
 		

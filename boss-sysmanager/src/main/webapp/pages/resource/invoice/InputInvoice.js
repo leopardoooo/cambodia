@@ -25,7 +25,8 @@ CheckInInvoiceForm = Ext.extend(Ext.form.FormPanel,{
 								})
 							}
 						}},
-					{fieldLabel:lsys('InvoiceCommon.invoice_code'),xtype:'textfield',name:'invoiceDto.invoice_code',allowBlank:false,value:'AAA',readOnly:true},
+//					{fieldLabel:lsys('InvoiceCommon.invoice_code'),xtype:'textfield',name:'invoiceDto.invoice_code',allowBlank:false,value:'AAA',readOnly:true},
+					{xtype: 'hidden', name:'invoiceDto.invoice_code', value: 'AAA'},
 					{fieldLabel:lsys('InvoiceInput.startInvoiceId'),name:'invoiceDto.start_invoice_id',allowBlank:false,
 						minLength:8,maxLength:8,enableKeyEvents:true,vtype:'invoiceId',
 						listeners:{

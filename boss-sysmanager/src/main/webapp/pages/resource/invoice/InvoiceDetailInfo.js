@@ -9,7 +9,7 @@ var InvoiceDetailForm = Ext.extend(Ext.form.FormPanel, {
 		InvoiceDetailForm.superclass.constructor.call(this, {
 			border : false,
 			layout : 'column',
-			labelWidth : 75,
+			labelWidth : 120,
 			bodyStyle : 'padding:5px;padding-top : 10px',
 			items : [{
 						style: 'margin-left: 300px',

@@ -332,8 +332,8 @@ QueryInvoice = Ext.extend(Ext.Panel,{
 			baseCls: "x-plain",
 			layout:'anchor',
 			items:[
-				{anchor:'100% 32%',border:false,items:[this.form]},
-				{anchor:'100% 68%',layout:'fit',border:false,items:[this.grid]}
+				{anchor:'100% 35%',border:false,items:[this.form]},
+				{anchor:'100% 65%',layout:'fit',border:false,items:[this.grid]}
 			]
 		});
 	}

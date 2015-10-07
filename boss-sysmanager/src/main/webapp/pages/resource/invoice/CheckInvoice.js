@@ -9,7 +9,7 @@ CheckInvoice = Ext.extend(Ext.Panel,{
 		this.panel = new CommonInvoicePanel("CHECK");
 		CheckInvoice.superclass.constructor.call(this,{
 			id:'CheckInvoice',
-			title:'发票结账',
+			title:lsys('CheckInvoice._title'),
 			closable: true,
 			border : false ,
 			baseCls: "x-plain",
