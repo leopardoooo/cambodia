@@ -271,7 +271,8 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 						}
 					}
 					
-					int fzdNum = 0;
+					//去掉OTT终端个数限制
+					/*int fzdNum = 0;
 					for(CUser cu:userList){
 						if(SystemConstants.USER_TERMINAL_TYPE_FZD.equals(cu.getTerminal_type())){
 							fzdNum += 1;
@@ -279,7 +280,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 						if(fzdNum >= 2){
 							throw new ServicesException(ErrorCode.OttFzdNotMoreThanTwo);
 						}
-					}
+					}*/
 				}
 				
 				if (StringHelper.isEmpty(user.getTerminal_type())){
