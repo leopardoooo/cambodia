@@ -121,6 +121,12 @@ public class StockAction extends BaseAction {
 		if (comboParamNames == null) {
 			return JSON_RECORDS;
 		}
+		
+		Object langObj = request.getSession().getAttribute(Environment.USER_IN_SESSION_LANG);
+		if(langObj != null && !langObj.toString().equals(MemoryDict.getLang())){
+			MemoryDict.setLang(langObj.toString());
+		}
+		
 		List<List<SItemvalue>> lst = new ArrayList<List<SItemvalue>>();
 		for (String element : comboParamNames) {
 			lst.add(MemoryDict.getDicts(element));

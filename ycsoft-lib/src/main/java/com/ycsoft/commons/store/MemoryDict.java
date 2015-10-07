@@ -67,6 +67,7 @@ public class MemoryDict {
 	}
 	
 	private static String getLanguageData(SDataTranslation dataTrans){
+		System.out.println("%%%%%%%%%%%%%%%%%%%%%%"+getLang()+"%%%%%%%%%%%%%%%%%%%%%%%");
 		if(LANGUAGE_EN.equals( getLang() ) && StringHelper.isNotEmpty(dataTrans.getData_en())){
 			return dataTrans.getData_en();
 		}else if(LANGUAGE_KH.equals( getLang() ) && StringHelper.isNotEmpty(dataTrans.getData_kh())){
