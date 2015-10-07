@@ -26,6 +26,7 @@ import com.ycsoft.beans.core.prod.CProdOrder;
 import com.ycsoft.beans.core.prod.CProdPropChange;
 import com.ycsoft.beans.core.prod.CProdStatusChange;
 import com.ycsoft.beans.core.user.CUser;
+import com.ycsoft.beans.core.user.CUserPropChange;
 import com.ycsoft.beans.prod.PProd;
 import com.ycsoft.beans.prod.PProdTariff;
 import com.ycsoft.beans.system.SCounty;
@@ -43,6 +44,8 @@ import com.ycsoft.business.dao.core.prod.CProdDao;
 import com.ycsoft.business.dao.core.prod.CProdOrderDao;
 import com.ycsoft.business.dao.core.prod.CProdPropChangeDao;
 import com.ycsoft.business.dao.core.prod.CProdStatusChangeDao;
+import com.ycsoft.business.dao.core.user.CUserDao;
+import com.ycsoft.business.dao.core.user.CUserPropChangeDao;
 import com.ycsoft.business.dao.prod.PProdDao;
 import com.ycsoft.business.dao.prod.PProdTariffDao;
 import com.ycsoft.business.dao.system.SAgentDao;
@@ -92,6 +95,11 @@ public class BaseBusiComponent extends BaseComponent{
 	protected JProdNextTariffDao jProdNextTariffDao;
 	@Autowired
 	protected SAgentDao sAgentDao;
+	
+	@Autowired
+	protected CUserDao cUserDao;
+	@Autowired
+	protected CUserPropChangeDao cUserPropChangeDao;
 
 	public void setCAcctAcctitemDao(CAcctAcctitemDao acctAcctitemDao) {
 		cAcctAcctitemDao = acctAcctitemDao;
@@ -511,6 +519,53 @@ public class BaseBusiComponent extends BaseComponent{
 			invalidDate = this.getInvalidDateByAcctmode(invalidDate, changfee, tariff.getRent(), tariff.getBilling_cycle());
 		}
 		return invalidDate;
+	}
+	
+	/**
+	 * 修改用户信息
+	 * 
+	 * @param doneCode
+	 * @param userId
+	 * @param propChangeList
+	 * @throws Exception
+	 */
+	public void editUser(Integer doneCode,String userId,List<CUserPropChange> propChangeList) throws Exception{
+		if(propChangeList == null || propChangeList.size() == 0) return ;
+		CUser user = new CUser();
+		user.setUser_id(userId);
+		for (CUserPropChange change:propChangeList){
+			try{
+				String newValue = StringHelper.isEmpty(change.getNew_value()) ? ""
+						: change.getNew_value();
+				BeanHelper.setPropertyString(user, change.getColumn_name(), newValue);
+				if (change.getColumn_name().equalsIgnoreCase("status")){
+					user.setStatus_date(new Date());
+				}
+				
+				if (change.getColumn_name().equalsIgnoreCase("user_class")){
+					//获取操作员的原始信息
+					SOptr optr1 = sOptrDao.findByKey(getOptr().getOptr_id());
+					if (!getOptr().getCounty_id().equals(optr1.getCounty_id())){
+						user.setUser_class_area(optr1.getCounty_id());
+					}
+				}
+				if (change.getColumn_name().equalsIgnoreCase("stop_type")){
+					//更新产品的催停标记
+					cProdDao.updateStopType(userId,newValue);
+				}
+			} catch(Exception e){
+
+			}
+			setBaseInfo(change);
+			change.setUser_id(userId);
+			change.setDone_code(doneCode);
+			change.setChange_time(DateHelper.now());
+		}
+		//保存信息修改
+		cUserDao.update(user);
+		//保存异动信息
+		cUserPropChangeDao.save(propChangeList.toArray(new CUserPropChange[propChangeList.size()]));
+
 	}
 	
 	/**
