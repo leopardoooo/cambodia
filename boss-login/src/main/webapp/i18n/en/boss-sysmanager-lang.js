@@ -336,6 +336,9 @@ Sys = {
 	CancelCloseInvoice: {
 		_title: 'Cancellation verification~'
 	},
+	InvoiceRefunding: {
+		_title:'Invoices refunding~'
+	},
 
 	DeviceCommon : {// Device Information General fields
 		titleDeviceInfo : 'Device Info~',

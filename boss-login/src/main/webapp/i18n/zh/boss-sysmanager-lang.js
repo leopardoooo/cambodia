@@ -330,7 +330,10 @@ Sys = {
 		_title: '发票核销~'
 	},
 	CancelCloseInvoice: {
-		_title: '取消核销'
+		_title: '取消核销~'
+	},
+	InvoiceRefunding: {
+		_title:'发票退库~'
 	},
 	
 /** 设备管理开始 **/
