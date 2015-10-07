@@ -61,7 +61,6 @@ public class SetterParameterInterceptor implements MethodBeforeAdvice {
 				}
 				Object langObj = request.getSession().getAttribute(Environment.USER_IN_SESSION_LANG);
 				if(langObj != null && !langObj.toString().equals(MemoryDict.getLang())){
-					System.out.println("########################language :"+ langObj.toString()+"###########################");
 					MemoryDict.setLang(langObj.toString());
 				}
 				base.setParam(param);
