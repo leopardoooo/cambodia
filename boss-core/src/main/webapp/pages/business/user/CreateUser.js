@@ -169,10 +169,10 @@ UserBaseForm = Ext.extend( BaseForm , {
 			},{
 			    xtype:'fieldset',
 			    width: '100%',
-		        style: 'margin: 0 22px 0 38px;padding: 10px 0;',
+		        style: 'margin: 0 15px 0 30px;padding: 10px 0;',
 			    layout:'column',
 			    id: 'tmpFieldSet',
-			    labelWidth: 50,
+			    labelWidth: 80,
 			    title: 'a',
 			    defaults: {
 			    	bodyStyle:'background:#F9F9F9;padding-top:4px',
@@ -190,7 +190,7 @@ UserBaseForm = Ext.extend( BaseForm , {
 		                }
 		            }]
 			    },{
-			    	style: 'margin-left: 38px;',
+			    	style: 'margin-left: 30px;',
 			    	items :[{
 			    		xtype: 'textfield',
 			    		id: "txtLoginPswd",
