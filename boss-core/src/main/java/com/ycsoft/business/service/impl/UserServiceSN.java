@@ -1667,7 +1667,6 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 			throw new ServicesException(ErrorCode.CustDataException);
 		}
 		Integer doneCode = doneCodeComponent.gDoneCode();
-		List<CCustDeviceChange> deviceChanges = new ArrayList<CCustDeviceChange>();
 		
 		//查询设备
 		String deviceCode = null;
@@ -1681,8 +1680,11 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 			throw new ServicesException(ErrorCode.DeviceNotExists);
 		}
 		
-		
 		TDeviceBuyMode buyModeCfg = busiConfigComponent.queryBuyMode(deviceBuyMode);
+		if(buyModeCfg != null && buyModeCfg.getBuy_mode().equals(SystemConstants.BUSI_BUY_MODE_BUY)){
+			throw new ServicesException(ErrorCode.BuyDeviceNotSale);
+		}
+		
 		if(buyModeCfg!= null && device.getOwnership().equals(SystemConstants.OWNERSHIP_GD)
 					&& buyModeCfg.getChange_ownship().equals(SystemConstants.BOOLEAN_TRUE)){
 			String newOwnerShip = SystemConstants.OWNERSHIP_CUST;
