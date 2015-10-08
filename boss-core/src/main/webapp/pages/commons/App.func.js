@@ -72,19 +72,10 @@ Ext.apply(App.func,{
 				}
 				
 			}else if(busicode === '2262'){//销售设备
-				if(data['status'] =='UNTUCKEND'){
-					return true;
-				}
-				if((Ext.isEmpty(data['stb_id']) && Ext.isEmpty(data['modem_mac']) )){
+				if( data['status'] != 'UNTUCKEND' || ( data['str10'] == 'BUY' || (((data['user_type']=='DTT' || data['user_type']=='OTT') && Ext.isEmpty(data['stb_id']))
+					|| (data['user_type']=='BAND' && Ext.isEmpty(data['modem_mac']))) ) ){
 					return false;
 				}
-			}else if(busicode === '1030'){//模拟转数(模拟电视)
-				if(data['user_type'] != 'ATV' || data['status'] == 'CUSTLINE')
-					return false;
-			}else if(busicode === '1031'){//开通双向(数字电视，单向)
-				if (data['user_type'] != 'DTV' || data['serv_type'] != 'SINGLE'
-						|| Ext.isEmpty(data['stb_id']) || App.getCust().status=='RELOCATE')
-					return false;
 			}else if(busicode === '1029'){//指令重发(数字电视)
 				if(data['user_type'] != 'DTV')
 					return false;
