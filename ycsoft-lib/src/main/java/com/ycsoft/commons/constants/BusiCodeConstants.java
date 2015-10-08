@@ -47,6 +47,7 @@ public final class BusiCodeConstants {
 	public final static String PKG_EDIT = "1017";//修改套餐
 	public final static String USER_EDIT_LEVEL = "1018";//修改用户等级
 	public final static String USER_OPEN = "1020";//用户开户
+	public final static String USER_OPEN_BATCH = "2020";//批量用户开户
 	public final static String USER_WRITE_OFF = "1021";//用户销户
 	public final static String USER_TRANS = "1022";//带账移机
 	public final static String USER_EDIT = "1023";//用户修改资料

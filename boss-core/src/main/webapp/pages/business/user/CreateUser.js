@@ -14,9 +14,7 @@ UserBaseForm = Ext.extend( BaseForm , {
 			trackResetOnLoad:true,
 			autoScroll:true,
             bodyStyle: Constant.TAB_STYLE,
-            labelWidth:90,
-			baseCls: 'x-plain',
-			bodyStyle:'background:#F9F9F9;padding-top:4px',
+			bodyStyle:'background:#F9F9F9;padding-top:15px',
 			items:[{
 				xtype:'panel',
 				anchor:'100%',
@@ -28,7 +26,7 @@ UserBaseForm = Ext.extend( BaseForm , {
 					baseCls: 'x-plain',
 					columnWidth:0.5,
 					anchor: '100%',
-					labelWidth:90
+					labelWidth:100
 				},
 				items:[{
 					items:[{
@@ -43,6 +41,19 @@ UserBaseForm = Ext.extend( BaseForm , {
 							select:this.doSelectUserType
 						}
 					}]
+				},{
+					items:[{
+			            xtype: 'textfield',
+			            fieldLabel: lmain("user._form.deviceCode"),
+			            width : 150,
+			            id: 'deviceCodeEl',
+//			            disabled: true,
+			            allowBlank: false,
+			            listeners: {
+			            	scope: this,
+			            	change: this.doDeviceCodeChange
+			            }
+					}]
 				}/*,{
 					items:[{
 						id:'userNameId',
@@ -51,7 +62,7 @@ UserBaseForm = Ext.extend( BaseForm , {
 						name:'user_name'
 					}]
 				}*/]
-			},{
+			},/*{
 				xtype:'panel',
 				anchor:'100%',
 				layout:'column',
@@ -62,7 +73,7 @@ UserBaseForm = Ext.extend( BaseForm , {
 					baseCls: 'x-plain',
 					columnWidth:0.5,
 					anchor: '100%',
-					labelWidth:90
+					labelWidth:100
 				},
 				items: [{
 					items:[{
@@ -82,14 +93,15 @@ UserBaseForm = Ext.extend( BaseForm , {
 			            fieldLabel: lmain("user._form.deviceCode"),
 			            width : 150,
 			            id: 'deviceCodeEl',
-			            disabled: true,
+//			            disabled: true,
+			            allowBlank: false,
 			            listeners: {
 			            	scope: this,
 			            	change: this.doDeviceCodeChange
 			            }
 					}]
 				}]
-			},{
+			},*/{
 				xtype:'panel',
 				anchor:'100%',
 				layout:'column',
@@ -100,7 +112,7 @@ UserBaseForm = Ext.extend( BaseForm , {
 					baseCls: 'x-plain',
 					columnWidth:0.5,
 					anchor: '100%',
-					labelWidth:90
+					labelWidth:100
 				},
 				items:[{
 					items:[{
@@ -195,6 +207,7 @@ UserBaseForm = Ext.extend( BaseForm , {
 			    		xtype: 'textfield',
 			    		id: "txtLoginPswd",
 			    		allowBlank:false,
+			    		inputType: 'password',
 		                fieldLabel: lbc("common.pswd")
 		            }]
 			    }]
@@ -210,12 +223,12 @@ UserBaseForm = Ext.extend( BaseForm , {
 			}, this);
 		}, this);
 	},
-	isInputTask: function(flag){
+	/*isInputTask: function(flag){
 		if(Ext.getCmp('radioAssignWay'))
 			Ext.getCmp('radioAssignWay').allowBlank = !flag;
-	},
+	},*/
 	// 施工回填
-	doCheckedChangeTask: function(box, checked){
+	/*doCheckedChangeTask: function(box, checked){
 		if(checked){
 			var deviceCategoryEl = Ext.getCmp("deviceCategoryEl");
 			deviceCategoryEl.setEditable(true);
@@ -230,7 +243,7 @@ UserBaseForm = Ext.extend( BaseForm , {
 			deviceCodeEl.allowBlank = false;
 		}
 		this.isInputTask(checked);
-	},
+	},*/
 	doSelectUserType: function(c,r,i){
 		var type = c.getValue();
 		var fs = Ext.getCmp("tmpFieldSet");
@@ -265,7 +278,7 @@ UserBaseForm = Ext.extend( BaseForm , {
 		}else if(type === "OTT_MOBILE"){
 			fs.setVisible(true);
 			isAllowBlank(true);
-			this.isInputTask(false);
+//			this.isInputTask(false);
 		}else if(type === "OTT"){
 			fs.setVisible(true);
 			isAllowBlank(false);
@@ -275,7 +288,7 @@ UserBaseForm = Ext.extend( BaseForm , {
 			
 		}
 		
-		if(type == 'DTT'){
+		/*if(type == 'DTT'){
 			//施工回填选择框默认不勾选，且禁用掉，必须输入设备号
 			Ext.getCmp('boxTaskEl').setValue(false);
 			Ext.getCmp('boxTaskEl').setDisabled(true);
@@ -283,7 +296,7 @@ UserBaseForm = Ext.extend( BaseForm , {
 		}else{
 			Ext.getCmp('boxTaskEl').setValue(true);
 			Ext.getCmp('boxTaskEl').setDisabled(false);
-		}
+		}*/
 		
 		// 手机终端
 		if(type === "OTT_MOBILE"){
@@ -320,7 +333,7 @@ UserBaseForm = Ext.extend( BaseForm , {
 		
 	},
 	setDisplayItems: function(bool){
-		var elArr = [ "boxTaskEl", "deviceCodeEl", "deviceCategoryEl", "dfFeeNameEl",
+		var elArr = [ /*"boxTaskEl", */"deviceCodeEl", "deviceCategoryEl", "dfFeeNameEl",
 		              "deviceBuyMode", "txtFeeEl", "dfProtocolInfoEl" ];
 		for(var i = 0 ; i< elArr.length; i++){
 			Ext.get(elArr[i]).up('.x-form-item').setDisplayed(bool);
@@ -483,21 +496,19 @@ UserBaseForm = Ext.extend( BaseForm , {
 			return formValid;
 		}
 		var boxUserType = Ext.getCmp("boxUserType");
-		var boxTask = Ext.getCmp("boxTaskEl");
-		var deviceCodeEl = Ext.getCmp("deviceCodeEl");
+//		var boxTask = Ext.getCmp("boxTaskEl");
+//		var deviceCodeEl = Ext.getCmp("deviceCodeEl");
 		var deviceCategoryEl = Ext.getCmp("deviceCategoryEl");
 		var deviceBuyMode = Ext.getCmp("deviceBuyMode");
 		var txtFeeEl = Ext.getCmp("txtFeeEl");
-		var deviceCodeEl = Ext.getCmp("deviceCodeEl");
 		
-		alert(boxTask.checked+"  "+deviceCodeEl.getValue());
 		// 设备回填
-		if(boxTask.checked && !deviceCodeEl.getValue()){
+		/*if(boxTask.checked && !deviceCodeEl.getValue()){
 			return {
 				"isValid": false,
 				"msg": lmsg('notChooseDeviceMustBeInput')
 			}
-		}
+		}*/
 		
 		//设备费用检查
 		var fd = this.currentFeeData;

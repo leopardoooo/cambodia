@@ -209,6 +209,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		}
 		snTaskComponent.createOpenTask(doneCode, cust, users, getBusiParam().getWorkBillAsignType());
 		
+		getBusiParam().setSelectedUsers(users);
 		saveAllPublic(doneCode, getBusiParam());
 	}
 
