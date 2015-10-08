@@ -6,7 +6,7 @@ NavigationMenu = Ext.extend( Ext.Panel , {
 	dataView:null,
 	dvStore:null,
 	constructor: function(data){
-		nMenuThiz = this;
+		var nMenuThiz = this;
 		
 		this.dvStore = new Ext.data.JsonStore({
 	        fields:['res_id','res_name','res_pid','url','panel_name','show_name','handler','iconcls']
@@ -27,11 +27,9 @@ NavigationMenu = Ext.extend( Ext.Panel , {
 	            '<ul>',
 	                '<tpl for=".">',
 	                    '<li id="{handler}" class="thumb-wrap">',
-							"<div onclick=javascript:nMenuThiz.menuClick({res_name:'{res_name}',handler:'{handler}'})>",
 							'<div style="width:75px;height:75px">',
 								'<img width="48px" height="48px" src="/'+Constant.ROOT_PATH_LOGIN+'/resources/images/sysMenu/{iconcls}" />',
 		                        '<span class="x-editable"><font color="#555555" style="font-family:微软雅黑;font-size:13"><b>{res_name}</b></font></span>',
-	                        '</div>',
 	                        '</div>',
 	                    '</li>',
 	                '</tpl>',
@@ -45,7 +43,11 @@ NavigationMenu = Ext.extend( Ext.Panel , {
 	        singleSelect: true,
 	        multiSelect : true,
 	        autoScroll  : true,
-	        style:'background-color:#dfe8f6;'
+	        style:'background-color:#dfe8f6;',
+	        listeners: {
+            	scope: this,
+	        	click: this.doOpenResource
+            }
 	    });
 		
 		NavigationMenu.superclass.constructor.call(this, {
@@ -64,8 +66,12 @@ NavigationMenu = Ext.extend( Ext.Panel , {
 			bodyStyle:'padding:3px;background-color:#dfe8f6;'
 		});
 	},
+	doOpenResource: function(dv, index){
+		var record = this.dvStore.getAt(index);
+		this.menuClick(record.data);
+	},
 	//资源点击事件
-	menuClick:function(d,resName){
+	menuClick:function(d){
 		var panel = Ext.getCmp(d.handler);
 		//不存在，则添加到tabpanel中;存在则激活它，不重新加载
 		if(Ext.isEmpty(panel)){

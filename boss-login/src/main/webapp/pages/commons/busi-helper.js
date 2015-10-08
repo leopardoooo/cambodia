@@ -398,10 +398,8 @@ Ext.apply( App, {
 		else if(busiCode == '1021' || busiCode == '1913' || busiCode == '111' || busiCode == '1130' || busiCode == '2262'){//销户，高级销户，加挂IP,销售设备
 			panel.getUserPanel().userGrid.remoteRefresh();
 			panel.getPayfeePanel().refresh();
-		}else if(busiCode == '1020'){//用户开户、刷新用户和设备，账户
-			//panel.getCustPanel().custDeviceGrid.remoteRefresh();
+		}else if(busiCode == '1020' || busiCode == '2020'){//用户开户、刷新用户和设备，账户
 			panel.getUserPanel().userGrid.remoteRefresh();
-			panel.getCustPanel().acctItemGrid.remoteRefresh();
 		}else if(busiCode == '102' || busiCode == '101' || busiCode == '100' ||busiCode == '1015' ||busiCode =='1040'
 			|| busiCode == '110' ||busiCode == '109' || busiCode == '1027' || busiCode == '131'){//订购，续订，升级,套餐订购,缴费,高级退订,超级退订，退订
 			panel.getUserPanel().userGrid.remoteRefresh();
