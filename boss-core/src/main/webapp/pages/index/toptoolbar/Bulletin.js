@@ -168,7 +168,7 @@ function showBulletinWhenInit() {
 }
 //taskTime最好大于winHideTime,由于请求的原因，时间有差异，所以尽量设置明显的时间差
 //以下时间为测试数据。正式 循环执行时间最好大于1分钟！
-var taskTime = 600 *1000;//公告任务循环执行时间(单位为毫秒)
+var taskTime =  300*1000;//公告任务循环执行时间(单位为毫秒)
 //var winHideTime = 10000;//公告框显示多少时间后隐藏(单位为毫秒)
 
 //公告任务，每10秒查询一次
