@@ -989,6 +989,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		user.setPassword(newPwd);
 		
 		if(!user.getLogin_name().equals(newLoginName)){
+			this.validAccount(newLoginName);
 			propChange = new CUserPropChange();
 			propChange.setColumn_name("login_name");
 			propChange.setOld_value(user.getLogin_name());
