@@ -26,7 +26,7 @@ public class WTaskLogDao extends BaseEntityDao<WTaskLog> {
 	
 	public void updateUnSynLogToNone(String taskId,String remark) throws JDBCException{
 		String sql=" update w_task_log set syn_status=? ,error_remark=? where task_id=? and syn_status=? ";
-		this.executeUpdate(sql, StatusConstants.NONE,remark,StatusConstants.NOT_EXEC);
+		this.executeUpdate(sql, StatusConstants.NONE,remark,taskId,StatusConstants.NOT_EXEC);
 	}
 	public List<WTaskLog> querySynLog() throws JDBCException {
 		String sql = "select * from w_task_log t where "

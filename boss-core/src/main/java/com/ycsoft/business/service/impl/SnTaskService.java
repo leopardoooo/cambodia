@@ -85,8 +85,6 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 		if (task.getTask_type_id().equals(SystemConstants.TASK_TYPE_FAULT) && 
 				StringHelper.isEmpty(bugType))
 			throw new ServicesException("请指定故障类型!");	
-		if (task.getTeam_id().equals(deptId))
-			throw new ServicesException("施工队不能相同!");	
 		if (task.getTask_status().equals(StatusConstants.TASK_CANCEL))
 			throw new ServicesException("工单已取消，不能修改");	
 		if (task.getTask_status().equals(StatusConstants.TASK_END))
