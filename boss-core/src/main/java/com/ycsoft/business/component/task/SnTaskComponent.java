@@ -78,7 +78,6 @@ public class SnTaskComponent extends BaseBusiComponent {
 
 	/**
 	 *  创建拆机工单（最多有两种工单）
-	 *  TODO 代码没写全 
 	 * @param doneCode
 	 * @param cust
 	 * @param userList
@@ -93,8 +92,10 @@ public class SnTaskComponent extends BaseBusiComponent {
 			return;// no user
 		}
 		// 创建终端回收单
-		createSingleTaskWithUser(doneCode, cust, userList, getTeamId(SystemConstants.TEAM_TYPE_SUPERNET),
+		String terminalTaskId=createSingleTaskWithUser(doneCode, cust, userList, getTeamId(SystemConstants.TEAM_TYPE_SUPERNET),
 				SystemConstants.TASK_TYPE_WRITEOFF_TERMINAL);
+		//记录终端回收工单创建日志
+		createTaskLog(terminalTaskId, BusiCodeConstants.TASK_INIT, doneCode, null, StatusConstants.NONE);
 		// 去除DTT
 		filterUserList(userList, SystemConstants.USER_TYPE_DTT);
 		if (userList.size() == 0) {
@@ -103,17 +104,20 @@ public class SnTaskComponent extends BaseBusiComponent {
 		// 创建拆线路单
 		List<CUser> bandList = getUserByTyoe(userList, SystemConstants.USER_TYPE_BAND);
 		String teamType = SystemConstants.TEAM_TYPE_SUPERNET;
-		if (assignType.equals(SystemConstants.TASK_ASSIGN_CFOCN))
+		String synStatus=StatusConstants.NONE;
+		if (assignType.equals(SystemConstants.TASK_ASSIGN_CFOCN)){
 			teamType = SystemConstants.TEAM_TYPE_CFOCN;
+			synStatus=StatusConstants.NOT_EXEC;
+		}
 		String teamId = getTeamId(teamType);
 		String taskId = this.saveTaskBaseInfo(cust, doneCode, SystemConstants.TASK_TYPE_WRITEOFF_LINE, teamId, null,
 				null);
 		this.saveTaskUser(bandList, SystemConstants.TASK_TYPE_WRITEOFF_LINE, taskId);
+		createTaskLog(taskId, BusiCodeConstants.TASK_INIT, doneCode, null, synStatus);
 	}
 
 	/**
 	 *  创建故障单
-	 *  代码没写全
 	 * @param doneCode
 	 * @param cust
 	 * @param bugDetail
@@ -125,12 +129,12 @@ public class SnTaskComponent extends BaseBusiComponent {
 		List<CUser> userList = cUserDao.queryUserByCustId(cust.getCust_id());
 		List<CUser> bandList = getUserByTyoe(userList, SystemConstants.USER_TYPE_BAND);
 		saveTaskUser(bandList, SystemConstants.TASK_TYPE_FAULT, taskId);
-
+		//记录日志
+		createTaskLog(taskId, BusiCodeConstants.TASK_INIT, doneCode, null, StatusConstants.NONE);
 	}
 
 	/**
 	 *  生成移机工单
-	 *  TODO 代码没写完
 	 * @param doneCode
 	 * @param cust
 	 * @param newAddrId
@@ -141,13 +145,18 @@ public class SnTaskComponent extends BaseBusiComponent {
 	public void createMoveTask(Integer doneCode, CCust cust, String newAddrId, String newAddr, String assignType)
 			throws Exception {
 		String teamType = SystemConstants.TEAM_TYPE_SUPERNET;
-		if (SystemConstants.TASK_ASSIGN_CFOCN.equals(assignType))
+		String synStatus=StatusConstants.NONE;
+		if (SystemConstants.TASK_ASSIGN_CFOCN.equals(assignType)){
 			teamType = SystemConstants.TEAM_TYPE_CFOCN;
+			synStatus=StatusConstants.NOT_EXEC;
+		}
 		String taskId = this.saveTaskBaseInfo(cust, doneCode, SystemConstants.TASK_TYPE_MOVE, getTeamId(teamType),
 				newAddr, null);
 		List<CUser> userList = cUserDao.queryUserByCustId(cust.getCust_id());
 		List<CUser> bandList = getUserByTyoe(userList, SystemConstants.USER_TYPE_BAND);
 		saveTaskUser(bandList, SystemConstants.TASK_TYPE_MOVE, taskId);
+		//记录日志
+		createTaskLog(taskId, BusiCodeConstants.TASK_INIT, doneCode, null,synStatus);
 	}
 
 	/**
@@ -162,9 +171,22 @@ public class SnTaskComponent extends BaseBusiComponent {
 	 * @throws Exception
 	 */
 	public void changeTaskTeam(Integer doneCode, String taskId, String deptId, String buyType) throws Exception {
-		//TODO 增加验证
+		//需要查询锁
 		// 修改工单对应的施工队
-		WTaskBaseInfo task = wTaskBaseInfoDao.findByKey(taskId);
+		WTaskBaseInfo task = wTaskBaseInfoDao.queryForLock(taskId);
+		if (task == null) {
+			throw new ComponentException("工单不存在");
+		}
+		String cfonTeamId = getTeamId(SystemConstants.TEAM_TYPE_CFOCN);
+		if(cfonTeamId.equals(task.getTeam_id())&&!task.getTask_status().equals(StatusConstants.TASK_CREATE)){
+			throw new ComponentException("只有待派单的cfocn工单才能重新派单");
+		}
+		if(!cfonTeamId.equals(task.getTeam_id())
+				&&!task.getTask_status().equals(StatusConstants.TASK_CREATE)
+				&&!task.getTask_status().equals(StatusConstants.TASK_INIT)){
+			throw new ComponentException("只有待派单和施工中的supernet工单才能重新派单");
+		}
+		
 		String oldTeamId = task.getTeam_id();
 		task.setBug_type(buyType);
 		task.setTeam_id(deptId);
@@ -173,7 +195,7 @@ public class SnTaskComponent extends BaseBusiComponent {
 		JsonObject jo = new JsonObject();
 		jo.addProperty("oldTeamId", oldTeamId);
 		jo.addProperty("newTeamId", deptId);
-		String cfonTeamId = getTeamId(SystemConstants.TEAM_TYPE_CFOCN);
+		//String cfonTeamId = getTeamId(SystemConstants.TEAM_TYPE_CFOCN);
 		if (StringHelper.isNotEmpty(cfonTeamId) && (cfonTeamId.equals(deptId) || cfonTeamId.equals(oldTeamId))) {
 			if (cfonTeamId.equals(deptId))
 				jo.addProperty("synType", "add");
@@ -193,7 +215,8 @@ public class SnTaskComponent extends BaseBusiComponent {
 	 * @throws Exception 
 	 */
 	public void  withdrawTask(Integer doneCode,String taskId) throws Exception{
-		WTaskBaseInfo oldTask = wTaskBaseInfoDao.findByKey(taskId);
+		
+		WTaskBaseInfo oldTask = wTaskBaseInfoDao.queryForLock(taskId);
 		if (oldTask == null) {
 			throw new ComponentException("工单不存在");
 		}
@@ -214,21 +237,28 @@ public class SnTaskComponent extends BaseBusiComponent {
 	 *  1.未派单的工单，可以作废
 	 *  2.施工中的派给cfocn的工单，不能作废
 	 *  3.施工中的派给工程部的工单，可以作废
-	 * b.单据面板的作废工单按钮
+	 * b.单据面板的作废工单按钮（这个放service中验证）
 	 *  未派单的工单可以作废
 	 * @param doneCode
 	 * @param taskId
 	 * @throws Exception
 	 */
 	public void cancelTask(Integer doneCode, String taskId) throws Exception {
-		//TODO  加验证
-		WTaskBaseInfo oldTask = wTaskBaseInfoDao.findByKey(taskId);
+		//加查询锁  加验证
+		WTaskBaseInfo oldTask =  wTaskBaseInfoDao.queryForLock(taskId);
 		if (oldTask == null) {
 			throw new ComponentException("工单不存在");
 		}
-		if (oldTask.getTask_status().equals(StatusConstants.TASK_END)) {
-			throw new ComponentException("工单已经完工");
+		String cfonTeamId = getTeamId(SystemConstants.TEAM_TYPE_CFOCN);
+		if(cfonTeamId.equals(oldTask.getTeam_id())&&!oldTask.getTask_status().equals(StatusConstants.TASK_CREATE)){
+			throw new ComponentException("只有待派单的cfocn工单才能作废");
 		}
+		if(!cfonTeamId.equals(oldTask.getTeam_id())
+				&&!oldTask.getTask_status().equals(StatusConstants.TASK_CREATE)
+				&&!oldTask.getTask_status().equals(StatusConstants.TASK_INIT)){
+			throw new ComponentException("只有待派单和施工中的supernet工单才能作废");
+		}
+		
 		// 作废销终端工单，用户状态还原
 		if (oldTask.getTask_type_id().equals(SystemConstants.TASK_TYPE_WRITEOFF_TERMINAL)) {
 			List<CProdOrderDto> orderList = cProdOrderDao.queryCustEffOrderDto(oldTask.getCust_id());
