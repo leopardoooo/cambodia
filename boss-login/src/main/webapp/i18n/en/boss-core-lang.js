@@ -530,7 +530,7 @@ BCLang.home = {
 			taskCols : ['ticket type~', 'customer name~', 'work order status~', 'construction team~',
 					'ZTE state~', 'address~', 'Tel~', 'creation time~ ', ' fault type~ ', ' fault details~ '],
 			userCols : ['user type~', '~ username', 'password~', 'device model~', 'device number~', 'posNo~', 'occNo~', 'Bandwidth~'],
-			operateCols : ['operating time~', 'operation type~', 'operator~,', 'synchronization status~', 'description~'],
+			operateCols : ['operating time~', 'operation type~', 'operator~,', 'synchronization status~', 'description~','Delay time~'],
 			taskDeviceCols : ['user type~', '~ username', 'model~', 'Device number~', 'equipment recycling~'],
 			msg : {
 				enterDeviceNo : 'Please enter the device number~',

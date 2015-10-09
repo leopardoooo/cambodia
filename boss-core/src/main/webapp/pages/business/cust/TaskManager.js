@@ -29,7 +29,7 @@ TaskDetailGrid = Ext.extend(Ext.grid.GridPanel, {
 	constructor : function() {
 		this.taskDetailStore = new Ext.data.JsonStore({
 					fields : ['busi_code', 'busi_name', 'optr_id','optr_name','log_time',
-							'syn_status','error_remark','syn_status_text']});
+							'syn_status','error_remark','syn_status_text','delay_time']});
 		var operateCols = lbc('home.tools.TaskManager.operateCols');							
 		TaskDetailGrid.superclass.constructor.call(this, {
 			ds : this.taskDetailStore,
@@ -40,7 +40,8 @@ TaskDetailGrid = Ext.extend(Ext.grid.GridPanel, {
 				header : operateCols[1],dataIndex : 'busi_name',width:80,renderer : App.qtipValue}, {
 				header : operateCols[2],dataIndex : 'optr_name',width:80,renderer : App.qtipValue}, {
 				header : operateCols[3],dataIndex : 'syn_status_text',width:80,renderer : App.qtipValue}, {
-				header : operateCols[4],daIndex : 'error_remark',width:150,renderer :  App.qtipValue
+				header : operateCols[4],daIndex : 'error_remark',width:150,renderer :  App.qtipValue}, {
+				header : operateCols[5],daIndex : 'delay_time',width:80,renderer :  App.qtipValue
 			}])          
 		})               
 	}                    
