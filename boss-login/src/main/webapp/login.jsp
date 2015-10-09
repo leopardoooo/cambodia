@@ -39,7 +39,7 @@
   			<td>
   				<div class="top">
   					<a href="#" onclick="SetHome(this,window.location)">设为首页</a> 
-  					<a href="/help/">使用帮助</a>
+  					<a href="/help/Train.doc">使用帮助</a>
   					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   				</div>
   			</td>
