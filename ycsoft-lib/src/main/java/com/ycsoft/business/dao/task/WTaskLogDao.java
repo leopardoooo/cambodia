@@ -19,6 +19,15 @@ public class WTaskLogDao extends BaseEntityDao<WTaskLog> {
 		return this.createQuery(sql, taskId).list();
 	}
 	
+	public List<WTaskLog> queryUnSynLogByTaskId(String taskId) throws JDBCException{
+		String sql = "select * from w_task_log where task_id=?  and syn_status=? ";
+		return this.createQuery(sql, taskId,StatusConstants.NOT_EXEC).list();
+	}
+	
+	public void updateUnSynLogToNone(String taskId,String remark) throws JDBCException{
+		String sql=" update w_task_log set syn_status=? ,error_remark=? where task_id=? and syn_status=? ";
+		this.executeUpdate(sql, StatusConstants.NONE,remark,StatusConstants.NOT_EXEC);
+	}
 	public List<WTaskLog> querySynLog() throws JDBCException {
 		String sql = "select * from w_task_log t where "
 				+" syn_status =? "+

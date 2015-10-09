@@ -153,6 +153,7 @@ public class SnTaskComponent extends BaseBusiComponent {
 		String taskId = this.saveTaskBaseInfo(cust, doneCode, SystemConstants.TASK_TYPE_MOVE, getTeamId(teamType),
 				newAddr, null);
 		List<CUser> userList = cUserDao.queryUserByCustId(cust.getCust_id());
+		//取宽带是为了光路信息变化回填用的
 		List<CUser> bandList = getUserByTyoe(userList, SystemConstants.USER_TYPE_BAND);
 		saveTaskUser(bandList, SystemConstants.TASK_TYPE_MOVE, taskId);
 		//记录日志
@@ -192,18 +193,17 @@ public class SnTaskComponent extends BaseBusiComponent {
 		task.setTeam_id(deptId);
 		wTaskBaseInfoDao.update(task);
 		// 记录操作日志
-		JsonObject jo = new JsonObject();
-		jo.addProperty("oldTeamId", oldTeamId);
-		jo.addProperty("newTeamId", deptId);
 		//String cfonTeamId = getTeamId(SystemConstants.TEAM_TYPE_CFOCN);
-		if (StringHelper.isNotEmpty(cfonTeamId) && (cfonTeamId.equals(deptId) || cfonTeamId.equals(oldTeamId))) {
-			if (cfonTeamId.equals(deptId))
-				jo.addProperty("synType", "add");
-			else
-				jo.addProperty("synType", "cancel");
-			createTaskLog(taskId, BusiCodeConstants.TASK_ASSIGN, doneCode, jo.toString(), StatusConstants.NOT_EXEC);
+		//查询未执行的工单日志，更新为NONE
+		if(oldTeamId.equals(cfonTeamId)&&wTaskLogDao.queryUnSynLogByTaskId(taskId).size()>0){
+			wTaskLogDao.updateUnSynLogToNone(taskId, "重新派单取消执行");
+		}
+
+		if (StringHelper.isNotEmpty(cfonTeamId) && cfonTeamId.equals(deptId)) {
+			createTaskLog(taskId, BusiCodeConstants.TASK_ASSIGN, doneCode, null, StatusConstants.NOT_EXEC);
 		} else {
-			createTaskLog(taskId, BusiCodeConstants.TASK_ASSIGN, doneCode, jo.toString(), StatusConstants.NONE);
+			createTaskLog(taskId, BusiCodeConstants.TASK_ASSIGN, doneCode,null, StatusConstants.NONE);
+			wTaskBaseInfoDao.updateTaskStatus(taskId, StatusConstants.TASK_INIT);
 		}
 	}
 	
