@@ -286,7 +286,7 @@ Ext.apply(App.func,{
 				return false; 
 			}
 			
-			if( (busicode == '1027' || busicode == '109' || busicode == '110') && data['is_pay'] == 'F' ){
+			if( (busicode == '1027' || busicode == '109' || busicode == '110' || busicode == '100') && data['is_pay'] == 'F' ){
 				return false;
 			}
 			
