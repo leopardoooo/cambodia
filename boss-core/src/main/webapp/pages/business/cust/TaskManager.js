@@ -380,9 +380,9 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 	initWidgets: function(item){
 		this.taskStore = new Ext.data.JsonStore({
 			url: root + '/core/x/Task!queryTasks.action' ,
-			fields:['task_id','cust_id','cust_no','cust_name','tel','old_addr','new_addr','address','task_type_id',
+			fields:['task_id','cust_no','cust_name','tel','old_addr','new_addr','address','task_type_id',
 					'task_status','task_status_text','task_type_id_text','team_id','team_id_text','bug_type','bug_type_text'
-					,'bug_detail','zte_status','zte_status_text','task_create_time'],
+					,'bug_detail','zte_status','zte_status_text','task_create_time','team_type'],
 			root : 'records',
 			totalProperty : 'totalProperty',
 			autoDestroy : true
@@ -680,8 +680,8 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 	doEndTask:function(){//完成工单,施工中和supernet
 		var rs = this.getSelections();
 		if(rs === false){return ;}
-		if(){
-			Alert('只有工单状态为施工中和supernet');
+		if(rs.get('task_status') != 'INIT' || rs.get('team_type') != 'SUPERNET' ){
+			Alert(lbc('home.tools.TaskManager.msg.taskStatusInitAndSupernet'));
 			return false;
 		}		
 		

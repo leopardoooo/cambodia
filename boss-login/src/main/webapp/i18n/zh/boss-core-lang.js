@@ -545,7 +545,8 @@ BCLang.home = {
 				finishTypeCantEmpty : '完工类型不能为空~',
 				selectRecord : '请选择需要操作的记录!~',
 				roderHaveBeenCompletedOrObsolete : '工单已完工或已作废~',
-				teamIsnotSingleWork : '该工单施工队不是本部门~'
+				teamIsnotSingleWork : '该工单施工队不是本部门~',
+				taskStatusInitAndSupernet:'施工中状态和supernet施工队才能使用完工~'
 			}
 		},
 		feeUnitpre : {

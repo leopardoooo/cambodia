@@ -540,7 +540,8 @@ BCLang.home = {
 				finishTypeCantEmpty : 'completion type can not be empty~',
 				selectRecord : 'Please select the records need to operate!~',
 				roderHaveBeenCompletedOrObsolete : 'ticket have been completed or obsolete~',
-				teamIsnotSingleWork : 'This work is not a single construction team of the department~'
+				teamIsnotSingleWork : 'This work is not a single construction team of the department~',
+				taskStatusInitAndSupernet:'work order status must be During Construction and construction team must be supernet'
 			}
 		},
 		feeUnitpre : {
