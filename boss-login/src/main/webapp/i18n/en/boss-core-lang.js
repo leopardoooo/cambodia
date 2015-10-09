@@ -289,7 +289,7 @@ BCLang.home = {
 			},
 			feePayDetail: {
 				_title: 'Fee Details~',
-				columns: ['Fee Item~', 'Amount~']
+				columns: ['serial number','feeitem', 'amount','invoice']
 			},
 			_form: {
 					oldOptrName: 'Old Development~',
