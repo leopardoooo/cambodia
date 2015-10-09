@@ -24,7 +24,7 @@ new Ext.KeyMap(document,
 		);  
 
 // store 字段中文排序 补丁
- Ext.data.Store.prototype.applySort = function() {
+ /*Ext.data.Store.prototype.applySort = function() {
 	if (this.sortInfo && !this.remoteSort) {
 		var s = this.sortInfo, f = s.field;
 		var tmp = this.fields.get(f);
@@ -47,7 +47,7 @@ new Ext.KeyMap(document,
 			this.snapshot.sort(s.direction, fn);
 		}
 	}
-};  
+};*/  
 
 // ajax 请求超时时间
 Ext.apply( Ext.data.Connection.prototype, {
