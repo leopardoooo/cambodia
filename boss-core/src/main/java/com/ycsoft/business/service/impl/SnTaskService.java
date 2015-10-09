@@ -464,6 +464,7 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 		}
 		for(TaskUserDto task: userList){
 			CUser user = userComponent.queryUserById(task.getUser_id());
+			task.setDevice_code(task.getDevice_id());
 			task.setUser_name( taskComponent.getFillUserName(user) );
 			task.setOccNo(user.getStr7());
 			task.setPosNo(user.getStr8());

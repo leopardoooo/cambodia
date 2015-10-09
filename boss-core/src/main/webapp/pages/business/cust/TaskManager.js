@@ -158,8 +158,8 @@ var TaskDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 		},
 		getValues:function(){
 			var arr=[];
-			var store = this.getStore();
-			store.each(function(record){
+			var records = this.getStore().getModifiedRecords();
+			Ext.each(records,function(record){
 				var values = {};
 				values["oldDeviceCode"] = record.get('device_id');
 				values["deviceModel"] =record.get('device_model');
@@ -172,6 +172,21 @@ var TaskDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 				}
 				arr.push(values);
 			},this);
+			
+//			var store = this.getStore();
+//			store.each(function(record){
+//				var values = {};
+//				values["oldDeviceCode"] = record.get('device_id');
+//				values["deviceModel"] =record.get('device_model');
+//				values["deviceCode"] = record.get('device_code');
+//				values["posNo"] = record.get('posNo');
+//				values["occNo"] = record.get('occNo');
+//				values["fcPort"] = false;
+//				if(record.get('user_type') == 'BAND'){
+//					values["fcPort"] = true;
+//				}
+//				arr.push(values);
+//			},this);
 			return arr;
 		},
 		getUserIds:function(){
