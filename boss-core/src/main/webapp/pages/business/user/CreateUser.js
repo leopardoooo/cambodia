@@ -253,6 +253,7 @@ UserBaseForm = Ext.extend( BaseForm , {
 			Ext.getCmp('txtLoginName').allowBlank = !flag;
 			Ext.getCmp('txtLoginPswd').allowBlank = !flag;
 			
+			Ext.getCmp('deviceCodeEl').allowBlank = flag;
 			Ext.getCmp('deviceCategoryEl').allowBlank = flag;
 			Ext.getCmp('deviceBuyMode').allowBlank = flag;
 			Ext.getCmp('txtFeeEl').allowBlank = flag;

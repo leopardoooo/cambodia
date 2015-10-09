@@ -72,7 +72,7 @@ Ext.apply(App.func,{
 				}
 				
 			}else if(busicode === '2262'){//销售设备
-				if( data['str10'] == 'BUY' || (((data['user_type']=='DTT' || data['user_type']=='OTT') && Ext.isEmpty(data['stb_id']))
+				if( data['user_type']=='OTT_MOBILE' || data['str10'] == 'BUY' || (((data['user_type']=='DTT' || data['user_type']=='OTT') && Ext.isEmpty(data['stb_id']))
 					|| (data['user_type']=='BAND' && Ext.isEmpty(data['modem_mac']))) ){
 					return false;
 				}
