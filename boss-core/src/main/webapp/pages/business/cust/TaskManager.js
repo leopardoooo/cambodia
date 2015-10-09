@@ -598,17 +598,35 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 		var rs = this.getSelections();
 		if(rs === false){return ;}
 		if(rs.get('task_status') != 'INIT' || rs.get('team_type') != 'CFOCN' ){
-			Alert('施工中状态,cfocn的工单才能进行工单撤回');
+			Alert(lbc('home.tools.TaskManager.msg.taskStatusInitAndCfocnCanWithdraw'));
 			return false;
 		}
 		
+		Confirm(lbc('home.tools.TaskManager.msg.sureWantWithdrawSelectedWork'), this , function(){
+			var taskId = rs.get("task_id");
+			var that = this;
+			App.sendRequest(
+				Constant.ROOT_PATH + "/core/x/Task!withdrawTask.action",
+				{task_id : taskId},
+				function(res,opt){
+					Ext.getCmp('taskManagerPanelId').grid.getStore().reload({
+					callback:function(records, options, success){  
+		           		    var panel = Ext.getCmp('taskManagerPanelId');
+				           	var index = panel.grid.getStore().find('task_id',taskId);	           		
+				           	panel.grid.getSelectionModel().selectRow(index);
+				           	panel.loadTaskData(taskId);
+						}
+			         });
+					that.close();
+				});
+		}); 
 	},
 	doTeamTask:function(){//派单
 		var rs = this.getSelections();
 		if(rs === false){return ;}
 		if(this.checkViald(rs) === false){return;}
-		if((rs.get('task_status') != 'INIT' && rs.get('team_type') != 'SUPERNET' ) || rs.get('task_status') != 'CREATE'){
-			Alert('只有待派单状态的工单或者施工中状态,supernet的工单才能进行派单');
+		if((rs.get('task_status') != 'INIT' || rs.get('team_type') != 'SUPERNET' ) && rs.get('task_status') != 'CREATE'){
+			Alert(lbc('home.tools.TaskManager.msg.taskStatusInitAndSupernetCanAssignment'));
 			return false;
 		}
 		var arr = [];

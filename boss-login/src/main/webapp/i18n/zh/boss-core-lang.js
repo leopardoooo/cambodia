@@ -529,7 +529,7 @@ BCLang.home = {
 				finish : '完工~',
 				returning : '回访~',
 				sendAuth : '发送ZTE授权~',
-				withdraw : '工单撤回~'
+				withdraw : 'cfocn撤回~'
 			},
 			taskCols : ['工单类型~', '客户名称~', '工单状态~', '施工队~', 'ZTE状态~', '地址~',
 					'联系电话~', '创建时间~', '故障类型~', '故障详细信息~'],
@@ -541,13 +541,16 @@ BCLang.home = {
 				enterDeviceNo : '请输入设备号~',
 				noCancel : '不允许取消!~',
 				sureWantSelectedWork : '确定要作废选中的工单吗?~',
+				sureWantWithdrawSelectedWork : '确定要撤回选中的工单吗?~',
 				teamCantEmpty : '施工队不能为空~',
 				faultTypeCantEmpty : '故障类型不能为空~',
 				finishTypeCantEmpty : '完工类型不能为空~',
 				selectRecord : '请选择需要操作的记录!~',
 				roderHaveBeenCompletedOrObsolete : '工单已完工或已作废~',
 				teamIsnotSingleWork : '该工单施工队不是本部门~',
-				taskStatusInitAndSupernet:'施工中状态和supernet施工队才能使用完工~'
+				taskStatusInitAndSupernet:'施工中状态和supernet施工队才能使用完工~',
+				taskStatusInitAndCfocnCanWithdraw:'施工中状态和cfocn施工队才能使用工单撤回~',
+				taskStatusInitAndSupernetCanAssignment:'只有待派单状态的工单或者施工中状态,supernet的工单才能进行派单~'
 			}
 		},
 		feeUnitpre : {

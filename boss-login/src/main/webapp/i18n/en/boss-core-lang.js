@@ -525,7 +525,7 @@ BCLang.home = {
 				finish : 'completed~',
 				returning : 'visit~',
 				sendAuth : 'Send ZTE authorized~',
-				withdraw : 'work withdraw~'
+				withdraw : 'cfocn withdraw~'
 			},
 			taskCols : ['ticket type~', 'customer name~', 'work order status~', 'construction team~',
 					'ZTE state~', 'address~', 'Tel~', 'creation time~ ', ' fault type~ ', ' fault details~ '],
@@ -536,13 +536,17 @@ BCLang.home = {
 				enterDeviceNo : 'Please enter the device number~',
 				noCancel : 'No cancellations~!',
 				sureWantSelectedWork : 'sure you want to void the selected work order you~?',
+				sureWantWithdrawSelectedWork : 'sure you want to withdraw the selected work order you~?',
 				teamCantEmpty : 'construction team can not be empty~',
 				faultTypeCantEmpty : 'fault type can not be empty~',
 				finishTypeCantEmpty : 'completion type can not be empty~',
 				selectRecord : 'Please select the records need to operate!~',
 				roderHaveBeenCompletedOrObsolete : 'ticket have been completed or obsolete~',
 				teamIsnotSingleWork : 'This work is not a single construction team of the department~',
-				taskStatusInitAndSupernet:'work order status must be During Construction and construction team must be supernet'
+				taskStatusInitAndSupernet:'Work order status must be During Construction and construction team must be supernet~',
+				taskStatusInitAndCfocnCanWithdraw:'Work order status must be During Construction and construction team must be cfocn~',
+				taskStatusInitAndSupernetCanAssignment:'Work order status is Waiting or During Construction and construction team is supernet can assignment~'
+				
 			}
 		},
 		feeUnitpre : {

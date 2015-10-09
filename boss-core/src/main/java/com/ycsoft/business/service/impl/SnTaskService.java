@@ -102,6 +102,7 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 		//获取业务流水
 		Integer doneCode = doneCodeComponent.gDoneCode();
 		snTaskComponent.cancelTask(doneCode, taskId);
+		getBusiParam().setBusiCode(BusiCodeConstants.TASK_CANCEL);
 		saveAllPublic(doneCode, getBusiParam());
 		
 	}
@@ -110,8 +111,6 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 		//获取业务流水
 		Integer doneCode = doneCodeComponent.gDoneCode();
 		snTaskComponent.withdrawTask(doneCode, taskId);
-		saveAllPublic(doneCode, getBusiParam());
-		
 	}
 	
 	//回填销户回收设备
