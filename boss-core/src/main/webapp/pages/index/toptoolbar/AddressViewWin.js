@@ -415,19 +415,21 @@ AddressWin = Ext.extend(Ext.Window,{
 			Ext.getCmp('treeLevel').setValue(this.level+1);
 			Ext.getCmp('areaId').setValue(node.attributes.others.area_id);
 			Ext.getCmp('countyId').setValue(node.attributes.others.county_id);
+			Ext.getCmp('parentName').fieldLabel = langUtils.bc('home.tools.AddressNodeManage.formWin.labelParentName');
 		}else if(this.type == 'edit'){
 			if(this.level == 1){
-				this.title = langUtils.bc('home.tools.AddressNodeManage.formWin.titleNewSaveLevelCity');
+				this.title = langUtils.bc('home.tools.AddressNodeManage.formWin.titleEditSaveLevelCity');
 				fieldLabel = langUtils.bc('home.tools.AddressNodeManage.formWin.labelCityName');
 			}else if(this.level == 2){
-				this.title = langUtils.bc('home.tools.AddressNodeManage.formWin.titleNewSaveLevelStreet');
+				this.title = langUtils.bc('home.tools.AddressNodeManage.formWin.titleEditSaveLevelStreet');
 				fieldLabel =langUtils.bc('home.tools.AddressNodeManage.formWin.labelStreatName');
 			}else if(this.level == 3){
-				this.title = langUtils.bc('home.tools.AddressNodeManage.formWin.titleNewSaveLevelRoadNum');
+				this.title = langUtils.bc('home.tools.AddressNodeManage.formWin.titleEditSaveLevelRoadNum');
 				fieldLabel =langUtils.bc('home.tools.AddressNodeManage.formWin.labelRoadNum');
 			}
 			Ext.getCmp('addrName').setValue(node.text);
 			Ext.getCmp('treeLevel').setValue(this.level);
+			Ext.getCmp('parentName').fieldLabel = langUtils.bc('home.tools.AddressNodeManage.formWin.labelOldName');
 		}else if(this.type == 'leveladd'){
 			if(this.level == 1){
 				this.title = langUtils.bc('home.tools.AddressNodeManage.formWin.titleNewSaveLevelCity');
@@ -442,6 +444,7 @@ AddressWin = Ext.extend(Ext.Window,{
 			Ext.getCmp('treeLevel').setValue(this.level);
 			Ext.getCmp('areaId').setValue(node.attributes.others.area_id);
 			Ext.getCmp('countyId').setValue(node.attributes.others.county_id);
+			Ext.getCmp('parentName').fieldLabel = langUtils.bc('home.tools.AddressNodeManage.formWin.labelBrotherName');
 		}
 		Ext.getCmp('addrName').fieldLabel =fieldLabel;
 		Ext.getCmp('parentName').setValue(node.text);

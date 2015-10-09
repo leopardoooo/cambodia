@@ -69,7 +69,10 @@ public class TemplateConfigDto extends TTemplate {
 		/**在网协议截止日期月份数**/
 		PROTOCOL_DATE_MONTHS,
 		/**发票缴销仓库**/
-		INVOICE_DEPT_CHECKOUT
+		INVOICE_DEPT_CHECKOUT,
+		/**工单延迟时间**/
+		DELAY_TASK_TIME
+		
 	};
 
 	private List<TConfigTemplate> configList = null;

@@ -288,6 +288,9 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 			throw new ServicesException("工单已取消");	
 		if (task.getTask_status().equals(StatusConstants.TASK_END))
 			throw new ServicesException("工单已完工");	
+		if(!task.getTask_status().equals(StatusConstants.TASK_INIT)){
+			throw new ServicesException("工单不是施工状态");	
+		}
 		//获取业务流水
 		Integer doneCode = doneCodeComponent.gDoneCode();
 		snTaskComponent.finishTask(doneCode, taskId, resultType,remark);

@@ -20,8 +20,10 @@ public class WTaskLogDao extends BaseEntityDao<WTaskLog> {
 	}
 	
 	public List<WTaskLog> querySynLog() throws JDBCException {
-		String sql = "select * from w_task_log a where "
-				+" syn_status =?  order by a.done_code";
+		String sql = "select * from w_task_log t where "
+				+" syn_status =? "+
+				" and  (t.delay_time is  null or t.delay_time<=0 or (t.delay_time>0 and t.log_time <sysdate-t.delay_time/(24*60))) "
+				+" order by t.log_sn";
 		return this.createQuery(sql, StatusConstants.NOT_EXEC).list();
 	}
 }

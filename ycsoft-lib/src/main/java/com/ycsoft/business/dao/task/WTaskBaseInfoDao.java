@@ -31,7 +31,21 @@ public class WTaskBaseInfoDao extends BaseEntityDao<WTaskBaseInfo> {
 	 * default empty constructor
 	 */
 	public WTaskBaseInfoDao() {}
+	/**
+	 * 加锁查询
+	 * @param taskId
+	 * @return
+	 * @throws JDBCException
+	 */
+	public WTaskBaseInfo queryForLock(String taskId) throws JDBCException{
+		String sql=" select * from w_task_base_info where task_id=? for update ";
+		return this.createQuery(sql, taskId).first();
+	}
 
+	public void updateTaskStatus(String taskId,String status) throws JDBCException{
+		String sql="update w_task_base_info set task_status=? where task_id=? ";
+		this.executeUpdate(sql, status,taskId);
+	}
 	/**
 	 * 查询客户的工单
 	 * @param custId
