@@ -51,7 +51,7 @@ public interface IUserService extends IBaseService{
 	public void createUserBatch(List<UserInfo> userList, String stopType, String isHand) throws Exception;
 	
 //	public void saveChangeDevice(String userId,String deviceId,String devcieBuyMode,FeeInfoDto deviceFee, String changeReason, boolean reclaim)  throws Exception;
-	public void saveChangeDevice(String userId, String deviceCode, String changeReason) throws Exception;
+	public void saveChangeDevice(String userId, String deviceCode, String changeReason, String deviceBuyMode, FeeInfoDto deviceFee) throws Exception;
 
 	/**
 	 * 修改用户信息

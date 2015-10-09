@@ -187,7 +187,7 @@ public class UserAction extends BaseBusiAction {
 	 * @throws Exception
 	 */
 	public String changeDevice() throws Exception {
-		userServiceSN.saveChangeDevice(userId, deviceCode, reasonType);
+		userServiceSN.saveChangeDevice(userId, deviceCode, reasonType, deviceBuyMode, deviceFee);
 		return JSON_SUCCESS;
 	}
 	

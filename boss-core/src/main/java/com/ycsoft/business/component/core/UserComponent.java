@@ -508,7 +508,7 @@ public class UserComponent extends BaseBusiComponent {
 	 */
 	public void updateDevice(Integer doneCode,CUser user) throws Exception {
 		CUser oldUser = cUserDao.findByKey(user.getUser_id());
-		String[] propNames = {"stb_id","card_id","modem_mac"};
+		String[] propNames = {"stb_id","card_id","modem_mac", "str10"};
 		List<CUserPropChange> upcList = new ArrayList<CUserPropChange>();
 		for (String propName:propNames){
 			String oldValue = BeanHelper.getPropertyString(oldUser, propName);

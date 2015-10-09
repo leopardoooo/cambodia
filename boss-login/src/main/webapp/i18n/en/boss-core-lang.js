@@ -236,8 +236,8 @@ BCLang.home = {
 				transferDetailDate: ' Transferring Details（Billing Starting Date：{0} "）~',
 				labelChangeDeviceResion: 'The replacement need~',
 				labelChangeBuyDevice: ' Income from the purchase cost~',
-				labelChangeBuyDevice: ' Recycling Equipment~',
-				labelChangeBuyDevice: ' Report the loss of equipment~',
+				labelChangeReclaimDevice: ' Recycling Equipment~',
+				labelChangeLossDevice: ' Report the loss of equipment~',
 				
 				oldOrderFee: 'original order amount~',
 				oldTransFee: 'original transfer payments~',
