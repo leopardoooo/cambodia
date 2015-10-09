@@ -1702,10 +1702,6 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		}
 		
 		TDeviceBuyMode buyModeCfg = busiConfigComponent.queryBuyMode(deviceBuyMode);
-		if(buyModeCfg != null && buyModeCfg.getBuy_mode().equals(SystemConstants.BUSI_BUY_MODE_BUY)){
-			throw new ServicesException(ErrorCode.BuyDeviceNotSale);
-		}
-		
 		if(buyModeCfg!= null && device.getOwnership().equals(SystemConstants.OWNERSHIP_GD)
 					&& buyModeCfg.getChange_ownship().equals(SystemConstants.BOOLEAN_TRUE)){
 			String newOwnerShip = SystemConstants.OWNERSHIP_CUST;

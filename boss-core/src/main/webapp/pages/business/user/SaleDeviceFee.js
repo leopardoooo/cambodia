@@ -104,7 +104,6 @@ SaleDeviceFee = Ext.extend(BaseForm, {
 		if(formValid !== true){
 			return formValid;
 		}
-		var deviceBuyMode = Ext.getCmp("deviceBuyMode");
 		var txtFeeEl = Ext.getCmp("txtFeeEl");
 		//设备费用检查
 		var fd = this.currentFeeData;
