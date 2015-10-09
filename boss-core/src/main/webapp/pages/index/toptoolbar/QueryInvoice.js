@@ -54,8 +54,8 @@ var QueryInvoiceWin = Ext.extend(Ext.Window,{
 			title:this.LU_INVO['_title'],
 			region:'center',
 			closeAction:'close',
-			width:650,
-			height:350,
+			width:700,
+			height:500,
 			border:false,
 			bodyStyle: "background:#F9F9F9",
 			items:[
@@ -246,56 +246,62 @@ FeeDetailWin = Ext.extend(Ext.Window,{
 	grid : null,
 	constructor : function(){
 		var COLUMN_HEADERS = langUtils.bc('home.tools.invoiceQuery.cols');
-		
-		var invoiceDetailStore = new Ext.data.JsonStore({
-			fields : ['cust_name', 'cust_no', 'busi_name',
-					'fee_name', 'real_pay', 'create_time','optr_name']
-		});
-		
+		this.invoiceDetailStore = new Ext.data.GroupingStore({
+            reader: new Ext.data.JsonReader({},[ 
+				'cust_name', 'cust_no', 'busi_name', 'fee_name', 'real_pay', 'create_time','optr_name', 'fee_id', 'total']
+			),
+            groupField:'fee_name',
+            listeners: {
+            	scope: this,
+            	load: this.doLoadData
+            }
+        });
 		this.grid = new Ext.grid.GridPanel({
-			ds : invoiceDetailStore,
+			store : this.invoiceDetailStore,
 			sm : new Ext.grid.CheckboxSelectionModel(),
-			cm : new Ext.grid.ColumnModel([{
-				header : COLUMN_HEADERS[0],
-				dataIndex : 'cust_name',
-				renderer : App.qtipValue
-			}, {
-				header : COLUMN_HEADERS[1],
-				dataIndex : 'cust_no',
-				renderer : App.qtipValue
-			}, {
-				header : COLUMN_HEADERS[2],
-				dataIndex : 'busi_name',
-				renderer : App.qtipValue
-			}, {
-				header : COLUMN_HEADERS[3],
-				dataIndex : 'fee_name'
-			}, {
-				header : COLUMN_HEADERS[4],
-				dataIndex : 'real_pay',
-				renderer : Ext.util.Format.formatFee
-			}, {
-				header : COLUMN_HEADERS[5],
-				dataIndex : 'create_time',
-				renderer : App.qtipValue
-			}, {
-				header : COLUMN_HEADERS[6],
-				dataIndex : 'optr_name',
-				renderer : App.qtipValue
-			}]),
-			viewConfig : {
-				forceFit : true
-			}
+			columns:[
+				{ header : COLUMN_HEADERS[0], width:90, dataIndex : 'cust_name', renderer : App.qtipValue }, 
+				{ header : COLUMN_HEADERS[1], width:90, dataIndex : 'cust_no', renderer : App.qtipValue }, 
+				{ header : COLUMN_HEADERS[2], width:90, dataIndex : 'busi_name', renderer : App.qtipValue }, 
+				{ header : COLUMN_HEADERS[3], width:150, dataIndex : 'fee_name' }, 
+				{ header : COLUMN_HEADERS[4], width:70, dataIndex : 'real_pay', renderer : function(v, params, record){
+	                    return Ext.util.Format.usMoney( Ext.util.Format.formatFee(record.data.real_pay) );
+	                } }, 
+				{ header : COLUMN_HEADERS[5], width:130, dataIndex : 'create_time', renderer : App.qtipValue }
+				
+			],
+			view: new Ext.grid.GroupingView({
+	            forceFit:true,
+	            groupTextTpl: '{text}  ('+lbc("common.total")+'：{[values.rs[0].data["total"]]})'
+	        })
 		});
 		
 		FeeDetailWin.superclass.constructor.call(this,{
 			id : 'feeDetailWin',
 			layout : 'fit',
-			closeAction : 'hide',
-			width:600,
-			height:300,
+			closeAction : 'close',
+			width:700,
+			height:400,
 			border:false,
 			items : [this.grid]
 		})
+	},
+	doLoadData: function(){
+		var feeNamesArray = this.invoiceDetailStore.collect('fee_name');
+		
+		for(var i=0,len=feeNamesArray.length;i<len;i++){
+			var total = 0;
+			this.invoiceDetailStore.each(function(record){
+				if(record.get('fee_name') == feeNamesArray[i]){
+					total += record.get('real_pay');
+				}
+			}, this);
+			this.invoiceDetailStore.each(function(record){
+				if(record.get('fee_name') == feeNamesArray[i]){
+					record.set('total', Ext.util.Format.usMoney( Ext.util.Format.formatFee(total) ));
+				}
+			}, this);
+		}
+		
 	}
 })
