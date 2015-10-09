@@ -697,13 +697,11 @@ public class BaseBusiService extends BaseService {
 	 * @param newStatus
 	 */
 	protected void updateUserStatus(Integer doneCode,String userId,String oldStatus,String newStatus) throws Exception{
-		CUserPropChange propChange = new CUserPropChange();
-		propChange.setColumn_name("status");
-		propChange.setOld_value(oldStatus);
-		propChange.setNew_value(newStatus);
+		CUser user = userComponent.queryUserById(userId);
 
 		List<CUserPropChange> changeList = new ArrayList<CUserPropChange>();
-		changeList.add(propChange);
+		changeList.add(new CUserPropChange("status", oldStatus, newStatus));
+		changeList.add(new CUserPropChange("status_date", DateHelper.dateToStr(user.getStatus_date()), DateHelper.dateToStr(new Date())));
 		userComponent.editUser(doneCode, userId, changeList);
 	}
 

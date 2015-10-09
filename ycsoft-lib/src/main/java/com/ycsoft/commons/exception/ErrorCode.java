@@ -148,7 +148,8 @@ public enum ErrorCode {
 	NoStopRecord("找不到产品报停记录，请联系管理员"),
 	TaskDeviceUnFill("有未回填设备的用户，不能完工"),
 	GDDEviceNotOff("supernet产权的设备不能销户，请先拆机或购买设备!"),
-	UserStatusNotOff("用户状态不是拆机完成，请先完成拆机工单!")
+	UserStatusNotOff("用户状态不是拆机完成，请先完成拆机工单!"),
+	BuyDeviceNotSale("自购设备不能销售!")
 	;
 	
 	

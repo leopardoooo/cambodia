@@ -677,10 +677,14 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 			win = new TaskDeviceWin(rs);
 		win.show(rs);
 	},
-	doEndTask:function(){//完成工单
+	doEndTask:function(){//完成工单,施工中和supernet
 		var rs = this.getSelections();
 		if(rs === false){return ;}
-		if(this.checkViald(rs) === false){return;}
+		if(){
+			Alert('只有工单状态为施工中和supernet');
+			return false;
+		}		
+		
 		var finishCombo = new Ext.form.ComboBox({
 			width: 120,
 			fieldLabel:lbc('home.tools.TaskManager.forms.finishType'),

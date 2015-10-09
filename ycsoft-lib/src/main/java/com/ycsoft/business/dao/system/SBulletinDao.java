@@ -133,7 +133,7 @@ public class SBulletinDao extends BaseEntityDao<SBulletin> {
 			throws JDBCException {
 		String sql = "SELECT * FROM s_bulletin a , s_bulletin_county sbc WHERE a.bulletin_id = sbc.bulletin_id and "
 				+ " a.status=? AND to_date(to_char(sysdate,'yyyy-mm-dd hh24:mi:ss'),'yyyy-mm-dd hh24:mi:ss') BETWEEN  a.eff_date AND a.exp_date "
-				+ " and sbc.county_id =(SELECT o.county_id FROM s_optr o WHERE o.optr_id =?) "
+				+ " and sbc.dept_id =(SELECT o.dept_id FROM s_optr o WHERE o.optr_id =?) "
 				+ " AND NOT EXISTS (SELECT 1 FROM s_bulletin_check c WHERE c.bulletin_id=a.bulletin_id and ? = c.optr_id )";
 		return createQuery(SBulletinDto.class, sql, StatusConstants.ACTIVE,optrId,optrId).first();
 	}

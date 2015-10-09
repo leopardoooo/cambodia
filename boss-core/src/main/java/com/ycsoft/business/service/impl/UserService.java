@@ -2778,7 +2778,7 @@ public class UserService extends BaseBusiService implements IUserService {
 	}
 
 	@Override
-	public void saveChangeDevice(String userId, String deviceCode, String changeReason) throws Exception {
+	public void saveChangeDevice(String userId, String deviceCode, String changeReason, String deviceBuyMode, FeeInfoDto deviceFee) throws Exception {
 		// TODO Auto-generated method stub
 		
 	}

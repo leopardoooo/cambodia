@@ -47,6 +47,7 @@ public final class BusiCodeConstants {
 	public final static String PKG_EDIT = "1017";//修改套餐
 	public final static String USER_EDIT_LEVEL = "1018";//修改用户等级
 	public final static String USER_OPEN = "1020";//用户开户
+	public final static String USER_OPEN_BATCH = "2020";//批量用户开户
 	public final static String USER_WRITE_OFF = "1021";//用户销户
 	public final static String USER_TRANS = "1022";//带账移机
 	public final static String USER_EDIT = "1023";//用户修改资料
@@ -144,6 +145,7 @@ public final class BusiCodeConstants {
 	public final static String TASK_FILL = "2259";	//工单回填
 	public final static String TASK_ZTE_OPEN = "2260";	//开通zte授权
 	public final static String TASK_CANCEL = "2261";	//工单作废
+	public final static String TASK_Withdraw = "2265";	//工单撤回
 	public final static String TASK_CHANGE_DEVICE = "2262";	//工单更换回填的智能卡
 	public final static String CANCEL_PAY = "2263";	//支付回退
 	public final static String SUPER_CANCEL_PAY = "2264";//超级支付回退

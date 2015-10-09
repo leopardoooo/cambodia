@@ -32,6 +32,10 @@ public class WTaskBaseInfoDao extends BaseEntityDao<WTaskBaseInfo> {
 	 */
 	public WTaskBaseInfoDao() {}
 
+	public void updateTaskStatus(String taskId,String status) throws JDBCException{
+		String sql="update w_task_base_info set task_status=? where task_id=? ";
+		this.executeUpdate(sql, status,taskId);
+	}
 	/**
 	 * 查询客户的工单
 	 * @param custId

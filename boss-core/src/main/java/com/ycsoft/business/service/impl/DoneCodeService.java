@@ -8,6 +8,7 @@ import static com.ycsoft.commons.constants.BusiCodeConstants.DEVICE_BUY;
 import static com.ycsoft.commons.constants.BusiCodeConstants.DEVICE_CHANGE;
 import static com.ycsoft.commons.constants.BusiCodeConstants.PROD_PACKAGE_ORDER;
 import static com.ycsoft.commons.constants.BusiCodeConstants.USER_OPEN;
+import static com.ycsoft.commons.constants.BusiCodeConstants.USER_OPEN_BATCH;
 import static com.ycsoft.commons.constants.BusiCodeConstants.USER_PROMOTION;
 
 import java.util.ArrayList;
@@ -624,7 +625,7 @@ public class DoneCodeService extends BaseBusiService implements IDoneCodeService
 			Integer limit) throws Exception {
 		CDoneCode cDoneCode = doneCodeComponent.queryByKey(doneCode);
 		String busiCode = cDoneCode.getBusi_code();
-		if(busiCode.equals(USER_OPEN)){
+		if(busiCode.equals(USER_OPEN) || busiCode.equals(USER_OPEN_BATCH)){
 			//目前不支持分页，还未有批量开户
 			List<CDoneCodeDetail> detailList = doneCodeComponent.queryDetail(doneCode);
 			String[] users = CollectionHelper.converValueToArray(detailList, "user_id");

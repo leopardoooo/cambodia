@@ -1,11 +1,11 @@
 DoneResultGrid =Ext.extend(Ext.grid.GridPanel,{ 
 	constructor:function(doneCode,busiCode){
 		var columns=[],fields=[];showRemark = false;
-		if(busiCode == '1020'){		//用户开户
+		if(busiCode == '1020' || busiCode == '2020'){		//用户开户
 			columns = [
-				{header: '终端类型',dataIndex: 'user_name',width:100},
-	         	{header: '用户状态',dataIndex: 'status_text',width:70,renderer:Ext.util.Format.statusShow},
-	         	{header: '用户类型',dataIndex: 'user_type_text'},
+				{header: '终端类型',dataIndex: 'user_name',width:150},
+	         	{header: '用户状态',dataIndex: 'status_text',width:65,renderer:Ext.util.Format.statusShow},
+	         	{header: '用户类型',dataIndex: 'user_type_text',width:65},
 	         	{header: '机顶盒号',dataIndex: 'stb_id',width:140},
 	         	{header: '智能卡号',dataIndex: 'card_id',width:140},
 	         	{header: 'Modem号',dataIndex: 'modem_mac',width:140}
@@ -153,7 +153,7 @@ DoneCodeGrid = Ext.extend(Ext.ux.Grid,{
 		var cm = [
 			{header:lc[0],dataIndex:'done_code',width:100,renderer:function(value,metaData,record){
 				var busiCode = record.get('busi_code');
-					if(busiCode == '1020' || busiCode == '1015' || busiCode == '1064' 
+					if(busiCode == '1020' || busiCode == '2020' || busiCode == '1015' || busiCode == '1064' 
 						|| busiCode == '1009' || busiCode == '9003'|| busiCode == '1007' || busiCode == '1127'){
 						return '<div style="text-decoration:underline;font-weight:bold" ext:qtitle="" ext:qtip="' + value + '">' + value +'</div>';
 					}else{
@@ -209,7 +209,7 @@ DoneCodeGrid = Ext.extend(Ext.ux.Grid,{
 				"rowdblclick" : function(g, i, e) {
 					var record = g.getStore().getAt(i);
 					var busiCode = record.get('busi_code');
-					if(busiCode == '1020' || busiCode == '1015'|| busiCode == '1064'
+					if(busiCode == '1020' || busiCode == '2020' || busiCode == '1015'|| busiCode == '1064'
 					|| busiCode == '1009'|| busiCode == '1007' || busiCode == '9003' || busiCode == '1127'){
 						var doneCode = record.get('done_code');
 						new DoneCodeInfoWindow( doneCode,busiCode ).show();

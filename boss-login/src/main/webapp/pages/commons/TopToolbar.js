@@ -139,7 +139,7 @@ TopToolbar = Ext.extend(Ext.Toolbar , {
 					 + 'toolbar=no,left=0px,top=0px,'
 					 + 'width=' + width + ','
 					 + 'height=' + height;
-		var win = window.open("/help/",'', property);
+		var win = window.open("/help/Train.doc",'', property);
 	},
 	aboutUs: function(){
 		var win = Ext.getCmp('aboutUsId');
@@ -767,7 +767,7 @@ var BulletinAllGrid = Ext.extend(Ext.grid.GridPanel,{
                 	}
                 	p.body = '<div><div style="font-size:14px;font-family:KaiTi;color:#337FE5;">'
                     + '&nbsp&nbsp' +record.data.bulletin_content + '</br></div>'
-                    + '<div style="width:' + (BulletinGrid.prototype.width -20) + ';height:1;"/>'
+                    + '<div style="width:690px;height:1;"/>'
                     + '<div style="text-align:right;float:right;"> ' + 
                     String.format('{0}' + LU_AD['tplPublishTme'] + ' {1}', record.get('bulletin_publisher'),record.get('create_date')) +
                     '</div></div>'

@@ -108,6 +108,9 @@ langUtils = function(DOC){
 		res: function(langKeys, dom){
 			return set(findLangString.apply(ResLang, [langKeys]), dom);
 		},
+		resSys: function(langKeys, dom){
+			return set(findLangString.apply(ResSysLang, [langKeys]), dom);
+		},
 		msg: function(langKeys, dom, fmtParams){
 			var text = findLangString.apply(BCLang.msgBox, [langKeys]);
 			return set(format(text, fmtParams), dom);

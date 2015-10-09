@@ -23,14 +23,13 @@ public class WTaskLog  extends BusiBase  implements Serializable {
 	private String error_code;
 	private String error_remark;
 	private String syn_status_text;
-	private Date delay_time;
+	private int delay_time;
 	
-	
-	
-	public Date getDelay_time() {
+
+	public int getDelay_time() {
 		return delay_time;
 	}
-	public void setDelay_time(Date delay_time) {
+	public void setDelay_time(int delay_time) {
 		this.delay_time = delay_time;
 	}
 	public int getLog_sn() {
