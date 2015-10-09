@@ -40,8 +40,8 @@ TaskDetailGrid = Ext.extend(Ext.grid.GridPanel, {
 				header : operateCols[1],dataIndex : 'busi_name',width:80,renderer : App.qtipValue}, {
 				header : operateCols[2],dataIndex : 'optr_name',width:80,renderer : App.qtipValue}, {
 				header : operateCols[3],dataIndex : 'syn_status_text',width:80,renderer : App.qtipValue}, {
-				header : operateCols[4],daIndex : 'error_remark',width:150,renderer :  App.qtipValue}, {
-				header : operateCols[5],daIndex : 'delay_time',width:80,renderer :  App.qtipValue
+				header : operateCols[4],dataIndex : 'error_remark',width:150,renderer :  App.qtipValue}, {
+				header : operateCols[5],dataIndex : 'delay_time',width:80
 			}])          
 		})               
 	}                    
@@ -490,7 +490,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 	        store: this.taskStore,
 	        cm: new Ext.ux.grid.LockingColumnModel({
 	        	columns:[
-				//{header: '工单编号',		dataIndex : 'task_id', 				width: 100},
+				{header: '工单编号',dataIndex : 'task_id', width: 80},
 				{header: taskCols[0],		dataIndex : 'task_type_id_text', 	width: 70, renderer: function(v, m ,rs){
 					return "<span style='font-weight: bold;'>"+ v +"</span>";
 				}},
@@ -509,8 +509,8 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 				}},
 				{header: taskCols[3], dataIndex:'team_id_text',width:100,renderer:App.qtipValue},
 				{header: taskCols[4],dataIndex: 'zte_status_text', width: 70, renderer:Ext.util.Format.statusShow},
-				{header: taskCols[5], 		dataIndex : 'address', width: 200,renderer:App.qtipValue},
-				{header: taskCols[6], 	dataIndex : 'tel', 				width: 100},
+				{header: taskCols[5], dataIndex : 'address', width: 200,renderer:App.qtipValue},
+				{header: taskCols[6], dataIndex : 'tel', 				width: 100},
 				{header: taskCols[7], dataIndex: 'task_create_time', 	width: 80, renderer: Ext.util.Format.dateFormat},					
 				{header: taskCols[8],dataIndex:'bug_type_text',width:85},
 				{header: taskCols[9],dataIndex:'bug_detail',width:120,renderer:App.qtipValue}

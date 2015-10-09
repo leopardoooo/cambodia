@@ -564,7 +564,7 @@ Ext.apply(App.func,{
 		
 		}else if(panelName ==='D_TASK'){
 			if(busicode =='2261'){//工单作废
-				if(data['task_status'] != 'INIT' )
+				if(data['task_status'] != 'CREATE' )
 					return false;
 			}
 		}else if(panelName ==='P_FEE_PAY'){
