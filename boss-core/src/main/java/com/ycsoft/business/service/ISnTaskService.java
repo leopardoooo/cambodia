@@ -86,6 +86,8 @@ public interface ISnTaskService {
 	public Pager<TaskBaseInfoDto> queryUnProcessTask(Integer start, Integer limit)throws Exception;
 
 	public List<TaskUserDto> queryTaskDevice(String task_id) throws Exception;
+
+	public void withdrawTask(String task_id)throws Exception;
 	
 	
 

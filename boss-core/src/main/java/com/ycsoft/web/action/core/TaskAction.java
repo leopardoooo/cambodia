@@ -171,6 +171,13 @@ public class TaskAction extends BaseBusiAction{
 		return JSON_SUCCESS;
 	}
 	
+	
+	public String withdrawTask()throws Exception{
+		snTaskService.withdrawTask(task_id);
+		getRoot().setSuccess(true);
+		return JSON_SUCCESS;
+	}
+	
 	/**
 	 * 完工
 	 * @return

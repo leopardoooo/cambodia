@@ -106,6 +106,14 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 		
 	}
 	
+	public void withdrawTask(String taskId)  throws Exception{
+		//获取业务流水
+		Integer doneCode = doneCodeComponent.gDoneCode();
+		snTaskComponent.withdrawTask(doneCode, taskId);
+		saveAllPublic(doneCode, getBusiParam());
+		
+	}
+	
 	//回填销户回收设备
 	public void fillWriteOffTerminalTask(String taskId,String[] userIds) throws Exception{
 		//获取业务流水
