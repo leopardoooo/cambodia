@@ -40,8 +40,7 @@ PayForm = Ext.extend( Ext.form.FormPanel , {
 				xtype: 'textfield',
 				fieldLabel: lc[3],
 				name: 'pay.payer',
-				value: App.getApp().data.custFullInfo.cust.cust_name,
-				emptyText: '默认为客户名称'
+				value: App.getApp().data.custFullInfo.cust.cust_name
 			},{
 				fieldLabel: lc[4],
 				xtype: 'paramcombo',
