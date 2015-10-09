@@ -479,13 +479,18 @@ BCLang.home = {
 				btnTxtSave : 'save~',
 				labelRoadNum : 'Road Name~',
 				titleNewSaveLevelRoadNum : 'New Road~',
+				titleEditSaveLevelRoadNum:'Edit Road~',
 				labelStreatName : 'street name~',
 				titleNewSaveLevelStreet : 'New Street~',
+				titleEditSaveLevelStreet:'Edit Street~',
 				labelCityName : 'city name~',
 				titleNewSaveLevelCity : 'new city~',
+				titleEditSaveLevelCity : 'Edit city~',
 				labelShowName : 'show name~',
 				labelParentName : 'superiors name~',
-
+				labelBrotherName:'brother name~',
+				labelOldName:'old name~',
+				
 				labelNewAddChild : 'new subordinate~',
 				labelNewAddBrother : 'new flat level~',
 				labelAddrTree : 'address tree~'

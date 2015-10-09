@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.google.gson.JsonObject;
+import com.ycsoft.beans.config.TConfigTemplate;
 import com.ycsoft.beans.core.cust.CCust;
 import com.ycsoft.beans.core.cust.CCustLinkman;
 import com.ycsoft.beans.core.user.CUser;
@@ -19,6 +20,7 @@ import com.ycsoft.beans.task.WTaskLog;
 import com.ycsoft.beans.task.WTaskUser;
 import com.ycsoft.beans.task.WTeam;
 import com.ycsoft.business.commons.abstracts.BaseBusiComponent;
+import com.ycsoft.business.dao.config.TConfigTemplateDao;
 import com.ycsoft.business.dao.core.cust.CCustLinkmanDao;
 import com.ycsoft.business.dao.core.user.CUserDao;
 import com.ycsoft.business.dao.resource.device.RDeviceDao;
@@ -26,14 +28,14 @@ import com.ycsoft.business.dao.task.WTaskBaseInfoDao;
 import com.ycsoft.business.dao.task.WTaskLogDao;
 import com.ycsoft.business.dao.task.WTaskUserDao;
 import com.ycsoft.business.dao.task.WTeamDao;
-import com.ycsoft.business.dto.device.DeviceDto;
+import com.ycsoft.business.dto.config.TemplateConfigDto;
 import com.ycsoft.commons.constants.BusiCodeConstants;
 import com.ycsoft.commons.constants.SequenceConstants;
 import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.exception.ComponentException;
 import com.ycsoft.commons.exception.ErrorCode;
-import com.ycsoft.commons.exception.ServicesException;
+import com.ycsoft.commons.helper.DateHelper;
 import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.daos.core.JDBCException;
 
@@ -58,7 +60,8 @@ public class SnTaskComponent extends BaseBusiComponent{
 	private CUserDao cUserDao;
 	@Autowired
 	private RDeviceDao rDeviceDao;
-	
+	@Autowired
+	private TConfigTemplateDao tConfigTemplateDao;
 	//创建开户工单
 	public void createOpenTask(Integer doneCode,CCust cust,List<CUser> userList,String assignType) throws Exception{
 		this.createTaskWithUser(doneCode, cust, userList, SystemConstants.TASK_TYPE_INSTALL, assignType);
@@ -311,14 +314,14 @@ public class SnTaskComponent extends BaseBusiComponent{
 		if (assignType.equals(SystemConstants.TASK_ASSIGN_BOTH)){
 			String taskId = createSingleTaskWithUser(doneCode, cust, tvUserList, 
 					getTeamId(SystemConstants.TEAM_TYPE_SUPERNET), taskType);			
-				createTaskLog(taskId, BusiCodeConstants.TASK_INIT, doneCode, null, StatusConstants.NOT_EXEC);
+				createTaskLog(taskId, BusiCodeConstants.TASK_INIT, doneCode, null, StatusConstants.NONE);
 			//一个宽带用户一个工单
 			for (CUser user:bandList){
 				List<CUser> l = new ArrayList<CUser>();
 				l.add(user);
 				taskId = createSingleTaskWithUser(doneCode, cust, l, 
 						getTeamId(SystemConstants.TEAM_TYPE_CFOCN), taskType);
-				createTaskLog(taskId, BusiCodeConstants.TASK_INIT, doneCode, null, StatusConstants.NONE);
+				createTaskLog(taskId, BusiCodeConstants.TASK_INIT, doneCode, null, StatusConstants.NOT_EXEC);
 			}
 		} else {
 			String teamType = SystemConstants.TEAM_TYPE_SUPERNET;
@@ -340,7 +343,7 @@ public class SnTaskComponent extends BaseBusiComponent{
 						l.addAll(tvUserList);
 					String taskId = createSingleTaskWithUser(doneCode, cust, l, 
 							getTeamId(SystemConstants.TEAM_TYPE_CFOCN), taskType);
-					createTaskLog(taskId, BusiCodeConstants.TASK_INIT, doneCode, null, StatusConstants.NONE);
+					createTaskLog(taskId, BusiCodeConstants.TASK_INIT, doneCode, null, StatusConstants.NOT_EXEC);
 				}
 			}
 		}
@@ -467,8 +470,19 @@ public class SnTaskComponent extends BaseBusiComponent{
 	
 	private void createTaskLog(String taskId,String busiCode,Integer doneCode,String logDetail,String synStatus) throws Exception{
 		if(StringHelper.isNotEmpty(taskId)){
-			
 			WTaskLog log = new WTaskLog();
+//			if(busiCode.equals(BusiCodeConstants.TASK_INIT) && synStatus.equals(StatusConstants.NOT_EXEC)){
+//				//获取延迟时间
+//				TConfigTemplate ct = tConfigTemplateDao.queryConfigByConfigName(
+//						TemplateConfigDto.Config.DELAY_TASK_TIME.toString(), getOptr().getCounty_id());	//当前值
+//				if(ct != null){
+//					String delayTime = ct.getConfig_value();
+//					if(StringHelper.isNotEmpty(delayTime)){
+//						log.setDelay_time(DateHelper.addNumDate(DateHelper.now(), Integer.parseInt(delayTime), DateHelper.SECOND));
+//					}
+//				}
+//			}
+			
 			log.setLog_sn(Integer.parseInt(wTaskLogDao.findSequence().toString()));
 			log.setTask_id(taskId);
 			log.setBusi_code(busiCode);
