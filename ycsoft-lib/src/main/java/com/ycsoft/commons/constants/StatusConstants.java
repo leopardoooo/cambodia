@@ -57,7 +57,7 @@ public class StatusConstants {
 	public static String TASK_END = "END";//完工
 	public static String TASK_CANCEL = "CANCEL";//已取消
 	public static String TASK_WAITEND = "WAITEND";//回访完成
-	public static String TASK_CREATE = "CREATE";//工单创建
+	public static String TASK_CREATE = "CREATE";//工单新建待派单
 	
 	public static String REQSTOPLONG = "REQSTOPLONG";//长报停   红
 	public static String REQSTOPSLEEP = "REQSTOPSLEEP";//休眠报停   红

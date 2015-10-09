@@ -39,6 +39,9 @@ public class TaskComponent extends BaseComponent {
 		
 	}
 	
+	public void updateTaskBaseInfoStatus(String taskId,String status)throws Exception{
+		wTaskBaseInfoDao.updateTaskStatus(taskId, status);
+	}
 	public WTaskBaseInfo queryTaskBaseInfo(String taskId) throws Exception{
 		return wTaskBaseInfoDao.findByKey(taskId);
 	}

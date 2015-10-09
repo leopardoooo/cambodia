@@ -22,6 +22,7 @@ import com.ycsoft.boss.remoting.cfocn.WordOrderException;
 import com.ycsoft.boss.remoting.cfocn.WorkOrderClient;
 import com.ycsoft.boss.remoting.ott.Result;
 import com.ycsoft.commons.constants.BusiCodeConstants;
+import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.helper.StringHelper;
 
 /**
@@ -55,21 +56,16 @@ public class TaskServiceJob implements Job2 {
 			if (StringHelper.isNotEmpty(taskLog.getLog_detail()))
 				params = new JsonParser().parse(taskLog.getLog_detail()).getAsJsonObject();
 			try{
-				if (taskLog.getBusi_code().equals(BusiCodeConstants.TASK_CANCEL)){
+				if (taskLog.getBusi_code().equals(BusiCodeConstants.TASK_Withdraw)){
 					client.cancelTaskService(taskLog.getDone_code(), taskLog.getTask_id());
-				} else if (taskLog.getBusi_code().equals(BusiCodeConstants.TASK_INIT)){
+					//修改工单状态待派单
+					taskComponent.updateTaskBaseInfoStatus(taskLog.getTask_id(), StatusConstants.TASK_CREATE);
+				} else if (taskLog.getBusi_code().equals(BusiCodeConstants.TASK_INIT)
+						||taskLog.getBusi_code().equals(BusiCodeConstants.TASK_ASSIGN)){
 					sendNewWorkOrder(client,taskLog.getTask_id());
-				} else if (taskLog.getBusi_code().equals(BusiCodeConstants.TASK_ASSIGN)){
-					String synType = getJsonValue(params, "synType");
-					if ("add".equals(synType)){
-						sendNewWorkOrder(client,taskLog.getTask_id());
-					} else if ("cancel".equals(synType)){
-						client.cancelTaskService(taskLog.getDone_code(), taskLog.getTask_id());
-					} else {
-						result.setStatus(Result.BOSS_ERROR_STATUS);
-						result.setReason("未定义的同步类型");
-					}
-				} else {
+					//修改工单状态施工中
+					taskComponent.updateTaskBaseInfoStatus(taskLog.getTask_id(), StatusConstants.TASK_INIT);
+				}else {
 					result.setStatus(Result.BOSS_ERROR_STATUS);
 					result.setReason("未定义的同步类型");
 				}

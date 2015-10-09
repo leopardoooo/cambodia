@@ -71,7 +71,15 @@ public class SnTaskComponent extends BaseBusiComponent {
 		this.createTaskWithUser(doneCode, cust, userList, SystemConstants.TASK_TYPE_INSTALL, assignType);
 	}
 
-	// 创建销户工单
+	/**
+	 *  创建拆机工单（最多有两种工单）
+	 *  TODO 代码没写全 
+	 * @param doneCode
+	 * @param cust
+	 * @param userList
+	 * @param assignType
+	 * @throws Exception
+	 */
 	public void createWriteOffTask(Integer doneCode, CCust cust, List<CUser> userList, String assignType)
 			throws Exception {
 		// 去除OTT_MOBILE
@@ -98,7 +106,14 @@ public class SnTaskComponent extends BaseBusiComponent {
 		this.saveTaskUser(bandList, SystemConstants.TASK_TYPE_WRITEOFF_LINE, taskId);
 	}
 
-	// 创建故障单
+	/**
+	 *  创建故障单
+	 *  代码没写全
+	 * @param doneCode
+	 * @param cust
+	 * @param bugDetail
+	 * @throws Exception
+	 */
 	public void createBugTask(Integer doneCode, CCust cust, String bugDetail) throws Exception {
 		String taskId = this.saveTaskBaseInfo(cust, doneCode, SystemConstants.TASK_TYPE_FAULT,
 				getTeamId(SystemConstants.TEAM_TYPE_SUPERNET), null, bugDetail);
@@ -108,7 +123,16 @@ public class SnTaskComponent extends BaseBusiComponent {
 
 	}
 
-	// 生成移机工单
+	/**
+	 *  生成移机工单
+	 *  TODO 代码没写完
+	 * @param doneCode
+	 * @param cust
+	 * @param newAddrId
+	 * @param newAddr
+	 * @param assignType
+	 * @throws Exception
+	 */
 	public void createMoveTask(Integer doneCode, CCust cust, String newAddrId, String newAddr, String assignType)
 			throws Exception {
 		String teamType = SystemConstants.TEAM_TYPE_SUPERNET;
@@ -121,8 +145,19 @@ public class SnTaskComponent extends BaseBusiComponent {
 		saveTaskUser(bandList, SystemConstants.TASK_TYPE_MOVE, taskId);
 	}
 
-	// 修改施工队
+	/**
+	 * 派单
+	 * 1.待派单的工单可以操作派单。 指定给cfocn的待派单工单如果存在未执行的同步日志，则要作废同步日志。
+	 * 2.施工中的cfocn工单，不能派单
+	 * 3.施工中的工程部工单，可以重新派单给cfocn
+	 * @param doneCode
+	 * @param taskId
+	 * @param deptId
+	 * @param buyType
+	 * @throws Exception
+	 */
 	public void changeTaskTeam(Integer doneCode, String taskId, String deptId, String buyType) throws Exception {
+		//TODO 增加验证
 		// 修改工单对应的施工队
 		WTaskBaseInfo task = wTaskBaseInfoDao.findByKey(taskId);
 		String oldTeamId = task.getTeam_id();
@@ -144,9 +179,44 @@ public class SnTaskComponent extends BaseBusiComponent {
 			createTaskLog(taskId, BusiCodeConstants.TASK_ASSIGN, doneCode, jo.toString(), StatusConstants.NONE);
 		}
 	}
+	
+	/**
+	 * 撤回
+	 * 施工中的cfocn的工单可以操作撤回。
+	 * @param doneCode
+	 * @param taskId
+	 * @throws Exception 
+	 */
+	public void  withdrawTask(Integer doneCode,String taskId) throws Exception{
+		WTaskBaseInfo oldTask = wTaskBaseInfoDao.findByKey(taskId);
+		if (oldTask == null) {
+			throw new ComponentException("工单不存在");
+		}
+		if (oldTask.getTask_status().equals(StatusConstants.TASK_END)) {
+			throw new ComponentException("工单已经完工");
+		}
+		// 施工是cfocn,状态是施工中
+		if(!getTeamId(SystemConstants.TEAM_TYPE_CFOCN).equals(oldTask.getTeam_id())||
+				!oldTask.getTask_status().equals(StatusConstants.TASK_INIT)){
+			throw new ComponentException("不是施工中cfocn工单");		
+		}
+		//插入工单撤回日志
+		createTaskLog(taskId, BusiCodeConstants.TASK_Withdraw, doneCode, null, StatusConstants.NOT_EXEC);
+	}
 
-	// 作废工单
+	/**
+	 * a.工单管理的作废工单功能
+	 *  1.未派单的工单，可以作废
+	 *  2.施工中的派给cfocn的工单，不能作废
+	 *  3.施工中的派给工程部的工单，可以作废
+	 * b.单据面板的作废工单按钮
+	 *  未派单的工单可以作废
+	 * @param doneCode
+	 * @param taskId
+	 * @throws Exception
+	 */
 	public void cancelTask(Integer doneCode, String taskId) throws Exception {
+		//TODO  加验证
 		WTaskBaseInfo oldTask = wTaskBaseInfoDao.findByKey(taskId);
 		if (oldTask == null) {
 			throw new ComponentException("工单不存在");
@@ -188,11 +258,7 @@ public class SnTaskComponent extends BaseBusiComponent {
 		wTaskBaseInfoDao.update(task);
 		// 如果是CFON的工单需要同步
 		task = wTaskBaseInfoDao.findByKey(taskId);
-		String synStatus = StatusConstants.NONE;
-		if (StringHelper.isNotEmpty(task.getTeam_id())
-				&& task.getTeam_id().equals(getTeamId(SystemConstants.TEAM_TYPE_CFOCN)))
-			synStatus = StatusConstants.NOT_EXEC;
-		createTaskLog(taskId, BusiCodeConstants.TASK_CANCEL, doneCode, null, synStatus);
+		createTaskLog(taskId, BusiCodeConstants.TASK_CANCEL, doneCode, null, StatusConstants.NONE);
 	}
 
 	// 保存开户、移机、故障单的回填信息
