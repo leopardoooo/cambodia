@@ -95,12 +95,12 @@ BCLang.home = {
 		},
 		// customer page
 		cust: {
-			base: {_title: "Basic Information~",name: "Customer Name~",busiId: "Reception No.~",openDate: "Open Account Date~",addr: "Address~",status: "Customer Status~",
-				type: "Customer Type~",certType: "ID Type~",certNum: "ID No.~",linkMan: "Contact~",tel: "mobile phone number1~",barthday: "Birthday~",
+			base: {_title: "Basic Information~",name: "Customer Name~",busiId: "Customer No.~",openDate: "Open Account Date~",addr: "Address~",status: "Customer Status~",
+				type: "Customer Type",certType: "ID Type~",certNum: "ID No.~",linkMan: "Contact~",tel: "mobile phone number1~",barthday: "Birthday~",
 				mobile: "mobile phone number2~",areaCateory: "Area Community~",houseNetType: "service Type~",houseManager: "Community Customer Manager~",
-				houseOptr: "Community Maintenance Staff~",postalAddr: "Post Address~", remark: "Remark~",
+				houseOptr: "Community Maintenance Staff~",postalAddr: "PostAddress", remark: "Remark~",
 				email: "email~", sex: "sex~",postcode: 'postcode~', blackList: 'black list~',
-				agentName: "Agent~", deptName: "Open Account Department~", developName: "Developer~", BusinessLicence: "Business License~", unitNumber: "Unit Taxation Number~",
+				agentName: "Agent~", deptName: "Open Account Department~", developName: "Developer", BusinessLicence: "Business License~", unitNumber: "Unit Taxation Number~",
 				spkgSn: "Agreement No.~", cust_level: "Customer Level~",switchCustTitle: 'Select Customer~', languageType: 'Service language~', unitName: 'Subordinate unit~'
 			},
 			_form: {
@@ -156,7 +156,7 @@ BCLang.home = {
 		// Customer Page
 		user: {
 			base:{
-				type: ' Customer Type~', name: ' Customer Name~', status: 'Status~', statusTime: ' Status Time~',
+				type: 'Service Type', name: ' Terminal Name', status: 'Status~', statusTime: ' Status Time~',
 				stbId: 'Set-Top Box~', cardId: 'Smart Card~', modem: 'Modem No.~', createTime: 'Create Time~',
 				loginName: 'Account~', terminal: 'Terminal Type~', deviceModel: 'Equipment Type~', buyWay: 'Buy Way~',
 				stopDate: 'Termination Pre-Report Time~', stopType: 'Calling Fee Type~', protocolDate: 'Agreement Date~', 
@@ -245,17 +245,17 @@ BCLang.home = {
 				newAddFee: 'up close to the amount of~'
 			},
 			list: {
-				_title: 'Customer Information~',
+				_title: 'User Information~',
 				tools: ["Inquiry~"]
 			},
 			prod: {
 				base: {
 					_title: " Customer Product~",
-					columns: ["Purchase No.~","Product Name~","Belonged Package~","Current Fee~","Effective Date~" ,"Invalid Date~","Status~","Status Change Time~","Purchase Time~" ,"Purchase Month Quantity~","Create serial number~"]
+					columns: ["Order Sn","Product Name~","Belonged Package~","Current Fee~","Effective Date~" ,"Invalid Date~","Status~","Status Change Time~","Purchase Time~" ,"Purchase Month Quantity~","Create serial number~"]
 				},
 				pkg: {
 					_title: 'Customer Package~',
-					columns: ["Purchased No.~","Product Name~","Current Fee~","Status~"," Effective Date~" ,"Invalid Date~","Product Type~","Purchase Time~"]
+					columns: ["Order Sn","Product Name~","Current Fee~","Status~"," Effective Date~" ,"Invalid Date~","Product Type~","Purchase Time~"]
 				},
 				tools: ["Default Order~","History Oder~"]
 			},
@@ -469,22 +469,22 @@ BCLang.home = {
 
 			},
 			formWin : {
-				labelSortNum : 'No.~',
-				labelProvince : 'province~',
+				labelSortNum : 'Sort value',
+				labelProvince : 'Province~',
 				labelDistrict : 'administrative area~',
 				labelNetType : 'Network type~',
 				emptyTxtProvince : 'Please select the province~',
 				emptyTxtBlurQuery : 'support fuzzy queries~',
 				btnTxtClose : 'close~',
 				btnTxtSave : 'save~',
-				labelRoadNum : 'Road Name~',
-				titleNewSaveLevelRoadNum : 'New Road~',
+				labelRoadNum : 'House No.',
+				titleNewSaveLevelRoadNum : 'New House No.',
 				labelStreatName : 'street name~',
 				titleNewSaveLevelStreet : 'New Street~',
 				labelCityName : 'city name~',
 				titleNewSaveLevelCity : 'new city~',
 				labelShowName : 'show name~',
-				labelParentName : 'superiors name~',
+				labelParentName : 'SuperiorsName',
 
 				labelNewAddChild : 'new subordinate~',
 				labelNewAddBrother : 'new flat level~',
