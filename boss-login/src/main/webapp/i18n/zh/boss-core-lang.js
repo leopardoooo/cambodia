@@ -523,12 +523,13 @@ BCLang.home = {
 				query : '查询~',
 				pendingOrder : '待处理工单~',
 				accptTime : '受理时间:~',
-				distTeam : '分配施工队~',
+				distTeam : '派单~',
 				invalidTeam : '工单作废~',
 				backDevice : '回填设备~',
 				finish : '完工~',
 				returning : '回访~',
-				sendAuth : '发送ZTE授权~'
+				sendAuth : '发送ZTE授权~',
+				withdraw : '工单撤回~'
 			},
 			taskCols : ['工单类型~', '客户名称~', '工单状态~', '施工队~', 'ZTE状态~', '地址~',
 					'联系电话~', '创建时间~', '故障类型~', '故障详细信息~'],

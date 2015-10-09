@@ -25,13 +25,16 @@
 	 	for(var i=0,len=resources.length;i<len;i++){
 			var res = resources[i];
 			if(res['handler'] == 'removeTaskBtnId'){//作废
-				Ext.getCmp('removeTaskBtnId').enable();
+				Ext.getCmp('removeTaskBtnId').show();
 			}else if(res['handler'] == 'device_btn_id'){//回填
-				Ext.getCmp('device_btn_id').enable();
+				Ext.getCmp('device_btn_id').show();
 			}else if(res['handler'] == 'end_btn_id'){//完工
-				Ext.getCmp('end_btn_id').enable();
+				Ext.getCmp('end_btn_id').show();
 			}else if(res['handler'] == 'team_btn_id'){//施工队
-				Ext.getCmp('team_btn_id').enable();
+				//Ext.getCmp('team_btn_id').enable();
+				Ext.getCmp('team_btn_id').show();
+			}else if(res['handler'] == 'withdraw_btn_id'){
+				Ext.getCmp('withdraw_btn_id').show();
 			}
 		} 
 	});

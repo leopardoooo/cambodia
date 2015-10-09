@@ -519,12 +519,13 @@ BCLang.home = {
 				query : 'Query~',
 				pendingOrder : 'pending work orders~',
 				accptTime : 'Hours:~',
-				distTeam : 'distribution construction team~',
+				distTeam : 'Order Arrangement~',
 				invalidTeam : 'ticket invalid~',
 				backDevice : 'backfill equipment~',
 				finish : 'completed~',
 				returning : 'visit~',
-				sendAuth : 'Send ZTE authorized~'
+				sendAuth : 'Send ZTE authorized~',
+				withdraw : 'work withdraw~'
 			},
 			taskCols : ['ticket type~', 'customer name~', 'work order status~', 'construction team~',
 					'ZTE state~', 'address~', 'Tel~', 'creation time~ ', ' fault type~ ', ' fault details~ '],

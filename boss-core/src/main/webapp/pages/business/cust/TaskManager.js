@@ -307,16 +307,25 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 				text: btns['distTeam'],
 				height: 30,
 				width: 80,
-				disabled:true,
+//				disabled:true,
+				hidden:true,
 				style: 'color: red;',
 				scope: this,
 				handler: this.doTeamTask
+			},{
+				id:'withdraw_btn_id',
+				text: btns['withdraw'],
+				width: 80,
+				hidden:true,
+				height: 30,
+				scope: this,
+				handler: this.doWithdrawTask
 			},{
 				id:'removeTaskBtnId',
 				text: btns['invalidTeam'],
 				height: 30,
 				width: 80,
-				disabled:true,
+				hidden:true,
 				style: 'color: red;',
 				scope: this,
 				handler: this.doCancelTask
@@ -325,7 +334,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 				text: btns['backDevice'],
 				height: 30,
 				width: 80,
-				disabled:true,
+				hidden:true,
 				style: 'color: red;',
 				scope: this,
 				handler: this.doDeviceTask
@@ -334,7 +343,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 				text: btns['finish'],
 				height: 30,
 				width: 80,
-				disabled:true,
+				hidden:true,
 				style: 'color: red;',
 				scope: this,
 				handler: this.doEndTask
@@ -343,7 +352,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 				text: btns['returning'],
 				height: 30,
 				width: 80,
-				disabled:true,
+				hidden:true,
 				style: 'color: red;',
 				scope: this,
 				handler: this.doVisitTask
@@ -351,7 +360,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 				id:'send_btn_id',
 				text: btns['sendAuth'],
 				width: 80,
-				disabled:true,
+				hidden:true,
 				height: 30,
 				scope: this,
 				handler: this.doSendTask
@@ -526,10 +535,13 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 	},
 	doClickRecord:function(g, i, e){
 		//选中一条时才显示
-		var records = g.getSelectionModel().getSelections();
-		if(records.length == 1){
-			this.loadTaskData(records[0].get("task_id"));
-		}
+		var record = g.getStore().getAt(i);
+//		if((record.get('task_status') == 'INIT' && record.get('team_type') == 'SUPERNET' ) || record.get('task_status') == 'CREATE'){
+//			Ext.getCmp('team_btn_id').enable()
+//		}else{
+//			Ext.getCmp('team_btn_id').disable();
+//		}
+		this.loadTaskData(record.get("task_id"));
 	},
 	loadTaskData:function(taskId){
 		Ext.Ajax.request({
@@ -582,14 +594,31 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 		if(rs === false){return ;}
 
 	},
-	doTeamTask:function(){//分配施工队
+	doWithdrawTask:function(){//工单撤回
+		var rs = this.getSelections();
+		if(rs === false){return ;}
+		if(rs.get('task_status') != 'INIT' || rs.get('team_type') != 'CFOCN' ){
+			Alert('施工中状态,cfocn的工单才能进行工单撤回');
+			return false;
+		}
+		
+	},
+	doTeamTask:function(){//派单
 		var rs = this.getSelections();
 		if(rs === false){return ;}
 		if(this.checkViald(rs) === false){return;}
+		if((rs.get('task_status') != 'INIT' && rs.get('team_type') != 'SUPERNET' ) || rs.get('task_status') != 'CREATE'){
+			Alert('只有待派单状态的工单或者施工中状态,supernet的工单才能进行派单');
+			return false;
+		}
 		var arr = [];
 		this.taskTeamCombo.getStore().each(function(record){
-			if(record.get('dept_id') != rs.get('team_id')){
+			if(rs.get('task_status') == 'CREATE'){
 				arr.push(record.data);
+			}else if(rs.get('team_type') == 'SUPERNET' && rs.get('task_status') == 'INIT'){
+				if(record.get('dept_id') != rs.get('team_id')){
+					arr.push(record.data);
+				}
 			}
 		});
 		
@@ -770,10 +799,10 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 			Alert(lbc('home.tools.TaskManager.msg.roderHaveBeenCompletedOrObsolete'));
 			return false;
 		}
-		if(rs.get('team_id') != App.getData().optr['dept_id']){
-			Alert(lbc('home.tools.TaskManager.msg.teamIsnotSingleWork'));
-			return false;
-		}
+//		if(rs.get('team_id') != App.getData().optr['dept_id']){
+//			Alert(lbc('home.tools.TaskManager.msg.teamIsnotSingleWork'));
+//			return false;
+//		}
 	}
 	,
 	//search task from remote
