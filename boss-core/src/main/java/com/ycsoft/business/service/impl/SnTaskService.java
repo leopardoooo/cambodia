@@ -286,8 +286,9 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 	@Override
 	/**
 	 * 完工
+	 * isBusi=true表示完工是前台发起
 	 */
-	public void finishTask(String taskId, String resultType,String remark)  throws Exception{
+	public void finishTask(String taskId, String resultType,String remark,boolean isBusi)  throws Exception{
 		WTaskBaseInfo task = wTaskBaseInfoDao.findByKey(taskId);
 		if (task == null)
 			throw new ServicesException("工单不存在!");
@@ -350,13 +351,10 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 					}
 				}
 			}
-		}else if(task.getTask_type_id().equals(SystemConstants.TASK_TYPE_FAULT)){
+		}else if(task.getTask_type_id().equals(SystemConstants.TASK_TYPE_FAULT)&&!isBusi){
 			//故障单，如果是cfocn完工，状态改为完工等待，需要supernet这边确认完工或重派给自己部门处理
-			String cfocnTeamId=snTaskComponent.getTeamId(SystemConstants.TEAM_TYPE_CFOCN);
-			if(cfocnTeamId.equals(task.getTeam_id())&&task.getTask_status().equals(StatusConstants.TASK_INIT)){
-				//更改工单状态为施工中，
-				snTaskComponent.updateTaskStatus(taskId, StatusConstants.TASK_ENDWAIT);
-			}
+			snTaskComponent.updateTaskStatus(taskId, StatusConstants.TASK_ENDWAIT);
+			
 		}
 	}
 	
