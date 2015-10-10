@@ -470,7 +470,9 @@ public class SnTaskComponent extends BaseBusiComponent {
 				l.add(user);
 				taskId = createSingleTaskWithUser(doneCode, cust, l, 
 						getTeamId(SystemConstants.TEAM_TYPE_CFOCN), taskType);
-				createTaskLog(taskId, BusiCodeConstants.TASK_INIT, doneCode, null, StatusConstants.NOT_EXEC);
+				JsonObject jo = new JsonObject();
+				jo.addProperty("Team", SystemConstants.TEAM_TYPE_CFOCN);
+				createTaskLog(taskId, BusiCodeConstants.TASK_INIT, doneCode, jo.toString(), StatusConstants.NOT_EXEC);
 			}
 		} else {
 			String teamType = SystemConstants.TEAM_TYPE_SUPERNET;
@@ -478,9 +480,11 @@ public class SnTaskComponent extends BaseBusiComponent {
 				teamType = SystemConstants.TEAM_TYPE_CFOCN;
 			if (bandList.size() <= 1) {
 				String taskId = createSingleTaskWithUser(doneCode, cust, userList, getTeamId(teamType), taskType);
-				if (teamType.equals(SystemConstants.TEAM_TYPE_CFOCN))
-					this.createTaskLog(taskId, BusiCodeConstants.TASK_INIT, doneCode, null, StatusConstants.NOT_EXEC);
-				else
+				if (teamType.equals(SystemConstants.TEAM_TYPE_CFOCN)){
+					JsonObject jo = new JsonObject();
+					jo.addProperty("Team", SystemConstants.TEAM_TYPE_CFOCN);
+					this.createTaskLog(taskId, BusiCodeConstants.TASK_INIT, doneCode, jo.toString(), StatusConstants.NOT_EXEC);
+				}else
 					this.createTaskLog(taskId, BusiCodeConstants.TASK_INIT, doneCode, null, StatusConstants.NONE);
 			} else {
 				int i = 1;
@@ -488,11 +492,17 @@ public class SnTaskComponent extends BaseBusiComponent {
 					List<CUser> l = new ArrayList<CUser>();
 					l.add(user);
 					// 把所有ott用户和第一个宽带用户归为第一个工单
-					if (i == 1)
+					if (i == 1){
 						l.addAll(tvUserList);
-					String taskId = createSingleTaskWithUser(doneCode, cust, l,
-							getTeamId(SystemConstants.TEAM_TYPE_CFOCN), taskType);
-					createTaskLog(taskId, BusiCodeConstants.TASK_INIT, doneCode, null, StatusConstants.NOT_EXEC);
+					}
+					String taskId = createSingleTaskWithUser(doneCode, cust, l,getTeamId(teamType), taskType);
+					if (teamType.equals(SystemConstants.TEAM_TYPE_CFOCN)){
+						JsonObject jo = new JsonObject();
+						jo.addProperty("Team", SystemConstants.TEAM_TYPE_CFOCN);
+						createTaskLog(taskId, BusiCodeConstants.TASK_INIT, doneCode, jo.toString(), StatusConstants.NOT_EXEC);
+					}else{
+						createTaskLog(taskId, BusiCodeConstants.TASK_INIT, doneCode, null, StatusConstants.NONE);
+					}
 				}
 			}
 		}
