@@ -678,7 +678,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 		var rs = this.getSelections();
 		if(rs === false){return ;}
 		if(this.checkViald(rs) === false){return;}
-		if((rs.get('task_status') != 'INIT' || rs.get('team_type') != 'SUPERNET' ) && rs.get('task_status') != 'CREATE'){
+		if((rs.get('task_status') != 'INIT' || rs.get('team_type') != 'SUPERNET' ) && rs.get('task_status') != 'CREATE' && rs.get('task_status') != 'ENDWAIT' ){
 			Alert(lbc('home.tools.TaskManager.msg.taskStatusInitAndSupernetCanAssignment'));
 			return false;
 		}
@@ -787,7 +787,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 	doEndTask:function(){//完成工单,施工中和supernet
 		var rs = this.getSelections();
 		if(rs === false){return ;}
-		if(rs.get('task_status') != 'INIT' || rs.get('team_type') != 'SUPERNET' ){
+		if(((rs.get('task_status') != 'INIT' || rs.get('team_type') != 'SUPERNET' )) && rs.get('task_status') != 'ENDWAIT' ){
 			Alert(lbc('home.tools.TaskManager.msg.taskStatusInitAndSupernet'));
 			return false;
 		}		

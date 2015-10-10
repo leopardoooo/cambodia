@@ -114,7 +114,7 @@ public class WTaskBaseInfo implements Serializable{
 
 	public void setTask_status(String task_status) {
 		this.task_status = task_status;
-		task_status_text = MemoryDict.getDictName(DictKey.TASK_STATUS, task_status);
+		task_status_text = MemoryDict.getDictName(DictKey.STATUS_W_TASK, task_status);
 	}
 
 	public String getTeam_id() {
