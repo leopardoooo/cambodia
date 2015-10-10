@@ -664,6 +664,15 @@ public class SnTaskComponent extends BaseBusiComponent {
 		}
 	}
 
+	/**
+	 * 更改工单状态
+	 * @param taskId
+	 * @param status
+	 * @throws Exception
+	 */
+	public void updateTaskStatus(String taskId,String status) throws Exception{
+		wTaskBaseInfoDao.updateTaskStatus(taskId, status);
+	}
 	public WTaskBaseInfoDao getwTaskBaseInfoDao() {
 		return wTaskBaseInfoDao;
 	}

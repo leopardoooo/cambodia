@@ -6,11 +6,11 @@ AutoInvoicePanel = Ext.extend( Ext.Panel, {
 			border : false,
 			layout: 'form',
 			bodyStyle:Constant.TAB_STYLE,
-			labelWidth : 120,
+			labelWidth : 135,
 			defaultType:'textfield',
 			items:[
 				{id:'old_invoice_id',name:'oldInvoice.invoice_id',fieldLabel:lmain("doc._form.oldInvoiceId"),style : Constant.TEXTFIELD_STYLE},
-				{id:'old_invoice_code_id',name:'oldInvoice.invoice_code',fieldLabel:lmain("doc._form.oldInvoiceCode"),style : Constant.TEXTFIELD_STYLE},
+				{id:'old_invoice_code_id',name:'oldInvoice.invoice_code',xtype:'hidden'},
 				{id:'old_invoice_type_text',xtype:'displayfield',fieldLabel:lmain("doc._form.oldInvoiceType")},
 				{id:'old_invoice_type',name:'oldInvoice.doc_type',xtype:'hidden'},
 				{id:'old_invoice_book_id',name:'oldInvoice.invoice_book_id',xtype : 'hidden'},

@@ -349,8 +349,14 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 					}
 				}
 			}
-			
-			
+		}else if(task.getTask_type_id().equals(SystemConstants.TASK_TYPE_FAULT)){
+			//故障单，如果是cfocn完工，则转派给supernet施工队处理,由supernet确认完工（因为可能后续需要更换设备）
+			String cfocnTeamId=snTaskComponent.getTeamId(SystemConstants.TEAM_TYPE_CFOCN);
+			if(cfocnTeamId.equals(task.getTeam_id())){
+				//更改工单状态为施工中，
+				snTaskComponent.updateTaskStatus(taskId, StatusConstants.TASK_CREATE);
+				snTaskComponent.changeTaskTeam(doneCode, taskId, snTaskComponent.getTeamId(SystemConstants.TEAM_TYPE_SUPERNET), null);
+			}
 		}
 	}
 	
