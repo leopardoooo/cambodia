@@ -419,7 +419,7 @@ public class SnTaskComponent extends BaseBusiComponent {
 		JsonObject jo = new JsonObject();
 		jo.addProperty("zte_status", zte_status);
 		jo.addProperty("zte_remark", log_remark);
-		createTaskLog(task_id, BusiCodeConstants.TASK_FINISH, doneCode, jo.toString(), StatusConstants.NONE);
+		createTaskLog(task_id, BusiCodeConstants.TASK_ZTE_OPEN, doneCode, jo.toString(), StatusConstants.NONE);
 	}
 
 	// 删除ott_mobile和dtt用户 ,dtt用户还是需要生成销终端工单，否则销户的时候还得判断设备回收
