@@ -139,7 +139,8 @@ TopToolbar = Ext.extend(Ext.Toolbar , {
 					 + 'toolbar=no,left=0px,top=0px,'
 					 + 'width=' + width + ','
 					 + 'height=' + height;
-		var win = window.open("/help/Train.doc",'', property);
+		window.location.href = "/help/Train.doc";			 
+//		var win = window.open("/help/Train.doc",'', property);
 	},
 	aboutUs: function(){
 		var win = Ext.getCmp('aboutUsId');
