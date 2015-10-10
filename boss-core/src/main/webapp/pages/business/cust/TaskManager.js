@@ -447,7 +447,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 		this.taskStatusCombo = new Ext.ux.LovCombo({
 				width: 100,
 				emptyText: forms['taskStatus'],
-				paramName:'TASK_STATUS',
+				paramName:'STATUS_W_TASK',
 				hiddenName : 'task_status',
 				typeAhead:true,editable:true,
 				store:new Ext.data.JsonStore({
