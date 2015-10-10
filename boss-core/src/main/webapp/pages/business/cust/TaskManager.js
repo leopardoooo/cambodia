@@ -58,10 +58,7 @@ TaskAllInfo = Ext.extend(Ext.TabPanel,{
 				border : false,
 				activeTab: 0,
 				closable : true,
-				defaults : {
-					border: false,
-					layout : 'fit'
-				},
+				defaults : {border: false,layout : 'fit'},
 				items:[{title : lbc('home.tools.TaskManager._userTitle'),items:[this.userGrid]
 				},{title : lbc('home.tools.TaskManager._operateTitle'),items:[this.detail]}]
 		})
@@ -135,31 +132,6 @@ var TaskDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 				var data = cmp.store.getAt(index);
 				record.set('recycle_result',data.get('item_value'));
 			}
-//			//验证存在问题,暂时不验证
-//			if(obj.field == 'device_code'){
-//				var record =obj.record;
-//				this.queryAndAddDevice(obj.value,record);
-//				
-//			}
-		},
-		queryAndAddDevice:function(newValue,record){
-			Ext.Ajax.request({
-				url:Constant.ROOT_PATH + "/core/x/Task!queryDeviceInfoByCodeAndModel.action",
-				params:{deviceCode:newValue,deviceModel:record.get('device_model')},
-				scope:this,
-				success:function(res,opt){
-					var data = Ext.decode(res.responseText);
-					record.set('device_code',data['device_code']);
-					record.set('device_type_text',data['device_type_text']);
-					record.set('device_type',data['device_type']);
-				},
-				clearData:function(){
-					record.set('device_code','');
-					record.set('device_type_text','');
-					record.set('device_type','');
-					//清空组件
-				}
-			});
 		},
 		getValues:function(){
 			var arr=[];
@@ -177,21 +149,6 @@ var TaskDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 				}
 				arr.push(values);
 			},this);
-			
-//			var store = this.getStore();
-//			store.each(function(record){
-//				var values = {};
-//				values["oldDeviceCode"] = record.get('device_id');
-//				values["deviceModel"] =record.get('device_model');
-//				values["deviceCode"] = record.get('device_code');
-//				values["posNo"] = record.get('posNo');
-//				values["occNo"] = record.get('occNo');
-//				values["fcPort"] = false;
-//				if(record.get('user_type') == 'BAND'){
-//					values["fcPort"] = true;
-//				}
-//				arr.push(values);
-//			},this);
 			return arr;
 		},
 		getUserIds:function(){
@@ -212,28 +169,6 @@ var TaskDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 				Alert('数据没有修改');
 				flag = false;
 			}
-//			var store = this.getStore();
-//			var count = store.getCount();//总个数
-//			var config = this.getColumnModel().config;
-//			var dataIndexes = [];
-//			for(var i=0;i<config.length;i++){
-//				dataIndexes.push(config[i].dataIndex);
-//			}
-//			var flag = true;
-//			for(var i=0;i<count;i++){
-//				var data = store.getAt(i).data;
-//				for(var k=0;k<dataIndexes.length;k++){
-//					var a = dataIndexes[k];
-//					if(Ext.isEmpty(data[a]) && a == 'device_code'){
-//						Alert(lbc('home.tools.TaskManager.msg.enterDeviceNo'),function(){
-//							this.getSelectionModel().selectRow(i);
-//							this.startEditing(i,k);
-//						});
-//						flag = false;
-//						break;
-//					}
-//				}
-//			}
 			return flag;
 	}
 });
@@ -405,7 +340,6 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 	            this.view.mainWrap.dom.style.left = "0px"; 
 	        }, this); 
         }
-          
 	},
 	initEvents: function(){
 		this.on("afterrender",function(){
@@ -576,11 +510,6 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 	doClickRecord:function(g, i, e){
 		//选中一条时才显示
 		var record = g.getStore().getAt(i);
-//		if((record.get('task_status') == 'INIT' && record.get('team_type') == 'SUPERNET' ) || record.get('task_status') == 'CREATE'){
-//			Ext.getCmp('team_btn_id').enable()
-//		}else{
-//			Ext.getCmp('team_btn_id').disable();
-//		}
 		this.loadTaskData(record.get("task_id"));
 	},
 	loadTaskData:function(taskId){
@@ -611,6 +540,10 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 			Alert(lbc('home.tools.TaskManager.msg.noCancel'));
 			return ;
 		}
+		if(rs.get('task_status') == 'ENDWAIT'){
+			Alert(lbc('home.tools.TaskManager.msg.endWaitCanNotUse'));
+			return false;
+		}
 		Confirm(lbc('home.tools.TaskManager.msg.sureWantSelectedWork'), this , function(){
 			var taskId = rs.get("task_id");
 			var that = this;
@@ -637,7 +570,10 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 			Alert(lbc('home.tools.TaskManager.msg.zteStatusCanSend'));
 			return false;
 		}
-		
+		if(rs.get('task_status') == 'ENDWAIT'){
+			Alert(lbc('home.tools.TaskManager.msg.endWaitCanNotUse'));
+			return false;
+		}
 		var zteCombo = new Ext.form.ComboBox({
 			width: 120,
 			fieldLabel:lbc('home.tools.TaskManager.forms.zteStatus'),
@@ -715,7 +651,10 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 			Alert(lbc('home.tools.TaskManager.msg.taskStatusInitAndCfocnCanWithdraw'));
 			return false;
 		}
-		
+		if(rs.get('task_status') == 'ENDWAIT'){
+			Alert(lbc('home.tools.TaskManager.msg.endWaitCanNotUse'));
+			return false;
+		}
 		Confirm(lbc('home.tools.TaskManager.msg.sureWantWithdrawSelectedWork'), this , function(){
 			var taskId = rs.get("task_id");
 			var that = this;
@@ -834,6 +773,10 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 		if(rs === false){return ;}
 		if(rs.get('task_status') != 'INIT' || rs.get('team_type') != 'SUPERNET'){
 			Alert(lbc('home.tools.TaskManager.msg.taskStatusInitAndSupernet'));
+			return false;
+		}
+		if(rs.get('task_status') == 'ENDWAIT'){
+			Alert(lbc('home.tools.TaskManager.msg.endWaitCanNotUse'));
 			return false;
 		}
 		var win = Ext.getCmp('TaskDeviceWinId');
