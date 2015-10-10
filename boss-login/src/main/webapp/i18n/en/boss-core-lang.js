@@ -531,7 +531,7 @@ BCLang.home = {
 					'ZTE state~', 'address~', 'Tel~', 'creation time~ ', ' fault type~ ', ' fault details~ ','work No.~'],
 			userCols : ['user type~', '~ username', 'password~', 'device model~', 'device number~', 'posNo~', 'occNo~', 'Bandwidth~'],
 			operateCols : ['operating time~', 'operation type~', 'operator~,', 'synchronization status~', 'description~','delay time~'],
-			taskDeviceCols : ['user type~', '~ username', 'model~', 'Device number~', 'equipment recycling~'],
+			taskDeviceCols : ['user type~', '~ username', 'model~', 'Device number~', 'equipment recycling~','old device number~'],
 			msg : {
 				enterDeviceNo : 'Please enter the device number~',
 				noCancel : 'No cancellations~!',
@@ -545,8 +545,8 @@ BCLang.home = {
 				teamIsnotSingleWork : 'This work is not a single construction team of the department~',
 				taskStatusInitAndSupernet:'Work order status must be During Construction and construction team must be supernet~',
 				taskStatusInitAndCfocnCanWithdraw:'Work order status must be During Construction and construction team must be cfocn~',
-				taskStatusInitAndSupernetCanAssignment:'Work order status is Waiting or During Construction and construction team is supernet can assignment~'
-				
+				taskStatusInitAndSupernetCanAssignment:'Work order status is Waiting or During Construction and construction team is supernet can assignment~',
+				taskStatusMustBeInit:'Work order status must be During Construction~'
 			}
 		},
 		feeUnitpre : {
