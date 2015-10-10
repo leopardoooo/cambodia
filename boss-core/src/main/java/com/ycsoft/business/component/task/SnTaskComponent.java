@@ -12,7 +12,6 @@ import com.google.gson.JsonObject;
 import com.ycsoft.beans.config.TConfigTemplate;
 import com.ycsoft.beans.core.cust.CCust;
 import com.ycsoft.beans.core.cust.CCustLinkman;
-import com.ycsoft.beans.core.prod.CProdOrder;
 import com.ycsoft.beans.core.prod.CProdOrderDto;
 import com.ycsoft.beans.core.prod.CProdPropChange;
 import com.ycsoft.beans.core.user.CUser;
@@ -403,6 +402,19 @@ public class SnTaskComponent extends BaseBusiComponent {
 		createTaskLog(taskId, BusiCodeConstants.TASK_FINISH, doneCode, jo.toString(), StatusConstants.NONE);
 
 	}
+	
+	public void saveZte(Integer doneCode, String task_id, String zte_status, String log_remark) throws Exception {
+		WTaskBaseInfo task = new WTaskBaseInfo();
+		task.setTask_id(task_id);
+		task.setZte_status(zte_status);
+		wTaskBaseInfoDao.update(task);
+
+		// 记录操作日志
+		JsonObject jo = new JsonObject();
+		jo.addProperty("zte_status", zte_status);
+		jo.addProperty("zte_remark", log_remark);
+		createTaskLog(task_id, BusiCodeConstants.TASK_FINISH, doneCode, jo.toString(), StatusConstants.NONE);
+	}
 
 	// 删除ott_mobile和dtt用户 ,dtt用户还是需要生成销终端工单，否则销户的时候还得判断设备回收
 	private void filterUserList(List<CUser> userList, String userType) {
@@ -675,5 +687,6 @@ public class SnTaskComponent extends BaseBusiComponent {
 	public void setwTaskLogDao(WTaskLogDao wTaskLogDao) {
 		this.wTaskLogDao = wTaskLogDao;
 	}
+
 
 }

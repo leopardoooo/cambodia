@@ -501,6 +501,7 @@ BCLang.home = {
 			_operateTitle : 'Operation Details~',
 			_userTitle : 'User Details~',
 			_winTitle : 'Work Order completion~',
+			_ZteWinTitle : 'Send ZTE~',
 			forms : {
 				custNo : 'Customer ID~',
 				taskNo : 'ticket number~',
@@ -542,6 +543,7 @@ BCLang.home = {
 				teamCantEmpty : 'construction team can not be empty~',
 				faultTypeCantEmpty : 'fault type can not be empty~',
 				finishTypeCantEmpty : 'completion type can not be empty~',
+				ZteStatusCantEmpty : 'zte status can not be empty~',
 				selectRecord : 'Please select the records need to operate!~',
 				roderHaveBeenCompletedOrObsolete : 'ticket have been completed or obsolete~',
 				teamIsnotSingleWork : 'This work is not a single construction team of the department~',

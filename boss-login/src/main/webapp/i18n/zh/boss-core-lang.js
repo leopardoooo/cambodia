@@ -505,6 +505,7 @@ BCLang.home = {
 			_operateTitle : '操作明细~',
 			_userTitle : '用户明细~',
 			_winTitle : '工单完工~',
+			_ZteWinTitle : '发送ZTE~',
 			forms : {
 				custNo : '客户编号~',
 				taskNo : '工单编号~',
@@ -547,6 +548,7 @@ BCLang.home = {
 				teamCantEmpty : '施工队不能为空~',
 				faultTypeCantEmpty : '故障类型不能为空~',
 				finishTypeCantEmpty : '完工类型不能为空~',
+				ZteStatusCantEmpty : 'zte状态不能为空~',
 				selectRecord : '请选择需要操作的记录!~',
 				roderHaveBeenCompletedOrObsolete : '工单已完工或已作废~',
 				teamIsnotSingleWork : '该工单施工队不是本部门~',
