@@ -684,7 +684,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 		}
 		var arr = [];
 		this.taskTeamCombo.getStore().each(function(record){
-			if(rs.get('task_status') == 'CREATE'){
+			if(rs.get('task_status') == 'CREATE' || rs.get('task_status') == 'ENDWAIT'){
 				arr.push(record.data);
 			}else if(rs.get('team_type') == 'SUPERNET' && rs.get('task_status') == 'INIT'){
 				if(record.get('dept_id') != rs.get('team_id')){

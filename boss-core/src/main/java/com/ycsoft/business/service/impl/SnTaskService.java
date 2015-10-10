@@ -408,7 +408,7 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 	}
 
 	public Pager<TaskBaseInfoDto> queryUnProcessTask(Integer start, Integer limit) throws Exception {
-		return wTaskBaseInfoDao.queryUnProcessTask(getOptr().getDept_id(),StatusConstants.TASK_CREATE,StatusConstants.NOT_EXEC,start, limit);
+		return wTaskBaseInfoDao.queryUnProcessTask(snTaskComponent.getTeamId(SystemConstants.TASK_ASSIGN_SUPPERNET),start, limit);
 	}
 
 	
