@@ -501,6 +501,7 @@ BCLang.home = {
 			_operateTitle : 'Operation Details~',
 			_userTitle : 'User Details~',
 			_winTitle : 'Work Order completion~',
+			_ZteWinTitle : 'Send ZTE~',
 			forms : {
 				custNo : 'Customer ID~',
 				taskNo : 'ticket number~',
@@ -513,7 +514,9 @@ BCLang.home = {
 				taskTeam : 'construction team~',
 				faultType : 'fault type~',
 				finishType : 'completion type~',
-				finishExplan : 'completed Description~'
+				finishExplan : 'completed Description~',
+				zteStatus	: 'ZTE status~',
+				zteRemark :'remark~'
 			},
 			buttons : {
 				query : 'Query~',
@@ -528,7 +531,7 @@ BCLang.home = {
 				withdraw : 'cfocn withdraw~'
 			},
 			taskCols : ['ticket type~', 'customer name~', 'work order status~', 'construction team~',
-					'ZTE state~', 'address~', 'Tel~', 'creation time~ ', ' fault type~ ', ' fault details~ ','work No.~'],
+					'ZTE state~', 'address~', 'Tel~', 'creation time~ ', ' fault type~ ', ' fault details~ ','work No.~','Customer Manager~','Customer Manager tel~'],
 			userCols : ['user type~', '~ username', 'password~', 'device model~', 'device number~', 'posNo~', 'occNo~', 'Bandwidth~'],
 			operateCols : ['operating time~', 'operation type~', 'operator~,', 'synchronization status~', 'description~','delay time~'],
 			taskDeviceCols : ['user type~', '~ username', 'model~', 'Device number~', 'equipment recycling~','old device number~'],
@@ -540,6 +543,7 @@ BCLang.home = {
 				teamCantEmpty : 'construction team can not be empty~',
 				faultTypeCantEmpty : 'fault type can not be empty~',
 				finishTypeCantEmpty : 'completion type can not be empty~',
+				ZteStatusCantEmpty : 'zte status can not be empty~',
 				selectRecord : 'Please select the records need to operate!~',
 				roderHaveBeenCompletedOrObsolete : 'ticket have been completed or obsolete~',
 				teamIsnotSingleWork : 'This work is not a single construction team of the department~',

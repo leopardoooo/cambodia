@@ -505,6 +505,7 @@ BCLang.home = {
 			_operateTitle : '操作明细~',
 			_userTitle : '用户明细~',
 			_winTitle : '工单完工~',
+			_ZteWinTitle : '发送ZTE~',
 			forms : {
 				custNo : '客户编号~',
 				taskNo : '工单编号~',
@@ -517,7 +518,9 @@ BCLang.home = {
 				taskTeam : '施工队~',
 				faultType : '故障类型~',
 				finishType : '完工类型~',
-				finishExplan : '完工说明~'
+				finishExplan : '完工说明~',
+				zteStatus	: 'ZTE状态~',
+				zteRemark :'备注~'
 			},
 			buttons : {
 				query : '查询~',
@@ -532,7 +535,7 @@ BCLang.home = {
 				withdraw : 'cfocn撤回~'
 			},
 			taskCols : ['工单类型~', '客户名称~', '工单状态~', '施工队~', 'ZTE状态~', '地址~',
-					'联系电话~', '创建时间~', '故障类型~', '故障详细信息~','工单编号~'],
+					'联系电话~', '创建时间~', '故障类型~', '故障详细信息~','工单编号~','客户经理~','客户经理电话~'],
 			userCols : ['用户类型~', '用户名~', '密码~', '设备型号~', '设备号~', 'posNo~',
 					'occNo~', '带宽~'],
 			operateCols : ['操作时间~', '操作类型~', '操作人~', '同步状态~', '描述~','延迟时间~'],
@@ -545,6 +548,7 @@ BCLang.home = {
 				teamCantEmpty : '施工队不能为空~',
 				faultTypeCantEmpty : '故障类型不能为空~',
 				finishTypeCantEmpty : '完工类型不能为空~',
+				ZteStatusCantEmpty : 'zte状态不能为空~',
 				selectRecord : '请选择需要操作的记录!~',
 				roderHaveBeenCompletedOrObsolete : '工单已完工或已作废~',
 				teamIsnotSingleWork : '该工单施工队不是本部门~',

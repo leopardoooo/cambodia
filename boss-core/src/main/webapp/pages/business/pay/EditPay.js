@@ -40,26 +40,26 @@ BusiFeeGrid = Ext.extend( Ext.grid.EditorGridPanel, {
 		this.busiFeeStore.on('load',this.doLoadData,this);
 		
 		var baseColumns = [
-					{ header: '单价', dataIndex: 'default_value',width:70,renderer : Ext.util.Format.formatFee},
-					{ id:'buy_num_id',header: '个数', dataIndex: 'buy_num',width:70,editor: new Ext.form.NumberField({
+					{ header: '单价', dataIndex: 'default_value',width:55,renderer : Ext.util.Format.formatFee},
+					{ id:'buy_num_id',header: '个数', dataIndex: 'buy_num',width:45,editor: new Ext.form.NumberField({
 						allowBlank : false,
 						allowNegative : false
 					})},
-					{ header: '累计收费', dataIndex: 'sum_fee',width:80,renderer : this.formatFenToYuan},
-					{ id : 'real_pay',header: '实际应收', dataIndex: 'real_pay',width:80,renderer : this.formatFee,
+					{ header: '累计收费', dataIndex: 'sum_fee',width:65,renderer : this.formatFenToYuan},
+					{ id : 'real_pay',header: '实际应收', dataIndex: 'real_pay',width:65,renderer : this.formatFee,
 						editor : new Ext.form.NumberField({
 							allowBlank : false,
 							allowNegative : false
 						})},
-					{ header : '本次收费', dataIndex: 'feeValue',renderer : this.formatFee}]
+					{ header : '本次收费', dataIndex: 'feeValue',width:65,renderer : this.formatFee}]
 		
 		var topColumns = [
-					{ id : 'fee_name',header: '费用项', dataIndex: 'fee_name',width:150}
+					{ id : 'fee_name',header: '费用项', dataIndex: 'fee_name'}
 				];
 		var columns = [];				
 		if(this.busiCode =='1109' || this.busiCode =='1108'){
 			var	deviceColumns = [
-				{ header: '型号', dataIndex: 'device_model_text',width:100,renderer:App.qtipValue}					
+				{ header: '型号', dataIndex: 'device_model_text',width:220,renderer:App.qtipValue}					
 			];
 			columns = topColumns.concat(deviceColumns).concat(baseColumns);					
 		}else{

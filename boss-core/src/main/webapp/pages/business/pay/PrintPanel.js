@@ -627,11 +627,19 @@ InvoiceWindow = Ext.extend( Ext.Window ,{
 			invoiceBookId =	oldInvoiceBookId;
 			this.doAddInvoice(invoiceId,invoiceCode,invoiceBookId);
 		}else{
-			//取消自动发票+1
-//			invoiceId = App.getApp().getNextInvoice(this.docType);
+			invoiceId = App.getApp().getNextInvoice(this.docType);
 			if (!Ext.isEmpty(invoiceId)){
 				var that = this;
 				var successFunc = function(data){
+//					var store = this.invoiceGrid.getColumnModel().getColumnById('col_invoiceCode').editor.getStore();
+//					store.loadData(data);
+					// 发票号码如果为1，则发票号码累加
+					/*for(var i = o.row + 1; i< this.invoiceStore.getCount() ;i++){
+						currentVal++;
+						this.invoiceStore.getAt(i).set("invoiceId", currentVal );
+						this.invoiceStore.getAt(i).set("invoice_code", "AAA");
+						this.invoiceStore.getAt(i).set("invoice_book_id", "AAA");
+					}*/
 					var record = this.invoiceGrid.getSelectionModel().selectFirstRow();
 					if(record){
 						record.set('invoice_code',data[0]['invoice_code']);
@@ -643,6 +651,7 @@ InvoiceWindow = Ext.extend( Ext.Window ,{
 						
 					}
 					this.doAddInvoice(invoiceId,invoiceCode,invoiceBookId);
+//					this.invoiceGrid.startEditing(1, 2);
 				};
 				var clearFunc = function(){
 					invoiceId='';
@@ -655,26 +664,40 @@ InvoiceWindow = Ext.extend( Ext.Window ,{
 				this.doAddInvoice(invoiceId,invoiceCode,invoiceBookId);
 			}
 		}
+		
 
+//		if (this.pageCount==1)
+//			this.onSave();
 	},
 	doAddInvoice:function(invoiceId,invoiceCode,invoiceBookId){
 		var rs = [];
 		for(var i = 0 ;i< this.pageCount ;i++){
+		if (i==0)
 			rs[i] = new Ext.data.Record({
 				serialNum: i + 1,
 				invoiceId: invoiceId,
 				invoice_book_id:'AAA',
 				invoice_code :'AAA'
 			});
-				
-			/*if (!Ext.isEmpty(invoiceId)){
-				invoiceId = String.leftPad(parseInt(invoiceId,10)+1,invoiceId.length,'0');
-			}*/
+		else
+			rs[i] = new Ext.data.Record({
+				serialNum: i + 1,
+				invoiceId: invoiceId,
+				invoice_book_id:'AAA',
+				invoice_code:'AAA'
+			});
+			
+		if (invoiceId!="")
+			invoiceId = String.leftPad(parseInt(invoiceId,10)+1,invoiceId.length,'0')
 		}
 		this.invoiceStore.add(rs);
-		if( Ext.isEmpty(invoiceId) ){
+		if(invoiceId == ""){
 			this.invoiceGrid.startEditing(0, 1);
 		}
+//		else if(invoiceCode == ""){
+//			this.invoiceGrid.startEditing(1, 2);
+//		}
+		
 	}
 	,
 	//验证是否已经全部输入完整

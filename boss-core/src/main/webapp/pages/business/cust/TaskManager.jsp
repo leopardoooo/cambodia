@@ -33,8 +33,10 @@
 			}else if(res['handler'] == 'team_btn_id'){//施工队
 				//Ext.getCmp('team_btn_id').enable();
 				Ext.getCmp('team_btn_id').show();
-			}else if(res['handler'] == 'withdraw_btn_id'){
+			}else if(res['handler'] == 'withdraw_btn_id'){//撤回
 				Ext.getCmp('withdraw_btn_id').show();
+			}else if(res['handler'] == 'send_btn_id'){//发送ZTE
+				Ext.getCmp('send_btn_id').show();
 			}
 		} 
 	});

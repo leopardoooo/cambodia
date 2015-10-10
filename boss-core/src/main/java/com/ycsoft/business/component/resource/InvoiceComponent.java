@@ -291,13 +291,18 @@ public class InvoiceComponent extends BaseBusiComponent {
 			}else{
 				for (int i=invoices.size()-1;i>=0;i--){
 					RInvoice invoice = invoices.get(i);
-					/*if(SystemConstants.SYS_LEVEL_OPTR.equals(scopeInvoice)){
-						if(!getOptr().getOptr_id().equals(invoice.getOptr_id())){
+					if(SystemConstants.SYS_LEVEL_OPTR.equals(scopeInvoice)){
+						/*if(!getOptr().getOptr_id().equals(invoice.getOptr_id())){
+							errorMeg = "发票["+ invoice.getInvoice_id() +"]未领用";
+							errorMsgList.add(errorMeg);
+							continue;
+						}*/
+						if(StringHelper.isEmpty(invoice.getOptr_id())){
 							errorMeg = "发票["+ invoice.getInvoice_id() +"]未领用";
 							errorMsgList.add(errorMeg);
 							continue;
 						}
-					}*/
+					}
 					if(!docType.equals(invoice.getInvoice_type())){
 						errorMeg = "发票类型不符,需要【" + MemoryDict.getDictName(DictKey.INVOICE_TYPE, docType) + "】 ";
 						errorMsgList.add(errorMeg);
