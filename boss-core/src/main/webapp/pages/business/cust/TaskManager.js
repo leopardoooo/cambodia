@@ -29,19 +29,19 @@ TaskDetailGrid = Ext.extend(Ext.grid.GridPanel, {
 	constructor : function() {
 		this.taskDetailStore = new Ext.data.JsonStore({
 					fields : ['busi_code', 'busi_name', 'optr_id','optr_name','log_time',
-							'syn_status','error_remark','syn_status_text','delay_time']});
+							'syn_status','error_remark','syn_status_text','delay_time','log_detail']});
 		var operateCols = lbc('home.tools.TaskManager.operateCols');							
 		TaskDetailGrid.superclass.constructor.call(this, {
 			ds : this.taskDetailStore,
 			sm : new Ext.grid.CheckboxSelectionModel(),
 			border: false,
 			cm : new Ext.grid.ColumnModel([{
-				header : operateCols[0],dataIndex : 'log_time',width : 100,renderer : Ext.util.Format.dateFormat}, {
+				header : operateCols[0],dataIndex : 'log_time',width : 80,renderer : Ext.util.Format.dateFormat}, {
 				header : operateCols[1],dataIndex : 'busi_name',width:80,renderer : App.qtipValue}, {
 				header : operateCols[2],dataIndex : 'optr_name',width:80,renderer : App.qtipValue}, {
 				header : operateCols[3],dataIndex : 'syn_status_text',width:80,renderer : App.qtipValue}, {
-				header : operateCols[4],dataIndex : 'error_remark',width:150,renderer :  App.qtipValue}, {
-				header : operateCols[5],dataIndex : 'delay_time',width:80
+				header : operateCols[5],dataIndex : 'delay_time',width:80}, {
+				header : operateCols[4],dataIndex : 'log_detail',width:400,renderer :  App.qtipValue
 			}])          
 		})               
 	}                    
@@ -622,26 +622,31 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 	doSendTask: function(){//发送ZTE
 		var rs = this.getSelections();
 		if(rs === false){return ;}
-		var finishCombo = new Ext.form.ComboBox({
+		if(rs.get('zte_status') != 'FAILURE' && rs.get('zte_status') != 'NOT_EXEC'){
+			Alert(lbc('home.tools.TaskManager.msg.zteStatusCanSend'));
+			return false;
+		}
+		
+		var zteCombo = new Ext.form.ComboBox({
 			width: 120,
-			fieldLabel:lbc('home.tools.TaskManager.forms.finishType'),
+			fieldLabel:lbc('home.tools.TaskManager.forms.zteStatus'),
 			allowBlank:false,
 			typeAhead:true,editable:true,
-			paramName:'TASK_FINISH_TYPE',
+			paramName:'ZTE_STATUS_W_TASK',
 			store:new Ext.data.JsonStore({
 				fields:['item_value','item_name']
 			}),displayField:'item_name',valueField:'item_value',
 			triggerAction:'all',mode:'local'
 		});
-		App.form.initComboData([finishCombo]);
+		App.form.initComboData([zteCombo]);
 		var endForm = new Ext.form.FormPanel({
 			layout : 'form',
 			border : false,
 			labelWidth : 100,
 			bodyStyle : 'padding : 5px;padding-top : 10px;',
-			items: [finishCombo,{
-				fieldLabel: lbc('home.tools.TaskManager.forms.finishExplan'),
-				name:'finishRemark',
+			items: [zteCombo,{
+				fieldLabel: lbc('home.tools.TaskManager.forms.remark'),
+				name:'log_remark',
 				height : 100,
 				width : 240,
 				xtype:'textarea'
@@ -650,7 +655,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 		var win = new Ext.Window({
 			width: 450,
 			height: 250,
-			title: lbc('home.tools.TaskManager._winTitle'),
+			title: lbc('home.tools.TaskManager._ZteWinTitle'),
 			border: false,
 			closeAction:'close',
 			layout: 'fit',
@@ -660,15 +665,15 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 				scope: this,
 				iconCls : 'icon-save',
 				handler: function(){
-					if(Ext.isEmpty(finishCombo.getValue())){
-						Alert(lbc('home.tools.TaskManager.msg.finishTypeCantEmpty'));return false;
+					if(Ext.isEmpty(zteCombo.getValue())){
+						Alert(lbc('home.tools.TaskManager.msg.ZteStatusCantEmpty'));return false;
 					}
-					var url = Constant.ROOT_PATH + "/core/x/Task!endTask.action";
+					var url = Constant.ROOT_PATH + "/core/x/Task!saveZte.action";
 					var taskId = rs.get("task_id");
 					var o = {
 						task_id : taskId, 
-						resultType : finishCombo.getValue(),
-						finishRemark : endForm.getForm().findField('finishRemark').getValue()
+						zte_status : zteCombo.getValue(),
+						log_remark : endForm.getForm().findField('log_remark').getValue()
 					};
 					App.sendRequest( url, o, function(res,opt){
 						Ext.getCmp('taskManagerPanelId').grid.getStore().reload({

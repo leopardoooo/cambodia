@@ -501,6 +501,7 @@ BCLang.home = {
 			_operateTitle : 'Operation Details~',
 			_userTitle : 'User Details~',
 			_winTitle : 'Work Order completion~',
+			_ZteWinTitle : 'Send ZTE~',
 			forms : {
 				custNo : 'Customer ID~',
 				taskNo : 'ticket number~',
@@ -542,13 +543,15 @@ BCLang.home = {
 				teamCantEmpty : 'construction team can not be empty~',
 				faultTypeCantEmpty : 'fault type can not be empty~',
 				finishTypeCantEmpty : 'completion type can not be empty~',
+				ZteStatusCantEmpty : 'zte status can not be empty~',
 				selectRecord : 'Please select the records need to operate!~',
 				roderHaveBeenCompletedOrObsolete : 'ticket have been completed or obsolete~',
 				teamIsnotSingleWork : 'This work is not a single construction team of the department~',
 				taskStatusInitAndSupernet:'Work order status must be During Construction and construction team must be supernet~',
 				taskStatusInitAndCfocnCanWithdraw:'Work order status must be During Construction and construction team must be cfocn~',
 				taskStatusInitAndSupernetCanAssignment:'Work order status is Waiting or During Construction and construction team is supernet can assignment~',
-				taskStatusMustBeInit:'Work order status must be During Construction~'
+				taskStatusMustBeInit:'Work order status must be During Construction~',
+				zteStatusCanSend:'status is failure  or NOT_EXEC  can be operate zte~'
 			}
 		},
 		feeUnitpre : {

@@ -143,7 +143,7 @@ public final class BusiCodeConstants {
 	public final static String TASK_INIT = "2257";	//新建工单
 	public final static String TASK_ASSIGN = "2258";	//分配施工员
 	public final static String TASK_FILL = "2259";	//工单回填
-	public final static String TASK_ZTE_OPEN = "2260";	//开通zte授权
+	public final static String TASK_ZTE_OPEN = "2269";	//开通zte授权
 	public final static String TASK_CANCEL = "2261";	//工单作废
 	public final static String TASK_Withdraw = "2268";	//工单撤回
 	public final static String TASK_CHANGE_DEVICE = "2262";	//工单更换回填的智能卡

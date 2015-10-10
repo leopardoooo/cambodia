@@ -436,6 +436,11 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 		}
 		
 		List<WTaskLog> logList = wTaskLogDao.queryByTaskId(task_id);
+		for(WTaskLog log : logList){
+			String errorstr = StringHelper.isNotEmpty(log.getError_remark())?log.getError_remark():"";
+			String logstr = log.getLog_detail()==null?"":log.getLog_detail();
+			log.setLog_detail(logstr+errorstr);
+		}
 		map.put("taskUserList", userList);
 		map.put("taskLogList", logList);	
 		return map;
@@ -485,6 +490,21 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 			}
 		}
 		return userList;
+	}
+
+	@Override
+	public void saveZte(String task_id, String zte_status, String log_remark) throws Exception {
+		WTaskBaseInfo task = wTaskBaseInfoDao.findByKey(task_id);
+		if (task == null)
+			throw new ServicesException("工单不存在!");
+		if (task.getTask_status().equals(StatusConstants.TASK_CANCEL))
+			throw new ServicesException("工单已取消");	
+		if (task.getTask_status().equals(StatusConstants.TASK_END))
+			throw new ServicesException("工单已完工");	
+		//获取业务流水
+		Integer doneCode = doneCodeComponent.gDoneCode();
+		snTaskComponent.saveZte(doneCode, task_id, zte_status,log_remark);
+		
 	}
 
 	

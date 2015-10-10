@@ -189,6 +189,18 @@ public class TaskAction extends BaseBusiAction{
 		return JSON_SUCCESS;
 	}
 	
+	/**
+	 * 保存zte
+	 * @return
+	 * @throws Exception
+	 */
+	public String saveZte() throws Exception{
+		String zte_status = request.getParameter("zte_status");
+		String log_remark = request.getParameter("log_remark");
+		snTaskService.saveZte(task_id,zte_status,log_remark);
+		return JSON_SUCCESS;
+	}
+	
 	public String  queryDeviceInfoByCodeAndModel() throws Exception {
 		getRoot().setSimpleObj(snTaskService.queryDeviceInfoByCodeAndModel(deviceCode,deviceModel)); 
 		return JSON_SIMPLEOBJ;

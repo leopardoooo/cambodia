@@ -88,6 +88,8 @@ public interface ISnTaskService {
 	public List<TaskUserDto> queryTaskDevice(String task_id) throws Exception;
 
 	public void withdrawTask(String task_id)throws Exception;
+
+	public void saveZte(String task_id, String zte_status, String log_remark)throws Exception;
 	
 	
 
