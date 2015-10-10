@@ -1319,6 +1319,10 @@ public class FeeComponent extends BaseBusiComponent {
 		List<CFeeDevice> list= cFeeDao.queryDeviceByDoneCode(doneCode, getOptr().getCounty_id());
 		return list;
 	}
+	
+	public List<CFeeDevice> queryDeviceByDoneCodeAndFeeStdId(Integer doneCode, String feeId, String feeStdId) throws Exception{
+		return cFeeDao.queryDeviceByDoneCodeAndFeeStdId(doneCode, feeId, feeStdId);
+	}
 	/**
 	 * 根据sn获取费用信息
 	 * @param feeSn

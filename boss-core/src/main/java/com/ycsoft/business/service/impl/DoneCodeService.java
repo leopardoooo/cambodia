@@ -74,7 +74,7 @@ public class DoneCodeService extends BaseBusiService implements IDoneCodeService
 	public List<BusiFeeDto> queryEditFee(String custId,Integer doneCode,String busiCode) throws Exception{
 		List<BusiFeeDto> feeList = new ArrayList<BusiFeeDto>();
 		List<CFee>  sumFeeList = feeComponent.querySumFeeByDoneCode(custId,doneCode);
-		Map<String,CFee> feeMap = CollectionHelper.converToMapSingle(sumFeeList, "fee_id");
+		Map<String,CFee> feeMap = CollectionHelper.converToMapSingle(sumFeeList, "fee_id","fee_std_id");
 //		if (busiCode.equals(DEVICE_BUY) || busiCode.equals(DEVICE_SALE)
 //				|| busiCode.equals(DEVICE_RECLAIM) || busiCode.equals(BusiCodeConstants.DEVICE_CHANGE )
 //				|| busiCode.equals(BusiCodeConstants.DEVICE_BUY_PJ ) || busiCode.equals(BusiCodeConstants.DEVICE_BUY_PJ_BACTH)){
@@ -83,7 +83,7 @@ public class DoneCodeService extends BaseBusiService implements IDoneCodeService
 			List<CFeeDevice> deviceList = feeComponent.queryDeviceByDoneCode(doneCode);
 			if (deviceList!=null ){
 				for(CFeeDevice device : deviceList){
-					CFee fee = feeMap.get(device.getFee_id());
+					CFee fee = feeMap.get(device.getFee_id()+"_"+device.getFee_std_id());
 					if (StringHelper.isNotEmpty(device.getFee_std_id())){
 						for (BusiFeeDto busiFee:list){
 							if (busiFee.getFee_std_id().equals(device.getFee_std_id())){
