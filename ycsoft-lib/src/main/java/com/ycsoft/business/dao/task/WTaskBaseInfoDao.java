@@ -70,7 +70,7 @@ public class WTaskBaseInfoDao extends BaseEntityDao<WTaskBaseInfo> {
 	}
 
 	public Pager<TaskBaseInfoDto> queryTask(String taskTypes, String addrIds, String beginDate, String endDate,
-			String taskId, String teamId, String status, String custNo, String custName, String custAddr,String mobile, Integer start, Integer limit) throws Exception {
+			String taskId, String teamId, String status, String custNo, String custName, String custAddr,String mobile, String zteStatus, Integer start, Integer limit) throws Exception {
 		
 		String sql = "select t.*,wt.team_type,case when s.tel is null and s.mobile is null then '' "
 				+ " when s.mobile is null then  s.tel  "
@@ -90,6 +90,9 @@ public class WTaskBaseInfoDao extends BaseEntityDao<WTaskBaseInfo> {
 		}	
 		if(StringHelper.isNotEmpty(taskTypes)){
 			sql += "  AND  t.task_type_id in ("+sqlGenerator.in(taskTypes.split(","))+")";
+		}
+		if(StringHelper.isNotEmpty(zteStatus)){
+			sql += "  AND  t.zte_status in ("+sqlGenerator.in(zteStatus.split(","))+")";
 		}
 		if(StringHelper.isNotEmpty(status)){
 			sql += "  AND T.TASK_STATUS in ("+sqlGenerator.in(status.split(","))+")";

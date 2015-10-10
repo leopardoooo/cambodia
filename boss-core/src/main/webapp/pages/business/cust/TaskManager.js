@@ -445,7 +445,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 		this.newaddrField = new Ext.form.TextField({
 				xtype: 'textfield',width: 140,emptyText: forms['newaddr']});
 		this.taskStatusCombo = new Ext.ux.LovCombo({
-				width: 120,
+				width: 100,
 				emptyText: forms['taskStatus'],
 				paramName:'TASK_STATUS',
 				hiddenName : 'task_status',
@@ -454,11 +454,21 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 					fields:['item_value','item_name']
 				}),displayField:'item_name',valueField:'item_value',
 				triggerAction:'all',mode:'local'
-			});		
-		
+			});	
+		this.zteStatusCombo = new Ext.ux.LovCombo({
+				width: 100,
+				emptyText: forms['zteStatus'],
+				paramName:'ZTE_QUERY_STATUS_W_TASK',
+				hiddenName : 'task_status',
+				typeAhead:true,editable:true,
+				store:new Ext.data.JsonStore({
+					fields:['item_value','item_name']
+				}),displayField:'item_name',valueField:'item_value',
+				triggerAction:'all',mode:'local'
+			});	
 		this.taskDetailTypeCombo = new Ext.ux.LovCombo({
 				xtype: 'textfield',
-				width: 120,
+				width: 100,
 				emptyText: forms['taskDetailType'],
 				typeAhead:true,editable:true,
 				paramName:'TASK_DETAIL_TYPE',
@@ -470,7 +480,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 		
 		this.taskAddrCombo = new Ext.ux.LovCombo({
 			typeAhead: true,
-			width: 120,
+			width: 100,
 		    triggerAction: 'all',
 		    mode: 'remote',
 		    emptyText: forms['taskAddr'],
@@ -487,7 +497,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 		
 		this.taskTeamCombo = new Ext.ux.LovCombo({
 			typeAhead: true,
-			width: 120,
+			width: 100,
 		    triggerAction: 'all',
 		    mode: 'remote',
 		    emptyText: forms['taskTeam'],
@@ -502,7 +512,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 		    displayField: 'dept_name'
 		});
 		//初始化下拉框的数据 
-		App.form.initComboData([this.taskStatusCombo,this.taskDetailTypeCombo],function(){this.doWaitTask();},this);
+		App.form.initComboData([this.taskStatusCombo,this.zteStatusCombo,this.taskDetailTypeCombo],function(){this.doWaitTask();},this);
 		
 		var twoTbar = new Ext.Toolbar({
 			items : [this.taskNoField,'-',this.custNoField,'-',this.mobileField,'-',this.custNameField,'-',this.newaddrField,'-',{
@@ -551,7 +561,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 		        pageSize: this.pageSize
 		    }),
 			tbar: [this.taskDetailTypeCombo,'-',this.taskAddrCombo,'-',lbc('home.tools.TaskManager.buttons.accptTime'),this.createStartDateField,' ',this.createEndDateField,'-',
-			this.taskTeamCombo,'-',this.taskStatusCombo],
+			this.taskTeamCombo,'-',this.taskStatusCombo,'-',this.zteStatusCombo],
 			listeners : {
 				'render' : function() {
 					twoTbar.render(this.tbar);
@@ -591,6 +601,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 	taskStatusCombo: null,
 	mobileField: null,
 	newaddrField: null,
+	zteStatusCombo:null,
 	doCancelTask: function(){
 		var rs = this.getSelections();
 		if(rs === false){return ;}
@@ -942,7 +953,8 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 			"taskCond.taskTeam":this.taskTeamCombo.getValue(),
 			"taskCond.addrIds":this.taskAddrCombo.getValue(),
 			"taskCond.taskId":this.taskNoField.getValue(),
-			"taskCond.taskType":this.taskDetailTypeCombo.getValue()
+			"taskCond.taskType":this.taskDetailTypeCombo.getValue(),
+			"taskCond.zteStatus":this.zteStatusCombo.getValue()
 		};
 		this.taskStore.baseParams = o;
 		this.taskStore.load({

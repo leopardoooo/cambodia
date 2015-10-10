@@ -66,13 +66,14 @@ public interface ISnTaskService {
 	 * @param custNo
 	 * @param custName
 	 * @param custAddr
+	 * @param zteStatus 
 	 * @param limit 
 	 * @param start 
 	 * @throws Exception
 	 */
 	public Pager<TaskBaseInfoDto> queryTask(String taskTypes,String addrIds,String beginDate,String endDate,
 			String taskId,String teamId,String status, 
-			String custNo,String custName,String custAddr,String mobile, Integer start, Integer limit) throws Exception;
+			String custNo,String custName,String custAddr,String mobile, String zteStatus, Integer start, Integer limit) throws Exception;
 	
 
 	public Map<String, ?> queryTaskDetail(String task_id) throws Exception;

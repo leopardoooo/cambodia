@@ -103,7 +103,7 @@ public class TaskAction extends BaseBusiAction{
 			taskCond.setStart(start);
 			taskCond.setLimit(limit);
 			getRoot().setPage(snTaskService.queryTask(taskCond.getTaskType(),taskCond.getAddrIds(),taskCond.getStartTime(),taskCond.getEndTime(),taskCond.getTaskId()
-					,taskCond.getTaskTeam(),taskCond.getStatus(),taskCond.getCustNo(),taskCond.getCustName(),taskCond.getAddr(),taskCond.getMobile(),taskCond.getStart(),taskCond.getLimit()));
+					,taskCond.getTaskTeam(),taskCond.getStatus(),taskCond.getCustNo(),taskCond.getCustName(),taskCond.getAddr(),taskCond.getMobile(),taskCond.getZteStatus(),taskCond.getStart(),taskCond.getLimit()));
 		}
 		return JSON_PAGE;
 	}
