@@ -66,7 +66,16 @@ public class CFee extends BusiBase implements Serializable {
 	private Integer buy_num;
 	private String addr_id;
 	private String pay_sn;
+	private String fee_std_id;
 	
+	public String getFee_std_id() {
+		return fee_std_id;
+	}
+
+	public void setFee_std_id(String fee_std_id) {
+		this.fee_std_id = fee_std_id;
+	}
+
 	public String getPay_sn() {
 		return pay_sn;
 	}

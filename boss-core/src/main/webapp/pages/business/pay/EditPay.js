@@ -24,7 +24,8 @@ BusiFeeGrid = Ext.extend( Ext.grid.EditorGridPanel, {
 				{name: 'real_pay', type: 'float'},
 				{name: 'feeValue', type: 'float'},
 				{name: 'buy_num', type: 'int'},
-				{name: 'addr_id'},{name:'device_model'},{name:'device_model_text'}
+				{name: 'addr_id'},{name:'device_model'},{name:'device_model_text'},
+				'fee_std_id'
 			]
 		});
 		this.doneCode = record.get('done_code');
@@ -204,6 +205,7 @@ BusiFeeGrid = Ext.extend( Ext.grid.EditorGridPanel, {
 				obj['fee_id'] = rec.get('fee_id');
 				obj['fee_type'] = rec.get('fee_type');
 				obj['real_pay'] = Ext.util.Format.formatToFen(rec.get('feeValue'));
+				obj['fee_std_id'] = rec.get('fee_std_id');
 				
 				obj['addr_id']=rec.get('addr_id');
 				//器材购买，数量是 本次收费/单价=变化的数量

@@ -20,8 +20,17 @@ public class BusiFeeDto extends TBusiFeeStd {
 	private Integer fee_count;//费用倍数，IP加挂方案使用
 	private Date last_prod_exp;//上期产品截止日
 	private String user_id;//有加挂IP的用户
+	private String fee_std_id;
 	
 	
+	public String getFee_std_id() {
+		return fee_std_id;
+	}
+
+	public void setFee_std_id(String fee_std_id) {
+		this.fee_std_id = fee_std_id;
+	}
+
 	public String getUser_id() {
 		return user_id;
 	}

@@ -1010,27 +1010,24 @@ public class PayService extends BaseBusiService implements IPayService {
 						doneCode, busiDoneCode, busiCode, userList,null);
 			} else {
 				//根据donecode和fee_id查找设备信息
-				List<CFeeDevice> devices = feeComponent.queryDeviceByDoneCode(busiDoneCode);
-				CFeeDevice device = null;
-				if (devices.size()>0)
-					device = devices.get(0);
-				else
-					device = new CFeeDevice();
+				List<CFeeDevice> devices = feeComponent.queryDeviceByDoneCodeAndFeeStdId(busiDoneCode, feeDto.getFee_id(), feeDto.getFee_std_id());
 				String payType = SystemConstants.PAY_TYPE_UNPAY;
 				if (this.getBusiParam().getPay()!= null && this.getBusiParam().getPay().getPay_type() !=null)
 					payType = this.getBusiParam().getPay().getPay_type();
-				feeComponent.saveDeviceFee(cust.getCust_id(),cust.getAddr_id(), feeDto.getFee_id(), device.getFee_std_id(),payType,
-						device.getDevice_type(), device.getDevice_id(),
-						device.getDevice_code(), device.getPair_card_id(),
-						device.getPair_card_code(), device.getPair_modem_id(),
-						device.getPair_modem_code(),device.getDevice_model(), feeDto.getReal_pay(),
-						doneCode,busiDoneCode, busiCode, feeDto.getBuy_num());
-				//配件处理数量
-				if(isCanDoDevice){
-					//回退配件库存,修改费用的话，buy_num大于0=再次购买配件，总数要-buy_num;小于0=	退回总数
-					if(feeDto.getBuy_num() != 0){
-						device.setBuy_num(-1*feeDto.getBuy_num());
-						deviceComponent.updateDeviceNum(device);
+				for(CFeeDevice device : devices){
+					feeComponent.saveDeviceFee(cust.getCust_id(),cust.getAddr_id(), feeDto.getFee_id(), device.getFee_std_id(),payType,
+							device.getDevice_type(), device.getDevice_id(),
+							device.getDevice_code(), device.getPair_card_id(),
+							device.getPair_card_code(), device.getPair_modem_id(),
+							device.getPair_modem_code(),device.getDevice_model(), feeDto.getReal_pay(),
+							doneCode,busiDoneCode, busiCode, feeDto.getBuy_num());
+					//配件处理数量
+					if(isCanDoDevice){
+						//回退配件库存,修改费用的话，buy_num大于0=再次购买配件，总数要-buy_num;小于0=	退回总数
+						if(feeDto.getBuy_num() != 0){
+							device.setBuy_num(-1*feeDto.getBuy_num());
+							deviceComponent.updateDeviceNum(device);
+						}
 					}
 				}
 			}
