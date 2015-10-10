@@ -392,12 +392,15 @@ public class SnTaskComponent extends BaseBusiComponent {
 	}
 
 	// 完工
-	public void finishTask(Integer doneCode, String taskId, String resultType, String finishDesc) throws Exception {
-		// 检查设备是否已经回填
-		if (wTaskUserDao.queryUnFillUserCount(taskId) > 0)
+	public void finishTask(Integer doneCode, WTaskBaseInfo wtask, String resultType, String finishDesc) throws Exception {
+		// 安装工单且完工成功要检查设备是否已经回填
+		if (wtask.getTask_type_id().equals(SystemConstants.TASK_TYPE_INSTALL)
+				&&resultType.equals(SystemConstants.TASK_FINISH_TYPE_SUCCESS)
+				&&wTaskUserDao.queryUnFillUserCount(wtask.getTask_id()) > 0){
 			throw new ComponentException(ErrorCode.TaskDeviceIsNull);
+		}
 		WTaskBaseInfo task = new WTaskBaseInfo();
-		task.setTask_id(taskId);
+		task.setTask_id(wtask.getTask_id());
 		task.setTask_status(StatusConstants.TASK_END);
 		task.setTask_finish_type(resultType);
 		task.setTask_finish_desc(finishDesc);
@@ -408,7 +411,7 @@ public class SnTaskComponent extends BaseBusiComponent {
 		JsonObject jo = new JsonObject();
 		jo.addProperty("resultType", resultType);
 		jo.addProperty("finishDesc", finishDesc);
-		createTaskLog(taskId, BusiCodeConstants.TASK_FINISH, doneCode, jo.toString(), StatusConstants.NONE);
+		createTaskLog(wtask.getTask_id(), BusiCodeConstants.TASK_FINISH, doneCode, jo.toString(), StatusConstants.NONE);
 
 	}
 	
