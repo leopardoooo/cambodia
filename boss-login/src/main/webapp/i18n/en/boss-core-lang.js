@@ -375,7 +375,12 @@ BCLang.home = {
 			_title:' Personal Information Amendment~',
 			labelNewPwd:'new code~',
             labelNewPwdConfirm:'confirm new code~',
-            labelDefaultSystem:'Default Login System~'
+            labelDefaultSystem:'Default Login System~',
+            msg: {
+            	msgConfirmSave: 'You sure you want to save it?~',
+            	msgSuccess: 'Successfully modified!~',
+            	msgFail: 'Modification fails!~'
+            }
 		},
 		queryDevice:{//Equipment Inquiry
 			_title:' Equipment Inquiry~',

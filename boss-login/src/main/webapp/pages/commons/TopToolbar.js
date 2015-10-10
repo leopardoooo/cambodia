@@ -925,7 +925,8 @@ OptrDataWin = Ext.extend(Ext.Window, {//个人修改面板
 		if(!Ext.isEmpty(Ext.getCmp('password').getValue())){
 			obj["pwd"] = Ext.getCmp('password').getValue();
 		}
-		Confirm("确定要保存吗?", this, function() {
+		var LBC = lbc('home.tools.grxg.msg');
+		Confirm(LBC['msgConfirmSave'], this, function() {
 		Ext.Ajax.request({
 					url : saveUrl,
 					params : obj,
@@ -933,12 +934,12 @@ OptrDataWin = Ext.extend(Ext.Window, {//个人修改面板
 					success : function(res, opt) {
 						var data = Ext.decode(res.responseText);
 						if (true === data.success) {
-							Alert('修改成功!', function() {
+							Alert(LBC['msgSuccess'], function() {
 								App.getData().optr.login_sys_id = obj["query"];
 								this.close();
 							}, this);
 						}else{
-							Alert('修改失败!');
+							Alert(LBC['msgFail']);
 						}
 					}
 				});

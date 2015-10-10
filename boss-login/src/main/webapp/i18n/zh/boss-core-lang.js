@@ -377,7 +377,12 @@ BCLang.home = {
 			_title:'个人资料修改~',
 			labelNewPwd:'新密码~',
             labelNewPwdConfirm:'确认新密码~',
-            labelDefaultSystem:'默认登录系统~'
+            labelDefaultSystem:'默认登录系统~',
+            msg: {
+            	msgConfirmSave: '确定要保存吗?~',
+            	msgSuccess: '修改成功!~',
+            	msgFail: '修改失败!~'
+            }
 		},
 		queryDevice:{//设备查询
 			_title:'设备查询~',
