@@ -12,10 +12,9 @@ UserDetailGrid = Ext.extend(Ext.grid.GridPanel, {
 			border: false,
 			sm : new Ext.grid.CheckboxSelectionModel(),
 			cm : new Ext.grid.ColumnModel([{
-						header : userCols[0],dataIndex : 'user_type_text',width : 60,renderer : App.qtipValue}, {
-						header : userCols[1],dataIndex : 'user_name',width : 120,renderer : App.qtipValue}, {
-						header : userCols[2],dataIndex : 'password',width : 60,renderer : App.qtipValue}, {
-						header : userCols[3],dataIndex : 'device_model_text',width : 120,renderer : App.qtipValue}, {
+						header : userCols[0],dataIndex : 'user_type_text',width : 80,renderer : App.qtipValue}, {
+						header : userCols[1],dataIndex : 'user_name',width : 180,renderer : App.qtipValue}, {
+						header : userCols[3],dataIndex : 'device_model_text',width : 200,renderer : App.qtipValue}, {
 						header : userCols[4],dataIndex : 'device_id',width : 120,renderer : App.qtipValue}, {
 						header : userCols[5],dataIndex : 'posNo',width : 100,renderer : App.qtipValue}, {
 						header : userCols[6],dataIndex : 'occNo',width : 100,renderer : App.qtipValue}, {
@@ -37,11 +36,11 @@ TaskDetailGrid = Ext.extend(Ext.grid.GridPanel, {
 			border: false,
 			cm : new Ext.grid.ColumnModel([{
 				header : operateCols[0],dataIndex : 'log_time',width : 130}, {
-				header : operateCols[1],dataIndex : 'busi_name',width:80,renderer : App.qtipValue}, {
+				header : operateCols[1],dataIndex : 'busi_name',width:120,renderer : App.qtipValue}, {
 				header : operateCols[2],dataIndex : 'optr_name',width:80,renderer : App.qtipValue}, {
 				header : operateCols[3],dataIndex : 'syn_status_text',width:80,renderer : App.qtipValue}, {
 				header : operateCols[5],dataIndex : 'delay_time',width:80}, {
-				header : operateCols[4],dataIndex : 'log_detail',width:400,renderer :  App.qtipValue
+				header : operateCols[4],dataIndex : 'log_detail',width:350,renderer :  App.qtipValue
 			}])          
 		})               
 	}                    
@@ -527,12 +526,12 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 	        store: this.taskStore,
 	        cm: new Ext.ux.grid.LockingColumnModel({
 	        	columns:[
-				{header: taskCols[10],dataIndex : 'task_id', width: 80},
-				{header: taskCols[0],		dataIndex : 'task_type_id_text', 	width: 70, renderer: function(v, m ,rs){
-					return "<span style='font-weight: bold;'>"+ v +"</span>";
+				{header: taskCols[10],dataIndex : 'task_id', width: 80, renderer:App.qtipValue},
+				{header: taskCols[0],		dataIndex : 'task_type_id_text', 	width: 85, renderer: function(v, m ,rs){
+					return '<div  style="font-weight: bold" ext:qtitle="" ext:qtip="' + v + '">' + v +'</div>';
 				}},
 				{header: taskCols[1], 	dataIndex: 'cust_name', width: 80},
-				{header: taskCols[2], 		dataIndex: 'task_status', width: 70, renderer: function(v, m ,rs){
+				{header: taskCols[2], 		dataIndex: 'task_status', width: 85, renderer: function(v, m ,rs){
 					var text = rs.get("task_status_text");
 					var color = "black";
 					if(v == 'INIT'){
@@ -542,17 +541,17 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 					}else if(v == 'CANCEL'){
 						color = "gray";
 					}
-					return "<span style='font-weight: bold;color: "+ color +";'>"+ text +"</span>";
+					return '<div  style="font-weight: bold;color: '+ color +';" ext:qtitle="" ext:qtip="' + text + '">' + text +'</div>';
 				}},
-				{header: taskCols[3], dataIndex:'team_id_text',width:100,renderer:App.qtipValue},
+				{header: taskCols[3], dataIndex:'team_id_text',width:110,renderer:App.qtipValue},
 				{header: taskCols[4],dataIndex: 'zte_status_text', width: 70, renderer:Ext.util.Format.statusShow},
 				{header: taskCols[5], dataIndex : 'address', width: 200,renderer:App.qtipValue},
-				{header: taskCols[6], dataIndex : 'tel', 				width: 100},
+				{header: taskCols[6], dataIndex : 'tel', 				width: 100, renderer:App.qtipValue},
 				{header: taskCols[7], dataIndex: 'task_create_time', 	width: 80, renderer: Ext.util.Format.dateFormat},					
-				{header: taskCols[8],dataIndex:'bug_type_text',width:85},
+				{header: taskCols[8],dataIndex:'bug_type_text',width:85, renderer:App.qtipValue},
 				{header: taskCols[9],dataIndex:'bug_detail',width:120,renderer:App.qtipValue},
-				{header: taskCols[11],dataIndex:'linkman_name',width:80,renderer:App.qtipValue},
-				{header: taskCols[12],dataIndex:'linkman_tel',width:100,renderer:App.qtipValue}
+				{header: taskCols[11],dataIndex:'linkman_name',width:90,renderer:App.qtipValue},
+				{header: taskCols[12],dataIndex:'linkman_tel',width:110,renderer:App.qtipValue}
 	        ]}),
 	        sm: sm,
 	        stripeRows: true,
@@ -613,7 +612,6 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 		}
 		Confirm(lbc('home.tools.TaskManager.msg.sureWantSelectedWork'), this , function(){
 			var taskId = rs.get("task_id");
-			var that = this;
 			App.sendRequest(
 				Constant.ROOT_PATH + "/core/x/Task!cancelTaskSn.action",
 				{task_id : taskId,taskType:rs.get('task_type_id')},
@@ -626,7 +624,6 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 				           	panel.loadTaskData(taskId);
 						}
 			         });
-					that.close();
 				});
 		}); 
 	},
@@ -718,7 +715,6 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 		
 		Confirm(lbc('home.tools.TaskManager.msg.sureWantWithdrawSelectedWork'), this , function(){
 			var taskId = rs.get("task_id");
-			var that = this;
 			App.sendRequest(
 				Constant.ROOT_PATH + "/core/x/Task!withdrawTask.action",
 				{task_id : taskId},
@@ -731,7 +727,6 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 				           	panel.loadTaskData(taskId);
 						}
 			         });
-					that.close();
 				});
 		}); 
 	},

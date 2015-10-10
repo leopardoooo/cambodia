@@ -162,11 +162,11 @@ public class CFee extends BusiBase implements Serializable {
 	public void setIs_doc(String is_doc) {
 		this.is_doc = is_doc;
 		if(this.is_doc.equals("T")){
-			is_doc_text = "已打印";
+			this.is_doc_text = MemoryDict.getDictName(DictKey.STATUS, "PRINT");
 		}else if(this.is_doc.equals("N")){
-			is_doc_text = "不打印";
+			this.is_doc_text = MemoryDict.getDictName(DictKey.STATUS, "DONOTPRINT");
 		}else{
-			is_doc_text = "未打印";
+			this.is_doc_text = MemoryDict.getDictName(DictKey.STATUS, "NOTPRINT");
 		}
 	}
 
