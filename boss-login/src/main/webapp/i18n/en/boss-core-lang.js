@@ -334,16 +334,16 @@ BCLang.home = {
 		cmd: {
 			dtt: {
 				_title: "DTT Instruction Information~",
-				columns: ['Service serial number~','Set-Top Box No.~','Smart Card No.~','Control Word~','Program Name~',
-				       'Instruction Type~','Result Mark~','Create Time~','Send Time~','CA Recycle Time~','Wrong Information~','Authorization Ending Date~']
+				columns: ['ServiceSerialNumber~','STBNo.~','Card No.~','ControlWord~','ProgramName~',
+				       'InstructionType~','ResultMark~','CreateTime~','SendTime~','CARecycleTime~','WrongInfo~','AuthEndDate~']
 			},
 			ott: {
 				_title: "OTT Instruction Information~",
-				columns: ['Instruction No.~','Service Serial Number~','Instruction Type~','Set-Top Box No.~','Smart Card No.~','MAC~','Success or not~','Wrong Information~','Send Time~']
+				columns: ['InstructionNo.~','ServiceSerialNumber~','InstructionType~','STBNo.~','Card No.~','MAC~','SuccessOrNot~','WrongInfo~','Send Time~']
 			},
 			band: {
 				_title: 'BAND Instruction Information~',
-				columns: ['Instruction No.~','Service Serial Number~','Instruction  Type~','Set-Top Box No.~','Modem No.~','Success or Not~','Wrong Information~','Sending Time~']
+				columns: ['InstructionNo.~','ServiceSerialNumber~','InstructionType~','STBNo.~','ModemNo.~','SuccessOrNot~','WrongInfo~','SendTime~']
 			}
 		},
 		// Bill
@@ -525,21 +525,21 @@ BCLang.home = {
 			},
 			buttons : {
 				query : 'Query~',
-				pendingOrder : 'pending work orders~',
+				pendingOrder : 'Pending WorkOrders~',
 				accptTime : 'Hours:~',
 				distTeam : 'Order Arrangement~',
-				invalidTeam : 'ticket invalid~',
-				backDevice : 'backfill equipment~',
-				finish : 'completed~',
+				invalidTeam : 'Ticket Invalid~',
+				backDevice : 'Backfill Equipment~',
+				finish : 'Completed~',
 				returning : 'visit~',
-				sendAuth : 'ZTE authorized~',
-				withdraw : 'cfocn withdraw~'
+				sendAuth : 'ZTE Authorized~',
+				withdraw : 'CFOCN Withdraw~'
 			},
-			taskCols : ['ticket type~', 'customer name~', 'work order status~', 'construction team~',
-					'ZTE state~', 'address~', 'Tel~', 'creation time~ ', ' fault type~ ', ' fault details~ ','work No.~','Customer Manager~','Customer Manager tel~'],
-			userCols : ['user type~', '~ username', 'password~', 'device model~', 'device number~', 'posNo~', 'occNo~', 'Bandwidth~'],
-			operateCols : ['operating time~', 'operation type~', 'operator~,', 'synchronization status~', 'description~','delay time~'],
-			taskDeviceCols : ['user type~', '~ username', 'model~', 'Device number~', 'equipment recycling~','old device number~'],
+			taskCols : ['TicketType~', 'CustName~', 'TicketStatus~', 'ConstructionTeam~',
+					'ZTEState~', 'Address~', 'Tel~', 'CreatTime~', 'FaultType~', 'FaultDetails~','WorkNo.~','CustManager~','CustManagerTel~'],
+			userCols : ['UserType~', 'UserName~', 'Password~', 'DeviceModel~', 'DeviceNO.~', 'PosNo~', 'OccNo~', 'Bandwidth~'],
+			operateCols : ['OperatingTime~', 'OperationType~', 'Operator~,', 'SyncStatus~', 'Description~','DelayTime~'],
+			taskDeviceCols : ['UserType~', 'UserName~', 'Model~', 'DeviceNO.~', 'EquipmentRecycling~','OldDeviceNO.~'],
 			msg : {
 				enterDeviceNo : 'Please enter the device number~',
 				noCancel : 'No cancellations~!',

@@ -295,12 +295,13 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 			throw new ServicesException("工单已取消");	
 		if (task.getTask_status().equals(StatusConstants.TASK_END))
 			throw new ServicesException("工单已完工");	
-		if(!task.getTask_status().equals(StatusConstants.TASK_INIT)){
-			throw new ServicesException("工单不是施工状态");	
+		if(!task.getTask_status().equals(StatusConstants.TASK_INIT)
+				&&!task.getTask_status().equals(StatusConstants.TASK_ENDWAIT)){
+			throw new ServicesException("工单可完工状态");	
 		}
 		//获取业务流水
 		Integer doneCode = doneCodeComponent.gDoneCode();
-		snTaskComponent.finishTask(doneCode, taskId, resultType,remark);
+		snTaskComponent.finishTask(doneCode, task, resultType,remark);
 		List<CUser> users = cUserDao.queryTaskUser(taskId);
 		if (task.getTask_type_id().equals(SystemConstants.TASK_TYPE_INSTALL) && 
 				resultType.equals(SystemConstants.TASK_FINISH_TYPE_SUCCESS)){
@@ -352,7 +353,7 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 		}else if(task.getTask_type_id().equals(SystemConstants.TASK_TYPE_FAULT)){
 			//故障单，如果是cfocn完工，状态改为完工等待，需要supernet这边确认完工或重派给自己部门处理
 			String cfocnTeamId=snTaskComponent.getTeamId(SystemConstants.TEAM_TYPE_CFOCN);
-			if(cfocnTeamId.equals(task.getTeam_id())){
+			if(cfocnTeamId.equals(task.getTeam_id())&&task.getTask_status().equals(StatusConstants.TASK_INIT)){
 				//更改工单状态为施工中，
 				snTaskComponent.updateTaskStatus(taskId, StatusConstants.TASK_ENDWAIT);
 			}
