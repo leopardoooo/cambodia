@@ -615,6 +615,7 @@ public class SnTaskComponent extends BaseBusiComponent {
 			throws Exception {
 		if (StringHelper.isNotEmpty(taskId)) {
 			WTaskLog log = new WTaskLog();
+			log.setSyn_status(synStatus);
 			if(busiCode.equals(BusiCodeConstants.TASK_INIT) && StatusConstants.NOT_EXEC.equals(synStatus)){
 				log.setSyn_status(StatusConstants.NONE);
 			}
@@ -624,7 +625,6 @@ public class SnTaskComponent extends BaseBusiComponent {
 			log.setBusi_code(busiCode);
 			log.setDone_code(doneCode);
 			log.setOptr_id(getOptr().getOptr_id());
-			log.setSyn_status(synStatus);
 			log.setLog_time(new Date());
 			log.setLog_detail(logDetail);
 			wTaskLogDao.save(log);
