@@ -188,8 +188,8 @@ TaskGrid = Ext.extend(Ext.ux.Grid,{
 						return '<div ext:qtitle="" ext:qtip="' + value + '">' + value +'</div>';
 					}
 				}},
-				{header:lc[1],dataIndex:'task_type_id_text',	width:80},
-				{header:lc[2],dataIndex:'task_status_text',	width:80,renderer:Ext.util.Format.statusShow},
+				{header:lc[1],dataIndex:'task_type_id_text',	width:80,renderer : App.qtipValue},
+				{header:lc[2],dataIndex:'task_status_text',	width:120,renderer:Ext.util.Format.statusShow},
 				{header:lc[3],dataIndex:'team_id_text',	width:80,renderer : App.qtipValue},
 				{header:lc[4],dataIndex:'bug_type_text',width:200,renderer : App.qtipValue},
 				{header:lc[5],dataIndex:'bug_detail',	width:120,renderer : App.qtipValue},
