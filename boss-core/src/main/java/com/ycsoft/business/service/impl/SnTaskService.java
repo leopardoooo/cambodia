@@ -249,10 +249,12 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 					for (;index<userList.size();index++){
 						WTaskUser user = userList.get(index);
 						if (StringHelper.isEmpty(user.getDevice_id())){
-							fillDevice.setUserId(user.getUser_id());
-							index++;
-							exists=true;
-							break;
+							if(fillDevice.isFcPort() ==  user.getUser_type().equals(SystemConstants.USER_TYPE_BAND)){
+								fillDevice.setUserId(user.getUser_id());
+								index++;
+								exists=true;
+								break;
+							}
 						}
 					}
 					if (!exists){
