@@ -178,13 +178,16 @@ public class SnTaskComponent extends BaseBusiComponent {
 			throw new ComponentException("工单不存在");
 		}
 		String cfonTeamId = getTeamId(SystemConstants.TEAM_TYPE_CFOCN);
-		if(cfonTeamId.equals(task.getTeam_id())&&!task.getTask_status().equals(StatusConstants.TASK_CREATE)){
-			throw new ComponentException("只有待派单的cfocn工单才能重新派单");
+		if(cfonTeamId.equals(task.getTeam_id())
+				&&!task.getTask_status().equals(StatusConstants.TASK_CREATE)
+				&&!task.getTask_status().equals(StatusConstants.TASK_ENDWAIT)){
+			throw new ComponentException("只有待派单或完工等待的cfocn工单才能重新派单");
 		}
 		if(!cfonTeamId.equals(task.getTeam_id())
 				&&!task.getTask_status().equals(StatusConstants.TASK_CREATE)
-				&&!task.getTask_status().equals(StatusConstants.TASK_INIT)){
-			throw new ComponentException("只有待派单和施工中的supernet工单才能重新派单");
+				&&!task.getTask_status().equals(StatusConstants.TASK_INIT)
+				&&!task.getTask_status().equals(StatusConstants.TASK_ENDWAIT)){
+			throw new ComponentException("只有待派单或施工中或完工等待的supernet工单才能重新派单");
 		}
 		
 		String oldTeamId = task.getTeam_id();
@@ -664,6 +667,15 @@ public class SnTaskComponent extends BaseBusiComponent {
 		}
 	}
 
+	/**
+	 * 更改工单状态
+	 * @param taskId
+	 * @param status
+	 * @throws Exception
+	 */
+	public void updateTaskStatus(String taskId,String status) throws Exception{
+		wTaskBaseInfoDao.updateTaskStatus(taskId, status);
+	}
 	public WTaskBaseInfoDao getwTaskBaseInfoDao() {
 		return wTaskBaseInfoDao;
 	}

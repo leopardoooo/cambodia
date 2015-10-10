@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import com.ycsoft.beans.task.WTaskBaseInfo;
 import com.ycsoft.business.dto.config.TaskBaseInfoDto;
+import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.daos.abstracts.BaseEntityDao;
 import com.ycsoft.daos.core.JDBCException;
@@ -143,30 +144,18 @@ public class WTaskBaseInfoDao extends BaseEntityDao<WTaskBaseInfo> {
 		return this.createQuery(sql,doneCode).list();
 	}
 
-	public Pager<TaskBaseInfoDto> queryUnProcessTask(String deptId, String taskStatus, String zteStatus, Integer start,
+	public Pager<TaskBaseInfoDto> queryUnProcessTask(String deptId, Integer start,
 			Integer limit) throws JDBCException {
 		
 		String sql = "select t.* ,wt.team_type,case when s.tel is null and s.mobile is null then '' "
 				+ " when s.mobile is null then  s.tel  "
 				+ " when s.tel is null then s.mobile  else s.tel||','||s.mobile end linkman_tel ,c.cust_name linkman_name "
 				+ " from w_task_base_info t, C_CUST c  ,w_team wt,s_optr s "
-				+ " where t.cust_id = c.cust_id and c.str9 = s.optr_id(+) and t.team_id = wt.dept_id(+) " ;
-		
-		if(StringHelper.isNotEmpty(taskStatus)){
-			sql += "  AND T.TASK_STATUS in ("+sqlGenerator.in(taskStatus.split(","))+")";
-		}
-		if(StringHelper.isNotEmpty(zteStatus) && StringHelper.isEmpty(deptId)){
-			sql += "  AND  t.zte_status in ("+sqlGenerator.in(zteStatus.split(","))+")";
-		}		
-		if(StringHelper.isNotEmpty(deptId) && StringHelper.isEmpty(zteStatus)){
-			sql += "  AND t.team_id in ("+sqlGenerator.in(deptId.split(","))+")";
-		}
-		if(StringHelper.isNotEmpty(deptId) && StringHelper.isNotEmpty(zteStatus)){
-			sql += "  AND  (t.team_id in ("+sqlGenerator.in(deptId.split(","))+") or t.zte_status in ("+sqlGenerator.in(zteStatus.split(","))+"))";
-		}
-		
-		sql += " ORDER BY t.task_create_time DESC ";
-		return this.createQuery(TaskBaseInfoDto.class,sql)
+				+ " where t.cust_id = c.cust_id and c.str9 = s.optr_id(+) and t.team_id = wt.dept_id(+) " 
+				+" and (( t.task_status =? and t.team_id =?) or t.task_status=? or (t.task_status=? and t.zte_status=?)) "
+				+" ORDER BY t.task_create_time DESC ";
+		return this.createQuery(TaskBaseInfoDto.class,sql,StatusConstants.TASK_CREATE,deptId,StatusConstants.TASK_ENDWAIT
+				,StatusConstants.TASK_INIT,StatusConstants.NOT_EXEC)
 			.setLimit(limit)
 			.setStart(start)
 			.page();

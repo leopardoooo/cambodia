@@ -249,10 +249,12 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 					for (;index<userList.size();index++){
 						WTaskUser user = userList.get(index);
 						if (StringHelper.isEmpty(user.getDevice_id())){
-							fillDevice.setUserId(user.getUser_id());
-							index++;
-							exists=true;
-							break;
+							if(fillDevice.isFcPort() ==  user.getUser_type().equals(SystemConstants.USER_TYPE_BAND)){
+								fillDevice.setUserId(user.getUser_id());
+								index++;
+								exists=true;
+								break;
+							}
 						}
 					}
 					if (!exists){
@@ -347,8 +349,13 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 					}
 				}
 			}
-			
-			
+		}else if(task.getTask_type_id().equals(SystemConstants.TASK_TYPE_FAULT)){
+			//故障单，如果是cfocn完工，状态改为完工等待，需要supernet这边确认完工或重派给自己部门处理
+			String cfocnTeamId=snTaskComponent.getTeamId(SystemConstants.TEAM_TYPE_CFOCN);
+			if(cfocnTeamId.equals(task.getTeam_id())){
+				//更改工单状态为施工中，
+				snTaskComponent.updateTaskStatus(taskId, StatusConstants.TASK_ENDWAIT);
+			}
 		}
 	}
 	
@@ -401,7 +408,7 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 	}
 
 	public Pager<TaskBaseInfoDto> queryUnProcessTask(Integer start, Integer limit) throws Exception {
-		return wTaskBaseInfoDao.queryUnProcessTask(getOptr().getDept_id(),StatusConstants.TASK_CREATE,StatusConstants.NOT_EXEC,start, limit);
+		return wTaskBaseInfoDao.queryUnProcessTask(snTaskComponent.getTeamId(SystemConstants.TASK_ASSIGN_SUPPERNET),start, limit);
 	}
 
 	
