@@ -36,7 +36,7 @@ TaskDetailGrid = Ext.extend(Ext.grid.GridPanel, {
 			sm : new Ext.grid.CheckboxSelectionModel(),
 			border: false,
 			cm : new Ext.grid.ColumnModel([{
-				header : operateCols[0],dataIndex : 'log_time',width : 80,renderer : Ext.util.Format.dateFormat}, {
+				header : operateCols[0],dataIndex : 'log_time',width : 130}, {
 				header : operateCols[1],dataIndex : 'busi_name',width:80,renderer : App.qtipValue}, {
 				header : operateCols[2],dataIndex : 'optr_name',width:80,renderer : App.qtipValue}, {
 				header : operateCols[3],dataIndex : 'syn_status_text',width:80,renderer : App.qtipValue}, {
