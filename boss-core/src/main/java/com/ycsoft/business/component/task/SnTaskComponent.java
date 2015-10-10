@@ -201,6 +201,7 @@ public class SnTaskComponent extends BaseBusiComponent {
 
 		if (StringHelper.isNotEmpty(cfonTeamId) && cfonTeamId.equals(deptId)) {
 			createTaskLog(taskId, BusiCodeConstants.TASK_ASSIGN, doneCode, null, StatusConstants.NOT_EXEC);
+			wTaskBaseInfoDao.updateTaskStatus(taskId, StatusConstants.TASK_CREATE);
 		} else {
 			createTaskLog(taskId, BusiCodeConstants.TASK_ASSIGN, doneCode,null, StatusConstants.NONE);
 			wTaskBaseInfoDao.updateTaskStatus(taskId, StatusConstants.TASK_INIT);
