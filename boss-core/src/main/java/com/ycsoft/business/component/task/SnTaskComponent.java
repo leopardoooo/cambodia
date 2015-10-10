@@ -199,9 +199,14 @@ public class SnTaskComponent extends BaseBusiComponent {
 		}
 
 		if (StringHelper.isNotEmpty(cfonTeamId) && cfonTeamId.equals(deptId)) {
-			createTaskLog(taskId, BusiCodeConstants.TASK_ASSIGN, doneCode, null, StatusConstants.NOT_EXEC);
+			JsonObject jo = new JsonObject();
+			jo.addProperty("Team", SystemConstants.TEAM_TYPE_CFOCN);
+			createTaskLog(taskId, BusiCodeConstants.TASK_ASSIGN, doneCode, jo.toString(), StatusConstants.NOT_EXEC);
+			wTaskBaseInfoDao.updateTaskStatus(taskId, StatusConstants.TASK_CREATE);
 		} else {
-			createTaskLog(taskId, BusiCodeConstants.TASK_ASSIGN, doneCode,null, StatusConstants.NONE);
+			JsonObject jo = new JsonObject();
+			jo.addProperty("Team", SystemConstants.TEAM_TYPE_SUPERNET);
+			createTaskLog(taskId, BusiCodeConstants.TASK_ASSIGN, doneCode,jo.toString(), StatusConstants.NONE);
 			wTaskBaseInfoDao.updateTaskStatus(taskId, StatusConstants.TASK_INIT);
 		}
 	}
@@ -399,6 +404,7 @@ public class SnTaskComponent extends BaseBusiComponent {
 		// 记录操作日志
 		JsonObject jo = new JsonObject();
 		jo.addProperty("resultType", resultType);
+		jo.addProperty("finishDesc", finishDesc);
 		createTaskLog(taskId, BusiCodeConstants.TASK_FINISH, doneCode, jo.toString(), StatusConstants.NONE);
 
 	}
