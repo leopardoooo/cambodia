@@ -536,7 +536,7 @@ BCLang.home = {
 			userCols : ['用户类型~', '用户名~', '密码~', '设备型号~', '设备号~', 'posNo~',
 					'occNo~', '带宽~'],
 			operateCols : ['操作时间~', '操作类型~', '操作人~', '同步状态~', '描述~','延迟时间~'],
-			taskDeviceCols : ['用户类型~', '用户名~', '型号~', '设备编号~', '设备回收~'],
+			taskDeviceCols : ['用户类型~', '用户名~', '型号~', '设备编号~', '设备回收~','原设备编号~'],
 			msg : {
 				enterDeviceNo : '请输入设备号~',
 				noCancel : '不允许取消!~',
@@ -550,7 +550,8 @@ BCLang.home = {
 				teamIsnotSingleWork : '该工单施工队不是本部门~',
 				taskStatusInitAndSupernet:'施工中状态和supernet施工队才能使用完工~',
 				taskStatusInitAndCfocnCanWithdraw:'施工中状态和cfocn施工队才能使用工单撤回~',
-				taskStatusInitAndSupernetCanAssignment:'只有待派单状态的工单或者施工中状态,supernet的工单才能进行派单~'
+				taskStatusInitAndSupernetCanAssignment:'只有待派单状态的工单或者施工中状态,supernet的工单才能进行派单~',
+				taskStatusMustBeInit:'必须是施工中状态~'
 			}
 		},
 		feeUnitpre : {

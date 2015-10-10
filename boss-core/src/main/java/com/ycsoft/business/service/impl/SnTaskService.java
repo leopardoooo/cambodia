@@ -401,7 +401,7 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 	}
 
 	public Pager<TaskBaseInfoDto> queryUnProcessTask(Integer start, Integer limit) throws Exception {
-		return wTaskBaseInfoDao.queryUnProcessTask(getOptr().getDept_id(),StatusConstants.TASK_INIT,StatusConstants.NOT_EXEC,start, limit);
+		return wTaskBaseInfoDao.queryUnProcessTask(getOptr().getDept_id(),StatusConstants.TASK_CREATE,StatusConstants.NOT_EXEC,start, limit);
 	}
 
 	
@@ -464,8 +464,13 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 		}
 		for(TaskUserDto task: userList){
 			CUser user = userComponent.queryUserById(task.getUser_id());
-			task.setDevice_code(task.getDevice_id());
 			task.setUser_name( taskComponent.getFillUserName(user) );
+			if(taskBase.getTask_type_id().equals(SystemConstants.TASK_TYPE_MOVE) && user.getUser_type().equals(SystemConstants.USER_TYPE_BAND)){
+				if(StringHelper.isNotEmpty(task.getDevice_id())){
+					task.setDevice_code(task.getDevice_id());
+					task.setDevice_id(null);
+				}
+			}
 			task.setOccNo(user.getStr7());
 			task.setPosNo(user.getStr8());
 			if(!user.getUser_type().equals(SystemConstants.USER_TYPE_OTT_MOBILE)){

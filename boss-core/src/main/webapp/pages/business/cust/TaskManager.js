@@ -18,8 +18,8 @@ UserDetailGrid = Ext.extend(Ext.grid.GridPanel, {
 						header : userCols[3],dataIndex : 'device_model_text',width : 120,renderer : App.qtipValue}, {
 						header : userCols[4],dataIndex : 'device_id',width : 120,renderer : App.qtipValue}, {
 						header : userCols[5],dataIndex : 'posNo',width : 100,renderer : App.qtipValue}, {
-						header : userCols[5],dataIndex : 'occNo',width : 100,renderer : App.qtipValue}, {
-						header : userCols[6],dataIndex : 'band',width: 80,renderer : App.qtipValue}])
+						header : userCols[6],dataIndex : 'occNo',width : 100,renderer : App.qtipValue}, {
+						header : userCols[7],dataIndex : 'band',width: 80,renderer : App.qtipValue}])
 		})
 	}
 })
@@ -86,15 +86,15 @@ var TaskDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 		var baseColumns = [{
 				header : cols[0],dataIndex : 'user_type_text',width : 70,renderer : App.qtipValue}, {
 				header : cols[1],dataIndex : 'user_name',renderer : App.qtipValue},
-				{header: cols[2],dataIndex:'device_model_text',width:130}];
+				{header: cols[2],dataIndex:'device_model_text',width:130},
+				{header: cols[5],dataIndex:'device_id',width:130}];
 		if(this.taskTypeId == '9'){//销终端工单
 			this.resultCombo = new Ext.ux.ParamCombo({
 				paramName:'BOOLEAN',typeAhead:false,valueField:'item_name',
 				forceSelection:true,selectOnFocus:true,editable:true
 			});
 			App.form.initComboData([this.resultCombo]);
-			nextColums = [{header:cols[3],dataIndex:'device_id',width:130},
-				{header:cols[4],dataIndex:'recycle_result_text',width:80,editor:this.resultCombo}]; 
+			nextColums = [{header:cols[4],dataIndex:'recycle_result_text',width:80,editor:this.resultCombo}]; 
 		}else{
 			nextColums = [{header:cols[3],dataIndex:'device_code',width:130,editor:new Ext.form.TextField({vtype:'alphanum'})},
 						{header:'occNo',dataIndex:'occNo',width:80,editor:new Ext.form.TextField({vtype:'alphanum'})},
@@ -121,6 +121,11 @@ var TaskDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 					return false;
 				}
 			}
+			if(obj.field == 'device_code'){
+				if(this.taskTypeId !='1'){
+					return false;
+				}
+			}
 		},
 		afteredit:function(obj){
 			if(obj.field == 'recycle_result_text'){
@@ -130,12 +135,12 @@ var TaskDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 				var data = cmp.store.getAt(index);
 				record.set('recycle_result',data.get('item_value'));
 			}
-			//暂时不验证
-			if(obj.field == 'device_code'){
-				var record =obj.record;
-				this.queryAndAddDevice(obj.value,record);
-				
-			}
+//			//验证存在问题,暂时不验证
+//			if(obj.field == 'device_code'){
+//				var record =obj.record;
+//				this.queryAndAddDevice(obj.value,record);
+//				
+//			}
 		},
 		queryAndAddDevice:function(newValue,record){
 			Ext.Ajax.request({
@@ -201,28 +206,34 @@ var TaskDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 		},
 		checkDeviceCode : function(){
 			this.stopEditing();//停止编辑
-			var store = this.getStore();
-			var count = store.getCount();//总个数
-			var config = this.getColumnModel().config;
-			var dataIndexes = [];
-			for(var i=0;i<config.length;i++){
-				dataIndexes.push(config[i].dataIndex);
-			}
 			var flag = true;
-			for(var i=0;i<count;i++){
-				var data = store.getAt(i).data;
-				for(var k=0;k<dataIndexes.length;k++){
-					var a = dataIndexes[k];
-					if(Ext.isEmpty(data[a]) && a == 'device_code'){
-						Alert(lbc('home.tools.TaskManager.msg.enterDeviceNo'),function(){
-							this.getSelectionModel().selectRow(i);
-							this.startEditing(i,k);
-						});
-						flag = false;
-						break;
-					}
-				}
+			var records = this.getStore().getModifiedRecords();
+			if(records.length == 0){
+				Alert('数据没有修改');
+				flag = false;
 			}
+//			var store = this.getStore();
+//			var count = store.getCount();//总个数
+//			var config = this.getColumnModel().config;
+//			var dataIndexes = [];
+//			for(var i=0;i<config.length;i++){
+//				dataIndexes.push(config[i].dataIndex);
+//			}
+//			var flag = true;
+//			for(var i=0;i<count;i++){
+//				var data = store.getAt(i).data;
+//				for(var k=0;k<dataIndexes.length;k++){
+//					var a = dataIndexes[k];
+//					if(Ext.isEmpty(data[a]) && a == 'device_code'){
+//						Alert(lbc('home.tools.TaskManager.msg.enterDeviceNo'),function(){
+//							this.getSelectionModel().selectRow(i);
+//							this.startEditing(i,k);
+//						});
+//						flag = false;
+//						break;
+//					}
+//				}
+//			}
 			return flag;
 	}
 });
@@ -237,7 +248,7 @@ TaskDeviceWin = Ext.extend(Ext.Window,{
 			title : '设备回填',
 			layout : 'fit',
 			height : 400,
-			width : 700,
+			width : 750,
 			id:'TaskDeviceWinId',
 			closeAction : 'close',
 			items : [this.deviceGrid],
@@ -259,6 +270,7 @@ TaskDeviceWin = Ext.extend(Ext.Window,{
 		if(!this.deviceGrid.checkDeviceCode()){
 			return false;
 		}
+		
 		var o ={},url;
 		if(this.task_type_id == '9'){//销终端工单
 			var data = this.deviceGrid.getUserIds();
@@ -734,7 +746,10 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 	doDeviceTask:function(){//回填设备
 		var rs = this.getSelections();
 		if(rs === false){return ;}
-		if(this.checkViald(rs) === false){return;}
+		if(rs.get('task_status') != 'INIT'){
+			Alert(lbc('home.tools.TaskManager.msg.taskStatusMustBeInit'));
+			return false;
+		}
 		var win = Ext.getCmp('TaskDeviceWinId');
 		if(!win)
 			win = new TaskDeviceWin(rs);
