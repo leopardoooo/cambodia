@@ -436,6 +436,10 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 		}
 		
 		List<WTaskLog> logList = wTaskLogDao.queryByTaskId(task_id);
+		for(WTaskLog log : logList){
+			String srr = StringHelper.isNotEmpty(log.getError_remark())?log.getError_remark():"";
+			log.setLog_detail(log.getLog_detail()+srr );
+		}
 		map.put("taskUserList", userList);
 		map.put("taskLogList", logList);	
 		return map;

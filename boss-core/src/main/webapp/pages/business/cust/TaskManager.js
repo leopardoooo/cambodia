@@ -29,19 +29,19 @@ TaskDetailGrid = Ext.extend(Ext.grid.GridPanel, {
 	constructor : function() {
 		this.taskDetailStore = new Ext.data.JsonStore({
 					fields : ['busi_code', 'busi_name', 'optr_id','optr_name','log_time',
-							'syn_status','error_remark','syn_status_text','delay_time']});
+							'syn_status','error_remark','syn_status_text','delay_time','log_detail']});
 		var operateCols = lbc('home.tools.TaskManager.operateCols');							
 		TaskDetailGrid.superclass.constructor.call(this, {
 			ds : this.taskDetailStore,
 			sm : new Ext.grid.CheckboxSelectionModel(),
 			border: false,
 			cm : new Ext.grid.ColumnModel([{
-				header : operateCols[0],dataIndex : 'log_time',width : 100,renderer : Ext.util.Format.dateFormat}, {
+				header : operateCols[0],dataIndex : 'log_time',width : 80,renderer : Ext.util.Format.dateFormat}, {
 				header : operateCols[1],dataIndex : 'busi_name',width:80,renderer : App.qtipValue}, {
 				header : operateCols[2],dataIndex : 'optr_name',width:80,renderer : App.qtipValue}, {
 				header : operateCols[3],dataIndex : 'syn_status_text',width:80,renderer : App.qtipValue}, {
-				header : operateCols[4],dataIndex : 'error_remark',width:150,renderer :  App.qtipValue}, {
-				header : operateCols[5],dataIndex : 'delay_time',width:80
+				header : operateCols[5],dataIndex : 'delay_time',width:80}, {
+				header : operateCols[4],dataIndex : 'log_detail',width:400,renderer :  App.qtipValue
 			}])          
 		})               
 	}                    
@@ -622,6 +622,11 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 	doSendTask: function(){//发送ZTE
 		var rs = this.getSelections();
 		if(rs === false){return ;}
+		if(rs.get('zte_status') != 'FAILURE' && rs.get('zte_status') != 'NOT_EXEC'){
+			Alert(lbc('home.tools.TaskManager.msg.zteStatusCanSend'));
+			return false;
+		}
+		
 		var zteCombo = new Ext.form.ComboBox({
 			width: 120,
 			fieldLabel:lbc('home.tools.TaskManager.forms.zteStatus'),

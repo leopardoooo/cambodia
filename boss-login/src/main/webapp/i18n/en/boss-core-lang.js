@@ -550,7 +550,8 @@ BCLang.home = {
 				taskStatusInitAndSupernet:'Work order status must be During Construction and construction team must be supernet~',
 				taskStatusInitAndCfocnCanWithdraw:'Work order status must be During Construction and construction team must be cfocn~',
 				taskStatusInitAndSupernetCanAssignment:'Work order status is Waiting or During Construction and construction team is supernet can assignment~',
-				taskStatusMustBeInit:'Work order status must be During Construction~'
+				taskStatusMustBeInit:'Work order status must be During Construction~',
+				zteStatusCanSend:'status is failure  or NOT_EXEC  can be operate zte~'
 			}
 		},
 		feeUnitpre : {

@@ -555,7 +555,8 @@ BCLang.home = {
 				taskStatusInitAndSupernet:'施工中状态和supernet施工队才能使用完工~',
 				taskStatusInitAndCfocnCanWithdraw:'施工中状态和cfocn施工队才能使用工单撤回~',
 				taskStatusInitAndSupernetCanAssignment:'只有待派单状态的工单或者施工中状态,supernet的工单才能进行派单~',
-				taskStatusMustBeInit:'必须是施工中状态~'
+				taskStatusMustBeInit:'必须是施工中状态~',
+				zteStatusCanSend:'必须是失败或未执行才能发送zte授权~'
 			}
 		},
 		feeUnitpre : {
