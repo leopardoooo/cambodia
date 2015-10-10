@@ -59,8 +59,9 @@ TaskAllInfo = Ext.extend(Ext.TabPanel,{
 				activeTab: 0,
 				closable : true,
 				defaults : {border: false,layout : 'fit'},
-				items:[{title : lbc('home.tools.TaskManager._userTitle'),items:[this.userGrid]
-				},{title : lbc('home.tools.TaskManager._operateTitle'),items:[this.detail]}]
+				items:[{title : lbc('home.tools.TaskManager._operateTitle'),items:[this.detail]},
+				{title : lbc('home.tools.TaskManager._userTitle'),items:[this.userGrid]
+				}]
 		})
 	}
 })
