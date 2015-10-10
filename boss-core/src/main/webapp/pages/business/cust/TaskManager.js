@@ -656,7 +656,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 			labelWidth : 100,
 			bodyStyle : 'padding : 5px;padding-top : 10px;',
 			items: [zteCombo,{
-				fieldLabel: lbc('home.tools.TaskManager.forms.remark'),
+				fieldLabel: lbc('home.tools.TaskManager.forms.zteRemark'),
 				name:'log_remark',
 				height : 100,
 				width : 240,
@@ -832,8 +832,8 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 	doDeviceTask:function(){//回填设备
 		var rs = this.getSelections();
 		if(rs === false){return ;}
-		if(rs.get('task_status') != 'INIT'){
-			Alert(lbc('home.tools.TaskManager.msg.taskStatusMustBeInit'));
+		if(rs.get('task_status') != 'INIT' || rs.get('team_type') != 'SUPERNET'){
+			Alert(lbc('home.tools.TaskManager.msg.taskStatusInitAndSupernet'));
 			return false;
 		}
 		var win = Ext.getCmp('TaskDeviceWinId');
