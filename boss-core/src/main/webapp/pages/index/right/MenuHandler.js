@@ -3044,7 +3044,7 @@ Ext.apply(MenuHandler, {
 				Alert('工单作废成功!');
 				App.getApp().main.infoPanel.getUserPanel().userGrid.remoteRefresh();
 				App.getApp().main.infoPanel.docPanel.taskGrid.remoteRefresh();
-						
+				App.getApp().refreshPayInfo();
 			}
 		}
 		var url = Constant.ROOT_PATH + "/core/x/Task!cancelTaskSn.action";
