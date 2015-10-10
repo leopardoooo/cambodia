@@ -314,8 +314,8 @@ public class InvoiceComponent extends BaseComponent {
 					list.remove(i);
 					continue;
 				}
-				// 未领用的才能领用 领用过的仍然可以再领用		暂时不改
-				if(optrType.equals(InvoiceOptrType.RECEIVE.toString()) && invoice.getOptr_id()!=null){
+				// 未领用的才能领用 
+				if(optrType.equals(InvoiceOptrType.RECEIVE.toString()) && StringHelper.isNotEmpty(invoice.getOptr_id())){
 					list.remove(i);
 				}
 				if(optrType.equals(InvoiceOptrType.CANCEL_RECEIVE.toString()) && 
