@@ -505,7 +505,7 @@ BCLang.home = {
 			_operateTitle : '操作明细~',
 			_userTitle : '用户明细~',
 			_winTitle : '工单完工~',
-			_ZteWinTitle : '发送ZTE~',
+			_ZteWinTitle : 'ZTE授权~',
 			forms : {
 				custNo : '客户编号~',
 				taskNo : '工单编号~',
@@ -531,7 +531,7 @@ BCLang.home = {
 				backDevice : '回填设备~',
 				finish : '完工~',
 				returning : '回访~',
-				sendAuth : '发送ZTE授权~',
+				sendAuth : 'ZTE授权~',
 				withdraw : 'cfocn撤回~'
 			},
 			taskCols : ['工单类型~', '客户名称~', '工单状态~', '施工队~', 'ZTE状态~', '地址~',

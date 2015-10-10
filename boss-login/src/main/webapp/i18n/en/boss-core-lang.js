@@ -501,7 +501,7 @@ BCLang.home = {
 			_operateTitle : 'Operation Details~',
 			_userTitle : 'User Details~',
 			_winTitle : 'Work Order completion~',
-			_ZteWinTitle : 'Send ZTE~',
+			_ZteWinTitle : 'ZTE authorized~',
 			forms : {
 				custNo : 'Customer ID~',
 				taskNo : 'ticket number~',
@@ -527,7 +527,7 @@ BCLang.home = {
 				backDevice : 'backfill equipment~',
 				finish : 'completed~',
 				returning : 'visit~',
-				sendAuth : 'Send ZTE authorized~',
+				sendAuth : 'ZTE authorized~',
 				withdraw : 'cfocn withdraw~'
 			},
 			taskCols : ['ticket type~', 'customer name~', 'work order status~', 'construction team~',
