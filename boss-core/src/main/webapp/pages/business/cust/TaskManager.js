@@ -419,7 +419,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 			url: root + '/core/x/Task!queryTasks.action' ,
 			fields:['task_id','cust_no','cust_name','tel','old_addr','new_addr','address','task_type_id',
 					'task_status','task_status_text','task_type_id_text','team_id','team_id_text','bug_type','bug_type_text'
-					,'bug_detail','zte_status','zte_status_text','task_create_time','team_type'],
+					,'bug_detail','zte_status','zte_status_text','task_create_time','team_type','linkman_name','linkman_tel'],
 			root : 'records',
 			totalProperty : 'totalProperty',
 			autoDestroy : true
@@ -517,7 +517,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 	        store: this.taskStore,
 	        cm: new Ext.ux.grid.LockingColumnModel({
 	        	columns:[
-				{header: '工单编号',dataIndex : 'task_id', width: 80},
+				{header: taskCols[10],dataIndex : 'task_id', width: 80},
 				{header: taskCols[0],		dataIndex : 'task_type_id_text', 	width: 70, renderer: function(v, m ,rs){
 					return "<span style='font-weight: bold;'>"+ v +"</span>";
 				}},
@@ -540,7 +540,9 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 				{header: taskCols[6], dataIndex : 'tel', 				width: 100},
 				{header: taskCols[7], dataIndex: 'task_create_time', 	width: 80, renderer: Ext.util.Format.dateFormat},					
 				{header: taskCols[8],dataIndex:'bug_type_text',width:85},
-				{header: taskCols[9],dataIndex:'bug_detail',width:120,renderer:App.qtipValue}
+				{header: taskCols[9],dataIndex:'bug_detail',width:120,renderer:App.qtipValue},
+				{header: taskCols[11],dataIndex:'linkman_name',width:80,renderer:App.qtipValue},
+				{header: taskCols[12],dataIndex:'linkman_tel',width:100,renderer:App.qtipValue}
 	        ]}),
 	        sm: sm,
 	        stripeRows: true,
@@ -617,9 +619,77 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 				});
 		}); 
 	},
-	doSendTask: function(){
+	doSendTask: function(){//发送ZTE
 		var rs = this.getSelections();
 		if(rs === false){return ;}
+		var finishCombo = new Ext.form.ComboBox({
+			width: 120,
+			fieldLabel:lbc('home.tools.TaskManager.forms.finishType'),
+			allowBlank:false,
+			typeAhead:true,editable:true,
+			paramName:'TASK_FINISH_TYPE',
+			store:new Ext.data.JsonStore({
+				fields:['item_value','item_name']
+			}),displayField:'item_name',valueField:'item_value',
+			triggerAction:'all',mode:'local'
+		});
+		App.form.initComboData([finishCombo]);
+		var endForm = new Ext.form.FormPanel({
+			layout : 'form',
+			border : false,
+			labelWidth : 100,
+			bodyStyle : 'padding : 5px;padding-top : 10px;',
+			items: [finishCombo,{
+				fieldLabel: lbc('home.tools.TaskManager.forms.finishExplan'),
+				name:'finishRemark',
+				height : 100,
+				width : 240,
+				xtype:'textarea'
+			}]
+		});
+		var win = new Ext.Window({
+			width: 450,
+			height: 250,
+			title: lbc('home.tools.TaskManager._winTitle'),
+			border: false,
+			closeAction:'close',
+			layout: 'fit',
+			items: endForm,
+			buttons: [{
+				text: lbc('common.save'),
+				scope: this,
+				iconCls : 'icon-save',
+				handler: function(){
+					if(Ext.isEmpty(finishCombo.getValue())){
+						Alert(lbc('home.tools.TaskManager.msg.finishTypeCantEmpty'));return false;
+					}
+					var url = Constant.ROOT_PATH + "/core/x/Task!endTask.action";
+					var taskId = rs.get("task_id");
+					var o = {
+						task_id : taskId, 
+						resultType : finishCombo.getValue(),
+						finishRemark : endForm.getForm().findField('finishRemark').getValue()
+					};
+					App.sendRequest( url, o, function(res,opt){
+						Ext.getCmp('taskManagerPanelId').grid.getStore().reload({
+							callback:function(records, options, success){  
+				           		var panel = Ext.getCmp('taskManagerPanelId');
+					           	var index = panel.grid.getStore().find('task_id',taskId);	           		
+					           	panel.grid.getSelectionModel().selectRow(index);
+					           	panel.loadTaskData(taskId);
+							}
+				         });
+						win.close();
+					});
+				}
+			},{
+				text: lbc('common.cancel'),
+				handler: function(){
+					win.hide();
+				}
+			}]
+		});
+		win.show();
 
 	},
 	doWithdrawTask:function(){//工单撤回

@@ -72,9 +72,11 @@ public class WTaskBaseInfoDao extends BaseEntityDao<WTaskBaseInfo> {
 	public Pager<TaskBaseInfoDto> queryTask(String taskTypes, String addrIds, String beginDate, String endDate,
 			String taskId, String teamId, String status, String custNo, String custName, String custAddr,String mobile, Integer start, Integer limit) throws Exception {
 		
-		String sql = "select t.*,wt.team_type "
-				+ " from w_task_base_info t, C_CUST c ,w_team wt "+(StringHelper.isEmpty(addrIds)?"":", t_district td, t_address ta,t_province tp")
-				+ " where t.cust_id = c.cust_id and t.team_id = wt.dept_id(+) "+(StringHelper.isEmpty(addrIds)?"":" and c.addr_id = ta.addr_id "
+		String sql = "select t.*,wt.team_type,case when s.tel is null and s.mobile is null then '' "
+				+ " when s.mobile is null then  s.tel  "
+				+ " when s.tel is null then s.mobile  else s.tel||','||s.mobile end linkman_tel ,c.cust_name linkman_name "
+				+ " from w_task_base_info t, C_CUST c ,w_team wt,s_optr s "+(StringHelper.isEmpty(addrIds)?"":", t_district td, t_address ta,t_province tp")
+				+ " where t.cust_id = c.cust_id and c.str9 = s.optr_id(+) and t.team_id = wt.dept_id(+) "+(StringHelper.isEmpty(addrIds)?"":" and c.addr_id = ta.addr_id "
 				+ "and ta.district_id = td.district_id  and td.province_id=tp.id and  tp.id in ("+sqlGenerator.in(addrIds.split(","))+")") ;
 		List<Object> params = new ArrayList<Object>();
 		
@@ -141,9 +143,11 @@ public class WTaskBaseInfoDao extends BaseEntityDao<WTaskBaseInfo> {
 	public Pager<TaskBaseInfoDto> queryUnProcessTask(String deptId, String taskStatus, String zteStatus, Integer start,
 			Integer limit) throws JDBCException {
 		
-		String sql = "select t.* ,wt.team_type "
-				+ " from w_task_base_info t, C_CUST c  ,w_team wt "
-				+ " where t.cust_id = c.cust_id and t.team_id = wt.dept_id(+) " ;
+		String sql = "select t.* ,wt.team_type,case when s.tel is null and s.mobile is null then '' "
+				+ " when s.mobile is null then  s.tel  "
+				+ " when s.tel is null then s.mobile  else s.tel||','||s.mobile end linkman_tel ,c.cust_name linkman_name "
+				+ " from w_task_base_info t, C_CUST c  ,w_team wt,s_optr s "
+				+ " where t.cust_id = c.cust_id and c.str9 = s.optr_id(+) and t.team_id = wt.dept_id(+) " ;
 		
 		if(StringHelper.isNotEmpty(taskStatus)){
 			sql += "  AND T.TASK_STATUS in ("+sqlGenerator.in(taskStatus.split(","))+")";
