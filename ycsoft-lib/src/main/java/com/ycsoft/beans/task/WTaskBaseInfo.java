@@ -59,6 +59,44 @@ public class WTaskBaseInfo implements Serializable{
 	private String bug_type_text;
 	private String team_id_text;
 	
+	private Date  task_status_date;
+	private Date zte_status_date;
+	private String sync_statu;//同步状态
+	private Date sync_status_date;//同步状态时间
+	
+	
+	public Date getTask_status_date() {
+		return task_status_date;
+	}
+
+	public void setTask_status_date(Date task_status_date) {
+		this.task_status_date = task_status_date;
+	}
+
+	public Date getZte_status_date() {
+		return zte_status_date;
+	}
+
+	public void setZte_status_date(Date zte_status_date) {
+		this.zte_status_date = zte_status_date;
+	}
+
+	public String getSync_statu() {
+		return sync_statu;
+	}
+
+	public void setSync_statu(String sync_statu) {
+		this.sync_statu = sync_statu;
+	}
+
+	public Date getSync_status_date() {
+		return sync_status_date;
+	}
+
+	public void setSync_status_date(Date sync_status_date) {
+		this.sync_status_date = sync_status_date;
+	}
+
 	public String getTask_id() {
 		return task_id;
 	}

@@ -63,6 +63,7 @@ public class TaskComponent extends BaseComponent {
 		client.cancelTaskService(doneCode, taskId);
 		//更新工单状态为待派单
 		this.updateTaskBaseInfoStatus(taskId, StatusConstants.TASK_CREATE);
+		wTaskBaseInfoDao.updateTaskSyncStatus(taskId, StatusConstants.SUCCESS);
 	}
 	/**
 	 * 同步工单给cfocn
@@ -88,6 +89,8 @@ public class TaskComponent extends BaseComponent {
 		boolean sign= client.createTaskService(task, userList, extInfo);
 		//更新工单状态为施工中
 		this.updateTaskBaseInfoStatus(taskId, StatusConstants.TASK_INIT);
+		//同步标志成功
+		wTaskBaseInfoDao.updateTaskSyncStatus(taskId, StatusConstants.SUCCESS);
 		return sign;
 	}
 	
@@ -125,8 +128,10 @@ public class TaskComponent extends BaseComponent {
 		}else if (result.isUndefinedError() || result.isConnectionError()){
 			//网络错误或者未知严重错误需要重发,所有不设置已发状态
 			log.setSyn_status(StatusConstants.NOT_EXEC);
+			wTaskBaseInfoDao.updateTaskSyncStatus(log.getTask_id(), StatusConstants.FAILURE);
 		}else {
 			log.setSyn_status(StatusConstants.FAILURE);
+			wTaskBaseInfoDao.updateTaskSyncStatus(log.getTask_id(), StatusConstants.FAILURE);
 		}
 		
 		log.setError_code(result.getErr());
@@ -135,4 +140,21 @@ public class TaskComponent extends BaseComponent {
 		wTaskLogDao.update(log);
 		
 	}
+	/**
+	 * 查询一个部门创建的工单的新增派单
+	 */
+	public int queryInitAddCntByDeptId(String deptId,Date currentTimeStamp)throws Exception{
+		return wTaskBaseInfoDao.queryStatusAddCntByDeptTimeStamp(deptId, currentTimeStamp, StatusConstants.TASK_INIT);
+	}
+	/**
+	 * 查询一个部门创建的工单的新增完工
+	 * @param deptId
+	 * @param currentTimeStamp
+	 * @return
+	 * @throws Exception
+	 */
+	public int queryEndAddCntByDeptId(String deptId,Date currentTimeStamp)throws Exception{
+		return wTaskBaseInfoDao.queryStatusAddCntByDeptTimeStamp(deptId, currentTimeStamp, StatusConstants.TASK_END);
+	}
+	
 }

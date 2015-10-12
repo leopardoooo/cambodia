@@ -206,11 +206,13 @@ public class SnTaskComponent extends BaseBusiComponent {
 			jo.addProperty("Team", SystemConstants.TEAM_TYPE_CFOCN);
 			createTaskLog(taskId, BusiCodeConstants.TASK_ASSIGN, doneCode, jo.toString(), StatusConstants.NOT_EXEC);
 			wTaskBaseInfoDao.updateTaskStatus(taskId, StatusConstants.TASK_CREATE);
+			wTaskBaseInfoDao.updateTaskSyncStatus(taskId, StatusConstants.NOT_EXEC);
 		} else {
 			JsonObject jo = new JsonObject();
 			jo.addProperty("Team", SystemConstants.TEAM_TYPE_SUPERNET);
 			createTaskLog(taskId, BusiCodeConstants.TASK_ASSIGN, doneCode,jo.toString(), StatusConstants.NONE);
 			wTaskBaseInfoDao.updateTaskStatus(taskId, StatusConstants.TASK_INIT);
+			wTaskBaseInfoDao.updateTaskSyncStatus(taskId, StatusConstants.NONE);
 		}
 	}
 	
@@ -297,6 +299,7 @@ public class SnTaskComponent extends BaseBusiComponent {
 		task.setTask_id(taskId);
 		task.setTask_status(StatusConstants.CANCEL);
 		task.setTask_invalide_time(new Date());
+		task.setTask_status_date(new Date());
 		wTaskBaseInfoDao.update(task);
 		// 如果是CFON的工单需要同步
 		task = wTaskBaseInfoDao.findByKey(taskId);
@@ -336,6 +339,7 @@ public class SnTaskComponent extends BaseBusiComponent {
 			cUserDao.update(user);
 			// 更新工单修改中兴配置的状态
 			task.setZte_status(StatusConstants.NOT_EXEC);
+			task.setZte_status_date(new Date());
 			wTaskBaseInfoDao.update(task);
 		}
 
@@ -368,6 +372,7 @@ public class SnTaskComponent extends BaseBusiComponent {
 				cUserDao.update(band);
 				// 更新工单修改中兴配置的状态
 				task.setZte_status(StatusConstants.NOT_EXEC);
+				task.setZte_status_date(new Date());
 				wTaskBaseInfoDao.update(task);
 
 				// 记录操作日志
@@ -405,7 +410,7 @@ public class SnTaskComponent extends BaseBusiComponent {
 		task.setTask_finish_type(resultType);
 		task.setTask_finish_desc(finishDesc);
 		task.setTask_finish_time(new Date());
-
+		task.setTask_status_date(new Date());
 		wTaskBaseInfoDao.update(task);
 		// 记录操作日志
 		JsonObject jo = new JsonObject();
@@ -419,6 +424,7 @@ public class SnTaskComponent extends BaseBusiComponent {
 		WTaskBaseInfo task = new WTaskBaseInfo();
 		task.setTask_id(task_id);
 		task.setZte_status(zte_status);
+		task.setZte_status_date(new Date());
 		wTaskBaseInfoDao.update(task);
 
 		// 记录操作日志

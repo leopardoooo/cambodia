@@ -4,6 +4,7 @@
 
 package com.ycsoft.business.dao.task;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
@@ -44,7 +45,12 @@ public class WTaskBaseInfoDao extends BaseEntityDao<WTaskBaseInfo> {
 	}
 
 	public void updateTaskStatus(String taskId,String status) throws JDBCException{
-		String sql="update w_task_base_info set task_status=? where task_id=? ";
+		String sql="update w_task_base_info set task_status=? ,task_status_date=sysdate where task_id=? ";
+		this.executeUpdate(sql, status,taskId);
+	}
+	
+	public void updateTaskSyncStatus(String taskId,String status)throws JDBCException{
+		String sql="update w_task_base_info set sync_status=? ,sync_status_date=sysdate where task_id=? ";
 		this.executeUpdate(sql, status,taskId);
 	}
 	/**
@@ -159,6 +165,28 @@ public class WTaskBaseInfoDao extends BaseEntityDao<WTaskBaseInfo> {
 			.setLimit(limit)
 			.setStart(start)
 			.page();
+	}
+
+	
+	/**
+	 * 查询一个部门相关的新增派单
+	 * @throws JDBCException 
+	 */
+	public int queryStatusAddCntByDeptTimeStamp(String deptId,Date currentTimeStamp,String status) throws JDBCException{
+		String sql="select count(1) from w_task_base_info t,s_optr op "
+					+" where t.task_status=? and t.task_status_date>? "
+					+" and t.optr_id=op.optr_id and op.dept_id=?";
+		//this.findUnique(sql, params)
+		return this.count(sql, status,currentTimeStamp,deptId);
+	}
+	/**
+	 * 查询一个部门相关的工单新增派单同步失败
+	 */
+	public int querySyncErrorAddCntByDeptTimeStamp(String deptId,Date currentTimeStamp)throws JDBCException{
+		String sql="select count(1) from w_task_base_info t,s_optr op "
+				+" where t.task_status=? and t.sync_status=? and t.sync_status_date>? "
+				+" and t.optr_id=op.optr_id and op.dept_id=?";
+		return this.count(sql, StatusConstants.TASK_CREATE,StatusConstants.FAILURE,currentTimeStamp,deptId);
 	}
 
 }
