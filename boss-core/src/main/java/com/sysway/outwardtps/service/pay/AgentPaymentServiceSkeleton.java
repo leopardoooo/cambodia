@@ -6,13 +6,14 @@
  */
 package com.sysway.outwardtps.service.pay;
 
+import com.ycsoft.business.commons.interceptor.ServiceNotInterceptInterface;
 import com.ycsoft.business.service.impl.UserServiceSN;
 
 /**
  *  AgentPaymentServiceSkeleton java skeleton for the axisService
  */
 public class AgentPaymentServiceSkeleton
-    implements AgentPaymentServiceSkeletonInterface {
+    implements AgentPaymentServiceSkeletonInterface,ServiceNotInterceptInterface {
 	
 	private UserServiceSN userServiceSN;
 	

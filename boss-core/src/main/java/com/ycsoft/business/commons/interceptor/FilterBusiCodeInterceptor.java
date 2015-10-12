@@ -30,8 +30,14 @@ public class FilterBusiCodeInterceptor implements MethodBeforeAdvice {
 	public void before(@SuppressWarnings("unused")
 	Method method, @SuppressWarnings("unused")
 	Object[] params, Object scope) throws Throwable {
+		System.out.println(scope);
+		System.out.println(scope.getClass());
+		if(scope instanceof ServiceNotInterceptInterface ){
+			//不拦截，放行
+			return ;
+		}
 		if(!(scope instanceof BaseService)){
-			throw new Exception("该拦截器只适用于Service层...");
+			throw new Exception("该拦截器只适用于Service层...1");
 		}
 		if(scope instanceof  OttExternalService ){
 			//接口不拦截

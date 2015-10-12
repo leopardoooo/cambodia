@@ -10,13 +10,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.ycsoft.beans.task.TaskFillDevice;
+import com.ycsoft.business.commons.interceptor.ServiceNotInterceptInterface;
 import com.ycsoft.business.service.impl.SnTaskService;
 
 /**
  *  BOSSWebServiceSoapImplServiceSkeleton java skeleton for the axisService
  */
 public class BOSSWebServiceSoapImplServiceSkeleton
-    implements BOSSWebServiceSoapImplServiceSkeletonInterface {
+    implements BOSSWebServiceSoapImplServiceSkeletonInterface,ServiceNotInterceptInterface {
     
 	private SnTaskService snTaskService;
 	
