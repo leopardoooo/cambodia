@@ -527,7 +527,7 @@ BCLang.home = {
 				finishExplan : 'completed Description~',
 				zteStatus	: 'ZTE status~',
 				zteRemark :'remark~',
-				syncStatus:'synchronous status~'
+				syncStatus:'cfocn synchronous status~'
 			},
 			buttons : {
 				query : 'Query~',
@@ -542,7 +542,8 @@ BCLang.home = {
 				withdraw : 'CFOCN Withdraw~'
 			},
 			taskCols : ['WorkOrdersType~', 'CustName~', 'WorkOrdersStatus~', 'ConstructionTeam~',
-					'ZTEState~', 'Address~', 'Tel~', 'CreatTime~', 'FaultType~', 'FaultDetails~','WorkNo.~','CustManager~','CustManagerTel~'],
+					'ZTEState~', 'Address~', 'Tel~', 'CreatTime~', 'FaultType~', 'FaultDetails~','WorkNo.~','CustManager~'
+					,'CustManagerTel~','CustNo~','cfocnSyncStatus'],
 			userCols : ['UserType~', 'UserName~', 'Password~', 'DeviceModel~', 'DeviceNO.~', 'PosNo~', 'OccNo~', 'Bandwidth~'],
 			operateCols : ['OperatingTime~', 'OperationType~', 'Operator~,', 'SyncStatus~', 'Description~','DelayTime~'],
 			taskDeviceCols : ['UserType~', 'UserName~', 'Model~', 'DeviceNO.~', 'EquipmentRecycling~','OldDeviceNO.~'],
