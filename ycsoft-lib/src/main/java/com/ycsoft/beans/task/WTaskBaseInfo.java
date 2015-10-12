@@ -49,6 +49,7 @@ public class WTaskBaseInfo implements Serializable{
 	private String bug_type;
 	private String bug_detail;
 	private String optr_id;
+	private Integer finish_done_code;
 
 	private String task_type_name;
 	private String task_detail_type_name;
@@ -399,6 +400,12 @@ public class WTaskBaseInfo implements Serializable{
 		this.task_finish_desc = task_finish_desc;
 	}
 	
-	
+	public Integer getFinish_done_code() {
+		return finish_done_code;
+	}
+
+	public void setFinish_done_code(Integer finish_done_code) {
+		this.finish_done_code = finish_done_code;
+	}
 	
 }
