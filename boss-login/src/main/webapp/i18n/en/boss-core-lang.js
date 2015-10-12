@@ -85,7 +85,7 @@ BCLang.home = {
 			pay: {
 				_stayTitle: 'Items to be paid~',
 				_title: 'Payment~',
-				columns: ['Operate~', 'Service Name~', 'Fee Name~', 'Paid Money Amount~', 'Order No.~', 'Remark~', 'Quantity~', 'Operate Time~', 'Fee No.~', 'serial number~'],
+				columns: ['Operate~', 'Service Name~', 'Fee Name~', 'Paid Money Amount~', 'Order No.~', 'Remark~', 'Quantity~', 'Operate Time~', 'Fee No.~', 'Serial Number~'],
 				buttons: ['Save~', 'Close~']
 			},
 			charge:{
@@ -251,7 +251,7 @@ BCLang.home = {
 			prod: {
 				base: {
 					_title: " Customer Product~",
-					columns: ["Order Sn","Product Name~","Belonged Package~","Current Fee~","Effective Date~" ,"Invalid Date~","Status~","Status Change Time~","Purchase Time~" ,"Purchase Month Quantity~","Create serial number~"]
+					columns: ["Order Sn","Product Name~","Belonged Package~","Current Fee~","Effective Date~" ,"Invalid Date~","Status~","Status Change Time~","Purchase Time~" ,"Purchase Month Quantity~","Create Serial Number~"]
 				},
 				pkg: {
 					_title: 'Customer Package~',
@@ -267,25 +267,25 @@ BCLang.home = {
 			},
 			prodDetail: {
 				tabs: ["Order Amount in Details~","Abnormal Information~"],
-				detail: ["No.~","Fund Type~"," Import Product~"," Import Type~"," Import Money Amount~"," Export Product~","Export Type~","Import Money Amount~","serial number~" ]
+				detail: ["No.~","Fund Type~"," Import Product~"," Import Type~"," Import Money Amount~"," Export Product~","Export Type~","Import Money Amount~","Serial Number~" ]
 			}
 		},
 		//Payment Records
 		pay: {
 			payfee: {
 				_title: "prepaid money~",
-				columns: ["serial number~","Service Name~","Account Type~","Account Name~","User Type~", "User Name~","Equipment No.~","Status~","Money Amount~","Estimated Expiry Date before Payment~",
+				columns: ["Serial Number~","Service Name~","Account Type~","Account Name~","User Type~", "User Name~","Equipment No.~","Status~","Money Amount~","Estimated Expiry Date before Payment~",
 				        "Expiry Date after Payment~","Print Status~","Payment Way~","Reception Date~","Account Date~","Receptionist~","Reception Department~","Invoice~","Invoice Issuance Way~", "Invoice Type~", "Development of Human ~"]
 			},
 			busifee: {
 				_title: "Service Fee~",
-				columns: ["serial number~","Fee Name~","Equipment Type~","Equipment No.~","Status~","Print Status~",
+				columns: ["Serial Number~","Fee Name~","Equipment Type~","Equipment No.~","Status~","Print Status~",
 				          "Payable~","Paid~","Payment Way~","ReceptionDate~","Receptionist~","ReceptionDepartment~","Invoice~"," Invoice Issuance Way~","Invoice Type~","Buy Quantity~","Equipment Type~","Remark~"]
 			},
 			detail: {
 				_title: 'payment record~',
 				columns: ["Payment No.~","USD~","KHR~","Exchange~","KHR Round-off~","Effective~","Payment Way~",
-				          "Payer~","Service serial number~","Reception No.~","Reception Issuance Way~","Reception Date~","Receptionist~","Reception Department~"]
+				          "Payer~","Service Serial Number~","Reception No.~","Reception Issuance Way~","Reception Date~","Receptionist~","Reception Department~"]
 			},
 			feePayDetail: {
 				_title: 'Fee Details~',
@@ -327,7 +327,7 @@ BCLang.home = {
 		//Reception Record
 		doneCode: {
 			_title: ' Reception Record~',
-			columns: ["serial number~","Service Name~","Status~","Reception Date~","Operator~","Reception Department~",
+			columns: ["Serial Number~","Service Name~","Status~","Reception Date~","Operator~","Reception Department~",
 			         "Returnable~","Ignorable~","Paid Money Amount~"," Service Expansion Information~","Remark~"]
 		},
 		//instruction
@@ -352,7 +352,7 @@ BCLang.home = {
 				_title: 'Bill Information~',
 				columns: ['Billing Period~','Source~','Smart Card No.~','Serial~','Charge-off Time~','Account Name~',
 				      'Fee Name~','Status~',' Charge-off Money Amount~','Due Money Amount~','Operate~'],
-				tbar: ["Smart Card~","serial number~","Due Bill~","All Bill~"]
+				tbar: ["Smart Card~","Serial Number~","Due Bill~","All Bill~"]
 			},
 			acctitemInvalid: {
 				_title: 'Account Invalid Information~',
@@ -457,7 +457,7 @@ BCLang.home = {
 			titlePrintPreview:'Print Preview~',
 			titleInvoiceWindow:'Print {0} Invoices totally~',
 			wdxj:'Shop Cash~',
-			printGridColumns:['serial number~','Reception Name~','Create Time~'],
+			printGridColumns:['Serial Number~','Reception Name~','Create Time~'],
 			invoiceGridColumns:['Serial Number~','Invoice No.~','Invoice Code~'],
 			printItemGridColumns:['Name~','Money Amount~'],
 			stillEmptyInvoiceField:"Still empty invoice input frame!~",
@@ -510,8 +510,9 @@ BCLang.home = {
 			_title : 'Work Order Management~',
 			_operateTitle : 'Operation Details~',
 			_userTitle : 'User Details~',
-			_winTitle : 'Work Order completion~',
-			_ZteWinTitle : 'ZTE authorized~',
+			_winTitle : 'Work Order Completion~',
+			_ZteWinTitle : 'ZTE Authorized~',
+			_fillDevTitle: 'Backfill Equipment',
 			forms : {
 				custNo : 'Customer ID~',
 				taskNo : 'WorkOrdersNo.~',
