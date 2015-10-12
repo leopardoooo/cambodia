@@ -9,7 +9,7 @@
         </messageReceivers>
         
         <parameter name="ServiceObjectSupplier">org.apache.axis2.extensions.spring.receivers.SpringServletContextObjectSupplier</parameter>
-        <parameter name="SpringBeanName">bossWebServiceSoapImplServiceSkeleton</parameter>
+        <parameter name="SpringBeanName">bossTaskSoapImplSkeleton</parameter>
         <parameter name="useOriginalwsdl">true</parameter>
         <parameter name="modifyUserWSDLPortAddress">true</parameter>
         
