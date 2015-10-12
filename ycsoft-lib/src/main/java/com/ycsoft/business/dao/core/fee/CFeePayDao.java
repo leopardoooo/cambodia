@@ -715,7 +715,7 @@ public class CFeePayDao extends BaseEntityDao<CFeePay> {
 	public List<FeeDto> queryFeePayDetail(String paySn)throws Exception {
 		String sql = null;
 		sql = append(
-				" select t.real_pay,decode(t1.fee_name,null,t2.acctitem_name,t1.fee_name) fee_text " +
+				" select t.real_pay,decode(t1.fee_name,null,t2.acctitem_name,t1.fee_name) fee_text,t.invoice_id,t.create_done_code " +
 				" from c_fee t, t_busi_Fee t1, vew_acctitem t2",				
 				" where t.fee_id = t1.fee_id(+) and t.acctitem_id = t2.acctitem_id(+) and t.pay_sn  = ? ");
 		return createQuery(FeeDto.class, sql,paySn).list();

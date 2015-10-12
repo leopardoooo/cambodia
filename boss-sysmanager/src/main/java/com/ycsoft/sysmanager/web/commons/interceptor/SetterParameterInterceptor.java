@@ -10,6 +10,7 @@ import com.ycsoft.beans.system.SOptr;
 import com.ycsoft.commons.abstracts.BaseComponent;
 import com.ycsoft.commons.constants.Environment;
 import com.ycsoft.commons.helper.JsonHelper;
+import com.ycsoft.commons.store.MemoryDict;
 
 /**
  * 使用拦截器设置 <code>Parameter</code> 等信息,
@@ -42,6 +43,11 @@ public class SetterParameterInterceptor implements MethodBeforeAdvice {
 					throw new Exception("操作员信息无法获取，系统错误");
 				}
 				WebOptr.setOptr(JsonHelper.toObject(optr.toString(), SOptr.class));
+				
+				Object langObj = request.getSession().getAttribute(Environment.USER_IN_SESSION_LANG);
+				if(langObj != null && !langObj.toString().equals(MemoryDict.getLang())){
+					MemoryDict.setLang(langObj.toString());
+				}
 			}
 			
 		}catch (Exception e) {

@@ -263,6 +263,10 @@ CardSendForm = Ext.extend(Ext.FormPanel, {
 		                    columnWidth: 1,
 		                    id:'fileFormId',
 		                    items: [{
+					                xtype: 'displayfield',
+					                width : 400,
+					                value:"<font style='font-size:13px;color:red'>支持xls和txt,格式为：第一行为空,共1列：设备号</font>"
+								},{
 		                    	id:'caFileId',xtype:'textfield',fieldLabel:'文件',inputType:'file',
 		                    	allowBlank:false,anchor:'95%',name:'files'}]
 	                    },{
@@ -336,8 +340,8 @@ CardSendForm = Ext.extend(Ext.FormPanel, {
 		                }					
 					]
 				},{
-					xtype:'panel',flex:1,layout : 'column',defaults : {
-							width:'200',
+					xtype:'panel',flex:2,layout : 'column',defaults : {
+							width:300,
 							baseCls : 'x-plain',
 							columnWidth : 1,
 							layout : 'form',
@@ -355,7 +359,7 @@ CardSendForm = Ext.extend(Ext.FormPanel, {
 	                        imagePath: '/' + Constant.ROOT_PATH_LOGIN + '/resources/images/itemselectorImage',
 	                        multiselects: [{
 	                            legend: '待选资源',
-	                            width: 160,
+	                            width: 140,
 	                            height: 220,
 	                            store: new Ext.data.ArrayStore({
 	                                fields: ['res_id', 'res_name']
@@ -381,7 +385,7 @@ CardSendForm = Ext.extend(Ext.FormPanel, {
 	                            }]
 	                        	}, {
 		                            legend: '已选资源',
-		                            width: 100,
+		                            width: 140,
 		                            height: 220,
 		                            store: new Ext.data.ArrayStore({
 		                                fields: ['res_id', 'res_name']
@@ -405,9 +409,9 @@ CardSendForm = Ext.extend(Ext.FormPanel, {
 		                        fieldLabel: '信息',
 		                        xtype: 'textarea',
 		                        id: 'messageOsd',
-		                        width: 180,
+		                        width: 300,
 		                        allowBlank: false,
-		                        height: 100,
+		                        height: 150,
 		                        name: 'message',
 		                        listeners: {
 		                            scope: this,
@@ -420,7 +424,7 @@ CardSendForm = Ext.extend(Ext.FormPanel, {
 		                        id: 'messageNumberOsdId',
 		                        layout: 'form',
 		                        id: 'invoiceBookStatisOsdId',
-		                        value: '还剩96个字符(48个中文)',
+		                        value: '还剩96个字符',
 		                        labelWidth: 75,
 		                        border: false
 		                    }]
@@ -659,13 +663,15 @@ CardSendForm = Ext.extend(Ext.FormPanel, {
 	                }
 	            });
         	}else if(sendType == 'FILE'){
-        		var flag = checkFileType(Ext.getCmp('caFileId').getValue());
-				if(!flag)return;
+//        		var flag = checkFileType(Ext.getCmp('caFileId').getValue());
+//				if(!flag)return;
+				var flag = checkTxtXlsFileType(Ext.getCmp('caFileId').getValue());
+				if(flag === false)return;
         		newValues['busiCmd.supplier_id'] = this.supplier_id;
         		mb = Show(); // 显示正在提交
         		Ext.Ajax.request({
         			form:this.form.el.dom,
-        			url:root + '/resource/Job!createBusiCmdFile.action',
+        			url:root + '/resource/Job!createBusiCmdFile.action?fileType='+flag,
         			params:newValues,
         			scope:this,
         			isUpload:true,

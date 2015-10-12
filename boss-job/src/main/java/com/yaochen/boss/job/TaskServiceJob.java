@@ -8,21 +8,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.yaochen.boss.job.component.TaskComponent;
 import com.yaochen.myquartz.Job2;
 import com.yaochen.myquartz.Job2ExecutionContext;
-import com.ycsoft.beans.task.TaskCustExtInfo;
-import com.ycsoft.beans.task.WTaskBaseInfo;
 import com.ycsoft.beans.task.WTaskLog;
-import com.ycsoft.beans.task.WTaskUser;
 import com.ycsoft.boss.remoting.cfocn.CFOCN_WebSvc_WorkOrderStub.ResultHead;
 import com.ycsoft.boss.remoting.cfocn.WordOrderException;
 import com.ycsoft.boss.remoting.cfocn.WorkOrderClient;
 import com.ycsoft.boss.remoting.ott.Result;
 import com.ycsoft.commons.constants.BusiCodeConstants;
-import com.ycsoft.commons.helper.StringHelper;
+import com.ycsoft.commons.constants.SystemConstants;
 
 /**
  * 发送工单创建信息
@@ -41,8 +36,11 @@ public class TaskServiceJob implements Job2 {
 			throws JobExecutionException {
 		WorkOrderClient client = new WorkOrderClient();
 		List<WTaskLog> taskLogList = null;
+		//施工队
+		String cfonTeamId =null; 
 		try{
 			taskLogList = taskComponent.querySynTaskLog();
+			cfonTeamId=taskComponent.getTeamId(SystemConstants.TEAM_TYPE_CFOCN);
 		}catch(Exception e){
 			e.printStackTrace();
 			logger.error("读取工单同步信息错误"+e.getMessage());
@@ -51,25 +49,17 @@ public class TaskServiceJob implements Job2 {
 		
 		for (WTaskLog taskLog:taskLogList){
 			Result result = new Result();
-			JsonObject params =null;
+			/**JsonObject params =null;
 			if (StringHelper.isNotEmpty(taskLog.getLog_detail()))
 				params = new JsonParser().parse(taskLog.getLog_detail()).getAsJsonObject();
+			**/
 			try{
-				if (taskLog.getBusi_code().equals(BusiCodeConstants.TASK_CANCEL)){
-					client.cancelTaskService(taskLog.getDone_code(), taskLog.getTask_id());
-				} else if (taskLog.getBusi_code().equals(BusiCodeConstants.TASK_INIT)){
-					sendNewWorkOrder(client,taskLog.getTask_id());
+				if (taskLog.getBusi_code().equals(BusiCodeConstants.TASK_Withdraw)){
+					//撤回工单
+					taskComponent.cancelTaskService(client,taskLog.getTask_id(),taskLog.getDone_code());
 				} else if (taskLog.getBusi_code().equals(BusiCodeConstants.TASK_ASSIGN)){
-					String synType = getJsonValue(params, "synType");
-					if ("add".equals(synType)){
-						sendNewWorkOrder(client,taskLog.getTask_id());
-					} else if ("cancel".equals(synType)){
-						client.cancelTaskService(taskLog.getDone_code(), taskLog.getTask_id());
-					} else {
-						result.setStatus(Result.BOSS_ERROR_STATUS);
-						result.setReason("未定义的同步类型");
-					}
-				} else {
+					taskComponent.sendNewWorkOrder(client,taskLog.getTask_id(),cfonTeamId);		
+				}else {
 					result.setStatus(Result.BOSS_ERROR_STATUS);
 					result.setReason("未定义的同步类型");
 				}
@@ -114,18 +104,9 @@ public class TaskServiceJob implements Job2 {
 
 	}
 
-	private boolean sendNewWorkOrder(WorkOrderClient client, String taskId) throws Exception{
-		WTaskBaseInfo task;
-		task = taskComponent.queryTaskBaseInfo(taskId);
-		List<WTaskUser> userList = taskComponent.queryTaskUser(taskId);
-		TaskCustExtInfo extInfo = taskComponent.queryCustInfo(task.getCust_id());
-		return client.createTaskService(task, userList, extInfo);
-		
-	}
-	
+	/**
 	private String getJsonValue(JsonObject jo,String key){
 		return jo.get(key).isJsonNull()?null:jo.get(key).getAsString();
-	}
+	}**/
 
-	
 }

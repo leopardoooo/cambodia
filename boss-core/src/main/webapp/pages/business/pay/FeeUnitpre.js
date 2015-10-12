@@ -4,7 +4,7 @@
 var FeeUnitpreForm = Ext.extend(BaseForm,{
 	url:Constant.ROOT_PATH+"/core/x/Acct!saveGeneralContract.action",
 	constructor:function(){
-		
+		var forms = lbc('home.tools.feeUnitpre.forms');
 		FeeUnitpreForm.superclass.constructor.call(this,{
 			id:'feeUnitpreFormId',
 			border:false,
@@ -32,18 +32,18 @@ var FeeUnitpreForm = Ext.extend(BaseForm,{
 			},{
 				items:[{
 					xtype:'textfield',
-					fieldLabel:'客户名称',
+					fieldLabel: forms['cust_name'],
 					name:'generalContract.cust_name',
 					allowBlank:false
 				},{
 					xtype:'textfield',
-					fieldLabel:'合同号',
+					fieldLabel: forms['contract_no'],
 					vtype : 'alphanum',
 					name:'generalContract.contract_no',
 					allowBlank:false
 				},{
 					xtype:'numberfield',
-					fieldLabel:'合同金额',
+					fieldLabel: forms['nominal_amount'],
 					minValue : 1,
 					id : 'nominalAmount',
 					name:'generalContract.nominal_amount',
@@ -56,7 +56,7 @@ var FeeUnitpreForm = Ext.extend(BaseForm,{
 			},{
 				items:[{
 					xtype:'combo',
-					fieldLabel:'费用名称',
+					fieldLabel: forms['fee_name'],
 					store : new Ext.data.JsonStore({
 						autoLoad : true,
 						url : Constant.ROOT_PATH+"/core/x/Acct!queryUnBusiFee.action",
@@ -75,12 +75,12 @@ var FeeUnitpreForm = Ext.extend(BaseForm,{
 					}
 				},{
 					xtype:'textfield',
-					fieldLabel:'合同名称',
+					fieldLabel: forms['contract_name'],
 					name:'generalContract.contract_name',
 					allowBlank:false
 				},{
 					xtype:'combo',
-					fieldLabel:'所属城市',
+					fieldLabel: forms['addr_district'],
 					store : new Ext.data.JsonStore({
 						autoLoad : true,
 						url : Constant.ROOT_PATH+"/commons/x/QueryParam!queryAddrDistrict.action",
@@ -104,17 +104,17 @@ var FeeUnitpreForm = Ext.extend(BaseForm,{
 				items:[{
 						xtype: 'displayfield',
 						style: Constant.MONEY_LABEL_STYLE,
-						fieldLabel: '总额USD',
+						fieldLabel: forms['lblFee'],
 						value: '0.00',
 						id: 'labelDollor',
 						name: 'lblFee'
 					},{
 						xtype: 'displayfield',
-						fieldLabel: '柬埔寨KHR',
+						fieldLabel: forms['LabelJian'],
 						value: '0.00',
 						id: 'LabelJian'
 					},{
-						fieldLabel: '实收USD',
+						fieldLabel: forms['nfDollar'],
 						xtype: 'numberfield',
 						decimalPrecision: 0,
 						id: 'nfDollar',
@@ -124,7 +124,7 @@ var FeeUnitpreForm = Ext.extend(BaseForm,{
 							change: this.doCalcJianYuan
 						}
 					},{
-						fieldLabel: '实收KHR',
+						fieldLabel: forms['nfJianYuan'],
 						xtype: 'numberfield',
 						name: 'pay.khr',
 						decimalPrecision: 0,
@@ -134,11 +134,11 @@ var FeeUnitpreForm = Ext.extend(BaseForm,{
 				bodyStyle: 'padding-top:10px',
 				items:[{
 					xtype: 'displayfield',
-					fieldLabel: '当日汇率',
+					fieldLabel: forms['labelExchange'],
 					id: 'labelExchange'
 				},{
 					id:'pay_type_id',
-					fieldLabel: '缴费方式',
+					fieldLabel: forms['pay_type'],
 					xtype: 'paramcombo',
 					paramName:'UNBUSI_PAY_FEE',
 					allowBlank: false,
@@ -149,13 +149,13 @@ var FeeUnitpreForm = Ext.extend(BaseForm,{
 						select: this.doChangePayType
 					}
 				},{
-					fieldLabel: '票据编号',
+					fieldLabel: forms['receipt_id'],
 					maxLength: 18,
 					disabled: true,
 					xtype: 'textfield',
 					name: 'pay.receipt_id'
 				},{
-					fieldLabel: '发票号',
+					fieldLabel: forms['invoice_id'],
 					maxLength: 18,
 					xtype: 'textfield',
 					name: 'pay.invoice_id',
@@ -228,7 +228,7 @@ var FeeUnitpreForm = Ext.extend(BaseForm,{
 				var rec = Ext.decode(res.responseText);
 				var invoiceCode = Ext.getCmp('new_invoice_code');
 				if(rec.length == 0){
-					Alert('该发票无法使用');
+					Alert(lbc('home.tools.feeUnitpre.msg.receiptCantUsed'));
 				}else{
 					var data = [];
 					for(var i=0;i<rec.length;i++){

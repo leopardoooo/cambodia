@@ -23,6 +23,7 @@ import com.ycsoft.business.dao.resource.invoice.RInvoiceDetailDao;
 import com.ycsoft.business.dao.resource.invoice.RInvoiceInputDao;
 import com.ycsoft.business.dao.resource.invoice.RInvoiceOptrDao;
 import com.ycsoft.business.dao.resource.invoice.RInvoiceTransferDao;
+import com.ycsoft.business.dao.system.SDeptDao;
 import com.ycsoft.business.dto.config.TemplateConfigDto;
 import com.ycsoft.commons.abstracts.BaseComponent;
 import com.ycsoft.commons.constants.DataRight;
@@ -57,6 +58,8 @@ public class InvoiceComponent extends BaseComponent {
 	private RDepotDefineDao rDepotDefineDao;
 	@Autowired
 	private TConfigTemplateDao tConfigTemplateDao;
+	@Autowired
+	private SDeptDao sDeptDao;
 	
 	/**
 	 * 查找操作员管理的仓库
@@ -311,8 +314,8 @@ public class InvoiceComponent extends BaseComponent {
 					list.remove(i);
 					continue;
 				}
-				// 未领用的才能领用 领用过的仍然可以再领用		暂时不改
-				if(optrType.equals(InvoiceOptrType.RECEIVE.toString()) && invoice.getOptr_id()!=null){
+				// 未领用的才能领用 
+				if(optrType.equals(InvoiceOptrType.RECEIVE.toString()) && StringHelper.isNotEmpty(invoice.getOptr_id())){
 					list.remove(i);
 				}
 				if(optrType.equals(InvoiceOptrType.CANCEL_RECEIVE.toString()) && 
@@ -447,21 +450,13 @@ public class InvoiceComponent extends BaseComponent {
 	 * @return
 	 * @throws JDBCException
 	 */
-	public List<RDepotDto> queryChildInvoiceDepot(SOptr optr) throws Exception{
-		String[] depotIds=null;
+	public List<SDept> queryChildInvoiceDepot(SOptr optr) throws Exception{
 		String dataRight = this.queryDataRightCon(optr, DataRight.INVOICE_MNG.toString());
-		if (dataRight.equals(DataRightLevel.AREA.toString())
-				&& optr.getArea_id().equals(SystemConstants.WH_AREA_ID)) {
-			depotIds = new String[2];
-			depotIds[0] = SystemConstants.WH_COUNTY_ID;
-			depotIds[1] = SystemConstants.ZS_COUNTY_ID;
-		} else {
-			String depotId = findDepot(optr);
-			depotIds = new String[1];
-			depotIds[0] = depotId;
+		if (dataRight.equals(DataRightLevel.AREA.toString()) || optr.getCounty_id().equals(SystemConstants.COUNTY_ALL)) {
+			return sDeptDao.queryAllDept();
 		}
-		
-		return rDepotDefineDao.queryChildInvoiceDepot(depotIds);
+		String depotId = findDepot(optr);
+		return sDeptDao.queryChildDept(depotId);
 	}
 
 	/**
@@ -503,6 +498,11 @@ public class InvoiceComponent extends BaseComponent {
 			optrId = null;
 		}
 		rInvoiceDao.saveTrans(doneCode, transDepotId, optrId);
+		if(InvoiceOptrType.RECEIVE.toString().equals(transType)){
+			rInvoiceDao.updateInvoiceOpenOptrId(doneCode, optrId);
+		}else if(InvoiceOptrType.CANCEL_RECEIVE.toString().equals(transType)){
+			rInvoiceDao.updateInvoiceOpenOptrId(doneCode, null);
+		}
 	}
 
 	//保存发票结账

@@ -72,16 +72,10 @@ Ext.apply(App.func,{
 				}
 				
 			}else if(busicode === '2262'){//销售设备
-				if(Ext.isEmpty(data['device_model'])){
+				if( data['user_type']=='OTT_MOBILE' || data['str10'] == 'BUY' || (((data['user_type']=='DTT' || data['user_type']=='OTT') && Ext.isEmpty(data['stb_id']))
+					|| (data['user_type']=='BAND' && Ext.isEmpty(data['modem_mac']))) ){
 					return false;
 				}
-			}else if(busicode === '1030'){//模拟转数(模拟电视)
-				if(data['user_type'] != 'ATV' || data['status'] == 'CUSTLINE')
-					return false;
-			}else if(busicode === '1031'){//开通双向(数字电视，单向)
-				if (data['user_type'] != 'DTV' || data['serv_type'] != 'SINGLE'
-						|| Ext.isEmpty(data['stb_id']) || App.getCust().status=='RELOCATE')
-					return false;
 			}else if(busicode === '1029'){//指令重发(数字电视)
 				if(data['user_type'] != 'DTV')
 					return false;
@@ -136,8 +130,7 @@ Ext.apply(App.func,{
 					return false;
 			}else if(busicode == '2123'){//重置密码
 				//只有user_type = BAND和OTT_MOBILE用户显示, 且用户状态 是 正常 和施工 
-				if( (data['user_type'] == 'BAND' || data['user_type'] == 'OTT_MOBILE') 
-							&& ( data.status == 'ACTIVE' || data.status == 'INIT' ) ){
+				if( (data['user_type'] == 'BAND' || data['user_type'] == 'OTT_MOBILE') && data.status == 'ACTIVE' ){
 					return true;
 				}else{
 					return false;
@@ -281,13 +274,22 @@ Ext.apply(App.func,{
 		
 /**************************************用户产品信息开始************************************************/
 		else if(panelName.indexOf('U_PROD')>=0){//用户产品信息
+			if(busicode == '131'){
+				if(data['is_pay'] == 'F' && data["package_id"] == null){
+					return true;
+				}else{
+					return false;
+				}
+			}
 			// 如果是套餐所有按钮在基本产品列表中都不显示
-			if(data["package_id"] || data['status'] != 'ACTIVE'){
+			if(data["package_id"]!=null || (data['status'] != 'ACTIVE' && data['status'] != 'INSTALL')){
 				return false; 
 			}
 			
-			if(data['user_status'] == 'DORMANCY' || data['user_status'] == 'ATVCLOSE' || data['user_status'] == 'WAITLOGOFF' )
+			if( (busicode == '1027' || busicode == '109' || busicode == '110' || busicode == '100') && data['is_pay'] == 'F' ){
 				return false;
+			}
+			
 			/*if(busicode == '1027'){//产品退订
 				var userId = data['user_id'];
 				var acctItemData = App.getAcctItemByProdId(data['prod_id'],userId);
@@ -312,7 +314,8 @@ Ext.apply(App.func,{
 					},store);
 					if(!flag)return false;
 				}
-			}else */if(busicode == '1028'){//资费变更
+			}else */
+			if(busicode == '1028'){//资费变更
 				var userId = data['user_id'];
 				var acctItemData = App.getAcctItemByProdId(data['prod_id'],userId);
 				if(acctItemData){
@@ -561,8 +564,25 @@ Ext.apply(App.func,{
 		
 		}else if(panelName ==='D_TASK'){
 			if(busicode =='2261'){//工单作废
-				if(data['task_status'] != 'INIT' )
+				if(data['task_status'] != 'CREATE' )
 					return false;
+			}
+		}else if(panelName ==='P_FEE_PAY'){
+			if(busicode =='2263'){//支付回退
+//				if(nowDate().format('Y-m') != data['create_time'].substring(0,7)){
+				if(Ext.util.Format.date(nowDate(),'Y-m-d') !== data['create_time'].substring(0,10)){
+					return false;
+				}
+				if (data['optr_id'] != App.getData().optr.optr_id || data['is_valid'] == 'F'){
+					return false;
+				}
+			}else if(busicode =='2264'){//隔月支付回退
+//				if(nowDate().format('Y-m') == data['create_time'].substring(0,7)){
+//					return false;
+//				}
+//				if (data['optr_id'] != App.getData().optr.optr_id || data['is_valid'] == 'F'){
+//					return false;
+//				}
 			}
 		}else if(panelName === 'D_BUSI'){
 			if(busicode == '1163'){//重打业务单只能打当前操作员打印过的

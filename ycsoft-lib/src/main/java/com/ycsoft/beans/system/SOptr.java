@@ -36,6 +36,7 @@ public class SOptr extends CountyBase implements Serializable {
 	private String creator;
 	private String remark;
 	private String tel;
+	private String mobile;
 	private String position;
 	private String is_busi_optr;
 	private String old_county_id;
@@ -55,6 +56,16 @@ public class SOptr extends CountyBase implements Serializable {
 	 * default empty constructor
 	 */
 	public SOptr() {
+	}
+
+	
+	
+	public String getMobile() {
+		return mobile;
+	}
+
+	public void setMobile(String mobile) {
+		this.mobile = mobile;
 	}
 
 	public SOptr(String login_name, String password) {

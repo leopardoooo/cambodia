@@ -60,7 +60,7 @@ public class RDeviceOutputDao extends BaseEntityDao<RDeviceOutput> {
             " when dh.modem_mac is not null then dh.modem_mac end) device_code"+
             " from r_device_done_deviceid di,r_device_his dh,s_dept d"+
             " where di.device_id=dh.device_id and dh.depot_id=d.dept_id"+
-            " and (d.dept_type='FGS' or d.dept_type='YYT') and d.status='ACTIVE'"+
+            " and d.status='ACTIVE'"+
             " and di.device_done_code=? and dh.device_type=? and dh.device_model = ? ";
 		return this.createQuery(DeviceDto.class, sql, deviceDoneCode, deviceType,deviceModel)
 				.setStart(start).setLimit(limit).page();

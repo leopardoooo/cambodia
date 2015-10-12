@@ -18,9 +18,16 @@ public class QueryTaskConditionDto {
 	private String taskId;
 	private String custName;
 	private String addrIds;
+	private String zteStatus;
 	
 	
 	
+	public String getZteStatus() {
+		return zteStatus;
+	}
+	public void setZteStatus(String zteStatus) {
+		this.zteStatus = zteStatus;
+	}
 	public String getAddrIds() {
 		return addrIds;
 	}

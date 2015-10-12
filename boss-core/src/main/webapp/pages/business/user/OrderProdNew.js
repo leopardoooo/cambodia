@@ -127,20 +127,22 @@ ProdOrderForm = Ext.extend( BaseForm, {
 						border: false,
 						layout: 'form',
 						items:[
-						{ id:'order_type_id',hiddenName:'order_type',xtype:'combo',allowBlank:true,
-						 fieldLabel: '订购方式',value:'ORDER',width:100,
-           				 store:new Ext.data.ArrayStore({
-              						fields:['order_type','order_name'],
-             						data:[['ORDER','按月'],['TRANSFER','按转移支付']]
-						}),
-						displayField:'order_name',valueField:'order_type',
-						listeners:{
-							scope:this,
-							select:function(box,record,index){
-								this.doPayOrderType(box.getValue());
+						{
+							id:'order_type_id',
+							fieldLabel: lmain("user._form.prodOrderType"),
+							xtype:'paramcombo',
+							allowBlank:false,
+							hiddenName:'order_type',
+							paramName:'ORDER_TYPE',
+							defaultValue:'ORDER',
+							listeners : {
+								scope : this,
+								select:function(box,record,index){
+									this.doPayOrderType(box.getValue());
+								}
 							}
 						}
-					}]},{
+						]},{
 						id:'orderMonthItemsId',
 						border: false,
 						layout: 'form',
@@ -244,7 +246,7 @@ ProdOrderForm = Ext.extend( BaseForm, {
 			}
 			filterOrderSn  = prodData["order_sn"];
 		}
-		if(this.busiCode === "101" || this.busiCode === "102"){
+		if(this.busiCode === "101" || this.busiCode === "102" || this.busiCode ==="1015"){
 			Ext.getCmp('orderTypeItemsId').hide();
 		}
 		
@@ -489,11 +491,11 @@ ProdOrderForm = Ext.extend( BaseForm, {
 		var tAmount = this.transferAmount;
 		var disctRent = tariffRecord.get("disct_rent");
 		//根据转移支付的金额计算出多少月（带小数，小数再转换为天）
-		var mothAllNum = Ext.util.Format.ceil((tAmount/disctRent)*tariffRecord.get("billing_cycle"),2);
-		//月数赋值
-		Ext.getCmp("sfOrderCycle").setValue(mothAllNum);
+		var mothAllNum =(tAmount/disctRent)*tariffRecord.get("billing_cycle");
 		var mothNum = parseInt(mothAllNum);
 		var dayNum = Math.ceil((mothAllNum - mothNum)*30);
+		//月数赋值
+		Ext.getCmp("sfOrderCycle").setValue(mothNum+Ext.util.Format.ceil((dayNum/30),2));
 		var startDate = Ext.getCmp("dfStartDate").getValue();
 		//开始日期加mothNum月，dayNum天,,startDate是+1天的，所以到期日要-1天，dayNum-1;
 		Ext.getCmp("dfExpDate").setValue(Ext.util.Format.addTime(startDate.format("Y-m-d"),mothNum,dayNum-1));

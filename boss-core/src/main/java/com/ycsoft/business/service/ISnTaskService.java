@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 
 import com.ycsoft.beans.task.TaskFillDevice;
-import com.ycsoft.beans.task.WTaskBaseInfo;
 import com.ycsoft.beans.task.WTeam;
 import com.ycsoft.business.dto.config.TaskBaseInfoDto;
+import com.ycsoft.business.dto.config.TaskUserDto;
 import com.ycsoft.business.dto.device.DeviceDto;
 import com.ycsoft.daos.core.Pager;
 
@@ -36,14 +36,23 @@ public interface ISnTaskService {
 	 * @param ponNo 网络参数
 	 * @param deviceList 设备列表
 	 */
-	public void fillTask(String taskId,String otlNo,String ponNo,List<TaskFillDevice> deviceList)throws Exception;
+	public void fillTask(String taskId,List<TaskFillDevice> deviceList)throws Exception;
+	
+	
+	/**
+	 * 回填拆机工单的设备回收信息
+	 * @param taskId
+	 * @param userIds
+	 * @throws Exception
+	 */
+	public void fillWriteOffTerminalTask(String taskId,String[] userIds) throws Exception;
 	
 	/**
 	 * 完工
 	 * @param taskId
 	 * @param resultType 完工类型
 	 */
-	public void finishTask(String taskId,String resultType)throws Exception;
+	public void finishTask(String taskId,String resultType,String remark,boolean isBusi)throws Exception;
 	
 	/**
 	 * 工单查询
@@ -57,20 +66,15 @@ public interface ISnTaskService {
 	 * @param custNo
 	 * @param custName
 	 * @param custAddr
+	 * @param zteStatus 
 	 * @param limit 
 	 * @param start 
 	 * @throws Exception
 	 */
 	public Pager<TaskBaseInfoDto> queryTask(String taskTypes,String addrIds,String beginDate,String endDate,
 			String taskId,String teamId,String status, 
-			String custNo,String custName,String custAddr,String mobile, Integer start, Integer limit) throws Exception;
+			String custNo,String custName,String custAddr,String mobile, String zteStatus, Integer start, Integer limit) throws Exception;
 	
-	/**
-	 * 查询待处理工单
-	 * @return
-	 * @throws Exception
-	 */
-	public List<WTaskBaseInfo> queryUnProcessTask() throws Exception;
 
 	public Map<String, ?> queryTaskDetail(String task_id) throws Exception;
 
@@ -79,6 +83,14 @@ public interface ISnTaskService {
 	public DeviceDto queryDeviceInfoByCodeAndModel(String deviceCode, String deviceModel) throws Exception;
 
 	public List<TaskBaseInfoDto> queryTaskByCustId(String custId) throws Exception;
+
+	public Pager<TaskBaseInfoDto> queryUnProcessTask(Integer start, Integer limit)throws Exception;
+
+	public List<TaskUserDto> queryTaskDevice(String task_id) throws Exception;
+
+	public void withdrawTask(String task_id)throws Exception;
+
+	public void saveZte(String task_id, String zte_status, String log_remark)throws Exception;
 	
 	
 

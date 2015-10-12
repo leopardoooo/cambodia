@@ -43,8 +43,8 @@ Sys = {
 		cancelConfirm:'取消确认~',
 		notForSure:'不确认~',
 		effect:'有效~',
-		createDate:'创建日期',
-		createTime:'创建时间',
+		createDate:'创建日期~',
+		createTime:'创建时间~',
 		restore:'恢复~',
 		downLoad:'下载~',
 		downLoadDetail:'下载明细~',
@@ -84,236 +84,256 @@ Sys = {
 		}
 	},
 	ExchangeRateManage: {//汇率配置
-		title:'汇率配置',
+		title:'汇率配置~',
 		commons:{
-			exchange_id: '汇率编号',
-			effective_time :'生效时间',
+			exchange_id: '汇率编号~',
+			effective_time :'生效时间~',
 			exchange_rate:'汇率',
-			status:'状态',
-			query:'查询',
-			addNewOne:'新增',
-			update:'修改',
-			invalid:'作废',
-			saveBtn:'保存',
-			cancelBtn:'取消',
-			optr:'操作员',
-			create_time:'创建时间'
+			status:'状态~',
+			query:'查询~',
+			addNewOne:'新增~',
+			update:'修改~',
+			invalid:'作废~',
+			saveBtn:'保存~',
+			cancelBtn:'取消~',
+			optr:'操作员~',
+			create_time:'创建时间~'
 		},
 		status:{
-			empty:'所有',
-			ACTIVE:'正常',
-			INVALID:'失效'
+			empty:'所有~',
+			ACTIVE:'正常~',
+			INVALID:'失效~'
 		},
 		msg:{
-			successMsg:'操作成功.',
-			onlyOne:'选择且仅选择一条记录.',
-			areYouSure:'是否确认?'
+			successMsg:'操作成功.~',
+			onlyOne:'选择且仅选择一条记录.~',
+			areYouSure:'是否确认?~'
 		}
 	},
 	AddressNodeManage: {//地址节点配置
-		panelTitle:'地址管理',//面板主标题
+		panelTitle:'地址管理~',//面板主标题
 		msg:{//各种提示消息
-			actionFailed:'操作失败',
-			actionSuccess:'操作成功',
-			confirmSave:'确认保存?',
-			confirmInvalid:'确认要禁用?',
-			confirmDelete:'确认要删除?',
-			confirmActivate:'确认要激活?',
-			cantDelete:'还有客户在使用，暂不能删除。',
-			cantBeInvalided:'存在子级别,无法禁用!',
-			maxDepthText: '不能再往下添加',
-			noSingleQuoteAllowed:'请不要输入单引号'
+			actionFailed:'操作失败~',
+			actionSuccess:'操作成功~',
+			confirmSave:'确认保存?~',
+			confirmInvalid:'确认要禁用?~',
+			confirmDelete:'确认要删除?~',
+			confirmActivate:'确认要激活?~',
+			cantDelete:'还有客户在使用，暂不能删除。~',
+			cantBeInvalided:'存在子级别,无法禁用!~',
+			maxDepthText: '不能再往下添加~',
+			noSingleQuoteAllowed:'请不要输入单引号~'
 			
 		},
 		formWin:{
-			labelSortNum:'序号',
-			labelProvince:'省',
-			labelDistrict:'行政区域',
-			labelNetType:'网络类型',
-			emptyTxtProvince:'请选择省',
-			emptyTxtBlurQuery:'支持模糊查询',
-			btnTxtClose:'关闭',
-			btnTxtSave:'保存',
-			labelRoadNum:'路号名称',
-			titleNewSaveLevelRoadNum:'平级新增路号',
-			labelStreatName:'街道名称',
-			titleNewSaveLevelStreet:'平级新增街道',
-			labelCityName:'城市名称',
-			titleNewSaveLevelCity:'平级新增城市',
-			labelShowName:'显示名称',
-			labelParentName:'上级名称',
+			labelSortNum:'序号~',
+			labelProvince:'省~',
+			labelDistrict:'行政区域~',
+			labelNetType:'网络类型~',
+			emptyTxtProvince:'请选择省~',
+			emptyTxtBlurQuery:'支持模糊查询~',
+			btnTxtClose:'关闭~',
+			btnTxtSave:'保存~',
+			labelRoadNum:'路号名称~',
+			titleNewSaveLevelRoadNum:'平级新增路号~',
+			labelStreatName:'街道名称~',
+			titleNewSaveLevelStreet:'平级新增街道~',
+			labelCityName:'城市名称~',
+			titleNewSaveLevelCity:'平级新增城市~',
+			labelShowName:'显示名称~',
+			labelParentName:'上级名称~',
 			
-			labelNewAddChild:'新增下级',
-			labelNewAddBrother:'新增平级',
-			labelAddrTree:'地址树'
+			labelNewAddChild:'新增下级~',
+			labelNewAddBrother:'新增平级~',
+			labelAddrTree:'地址树~'
 		}
 	},
 	WorkTask:{//工单系统目前三个功能，所有资源都是一样的.
 		msg:{//提示信息
-			minTimeText:'不能选择当日之前',
-			needSelectOneRecord:'请选择需要操作的记录',
-			needSelectOnlyOneRecord:'仅能选择一条记录进行操作!',
-			cantReplyWorkTask:'只有施工中的工单才能回单',
-			workTaskInvalided:'工单已作废',
-			sureToInvalidWorkTask:'确定要作废选中的工单吗?',
-			invalidReason:'作废原因',
-			cantBeInvalided:'不允许作废!',
-			cantSendWorkTask:'只有预约和施工中的工单才能派单!',
-			printWorkTaskToolTip:'打印施工单',
-			writeWorkReplyTip:'施工完成，填写回单信息',
-			replySuccess:'回单成功!',
-			replyFailure:'回单失败!',
-			sendWorkTaskSuccess:'派单成功!',
-			sendWorkTaskFailure:'派单失败!',
-			confirmSaveReplyInfo:'确定要保存回单信息吗?',
-			replyInfoNotComplete:'回单信息填写不完整!',
-			confirmSendWorkTask:'确定要派单吗?',
-			warnSelectWorkTeam:'请选择施工部门!'
+			minTimeText:'不能选择当日之前~',
+			needSelectOneRecord:'请选择需要操作的记录~',
+			needSelectOnlyOneRecord:'仅能选择一条记录进行操作!~',
+			cantReplyWorkTask:'只有施工中的工单才能回单~',
+			workTaskInvalided:'工单已作废~',
+			sureToInvalidWorkTask:'确定要作废选中的工单吗?~',
+			invalidReason:'作废原因~',
+			cantBeInvalided:'不允许作废!~',
+			cantSendWorkTask:'只有预约和施工中的工单才能派单!~',
+			printWorkTaskToolTip:'打印施工单~',
+			writeWorkReplyTip:'施工完成，填写回单信息~',
+			replySuccess:'回单成功!~',
+			replyFailure:'回单失败!~',
+			sendWorkTaskSuccess:'派单成功!~',
+			sendWorkTaskFailure:'派单失败!~',
+			confirmSaveReplyInfo:'确定要保存回单信息吗?~',
+			replyInfoNotComplete:'回单信息填写不完整!~',
+			confirmSendWorkTask:'确定要派单吗?~',
+			warnSelectWorkTeam:'请选择施工部门!~'
 		},
 		common:{
-			replyWrokTaskTitle:'回单',
-			sendWrokTaskTitle:'派单',
-			taskType:'工单类型',
-			finish:'完成',
-			failure:'失败'
+			replyWrokTaskTitle:'回单~',
+			sendWrokTaskTitle:'派单~',
+			taskType:'工单类型~',
+			finish:'完成~',
+			failure:'失败~'
 			
 		},
 		formLabels:{//表单的标签和表格的列名
-				replyRemark:'回单备注',
-				failReason:'失败原因',
-				custPrise:'客户评价',
-				finishFlag:'是否完工',
-				finishOptr:'完工人员',
-				finishDept:'完工部门',
-				finishDate:'完工日期',
-				assignDate:'分派日期',
-				mobile:'手机',
-				phone:'电话',
-				contack:'联系方式',
-				contactPerson :'联系人',
-				contactPhone :'联系电话',
-				workDept:'施工部门',
-				workTaskStatus:'工单状态',
-				createDate:'创建日期',
-				createTime:'创建时间',
-				orderDate:'预约时间',
-				servType:'服务类型',
-				createType:'创建方式',
-				workTaskType:'工单类型',
-				workTaskInfo:'工单信息',
-				remark:'备注',
-				faultReason:'故障原因',
-				newAddr:'新地址',
-				oldAddr:'旧地址',
-				labelAddress:'地址',
-				optrDate:'操作日期',
-				businessName:'业务名称',
-				optr:'操作员',
-				businessHall:'营业厅',
-				busiInfo:'业务信息',
-				custAddr:'客户地址',
-				custBusiName:'受理编号',
-				custName:'客户名称',
-				custInfo:'客户信息',
-				workRemark:'施工备注',
-				createOptr:'创建人员',
-				businessType:'业务类型'
+				replyRemark:'回单备注~',
+				failReason:'失败原因~',
+				custPrise:'客户评价~',
+				finishFlag:'是否完工~',
+				finishOptr:'完工人员~',
+				finishDept:'完工部门~',
+				finishDate:'完工日期~',
+				assignDate:'分派日期~',
+				mobile:'手机~',
+				phone:'电话~',
+				contack:'联系方式~',
+				contactPerson :'联系人~',
+				contactPhone :'联系电话~',
+				workDept:'施工部门~',
+				workTaskStatus:'工单状态~',
+				createDate:'创建日期~',
+				createTime:'创建时间~',
+				orderDate:'预约时间~',
+				servType:'服务类型~',
+				createType:'创建方式~',
+				workTaskType:'工单类型~',
+				workTaskInfo:'工单信息~',
+				remark:'备注~',
+				faultReason:'故障原因~',
+				newAddr:'新地址~',
+				oldAddr:'旧地址~',
+				labelAddress:'地址~',
+				optrDate:'操作日期~',
+				businessName:'业务名称~',
+				optr:'操作员~',
+				businessHall:'营业厅~',
+				busiInfo:'业务信息~',
+				custAddr:'客户地址~',
+				custBusiName:'受理编号~',
+				custName:'客户名称~',
+				custInfo:'客户信息~',
+				workRemark:'施工备注~',
+				createOptr:'创建人员~',
+				businessType:'业务类型~'
 		},
 		formWin:{//表单和表格，窗口用到的其他的一些文字
-			titleChangeWorker:'变更施工员',
-			labelNewWorker:'新施工员',
-			labelFormerWorker:'原施工员',
-			labelNewOrderTime:'新预约时间',
-			labelFormerOrderTime:'原预约时间',
-			labelSendWorkTask:'对选中的施工单进行派单',
-			labelInvalidWorkTask:'作废选择的施工单',
-			labelWorkTaskType:'工单类型',
-			emptyTxtWorkTeam:'施工队',
-			emptyTxtAddress:'地址',
-			emptyTxtContactPhone:'手机',
-			emptyTxtCustBusiName:'受理编号11',//后面的11是原来的代码里有的,照抄过来.
-			titleWorkDetailInfo:'工单详细信息',
-			labelCustPrise:'客户评价',
-			labelWorkFinishDate:'施工完成日期',
-			minTextWorkFinishDate:'不能选择当日之前',
-			labelWorker:'施工员',
-			labelSatisfy:'满意度',
-			labelFinishType:'完工类型',
-			labelFailReason:'失败原因',
-			titleAllWorkTask:'所有工单',
-			titleFinishedWorkTask:'已完成工单',
-			titleUnFinishedWorkTask:'处理中工单',
-			labelWaitAcceptTas:'待处理工单',
-			btnSearchWorkTask:'搜索工单'
+			titleChangeWorker:'变更施工员~',
+			labelNewWorker:'新施工员~',
+			labelFormerWorker:'原施工员~',
+			labelNewOrderTime:'新预约时间~',
+			labelFormerOrderTime:'原预约时间~',
+			labelSendWorkTask:'对选中的施工单进行派单~',
+			labelInvalidWorkTask:'作废选择的施工单~',
+			labelWorkTaskType:'工单类型~',
+			emptyTxtWorkTeam:'施工队~',
+			emptyTxtAddress:'地址~',
+			emptyTxtContactPhone:'手机~',
+			emptyTxtCustBusiName:'受理编号~',
+			titleWorkDetailInfo:'工单详细信息~',
+			labelCustPrise:'客户评价~',
+			labelWorkFinishDate:'施工完成日期~',
+			minTextWorkFinishDate:'不能选择当日之前~',
+			labelWorker:'施工员~',
+			labelSatisfy:'满意度~',
+			labelFinishType:'完工类型~',
+			labelFailReason:'失败原因~',
+			titleAllWorkTask:'所有工单~',
+			titleFinishedWorkTask:'已完成工单~',
+			titleUnFinishedWorkTask:'处理中工单~',
+			labelWaitAcceptTas:'待处理工单~',
+			btnSearchWorkTask:'搜索工单~'
 			
 		}
 	},//目前工单系统里的三个功能结束 ~.
-	//发票子系统
-	InvoiceCommon:{
-		  titleInvoiceInfo:'发票信息~',
-			titleInvoiceCount:'发票信息  数量：{0} ~',
-			titleInvoiceCountAndAmount:"发票信息 共选中{0}行,金额总和为{1}",
-			
-			tipInvoiceCountAndAmount:"一共:{0} 张发票，总额:{1} 元，",
-			
-		  namount: "金额~",
-			check_time: "结账时间~",
-			close_time: "核销时间~",
-			create_time: "入库时间~",
-			depot_name: "仓&nbsp;&nbsp;&nbsp;&nbsp;库~",
-			check_depot_id:'结账仓库~',
-			finance_status: "结存状态~",
-			invoice_code: "发票代码~",
-			invoice_id: "发票号码~",
-			invoice_mode:'出票方式~',
-			invoice_type: "发票类型~",
-			finance_status: "结存状态~",
-			optr_name: "所属营业员~",
-			status: "使用状态~",
-			amount:'金&nbsp;&nbsp;额~',
-			use_optr:'领&nbsp;用&nbsp;人~',
-			use_time: "开票时间~",
-			//好多个功能下面的表格使用了同样的column
-			commonGridColls:['发票号码~','发票代码~','发票类型~','使用状态~','金额~','出票方式~','结存状态~','仓库~','领用人~']
+	//收据子系统
+	InvoiceCommon : {
+
+		titleInvoiceInfo : '收据信息~',
+		titleInvoiceCount : '收据信息  数量：{0} ~',
+		titleInvoiceCountAndAmount : "收据信息 共选中{0}行,金额总和为{1}",
+
+		tipInvoiceCountAndAmount : "一共:{0} 张收据，总额:{1} 元，",
+
+		namount : "金额~",
+		check_time : "结账时间~",
+		close_time : "核销时间~",
+		create_time : "入库时间~",
+		depot_name : "仓&nbsp;&nbsp;&nbsp;&nbsp;库~",
+		check_depot_id : '结账仓库~',
+		finance_status : "结存状态~",
+		invoice_code : "收据代码~",
+		invoice_id : "收据号码~",
+		invoice_mode : '出票方式~',
+		invoice_type : "收据类型~",
+		finance_status : "结存状态~",
+		optr_name : "领用人~",
+		open_optr_name : "开票人~",
+		status : "使用状态~",
+		amount : '金&nbsp;&nbsp;额~',
+		use_optr : '领&nbsp;用&nbsp;人~',
+		use_time : "开票时间~",
+		cust_name : "客户名称~",
+		// 好多个功能下面的表格使用了同样的column
+		commonGridColls : ['收据号码~', '收据代码~', '收据类型~', '使用状态~', '金额~', '出票方式~',
+				'结存状态~', '仓库~', '领用人~']
 	},
-	QueryInvoice:{//查询发票
+	QueryInvoice:{//查询收据
 			common:{
-				titlaQueryInvoick:'发票查询~',
-				winTitleInvoiceDetail:'发票明细~',
+				titlaQueryInvoick:'收据查询~',
+				winTitleInvoiceDetail:'收据明细~',
 				titleMoneyCountPrefix:'有效总金额~'				
 			}
 			
 	},
-	InvoiceDetail:{//发票详细信息
-		InvoiceDepotDetailGridColls:['操作类型~','发票流转~','操作员~','操作时间~'],
+	InvoiceDetail:{//收据详细信息
+		InvoiceDepotDetailGridColls:['操作类型~','收据流转~','操作员~','操作时间~'],
 		InvoiceDetailGridColls:['客户名称~','客户编号~','业务名称~','费用名称~','实际金额~','操作时间~','操作员~','状态~'],
-		titleInvoiceBaseInfo:'发票基础信息~',
-		titleInvoiceOptrRec:'发票操作记录~',
+		titleInvoiceBaseInfo:'收据基础信息~',
+		titleInvoiceOptrRec:'收据操作记录~',
 		titleFeeDetail:'费用明细~',
 		titleDetailQuery:'详细查询~'
 	},
-	InvoiceInput:{//发票领用
-		startInvoiceId:'开始发票号~',
-		endInvoiceId:'开始发票号~',
-		invoiceCount:'发票共 {0} 张~',
-		_title:'发票入库~',
+	InvoiceInput:{//收据领用
+		startInvoiceId:'开始收据号~',
+		endInvoiceId:'截止收据号~',
+		invoiceCount:'收据共 {0} 张~',
+		_title:'收据入库~',
 		btnRecord:'录入~'
 	},
-	TransferInvoice:{//发票调拨
-		_title:'发票调拨~',
+	TransferInvoice:{//收据调拨
+		_title:'收据调拨~',
 		_titleSimple:'调拨~',
 		transDepotId:'调拨对象~'
 	},
-	ReceiveInvoice:{//发票领用
+	ReceiveInvoice:{//收据领用
 		optrId:'领用营业员~',
 		_title:'领用~'
 	},
-	CancelReceiveInvoice:{//发票取消领用
+	CancelReceiveInvoice:{//收据取消领用
 		_title:'取消领用~'
 	},
-	EditStatusInvoice:{//修改发票状态
-		_title:'修改状态~'
+	EditStatusInvoice:{//修改收据状态
+		_title:'修改状态~',
+		editStatus:'修改状态为~'
 		
+	},
+	CheckInvoice: {
+		_title: '发票结账~'
+	},
+	CancelCheck: {
+		_title: '取消结账~'
+	},
+	CloseInvoice: {
+		_title: '发票核销~'
+	},
+	CancelCloseInvoice: {
+		_title: '取消核销~'
+	},
+	InvoiceRefunding: {
+		_title:'发票退库~'
 	},
 	
 /** 设备管理开始 **/
@@ -321,6 +341,7 @@ Sys = {
 		titleDeviceInfo:'设备信息~',
 		labelStbModel:'机顶盒型号~',
 		labelCardModel:'智能卡型号~',
+		labelFittingModel:'器材型号~',
 		labelModemModel:'猫类型~',
 		labelModemModel2:'MODEM型号~',
 		labelStbCode:'机顶盒号~',
@@ -337,14 +358,15 @@ Sys = {
 		labelInputDate:'入库日期~',
 		labelDevInputDepot:'入库仓库~',
 		labelNum:'数量~',
+		labelTotalNum:'库存数量~',
 		labelBatchNum:'批号~',
 		labelPairStbCode:'配对机顶盒号~',
 		labelPairStbType:'配对机顶盒型号~',
-		labelPairCardCode:'配对卡号~',
+		labelPairCardCode:'卡号或MAC~',
 		labelPairCardType:'配对卡型号~',
 		labelPairCardType2:'配对卡类型~',
 		labelPairModemType:'配对MODEM型号~',
-		labelPairModemCode:'配对MODEM号~',
+		labelPairModemCode:'MAC~',
 		labelDeviceModel:'设备型号~',
 		labelDevCode:'设备编号~',
 		labelDevCode2:'编号(Modem_mac)~',
@@ -374,14 +396,16 @@ Sys = {
 		labelOperateTime:'操作时间~',
 		labelFileOperate:'文件操作~',
 		labelManualInput:'手工录入~',
-		labelSingleStb:'单机顶盒~',
+		labelSingleStb:'机顶盒',
+		labelStbCardModemPair:'盒卡MODEM配对~',
 		labelSingleCard:'单智能卡~',
 		labelStbCardPair:'机卡配对~',
-		labelSingleModem:'单MODEM~',
+		labelSingleModem:'MODEM',
 		labelStbModemPair:'机MODEM配对~',
 		labelConfirmDate:'确认时间~',
 		labelConfirmOptr:'确认人~',
 		labelCustName:'客户名称~',
+		labelCustStr9:'发展人',
 		labelCustNo:'客户编号~',
 		vitualDevice:'虚拟设备~',
 		isDifferent:'是否差异~',
@@ -467,7 +491,8 @@ Sys = {
 		labelOldTransCardNum:'原调拨智能卡数量~',
 		labelNewTransCardNum:'本次调拨智能卡数量~',
 		labelOldTransModemNum :'原调拨猫数量~',
-		labelNewTransModemNum:'本次调拨猫数量~'
+		labelNewTransModemNum:'本次调拨猫数量~',
+		labelPrint: '打印~'
 	},
 	AppUseDevice : {// 设备领用
 		_title:'设备领用~',
@@ -508,7 +533,7 @@ Sys = {
 		titleOutputInfo:'退库信息~',
 		fileOutput:'文件退库~',
 		manualOutput:'手工退库~',
-		materalOutPut:'材料退库~'
+		materalOutPut:'器材退库~'
 		
 	},
 	Deploy : {// 基本配置
@@ -570,14 +595,14 @@ Sys = {
 /** 设备管理结束~.~ **/	
 	//消息内容
 	msgBox:{
-		invoiceNotExists:'{0} 发票不存在~',
-		selectInvoiceCode:'请选择发票代码~',
+		invoiceNotExists:'{0} 收据不存在~',
+		selectInvoiceCode:'请选择收据代码~',
 		emptyTextSelectStore:'请选择仓库~',
-		invoiceIdLengthNotEquals:"发票开始号和发票结束号长度不一致~",
-		needCorrectInvoiceId:'请正确输入发票号!~',
-		needInputAtLeastOneInvoice:'请至少输入一个发票号码~',
+		invoiceIdLengthNotEquals:"收据开始号和收据结束号长度不一致~",
+		needCorrectInvoiceId:'请正确输入收据号!~',
+		needInputAtLeastOneInvoice:'请至少输入一个收据号码~',
 		linkFailure:'连接异常!查询失败~',
-		invoiceNotFoundTryReSearch:'未查询到发票信息，请重新输入发票号查询！~',
+		invoiceNotFoundTryReSearch:'未查询到收据信息，请重新输入收据号查询！~',
 		selectTransDepotId:'请选择调拨仓库~',
 		selectStatus2BeModify:'请选择要修改的状态~',
 		confirmSaveBusiWithInvoice:'{0} 确定要保存业务吗?~',
@@ -614,7 +639,7 @@ Sys = {
 		tipHasSameMateral:'器材有相同的，请检查！~',
 		tipTransNumCantBeEmpty:'调拨数量不能为空！~',
 		tipOutputNumCantBeEmpty:'退库数量不能为空~',
-		pleaseUploadExcelFile:'请选择excel文件进行上传！~',
+		pleaseUploadExcelFile:'请选择excel文件进行上传~',
 		pleaseUploadExcel2003:'请选择excel2003文件进行上传,文件后缀名为.xls!~',
 		needDevCode2Query:'输入设备编号回车查询~',
 		confirmCancelApply:"确定取消领用吗?~",
@@ -627,11 +652,11 @@ Sys = {
 		tipCalcenDiffSuccess:'取消差异成功!~',
 		tipSelectTragetDevStatus : '请先选择要修改的设备状态类型!~',
 		fileDownloadFailed:'文件下载失败~',
-		confirmCancelRecycle:'确认取消回收吗？~',
+		confirmCancelRecycle:'确认取消回收吗?~',
 		tipDevDosNotExists:'查询的设备不存在~',
 		tipQueryDateBeforeDownLoad:'请先查询出数据，方能下载!!~',
 		tipPleaseEditWell:'请编辑完整~',
-		duplicateRows:"第 {0} 行和第 {1} 行相同,请重新编辑！"
+		duplicateRows:"第 {0} 行和第 {1} 行相同,请重新编辑~"
     
 		
 		

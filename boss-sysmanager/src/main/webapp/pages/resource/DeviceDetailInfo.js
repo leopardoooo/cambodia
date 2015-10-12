@@ -76,8 +76,8 @@ var DeviceDetailForm = Ext.extend(Ext.form.FormPanel,{
 						if(data.device_type == 'STB'){
 							data['pair_card_label'] = DEV_COMMON_LU.labelPairCardCode;
 							data['pair_card_type_label'] = DEV_COMMON_LU.labelPairCardType;
-							data['pair_modem_label'] = DEV_COMMON_LU.labelPairModemCode;
-							data['pair_modem_type_label'] = DEV_COMMON_LU.labelPairModemType;
+//							data['pair_modem_label'] = DEV_COMMON_LU.labelPairModemCode;
+//							data['pair_modem_type_label'] = DEV_COMMON_LU.labelPairModemType;
 						}else if(data.device_type == 'CARD'){
 							data['pair_card_label'] = DEV_COMMON_LU.labelPairStbCode;
 							data['pair_card_type_label'] = DEV_COMMON_LU.labelPairStbType;
@@ -149,12 +149,12 @@ var DeviceDetailPanel = Ext.extend(Ext.Panel,{
 			      	'<td class="label" width=20%>{pair_card_type_label}：</td>',
 			      	'<td class="input_bold" width=30%>&nbsp;{pair_device_model_text}</td>',
 		    	'</tr>',
-		    	'<tr height=24>',
-					'<td class="label" width=20%>{pair_modem_label}：</td>',
-			      	'<td class="input_bold" width=30%>&nbsp;{pair_device_modem_code}</td>',
-			      	'<td class="label" width=20%>{pair_modem_type_label}：</td>',
-			      	'<td class="input_bold" width=30%>&nbsp;{pair_device_modem_model_text}</td>',
-		    	'</tr>',
+//		    	'<tr height=24>',
+//					'<td class="label" width=20%>{pair_modem_label}：</td>',
+//			      	'<td class="input_bold" width=30%>&nbsp;{pair_device_modem_code}</td>',
+//			      	'<td class="label" width=20%>{pair_modem_type_label}：</td>',
+//			      	'<td class="input_bold" width=30%>&nbsp;{pair_device_modem_model_text}</td>',
+//		    	'</tr>',
 		    	'<tr height=24>',
 					'<td class="label" width=20%>' + DEV_COMMON_LU.labelCustNo + '：</td>',
 					'<td class="input_bold" width=30%>&nbsp;{[values.cust_no || ""]}</td>',

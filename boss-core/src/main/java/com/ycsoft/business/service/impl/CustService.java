@@ -37,6 +37,7 @@ import com.ycsoft.beans.device.RStbModel;
 import com.ycsoft.beans.system.SOptr;
 import com.ycsoft.business.commons.pojo.BusiParameter;
 import com.ycsoft.business.component.core.OrderComponent;
+import com.ycsoft.business.component.task.SnTaskComponent;
 import com.ycsoft.business.dto.config.TAddressDto;
 import com.ycsoft.business.dto.core.acct.AcctAcctitemActiveDto;
 import com.ycsoft.business.dto.core.acct.AcctitemDto;
@@ -70,6 +71,8 @@ import com.ycsoft.sysmanager.dto.resource.RDeviceModelTotalDto;
 public class CustService extends BaseBusiService implements ICustService {
 	@Autowired
 	private OrderComponent orderComponent;
+	@Autowired
+	private SnTaskComponent snTaskComponent;
 	/**
 	 * 创建新客户
 	 * @param busiCode
@@ -217,7 +220,7 @@ public class CustService extends BaseBusiService implements ICustService {
 				propChangeList.remove(i);
 		}
 		custComponent.editCust(doneCode,cust.getCust_id(), propChangeList);
-		//String busiCode = getBusiParam().getBusiCode();
+		String busiCode = getBusiParam().getBusiCode();
 		Map<String, Object> doneInfo = new HashMap<String, Object>();
 		/*
 		//如果是移机或者是过户业务，且客户状态为拆迁
@@ -253,22 +256,29 @@ public class CustService extends BaseBusiService implements ICustService {
 			
 		}
 		*/
-		
+		boolean isMoveTask = false;
+		String newAddress = "";
 		//判断客户地址是否变化，如果有变化，设置旧客户地址
 		for (CCustPropChange change:propChangeList){
 			change.fillPropertyChineseText();
-			if (change.getColumn_name().equals("addr_id") ||
-				change.getColumn_name().equals("address")){
+			if (change.getColumn_name().equals("address")){
 				getBusiParam().getTempVar().put(SystemConstants.EXTEND_ATTR_KEY_NEWADDR,
 						cust.getAddress());
+				isMoveTask = true;
+				newAddress = change.getNew_value();
 				break;
 			}
 		}
+		//生成移机工单
+		if(BusiCodeConstants.CUST_CHANGE_ADDR.equals(busiCode) && isMoveTask){
+			snTaskComponent.createMoveTask(doneCode, cust, null, newAddress, getBusiParam().getWorkBillAsignType());
+		}
+		
 		//设置扩展表信息
 		setExtAttrInfo("EXT_C_CUST", "cust_id", cust.getCust_id());
 				
 		//生成计算信用度任务
-		jobComponent.createCreditCalJob(doneCode, cust.getCust_id(), null,SystemConstants.BOOLEAN_TRUE);
+//		jobComponent.createCreditCalJob(doneCode, cust.getCust_id(), null,SystemConstants.BOOLEAN_TRUE);
 		
 		doneInfo.put("changes", propChangeList);
 		doneCodeComponent.saveDoneCodeInfo(doneCode, cust.getCust_id() ,null, doneInfo );
@@ -2197,6 +2207,22 @@ public class CustService extends BaseBusiService implements ICustService {
 		}
 		
 		saveAllPublic(doneCode,getBusiParam());
+	}
+	
+	/**
+	 * 生成故障单
+	 * @param bugDetail
+	 * @throws Exception
+	 */
+	public void saveBugTask(String bugDetail) throws Exception{
+		CCust cust = getBusiParam().getCust();
+		String  custId = cust.getCust_id();
+		doneCodeComponent.lockCust(custId);
+		Integer doneCode = doneCodeComponent.gDoneCode();
+		
+		snTaskComponent.createBugTask(doneCode, cust, bugDetail);
+		
+		saveAllPublic(doneCode, getBusiParam());
 	}
 	
 }

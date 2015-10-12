@@ -48,6 +48,7 @@ import com.ycsoft.beans.core.fee.CFee;
 import com.ycsoft.beans.core.job.JUserStop;
 import com.ycsoft.beans.core.prod.CProd;
 import com.ycsoft.beans.core.prod.CProdPropChange;
+import com.ycsoft.beans.core.prod.CancelUserDto;
 import com.ycsoft.beans.core.promotion.CPromotion;
 import com.ycsoft.beans.core.promotion.CPromotionAcct;
 import com.ycsoft.beans.core.promotion.CPromotionHis;
@@ -2765,8 +2766,7 @@ public class UserService extends BaseBusiService implements IUserService {
 	}
 
 	@Override
-	public void saveRemoveUser(String userId, String banlanceDealType, String reclaim, Integer cancelFee,
-			Integer refundFee, String transAcctId, String transAcctItemId) throws Exception {
+	public void saveRemoveUser(String userId, Integer cancelFee, Integer refundFee) throws Exception {
 		// TODO Auto-generated method stub
 		
 	}
@@ -2778,7 +2778,7 @@ public class UserService extends BaseBusiService implements IUserService {
 	}
 
 	@Override
-	public void saveChangeDevice(String userId, String deviceCode, String changeReason) throws Exception {
+	public void saveChangeDevice(String userId, String deviceCode, String changeReason, String deviceBuyMode, FeeInfoDto deviceFee) throws Exception {
 		// TODO Auto-generated method stub
 		
 	}
@@ -2810,7 +2810,21 @@ public class UserService extends BaseBusiService implements IUserService {
 
 
 	@Override
-	public void untuckUsers(String[] userIds) throws Exception {
+	public void untuckUsers() throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void saveEditPwd(String loginName, String newPwd) throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void batchLogoffUser(List<CancelUserDto> cancelUserList) throws Exception {
 		// TODO Auto-generated method stub
 		
 	}

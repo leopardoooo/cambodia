@@ -22,6 +22,13 @@ public class CUserPropChange extends PropertyChange implements Serializable {
 	 */
 	public CUserPropChange() {
 	}
+	
+	public CUserPropChange(String column_name, String old_value,
+			String new_value) {
+		setColumn_name(column_name);
+		setOld_value(old_value);
+		setNew_value(new_value);
+	}
 
 	// user_id getter and setter
 	public String getUser_id() {

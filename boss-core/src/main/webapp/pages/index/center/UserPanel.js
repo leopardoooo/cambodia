@@ -290,7 +290,7 @@ ProdGrid = Ext.extend(Ext.TabPanel,{
 			         "order_sn","package_sn","package_id","cust_id","user_id","prod_id","tariff_id","disct_id",
 			         "status","status_text","status_date","eff_date","exp_date","active_fee","bill_fee",
 			         "rent_fee","last_bill_date","next_bill_date","order_months","order_fee","order_time",
-			         "order_type","package_group_id","remark","public_acctitem_type","done_code"],			
+			         "order_type","package_group_id","remark","public_acctitem_type","done_code","is_pay"],			
 			sortInfo : {
 				field : 'prod_name',
 				direction:'DESC'
@@ -305,7 +305,11 @@ ProdGrid = Ext.extend(Ext.TabPanel,{
 			store:this.userProdStore,
 			sm:new Ext.grid.RowSelectionModel(),
 			view: new Ext.ux.grid.ColumnLockBufferView(),
-			cm: this.baseProdCm
+			cm: this.baseProdCm,
+			listeners: {
+				scope: this,
+				rowclick: this.doClickRecord
+			}
 		});
 		
 		// 客户套餐
@@ -329,7 +333,7 @@ ProdGrid = Ext.extend(Ext.TabPanel,{
 			         "order_sn","package_sn","package_id","cust_id","user_id","prod_id","tariff_id","disct_id",
 			         "status","status_text","status_date","eff_date","exp_date","active_fee","bill_fee",
 			         "rent_fee","last_bill_date","next_bill_date","order_months","order_fee","order_time",
-			         "order_type","package_group_id","remark","public_acctitem_type"]
+			         "order_type","package_group_id","remark","public_acctitem_type","is_pay"]
 		});
 		this.custPkgGrid = new Ext.ux.Grid({
 			id:'U_CUST_PKG',
@@ -338,7 +342,11 @@ ProdGrid = Ext.extend(Ext.TabPanel,{
 			store:this.custPkgStore,
 			sm:new Ext.grid.RowSelectionModel(),
 			view: new Ext.ux.grid.ColumnLockBufferView(),
-			cm: this.custPkgCm
+			cm: this.custPkgCm,
+			listeners: {
+				scope: this,
+				rowclick: this.doClickRecord
+			}
 		});
 		
 		ProdGrid.superclass.constructor.call(this,{
@@ -366,7 +374,6 @@ ProdGrid = Ext.extend(Ext.TabPanel,{
 		})
 	},
 	initEvents: function(){
-		this.baseProdGrid.on("rowclick", this.doClickRecord, this );
 		this.baseProdGrid.on("afterrender",function(){
 			this.baseProdGrid.swapViews();
 		},this,{delay:10});
@@ -412,9 +419,7 @@ ProdGrid = Ext.extend(Ext.TabPanel,{
 		prodDetailTab.refreshPanel(prodDetailTab.getActiveTab());
 	},
 	getSelections:function(){
-		var panelId = App.getData().currentPanelId;
-		var prodGrid = null;
-		// 套餐
+		var panelId = App.getData().currentPanelId || this.getActiveTab().items.itemAt(0).getId();
 		if(panelId === "U_CUST_PKG"){
 			return this.custPkgGrid.getSelectionModel().getSelections();
 		}else{
@@ -441,6 +446,8 @@ ProdGrid = Ext.extend(Ext.TabPanel,{
 				}
 			}
 		}
+		if(this.prodMap['CUST'])
+			this.custPkgGrid.getStore().loadData(this.prodMap['CUST']);
 	},
 	remoteRefresh:function(loadType){
 		var cust = App.getData().custFullInfo.cust;
@@ -468,6 +475,7 @@ ProdGrid = Ext.extend(Ext.TabPanel,{
 				App.hideTip();
 				if(data["CUST"]){
 					this.custPkgGrid.getStore().loadData(data["CUST"]);
+					this.prodMap['CUST'] = data["CUST"];
 				}
 //				this.setActiveTab(0);
 			}
@@ -1094,8 +1102,8 @@ ProdPropChangeGrid = Ext.extend(Ext.grid.GridPanel,{
 		var cm = [
 			{header:lc[0],dataIndex:'busi_name', width:60,renderer:App.qtipValue},
 			{header:lc[1],dataIndex:'column_name_text', width:90,renderer:App.qtipValue},
-			{header:lc[2],dataIndex:'old_value', width:90},
-			{header:lc[3],dataIndex:'new_value',width:90},
+			{header:lc[2],dataIndex:'old_value', width:120,renderer:App.qtipValue},
+			{header:lc[3],dataIndex:'new_value',width:120,renderer:App.qtipValue},
 			{header:lc[4],dataIndex:'change_time',width:130},
 			{header:lc[5],dataIndex:'optr_name',width:80}
 		];

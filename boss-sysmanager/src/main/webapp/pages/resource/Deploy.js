@@ -154,17 +154,17 @@ var commonBeforeedit = function(obj){
 		var store = this.virtualCardModelCombo.getStore();
 		store.removeAll();
 		store.add(records);
-	}else if(fieldName == 'virtual_modem_model_name'){
-		var cStore = Ext.getCmp('modemGridId').getStore();
-		var records = [];
-		cStore.each(function(record){
-			if(record.get('is_virtual') == 'T'){
-				records.push(record);
-			}
-		});
-		var store = this.virtualModemModelCombo.getStore();
-		store.removeAll();
-		store.add(records);
+//	}else if(fieldName == 'virtual_modem_model_name'){
+//		var cStore = Ext.getCmp('modemGridId').getStore();
+//		var records = [];
+//		cStore.each(function(record){
+//			if(record.get('is_virtual') == 'T'){
+//				records.push(record);
+//			}
+//		});
+//		var store = this.virtualModemModelCombo.getStore();
+//		store.removeAll();
+//		store.add(records);
 	}
 }
 
@@ -669,6 +669,10 @@ var StbGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 				scope:this,
 				select:function(combo,record){
 					this.getSelectionModel().getSelected().set('interactive_type',record.get('item_value'));
+					if(combo.getValue() == 'DTT'){
+						alert(combo.getValue());
+						this.getSelectionModel().getSelected().set('virtual_card_model','SMSX_CA_CARD');
+					}
 				}
 			}
 		});
@@ -700,35 +704,35 @@ var StbGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 				}
 			}
 		});
-		this.virtualModemModelCombo = new Ext.form.ComboBox({
-			store:new Ext.data.JsonStore({
-				fields:['model_name','device_model']
-			}),displayField:'model_name',valueField:'model_name',
-				mode:'local',triggerAction:'all',editable:true,
-				forceSelection:true,selectOnFocus:true,listWidth:150,
-			listeners:{
-				scope:this,
-				select:function(combo,record){
-					this.getSelectionModel().getSelected().set('virtual_modem_model',record.get('device_model'));
-				},
-				blur:function(combo){
-					if(Ext.isEmpty(combo.getRawValue())){
-						this.getSelectionModel().getSelected().set('virtual_modem_model',"");
-					}
-				}
-			}
-		});
+//		this.virtualModemModelCombo = new Ext.form.ComboBox({
+//			store:new Ext.data.JsonStore({
+//				fields:['model_name','device_model']
+//			}),displayField:'model_name',valueField:'model_name',
+//				mode:'local',triggerAction:'all',editable:true,
+//				forceSelection:true,selectOnFocus:true,listWidth:150,
+//			listeners:{
+//				scope:this,
+//				select:function(combo,record){
+//					this.getSelectionModel().getSelected().set('virtual_modem_model',record.get('device_model'));
+//				},
+//				blur:function(combo){
+//					if(Ext.isEmpty(combo.getRawValue())){
+//						this.getSelectionModel().getSelected().set('virtual_modem_model',"");
+//					}
+//				}
+//			}
+//		});
 		var cm = new Ext.grid.ColumnModel([
-			{id:'device_model_id',header:COMMON_LU.modelSimple,dataIndex:'device_model',width:110,editor:new Ext.form.TextField({vtype:'singleChar'})},
-			{header:BASE_CFG_LU.labelModelName,dataIndex:'model_name',width:120,editor:new Ext.form.TextField({})},
-			{header:BASE_CFG_LU.labelProducer,dataIndex:'supplier_name',width:75,editor:this.supplierCombo},
-			{header:DEV_COMMON_LU.labelInteractiveType,dataIndex:'interactive_type_text',width:60,editor:this.interactiveTypeCombo},
-			{header:DEV_COMMON_LU.labelDefinition,dataIndex:'definition_type_text',width:50,editor:this.definitionTypeCombo},
-			{header:DEV_COMMON_LU.labelPairCardType2,dataIndex:'virtual_card_model_name',width:80,editor:this.virtualCardModelCombo},
-//			{header:'虚拟MODEM类型',dataIndex:'virtual_modem_model_name',width:95,editor:this.virtualModemModelCombo},
-			{header:COMMON_LU.doActionBtn,dataIndex:'device_model',width:80,renderer:function(value){
-				return "<a href='#' onclick=stbGrid.matchCard('"+value+"')>" + BASE_CFG_LU.stbCardPairCfg + "</a>";
-			}}
+			{id:'device_model_id',header:COMMON_LU.modelSimple,dataIndex:'device_model',width:200,sortable: true,editor:new Ext.form.TextField({vtype:'singleChar'})},
+			{header:BASE_CFG_LU.labelModelName,dataIndex:'model_name',width:200,sortable: true,editor:new Ext.form.TextField({})},
+			{header:BASE_CFG_LU.labelProducer,dataIndex:'supplier_name',width:90,sortable: true,editor:this.supplierCombo},
+			{header:DEV_COMMON_LU.labelInteractiveType,dataIndex:'interactive_type_text',sortable: true,width:80,editor:this.interactiveTypeCombo},
+			{header:DEV_COMMON_LU.labelDefinition,dataIndex:'definition_type_text',width:70,sortable: true,editor:this.definitionTypeCombo}
+//			,{header:DEV_COMMON_LU.labelPairCardType2,dataIndex:'virtual_card_model_name',width:80,sortable: true,editor:this.virtualCardModelCombo}
+//			,{header:'虚拟MODEM类型',dataIndex:'virtual_modem_model_name',width:95,editor:this.virtualModemModelCombo}
+//			,{header:COMMON_LU.doActionBtn,dataIndex:'device_model',width:80,renderer:function(value){
+//				return "<a href='#' onclick=stbGrid.matchCard('"+value+"')>" + BASE_CFG_LU.stbCardPairCfg + "</a>";
+//			}}
 		]);
 		cm.isCellEditable = commonIsCellEditable;
 		StbGrid.superclass.constructor.call(this,{
@@ -832,8 +836,8 @@ var ModemGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 		});
 		var cm = new Ext.grid.ColumnModel([
 			{header:DEV_COMMON_LU.labelModemType,dataIndex:'modem_type_name',width:80,editor:this.modemTypeCombo},
-			{id:'device_model_id',header:COMMON_LU.modelSimple,dataIndex:'device_model',width:120,editor:new Ext.form.TextField({vtype:'singleChar'})},
-			{header:BASE_CFG_LU.labelModelName,dataIndex:'model_name',width:120,editor:new Ext.form.TextField({})},
+			{id:'device_model_id',header:COMMON_LU.modelSimple,dataIndex:'device_model',width:150,editor:new Ext.form.TextField({vtype:'singleChar'})},
+			{header:BASE_CFG_LU.labelModelName,dataIndex:'model_name',width:150,editor:new Ext.form.TextField({})},
 			{header:BASE_CFG_LU.labelNetType,dataIndex:'net_type_name',width:70,editor:this.netTypeCombo},
 			{header:BASE_CFG_LU.labelProducer,dataIndex:'supplier_name',width:70,editor:this.supplierCombo},
 			{header:BASE_CFG_LU.isVitual,dataIndex:'is_virtual_text',width:70,editor:this.isVirtualCombo},
@@ -1142,27 +1146,15 @@ var CountyModelGrid = Ext.extend(Ext.grid.GridPanel,{
 var MateralCfgGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 	modemStore:null,
 //	supplierCombo:null,
-	deviceTypeCombo:null,
+//	deviceTypeCombo:null,
 	constructor:function(){
 		modemGrid = this;
 		this.modemStore = new Ext.data.JsonStore({
 			url:'resource/ResourceCfg!queryDeviceModelCfg.action',
 			pruneModifiedRecords:true,
-			fields:['device_model','device_type','model_name','device_type_text'
-//			,'supplier_id','supplier_name'
-			]
+			fields:['device_model','device_type','model_name','device_type_text']
 		});
-//		this.modemStore.load();
-		
-		this.deviceTypeCombo = new Ext.ux.ParamCombo({paramName:'OTHER_DEVICE_TYPE',valueField:'item_name',
-			forceSelection:true,selectOnFocus:true,editable:true,
-			listeners:{
-				scope:this,
-				select:function(combo,record){
-					this.getSelectionModel().getSelected().set('device_type',record.get('item_value'));
-				}
-			}
-		});
+
 		
 //		this.supplierCombo = new Ext.form.ComboBox({
 //			store:new Ext.data.JsonStore({
@@ -1179,9 +1171,8 @@ var MateralCfgGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 //		});
 		
 		var cm = new Ext.grid.ColumnModel([
-			{id:'device_type_id',header:BASE_CFG_LU.labelMateralType,dataIndex:'device_type_text',width:80,editor:this.deviceTypeCombo},
-			{id:'device_model_id',header:COMMON_LU.modelSimple,dataIndex:'device_model',width:120,editor:new Ext.form.TextField({vtype:'singleChar'})},
-			{header:BASE_CFG_LU.labelModelName,dataIndex:'model_name',width:120,editor:new Ext.form.TextField({})}
+			{id:'device_model_id',header:COMMON_LU.modelSimple,dataIndex:'device_model',width:300,editor:new Ext.form.TextField({vtype:'singleChar'})},
+			{header:BASE_CFG_LU.labelModelName,dataIndex:'model_name',width:300,editor:new Ext.form.TextField({})}
 //			{header:BASE_CFG_LU.labelProducer,dataIndex:'supplier_name',width:70,editor:this.supplierCombo}
 		]);
 		cm.isCellEditable = commonIsCellEditable;
@@ -1202,8 +1193,6 @@ var MateralCfgGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 	},
 	initComponent:function(){
 		MateralCfgGrid.superclass.initComponent.call(this);
-//		this.supplierCombo.getStore().load();
-		App.form.initComboData([this.deviceTypeCombo]);
 	},
 	initEvents:function(){
 		MateralCfgGrid.superclass.initEvents.call(this);
@@ -1211,8 +1200,7 @@ var MateralCfgGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 	},
 	doAdd:function(){
 		commonDoAdd(this,{
-			device_model:'',device_type:'',model_name:'',device_type_text:''
-//			,supplier_id:'',supplier_name:''				
+			device_model:'',model_name:''
 		});
 	},
 	doSave:function(){
@@ -1280,26 +1268,26 @@ var DeviceCfgGrid = Ext.extend(Ext.grid.EditorGridPanel,{
  */
 var DeviceTab = Ext.extend(Ext.TabPanel,{
 	stbGrid:null,
-	cardGrid:null,
+//	cardGrid:null,
 	modemGrid:null,
-	countyCfgGrid:null,
+//	countyCfgGrid:null,
 	materalCfgGrid:null,
-	deviceCfgGrid:null,
+//	deviceCfgGrid:null,
 	constructor:function(){
 		that = this;
 		this.stbGrid = new StbGrid();
-		this.cardGrid = new CardGrid();
+//		this.cardGrid = new CardGrid();
 		this.modemGrid = new ModemGrid();
-		this.countyCfgGrid = new CountyModelGrid();
+//		this.countyCfgGrid = new CountyModelGrid();
 		this.materalCfgGrid = new MateralCfgGrid();
-		this.deviceCfgGrid = new DeviceCfgGrid(); 
+//		this.deviceCfgGrid = new DeviceCfgGrid(); 
 		DeviceTab.superclass.constructor.call(this,{
 			id:'deviceTabId',
 			region:'center',
 			deferredRender:false,
 			enableTabScroll:true,
 			activeTab:0,
-			items:[this.stbGrid,this.cardGrid,this.modemGrid,this.materalCfgGrid,this.deviceCfgGrid,this.countyCfgGrid]
+			items:[this.stbGrid,this.modemGrid,this.materalCfgGrid]
 		});
 	},
 	initComponent:function(){
@@ -1310,12 +1298,12 @@ var DeviceTab = Ext.extend(Ext.TabPanel,{
 				var rs = Ext.decode(res.responseText);
 				that.modemGrid.getStore().loadData(rs.modemList);
 				that.stbGrid.getStore().loadData(rs.stbList);
-				that.cardGrid.getStore().loadData(rs.cardList);
+//				that.cardGrid.getStore().loadData(rs.cardList);
 				Ext.getCmp('buyTypeGridId').getStore().loadData(rs.buyModeList);
 				Ext.getCmp('provideGridId').getStore().loadData(rs.supplierList);
 				that.materalCfgGrid.getStore().loadData(rs.modelList);
-				that.deviceCfgGrid.getStore().loadData(rs.typeList);
-				that.countyCfgGrid.getStore().loadData(rs.countyModelList);
+//				that.deviceCfgGrid.getStore().loadData(rs.typeList);
+//				that.countyCfgGrid.getStore().loadData(rs.countyModelList);
 			}
 		});
 	}

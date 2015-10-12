@@ -8,6 +8,7 @@ import static com.ycsoft.commons.constants.BusiCodeConstants.DEVICE_BUY;
 import static com.ycsoft.commons.constants.BusiCodeConstants.DEVICE_CHANGE;
 import static com.ycsoft.commons.constants.BusiCodeConstants.PROD_PACKAGE_ORDER;
 import static com.ycsoft.commons.constants.BusiCodeConstants.USER_OPEN;
+import static com.ycsoft.commons.constants.BusiCodeConstants.USER_OPEN_BATCH;
 import static com.ycsoft.commons.constants.BusiCodeConstants.USER_PROMOTION;
 
 import java.util.ArrayList;
@@ -73,7 +74,7 @@ public class DoneCodeService extends BaseBusiService implements IDoneCodeService
 	public List<BusiFeeDto> queryEditFee(String custId,Integer doneCode,String busiCode) throws Exception{
 		List<BusiFeeDto> feeList = new ArrayList<BusiFeeDto>();
 		List<CFee>  sumFeeList = feeComponent.querySumFeeByDoneCode(custId,doneCode);
-		Map<String,CFee> feeMap = CollectionHelper.converToMapSingle(sumFeeList, "fee_id");
+		Map<String,CFee> feeMap = CollectionHelper.converToMapSingle(sumFeeList, "fee_id","fee_std_id");
 //		if (busiCode.equals(DEVICE_BUY) || busiCode.equals(DEVICE_SALE)
 //				|| busiCode.equals(DEVICE_RECLAIM) || busiCode.equals(BusiCodeConstants.DEVICE_CHANGE )
 //				|| busiCode.equals(BusiCodeConstants.DEVICE_BUY_PJ ) || busiCode.equals(BusiCodeConstants.DEVICE_BUY_PJ_BACTH)){
@@ -82,7 +83,7 @@ public class DoneCodeService extends BaseBusiService implements IDoneCodeService
 			List<CFeeDevice> deviceList = feeComponent.queryDeviceByDoneCode(doneCode);
 			if (deviceList!=null ){
 				for(CFeeDevice device : deviceList){
-					CFee fee = feeMap.get(device.getFee_id());
+					CFee fee = feeMap.get(device.getFee_id()+"_"+device.getFee_std_id());
 					if (StringHelper.isNotEmpty(device.getFee_std_id())){
 						for (BusiFeeDto busiFee:list){
 							if (busiFee.getFee_std_id().equals(device.getFee_std_id())){
@@ -113,18 +114,18 @@ public class DoneCodeService extends BaseBusiService implements IDoneCodeService
 				}
 			} 
 //		}  else {
-			List<BusiFeeDto> busiList = feeComponent.getBusiFeeAndIpFeeItems();
+			List<BusiFeeDto> busiList = feeComponent.getBusiFeeItems();
 			for (BusiFeeDto busiFee:busiList){
-				//IP费用
-				if(busiFee.getFee_id().equals(SystemConstants.USER_IP_FEE_ID)){
-					CFee fee = feeMap.get(busiFee.getFee_id());
-					if(fee != null){
-						busiFee.setSum_fee(fee.getReal_pay());
-						busiFee.setBuy_num(0);
-						busiFee.setAddr_id(fee.getAddr_id());
-						feeList.add(busiFee);
-					}
-				}else{
+//				//IP费用
+//				if(busiFee.getFee_id().equals(SystemConstants.USER_IP_FEE_ID)){
+//					CFee fee = feeMap.get(busiFee.getFee_id());
+//					if(fee != null){
+//						busiFee.setSum_fee(fee.getReal_pay());
+//						busiFee.setBuy_num(0);
+//						busiFee.setAddr_id(fee.getAddr_id());
+//						feeList.add(busiFee);
+//					}
+//				}else{
 					if (busiFee.getBusi_code().equals(busiCode)){
 						for (CFee fee:sumFeeList){
 							if (fee.getFee_id().equals(busiFee.getFee_id())){
@@ -136,7 +137,7 @@ public class DoneCodeService extends BaseBusiService implements IDoneCodeService
 						}
 						feeList.add(busiFee);
 					}					
-				}
+//				}
 			}
 			
 //		}
@@ -624,7 +625,7 @@ public class DoneCodeService extends BaseBusiService implements IDoneCodeService
 			Integer limit) throws Exception {
 		CDoneCode cDoneCode = doneCodeComponent.queryByKey(doneCode);
 		String busiCode = cDoneCode.getBusi_code();
-		if(busiCode.equals(USER_OPEN)){
+		if(busiCode.equals(USER_OPEN) || busiCode.equals(USER_OPEN_BATCH)){
 			//目前不支持分页，还未有批量开户
 			List<CDoneCodeDetail> detailList = doneCodeComponent.queryDetail(doneCode);
 			String[] users = CollectionHelper.converValueToArray(detailList, "user_id");

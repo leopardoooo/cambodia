@@ -39,7 +39,7 @@
   			<td>
   				<div class="top">
   					<a href="#" onclick="SetHome(this,window.location)">设为首页</a> 
-  					<a href="/help/">使用帮助</a>
+  					<a href="/help/Train.doc">使用帮助</a>
   					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   				</div>
   			</td>
@@ -55,7 +55,7 @@
 								<tr>
 									<th>用户名</th>
 									<td class="inner-input-cmp">
-										<input class="input-blur"  maxlength="20" id="loginName" value='admin'
+										<input class="input-blur"  maxlength="20" id="loginName" 
 											   onfocus="this.select();this.className='input-focus';" 
 											   onblur="this.className='input-blur';"/>
 									</td>
@@ -64,7 +64,7 @@
 								<tr>
 									<th>密&nbsp;&nbsp;&nbsp;&nbsp;码</th>
 									<td width="90" class="inner-input-cmp">
-										<input class="input-blur" maxlength="20" id="pwd" type="password"  value='123shyc'
+										<input class="input-blur" maxlength="20" id="pwd" type="password" 
 											   onfocus="this.select();this.className='input-focus';" 
 											   onblur="this.className='input-blur';"/>
 									</td>
@@ -75,9 +75,8 @@
 									<th>语&nbsp;&nbsp;&nbsp;&nbsp;言</th> 
 									<td width="90" class="inner-input-cmp">
 										<select id="lang" style="margin-left: 7px;">
-											<option value="zh" selected>简体中文</option>
-											<option value="en">English</option>
-											<option value="kh">ភាសាខ្មែរ</option>
+											<option value="zh">简体中文</option>
+											<option value="en" selected>English</option>
 										</select>
 									</td>
 									<td></td>

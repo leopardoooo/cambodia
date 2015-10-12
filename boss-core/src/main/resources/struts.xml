@@ -126,6 +126,12 @@
 			
 			<result name="{4}-html" type="redirect">/pages/business/{1}/{2}/{3}-{4}.html</result>
 			
+			<result type="json" name="ajax-upload">
+				<param name="contentType">text/html</param>
+                <param name="charSet">UTF-8</param>
+				<param name="root">root</param>
+			</result>
+			
 			<result type="json" name="json-simpleObj">
 				<param name="root">root.simpleObj</param>
 				<param name="ignoreHierarchy">false</param><!-- 不忽略继承关系，返回json字符串包含父类的属性 -->

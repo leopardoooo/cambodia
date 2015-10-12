@@ -24,7 +24,7 @@ new Ext.KeyMap(document,
 		);  
 
 // store 字段中文排序 补丁
- Ext.data.Store.prototype.applySort = function() {
+ /*Ext.data.Store.prototype.applySort = function() {
 	if (this.sortInfo && !this.remoteSort) {
 		var s = this.sortInfo, f = s.field;
 		var tmp = this.fields.get(f);
@@ -47,7 +47,7 @@ new Ext.KeyMap(document,
 			this.snapshot.sort(s.direction, fn);
 		}
 	}
-};  
+};*/  
 
 // ajax 请求超时时间
 Ext.apply( Ext.data.Connection.prototype, {
@@ -379,22 +379,8 @@ Ext.util.Format.lpadRight = function( v,l,c ){
  */
 Ext.util.Format.convertToYuan = function( v ){
 	if(isNaN(v)) return "" ;
-//	var s = String(v) , newValue = v ;
-//	if( s.indexOf('.') < 0){
-//		s = String(parseInt(s , 10));
-//		if(s.length < 3 ){
-//			var split = "0." ;
-//			if(s.length == 1)
-//				split += "0";
-//			newValue = split + s;
-//		} else {
-//			newValue = s.substr(0, s.length -2) + "." + s.substr(s.length - 2);
-//		}
-//	}
-// 	return parseFloat(v*100)/10000;
 	v = parseInt(v*100)/10000;
 	return v.toFixed(2);
-
 }
 Ext.util.Format.toDecimal= function (x) {   
     var f = parseFloat(x);   
@@ -418,7 +404,7 @@ Ext.util.Format.booleanRenderer = function( v ){
  * 封装一个金额的渲染函数，包含￥字符，{@link Ext.ux.MoneyColumn}
  */
 Ext.util.Format.moneyRenderer = function( v ){
-	if(!v || isNaN(v)) return "" ;
+	if(isNaN(v)) return "" ;
 	return "￥" + Ext.util.Format.convertToYuan(v) ;
 }
 /**
@@ -455,6 +441,14 @@ Ext.util.Format.dateFormat = function(v){
 	}
 	var date = Date.parseDate(v,'Y-m-d h:i:s');
 	return date.format('Y-m-d');
+}
+Ext.util.Format.dateFormatHIS = function(v){
+	if(!v) return "" ;
+	if(Ext.isDate(v)){
+		return v.format('Y-m-d h:i:s');
+	}
+	var date = Date.parseDate(v,'Y-m-d h:i:s');
+	return date.format('Y-m-d h:i:s');
 }
 /**
  * 计算当前日期与传入日期的天数

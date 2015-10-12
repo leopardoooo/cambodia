@@ -236,11 +236,11 @@ public class ResourceCfgComponent extends BaseComponent {
 		map.put("stbList", queryRStbModel()); //机顶盒型号
 		map.put("supplierList", queryRDeviceSupplier()); //供应商配置
 		map.put("buyModeList", queryDeviceBuyMode());//设备购买方式
-		map.put("cardList", queryRCardModel());//智能卡型号
+//		map.put("cardList", queryRCardModel());//智能卡型号
 		map.put("modemList", queryRModemModel());//modem型号
 		map.put("modelList", queryDeviceModel());//器材型号
-		map.put("typeList", queryDeviceType());//设备类型
-		map.put("countyModelList", queryCountyModel(optr));//设备适用地区
+//		map.put("typeList", queryDeviceType());//设备类型
+//		map.put("countyModelList", queryCountyModel(optr));//设备适用地区
 		return map;
 	}
 
@@ -280,11 +280,11 @@ public class ResourceCfgComponent extends BaseComponent {
 	 */
 	public void saveMateralModel(List<RDeviceModel> list) throws Exception{
 		for(RDeviceModel m: list){
-			RDeviceModel r = rDeviceModelDao.findDevice(m.getDevice_type(),m.getDevice_model());
+			RDeviceModel r = rDeviceModelDao.findDevice(SystemConstants.DEVICE_TYPE_FITTING,m.getDevice_model());
 			if (r==null)
-				rDeviceModelDao.saveMateral(m.getDevice_type(),m.getDevice_model(),m.getModel_name());
+				rDeviceModelDao.saveMateral(SystemConstants.DEVICE_TYPE_FITTING,m.getDevice_model(),m.getModel_name());
 			else
-				rDeviceModelDao.updateMateral(m.getDevice_type(),m.getDevice_model(),m.getModel_name());
+				rDeviceModelDao.updateMateral(SystemConstants.DEVICE_TYPE_FITTING,m.getDevice_model(),m.getModel_name());
 		}
 		memoryComponent.addDictSignal(DictKey.FITTING_MODEL.toString());
 	}

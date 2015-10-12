@@ -117,7 +117,7 @@ public class CustAction extends BaseBusiAction{
 		}
 		try{
 			if(file != null){
-				addrList.remove(0);
+//				addrList.remove(0);
 				if(addrList.size() != custNum)
 					throw new Exception("文件中地址数量必须等于开户数量!");
 				if(addrList.size() > 2000)
@@ -638,6 +638,13 @@ public class CustAction extends BaseBusiAction{
 		getRoot().setPage(custService.queryNonresCustApp(start, limit));
 		return JSON_PAGE;
 	}
+	
+	public String saveBugTask() throws Exception{
+		String bugDetail = request.getParameter("bugDetail");
+		custService.saveBugTask(bugDetail);
+		return JSON_SUCCESS;
+	}
+	
 	
 	public void setCustService(ICustService custService) {
 		this.custService = custService;

@@ -43,7 +43,8 @@ public class RDevice extends RDeviceModel implements Serializable {
 	private String is_new_stb;
 	private String batch_num;
 	private Integer total_num;
-
+	private String box_no;
+	
 	private String ownership_text;
 	private String device_status_text;
 	private String depot_status_text;
@@ -73,6 +74,14 @@ public class RDevice extends RDeviceModel implements Serializable {
 		setTran_status(StatusConstants.IDLE);
 	}
 
+
+	public String getBox_no() {
+		return box_no;
+	}
+
+	public void setBox_no(String box_no) {
+		this.box_no = box_no;
+	}
 
 	public String getBatch_num() {
 		return batch_num;

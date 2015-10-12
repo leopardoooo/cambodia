@@ -1,18 +1,23 @@
 package com.ycsoft.web.action.core;
 
+import java.io.File;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Controller;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import com.ycsoft.beans.core.prod.CancelUserDto;
 import com.ycsoft.business.dto.core.prod.OrderProd;
 import com.ycsoft.business.service.IOrderService;
+import com.ycsoft.commons.helper.FileHelper;
 import com.ycsoft.commons.helper.JsonHelper;
 import com.ycsoft.commons.helper.StringHelper;
+import com.ycsoft.commons.pojo.Root;
 import com.ycsoft.web.commons.abstracts.BaseBusiAction;
 
 @Controller
@@ -49,6 +54,27 @@ public class ProdOrderAction extends BaseBusiAction {
 	private String loadType;
 	
 	/**
+	 * 查询订单编辑的初始化数据
+	 * @return
+	 * @throws Exception
+	 */
+	public String queryOrderToEdit()throws Exception{
+		getRoot().setSimpleObj(orderService.queryOrderToEdit(order_sn));
+		return JSON_SIMPLEOBJ;
+	}
+	/**
+	 * 保存订单修改
+	 * @param orderProd
+	 * @return
+	 * @throws Exception
+	 */
+	public String saveOrderEdit() throws Exception{
+		OrderProd o=JsonHelper.toObject(orderProd, OrderProd.class);
+		orderService.saveOrderEdit(o);
+		return JSON_SUCCESS;
+	}
+	
+	/**
 	 * 退订界面数据初始化查询
 	 * @return
 	 * @throws Exception 
@@ -68,13 +94,40 @@ public class ProdOrderAction extends BaseBusiAction {
 		return JSON_RECORDS;
 	}
 	
+	private File file;
+	public File getFile() {
+		return file;
+	}
+	public void setFile(File file) {
+		this.file = file;
+	}
+	public String queryBatchLogoffUserProd() throws Exception {
+		List<String> userIdList = new ArrayList<String>();
+		if(file != null){
+			userIdList = FileHelper.fileToArray(file);
+		}
+		Root root = getProxyRoot();
+		try {
+			Map<String, Object> map = orderService.queryLogoffUserProdList(cust_id, userIdList);
+			root.setSimpleObj(map);
+			root.setSuccess(true);
+		} catch (Exception e) {
+			e.printStackTrace();
+			root.setSimpleObj(e.getMessage());
+			root.setSuccess(false);
+		}
+		
+		return AJAX_UPLOAD;
+	}
+	
 	/**
 	 * 退订产品(高级和普通退订)
 	 * @return
 	 * @throws Exception 
 	 */
 	public String cancelProd() throws Exception{
-		orderService.saveCancelProd(orderSns, cancelFee,refundFee);
+		String acctBalanceType = request.getParameter("acctBalanceType");
+		orderService.saveCancelProd(orderSns, cancelFee,refundFee,acctBalanceType);
 		return JSON_SUCCESS;
 	}
 	/**
@@ -146,6 +199,11 @@ public class ProdOrderAction extends BaseBusiAction {
 		orderService.savePublicRecharge(pay_type,fee,receipt_id);
 		return JSON;
 	}
+	
+	public String savePayOtherFee() throws Exception{
+		orderService.savePayOtherFee();
+		return JSON;
+	} 
 	
 	
 	public String savePublicRefund() throws Exception{

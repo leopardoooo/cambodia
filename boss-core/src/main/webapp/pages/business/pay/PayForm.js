@@ -8,6 +8,11 @@ PayForm = Ext.extend( Ext.form.FormPanel , {
 	parent: null,
 	constructor: function(parent){
 		this.parent = parent;
+		this.busiOptrStore = new Ext.data.JsonStore({
+			url:root+'/system/x/Index!queryOptrByCountyId.action',
+			fields:['optr_id','optr_name','attr'],
+			autoLoad: true
+		});
 		var lc = langUtils.main("cashPay.charge.columns");
 		PayForm.superclass.constructor.call(this, {
 			border: false,
@@ -35,8 +40,7 @@ PayForm = Ext.extend( Ext.form.FormPanel , {
 				xtype: 'textfield',
 				fieldLabel: lc[3],
 				name: 'pay.payer',
-				value: App.getApp().data.custFullInfo.cust.cust_name,
-				emptyText: '默认为客户名称'
+				value: App.getApp().data.custFullInfo.cust.cust_name
 			},{
 				fieldLabel: lc[4],
 				xtype: 'paramcombo',
@@ -63,7 +67,8 @@ PayForm = Ext.extend( Ext.form.FormPanel , {
 			}*/,{
 				fieldLabel: lc[7],
 				xtype: 'numberfield',
-				decimalPrecision: 0,
+				allowDecimals: false,
+				allowNegative: false,
 				id: 'nfDollar',
 				name: 'pay.usd',
 				listeners: {
@@ -83,8 +88,6 @@ PayForm = Ext.extend( Ext.form.FormPanel , {
 			}]
 			
 		});
-		var acctdatecmp = this.find("name","pay.acct_date")[0];
-		App.acctDate(acctdatecmp);
 	},
 	initComponent: function(){
 		PayForm.superclass.initComponent.call(this);

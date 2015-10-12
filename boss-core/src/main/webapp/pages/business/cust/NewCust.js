@@ -48,6 +48,7 @@ NewCustForm = Ext.extend( CustBaseForm , {
 	getValues : function(){
 		var all = this.getForm().getValues();
 		all['cust.address'] = Ext.getCmp('tempCustAddress').getValue();
+		all['linkman.birthday']=Date.parseDate(all["linkman.birthday"],'Y-m-d');
 		if(this.custLevel){
 			all['cust.cust_level'] = this.custLevel;
 		}

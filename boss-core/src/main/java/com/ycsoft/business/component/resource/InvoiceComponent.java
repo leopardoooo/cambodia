@@ -113,6 +113,10 @@ public class InvoiceComponent extends BaseBusiComponent {
 		rInvoiceDao.useInvoice(invoiceCode, invoiceId, invoiceMode,amount);
 	}
 	
+	public void updateInvoiceInfo(String invoiceCode, String invoiceId, String invoiceMode, int amount) throws Exception {
+		rInvoiceDao.updateInvoiceInfo(invoiceCode, invoiceId, invoiceMode,amount, getOptr().getOptr_id());
+	}
+	
 	public void updateDocType(String docSn, String docType) throws JDBCException {
 		cDocDao.updateDocType(docSn, docType);
 	}
@@ -288,7 +292,12 @@ public class InvoiceComponent extends BaseBusiComponent {
 				for (int i=invoices.size()-1;i>=0;i--){
 					RInvoice invoice = invoices.get(i);
 					if(SystemConstants.SYS_LEVEL_OPTR.equals(scopeInvoice)){
-						if(!getOptr().getOptr_id().equals(invoice.getOptr_id())){
+						/*if(!getOptr().getOptr_id().equals(invoice.getOptr_id())){
+							errorMeg = "发票["+ invoice.getInvoice_id() +"]未领用";
+							errorMsgList.add(errorMeg);
+							continue;
+						}*/
+						if(StringHelper.isEmpty(invoice.getOptr_id())){
 							errorMeg = "发票["+ invoice.getInvoice_id() +"]未领用";
 							errorMsgList.add(errorMeg);
 							continue;

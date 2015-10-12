@@ -9,7 +9,7 @@ CancelCloseInvoice = Ext.extend(Ext.Panel,{
 		this.panel = new CommonInvoicePanel("CANCELCLOSE");
 		CancelCloseInvoice.superclass.constructor.call(this,{
 			id:'CancelCloseInvoice',
-			title:'取消核销',
+			title:lsys('CancelCloseInvoice._title'),
 			closable: true,
 			border : false ,
 			baseCls: "x-plain",

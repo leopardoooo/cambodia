@@ -12,14 +12,18 @@ import com.ycsoft.beans.task.TaskCustExtInfo;
 import com.ycsoft.beans.task.WTaskBaseInfo;
 import com.ycsoft.beans.task.WTaskLog;
 import com.ycsoft.beans.task.WTaskUser;
+import com.ycsoft.beans.task.WTeam;
+import com.ycsoft.boss.remoting.cfocn.WorkOrderClient;
 import com.ycsoft.boss.remoting.ott.Result;
 import com.ycsoft.business.dao.core.cust.CCustDao;
 import com.ycsoft.business.dao.system.SOptrDao;
 import com.ycsoft.business.dao.task.WTaskBaseInfoDao;
 import com.ycsoft.business.dao.task.WTaskLogDao;
 import com.ycsoft.business.dao.task.WTaskUserDao;
+import com.ycsoft.business.dao.task.WTeamDao;
 import com.ycsoft.commons.abstracts.BaseComponent;
 import com.ycsoft.commons.constants.StatusConstants;
+import com.ycsoft.commons.constants.SystemConstants;
 @Component
 public class TaskComponent extends BaseComponent {
 	@Autowired
@@ -32,13 +36,76 @@ public class TaskComponent extends BaseComponent {
 	private SOptrDao sOptrDao;
 	@Autowired
 	private CCustDao cCustDao;
+	@Autowired
+	private WTeamDao wTeamDao;
 	
 	//查找需要执行的工单任务
 	public List<WTaskLog> querySynTaskLog() throws Exception{
 		return wTaskLogDao.querySynLog();
 		
 	}
+	/**
+	 * 从cfocn撤回工单
+	 * @param client
+	 * @param taskId
+	 * @param doneCode
+	 * @throws Exception
+	 */
+	public void cancelTaskService(WorkOrderClient client,String taskId,Integer doneCode) throws Exception{
+		WTaskBaseInfo task= wTaskBaseInfoDao.queryForLock(taskId);
+		if(task==null){
+			throw new Exception("工单不存在");
+		}
+		if(!task.getTask_status().equals(StatusConstants.TASK_INIT)){
+			throw new Exception("工单状态非施工中");
+		}
+		//调用接口撤回
+		client.cancelTaskService(doneCode, taskId);
+		//更新工单状态为待派单
+		this.updateTaskBaseInfoStatus(taskId, StatusConstants.TASK_CREATE);
+		wTaskBaseInfoDao.updateTaskSyncStatus(taskId, StatusConstants.SUCCESS);
+	}
+	/**
+	 * 同步工单给cfocn
+	 * @param client
+	 * @param taskId
+	 * @return
+	 * @throws Exception
+	 */
+	public boolean sendNewWorkOrder(WorkOrderClient client, String taskId,String cfonTeamId) throws Exception{
+		WTaskBaseInfo task=wTaskBaseInfoDao.queryForLock(taskId);
+		//工单状态判断
+		if(!task.getTask_status().equals(StatusConstants.TASK_CREATE)
+				&&!task.getTask_status().equals(StatusConstants.TASK_ENDWAIT)){
+			throw new Exception("工单状态非可派单派单");
+		}
+
+		if(!cfonTeamId.equals(task.getTeam_id())){
+			throw new Exception("非cfocn的工单");
+		}
+		List<WTaskUser> userList = queryTaskUser(taskId);
+		TaskCustExtInfo extInfo = queryCustInfo(task.getCust_id());
+		
+		boolean sign= client.createTaskService(task, userList, extInfo);
+		//更新工单状态为施工中
+		this.updateTaskBaseInfoStatus(taskId, StatusConstants.TASK_INIT);
+		//同步标志成功
+		wTaskBaseInfoDao.updateTaskSyncStatus(taskId, StatusConstants.SUCCESS);
+		return sign;
+	}
 	
+	public String getTeamId(String teamType) throws Exception {
+		// 获取施工队信息
+		List<WTeam> teamList = wTeamDao.findAll();
+		for (WTeam team : teamList) {
+			if (team.getTeam_type().equals(teamType))
+				return team.getDept_id();
+		}
+		return null;
+	}
+	public void updateTaskBaseInfoStatus(String taskId,String status)throws Exception{
+		wTaskBaseInfoDao.updateTaskStatus(taskId, status);
+	}
 	public WTaskBaseInfo queryTaskBaseInfo(String taskId) throws Exception{
 		return wTaskBaseInfoDao.findByKey(taskId);
 	}
@@ -61,8 +128,10 @@ public class TaskComponent extends BaseComponent {
 		}else if (result.isUndefinedError() || result.isConnectionError()){
 			//网络错误或者未知严重错误需要重发,所有不设置已发状态
 			log.setSyn_status(StatusConstants.NOT_EXEC);
+			wTaskBaseInfoDao.updateTaskSyncStatus(log.getTask_id(), StatusConstants.FAILURE);
 		}else {
 			log.setSyn_status(StatusConstants.FAILURE);
+			wTaskBaseInfoDao.updateTaskSyncStatus(log.getTask_id(), StatusConstants.FAILURE);
 		}
 		
 		log.setError_code(result.getErr());
@@ -71,4 +140,21 @@ public class TaskComponent extends BaseComponent {
 		wTaskLogDao.update(log);
 		
 	}
+	/**
+	 * 查询一个部门创建的工单的新增派单
+	 */
+	public int queryInitAddCntByDeptId(String deptId,Date currentTimeStamp)throws Exception{
+		return wTaskBaseInfoDao.queryStatusAddCntByDeptTimeStamp(deptId, currentTimeStamp, StatusConstants.TASK_INIT);
+	}
+	/**
+	 * 查询一个部门创建的工单的新增完工
+	 * @param deptId
+	 * @param currentTimeStamp
+	 * @return
+	 * @throws Exception
+	 */
+	public int queryEndAddCntByDeptId(String deptId,Date currentTimeStamp)throws Exception{
+		return wTaskBaseInfoDao.queryStatusAddCntByDeptTimeStamp(deptId, currentTimeStamp, StatusConstants.TASK_END);
+	}
+	
 }

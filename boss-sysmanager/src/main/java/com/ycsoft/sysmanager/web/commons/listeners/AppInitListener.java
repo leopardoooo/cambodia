@@ -10,6 +10,7 @@ import com.ycsoft.business.dao.system.SDataTranslationDao;
 import com.ycsoft.business.dao.system.SItemvalueDao;
 import com.ycsoft.commons.store.MemoryDict;
 import com.ycsoft.daos.core.JDBCException;
+import com.ycsoft.sysmanager.print.PrintContentConfiguration;
 
 /**
  * 容器启动的监听器,完成系统初始化工作。 包括配置文件、系统参数等初始化。
@@ -30,14 +31,21 @@ public class AppInitListener implements javax.servlet.ServletContextListener {
 	 * 实现容器初始化的函数
 	 */
 	public void contextInitialized(ServletContextEvent sce) {
-		initComponent(sce.getServletContext());
+		ServletContext sc = sce.getServletContext();
+		
+		try{
+			initComponent(sc);
+			configuration(sc);
+		}catch(Exception ex){
+			ex.printStackTrace();
+		}
 	}
 
 	/**
 	 * 配置文件参数
 	 */
-	private void configuration()throws Exception{
-
+	private void configuration(ServletContext sc)throws Exception{
+		PrintContentConfiguration.configure(sc.getRealPath("/"));
 	}
 
 	/**

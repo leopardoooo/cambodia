@@ -22,6 +22,7 @@ public class WTaskUser implements Serializable {
 	
 	private String user_type_text;
 	private String device_model_text;
+	private String recycle_result_text;
 	
 	
 	
@@ -32,6 +33,12 @@ public class WTaskUser implements Serializable {
 		this.user_type_text = user_type_text;
 	}
 
+	public String getRecycle_result_text() {
+		return recycle_result_text;
+	}
+	public void setRecycle_result_text(String recycle_result_text) {
+		this.recycle_result_text = recycle_result_text;
+	}
 	public String getDevice_model_text() {
 		return device_model_text;
 	}
@@ -76,6 +83,7 @@ public class WTaskUser implements Serializable {
 	}
 	public void setRecycle_result(String recycle_result) {
 		this.recycle_result = recycle_result;
+		recycle_result_text = MemoryDict.getDictName(DictKey.BOOLEAN, this.recycle_result);
 	}
 	public String getUser_type() {
 		return user_type;

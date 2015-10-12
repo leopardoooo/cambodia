@@ -16,6 +16,15 @@ import com.ycsoft.daos.core.JDBCException;
 @Component
 public class CProdOrderDao extends BaseEntityDao<CProdOrder> {
 	/**
+	 * 保存订单修改
+	 * @param order
+	 * @throws JDBCException
+	 */
+	public void updateOrderEdit(CProdOrder order) throws JDBCException{
+		String sql="update c_prod_order set prod_id=?,tariff_id=?,disct_id=?,exp_date=?,order_months=?,order_fee=?,remark=? where order_sn=?";
+		this.executeUpdate(sql, order.getProd_id(),order.getTariff_id(),order.getDisct_id(),order.getExp_date(),order.getOrder_months(),order.getOrder_fee(),order.getRemark(),order.getOrder_sn());
+	}
+	/**
 	 * 查询可以续费的订单记录
 	 * @param custId
 	 * @return
@@ -123,9 +132,9 @@ public class CProdOrderDao extends BaseEntityDao<CProdOrder> {
 	 * @param cust_id
 	 * @throws JDBCException
 	 */
-    public void updateOrderToPay(String order_sn,String cust_id) throws JDBCException{
-    	String sql="update c_prod_order set is_pay='T' where is_pay='F' and order_sn=? and cust_id=? ";
-    	this.executeUpdate(sql, order_sn,cust_id);
+    public void updateOrderToPay(String order_sn,String cust_id,String is_pay) throws JDBCException{
+    	String sql="update c_prod_order set is_pay=? where order_sn=? and cust_id=? ";
+    	this.executeUpdate(sql, is_pay,order_sn,cust_id);
     }
 
 	/**
@@ -176,6 +185,7 @@ public class CProdOrderDao extends BaseEntityDao<CProdOrder> {
 				"where user_id=? and prod_id=?  and exp_date >=trunc(sysdate)  order by exp_date ");
 		return this.createQuery(sql, user_id,prod_id).list();
 	}
+	
 	/**
 	 * 查询一个用户有效的所有产品订购记录(含套餐子产品)
 	 * @param user_id
@@ -187,6 +197,7 @@ public class CProdOrderDao extends BaseEntityDao<CProdOrder> {
 				"where user_id=?  and exp_date >=trunc(sysdate)  order by exp_date ");
 		return this.createQuery(sql, user_id).list();
 	}	
+	
 	/**
 	 * 查询一个宽带用户的所有单产品订购记录(不含套餐子产品)
 	 * @param user_id
@@ -248,6 +259,21 @@ public class CProdOrderDao extends BaseEntityDao<CProdOrder> {
 		
 		return this.createQuery(CProdOrderDto.class,sql, user_id).list();
 	}
+	
+	public List<CProdOrderDto> queryProdOrderDtoByUserIdList(String[] userIds) throws JDBCException{
+
+		String sql=StringHelper.append(
+				" select p.prod_name,p.prod_type,p.serv_id, p.is_base, cu.protocol_date, nvl(d.billing_cycle,ppt.billing_cycle) billing_cycle,ppt.billing_type,"
+				," case when cu.user_id is null then null when   cu.user_type in ('OTT_MOBILE','BAND') then cu.login_name else nvl(cu.stb_id,'INSTALL') end user_name ,nvl(d.disct_name,ppt.tariff_name) tariff_name,p.prod_name, o.* ",
+				" from c_prod_order o,p_prod p,p_prod_tariff ppt ,p_prod_tariff_disct d,c_user cu ",
+			    " where p.prod_id=o.prod_id and ppt.tariff_id=o.tariff_id and d.disct_id(+)=o.disct_id and cu.user_id(+)=o.user_id ",
+			    " and o.user_id in ("+sqlGenerator.in(userIds)+") ",
+			    " and trunc(o.exp_date)>=trunc(sysdate)",
+			    " order by o.exp_date "); 
+		
+		return this.createQuery(CProdOrderDto.class,sql).list();
+	}
+	
 	/**
 	 * 查询一个套餐的子产品详细信息
 	 * @param package_sn
@@ -299,5 +325,69 @@ public class CProdOrderDao extends BaseEntityDao<CProdOrder> {
 	public void updateExpOrderStatusToForStop() throws JDBCException{
 		String sql="update   c_prod_order t set t.status=? ,t.status_date=sysdate where t.status=? and t.exp_date<trunc(sysdate)";
 		this.executeUpdate(sql, StatusConstants.FORSTOP,StatusConstants.ACTIVE);
+	}
+	
+	/**
+	 * 查询一个用户一个单产品有效的所有订购记录(含套餐子产品)
+	 * 先套餐再按生效时间排序
+	 * @param cust_id
+	 * @return
+	 * @throws JDBCException
+	 */
+	public List<CProdOrder> queryNotExpAllOrderByProdOrderByEff(String user_id,String prod_id)throws JDBCException{
+		
+		String sql=StringHelper.append("select * from c_prod_order ",
+				"where user_id=? and prod_id=?  and exp_date >=trunc(sysdate)  order by (case when package_sn is not null then 1 else 2 end), eff_date ");
+		return this.createQuery(sql, user_id,prod_id).list();
+	}
+	/** 
+	 * 查询一个用户有效的所有产品订购记录(含套餐子产品)
+	 * 先套餐再按生效时间排序
+	 * @param cust_id
+	 * @return
+	 * @throws JDBCException
+	 */
+	public List<CProdOrder> queryNotExpAllOrderByUserOrderEff(String user_id)throws JDBCException{
+		String sql=StringHelper.append("select * from c_prod_order ",
+				"where user_id=?  and exp_date >=trunc(sysdate)  order by (case when package_sn is not null then 1 else 2 end),eff_date ");
+		return this.createQuery(sql, user_id).list();
+	}
+	/**
+	 * 查询一个客户有效的套餐所有订购记录
+	 * 先套餐再按生效时间排序
+	 * @param cust_id
+	 * @return
+	 * @throws JDBCException
+	 */
+	public List<CProdOrder> queryNotExpPackageOrderByEff(String cust_id)throws JDBCException{
+		String sql=StringHelper.append("select * from c_prod_order ",
+				"where cust_id=? and prod_id in (select a.prod_id from p_prod a where a.prod_type<>'BASE') ",
+				"and package_sn is null ",
+				" and exp_date >=trunc(sysdate) order by eff_date");
+		return this.createQuery(sql, cust_id).list();
+	}
+	/**
+	 * 查询订单回退相关的所有订单
+	 * @param custId
+	 * @param userIds
+	 * @param taskDoneCode
+	 * @return
+	 * @throws Exception
+	 */
+	public List<CProdOrder> queryTaskCancelOrder(String custId,String[] userIds,Integer taskDoneCode) throws Exception{
+		String sql ="select a.* from c_prod_order a "+
+				  " where  a.order_sn in ( "+
+				  "	select order_sn "+
+				  "	  from c_prod_order "+
+				  "	 where cust_id = ?  "+
+				  "	   and user_id in ("+sqlGenerator.in(userIds)+") "+
+				  "	  "+
+				  "	union "+
+				  "	select pak.order_sn "+
+				  "	  from c_prod_order a,c_prod_order pak "+
+				  "	 where a.cust_id = ? "+
+				  "	   and a.user_id in ("+sqlGenerator.in(userIds)+") "+
+				  "	   and a.package_sn=pak.order_sn and pak.done_code>? )";
+		return this.createQuery(sql, custId,custId,taskDoneCode).list();
 	}
 }

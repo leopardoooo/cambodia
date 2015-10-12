@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.ycsoft.beans.config.TBusiFee;
 import com.ycsoft.beans.config.TDeviceChangeReason;
+import com.ycsoft.beans.core.prod.CancelUserDto;
 import com.ycsoft.beans.core.user.CUser;
 import com.ycsoft.beans.core.user.CUserPropChange;
 import com.ycsoft.beans.prod.PPromotionAcct;
@@ -50,7 +51,7 @@ public interface IUserService extends IBaseService{
 	public void createUserBatch(List<UserInfo> userList, String stopType, String isHand) throws Exception;
 	
 //	public void saveChangeDevice(String userId,String deviceId,String devcieBuyMode,FeeInfoDto deviceFee, String changeReason, boolean reclaim)  throws Exception;
-	public void saveChangeDevice(String userId, String deviceCode, String changeReason) throws Exception;
+	public void saveChangeDevice(String userId, String deviceCode, String changeReason, String deviceBuyMode, FeeInfoDto deviceFee) throws Exception;
 
 	/**
 	 * 修改用户信息
@@ -78,7 +79,7 @@ public interface IUserService extends IBaseService{
 	 * 用户销户(支持多用户)
 	 * @param logoffUserDto
 	 */
-	public void saveRemoveUser(String userId ,String banlanceDealType,String reclaim,Integer cancelFee,Integer refundFee,String transAcctId,String transAcctItemId) throws Exception;
+	public void saveRemoveUser(String userId, Integer cancelFee, Integer refundFee) throws Exception;
 
 	/**
 	 * 开通双向
@@ -106,7 +107,7 @@ public interface IUserService extends IBaseService{
 	 */
 	public void checkStopUser(String[] userIds) throws Exception;
 	
-	public void untuckUsers(String[] userIds) throws Exception;
+	public void untuckUsers() throws Exception;
 
 	/**
 	 * 报停(支持多用户)
@@ -145,7 +146,7 @@ public interface IUserService extends IBaseService{
 	 * @param newPwd   新密码
 	 * @throws Exception
 	 */
-	public void saveEditPwd(String newPwd) throws Exception;
+	public void saveEditPwd(String loginName, String newPwd) throws Exception;
 	
 	/**
 	 * 修改连接数
@@ -369,7 +370,7 @@ public interface IUserService extends IBaseService{
 	/**
 	 * @param userIdList
 	 */
-	public void batchLogoffUser(List<String> userIdList,String isReclaimDevice,String deviceStatus,String remark) throws Exception;
+	public void batchLogoffUser(List<CancelUserDto> cancelUserList) throws Exception;
 
 	public void editFreeUser(String userId, String prodId, String tariffId,String type,Date tariffStartDate )throws Exception;
 	public void transferUsers(String toCustId) throws Exception  ;

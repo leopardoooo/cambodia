@@ -45,7 +45,7 @@
   	
 	<div id="header"">
 		<div class="logo">
-			<img src="<%=boss_res %>/resources/images/index/logo33.gif"/>
+			<img src="<%=boss_res %>/resources/images/logo.jpg"/>
 		</div><div id="titleId" class="title">系统管理</div>
 	</div>
 	<div id="loading"><div>
@@ -125,7 +125,7 @@
 		<script type="text/javascript">document.getElementById('titleId').innerHTML = '仓库管理';</script>
 		<jsp:include page = "/pages/index/depotLibrary.jsp" />
 	<%}else if("6".equals(sub_system_id)){ %>
-		<script type="text/javascript">document.getElementById('titleId').innerHTML = '发票管理';</script>
+		<script type="text/javascript">document.getElementById('titleId').innerHTML = '收据管理';</script>
 		<jsp:include page = "/pages/index/invoiceLibrary.jsp" />
 	<%}else if("8".equals(sub_system_id)){ %>
 		<script type="text/javascript">document.getElementById('titleId').innerHTML = '项目管理';</script>

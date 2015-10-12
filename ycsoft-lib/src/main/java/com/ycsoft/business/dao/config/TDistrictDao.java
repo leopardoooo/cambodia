@@ -39,7 +39,7 @@ public class TDistrictDao extends BaseEntityDao<TDistrict> {
 	}
 	
 	public List<TDistrictDto> queryDistrictListByPid(String pId) throws JDBCException {
-		String sql = "  select t.*,level from t_district t start with t.parent_id = ? "
+		String sql = "  select t.*,level from t_district t start with t.district_id = ? "
 				+ " connect by prior t.district_id = t.parent_id order by level asc " ;
 		return createQuery(TDistrictDto.class,sql, pId).list();
 	}

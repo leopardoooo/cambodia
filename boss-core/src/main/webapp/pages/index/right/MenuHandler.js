@@ -90,11 +90,48 @@ Ext.apply(MenuHandler, {
 			height : 470
 		};
 	},
+	//支付回退  
+	CancelPayFee : function(){
+		record = App.main.infoPanel.getPayfeePanel().feePayGrid.getSelectionModel().getSelected();
+		// 回调函数
+		function callback(res, opt) {
+			Alert(LU_MSG('cancelPayFeeSuccess'));
+			App.main.infoPanel.setReload(true);
+			App.main.infoPanel.getPayfeePanel().refresh();
+			App.main.infoPanel.getDocPanel().setReload(true);
+			App.main.infoPanel.getDoneCodePanel().setReload(true);
+			App.getApp().refreshPayInfo();
+		}
+		
+		
+		function callbackSave(res, opt) {
+			var rec = Ext.decode(res.responseText);
+			var saveParams = {invoiceIds:rec,paySn:record.get("pay_sn")};
+			var txt = LU_FM('msgBox.confirmCancelPayFeeWithNoParam');
+			if(rec.length>0){
+				txt = LU_FM('msgBox.confirmCancelPayFeeWithParam',null,[saveParams["invoiceIds"]]);
+			}
+			Confirm( txt, this, function() {
+				App.sendRequest(Constant.ROOT_PATH + "/core/x/Pay!canclePay.action", saveParams, callback);
+			});
+		}
+	
+		if (record) {
+			var params = {};
+			params["paySn"] = record.get("pay_sn");
+			var url = Constant.ROOT_PATH + "/core/x/Pay!queryPayToCancel.action";
+			App.sendRequest(url, params, callbackSave);
+		} else {
+			Alert(LU_MSG('selectRecCancelPayFee'));
+			return false;
+		}
+		return false;
+	},
 	// --------------------客户信息------------------------------------------------
 	// 开户
 	NewCust : function() {
 		return {
-			width : 580,
+			width : 630,
 			height : 510
 		};
 	},
@@ -345,8 +382,8 @@ Ext.apply(MenuHandler, {
 			return false;
 		}
 		return {
-			width : 580,
-			height : 470
+			width : 630,
+			height : 510
 		};
 	},
 	EditCustClass: function(){//修改优惠类型
@@ -475,8 +512,8 @@ Ext.apply(MenuHandler, {
 		if (!hasCust())
 			return false
 		return {
-			width : 450,
-			height : 300
+			width : 500,
+			height : 350
 		};
 	},
 	//批量购买配件
@@ -790,8 +827,8 @@ Ext.apply(MenuHandler, {
 			return false;
 		}
 		return {
-			width : 550,
-			height : 400
+			width : 580,
+			height : 480
 		};
 	},
 	//派单开户
@@ -800,7 +837,7 @@ Ext.apply(MenuHandler, {
 			return false;
 		}
 		return {
-			width: 580,
+			width: 650,
 			height: 550
 		}
 	},
@@ -814,15 +851,37 @@ Ext.apply(MenuHandler, {
 			Alert(lmsg('needUser'));
 			return false;
 		}
-		if (userRecords[0].get("status") != "ACTIVE" &&  userRecords[0].get("status") != "INSTALL") {
-			Alert(lmsg('userNotActive'));
+		if(userRecords.length>1){
+			Alert(lmsg('needOneUser'));
 			return false;
+		}
+		if (userRecords[0].get("user_type") !='OTT_MOBILE' && userRecords[0].get("status") != "UNTUCKEND") {
+			Alert('用户还未拆机完成或者工单未作废');
+			return false;
+		}
+		
+		var store = userGrid.getStore();
+		
+		for(var i=0,count=store.getCount();i<count;i++){
+			var record = store.getAt(i);
+			if(userRecords[0].get('user_type') == 'OTT' && userRecords[0].get('terminal_type') == 'FZD'
+				&& userRecords[0].get('user_id') != record.get('user_id') && record.get('user_type') == 'OTT' && record.get('terminal_type') == 'ZZD'){
+					Alert('请先销户OTT主终端!');
+					return false;
+			}
 		}
 			
 		return {
 				width : 650,
 				height : 550
 			};
+	},
+	BatchLogoffUser: function(){
+		if(!hasCust()) return false;
+		return {
+			width:440,
+			height:450
+		}
 	},
 	// 用户销户
 	LogoffUser : function() {
@@ -1373,7 +1432,7 @@ Ext.apply(MenuHandler, {
 			userIds.push(userRecords[i].get("user_id"));
 		}
 		
-		var url = Constant.ROOT_PATH + "/core/x/User!untuckUsers.action";
+		/*var url = Constant.ROOT_PATH + "/core/x/User!untuckUsers.action";
 		Confirm(lmsg("confirmUntuckUser"), this, function() {
 			App.sendRequest(url, {userIds: userIds}, function(res, opt){
 				var data = Ext.decode(res.responseText);
@@ -1381,8 +1440,11 @@ Ext.apply(MenuHandler, {
 					App.getApp().main.infoPanel.getUserPanel().userGrid.remoteRefresh();
 				}
 			});
-		});
-		return false;
+		});*/
+		return {
+			width: 450,
+			height: 400
+		};
 	},
 	// 报停
 	UserStop : function() {
@@ -1637,6 +1699,36 @@ Ext.apply(MenuHandler, {
 			}
 		}
 		return windowSize;
+	},
+	OrderProdEdit: function(){
+		if(!hasCust())	return false;
+		var prodRecord = App.main.infoPanel.getUserPanel().prodGrid.getSelections();
+		if(prodRecord[0].get('prod_type') == 'BASE'){
+			var userRecords =  App.main.infoPanel.getUserPanel().userGrid.getSelections();
+			var len = userRecords.length;
+			if (len == 0) {
+				Alert('请先选择用户!');
+				return false;
+			}
+		}
+		for (var i = 0; i < len; i++) {
+			if (userRecords[i].get("status") != "ACTIVE" && userRecords[i].get("status") != "INSTALL" ) {
+				Alert("所选用户的状态必须是正常");
+				return false;
+			}
+			for (var j = i + 1; j < len; j++) {
+				if (userRecords[i].get('user_type') != userRecords[j]
+						.get('user_type')) {
+
+					Alert("用户的类型必须一致");
+					return false;
+				}
+			}
+		}
+		return {
+			width: 450,
+			height: 450
+		};
 	},
 	// 取消套餐
 	CancelPromFee : function() {
@@ -2750,9 +2842,10 @@ Ext.apply(MenuHandler, {
 			height : 300
 		};
 	},
+	//新增保障单
 	NewRepairTask: function(){
 	    if(!hasCust()) return false;
-	    return {width: 340 , height: 420};
+	    return {width: 450 , height: 300};
 	  },
 	PrintRepairTask: function(){
 	  	var record = App.getApp().main.infoPanel.getDocPanel().taskGrid.getSelectionModel().getSelected();
@@ -2947,10 +3040,11 @@ Ext.apply(MenuHandler, {
 		// 回调函数
 		function callback(res, opt) {
 			var result = Ext.decode(res.responseText);
-			if (result.success == true) {
+			if (result == true) {
 				Alert('工单作废成功!');
+				App.getApp().main.infoPanel.getUserPanel().userGrid.remoteRefresh();
 				App.getApp().main.infoPanel.docPanel.taskGrid.remoteRefresh();
-						
+				App.getApp().refreshPayInfo();
 			}
 		}
 		var url = Constant.ROOT_PATH + "/core/x/Task!cancelTaskSn.action";
@@ -2969,6 +3063,14 @@ Ext.apply(MenuHandler, {
 			height : 400
 		};
 		
+	},
+	PayOtherFee:function(){
+		if (!hasCust())
+			return false;
+		return {
+			width : 450,
+			height : 400
+		};
 	}
 	
 });

@@ -8,6 +8,7 @@
    String nowDate = DateHelper.format(new Date(),"yyyy/MM/dd HH:mm:ss");
    String basePath = request.getLocalAddr()+":"+request.getServerPort();
    String lang = session.getAttribute(Environment.USER_IN_SESSION_LANG).toString();
+   String version = "1";
 %>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
@@ -41,7 +42,7 @@
 	<div id="header" style="visibility: hidden;">
 		<div class="site-nav-search">
 			<div class="logo">
-					<img src="<%=boss_res %>/resources/images/index/logo33.gif"/>
+				<img src="<%=boss_res %>/resources/images/logo.jpg"/>
 			</div>
 			<div action="?" method="post" name="search" id="search">
 				 <div class="search-panel">
@@ -238,7 +239,7 @@
 	<script type="text/javascript" src="<%=root %>/pages/index/center/CommandInfoPanel.js" charset="UTF-8"></script>
 	<script type="text/javascript" src="<%=boss_res %>/pages/commons/ux/MonthPickerPlugin.js" charset="UTF-8"></script>
 	<script type="text/javascript" src="<%=root %>/pages/index/center/BillPanel.js" charset="UTF-8"></script>
-	<script type="text/javascript" src="<%=root %>/pages/index/center/center.js" charset="UTF-8" ></script>
+	<script type="text/javascript" src="<%=root %>/pages/index/center/center.js?version=<%=version %>" charset="UTF-8" ></script>
   
   	<%--  组装首页  --%> 
   	<script type="text/javascript" src="<%=root %>/pages/business/common/ExtAttrFactory.js"></script>

@@ -39,6 +39,14 @@ public enum ErrorCode {
 	UnPayAcctRefundFeeAndChangeIsDiffer("账户退款和资金异动明细不一致"),
 	UnPayLock("客户被锁定,请等待%s(%s)完成支付!"),
 	UnPayIsOld("待支付金额已失效，请重新打开待支付界面"),
+	UnPayHasEdit("对应订单金额被修改，不能取消，请使用订单修改功能更正费用"),
+	
+	PayCancelOnlyPayOptr("只有支付操作员可以操作回退支付"),
+	//PayCancelInvoiceIsCheck("发票已结账，不能回退支付"),InvoiceCheckStatusIsNotIdle
+	PayHasCancel("支付已回退，不能再次回退"),
+	PayFeeStatusError("支付对应的缴费记录状态异常，不能回退"),
+	PayCancelInvoiceParamError("前后台发票不一致"),
+	PayFeeHasCancelOrder("支付关联的订购订单费用或修改订单费用存在订单被退订情况，不能回退"),
 	
 	FeeDateException("前后台金额不一致"),
 	CFeeAndProdOrderIsNotOne("费用记录和订单信息不一致"),
@@ -66,6 +74,12 @@ public enum ErrorCode {
 	OrderTransUnPayPleaseCancel("被覆盖的订单存在未支付记录，请先取消订单号=%s的费用才能升级"),
 	OrderDateCanNotUpWhyPak("产品不能升级,因为存在有效的套餐子产品"),
 
+	OrderStatusException("订单状态异常"),
+	OrderEditOnlyUnPay("只有未支付的订单才可以修改退款"),
+	OrderEditNoProd("订单已支付，不能修改"),
+	OrderEditIsPakDetail("订单是套餐子产品，不能修改"),
+	
+	OttFzdNotMoreThanTwo("OTT主终端下只能挂2个副终端"),
 	//task
 	TaskDeviceIsNull("设备未回填"),
 	TaskDeviceModelIsNull("该工单用户的设备型号不存在"),
@@ -77,6 +91,7 @@ public enum ErrorCode {
 	DeviceTotalNumIsNull("设备数量不够"),
 	DeviceTotalNumIsTooBig("设备入库数量超出了订货数量"),
 	DeviceDateException("设备数据异常，请联系管理员!(device_id=%s)"),
+	DevicePairModelNotExists("设备对应的智能卡型号不存在!(device_model=%s)"),
 	
 	AcctPublicNotExists("客户缺失公用账户，请联系管理员！"),
 	AcctItemNotExists("账目不存在，请联系管理员！"),
@@ -90,6 +105,8 @@ public enum ErrorCode {
 	InvoiceIsNotYou("只有开票人可以操作"),
 	InvoiceCheckStatusIsNotIdle("发票已结账或缴销，不能操作"),
 	InvoiceTemplateDeptIsNull("模板缺失发票缴销仓库配置，请联系管理员"),
+	InvoiceNotExists("发票不存在"),
+	InvoiceNotUse("发票未使用或已作废"),
 	
 	TemplateNotConfigBuseFee("该地区费用模板未配置该费用项(%s)"),
 	CustUserIpAddressFeeCoinfigError("客户宽带IP收费存在多个费用项目，请联系管理员！"),
@@ -125,11 +142,13 @@ public enum ErrorCode {
 	//OTT授权相关错误
 	ResIsNull("控制字为空"),
 	ResOttIsError("OTT控制字格式错误"),
-	CmdTypeUnDefined("授权类型(s%)未定义,请联系管理员"),
+	CmdTypeUnDefined("授权类型(%s)未定义,请联系管理员"),
 	
 	//======================未翻译===========================
 	NoStopRecord("找不到产品报停记录，请联系管理员"),
 	TaskDeviceUnFill("有未回填设备的用户，不能完工"),
+	GDDEviceNotOff("supernet产权的设备不能销户，请先拆机或购买设备!"),
+	UserStatusNotOff("用户状态不是拆机完成，请先完成拆机工单!")
 	;
 	
 	

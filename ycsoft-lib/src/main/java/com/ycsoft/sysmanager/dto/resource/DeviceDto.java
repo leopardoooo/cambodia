@@ -35,6 +35,8 @@ public class DeviceDto extends RDevice{
 	private String county_id_text;
 	private String cust_id;
 	private String cust_no;
+	private String str9;
+	private String develop_optr_name;
 	private String cust_name;
 	private String wrong_device_code;
 	private String ca_type;
@@ -257,6 +259,19 @@ public class DeviceDto extends RDevice{
 
 	public void setDeviceUseRecordsList(List<RDeviceUseRecords> deviceUseRecordsList) {
 		this.deviceUseRecordsList = deviceUseRecordsList;
+	}
+
+	public String getStr9() {
+		return str9;
+	}
+
+	public void setStr9(String str9) {
+		this.str9 = str9;
+		this.develop_optr_name = MemoryDict.getDictName(DictKey.OPTR, str9);
+	}
+
+	public void setDevelop_optr_name(String develop_optr_name) {
+		this.develop_optr_name = develop_optr_name;
 	}
 
 }

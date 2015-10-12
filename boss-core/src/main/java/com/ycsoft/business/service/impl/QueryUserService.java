@@ -207,7 +207,7 @@ public class QueryUserService extends BaseService implements IQueryUserService {
 		String paramName = null;
 		for(CProdPropChange prodProp : prodPropList.getRecords()){
 			//当变动的字段为 资费ID时，通过ID查询资费名称
-			if(prodProp.getColumn_name().equals("TARIFF_ID")){
+			if(prodProp.getColumn_name().toUpperCase().equals("TARIFF_ID")){
 				ppt = prodComponent.queryTariffById(prodProp.getOld_value());
 				prodProp.setOld_value(ppt.getTariff_name());
 

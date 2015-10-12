@@ -41,6 +41,7 @@ import com.ycsoft.beans.prod.PProd;
 import com.ycsoft.beans.prod.PProdTariff;
 import com.ycsoft.beans.prod.PProdTariffDisct;
 import com.ycsoft.beans.system.SOptr;
+import com.ycsoft.beans.task.TaskFillDevice;
 import com.ycsoft.beans.task.WTaskUser;
 import com.ycsoft.business.cache.PrintContentConfiguration;
 import com.ycsoft.business.commons.abstracts.BaseService;
@@ -110,6 +111,37 @@ public class BaseBusiService extends BaseService {
 	@Autowired
 	protected AuthComponent authComponent;
 	
+	/**
+	 * 处理产品授权（不处理套餐，但是一个产品如果是套餐子产品则会被处理）
+	 * 加减授权都会正确处理
+	 * @param cancelList
+	 * @throws Exception 
+	 */
+	public void authProdNoPackage(List<CProdOrder> cancelResultList,Map<String,CUser> userMap,Integer done_code) throws Exception{
+	
+		Map<CUser,List<CProdOrder>> pstProdMap=new HashMap<>();
+		for(CProdOrder pstorder:cancelResultList){
+			if(StringHelper.isNotEmpty(pstorder.getUser_id())){
+				CUser user=userMap.get(pstorder.getUser_id());
+			    if(user==null){
+			    	user=userComponent.queryUserById(pstorder.getUser_id());
+			    	userMap.put(pstorder.getUser_id(), user);
+			    	if(user==null){
+			    		throw new ServicesException(ErrorCode.OrderDateException,pstorder.getOrder_sn());
+			    	}
+			    }
+			    List<CProdOrder> pstlist=pstProdMap.get(user);
+			    if(pstlist==null){
+			    	pstlist=new ArrayList<>();
+			    	pstProdMap.put(user, pstlist);
+			    }
+			    pstlist.add(pstorder);
+			}
+		}
+		for(CUser user:  pstProdMap.keySet()){
+			authComponent.sendAuth(user, pstProdMap.get(user), BusiCmdConstants.ACCTIVATE_PROD, done_code);
+		}
+	}
 	/**
 	 * 初始化接口的业务参数
 	 * @param busiCode
@@ -665,13 +697,11 @@ public class BaseBusiService extends BaseService {
 	 * @param newStatus
 	 */
 	protected void updateUserStatus(Integer doneCode,String userId,String oldStatus,String newStatus) throws Exception{
-		CUserPropChange propChange = new CUserPropChange();
-		propChange.setColumn_name("status");
-		propChange.setOld_value(oldStatus);
-		propChange.setNew_value(newStatus);
+		CUser user = userComponent.queryUserById(userId);
 
 		List<CUserPropChange> changeList = new ArrayList<CUserPropChange>();
-		changeList.add(propChange);
+		changeList.add(new CUserPropChange("status", oldStatus, newStatus));
+		changeList.add(new CUserPropChange("status_date", DateHelper.dateToStr(user.getStatus_date()), DateHelper.dateToStr(new Date())));
 		userComponent.editUser(doneCode, userId, changeList);
 	}
 
@@ -1850,8 +1880,8 @@ public class BaseBusiService extends BaseService {
 			deviceComponent.updateDeviceDepotStatus(doneCode, busiCode, device.getDevice_id(),
 					device.getDepot_status(), StatusConstants.USE,true);
 			//更新设备产权
-			if (!SystemConstants.OWNERSHIP_CUST.equals(ownership)){
-				deviceComponent.updateDeviceOwnership(doneCode, busiCode, device.getDevice_id(),device.getOwnership(),SystemConstants.OWNERSHIP_CUST,true);
+			if (!device.getOwnership().equals(ownership)){
+				deviceComponent.updateDeviceOwnership(doneCode, busiCode, device.getDevice_id(),device.getOwnership(),ownership,true);
 			}
 			//更新设备为旧设备
 			if (SystemConstants.BOOLEAN_TRUE.equals(device.getUsed()))
@@ -1905,37 +1935,7 @@ public class BaseBusiService extends BaseService {
 		
 	}
 	
-	//回填用户设备
-	protected void fillUserDevice(int doneCode,List<WTaskUser> deviceList) throws Exception {
-		CCust cust = null;
-		for (WTaskUser userDevice:deviceList){
-			CUser user = userComponent.queryUserById(userDevice.getUser_id());
-			DeviceDto device = deviceComponent.queryDeviceByDeviceCode(userDevice.getDevice_id());
-			setUserDeviceInfo(user, device);
-			userComponent.updateDevice(doneCode, user);
-			//发送授权
-			if(user.getUser_type().equals(SystemConstants.USER_TYPE_DTT)||
-					user.getUser_type().equals(SystemConstants.USER_TYPE_OTT)){
-				//开户指令
-				this.createUserJob(user, user.getCust_id(), doneCode);
-			}
-			//发产品授权
-			List<CProdOrder> prodList = orderComponent.queryOrderProdByUserId(user.getUser_id());
-			authComponent.sendAuth(user, prodList, BusiCmdConstants.ACCTIVATE_PROD, doneCode);
-			
-			
-			//TODO DTT回填有变更设备处理，要对换下的设备发销户指令DEL_USER
-			
-			//处理设备
-			TDeviceBuyMode buyModeCfg = busiConfigComponent.queryBuyMode(user.getStr10());
-			String ownership = SystemConstants.OWNERSHIP_GD;
-			if (buyModeCfg.getChange_ownship().equals(SystemConstants.BOOLEAN_TRUE))
-				ownership = SystemConstants.OWNERSHIP_CUST;
-			if (cust == null)
-				cust = custComponent.queryCustById(user.getCust_id());
-			this.buyDevice(device, user.getStr10(), ownership, null, BusiCodeConstants.TASK_FILL, cust, doneCode);
-		}
-	}
+	
 	
 	protected void setUserDeviceInfo(CUser user, DeviceDto device) throws Exception{
 		if (user.getUser_type().equals(SystemConstants.USER_TYPE_BAND)){

@@ -34,7 +34,13 @@ BuyMaterialForm = Ext.extend( BaseForm , {
 					paramName:'OTHER_DEVICE_TYPE',
 					listeners: {
 						scope: this
-						,'select': this.filterDeviceModel
+						,'select': this.filterDeviceModel,
+						expand:function(combo){
+							var store = combo.getStore();
+							store.filterBy(function(record){
+								return record.get('item_value').indexOf('CARD')<0;
+							})
+						}
 					}
 				},{
 					fieldLabel : langUtils.main("cust._form.deviceModel"),

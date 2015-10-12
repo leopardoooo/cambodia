@@ -11,32 +11,22 @@ var MSG_LU = lsys('msgBox');
 QueryDeviceForm = Ext.extend(Ext.form.FormPanel,{
 	parent:null,
 	showDownloadBtn:false,
+	checkDeviceType:null,
 	constructor:function(p){
 		this.parent = p;
 		QueryDeviceForm.superclass.constructor.call(this,{
 			border:false,
 			bodyStyle:'padding-top:10px',
 			layout:'column',
-			labelWidth:75,
+			labelWidth:80,
 			items:[
 				{columnWidth:.33,layout:'form',border:false,items:[
-					{xtype:'treecombo',fieldLabel:DEV_COMMON_LU.labelDepot,hiddenName:'depotId',
-						width:150,
-						treeWidth:400,
-//						minChars:2,
-						height: 22,
-						allowBlank: false,
-						onlySelectLeaf:false,
-						emptyText :MSG_LU.emptyTextSelectStore,
-						blankText:MSG_LU.emptyTextSelectStore,
-						treeUrl: 'resource/Device!queryChildDepot.action',
-						listeners : {
-							'focus' : function(){
-								if(this.list){
-									this.expand();
-								}
-							}
-						}
+					{fieldLabel:DEV_COMMON_LU.labelDepot,hiddenName:'depotId',xtype:'combo',allowBlank:false,
+							store:new Ext.data.JsonStore({
+								url:'resource/Device!queryAllDept.action',
+								autoLoad:true,
+								fields:['dept_id','dept_name']
+							}),displayField:'dept_name',valueField:'dept_id',triggerAction:'all',mode:'local',width :150,minListWidth :250
 					},
 					{fieldLabel:DEV_COMMON_LU.labelDevStatus,hiddenName:'status',xtype:'paramcombo',width:150,
 						forceSelection:true,selectOnFocus:true,editable:true,
@@ -51,8 +41,9 @@ QueryDeviceForm = Ext.extend(Ext.form.FormPanel,{
 					{fieldLabel:DEV_COMMON_LU.labelDeviceType,hiddenName:'mode',xtype:'combo',allowBlank:false,
 						store:new Ext.data.ArrayStore({
 							fields:['mode','mode_name'],
-							data:[['STB',DEV_COMMON_LU.labelSingleStb],['CARD',DEV_COMMON_LU.labelSingleCard],
-								['MODEM',DEV_COMMON_LU.labelSingleModem],['STBCARD',DEV_COMMON_LU.labelStbCardPair],['STBMODEM',DEV_COMMON_LU.labelStbModemPair]]
+							data:[['STB','STB'],['FITTING','FITTING'],
+//							['STBCARDMODEM',DEV_COMMON_LU.labelStbCardModemPair],['STBCARD',DEV_COMMON_LU.labelStbCardPair],['STBMODEM',DEV_COMMON_LU.labelStbModemPair],
+								['MODEM','MODEM']]
 						}),
 						displayField:'mode_name',valueField:'mode',width:150,
 						listeners:{
@@ -123,7 +114,7 @@ QueryDeviceForm = Ext.extend(Ext.form.FormPanel,{
 			buttonAlign : 'center',
 			buttons : [{id:'queryDeviceBtnId',xtype:'button',text:COMMON_LU.query,iconCls:'icon-query',disableSelfCtrl:true,
 						scope:this,handler:this.doQuery},
-					{id:'downloadBtnId',xtype:'button',hidden:true,text:COMMON_LU.downLoad,iconCls:'icon-excel',
+					{id:'downloadBtnId',xtype:'button',text:COMMON_LU.downLoad,iconCls:'icon-excel',
 						scope:this,handler:this.doDownload}]
 		});
 	},
@@ -133,18 +124,40 @@ QueryDeviceForm = Ext.extend(Ext.form.FormPanel,{
 	},
 	doSelect:function(combo,record){
 		var value = combo.getValue();
+		if(this.checkDeviceType == null){
+			this.checkDeviceType = value;
+		}else{
+			if(this.checkDeviceType == value){
+				return;
+			}
+		}
+		this.checkDeviceType = value;
+		if(this.checkDeviceType == 'FITTING'){
+			this.getForm().items.each(function(f){
+				if(f.label){
+					Ext.fly(f.label.id).setStyle('color','gray');
+				}
+				if(f.hiddenName != 'depotId' && f.hiddenName != 'mode' ){
+					f.disable();
+				}
+			});
+		}else{
+			this.getForm().items.each(function(f){
+				if(f.label){
+					Ext.fly(f.label.id).setStyle('color','gray');
+				}
+				f.enable();
+			});
+		}
+		
+		
 		var modemType = this.getForm().findField('modemType');
-		if(value == 'STBCARD' || value == 'STBMODEM'){
-			value='STB';
-			modemType.reset();
-			modemType.disable();
-		}else if (value == 'MODEM'){
+		if (value == 'MODEM'){
 			modemType.enable();
 		}else{
 			modemType.reset();
 			modemType.disable();
 		}
-		
 		
 		var deviceModel = this.getForm().findField('deviceModel');
 		deviceModel.reset();
@@ -159,10 +172,10 @@ QueryDeviceForm = Ext.extend(Ext.form.FormPanel,{
 		var values = this.getForm().getValues();
 		var mode = values['mode'];
 		var columns = grid.currColumns;
-		if(mode == 'STB' || mode == 'STBCARD'){//单机或机卡配对
+		if(mode == 'STB'){//单机或机卡配对
 			columns = grid.stbColumns;
-		}else if(mode == 'CARD'){//单卡
-			columns = grid.cardColumns;
+		}else if(mode == 'FITTING'){//器材
+			columns = grid.fittingColumns;
 		}else if(mode == 'MODEM'){//猫
 			columns = grid.modemColumns;
 		}
@@ -184,7 +197,7 @@ QueryDeviceForm = Ext.extend(Ext.form.FormPanel,{
 			return ;
 		}
 		var values = Ext.Ajax.serializeForm(this.getForm().getEl().dom);
-		window.open(root+'/resource/Device!downloadQueryDevice.action?'+values);
+		window.open(root+'/resource/Device!downloadQueryDeviceDetail.action?'+values);
 	}
 });
 
@@ -192,7 +205,7 @@ QueryDeviceGrid = Ext.extend(Ext.grid.GridPanel,{
 	store:null,
 	
 	stbColumns:null,
-	cardColumns:null,
+	fittingColumns:null,
 	modemColumns:null,
 	currColumns:null,
 	constructor:function(cfg){
@@ -202,8 +215,8 @@ QueryDeviceGrid = Ext.extend(Ext.grid.GridPanel,{
 			root : 'records' ,
 			totalProperty: 'totalProperty',
 			fields:['device_id','device_status','device_status_text','device_code',
-				'device_model','device_model_text','modem_mac','pair_device_code',
-				'pair_device_model','pair_device_model_text','depot_status_text', 'batch_num',
+				'device_model','device_model_text','modem_mac','pair_device_code','total_num',
+				'pair_device_model','pair_device_model_text','depot_status_text', 'batch_num','develop_optr_name',
 				'depot_id','depot_id_text','cust_id','cust_name','pair_device_modem_code','pair_device_modem_model_text']
 		});
 		this.store.on('load',function(){
@@ -213,26 +226,21 @@ QueryDeviceGrid = Ext.extend(Ext.grid.GridPanel,{
 		this.stbColumns = [
 			{header:DEV_COMMON_LU.labelStbCode,dataIndex:'device_code',width:130,renderer:App.qtipValue},
 			{header:DEV_COMMON_LU.labelStbType,dataIndex:'device_model_text',width:100,renderer:App.qtipValue},
-			{header:DEV_COMMON_LU.labelCardCode,dataIndex:'pair_device_code',width:120,renderer:App.qtipValue},
-			{header:DEV_COMMON_LU.labelCardType,dataIndex:'pair_device_model_text',width:100,renderer:App.qtipValue},
-			{header:DEV_COMMON_LU.labelPairModemCode,dataIndex:'pair_device_modem_code',width:120,renderer:App.qtipValue},
-			{header:DEV_COMMON_LU.labelPairModemType2,dataIndex:'pair_device_modem_model_text',width:100,renderer:App.qtipValue},
+			{header:DEV_COMMON_LU.labelPairCardCode,dataIndex:'pair_device_code',width:120,renderer:App.qtipValue},
+//			{header:DEV_COMMON_LU.labelCardType,dataIndex:'pair_device_model_text',width:100,renderer:App.qtipValue},
+//			{header:DEV_COMMON_LU.labelPairModemCode,dataIndex:'modem_mac',width:120,renderer:App.qtipValue},
 			{header:DEV_COMMON_LU.labelDevStatus,dataIndex:'device_status_text',width:75,renderer:App.qtipValue},
 			{header:DEV_COMMON_LU.labelDevStatus,dataIndex:'depot_status_text',width:75,renderer:App.qtipValue},
 			{header:COMMON_LU.depotText,dataIndex:'depot_id_text',width:100,renderer:App.qtipValue},
 			{header:DEV_COMMON_LU.labelCustNo,dataIndex:'cust_id',width:75,renderer:App.qtipValue},
 			{header:DEV_COMMON_LU.labelCustName,dataIndex:'cust_name',width:100,renderer:App.qtipValue},
-			{header:DEV_COMMON_LU.labelBatchNum,dataIndex:'batch_num',width:100,renderer:App.qtipValue}
+			{header:DEV_COMMON_LU.labelCustStr9,dataIndex:'develop_optr_name',width:100,renderer:App.qtipValue},
+			{header:DEV_COMMON_LU.labelBatchNum,dataIndex:'batch_num',width:80,renderer:App.qtipValue}
 			
 		];
-		this.cardColumns = [
-			{header:DEV_COMMON_LU.labelCardCode,dataIndex:'device_code',width:160,renderer:App.qtipValue},
-			{header:COMMON_LU.typeSimple,dataIndex:'device_model_text',width:120,renderer:App.qtipValue},
-			{header:DEV_COMMON_LU.labelDevStatus,dataIndex:'device_status_text',width:80,renderer:App.qtipValue},
-			{header:DEV_COMMON_LU.labelDevStatus,dataIndex:'depot_status_text',width:75,renderer:App.qtipValue},
-			{header:COMMON_LU.depotText,dataIndex:'depot_id_text',width:130,renderer:App.qtipValue},
-			{header:DEV_COMMON_LU.labelCustNo,dataIndex:'cust_id',width:120,renderer:App.qtipValue},
-			{header:DEV_COMMON_LU.labelCustName,dataIndex:'cust_name',width:130,renderer:App.qtipValue}
+		this.fittingColumns = [
+			{header:DEV_COMMON_LU.labelFittingModel,dataIndex:'device_model_text',width:400,renderer:App.qtipValue},
+			{header:DEV_COMMON_LU.labelTotalNum,dataIndex:'total_num',width:120,renderer:App.qtipValue}
 		];
 		this.modemColumns = [
 			{header:DEV_COMMON_LU.labelModemCode,dataIndex:'modem_mac',width:160,renderer:App.qtipValue},
@@ -241,14 +249,16 @@ QueryDeviceGrid = Ext.extend(Ext.grid.GridPanel,{
 			{header:DEV_COMMON_LU.labelDevStatus,dataIndex:'depot_status_text',width:75,renderer:App.qtipValue},
 			{header:COMMON_LU.depotText,dataIndex:'depot_id_text',width:130,renderer:App.qtipValue},
 			{header:DEV_COMMON_LU.labelCustNo,dataIndex:'cust_id',width:120,renderer:App.qtipValue},
-			{header:DEV_COMMON_LU.labelCustName,dataIndex:'cust_name',width:130,renderer:App.qtipValue}
+			{header:DEV_COMMON_LU.labelCustName,dataIndex:'cust_name',width:130,renderer:App.qtipValue},
+			{header:DEV_COMMON_LU.labelCustStr9,dataIndex:'develop_optr_name',width:100,renderer:App.qtipValue},
+			{header:DEV_COMMON_LU.labelBatchNum,dataIndex:'batch_num',width:80,renderer:App.qtipValue}
 		];
 		this.currColumns = this.stbColumns;
 		QueryDeviceGrid.superclass.constructor.call(this,{
-			title:DEV_COMMON_LU.titleDeviceInfo,
+//			title:DEV_COMMON_LU.titleDeviceInfo,
 			border:false,
 			ds:this.store,
-			columns:this.stbColumns,
+			columns:this.currColumns,
 			bbar: new Ext.PagingToolbar({store: this.store })
 		});
 	}

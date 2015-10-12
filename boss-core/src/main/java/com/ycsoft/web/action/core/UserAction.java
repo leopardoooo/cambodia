@@ -12,6 +12,7 @@ import org.springframework.stereotype.Controller;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.ycsoft.beans.core.prod.CancelUserDto;
 import com.ycsoft.beans.core.user.CUser;
 import com.ycsoft.beans.core.user.CUserPropChange;
 import com.ycsoft.beans.prod.PPromotionAcct;
@@ -186,7 +187,7 @@ public class UserAction extends BaseBusiAction {
 	 * @throws Exception
 	 */
 	public String changeDevice() throws Exception {
-		userServiceSN.saveChangeDevice(userId, deviceCode, reasonType);
+		userServiceSN.saveChangeDevice(userId, deviceCode, reasonType, deviceBuyMode, deviceFee);
 		return JSON_SUCCESS;
 	}
 	
@@ -200,7 +201,7 @@ public class UserAction extends BaseBusiAction {
 	 * @throws Exception
 	 */
 	public String logoffUser() throws Exception{
-		userServiceSN.saveRemoveUser(userId,banlanceDealType,reclaim,cancelFee,refundFee, transAcctId, transAcctItemId);
+		userServiceSN.saveRemoveUser(userId,cancelFee,refundFee);
 		return JSON_SUCCESS;
 	}
 
@@ -311,7 +312,8 @@ public class UserAction extends BaseBusiAction {
 	
 	public String saveEditPwd() throws Exception {
 		String pwd = request.getParameter("login_password");
-		userServiceSN.saveEditPwd(pwd);
+		String loginName = request.getParameter("login_name");
+		userServiceSN.saveEditPwd(loginName, pwd);
 		return JSON_SUCCESS;
 	}
 	
@@ -325,7 +327,7 @@ public class UserAction extends BaseBusiAction {
 		
 		String[] colName = new String[]{"user_name","stb_id"};
 		List<CUser> userList = FileHelper.fileToBean(files, colName, CUser.class);
-		userList.remove(0);
+//		userList.remove(0);
 		String result = "操作成功!";
 		try {
 			userServiceSN.saveBatchUpdateUserName(userList,custId);
@@ -362,7 +364,7 @@ public class UserAction extends BaseBusiAction {
 	 * @throws Exception
 	 */
 	public String untuckUsers() throws Exception {
-		userServiceSN.untuckUsers(userIds);
+		userServiceSN.untuckUsers();
 		return JSON_SUCCESS;
 	}
 	
@@ -822,8 +824,13 @@ public class UserAction extends BaseBusiAction {
 	 * @return
 	 * @throws Exception
 	 */
+	private String cancelUserInfo;
+	public void setCancelUserInfo(String cancelUserInfo) {
+		this.cancelUserInfo = cancelUserInfo;
+	}
+
 	public String batchLogoffUser() throws Exception{
-		String remark = request.getParameter("remark");
+		/*String remark = request.getParameter("remark");
 		String isReclaimDevice = request.getParameter("isReclaimDevice");
 		String deviceStatus = request.getParameter("deviceStatus");
 		String msg = "";
@@ -832,15 +839,18 @@ public class UserAction extends BaseBusiAction {
 			userIdList = FileHelper.fileToArray(file);
 		}
 		try{
-			if(userIdList.size() > 2500)
-				throw new Exception("请一次性录入小于2500条数据");
 			userServiceSN.batchLogoffUser(userIdList,isReclaimDevice,deviceStatus,remark);
 		} catch (Exception e) {
 			e.printStackTrace();
 			msg = e.getMessage();
 		}
 		
-		return retrunNone(msg);
+		return retrunNone(msg);*/
+		Type type = new TypeToken<List<CancelUserDto>>(){}.getType();
+		Gson gson = new Gson();
+		List<CancelUserDto> cancelUserList = gson.fromJson(cancelUserInfo, type);
+		userServiceSN.batchLogoffUser(cancelUserList);
+		return JSON_SUCCESS;
 	}
 	
 	public String saveProdSyn() throws Exception{
@@ -911,6 +921,7 @@ public class UserAction extends BaseBusiAction {
 		userServiceSN.saveSaleDevice(userId,deviceModel,deviceBuyMode,deviceFee);
 		return JSON;
 	}
+	
 	
 	/**
 	 * @param userService

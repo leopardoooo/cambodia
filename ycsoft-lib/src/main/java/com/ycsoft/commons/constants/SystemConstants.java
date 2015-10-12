@@ -555,8 +555,8 @@ public class SystemConstants {
 	public static final String EXT_ATTRID_PROTOCOL = "100"; 
 	
 	
-	public static final String TEAM_TYPE_SUPERNET="SUPERNET";
-	public static final String TEAM_TYPE_CFOCN="CFOCN";
+	public static final String TEAM_TYPE_SUPERNET="SUPERNET";//工程运维部
+	public static final String TEAM_TYPE_CFOCN="CFOCN"; //柬光施工
 	
 	public static final String TASK_ASSIGN_SUPPERNET="SUPERNET";
 	public static final String TASK_ASSIGN_CFOCN="CFOCN";
@@ -568,7 +568,7 @@ public class SystemConstants {
 	public static final String TASK_TYPE_CHANGE="5";//变动工单
 	public static final String TASK_TYPE_WRITEOFF_LINE="7";//拆除工单
 	public static final String TASK_TYPE_PROJECT="8";//工程工单
-	public static final String TASK_TYPE_WRITEOFF_TERMINAL="9";//工程工单
+	public static final String TASK_TYPE_WRITEOFF_TERMINAL="9";//销终端工单
 	
 	public static final String TASK_FINISH_TYPE_SUCCESS="QC";//正常完工
 	public static final String TASK_FINISH_TYPE_FAILURE="QD";//施工失败
@@ -609,4 +609,6 @@ public class SystemConstants {
 	public static final String LANGUAGE_EN = "en";		//英文
 	
 	public static final String PROMOTION_TYPE_OTT_MOBILE_EXTERNAL="ott_mobile_external";
+	
+	public static final String BASE_INVOICE_CODE="AAA";//发票固定代码
  }

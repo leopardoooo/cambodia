@@ -50,18 +50,18 @@ public class JCaCommandDao extends BaseEntityDao<JCaCommand> {
 	}
 
 	public Pager<JCaCommand> queryCaByCardId(String[] cardIds,Integer start,Integer limit) throws JDBCException{
-		String	sql = "  SELECT t.transnum,t.job_id,t.done_code,t.stb_id,t.card_id,case when  t.cmd_type = 'AddProduct' then trunc(t.auth_end_date) else null end auth_end_date," +
-				" t.prg_name,t.result_flag,t.control_id,t.error_info,t.record_date,t.send_date, s.supplier_cmd_name cmd_type_text,c.optr_id "+
-				" FROM j_ca_command t, (select max(supplier_cmd_name) supplier_cmd_name,supplier_id,supplier_cmd_id from  t_busi_cmd_supplier  group by supplier_id,supplier_cmd_id) s,c_done_code c,j_busi_cmd_his j " +
-				" WHERE t.cas_type = s.supplier_id AND s.supplier_cmd_id = t.cmd_type and c.done_code(+) = j.done_code " +
-				" and j.job_id(+) = t.job_id AND t.card_id in ("+sqlGenerator.in(cardIds)+") " +
+		String	sql = "select * from(  SELECT t.transnum,t.job_id,t.done_code,t.stb_id,t.card_id,case when  t.cmd_type = 'AddProduct' then trunc(t.auth_end_date) else null end auth_end_date," +
+				" t.prg_name,t.result_flag,t.control_id,t.error_info,t.record_date,t.send_date, t.cmd_type ,c.optr_id "+
+				" FROM j_ca_command t, c_done_code c " +
+				" WHERE  c.done_code(+) = t.done_code " +
+				" AND t.card_id in ("+sqlGenerator.in(cardIds)+") " +
 				"  union all " +
 				" SELECT t.transnum,t.job_id,t.done_code,t.stb_id,t.card_id,case when  t.cmd_type = 'AddProduct' then trunc(t.auth_end_date) else null end auth_end_date," +
-				" t.prg_name,t.result_flag,t.control_id,t.error_info,t.record_date,t.send_date, s.supplier_cmd_name cmd_type_text,c.optr_id "+
-				" FROM j_ca_command_day t, (select max(supplier_cmd_name) supplier_cmd_name,supplier_id,supplier_cmd_id from  t_busi_cmd_supplier  group by supplier_id,supplier_cmd_id) s,c_done_code c,j_busi_cmd_his j " +
-				" WHERE t.cas_type = s.supplier_id AND s.supplier_cmd_id = t.cmd_type and c.done_code(+) = j.done_code " +
-				" and j.job_id(+) = t.job_id AND t.card_id in ("+sqlGenerator.in(cardIds)+") " +
-				" ORDER BY transnum DESC";
+				" t.prg_name,t.result_flag,t.control_id,t.error_info,t.record_date,t.send_date, t.cmd_type ,c.optr_id "+
+				" FROM j_ca_command_his t,c_done_code c " +
+				" WHERE c.done_code(+) = t.done_code " +
+				" and  t.card_id in ("+sqlGenerator.in(cardIds)+") " +
+				" ) ORDER BY transnum DESC ";
 		return createQuery(sql).setStart(start).setLimit(limit).page();
 	}
 	/**

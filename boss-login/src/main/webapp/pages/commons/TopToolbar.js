@@ -71,8 +71,9 @@ TopToolbar = Ext.extend(Ext.Toolbar , {
 				var data = Ext.decode(res.responseText);
 				for(var i=0;i<data.length;i++){
 					var obj={};
-					obj["text"]=data[i]["sub_system_name"];
+//					obj["text"]=data[i]["sub_system_name"];
 					obj["itemId"]=data[i]["sub_system_id"];
+					obj['text'] = langUtils.tools('subsystem')[data[i]["sub_system_id"]];
 					obj["url"]=data[i]["sub_system_url"];
 					obj["root"]=data[i]["sub_system_host"];
 					obj["iconCls"]=data[i]["iconcls"];
@@ -138,7 +139,8 @@ TopToolbar = Ext.extend(Ext.Toolbar , {
 					 + 'toolbar=no,left=0px,top=0px,'
 					 + 'width=' + width + ','
 					 + 'height=' + height;
-		var win = window.open("/help/",'', property);
+		window.location.href = "/help/Train.doc";			 
+//		var win = window.open("/help/Train.doc",'', property);
 	},
 	aboutUs: function(){
 		var win = Ext.getCmp('aboutUsId');
@@ -370,8 +372,9 @@ TopToolbar = Ext.extend(Ext.Toolbar , {
 		if(!win){
 			win = new Ext.Window({
 				id: 'taskManagerWinId',
-				width: 860,
-				height: 580,
+				title: lbc('home.tools.TaskManager._title'),
+				width: 900,
+				height: 520,
 				border: false,
 				closeAction:'hide',
 				html: "<iframe id='Task_Manager_Window_Frame' width=100% height=100%"
@@ -765,7 +768,7 @@ var BulletinAllGrid = Ext.extend(Ext.grid.GridPanel,{
                 	}
                 	p.body = '<div><div style="font-size:14px;font-family:KaiTi;color:#337FE5;">'
                     + '&nbsp&nbsp' +record.data.bulletin_content + '</br></div>'
-                    + '<div style="width:' + (BulletinGrid.prototype.width -20) + ';height:1;"/>'
+                    + '<div style="width:690px;height:1;"/>'
                     + '<div style="text-align:right;float:right;"> ' + 
                     String.format('{0}' + LU_AD['tplPublishTme'] + ' {1}', record.get('bulletin_publisher'),record.get('create_date')) +
                     '</div></div>'
@@ -922,7 +925,8 @@ OptrDataWin = Ext.extend(Ext.Window, {//个人修改面板
 		if(!Ext.isEmpty(Ext.getCmp('password').getValue())){
 			obj["pwd"] = Ext.getCmp('password').getValue();
 		}
-		Confirm("确定要保存吗?", this, function() {
+		var LBC = lbc('home.tools.grxg.msg');
+		Confirm(LBC['msgConfirmSave'], this, function() {
 		Ext.Ajax.request({
 					url : saveUrl,
 					params : obj,
@@ -930,12 +934,12 @@ OptrDataWin = Ext.extend(Ext.Window, {//个人修改面板
 					success : function(res, opt) {
 						var data = Ext.decode(res.responseText);
 						if (true === data.success) {
-							Alert('修改成功!', function() {
+							Alert(LBC['msgSuccess'], function() {
 								App.getData().optr.login_sys_id = obj["query"];
 								this.close();
 							}, this);
 						}else{
-							Alert('修改失败!');
+							Alert(LBC['msgFail']);
 						}
 					}
 				});

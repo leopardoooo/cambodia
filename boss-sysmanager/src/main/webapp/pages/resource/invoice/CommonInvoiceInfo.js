@@ -10,15 +10,16 @@ CommonInvoiceForm = Ext.extend(Ext.form.FormPanel,{
 			border:false,
 			bodyStyle:'padding:10px',
 			layout:'column',
-			labelWidth:90,
-			items:[{columnWidth:1,layout:'form',border:false,items:[
+			labelWidth:120,
+			items:[/*{columnWidth:1,layout:'form',border:false,items:[
 				        {fieldLabel:lsys('InvoiceCommon.invoice_code'),allowBlank:false,xtype:'textfield',name:'invoiceCode',value:'AAA',readOnly:true}
-				]},
+				]},*/
+				{xtype: 'hidden', name: 'invoiceCode', value: 'AAA'},
 				{columnWidth:.5,layout:'form',border:false,items:[
 					{
 					fieldLabel:lsys('InvoiceCommon.invoice_id'),
 				    xtype:'compositefield',combineErrors:false,
-				    labelWidth:120,
+				    labelWidth:150,
 				    items: [
 				        {xtype:'textfield',name:'startInvoiceId',vtype:'invoiceId'},
 				        {xtype:'displayfield',value:lsys('common.to')},

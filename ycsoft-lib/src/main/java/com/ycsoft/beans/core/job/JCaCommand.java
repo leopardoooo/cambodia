@@ -44,7 +44,7 @@ public class JCaCommand extends BusiBase implements Serializable {
 	private Date record_date;
 	private Date send_date;
 	private String detail_params;
-	private Integer priority;
+	private Integer priority=10;
 
 	private String cmd_type_text;
 	private Date ret_date;

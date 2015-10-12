@@ -98,12 +98,10 @@ import com.ycsoft.sysmanager.dto.prod.ResGroupDto;
  */
 @Component
 public class UserComponent extends BaseBusiComponent {
-	private CUserDao cUserDao;
 	private CUserHisDao cUserHisDao;
 	private CUserAtvDao cUserAtvDao;
 	private CUserDtvDao cUserDtvDao;
 	private CUserBroadbandDao cUserBroadbandDao;
-	private CUserPropChangeDao cUserPropChangeDao;
 	private SOptrDao sOptrDao;
 	private CRejectResDao cRejectResDao;
 	private JUserStopDao jUserStopDao;
@@ -185,65 +183,6 @@ public class UserComponent extends BaseBusiComponent {
 		*/
 	}
 
-	/**
-	 * 修改用户信息
-	 * 
-	 * @param doneCode
-	 * @param userId
-	 * @param propChangeList
-	 * @throws Exception
-	 */
-	public void editUser(Integer doneCode,String userId,List<CUserPropChange> propChangeList) throws Exception{
-		if(propChangeList == null || propChangeList.size() == 0) return ;
-		CUser user = new CUser();
-		CUserAtv atv = new CUserAtv();
-		CUserDtv dtv = new CUserDtv();
-		CUserBroadband bBand = new CUserBroadband();
-		user.setUser_id(userId);
-		atv.setUser_id(userId);
-		dtv.setUser_id(userId);
-		bBand.setUser_id(userId);
-		for (CUserPropChange change:propChangeList){
-			try{
-				String newValue = StringHelper.isEmpty(change.getNew_value()) ? ""
-						: change.getNew_value();
-				BeanHelper.setPropertyString(user, change.getColumn_name(), newValue);
-				BeanHelper.setPropertyString(atv, change.getColumn_name(), newValue);
-				BeanHelper.setPropertyString(dtv, change.getColumn_name(), newValue);
-				BeanHelper.setPropertyString(bBand, change.getColumn_name(), newValue);
-				if (change.getColumn_name().equalsIgnoreCase("status")){
-					user.setStatus_date(new Date());
-				}
-				
-				if (change.getColumn_name().equalsIgnoreCase("user_class")){
-					//获取操作员的原始信息
-					SOptr optr1 = sOptrDao.findByKey(getOptr().getOptr_id());
-					if (!getOptr().getCounty_id().equals(optr1.getCounty_id())){
-						user.setUser_class_area(optr1.getCounty_id());
-					}
-				}
-				if (change.getColumn_name().equalsIgnoreCase("stop_type")){
-					//更新产品的催停标记
-					cProdDao.updateStopType(userId,newValue);
-				}
-			} catch(Exception e){
-
-			}
-			setBaseInfo(change);
-			change.setUser_id(userId);
-			change.setDone_code(doneCode);
-			change.setChange_time(DateHelper.now());
-		}
-		//保存信息修改
-		cUserDao.update(user);
-		cUserAtvDao.update(atv);
-		cUserDtvDao.update(dtv);
-		cUserBroadbandDao.update(bBand);
-		//保存异动信息
-		cUserPropChangeDao.save(propChangeList.toArray(new CUserPropChange[propChangeList.size()]));
-
-	}
-	
 	public String queryLastStatus(String userId) throws Exception{
 		CUserPropChange upc =  cUserPropChangeDao.queryLastStatus(userId, getOptr().getCounty_id());
 		if(null == upc)
@@ -364,9 +303,15 @@ public class UserComponent extends BaseBusiComponent {
 	public List<UserDto> queryUser(String custId) throws Exception {
 		List<UserDto> result = new ArrayList<UserDto>();
 		List<CUser> users = queryUserByCustId(custId);
+		List<JUserStop> stopList = jUserStopDao.findAll();
+		Map<String,List<JUserStop>> stopmap = CollectionHelper.converToMap(stopList, "user_id");
 		for (CUser user :users){
 			UserDto userdto = new UserDto();
 			BeanUtils.copyProperties(user, userdto);
+			List<JUserStop> stoplist = stopmap.get(user.getUser_id());
+			if(stoplist!=null){
+				userdto.setStop_date(stoplist.get(0).getStop_date());
+			}
 			if(userdto.getUser_type().equals(SystemConstants.USER_TYPE_BAND)){
 				if(StringHelper.isNotEmpty(userdto.getModem_mac())){
 					RModemModel modemModel = rModemModelDao.queryByModemMac(userdto.getModem_mac());
@@ -563,7 +508,7 @@ public class UserComponent extends BaseBusiComponent {
 	 */
 	public void updateDevice(Integer doneCode,CUser user) throws Exception {
 		CUser oldUser = cUserDao.findByKey(user.getUser_id());
-		String[] propNames = {"stb_id","card_id","modem_mac"};
+		String[] propNames = {"stb_id","card_id","modem_mac", "str10"};
 		List<CUserPropChange> upcList = new ArrayList<CUserPropChange>();
 		for (String propName:propNames){
 			String oldValue = BeanHelper.getPropertyString(oldUser, propName);
@@ -583,10 +528,6 @@ public class UserComponent extends BaseBusiComponent {
 		}
 		//修改用户信息
 		cUserDao.update(user);
-		//处理授权
-		if (user.getUser_type().equals(SystemConstants.USER_TYPE_OTT)){
-			
-		}
 		//记录异动
 		cUserPropChangeDao.save(upcList.toArray(new CUserPropChange[upcList.size()]));
 	}
@@ -1160,10 +1101,6 @@ public class UserComponent extends BaseBusiComponent {
 		this.cUserDao.callChangeCust(userId, toCustId, doneCode, busiCode,this.getOptr());
 	}
 	
-	public void setCUserDao(CUserDao userDao) {
-		cUserDao = userDao;
-	}
-
 	public void setCUserAtvDao(CUserAtvDao userAtvDao) {
 		cUserAtvDao = userAtvDao;
 	}
@@ -1177,10 +1114,6 @@ public class UserComponent extends BaseBusiComponent {
 	 */
 	public void setCUserBroadbandDao(CUserBroadbandDao userBroadbandDao) {
 		cUserBroadbandDao = userBroadbandDao;
-	}
-
-	public void setCUserPropChangeDao(CUserPropChangeDao userPropChangeDao) {
-		cUserPropChangeDao = userPropChangeDao;
 	}
 
 	public void setCUserHisDao(CUserHisDao userHisDao) {
@@ -1316,6 +1249,30 @@ public class UserComponent extends BaseBusiComponent {
 	 */
 	public int updateUserNameByDeviceCode(CUser user, String custId) throws Exception {
 		return cUserDao.updateUserNameByDeviceCode(user,custId);
+	}
+
+	public List<CUser> queryAllUserAndHisByUserIds(String[] userIds) throws Exception {
+		List<CUser> list = new ArrayList<CUser>();
+		List<CUser> userList = cUserDao.queryUserByUserIds(userIds);
+		if(userList.size()>0){
+			list.addAll(userList);
+		}
+		if(list.size()!=userIds.length){
+			List<String> userHis = new ArrayList<String>();
+			List<String> userIdList = CollectionHelper.converValueToList(list, "user_id");
+			for(int i = 0 ;i<userIds.length;i++){
+				if(!userIdList.contains(userIds[i])){
+					userHis.add(userIds[i]);
+				}
+			}
+			if(userHis.size()>0){
+				List<CUserHis> userHisList = cUserHisDao.queryAllUserHisByUserIds(userIds);
+				if(userHisList.size()>0){
+					list.addAll(userHisList);
+				}
+			}
+		}
+		return list;
 	}
 	
 	

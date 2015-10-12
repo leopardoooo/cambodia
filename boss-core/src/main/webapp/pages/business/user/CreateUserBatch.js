@@ -66,12 +66,12 @@ UserBaseBatchForm = Ext.extend( BaseForm , {
 		UserBaseBatchForm.superclass.constructor.call(this, {
 			trackResetOnLoad:true,
 			autoScroll:true,
-            labelWidth:90,
+            labelWidth:100,
 			layout: 'border',
 			border: false,
 			items: [{
 				region: 'north',
-				height: 88,
+				height: 115,
 				bodyStyle:'background:#F9F9F9;padding-top:4px;border-bottom-width: 0px;',
 				layout: 'column',
 				defaults: {
@@ -79,7 +79,7 @@ UserBaseBatchForm = Ext.extend( BaseForm , {
 					bodyStyle:'background:#F9F9F9;padding-top:4px',
 					layout: 'form',
 					baseCls: 'x-plain',
-					labelWidth:80
+					labelWidth:100
 				},
 				items:[{
 					items:[{

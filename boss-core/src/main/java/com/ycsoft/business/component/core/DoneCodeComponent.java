@@ -14,7 +14,6 @@ import com.google.gson.Gson;
 import com.ycsoft.beans.core.common.CDoneCode;
 import com.ycsoft.beans.core.common.CDoneCodeDetail;
 import com.ycsoft.beans.core.common.CDoneCodeInfo;
-import com.ycsoft.beans.core.common.CDoneCodeUnpay;
 import com.ycsoft.beans.core.fee.CFee;
 import com.ycsoft.beans.core.user.CUser;
 import com.ycsoft.business.commons.abstracts.BaseBusiComponent;
@@ -82,12 +81,8 @@ public class DoneCodeComponent extends BaseBusiComponent {
 	 * @throws JDBCException
 	 */
 	public void saveDoneCodeUnPay(String cust_id,Integer done_code,String optr_id) throws Exception{
-		
-		for(CDoneCodeUnpay unPay: cDoneCodeUnpayDao.queryUnPay(cust_id)){
-			if(unPay.getDone_code().equals(done_code)){
-				//已经保存过，不需要重复保存
-				return;
-			}
+		if(cDoneCodeUnpayDao.findByKey(done_code)!=null){
+				return;//已经保存过，不需要重复保存
 		}
 		cDoneCodeUnpayDao.saveUnpay(cust_id, done_code,optr_id);
 		
@@ -261,7 +256,6 @@ public class DoneCodeComponent extends BaseBusiComponent {
 		List<DoneCodeDto> lstDone = pageLstDone.getRecords();
 		String[] doneCodeArr =  CollectionHelper.converValueToArray(lstDone, "done_code");
 		List<DoneCodeDto> queryCfeeByDoneCode = cDoneCodeDao.queryCfeeByDoneCode(doneCodeArr,custId);
-		Map<String, List<DoneCodeDto>> busiFeeMap =  CollectionHelper.converToMap(queryCfeeByDoneCode, "done_code");
 		Map<String, List<DoneCodeDto>> map2 = CollectionHelper.converToMap(queryCfeeByDoneCode, "reverse_done_code");
 		for (DoneCodeDto doneCodeDto : lstDone) {			
 			temp = new ExtAttributeDto( doneCodeDto );
@@ -285,18 +279,6 @@ public class DoneCodeComponent extends BaseBusiComponent {
 					doneCodeDto.setReal_pay(0-realPay);
 				}
 				
-				//ip外挂费用
-				List<DoneCodeDto> busiFeeList = busiFeeMap.get(doneCodeDto.getDone_code().toString());
-				if(CollectionHelper.isNotEmpty(busiFeeList)){
-					for(DoneCodeDto dto : busiFeeList){
-						if(StringHelper.isNotEmpty(dto.getFee_id()) && dto.getFee_id().equals(SystemConstants.USER_IP_FEE_ID)){
-							doneCodeDto.setFee_id(dto.getFee_id());
-							break;
-						}
-					}
-				}
-				
-				
 				BeanUtils.copyProperties(doneCodeDto, tempQ);
 				target.add(tempQ);
 			}
@@ -313,15 +295,18 @@ public class DoneCodeComponent extends BaseBusiComponent {
 			}
 			if(doneCodeDto.getBusi_code().equals(BusiCodeConstants.USER_OPEN)){
 				CUser user = cUserDao.findByKey(doneCodeDto.getUser_id());
-				if(user != null ){
-					String str = user.getUser_type();
-					if(str.equals(SystemConstants.USER_TYPE_BAND) && StringHelper.isNotEmpty(user.getModem_mac())){
-						str += " Modem: "+user.getModem_mac();
-					}else  if(StringHelper.isNotEmpty(user.getStb_id())){
-						str += " Stb: "+user.getStb_id();
-					}
-					tempQ.setRemark(str);
+				if(user == null ){
+					user = (CUser)cUserHisDao.findByKey(doneCodeDto.getUser_id());
 				}
+				String str = "";
+				if(user!=null){
+					if(str.equals(SystemConstants.USER_TYPE_BAND) && StringHelper.isNotEmpty(user.getModem_mac())){
+						str += user.getUser_type()+" Modem: "+user.getModem_mac();
+					}else  if(StringHelper.isNotEmpty(user.getStb_id())){
+						str += user.getUser_type()+" Stb: "+user.getStb_id();
+					}
+				}
+				tempQ.setRemark(str);
 			}
 		}
 		return pageTarget;

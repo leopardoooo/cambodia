@@ -15,18 +15,18 @@ InvoiceGrid = Ext.extend(Ext.ux.Grid,{
 						"doc_sn","doc_type","fee_invoice_id","fee_invoice_code","doc_type_text",
 						"fee_invoice_status","fee_invoice_status_text","fee_done_code","invoice_mode_text"]
 		}); 
-		var lc = langUtils.main("doc.invoice.columns");
+		var lc = lmain("doc.invoice.columns");
 		var cm = new Ext.ux.grid.LockingColumnModel({ 
     		columns : [
 			{id:'invoice_id',header:lc[0],dataIndex:'invoice_id',width:80},
-			{header:lc[1],dataIndex:'invoice_code',	width:80},
+//			{header:lc[1],dataIndex:'invoice_code',	width:80},
 			{header:lc[2],dataIndex:'amount',width:60,renderer : Ext.util.Format.formatFee},
 			{header:lc[3],dataIndex:'print_date',	width:120},
-			{header:lc[4],dataIndex:'invoice_mode_text',	width:80},
-			{header:lc[5],dataIndex:'doc_type_text',	width:80},
-			{header:lc[6],dataIndex:'status_text',	width:70,renderer:Ext.util.Format.statusShow},
-			{header:lc[7],dataIndex:'finance_status_text',	width:70,renderer:Ext.util.Format.statusShow},
-			{header:lc[8],dataIndex:'optr_name',	width:80},
+//			{header:lc[4],dataIndex:'invoice_mode_text',	width:80},
+			{header:lc[5],dataIndex:'doc_type_text',	width:85},
+			{header:lc[6],dataIndex:'status_text',	width:85,renderer:Ext.util.Format.statusShow},
+			{header:lc[7],dataIndex:'finance_status_text',	width:85,renderer:Ext.util.Format.statusShow},
+			{header:lc[8],dataIndex:'optr_name',	width:85},
 			{header:lc[9],dataIndex:'fee_create_time',	width:120}
 	        ]
 	      });
@@ -74,21 +74,20 @@ UserDetailGrid = Ext.extend(Ext.grid.GridPanel, {
 	constructor : function() {
 		this.userDetailStore = new Ext.data.JsonStore({
 					fields : ['user_type', 'user_type_text','user_name', 'device_model','device_model_text','task_id',
-							'device_code', 'password']
+							'device_code', 'password','device_id','band','posNo','occNo']
 				});
+		var lc = lmain("doc.task.userColumns");
 		UserDetailGrid.superclass.constructor.call(this, {
 			ds : this.userDetailStore,
-			viewConfig : {
-				forceFit :true
-			},
 			sm : new Ext.grid.CheckboxSelectionModel(),
 			cm : new Ext.grid.ColumnModel([{
-						header : '用户类型',dataIndex : 'user_type_text',width : 80,renderer : App.qtipValue}, {
-						header : '用户名',dataIndex : 'user_name',renderer : App.qtipValue}, {
-						header : '密码',dataIndex : 'password',renderer : App.qtipValue}, {
-						header : '设备型号',dataIndex : 'device_model_text',renderer : App.qtipValue}, {
-						header : '设备号',dataIndex : 'device_code',renderer : App.qtipValue}, {
-						header : '带宽',dataIndex : 'task_id',renderer : App.qtipValue}])
+						header : lc[0],dataIndex : 'user_type_text',width: 70,renderer : App.qtipValue}, {
+						header : lc[1],dataIndex : 'user_name',width:160,renderer : App.qtipValue}, {
+						header : lc[2],dataIndex : 'device_model_text',width:150,renderer : App.qtipValue}, {
+						header : lc[3],dataIndex : 'device_id',width:120,renderer : App.qtipValue},{
+						header : lc[4],dataIndex : 'posNo',width : 100,renderer : App.qtipValue}, {
+						header : lc[5],dataIndex : 'occNo',width : 100,renderer : App.qtipValue}, {
+						header : lc[6],dataIndex : 'band',width : 80,renderer : App.qtipValue}])
 		})
 	}
 })
@@ -99,18 +98,17 @@ TaskDetailGrid = Ext.extend(Ext.grid.GridPanel, {
 		this.taskDetailStore = new Ext.data.JsonStore({
 					fields : ['busi_code', 'busi_name', 'optr_id','optr_name','log_time',
 							'syn_status','error_remark','syn_status_text']});
+		var lc = lmain("doc.task.detailColumns");
 		TaskDetailGrid.superclass.constructor.call(this, {
 			ds : this.taskDetailStore,
-			viewConfig : {
-				forceFit :true
-			},
 			sm : new Ext.grid.CheckboxSelectionModel(),
+  			autoExpandColumn: 'errorTaskRemarkId',
 			cm : new Ext.grid.ColumnModel([{
-				header : '操作时间',dataIndex : 'log_time',width : 100,renderer : Ext.util.Format.dateFormat}, {
-				header : '操作类型',dataIndex : 'busi_name',renderer : App.qtipValue}, {
-				header : '操作人',dataIndex : 'optr_name',renderer : App.qtipValue}, {
-				header : '同步状态',dataIndex : 'syn_status_text',renderer : App.qtipValue}, {
-				header : '错误描述',dataIndex : 'error_remark',renderer :  App.qtipValue
+				header : lc[0],dataIndex : 'log_time',width : 100,renderer : Ext.util.Format.dateFormat}, {
+				header : lc[1],dataIndex : 'busi_name',renderer : App.qtipValue}, {
+				header : lc[2],dataIndex : 'optr_name',renderer : App.qtipValue}, {
+				header : lc[3],dataIndex : 'syn_status_text',renderer : App.qtipValue}, {
+				id:'errorTaskRemarkId',header : lc[4],dataIndex : 'error_remark',sortable: true,renderer :  App.qtipValue
 			}])
 		})
 	}
@@ -127,19 +125,21 @@ TaskDetailWindow = Ext.extend(Ext.Window, {
 				closable : true,
 				width: 800,
 				height: 450,
-//				title: '工单明细',
+				title: lmain("doc.task.winTitle"),
 				border: false,
 				items : [{
-							region : 'west',
-							layout : 'fit',
-							width : '55%',
-							split : true,
-							title : '用户信息',
-							items : [this.userGrid]
-						}, {
 							region : 'center',
 							layout : 'fit',
-							title : '操作明细',
+							split : true,
+							title : lmain("doc.task.userTitle"),
+							border: false,
+							items : [this.userGrid]
+						}, {
+							region : 'north',
+							layout : 'fit',
+							height: 150,
+							title : lmain("doc.task.opertaionTitle"),
+							border: false,
 							items : [this.detail]
 						}]
 		});
@@ -177,10 +177,10 @@ TaskGrid = Ext.extend(Ext.ux.Grid,{
 					'task_status','task_status_text','task_type_id_text','team_id','team_id_text','bug_type','bug_type_text'
 					,'bug_detail','zte_status','zte_status_text','task_create_time']
 		}); 
-		var lc = langUtils.main("doc.task.columns");
+		var lc = lmain("doc.task.columns");
 		var cm = new Ext.ux.grid.LockingColumnModel({
 			columns : [
-				{header:"工单编号",dataIndex:'task_id',width:80,renderer:function(value,metaData,record){
+				{header:lc[0],dataIndex:'task_id',width:80,renderer:function(value,metaData,record){
 					that = this;
 					if(value != ''){
 						return '<div style="text-decoration:underline;font-weight:bold"  onclick="Ext.getCmp(\'D_TASK\').doTaskWin();"  ext:qtitle="" ext:qtip="' + value + '">' + value +'</div>';
@@ -188,13 +188,13 @@ TaskGrid = Ext.extend(Ext.ux.Grid,{
 						return '<div ext:qtitle="" ext:qtip="' + value + '">' + value +'</div>';
 					}
 				}},
-				{header:lc[0],dataIndex:'task_type_id_text',	width:60},
-				{header:lc[1],dataIndex:'task_status_text',	width:60,renderer:Ext.util.Format.statusShow},
-				{header:"施工队",dataIndex:'team_id_text',	width:80},
-				{header:"故障原因",dataIndex:'bug_type_text',width:120},
-				{header:"故障明细",dataIndex:'bug_detail',	width:120},
-				{header:"ZTE授权状态",dataIndex:'zte_status_text',	width:80},
-				{header:lc[4],dataIndex:'task_create_time',	width:100}
+				{header:lc[1],dataIndex:'task_type_id_text',	width:80,renderer : App.qtipValue},
+				{header:lc[2],dataIndex:'task_status_text',	width:120,renderer:Ext.util.Format.statusShow},
+				{header:lc[3],dataIndex:'team_id_text',	width:80,renderer : App.qtipValue},
+				{header:lc[4],dataIndex:'bug_type_text',width:200,renderer : App.qtipValue},
+				{header:lc[5],dataIndex:'bug_detail',	width:120,renderer : App.qtipValue},
+				{header:lc[6],dataIndex:'zte_status_text',	width:80},
+				{header:lc[7],dataIndex:'task_create_time',	width:130}
 			]
 		})
 		var pageTbar = new Ext.PagingToolbar({store: this.taskStore ,pageSize : App.pageSize});
@@ -267,7 +267,7 @@ BusiDocGrid = Ext.extend(Ext.ux.Grid,{
 				"last_print",'done_date','doc_sn','create_time']
 		}); 
 		var sm = new Ext.grid.CheckboxSelectionModel();
-		var lc = langUtils.main("doc.busi.columns");
+		var lc = lmain("doc.busi.columns");
 		var cm = [
 			sm,
 			{header:lc[0],dataIndex:'optr_name',	width:80},
@@ -328,7 +328,7 @@ DocPanel = Ext.extend(BaseInfoPanel,{
 				bodyStyle: 'border-right-width: 1px',
 				items:[{
 					anchor:"100% 100%",
-					title: langUtils.main("doc.invoice._title"),
+					title: lmain("doc.invoice._title"),
 					layout:'border',
 					border: false,
 					defaults: {border: false},
@@ -344,13 +344,13 @@ DocPanel = Ext.extend(BaseInfoPanel,{
 				items:[{
 					anchor:"100% 50%",
 					layout:'border',
-					title:langUtils.main("doc.task._title"),
+					title:lmain("doc.task._title"),
 					border: false,
 					defaults: {border: false},
 					items:[this.taskGrid]
 				},{
 					anchor:"100% 50%",
-					title: langUtils.main("doc.busi._title"),
+					title: lmain("doc.busi._title"),
 					layout:'border',
 					border: false,
 					defaults: {border: false},

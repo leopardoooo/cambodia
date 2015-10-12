@@ -66,7 +66,16 @@ public class CFee extends BusiBase implements Serializable {
 	private Integer buy_num;
 	private String addr_id;
 	private String pay_sn;
+	private String fee_std_id;
 	
+	public String getFee_std_id() {
+		return fee_std_id;
+	}
+
+	public void setFee_std_id(String fee_std_id) {
+		this.fee_std_id = fee_std_id;
+	}
+
 	public String getPay_sn() {
 		return pay_sn;
 	}
@@ -153,11 +162,11 @@ public class CFee extends BusiBase implements Serializable {
 	public void setIs_doc(String is_doc) {
 		this.is_doc = is_doc;
 		if(this.is_doc.equals("T")){
-			is_doc_text = "已打印";
+			this.is_doc_text = MemoryDict.getDictName(DictKey.STATUS, "PRINT");
 		}else if(this.is_doc.equals("N")){
-			is_doc_text = "不打印";
+			this.is_doc_text = MemoryDict.getDictName(DictKey.STATUS, "DONOTPRINT");
 		}else{
-			is_doc_text = "未打印";
+			this.is_doc_text = MemoryDict.getDictName(DictKey.STATUS, "NOTPRINT");
 		}
 	}
 

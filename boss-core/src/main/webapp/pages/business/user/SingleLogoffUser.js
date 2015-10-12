@@ -7,7 +7,6 @@ UserProdGrid = Ext.extend(Ext.grid.GridPanel,{
 	userProdStore : null,
 	totalFee : 0,//退款总额
 	constructor : function(){
-		userProdThis = this;
 		this.userProdStore = new Ext.data.JsonStore({
 			url: Constant.ROOT_PATH + '/core/x/ProdOrder!queryLogoffUserProd.action' ,
 			fields: ["tariff_name","disct_name","prod_type","prod_name","prod_type_text","serv_id",
@@ -51,10 +50,6 @@ UserProdGrid = Ext.extend(Ext.grid.GridPanel,{
 			columns : cm			
 		})
 	},
-	initComponent:function(){
-		UserProdGrid.superclass.initComponent.call(this);
-		
-	},
 	doLoadResult:function(store){
 		var fee = 0 ;
 		var feeTotalNum = 0 ;
@@ -67,14 +62,12 @@ UserProdGrid = Ext.extend(Ext.grid.GridPanel,{
 			if(record.get('balance_acct')){
 				acctTotalNum = acctTotalNum + record.get('balance_acct');
 			}
-		})
-		userProdThis.totalFee = fee;
-		if(Ext.getCmp('refundFeeValue')){
-			Ext.getCmp('refundFeeValue').setValue(Ext.util.Format.formatFee(userProdThis.totalFee));
-			Ext.getCmp('refundFeeValue').maxValue = Ext.util.Format.formatFee(userProdThis.totalFee);
-		}
-		Ext.getCmp('cfeeTotalAmountId').setValue(Ext.util.Format.formatFee(feeTotalNum));
-		Ext.getCmp('acctTotalAmountId').setValue(Ext.util.Format.formatFee(acctTotalNum));
+		});
+		this.refundFee = Ext.util.Format.formatFee(feeTotalNum);
+		this.transFee = Ext.util.Format.formatFee(acctTotalNum);
+		Ext.getCmp('refundFeeValue').setValue(Ext.util.Format.formatFee(fee));
+		Ext.getCmp('cfeeTotalAmountId').setValue(this.refundFee);
+		Ext.getCmp('acctTotalAmountId').setValue(this.transFee);
 		
 	}
 });
@@ -88,7 +81,6 @@ LogoffUserForm = Ext.extend(BaseForm,{
 	userId:null,
 	constructor: function(){
 		this.userProdGrid = new UserProdGrid();
-//		this.userProdGrid["region"]='north';
 		var record = App.getApp().main.infoPanel.getUserPanel().userGrid.getSelectionModel().getSelected();
 		this.userId = record.get('user_id');
 		LogoffUserForm.superclass.constructor.call(this,{
@@ -127,12 +119,6 @@ LogoffUserForm = Ext.extend(BaseForm,{
 					items:[{xtype:'displayfield',fieldLabel:lmain("user.base.modem"),style:Constant.TEXTFIELD_STYLE,
 					value:record.get('modem_mac')}]
 				},{
-					width : 60,
-					columnWidth : 1,
-					items:[{xtype : 'paramcombo',fieldLabel : lmain("user._form.returnDevice"),paramName : 'BOOLEAN',defaultValue: 'T',
-				width : 60,foreceSelection : true,id : 'reclaim',hiddenName : 'reclaimDevice'}]
-				}
-				,{
 					items:[{xtype:'displayfield',fieldLabel:lmain("user._form.canRetrunFee"),style:Constant.TEXTFIELD_STYLE,id:'cfeeTotalAmountId'}]
 				},{
 					items:[{xtype:'displayfield',fieldLabel:lmain("user._form.canTransferFee"),style:Constant.TEXTFIELD_STYLE,id:'acctTotalAmountId'}]
@@ -146,11 +132,20 @@ LogoffUserForm = Ext.extend(BaseForm,{
 						paramName:'ACCT_BALANCE',
 						listeners : {
 							scope : this,
-							'expand': function(combo){
-										var store = combo.getStore();
-										store.removeAt(store.find('item_value','EXPIRE'));
-									}
-//							,'select' : this.addTransAcctPanel
+							expand: function(combo){
+								var store = combo.getStore();
+								store.removeAt(store.find('item_value','EXPIRE'));
+							},
+							select: function(combo){
+								var value = combo.getValue();
+								if(value == 'TRANS'){
+									Ext.getCmp('cfeeTotalAmountId').setValue(0);
+									Ext.getCmp('acctTotalAmountId').setValue( this.userProdGrid.refundFee + this.userProdGrid.transFee );
+								}else if(value == 'REFUND'){
+									Ext.getCmp('cfeeTotalAmountId').setValue( this.userProdGrid.refundFee );
+									Ext.getCmp('acctTotalAmountId').setValue( this.userProdGrid.transFee );
+								}
+							}
 						}
 					}]
 				},{
@@ -165,65 +160,17 @@ LogoffUserForm = Ext.extend(BaseForm,{
 						style: Constant.TEXTFIELD_STYLE,
 						allowNegative : false,
 						allowBlank : false
-//						value : Ext.util.Format.formatFee(this.userProdGrid.totalFee),
-//						maxValue : Ext.util.Format.formatFee(this.userProdGrid.totalFee)
 					}]
 				}]
             }]
 		});
 	},
-	doInit : function(){
-		var dealType = Ext.getCmp('banlanceDealType');
-//			dealTypeStore.removeAt(dealTypeStore.find('item_value','TRANS'));
-	},
-	addTransAcctPanel : function(combo){
-		//值不变，返回
-		if(this.oldBalanceDealTyep == combo.getValue()){
-			return;
-		}
-		Ext.getCmp('DealTypePanel').removeAll();
-		//如果退至客户账户
-		if(combo.getValue() == 'TRANS'){
-			alert(this.userProdGrid.totalFee);
-			if(this.userProdGrid.totalFee>0 && this.publicAcctInfo != null){
-				Ext.getCmp('DealTypePanel').add(new TransAcctPanel(this.publicAcctInfo));
-			}
-		}else if(combo.getValue() == 'REFUND'){
-			Ext.getCmp('DealTypePanel').add({
-				xtype : 'numberfield',
-				id : 'refundFeeValue',
-				fieldLabel : '退款金额',
-				allowNegative : false,
-				allowBlank : false,
-				style: Constant.TEXTFIELD_STYLE,
-				value : Ext.util.Format.formatFee(this.userProdGrid.totalFee),
-				maxValue : Ext.util.Format.formatFee(this.userProdGrid.totalFee)
-			});
-		}
-		
-		this.oldBalanceDealTyep = combo.getValue();
-		this.doLayout();
-	},
 	getValues : function(){
 		var all = {};
 		all['banlanceDealType'] = Ext.getCmp('banlanceDealType').getValue();
-		all['reclaim'] = Ext.getCmp('reclaim').getValue();
 		all['userId'] = this.userId;
-		var cmp = Ext.getCmp('refundFeeValue');
-		if(cmp){
-			all['cancelFee'] = -1*Ext.util.Format.formatToFen(cmp.getValue());
-		}
-		
+		all['cancelFee'] = -1*Ext.util.Format.formatToFen(Ext.getCmp('refundFeeValue').getValue());
 		all['refundFee'] =-1*Ext.util.Format.formatToFen(Ext.getCmp('cfeeTotalAmountId').getValue());
-		
-		if(Ext.getCmp('newAcctItemId')){
-			all['transAcctId'] = this.publicAcctInfo.acct_id;
-			all['transAcctItemId'] = Ext.getCmp('newAcctItemId').getValue();
-		}else{
-			all['transAcctId'] = "";
-			all['transAcctItemId'] = "";
-		}
-		
 		return all;
 	},
 	success : function(){

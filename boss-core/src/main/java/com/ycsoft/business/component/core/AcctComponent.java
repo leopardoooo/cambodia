@@ -54,6 +54,7 @@ import com.ycsoft.beans.core.cust.CCustPropChange;
 import com.ycsoft.beans.core.prod.CProd;
 import com.ycsoft.beans.core.prod.CProdHis;
 import com.ycsoft.beans.core.prod.CProdOrderFee;
+import com.ycsoft.beans.core.prod.CProdOrderFeeOut;
 import com.ycsoft.beans.prod.PProdTariff;
 import com.ycsoft.beans.record.CBandUpgradeRecord;
 import com.ycsoft.beans.system.SDept;
@@ -456,23 +457,23 @@ public class AcctComponent  extends BusiConfigComponent {
 	 * @param busi_code
 	 * @throws Exception
 	 */
-	public void saveCancelFeeToAcct(List<CProdOrderFee> orderFees,String cust_id,Integer doneCode,String busi_code) throws Exception{
+	public void saveCancelFeeToAcct(List<CProdOrderFeeOut> outList,String cust_id,Integer doneCode,String busi_code) throws Exception{
 		//账户
 		CAcct acct=queryCustAcctByCustId(cust_id);
 		//按订单转账到公用账目中
 		String acctItemId=SystemConstants.ACCTITEM_PUBLIC_ID;
 		String acctId=acct.getAcct_id();
 		
-		for(CProdOrderFee orderFee:orderFees){
-			if(orderFee.getOutput_type().equals(SystemConstants.ORDER_FEE_TYPE_ACCT)
-					&&orderFee.getOutput_fee()>0){
-				Integer fee=orderFee.getOutput_fee();
-				String feeType=orderFee.getFee_type();
+		for(CProdOrderFeeOut out:outList){
+			if(out.getOutput_type().equals(SystemConstants.ORDER_FEE_TYPE_ACCT)
+					&&out.getOutput_fee()>0){
+				Integer fee=out.getOutput_fee();
+				String feeType=out.getFee_type();
 				String changeType=SystemConstants.ACCT_CHANGE_TRANS;
 				String acct_change_sn=
-						saveAcctAddFee(cust_id, acctId, acctItemId, changeType, fee, feeType, busi_code, doneCode,orderFee.getProd_name())
+						saveAcctAddFee(cust_id, acctId, acctItemId, changeType, fee, feeType, busi_code, doneCode,out.getRemark())
 										.getAcct_change_sn();
-				orderFee.setOutput_sn(acct_change_sn);
+				out.setOutput_sn(acct_change_sn);
 			}
 		}
 	}
@@ -1653,8 +1654,8 @@ public class AcctComponent  extends BusiConfigComponent {
 	
 	public CAcct queryCustAcctByCustId(String custId) throws Exception {
 		CAcct acct = cAcctDao.findCustAcctByCustId(custId,getOptr().getCounty_id());
-		if (acct == null)
-			throw new ComponentException(ErrorCode.AcctPublicNotExists);
+//		if (acct == null)
+//			throw new ComponentException(ErrorCode.AcctPublicNotExists);
 		return acct;
 	}
 	/**

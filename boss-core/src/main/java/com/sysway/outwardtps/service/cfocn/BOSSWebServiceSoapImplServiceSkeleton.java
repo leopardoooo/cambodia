@@ -56,9 +56,10 @@ public class BOSSWebServiceSoapImplServiceSkeleton
     	// 回执消息, 如果失败的情况
     	String msg = resp.getRespMsg();
     	
+    	
     	try{
     		// 调用boss接口完成工单
-    		snTaskService.finishTask(taskId, resultType);
+    		snTaskService.finishTask(taskId, resultType,msg,false);
     		// 返回成功的结果
     		return createReturnWorkOrderResponse(createResultHeadForSuccess());
     	}catch(Exception e){
@@ -107,28 +108,27 @@ public class BOSSWebServiceSoapImplServiceSkeleton
     	
     	// 工单编号
     	String taskId = dfb.getArg0();
-    	// TODO 该参数不知道有什么处理
-    	// Normal 正常设备回填  （需要回填全部设备）
-    	// Replace 正常回填后，需要再次更换设备（比如调试过程发现设备坏了，只需要回填更换的设备）
-    	String type = dfb.getArg1();
+    	String type = dfb.getArg1();//无效参数；原意是标明本次是新装还是变更设备，实际上并没有这么使用
+  
     	
     	// 设备信息
     	ProductInfo[] prodArray = dfb.getArg2();
     	List<TaskFillDevice> devices = new ArrayList<>();
     	for (DeviceInfo deviceInfo : prodArray[0].getDeviceInfos()) {
-    		TaskFillDevice d = new TaskFillDevice();
-    		d.setDeviceId(deviceInfo.getDeviceSN());
-    		d.setDeviceCode(deviceInfo.getDeviceSpecCode());
-    		d.setOldDeviceCode(deviceInfo.getOriginalDeviceSpecCode());
+    		TaskFillDevice device = new TaskFillDevice();
+    		device.setDeviceCode(deviceInfo.getDeviceSN());
+    		device.setFcPort(deviceInfo.getIsFCPort());
+    		device.setOldDeviceCode(deviceInfo.getOriginalDeviceSN());
+    		if (device.isFcPort()){
+    			device.setOccNo(deviceInfo.getOCCSerialCode());//交接箱编号
+    			device.setPosNo(deviceInfo.getPOSSerialCode());//分光器编号
+    		}
     		
-    		// TODO 不知道怎么对应
-    		// d.setDeviceModel(deviceModel);
-    		
-    		devices.add(d);
+    		devices.add(device);
     	}
     	
     	try {
-			snTaskService.fillTask(taskId, null, null, devices);
+			snTaskService.fillTask(taskId, devices);
 			return createDeviceFeedBackResponse(createResultHeadForSuccess());
 		} catch (Exception e) {
 			e.printStackTrace();

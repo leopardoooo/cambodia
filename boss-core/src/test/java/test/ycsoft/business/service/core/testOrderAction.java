@@ -9,8 +9,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.ycsoft.beans.system.SOptr;
 import com.ycsoft.business.commons.pojo.BusiParameter;
-import com.ycsoft.business.dto.core.fee.FeeBusiFormDto;
+import com.ycsoft.business.dao.core.cust.CCustDao;
+import com.ycsoft.business.dto.core.cust.CustFullInfoDto;
 import com.ycsoft.business.dto.core.prod.OrderProd;
+import com.ycsoft.business.dto.core.prod.OrderProdEdit;
 import com.ycsoft.business.dto.core.prod.PackageGroupPanel;
 import com.ycsoft.business.dto.core.prod.PackageGroupUser;
 import com.ycsoft.business.service.impl.OrderService;
@@ -24,6 +26,35 @@ public class testOrderAction extends JunitSpringBase {
 	
 	@Autowired
 	private OrderService orderService;
+	@Autowired
+	private CCustDao cCustDao;
+	
+	@Test
+	public void testQueryEdit()throws Exception{
+		OrderProdEdit edit=orderService.queryOrderToEdit("245601");
+		System.out.println(edit);
+		
+		edit.setPay_fee(20000);
+	//	edit.setOrder_months(2.0f);
+	//	edit.setExp_date(DateHelper.getNextMonthPreviousDay(edit.getEff_date(), 2));
+		SOptr soptr=new SOptr();
+		soptr.setOptr_id("0");
+		soptr.setDept_id("4501");
+		soptr.setCounty_id("4501");
+		soptr.setArea_id("4500");
+		
+		BusiParameter parm=new BusiParameter();
+		parm.setOptr(soptr);
+		parm.setBusiCode(BusiCodeConstants.ORDER_EDIT);
+		CustFullInfoDto custInfo=new CustFullInfoDto();
+		custInfo.setCust(cCustDao.findByKey(edit.getCust_id()));
+		parm.setCustFullInfo(custInfo);
+		orderService.setParam(parm);
+		
+		orderService.saveOrderEdit(edit);
+		
+	}
+	
 
 	@Test 
 	public void test1() throws Exception{

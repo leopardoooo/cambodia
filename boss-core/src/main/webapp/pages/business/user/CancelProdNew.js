@@ -81,15 +81,17 @@ CancelProdGrid = Ext.extend(Ext.grid.GridPanel,{
 		this.totalFeeNum = totalFeeNum;
 		this.totalAcctNum = totalAcctNum;
 		if(this.totalFeeNum>0){
-			Ext.get("cfeeTotalAmount").update(String(this.totalFeeNum/100));
+			Ext.get("cfeeTotalAmount").update(String(this.totalFeeNum/100.0));
+			Ext.getCmp('reallFeeId').maxValue = this.totalFeeNum/100.0;
+			Ext.getCmp('reallFeeId').setValue(this.totalFeeNum/100.0);
+		}else{
+			Ext.getCmp('reallFeeId').maxValue = 0;
+			Ext.getCmp('reallFeeId').setValue(0);
 		}
 		if(this.totalAcctNum>0){
-			Ext.get("acctTotalAmount").update(String(this.totalAcctNum/100));
+			Ext.get("acctTotalAmount").update(String(this.totalAcctNum/100.0));
 		}
 		this.totalFee = this.totalFeeNum + this.totalAcctNum;
-//		if(this.totalFee>0){
-//			Ext.get("totalFeeAmount").update(String(this.totalFee/100));
-//		}
 	},
 	refresh:function(orderSn){
 		this.selectProdStore.load({
@@ -123,7 +125,7 @@ CancelProdNewForm = Ext.extend(BaseForm,{
             layout:'border', 
             items:[this.cancelProdGrid,{
 				region: "south",
-				height: 80, 
+				height: 130, 
 //				bodyStyle: 'background-color: rgb(213,225,241);padding: 10px 0 10px 30px; color: red',
 				buttonAlign:'center',
 				 flex:1,
@@ -135,24 +137,24 @@ CancelProdNewForm = Ext.extend(BaseForm,{
 		         		{ 
 		         	columnWidth:.5,
 		         	xtype:'fieldset',  
-				    height: 60, 
+				    height: 100, 
 				    title: lmain("user._form.retrunInfo"),
          			style:'margin-left:10px;padding: 10px 0 10px 10px; color: red',
          			layout:'column',
          			items:[{
-         				columnWidth:.50,
+         				columnWidth:.5,
          				items:[{
          						bodyStyle:'padding-top:4px',
 		         				html: "* "+ lmain("user._form.canRetrunFee") +"$:<span id='cfeeTotalAmount'>--</span>"
 			         			}]
          				},{
-         				columnWidth:.50,
+         				columnWidth:.5,
          				layout : 'form',
          				labelWidth:75,  
          				items:[{
 								fieldLabel : lbc("common.busiWay"),
 								id : 'CancelFeeTypeId',
-								name:'order_fee_type',
+								name:'acct_balance_type',
 								allowBlank : false,
 								xtype:'paramcombo',
 								width: 80,
@@ -166,13 +168,22 @@ CancelProdNewForm = Ext.extend(BaseForm,{
 									}
 								}
 							}]
+         				},{
+         				columnWidth:1,
+         				layout: 'form',
+         				labelWidth: 120,
+         				bodyStyle:'padding-top:10px;',
+         				items:[{
+         						id:'reallFeeId', fieldLabel: lmain("user._form.canRefundRealFee"), xtype: 'numberfield', 
+         						allowNegative: false, allowBlank: false, minValue: 0
+			         		}]
          				}]
 		         },{ 
 		         	columnWidth:.5,
 		         	xtype:'fieldset',  
-				    height: 60, 
+				    height: 100, 
 				    title: lmain("user._form.transferInfo"),
-         			style:'margin-left:10px;padding: 10px 0 10px 10px; color: red',
+         			style:'margin-left:10px;padding: 25px 0 10px 10px; color: red',
          			layout:'column',
          			items:[{
          				columnWidth:.50,
@@ -226,19 +237,17 @@ CancelProdNewForm = Ext.extend(BaseForm,{
 		var prodSn = this.cancelProdGrid.checkSm.orderSns;
 		if(!prodSn ||prodSn.length == 0){
 			obj["isValid"] = false;
-			obj["msg"] = "请输入选择一项进行退订";
+			obj["msg"] = "请选择一项进行退订";
 			return obj;
 		}
 		return CancelProdNewForm.superclass.doValid.call(this);
 	},
 	getValues:function(){
 		var obj = {};
-		obj['cancelFee'] = this.cancelProdGrid.checkSm.totalFee*-1;
-		if(Ext.getCmp('CancelFeeTypeId').getValue() == 'REFUND'){
-			obj['refundFee'] = this.cancelProdGrid.checkSm.totalFeeNum*-1;
-		}else{
-			obj['refundFee'] = 0;
-		}
+		var realFee = Ext.util.Format.formatToFen(Ext.getCmp('reallFeeId').getValue());
+		obj['cancelFee'] = (this.cancelProdGrid.totalAcctNum + realFee)*-1;
+		obj['acctBalanceType'] = Ext.getCmp('CancelFeeTypeId').getValue();		
+		obj['refundFee'] = realFee*-1;	
 		obj['orderSns'] = this.cancelProdGrid.checkSm.orderSns;
 		return obj;
 	},

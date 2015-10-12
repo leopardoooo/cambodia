@@ -409,12 +409,9 @@ public class DocService extends BaseBusiService implements IDocService {
 		
 		
 		if(!oldFlag){
-			String optrId = getOptr().getOptr_id();
 			for (InvoiceFromDto i : invoices) {
 				printComponent.saveInvoice(doneCode, i, balance);
-				invoiceComponent.useInvoice(i.getInvoice_code(), i
-						.getInvoice_id(), SystemConstants.INVOICE_MODE_AUTO, i
-						.getAmount());
+				invoiceComponent.updateInvoiceInfo(i.getInvoice_code(), i .getInvoice_id(), SystemConstants.INVOICE_MODE_AUTO, i .getAmount());
 				
 				//重载操作员未打印的费用
 				//List<String> feeSnList = feeComponent.queryUnPrintFeeByOptr(optrId);

@@ -15,12 +15,15 @@ public class CProdOrderFee extends BusiBase implements Serializable {
 	private String input_sn;
 	private String fee_type;
 	private Integer input_fee;
+	private Integer fee;
 	private Integer writeoff_fee;
 	private String output_type;
 	private String output_sn;
 	private Integer output_fee;
 	//额外信息 产品名称
-	private String prod_name;
+	//private String prod_name;
+	
+	private String remark;
 	
 	private String fee_type_text;
 	private String input_type_text;
@@ -35,6 +38,10 @@ public class CProdOrderFee extends BusiBase implements Serializable {
 		return fee_type_text;
 	}
 	
+	public Integer getInput_fee() {
+		return input_fee;
+	}
+
 	public String getInput_type_text() {
 		return input_type_text;
 	}
@@ -75,16 +82,25 @@ public class CProdOrderFee extends BusiBase implements Serializable {
 		this.output_prod_name = output_prod_name;
 	}
 
-	public String getProd_name() {
-		return prod_name;
-	}
-
-	public void setProd_name(String prod_name) {
-		this.prod_name = prod_name;
-	}
+//	public String getProd_name() {
+//		return prod_name;
+//	}
+//
+//	public void setProd_name(String prod_name) {
+//		this.prod_name = prod_name;
+//	}
+	
 
 	public String getInput_type() {
 		return input_type;
+	}
+
+	public String getRemark() {
+		return remark;
+	}
+
+	public void setRemark(String remark) {
+		this.remark = remark;
 	}
 
 	public void setInput_type(String input_type) {
@@ -100,12 +116,16 @@ public class CProdOrderFee extends BusiBase implements Serializable {
 		this.input_sn = input_sn;
 	}
 
-	public Integer getInput_fee() {
-		return input_fee;
+	public Integer getFee() {
+		return fee;
 	}
 
 	public void setInput_fee(Integer input_fee) {
 		this.input_fee = input_fee;
+	}
+	
+	public void setFee(Integer fee){
+		this.fee=fee;
 	}
 
 	public String getOutput_type() {

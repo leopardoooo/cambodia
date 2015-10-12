@@ -4,18 +4,21 @@ UserDetailGrid = Ext.extend(Ext.grid.GridPanel, {
 	constructor : function() {
 		this.userDetailStore = new Ext.data.JsonStore({
 					fields : ['user_type', 'user_type_text','user_name', 'device_model','device_model_text','task_id',
-							'device_code', 'password','device_id','band']
+							'device_code', 'password','device_id','band','posNo','occNo']
 				});
+		var userCols = lbc('home.tools.TaskManager.userCols');
 		UserDetailGrid.superclass.constructor.call(this, {
 			ds : this.userDetailStore,
+			border: false,
 			sm : new Ext.grid.CheckboxSelectionModel(),
 			cm : new Ext.grid.ColumnModel([{
-						header : '用户类型',dataIndex : 'user_type_text',width : 60,renderer : App.qtipValue}, {
-						header : '用户名',dataIndex : 'user_name',width : 130,renderer : App.qtipValue}, {
-						header : '密码',dataIndex : 'password',width : 60,renderer : App.qtipValue}, {
-						header : '设备型号',dataIndex : 'device_model_text',width : 150,renderer : App.qtipValue}, {
-						header : '设备号',dataIndex : 'device_id',width : 120,renderer : App.qtipValue}, {
-						header : '带宽',dataIndex : 'band',width: 80,renderer : App.qtipValue}])
+						header : userCols[0],dataIndex : 'user_type_text',width : 80,renderer : App.qtipValue}, {
+						header : userCols[1],dataIndex : 'user_name',width : 180,renderer : App.qtipValue}, {
+						header : userCols[3],dataIndex : 'device_model_text',width : 200,renderer : App.qtipValue}, {
+						header : userCols[4],dataIndex : 'device_id',width : 120,renderer : App.qtipValue}, {
+						header : userCols[5],dataIndex : 'posNo',width : 100,renderer : App.qtipValue}, {
+						header : userCols[6],dataIndex : 'occNo',width : 100,renderer : App.qtipValue}, {
+						header : userCols[7],dataIndex : 'band',width: 80,renderer : App.qtipValue}])
 		})
 	}
 })
@@ -25,22 +28,25 @@ TaskDetailGrid = Ext.extend(Ext.grid.GridPanel, {
 	constructor : function() {
 		this.taskDetailStore = new Ext.data.JsonStore({
 					fields : ['busi_code', 'busi_name', 'optr_id','optr_name','log_time',
-							'syn_status','error_remark','syn_status_text']});
+							'syn_status','error_remark','syn_status_text','delay_time','log_detail']});
+		var operateCols = lbc('home.tools.TaskManager.operateCols');							
 		TaskDetailGrid.superclass.constructor.call(this, {
 			ds : this.taskDetailStore,
 			sm : new Ext.grid.CheckboxSelectionModel(),
+			border: false,
 			cm : new Ext.grid.ColumnModel([{
-				header : '操作时间',dataIndex : 'log_time',width : 100,renderer : Ext.util.Format.dateFormat}, {
-				header : '操作类型',dataIndex : 'busi_name',width:80,renderer : App.qtipValue}, {
-				header : '操作人',dataIndex : 'optr_name',width:80,renderer : App.qtipValue}, {
-				header : '同步状态',dataIndex : 'syn_status_text',width:80,renderer : App.qtipValue}, {
-				header : '描述',dataIndex : 'error_remark',width:150,renderer :  App.qtipValue
-			}])
-		})
-	}
+				header : operateCols[0],dataIndex : 'log_time',width : 130}, {
+				header : operateCols[1],dataIndex : 'busi_name',width:120,renderer : App.qtipValue}, {
+				header : operateCols[2],dataIndex : 'optr_name',width:80,renderer : App.qtipValue}, {
+				header : operateCols[3],dataIndex : 'syn_status_text',width:80,renderer : App.qtipValue}, {
+				header : operateCols[5],dataIndex : 'delay_time',width:80}, {
+				header : operateCols[4],dataIndex : 'log_detail',width:350,renderer :  App.qtipValue
+			}])          
+		})               
+	}                    
 })
 
-TaskAllInfo = Ext.extend(Ext.Panel,{
+TaskAllInfo = Ext.extend(Ext.TabPanel,{
 	panel : null,
 	userGrid : null,
 	detail : null,
@@ -49,52 +55,49 @@ TaskAllInfo = Ext.extend(Ext.Panel,{
 		this.detail = new TaskDetailGrid();
 		TaskAllInfo.superclass.constructor.call(this, {
 				border : false,
-				layout : 'border',
+				activeTab: 0,
 				closable : true,
-				items : [{
-							region : 'west',
-							layout : 'fit',
-							width : '55%',
-							split : true,
-							title : '用户信息',
-							items : [this.userGrid]
-						}, {
-							region : 'center',
-							layout : 'fit',
-							title : '操作明细',
-							items : [this.detail]
-						}]
+				defaults : {border: false,layout : 'fit'},
+				items:[{title : lbc('home.tools.TaskManager._operateTitle'),items:[this.detail]},
+				{title : lbc('home.tools.TaskManager._userTitle'),items:[this.userGrid]
+				}]
 		})
 	}
 })
 
 var TaskDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 	taskDeviceGridStore:null,
-	taskId:null,
-	otlNoField:null,
-	ponNoField:null,
-	constructor:function(){
-		var that = this;
+	taskTypeId:null,
+	constructor:function(rs){
 		this.taskDeviceGridStore = new Ext.data.JsonStore({
-			fields:['device_id','device_type','device_type_text','device_model','device_model_text',
-				'device_code','user_type', 'user_type_text','user_name','task_id']
+			url: root + '/core/x/Task!queryTaskDevice.action' ,
+			fields:['device_id','device_type','device_type_text','device_model','device_model_text','user_id',
+				'device_code','user_type', 'user_type_text','user_name','task_id','occNo','posNo','recycle_result'
+				,'recycle_result_text']
 		});
-		
-		this.otlNoField = new Ext.form.TextField({xtype: 'textfield',width: 90});
-		this.ponNoField = new Ext.form.TextField({xtype: 'textfield',width: 90});
-		var columns = [{
-						header : '用户类型',dataIndex : 'user_type_text',width : 80,renderer : App.qtipValue}, {
-						header : '用户名',dataIndex : 'user_name',renderer : App.qtipValue},
-						{header:'型号',dataIndex:'device_model_text',width:150},	
-						{header:'设备编号',dataIndex:'device_code',width:150,editor:new Ext.form.TextField({
-							vtype:'alphanum',
-							listeners:{
-								scope:this,
-								change:this.queryAndAddDevice
-							}
-						})},
-						{header:'类型',dataIndex:'device_type_text',width:70}
-		];
+		var taskId = rs.get('task_id');
+		this.taskTypeId = rs.get('task_type_id');
+		this.taskDeviceGridStore.load({params : {task_id :taskId}});
+		var columns = [],nextColums = [];	
+		var cols = lbc('home.tools.TaskManager.taskDeviceCols');
+		var baseColumns = [{
+				header : cols[0],dataIndex : 'user_type_text',width : 70,renderer : App.qtipValue}, {
+				header : cols[1],dataIndex : 'user_name',renderer : App.qtipValue},
+				{header: cols[2],dataIndex:'device_model_text',width:130},
+				{header: cols[5],dataIndex:'device_id',width:130}];
+		if(this.taskTypeId == '9'){//销终端工单
+			this.resultCombo = new Ext.ux.ParamCombo({
+				paramName:'BOOLEAN',typeAhead:false,valueField:'item_name',
+				forceSelection:true,selectOnFocus:true,editable:true
+			});
+			App.form.initComboData([this.resultCombo]);
+			nextColums = [{header:cols[4],dataIndex:'recycle_result_text',width:80,editor:this.resultCombo}]; 
+		}else{
+			nextColums = [{header:cols[3],dataIndex:'device_code',width:130,editor:new Ext.form.TextField({vtype:'alphanum'})},
+						{header:'occNo',dataIndex:'occNo',width:80,editor:new Ext.form.TextField({vtype:'alphanum'})},
+						{header:'posNo',dataIndex:'posNo',width:80,editor:new Ext.form.TextField({vtype:'alphanum'})}]
+		}
+		columns  = baseColumns.concat(nextColums)
 		
 		TaskDeviceGrid.superclass.constructor.call(this,{
 			region:'center',
@@ -102,69 +105,69 @@ var TaskDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 			clicksToEdit:1,
 			columns:columns,
 			sm:new Ext.grid.RowSelectionModel({}),
-			tbar: ['otlNo:',this.otlNoField,'-','ponNo:',this.ponNoField]
+			listeners:{
+				scope:this,
+				beforeedit: this.beforeEdit,
+				afteredit:this.afteredit
+			}
 		});
+		},beforeEdit: function(obj){
+			if(obj.field == 'occNo' || obj.field == 'posNo'){
+				var value = obj.record.get('user_type');
+				if(value !='BAND'){
+					return false;
+				}
+			}
+			if(obj.field == 'device_code'){
+				if(this.taskTypeId !='1'){
+					return false;
+				}
+			}
 		},
-		queryAndAddDevice:function(field,newValue,oldValue){
-			if(newValue && newValue!==oldValue){
-				var dRecord = this.getSelectionModel().getSelected();
-				Ext.Ajax.request({
-					url:Constant.ROOT_PATH + "/core/x/Task!queryDeviceInfoByCodeAndModel.action",
-					params:{deviceCode:newValue,deviceModel:dRecord.get('device_model')},
-					scope:this,
-					success:function(res,opt){
-						var data = Ext.decode(res.responseText);
-						dRecord.set('device_code',data['device_code']);
-						dRecord.set('device_type_text',data['device_type_text']);
-						dRecord.set('device_type',data['device_type']);
-					},
-					clearData:function(){
-						dRecord.set('device_code','');
-						dRecord.set('device_type_text','');
-						dRecord.set('device_type','');
-						//清空组件
-					}
-				});
+		afteredit:function(obj){
+			if(obj.field == 'recycle_result_text'){
+				var record =obj.record;
+				var cmp = this.resultCombo;
+				var index = cmp.store.find('item_name',obj.value);
+				var data = cmp.store.getAt(index);
+				record.set('recycle_result',data.get('item_value'));
 			}
 		},
 		getValues:function(){
 			var arr=[];
-			var store = this.getStore();
-			store.each(function(record){
+			var records = this.getStore().getModifiedRecords();
+			Ext.each(records,function(record){
 				var values = {};
 				values["oldDeviceCode"] = record.get('device_id');
 				values["deviceModel"] =record.get('device_model');
 				values["deviceCode"] = record.get('device_code');
+				values["posNo"] = record.get('posNo');
+				values["occNo"] = record.get('occNo');
+				values["fcPort"] = false;
+				if(record.get('user_type') == 'BAND'){
+					values["fcPort"] = true;
+				}
 				arr.push(values);
+			},this);
+			return arr;
+		},
+		getUserIds:function(){
+			var arr=[];
+			var store = this.getStore();
+			store.each(function(record){
+				if(record.get('recycle_result') == 'T'){
+					arr.push(record.get('user_id'));
+				}
 			},this);
 			return arr;
 		},
 		checkDeviceCode : function(){
 			this.stopEditing();//停止编辑
-			var store = this.getStore();
-			var count = store.getCount();//总个数
-			
-			var config = this.getColumnModel().config;
-			
-			var dataIndexes = [];
-			for(var i=0;i<config.length;i++){
-				dataIndexes.push(config[i].dataIndex);
-			}
-			
 			var flag = true;
-			for(var i=0;i<count;i++){
-				var data = store.getAt(i).data;
-				for(var k=0;k<dataIndexes.length;k++){
-					var a = dataIndexes[k];
-					if(Ext.isEmpty(data[a]) && a == 'device_code'){
-						Alert('请输入设备号!',function(){
-							this.getSelectionModel().selectRow(i);
-							this.startEditing(i,k);
-						});
-						flag = false;
-						break;
-					}
-				}
+			var records = this.getStore().getModifiedRecords();
+			if(records.length == 0){
+				Alert('数据没有修改');
+				flag = false;
 			}
 			return flag;
 	}
@@ -173,13 +176,14 @@ var TaskDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 TaskDeviceWin = Ext.extend(Ext.Window,{
 	deviceGrid : null,
 	task_id:null,
-	constructor : function(){
-		this.deviceGrid = new TaskDeviceGrid();
+	task_type_id:null,
+	constructor : function(rs){
+		this.deviceGrid = new TaskDeviceGrid(rs);
 		TaskDeviceWin.superclass.constructor.call(this,{
 			title : '设备回填',
 			layout : 'fit',
 			height : 400,
-			width : 600,
+			width : 750,
 			id:'TaskDeviceWinId',
 			closeAction : 'close',
 			items : [this.deviceGrid],
@@ -201,14 +205,17 @@ TaskDeviceWin = Ext.extend(Ext.Window,{
 		if(!this.deviceGrid.checkDeviceCode()){
 			return false;
 		}
-		var data = this.deviceGrid.getValues();
-		var url = Constant.ROOT_PATH + "/core/x/Task!fillTask.action";
-		var o = {
-			task_id:this.task_id,
-			devices : Ext.encode(data), 
-			otlNo: this.deviceGrid.otlNoField.getValue(),
-			ponNo : this.deviceGrid.ponNoField.getValue()
-		};
+		
+		var o ={},url;
+		if(this.task_type_id == '9'){//销终端工单
+			var data = this.deviceGrid.getUserIds();
+			url = Constant.ROOT_PATH + "/core/x/Task!fillWriteOffTerminalTask.action";
+			o = {task_id:this.task_id,userIds : data.join(",")};
+		}else{
+			var data = this.deviceGrid.getValues();
+			url = Constant.ROOT_PATH + "/core/x/Task!fillTask.action";
+			o = {task_id:this.task_id,devices : Ext.encode(data)};
+		}
 		var that = this;
 		App.sendRequest( url, o, function(res,opt){
 			Ext.getCmp('taskManagerPanelId').grid.getStore().reload({
@@ -222,9 +229,9 @@ TaskDeviceWin = Ext.extend(Ext.Window,{
 			that.close();
 		});
 	},
-	show:function(t,data){
-		this.task_id = t;
-		this.deviceGrid.taskDeviceGridStore.loadData(data);
+	show:function(rs,data){
+		this.task_id = rs.get('task_id');
+		this.task_type_id = rs.get('task_type_id');
 		TaskDeviceWin.superclass.show.call(this);
 	}
 });
@@ -236,15 +243,11 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 	taskStore:null,
 	grid: null,
 	pageSize: 20,
-	taskFinishWin: null,
-	taskDetailsWin:null,
-	iconCls: 'doc',
 	taskAllInfo:null,
-	taskUserData:null,
-	taskLogData:null,
 	constructor:function(item){
 		this.initWidgets(item);	
 		this.taskAllInfo = new TaskAllInfo();
+		var btns = lbc('home.tools.TaskManager.buttons');
   		TaskManagerPanel.superclass.constructor.call(this,{
 			border: false,
 			id: 'taskManagerPanelId',
@@ -252,7 +255,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 			items : [{
 						region : 'south',
 						layout : 'fit',
-						height : 160,
+						height : 140,
 						border: false,
 						split : true,
 						items : [this.taskAllInfo]
@@ -264,51 +267,63 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 					}],
 			buttons: [{
 				id:'team_btn_id',
-				text: '分配施工队',
+				text: btns['distTeam'],
 				height: 30,
 				width: 80,
+//				disabled:true,
+				hidden:true,
 				style: 'color: red;',
 				scope: this,
 				handler: this.doTeamTask
 			},{
-				id:'ivalid_btn_id',
-				text: '工单作废',
+				id:'withdraw_btn_id',
+				text: btns['withdraw'],
+				width: 80,
+				hidden:true,
+				height: 30,
+				scope: this,
+				handler: this.doWithdrawTask
+			},{
+				id:'removeTaskBtnId',
+				text: btns['invalidTeam'],
 				height: 30,
 				width: 80,
+				hidden:true,
 				style: 'color: red;',
 				scope: this,
 				handler: this.doCancelTask
 			},{
 				id:'device_btn_id',
-				text: '回填设备',
+				text: btns['backDevice'],
 				height: 30,
 				width: 80,
+				hidden:true,
 				style: 'color: red;',
 				scope: this,
 				handler: this.doDeviceTask
 			},{
 				id:'end_btn_id',
-				text: '完工',
+				text: btns['finish'],
 				height: 30,
 				width: 80,
+				hidden:true,
 				style: 'color: red;',
 				scope: this,
 				handler: this.doEndTask
 			},{
 				id:'visit_btn_id',
-				text: '回访',
+				text: btns['returning'],
 				height: 30,
 				width: 80,
-				disabled:true,
+				hidden:true,
 				style: 'color: red;',
 				scope: this,
 				handler: this.doVisitTask
 			},{
 				id:'send_btn_id',
-				text: '发送ZTE授权',
+				text: btns['sendAuth'],
 				width: 80,
-//				tooltip: '工单传给呼叫',
-				disabled:true,
+				hidden:true,
 				height: 30,
 				scope: this,
 				handler: this.doSendTask
@@ -325,7 +340,6 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 	            this.view.mainWrap.dom.style.left = "0px"; 
 	        }, this); 
         }
-          
 	},
 	initEvents: function(){
 		this.on("afterrender",function(){
@@ -337,49 +351,59 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 	initWidgets: function(item){
 		this.taskStore = new Ext.data.JsonStore({
 			url: root + '/core/x/Task!queryTasks.action' ,
-			fields:['task_id','cust_id','cust_no','cust_name','tel','old_addr','new_addr','address','task_type_id',
+			fields:['task_id','cust_no','cust_name','tel','old_addr','new_addr','address','task_type_id',
 					'task_status','task_status_text','task_type_id_text','team_id','team_id_text','bug_type','bug_type_text'
-					,'bug_detail','zte_status','zte_status_text','task_create_time'],
+					,'bug_detail','zte_status','zte_status_text','task_create_time','team_type','linkman_name','linkman_tel'],
 			root : 'records',
 			totalProperty : 'totalProperty',
 			autoDestroy : true
 		});
-		
+		var forms = lbc('home.tools.TaskManager.forms');
 		var tomorrow = new Date();
 		tomorrow.setDate(tomorrow.getDate() + 1);
 		var startDate = new Date();
-		startDate.setDate(startDate.getDate() - 1);
+		startDate.setDate(startDate.getDate() - 7);
 		this.createStartDateField = new Ext.form.DateField({
 				xtype: 'datefield',width: 90,format: 'Y-m-d',allowBlank: false,value: startDate
 			});
 		this.createEndDateField = new Ext.form.DateField({
 				xtype: 'datefield',width: 90,format: 'Y-m-d',allowBlank: false,value: tomorrow});
 		this.custNoField = new Ext.form.TextField({
-				xtype: 'textfield',width: 90,emptyText: '客户编号'});
+				xtype: 'textfield',width: 90,emptyText: forms['custNo']});
 		this.taskNoField = new Ext.form.TextField({
-				xtype: 'textfield',width: 90,emptyText: '工单编号'});			
+				xtype: 'textfield',width: 90,emptyText: forms['taskNo']});			
 		this.custNameField = new Ext.form.TextField({
-				xtype: 'textfield',width: 90,emptyText: '客户名称'});
+				xtype: 'textfield',width: 90,emptyText: forms['custName']});
 		this.mobileField = new Ext.form.TextField({
-				xtype: 'textfield',width: 100,emptyText: '联系电话'});
+				xtype: 'textfield',width: 100,emptyText: forms['mobile']});
 		this.newaddrField = new Ext.form.TextField({
-				xtype: 'textfield',width: 140,emptyText: '地址'});
+				xtype: 'textfield',width: 140,emptyText: forms['newaddr']});
 		this.taskStatusCombo = new Ext.ux.LovCombo({
-				width: 120,
-				emptyText: '工单状态',
-				paramName:'TASK_STATUS',
+				width: 100,
+				emptyText: forms['taskStatus'],
+				paramName:'STATUS_W_TASK',
 				hiddenName : 'task_status',
 				typeAhead:true,editable:true,
 				store:new Ext.data.JsonStore({
 					fields:['item_value','item_name']
 				}),displayField:'item_name',valueField:'item_value',
 				triggerAction:'all',mode:'local'
-			});		
-		
+			});	
+		this.zteStatusCombo = new Ext.ux.LovCombo({
+				width: 100,
+				emptyText: forms['zteStatus'],
+				paramName:'ZTE_QUERY_STATUS_W_TASK',
+				hiddenName : 'task_status',
+				typeAhead:true,editable:true,
+				store:new Ext.data.JsonStore({
+					fields:['item_value','item_name']
+				}),displayField:'item_name',valueField:'item_value',
+				triggerAction:'all',mode:'local'
+			});	
 		this.taskDetailTypeCombo = new Ext.ux.LovCombo({
 				xtype: 'textfield',
-				width: 120,
-				emptyText: '工单类型',
+				width: 100,
+				emptyText: forms['taskDetailType'],
 				typeAhead:true,editable:true,
 				paramName:'TASK_DETAIL_TYPE',
 				store:new Ext.data.JsonStore({
@@ -390,10 +414,10 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 		
 		this.taskAddrCombo = new Ext.ux.LovCombo({
 			typeAhead: true,
-			width: 120,
+			width: 100,
 		    triggerAction: 'all',
 		    mode: 'remote',
-		    emptyText: '地区',
+		    emptyText: forms['taskAddr'],
 		    editable : true,
 		    store: new Ext.data.JsonStore({
 		    	url: root + '/commons/x/QueryCust!queryProvince.action',
@@ -407,10 +431,10 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 		
 		this.taskTeamCombo = new Ext.ux.LovCombo({
 			typeAhead: true,
-			width: 120,
+			width: 100,
 		    triggerAction: 'all',
 		    mode: 'remote',
-		    emptyText: '施工队',
+		    emptyText: forms['taskTeam'],
 		    editable : true,
 		    store: new Ext.data.JsonStore({
 		    	url: root + '/core/x/Task!queryTaskTeam.action' ,
@@ -422,38 +446,27 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 		    displayField: 'dept_name'
 		});
 		//初始化下拉框的数据 
-		App.form.initComboData([this.taskStatusCombo,this.taskDetailTypeCombo]);
+		App.form.initComboData([this.taskStatusCombo,this.zteStatusCombo,this.taskDetailTypeCombo],function(){this.doWaitTask();},this);
 		
 		var twoTbar = new Ext.Toolbar({
 			items : [this.taskNoField,'-',this.custNoField,'-',this.mobileField,'-',this.custNameField,'-',this.newaddrField,'-',{
-				text: '查询',
-				pressed: true,
-				scope: this,
-				width: 80,
-				handler: this.doSearchTask
-			},'-',{
-				text: '待处理工单',
-				pressed: true,
-				scope: this,
-				width: 100
-//				handler: this.doSearchTask
-			}]
+				text: lbc('home.tools.TaskManager.buttons.query'),pressed: true,scope: this,width: 80,handler: this.doSearchTask
+			},'-',{text: lbc('home.tools.TaskManager.buttons.pendingOrder'),pressed: true,scope: this,width: 100,handler: this.doWaitTask}]
 		});
 		
     	// create the Grid
     	var sm = new Ext.grid.RowSelectionModel();
+    	var taskCols = lbc('home.tools.TaskManager.taskCols');
 	    this.grid = new Ext.grid.GridPanel({
 	        store: this.taskStore,
 	        cm: new Ext.ux.grid.LockingColumnModel({
 	        	columns:[
-				//{header: '工单编号',		dataIndex : 'task_id', 				width: 100},
-				{header: '工单类型',		dataIndex : 'task_type_id_text', 	width: 100, renderer: function(v, m ,rs){
-					return "<span style='font-weight: bold;'>"+ v +"</span>";
+				{header: taskCols[10],dataIndex : 'task_id', width: 80, renderer:App.qtipValue},
+				{header: taskCols[0],		dataIndex : 'task_type_id_text', 	width: 85, renderer: function(v, m ,rs){
+					return '<div  style="font-weight: bold" ext:qtitle="" ext:qtip="' + v + '">' + v +'</div>';
 				}},
-				{header: '客户名称', 	dataIndex: 'cust_name', width: 80},
-				{header: '地址', 		dataIndex : 'address', width: 200,renderer:App.qtipValue},
-				{header: '联系电话', 	dataIndex : 'tel', 				width: 100},
-				{header: '工单状态', 		dataIndex: 'task_status', width: 100, renderer: function(v, m ,rs){
+				{header: taskCols[1], 	dataIndex: 'cust_name', width: 80},
+				{header: taskCols[2], 		dataIndex: 'task_status', width: 85, renderer: function(v, m ,rs){
 					var text = rs.get("task_status_text");
 					var color = "black";
 					if(v == 'INIT'){
@@ -463,13 +476,17 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 					}else if(v == 'CANCEL'){
 						color = "gray";
 					}
-					return "<span style='font-weight: bold;color: "+ color +";'>"+ text +"</span>";
+					return '<div  style="font-weight: bold;color: '+ color +';" ext:qtitle="" ext:qtip="' + text + '">' + text +'</div>';
 				}},
-				{header:'施工队', dataIndex:'team_id_text',width:100,renderer:App.qtipValue},
-				{header:'故障类型',dataIndex:'bug_type_text',width:85},
-				{header:'故障详细信息',dataIndex:'bug_detail',width:120,renderer:App.qtipValue},
-				{header: 'ZTE授权状态',dataIndex: 'zte_status_text', width: 100, renderer:App.qtipValue},
-				{header: '创建时间', dataIndex: 'task_create_time', 	width: 165, renderer: Ext.util.Format.dateFormat}					
+				{header: taskCols[3], dataIndex:'team_id_text',width:110,renderer:App.qtipValue},
+				{header: taskCols[4],dataIndex: 'zte_status_text', width: 70, renderer:Ext.util.Format.statusShow},
+				{header: taskCols[5], dataIndex : 'address', width: 200,renderer:App.qtipValue},
+				{header: taskCols[6], dataIndex : 'tel', 				width: 100, renderer:App.qtipValue},
+				{header: taskCols[7], dataIndex: 'task_create_time', 	width: 80, renderer: Ext.util.Format.dateFormat},					
+				{header: taskCols[8],dataIndex:'bug_type_text',width:85, renderer:App.qtipValue},
+				{header: taskCols[9],dataIndex:'bug_detail',width:120,renderer:App.qtipValue},
+				{header: taskCols[11],dataIndex:'linkman_name',width:90,renderer:App.qtipValue},
+				{header: taskCols[12],dataIndex:'linkman_tel',width:110,renderer:App.qtipValue}
 	        ]}),
 	        sm: sm,
 	        stripeRows: true,
@@ -477,8 +494,8 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 		        store: this.taskStore, // grid and PagingToolbar using same store
 		        pageSize: this.pageSize
 		    }),
-			tbar: [this.taskDetailTypeCombo,'-',this.taskAddrCombo,'-','受理时间:',this.createStartDateField,' ',this.createEndDateField,'-',
-			this.taskTeamCombo,'-',this.taskStatusCombo],
+			tbar: [this.taskDetailTypeCombo,'-',this.taskAddrCombo,'-',lbc('home.tools.TaskManager.buttons.accptTime'),this.createStartDateField,' ',this.createEndDateField,'-',
+			this.taskTeamCombo,'-',this.taskStatusCombo,'-',this.zteStatusCombo],
 			listeners : {
 				'render' : function() {
 					twoTbar.render(this.tbar);
@@ -488,27 +505,20 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 	},
 	initEvents: function(){
 		this.grid.on("rowclick", this.doClickRecord, this );
-		
 		TaskManagerPanel.superclass.initEvents.call(this);
 	},
 	doClickRecord:function(g, i, e){
 		//选中一条时才显示
-		var records = g.getSelectionModel().getSelections();
-		if(records.length == 1){
-			this.loadTaskData(records[0].get("task_id"));
-		}
+		var record = g.getStore().getAt(i);
+		this.loadTaskData(record.get("task_id"));
 	},
 	loadTaskData:function(taskId){
 		Ext.Ajax.request({
 			scope : this,
 			url: root + '/core/x/Task!queryTaskDetail.action' ,
-			params : {
-				task_id : taskId
-			},
+			params : {task_id : taskId},
 			success : function(res,opt){
 				var rs = Ext.decode(res.responseText);
-				this.taskUserData = rs.taskUserList;
-				this.taskLogData = rs.taskLogList;
 				this.taskAllInfo.userGrid.getStore().loadData(rs.taskUserList);
 				this.taskAllInfo.detail.getStore().loadData(rs.taskLogList);
 			}
@@ -520,19 +530,22 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 	taskStatusCombo: null,
 	mobileField: null,
 	newaddrField: null,
+	zteStatusCombo:null,
 	doCancelTask: function(){
 		var rs = this.getSelections();
-		if(rs === false){
-			return ;
-		}
+		if(rs === false){return ;}
+		if(this.checkViald(rs) === false){return;}
 		var ts = rs.get("task_status");
 		if(ts == 'WAITEND' || ts == 'CANCEL' || ts == 'END'){
-			Alert("不允许取消!");
+			Alert(lbc('home.tools.TaskManager.msg.noCancel'));
 			return ;
 		}
-		Confirm("确定要作废选中的工单吗?", this , function(){
+		if(rs.get('task_status') == 'ENDWAIT'){
+			Alert(lbc('home.tools.TaskManager.msg.endWaitCanNotUse'));
+			return false;
+		}
+		Confirm(lbc('home.tools.TaskManager.msg.sureWantSelectedWork'), this , function(){
 			var taskId = rs.get("task_id");
-			var that = this;
 			App.sendRequest(
 				Constant.ROOT_PATH + "/core/x/Task!cancelTaskSn.action",
 				{task_id : taskId,taskType:rs.get('task_type_id')},
@@ -545,26 +558,134 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 				           	panel.loadTaskData(taskId);
 						}
 			         });
-					that.close();
 				});
 		}); 
 	},
-	doSendTask: function(){
+	doSendTask: function(){//发送ZTE
 		var rs = this.getSelections();
-		if(rs === false){
-			return ;
+		if(rs === false){return ;}
+		if(rs.get('zte_status') != 'FAILURE' && rs.get('zte_status') != 'NOT_EXEC'){
+			Alert(lbc('home.tools.TaskManager.msg.zteStatusCanSend'));
+			return false;
 		}
+		if(rs.get('task_status') == 'ENDWAIT'){
+			Alert(lbc('home.tools.TaskManager.msg.endWaitCanNotUse'));
+			return false;
+		}
+		var zteCombo = new Ext.form.ComboBox({
+			width: 120,
+			fieldLabel:lbc('home.tools.TaskManager.forms.zteStatus'),
+			allowBlank:false,
+			typeAhead:true,editable:true,
+			paramName:'ZTE_STATUS_W_TASK',
+			store:new Ext.data.JsonStore({
+				fields:['item_value','item_name']
+			}),displayField:'item_name',valueField:'item_value',
+			triggerAction:'all',mode:'local'
+		});
+		App.form.initComboData([zteCombo]);
+		var endForm = new Ext.form.FormPanel({
+			layout : 'form',
+			border : false,
+			labelWidth : 100,
+			bodyStyle : 'padding : 5px;padding-top : 10px;',
+			items: [zteCombo,{
+				fieldLabel: lbc('home.tools.TaskManager.forms.zteRemark'),
+				name:'log_remark',
+				height : 100,
+				width : 240,
+				xtype:'textarea'
+			}]
+		});
+		var win = new Ext.Window({
+			width: 450,
+			height: 250,
+			title: lbc('home.tools.TaskManager._ZteWinTitle'),
+			border: false,
+			closeAction:'close',
+			layout: 'fit',
+			items: endForm,
+			buttons: [{
+				text: lbc('common.save'),
+				scope: this,
+				iconCls : 'icon-save',
+				handler: function(){
+					if(Ext.isEmpty(zteCombo.getValue())){
+						Alert(lbc('home.tools.TaskManager.msg.ZteStatusCantEmpty'));return false;
+					}
+					var url = Constant.ROOT_PATH + "/core/x/Task!saveZte.action";
+					var taskId = rs.get("task_id");
+					var o = {
+						task_id : taskId, 
+						zte_status : zteCombo.getValue(),
+						log_remark : endForm.getForm().findField('log_remark').getValue()
+					};
+					App.sendRequest( url, o, function(res,opt){
+						Ext.getCmp('taskManagerPanelId').grid.getStore().reload({
+							callback:function(records, options, success){  
+				           		var panel = Ext.getCmp('taskManagerPanelId');
+					           	var index = panel.grid.getStore().find('task_id',taskId);	           		
+					           	panel.grid.getSelectionModel().selectRow(index);
+					           	panel.loadTaskData(taskId);
+							}
+				         });
+						win.close();
+					});
+				}
+			},{
+				text: lbc('common.cancel'),
+				handler: function(){
+					win.hide();
+				}
+			}]
+		});
+		win.show();
 
 	},
-	doTeamTask:function(){//分配施工队
+	doWithdrawTask:function(){//工单撤回
 		var rs = this.getSelections();
-		if(rs === false){
-			return ;
+		if(rs === false){return ;}
+		if(rs.get('task_status') != 'INIT' || rs.get('team_type') != 'CFOCN' ){
+			Alert(lbc('home.tools.TaskManager.msg.taskStatusInitAndCfocnCanWithdraw'));
+			return false;
+		}
+		if(rs.get('task_status') == 'ENDWAIT'){
+			Alert(lbc('home.tools.TaskManager.msg.endWaitCanNotUse'));
+			return false;
+		}
+		Confirm(lbc('home.tools.TaskManager.msg.sureWantWithdrawSelectedWork'), this , function(){
+			var taskId = rs.get("task_id");
+			App.sendRequest(
+				Constant.ROOT_PATH + "/core/x/Task!withdrawTask.action",
+				{task_id : taskId},
+				function(res,opt){
+					Ext.getCmp('taskManagerPanelId').grid.getStore().reload({
+					callback:function(records, options, success){  
+		           		    var panel = Ext.getCmp('taskManagerPanelId');
+				           	var index = panel.grid.getStore().find('task_id',taskId);	           		
+				           	panel.grid.getSelectionModel().selectRow(index);
+				           	panel.loadTaskData(taskId);
+						}
+			         });
+				});
+		}); 
+	},
+	doTeamTask:function(){//派单
+		var rs = this.getSelections();
+		if(rs === false){return ;}
+		if(this.checkViald(rs) === false){return;}
+		if((rs.get('task_status') != 'INIT' || rs.get('team_type') != 'SUPERNET' ) && rs.get('task_status') != 'CREATE' && rs.get('task_status') != 'ENDWAIT' ){
+			Alert(lbc('home.tools.TaskManager.msg.taskStatusInitAndSupernetCanAssignment'));
+			return false;
 		}
 		var arr = [];
 		this.taskTeamCombo.getStore().each(function(record){
-			if(record.get('dept_id') != rs.get('team_id')){
+			if(rs.get('task_status') == 'CREATE' || rs.get('task_status') == 'ENDWAIT'){
 				arr.push(record.data);
+			}else if(rs.get('team_type') == 'SUPERNET' && rs.get('task_status') == 'INIT'){
+				if(record.get('dept_id') != rs.get('team_id')){
+					arr.push(record.data);
+				}
 			}
 		});
 		
@@ -573,7 +694,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 			width: 120,
 		    triggerAction: 'all',
 		    mode: 'local',
-		    fieldLabel:'施工队',
+		    fieldLabel:lbc('home.tools.TaskManager.forms.taskTeam'),
 		    editable : true,
 		    allowBlank:false,
 		    store: new Ext.data.JsonStore({
@@ -583,16 +704,14 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 		    displayField: 'dept_name'
 		});
 		teamCombo.getStore().loadData(arr);
-		
 		var form = new Ext.form.FormPanel({
 			labelWidth: 90,
 			bodyStyle: 'padding-top: 10px;',
 			items: [teamCombo]
 		});
-	
 		if(rs.get('task_type_id') == '2'){
 			var bugCauseCombo = new Ext.ux.ParamCombo({
-				fieldLabel:'故障类型',
+				fieldLabel: lbc('home.tools.TaskManager.forms.faultType'),
 				xtype:'paramcombo',
 				allowBlank:false,
 				anchor: '95%',
@@ -601,25 +720,24 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 			App.form.initComboData([bugCauseCombo]);
 			form.add(bugCauseCombo);
 		}
-		
 		var win = new Ext.Window({
 			width: 320,
 			height: 250,
-			title: '施工队',
+			title: lbc('home.tools.TaskManager.forms.taskTeam'),
 			border: false,
 			closeAction:'close',
 			layout: 'fit',
 			items: form,
 			buttons: [{
-				text: '保存',
+				text: lbc('common.save'),
 				scope: this,
 				iconCls : 'icon-save',
 				handler: function(){
 					if(Ext.isEmpty(teamCombo.getValue())){
-						Alert("施工队不能为空");return false;
+						Alert(lbc('home.tools.TaskManager.msg.teamCantEmpty'));return false;
 					}
 					if(bugCauseCombo && Ext.isEmpty(bugCauseCombo.getValue())){
-						Alert("故障类型不能为空");return false;
+						Alert(lbc('home.tools.TaskManager.msg.faultTypeCantEmpty'));return false;
 					}
 					var url = Constant.ROOT_PATH + "/core/x/Task!editTaskTeam.action";
 					var taskId = rs.get("task_id");
@@ -641,33 +759,38 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 					});
 				}
 			},{
-				text: '取消',
-				handler: function(){
-					win.hide();
-				}
+				text: lbc('common.cancel'),handler: function(){win.hide();}
 			}]
 		});
 		win.show();
 	},
 	doDeviceTask:function(){//回填设备
 		var rs = this.getSelections();
-		if(rs === false){
-			return ;
+		if(rs === false){return ;}
+		if(rs.get('task_status') != 'INIT' || rs.get('team_type') != 'SUPERNET'){
+			Alert(lbc('home.tools.TaskManager.msg.taskStatusInitAndSupernet'));
+			return false;
+		}
+		if(rs.get('task_status') == 'ENDWAIT'){
+			Alert(lbc('home.tools.TaskManager.msg.endWaitCanNotUse'));
+			return false;
 		}
 		var win = Ext.getCmp('TaskDeviceWinId');
 		if(!win)
-			win = new TaskDeviceWin();
-		win.show(rs.get('task_id'),this.taskUserData);
+			win = new TaskDeviceWin(rs);
+		win.show(rs);
 	},
-	doEndTask:function(){//完成工单
+	doEndTask:function(){//完成工单,施工中和supernet
 		var rs = this.getSelections();
-		if(rs === false){
-			return ;
-		}
+		if(rs === false){return ;}
+		if(((rs.get('task_status') != 'INIT' || rs.get('team_type') != 'SUPERNET' )) && rs.get('task_status') != 'ENDWAIT' ){
+			Alert(lbc('home.tools.TaskManager.msg.taskStatusInitAndSupernet'));
+			return false;
+		}		
+		
 		var finishCombo = new Ext.form.ComboBox({
-			xtype: 'textfield',
 			width: 120,
-			fieldLabel:'完工类型',
+			fieldLabel:lbc('home.tools.TaskManager.forms.finishType'),
 			allowBlank:false,
 			typeAhead:true,editable:true,
 			paramName:'TASK_FINISH_TYPE',
@@ -677,37 +800,46 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 			triggerAction:'all',mode:'local'
 		});
 		App.form.initComboData([finishCombo]);
-		var form = new Ext.form.FormPanel({
-			labelWidth: 90,
-			bodyStyle: 'padding-top: 10px;',
-			items: [finishCombo]
+		var endForm = new Ext.form.FormPanel({
+			layout : 'form',
+			border : false,
+			labelWidth : 100,
+			bodyStyle : 'padding : 5px;padding-top : 10px;',
+			items: [finishCombo,{
+				fieldLabel: lbc('home.tools.TaskManager.forms.finishExplan'),
+				name:'finishRemark',
+				height : 100,
+				width : 240,
+				xtype:'textarea'
+			}]
 		});
 		var win = new Ext.Window({
-			width: 320,
+			width: 450,
 			height: 250,
-			title: '工单完工',
+			title: lbc('home.tools.TaskManager._winTitle'),
 			border: false,
 			closeAction:'close',
 			layout: 'fit',
-			items: form,
+			items: endForm,
 			buttons: [{
-				text: '保存',
+				text: lbc('common.save'),
 				scope: this,
 				iconCls : 'icon-save',
 				handler: function(){
 					if(Ext.isEmpty(finishCombo.getValue())){
-						Alert("完工类型不能为空");return false;
+						Alert(lbc('home.tools.TaskManager.msg.finishTypeCantEmpty'));return false;
 					}
 					var url = Constant.ROOT_PATH + "/core/x/Task!endTask.action";
 					var taskId = rs.get("task_id");
 					var o = {
 						task_id : taskId, 
-						resultType : finishCombo.getValue()
+						resultType : finishCombo.getValue(),
+						finishRemark : endForm.getForm().findField('finishRemark').getValue()
 					};
 					App.sendRequest( url, o, function(res,opt){
 						Ext.getCmp('taskManagerPanelId').grid.getStore().reload({
 							callback:function(records, options, success){  
-				           		 var panel = Ext.getCmp('taskManagerPanelId');
+				           		var panel = Ext.getCmp('taskManagerPanelId');
 					           	var index = panel.grid.getStore().find('task_id',taskId);	           		
 					           	panel.grid.getSelectionModel().selectRow(index);
 					           	panel.loadTaskData(taskId);
@@ -717,7 +849,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 					});
 				}
 			},{
-				text: '取消',
+				text: lbc('common.cancel'),
 				handler: function(){
 					win.hide();
 				}
@@ -731,11 +863,22 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 	getSelections: function(){
 		var rs = this.grid.getSelectionModel().getSelected();
 		if(rs == null || Ext.isEmpty(rs.get('task_id'))){
-			Alert("请选择需要操作的记录!");
+			Alert(lbc('home.tools.TaskManager.msg.selectRecord'));
 			return false;
 		}
 		return rs;
 	},
+	checkViald:function(rs){
+		if(rs.get('task_status') == 'END' || rs.get('task_status') == 'CANCEL'){
+			Alert(lbc('home.tools.TaskManager.msg.roderHaveBeenCompletedOrObsolete'));
+			return false;
+		}
+//		if(rs.get('team_id') != App.getData().optr['dept_id']){
+//			Alert(lbc('home.tools.TaskManager.msg.teamIsnotSingleWork'));
+//			return false;
+//		}
+	}
+	,
 	//search task from remote
 	doSearchTask: function(){
 		var o = {
@@ -749,7 +892,8 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 			"taskCond.taskTeam":this.taskTeamCombo.getValue(),
 			"taskCond.addrIds":this.taskAddrCombo.getValue(),
 			"taskCond.taskId":this.taskNoField.getValue(),
-			"taskCond.taskType":this.taskDetailTypeCombo.getValue()
+			"taskCond.taskType":this.taskDetailTypeCombo.getValue(),
+			"taskCond.zteStatus":this.zteStatusCombo.getValue()
 		};
 		this.taskStore.baseParams = o;
 		this.taskStore.load({
@@ -758,5 +902,11 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 				"limit": this.pageSize
 			}
 		});
+	},
+	doWaitTask:function(){
+		var o = {"isWaitTask": 'T'};
+		this.taskStore.baseParams = o;
+		this.taskStore.load({params: {"start": 0, "limit": this.pageSize}});
+	
 	}
 });		

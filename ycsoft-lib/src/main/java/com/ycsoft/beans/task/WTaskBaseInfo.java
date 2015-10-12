@@ -32,6 +32,7 @@ public class WTaskBaseInfo implements Serializable{
 	private Date task_invalide_time;
 	private Date task_finish_time;
 	private String task_finish_type;
+	private String task_finish_desc;
 	private String cust_id;
 	private String cust_name;
 	private String new_addr;
@@ -58,6 +59,44 @@ public class WTaskBaseInfo implements Serializable{
 	private String bug_type_text;
 	private String team_id_text;
 	
+	private Date  task_status_date;
+	private Date zte_status_date;
+	private String sync_statu;//同步状态
+	private Date sync_status_date;//同步状态时间
+	
+	
+	public Date getTask_status_date() {
+		return task_status_date;
+	}
+
+	public void setTask_status_date(Date task_status_date) {
+		this.task_status_date = task_status_date;
+	}
+
+	public Date getZte_status_date() {
+		return zte_status_date;
+	}
+
+	public void setZte_status_date(Date zte_status_date) {
+		this.zte_status_date = zte_status_date;
+	}
+
+	public String getSync_statu() {
+		return sync_statu;
+	}
+
+	public void setSync_statu(String sync_statu) {
+		this.sync_statu = sync_statu;
+	}
+
+	public Date getSync_status_date() {
+		return sync_status_date;
+	}
+
+	public void setSync_status_date(Date sync_status_date) {
+		this.sync_status_date = sync_status_date;
+	}
+
 	public String getTask_id() {
 		return task_id;
 	}
@@ -113,7 +152,7 @@ public class WTaskBaseInfo implements Serializable{
 
 	public void setTask_status(String task_status) {
 		this.task_status = task_status;
-		task_status_text = MemoryDict.getDictName(DictKey.TASK_STATUS, task_status);
+		task_status_text = MemoryDict.getDictName(DictKey.STATUS_W_TASK, task_status);
 	}
 
 	public String getTeam_id() {
@@ -351,5 +390,15 @@ public class WTaskBaseInfo implements Serializable{
 	public void setBug_type_text(String bug_type_text) {
 		this.bug_type_text = bug_type_text;
 	}
+
+	public String getTask_finish_desc() {
+		return task_finish_desc;
+	}
+
+	public void setTask_finish_desc(String task_finish_desc) {
+		this.task_finish_desc = task_finish_desc;
+	}
+	
+	
 	
 }

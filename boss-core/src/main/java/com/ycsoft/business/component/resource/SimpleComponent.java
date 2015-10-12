@@ -135,10 +135,10 @@ public class SimpleComponent extends BaseBusiComponent {
 		String districtName = "";
 		for(TDistrict t : districtList){
 			if(t.getDistrict_level() != 0){
-				districtName = districtName+t.getDistrict_name();
+				districtName = districtName+t.getDistrict_name()+",";
 			}
 		}
-		
+		districtName = StringHelper.isNotEmpty(districtName)? StringHelper.delEndChar(districtName, 1):"";
 		Map<String , Object> map = new HashMap<String, Object>();
 		map.put("netType", addr.getNet_type()); //小区网络
 		map.put("districtName", districtName); //行政区域

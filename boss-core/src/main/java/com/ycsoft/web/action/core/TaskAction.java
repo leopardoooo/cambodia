@@ -12,7 +12,6 @@ import com.ycsoft.beans.task.WTaskBaseInfo;
 import com.ycsoft.business.dto.core.cust.QueryTaskConditionDto;
 import com.ycsoft.business.service.ISnTaskService;
 import com.ycsoft.business.service.ITaskService;
-import com.ycsoft.business.service.IUserService;
 import com.ycsoft.business.service.impl.UserServiceSN;
 import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.helper.JsonHelper;
@@ -93,19 +92,30 @@ public class TaskAction extends BaseBusiAction{
 	 * @throws Exception
 	 */
 	public String queryTasks()throws Exception{
-		if(taskCond == null){
-			return JSON_PAGE;
+		String isWaitTask = request.getParameter("isWaitTask");
+		//查询待办工单
+		if(SystemConstants.BOOLEAN_TRUE.equals(isWaitTask)){
+			getRoot().setPage(snTaskService.queryUnProcessTask(start,limit));
+		}else{
+			if(taskCond == null){
+				return JSON_PAGE;
+			}
+			taskCond.setStart(start);
+			taskCond.setLimit(limit);
+			getRoot().setPage(snTaskService.queryTask(taskCond.getTaskType(),taskCond.getAddrIds(),taskCond.getStartTime(),taskCond.getEndTime(),taskCond.getTaskId()
+					,taskCond.getTaskTeam(),taskCond.getStatus(),taskCond.getCustNo(),taskCond.getCustName(),taskCond.getAddr(),taskCond.getMobile(),taskCond.getZteStatus(),taskCond.getStart(),taskCond.getLimit()));
 		}
-		taskCond.setStart(start);
-		taskCond.setLimit(limit);
-		getRoot().setPage(snTaskService.queryTask(taskCond.getTaskType(),taskCond.getAddrIds(),taskCond.getStartTime(),taskCond.getEndTime(),taskCond.getTaskId()
-				,taskCond.getTaskTeam(),taskCond.getStatus(),taskCond.getCustNo(),taskCond.getCustName(),taskCond.getAddr(),taskCond.getMobile(),taskCond.getStart(),taskCond.getLimit()));
 		return JSON_PAGE;
 	}
 	
 	public String queryTaskDetail() throws Exception{
 		getRoot().setOthers(snTaskService.queryTaskDetail(task_id));
 		return JSON_OTHER;
+	}
+	
+	public String queryTaskDevice()  throws Exception{
+		getRoot().setRecords(snTaskService.queryTaskDevice(task_id));
+		return JSON_RECORDS;
 	}
 	
 	public String queryTaskTeam() throws Exception{
@@ -161,13 +171,33 @@ public class TaskAction extends BaseBusiAction{
 		return JSON_SUCCESS;
 	}
 	
+	
+	public String withdrawTask()throws Exception{
+		snTaskService.withdrawTask(task_id);
+		getRoot().setSuccess(true);
+		return JSON_SUCCESS;
+	}
+	
 	/**
 	 * 完工
 	 * @return
 	 * @throws Exception
 	 */
 	public String endTask() throws Exception{
-		snTaskService.finishTask(task_id,resultType);
+		String finishRemark = request.getParameter("finishRemark");
+		snTaskService.finishTask(task_id,resultType,finishRemark,true);
+		return JSON_SUCCESS;
+	}
+	
+	/**
+	 * 保存zte
+	 * @return
+	 * @throws Exception
+	 */
+	public String saveZte() throws Exception{
+		String zte_status = request.getParameter("zte_status");
+		String log_remark = request.getParameter("log_remark");
+		snTaskService.saveZte(task_id,zte_status,log_remark);
 		return JSON_SUCCESS;
 	}
 	
@@ -178,14 +208,17 @@ public class TaskAction extends BaseBusiAction{
 	
 	public String fillTask() throws Exception{
 		String devices = request.getParameter("devices");
-		String otlNo = request.getParameter("otlNo");
-		String ponNo = request.getParameter("ponNo");
 		Type t = new TypeToken<List<TaskFillDevice>>(){}.getType();
 		List<TaskFillDevice> list = JsonHelper.gson.fromJson( devices , t);
-		snTaskService.fillTask(task_id,otlNo,ponNo,list);
+		snTaskService.fillTask(task_id,list);
 		return JSON_SUCCESS;
 	}
 	
+	public String fillWriteOffTerminalTask() throws Exception{
+		String userIds = request.getParameter("userIds");
+		snTaskService.fillWriteOffTerminalTask(task_id, userIds.split(","));
+		return JSON_SUCCESS;
+	}
 	
 	public String queryTaskByCustId()throws Exception{
 		getRoot().setRecords(snTaskService.queryTaskByCustId(custId));

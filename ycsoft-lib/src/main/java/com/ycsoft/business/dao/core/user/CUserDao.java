@@ -532,4 +532,11 @@ public class CUserDao extends BaseEntityDao<CUser> {
 		String sql = "select * from c_user a,w_task_user b where a.user_id = b.user_id and b.task_id =?";
 		return this.createQuery(sql, taskId).list();
 	}
+	
+	public CUser queryUserByDeviceCode(String DeviceCode) throws JDBCException{
+		String sql="select * from c_user where  stb_id=? or card_id=? or modem_mac=? ";
+		return this.createQuery(sql, DeviceCode,DeviceCode,DeviceCode).first();
+	}
+
+
 }

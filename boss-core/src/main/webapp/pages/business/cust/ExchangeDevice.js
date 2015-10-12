@@ -47,7 +47,7 @@ ExchangeDevicePanel = Ext.extend(BaseForm,{
 							change: this.checkDevice
 						}
 					},
-					{xtype:'displayfield',fieldLabel:lmain("user._form.newStdModel"),id:'newStbModel'},
+					{xtype:'displayfield',fieldLabel:lmain("user._form.newStdModel"),id:'newStbModel'}
 					
 			]},{
 				id: 'modemPanleId',
@@ -74,21 +74,37 @@ ExchangeDevicePanel = Ext.extend(BaseForm,{
     			    id: 'promptInfoId',
     			    fieldLabel: lbc("common.tip")
     			}
-            ]}
+            ]},
+            {
+            	id: 'buyDevicePanelId',
+            	bodyStyle: 'padding-top: 10px',
+            	items:[{
+    				xtype : 'paramcombo',
+					fieldLabel: lmain("user.base.buyWay"),
+					allowBlank : false,
+					paramName:'DEVICE_SALE_MODE',
+					hiddenName:'buy_mode',
+					id : 'deviceBuyMode',
+					width:150,
+					defaultValue: 'BUY',
+					listeners: {
+						scope: this,
+						select: this.doBuyModeSelect
+					}
+    			},{
+					xtype: 'displayfield',
+		            fieldLabel: lmain("user._form.feeName"),
+		            width : 150,
+		            id: 'dfFeeNameEl'
+				},{
+					fieldLabel: lmain("user._form.feeAmount"),
+					xtype:'numberfield',
+					width:150,
+					allowBlank:false,
+					id: 'txtFeeEl'
+				}]
+            }
 		]});
-	},
-	doSelectReason: function(combo, record){
-		var comp = Ext.getCmp('promptInfoId'), str='本次更换需要';
-		if(record.get('is_charge') == 'T'){
-			str += ' 收自购费用';
-		}
-		if(record.get('is_reclaim') == 'T'){
-			str += ' 回收设备';
-		}
-		if(record.get('is_lost') == 'T'){
-			str += ' 挂失设备';
-		}
-		comp.setValue("<font color='red'>"+str+"</font>");
 	},
 	doInit: function(){
 		ExchangeDevicePanel.superclass.doInit.call(this);
@@ -109,7 +125,6 @@ ExchangeDevicePanel = Ext.extend(BaseForm,{
 		if(userType == 'OTT' || userType == 'DTT'){		//机顶盒
 			Ext.getCmp('oldStbCode').setValue(this.userData['stb_id']);
 			Ext.getCmp('oldStbModelText').setValue(this.userData['device_model_text']);
-			
 			showCmp(true);
 		}else if( userType == 'BAND' ){					//MODEM
 			Ext.getCmp('oldModemCode').setValue(this.userData['modem_mac']);
@@ -117,7 +132,24 @@ ExchangeDevicePanel = Ext.extend(BaseForm,{
 			
 			showCmp(false);
 		}
-		
+		Ext.getCmp('buyDevicePanelId').setVisible(false);
+	},
+	doSelectReason: function(combo, record){
+		var comp = Ext.getCmp('promptInfoId'), str = lmain('user._form.labelChangeDeviceResion');
+		if(record.get('is_charge') == 'T'){
+			str += lmain('user._form.labelChangeBuyDevice');
+			Ext.getCmp('buyDevicePanelId').setVisible(true);
+		}else{
+			Ext.getCmp('buyDevicePanelId').setVisible(false);
+			this.currentFeeData['deviceBuyMode'] = 'PRESENT';
+		}
+		if(record.get('is_reclaim') == 'T'){
+			str += lmain('user._form.labelChangeReclaimDevice');
+		}
+		if(record.get('is_lost') == 'T'){
+			str += lmain('user._form.labelChangeLossDevice');
+		}
+		comp.setValue("<font color='red'>"+str+"</font>");
 	},
 	checkDevice:function(field){
 		var value = field.getRawValue();
@@ -142,8 +174,7 @@ ExchangeDevicePanel = Ext.extend(BaseForm,{
 					Ext.getCmp('newModemModel').setValue(data['deviceModel']['model_name']);
 				}
 				
-				/*Ext.getCmp('deviceBuyMode').setDisabled(false);
-				Ext.getCmp('txtFeeEl').setDisabled(false);*/
+				this.doBuyModeSelect();
 			},
 			clearData:function(){
 				//清空组件
@@ -152,17 +183,18 @@ ExchangeDevicePanel = Ext.extend(BaseForm,{
 			}
 		});
 	},
-	/*doBuyModeSelect: function(){
+	doBuyModeSelect : function(){
 		var deviceBuyModeValue = Ext.getCmp("deviceBuyMode").getValue();
-		
-		if(!this.userData['new_deviec_model'] || !deviceBuyModeValue){
+		var deviceModelValue = this.userData['new_deviec_model'];
+
+		if(!deviceModelValue || !deviceBuyModeValue){
 			return ;
 		}
 		Ext.Ajax.request({
 			scope : this,
 			url : root + '/commons/x/QueryDevice!queryDeviceFee.action',
 			params : {
-				deviceModel : this.userData['new_deviec_model'],
+				deviceModel : deviceModelValue,
 				buyMode : deviceBuyModeValue
 			},
 			success : function(res,opt){
@@ -184,13 +216,16 @@ ExchangeDevicePanel = Ext.extend(BaseForm,{
 					txtFee.setMinValue(0);
 					this.currentFeeData = null;
 				}
+				this.currentFeeData['deviceBuyMode'] = Ext.getCmp('deviceBuyMode').getValue();
 			}
 		});
-	},*/
+	},
 	doValid: function(){
-		
+		var formValid =  ExchangeDevicePanel.superclass.doValid.call(this);
+		if(formValid !== true){
+			return formValid;
+		}
 		var txtFeeEl = Ext.getCmp("txtFeeEl");
-		//设备费用检查
 		var fd = this.currentFeeData;
 		if(fd){
 			var maxfee = parseFloat(fd["min_fee_value"])/100.0;
@@ -199,18 +234,26 @@ ExchangeDevicePanel = Ext.extend(BaseForm,{
 			if(feeValue < minfee || feeValue > maxfee){
 				return {
 					isValid: false,
-					msg: "设备费用必须介于"+ minfee +"-" +maxfee +"之间"
+					msg: lbc('msgBox.deviceFeeMustBeBetween', null, [minfee, maxfee])
 				};
 			}
 		}
 		
-		return ExchangeDevicePanel.superclass.doValid.call(this);
+		return true;
 	},
 	getValues : function(){
 		var values = {};
 		values['deviceCode'] = Ext.getCmp('newStbCode').getValue() || Ext.getCmp('newModemCode').getValue();
 		values['userId'] = this.userData['user_id'];
 		values["reasonType"] = Ext.getCmp("reasonId").getValue();
+		// 设备费用
+		var fee = this.currentFeeData;
+		if(fee){
+			values['deviceBuyMode'] = fee['deviceBuyMode'];
+			values["deviceFee.fee_id"] = fee["fee_id"];
+			values["deviceFee.fee_std_id"] = fee["fee_std_id"];
+			values["deviceFee.fee"] =Ext.util.Format.formatToFen(Ext.getCmp("txtFeeEl").getValue());
+		}
 		return values;
 	},
 	success: function(form, resultData){

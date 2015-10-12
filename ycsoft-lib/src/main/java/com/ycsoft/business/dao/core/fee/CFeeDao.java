@@ -56,6 +56,28 @@ public class CFeeDao extends BaseEntityDao<CFee> {
 		return  this.createQuery(FeeDto.class, sql, feeSn).first();
 	}
 	/**
+	 * 按支付编号查询缴费记录
+	 * @param paySn
+	 * @return
+	 * @throws JDBCException 
+	 */
+	public List<FeeDto> queryPayFeeDto(String paySn) throws JDBCException{
+		String sql="select cf.*,fa.prod_sn from c_fee cf left join c_fee_acct fa on fa.fee_sn=cf.fee_sn where cf.pay_sn=? ";
+		return  this.createQuery(FeeDto.class, sql, paySn).list();
+	}
+	/**
+	 * 恢复费用记录的未支付状态
+	 * @param paySn
+	 * @throws JDBCException
+	 */
+	public void updateCFeeToUnPayByPaySn(String paySn) throws JDBCException{
+		String sql="update c_fee set status=? ,pay_type=?,is_doc=decode(is_doc,'N','N','F'), "
+				+" invoice_id=null,invoice_book_id=null,invoice_code=null,pay_sn=null  "
+				+" where pay_sn=? ";
+		this.executeUpdate(sql, StatusConstants.UNPAY,SystemConstants.PAY_TYPE_UNPAY,paySn);
+	}
+	
+	/**
 	 * 更新缴费记录的未支付状态
 	 * @param cust_id
 	 * @param done_code
@@ -114,9 +136,9 @@ public class CFeeDao extends BaseEntityDao<CFee> {
 					" left join t_busi_fee bf on bf.fee_id=cf.fee_id",
 					" left join vew_device_typemodel vdtm on cfb.device_type||'_'||cfb.device_model=vdtm.device_type_model",
 					" left join vew_acctitem atm on atm.acctitem_id=cf.acctitem_id",
-				" where un.cust_id=? and cf.status<> ? ",
+				" where un.cust_id=? and cf.status=? ",
 				" order by cf.create_time ");
-		return this.createQuery(FeeDto.class, sql, cust_id, StatusConstants.INVALID).list();
+		return this.createQuery(FeeDto.class, sql, cust_id, StatusConstants.UNPAY).list();
 	}
 	/**
 	 * 根据业务流水号查询未支付费用信息
@@ -325,14 +347,14 @@ public class CFeeDao extends BaseEntityDao<CFee> {
 	}
 	
 	public List<CFee> querySumFeeByDoneCode(String custId,Integer doneCode, String countyId) throws Exception{
-		String sql = "select fee_type,fee_id,null addr_id,sum(decode(status,'PAY',real_pay,'UNPAY',real_pay,0)) real_pay,sum(fd.buy_num) buy_num" +
+		String sql = "select fee_type,fee_id,fd.fee_std_id,null addr_id,sum(decode(status,'PAY',real_pay,'UNPAY',real_pay,0)) real_pay,sum(fd.buy_num) buy_num" +
 				" from c_fee f,c_fee_device fd " +
 				" where f.fee_sn=fd.fee_sn and f.cust_id=?" +
 				" and f.busi_done_code=? and f.county_id=? and fd.county_id=?" +
 				" and f.fee_type<> ?" +
-				" group by fee_type,f.fee_id" +
+				" group by fee_type,f.fee_id,fd.fee_std_id" +
 				" union all " +
-				"select fee_type,fee_id,max(f.addr_id) addr_id,sum(decode(status,'PAY',real_pay,'UNPAY',real_pay,0)) real_pay,1 buy_num" +
+				"select fee_type,fee_id,null fee_std_id,max(f.addr_id) addr_id,sum(decode(status,'PAY',real_pay,'UNPAY',real_pay,0)) real_pay,1 buy_num" +
 				" from c_fee f,c_fee_busi fd " +
 				" where f.fee_sn=fd.fee_sn and f.cust_id=?" +
 				" and f.busi_done_code=? and f.county_id=? and fd.county_id=?" +
@@ -362,6 +384,14 @@ public class CFeeDao extends BaseEntityDao<CFee> {
 				" and b.fee_id is not null " +
 				" and b.create_done_code = ? and b.county_id=?";
 		return createQuery(CFeeDevice.class,sql,doneCode,countyId).list();
+	}
+	
+	public List<CFeeDevice> queryDeviceByDoneCodeAndFeeStdId(Integer doneCode, String feeId, String feeStdId) throws Exception{
+		String sql = "select * from c_fee_device a,c_fee b " +
+				" where a.fee_sn = b.fee_sn" +
+				" and b.create_done_code = ?" +
+				" and b.fee_id=? and a.fee_std_id=? ";
+		return createQuery(CFeeDevice.class,sql,doneCode, feeId, feeStdId).list();
 	}
 
 	/**
@@ -657,6 +687,30 @@ public class CFeeDao extends BaseEntityDao<CFee> {
 			  "	   and package_sn is not null) and status='UNPAY'";	
 		return createQuery(CFeeAcct.class,sql,custId,custId).list();
 	} 
+	/**
+	 * 提取和工单相关的缴费记录
+	 * a类：所有单产品订单（退订） 、 b类：在工单创建之后订购的套餐（套餐退订）
+	 * @param custId
+	 * @param userIds
+	 * @return
+	 * @throws JDBCException
+	 */
+	public List<CFeeAcct> queryTaskUserUnPayCFeeAcct(String custId,String[] userIds,Integer taskDoneCode) throws JDBCException {
+		String sql = "select a.*,b.prod_sn from c_fee a,c_fee_acct b where a.fee_sn = b.fee_sn "+
+			  "and a.status = 'UNPAY'	and b.prod_sn in ( "+
+				  "	select order_sn "+
+				  "	  from c_prod_order "+
+				  "	 where cust_id = ?  "+
+				  "	   and user_id in ("+sqlGenerator.in(userIds)+") "+
+				  "	   and package_sn is null "+
+				  "	union "+
+				  "	select pak.order_sn "+
+				  "	  from c_prod_order a,c_prod_order pak "+
+				  "	 where a.cust_id = ? "+
+				  "	   and a.user_id in ("+sqlGenerator.in(userIds)+") "+
+				  "	   and a.package_sn=pak.order_sn and pak.done_code>? )";
+		return createQuery(CFeeAcct.class,sql,custId,custId,taskDoneCode).list();
+	}
 	
 	public CFeeAcct queryAcctFeeByOrderSn(String orderSn)throws JDBCException {
 		String sql ="select a.* from c_fee a,c_fee_acct b "

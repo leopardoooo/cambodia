@@ -148,7 +148,7 @@ public class PProdDao extends BaseEntityDao<PProd> {
 		
 		String sql = StringHelper.append("select distinct t.* from p_prod t,p_prod_county t2,P_PROD_TARIFF t3,P_PROD_TARIFF_COUNTY t4 ",
 				" where t.eff_date < SYSDATE AND (t.exp_date IS NULL OR t.exp_date > SYSDATE) and t.prod_id=t2.prod_id and t.prod_id=t3.prod_id and t3.tariff_id=t4.tariff_id",
-				" and t.status = ? and prod_type =? and t2.county_id=? and t4.county_id=? and serv_id =? and ",dataRight);
+				" and t.status = ? and prod_type =? and t2.county_id=? and t4.county_id=? and serv_id =? and ",dataRight," order by t.is_base desc ,t.prod_name desc ");
 		
 		
 		prodList = this.createQuery(sql,StatusConstants.ACTIVE, PROD_TYPE_BASE,

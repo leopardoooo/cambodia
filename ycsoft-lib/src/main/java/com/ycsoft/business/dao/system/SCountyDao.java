@@ -101,9 +101,8 @@ public class SCountyDao extends BaseEntityDao<SCounty> {
 	 */
 	public List<TreeDto> getDeptTreeByDataRight(String dataRight) throws Exception{
 		String sql = StringHelper.append(
-					"select * from ( select dept_id id, dept_pid || '-1' pid, dept_name text from s_dept where " ,dataRight,
-				" union select county_id || '-1' id, '-1' pid, county_name text from s_county where county_id in (select county_id from s_county where " ,dataRight,
-				" )) t  start with t.pid = '-1' connect by prior t.id = t.pid  order by level ");
+				" select *  from (select dept_id id, dept_pid  pid, dept_name text  from s_dept ) t ",
+				" start with t.pid = '-1' connect by prior t.id = t.pid  order by level ");
 	    return createQuery(TreeDto.class,sql).list();
 	}
 	

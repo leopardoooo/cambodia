@@ -24,6 +24,7 @@ PayPanel = Ext.extend( Ext.Panel ,{
 		var bt = langUtils.main("cashPay.pay.buttons");
 		this.paySm = new Ext.grid.CheckboxSelectionModel();
 		//费用表格
+		var cancelText = lbc('common.cancel');
 		this.feeGrid = new Ext.grid.GridPanel({
 			title: langUtils.main('cashPay.pay._stayTitle'),
 			region: 'center',
@@ -32,7 +33,7 @@ PayPanel = Ext.extend( Ext.Panel ,{
 			columns: [
 				this.paySm,
 			    { header: lc[0], width: 50,renderer: function(v , md, record , i  ){
-					return "<DIV><a href='#' onclick=Ext.getCmp('PayPanelId').deletePay()>取消</a></DIV>";
+					return "<DIV><a href='#' onclick=Ext.getCmp('PayPanelId').deletePay()>"+cancelText+"</a></DIV>";
 				}},
 				{ header: lc[1], dataIndex: 'busi_name', width: 80},
 				{ header: lc[2], dataIndex: 'fee_text',width: 120, renderer:App.qtipValue},
@@ -42,7 +43,8 @@ PayPanel = Ext.extend( Ext.Panel ,{
 				{ header: lc[6], dataIndex: 'buy_num', width: 70},
 				{ header: lc[7], dataIndex: 'create_time', width: 130},
 				{ header: lc[8], dataIndex: 'fee_sn', width: 80},
-				{ header: lc[9], dataIndex: 'create_done_code', width: 80}
+				{ header: lc[9], dataIndex: 'create_done_code', width: 80},
+				{ header: lc[9], dataIndex: 'optr_name', width: 80}
 				
 			],
 			ds: this.feeStore,
@@ -70,7 +72,8 @@ PayPanel = Ext.extend( Ext.Panel ,{
 				{ header: lc[6], dataIndex: 'buy_num', width: 70},
 				{ header: lc[7], dataIndex: 'create_time', width: 130},
 				{ header: lc[8], dataIndex: 'fee_sn', width: 80},
-				{ header: lc[9], dataIndex: 'create_done_code', width: 80}
+				{ header: lc[9], dataIndex: 'create_done_code', width: 80},
+				{ header: lc[9], dataIndex: 'optr_name', width: 80}
 				
 			],
 			ds: this.realFeeStore,
@@ -95,8 +98,8 @@ PayPanel = Ext.extend( Ext.Panel ,{
 						layout: 'border',
 						items: [this.feeGrid ],
 						bbar:['-',
-							{text: '确认', iconCls: 'icon-confirm', scope:this, handler: this.doConfirm},'-',
-							{text: '移除', iconCls: 'icon-del', scope:this, handler: this.doDelete},'-']
+							{text: lbc('common.confirm'), iconCls: 'icon-confirm', scope:this, handler: this.doConfirm},'-',
+							{text: lbc('common.remove'), iconCls: 'icon-del', scope:this, handler: this.doDelete},'-']
 					},
 					{
 						region: 'south',
@@ -169,7 +172,7 @@ PayPanel = Ext.extend( Ext.Panel ,{
 				this.realFeeStore.removeAll();
 				this.feeStore.add(records);
 			}else{
-				var recordArray = this.getSameTypeProd(this.feeStore, records);
+				var recordArray = this.getSameTypeProd(this.realFeeStore, records);
 				this.realFeeStore.remove(recordArray);
 				this.feeStore.add(recordArray);
 			}
@@ -188,7 +191,7 @@ PayPanel = Ext.extend( Ext.Panel ,{
 	},
 	doRealRowClick: function(grid, rowIndex){
 		var record = this.realFeeStore.getAt(rowIndex);
-		if(this.realFeeStore.indexOf(record) > 0)
+		if(this.feeStore.indexOf(record) > 0)
 			return;
 		var recordArray = this.getSameTypeProd(this.realFeeStore, record);
 		
@@ -202,8 +205,15 @@ PayPanel = Ext.extend( Ext.Panel ,{
 			dollar += record.get('real_pay');
 		}, this);
 		dollar = dollar / 100.0;
+		
+		var arr = dollar.toString().split('.'), jy = 0;
+		if(arr.length > 1){
+			dollar = parseInt(arr[0]);
+			jy = parseFloat('0.'+arr[1]);
+		}
+		
 		Ext.getCmp("nfDollar").setValue(dollar);
-		Ext.getCmp("nfJianYuan").setValue(0);
+		Ext.getCmp("nfJianYuan").setValue(Ext.util.Format.round(jy * this.feeData["EXC"], 2));
 		var substrIndex = 1, append = "";
 		if(dollar < 0){
 			substrIndex = 2;
@@ -237,13 +247,15 @@ PayPanel = Ext.extend( Ext.Panel ,{
 						recordArray.push(r);
 					}
 				}, this);
-			}else{
+			}else if(prodId){
 				//相同用户相同产品必须一起支付
 				store.each(function(r){
 					if(userId == r.get('user_id') && prodId == r.get('acctitem_id')){
 						recordArray.push(r);
 					}
 				}, this);
+			}else{
+				recordArray.push(record);
 			}
 		}, this);
 		
@@ -270,24 +282,33 @@ PayPanel = Ext.extend( Ext.Panel ,{
 				async : false,
 				success: function(res, ops){
 					info = Ext.decode(res.responseText);
-					if(!flag){
-						this.loadBaseData();
-						App.getApp().refreshPayInfo(parent);
-						App.getApp().main.infoPanel.getPayfeePanel().acctFeeGrid.remoteRefresh();
-						App.getApp().main.infoPanel.getPayfeePanel().busiFeeGrid.remoteRefresh();
-						App.getApp().main.infoPanel.getDoneCodePanel().doneCodeGrid.remoteRefresh();
-						this.realFeeStore.each(function(record){
-							if(record.get('fee_sn') == rec.get('fee_sn')){
-								this.realFeeStore.remove(record);
-								return false;
-							}
-						},this);
+					
+					if(info['success']== false &&info['exception']){
+//						info = info['exception']['content'];
+					}else{
+						if(!flag){
+							this.loadBaseData();
+							App.getApp().refreshPayInfo(parent);
+							App.getApp().refreshPanel('1113');
+							this.realFeeStore.each(function(record){
+								if(record.get('fee_sn') == rec.get('fee_sn')){
+									this.realFeeStore.remove(record);
+									return false;
+								}
+							},this);
+						}
 					}
 				}
 			});
 			return info;
 		}
-		Confirm( func(true), this ,function(){
+		
+		var msg = func(true);
+		if(msg['success']== false && msg['exception']){
+			Alert(msg['exception']['content']);
+			return false;
+		}
+		Confirm( msg, this ,function(){
 			func(false);
 		});
 	},
@@ -314,7 +335,6 @@ PayPanel = Ext.extend( Ext.Panel ,{
 				feeSns.push(record.get('fee_sn'));
 			},this);
 			params['feeSn'] = feeSns;
-			console.log(feeSns);
 			
 			var mb = Show();
 			//提交
@@ -349,6 +369,8 @@ PayPanel = Ext.extend( Ext.Panel ,{
 		return 0;
 	},
 	success:function(){
+		App.getApp().main.infoPanel.getUserPanel().refresh();
+		App.getApp().main.infoPanel.getPayfeePanel().feePayGrid.remoteRefresh();
 		App.getApp().data.currentResource = {busicode:'1068'};//打印业务编号
 		App.getApp().menu.bigWindow.show({ text: '发票打印',  attrs: {busiCode:'8888',
 					url: 'pages/business/pay/Print.jsp?type=through'}} ,{width: 710, height: 460});

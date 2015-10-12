@@ -88,7 +88,7 @@ var BackHouseGrid = Ext.extend(Ext.grid.GridPanel,{
 	            }),'-','->','-',
 				{text:BH_LU.fileOutput,iconCls:'icon-excel',scope:this,handler:this.fileBack},'-',
 				{text:BH_LU.manualOutput,iconCls:'icon-hand',scope:this,handler:this.handBack},'-',
-				{text:BH_LU.materalOutPut,iconCls:'icon-batch-number',scope:this,handler:this.materalBack}
+				{text:BH_LU.materalOutPut,iconCls:'icon-hand',scope:this,handler:this.materalBack}
 			],
 			bbar : new Ext.PagingToolbar({
 										store : this.backHouseGridStore,
@@ -164,66 +164,24 @@ var MateralBackDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 		this.parent = parent;
 		materalThat = this;
 		this.materalStore = new Ext.data.JsonStore({
+			url:'resource/Device!queryMateralTransferDeviceByDepotId.action',
 			fields:['device_model','device_type','device_model_text',
 				'device_type_text','total_num','num','device_id']
 		});	
-		
-		doDel = function(){
-			Confirm(MSG_LU.confirmDelete,this,function(){
-				materalThat.getStore().remove(materalThat.getSelectionModel().getSelected());
-			});
-		};
 		var cm = new Ext.grid.ColumnModel([
-				{id:'device_type_text_id',header:DEV_COMMON_LU.labelDeviceType,dataIndex:'device_type_text',width:80,editor:new Ext.form.ComboBox({
-					store:new Ext.data.JsonStore({
-						fields:['device_type_text','device_type','materialList']
-					}),displayField:'device_type_text',valueField:'device_type_text',triggerAction:'all',mode: 'local'
-					,listeners:{
-						scope:this,
-						select:function(combo,record){
-							this.getSelectionModel().getSelected().set('device_type',record.get('device_type'));
-							var model = record.get('materialList');
-							if(model.length == 1){
-								this.getSelectionModel().getSelected().set('device_model_text',model[0]['device_model_text']);
-								this.getSelectionModel().getSelected().set('device_model',model[0]['device_model']);
-								this.getSelectionModel().getSelected().set('total_num',model[0]['total_num']);
-								this.getSelectionModel().getSelected().set('device_id',model[0]['device_id']);
-							}else{
-								this.getSelectionModel().getSelected().set('device_model_text','');
-								this.getSelectionModel().getSelected().set('device_model','');
-								this.getSelectionModel().getSelected().set('total_num','');
-								this.getSelectionModel().getSelected().set('device_id','');
-							}
-						}
-					}
-				})},
-				{id:'device_model_text_id',header:DEV_COMMON_LU.labelDeviceModel,dataIndex:'device_model_text',width:120,editor:new Ext.form.ComboBox({
-					store:new Ext.data.JsonStore({
-						fields:['device_model_text','device_model','total_num','device_id']
-					}),displayField:'device_model_text',valueField:'device_model_text',triggerAction:'all',mode: 'local'
-					,listeners:{
-						scope:this,
-						select:function(combo,record){
-							this.getSelectionModel().getSelected().set('device_model',record.get('device_model'));
-							this.getSelectionModel().getSelected().set('total_num',record.get('total_num'));
-							this.getSelectionModel().getSelected().set('device_id',record.get('device_id'));
-						}
-					}
-				})},
+				{id:'device_model_text_id',header:DEV_COMMON_LU.labelDeviceType,dataIndex:'device_model_text',width:300
+				},
 				{header:DEV_COMMON_LU.labelTotalStoreNum,dataIndex:'total_num',width:70,renderer:App.qtipValue},
 				{id:'num_id',header:DEV_COMMON_LU.labelNum,dataIndex:'num',width:100,
 					scope:this
 					,editor: new Ext.form.NumberField({
 						allowDecimals:false,//不允许输入小数 
 		    			allowNegative:false,
-		    			minValue:1//enableKeyEvents: true,
+		    			minValue:0//enableKeyEvents: true,
 					})
 				},
 				{header:DEV_COMMON_LU.labelDevCode,dataIndex:'device_id',hidden:true},
-				{header:DEV_COMMON_LU.labelDeviceTypeCode ,dataIndex:'device_type',hidden:true},
-				{header:COMMON_LU.doActionBtn,dataIndex:'',width:40,renderer:function(value,metavalue,record,i){
-					return "<a href='#' onclick=doDel()>" + COMMON_LU.remove + "</a>";
-				}}
+				{header:DEV_COMMON_LU.labelDeviceTypeCode ,dataIndex:'device_type',hidden:true}
 			]
 		);
 		cm.isCellEditable = this.cellEditable;
@@ -243,21 +201,7 @@ var MateralBackDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 	},//是否可编辑
 	cellEditable:function(colIndex,rowIndex){
 		var record = materalThat.getStore().getAt(rowIndex);//当前编辑行对应record
-		if(colIndex == this.getIndexById('device_type_text_id')){
-			var store = this.getCellEditor(colIndex,rowIndex).field.getStore();
-			store.removeAll();//清空上一次选中行中 该列的数据
-			var data =  Ext.getCmp('MateralBackDeviceGridId').remoteData;
-			var arr = [];
-			for(var i= 0;i < data.length; i++){
-				arr.push(data[i]);
-			}
-			store.loadData(arr);
-		}else if(colIndex == this.getIndexById('device_model_text_id')){
-			if(Ext.isEmpty(record.get('device_type_text'))){
-				return false;
-			}
-			
-		}else if(colIndex == this.getIndexById('num_id')){
+		if(colIndex == this.getIndexById('num_id')){
 			if(Ext.isEmpty(record.get('device_model_text'))){
 				return false;
 			}
@@ -286,7 +230,6 @@ var MateralBackDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 	            this.view.mainWrap.dom.style.left = "0px"; 
 	        }, this); 
         }
-          
 	},
 	beforeedit:function(obj){
 	
@@ -294,24 +237,15 @@ var MateralBackDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 	afterEdit:function(obj){
 		var record = obj.record;
 		var fieldName = obj.field;//编辑的column对应的dataIndex
-		var value = obj.value;
-		if(fieldName == 'device_type_text'){
-			var typeStore = this.getColumnModel().getColumnById('device_type_text_id').editor.getStore();
-			var indexe = typeStore.find('device_type',record.get('device_type'));
-			var data = typeStore.getAt(indexe).get('materialList');
-			var arr = [];
-			Ext.each(data,function(d){
-				arr.push(d);
-			});
-			var store = this.getColumnModel().getColumnById('device_model_text_id').editor.getStore();
-			store.loadData(arr);
-		}else if(fieldName == 'num'){
+		var value = obj.value; 
+		if(fieldName == 'num'){
 			if(value >record.get('total_num')){
 				record.set('num','');
 				Confirm(MSG_LU.tipOutOfStock,this,function(){
 					materalThat.startEditing(obj.row,obj.column);
 				});
 			}
+			record.set('num',parseInt(value));
 		}
 	},
 	doAdd:function(){
@@ -328,13 +262,47 @@ var MateralBackDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 	}
 });
 
+var BackMateralForm = Ext.extend(Ext.form.FormPanel,{
+	constructor:function(){
+		BackHandForm.superclass.constructor.call(this,{
+			labelWidth: 80,
+			height:155,
+			region:'north',
+			fileUpload: true,
+			bodyStyle:'padding-top:10px',
+			defaults:{
+				baseCls:'x-plain'
+			},
+			items:[
+				outputNo,
+				backSupplierCombo,
+				outputType,
+				backRemark
+			]
+		});
+	},
+	initComponent:function(){
+		BackMateralForm.superclass.initComponent.call(this);
+		
+		App.form.initComboData( this.findByType("paramcombo"));
+		
+		var comboes = this.findByType('combo');
+		if(comboes.length>0)
+			for(var i=0;i<comboes.length;i++){
+				if(!(comboes[i] instanceof Ext.ux.ParamCombo)){
+					comboes[i].getStore().load();	
+				}
+			}
+			
+	}
+});
 
-//器材调拨
+//器材退库
 BackMateralWin = Ext.extend(Ext.Window,{
 	handForm:null,
 	queryDeviceGrid:null,
 	constructor:function(){
-		this.handForm = new BackHandForm();
+		this.handForm = new BackMateralForm();
 		this.queryDeviceGrid = new MateralBackDeviceGrid();
 		BackMateralWin.superclass.constructor.call(this,{
 			id : 'backMateralWinId',
@@ -362,13 +330,7 @@ BackMateralWin = Ext.extend(Ext.Window,{
 	},
 	show:function(){
 		BackMateralWin.superclass.show.call(this);
-		var that = this;
-		Ext.Ajax.request({
-			url:'resource/Device!queryMateralTransferDeviceByDepotId.action',
-			success: function(res, ops){
-				that.queryDeviceGrid.remoteData = Ext.decode(res.responseText);
-			}
-		});
+		this.queryDeviceGrid.materalStore.load();
 	},
 	doSave:function(){
 		var form = this.handForm.getForm();
@@ -378,31 +340,16 @@ BackMateralWin = Ext.extend(Ext.Window,{
 		this.queryDeviceGrid.stopEditing();
 		
 		var store = this.queryDeviceGrid.getStore();
-		
-		var arrCode = [];
-		for(var i=0;i<store.getCount();i++){
-			var data = store.getAt(i).data;
-			if(data['device_id']){
-				//过滤掉重复调拨的设备
-				if(arrCode.indexOf(data['device_id']) >=0){
-					Alert(MSG_LU.tipHasSameMateral);
-					return ;
-				}
-				if(Ext.isEmpty(data['num'])){
-					Alert(MSG_LU.tipOutputNumCantBeEmpty);
-					return;
-				}
-				arrCode.push(data);
-			}
-		}
 		var arr = [];//只传递device_id到后台
-		Ext.each(arrCode,function(d){
-			var obj = {};
-			obj['device_id'] = d['device_id'];
-			obj['device_type'] = d['device_type'];
-			obj['device_model'] = d['device_model'];
-			obj['total_num'] = d['num'];
-			arr.push(obj);
+		store.each(function(record){
+			if(!Ext.isEmpty(record.get('num'))  && record.get('num')>0){
+				var obj = {};
+				obj['device_id'] = record.get('device_id');
+				obj['device_type'] = record.get('device_type');
+				obj['device_model'] = record.get('device_model');
+				obj['total_num'] = record.get('num');
+				arr.push(obj);
+			}
 		});
 		
 		if(arr.length === 0){
@@ -441,7 +388,7 @@ var BackFileForm = Ext.extend(Ext.form.FormPanel,{
 		BackFileForm.superclass.constructor.call(this,{
 			id:'backFileFormId',
 			border:false,
-			labelWidth: 70,
+			labelWidth: 80,
 			layout : 'column',
 			fileUpload: true,
 			bodyStyle:'padding-top:10px',
@@ -449,18 +396,22 @@ var BackFileForm = Ext.extend(Ext.form.FormPanel,{
 				baseCls:'x-plain'
 			},
 			items:[{
-				columnWidth:.5,layout:'form',
+				columnWidth:.45,layout:'form',
 				items:[
 					outputNo,
 					backSupplierCombo
 				]},
-				{columnWidth:.5,layout:'form',
+				{columnWidth:.55,layout:'form',
 					items:[
-						backDeviceType,
-						outputType
+						backDeviceType
+						,outputType
 					]
 				},{columnWidth:1,layout:'form',
-					items:[
+					items:[{
+			                xtype: 'displayfield',
+			                width : 400,
+			                value:"<font style='font-size:14px;color:red'>支持xls和txt,格式为：第一行为空,共1列：设备号</font>"
+						},
 						{id:'backHouseFileId',fieldLabel:DEV_COMMON_LU.labelDevFile,name:'files',xtype:'textfield',inputType:'file',allowBlank:false,anchor:'95%'},//,width:367},
 						backRemark
 				]}
@@ -469,9 +420,8 @@ var BackFileForm = Ext.extend(Ext.form.FormPanel,{
 	},
 	initComponent:function(){
 		BackFileForm.superclass.initComponent.call(this);
-		
 		App.form.initComboData( this.findByType("paramcombo"));
-		
+
 		var comboes = this.findByType('combo');
 		if(comboes.length>0)
 			for(var i=0;i<comboes.length;i++){
@@ -496,8 +446,8 @@ var BackFileWin = Ext.extend(Ext.Window,{
 			title:BH_LU.fileOutput,
 			closeAction:'hide',
 			maximizable:false,
-			width: 450,
-			height: 230,
+			width: 600,
+			height: 300,
 			layout: 'fit',
 			border: false,
 			items:[this.fileForm],
@@ -516,17 +466,17 @@ var BackFileWin = Ext.extend(Ext.Window,{
 	},
 	doSave:function(){
 		if(this.fileForm.getForm().isValid()){
-			
 			var file = Ext.getCmp('backHouseFileId').getValue();
-			var flag = checkFileType(file);
-			if(!flag)return;
-			
+			var flag = checkTxtXlsFileType(file);
+			if(flag === false)return;
+			var msg = Show();
 			this.fileForm.getForm().submit({
-				url:'resource/Device!saveDeviceOutputFile.action',
-				waitTitle:COMMON_LU.tipTxt,
-				waitMsg:COMMON_LU.waitForUpload,
+				url:'resource/Device!saveDeviceOutputFile.action?fileType='+flag,
+//				waitTitle:COMMON_LU.tipTxt,
+//				waitMsg:COMMON_LU.waitForUpload,
 				scope:this,
 				success:function(form,action){
+					msg.hide();
 					var data = action.result;
 					if(data.success == true){
 						if(data.msg){//错误信息
@@ -719,7 +669,7 @@ var BackHandWin = Ext.extend(Ext.Window,{
 			success:function(res,opt){
 				msg.hide();
 				msg = null;
-				Alert(MSG_LU.addSuccess,function(){
+				Alert(COMMON_LU.addSuccess,function(){
 					this.hide();
 					Ext.getCmp('backHourseGridId').getStore().reload();
 				},this);
@@ -736,10 +686,10 @@ var OutputNoWin = Ext.extend(Ext.Window, {
 			closeAction:'hide',
 			border:false,
 			maximizable:false,
-			width: 330,
-			height: 250,
+			width: 400,
+			height: 300,
 			items:[{id:'outputNoFormId',xtype:'form',border:false,
-				bodyStyle:'padding-top:10px',labelWidth:65,items:[
+				bodyStyle:'padding-top:10px',labelWidth:80,items:[
 					{xtype:'hidden',name:'deviceDoneCode'},
 					{xtype:'textfield',fieldLabel:DEV_COMMON_LU.labelNewOrderNo,width:200,name:'outputNo',vtype:'alphanum',allowBlank:false},
 					{fieldLabel:COMMON_LU.remarkTxt,name:'remark',maxLength:128,xtype:'textarea',width : 210,height : 140}//128个汉字
