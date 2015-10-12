@@ -432,9 +432,9 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 					if(StringHelper.isEmpty(user.getDevice_model()) && StringHelper.isNotEmpty(user.getStr3())){
 						user.setDevice_model(user.getStr3());
 						if(user.getUser_type().equals(SystemConstants.USER_TYPE_BAND)){
-							task.setDevice_model_text( MemoryDict.getTransName(DictKey.MODEM_MODEL, user.getStr3()) );
+							task.setDevice_model_text( MemoryDict.getDictName(DictKey.MODEM_MODEL, user.getStr3()) );
 						}else{
-							task.setDevice_model_text( MemoryDict.getTransName(DictKey.STB_MODEL, user.getStr3()) );
+							task.setDevice_model_text( MemoryDict.getDictName(DictKey.STB_MODEL, user.getStr3()) );
 						}
 					}
 				}
@@ -488,9 +488,9 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 				if(StringHelper.isEmpty(user.getDevice_model()) && StringHelper.isNotEmpty(user.getStr3())){
 					user.setDevice_model(user.getStr3());
 					if(user.getUser_type().equals(SystemConstants.USER_TYPE_BAND)){
-						task.setDevice_model_text( MemoryDict.getTransName(DictKey.MODEM_MODEL, user.getStr3()) );
+						task.setDevice_model_text( MemoryDict.getDictName(DictKey.MODEM_MODEL, user.getStr3()) );
 					}else{
-						task.setDevice_model_text( MemoryDict.getTransName(DictKey.STB_MODEL, user.getStr3()) );
+						task.setDevice_model_text( MemoryDict.getDictName(DictKey.STB_MODEL, user.getStr3()) );
 					}
 				}
 			}

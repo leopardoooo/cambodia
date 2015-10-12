@@ -345,14 +345,14 @@ public class UserComponent extends BaseBusiComponent {
 				if(StringHelper.isEmpty(userdto.getDevice_model()) && StringHelper.isNotEmpty(user.getStr3())){
 					userdto.setDevice_model(user.getStr3());
 					if(user.getUser_type().equals(SystemConstants.USER_TYPE_BAND)){
-						userdto.setDevice_model_text( MemoryDict.getTransName(DictKey.MODEM_MODEL, user.getStr3()) );
+						userdto.setDevice_model_text( MemoryDict.getDictName(DictKey.MODEM_MODEL, user.getStr3()) );
 					}else{
-						userdto.setDevice_model_text( MemoryDict.getTransName(DictKey.STB_MODEL, user.getStr3()) );
+						userdto.setDevice_model_text( MemoryDict.getDictName(DictKey.STB_MODEL, user.getStr3()) );
 					}
 				}
 				if(StringHelper.isEmpty(userdto.getBuy_model()) && StringHelper.isNotEmpty(user.getStr10())){
 					userdto.setBuy_model(user.getStr10());
-					userdto.setBuy_model_text( MemoryDict.getTransName(DictKey.DEVICE_BUY_MODE, user.getStr10()) );
+					userdto.setBuy_model_text( MemoryDict.getDictName(DictKey.DEVICE_BUY_MODE, user.getStr10()) );
 				}
 			}
 			

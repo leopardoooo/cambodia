@@ -461,7 +461,7 @@ CustBaseForm = Ext.extend( BaseForm , {
 		this.linkPanel = new LinkPanel(this);
 		CustBaseForm.superclass.constructor.call(this, {
 			trackResetOnLoad:true,
-			labelWidth: 75,
+			labelWidth: 85,
 			bodyStyle: Constant.TAB_STYLE,
 			items:[{
 				layout:'column',
@@ -471,7 +471,7 @@ CustBaseForm = Ext.extend( BaseForm , {
 					baseCls: 'x-plain',
 					columnWidth:0.5,
 					layout: 'form',
-					labelWidth: 75
+					labelWidth: 85
 				},
 				items: [{
 					items:[{
