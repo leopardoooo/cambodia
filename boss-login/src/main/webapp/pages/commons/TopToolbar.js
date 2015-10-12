@@ -373,7 +373,7 @@ TopToolbar = Ext.extend(Ext.Toolbar , {
 			win = new Ext.Window({
 				id: 'taskManagerWinId',
 				title: lbc('home.tools.TaskManager._title'),
-				width: 900,
+				width: 980,
 				height: 520,
 				border: false,
 				closeAction:'hide',

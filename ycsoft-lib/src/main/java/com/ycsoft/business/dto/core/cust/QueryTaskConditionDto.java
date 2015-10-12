@@ -19,9 +19,16 @@ public class QueryTaskConditionDto {
 	private String custName;
 	private String addrIds;
 	private String zteStatus;
+	private String syncStatus;
 	
 	
 	
+	public String getSyncStatus() {
+		return syncStatus;
+	}
+	public void setSyncStatus(String syncStatus) {
+		this.syncStatus = syncStatus;
+	}
 	public String getZteStatus() {
 		return zteStatus;
 	}

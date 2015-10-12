@@ -12,6 +12,7 @@ import com.ycsoft.business.commons.pojo.BusiParameter;
 import com.ycsoft.business.dto.core.prod.DisctFeeDto;
 import com.ycsoft.business.service.impl.QueryUserService;
 import com.ycsoft.business.service.impl.UserService;
+import com.ycsoft.business.service.impl.UserServiceSN;
 
 /**
  * @author liujiaqi
@@ -22,7 +23,7 @@ public class UserServiceExternal extends ParentService implements
 
 	public void saveStop(BusiParameter p, String effectiveDate, int tjFee)
 			throws Exception {
-		UserService userService = (UserService) getBean(UserService.class, p);
+		UserServiceSN userService = (UserServiceSN) getBean(UserServiceSN.class, p);
 		userService.saveStop(effectiveDate, tjFee);
 	}
 

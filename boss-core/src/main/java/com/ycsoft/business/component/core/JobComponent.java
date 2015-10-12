@@ -236,6 +236,10 @@ public class JobComponent  extends BaseBusiComponent {
 		return jUserStopDao.queryStopByUserId(userId);
 	}
 	
+	public List<JUserStop> queryStopByCustId(String custId)throws Exception{
+		return jUserStopDao.queryStopByCustId(custId);
+	}
+	
 	public void cancelStopUser(String[] userall)throws Exception{
 		 jUserStopDao.cancelStopUser(userall);
 	}
