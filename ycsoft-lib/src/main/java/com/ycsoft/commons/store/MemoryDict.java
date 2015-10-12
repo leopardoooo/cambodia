@@ -83,11 +83,6 @@ public class MemoryDict {
 		return getLanguageData(dataTrans);
 	}
 	
-	public static String getTransName(Object key, String value) {
-		String itemName = getDictName(key, value);
-		return getTransData(itemName);
-	}
-	
 	private static SItemvalue createItemvalue(SItemvalue s){
 		SItemvalue itemvalue = new SItemvalue();
 		itemvalue.setItem_desc(s.getItem_desc());

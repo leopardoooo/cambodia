@@ -253,9 +253,9 @@ PropChangeGrid = Ext.extend(Ext.grid.GridPanel,{
 		}); 
 		var lu = langUtils.main("cust.change.columns");
 		var cm = [
-			{header:lu[0], dataIndex:'column_name_text',width:100},
-			{header:lu[1], dataIndex:'old_value_text',width:230},
-			{header:lu[2], dataIndex:'new_value_text',width:230},
+			{header:lu[0], dataIndex:'column_name_text',width:120, renderer:App.qtipValue},
+			{header:lu[1], dataIndex:'old_value_text',width:230, renderer:App.qtipValue},
+			{header:lu[2], dataIndex:'new_value_text',width:230, renderer:App.qtipValue},
 			{header:lu[3], dataIndex:'change_time',width:130}
 		];
 		var pageTbar = new Ext.PagingToolbar({store: this.propChangeStore ,pageSize : App.pageSize});

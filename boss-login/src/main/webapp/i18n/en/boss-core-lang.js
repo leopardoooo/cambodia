@@ -95,13 +95,13 @@ BCLang.home = {
 		},
 		// customer page
 		cust: {
-			base: {_title: "Basic Information~",name: "Customer Name~",busiId: "Customer No.~",openDate: "Open Account Date~",addr: "Address~",status: "Customer Status~",
-				type: "Customer Type",certType: "ID Type~",certNum: "ID No.~",linkMan: "Contact~",tel: "mobile phone number1~",barthday: "Birthday~",
-				mobile: "mobile phone number2~",areaCateory: "Area Community~",houseNetType: "service Type~",houseManager: "Community Customer Manager~",
+			base: {_title: "Basic Information~",name: "CustName~",busiId: "CustNo.~",openDate: "Open Account Date~",addr: "Address~",status: "CustStatus~",
+				type: "CustType",certType: "ID Category~",certNum: "IDNo.~",linkMan: "Contact~",tel: "Mobile Phone1~",barthday: "Birthday~",
+				mobile: "Mobile Phone2~",areaCateory: "Area Community~",houseNetType: "ServiceType~",houseManager: "Community Customer Manager~",
 				houseOptr: "Community Maintenance Staff~",postalAddr: "PostAddress", remark: "Remark~",
-				email: "email~", sex: "sex~",postcode: 'postcode~', blackList: 'black list~',
-				agentName: "Agent~", deptName: "Open Account Department~", developName: "Developer", BusinessLicence: "Business License~", unitNumber: "Unit Taxation Number~",
-				spkgSn: "Agreement No.~", cust_level: "Customer Level~",switchCustTitle: 'Select Customer~', languageType: 'Service language~', unitName: 'Subordinate unit~'
+				email: "Email~", sex: "Sex~",postcode: 'Postcode~', blackList: 'BlackList~',
+				agentName: "Agent~", deptName: "Open Account Department~", developName: "Developer", businessLicence: "Business License~", unitNumber: "Unit Taxation Number~",
+				spkgSn: "AgreementNo.~", cust_level: "CustLevel~",switchCustTitle: 'Select Customer~', languageType: 'Service Language~', unitName: 'Subordinate unit~'
 			},
 			_form: {
 				thinkCust: 'Intending Customer~',
@@ -156,9 +156,9 @@ BCLang.home = {
 		// Customer Page
 		user: {
 			base:{
-				type: 'Service Type', name: ' Terminal Name', status: 'Status~', statusTime: ' Status Time~',
-				stbId: 'Set-Top Box~', cardId: 'Smart Card~', modem: 'Modem No.~', createTime: 'Create Time~',
-				loginName: 'Account~', terminal: 'Terminal Type~', deviceModel: 'Equipment Type~', buyWay: 'Buy Way~',
+				type: 'ServiceType', name: ' TerminalName', status: 'Status~', statusTime: 'StatusTime~',
+				stbId: 'STB~', cardId: 'CARD~', modem: 'MODEM~', createTime: 'CreateTime~',
+				loginName: 'Account~', terminal: 'Terminal Type~', deviceModel: 'Equipment Type~', buyWay: 'BuyWay~',
 				stopDate: 'Termination Pre-Report Time~', stopType: 'Calling Fee Type~', protocolDate: 'Agreement Date~', 
 				str4: 'IP Adress~',str6: 'IP Fee Amount~'
 			},
@@ -211,8 +211,8 @@ BCLang.home = {
 				transferInfo: 'transferable~',
 				stdId: 'STP No.~',
 				stdModel: ' STP Type~',
-				newStdId: 'New Set-Top Box No.~',
-				newStdModel: 'New Set-Top Box Type~',
+				newStdId: 'New STB No.~',
+				newStdModel: 'New STB Type~',
 				modemId: 'Modem No.~',
 				modemModel: 'Modem Type~',
 				newModemId: 'New Modem No.~',
@@ -403,8 +403,8 @@ BCLang.home = {
             labelCardModel:'Martching CardType~',
             labelModemNo:' Matching MODEM No.~',
             labelModemModel:' Matching MODEM Type~',
-            labelStbNo:' Matching Set-Top Box No.~',
-            labelStbModel:' Matching Set-Top Box Type~',
+            labelStbNo:' Matching STBNo.~',
+            labelStbModel:' Matching STB Type~',
             tipDevNotExists:'Inquiry Equipment does not exist!~'
 			
 		},
@@ -672,8 +672,8 @@ BCLang.msgBox = {
 	
 	freeUsersOver2:"Free Terminals cannot be more than 2~",
 	
-	singleInteractiveDevCantOpenDuplex:'This User’s Set-Top Box is one-way，cannot open two-way~',
-	custMustHaveDuplexDev:'User must have two-way Set-Top Box~',
+	singleInteractiveDevCantOpenDuplex:'This User’s STB is one-way，cannot open two-way~',
+	custMustHaveDuplexDev:'User must have two-way STB~',
 	
 	needCancelProgramFirst:'User has interactive TV Product，Please unsubscribe and then operate!~',
 	confirmCancelDuplex:"Sure to cancel two-way?~",
@@ -716,8 +716,8 @@ BCLang.msgBox = {
 	
 	notChooseDeviceMustBeInput: 'When backfilling construction is not selected for equipment，the equipment code must be input!~',
 	noChargeNumber: 'Fee No. does not exist!~',
-	singleStbNotSupDTT: 'This Equipment is one-way Set-Top Box，Do not support current OTT Type!~',
-	doubleStbNotSupOTT: 'This Equipment is two-way Set-Top Box, do not support current DTT Type!~',
+	singleStbNotSupDTT: 'This Equipment is one-way STB，Do not support current OTT Type!~',
+	doubleStbNotSupOTT: 'This Equipment is two-way STB, do not support current DTT Type!~',
 	modemNotSupUserType: 'Equipment为Modem，Do not support selected[{0}]User Type!~',
 	currDeviceNotSupUserType: 'This Equipment do not support current User Type!~',
 	deviceFeeMustBeBetween:'Equipment Fee must be between [{0}]-[{1}]!~',
