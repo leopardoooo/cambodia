@@ -39,7 +39,7 @@ public class BOSSWebServiceTestMain {
 			
 			WorkOrderResp arg=new WorkOrderResp();
 			// 工单编号
-			arg.setOrderNo("123");
+			arg.setOrderNo("10003315");
 	    	// 完工类型
 	    	arg.setRespType("QC");
 	    	// 回执消息, 如果失败的情况

@@ -9,7 +9,9 @@ package com.sysway.outwardtps.service.cfocn;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.ycsoft.beans.system.SOptr;
 import com.ycsoft.beans.task.TaskFillDevice;
+import com.ycsoft.business.commons.pojo.BusiParameter;
 import com.ycsoft.business.service.impl.SnTaskService;
 
 /**
@@ -59,6 +61,7 @@ public class BOSSWebServiceSoapImplServiceSkeleton
     	
     	try{
     		// 调用boss接口完成工单
+    		snTaskService.setParam(getServiceParam());
     		snTaskService.finishTask(taskId, resultType,msg,false);
     		// 返回成功的结果
     		return createReturnWorkOrderResponse(createResultHeadForSuccess());
@@ -69,6 +72,17 @@ public class BOSSWebServiceSoapImplServiceSkeleton
     	}
     }
     
+    private BusiParameter getServiceParam(){
+    	SOptr optr=new SOptr();
+    	optr.setOptr_id("249");
+    	optr.setLogin_name("jgsg001");
+    	optr.setDept_id("3");
+    	optr.setCounty_id("4501");
+    	optr.setArea_id("4500");
+    	BusiParameter busiParameter=new BusiParameter();
+    	busiParameter.setOptr(optr);
+    	return busiParameter;
+    }
     private ReturnWorkOrderResponseE createReturnWorkOrderResponse(ResultHead head){
     	ReturnWorkOrderResponseE response = new ReturnWorkOrderResponseE();
     	
@@ -128,6 +142,7 @@ public class BOSSWebServiceSoapImplServiceSkeleton
     	}
     	
     	try {
+    		snTaskService.setParam(getServiceParam());
 			snTaskService.fillTask(taskId, devices);
 			return createDeviceFeedBackResponse(createResultHeadForSuccess());
 		} catch (Exception e) {
