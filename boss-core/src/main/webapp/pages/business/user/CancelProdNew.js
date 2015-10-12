@@ -105,11 +105,11 @@ CancelProdGrid = Ext.extend(Ext.grid.GridPanel,{
 	},
 	doLoadResult:function(){
 		//普通退订 需要全选，高级退订可以自由选择
-		if(this.busiCode == '1027'){
+//		if(this.busiCode == '1027'){
 			var mod = this.getSelectionModel();
 			mod.selectAll();
 			mod.lock();
-		}
+//		}
 	}	
 	
 })

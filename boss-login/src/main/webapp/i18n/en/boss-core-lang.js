@@ -526,7 +526,8 @@ BCLang.home = {
 				finishType : 'completion type~',
 				finishExplan : 'completed Description~',
 				zteStatus	: 'ZTE status~',
-				zteRemark :'remark~'
+				zteRemark :'remark~',
+				syncStatus:'synchronous status~'
 			},
 			buttons : {
 				query : 'Query~',

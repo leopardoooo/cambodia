@@ -550,6 +550,10 @@ public class SnTaskComponent extends BaseBusiComponent {
 					taskUser.setRecycle_device(SystemConstants.BOOLEAN_FALSE);
 					taskUser.setRecycle_result(SystemConstants.BOOLEAN_FALSE);
 				}
+			}else if((taskType.equals(SystemConstants.TASK_TYPE_MOVE) || taskType.equals(SystemConstants.TASK_TYPE_FAULT))
+					&& user.getUser_type().equals(SystemConstants.USER_TYPE_BAND) && StringHelper.isEmpty(taskUser.getDevice_id())){
+				//移机故障单，宽带用户，没有设备的情况下，虚拟一个设备编号，virtual_userId
+				taskUser.setDevice_id("virtual_"+user.getUser_id());
 			}
 			wTaskUserDao.save(taskUser);
 		}

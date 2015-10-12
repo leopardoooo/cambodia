@@ -206,13 +206,24 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 					if (snTaskComponent.getTeamId(SystemConstants.TEAM_TYPE_CFOCN).equals(task.getTeam_id()))
 						throw new ServicesException("光口设备"+fillDevice.getDeviceCode()+"没有交接箱或分光器编号");
 			}
-			//查找欣赏设备信息
-			DeviceDto device = deviceComponent.queryDeviceByDeviceCode(fillDevice.getDeviceCode());
-			if (device == null)
-				throw new ServicesException(fillDevice.getDeviceCode()+"不存在");
-			//设备类型是否正确
-			if (!fillDevice.isFcPort() == device.getDevice_type().equals(SystemConstants.DEVICE_TYPE_MODEM))
-				throw new ServicesException(fillDevice.getDeviceCode()+"设备类型不正确");
+			boolean isVirtual = false;//宽带虚拟设备为 virtual_**(user_id)
+			if(task.getTask_type_id().equals(SystemConstants.TASK_TYPE_MOVE) || task.getTask_type_id().equals(SystemConstants.TASK_TYPE_FAULT)){
+				String[] userId = fillDevice.getDeviceCode().split("_");
+				if(userId.length == 2){
+					isVirtual = true;
+				}
+			}
+			
+			//查找设备信息
+			DeviceDto device = new DeviceDto();
+			if(!isVirtual){//非虚拟宽带设备
+				device = deviceComponent.queryDeviceByDeviceCode(fillDevice.getDeviceCode());
+				if (device == null)
+					throw new ServicesException(fillDevice.getDeviceCode()+"不存在");
+				//设备类型是否正确
+				if (!fillDevice.isFcPort() == device.getDevice_type().equals(SystemConstants.DEVICE_TYPE_MODEM))
+					throw new ServicesException(fillDevice.getDeviceCode()+"设备类型不正确");
+			}
 			//检查更换设备操作中，旧设备是否存在;设置设备对应的用户id
 			if (task.getTask_type_id().equals(SystemConstants.TASK_TYPE_INSTALL)){
 				//判断设备是否被其他用户使用
@@ -271,8 +282,17 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 				boolean  exists = false;
 				for (WTaskUser user:userList){
 					if (fillDevice.getDeviceCode().equals(user.getDevice_id())){
+						if(isVirtual){
+							String[] userIds = fillDevice.getDeviceCode().split("_");
+							if(userIds.length==2){
+								fillDevice.setUserId(userIds[1]);
+							}else{
+								throw new ServicesException("虚拟设备格式错误");
+							}
+						}else{
+							fillDevice.setUserId(user.getUser_id());
+						}
 						exists = true;
-						fillDevice.setUserId(user.getUser_id());
 						break;
 					}
 				}
@@ -400,10 +420,11 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 	}
 
 	public Pager<TaskBaseInfoDto> queryTask(String taskTypes, String addrIds, String beginDate, String endDate,
-			String taskId, String teamId, String status, String custNo, String custName, String custAddr,String mobile,String zteStatus, Integer start, Integer limit)
+			String taskId, String teamId, String status, String custNo, String custName, String custAddr,
+			String mobile,String zteStatus, String syncStatus, Integer start, Integer limit)
 					throws Exception {
 		return wTaskBaseInfoDao.queryTask(taskTypes,addrIds,beginDate,endDate,taskId,teamId,status,custNo,custName
-				,custAddr,mobile,zteStatus, start, limit);
+				,custAddr,mobile,zteStatus,syncStatus, start, limit);
 	}
 
 	public Pager<TaskBaseInfoDto> queryUnProcessTask(Integer start, Integer limit) throws Exception {

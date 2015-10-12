@@ -61,7 +61,7 @@ public class WTaskBaseInfo implements Serializable{
 	
 	private Date  task_status_date;
 	private Date zte_status_date;
-	private String sync_statu;//同步状态
+	private String sync_status;//同步状态
 	private Date sync_status_date;//同步状态时间
 	
 	
@@ -81,12 +81,12 @@ public class WTaskBaseInfo implements Serializable{
 		this.zte_status_date = zte_status_date;
 	}
 
-	public String getSync_statu() {
-		return sync_statu;
+	public String getSync_status() {
+		return sync_status;
 	}
 
-	public void setSync_statu(String sync_statu) {
-		this.sync_statu = sync_statu;
+	public void setSync_status(String sync_status) {
+		this.sync_status = sync_status;
 	}
 
 	public Date getSync_status_date() {
