@@ -158,4 +158,14 @@ public class SBulletinDao extends BaseEntityDao<SBulletin> {
 		String sql ="update s_bulletin set status=? where bulletin_id=?";
 		return executeUpdate(sql, statusId,bulletinId);
 	}
+	/**
+	 * 更新公告内容，并删除营业员查看信息
+	 */
+	public int updateBulletinByWorkTask(String bulletinId,String bulletinText) throws JDBCException{
+		String sql1="delete s_bulletin_check where bulletin_id=? ";
+		 executeUpdate(sql1,bulletinId);
+		
+		String sql="update s_bulletin set bulletin_content=? where bulletin_id=?";
+		return executeUpdate(sql, bulletinText,bulletinId);
+	}
 }

@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.ycsoft.beans.core.cust.CCust;
+import com.ycsoft.beans.system.SBullentionWorkCount;
+import com.ycsoft.beans.system.SBulletinWorktask;
 import com.ycsoft.beans.system.SOptr;
 import com.ycsoft.beans.task.TaskCustExtInfo;
 import com.ycsoft.beans.task.WTaskBaseInfo;
@@ -16,6 +18,8 @@ import com.ycsoft.beans.task.WTeam;
 import com.ycsoft.boss.remoting.cfocn.WorkOrderClient;
 import com.ycsoft.boss.remoting.ott.Result;
 import com.ycsoft.business.dao.core.cust.CCustDao;
+import com.ycsoft.business.dao.system.SBulletinDao;
+import com.ycsoft.business.dao.system.SBulletinWorktaskDao;
 import com.ycsoft.business.dao.system.SOptrDao;
 import com.ycsoft.business.dao.task.WTaskBaseInfoDao;
 import com.ycsoft.business.dao.task.WTaskLogDao;
@@ -24,6 +28,7 @@ import com.ycsoft.business.dao.task.WTeamDao;
 import com.ycsoft.commons.abstracts.BaseComponent;
 import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.constants.SystemConstants;
+import com.ycsoft.daos.core.JDBCException;
 @Component
 public class TaskComponent extends BaseComponent {
 	@Autowired
@@ -38,6 +43,10 @@ public class TaskComponent extends BaseComponent {
 	private CCustDao cCustDao;
 	@Autowired
 	private WTeamDao wTeamDao;
+	@Autowired
+	private SBulletinWorktaskDao sBulletinWorktaskDao;
+	@Autowired
+	private SBulletinDao sBulletinDao;
 	
 	//查找需要执行的工单任务
 	public List<WTaskLog> querySynTaskLog() throws Exception{
@@ -141,20 +150,25 @@ public class TaskComponent extends BaseComponent {
 		
 	}
 	/**
-	 * 查询一个部门创建的工单的新增派单
+	 * 查询公告提醒统计信息
 	 */
-	public int queryInitAddCntByDeptId(String deptId,Date currentTimeStamp)throws Exception{
-		return wTaskBaseInfoDao.queryStatusAddCntByDeptTimeStamp(deptId, currentTimeStamp, StatusConstants.TASK_INIT);
+	public List<SBullentionWorkCount> queryBullentionWorkCount(Date currentTimeStamp)throws Exception{
+		String supernetTreamId=this.getTeamId(SystemConstants.TEAM_TYPE_SUPERNET);
+		return wTaskBaseInfoDao.queryBullentionWorkCount(supernetTreamId, currentTimeStamp);
 	}
 	/**
-	 * 查询一个部门创建的工单的新增完工
-	 * @param deptId
-	 * @param currentTimeStamp
-	 * @return
-	 * @throws Exception
+	 * 查询部门的公告配置
+	 * @return 
+	 * @throws Exception 
 	 */
-	public int queryEndAddCntByDeptId(String deptId,Date currentTimeStamp)throws Exception{
-		return wTaskBaseInfoDao.queryStatusAddCntByDeptTimeStamp(deptId, currentTimeStamp, StatusConstants.TASK_END);
+	public List<SBulletinWorktask> queryDeptBullentionConfig() throws Exception{
+		return sBulletinWorktaskDao.findAll();
 	}
-	
+	/**
+	 * 更新公告内容和操作员查看信息
+	 * @throws Exception 
+	 */
+	public int updateBullentin(String bullentinId,String bullentinText) throws Exception{
+		return sBulletinDao.updateBulletinByWorkTask(bullentinId,bullentinText);
+	}
 }

@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
+import com.ycsoft.beans.system.SBullentionWorkCount;
 import com.ycsoft.beans.task.WTaskBaseInfo;
 import com.ycsoft.business.dto.config.TaskBaseInfoDto;
 import com.ycsoft.commons.constants.StatusConstants;
@@ -167,26 +168,36 @@ public class WTaskBaseInfoDao extends BaseEntityDao<WTaskBaseInfo> {
 			.page();
 	}
 
+	public List<SBullentionWorkCount> queryBullentionWorkCount(String supernetTeamId,Date currentTimeStamp) throws JDBCException{
+		String sql="select sysdate query_date, op.dept_id, "
+				+" sum(case when t.task_status='CREATE' then 1 else 0 end) create_total, "
+				+" sum(case when t.task_status='CREATE' and t.team_id=? then 1 else 0 end)  create_supernet_total, "
+				+" sum(case when t.task_status='CREATE' and t.team_id=? and t.task_status_date>? then 1 else 0 end) create_supernet_new, "
+				+" sum(case when t.task_status='CREATE' and t.sync_status='FAILURE' then 1 else 0 end) cfocn_failure_total, "
+				+" sum(case when t.task_status='CREATE' and t.sync_status='FAILURE' and t.sync_status_date>?  then 1 else 0 end) cfocn_failure_new, "
+				+" sum(case when t.task_status='INIT' then 1 else 0 end) init_total, "
+				+" sum(case when t.task_status='INIT' and t.task_status_date>? then 1 else 0 end) init_new, "
+				+" sum(case when t.task_status='INIT' and t.team_id=? then 1 else 0 end) init_supernet_total, "
+				+" sum(case when t.task_status='INIT' and t.zte_status='NOT_EXEC' then 1 else 0 end) zte_total, "
+				+" sum(case when t.task_status='INIT' and t.zte_status='NOT_EXEC' and t.zte_status_date>?  then 1 else 0 end) zte_new, "
+				+" sum(case when t.task_status='ENDWAIT' then 1 else 0 end) endwait_total, "
+				+" sum(case when t.task_status='ENDWAIT' and t.task_status_date>? then 1 else 0 end) endwait_new, "
+				+" sum(case when t.task_status ='END' and t.task_status_date >trunc(sysdate) then 1 else 0 end) end_today_total, "
+				+" sum(case when t.task_status='END' and t.task_status_date> ? then 1 else 0 end) end_today_new "
+				+" from w_task_base_info t,s_optr op "
+				+" where t.optr_id=op.optr_id "
+				+" and (t.task_status in ('CREATE','INIT','ENDWAIT') "
+				+" or (t.task_status='END' and t.task_status_date>trunc(sysdate))) "
+				+" group by op.dept_id ";
+		return this.createQuery(SBullentionWorkCount.class, sql
+							,supernetTeamId
+							,supernetTeamId,currentTimeStamp
+							,currentTimeStamp
+							,currentTimeStamp
+							,supernetTeamId
+							,currentTimeStamp
+							,currentTimeStamp
+							,currentTimeStamp).list();
+	}
 	
-	/**
-	 * 查询一个部门相关的新增派单
-	 * @throws JDBCException 
-	 */
-	public int queryStatusAddCntByDeptTimeStamp(String deptId,Date currentTimeStamp,String status) throws JDBCException{
-		String sql="select count(1) from w_task_base_info t,s_optr op "
-					+" where t.task_status=? and t.task_status_date>? "
-					+" and t.optr_id=op.optr_id and op.dept_id=?";
-		//this.findUnique(sql, params)
-		return this.count(sql, status,currentTimeStamp,deptId);
-	}
-	/**
-	 * 查询一个部门相关的工单新增派单同步失败
-	 */
-	public int querySyncErrorAddCntByDeptTimeStamp(String deptId,Date currentTimeStamp)throws JDBCException{
-		String sql="select count(1) from w_task_base_info t,s_optr op "
-				+" where t.task_status=? and t.sync_status=? and t.sync_status_date>? "
-				+" and t.optr_id=op.optr_id and op.dept_id=?";
-		return this.count(sql, StatusConstants.TASK_CREATE,StatusConstants.FAILURE,currentTimeStamp,deptId);
-	}
-
 }

@@ -611,4 +611,8 @@ public class SystemConstants {
 	public static final String PROMOTION_TYPE_OTT_MOBILE_EXTERNAL="ott_mobile_external";
 	
 	public static final String BASE_INVOICE_CODE="AAA";//发票固定代码
+	
+	public static final String Bulletin_worktask_YYT="YYT";//营业厅工单提醒
+	public static final String Bulletin_worktask_CALL="CALL";//呼叫中心工单提醒
+	public static final String Bulletin_worktask_WORK="WORK";//工程部门工单提醒
  }
