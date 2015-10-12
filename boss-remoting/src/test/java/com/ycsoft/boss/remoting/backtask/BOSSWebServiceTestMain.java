@@ -17,16 +17,16 @@ public class BOSSWebServiceTestMain {
 	public static void main(String[] args) {
 		
 		System.setProperty("javax.net.debug", "ssl,handshake");
-       // System.setProperty("javax.net.ssl.keyStore", "/Users/killer/Documents/MyWorks/GitHub/cambodia/boss-core/src/main/resources/cert/client/client.p12");
-        System.setProperty("javax.net.ssl.keyStore", "E:/MyWork/workspace_st/cambodia/boss-core/src/main/resources/cert/client/client.p12");
+        System.setProperty("javax.net.ssl.keyStore", "/Users/killer/Documents/MyWorks/GitHub/cambodia/boss-core/src/main/resources/cert/client/client.p12");
+       // System.setProperty("javax.net.ssl.keyStore", "E:/MyWork/workspace_st/cambodia/boss-core/src/main/resources/cert/client/client.p12");
         
         System.setProperty("javax.net.ssl.keyStorePassword", "a1234567");
         System.setProperty("javax.net.ssl.keyStoreType", "PKCS12");
 		
-		//System.setProperty("javax.net.ssl.trustStore", "/Users/killer/Documents/MyWorks/GitHub/cambodia/boss-core/src/main/resources/cert/server/ca.jks");
-		System.setProperty("javax.net.ssl.trustStore", "E:/MyWork/workspace_st/cambodia/boss-core/src/main/resources/cert/server/ca.jks");
+		System.setProperty("javax.net.ssl.trustStore", "/Users/killer/Documents/MyWorks/GitHub/cambodia/boss-core/src/main/resources/cert/client/ca.p12");
+		//System.setProperty("javax.net.ssl.trustStore", "E:/MyWork/workspace_st/cambodia/boss-core/src/main/resources/cert/server/ca.jks");
         System.setProperty("javax.net.ssl.trustStorePassword", "a1234567");
-        System.setProperty("javax.net.ssl.trustStoreType", "JKS");
+        System.setProperty("javax.net.ssl.trustStoreType", "PKCS12");
 		
         
         // TODO 接口方法调用： 
