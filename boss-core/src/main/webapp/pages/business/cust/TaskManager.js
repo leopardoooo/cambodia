@@ -16,8 +16,8 @@ UserDetailGrid = Ext.extend(Ext.grid.GridPanel, {
 						header : userCols[1],dataIndex : 'user_name',width : 180,renderer : App.qtipValue}, {
 						header : userCols[3],dataIndex : 'device_model_text',width : 200,renderer : App.qtipValue}, {
 						header : userCols[4],dataIndex : 'device_id',width : 120,renderer : App.qtipValue}, {
-						header : userCols[5],dataIndex : 'posNo',width : 100,renderer : App.qtipValue}, {
 						header : userCols[6],dataIndex : 'occNo',width : 100,renderer : App.qtipValue}, {
+						header : userCols[5],dataIndex : 'posNo',width : 100,renderer : App.qtipValue}, {
 						header : userCols[7],dataIndex : 'band',width: 80,renderer : App.qtipValue}])
 		})
 	}
@@ -114,14 +114,10 @@ var TaskDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 		},beforeEdit: function(obj){
 			if(obj.field == 'occNo' || obj.field == 'posNo'){
 				var value = obj.record.get('user_type');
-				if(value !='BAND'){
-					return false;
-				}
+				if(value !='BAND'){return false;}
 			}
 			if(obj.field == 'device_code'){
-				if(this.taskTypeId !='1'){
-					return false;
-				}
+				if(this.taskTypeId !='1'){return false;}
 			}
 		},
 		afteredit:function(obj){
@@ -165,10 +161,7 @@ var TaskDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 			this.stopEditing();//停止编辑
 			var flag = true;
 			var records = this.getStore().getModifiedRecords();
-			if(records.length == 0){
-				Alert('数据没有修改');
-				flag = false;
-			}
+			if(records.length == 0){Alert('数据没有修改');flag = false;}
 			return flag;
 	}
 });
@@ -202,10 +195,7 @@ TaskDeviceWin = Ext.extend(Ext.Window,{
 		})
 	},
 	doSave:function(){
-		if(!this.deviceGrid.checkDeviceCode()){
-			return false;
-		}
-		
+		if(!this.deviceGrid.checkDeviceCode()){return false;}
 		var o ={},url;
 		if(this.task_type_id == '9'){//销终端工单
 			var data = this.deviceGrid.getUserIds();
@@ -353,7 +343,8 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 			url: root + '/core/x/Task!queryTasks.action' ,
 			fields:['task_id','cust_no','cust_name','tel','old_addr','new_addr','address','task_type_id',
 					'task_status','task_status_text','task_type_id_text','team_id','team_id_text','bug_type','bug_type_text'
-					,'bug_detail','zte_status','zte_status_text','task_create_time','team_type','linkman_name','linkman_tel'],
+					,'bug_detail','zte_status','zte_status_text','task_create_time','team_type','linkman_name',
+					'linkman_tel','sync_status','sync_status_text'],
 			root : 'records',
 			totalProperty : 'totalProperty',
 			autoDestroy : true
@@ -381,6 +372,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 		this.taskStatusCombo = new Ext.ux.LovCombo({
 				width: 100,
 				emptyText: forms['taskStatus'],
+				listWidth:200,
 				paramName:'STATUS_W_TASK',
 				hiddenName : 'task_status',
 				typeAhead:true,editable:true,
@@ -391,6 +383,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 			});	
 		this.zteStatusCombo = new Ext.ux.LovCombo({
 				width: 100,
+				listWidth:150,
 				emptyText: forms['zteStatus'],
 				paramName:'ZTE_QUERY_STATUS_W_TASK',
 				hiddenName : 'task_status',
@@ -400,9 +393,22 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 				}),displayField:'item_name',valueField:'item_value',
 				triggerAction:'all',mode:'local'
 			});	
+		this.syncStatusCombo = new Ext.ux.LovCombo({
+				width: 100,
+				listWidth:150,
+				emptyText: forms['syncStatus'],
+				paramName:'ZTE_QUERY_STATUS_W_TASK',
+				hiddenName : 'sync_status',
+				typeAhead:true,editable:true,
+				store:new Ext.data.JsonStore({
+					fields:['item_value','item_name']
+				}),displayField:'item_name',valueField:'item_value',
+				triggerAction:'all',mode:'local'
+			});
 		this.taskDetailTypeCombo = new Ext.ux.LovCombo({
 				xtype: 'textfield',
 				width: 100,
+				listWidth:200,
 				emptyText: forms['taskDetailType'],
 				typeAhead:true,editable:true,
 				paramName:'TASK_DETAIL_TYPE',
@@ -415,6 +421,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 		this.taskAddrCombo = new Ext.ux.LovCombo({
 			typeAhead: true,
 			width: 100,
+			listWidth:200,
 		    triggerAction: 'all',
 		    mode: 'remote',
 		    emptyText: forms['taskAddr'],
@@ -432,6 +439,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 		this.taskTeamCombo = new Ext.ux.LovCombo({
 			typeAhead: true,
 			width: 100,
+			listWidth:200,
 		    triggerAction: 'all',
 		    mode: 'remote',
 		    emptyText: forms['taskTeam'],
@@ -446,7 +454,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 		    displayField: 'dept_name'
 		});
 		//初始化下拉框的数据 
-		App.form.initComboData([this.taskStatusCombo,this.zteStatusCombo,this.taskDetailTypeCombo],function(){this.doWaitTask();},this);
+		App.form.initComboData([this.taskStatusCombo,this.zteStatusCombo,this.syncStatusCombo,this.taskDetailTypeCombo],function(){this.doWaitTask();},this);
 		
 		var twoTbar = new Ext.Toolbar({
 			items : [this.taskNoField,'-',this.custNoField,'-',this.mobileField,'-',this.custNameField,'-',this.newaddrField,'-',{
@@ -495,7 +503,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 		        pageSize: this.pageSize
 		    }),
 			tbar: [this.taskDetailTypeCombo,'-',this.taskAddrCombo,'-',lbc('home.tools.TaskManager.buttons.accptTime'),this.createStartDateField,' ',this.createEndDateField,'-',
-			this.taskTeamCombo,'-',this.taskStatusCombo,'-',this.zteStatusCombo],
+			this.taskTeamCombo,'-',this.taskStatusCombo,'-',this.zteStatusCombo,this.syncStatusCombo],
 			listeners : {
 				'render' : function() {
 					twoTbar.render(this.tbar);
@@ -531,6 +539,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 	mobileField: null,
 	newaddrField: null,
 	zteStatusCombo:null,
+	syncStatusCombo:null,
 	doCancelTask: function(){
 		var rs = this.getSelections();
 		if(rs === false){return ;}
@@ -697,9 +706,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 		    fieldLabel:lbc('home.tools.TaskManager.forms.taskTeam'),
 		    editable : true,
 		    allowBlank:false,
-		    store: new Ext.data.JsonStore({
-		        fields: [ 'dept_id', 'dept_name' ]
-		    }),
+		    store: new Ext.data.JsonStore({fields: [ 'dept_id', 'dept_name' ]}),
 		    valueField: 'dept_id',
 		    displayField: 'dept_name'
 		});
@@ -741,9 +748,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 					}
 					var url = Constant.ROOT_PATH + "/core/x/Task!editTaskTeam.action";
 					var taskId = rs.get("task_id");
-					var o = {
-						task_id : taskId, 
-						deptId: teamCombo.getValue(),
+					var o = {task_id : taskId, deptId: teamCombo.getValue(),
 						bugType : bugCauseCombo?bugCauseCombo.getValue():null
 					};
 					App.sendRequest( url, o, function(res,opt){
@@ -893,7 +898,8 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 			"taskCond.addrIds":this.taskAddrCombo.getValue(),
 			"taskCond.taskId":this.taskNoField.getValue(),
 			"taskCond.taskType":this.taskDetailTypeCombo.getValue(),
-			"taskCond.zteStatus":this.zteStatusCombo.getValue()
+			"taskCond.zteStatus":this.zteStatusCombo.getValue(),
+			"taskCond.syncStatus":this.syncStatusCombo.getValue()
 		};
 		this.taskStore.baseParams = o;
 		this.taskStore.load({

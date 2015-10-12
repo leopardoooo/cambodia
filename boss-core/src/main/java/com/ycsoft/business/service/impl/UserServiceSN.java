@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +22,6 @@ import com.ycsoft.beans.config.TDeviceChangeReason;
 import com.ycsoft.beans.core.acct.CAcct;
 import com.ycsoft.beans.core.cust.CCust;
 import com.ycsoft.beans.core.cust.CCustDevice;
-import com.ycsoft.beans.core.cust.CCustDeviceChange;
 import com.ycsoft.beans.core.fee.CFee;
 import com.ycsoft.beans.core.fee.CFeeAcct;
 import com.ycsoft.beans.core.fee.CFeeDevice;
@@ -36,7 +34,6 @@ import com.ycsoft.beans.core.prod.CProdPropChange;
 import com.ycsoft.beans.core.prod.CancelUserDto;
 import com.ycsoft.beans.core.user.CUser;
 import com.ycsoft.beans.core.user.CUserPropChange;
-import com.ycsoft.beans.device.RDeviceFee;
 import com.ycsoft.beans.prod.PPromotionAcct;
 import com.ycsoft.beans.prod.PSpkgOpenbusifee;
 import com.ycsoft.beans.prod.PSpkgOpenuser;
@@ -802,6 +799,117 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		}
 		
 	}
+	
+	
+	public void checkOpenUser(String[] userIds) throws Exception{
+		//获取操作的客户、用户信息
+		List<CUser> users = userComponent.queryAllUserByUserIds(userIds);
+		CCust cust = custComponent.queryCustById(users.get(0).getCust_id());
+		if (users == null || users.size() == 0 || users.get(0) == null)
+			throw new ServicesException("请选择用户");
+		
+		//查找客户名下所有有效的产品
+		Map<String,String> packageUserIdS = new HashMap<String,String>();
+		List<CProdOrder> orderList = cProdOrderDao.queryCustEffOrder(users.get(0).getCust_id());
+		for (CProdOrder order:orderList){
+			if (StringHelper.isNotEmpty(order.getPackage_sn()) && StringHelper.isNotEmpty(order.getUser_id())){
+				packageUserIdS.put(order.getUser_id(),order.getPackage_sn());
+			}
+		}
+		
+		boolean hasPkgUser = false; //报停的用户有归属于客户套餐的
+		boolean hasBand = false; //有宽带用户
+		int count=0;
+		Map<Integer, CUser> map = new HashMap<Integer, CUser>();
+		for (CUser user:users){
+			if (!user.getStatus().equals(StatusConstants.REQSTOP)){
+				throw new ServicesException("用户["+user.getUser_id()+"]不是报停状态，不能报开!");
+				
+			}
+			if (packageUserIdS.get(user.getUser_id()) != null){
+				hasPkgUser =true;
+				count ++;
+			}
+			
+			if (user.getUser_type().equals(USER_TYPE_BAND)){
+				hasBand = true;
+			}
+		
+		}
+		
+		if (hasPkgUser && (count<packageUserIdS.size())){
+			throw new ServicesException("归属套餐的用户必须同时报开");
+			
+		}
+		
+		if(hasBand && cust.getCust_type().equals(SystemConstants.CUST_TYPE_RESIDENT)){
+			List<CUser> allUusers = userComponent.queryUserByCustId(cust.getCust_id());
+			List<String> selectUser = Arrays.asList(userIds);
+			for(CUser user : allUusers){
+				if (user.getStatus().equals(StatusConstants.REQSTOP)){
+					if(!selectUser.contains(user.getUser_id())){
+						throw new ServicesException("宽带用户报开,其他用户都需要报开");
+					}
+				}
+			}
+		}
+		
+	}
+	
+	
+	public void checkCancelStop(String[] userIds,String custId) throws Exception{
+		//获取操作的客户、用户信息
+		List<CUser> users = userComponent.queryAllUserByUserIds(userIds);
+		CCust cust = custComponent.queryCustById(users.get(0).getCust_id());
+		if (users == null || users.size() == 0 || users.get(0) == null)
+			throw new ServicesException("请选择用户");
+		
+		List<JUserStop> cancelUsers = jobComponent.queryStopByCustId(custId);
+		if(cancelUsers.size()==0){
+			throw new ServicesException("不存在预报停用户");
+		}
+		List<String> cancelUser = CollectionHelper.converValueToList(cancelUsers, "user_id");
+		//查找客户名下所有有效的产品
+		Map<String,String> packageUserIdS = new HashMap<String,String>();
+		List<CProdOrder> orderList = cProdOrderDao.queryCustEffOrder(users.get(0).getCust_id());
+		for (CProdOrder order:orderList){
+			if (StringHelper.isNotEmpty(order.getPackage_sn()) && StringHelper.isNotEmpty(order.getUser_id())
+					&& cancelUser.contains(order.getUser_id())){
+				packageUserIdS.put(order.getUser_id(),order.getPackage_sn());
+			}
+		}
+		
+		
+		boolean hasPkgUser = false; //报停的用户有归属于客户套餐的
+		boolean hasBand = false; //有宽带用户
+		int count=0;
+		for (CUser user:users){
+			if (packageUserIdS.get(user.getUser_id()) != null){
+				hasPkgUser =true;
+				count ++;
+			}
+			
+			if (user.getUser_type().equals(USER_TYPE_BAND)){
+				hasBand = true;
+			}
+		
+		}
+		
+		if (hasPkgUser && (count<packageUserIdS.size())){
+			throw new ServicesException("归属套餐的用户必须同时取消预报停");
+			
+		}
+		
+		if(hasBand && cust.getCust_type().equals(SystemConstants.CUST_TYPE_RESIDENT)){
+			List<String> selectUser = Arrays.asList(userIds);
+			for(String userId : cancelUser){
+				if(!selectUser.contains(userId)){
+					throw new ServicesException("宽带用户取消预报停,其他用户都需要取消预报停");
+				}
+			}
+		}
+		
+	}
 
 
 	@Override
@@ -875,6 +983,9 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		Integer doneCode = doneCodeComponent.gDoneCode();
 		List<CUser> users = getBusiParam().getSelectedUsers();
 		String[] userall = CollectionHelper.converValueToArray(users, "user_id");
+		if(users.size()>0){
+			checkCancelStop(userall,getBusiParam().getCust().getCust_id());
+		}
 		jobComponent.cancelStopUser(userall);
 		saveAllPublic(doneCode,getBusiParam());
 	}
@@ -891,6 +1002,10 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		Integer doneCode = doneCodeComponent.gDoneCode();
 		//获取操作的客户、用户信息
 		List<CUser> users = getBusiParam().getSelectedUsers();
+		if(users.size()>0){
+			checkOpenUser(CollectionHelper.converValueToArray(users, "user_id"));
+		}
+		
 		List<CProdOrderDto> orderList = cProdOrderDao.queryCustEffOrderDto(cust.getCust_id());
 		boolean isCustPkgOpen = false;
 		for(CUser user:users){

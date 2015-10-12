@@ -530,7 +530,8 @@ BCLang.home = {
 				finishType : '完工类型~',
 				finishExplan : '完工说明~',
 				zteStatus	: 'ZTE状态~',
-				zteRemark :'备注~'
+				zteRemark :'备注~',
+				syncStatus	:'同步状态~'
 			},
 			buttons : {
 				query : '查询~',

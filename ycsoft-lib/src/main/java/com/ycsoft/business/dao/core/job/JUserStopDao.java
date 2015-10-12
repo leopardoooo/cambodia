@@ -62,4 +62,9 @@ public class JUserStopDao extends BaseEntityDao<JUserStop> {
 		String sql = "update J_USER_STOP set user_id=? where user_id=?";
 		this.executeUpdate(sql, newUserId, oldUserId);
 	}
+
+	public List<JUserStop> queryStopByCustId(String custId) throws Exception {
+		String sql ="select j.* from j_user_stop j,c_user u where j.user_id=u.user_id and u.cust_id=?";
+		return this.createQuery(sql, custId).list();
+	}
 }

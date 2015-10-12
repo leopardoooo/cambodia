@@ -10,6 +10,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.yaochen.boss.commons.InvalidMath;
@@ -51,11 +52,7 @@ import com.ycsoft.beans.core.prod.CProdPropChange;
 import com.ycsoft.beans.core.prod.CProdPropPat;
 import com.ycsoft.beans.core.promotion.CPromotion;
 import com.ycsoft.beans.core.user.CUser;
-import com.ycsoft.beans.core.user.CUserAtv;
-import com.ycsoft.beans.core.user.CUserBroadband;
-import com.ycsoft.beans.core.user.CUserDtv;
 import com.ycsoft.beans.core.user.CUserPropChange;
-import com.ycsoft.beans.core.user.CUserStb;
 import com.ycsoft.beans.prod.PProdTariff;
 import com.ycsoft.beans.system.SCounty;
 import com.ycsoft.beans.system.SOptr;
@@ -156,8 +153,6 @@ public class BusiComponent {
 	private CBankReturnDao cBankReturnDao;
 	private CBankRefundtodiskDao cBankRefundtodiskDao;
 	private CBankReturnPayerrorDao cBankReturnPayerrorDao;
-
-
 
 	
 	/**
