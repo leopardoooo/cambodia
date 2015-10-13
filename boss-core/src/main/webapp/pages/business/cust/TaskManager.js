@@ -88,14 +88,14 @@ var TaskDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 		if(this.taskTypeId == '9'){//销终端工单
 			this.resultCombo = new Ext.ux.ParamCombo({
 				paramName:'BOOLEAN',typeAhead:false,valueField:'item_name',
-				forceSelection:true,selectOnFocus:true,editable:true
+				forceSelection:true,selectOnFocus:true,editable:false
 			});
 			App.form.initComboData([this.resultCombo]);
 			nextColums = [{header:cols[4],dataIndex:'recycle_result_text',width:80,editor:this.resultCombo}]; 
 		}else{
 			nextColums = [{header:cols[3],dataIndex:'device_code',width:130,editor:new Ext.form.TextField({vtype:'alphanum'})},
-						{header:'occNo',dataIndex:'occNo',width:80,editor:new Ext.form.TextField({vtype:'alphanum'})},
-						{header:'posNo',dataIndex:'posNo',width:80,editor:new Ext.form.TextField({vtype:'alphanum'})}]
+						{header:'OccNo',dataIndex:'occNo',width:80,editor:new Ext.form.TextField({vtype:'alphanum'})},
+						{header:'PosNo',dataIndex:'posNo',width:80,editor:new Ext.form.TextField({vtype:'alphanum'})}]
 		}
 		columns  = baseColumns.concat(nextColums)
 		
@@ -173,7 +173,7 @@ TaskDeviceWin = Ext.extend(Ext.Window,{
 	constructor : function(rs){
 		this.deviceGrid = new TaskDeviceGrid(rs);
 		TaskDeviceWin.superclass.constructor.call(this,{
-			title : '设备回填',
+			title : lbc('home.tools.TaskManager._fillDevTitle'),
 			layout : 'fit',
 			height : 400,
 			width : 750,
@@ -181,12 +181,12 @@ TaskDeviceWin = Ext.extend(Ext.Window,{
 			closeAction : 'close',
 			items : [this.deviceGrid],
 			buttons : [{
-				text : '保存',
+				text : lbc('common.save'),
 				scope : this,
 				iconCls : 'icon-save',
 				handler : this.doSave
 			}, {
-				text : '关闭',
+				text : lbc('common.close'),
 				scope : this,
 				handler : function() {
 					this.close();
@@ -375,7 +375,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 				listWidth:200,
 				paramName:'STATUS_W_TASK',
 				hiddenName : 'task_status',
-				typeAhead:true,editable:true,
+				typeAhead:true,editable:false,
 				store:new Ext.data.JsonStore({
 					fields:['item_value','item_name']
 				}),displayField:'item_name',valueField:'item_value',
@@ -387,7 +387,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 				emptyText: forms['zteStatus'],
 				paramName:'ZTE_QUERY_STATUS_W_TASK',
 				hiddenName : 'task_status',
-				typeAhead:true,editable:true,
+				typeAhead:true,editable:false,
 				store:new Ext.data.JsonStore({
 					fields:['item_value','item_name']
 				}),displayField:'item_name',valueField:'item_value',
@@ -399,7 +399,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 				emptyText: forms['syncStatus'],
 				paramName:'ZTE_QUERY_STATUS_W_TASK',
 				hiddenName : 'sync_status',
-				typeAhead:true,editable:true,
+				typeAhead:true,editable:false,
 				store:new Ext.data.JsonStore({
 					fields:['item_value','item_name']
 				}),displayField:'item_name',valueField:'item_value',
@@ -410,7 +410,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 				width: 100,
 				listWidth:200,
 				emptyText: forms['taskDetailType'],
-				typeAhead:true,editable:true,
+				typeAhead:true,editable:false,
 				paramName:'TASK_DETAIL_TYPE',
 				store:new Ext.data.JsonStore({
 					fields:['item_value','item_name']
@@ -587,7 +587,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 			width: 120,
 			fieldLabel:lbc('home.tools.TaskManager.forms.zteStatus'),
 			allowBlank:false,
-			typeAhead:true,editable:true,
+			typeAhead:true,editable:false,
 			paramName:'ZTE_STATUS_W_TASK',
 			store:new Ext.data.JsonStore({
 				fields:['item_value','item_name']
@@ -799,7 +799,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 			width: 120,
 			fieldLabel:lbc('home.tools.TaskManager.forms.finishType'),
 			allowBlank:false,
-			typeAhead:true,editable:true,
+			typeAhead:true,editable:false,
 			paramName:'TASK_FINISH_TYPE',
 			store:new Ext.data.JsonStore({
 				fields:['item_value','item_name']

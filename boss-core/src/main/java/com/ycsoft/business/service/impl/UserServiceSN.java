@@ -1658,7 +1658,12 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 			doneCodeComponent.saveDoneCodeUnPay(task.getCust_id(),doneCode , getOptr().getOptr_id());
 		}
 		//update device status to idle,write off user
-		
+		//设置流水中user_id
+		BusiParameter parameter = getBusiParam();
+		List<CUser> userList = userComponent.queryTaskUser(taskId);
+		if(userList.size() > 0){
+			parameter.setSelectedUsers(userList);
+		}
 		for (WTaskUser user:allUserList){
 			if (StringHelper.isNotEmpty(user.getDevice_id())){
 				DeviceDto device = deviceComponent.queryDeviceByDeviceCode(user.getDevice_id());
@@ -1680,7 +1685,8 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		for (WTaskBaseInfo tb:taskList){
 			snTaskComponent.cancelTask(doneCode, tb.getTask_id());
 		}
-		getBusiParam().setBusiCode(BusiCodeConstants.TASK_CANCEL);
+		
+		parameter.setBusiCode(BusiCodeConstants.TASK_CANCEL);
 		saveAllPublic(doneCode, getBusiParam());
 		
 	}

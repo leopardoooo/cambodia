@@ -13,12 +13,15 @@ import com.ycsoft.beans.config.TDeviceBuyMode;
 import com.ycsoft.beans.core.cust.CCust;
 import com.ycsoft.beans.core.prod.CProdOrder;
 import com.ycsoft.beans.core.prod.CProdOrderDto;
+import com.ycsoft.beans.core.prod.CProdPropChange;
 import com.ycsoft.beans.core.user.CUser;
+import com.ycsoft.beans.core.user.CUserPropChange;
 import com.ycsoft.beans.task.TaskFillDevice;
 import com.ycsoft.beans.task.WTaskBaseInfo;
 import com.ycsoft.beans.task.WTaskLog;
 import com.ycsoft.beans.task.WTaskUser;
 import com.ycsoft.beans.task.WTeam;
+import com.ycsoft.business.commons.pojo.BusiParameter;
 import com.ycsoft.business.component.core.DoneCodeComponent;
 import com.ycsoft.business.component.resource.DeviceComponent;
 import com.ycsoft.business.component.task.SnTaskComponent;
@@ -31,6 +34,7 @@ import com.ycsoft.business.dao.task.WTaskUserDao;
 import com.ycsoft.business.dao.task.WTeamDao;
 import com.ycsoft.business.dto.config.TaskBaseInfoDto;
 import com.ycsoft.business.dto.config.TaskUserDto;
+import com.ycsoft.business.dto.core.cust.CustFullInfoDto;
 import com.ycsoft.business.dto.device.DeviceDto;
 import com.ycsoft.business.service.ISnTaskService;
 import com.ycsoft.commons.constants.BusiCmdConstants;
@@ -40,6 +44,7 @@ import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.exception.ServicesException;
 import com.ycsoft.commons.helper.CollectionHelper;
+import com.ycsoft.commons.helper.DateHelper;
 import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.commons.store.MemoryDict;
 import com.ycsoft.daos.core.Pager;
@@ -73,8 +78,9 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 		//获取业务流水
 		Integer doneCode = doneCodeComponent.gDoneCode();
 		CCust cust = cCustDao.findByKey(custId);
-		snTaskComponent.createBugTask(doneCode, cust, bugDetail);
-		
+		String taskId = snTaskComponent.createBugTask(doneCode, cust, bugDetail);
+		this.setDoneCodeInfo(taskId, getBusiParam(), BusiCodeConstants.TASK_INIT);
+		saveAllPublic(doneCode, getBusiParam());
 	}
 
 	@Override
@@ -91,16 +97,17 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 			throw new ServicesException("工单已完工，不能修改");	
 		//获取业务流水
 		Integer doneCode = doneCodeComponent.gDoneCode();
+		this.setDoneCodeInfo(taskId, getBusiParam(), BusiCodeConstants.TASK_ASSIGN);
 		snTaskComponent.changeTaskTeam(doneCode, taskId, deptId,bugType);
-		
+		saveAllPublic(doneCode, getBusiParam());
 	}
 
 	@Override
 	public void cancelTask(String taskId)  throws Exception{
 		//获取业务流水
 		Integer doneCode = doneCodeComponent.gDoneCode();
+		this.setDoneCodeInfo(taskId, getBusiParam(), BusiCodeConstants.TASK_CANCEL);
 		snTaskComponent.cancelTask(doneCode, taskId);
-		getBusiParam().setBusiCode(BusiCodeConstants.TASK_CANCEL);
 		saveAllPublic(doneCode, getBusiParam());
 		
 	}
@@ -108,14 +115,37 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 	public void withdrawTask(String taskId)  throws Exception{
 		//获取业务流水
 		Integer doneCode = doneCodeComponent.gDoneCode();
+		this.setDoneCodeInfo(taskId, getBusiParam(), BusiCodeConstants.TASK_Withdraw);
 		snTaskComponent.withdrawTask(doneCode, taskId);
+		saveAllPublic(doneCode, getBusiParam());
 	}
 	
 	//回填销户回收设备
 	public void fillWriteOffTerminalTask(String taskId,String[] userIds) throws Exception{
 		//获取业务流水
 		Integer doneCode = doneCodeComponent.gDoneCode();
+		this.setDoneCodeInfo(taskId, getBusiParam(), BusiCodeConstants.TASK_FILL);
 		snTaskComponent.fillWriteOffTerminalTask(doneCode,taskId,userIds);
+		saveAllPublic(doneCode, getBusiParam());
+	}
+	
+	private void setDoneCodeInfo(String taskId, BusiParameter parameter, String busiCode) throws Exception {
+		WTaskBaseInfo task = wTaskBaseInfoDao.findByKey(taskId);
+		if (task == null){
+			throw new ServicesException("工单不存在!");
+		}
+		CCust cust = cCustDao.findByKey(task.getCust_id());
+		if(cust == null){
+			throw new ServicesException("客户不存在!");
+		}
+		List<CUser> userList = cUserDao.queryTaskUser(taskId);
+		if(userList.size() > 0){
+			parameter.setSelectedUsers(userList);
+		}
+		CustFullInfoDto custFullDto = new CustFullInfoDto();
+		custFullDto.setCust(cust);
+		parameter.setCustFullInfo(custFullDto);
+		parameter.setBusiCode(busiCode);
 	}
 
 	//回填开户、移机、故障单
@@ -136,7 +166,8 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 		if (task.getTask_type_id().equals(SystemConstants.TASK_TYPE_INSTALL)){
 			this.fillInstallUserDevice(doneCode, deviceList);
 		}
-		
+		this.setDoneCodeInfo(taskId, getBusiParam(), BusiCodeConstants.TASK_FILL);
+		saveAllPublic(doneCode, getBusiParam());
 	}
 	
 	//回填新装用户设备
@@ -303,11 +334,11 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 		}
 	}
 
-	@Override
 	/**
 	 * 完工
 	 * isBusi=true表示完工是前台发起
 	 */
+	@Override
 	public void finishTask(String taskId, String resultType,String remark,boolean isBusi)  throws Exception{
 		WTaskBaseInfo task = wTaskBaseInfoDao.findByKey(taskId);
 		if (task == null)
@@ -355,19 +386,25 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 						//删除客户设备
 						custComponent.removeDevice(task.getCust_id(), device.getDevice_id(), doneCode, SystemConstants.BOOLEAN_FALSE);
 						//更新用户设备信息为空
-						CUser cuser = new CUser();
-						cuser.setUser_id(user.getUser_id());
-						cuser.setStb_id("");
-						cuser.setCard_id("");
-						cuser.setModem_mac("");
-						cuser.setStatus(StatusConstants.UNTUCKEND);
-						cUserDao.update(cuser);
+						
+						CUser cuser = cUserDao.findByKey(user.getUser_id());
+						List<CUserPropChange> propChangeList = new ArrayList<CUserPropChange>();
+						if(StringHelper.isNotEmpty(cuser.getStb_id()))
+							propChangeList.add(new CUserPropChange("stb_id", cuser.getStb_id(), ""));
+						if(StringHelper.isNotEmpty(cuser.getCard_id()))
+							propChangeList.add(new CUserPropChange("card_id", cuser.getCard_id(), ""));
+						if(StringHelper.isNotEmpty(cuser.getModem_mac()))
+							propChangeList.add(new CUserPropChange("modem_mac", cuser.getModem_mac(), ""));
+						propChangeList.add(new CUserPropChange("status", cuser.getStatus(), StatusConstants.UNTUCKEND));
+						propChangeList.add(new CUserPropChange("status_date", DateHelper.dateToStr(cuser.getStatus_date()),DateHelper.dateToStr(new Date())));
+						userComponent.editUser(doneCode, user.getUser_id(), propChangeList);
 					}else{
 						//supernet的设备，但是没有回收，需要前台收取设备费用
-						CUser cuser = new CUser();
-						cuser.setUser_id(user.getUser_id());
-						cuser.setStatus(StatusConstants.UNTUCKEND);
-						cUserDao.update(cuser);
+						CUser cuser = cUserDao.findByKey(user.getUser_id());
+						List<CUserPropChange> propChangeList = new ArrayList<CUserPropChange>();
+						propChangeList.add(new CUserPropChange("status", cuser.getStatus(), StatusConstants.UNTUCKEND));
+						propChangeList.add(new CUserPropChange("status_date", DateHelper.dateToStr(cuser.getStatus_date()),DateHelper.dateToStr(new Date())));
+						userComponent.editUser(doneCode, user.getUser_id(), propChangeList);
 					}
 				}
 			}
@@ -376,6 +413,14 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 			snTaskComponent.updateTaskStatus(taskId, StatusConstants.TASK_ENDWAIT);
 			
 		}
+		
+		BusiParameter parameter = getBusiParam();
+		if(parameter == null){
+			parameter = new BusiParameter();
+		}
+		parameter.setSelectedUsers(users);
+		this.setDoneCodeInfo(taskId, parameter, BusiCodeConstants.TASK_FINISH);
+		saveAllPublic(doneCode, parameter);
 	}
 	
 	public void installSuccess(Integer doneCode,String custId,List<CUser> users) throws Exception {
@@ -405,6 +450,13 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 			//产品的到期日可能变化了，需要重发加授权
 			List<CProdOrder> prodList = orderComponent.queryOrderProdByUserId(user.getUser_id());
 			authComponent.sendAuth(user, prodList, BusiCmdConstants.ACCTIVATE_PROD, doneCode);
+			
+			for(CProdOrder order : prodList){
+				List<CProdPropChange> propChangeList = new ArrayList<CProdPropChange>();
+				propChangeList.add(new CProdPropChange("status", order.getStatus(), StatusConstants.ACTIVE));
+				propChangeList.add(new CProdPropChange("status_date", DateHelper.dateToStr(order.getStatus_date()), DateHelper.formatNow()));
+				userProdComponent.editProd(doneCode, order.getOrder_sn(), propChangeList);
+			}
 		}
 		
 		if (isCustPkgOpen){
@@ -531,7 +583,8 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 		//获取业务流水
 		Integer doneCode = doneCodeComponent.gDoneCode();
 		snTaskComponent.saveZte(doneCode, task_id, zte_status,log_remark);
-		
+		this.setDoneCodeInfo(task_id, getBusiParam(), BusiCodeConstants.TASK_ZTE_OPEN);
+		saveAllPublic(doneCode, getBusiParam());
 	}
 
 	

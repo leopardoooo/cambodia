@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.omg.PortableInterceptor.USER_EXCEPTION;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -25,7 +24,6 @@ import com.ycsoft.beans.core.promotion.CPromFee;
 import com.ycsoft.beans.core.promotion.CPromProdRefund;
 import com.ycsoft.beans.core.user.CRejectRes;
 import com.ycsoft.beans.core.user.CUser;
-import com.ycsoft.beans.core.user.CUserAtv;
 import com.ycsoft.beans.core.user.CUserBroadband;
 import com.ycsoft.beans.core.user.CUserDtv;
 import com.ycsoft.beans.core.user.CUserHis;
@@ -36,7 +34,6 @@ import com.ycsoft.beans.device.RStbModel;
 import com.ycsoft.beans.prod.PPromFee;
 import com.ycsoft.beans.prod.PPromFeeUser;
 import com.ycsoft.beans.prod.PRes;
-import com.ycsoft.beans.prod.PSpkg;
 import com.ycsoft.beans.prod.PSpkgOpenbusifee;
 import com.ycsoft.beans.prod.PSpkgOpenuser;
 import com.ycsoft.beans.system.SOptr;
@@ -46,7 +43,6 @@ import com.ycsoft.business.dao.config.TCustColonyCfgDao;
 import com.ycsoft.business.dao.config.TDeviceChangeReasonDao;
 import com.ycsoft.business.dao.core.cust.CCustDao;
 import com.ycsoft.business.dao.core.cust.CCustDeviceDao;
-import com.ycsoft.business.dao.core.fee.CFeeDao;
 import com.ycsoft.business.dao.core.job.JUserStopDao;
 import com.ycsoft.business.dao.core.prod.CProdOrderFeeDao;
 import com.ycsoft.business.dao.core.promotion.CPromFeeDao;
@@ -54,14 +50,9 @@ import com.ycsoft.business.dao.core.promotion.CPromProdRefundDao;
 import com.ycsoft.business.dao.core.promotion.CPromotionDao;
 import com.ycsoft.business.dao.core.user.CRejectResDao;
 import com.ycsoft.business.dao.core.user.CUserAtvDao;
-import com.ycsoft.business.dao.core.user.CUserAtvHisDao;
 import com.ycsoft.business.dao.core.user.CUserBroadbandDao;
-import com.ycsoft.business.dao.core.user.CUserBroadbandHisDao;
-import com.ycsoft.business.dao.core.user.CUserDao;
 import com.ycsoft.business.dao.core.user.CUserDtvDao;
-import com.ycsoft.business.dao.core.user.CUserDtvHisDao;
 import com.ycsoft.business.dao.core.user.CUserHisDao;
-import com.ycsoft.business.dao.core.user.CUserPropChangeDao;
 import com.ycsoft.business.dao.prod.PPromFeeDao;
 import com.ycsoft.business.dao.prod.PPromFeeProdDao;
 import com.ycsoft.business.dao.prod.PPromFeeUserDao;
@@ -77,7 +68,6 @@ import com.ycsoft.business.dto.core.prod.CPromotionDto;
 import com.ycsoft.business.dto.core.prod.PromFeeProdDto;
 import com.ycsoft.business.dto.core.user.ChangedUser;
 import com.ycsoft.business.dto.core.user.UserDto;
-import com.ycsoft.business.dto.core.user.UserRes;
 import com.ycsoft.commons.constants.DictKey;
 import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.constants.SystemConstants;
@@ -776,17 +766,13 @@ public class UserComponent extends BaseBusiComponent {
 	}
 	
 	public List<CUser> queryAllUserByUserIds(String[] userIds) throws JDBCException {
-		List<CUser> users= new ArrayList<CUser>();
-		users = cUserDao.queryUserByUserIds(userIds);
+		List<CUser> users = cUserDao.queryUserByUserIds(userIds);
 		fillUserName(users);
 		return users;
 	}
 	
 	public List<CUser> queryAllUserHisByUserIds(String[] userIds) throws JDBCException {
-		List<CUser> users= new ArrayList<CUser>();
-		users.addAll(cUserAtvDao.queryAtvHisByUserIds(userIds));
-		users.addAll(cUserDtvDao.queryDtvHisByUserIds(userIds));
-		users.addAll(cUserBroadbandDao.queryBandHisByUserIds(userIds));
+		List<CUser> users = cUserHisDao.queryAllUserHisByUserIds(userIds);
 		fillUserName(users);
 		return users;
 	}
@@ -1266,7 +1252,7 @@ public class UserComponent extends BaseBusiComponent {
 				}
 			}
 			if(userHis.size()>0){
-				List<CUserHis> userHisList = cUserHisDao.queryAllUserHisByUserIds(userIds);
+				List<CUser> userHisList = cUserHisDao.queryAllUserHisByUserIds(userIds);
 				if(userHisList.size()>0){
 					list.addAll(userHisList);
 				}
@@ -1275,6 +1261,8 @@ public class UserComponent extends BaseBusiComponent {
 		return list;
 	}
 	
-	
+	public List<CUser> queryTaskUser(String taskId) throws Exception {
+		return cUserDao.queryTaskUser(taskId);
+	}
 	
 }

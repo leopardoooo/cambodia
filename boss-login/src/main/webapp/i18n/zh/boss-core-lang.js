@@ -516,6 +516,7 @@ BCLang.home = {
 			_userTitle : '用户明细~',
 			_winTitle : '工单完工~',
 			_ZteWinTitle : 'ZTE授权~',
+			_fillDevTitle: '设备回填~',
 			forms : {
 				custNo : '客户编号~',
 				taskNo : '工单编号~',
