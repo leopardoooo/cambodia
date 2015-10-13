@@ -68,7 +68,10 @@ BCLang.common = {
 	enableBtn: 'Enable~',
 	cancelBtn: 'Cancel~',
 	doActionBtn: 'Manipulation~',
-	add: 'Add~'
+	add: 'Add~',
+	correct: 'Correct~',
+	untreated: 'Untreated~',
+	wrong: 'Wrong~'
 }
 //home page module
 BCLang.home = {
@@ -231,18 +234,18 @@ BCLang.home = {
 				titleBusiFeeGrid: 'Other Fee~',
 				ipFee: 'IP fee~',
 				
-				titleTransferPayDetailGrid: 'transfer paymentDetails~',
+				titleTransferPayDetailGrid: 'Transfer PaymentDetails~',
 				transferPayCM: ['Product Name~', 'Fee~', 'User~', ' Billing Starting Date~', 'Ending Billing Date~', 'Transfer Money Amount$~'],
 				transferDetailDate: ' Transferring Details（Billing Starting Date：{0} "）~',
-				labelChangeDeviceResion: 'The replacement need~',
+				labelChangeDeviceResion: 'The Replacement Need~',
 				labelChangeBuyDevice: ' Income from the purchase cost~',
 				labelChangeReclaimDevice: ' Recycling Equipment~',
 				labelChangeLossDevice: ' Report the loss of equipment~',
 				
-				oldOrderFee: 'original order amount~',
-				oldTransFee: 'original transfer payments~',
-				realOrderFee: 'new orders amount~',
-				newAddFee: 'up close to the amount of~'
+				oldOrderFee: 'Original Order Amount~',
+				oldTransFee: 'Original Transfer Payments~',
+				realOrderFee: 'New Orders Amount~',
+				newAddFee: 'Up close to the amount of~'
 			},
 			list: {
 				_title: 'User Information~',

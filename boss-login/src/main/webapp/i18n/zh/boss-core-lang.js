@@ -68,7 +68,10 @@ BCLang.common = {
 	enableBtn:'启用~',
 	cancelBtn:'取消~',
 	doActionBtn:'操作~',
-	add: '添加~'
+	add: '添加~',
+	correct: '正确~',
+	untreated: '未处理~',
+	wrong: '错误~'
 }
 //主页模块
 BCLang.home = {
