@@ -14,7 +14,7 @@ OrderProdEditForm = Ext.extend(BaseForm, {
 		OrderProdEditForm.superclass.constructor.call(this, {
 			border: false,
 			bodyStyle: 'padding-top:15px',
-			labelWidth: 120,
+			labelWidth: 150,
 			items: [{
 				id: 'cmProdId',
 				fieldLabel: lmain("user._form.prodName"),
