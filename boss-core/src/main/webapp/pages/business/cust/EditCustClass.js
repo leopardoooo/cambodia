@@ -26,7 +26,7 @@ EditCustLevelForm = Ext.extend( BaseForm , {
 		EditCustLevelForm.superclass.constructor.call(this, {
 			border:false,
 			bodyStyle:'padding-top:10px',
-			labelWidth:100,
+			labelWidth:180,
 			items:[{
 				xtype:'displayfield',fieldLabel: langUtils.main("cust._form.oldCustLevel"),
 				value:this.formerCustLevel

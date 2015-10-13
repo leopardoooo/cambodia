@@ -10,7 +10,7 @@ SaleDeviceFee = Ext.extend(BaseForm, {
 		SaleDeviceFee.superclass.constructor.call(this, {
 				border : false,							
 				bodyStyle: Constant.TAB_STYLE,
-	            labelWidth:120,
+	            labelWidth:150,
 				baseCls: 'x-plain',
 				items : [{
 						xtype : 'hidden',
