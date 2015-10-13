@@ -619,7 +619,7 @@ BCLang.msgBox = {
 	selectRec4CancelFee:'请选择要冲正的费用记录!~',
 	confirmUnPayWithParam:'确定要回退【金额：{0} 】吗?~',
 	selectRecCancelPayFee:'请选择要回退的支付记录!',
-	confirmCancelPayFeeWithParam:'确定要支付回退并作废发票:{0}',
+	confirmCancelPayFeeWithParam:'确定要支付回退并作废发票:{0}~',
 	confirmCancelPayFeeWithNoParam:'确定要支付回退?',
 	cancelPayFeeSuccess:'支付回退冲正成功!',
 	confirmRestoreCust:'是否确定返销户?~',
@@ -634,7 +634,7 @@ BCLang.msgBox = {
 	confirmBankStop:'确定要暂停卡扣吗?~',
 	confirmEnableBankPay:'启用银行扣费吗?~',
 	confirmDisableBankPay:'禁止银行扣费吗?~',
-	confirmEditBankPay:'确定该产品',
+	confirmEditBankPay:'确定该产品~',
 	confirmBankResume:'确定要恢复卡扣吗?~',
 	confirmRenewCust:'去顶恢复客户状态吗?~',
 	commonSuccess: '业务操作成功!~',
@@ -746,5 +746,7 @@ BCLang.msgBox = {
 	exceedPkgMaxUserNum: '已超过套餐最大用户数限制!~',
 	completeChooseUserTerminal: '请完整选择需要参加的每种用户类型终端!~',
 	newOrderAmountCantBeLessThanZero: '新订单金额不能小于零!~',
-	newOrderAmountCantBeLessThanTransAmount: '新订单金额不能小于转移金额~'
+	newOrderAmountCantBeLessThanTransAmount: '新订单金额不能小于转移金额~',
+	CancelTheAccountDismantleDevice:'请先拆机或工单作废~',
+	PleaseCancelTheOttMainTerminal:'请先销户OTT主终端~'
 }

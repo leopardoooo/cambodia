@@ -216,8 +216,10 @@ public class TaskAction extends BaseBusiAction{
 	}
 	
 	public String fillWriteOffTerminalTask() throws Exception{
-		String userIds = request.getParameter("userIds");
-		snTaskService.fillWriteOffTerminalTask(task_id, userIds.split(","));
+		String devices = request.getParameter("devices");
+		Type t = new TypeToken<List<TaskFillDevice>>(){}.getType();
+		List<TaskFillDevice> list = JsonHelper.gson.fromJson( devices , t);
+		snTaskService.fillWriteOffTerminalTask(task_id, list);
 		return JSON_SUCCESS;
 	}
 	

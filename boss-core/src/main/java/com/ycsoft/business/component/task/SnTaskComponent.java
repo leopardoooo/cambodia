@@ -104,7 +104,7 @@ public class SnTaskComponent extends BaseBusiComponent {
 		List<CUser> bandList = getUserByTyoe(userList, SystemConstants.USER_TYPE_BAND);
 		String teamType = SystemConstants.TEAM_TYPE_SUPERNET;
 		String synStatus=StatusConstants.NONE;
-		if (assignType.equals(SystemConstants.TASK_ASSIGN_CFOCN)){
+		if (SystemConstants.TASK_ASSIGN_CFOCN.equals(assignType)){
 			teamType = SystemConstants.TEAM_TYPE_CFOCN;
 			synStatus=StatusConstants.NOT_EXEC;
 		}
@@ -392,8 +392,8 @@ public class SnTaskComponent extends BaseBusiComponent {
 		return userList;
 	}
 
-	public void fillWriteOffTerminalTask(int doneCode, String taskId, String[] userIds) throws Exception {
-		wTaskUserDao.updateRecycle(taskId, userIds);
+	public void fillWriteOffTerminalTask(int doneCode, String taskId, String[] userIds, String recycle_result) throws Exception {
+		wTaskUserDao.updateRecycle(taskId, userIds,recycle_result);
 		createTaskLog(taskId, BusiCodeConstants.TASK_FILL, doneCode, null, StatusConstants.NONE);
 	}
 
@@ -550,7 +550,7 @@ public class SnTaskComponent extends BaseBusiComponent {
 					taskUser.setRecycle_device(SystemConstants.BOOLEAN_TRUE);
 				} else {
 					taskUser.setRecycle_device(SystemConstants.BOOLEAN_FALSE);
-					taskUser.setRecycle_result(SystemConstants.BOOLEAN_FALSE);
+//					taskUser.setRecycle_result(SystemConstants.BOOLEAN_FALSE);
 				}
 			}else if((taskType.equals(SystemConstants.TASK_TYPE_MOVE) || taskType.equals(SystemConstants.TASK_TYPE_FAULT))
 					&& user.getUser_type().equals(SystemConstants.USER_TYPE_BAND) && StringHelper.isEmpty(taskUser.getDevice_id())){

@@ -147,15 +147,23 @@ var TaskDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 			},this);
 			return arr;
 		},
-		getUserIds:function(){
+		getWriteOffTerminalValue:function(){
 			var arr=[];
-			var store = this.getStore();
-			store.each(function(record){
-				if(record.get('recycle_result') == 'T'){
-					arr.push(record.get('user_id'));
-				}
+			var records = this.getStore().getModifiedRecords();
+			Ext.each(records,function(record){
+				var values = {};
+				values["recycle_result"] = record.get('recycle_result');
+				values["userId"] =record.get('user_id');
+				arr.push(values);
 			},this);
 			return arr;
+//			var store = this.getStore();
+//			store.each(function(record){
+//				if(record.get('recycle_result') == 'T'){
+//					arr.push(record.get('user_id'));
+//				}
+//			},this);
+//			return arr;
 		},
 		checkDeviceCode : function(){
 			this.stopEditing();//停止编辑
@@ -198,9 +206,9 @@ TaskDeviceWin = Ext.extend(Ext.Window,{
 		if(!this.deviceGrid.checkDeviceCode()){return false;}
 		var o ={},url;
 		if(this.task_type_id == '9'){//销终端工单
-			var data = this.deviceGrid.getUserIds();
+			var data = this.deviceGrid.getWriteOffTerminalValue();
 			url = Constant.ROOT_PATH + "/core/x/Task!fillWriteOffTerminalTask.action";
-			o = {task_id:this.task_id,userIds : data.join(",")};
+			o = {task_id:this.task_id,devices : Ext.encode(data)};
 		}else{
 			var data = this.deviceGrid.getValues();
 			url = Constant.ROOT_PATH + "/core/x/Task!fillTask.action";
@@ -714,7 +722,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 		});
 		teamCombo.getStore().loadData(arr);
 		var form = new Ext.form.FormPanel({
-			labelWidth: 90,
+			labelWidth: 150,
 			bodyStyle: 'padding-top: 10px;',
 			items: [teamCombo]
 		});
@@ -730,7 +738,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 			form.add(bugCauseCombo);
 		}
 		var win = new Ext.Window({
-			width: 320,
+			width: 450,
 			height: 250,
 			title: lbc('home.tools.TaskManager.forms.taskTeam'),
 			border: false,
@@ -810,19 +818,19 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 		var endForm = new Ext.form.FormPanel({
 			layout : 'form',
 			border : false,
-			labelWidth : 100,
+			labelWidth : 150,
 			bodyStyle : 'padding : 5px;padding-top : 10px;',
 			items: [finishCombo,{
 				fieldLabel: lbc('home.tools.TaskManager.forms.finishExplan'),
 				name:'finishRemark',
-				height : 100,
-				width : 240,
+				height : 140,
+				width : 200,
 				xtype:'textarea'
 			}]
 		});
 		var win = new Ext.Window({
 			width: 450,
-			height: 250,
+			height: 300,
 			title: lbc('home.tools.TaskManager._winTitle'),
 			border: false,
 			closeAction:'close',

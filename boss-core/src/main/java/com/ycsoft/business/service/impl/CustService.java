@@ -391,18 +391,18 @@ public class CustService extends BaseBusiService implements ICustService {
 			ownership = SystemConstants.OWNERSHIP_GD;
 		}
 		
-		deviceComponent.updateDeviceOwnership(doneCode, busiCode, deviceId,device.getOwnership(),ownership,true);
+		deviceComponent.updateDeviceOwnership(doneCode, busiCode, deviceId,device.getOwnership(),ownership,null,true);
 		
 		if(device.getPairCard() != null){
 			DeviceDto pairCard = deviceComponent.queryDeviceByDeviceId(device.getPairCard().getDevice_id());
 			if(pairCard.getDevice_id() != null){
-				deviceComponent.updateDeviceOwnership(doneCode, busiCode, pairCard.getDevice_id(),pairCard.getOwnership(),ownership,false);
+				deviceComponent.updateDeviceOwnership(doneCode, busiCode, pairCard.getDevice_id(),pairCard.getOwnership(),ownership,null,false);
 			}
 		}
 		if(device.getPairModem() != null){
 			DeviceDto pairModem = deviceComponent.queryDeviceByDeviceId(device.getPairModem().getDevice_id());
 			if(pairModem.getDevice_id() != null){
-				deviceComponent.updateDeviceOwnership(doneCode, busiCode, pairModem.getDevice_id(),pairModem.getOwnership(),ownership,false);
+				deviceComponent.updateDeviceOwnership(doneCode, busiCode, pairModem.getDevice_id(),pairModem.getOwnership(),ownership,null,false);
 			}
 		}
 		
@@ -482,28 +482,28 @@ public class CustService extends BaseBusiService implements ICustService {
 			deviceComponent.updateBuyMode(doneCode, busiCode, device.getDevice_id(),null,buyMode);
 			
 			//修改设备的仓库状态为占用，如果设备有配对的智能卡，修改智能卡的状态为占用
-			deviceComponent.updateDeviceDepotStatus(doneCode, busiCode, device.getDevice_id(),device.getDepot_status(), StatusConstants.USE,true);
+			deviceComponent.updateDeviceDepotStatus(doneCode, busiCode, device.getDevice_id(),device.getDepot_status(), StatusConstants.USE,null,true);
 			if (pairDevice != null)
-				deviceComponent.updateDeviceDepotStatus(doneCode, busiCode, pairDevice.getDevice_id(),pairDevice.getDepot_status(), StatusConstants.USE,false);
+				deviceComponent.updateDeviceDepotStatus(doneCode, busiCode, pairDevice.getDevice_id(),pairDevice.getDepot_status(), StatusConstants.USE,null,false);
 			if (pairModemDevice != null)
-				deviceComponent.updateDeviceDepotStatus(doneCode, busiCode, pairModemDevice.getDevice_id(),pairModemDevice.getDepot_status(), StatusConstants.USE,false);
+				deviceComponent.updateDeviceDepotStatus(doneCode, busiCode, pairModemDevice.getDevice_id(),pairModemDevice.getDepot_status(), StatusConstants.USE,null,false);
 			//根据设备的购买方式判断是否需要修改设备的产权
 			if (StringHelper.isNotEmpty(oldDeviceOwnShip)){
 				if ( oldDeviceOwnShip.equals(SystemConstants.OWNERSHIP_CUST)){
-					deviceComponent.updateDeviceOwnership(doneCode, busiCode, device.getDevice_id(),device.getOwnership(),SystemConstants.OWNERSHIP_CUST,true);
+					deviceComponent.updateDeviceOwnership(doneCode, busiCode, device.getDevice_id(),device.getOwnership(),SystemConstants.OWNERSHIP_CUST,null,true);
 					if (pairDevice != null)
-						deviceComponent.updateDeviceOwnership(doneCode, busiCode, pairDevice.getDevice_id(),pairDevice.getOwnership(), SystemConstants.OWNERSHIP_CUST,false);
+						deviceComponent.updateDeviceOwnership(doneCode, busiCode, pairDevice.getDevice_id(),pairDevice.getOwnership(), SystemConstants.OWNERSHIP_CUST,null,false);
 					if (pairModemDevice != null)
-						deviceComponent.updateDeviceOwnership(doneCode, busiCode, pairModemDevice.getDevice_id(),pairModemDevice.getOwnership(), SystemConstants.OWNERSHIP_CUST,false);
+						deviceComponent.updateDeviceOwnership(doneCode, busiCode, pairModemDevice.getDevice_id(),pairModemDevice.getOwnership(), SystemConstants.OWNERSHIP_CUST,null,false);
 				}
 			} else {
 				TDeviceBuyMode deviceBuyMode = busiConfigComponent.queryBuyMode(buyMode);
 				if (SystemConstants.BOOLEAN_TRUE.equals(deviceBuyMode.getChange_ownship())){
-					deviceComponent.updateDeviceOwnership(doneCode, busiCode, device.getDevice_id(),device.getOwnership(),SystemConstants.OWNERSHIP_CUST,true);
+					deviceComponent.updateDeviceOwnership(doneCode, busiCode, device.getDevice_id(),device.getOwnership(),SystemConstants.OWNERSHIP_CUST,buyMode,true);
 					if (pairDevice != null)
-						deviceComponent.updateDeviceOwnership(doneCode, busiCode, pairDevice.getDevice_id(),pairDevice.getOwnership(), SystemConstants.OWNERSHIP_CUST,false);
+						deviceComponent.updateDeviceOwnership(doneCode, busiCode, pairDevice.getDevice_id(),pairDevice.getOwnership(), SystemConstants.OWNERSHIP_CUST,buyMode,false);
 					if (pairModemDevice != null)
-						deviceComponent.updateDeviceOwnership(doneCode, busiCode, pairModemDevice.getDevice_id(),pairModemDevice.getOwnership(), SystemConstants.OWNERSHIP_CUST,false);
+						deviceComponent.updateDeviceOwnership(doneCode, busiCode, pairModemDevice.getDevice_id(),pairModemDevice.getOwnership(), SystemConstants.OWNERSHIP_CUST,buyMode,false);
 				}			
 			}
 			
@@ -545,7 +545,7 @@ public class CustService extends BaseBusiService implements ICustService {
 		//获取本地该器材的数量
 		RDevice device = deviceComponent.queryTotalNumDevice(deviceModel, getOptr().getDept_id());
 		//本地器材数量减去已购数量
-		deviceComponent.removeTotalNumDevice(doneCode,BusiCodeConstants.DEVICE_BUY_PJ,device.getDevice_id(), buyNum,getOptr());
+		deviceComponent.removeTotalNumDevice(doneCode,BusiCodeConstants.DEVICE_BUY_PJ,device.getDevice_id(), buyNum,buyMode,getOptr());
 		
 		//保存设备销售费用
 		if(feeInfoList != null){
@@ -860,11 +860,11 @@ public class CustService extends BaseBusiService implements ICustService {
 		//修改设备的产权
 		if(device.getOwnership().equals(SystemConstants.OWNERSHIP_GD) && changeOwnship.equals("T")){
 			String newValue = SystemConstants.OWNERSHIP_CUST;
-			deviceComponent.updateDeviceOwnership(doneCode, param.getBusiCode(), deviceId,device.getOwnership(), newValue,true);
+			deviceComponent.updateDeviceOwnership(doneCode, param.getBusiCode(), deviceId,device.getOwnership(), newValue,buyMode,true);
 			if (StringHelper.isNotEmpty(pairDevice.getDevice_id()) && pairDevice.getIs_virtual().equals(SystemConstants.BOOLEAN_FALSE))
-				deviceComponent.updateDeviceOwnership(doneCode, param.getBusiCode(), pairDevice.getDevice_id(), pairDevice.getOwnership(),newValue,false);
+				deviceComponent.updateDeviceOwnership(doneCode, param.getBusiCode(), pairDevice.getDevice_id(), pairDevice.getOwnership(),newValue,buyMode,false);
 			if (StringHelper.isNotEmpty(pairModemDevice.getDevice_id()) && pairModemDevice.getIs_virtual().equals(SystemConstants.BOOLEAN_FALSE))
-				deviceComponent.updateDeviceOwnership(doneCode, param.getBusiCode(), pairModemDevice.getDevice_id(), pairModemDevice.getOwnership(),newValue,false);
+				deviceComponent.updateDeviceOwnership(doneCode, param.getBusiCode(), pairModemDevice.getDevice_id(), pairModemDevice.getOwnership(),newValue,buyMode,false);
 		}
 		
 		//记录购买方式异动
@@ -921,11 +921,11 @@ public class CustService extends BaseBusiService implements ICustService {
 		if (SystemConstants.BOOLEAN_FALSE.equals(deviceBuyMode.getChange_ownship())){
 			   newOwnership = SystemConstants.OWNERSHIP_GD;
 		}	
-		deviceComponent.updateDeviceOwnership(doneCode, param.getBusiCode(), device.getDevice_id(),device.getOwnership(),newOwnership,true);
+		deviceComponent.updateDeviceOwnership(doneCode, param.getBusiCode(), device.getDevice_id(),device.getOwnership(),newOwnership,buyMode,true);
 		if (pairDevice.getDevice_id() != null)
-			deviceComponent.updateDeviceOwnership(doneCode, param.getBusiCode(), pairDevice.getDevice_id(),pairDevice.getOwnership(), newOwnership,false);
+			deviceComponent.updateDeviceOwnership(doneCode, param.getBusiCode(), pairDevice.getDevice_id(),pairDevice.getOwnership(), newOwnership,buyMode,false);
 		if (pairModemDevice.getDevice_id() != null)
-			deviceComponent.updateDeviceOwnership(doneCode, param.getBusiCode(), pairModemDevice.getDevice_id(),pairModemDevice.getOwnership(), newOwnership,false);
+			deviceComponent.updateDeviceOwnership(doneCode, param.getBusiCode(), pairModemDevice.getDevice_id(),pairModemDevice.getOwnership(), newOwnership,buyMode,false);
 		
 		//记录购买方式异动
 		CCustDevice custDevice = custComponent.queryCustDeviceByDeviceId(device.getDevice_id());
@@ -1099,8 +1099,8 @@ public class CustService extends BaseBusiService implements ICustService {
 	private void saveDeviceOwnership(RDevice newDevice,RDevice oldDevice,String busiCode,Integer doneCode,boolean key) throws Exception {
 		//根据设备的购买方式判断是否需要修改设备的产权
 		if(newDevice != null && oldDevice != null){
-			deviceComponent.updateDeviceOwnership(doneCode, busiCode, newDevice.getDevice_id(), newDevice.getOwnership(), oldDevice.getOwnership(),key);
-			deviceComponent.updateDeviceOwnership(doneCode, busiCode, oldDevice.getDevice_id(), oldDevice.getOwnership(), newDevice.getOwnership(),key);
+			deviceComponent.updateDeviceOwnership(doneCode, busiCode, newDevice.getDevice_id(), newDevice.getOwnership(), oldDevice.getOwnership(),null,key);
+			deviceComponent.updateDeviceOwnership(doneCode, busiCode, oldDevice.getDevice_id(), oldDevice.getOwnership(), newDevice.getOwnership(),null,key);
 		}
 	}
 	
@@ -1166,11 +1166,11 @@ public class CustService extends BaseBusiService implements ICustService {
 				}
 			}
 			//修改设备的仓库状态为占用，如果设备有配对的智能卡，修改智能卡的状态为占用
-			deviceComponent.updateDeviceDepotStatus(doneCode, busiCode, newDevice.getDevice_id(),newDevice.getDepot_status(), StatusConstants.USE,true);
+			deviceComponent.updateDeviceDepotStatus(doneCode, busiCode, newDevice.getDevice_id(),newDevice.getDepot_status(), StatusConstants.USE,null,true);
 			if (pairDevice != null)
-				deviceComponent.updateDeviceDepotStatus(doneCode, busiCode, pairDevice.getDevice_id(),pairDevice.getDepot_status(), StatusConstants.USE,false);
+				deviceComponent.updateDeviceDepotStatus(doneCode, busiCode, pairDevice.getDevice_id(),pairDevice.getDepot_status(), StatusConstants.USE,null,false);
 			if (pairModemDevice != null)
-				deviceComponent.updateDeviceDepotStatus(doneCode, busiCode, pairModemDevice.getDevice_id(),pairModemDevice.getDepot_status(), StatusConstants.USE,false);
+				deviceComponent.updateDeviceDepotStatus(doneCode, busiCode, pairModemDevice.getDevice_id(),pairModemDevice.getDepot_status(), StatusConstants.USE,null,false);
 			
 			//更新设备为旧设备
 			if (newDevice.getUsed().equals(SystemConstants.BOOLEAN_TRUE))
@@ -2186,7 +2186,7 @@ public class CustService extends BaseBusiService implements ICustService {
 			//获取本地该器材的数量
 			RDevice device = deviceComponent.queryTotalNumDevice(dto.getDevice_model(), getOptr().getDept_id());
 			//本地器材数量减去已购数量
-			deviceComponent.removeTotalNumDevice(doneCode,BusiCodeConstants.DEVICE_BUY_PJ_BACTH,device.getDevice_id(), dto.getBuy_num(),getOptr());
+			deviceComponent.removeTotalNumDevice(doneCode,BusiCodeConstants.DEVICE_BUY_PJ_BACTH,device.getDevice_id(), dto.getBuy_num(),SystemConstants.BUSI_BUY_MODE_BUY,getOptr());
 			
 			//保存费用
 			String feeId = dto.getFee_id();

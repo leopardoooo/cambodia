@@ -15,6 +15,17 @@ public class TaskFillDevice {
 	private DeviceDto oldDevice;
 	
 	private String userId;
+	private String recycle_result;
+	
+	
+
+	public String getRecycle_result() {
+		return recycle_result;
+	}
+
+	public void setRecycle_result(String recycle_result) {
+		this.recycle_result = recycle_result;
+	}
 
 	public String getDeviceCode() {
 		return deviceCode;

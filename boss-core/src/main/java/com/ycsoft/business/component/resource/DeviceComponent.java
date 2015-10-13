@@ -139,15 +139,15 @@ public class DeviceComponent extends BaseBusiComponent {
 	 * @param status   修改的仓库状态
 	 */
 	public void updateDeviceDepotStatus(Integer doneCode, String busiCode,
-			String deviceId, String oldValue,String newValue,boolean key) throws Exception {
+			String deviceId, String oldValue,String newValue,String buyMode,boolean key) throws Exception {
 		if (!oldValue.equals(newValue)){
 			RDevice rd = new RDevice();
 			rd.setDevice_id(deviceId);
 			rd.setDepot_status(newValue);
 			rDeviceDao.update(rd);
 			if (key){	
-				saveDeviceChange(doneCode, busiCode, deviceId, "depot_status",
-						oldValue, newValue);
+				saveDeviceChangeAndBuyMode(doneCode, busiCode, deviceId, "depot_status",
+						oldValue, newValue,buyMode);
 			}
 		}
 	}
@@ -329,15 +329,15 @@ public class DeviceComponent extends BaseBusiComponent {
 	 * @param depot_id
 	 */
 	public void updateDeviceDepotId(Integer doneCode, String busiCode,
-			String deviceId, String oldDepotId, String newDepotId,boolean key) throws Exception {
+			String deviceId, String oldDepotId, String newDepotId,String buyMode,boolean key) throws Exception {
 		if (!oldDepotId.equals(newDepotId)) {
 			RDevice rd = new RDevice();
 			rd.setDevice_id(deviceId);
 			rd.setDepot_id(newDepotId);
 			rDeviceDao.update(rd);
 			if(key){
-				saveDeviceChange(doneCode, busiCode, deviceId, "depot_id",
-						oldDepotId, newDepotId);
+				saveDeviceChangeAndBuyMode(doneCode, busiCode, deviceId, "depot_id",
+						oldDepotId, newDepotId,buyMode);
 			}
 		}
 	}
@@ -350,15 +350,15 @@ public class DeviceComponent extends BaseBusiComponent {
 	 * @param ownerShip
 	 */
 	public void updateDeviceOwnership(Integer doneCode, String busiCode,
-			String deviceId, String oldValue,String newValue,boolean key) throws Exception {
+			String deviceId, String oldValue,String newValue,String buyMode,boolean key) throws Exception {
 		if (!oldValue.equals(newValue)){
 			RDevice rd = new RDevice();
 			rd.setDevice_id(deviceId);
 			rd.setOwnership(newValue);
 			rDeviceDao.update(rd);
 			if(key){
-				saveDeviceChange(doneCode, busiCode, deviceId, "ownership",
-						oldValue, newValue);
+				saveDeviceChangeAndBuyMode(doneCode, busiCode, deviceId, "ownership",
+						oldValue, newValue,buyMode);
 			}
 		}
 	}
@@ -526,8 +526,8 @@ public class DeviceComponent extends BaseBusiComponent {
 	public void exchangeDeviceOwnership(Integer doneCode,String busiCode,
 			DeviceDto d1,DeviceDto d2) throws Exception{
 		if (!d1.getOwnership().equals(d2.getOwnership())){
-			updateDeviceOwnership(doneCode, busiCode, d1.getDevice_id(), d2.getOwnership(),d1.getOwnership(),true);
-			updateDeviceOwnership(doneCode, busiCode, d2.getDevice_id(), d1.getOwnership(),d2.getOwnership(),true);
+			updateDeviceOwnership(doneCode, busiCode, d1.getDevice_id(), d2.getOwnership(),d1.getOwnership(),null,true);
+			updateDeviceOwnership(doneCode, busiCode, d2.getDevice_id(), d1.getOwnership(),d2.getOwnership(),null,true);
 		}
 	}
 
@@ -829,6 +829,12 @@ public class DeviceComponent extends BaseBusiComponent {
 				,getOptr().getDept_id(),getOptr().getCounty_id(),getOptr().getArea_id());
 	}
 	
+	private void saveDeviceChangeAndBuyMode(Integer doneCode, String busiCode,
+			String deviceId, String columnName, String oldValue, String newValue,String buyMode) throws Exception {
+		rDeviceChangeDao.saveDeviceChangeAndBuyMode(doneCode,busiCode,deviceId,columnName,oldValue,newValue,buyMode,getOptr().getOptr_id()
+				,getOptr().getDept_id(),getOptr().getCounty_id(),getOptr().getArea_id());
+	}
+	
 	/**
 	 * 
 	 * @param doneCode
@@ -1019,14 +1025,15 @@ public class DeviceComponent extends BaseBusiComponent {
 	 * @param deviceModel
 	 * @param optr
 	 * @param buyNum 
+	 * @param buyMode 
 	 * @throws Exception
 	 */
-	public void removeTotalNumDevice(Integer doneCode,String busiCode,String deviceId, Integer buyNum,SOptr optr) throws Exception{
+	public void removeTotalNumDevice(Integer doneCode,String busiCode,String deviceId, Integer buyNum,String buyMode, SOptr optr) throws Exception{
 		RDevice device = rDeviceDao.findByKey(deviceId);
 		
 		//总数异动记录
 		rDeviceChangeDao.saveMateralTransChange(doneCode,busiCode,device.getDevice_id(),"total_num",device.getTotal_num()
-				,device.getTotal_num()-buyNum,optr.getOptr_id(),optr.getDept_id(),optr.getCounty_id(), optr.getArea_id());
+				,device.getTotal_num()-buyNum,optr.getOptr_id(),optr.getDept_id(),optr.getCounty_id(), optr.getArea_id(),buyMode);
 		//减去数量
 		rDeviceDao.removeMateralDevice(deviceId, buyNum);
 		RDevice nextRdevice = rDeviceDao.findByKey(deviceId);

@@ -625,12 +625,13 @@ BCLang.msgBox = {
 	confirmBankStop:'Sure to suspend fee deduction of card?~',
 	confirmEnableBankPay:'Start fee deduction of bank card?~',
 	confirmDisableBankPay:'Forbid fee deduction of bank card?~',
-	confirmEditBankPay:'Confirm the Product',
+	confirmEditBankPay:'Confirm the Product~',
 	confirmBankResume:'Sure to restore fee deduction from card?~',
 	confirmRenewCust:'Restore Customer Status?~',
-	confirmCancelPayFeeWithParam:'Determined to pay rollback and void an invoice:{0}',
-	confirmCancelPayFeeWithNoParam:'Determined to pay rollback?',
-	cancelPayFeeSuccess:'Payment rollback Reversal Success!',
+	confirmCancelPayFeeWithParam:'Determined to pay rollback and void an invoice:{0}~',
+	confirmCancelPayFeeWithNoParam:'Determined to pay rollback?~',
+	cancelPayFeeSuccess:'Payment rollback Reversal Success!~',
+	commonSuccess: 'Operation success!~',
 	
 	custHasUnSuitableDev:'This User cannot do Equipment exchange now~',
 	custCantExchangeDev:' This User cannot do Equipment exchange now~',
@@ -736,6 +737,8 @@ BCLang.msgBox = {
 	chooseInUsers: 'Please select Terminal User to join package!~',
 	exceedPkgMaxUserNum: 'More than max quantity limit of package!~',
 	completeChooseUserTerminal: 'Please fully select every User Type Terminal!~',
-	newOrderAmountCantBeLessThanZero: 'new orders amount can not be less than zero ~!',
-	newOrderAmountCantBeLessThanTransAmount: 'new orders can not be less than the amount of the transfer amount ~'
+	newOrderAmountCantBeLessThanZero: 'new orders amount can not be less than zero~!',
+	newOrderAmountCantBeLessThanTransAmount: 'new orders can not be less than the amount of the transfer amount~',
+	CancelTheAccountDismantleDevice:'Please dismantle device or cancel work order~',
+	PleaseCancelTheOttMainTerminal:'Please cancel the main terminal OTT~'
 }

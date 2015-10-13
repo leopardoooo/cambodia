@@ -45,7 +45,7 @@ public interface ISnTaskService {
 	 * @param userIds
 	 * @throws Exception
 	 */
-	public void fillWriteOffTerminalTask(String taskId,String[] userIds) throws Exception;
+	public void fillWriteOffTerminalTask(String taskId,List<TaskFillDevice> deviceList) throws Exception;
 	
 	/**
 	 * 完工

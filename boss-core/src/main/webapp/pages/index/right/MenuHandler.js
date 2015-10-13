@@ -856,7 +856,7 @@ Ext.apply(MenuHandler, {
 			return false;
 		}
 		if (userRecords[0].get("user_type") !='OTT_MOBILE' && userRecords[0].get("status") != "UNTUCKEND") {
-			Alert('用户还未拆机完成或者工单未作废');
+			Alert(lmsg('CancelTheAccountDismantleDevice'));
 			return false;
 		}
 		
@@ -866,7 +866,7 @@ Ext.apply(MenuHandler, {
 			var record = store.getAt(i);
 			if(userRecords[0].get('user_type') == 'OTT' && userRecords[0].get('terminal_type') == 'FZD'
 				&& userRecords[0].get('user_id') != record.get('user_id') && record.get('user_type') == 'OTT' && record.get('terminal_type') == 'ZZD'){
-					Alert('请先销户OTT主终端!');
+					Alert(lmsg('PleaseCancelTheOttMainTerminal'));
 					return false;
 			}
 		}

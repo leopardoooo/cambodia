@@ -35,6 +35,7 @@ import com.ycsoft.business.dao.task.WTeamDao;
 import com.ycsoft.business.dto.config.TaskBaseInfoDto;
 import com.ycsoft.business.dto.config.TaskUserDto;
 import com.ycsoft.business.dto.core.cust.CustFullInfoDto;
+import com.ycsoft.business.dto.core.print.PrintItemDto;
 import com.ycsoft.business.dto.device.DeviceDto;
 import com.ycsoft.business.service.ISnTaskService;
 import com.ycsoft.commons.constants.BusiCmdConstants;
@@ -120,12 +121,17 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 		saveAllPublic(doneCode, getBusiParam());
 	}
 	
-	//回填销户回收设备
-	public void fillWriteOffTerminalTask(String taskId,String[] userIds) throws Exception{
+	//回填销户回收设备,不管设备是否属于客户都可以回收
+	public void fillWriteOffTerminalTask(String taskId,List<TaskFillDevice> deviceList) throws Exception{
 		//获取业务流水
 		Integer doneCode = doneCodeComponent.gDoneCode();
 		this.setDoneCodeInfo(taskId, getBusiParam(), BusiCodeConstants.TASK_FILL);
-		snTaskComponent.fillWriteOffTerminalTask(doneCode,taskId,userIds);
+		
+		Map<String, List<TaskFillDevice>> map = CollectionHelper.converToMap(deviceList, "recycle_result");
+		for(String key : map.keySet()){
+			List<TaskFillDevice> userList = map.get(key);
+			snTaskComponent.fillWriteOffTerminalTask(doneCode,taskId,CollectionHelper.converValueToArray(userList, "user_id"),key);
+		}
 		saveAllPublic(doneCode, getBusiParam());
 	}
 	
@@ -199,11 +205,11 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 				DeviceDto oldDevice = fillDevice.getOldDevice();
 				//更新设备仓库状态
 				deviceComponent.updateDeviceDepotStatus(doneCode, BusiCodeConstants.TASK_FILL, oldDevice.getDevice_id(),
-						oldDevice.getDepot_status(), StatusConstants.IDLE,true);
+						oldDevice.getDepot_status(), StatusConstants.IDLE,null,true);
 				//更新设备产权
 				if (!SystemConstants.OWNERSHIP_GD.equals(ownership)){
 					deviceComponent.updateDeviceOwnership(doneCode, BusiCodeConstants.TASK_FILL,
-							oldDevice.getDevice_id(),oldDevice.getOwnership(),SystemConstants.OWNERSHIP_GD,true);
+							oldDevice.getDevice_id(),oldDevice.getOwnership(),SystemConstants.OWNERSHIP_GD,null,true);
 				}
 				
 			}
@@ -375,37 +381,34 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 				if(StringHelper.isEmpty(user.getRecycle_result())){
 					throw new ServicesException("需要先回填设备，确认是否回收");
 				}
-				if (user.getRecycle_device().equals(SystemConstants.BOOLEAN_TRUE)){
-					if(user.getRecycle_result().equals(SystemConstants.BOOLEAN_TRUE) ){
-						//更新设备状态和仓库
-						DeviceDto device = deviceComponent.queryDeviceByDeviceCode(user.getDevice_id());
-						deviceComponent.updateDeviceDepotId(doneCode, BusiCodeConstants.TASK_FINISH, device.getDevice_id(), 
-								device.getDepot_id(), getOptr().getDept_id(), true);
-						deviceComponent.updateDeviceDepotStatus(doneCode, BusiCodeConstants.TASK_FINISH, device.getDevice_id(),
-								device.getDepot_status(), StatusConstants.IDLE, true);
-						//删除客户设备
-						custComponent.removeDevice(task.getCust_id(), device.getDevice_id(), doneCode, SystemConstants.BOOLEAN_FALSE);
-						//更新用户设备信息为空
-						
-						CUser cuser = cUserDao.findByKey(user.getUser_id());
-						List<CUserPropChange> propChangeList = new ArrayList<CUserPropChange>();
-						if(StringHelper.isNotEmpty(cuser.getStb_id()))
-							propChangeList.add(new CUserPropChange("stb_id", cuser.getStb_id(), ""));
-						if(StringHelper.isNotEmpty(cuser.getCard_id()))
-							propChangeList.add(new CUserPropChange("card_id", cuser.getCard_id(), ""));
-						if(StringHelper.isNotEmpty(cuser.getModem_mac()))
-							propChangeList.add(new CUserPropChange("modem_mac", cuser.getModem_mac(), ""));
-						propChangeList.add(new CUserPropChange("status", cuser.getStatus(), StatusConstants.UNTUCKEND));
-						propChangeList.add(new CUserPropChange("status_date", DateHelper.dateToStr(cuser.getStatus_date()),DateHelper.dateToStr(new Date())));
-						userComponent.editUser(doneCode, user.getUser_id(), propChangeList);
-					}else{
-						//supernet的设备，但是没有回收，需要前台收取设备费用
-						CUser cuser = cUserDao.findByKey(user.getUser_id());
-						List<CUserPropChange> propChangeList = new ArrayList<CUserPropChange>();
-						propChangeList.add(new CUserPropChange("status", cuser.getStatus(), StatusConstants.UNTUCKEND));
-						propChangeList.add(new CUserPropChange("status_date", DateHelper.dateToStr(cuser.getStatus_date()),DateHelper.dateToStr(new Date())));
-						userComponent.editUser(doneCode, user.getUser_id(), propChangeList);
-					}
+				CUser cuser = cUserDao.findByKey(user.getUser_id());
+				if(user.getRecycle_result().equals(SystemConstants.BOOLEAN_TRUE) ){
+					//更新设备状态和仓库
+					DeviceDto device = deviceComponent.queryDeviceByDeviceCode(user.getDevice_id());
+					deviceComponent.updateDeviceDepotId(doneCode, BusiCodeConstants.TASK_FINISH, device.getDevice_id(), 
+							device.getDepot_id(), getOptr().getDept_id(),cuser.getStr10(), true);
+					deviceComponent.updateDeviceDepotStatus(doneCode, BusiCodeConstants.TASK_FINISH, device.getDevice_id(),
+							device.getDepot_status(), StatusConstants.IDLE,cuser.getStr10(), true);
+					//删除客户设备
+					custComponent.removeDevice(task.getCust_id(), device.getDevice_id(), doneCode, SystemConstants.BOOLEAN_FALSE);
+					//更新用户设备信息为空
+					
+					List<CUserPropChange> propChangeList = new ArrayList<CUserPropChange>();
+					if(StringHelper.isNotEmpty(cuser.getStb_id()))
+						propChangeList.add(new CUserPropChange("stb_id", cuser.getStb_id(), ""));
+					if(StringHelper.isNotEmpty(cuser.getCard_id()))
+						propChangeList.add(new CUserPropChange("card_id", cuser.getCard_id(), ""));
+					if(StringHelper.isNotEmpty(cuser.getModem_mac()))
+						propChangeList.add(new CUserPropChange("modem_mac", cuser.getModem_mac(), ""));
+					propChangeList.add(new CUserPropChange("status", cuser.getStatus(), StatusConstants.UNTUCKEND));
+					propChangeList.add(new CUserPropChange("status_date", DateHelper.dateToStr(cuser.getStatus_date()),DateHelper.dateToStr(new Date())));
+					userComponent.editUser(doneCode, user.getUser_id(), propChangeList);
+				}else{
+					//supernet的设备，但是没有回收，需要前台收取设备费用
+					List<CUserPropChange> propChangeList = new ArrayList<CUserPropChange>();
+					propChangeList.add(new CUserPropChange("status", cuser.getStatus(), StatusConstants.UNTUCKEND));
+					propChangeList.add(new CUserPropChange("status_date", DateHelper.dateToStr(cuser.getStatus_date()),DateHelper.dateToStr(new Date())));
+					userComponent.editUser(doneCode, user.getUser_id(), propChangeList);
 				}
 			}
 		}else if(task.getTask_type_id().equals(SystemConstants.TASK_TYPE_FAULT)&&!isBusi){
@@ -541,11 +544,11 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 	public List<TaskUserDto> queryTaskDevice(String task_id) throws Exception {
 		WTaskBaseInfo taskBase = wTaskBaseInfoDao.findByKey(task_id);
 		List<TaskUserDto> userList = new ArrayList<TaskUserDto>();
-		if(taskBase.getTask_type_id().equals(SystemConstants.TASK_TYPE_WRITEOFF_TERMINAL)){
-			userList = wTaskUserDao.queryTaskWriteoffTerminal(task_id);
-		}else{
+//		if(taskBase.getTask_type_id().equals(SystemConstants.TASK_TYPE_WRITEOFF_TERMINAL)){
+//			userList = wTaskUserDao.queryTaskWriteoffTerminal(task_id);
+//		}else{
 			userList = wTaskUserDao.queryUserDetailByTaskId(task_id);
-		}
+//		}
 		for(TaskUserDto task: userList){
 			CUser user = userComponent.queryUserById(task.getUser_id());
 			task.setUser_name( taskComponent.getFillUserName(user) );
