@@ -389,6 +389,8 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 							device.getDepot_id(), getOptr().getDept_id(),cuser.getStr10(), true);
 					deviceComponent.updateDeviceDepotStatus(doneCode, BusiCodeConstants.TASK_FINISH, device.getDevice_id(),
 							device.getDepot_status(), StatusConstants.IDLE,cuser.getStr10(), true);
+					deviceComponent.updateDeviceOwnership(doneCode, BusiCodeConstants.TASK_FINISH, device.getDevice_id(), 
+							device.getOwnership(), SystemConstants.OWNERSHIP_GD, cuser.getStr10(), true);
 					//删除客户设备
 					custComponent.removeDevice(task.getCust_id(), device.getDevice_id(), doneCode, SystemConstants.BOOLEAN_FALSE);
 					//更新用户设备信息为空

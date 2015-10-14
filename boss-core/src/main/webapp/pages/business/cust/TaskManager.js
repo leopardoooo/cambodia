@@ -451,7 +451,6 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 		    triggerAction: 'all',
 		    mode: 'remote',
 		    emptyText: forms['taskTeam'],
-		    editable : true,
 		    store: new Ext.data.JsonStore({
 		    	url: root + '/core/x/Task!queryTaskTeam.action' ,
 		    	autoLoad : true,
@@ -714,7 +713,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 		    triggerAction: 'all',
 		    mode: 'local',
 		    fieldLabel:lbc('home.tools.TaskManager.forms.taskTeam'),
-		    editable : true,
+		    editable : false,
 		    allowBlank:false,
 		    store: new Ext.data.JsonStore({fields: [ 'dept_id', 'dept_name' ]}),
 		    valueField: 'dept_id',
