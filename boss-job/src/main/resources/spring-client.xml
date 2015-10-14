@@ -12,13 +12,13 @@
 
 	<!-- RMI interface -->
 	<!--
-	<bean id="custService" class="org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean" scope="prototype">
-		<property name="serviceUrl" value="http://${rmi.hostname}:${rmi.port}/boss-core/remoting/cust" />
-		<property name="serviceInterface" value="com.ycsoft.business.service.externalImpl.ICustServiceExternal" />
-	</bean>
 	<bean id="acctService" class="org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean" scope="prototype">
 		<property name="serviceUrl" value="http://${rmi.hostname}:${rmi.port}/boss-core/remoting/acct" />
 		<property name="serviceInterface" value="com.ycsoft.business.service.externalImpl.IAcctServiceExternal" />
+	</bean>
+	<bean id="custService" class="org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean" scope="prototype">
+		<property name="serviceUrl" value="http://${rmi.hostname}:${rmi.port}/boss-core/remoting/cust" />
+		<property name="serviceInterface" value="com.ycsoft.business.service.externalImpl.ICustServiceExternal" />
 	</bean>
 	<bean id="userProdService" class="org.springframework.remoting.httpinvoker.HttpInvokerProxyFactoryBean" scope="prototype">
 		<property name="serviceUrl" value="http://${rmi.hostname}:${rmi.port}/boss-core/remoting/userProd" />
