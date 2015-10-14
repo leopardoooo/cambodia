@@ -689,12 +689,12 @@ AcctItemGrid = Ext.extend(Ext.ux.Grid,{
 			store:this.acctItemStore,
 			sm:new Ext.grid.RowSelectionModel(),
 			cm:cm,
-			tools:[{id:'search',qtip:'查询',cls:'tip-target',scope:this,handler:function(){
+			tools:[{id:'search',qtip:langUtils.main("user.list.tools")[0],cls:'tip-target',scope:this,handler:function(){
 					var comp = this.tools.search;
 					if(this.acctItemStore.getCount()>0){
 						if(win)win.close();
 						win = FilterWindow.addComp(this,[
-							{text:'账目名称',field:'acctitem_name',type:'textfield'}
+							{text:lmain('cust._form.accountName'),field:'acctitem_name',type:'textfield'}
 						],145,null,false);
 						
 						if(win){
@@ -702,7 +702,7 @@ AcctItemGrid = Ext.extend(Ext.ux.Grid,{
 							win.show();
 						}
 					}else{
-						Alert('请先查询数据！');
+						Alert(lbc('common.emptyMsg'));
 					}
 		    	}
 		    }]

@@ -131,7 +131,8 @@ BCLang.home = {
 				roomTitle2: 'Administrative area:{0} service type:{1}',
 				addRoom: 'increased room~',
 				unitName:'unit name~',
-				unitAddress:'unit address~'
+				unitAddress:'unit address~',
+				accountName:'Account Name~'
 			},
 			acct: {
 				_title: "Account Information~",
@@ -331,7 +332,12 @@ BCLang.home = {
 		doneCode: {
 			_title: ' Reception Record~',
 			columns: ["Serial Number~","Service Name~","Status~","Reception Date~","Operator~","Reception Department~",
-			         "Returnable~","Ignorable~","Paid Money Amount~"," Service Expansion Information~","Remark~"]
+			         "Returnable~","Ignorable~","Paid Money Amount~"," Service Expansion Information~","Remark~"],
+			editPayColumns:["Fee Item~","Unit Price~","Amount~","Accumulated Cost~","Actual Cost~","The Cost~","Type Name~"],
+			_form:{
+				oldRemark: 'Old Remark~',
+				newRemark: 'New Remark~'
+			}
 		},
 		//instruction
 		cmd: {
@@ -743,5 +749,7 @@ BCLang.msgBox = {
 	newOrderAmountCantBeLessThanZero: 'new orders amount can not be less than zero~!',
 	newOrderAmountCantBeLessThanTransAmount: 'new orders can not be less than the amount of the transfer amount~',
 	CancelTheAccountDismantleDevice:'User status is normal and device buy mode is buy,or user status is complete removal machine~',
-	PleaseCancelTheOttMainTerminal:'Please cancel the main terminal OTT~'
+	PleaseCancelTheOttMainTerminal:'Please cancel the main terminal OTT~',
+	noFeeItemCanNotContinue:'Can not continue because no cost item~',
+	EditPayFeeAndNumberIsWrong:'This fee is not divisible by the price, the purchase of the number as an integer~'
 }

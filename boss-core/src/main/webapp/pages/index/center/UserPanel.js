@@ -116,7 +116,7 @@ UserGrid = Ext.extend(Ext.ux.Grid,{
 							win.show();
 						}
 					}else{
-						Alert('请先查询数据！');
+						Alert(lbc('common.emptyMsg'));
 					}
 		    	}
 		    }]
@@ -1143,13 +1143,13 @@ OrderFeeDetailGrid = Ext.extend(Ext.grid.GridPanel,{
 	constructor:function(){
 		this.changeStore = new Ext.data.JsonStore({
 			url:Constant.ROOT_PATH + "/commons/x/QueryUser!queryOrderFeeDetail.action",
-			fields: ['order_fee_sn', 'order_sn', 'done_code', 'input_type', 'input_type_text', 'output_type', 'output_type_text', 'fee_type', 'fee_type_text',
-			         'input_fee', 'writeoff_fee', 'create_time', 'output_fee', 'input_prod_id', 'input_prod_name', 'ouput_prod_id', 'output_prod_name'],
+			fields: ['order_fee_sn', 'order_sn', 'done_code', 'input_type', 'input_type_text',  'fee_type', 'fee_type_text',
+			         'input_fee', 'create_time', 'input_prod_id', 'input_prod_name'],
 			root: 'records',
 			totalProperty: 'totalProperty',
 			params:{start:0,limit:20},
 			sortInfo:{
-				field:'change_time',
+				field:'create_time',
 				direction:'DESC'
 			}
 		}); 
@@ -1160,9 +1160,6 @@ OrderFeeDetailGrid = Ext.extend(Ext.grid.GridPanel,{
 			{header:lc[3],dataIndex:'input_type_text', width:80},
 			{header:lc[4],dataIndex:'input_fee',width:80, renderer: Ext.util.Format.formatFee},
 			{header:lc[2],dataIndex:'input_prod_name',width:150, renderer: App.qtipValue},
-			{header:lc[6],dataIndex:'output_type_text',width:80},
-			{header:lc[7],dataIndex:'output_fee',width:80, renderer: Ext.util.Format.formatFee},
-			{header:lc[5],dataIndex:'output_prod_name',width:150, renderer: App.qtipValue},
 			{header:lc[8],dataIndex:'done_code', width:80}
 		];
 				  

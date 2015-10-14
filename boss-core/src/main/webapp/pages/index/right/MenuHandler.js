@@ -804,13 +804,13 @@ Ext.apply(MenuHandler, {
 	},
 	EditPay : function() {
 		return {
-			width : 650,
+			width : 750,
 			height : 400
 		};
 	},
 	EditDoneRemark: function(){
 		return {
-			width : 400,
+			width : 500,
 			height : 400
 		};
 	},
