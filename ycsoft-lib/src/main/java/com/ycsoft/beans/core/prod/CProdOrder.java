@@ -36,6 +36,11 @@ public class CProdOrder extends OptrBase implements Serializable {
     private String is_pay;
     private Date check_time;
     
+    private String is_pay_text;
+    
+	public String getIs_pay_text() {
+		return is_pay_text;
+	}
 	public Date getCheck_time() {
 		return check_time;
 	}
@@ -47,6 +52,7 @@ public class CProdOrder extends OptrBase implements Serializable {
 	}
 	public void setIs_pay(String is_pay) {
 		this.is_pay = is_pay;
+		this.is_pay_text = MemoryDict.getDictName(DictKey.BOOLEAN, is_pay);
 	}
 	public String getOrder_sn() {
 		return order_sn;
