@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 
 import com.yaochen.boss.job.component.BusiComponent;
 import com.yaochen.boss.job.component.JobComponent;
-import com.yaochen.boss.job.task.UnFreezeDealTask;
 import com.yaochen.myquartz.CustomThreadJob;
 import com.yaochen.myquartz.Job2ExecutionContext;
 import com.ycsoft.beans.core.acct.CAcctAcctitemInactive;

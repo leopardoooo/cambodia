@@ -208,6 +208,7 @@ BCLang.home = {
 				loginId: '登录账号~',
 				orderFee: '订单余额~',
 				canRetrunFee: '可退金额~',
+				totalReturnFee: '退款总额~',
 				canTransferFee: '转账金额~',
 				canRefundRealFee: '实退金额~',
 				returnDevice: '回收设备~',
@@ -255,7 +256,7 @@ BCLang.home = {
 			prod: {
 				base: {
 					_title: "用户产品~",
-					columns: ["订购编号~","产品名称~","所属套餐~","当前资费~","生效日期~" ,"失效日期~","状态~","状态变更时间~","订购时间~" ,"订购月数~","创建流水号~"]
+					columns: ["订购编号~","产品名称~","所属套餐~","当前资费~","生效日期~" ,"失效日期~","状态~","状态变更时间~","订购时间~" ,"订购月数~","流水号~","是否支付~"]
 				},
 				pkg: {
 					_title: '客户套餐~',
