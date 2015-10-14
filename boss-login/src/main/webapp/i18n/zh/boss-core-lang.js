@@ -750,6 +750,6 @@ BCLang.msgBox = {
 	completeChooseUserTerminal: '请完整选择需要参加的每种用户类型终端!~',
 	newOrderAmountCantBeLessThanZero: '新订单金额不能小于零!~',
 	newOrderAmountCantBeLessThanTransAmount: '新订单金额不能小于转移金额~',
-	CancelTheAccountDismantleDevice:'请先拆机或工单作废~',
+	CancelTheAccountDismantleDevice:'用户状态为正常并且设备购买方式为购买，或者用户状态为拆机完成才能销户~',
 	PleaseCancelTheOttMainTerminal:'请先销户OTT主终端~'
 }

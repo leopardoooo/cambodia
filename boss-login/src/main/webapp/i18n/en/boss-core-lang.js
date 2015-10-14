@@ -742,6 +742,6 @@ BCLang.msgBox = {
 	completeChooseUserTerminal: 'Please fully select every User Type Terminal!~',
 	newOrderAmountCantBeLessThanZero: 'new orders amount can not be less than zero~!',
 	newOrderAmountCantBeLessThanTransAmount: 'new orders can not be less than the amount of the transfer amount~',
-	CancelTheAccountDismantleDevice:'Please dismantle device or cancel work order~',
+	CancelTheAccountDismantleDevice:'User status is normal and device buy mode is buy,or user status is complete removal machine~',
 	PleaseCancelTheOttMainTerminal:'Please cancel the main terminal OTT~'
 }
