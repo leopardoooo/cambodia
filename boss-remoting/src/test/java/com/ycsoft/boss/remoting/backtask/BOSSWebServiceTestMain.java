@@ -3,8 +3,12 @@
  */
 package com.ycsoft.boss.remoting.backtask;
 
-import org.apache.axis2.AxisFault;
+import java.util.ArrayList;
+import java.util.List;
 
+import com.ycsoft.boss.remoting.backtask.BOSSWebServiceSoapImplServiceStub.DeviceFeedBack;
+import com.ycsoft.boss.remoting.backtask.BOSSWebServiceSoapImplServiceStub.DeviceInfo;
+import com.ycsoft.boss.remoting.backtask.BOSSWebServiceSoapImplServiceStub.ProductInfo;
 import com.ycsoft.boss.remoting.backtask.BOSSWebServiceSoapImplServiceStub.ReturnWorkOrder;
 import com.ycsoft.boss.remoting.backtask.BOSSWebServiceSoapImplServiceStub.WorkOrderResp;
 
@@ -34,21 +38,52 @@ public class BOSSWebServiceTestMain {
         try {
 			com.ycsoft.boss.remoting.backtask.BOSSWebServiceSoapImplServiceStub stub =
 			        new com.ycsoft.boss.remoting.backtask.BOSSWebServiceSoapImplServiceStub();
-			com.ycsoft.boss.remoting.backtask.BOSSWebServiceSoapImplServiceStub.ReturnWorkOrderE returnWorkOrder8 =
-		            new com.ycsoft.boss.remoting.backtask.BOSSWebServiceSoapImplServiceStub.ReturnWorkOrderE();
+			try{
+				//完工测试
+				com.ycsoft.boss.remoting.backtask.BOSSWebServiceSoapImplServiceStub.ReturnWorkOrderE returnWorkOrder8 =
+			            new com.ycsoft.boss.remoting.backtask.BOSSWebServiceSoapImplServiceStub.ReturnWorkOrderE();
+				
+				WorkOrderResp arg=new WorkOrderResp();
+				// 工单编号
+				arg.setOrderNo("10003315");
+		    	// 完工类型
+		    	arg.setRespType("QC");
+		    	// 回执消息, 如果失败的情况
+		    	arg.setRespMsg("你好啊OK");
+		    	
+				ReturnWorkOrder param=new ReturnWorkOrder();
+				param.setArg0(arg);
+				returnWorkOrder8.setReturnWorkOrder(param);
+				stub.returnWorkOrder(returnWorkOrder8);
+			}catch(Exception e){
+				e.printStackTrace();
+			}
 			
-			WorkOrderResp arg=new WorkOrderResp();
-			// 工单编号
-			arg.setOrderNo("10003315");
-	    	// 完工类型
-	    	arg.setRespType("QC");
-	    	// 回执消息, 如果失败的情况
-	    	arg.setRespMsg("你好啊OK");
+			//回填测试
+			com.ycsoft.boss.remoting.backtask.BOSSWebServiceSoapImplServiceStub.DeviceFeedBackE deviceFeedBack10
+			=new com.ycsoft.boss.remoting.backtask.BOSSWebServiceSoapImplServiceStub.DeviceFeedBackE();
+			
+			DeviceFeedBack param1=new DeviceFeedBack();
+			param1.setArg0("？");//工单ID
 	    	
-			ReturnWorkOrder param=new ReturnWorkOrder();
-			param.setArg0(arg);
-			returnWorkOrder8.setReturnWorkOrder(param);
-			stub.returnWorkOrder(returnWorkOrder8);
+	    	// 设备信息
+	    	ProductInfo prodArray[] = new ProductInfo[1];
+	    	prodArray[0]=new ProductInfo();
+	    	List<DeviceInfo> DeviceInfos=new ArrayList<>();
+	    	
+	    	DeviceInfo d1=new DeviceInfo();
+	    	DeviceInfos.add(d1);
+	    	
+	    	d1.setDeviceSN("？");//设备编号
+	    	d1.setIsFCPort(false);//是否光猫
+	    	d1.setOriginalDeviceSN(null);//原设备编号
+	    	d1.setOCCSerialCode(null);//光路信息1
+	    	d1.setPOSSerialCode(null);//光路信息2
+	    	
+	    	prodArray[0].setDeviceInfos(DeviceInfos.toArray(new DeviceInfo[DeviceInfos.size()]));
+	    	param1.setArg2(prodArray);
+			deviceFeedBack10.setDeviceFeedBack(param1);			
+			stub.deviceFeedBack(deviceFeedBack10);
 			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
