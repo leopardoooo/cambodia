@@ -309,7 +309,7 @@ BCLang.home = {
 			},
 			task: {
 				_title: 'Work Order~',
-				columns: ["WorkOrdersNo.~", "WorkOrdersType~", "WorkOrderStatus~", "ConstructionTeam~","Failure~", "FaultDetails~", "ZTEAuthorizedState~", "CreatingTime~"],
+				columns: ["WorkOrdersNo.~", "WorkOrdersType~", "WorkOrderStatus~", "ConstructionTeam~","FaultCause~", "FaultDetails~", "ZTEAuthorizedState~", "CreatingTime~"],
 				userColumns: ['UserType~', 'UserName~', 'DeviceModel~', 'DeviceNumber~', 'PosNo~', 'OccNo ~', 'BandWidth~'],
 				detailColumns: ['OperatTime~','OperatType~', 'Operator~','SyncStatus~', 'ErrorDesc~'],
 				winTitle: 'WorkOrders Info~',
@@ -332,8 +332,8 @@ BCLang.home = {
 		//Reception Record
 		doneCode: {
 			_title: ' Reception Record~',
-			columns: ["Serial Number~","Service Name~","Status~","Reception Date~","Operator~","Reception Department~",
-			         "Returnable~","Ignorable~","Paid Money Amount~","Extended ServiceInfo~","Remark~"]
+			columns: ["Serial Number~","Service Name~","Status~","Reception Date~","Operator~","ReceptionDept~",
+			         "Returnable~","Ignorable~","Paid Amount~","Extended ServiceInfo~","Remark~"]
 		},
 		//instruction
 		cmd: {
