@@ -1362,11 +1362,10 @@ public class BusiComponent {
 	
 	private SOptr gOptr(String areaId,String countyId) {
 		SOptr optr = new SOptr();
-		optr.setCounty_id(StringUtils.isEmpty(countyId) ? "5001" : countyId);
-		optr.setArea_id(StringUtils.isEmpty(areaId) ? "5000" : areaId);
-//		optr.setOptr_id("101676");
-		optr.setOptr_id("6");
-		optr.setDept_id(countyId);
+		optr.setCounty_id(StringUtils.isEmpty(countyId) ? "4501" : countyId);
+		optr.setArea_id(StringUtils.isEmpty(areaId) ? "4501" : areaId);
+		optr.setOptr_id("0");
+		optr.setDept_id(StringUtils.isEmpty(countyId) ? "4501" : countyId);
 		return optr;
 	}
 	

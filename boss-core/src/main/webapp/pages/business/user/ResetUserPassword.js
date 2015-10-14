@@ -10,10 +10,10 @@ EditPasswordForm = Ext.extend(BaseForm, {
 		EditPasswordForm.superclass.constructor.call(this, {
 			border : false,
 			bodyStyle : 'padding-top:10px',
+			labelWidth : 150,
 			defaults : {
 				layout : 'form',
 				border : false,
-				labelWidth : 150,
 				bodyStyle : "background:#F9F9F9;"
 			},
 			items : [{

@@ -68,7 +68,10 @@ BCLang.common = {
 	enableBtn:'启用~',
 	cancelBtn:'取消~',
 	doActionBtn:'操作~',
-	add: '添加~'
+	add: '添加~',
+	correct: '正确~',
+	untreated: '未处理~',
+	wrong: '错误~'
 }
 //主页模块
 BCLang.home = {
@@ -516,6 +519,7 @@ BCLang.home = {
 			_userTitle : '用户明细~',
 			_winTitle : '工单完工~',
 			_ZteWinTitle : 'ZTE授权~',
+			_fillDevTitle: '设备回填~',
 			forms : {
 				custNo : '客户编号~',
 				taskNo : '工单编号~',
@@ -531,7 +535,7 @@ BCLang.home = {
 				finishExplan : '完工说明~',
 				zteStatus	: 'ZTE状态~',
 				zteRemark :'备注~',
-				syncStatus	:'同步状态~'
+				syncStatus	:'cfocn同步状态~'
 			},
 			buttons : {
 				query : '查询~',
@@ -546,7 +550,7 @@ BCLang.home = {
 				withdraw : 'cfocn撤回~'
 			},
 			taskCols : ['工单类型~', '客户名称~', '工单状态~', '施工队~', 'ZTE状态~', '地址~',
-					'联系电话~', '创建时间~', '故障类型~', '故障详细信息~','工单编号~','客户经理~','客户经理电话~'],
+					'联系电话~', '创建时间~', '故障类型~', '故障详细信息~','工单编号~','客户经理~','客户经理电话~','客户编号~','cfocn同步状态~'],
 			userCols : ['用户类型~', '用户名~', '密码~', '设备型号~', '设备号~', 'posNo~',
 					'occNo~', '带宽~'],
 			operateCols : ['操作时间~', '操作类型~', '操作人~', '同步状态~', '描述~','延迟时间~'],
@@ -618,7 +622,7 @@ BCLang.msgBox = {
 	selectRec4CancelFee:'请选择要冲正的费用记录!~',
 	confirmUnPayWithParam:'确定要回退【金额：{0} 】吗?~',
 	selectRecCancelPayFee:'请选择要回退的支付记录!',
-	confirmCancelPayFeeWithParam:'确定要支付回退并作废发票:{0}',
+	confirmCancelPayFeeWithParam:'确定要支付回退并作废发票:{0}~',
 	confirmCancelPayFeeWithNoParam:'确定要支付回退?',
 	cancelPayFeeSuccess:'支付回退冲正成功!',
 	confirmRestoreCust:'是否确定返销户?~',
@@ -633,7 +637,7 @@ BCLang.msgBox = {
 	confirmBankStop:'确定要暂停卡扣吗?~',
 	confirmEnableBankPay:'启用银行扣费吗?~',
 	confirmDisableBankPay:'禁止银行扣费吗?~',
-	confirmEditBankPay:'确定该产品',
+	confirmEditBankPay:'确定该产品~',
 	confirmBankResume:'确定要恢复卡扣吗?~',
 	confirmRenewCust:'去顶恢复客户状态吗?~',
 	commonSuccess: '业务操作成功!~',
@@ -745,5 +749,7 @@ BCLang.msgBox = {
 	exceedPkgMaxUserNum: '已超过套餐最大用户数限制!~',
 	completeChooseUserTerminal: '请完整选择需要参加的每种用户类型终端!~',
 	newOrderAmountCantBeLessThanZero: '新订单金额不能小于零!~',
-	newOrderAmountCantBeLessThanTransAmount: '新订单金额不能小于转移金额~'
+	newOrderAmountCantBeLessThanTransAmount: '新订单金额不能小于转移金额~',
+	CancelTheAccountDismantleDevice:'请先拆机或工单作废~',
+	PleaseCancelTheOttMainTerminal:'请先销户OTT主终端~'
 }

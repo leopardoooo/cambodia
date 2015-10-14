@@ -1552,7 +1552,7 @@ public class DeviceComponent extends BaseDeviceComponent {
 			Integer newValue = _r.getTotal_num()-d.getTotal_num();
 			//总数异动记录
 			rDeviceChangeDao.saveMateralTransChange(doneCode,BusiCodeConstants.DEVICE_TRANSFER,deviceId,"total_num",oldValue
-					,newValue,transfer.getOptr_id(),transfer.getDepot_source(),optr.getCounty_id(), optr.getArea_id());
+					,newValue,transfer.getOptr_id(),transfer.getDepot_source(),optr.getCounty_id(), optr.getArea_id(),null);
 	
 			rDeviceDao.removeMateralDevice(deviceId, d.getTotal_num());
 			checkDeviceNum(deviceId);
@@ -1629,7 +1629,7 @@ public class DeviceComponent extends BaseDeviceComponent {
 					Integer newValue = oldValue + r.getTotal_num();
 					//总数异动记录
 					rDeviceChangeDao.saveMateralTransChange(doneCode,BusiCodeConstants.DEVICE_CANCEL_CONFIRM,device.getDevice_id(),"total_num",oldValue
-							,newValue,transfer.getConfirm_optr_id(),transfer.getDepot_source(),optr.getCounty_id(), optr.getArea_id());
+							,newValue,transfer.getConfirm_optr_id(),transfer.getDepot_source(),optr.getCounty_id(), optr.getArea_id(),null);
 					//减去调拨数量
 					rDeviceDao.removeMateralDevice(r.getDevice_id(), r.getTotal_num());
 					checkDeviceNum(r.getDevice_id());
@@ -2105,7 +2105,7 @@ public class DeviceComponent extends BaseDeviceComponent {
 			Integer newValue = _r.getTotal_num()-d.getTotal_num();
 			//总数异动记录
 			rDeviceChangeDao.saveMateralTransChange(doneCode,BusiCodeConstants.DEVICE_OUT,device.getDevice_id(),"total_num",oldValue
-					,newValue,output.getOptr_id(),output.getDepot_id(),optr.getCounty_id(), optr.getArea_id());
+					,newValue,output.getOptr_id(),output.getDepot_id(),optr.getCounty_id(), optr.getArea_id(),null);
 	
 			rDeviceDao.removeMateralDevice(d.getDevice_id(), d.getTotal_num());
 			checkDeviceNum(d.getDevice_id());

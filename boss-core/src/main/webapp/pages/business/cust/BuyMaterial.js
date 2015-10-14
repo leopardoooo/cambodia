@@ -23,6 +23,7 @@ BuyMaterialForm = Ext.extend( BaseForm , {
 		BuyMaterialForm.superclass.constructor.call(this, {
 			border: false,
 			bodyStyle:'padding-top:15px',
+			labelWidth: 150,
 			defaults:{layout:'form',border:false, width:200},
 			items: [{
 					fieldLabel : langUtils.main("cust._form.deviceType"),

@@ -83,7 +83,7 @@ public class WTaskBaseInfoDao extends BaseEntityDao<WTaskBaseInfo> {
 		
 		String sql = "select t.*,wt.team_type,case when s.tel is null and s.mobile is null then '' "
 				+ " when s.mobile is null then  s.tel  "
-				+ " when s.tel is null then s.mobile  else s.tel||','||s.mobile end linkman_tel ,c.cust_name linkman_name "
+				+ " when s.tel is null then s.mobile  else s.tel||','||s.mobile end linkman_tel ,c.cust_name linkman_name,c.cust_no "
 				+ " from w_task_base_info t, C_CUST c ,w_team wt,s_optr s "+(StringHelper.isEmpty(addrIds)?"":", t_district td, t_address ta,t_province tp")
 				+ " where t.cust_id = c.cust_id and c.str9 = s.optr_id(+) and t.team_id = wt.dept_id(+) "+(StringHelper.isEmpty(addrIds)?"":" and c.addr_id = ta.addr_id "
 				+ "and ta.district_id = td.district_id  and td.province_id=tp.id and  tp.id in ("+sqlGenerator.in(addrIds.split(","))+")") ;
@@ -160,13 +160,14 @@ public class WTaskBaseInfoDao extends BaseEntityDao<WTaskBaseInfo> {
 		
 		String sql = "select t.* ,wt.team_type,case when s.tel is null and s.mobile is null then '' "
 				+ " when s.mobile is null then  s.tel  "
-				+ " when s.tel is null then s.mobile  else s.tel||','||s.mobile end linkman_tel ,c.cust_name linkman_name "
+				+ " when s.tel is null then s.mobile  else s.tel||','||s.mobile end linkman_tel ,"
+				+ " c.cust_name linkman_name,c.cust_no "
 				+ " from w_task_base_info t, C_CUST c  ,w_team wt,s_optr s "
 				+ " where t.cust_id = c.cust_id and c.str9 = s.optr_id(+) and t.team_id = wt.dept_id(+) " 
-				+" and (( t.task_status =? and t.team_id =?) or t.task_status=? or (t.task_status=? and t.zte_status=?)) "
+				+" and (( t.task_status =? and t.team_id =?) or t.task_status=? or (t.task_status=? and t.zte_status=?) or (t.task_status=? and t.sync_status=?)) "
 				+" ORDER BY t.task_create_time DESC ";
 		return this.createQuery(TaskBaseInfoDto.class,sql,StatusConstants.TASK_CREATE,deptId,StatusConstants.TASK_ENDWAIT
-				,StatusConstants.TASK_INIT,StatusConstants.NOT_EXEC)
+				,StatusConstants.TASK_INIT,StatusConstants.NOT_EXEC,StatusConstants.TASK_CREATE,StatusConstants.FAILURE)
 			.setLimit(limit)
 			.setStart(start)
 			.page();

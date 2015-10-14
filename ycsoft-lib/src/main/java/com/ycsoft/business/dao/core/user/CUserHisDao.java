@@ -39,8 +39,8 @@ public class CUserHisDao extends BaseEntityDao<CUserHis> {
 		this.executeUpdate(sql, SystemConstants.BOOLEAN_FALSE,cardId);
 		
 	}
-	public List<CUserHis> queryAllUserHisByUserIds(String[] userIds) throws JDBCException{
+	public List<CUser> queryAllUserHisByUserIds(String[] userIds) throws JDBCException{
 		String sql = "SELECT * FROM c_user_his where "+getSqlGenerator().setWhereInArray("user_id",userIds)+"";
-		return createQuery(sql).list();
+		return createQuery(CUser.class, sql).list();
 	}
 }

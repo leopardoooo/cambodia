@@ -29,11 +29,22 @@ public class RDeviceChange extends BusiBase implements Serializable {
 	private Date change_date;
 	private String pair_card_id;
 	private String pair_modem_id;
+	private String buy_mode;
 
 	/**
 	 * default empty constructor
 	 */
 	public RDeviceChange() {
+	}
+
+	
+	
+	public String getBuy_mode() {
+		return buy_mode;
+	}
+
+	public void setBuy_mode(String buy_mode) {
+		this.buy_mode = buy_mode;
 	}
 
 	// device_id getter and setter

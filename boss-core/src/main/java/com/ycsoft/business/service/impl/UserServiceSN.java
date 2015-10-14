@@ -378,9 +378,9 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 			if (StringHelper.isNotEmpty(device.getDevice_id())){
 				//更新设备仓库状态
 				deviceComponent.updateDeviceDepotStatus(doneCode, busiCode, device.getDevice_id(),
-						device.getDepot_status(), StatusConstants.USE,true);
+						device.getDepot_status(), StatusConstants.USE,user.getStr10(),true);
 				if (!device.getOwnership().equals(SystemConstants.OWNERSHIP_GD)){
-					deviceComponent.updateDeviceOwnership(doneCode, busiCode, device.getDevice_id(),device.getOwnership(),SystemConstants.OWNERSHIP_GD,true);
+					deviceComponent.updateDeviceOwnership(doneCode, busiCode, device.getDevice_id(),device.getOwnership(),SystemConstants.OWNERSHIP_GD,user.getStr10(),true);
 				}
 				//更新设备为旧设备
 				if (SystemConstants.BOOLEAN_TRUE.equals(device.getUsed()))
@@ -1658,12 +1658,17 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 			doneCodeComponent.saveDoneCodeUnPay(task.getCust_id(),doneCode , getOptr().getOptr_id());
 		}
 		//update device status to idle,write off user
-		
+		//设置流水中user_id
+		BusiParameter parameter = getBusiParam();
+		List<CUser> userList = userComponent.queryTaskUser(taskId);
+		if(userList.size() > 0){
+			parameter.setSelectedUsers(userList);
+		}
 		for (WTaskUser user:allUserList){
 			if (StringHelper.isNotEmpty(user.getDevice_id())){
 				DeviceDto device = deviceComponent.queryDeviceByDeviceCode(user.getDevice_id());
 				deviceComponent.updateDeviceDepotStatus(doneCode, BusiCodeConstants.TASK_CANCEL, device.getDevice_id(), 
-					StatusConstants.USE, StatusConstants.ACTIVE, true);
+					StatusConstants.USE, StatusConstants.ACTIVE,null, true);
 			}
 			
 			// send write off cmd
@@ -1680,7 +1685,8 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		for (WTaskBaseInfo tb:taskList){
 			snTaskComponent.cancelTask(doneCode, tb.getTask_id());
 		}
-		getBusiParam().setBusiCode(BusiCodeConstants.TASK_CANCEL);
+		
+		parameter.setBusiCode(BusiCodeConstants.TASK_CANCEL);
 		saveAllPublic(doneCode, getBusiParam());
 		
 	}
@@ -1820,7 +1826,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		if(buyModeCfg!= null && device.getOwnership().equals(SystemConstants.OWNERSHIP_GD)
 					&& buyModeCfg.getChange_ownship().equals(SystemConstants.BOOLEAN_TRUE)){
 			String newOwnerShip = SystemConstants.OWNERSHIP_CUST;
-			deviceComponent.updateDeviceOwnership(doneCode, busiCode, device.getDevice_id(),device.getOwnership(),newOwnerShip,true);
+			deviceComponent.updateDeviceOwnership(doneCode, busiCode, device.getDevice_id(),device.getOwnership(),newOwnerShip,deviceBuyMode,true);
 		}
 		//保存设备费用
 		if (deviceFee != null && deviceFee.getFee_id()!= null && deviceFee.getFee()>0){

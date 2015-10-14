@@ -651,112 +651,112 @@ public class UserService extends BaseBusiService implements IUserService {
 		CCust cust = getBusiParam().getCust();
 		String busiCode = getBusiParam().getBusiCode();
 		List<CUser> users = getBusiParam().getSelectedUsers();
-		if (effectiveDate.equals(DateHelper.getDate("-"))){
-			//当天报停
-			for(CUser user:users){
-				//清除原有未执行的预报停
-				removeStopByUserId(user.getUser_id());
-				//修改客户设备状态
-				custComponent.updateDeviceStatusByCode(cust.getCust_id(), user.getStb_id(), StatusConstants.REQSTOP);
-				custComponent.updateDeviceStatusByCode(cust.getCust_id(), user.getCard_id(), StatusConstants.REQSTOP);
-				custComponent.updateDeviceStatusByCode(cust.getCust_id(), user.getModem_mac(), StatusConstants.REQSTOP);
-				CUser userDto = queryUserById(user.getUser_id());
-				if(userDto.getStatus().equals(StatusConstants.REQSTOP)){
-					throw new ServicesException("该用户已经报停!请重新查询该客户!");
-				}
-				//修改用户状态
-				updateUserStatus(doneCode, user.getUser_id(), user.getStatus(), StatusConstants.REQSTOP);
-				//生成钝化用户JOB
-				jobComponent.createBusiCmdJob(doneCode, BusiCmdConstants.PASSVATE_USER, cust.getCust_id(),
-						user.getUser_id(), user.getStb_id(), user.getCard_id(), user.getModem_mac(), null, null,JsonHelper.fromObject(userDto));
-				//修改用户产品状态为报停
-				List<CProdDto> prodList = userProdComponent.queryAllProdsByUserId(user.getUser_id());
-				for (CProdDto prod:prodList){
-					List<CProdPropChange> changeList = new ArrayList<CProdPropChange>();
-					changeList.add(new CProdPropChange("status",
-							prod.getStatus(),StatusConstants.REQSTOP));
-					changeList.add(new CProdPropChange("status_date",
-							DateHelper.dateToStr(prod.getStatus_date()),DateHelper.dateToStr(new Date())));
-					
-					userProdComponent.editProd(doneCode,prod.getProd_sn(),changeList);
-					
-					//生成钝化产品任务
-					if (isProdOpen(prod.getStatus())){
-						jobComponent.createBusiCmdJob(doneCode, BusiCmdConstants.PASSVATE_PROD, cust.getCust_id(),
-							user.getUser_id(), user.getStb_id(), user.getCard_id(), user.getModem_mac(), prod.getProd_sn(),prod.getProd_id());
-					}
-				}
-//				busiInfo += "终端类型："+user.getUser_type_text()+" 设备号:"+user.getStb_id();
-			}
-		} else {
-			getBusiParam().setBusiCode(BusiCodeConstants.USER_PRE_REQUIRE_STOP);		
-			//预报停
-			for(CUser user:users){
-				//清除原有未执行的预报停
-				removeStopByUserId(user.getUser_id());
-				jobComponent.createUserStopJob(doneCode, user.getUser_id(), effectiveDate);
-			}
-		}
-		//保存停机费
-		saveTjFee(doneCode,busiCode, cust.getCust_id(), tjFee);
-		saveAllPublic(doneCode,getBusiParam());
-		
-		// 保存打印数据
-		int atvCount = 0;
-		String stopReason="";
-		CUser atvUserPrint = new CUser();
-		ExtCDoneCode[] extInfo =  getBusiParam().getBusiExtAttr() ;
-		if(extInfo != null){
-			for( ExtCDoneCode info :extInfo ){
-				if(info.getAttribute_id().equals("411")){
-					stopReason = info.getAttribute_value();
-				}
-			}
-		}
-		List<Object> udl = new ArrayList<Object>();
-		for (CUser user : users) {
-			Map<String,Object> map = new HashMap<String,Object>();
-			map.put("busiName", MemoryDict.getDictName(DictKey.BUSI_CODE, getBusiParam().getBusiCode()));
-			if (("ATV").equals(user.getUser_type())) {
-				atvCount ++;
-				atvUserPrint = user;
-			} else if (("DTV").equals(user.getUser_type())) {
-				
-				map.put("user_type", user.getUser_type());
-				CUserDtv dtv = (CUserDtv) user;
-				map.put("terminal_type", dtv.getTerminal_type_text());
-				map.put("card_id", user.getCard_id());
-				map.put("stb_id", user.getStb_id());
-				map.put("effective_date", effectiveDate);
-				map.put("stop_reason", stopReason);
-				map.put("ext_info", extInfo);
-				udl.add(map);
-			} else if(("BAND").equals(user.getUser_type())){
-				map.put("user_type", user.getUser_type());
-				CUserBroadband band = (CUserBroadband) user;
-				map.put("login_name", band.getLogin_name());
-				map.put("modem_mac", user.getModem_mac());
-				map.put("recycle", "Modem及配件已回收");
-				map.put("effective_date", effectiveDate);
-				map.put("stop_reason", stopReason);
-				map.put("ext_info", extInfo);
-				udl.add(map);
-			}
-		}
-		//保存模拟的打印信息
-		if(atvCount > 0){
-			Map<String,Object> map = new HashMap<String,Object>();
-			map.put("user_type", atvUserPrint.getUser_type());
-			map.put("terminal_type", ((CUserAtv) atvUserPrint).getTerminal_type_text());
-			map.put("user_count", getBusiParam().getSelectedUsers().size());
-			map.put("stop_count", atvCount);
-			map.put("effective_date", effectiveDate);
-			map.put("stop_reason", stopReason);
-			map.put("ext_info", extInfo);
-			udl.add(map);
-		}
-		getBusiParam().setBusiConfirmParam("users", udl);
-		doneCodeComponent.saveDoneCodeInfo(doneCode, cust.getCust_id(), null, getBusiParam().getBusiConfirmParamInfo());
+//		if (effectiveDate.equals(DateHelper.getDate("-"))){
+//			//当天报停
+//			for(CUser user:users){
+//				//清除原有未执行的预报停
+//				removeStopByUserId(user.getUser_id());
+//				//修改客户设备状态
+//				custComponent.updateDeviceStatusByCode(cust.getCust_id(), user.getStb_id(), StatusConstants.REQSTOP);
+//				custComponent.updateDeviceStatusByCode(cust.getCust_id(), user.getCard_id(), StatusConstants.REQSTOP);
+//				custComponent.updateDeviceStatusByCode(cust.getCust_id(), user.getModem_mac(), StatusConstants.REQSTOP);
+//				CUser userDto = queryUserById(user.getUser_id());
+//				if(userDto.getStatus().equals(StatusConstants.REQSTOP)){
+//					throw new ServicesException("该用户已经报停!请重新查询该客户!");
+//				}
+//				//修改用户状态
+//				updateUserStatus(doneCode, user.getUser_id(), user.getStatus(), StatusConstants.REQSTOP);
+//				//生成钝化用户JOB
+//				jobComponent.createBusiCmdJob(doneCode, BusiCmdConstants.PASSVATE_USER, cust.getCust_id(),
+//						user.getUser_id(), user.getStb_id(), user.getCard_id(), user.getModem_mac(), null, null,JsonHelper.fromObject(userDto));
+//				//修改用户产品状态为报停
+//				List<CProdDto> prodList = userProdComponent.queryAllProdsByUserId(user.getUser_id());
+//				for (CProdDto prod:prodList){
+//					List<CProdPropChange> changeList = new ArrayList<CProdPropChange>();
+//					changeList.add(new CProdPropChange("status",
+//							prod.getStatus(),StatusConstants.REQSTOP));
+//					changeList.add(new CProdPropChange("status_date",
+//							DateHelper.dateToStr(prod.getStatus_date()),DateHelper.dateToStr(new Date())));
+//					
+//					userProdComponent.editProd(doneCode,prod.getProd_sn(),changeList);
+//					
+//					//生成钝化产品任务
+//					if (isProdOpen(prod.getStatus())){
+//						jobComponent.createBusiCmdJob(doneCode, BusiCmdConstants.PASSVATE_PROD, cust.getCust_id(),
+//							user.getUser_id(), user.getStb_id(), user.getCard_id(), user.getModem_mac(), prod.getProd_sn(),prod.getProd_id());
+//					}
+//				}
+////				busiInfo += "终端类型："+user.getUser_type_text()+" 设备号:"+user.getStb_id();
+//			}
+//		} else {
+//			getBusiParam().setBusiCode(BusiCodeConstants.USER_PRE_REQUIRE_STOP);		
+//			//预报停
+//			for(CUser user:users){
+//				//清除原有未执行的预报停
+//				removeStopByUserId(user.getUser_id());
+//				jobComponent.createUserStopJob(doneCode, user.getUser_id(), effectiveDate);
+//			}
+//		}
+//		//保存停机费
+//		saveTjFee(doneCode,busiCode, cust.getCust_id(), tjFee);
+//		saveAllPublic(doneCode,getBusiParam());
+//		
+//		// 保存打印数据
+//		int atvCount = 0;
+//		String stopReason="";
+//		CUser atvUserPrint = new CUser();
+//		ExtCDoneCode[] extInfo =  getBusiParam().getBusiExtAttr() ;
+//		if(extInfo != null){
+//			for( ExtCDoneCode info :extInfo ){
+//				if(info.getAttribute_id().equals("411")){
+//					stopReason = info.getAttribute_value();
+//				}
+//			}
+//		}
+//		List<Object> udl = new ArrayList<Object>();
+//		for (CUser user : users) {
+//			Map<String,Object> map = new HashMap<String,Object>();
+//			map.put("busiName", MemoryDict.getDictName(DictKey.BUSI_CODE, getBusiParam().getBusiCode()));
+//			if (("ATV").equals(user.getUser_type())) {
+//				atvCount ++;
+//				atvUserPrint = user;
+//			} else if (("DTV").equals(user.getUser_type())) {
+//				
+//				map.put("user_type", user.getUser_type());
+//				CUserDtv dtv = (CUserDtv) user;
+//				map.put("terminal_type", dtv.getTerminal_type_text());
+//				map.put("card_id", user.getCard_id());
+//				map.put("stb_id", user.getStb_id());
+//				map.put("effective_date", effectiveDate);
+//				map.put("stop_reason", stopReason);
+//				map.put("ext_info", extInfo);
+//				udl.add(map);
+//			} else if(("BAND").equals(user.getUser_type())){
+//				map.put("user_type", user.getUser_type());
+//				CUserBroadband band = (CUserBroadband) user;
+//				map.put("login_name", band.getLogin_name());
+//				map.put("modem_mac", user.getModem_mac());
+//				map.put("recycle", "Modem及配件已回收");
+//				map.put("effective_date", effectiveDate);
+//				map.put("stop_reason", stopReason);
+//				map.put("ext_info", extInfo);
+//				udl.add(map);
+//			}
+//		}
+//		//保存模拟的打印信息
+//		if(atvCount > 0){
+//			Map<String,Object> map = new HashMap<String,Object>();
+//			map.put("user_type", atvUserPrint.getUser_type());
+//			map.put("terminal_type", ((CUserAtv) atvUserPrint).getTerminal_type_text());
+//			map.put("user_count", getBusiParam().getSelectedUsers().size());
+//			map.put("stop_count", atvCount);
+//			map.put("effective_date", effectiveDate);
+//			map.put("stop_reason", stopReason);
+//			map.put("ext_info", extInfo);
+//			udl.add(map);
+//		}
+//		getBusiParam().setBusiConfirmParam("users", udl);
+//		doneCodeComponent.saveDoneCodeInfo(doneCode, cust.getCust_id(), null, getBusiParam().getBusiConfirmParamInfo());
 	}
 	
 	//续报停

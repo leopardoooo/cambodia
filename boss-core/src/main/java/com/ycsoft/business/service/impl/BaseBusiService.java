@@ -1202,34 +1202,34 @@ public class BaseBusiService extends BaseService {
 			}
 		}
 		//修改设备仓库状态,并修改对应配对的设备
-		deviceComponent.updateDeviceDepotStatus(doneCode, busiCode, deviceId,device.getDepot_status(), StatusConstants.IDLE,true);
+		deviceComponent.updateDeviceDepotStatus(doneCode, busiCode, deviceId,device.getDepot_status(), StatusConstants.IDLE,null,true);
 		if (pairDevice != null){
 			deviceComponent.updateDeviceDepotStatus(doneCode, busiCode,
-					device.getPairCard().getDevice_id(),pairDevice.getDepot_status(), StatusConstants.IDLE,false);
+					device.getPairCard().getDevice_id(),pairDevice.getDepot_status(), StatusConstants.IDLE,null,false);
 		}
 		if (pairModemDevice != null){
 			deviceComponent.updateDeviceDepotStatus(doneCode, busiCode,
-					pairModemDevice.getDevice_id(),pairModemDevice.getDepot_status(), StatusConstants.IDLE,false);
+					pairModemDevice.getDevice_id(),pairModemDevice.getDepot_status(), StatusConstants.IDLE,null,false);
 		}
 		//修改设备的产权为广电
-		deviceComponent.updateDeviceOwnership(doneCode, busiCode, deviceId, device.getOwnership(), SystemConstants.OWNERSHIP_GD,true);
+		deviceComponent.updateDeviceOwnership(doneCode, busiCode, deviceId, device.getOwnership(), SystemConstants.OWNERSHIP_GD,null,true);
 		if (pairDevice != null){
-			deviceComponent.updateDeviceOwnership(doneCode, busiCode, pairDevice.getDevice_id(), pairDevice.getOwnership(), SystemConstants.OWNERSHIP_GD,false);
+			deviceComponent.updateDeviceOwnership(doneCode, busiCode, pairDevice.getDevice_id(), pairDevice.getOwnership(), SystemConstants.OWNERSHIP_GD,null,false);
 		}
 		if (pairModemDevice != null){
-			deviceComponent.updateDeviceOwnership(doneCode, busiCode, pairModemDevice.getDevice_id(), pairModemDevice.getOwnership(), SystemConstants.OWNERSHIP_GD,false);
+			deviceComponent.updateDeviceOwnership(doneCode, busiCode, pairModemDevice.getDevice_id(), pairModemDevice.getOwnership(), SystemConstants.OWNERSHIP_GD,null,false);
 		}
 		//设备回收新机变成旧机
 		if(StringHelper.isEmpty(device.getIs_new_stb()) || SystemConstants.BOOLEAN_TRUE.equals(device.getIs_new_stb())){
 			deviceComponent.updateDeviceIsNewStb(doneCode, busiCode, deviceId, device.getIs_new_stb(), SystemConstants.BOOLEAN_FALSE,true);
 		}
 		//修改设备库位
-		deviceComponent.updateDeviceDepotId(doneCode, busiCode, deviceId, device.getDepot_id(), getOptr().getDept_id(),true);
+		deviceComponent.updateDeviceDepotId(doneCode, busiCode, deviceId, device.getDepot_id(), getOptr().getDept_id(),null,true);
 		if (pairDevice != null){
-			deviceComponent.updateDeviceDepotId(doneCode, busiCode, pairDevice.getDevice_id(), pairDevice.getDepot_id(), getOptr().getDept_id(),false);
+			deviceComponent.updateDeviceDepotId(doneCode, busiCode, pairDevice.getDevice_id(), pairDevice.getDepot_id(), getOptr().getDept_id(),null,false);
 		}
 		if (pairModemDevice != null){
-			deviceComponent.updateDeviceDepotId(doneCode, busiCode, pairModemDevice.getDevice_id(), pairModemDevice.getDepot_id(), getOptr().getDept_id(),false);
+			deviceComponent.updateDeviceDepotId(doneCode, busiCode, pairModemDevice.getDevice_id(), pairModemDevice.getDepot_id(), getOptr().getDept_id(),null,false);
 		}
 	}
 	
@@ -1878,10 +1878,10 @@ public class BaseBusiService extends BaseService {
 		if (StringHelper.isNotEmpty(device.getDevice_id())){
 			//更新设备仓库状态
 			deviceComponent.updateDeviceDepotStatus(doneCode, busiCode, device.getDevice_id(),
-					device.getDepot_status(), StatusConstants.USE,true);
+					device.getDepot_status(), StatusConstants.USE,buyMode,true);
 			//更新设备产权
 			if (!device.getOwnership().equals(ownership)){
-				deviceComponent.updateDeviceOwnership(doneCode, busiCode, device.getDevice_id(),device.getOwnership(),ownership,true);
+				deviceComponent.updateDeviceOwnership(doneCode, busiCode, device.getDevice_id(),device.getOwnership(),ownership,buyMode,true);
 			}
 			//更新设备为旧设备
 			if (SystemConstants.BOOLEAN_TRUE.equals(device.getUsed()))

@@ -88,14 +88,14 @@ var TaskDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 		if(this.taskTypeId == '9'){//销终端工单
 			this.resultCombo = new Ext.ux.ParamCombo({
 				paramName:'BOOLEAN',typeAhead:false,valueField:'item_name',
-				forceSelection:true,selectOnFocus:true,editable:true
+				forceSelection:true,selectOnFocus:true,editable:false
 			});
 			App.form.initComboData([this.resultCombo]);
 			nextColums = [{header:cols[4],dataIndex:'recycle_result_text',width:80,editor:this.resultCombo}]; 
 		}else{
 			nextColums = [{header:cols[3],dataIndex:'device_code',width:130,editor:new Ext.form.TextField({vtype:'alphanum'})},
-						{header:'occNo',dataIndex:'occNo',width:80,editor:new Ext.form.TextField({vtype:'alphanum'})},
-						{header:'posNo',dataIndex:'posNo',width:80,editor:new Ext.form.TextField({vtype:'alphanum'})}]
+						{header:'OccNo',dataIndex:'occNo',width:80,editor:new Ext.form.TextField({vtype:'alphanum'})},
+						{header:'PosNo',dataIndex:'posNo',width:80,editor:new Ext.form.TextField({vtype:'alphanum'})}]
 		}
 		columns  = baseColumns.concat(nextColums)
 		
@@ -147,15 +147,23 @@ var TaskDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 			},this);
 			return arr;
 		},
-		getUserIds:function(){
+		getWriteOffTerminalValue:function(){
 			var arr=[];
-			var store = this.getStore();
-			store.each(function(record){
-				if(record.get('recycle_result') == 'T'){
-					arr.push(record.get('user_id'));
-				}
+			var records = this.getStore().getModifiedRecords();
+			Ext.each(records,function(record){
+				var values = {};
+				values["recycle_result"] = record.get('recycle_result');
+				values["userId"] =record.get('user_id');
+				arr.push(values);
 			},this);
 			return arr;
+//			var store = this.getStore();
+//			store.each(function(record){
+//				if(record.get('recycle_result') == 'T'){
+//					arr.push(record.get('user_id'));
+//				}
+//			},this);
+//			return arr;
 		},
 		checkDeviceCode : function(){
 			this.stopEditing();//停止编辑
@@ -173,7 +181,7 @@ TaskDeviceWin = Ext.extend(Ext.Window,{
 	constructor : function(rs){
 		this.deviceGrid = new TaskDeviceGrid(rs);
 		TaskDeviceWin.superclass.constructor.call(this,{
-			title : '设备回填',
+			title : lbc('home.tools.TaskManager._fillDevTitle'),
 			layout : 'fit',
 			height : 400,
 			width : 750,
@@ -181,12 +189,12 @@ TaskDeviceWin = Ext.extend(Ext.Window,{
 			closeAction : 'close',
 			items : [this.deviceGrid],
 			buttons : [{
-				text : '保存',
+				text : lbc('common.save'),
 				scope : this,
 				iconCls : 'icon-save',
 				handler : this.doSave
 			}, {
-				text : '关闭',
+				text : lbc('common.close'),
 				scope : this,
 				handler : function() {
 					this.close();
@@ -198,9 +206,9 @@ TaskDeviceWin = Ext.extend(Ext.Window,{
 		if(!this.deviceGrid.checkDeviceCode()){return false;}
 		var o ={},url;
 		if(this.task_type_id == '9'){//销终端工单
-			var data = this.deviceGrid.getUserIds();
+			var data = this.deviceGrid.getWriteOffTerminalValue();
 			url = Constant.ROOT_PATH + "/core/x/Task!fillWriteOffTerminalTask.action";
-			o = {task_id:this.task_id,userIds : data.join(",")};
+			o = {task_id:this.task_id,devices : Ext.encode(data)};
 		}else{
 			var data = this.deviceGrid.getValues();
 			url = Constant.ROOT_PATH + "/core/x/Task!fillTask.action";
@@ -375,7 +383,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 				listWidth:200,
 				paramName:'STATUS_W_TASK',
 				hiddenName : 'task_status',
-				typeAhead:true,editable:true,
+				typeAhead:true,editable:false,
 				store:new Ext.data.JsonStore({
 					fields:['item_value','item_name']
 				}),displayField:'item_name',valueField:'item_value',
@@ -387,7 +395,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 				emptyText: forms['zteStatus'],
 				paramName:'ZTE_QUERY_STATUS_W_TASK',
 				hiddenName : 'task_status',
-				typeAhead:true,editable:true,
+				typeAhead:true,editable:false,
 				store:new Ext.data.JsonStore({
 					fields:['item_value','item_name']
 				}),displayField:'item_name',valueField:'item_value',
@@ -399,7 +407,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 				emptyText: forms['syncStatus'],
 				paramName:'ZTE_QUERY_STATUS_W_TASK',
 				hiddenName : 'sync_status',
-				typeAhead:true,editable:true,
+				typeAhead:true,editable:false,
 				store:new Ext.data.JsonStore({
 					fields:['item_value','item_name']
 				}),displayField:'item_name',valueField:'item_value',
@@ -410,7 +418,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 				width: 100,
 				listWidth:200,
 				emptyText: forms['taskDetailType'],
-				typeAhead:true,editable:true,
+				typeAhead:true,editable:false,
 				paramName:'TASK_DETAIL_TYPE',
 				store:new Ext.data.JsonStore({
 					fields:['item_value','item_name']
@@ -469,12 +477,13 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 	        store: this.taskStore,
 	        cm: new Ext.ux.grid.LockingColumnModel({
 	        	columns:[
-				{header: taskCols[10],dataIndex : 'task_id', width: 80, renderer:App.qtipValue},
-				{header: taskCols[0],		dataIndex : 'task_type_id_text', 	width: 85, renderer: function(v, m ,rs){
+				{header: taskCols[10],dataIndex : 'task_id', width: 70, renderer:App.qtipValue},
+				{header: taskCols[0],		dataIndex : 'task_type_id_text', 	width: 70, renderer: function(v, m ,rs){
 					return '<div  style="font-weight: bold" ext:qtitle="" ext:qtip="' + v + '">' + v +'</div>';
 				}},
+				{header: taskCols[13], 	dataIndex: 'cust_no', width: 80},
 				{header: taskCols[1], 	dataIndex: 'cust_name', width: 80},
-				{header: taskCols[2], 		dataIndex: 'task_status', width: 85, renderer: function(v, m ,rs){
+				{header: taskCols[2], 		dataIndex: 'task_status', width: 80, renderer: function(v, m ,rs){
 					var text = rs.get("task_status_text");
 					var color = "black";
 					if(v == 'INIT'){
@@ -486,8 +495,9 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 					}
 					return '<div  style="font-weight: bold;color: '+ color +';" ext:qtitle="" ext:qtip="' + text + '">' + text +'</div>';
 				}},
-				{header: taskCols[3], dataIndex:'team_id_text',width:110,renderer:App.qtipValue},
+				{header: taskCols[3], dataIndex:'team_id_text',width:80,renderer:App.qtipValue},
 				{header: taskCols[4],dataIndex: 'zte_status_text', width: 70, renderer:Ext.util.Format.statusShow},
+				{header: taskCols[14],dataIndex: 'sync_status_text', width: 90, renderer:Ext.util.Format.statusShow},
 				{header: taskCols[5], dataIndex : 'address', width: 200,renderer:App.qtipValue},
 				{header: taskCols[6], dataIndex : 'tel', 				width: 100, renderer:App.qtipValue},
 				{header: taskCols[7], dataIndex: 'task_create_time', 	width: 80, renderer: Ext.util.Format.dateFormat},					
@@ -585,7 +595,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 			width: 120,
 			fieldLabel:lbc('home.tools.TaskManager.forms.zteStatus'),
 			allowBlank:false,
-			typeAhead:true,editable:true,
+			typeAhead:true,editable:false,
 			paramName:'ZTE_STATUS_W_TASK',
 			store:new Ext.data.JsonStore({
 				fields:['item_value','item_name']
@@ -712,7 +722,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 		});
 		teamCombo.getStore().loadData(arr);
 		var form = new Ext.form.FormPanel({
-			labelWidth: 90,
+			labelWidth: 150,
 			bodyStyle: 'padding-top: 10px;',
 			items: [teamCombo]
 		});
@@ -728,7 +738,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 			form.add(bugCauseCombo);
 		}
 		var win = new Ext.Window({
-			width: 320,
+			width: 450,
 			height: 250,
 			title: lbc('home.tools.TaskManager.forms.taskTeam'),
 			border: false,
@@ -797,7 +807,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 			width: 120,
 			fieldLabel:lbc('home.tools.TaskManager.forms.finishType'),
 			allowBlank:false,
-			typeAhead:true,editable:true,
+			typeAhead:true,editable:false,
 			paramName:'TASK_FINISH_TYPE',
 			store:new Ext.data.JsonStore({
 				fields:['item_value','item_name']
@@ -808,19 +818,19 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 		var endForm = new Ext.form.FormPanel({
 			layout : 'form',
 			border : false,
-			labelWidth : 100,
+			labelWidth : 150,
 			bodyStyle : 'padding : 5px;padding-top : 10px;',
 			items: [finishCombo,{
 				fieldLabel: lbc('home.tools.TaskManager.forms.finishExplan'),
 				name:'finishRemark',
-				height : 100,
-				width : 240,
+				height : 140,
+				width : 200,
 				xtype:'textarea'
 			}]
 		});
 		var win = new Ext.Window({
 			width: 450,
-			height: 250,
+			height: 300,
 			title: lbc('home.tools.TaskManager._winTitle'),
 			border: false,
 			closeAction:'close',

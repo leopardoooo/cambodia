@@ -80,7 +80,7 @@ var CaGrid = Ext.extend(Ext.grid.GridPanel,{
  */
 var VodGrid = Ext.extend(Ext.grid.GridPanel,{
 	store : null,
-	constructor:function(){
+	constructor:function(p){
 		this.store = new Ext.data.JsonStore({
 			url:  root + '/commons/x/QueryCust!queryVodCommand.action',
 			root:'records',
@@ -96,7 +96,7 @@ var VodGrid = Ext.extend(Ext.grid.GridPanel,{
 			{header:lc[3],dataIndex:'stb_id',width:130,sortable:true,renderer:App.qtipValue},
 //			{header:lc[4],dataIndex:'card_id',width:130,sortable:true,renderer:App.qtipValue},
 			{header:lc[5],dataIndex:'modem_mac',width:130,sortable:true,renderer:App.qtipValue},
-			{header:lc[6],dataIndex:'is_success',width:70,sortable:true,renderer:this.showResult},
+			{header:lc[6],dataIndex:'is_success',width:70,sortable:true,renderer:p.showResult},
 			{header:lc[7],dataIndex:'error_info',width:70,sortable:true,renderer:App.qtipValue},
 			{header:lc[8],dataIndex:'send_time',width:120,sortable:true,renderer:App.qtipValue}
 		];
@@ -135,15 +135,6 @@ var VodGrid = Ext.extend(Ext.grid.GridPanel,{
 			this.store.baseParams.type = type;
 			this.refresh();
 		}
-	},
-	showResult : function(v){
-		if(v=='Y'){
-			return '正确';
-		}else if(v == 'F'){
-			return '未处理';
-		}else{
-			return '错误';
-		}
 	}
 });
 
@@ -154,7 +145,7 @@ var VodGrid = Ext.extend(Ext.grid.GridPanel,{
  */
 var BandGrid = Ext.extend(Ext.grid.GridPanel,{
 	bandStore:null,
-	constructor:function(){
+	constructor:function(p){
 		
 		this.bandStore = new Ext.data.JsonStore({
 			url:  root + '/commons/x/QueryCust!queryBandCommand.action',
@@ -170,7 +161,7 @@ var BandGrid = Ext.extend(Ext.grid.GridPanel,{
 			{header:lc[2],dataIndex:'cmd_type_text',width:80,sortable:true,renderer:App.qtipValue},
 //			{header:lc[3],dataIndex:'stb_id',width:130,sortable:true,renderer:App.qtipValue},
 			{header:lc[4],dataIndex:'modem_mac',width:130,sortable:true,renderer:App.qtipValue},
-			{header:lc[5],dataIndex:'is_success',width:70,sortable:true,renderer:this.showResult},
+			{header:lc[5],dataIndex:'is_success',width:70,sortable:true,renderer:p.showResult},
 			{header:lc[6],dataIndex:'error_info',width:70,sortable:true,renderer:App.qtipValue},
 			{header:lc[7],dataIndex:'send_time',width:120,sortable:true,renderer:App.qtipValue}
 		];
@@ -217,8 +208,8 @@ CommandInfoPanel = Ext.extend(BaseInfoPanel,{
 	bandGrid:null,
 	constructor:function(){
 		this.caGrid = new CaGrid();
-		this.vodGrid = new VodGrid();
-		this.bandGrid = new BandGrid();
+		this.vodGrid = new VodGrid(this);
+		this.bandGrid = new BandGrid(this);
 		CommandInfoPanel.superclass.constructor.call(this,{
 			id:'commandInfoPanelId',
 			border:false,
@@ -254,6 +245,15 @@ CommandInfoPanel = Ext.extend(BaseInfoPanel,{
 				}]
 			}]
 		});
+	},
+	showResult : function(v){
+		if(v=='Y'){
+			return lbc('common.correct');
+		}else if(v == 'F'){
+			return lbc('common.untreated');
+		}else{
+			return lbc('common.wrong');
+		}
 	},
 	refresh:function(){
 		this.caGrid.remoteRefresh();

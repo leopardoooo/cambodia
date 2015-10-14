@@ -104,7 +104,7 @@ public class SnTaskComponent extends BaseBusiComponent {
 		List<CUser> bandList = getUserByTyoe(userList, SystemConstants.USER_TYPE_BAND);
 		String teamType = SystemConstants.TEAM_TYPE_SUPERNET;
 		String synStatus=StatusConstants.NONE;
-		if (assignType.equals(SystemConstants.TASK_ASSIGN_CFOCN)){
+		if (SystemConstants.TASK_ASSIGN_CFOCN.equals(assignType)){
 			teamType = SystemConstants.TEAM_TYPE_CFOCN;
 			synStatus=StatusConstants.NOT_EXEC;
 		}
@@ -122,7 +122,7 @@ public class SnTaskComponent extends BaseBusiComponent {
 	 * @param bugDetail
 	 * @throws Exception
 	 */
-	public void createBugTask(Integer doneCode, CCust cust, String bugDetail) throws Exception {
+	public String createBugTask(Integer doneCode, CCust cust, String bugDetail) throws Exception {
 		String taskId = this.saveTaskBaseInfo(cust, doneCode, SystemConstants.TASK_TYPE_FAULT,
 				getTeamId(SystemConstants.TEAM_TYPE_SUPERNET), null, bugDetail);
 		List<CUser> userList = cUserDao.queryUserByCustId(cust.getCust_id());
@@ -130,6 +130,7 @@ public class SnTaskComponent extends BaseBusiComponent {
 		saveTaskUser(bandList, SystemConstants.TASK_TYPE_FAULT, taskId);
 		//记录日志
 		createTaskLog(taskId, BusiCodeConstants.TASK_INIT, doneCode, null, StatusConstants.NONE);
+		return taskId;
 	}
 
 	/**
@@ -391,8 +392,8 @@ public class SnTaskComponent extends BaseBusiComponent {
 		return userList;
 	}
 
-	public void fillWriteOffTerminalTask(int doneCode, String taskId, String[] userIds) throws Exception {
-		wTaskUserDao.updateRecycle(taskId, userIds);
+	public void fillWriteOffTerminalTask(int doneCode, String taskId, String[] userIds, String recycle_result) throws Exception {
+		wTaskUserDao.updateRecycle(taskId, userIds,recycle_result);
 		createTaskLog(taskId, BusiCodeConstants.TASK_FILL, doneCode, null, StatusConstants.NONE);
 	}
 
@@ -411,6 +412,7 @@ public class SnTaskComponent extends BaseBusiComponent {
 		task.setTask_finish_desc(finishDesc);
 		task.setTask_finish_time(new Date());
 		task.setTask_status_date(new Date());
+		task.setFinish_done_code(doneCode);
 		wTaskBaseInfoDao.update(task);
 		// 记录操作日志
 		JsonObject jo = new JsonObject();
@@ -548,7 +550,7 @@ public class SnTaskComponent extends BaseBusiComponent {
 					taskUser.setRecycle_device(SystemConstants.BOOLEAN_TRUE);
 				} else {
 					taskUser.setRecycle_device(SystemConstants.BOOLEAN_FALSE);
-					taskUser.setRecycle_result(SystemConstants.BOOLEAN_FALSE);
+//					taskUser.setRecycle_result(SystemConstants.BOOLEAN_FALSE);
 				}
 			}else if((taskType.equals(SystemConstants.TASK_TYPE_MOVE) || taskType.equals(SystemConstants.TASK_TYPE_FAULT))
 					&& user.getUser_type().equals(SystemConstants.USER_TYPE_BAND) && StringHelper.isEmpty(taskUser.getDevice_id())){
@@ -688,6 +690,10 @@ public class SnTaskComponent extends BaseBusiComponent {
 	 */
 	public void updateTaskStatus(String taskId,String status) throws Exception{
 		wTaskBaseInfoDao.updateTaskStatus(taskId, status);
+	}
+	
+	public void updateTask(WTaskBaseInfo task) throws Exception {
+		wTaskBaseInfoDao.update(task);
 	}
 	public WTaskBaseInfoDao getwTaskBaseInfoDao() {
 		return wTaskBaseInfoDao;
