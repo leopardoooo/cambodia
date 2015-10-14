@@ -207,6 +207,7 @@ BCLang.home = {
 				loginId: 'Login~',
 				orderFee: 'Order Balance~',
 				canRetrunFee: 'refundable Money Amount~',
+				totalReturnFee: 'Total Refund~',
 				canTransferFee: 'transferable Money Amount~',
 				canRefundRealFee: 'Real refund amount~',
 				returnDevice: 'Recycle Equipment~',
@@ -278,12 +279,13 @@ BCLang.home = {
 			payfee: {
 				_title: "prepaid money~",
 				columns: ["Serial Number~","Service Name~","Account Type~","Account Name~","User Type~", "User Name~","Equipment No.~","Status~","Money Amount~","Estimated Expiry Date before Payment~",
-				        "Expiry Date after Payment~","Print Status~","Payment Way~","Reception Date~","Account Date~","Receptionist~","Reception Department~","Invoice~","Invoice Issuance Way~", "Invoice Type~", "Development of Human ~"]
+				        "Expiry Date after Payment~","Print Status~","Payment Way~","Reception Date~","Account Date~","Receptionist~","Reception Department~","Invoice~","Invoice Issuance Way~", "Invoice Type~", "Developer~"]
 			},
 			busifee: {
 				_title: "Service Fee~",
 				columns: ["Serial Number~","Fee Name~","Equipment Type~","Equipment No.~","Status~","Print Status~",
-				          "Payable~","Paid~","Payment Way~","ReceptionDate~","Receptionist~","ReceptionDepartment~","Invoice~"," Invoice Issuance Way~","Invoice Type~","Buy Quantity~","Equipment Type~","Remark~"]
+				          "Payable~","Paid~","Payment Way~","ReceptionDate~","Receptionist~","ReceptionDepartment~",
+				          "Invoice~"," Invoice Issuance Way~","Invoice Type~","Buy Quantity~","Equipment Type~","Remark~", "Developer~", "Payment Dates~"]
 			},
 			detail: {
 				_title: 'payment record~',

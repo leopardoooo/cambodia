@@ -207,6 +207,7 @@ BCLang.home = {
 				loginId: '登录账号~',
 				orderFee: '订单余额~',
 				canRetrunFee: '可退金额~',
+				totalReturnFee: '退款总额~',
 				canTransferFee: '转账金额~',
 				canRefundRealFee: '实退金额~',
 				returnDevice: '回收设备~',
