@@ -327,7 +327,8 @@ BCLang.home = {
 				oldInvoiceType: ' FormerInvoiceType~',
 				oldStatus: ' FormerInvoiceStatus~',
 				newInvoiceId: 'NewInvoiceNo.~',
-				newInvoiceCode: 'NewInvoiceCode~'
+				newInvoiceCode: 'NewInvoiceCode~',
+				faultContent:'Fault content~'
 			}
 		},
 		//Reception Record
@@ -753,5 +754,6 @@ BCLang.msgBox = {
 	CancelTheAccountDismantleDevice:'User status is normal and device buy mode is buy,or user status is complete removal machine~',
 	PleaseCancelTheOttMainTerminal:'Please cancel the main terminal OTT~',
 	noFeeItemCanNotContinue:'Can not continue because no cost item~',
-	EditPayFeeAndNumberIsWrong:'This fee is not divisible by the price, the purchase of the number as an integer~'
+	EditPayFeeAndNumberIsWrong:'This fee is not divisible by the price, the purchase of the number as an integer~',
+	SelectOnlyOneData:'Please choose a record~'
 }

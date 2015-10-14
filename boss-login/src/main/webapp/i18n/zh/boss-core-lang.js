@@ -327,7 +327,8 @@ BCLang.home = {
 				oldInvoiceType: '原收据类型~',
 				oldStatus: '原收据状态~',
 				newInvoiceId: '新收据号码~',
-				newInvoiceCode: '新收据代码~'
+				newInvoiceCode: '新收据代码~',
+				faultContent:'故障内容~'
 			}
 		},
 		//受理记录
@@ -760,6 +761,6 @@ BCLang.msgBox = {
 	CancelTheAccountDismantleDevice:'用户状态为正常并且设备购买方式为购买，或者用户状态为拆机完成才能销户~',
 	PleaseCancelTheOttMainTerminal:'请先销户OTT主终端~',
 	noFeeItemCanNotContinue:'没有费用项，无法继续~',
-	EditPayFeeAndNumberIsWrong:'本次收费不能整除单价,购买个数应为整数~'
-	
+	EditPayFeeAndNumberIsWrong:'本次收费不能整除单价,购买个数应为整数~',
+	SelectOnlyOneData:'请选择一条记录~'
 }
