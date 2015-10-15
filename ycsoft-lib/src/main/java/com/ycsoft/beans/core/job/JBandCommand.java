@@ -51,6 +51,8 @@ public class JBandCommand implements Serializable {
 	private String card_id;
 	private String modem_mac;
 	private String cmd_type_text;
+	private String is_success_text;
+
 	/**
 	 * default empty constructor
 	 */
@@ -58,6 +60,10 @@ public class JBandCommand implements Serializable {
 	
 	
 	// transnum getter and setter
+	public String getIs_success_text() {
+		return is_success_text;
+	}
+	
 	public Long getTransnum(){
 		return this.transnum ;
 	}
@@ -191,6 +197,7 @@ public class JBandCommand implements Serializable {
 	
 	public void setIs_success(String is_success){
 		this.is_success = is_success ;
+		this.is_success_text = MemoryDict.getDictName(DictKey.BOOLEAN, is_success);
 	}
 	
 	// error_info getter and setter
