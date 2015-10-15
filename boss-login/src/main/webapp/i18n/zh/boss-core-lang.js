@@ -15,6 +15,7 @@ BCLang.common = {
 	tipBusiSaveOK: '业务保存成功!~',
 	tipLoadText: '正在查询，请稍等...',
 	tipConfirmSave: '确定要保存业务吗?~',
+	confirmSaveData: '确定要保存信息吗?~',
 	tipFormInvalid: '含有验证不通过的输入项!~',
 	filterTreePanel:{
 		emptyTipSearchField:'输入名称过滤...~',
@@ -71,7 +72,8 @@ BCLang.common = {
 	add: '添加~',
 	correct: '正确~',
 	untreated: '未处理~',
-	wrong: '错误~'
+	wrong: '错误~',
+	invoicePrint:'发票打印~'
 }
 //主页模块
 BCLang.home = {
@@ -625,6 +627,7 @@ BCLang.msgBox = {
 	needUser:'请选择用户!~',
 	needOneUser:'请选择单个用户!',
 	cancelFeeSuccess:'冲正成功!~',
+	paymentSuccess:'支付成功!~',
 	confirmCancelFeeAndInvaidInvoice:'收据{0}将作废!该收据上的费用项需要重打，确定冲正?~',
 	confirmCancelFee:'确定冲正吗?~',
 	selectRec4CancelFee:'请选择要冲正的费用记录!~',
@@ -764,5 +767,6 @@ BCLang.msgBox = {
 	PleaseCancelTheOttMainTerminal:'请先销户OTT主终端~',
 	noFeeItemCanNotContinue:'没有费用项，无法继续~',
 	EditPayFeeAndNumberIsWrong:'本次收费不能整除单价,购买个数应为整数~',
-	SelectOnlyOneData:'请选择一条记录~'
+	SelectOnlyOneData:'请选择一条记录~',
+	ChooseToPayTheRecord:'请选择要支付的记录~'
 }

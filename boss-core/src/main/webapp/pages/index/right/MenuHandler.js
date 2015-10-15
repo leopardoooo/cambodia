@@ -3050,7 +3050,7 @@ Ext.apply(MenuHandler, {
 		function callback(res, opt) {
 			var result = Ext.decode(res.responseText);
 			if (result == true) {
-				Alert('工单作废成功!');
+				Alert(lmsg('commonSuccess'));
 				App.getApp().main.infoPanel.getUserPanel().userGrid.remoteRefresh();
 				App.getApp().main.infoPanel.docPanel.taskGrid.remoteRefresh();
 				App.getApp().refreshPayInfo();
@@ -3058,7 +3058,7 @@ Ext.apply(MenuHandler, {
 		}
 		var url = Constant.ROOT_PATH + "/core/x/Task!cancelTaskSn.action";
 
-		Confirm("确定作废工单吗?", this, function() {
+		Confirm(lbc('home.tools.TaskManager.msg.sureWantSelectedWork'), this, function() {
 			// 调用请求函数,详细参数请看busi-helper.js
 			App.sendRequest(url, {task_id : record.get('task_id'),taskType:record.get('task_type_id')}, callback);
 		});

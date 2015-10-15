@@ -15,6 +15,7 @@ BCLang.common = {
 	tipBusiSaveOK: ' Business Saved Successfully!~',
 	tipLoadText: 'Being Inquiring, Please Wait...',
 	tipConfirmSave: 'Are you sure to save business?~',
+	confirmSaveData: 'Are you sure you want to save the information?~',
 	tipFormInvalid: 'Containing input items cannot pass examination!~',
 	filterTreePanel:{
 		emptyTipSearchField:'Input Name Filtration...~',
@@ -71,7 +72,8 @@ BCLang.common = {
 	add: 'Add~',
 	correct: 'Correct~',
 	untreated: 'Untreated~',
-	wrong: 'Wrong~'
+	wrong: 'Wrong~',
+	invoicePrint:'Invoice Print~'
 }
 //home page module
 BCLang.home = {
@@ -621,6 +623,7 @@ BCLang.msgBox = {
 	needCust:'Please find Customer to Operate at first!~',
 	needUser:'Please select customer!~',
 	cancelFeeSuccess:'Successful Write-off!~',
+	paymentSuccess:'Payment Success!~',
 	confirmCancelFeeAndInvaidInvoice:'Invoice{0} will be invalid! Fee Items of this Invoice need to be printed again，Sure to cancel it?~',
 	confirmCancelFee:'Sure to cancel it?~',
 	selectRec4CancelFee:'Please select fee record to cancel!~',
@@ -757,5 +760,6 @@ BCLang.msgBox = {
 	PleaseCancelTheOttMainTerminal:'Please cancel the main terminal OTT~',
 	noFeeItemCanNotContinue:'Can not continue because no cost item~',
 	EditPayFeeAndNumberIsWrong:'This fee is not divisible by the price, the purchase of the number as an integer~',
-	SelectOnlyOneData:'Please choose a record~'
+	SelectOnlyOneData:'Please choose a record~',
+	ChooseToPayTheRecord:'Please choose to pay the record~'
 }
