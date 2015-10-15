@@ -687,6 +687,7 @@ BCLang.msgBox = {
 	confirmDepositUnPay:"确定退押金吗?~",
 	
 	userNotActive:"选择的用户状态非正常~",
+	userStatusActiveOrConstruction:"选择的用户状态必须是正常或者施工中~",
 	cantLogOffZzd:'主终端不能先销户~',
 	cantLogOffCosBaseProdOweFee:'有基本包产品欠费,不能销户!~',
 	cantLogOffCosBaseProdNotActive:'有基本包产品状态不正常,不能销户!~',

@@ -393,8 +393,14 @@ public class SnTaskComponent extends BaseBusiComponent {
 	}
 
 	public void fillWriteOffTerminalTask(int doneCode, String taskId, String[] userIds, String recycle_result) throws Exception {
-		wTaskUserDao.updateRecycle(taskId, userIds,recycle_result);
-		createTaskLog(taskId, BusiCodeConstants.TASK_FILL, doneCode, null, StatusConstants.NONE);
+		if(userIds.length>0){
+			wTaskUserDao.updateRecycle(taskId, userIds,recycle_result);
+			// 记录操作日志
+			JsonObject jo = new JsonObject();
+			jo.addProperty("user_ids", StringHelper.join(userIds, ","));
+			jo.addProperty("recycle_result", recycle_result);
+			createTaskLog(taskId, BusiCodeConstants.TASK_FILL, doneCode, jo.toString(), StatusConstants.NONE);
+		}
 	}
 
 	// 完工

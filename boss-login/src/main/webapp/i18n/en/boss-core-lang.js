@@ -680,6 +680,7 @@ BCLang.msgBox = {
 	confirmDepositUnPay:"Sure to return deposit?~",
 	
 	userNotActive:"selected User Status is abnormal~",
+	userStatusActiveOrConstruction:"selected User Status must be normal or construction~",
 	cantLogOffZzd:'Main Terminal cannot be cancelled at first~',
 	cantLogOffCosBaseProdOweFee:'Overdue Basic Package Product cannot be cancelled!~',
 	cantLogOffCosBaseProdNotActive:' Basic Package Product Status is abnormal, cannot be cancelled!~',

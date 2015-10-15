@@ -130,6 +130,14 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 		Map<String, List<TaskFillDevice>> map = CollectionHelper.converToMap(deviceList, "recycle_result");
 		for(String key : map.keySet()){
 			List<TaskFillDevice> userList = map.get(key);
+			if(key.equals(SystemConstants.BOOLEAN_TRUE)){
+				for(TaskFillDevice dto : userList){
+					CUser user = userComponent.queryUserById(dto.getUserId());
+					if(user!=null){
+						authComponent.sendAuth(user, null, BusiCmdConstants.DEL_USER, doneCode);
+					}
+				}
+			}
 			snTaskComponent.fillWriteOffTerminalTask(doneCode,taskId,CollectionHelper.converValueToArray(userList, "userId"),key);
 		}
 		saveAllPublic(doneCode, getBusiParam());

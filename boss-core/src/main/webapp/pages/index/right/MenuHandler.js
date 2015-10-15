@@ -1690,12 +1690,12 @@ Ext.apply(MenuHandler, {
 		var userRecords =  App.main.infoPanel.getUserPanel().userGrid.getSelections();
 		var len = userRecords.length;
 		if (len == 0) {
-			Alert('请先选择用户!');
+			Alert(lmsg('needUser'));
 			return false;
 		}
 		for (var i = 0; i < len; i++) {
 			if (userRecords[i].get("status") != "ACTIVE" && userRecords[i].get("status") != "INSTALL" ) {
-				Alert("所选用户的状态必须是正常");
+				Alert(lmsg('userStatusActiveOrConstruction'));
 				return false;
 			}
 			for (var j = i + 1; j < len; j++) {
@@ -1716,13 +1716,13 @@ Ext.apply(MenuHandler, {
 			var userRecords =  App.main.infoPanel.getUserPanel().userGrid.getSelections();
 			var len = userRecords.length;
 			if (len == 0) {
-				Alert('请先选择用户!');
+				Alert(lmsg('needUser'));
 				return false;
 			}
 		}
 		for (var i = 0; i < len; i++) {
 			if (userRecords[i].get("status") != "ACTIVE" && userRecords[i].get("status") != "INSTALL" ) {
-				Alert("所选用户的状态必须是正常");
+				Alert(lmsg('userStatusActiveOrConstruction'));
 				return false;
 			}
 			for (var j = i + 1; j < len; j++) {
@@ -1877,7 +1877,7 @@ Ext.apply(MenuHandler, {
 			for(var i=0;i<userStore.getCount();i++){
 				if(userId == userStore.getAt(i).get('user_id')){
 					if(userStore.getAt(i).get("status") != "ACTIVE"){
-						Alert("所选用户的状态必须是正常");
+						Alert(lmsg('userNotActive'));
 						return false;
 					}
 				}
