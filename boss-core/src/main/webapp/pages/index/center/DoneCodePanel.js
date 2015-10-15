@@ -182,16 +182,16 @@ DoneCodeGrid = Ext.extend(Ext.ux.Grid,{
 			columns:cm,
 			sm : new Ext.grid.CheckboxSelectionModel(),
 			bbar: new Ext.PagingToolbar({store: this.doneCodeStore ,pageSize : this.pageSize}),
-			tools:[{id:'search',qtip:'查询',cls:'tip-target',scope:this,handler:function(){
+			tools:[{id:'search',qtip:langUtils.main("user.list.tools")[0],cls:'tip-target',scope:this,handler:function(){
 				var comp = this.tools.search;
 				if(this.doneCodeStore.getCount()>0){
 					if(win)win.close();
 					win = FilterWindow.addComp(this,[
-						{text:'业务名称',field:'busi_name',type:'textfield'},
-						{text:'操作员',field:'optr_name',type:'textfield'},
-						{text:'状态',field:'status',showField:'status_text',
+						{text:lc[1],field:'busi_name',type:'textfield'},
+						{text:lc[4],field:'optr_name',type:'textfield'},
+						{text:lc[2],field:'status',showField:'status_text',
 							data:[
-								{'text':'状态','value':''},
+								{'text':lc[2],'value':''},
 								{'text':'正常','value':'ACTIVE'},
 								{'text':'失效','value':'INVALID'}
 							]
@@ -202,7 +202,7 @@ DoneCodeGrid = Ext.extend(Ext.ux.Grid,{
 						win.show();
 					}
 				}else{
-					Alert('请先查询数据！');
+					Alert(lbc('common.emptyMsg'));
 				}
 		    }}],	
 			listeners : {

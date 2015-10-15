@@ -145,7 +145,7 @@ BillGrid = Ext.extend(Ext.ux.Grid, {
 								win.show();
 							}
 						}else{
-							Alert('请先查询数据！');
+							Alert(lbc('common.emptyMsg'));
 						}
 			    	}
 			    }],

@@ -804,13 +804,13 @@ Ext.apply(MenuHandler, {
 	},
 	EditPay : function() {
 		return {
-			width : 650,
+			width : 750,
 			height : 400
 		};
 	},
 	EditDoneRemark: function(){
 		return {
-			width : 400,
+			width : 500,
 			height : 400
 		};
 	},
@@ -855,7 +855,7 @@ Ext.apply(MenuHandler, {
 			Alert(lmsg('needOneUser'));
 			return false;
 		}
-		if (userRecords[0].get("user_type") !='OTT_MOBILE' && userRecords[0].get("status") != "UNTUCKEND") {
+		if (userRecords[0].get("user_type") !='OTT_MOBILE' && userRecords[0].get("status") != 'UNTUCKEND' && (userRecords[0].get("status") != 'ACTIVE' || userRecords[0].get("str10") != 'BUY')) {
 			Alert(lmsg('CancelTheAccountDismantleDevice'));
 			return false;
 		}

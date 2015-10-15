@@ -234,12 +234,12 @@ TaskGrid = Ext.extend(Ext.ux.Grid,{
 	},
 	doTaskWin:function(){
 		if(!App.getApp().getCustId()){
-			Alert('请查询客户之后再做操作.');
+			Alert(lbc('msgBox.needCust'));
 			return false;
 		}
 		var recs = this.selModel.getSelections();
 		if(!recs || recs.length !=1){
-			Alert('请选择且仅选择一条记录!');
+			Alert(lbc('msgBox.SelectOnlyOneData'));
 			return false;
 		}
 		var rec = recs[0];

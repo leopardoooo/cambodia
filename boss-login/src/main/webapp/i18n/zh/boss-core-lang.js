@@ -131,7 +131,8 @@ BCLang.home = {
 				roomTitle2: '行政区域:{0} 服务类型:{1}',
 				addRoom: '新增房间~',
 				unitName:'单位名称~',
-				unitAddress:'单位地址~'
+				unitAddress:'单位地址~',
+				accountName:'账目名称~'
 			},
 			acct: {
 				_title: "账目信息~",
@@ -326,14 +327,20 @@ BCLang.home = {
 				oldInvoiceType: '原收据类型~',
 				oldStatus: '原收据状态~',
 				newInvoiceId: '新收据号码~',
-				newInvoiceCode: '新收据代码~'
+				newInvoiceCode: '新收据代码~',
+				faultContent:'故障内容~'
 			}
 		},
 		//受理记录
 		doneCode: {
 			_title: '受理记录~',
 			columns: ["流水号~","业务名称~","状态~","受理日期~","操作员~","受理部门~",
-			         "可回退~","可忽略~","实缴金额~","扩展业务信息~","备注~"]
+			         "可回退~","可忽略~","实缴金额~","扩展业务信息~","备注~"],
+			editPayColumns:["费用项~","单价~","数量~","累计收费~","实际应收~","本次收费~","型号~"],
+			_form:{
+				oldRemark: '原备注~',
+				newRemark: '新备注~'
+			}
 		},
 		//指令
 		cmd: {
@@ -751,6 +758,9 @@ BCLang.msgBox = {
 	completeChooseUserTerminal: '请完整选择需要参加的每种用户类型终端!~',
 	newOrderAmountCantBeLessThanZero: '新订单金额不能小于零!~',
 	newOrderAmountCantBeLessThanTransAmount: '新订单金额不能小于转移金额~',
-	CancelTheAccountDismantleDevice:'请先拆机或工单作废~',
-	PleaseCancelTheOttMainTerminal:'请先销户OTT主终端~'
+	CancelTheAccountDismantleDevice:'用户状态为正常并且设备购买方式为购买，或者用户状态为拆机完成才能销户~',
+	PleaseCancelTheOttMainTerminal:'请先销户OTT主终端~',
+	noFeeItemCanNotContinue:'没有费用项，无法继续~',
+	EditPayFeeAndNumberIsWrong:'本次收费不能整除单价,购买个数应为整数~',
+	SelectOnlyOneData:'请选择一条记录~'
 }

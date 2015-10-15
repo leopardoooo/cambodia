@@ -131,7 +131,8 @@ BCLang.home = {
 				roomTitle2: 'Administrative area:{0} service type:{1}',
 				addRoom: 'increased room~',
 				unitName:'unit name~',
-				unitAddress:'unit address~'
+				unitAddress:'unit address~',
+				accountName:'Account Name~'
 			},
 			acct: {
 				_title: "Account Information~",
@@ -326,14 +327,20 @@ BCLang.home = {
 				oldInvoiceType: ' FormerInvoiceType~',
 				oldStatus: ' FormerInvoiceStatus~',
 				newInvoiceId: 'NewInvoiceNo.~',
-				newInvoiceCode: 'NewInvoiceCode~'
+				newInvoiceCode: 'NewInvoiceCode~',
+				faultContent:'Fault content~'
 			}
 		},
 		//Reception Record
 		doneCode: {
 			_title: ' Reception Record~',
 			columns: ["Serial Number~","Service Name~","Status~","Reception Date~","Operator~","ReceptionDept~",
-			         "Returnable~","Ignorable~","Paid Amount~","Extended ServiceInfo~","Remark~"]
+			         "Returnable~","Ignorable~","Paid Amount~","Extended ServiceInfo~","Remark~"],
+			editPayColumns:["Fee Item~","Unit Price~","Amount~","Accumulated Cost~","Actual Cost~","The Cost~","Type Name~"],
+			_form:{
+				oldRemark: 'Old Remark~',
+				newRemark: 'New Remark~'
+			}
 		},
 		//instruction
 		cmd: {
@@ -744,6 +751,9 @@ BCLang.msgBox = {
 	completeChooseUserTerminal: 'Please fully select every User Type Terminal!~',
 	newOrderAmountCantBeLessThanZero: 'new orders amount can not be less than zero~!',
 	newOrderAmountCantBeLessThanTransAmount: 'new orders can not be less than the amount of the transfer amount~',
-	CancelTheAccountDismantleDevice:'Please dismantle device or cancel work order~',
-	PleaseCancelTheOttMainTerminal:'Please cancel the main terminal OTT~'
+	CancelTheAccountDismantleDevice:'User status is normal and device buy mode is buy,or user status is complete removal machine~',
+	PleaseCancelTheOttMainTerminal:'Please cancel the main terminal OTT~',
+	noFeeItemCanNotContinue:'Can not continue because no cost item~',
+	EditPayFeeAndNumberIsWrong:'This fee is not divisible by the price, the purchase of the number as an integer~',
+	SelectOnlyOneData:'Please choose a record~'
 }

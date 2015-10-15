@@ -38,28 +38,24 @@ BusiFeeGrid = Ext.extend( Ext.grid.EditorGridPanel, {
 			}
 		});
 		this.busiFeeStore.on('load',this.doLoadData,this);
-		
+		var lc = langUtils.main("doneCode.editPayColumns");
 		var baseColumns = [
-					{ header: '单价', dataIndex: 'default_value',width:55,renderer : Ext.util.Format.formatFee},
-					{ id:'buy_num_id',header: '个数', dataIndex: 'buy_num',width:45,editor: new Ext.form.NumberField({
-						allowBlank : false,
-						allowNegative : false
+					{ header: lc[1], dataIndex: 'default_value',width:80,renderer : Ext.util.Format.formatFee},
+					{ id:'buy_num_id',header: lc[2], dataIndex: 'buy_num',width:80,editor: new Ext.form.NumberField({
+						allowBlank : false,allowDecimals:false,allowNegative : false
 					})},
-					{ header: '累计收费', dataIndex: 'sum_fee',width:65,renderer : this.formatFenToYuan},
-					{ id : 'real_pay',header: '实际应收', dataIndex: 'real_pay',width:65,renderer : this.formatFee,
-						editor : new Ext.form.NumberField({
-							allowBlank : false,
-							allowNegative : false
-						})},
-					{ header : '本次收费', dataIndex: 'feeValue',width:65,renderer : this.formatFee}]
+					{ header: lc[3], dataIndex: 'sum_fee',width:80,renderer : this.formatFenToYuan},
+					{ id : 'real_pay',header: lc[4], dataIndex: 'real_pay',width:80,renderer : this.formatFee,
+						editor : new Ext.form.NumberField({allowBlank : false,allowNegative : false})},
+					{ header : lc[5], dataIndex: 'feeValue',width:80,renderer : this.formatFee}]
 		
 		var topColumns = [
-					{ id : 'fee_name',header: '费用项', dataIndex: 'fee_name'}
+					{ id : 'fee_name',header: lc[0], dataIndex: 'fee_name'}
 				];
 		var columns = [];				
 		if(this.busiCode =='1109' || this.busiCode =='1108'){
 			var	deviceColumns = [
-				{ header: '型号', dataIndex: 'device_model_text',width:220,renderer:App.qtipValue}					
+				{ header: lc[6], dataIndex: 'device_model_text',width:180,renderer:App.qtipValue}					
 			];
 			columns = topColumns.concat(deviceColumns).concat(baseColumns);					
 		}else{
@@ -75,7 +71,7 @@ BusiFeeGrid = Ext.extend( Ext.grid.EditorGridPanel, {
 			cm: new Ext.grid.ColumnModel({
 				columns: columns
 			}),
-			tbar : ['->','费用合计:',{
+			tbar : ['->',lbc("common.total"),{
 								id: 'txtSumFee',
 								xtype:'tbtext',
 								readOnly: true,
@@ -115,9 +111,14 @@ BusiFeeGrid = Ext.extend( Ext.grid.EditorGridPanel, {
 	},
 	afterEdit : function(obj){
 		var record = obj.record,field = obj.field, fee = 0;
-		var buyNum = record.get('buy_num');
+		var buyNum =  record.get('buy_num');
 		if(field == 'buy_num'){
-			record.set('real_pay',Ext.util.Format.formatFee( obj.value * record.get('default_value') ));
+			var _v = obj.value;
+			if(parseInt(_v) != _v){
+				record.set('buy_num',parseInt(_v));
+				_v = parseInt(_v);
+			}
+			record.set('real_pay',Ext.util.Format.formatFee( _v * record.get('default_value') ));
 			record.set('feeValue',Ext.util.Format.formatFee(Ext.util.Format.formatToFen(record.get('real_pay'))-record.get('sum_fee')));
 			this.setTotalFee();
 		}
@@ -129,7 +130,7 @@ BusiFeeGrid = Ext.extend( Ext.grid.EditorGridPanel, {
 				//购买多个配件时，购买个数=费用除以单价，所以必须是整数(例：购买配件)
 				//若购买设备，购买个数为1个，此时不必是整数(例：购买设备、销售设备、更换设备)
 				if(record.get('buy_num') > 1 && addBuyNum != 0  ){
-					Alert('本次收费不能整除单价!<br/> <font color=red>购买个数应为整数!</font>');
+					Alert(lbc('msgBox.EditPayFeeAndNumberIsWrong'));
 					record.set('real_pay',Ext.util.Format.formatFee(record.get('sum_fee')));
 					record.set('feeValue',0);
 				}else{
@@ -162,7 +163,7 @@ BusiFeeGrid = Ext.extend( Ext.grid.EditorGridPanel, {
 		Ext.getCmp('BusiPanel').hideTip();
 		
 		if(this.busiFeeStore.getCount() == 0){
-			Alert("该业务没有收费项，不能修改",function(){
+			Alert(lbc('msgBox.noFeeItemCanNotContinue'),function(){
 				App.getApp().menu.hideBusiWin();
 			},this)
 		}else{
@@ -250,7 +251,7 @@ EditPayForm = Ext.extend(BaseForm,{
 		}else{
 			var result = {};
 			result["isValid"] = false;
-			result["msg"] = "没有新的费用，不需要保存";
+			result["msg"] = lbc('msgBox.notModifyAnyInfo');
 			return result
 		}
 	},
