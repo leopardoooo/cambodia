@@ -476,21 +476,14 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		if(!user.getCust_id().equals(custId)){
 			throw new ServicesException(ErrorCode.CustDataException);
 		}
-		//拆机完成后才能销户
-		if(!user.getUser_type().equals(USER_TYPE_OTT_MOBILE) && !user.getStatus().equals(StatusConstants.UNTUCKEND)
-				&&(!user.getStatus().equals(StatusConstants.ACTIVE) || !SystemConstants.BUSI_BUY_MODE_BUY.equals(user.getStr10()))){
+		if(user.getStatus().equals(StatusConstants.UNTUCK) || user.getStatus().equals(StatusConstants.REQSTOP) 
+				|| user.getStatus().equals(StatusConstants.INSTALL) ){
 			throw new ServicesException(ErrorCode.UserStatusNotOff);
 		}
-		
-		DeviceDto device = null;
-		if( (user.getUser_type().equals(USER_TYPE_DTT) || user.getUser_type().equals(USER_TYPE_OTT)) && StringHelper.isNotEmpty(user.getStb_id()) ){
-			device = deviceComponent.queryDeviceByDeviceCode(user.getStb_id());
-		}else if(user.getUser_type().equals(USER_TYPE_BAND) && StringHelper.isNotEmpty(user.getModem_mac())){
-			device = deviceComponent.queryDeviceByDeviceCode(user.getModem_mac());
-		}
-		
-		if(device != null && device.getOwnership().equals(SystemConstants.OWNERSHIP_GD)){
-			throw new ServicesException(ErrorCode.GDDEviceNotOff);
+		if(SystemConstants.BUSI_BUY_MODE_PRESENT.equals(user.getStr10()) && 
+			(StringHelper.isNotEmpty(user.getStb_id())||StringHelper.isNotEmpty(user.getCard_id()) 
+					|| StringHelper.isNotEmpty(user.getModem_mac()))){
+			throw new ServicesException(ErrorCode.UserStatusNotOff);
 		}
 
 		List<String> devoceList = new ArrayList<String>();

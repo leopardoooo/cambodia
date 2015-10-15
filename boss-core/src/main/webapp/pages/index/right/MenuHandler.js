@@ -855,10 +855,19 @@ Ext.apply(MenuHandler, {
 			Alert(lmsg('needOneUser'));
 			return false;
 		}
-		if (userRecords[0].get("user_type") !='OTT_MOBILE' && userRecords[0].get("status") != 'UNTUCKEND' && (userRecords[0].get("status") != 'ACTIVE' || userRecords[0].get("str10") != 'BUY')) {
+		
+		if(userRecords[0].get("status") == 'UNTUCK' || userRecords[0].get("status") == 'REQSTOP' 
+				|| userRecords[0].get("status") == 'INSTALL' ){
+			Alert(lmsg('CancelTheAccountUserStatus'));
+			return false;
+		}
+		if(userRecords[0].get("str10")== 'PRESENT' && 
+			(!Ext.isEmpty(userRecords[0].get("stb_id"))||!Ext.isEmpty(userRecords[0].get("card_id"))
+					|| !Ext.isEmpty(userRecords[0].get("modem_mac")))){
 			Alert(lmsg('CancelTheAccountDismantleDevice'));
 			return false;
 		}
+		
 		
 		var store = userGrid.getStore();
 		
