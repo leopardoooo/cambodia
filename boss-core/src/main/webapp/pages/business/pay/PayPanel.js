@@ -317,14 +317,14 @@ PayPanel = Ext.extend( Ext.Panel ,{
 	},
 	doSave: function(){
 		if(!this.payForm.getForm().isValid()){ 
-			Alert("含有验证不通过的输入项");
+			Alert(lbc("common.tipFormInvalid"));
 			return ;
 		}
 		if(this.realFeeStore.getCount() == 0){
-			Alert("请从待选支付框中选择要支付的记录!");
+			Alert(lmsg('ChooseToPayTheRecord'));
 			return;
 		}
-		Confirm("确定要保存信息吗?", this, function(){
+		Confirm(lbc("common.confirmSaveData"), this, function(){
 			var params = this.getValues()
 			var comomonParams = App.getValues();
 			comomonParams["busiCode"] = "1207";
@@ -348,7 +348,7 @@ PayPanel = Ext.extend( Ext.Panel ,{
 					if(o["exception"]){
 						new DebugWindow( o , "btnBusiSave").show();
 					} else {
-						Alert('支付成功!',function(){
+						Alert(lmsg('paymentSuccess'),function(){
 								App.getApp().refreshPayInfo(parent);
 								this.success();
 							},this);
@@ -372,7 +372,7 @@ PayPanel = Ext.extend( Ext.Panel ,{
 		App.getApp().main.infoPanel.getUserPanel().refresh();
 		App.getApp().main.infoPanel.getPayfeePanel().feePayGrid.remoteRefresh();
 		App.getApp().data.currentResource = {busicode:'1068'};//打印业务编号
-		App.getApp().menu.bigWindow.show({ text: '发票打印',  attrs: {busiCode:'8888',
+		App.getApp().menu.bigWindow.show({ text: lbc('common.invoicePrint'),  attrs: {busiCode:'8888',
 					url: 'pages/business/pay/Print.jsp?type=through'}} ,{width: 710, height: 460});
 	}
 });

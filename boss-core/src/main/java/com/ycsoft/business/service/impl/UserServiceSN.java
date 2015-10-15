@@ -529,6 +529,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		}
 		
 		authComponent.sendAuth(user, cancelResultList, BusiCmdConstants.PASSVATE_PROD, doneCode);
+		authComponent.sendAuth(user, cancelResultList, BusiCmdConstants.DEL_USER, doneCode);
 		//记录用户到历史表
 		userComponent.removeUserWithHis(doneCode, user);
 	}
