@@ -43,8 +43,9 @@
 		<appender-ref ref="CON" />
 	</logger>
 	<logger name="com.ycsoft.daos">
-		<level value="INFO" />
+		<level value="DEBUG" />
 		<appender-ref ref="CON" />
+		<appender-ref ref="SYS" />
 	</logger>
 	
 	<root>
