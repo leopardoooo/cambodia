@@ -338,34 +338,31 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		DeviceDto device = deviceComponent.queryDeviceByDeviceCode(deviceCode);
 		deviceComponent.checkChangeDevice(oldDevice, device);
 		
+		CCustDevice oldCustDevice = custComponent.queryCustDeviceByDeviceCode(oldDeviceCode);
+		
+		/*更换设备，新设备产权和购买方式与原设备一致，只是根据购买原因收费而已*/
+		
 		//修改用户设备信息
 		setUserDeviceInfo(user, device);
-		if(StringHelper.isNotEmpty(deviceBuyMode)){
-			user.setStr10(deviceBuyMode);
-		}
 		userComponent.updateDevice(doneCode, user);
+		
 		
 		TDeviceChangeReason changeReason = userComponent.queryChangeReasonByType(reasonType);
 		
 		if(changeReason.getIs_charge().equals(SystemConstants.BOOLEAN_TRUE)){
-			TDeviceBuyMode buyModeCfg = busiConfigComponent.queryBuyMode(deviceBuyMode);
-			String newOwnerShip = SystemConstants.OWNERSHIP_GD;
-			if(buyModeCfg!= null && buyModeCfg.getChange_ownship().equals(SystemConstants.BOOLEAN_TRUE)){
-				newOwnerShip = SystemConstants.OWNERSHIP_CUST;
-			}
-			this.buyDevice(device, SystemConstants.BUSI_BUY_MODE_BUY, newOwnerShip, deviceFee, getBusiParam().getBusiCode(), cust, doneCode);
+			this.buyDevice(device, oldCustDevice.getBuy_mode(), oldDevice.getOwnership(), deviceFee, busiCode, cust, doneCode);
 		}else{
 			custComponent.addDevice(doneCode, cust.getCust_id(),
 					device.getDevice_id(), device.getDevice_type(), device.getDevice_code(), 
 					device.getPairCard() ==null?null:device.getPairCard().getDevice_id(),
 					device.getPairCard() ==null?null:device.getPairCard().getCard_id(), 
-					null, null,deviceBuyMode);
-			if (StringHelper.isNotEmpty(device.getDevice_id())){
+					null, null,oldCustDevice.getBuy_mode());
+			if (device != null){
 				//更新设备仓库状态
 				deviceComponent.updateDeviceDepotStatus(doneCode, busiCode, device.getDevice_id(),
-						device.getDepot_status(), StatusConstants.USE,user.getStr10(),true);
-				if (!device.getOwnership().equals(SystemConstants.OWNERSHIP_GD)){
-					deviceComponent.updateDeviceOwnership(doneCode, busiCode, device.getDevice_id(),device.getOwnership(),SystemConstants.OWNERSHIP_GD,user.getStr10(),true);
+						device.getDepot_status(), StatusConstants.USE, user.getStr10(), true);
+				if (!device.getOwnership().equals(oldDevice.getOwnership())){
+					deviceComponent.updateDeviceOwnership(doneCode, busiCode, device.getDevice_id(),device.getOwnership(),oldDevice.getOwnership(),user.getStr10(),true);
 				}
 				//更新设备为旧设备
 				if (SystemConstants.BOOLEAN_TRUE.equals(device.getUsed()))
@@ -373,22 +370,19 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 			}
 		}
 		
-		
 		CCustDevice newCustDevice = custComponent.queryCustDeviceByDeviceCode(deviceCode);
 		//保存更换原因
 		if(newCustDevice != null)
 			custComponent.saveChangeDevice(newCustDevice, changeReason.getReason_type());
 		
-		CCustDevice oldCustDevice = custComponent.queryCustDeviceByDeviceCode(oldDeviceCode);
 		if(oldCustDevice != null)
 			custComponent.saveChangeDevice(oldCustDevice, changeReason.getReason_type());
 		
 		if(changeReason.getIs_reclaim().equals(SystemConstants.BOOLEAN_TRUE)){
-			deviceComponent.saveDeviceToReclaim(doneCode,  getBusiParam().getBusiCode(),
-					oldDevice, cust.getCust_id(), reasonType);
+			deviceComponent.saveDeviceToReclaim(doneCode,  busiCode, oldDevice, cust.getCust_id(), reasonType);
 		}
 		if(changeReason.getIs_lost().equals(SystemConstants.BOOLEAN_TRUE)){
-			deviceComponent.saveLossDevice(doneCode, getBusiParam().getBusiCode(), oldDeviceCode);
+			deviceComponent.saveLossDevice(doneCode, busiCode, oldDeviceCode);
 		}
 		
 		//处理授权
