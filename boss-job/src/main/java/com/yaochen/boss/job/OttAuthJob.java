@@ -43,11 +43,14 @@ public class OttAuthJob implements Job2 {
 			try{
 				JsonObject params =new JsonParser().parse(cmd.getDetail_param()).getAsJsonObject();
 				if ((cmd.getCmd_type().equals(BusiCmdConstants.CHANGE_USER))){
-					
-					result = ottClient.editUser(cmd.getLogin_name(), 
-							getJsonValue(params,BusiCmdParam.login_name.name()), 
-							getJsonValue(params,BusiCmdParam.login_password.name()),
-							null, null,null,
+					/**String loginName
+					 *,String password,String userName
+					 *,String address,String email,String telephone
+					 *,String stbId,String deviceMac,String status
+					**/
+					result = ottClient.editUser(getJsonValue(params,BusiCmdParam.login_name.name()), 
+							getJsonValue(params,BusiCmdParam.login_password.name()),getJsonValue(params,BusiCmdParam.login_name.name()),
+							null,null,null,
 							getJsonValue(params,BusiCmdParam.stb_id.name()),
 							getJsonValue(params,BusiCmdParam.stb_mac.name()),
 							getJsonValue(params,BusiCmdParam.user_status.name()));
