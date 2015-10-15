@@ -28,6 +28,7 @@ import com.ycsoft.beans.core.fee.CFee;
 import com.ycsoft.beans.core.prod.CProd;
 import com.ycsoft.beans.core.prod.CProdPropChange;
 import com.ycsoft.beans.core.user.CUser;
+import com.ycsoft.beans.core.user.CUserPropChange;
 import com.ycsoft.beans.device.RDevice;
 import com.ycsoft.beans.device.RDeviceFee;
 import com.ycsoft.beans.device.RDeviceModel;
@@ -314,12 +315,18 @@ public class CustService extends BaseBusiService implements ICustService {
 			}
 		}
 		//终止账户
-		acctComponent.removeAcctWithHis(acct,doneCode,busiCode);
+//		acctComponent.removeAcctWithHis(acct,doneCode,busiCode);
 		//删除客户设备
 		custComponent.removeAllDevice(cust.getCust_id(),doneCode);
 		//删除客户
-		custComponent.removeCustWithHis(doneCode, cust,
-				 getBusiParam().getCustFullInfo().getLinkman(),false);
+		/*custComponent.removeCustWithHis(doneCode, cust,
+				 getBusiParam().getCustFullInfo().getLinkman(),false);*/
+		
+		//客户销户，不删除账目，只修改客户状态
+		cust = custComponent.queryCustById(cust.getCust_id());
+		List<CCustPropChange> propChangeList = new ArrayList<CCustPropChange>();
+		propChangeList.add(new CCustPropChange("status", cust.getStatus(), StatusConstants.INVALID));
+		custComponent.editCust(doneCode, cust.getCust_id(), propChangeList);
 
 		doneCodeComponent.saveDoneCodeInfo(doneCode, cust.getCust_id() ,null, "" );
 		saveAllPublic(doneCode,getBusiParam());

@@ -22,6 +22,12 @@ public class CCustPropChange extends PropertyChange implements Serializable {
 	 */
 	public CCustPropChange() {
 	}
+	
+	public CCustPropChange(String column_name, String old_value, String new_value) {
+		setColumn_name(column_name);
+		setOld_value(old_value);
+		setNew_value(new_value);
+	}
 
 	// cust_id getter and setter
 	public String getCust_id() {

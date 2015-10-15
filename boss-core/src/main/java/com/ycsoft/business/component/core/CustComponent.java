@@ -962,16 +962,16 @@ public class CustComponent extends BaseBusiComponent {
 		CCustLinkman linkman = null;
 		CCustBonuspoint bonuspoint = null;
 		CAcctBank acctBank = null;
-		if(cust != null && !cust.getStatus().equals(StatusConstants.INVALID)){
+		if(cust != null/* && !cust.getStatus().equals(StatusConstants.INVALID)*/){
 			linkman = cCustLinkmanDao.findByKey(custId);
 			bonuspoint = cCustBonuspointDao.findByKey(custId);
 			acctBank = cAcctBankDao.findByCustId(custId);
-		}else{
+		}/*else{
 			cust = cCustHisDao.findByKey(custId);
 			CCustAddr custAddr = cCustAddrHisDao.findByKey(custId);
 			BeanUtils.copyProperties(custAddr, cust);
 			linkman = cCustLinkmanHisDao.findByKey(custId);
-		}
+		}*/
 		//设置客户单位信息
 		if (SystemConstants.CUST_TYPE_RESIDENT.equals(cust.getCust_type())){
 			List<CCust> custList = this.queryUnitByResident(cust.getCust_id());
