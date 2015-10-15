@@ -440,8 +440,8 @@ public class JobComponent extends BaseComponent{
 			}	
 		}else if(cmd.getBusi_cmd_type().equals(BusiCmdConstants.OSD)){
 			JCaCommand dttCmd =this.createDttCmdByJBuisCmd(cmd);
-			dttCmd.setDetail_params(cmd.getDetail_params().replaceAll("'", "''"));
-			dttCmd.setCmd_type(BusiCmdConstants.OSD);
+			dttCmd.setDetail_params(cmd.getDetail_params().replaceAll("''", "'"));
+			dttCmd.setCmd_type(SmsxCmd.SendOSD.name());
 			jCaCommandDao.save(dttCmd);
 		}
 	}
