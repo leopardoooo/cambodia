@@ -86,7 +86,7 @@ var VodGrid = Ext.extend(Ext.grid.GridPanel,{
 			root:'records',
 			totalProperty:'totalProperty',
 			fields:['done_code','stb_id','card_id','modem_mac','is_success','transnum',
-				'error_info','send_time','cmd_type_text']
+				'error_info','send_time','cmd_type_text','is_success_text']
 		});
 		var lc = langUtils.main("cmd.ott.columns");
 		var cm = [
@@ -96,7 +96,7 @@ var VodGrid = Ext.extend(Ext.grid.GridPanel,{
 			{header:lc[3],dataIndex:'stb_id',width:130,sortable:true,renderer:App.qtipValue},
 //			{header:lc[4],dataIndex:'card_id',width:130,sortable:true,renderer:App.qtipValue},
 			{header:lc[5],dataIndex:'modem_mac',width:130,sortable:true,renderer:App.qtipValue},
-			{header:lc[6],dataIndex:'is_success',width:70,sortable:true,renderer:p.showResult},
+			{header:lc[6],dataIndex:'is_success_text',width:70,sortable:true},
 			{header:lc[7],dataIndex:'error_info',width:70,sortable:true,renderer:App.qtipValue},
 			{header:lc[8],dataIndex:'send_time',width:120,sortable:true,renderer:App.qtipValue}
 		];
@@ -152,7 +152,7 @@ var BandGrid = Ext.extend(Ext.grid.GridPanel,{
 			root:'records',
 			totalProperty:'totalProperty',
 			fields:['done_code','stb_id','modem_mac','is_success','transnum',
-				'error_info','send_time','cmd_type_text']
+				'error_info','send_time','cmd_type_text','is_success_text']
 		});
 		var lc = langUtils.main("cmd.band.columns");
 		var cm = [
@@ -161,7 +161,7 @@ var BandGrid = Ext.extend(Ext.grid.GridPanel,{
 			{header:lc[2],dataIndex:'cmd_type_text',width:80,sortable:true,renderer:App.qtipValue},
 //			{header:lc[3],dataIndex:'stb_id',width:130,sortable:true,renderer:App.qtipValue},
 			{header:lc[4],dataIndex:'modem_mac',width:130,sortable:true,renderer:App.qtipValue},
-			{header:lc[5],dataIndex:'is_success',width:70,sortable:true,renderer:p.showResult},
+			{header:lc[5],dataIndex:'is_success_text',width:70,sortable:true},
 			{header:lc[6],dataIndex:'error_info',width:70,sortable:true,renderer:App.qtipValue},
 			{header:lc[7],dataIndex:'send_time',width:120,sortable:true,renderer:App.qtipValue}
 		];
@@ -190,15 +190,6 @@ var BandGrid = Ext.extend(Ext.grid.GridPanel,{
 			this.store.baseParams.custId = App.getData().custFullInfo.cust.cust_id;
 			this.refresh();
 		}
-	},
-	showResult : function(v){
-		if(v=='Y'){
-			return '正确';
-		}else if(v == 'F'){
-			return '未处理';
-		}else{
-			return '错误';
-		}
 	}
 });
 
@@ -226,7 +217,6 @@ CommandInfoPanel = Ext.extend(BaseInfoPanel,{
 				split:true,
 				region:'east',
 				layout:'anchor',
-//				collapsed : true,
 				border:false,
 				items:[{
 					anchor:'100% 50%',
@@ -245,15 +235,6 @@ CommandInfoPanel = Ext.extend(BaseInfoPanel,{
 				}]
 			}]
 		});
-	},
-	showResult : function(v){
-		if(v=='Y'){
-			return lbc('common.correct');
-		}else if(v == 'F'){
-			return lbc('common.untreated');
-		}else{
-			return lbc('common.wrong');
-		}
 	},
 	refresh:function(){
 		this.caGrid.remoteRefresh();
