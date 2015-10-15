@@ -261,31 +261,16 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 				user.setTerminal_type(SystemConstants.USER_TERMINAL_TYPE_ZZD);
 			} else {
 				List<CUser> userList = userComponent.queryUserByCustId(cust.getCust_id());
-				if (userList != null){
-					for (CUser cu:userList){
-						if(cu.getUser_type().equals(user.getUser_type())){
-							user.setTerminal_type(SystemConstants.USER_TERMINAL_TYPE_FZD);
-							break;
-						}
+				user.setTerminal_type(SystemConstants.USER_TERMINAL_TYPE_ZZD);
+				if (userList.size() > 0){
+					Map<String, List<CUser>> map = CollectionHelper.converToMap(userList, "user_type");
+					List<CUser> ottList = map.get(USER_TYPE_OTT);
+					if(ottList.size() > 0 && ottList.size() % 3 == 0){//二主一副
+						user.setTerminal_type(SystemConstants.USER_TERMINAL_TYPE_ZZD);
+					}else{
+						user.setTerminal_type(SystemConstants.USER_TERMINAL_TYPE_FZD);
 					}
-					
-					//去掉OTT终端个数限制
-					/*int fzdNum = 0;
-					for(CUser cu:userList){
-						if(SystemConstants.USER_TERMINAL_TYPE_FZD.equals(cu.getTerminal_type())){
-							fzdNum += 1;
-						}
-						if(fzdNum >= 2){
-							throw new ServicesException(ErrorCode.OttFzdNotMoreThanTwo);
-						}
-					}*/
 				}
-				
-				if (StringHelper.isEmpty(user.getTerminal_type())){
-					user.setTerminal_type(SystemConstants.USER_TERMINAL_TYPE_ZZD);
-				}
-				
-				
 			}
 		}
 		
