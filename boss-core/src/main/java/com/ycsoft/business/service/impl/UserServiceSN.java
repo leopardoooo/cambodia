@@ -264,7 +264,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 				user.setTerminal_type(SystemConstants.USER_TERMINAL_TYPE_ZZD);
 				if (userList.size() > 0){
 					Map<String, List<CUser>> map = CollectionHelper.converToMap(userList, "user_type");
-					List<CUser> ottList = map.get(SystemConstants.USER_TYPE_OTT);
+					List<CUser> ottList = map.get(USER_TYPE_OTT);
 					if(ottList.size() > 0 && ottList.size() % 3 == 0){//二主一副
 						user.setTerminal_type(SystemConstants.USER_TERMINAL_TYPE_ZZD);
 					}else{
