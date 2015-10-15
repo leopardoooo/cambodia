@@ -257,8 +257,10 @@ public class DeviceComponent extends BaseBusiComponent {
 		}
 		saveDeviceChange(doneCode, busiCode, oldDevice.getDevice_id(), "depot_status",
 				oldDevice.getDepot_status(), StatusConstants.IDLE);
-		saveDeviceChange(doneCode, busiCode, oldDevice.getDevice_id(), "ownership",
-				oldDevice.getOwnership(), SystemConstants.OWNERSHIP_GD);
+		if(!SystemConstants.OWNERSHIP_GD.equals(oldDevice.getOwnership())){
+			saveDeviceChange(doneCode, busiCode, oldDevice.getDevice_id(), "ownership",
+					oldDevice.getOwnership(), SystemConstants.OWNERSHIP_GD);
+		}
 		if(pairCard !=null){
 			saveDeviceChange(doneCode, busiCode, pairCard.getDevice_id(), "depot_status",
 					pairCard.getDepot_status(), StatusConstants.IDLE);

@@ -320,9 +320,10 @@ public class QueryCustService extends BaseService implements IQueryCustService {
 					}else{
 						pf.setDevice_code(user.getStb_id());
 					}
-				}else{
-					pf.setIs_logoff("T");
 				}
+				/*else{
+					pf.setIs_logoff("T");
+				}*/
 			}
 		}
 		return acctPayFee;

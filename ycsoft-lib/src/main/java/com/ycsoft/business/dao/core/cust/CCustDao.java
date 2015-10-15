@@ -78,12 +78,10 @@ public class CCustDao extends BaseEntityDao<CCust> {
 				value=value.replaceAll(" ", "");
 			}
 			sql = append("SELECT t1.* FROM c_cust t1",
-					" where t1.county_id=? ",
-					"  and lower( replace(t1.cust_name,' '))  like '%'||?||'%' ",
+					" where lower( replace(t1.cust_name,' '))  like ? ",
 					dataType.trim().equals("1=1")?"":" and t1."+dataType.trim(),
-					" order by cust_no"		);
-			resultPager = createQuery(sql, countyId,value).setStart(p.getStart()).setLimit(p.getLimit()).page();	
-	
+					" order by cust_no");
+			resultPager = createQuery(sql, "%"+value+"%").setStart(p.getStart()).setLimit(p.getLimit()).page();	
 		}else if(key.equals("device_id")){
 			String deviceId = value.replace(":","").replace("：", "");
 			sql = append(
