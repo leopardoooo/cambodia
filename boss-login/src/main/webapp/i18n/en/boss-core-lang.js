@@ -258,11 +258,11 @@ BCLang.home = {
 			prod: {
 				base: {
 					_title: " Customer Product~",
-					columns: ["Order Sn","Product Name~","Belonged Package~","Current Fee~","Effective Date~" ,"Invalid Date~","Status~","Status Change Time~","Purchase Time~" ,"Purchase Month Quantity~","SerialNo.~","WhetherToPay~"]
+					columns: ["OrderSn~","ProductName~","Belonged Package~","CurrentCharges~","EffectiveDate~" ,"ExpirationDate~","Status~","StatusChangeTime~","OrderTime~" ,"OrderMonths~","SerialNo.~","WhetherToPay~"]
 				},
 				pkg: {
 					_title: 'Customer Package~',
-					columns: ["Order Sn","Product Name~","Current Fee~","Status~"," Effective Date~" ,"Invalid Date~","Product Type~","Purchase Time~"]
+					columns: ["OrderSn~","ProductName~","CurrentCharges~","Status~","EffectiveDate~" ,"ExpirationDate~","ProductType~","OrderTime~"]
 				},
 				tools: ["Default Order~","History Oder~"]
 			},

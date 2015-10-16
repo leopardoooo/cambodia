@@ -272,14 +272,14 @@ ProdGrid = Ext.extend(Ext.TabPanel,{
     		columns : [
     		{header:lc[0],dataIndex:'order_sn',width:70},
 			{header:lc[1],dataIndex:'prod_name',width:120, renderer: App.qtipValue},
-			{header:lc[2],dataIndex:'package_name',width:80, renderer: App.qtipValue},
-			{header:lc[3],dataIndex:'tariff_name',	width:80, renderer: App.qtipValue},
-			{header:lc[4],dataIndex:'eff_date',width:80,renderer: Ext.util.Format.dateFormat},
-			{header:lc[5],dataIndex:'exp_date',width:80,renderer: Ext.util.Format.dateFormat},
-			{header:lc[6],dataIndex:'status_text',	width:60,renderer:Ext.util.Format.statusShow},
-			{header:lc[7],dataIndex:'status_date',width:100,renderer: Ext.util.Format.dateFormat},
+			{header:lc[2],dataIndex:'package_name',width:120, renderer: App.qtipValue},
+			{header:lc[3],dataIndex:'tariff_name',	width:110, renderer: App.qtipValue},
+			{header:lc[4],dataIndex:'eff_date',width:90,renderer: Ext.util.Format.dateFormat},
+			{header:lc[5],dataIndex:'exp_date',width:100,renderer: Ext.util.Format.dateFormat},
+			{header:lc[6],dataIndex:'status_text',	width:110,renderer:Ext.util.Format.statusShow},
+			{header:lc[7],dataIndex:'status_date',width:130,renderer: Ext.util.Format.dateFormat},
 			{header:lc[8],dataIndex:'order_time',width:80,renderer: Ext.util.Format.dateFormat},
-			{header:lc[9],dataIndex:'order_months',width:80},
+			{header:lc[9],dataIndex:'order_months',width:90},
 			{header:lc[10],dataIndex:'done_code',width:80},
 			{header:lc[11],dataIndex:'is_pay_text',width:100}
 	        ]
@@ -321,12 +321,12 @@ ProdGrid = Ext.extend(Ext.TabPanel,{
     		columns : [
     		{header:lc[0],dataIndex:'order_sn',width:70},
 			{header:lc[1],dataIndex:'prod_name',width:120},
-			{header:lc[2],dataIndex:'tariff_name',	width:80},
-			{header:lc[3],dataIndex:'status_text',	width:60,renderer:Ext.util.Format.statusShow},
-			{header:lc[4],dataIndex:'eff_date',width:80,renderer: Ext.util.Format.dateFormat},
-			{header:lc[5],dataIndex:'exp_date',width:80,renderer: Ext.util.Format.dateFormat},
-			{header:lc[6],dataIndex:'prod_type_text',width:80},
-			{header:lc[7],dataIndex:'order_time',width:80}
+			{header:lc[2],dataIndex:'tariff_name',	width:110},
+			{header:lc[3],dataIndex:'status_text',	width:110,renderer:Ext.util.Format.statusShow},
+			{header:lc[4],dataIndex:'eff_date',width:90,renderer: Ext.util.Format.dateFormat},
+			{header:lc[5],dataIndex:'exp_date',width:100,renderer: Ext.util.Format.dateFormat},
+			{header:lc[6],dataIndex:'prod_type_text',width:100},
+			{header:lc[7],dataIndex:'order_time',width:80,renderer: Ext.util.Format.dateFormat}
 	        ]
 	      });
 		this.custPkgStore = new Ext.data.JsonStore({
