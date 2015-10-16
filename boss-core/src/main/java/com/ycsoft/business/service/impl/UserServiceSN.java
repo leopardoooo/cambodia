@@ -297,7 +297,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		userComponent.createUser(user);
 		
 		
-		if (user.getStatus().equals(StatusConstants.ACTIVE)){
+		if (user.getStatus().equals(StatusConstants.ACTIVE) || user.getUser_type().equals(USER_TYPE_BAND)){
 			createUserJob(user, custId, doneCode);
 		}
 		
