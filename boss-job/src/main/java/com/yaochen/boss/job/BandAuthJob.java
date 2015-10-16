@@ -93,6 +93,7 @@ public class BandAuthJob implements Job2 {
 					logger.error("未知严重错误，暂停发送!",e);
 				} else {
 					result.setErr(rh.getResultCode());
+					result.setStatus(rh.getResultCode());
 					result.setReason(rh.getResultDesc());
 				}
 			}catch(Exception e){
