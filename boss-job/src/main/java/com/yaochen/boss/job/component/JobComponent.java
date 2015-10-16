@@ -74,13 +74,19 @@ public class JobComponent {
 	private CProdStatusChangeDao cProdStatusChangeDao;
 	/**
 	 * 变更失效订单的状态
+	 * @return 
 	 * @throws Exception 
 	 */
-	public void changeHasExpOrderStatusToForStop() throws Exception{
+	public List<CProdOrder> changeHasExpOrderStatusToForStop() throws Exception{
 		Integer doneCode=-7;
+		//对所有订单失效的宽带用户发清除宽带的授权
+		List<CProdOrder> orders=cProdOrderDao.queryBandAllOrderExp();
 		cProdStatusChangeDao.saveOrderExpStatus(doneCode);
 		cProdOrderDao.updateExpOrderStatusToForStop();
+		
+		return orders;
 	}
+	
 	
 	/**
 	 * 查询需要修正带宽的宽带订单

@@ -30,15 +30,15 @@ public class Bootstrap {
 		
 		//System.setProperty("javax.net.debug", "ssl,handshake");
 		//TODO 改成你本地的地址
-        System.setProperty("javax.net.ssl.keyStore", "D:/boss/cambodia/boss-core/src/main/resources/cert/cfocn/admin.pfx");
-        System.setProperty("javax.net.ssl.keyStorePassword", "123456");
+        System.setProperty("javax.net.ssl.keyStore", "D:/boss/cambodia/boss-core/src/main/resources/cert/client/client.p12");
+        System.setProperty("javax.net.ssl.keyStorePassword", "a1234567");
         System.setProperty("javax.net.ssl.keyStoreType", "PKCS12");
 		
         //TODO 改成你本地的地址
 		System.setProperty("javax.net.ssl.trustStore", "D:/boss/cambodia/boss-core/src/main/resources/cert/cfocn/cfocn.ca.jks");
         System.setProperty("javax.net.ssl.trustStorePassword", "a1234567");
         System.setProperty("javax.net.ssl.trustStoreType", "JKS");
-				
+        
 		new Thread(new Runnable(){
 			@Override
 			public void run() {
