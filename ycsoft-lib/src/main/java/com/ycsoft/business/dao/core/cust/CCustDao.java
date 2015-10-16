@@ -65,7 +65,24 @@ public class CCustDao extends BaseEntityDao<CCust> {
 		String value = p.getParams().get(key).toString();
 		
 		Pager<CCust> resultPager =null;
-		if(key.equals("device_id")){
+		if(key.equals("cust_no")){
+			sql = append("  SELECT t1.* FROM c_cust t1 " ,
+					" where t1.county_id = ? and t1.cust_no =? ",
+					dataType.trim().equals("1=1")?"":" and t1."+dataType.trim(),
+					" order by cust_no"		);
+			resultPager = createQuery(sql, countyId,value).setStart(p.getStart()).setLimit(p.getLimit()).page();	
+					
+		}else if(key.equals("cust_name")){
+			if(StringHelper.isNotEmpty(value)){
+				value=value.toLowerCase();
+				value=value.replaceAll(" ", "");
+			}
+			sql = append("SELECT t1.* FROM c_cust t1",
+					" where lower( replace(t1.cust_name,' '))  like ? ",
+					dataType.trim().equals("1=1")?"":" and t1."+dataType.trim(),
+					" order by cust_no");
+			resultPager = createQuery(sql, "%"+value+"%").setStart(p.getStart()).setLimit(p.getLimit()).page();	
+		}else if(key.equals("device_id")){
 			String deviceId = value.replace(":","").replace("：", "");
 			sql = append(
 					" SELECT t1.cust_id,t1. cust_name,t1. cust_no,t1. old_cust_no,t1. addr_id,t1. address,t1. status,t1. password,t1. cust_type,t1. cust_level,t1. cust_class,t1. cust_colony,t1. net_type,t1. is_black,t1. open_time,t1. area_id,t1. county_id,t1. remark,t1. str1,t1. str2,t1. str3,t1. str4,t1. str5,t1. str6,t1. str7,t1. str8,t1. str9,t1. str10,t1. cust_count,t1. app_code,t1. cust_class_date,t1. optr_id,t1. dept_id,t1. spkg_sn",
@@ -98,26 +115,6 @@ public class CCustDao extends BaseEntityDao<CCust> {
 					dataType.trim().equals("1=1")?"":" and t1."+dataType.trim(),
 					" order by cust_no"		);
 			resultPager = createQuery(sql, countyId,value,value).setStart(p.getStart()).setLimit(p.getLimit()).page();	
-		}else if(key.equals("cust_no")){
-//		
-			sql = append("  SELECT t1.* FROM c_cust t1 " ,
-					" where t1.county_id = ? and t1.cust_no =? ",
-					dataType.trim().equals("1=1")?"":" and t1."+dataType.trim(),
-					" order by cust_no"		);
-			resultPager = createQuery(sql, countyId,value).setStart(p.getStart()).setLimit(p.getLimit()).page();	
-					
-		}else if(key.equals("cust_name")){
-			if(value!=null){
-				value=value.toLowerCase();
-				value=value.replaceAll(" ", "");
-			}
-			sql = append("SELECT t1.* FROM c_cust t1",
-					" where t1.county_id=? ",
-					"  and lower( replace(t1.cust_name,' '))  like '%'||?||'%' ",
-					dataType.trim().equals("1=1")?"":" and t1."+dataType.trim(),
-					" order by cust_no"		);
-			resultPager = createQuery(sql, countyId,value).setStart(p.getStart()).setLimit(p.getLimit()).page();	
-	
 		}else{
 			sql = append("SELECT t1.* FROM c_cust t1 where t1.county_id=? ",
 					"and ", getSqlGenerator().and( p.getParams()),
@@ -127,7 +124,7 @@ public class CCustDao extends BaseEntityDao<CCust> {
 			resultPager = createQuery(sql, countyId).setStart(p.getStart()).setLimit(p.getLimit()).page();
 		}
 		//销户客户查询
-		if(resultPager.getRecords() == null || resultPager.getRecords().size() == 0){
+		/*if(resultPager.getRecords() == null || resultPager.getRecords().size() == 0){
 			
 			if(key.equals("addr_name")){
 				sql = append("SELECT t1.* FROM c_cust_his t1 ",
@@ -166,7 +163,7 @@ public class CCustDao extends BaseEntityDao<CCust> {
 					his.setStatus(StatusConstants.INVALID);
 				}
 			}
-		}	
+		}*/	
 		return resultPager;
 	}
 	
@@ -233,7 +230,7 @@ public class CCustDao extends BaseEntityDao<CCust> {
 		sql += " and "+dataType;
 		resultPager = createQuery(sql, countyId).setStart(start).setLimit(limit).page();
 		//查找已销户的客户
-		if (resultPager.getRecords()== null ||resultPager.getRecords().size()==0){
+		/*if (resultPager.getRecords()== null ||resultPager.getRecords().size()==0){
 			sql = " SELECT t1.* from c_cust_his t1 where t1.county_id =? " ;
 			if(StringHelper.isNotEmpty(cust.getCust_name())){
 				sql = append(sql," and t1.cust_name like '" + cust.getCust_name() + "%'");
@@ -255,7 +252,7 @@ public class CCustDao extends BaseEntityDao<CCust> {
 			}
 			sql += " and "+dataType;
 			resultPager = createQuery(sql, countyId).setStart(start).setLimit(limit).page();
-		}
+		}*/
 		
 		return resultPager;
 	}

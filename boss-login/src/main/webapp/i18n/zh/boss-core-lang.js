@@ -15,6 +15,7 @@ BCLang.common = {
 	tipBusiSaveOK: '业务保存成功!~',
 	tipLoadText: '正在查询，请稍等...',
 	tipConfirmSave: '确定要保存业务吗?~',
+	confirmSaveData: '确定要保存信息吗?~',
 	tipFormInvalid: '含有验证不通过的输入项!~',
 	filterTreePanel:{
 		emptyTipSearchField:'输入名称过滤...~',
@@ -68,7 +69,11 @@ BCLang.common = {
 	enableBtn:'启用~',
 	cancelBtn:'取消~',
 	doActionBtn:'操作~',
-	add: '添加~'
+	add: '添加~',
+	correct: '正确~',
+	untreated: '未处理~',
+	wrong: '错误~',
+	invoicePrint:'发票打印~'
 }
 //主页模块
 BCLang.home = {
@@ -128,7 +133,8 @@ BCLang.home = {
 				roomTitle2: '行政区域:{0} 服务类型:{1}',
 				addRoom: '新增房间~',
 				unitName:'单位名称~',
-				unitAddress:'单位地址~'
+				unitAddress:'单位地址~',
+				accountName:'账目名称~'
 			},
 			acct: {
 				_title: "账目信息~",
@@ -204,6 +210,7 @@ BCLang.home = {
 				loginId: '登录账号~',
 				orderFee: '订单余额~',
 				canRetrunFee: '可退金额~',
+				totalReturnFee: '退款总额~',
 				canTransferFee: '转账金额~',
 				canRefundRealFee: '实退金额~',
 				returnDevice: '回收设备~',
@@ -251,7 +258,7 @@ BCLang.home = {
 			prod: {
 				base: {
 					_title: "用户产品~",
-					columns: ["订购编号~","产品名称~","所属套餐~","当前资费~","生效日期~" ,"失效日期~","状态~","状态变更时间~","订购时间~" ,"订购月数~","创建流水号~"]
+					columns: ["订购编号~","产品名称~","所属套餐~","当前资费~","生效日期~" ,"失效日期~","状态~","状态变更时间~","订购时间~" ,"订购月数~","流水号~","是否支付~"]
 				},
 				pkg: {
 					_title: '客户套餐~',
@@ -322,14 +329,20 @@ BCLang.home = {
 				oldInvoiceType: '原收据类型~',
 				oldStatus: '原收据状态~',
 				newInvoiceId: '新收据号码~',
-				newInvoiceCode: '新收据代码~'
+				newInvoiceCode: '新收据代码~',
+				faultContent:'故障内容~'
 			}
 		},
 		//受理记录
 		doneCode: {
 			_title: '受理记录~',
 			columns: ["流水号~","业务名称~","状态~","受理日期~","操作员~","受理部门~",
-			         "可回退~","可忽略~","实缴金额~","扩展业务信息~","备注~"]
+			         "可回退~","可忽略~","实缴金额~","扩展业务信息~","备注~"],
+			editPayColumns:["费用项~","单价~","数量~","累计收费~","实际应收~","本次收费~","型号~"],
+			_form:{
+				oldRemark: '原备注~',
+				newRemark: '新备注~'
+			}
 		},
 		//指令
 		cmd: {
@@ -516,6 +529,7 @@ BCLang.home = {
 			_userTitle : '用户明细~',
 			_winTitle : '工单完工~',
 			_ZteWinTitle : 'ZTE授权~',
+			_fillDevTitle: '设备回填~',
 			forms : {
 				custNo : '客户编号~',
 				taskNo : '工单编号~',
@@ -530,7 +544,8 @@ BCLang.home = {
 				finishType : '完工类型~',
 				finishExplan : '完工说明~',
 				zteStatus	: 'ZTE状态~',
-				zteRemark :'备注~'
+				zteRemark :'备注~',
+				syncStatus	:'cfocn同步状态~'
 			},
 			buttons : {
 				query : '查询~',
@@ -545,7 +560,7 @@ BCLang.home = {
 				withdraw : 'cfocn撤回~'
 			},
 			taskCols : ['工单类型~', '客户名称~', '工单状态~', '施工队~', 'ZTE状态~', '地址~',
-					'联系电话~', '创建时间~', '故障类型~', '故障详细信息~','工单编号~','客户经理~','客户经理电话~'],
+					'联系电话~', '创建时间~', '故障类型~', '故障详细信息~','工单编号~','客户经理~','客户经理电话~','客户编号~','cfocn同步状态~'],
 			userCols : ['用户类型~', '用户名~', '密码~', '设备型号~', '设备号~', 'posNo~',
 					'occNo~', '带宽~'],
 			operateCols : ['操作时间~', '操作类型~', '操作人~', '同步状态~', '描述~','延迟时间~'],
@@ -612,12 +627,13 @@ BCLang.msgBox = {
 	needUser:'请选择用户!~',
 	needOneUser:'请选择单个用户!',
 	cancelFeeSuccess:'冲正成功!~',
+	paymentSuccess:'支付成功!~',
 	confirmCancelFeeAndInvaidInvoice:'收据{0}将作废!该收据上的费用项需要重打，确定冲正?~',
 	confirmCancelFee:'确定冲正吗?~',
 	selectRec4CancelFee:'请选择要冲正的费用记录!~',
 	confirmUnPayWithParam:'确定要回退【金额：{0} 】吗?~',
 	selectRecCancelPayFee:'请选择要回退的支付记录!',
-	confirmCancelPayFeeWithParam:'确定要支付回退并作废发票:{0}',
+	confirmCancelPayFeeWithParam:'确定要支付回退并作废发票:{0}~',
 	confirmCancelPayFeeWithNoParam:'确定要支付回退?',
 	cancelPayFeeSuccess:'支付回退冲正成功!',
 	confirmRestoreCust:'是否确定返销户?~',
@@ -632,7 +648,7 @@ BCLang.msgBox = {
 	confirmBankStop:'确定要暂停卡扣吗?~',
 	confirmEnableBankPay:'启用银行扣费吗?~',
 	confirmDisableBankPay:'禁止银行扣费吗?~',
-	confirmEditBankPay:'确定该产品',
+	confirmEditBankPay:'确定该产品~',
 	confirmBankResume:'确定要恢复卡扣吗?~',
 	confirmRenewCust:'去顶恢复客户状态吗?~',
 	commonSuccess: '业务操作成功!~',
@@ -674,6 +690,7 @@ BCLang.msgBox = {
 	confirmDepositUnPay:"确定退押金吗?~",
 	
 	userNotActive:"选择的用户状态非正常~",
+	userStatusActiveOrConstruction:"选择的用户状态必须是正常或者施工中~",
 	cantLogOffZzd:'主终端不能先销户~',
 	cantLogOffCosBaseProdOweFee:'有基本包产品欠费,不能销户!~',
 	cantLogOffCosBaseProdNotActive:'有基本包产品状态不正常,不能销户!~',
@@ -744,5 +761,12 @@ BCLang.msgBox = {
 	exceedPkgMaxUserNum: '已超过套餐最大用户数限制!~',
 	completeChooseUserTerminal: '请完整选择需要参加的每种用户类型终端!~',
 	newOrderAmountCantBeLessThanZero: '新订单金额不能小于零!~',
-	newOrderAmountCantBeLessThanTransAmount: '新订单金额不能小于转移金额~'
+	newOrderAmountCantBeLessThanTransAmount: '新订单金额不能小于转移金额~',
+	CancelTheAccountDismantleDevice:'设备未回收并且购买方式为配置，不能销户~',
+	CancelTheAccountUserStatus:'用户状态为报停,拆机,施工中的不能销户~',
+	PleaseCancelTheOttMainTerminal:'请先销户OTT主终端~',
+	noFeeItemCanNotContinue:'没有费用项，无法继续~',
+	EditPayFeeAndNumberIsWrong:'本次收费不能整除单价,购买个数应为整数~',
+	SelectOnlyOneData:'请选择一条记录~',
+	ChooseToPayTheRecord:'请选择要支付的记录~'
 }

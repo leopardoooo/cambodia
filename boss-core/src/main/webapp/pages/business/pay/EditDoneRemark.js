@@ -10,7 +10,7 @@ EditDoneRemarkForm = Ext.extend(BaseForm,{
 		var doneCode = record.get('done_code');
 		var oldRemark = record.get('remark');
 		EditDoneRemarkForm.superclass.constructor.call(this,{
-			labelWidth:65,
+			labelWidth:100,
 			bodyStyle: 'padding-top:10px',
 			items:[{
 				xtype:'hidden',
@@ -18,16 +18,16 @@ EditDoneRemarkForm = Ext.extend(BaseForm,{
 				value:doneCode
 			},{
 				xtype : 'textarea',
-				fieldLabel:'原备注',
+				fieldLabel:lmain('doneCode._form.oldRemark'),
 				name:'oldRemark',
 				value:oldRemark,
 				readOnly:true,
-				width:250,height:150
+				width:300,height:150
 			},{
 				xtype : 'textarea',
-				fieldLabel:'新备注',
+				fieldLabel:lmain('doneCode._form.newRemark'),
 				name:'remark',
-				width:250,height:150
+				width:300,height:150
 			}]
 		});
 	},

@@ -355,11 +355,11 @@ Ext.apply( App, {
 
 	refreshFeeView: function(){
 		
-		var width = 70,leftWidth = 0;
+		var width = 120,leftWidth = 0;
 		var pLeft = Ext.isIE ? 'padding-left:10px':'';
 		var toolstr = "<div style='width:"+width+"px;float:left;padding-left:50px' >" +
 				"<div class='top_button print_big' onClick='App.openPrint()'></div>" +
-				"<div style='font:11px'>"+lbc('home.tools.InvoicePrint._title')+"</div></div>";
+				"<div style='float:left;padding-left:10px;font:11px'>"+lbc('home.tools.InvoicePrint._title')+"</div></div>";
 //		toolstr +="<div style='width:"+width+"px;float:left;padding-left:"+leftWidth+"px;' >" +
 //				"<div class='top_button print_big' onClick='App.openBankPayment()'>" +
 //				"</div><div style='font:11px'>银行打印</div></div>";

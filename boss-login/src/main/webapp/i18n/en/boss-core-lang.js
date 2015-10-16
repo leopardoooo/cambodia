@@ -15,6 +15,7 @@ BCLang.common = {
 	tipBusiSaveOK: ' Business Saved Successfully!~',
 	tipLoadText: 'Being Inquiring, Please Wait...',
 	tipConfirmSave: 'Are you sure to save business?~',
+	confirmSaveData: 'Are you sure you want to save the information?~',
 	tipFormInvalid: 'Containing input items cannot pass examination!~',
 	filterTreePanel:{
 		emptyTipSearchField:'Input Name Filtration...~',
@@ -68,7 +69,11 @@ BCLang.common = {
 	enableBtn: 'Enable~',
 	cancelBtn: 'Cancel~',
 	doActionBtn: 'Manipulation~',
-	add: 'Add~'
+	add: 'Add~',
+	correct: 'Correct~',
+	untreated: 'Untreated~',
+	wrong: 'Wrong~',
+	invoicePrint:'Invoice Print~'
 }
 //home page module
 BCLang.home = {
@@ -85,7 +90,7 @@ BCLang.home = {
 			pay: {
 				_stayTitle: 'Items to be paid~',
 				_title: 'Payment~',
-				columns: ['Operate~', 'Service Name~', 'Fee Name~', 'Paid Money Amount~', 'Order No.~', 'Remark~', 'Quantity~', 'Operate Time~', 'Fee No.~', 'serial number~'],
+				columns: ['Operate~', 'Service Name~', 'Fee Name~', 'Paid Money Amount~', 'Order No.~', 'Remark~', 'Quantity~', 'Operate Time~', 'Fee No.~', 'Serial Number~'],
 				buttons: ['Save~', 'Close~']
 			},
 			charge:{
@@ -128,7 +133,8 @@ BCLang.home = {
 				roomTitle2: 'Administrative area:{0} service type:{1}',
 				addRoom: 'increased room~',
 				unitName:'unit name~',
-				unitAddress:'unit address~'
+				unitAddress:'unit address~',
+				accountName:'Account Name~'
 			},
 			acct: {
 				_title: "Account Information~",
@@ -157,7 +163,7 @@ BCLang.home = {
 		user: {
 			base:{
 				type: 'ServiceType', name: ' TerminalName', status: 'Status~', statusTime: 'StatusTime~',
-				stbId: 'STB~', cardId: 'CARD~', modem: 'MODEM~', createTime: 'CreateTime~',
+				stbId: 'Stb~', cardId: 'CARD~', modem: 'MODEM~', createTime: 'CreateTime~',
 				loginName: 'Account~', terminal: 'Terminal Type~', deviceModel: 'Equipment Type~', buyWay: 'BuyWay~',
 				stopDate: 'Termination Pre-Report Time~', stopType: 'Calling Fee Type~', protocolDate: 'Agreement Date~', 
 				str4: 'IP Adress~',str6: 'IP Fee Amount~'
@@ -204,15 +210,16 @@ BCLang.home = {
 				loginId: 'Login~',
 				orderFee: 'Order Balance~',
 				canRetrunFee: 'refundable Money Amount~',
+				totalReturnFee: 'Total Refund~',
 				canTransferFee: 'transferable Money Amount~',
 				canRefundRealFee: 'Real refund amount~',
 				returnDevice: 'Recycle Equipment~',
 				retrunInfo: 'Refundable~',
 				transferInfo: 'transferable~',
-				stdId: 'STP No.~',
-				stdModel: ' STP Type~',
-				newStdId: 'New STB No.~',
-				newStdModel: 'New STB Type~',
+				stdId: 'StbNo.~',
+				stdModel: ' Stb Type~',
+				newStdId: 'New StbNo.~',
+				newStdModel: 'New Stb Type~',
 				modemId: 'Modem No.~',
 				modemModel: 'Modem Type~',
 				newModemId: 'New Modem No.~',
@@ -231,18 +238,18 @@ BCLang.home = {
 				titleBusiFeeGrid: 'Other Fee~',
 				ipFee: 'IP fee~',
 				
-				titleTransferPayDetailGrid: 'transfer paymentDetails~',
+				titleTransferPayDetailGrid: 'Transfer PaymentDetails~',
 				transferPayCM: ['Product Name~', 'Fee~', 'User~', ' Billing Starting Date~', 'Ending Billing Date~', 'Transfer Money Amount$~'],
 				transferDetailDate: ' Transferring Details（Billing Starting Date：{0} "）~',
-				labelChangeDeviceResion: 'The replacement need~',
+				labelChangeDeviceResion: 'The Replacement Need~',
 				labelChangeBuyDevice: ' Income from the purchase cost~',
 				labelChangeReclaimDevice: ' Recycling Equipment~',
 				labelChangeLossDevice: ' Report the loss of equipment~',
 				
-				oldOrderFee: 'original order amount~',
-				oldTransFee: 'original transfer payments~',
-				realOrderFee: 'new orders amount~',
-				newAddFee: 'up close to the amount of~'
+				oldOrderFee: 'Original Order Amount~',
+				oldTransFee: 'Original Transfer Payments~',
+				realOrderFee: 'New Orders Amount~',
+				newAddFee: 'Up close to the amount of~'
 			},
 			list: {
 				_title: 'User Information~',
@@ -251,7 +258,7 @@ BCLang.home = {
 			prod: {
 				base: {
 					_title: " Customer Product~",
-					columns: ["Order Sn","Product Name~","Belonged Package~","Current Fee~","Effective Date~" ,"Invalid Date~","Status~","Status Change Time~","Purchase Time~" ,"Purchase Month Quantity~","Create serial number~"]
+					columns: ["Order Sn","Product Name~","Belonged Package~","Current Fee~","Effective Date~" ,"Invalid Date~","Status~","Status Change Time~","Purchase Time~" ,"Purchase Month Quantity~","SerialNo.~","WhetherToPay~"]
 				},
 				pkg: {
 					_title: 'Customer Package~',
@@ -267,25 +274,26 @@ BCLang.home = {
 			},
 			prodDetail: {
 				tabs: ["Order Amount in Details~","Abnormal Information~"],
-				detail: ["No.~","Fund Type~"," Import Product~"," Import Type~"," Import Money Amount~"," Export Product~","Export Type~","Import Money Amount~","serial number~" ]
+				detail: ["No.~","Fund Type~"," Import Product~"," Import Type~"," Import Money Amount~"," Export Product~","Export Type~","Import Money Amount~","Serial Number~" ]
 			}
 		},
 		//Payment Records
 		pay: {
 			payfee: {
 				_title: "prepaid money~",
-				columns: ["serial number~","Service Name~","Account Type~","Account Name~","User Type~", "User Name~","Equipment No.~","Status~","Money Amount~","Estimated Expiry Date before Payment~",
-				        "Expiry Date after Payment~","Print Status~","Payment Way~","Reception Date~","Account Date~","Receptionist~","Reception Department~","Invoice~","Invoice Issuance Way~", "Invoice Type~", "Development of Human ~"]
+				columns: ["Serial Number~","Service Name~","Account Type~","Account Name~","User Type~", "User Name~","Equipment No.~","Status~","Money Amount~","Estimated Expiry Date before Payment~",
+				        "Expiry Date after Payment~","Print Status~","Payment Way~","Reception Date~","Account Date~","Receptionist~","Reception Department~","Invoice~","Invoice Issuance Way~", "Invoice Type~", "Developer~"]
 			},
 			busifee: {
 				_title: "Service Fee~",
-				columns: ["serial number~","Fee Name~","Equipment Type~","Equipment No.~","Status~","Print Status~",
-				          "Payable~","Paid~","Payment Way~","ReceptionDate~","Receptionist~","ReceptionDepartment~","Invoice~"," Invoice Issuance Way~","Invoice Type~","Buy Quantity~","Equipment Type~","Remark~"]
+				columns: ["Serial Number~","Fee Name~","Equipment Type~","Equipment No.~","Status~","Print Status~",
+				          "Payable~","Paid~","Payment Way~","ReceptionDate~","Receptionist~","ReceptionDepartment~",
+				          "Invoice~"," Invoice Issuance Way~","Invoice Type~","Buy Quantity~","Equipment Type~","Remark~", "Developer~", "Payment Dates~"]
 			},
 			detail: {
 				_title: 'payment record~',
 				columns: ["Payment No.~","USD~","KHR~","Exchange~","KHR Round-off~","Effective~","Payment Way~",
-				          "Payer~","Service serial number~","Reception No.~","Reception Issuance Way~","Reception Date~","Receptionist~","Reception Department~"]
+				          "Payer~","Service Serial Number~","Reception No.~","Reception Issuance Way~","Reception Date~","Receptionist~","Reception Department~"]
 			},
 			feePayDetail: {
 				_title: 'Fee Details~',
@@ -304,7 +312,7 @@ BCLang.home = {
 			},
 			task: {
 				_title: 'Work Order~',
-				columns: ["WorkOrdersNo.~", "WorkOrdersType~", "WorkOrderStatus~", "ConstructionTeam~","Failure~", "FaultDetails~", "ZTEAuthorizedState~", "CreatingTime~"],
+				columns: ["WorkOrdersNo.~", "WorkOrdersType~", "WorkOrderStatus~", "ConstructionTeam~","FaultCause~", "FaultDetails~", "ZTEAuthorizedState~", "CreatingTime~"],
 				userColumns: ['UserType~', 'UserName~', 'DeviceModel~', 'DeviceNumber~', 'PosNo~', 'OccNo ~', 'BandWidth~'],
 				detailColumns: ['OperatTime~','OperatType~', 'Operator~','SyncStatus~', 'ErrorDesc~'],
 				winTitle: 'WorkOrders Info~',
@@ -321,29 +329,35 @@ BCLang.home = {
 				oldInvoiceType: ' FormerInvoiceType~',
 				oldStatus: ' FormerInvoiceStatus~',
 				newInvoiceId: 'NewInvoiceNo.~',
-				newInvoiceCode: 'NewInvoiceCode~'
+				newInvoiceCode: 'NewInvoiceCode~',
+				faultContent:'Fault content~'
 			}
 		},
 		//Reception Record
 		doneCode: {
 			_title: ' Reception Record~',
-			columns: ["serial number~","Service Name~","Status~","Reception Date~","Operator~","Reception Department~",
-			         "Returnable~","Ignorable~","Paid Money Amount~"," Service Expansion Information~","Remark~"]
+			columns: ["Serial Number~","Service Name~","Status~","Reception Date~","Operator~","ReceptionDept~",
+			         "Returnable~","Ignorable~","Paid Amount~","Extended ServiceInfo~","Remark~"],
+			editPayColumns:["Fee Item~","Unit Price~","Amount~","Accumulated Cost~","Actual Cost~","The Cost~","Type Name~"],
+			_form:{
+				oldRemark: 'Old Remark~',
+				newRemark: 'New Remark~'
+			}
 		},
 		//instruction
 		cmd: {
 			dtt: {
 				_title: "DTT Instruction Information~",
-				columns: ['ServiceSerialNumber~','STBNo.~','Card No.~','ControlWord~','ProgramName~',
+				columns: ['ServiceSerialNumber~','StbNo.~','Card No.~','ControlWord~','ProgramName~',
 				       'InstructionType~','ResultMark~','CreateTime~','SendTime~','CARecycleTime~','WrongInfo~','AuthEndDate~']
 			},
 			ott: {
 				_title: "OTT Instruction Information~",
-				columns: ['InstructionNo.~','ServiceSerialNumber~','InstructionType~','STBNo.~','Card No.~','MAC~','SuccessOrNot~','WrongInfo~','Send Time~']
+				columns: ['InstructionNo.~','ServiceSerialNumber~','InstructionType~','StbNo.~','Card No.~','MAC~','SuccessOrNot~','WrongInfo~','Send Time~']
 			},
 			band: {
 				_title: 'BAND Instruction Information~',
-				columns: ['InstructionNo.~','ServiceSerialNumber~','InstructionType~','STBNo.~','ModemNo.~','SuccessOrNot~','WrongInfo~','SendTime~']
+				columns: ['InstructionNo.~','ServiceSerialNumber~','InstructionType~','StbNo.~','ModemNo.~','SuccessOrNot~','WrongInfo~','SendTime~']
 			}
 		},
 		// Bill
@@ -352,7 +366,7 @@ BCLang.home = {
 				_title: 'Bill Information~',
 				columns: ['Billing Period~','Source~','Smart Card No.~','Serial~','Charge-off Time~','Account Name~',
 				      'Fee Name~','Status~',' Charge-off Money Amount~','Due Money Amount~','Operate~'],
-				tbar: ["Smart Card~","serial number~","Due Bill~","All Bill~"]
+				tbar: ["Smart Card~","Serial Number~","Due Bill~","All Bill~"]
 			},
 			acctitemInvalid: {
 				_title: 'Account Invalid Information~',
@@ -403,8 +417,8 @@ BCLang.home = {
             labelCardModel:'Martching CardType~',
             labelModemNo:' Matching MODEM No.~',
             labelModemModel:' Matching MODEM Type~',
-            labelStbNo:' Matching STBNo.~',
-            labelStbModel:' Matching STB Type~',
+            labelStbNo:' Matching StbNo.~',
+            labelStbModel:' Matching Stb Type~',
             tipDevNotExists:'Inquiry Equipment does not exist!~'
 			
 		},
@@ -457,7 +471,7 @@ BCLang.home = {
 			titlePrintPreview:'Print Preview~',
 			titleInvoiceWindow:'Print {0} Invoices totally~',
 			wdxj:'Shop Cash~',
-			printGridColumns:['serial number~','Reception Name~','Create Time~'],
+			printGridColumns:['Serial Number~','Reception Name~','Create Time~'],
 			invoiceGridColumns:['Serial Number~','Invoice No.~','Invoice Code~'],
 			printItemGridColumns:['Name~','Money Amount~'],
 			stillEmptyInvoiceField:"Still empty invoice input frame!~",
@@ -510,8 +524,9 @@ BCLang.home = {
 			_title : 'Work Order Management~',
 			_operateTitle : 'Operation Details~',
 			_userTitle : 'User Details~',
-			_winTitle : 'Work Order completion~',
-			_ZteWinTitle : 'ZTE authorized~',
+			_winTitle : 'Work Order Completion~',
+			_ZteWinTitle : 'ZTE Authorized~',
+			_fillDevTitle: 'Backfill Equipment',
 			forms : {
 				custNo : 'Customer ID~',
 				taskNo : 'WorkOrdersNo.~',
@@ -526,7 +541,8 @@ BCLang.home = {
 				finishType : 'completion type~',
 				finishExplan : 'completed Description~',
 				zteStatus	: 'ZTE status~',
-				zteRemark :'remark~'
+				zteRemark :'remark~',
+				syncStatus:'cfocn synchronous status~'
 			},
 			buttons : {
 				query : 'Query~',
@@ -541,7 +557,8 @@ BCLang.home = {
 				withdraw : 'CFOCN Withdraw~'
 			},
 			taskCols : ['WorkOrdersType~', 'CustName~', 'WorkOrdersStatus~', 'ConstructionTeam~',
-					'ZTEState~', 'Address~', 'Tel~', 'CreatTime~', 'FaultType~', 'FaultDetails~','WorkNo.~','CustManager~','CustManagerTel~'],
+					'ZTEState~', 'Address~', 'Tel~', 'CreatTime~', 'FaultType~', 'FaultDetails~','WorkNo.~','CustManager~'
+					,'CustManagerTel~','CustNo~','cfocnSyncStatus'],
 			userCols : ['UserType~', 'UserName~', 'Password~', 'DeviceModel~', 'DeviceNO.~', 'PosNo~', 'OccNo~', 'Bandwidth~'],
 			operateCols : ['OperatingTime~', 'OperationType~', 'Operator~,', 'SyncStatus~', 'Description~','DelayTime~'],
 			taskDeviceCols : ['UserType~', 'UserName~', 'Model~', 'DeviceNO.~', 'EquipmentRecycling~','OldDeviceNO.~'],
@@ -606,6 +623,7 @@ BCLang.msgBox = {
 	needCust:'Please find Customer to Operate at first!~',
 	needUser:'Please select customer!~',
 	cancelFeeSuccess:'Successful Write-off!~',
+	paymentSuccess:'Payment Success!~',
 	confirmCancelFeeAndInvaidInvoice:'Invoice{0} will be invalid! Fee Items of this Invoice need to be printed again，Sure to cancel it?~',
 	confirmCancelFee:'Sure to cancel it?~',
 	selectRec4CancelFee:'Please select fee record to cancel!~',
@@ -622,12 +640,13 @@ BCLang.msgBox = {
 	confirmBankStop:'Sure to suspend fee deduction of card?~',
 	confirmEnableBankPay:'Start fee deduction of bank card?~',
 	confirmDisableBankPay:'Forbid fee deduction of bank card?~',
-	confirmEditBankPay:'Confirm the Product',
+	confirmEditBankPay:'Confirm the Product~',
 	confirmBankResume:'Sure to restore fee deduction from card?~',
 	confirmRenewCust:'Restore Customer Status?~',
-	confirmCancelPayFeeWithParam:'Determined to pay rollback and void an invoice:{0}',
-	confirmCancelPayFeeWithNoParam:'Determined to pay rollback?',
-	cancelPayFeeSuccess:'Payment rollback Reversal Success!',
+	confirmCancelPayFeeWithParam:'Determined to pay rollback and void an invoice:{0}~',
+	confirmCancelPayFeeWithNoParam:'Determined to pay rollback?~',
+	cancelPayFeeSuccess:'Payment rollback Reversal Success!~',
+	commonSuccess: 'Operation success!~',
 	
 	custHasUnSuitableDev:'This User cannot do Equipment exchange now~',
 	custCantExchangeDev:' This User cannot do Equipment exchange now~',
@@ -664,6 +683,7 @@ BCLang.msgBox = {
 	confirmDepositUnPay:"Sure to return deposit?~",
 	
 	userNotActive:"selected User Status is abnormal~",
+	userStatusActiveOrConstruction:"selected User Status must be normal or construction~",
 	cantLogOffZzd:'Main Terminal cannot be cancelled at first~',
 	cantLogOffCosBaseProdOweFee:'Overdue Basic Package Product cannot be cancelled!~',
 	cantLogOffCosBaseProdNotActive:' Basic Package Product Status is abnormal, cannot be cancelled!~',
@@ -672,8 +692,8 @@ BCLang.msgBox = {
 	
 	freeUsersOver2:"Free Terminals cannot be more than 2~",
 	
-	singleInteractiveDevCantOpenDuplex:'This User’s STB is one-way，cannot open two-way~',
-	custMustHaveDuplexDev:'User must have two-way STB~',
+	singleInteractiveDevCantOpenDuplex:'This User’s Stb is one-way，cannot open two-way~',
+	custMustHaveDuplexDev:'User must have two-way Stb~',
 	
 	needCancelProgramFirst:'User has interactive TV Product，Please unsubscribe and then operate!~',
 	confirmCancelDuplex:"Sure to cancel two-way?~",
@@ -707,7 +727,7 @@ BCLang.msgBox = {
 	intentionCustPlsChooseProvince: 'Intending Customer Please select province!~',
 	rechargeCountMustBeGreaterThanZero: 'Money Amount is more than 0!~',
 	transferModifyCustName: 'Please change Customer Name for transferring account!~',
-	changeModifyCustAddr: 'Please change Customer Address for moving STB!~',
+	changeModifyCustAddr: 'Please change Customer Address for moving Stb!~',
 	notModifyAnyInfo: 'You do not change any information!~',
 	buyNumExceedStockNum: 'Buy Quantity more than storage quantity!~',
 	enterPositiverNum: 'Please input positive integer!~',
@@ -716,8 +736,8 @@ BCLang.msgBox = {
 	
 	notChooseDeviceMustBeInput: 'When backfilling construction is not selected for equipment，the equipment code must be input!~',
 	noChargeNumber: 'Fee No. does not exist!~',
-	singleStbNotSupDTT: 'This Equipment is one-way STB，Do not support current OTT Type!~',
-	doubleStbNotSupOTT: 'This Equipment is two-way STB, do not support current DTT Type!~',
+	singleStbNotSupDTT: 'This Equipment is one-way Stb, Do not support current OTT Type!~',
+	doubleStbNotSupOTT: 'This Equipment is two-way Stb, Do not support current DTT Type!~',
 	modemNotSupUserType: 'Equipment为Modem，Do not support selected[{0}]User Type!~',
 	currDeviceNotSupUserType: 'This Equipment do not support current User Type!~',
 	deviceFeeMustBeBetween:'Equipment Fee must be between [{0}]-[{1}]!~',
@@ -733,6 +753,13 @@ BCLang.msgBox = {
 	chooseInUsers: 'Please select Terminal User to join package!~',
 	exceedPkgMaxUserNum: 'More than max quantity limit of package!~',
 	completeChooseUserTerminal: 'Please fully select every User Type Terminal!~',
-	newOrderAmountCantBeLessThanZero: 'new orders amount can not be less than zero ~!',
-	newOrderAmountCantBeLessThanTransAmount: 'new orders can not be less than the amount of the transfer amount ~'
+	newOrderAmountCantBeLessThanZero: 'new orders amount can not be less than zero~!',
+	newOrderAmountCantBeLessThanTransAmount: 'new orders can not be less than the amount of the transfer amount~',
+	CancelTheAccountDismantleDevice:'Device not recovered And purchase way to configure cannot cancel~',
+	CancelTheAccountUserStatus:'The user state is stopped, disassemble, the construction cannot cancel~',
+	PleaseCancelTheOttMainTerminal:'Please cancel the main terminal OTT~',
+	noFeeItemCanNotContinue:'Can not continue because no cost item~',
+	EditPayFeeAndNumberIsWrong:'This fee is not divisible by the price, the purchase of the number as an integer~',
+	SelectOnlyOneData:'Please choose a record~',
+	ChooseToPayTheRecord:'Please choose to pay the record~'
 }

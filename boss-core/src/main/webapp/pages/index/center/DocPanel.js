@@ -180,7 +180,7 @@ TaskGrid = Ext.extend(Ext.ux.Grid,{
 		var lc = lmain("doc.task.columns");
 		var cm = new Ext.ux.grid.LockingColumnModel({
 			columns : [
-				{header:lc[0],dataIndex:'task_id',width:80,renderer:function(value,metaData,record){
+				{header:lc[0],dataIndex:'task_id',width:100,renderer:function(value,metaData,record){
 					that = this;
 					if(value != ''){
 						return '<div style="text-decoration:underline;font-weight:bold"  onclick="Ext.getCmp(\'D_TASK\').doTaskWin();"  ext:qtitle="" ext:qtip="' + value + '">' + value +'</div>';
@@ -188,9 +188,9 @@ TaskGrid = Ext.extend(Ext.ux.Grid,{
 						return '<div ext:qtitle="" ext:qtip="' + value + '">' + value +'</div>';
 					}
 				}},
-				{header:lc[1],dataIndex:'task_type_id_text',	width:80,renderer : App.qtipValue},
-				{header:lc[2],dataIndex:'task_status_text',	width:120,renderer:Ext.util.Format.statusShow},
-				{header:lc[3],dataIndex:'team_id_text',	width:80,renderer : App.qtipValue},
+				{header:lc[1],dataIndex:'task_type_id_text',	width:110,renderer : App.qtipValue},
+				{header:lc[2],dataIndex:'task_status_text',	width:110,renderer:Ext.util.Format.statusShow},
+				{header:lc[3],dataIndex:'team_id_text',	width:120,renderer : App.qtipValue},
 				{header:lc[4],dataIndex:'bug_type_text',width:200,renderer : App.qtipValue},
 				{header:lc[5],dataIndex:'bug_detail',	width:120,renderer : App.qtipValue},
 				{header:lc[6],dataIndex:'zte_status_text',	width:80},
@@ -234,12 +234,12 @@ TaskGrid = Ext.extend(Ext.ux.Grid,{
 	},
 	doTaskWin:function(){
 		if(!App.getApp().getCustId()){
-			Alert('请查询客户之后再做操作.');
+			Alert(lbc('msgBox.needCust'));
 			return false;
 		}
 		var recs = this.selModel.getSelections();
 		if(!recs || recs.length !=1){
-			Alert('请选择且仅选择一条记录!');
+			Alert(lbc('msgBox.SelectOnlyOneData'));
 			return false;
 		}
 		var rec = recs[0];

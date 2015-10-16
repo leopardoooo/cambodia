@@ -23,10 +23,18 @@ public class TaskBaseInfoDto extends WTaskBaseInfo{
 	private String team_type;
 	private String linkman_name;
 	private String linkman_tel;
+	private String cust_no;
+	
+	
+	
+	public String getCust_no() {
+		return cust_no;
+	}
 
-	
-	
-	
+	public void setCust_no(String cust_no) {
+		this.cust_no = cust_no;
+	}
+
 	public String getLinkman_name() {
 		return linkman_name;
 	}

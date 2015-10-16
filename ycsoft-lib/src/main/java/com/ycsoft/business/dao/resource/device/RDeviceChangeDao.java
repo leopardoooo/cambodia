@@ -185,6 +185,14 @@ public class RDeviceChangeDao extends BaseEntityDao<RDeviceChange> {
 		executeUpdate(sql, doneCode, busiCode,columnName,oldValue,newValue,optrId,deptId,countyId,areaId,deviceId);
 	}
 	
+	public void saveDeviceChangeAndBuyMode(Integer doneCode,String busiCode,String deviceId,String columnName,String oldValue,String newValue,String buyMode
+			,String optrId,String deptId,String countyId,String areaId) throws JDBCException {
+		String sql = " insert into r_device_change (done_code, busi_code, device_id, column_name, old_value, new_value, change_date, optr_id, " +
+				" dept_id, county_id, area_id, pair_card_id, pair_modem_id,buy_mode) select ?,?,d.device_id,?,?,?,sysdate,?,?,?,?, s.pair_card_id,s.pair_modem_id,?  " +
+				" from r_device d,r_stb s where s.device_id(+)=d.device_id and d.device_id=? ";
+		executeUpdate(sql, doneCode, busiCode,columnName,oldValue,newValue,optrId,deptId,countyId,areaId,buyMode,deviceId);
+	}
+	
 	public void saveDeviceChangeIsNewStb(Integer doneCode,String busiCode,String[] deviceId,String newValue
 			,String optrId,String deptId,String countyId,String areaId) throws JDBCException {
 		String sql = " insert into r_device_change (done_code, busi_code, device_id, column_name, old_value, new_value, change_date, optr_id, " +
@@ -221,10 +229,10 @@ public class RDeviceChangeDao extends BaseEntityDao<RDeviceChange> {
 	public void saveMateralTransChange(Integer doneCode,
 			String busiCode, String device_id, String columnName,
 			Integer oldValue, Integer newValue, String confirm_optr_id,
-			String depot_source, String county_id, String area_id) throws JDBCException {
+			String depot_source, String county_id, String area_id, String buyMode) throws JDBCException {
 			String sql = " insert into r_device_change (done_code, busi_code, device_id,column_name, old_value, " +
-					" new_value, change_date, optr_id, dept_id, county_id, area_id)  VALUES(?,?,?,?,?,?,sysdate,?,?,?,?)";
-			executeUpdate(sql, doneCode, busiCode,device_id,columnName,oldValue,newValue,confirm_optr_id,depot_source,county_id,area_id);
+					" new_value, change_date, optr_id, dept_id, county_id, area_id,buy_mode)  VALUES(?,?,?,?,?,?,sysdate,?,?,?,?,?)";
+			executeUpdate(sql, doneCode, busiCode,device_id,columnName,oldValue,newValue,confirm_optr_id,depot_source,county_id,area_id,buyMode);
 	}
 	
 	

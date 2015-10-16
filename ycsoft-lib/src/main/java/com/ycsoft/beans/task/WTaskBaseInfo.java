@@ -49,6 +49,7 @@ public class WTaskBaseInfo implements Serializable{
 	private String bug_type;
 	private String bug_detail;
 	private String optr_id;
+	private Integer finish_done_code;
 
 	private String task_type_name;
 	private String task_detail_type_name;
@@ -61,7 +62,7 @@ public class WTaskBaseInfo implements Serializable{
 	
 	private Date  task_status_date;
 	private Date zte_status_date;
-	private String sync_statu;//同步状态
+	private String sync_status;//同步状态
 	private Date sync_status_date;//同步状态时间
 	
 	
@@ -81,12 +82,12 @@ public class WTaskBaseInfo implements Serializable{
 		this.zte_status_date = zte_status_date;
 	}
 
-	public String getSync_statu() {
-		return sync_statu;
+	public String getSync_status() {
+		return sync_status;
 	}
 
-	public void setSync_statu(String sync_statu) {
-		this.sync_statu = sync_statu;
+	public void setSync_status(String sync_status) {
+		this.sync_status = sync_status;
 	}
 
 	public Date getSync_status_date() {
@@ -399,6 +400,12 @@ public class WTaskBaseInfo implements Serializable{
 		this.task_finish_desc = task_finish_desc;
 	}
 	
-	
+	public Integer getFinish_done_code() {
+		return finish_done_code;
+	}
+
+	public void setFinish_done_code(Integer finish_done_code) {
+		this.finish_done_code = finish_done_code;
+	}
 	
 }

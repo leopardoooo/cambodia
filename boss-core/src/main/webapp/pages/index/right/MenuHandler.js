@@ -131,7 +131,7 @@ Ext.apply(MenuHandler, {
 	// 开户
 	NewCust : function() {
 		return {
-			width : 630,
+			width : 700,
 			height : 510
 		};
 	},
@@ -382,7 +382,7 @@ Ext.apply(MenuHandler, {
 			return false;
 		}
 		return {
-			width : 630,
+			width : 700,
 			height : 510
 		};
 	},
@@ -804,13 +804,13 @@ Ext.apply(MenuHandler, {
 	},
 	EditPay : function() {
 		return {
-			width : 650,
+			width : 750,
 			height : 400
 		};
 	},
 	EditDoneRemark: function(){
 		return {
-			width : 400,
+			width : 500,
 			height : 400
 		};
 	},
@@ -855,10 +855,19 @@ Ext.apply(MenuHandler, {
 			Alert(lmsg('needOneUser'));
 			return false;
 		}
-		if (userRecords[0].get("user_type") !='OTT_MOBILE' && userRecords[0].get("status") != "UNTUCKEND") {
-			Alert('用户还未拆机完成或者工单未作废');
+		
+		if(userRecords[0].get("status") == 'UNTUCK' || userRecords[0].get("status") == 'REQSTOP' 
+				|| userRecords[0].get("status") == 'INSTALL' ){
+			Alert(lmsg('CancelTheAccountUserStatus'));
 			return false;
 		}
+		if(userRecords[0].get("str10")== 'PRESENT' && 
+			(!Ext.isEmpty(userRecords[0].get("stb_id"))||!Ext.isEmpty(userRecords[0].get("card_id"))
+					|| !Ext.isEmpty(userRecords[0].get("modem_mac")))){
+			Alert(lmsg('CancelTheAccountDismantleDevice'));
+			return false;
+		}
+		
 		
 		var store = userGrid.getStore();
 		
@@ -866,7 +875,7 @@ Ext.apply(MenuHandler, {
 			var record = store.getAt(i);
 			if(userRecords[0].get('user_type') == 'OTT' && userRecords[0].get('terminal_type') == 'FZD'
 				&& userRecords[0].get('user_id') != record.get('user_id') && record.get('user_type') == 'OTT' && record.get('terminal_type') == 'ZZD'){
-					Alert('请先销户OTT主终端!');
+					Alert(lmsg('PleaseCancelTheOttMainTerminal'));
 					return false;
 			}
 		}
@@ -1681,12 +1690,12 @@ Ext.apply(MenuHandler, {
 		var userRecords =  App.main.infoPanel.getUserPanel().userGrid.getSelections();
 		var len = userRecords.length;
 		if (len == 0) {
-			Alert('请先选择用户!');
+			Alert(lmsg('needUser'));
 			return false;
 		}
 		for (var i = 0; i < len; i++) {
 			if (userRecords[i].get("status") != "ACTIVE" && userRecords[i].get("status") != "INSTALL" ) {
-				Alert("所选用户的状态必须是正常");
+				Alert(lmsg('userStatusActiveOrConstruction'));
 				return false;
 			}
 			for (var j = i + 1; j < len; j++) {
@@ -1707,13 +1716,13 @@ Ext.apply(MenuHandler, {
 			var userRecords =  App.main.infoPanel.getUserPanel().userGrid.getSelections();
 			var len = userRecords.length;
 			if (len == 0) {
-				Alert('请先选择用户!');
+				Alert(lmsg('needUser'));
 				return false;
 			}
 		}
 		for (var i = 0; i < len; i++) {
 			if (userRecords[i].get("status") != "ACTIVE" && userRecords[i].get("status") != "INSTALL" ) {
-				Alert("所选用户的状态必须是正常");
+				Alert(lmsg('userStatusActiveOrConstruction'));
 				return false;
 			}
 			for (var j = i + 1; j < len; j++) {
@@ -1868,7 +1877,7 @@ Ext.apply(MenuHandler, {
 			for(var i=0;i<userStore.getCount();i++){
 				if(userId == userStore.getAt(i).get('user_id')){
 					if(userStore.getAt(i).get("status") != "ACTIVE"){
-						Alert("所选用户的状态必须是正常");
+						Alert(lmsg('userNotActive'));
 						return false;
 					}
 				}
@@ -3031,7 +3040,7 @@ Ext.apply(MenuHandler, {
 			return false;
 		}
 		return {
-			width : 450,
+			width : 580,
 			height : 400
 		};
 	},
@@ -3041,7 +3050,7 @@ Ext.apply(MenuHandler, {
 		function callback(res, opt) {
 			var result = Ext.decode(res.responseText);
 			if (result == true) {
-				Alert('工单作废成功!');
+				Alert(lmsg('commonSuccess'));
 				App.getApp().main.infoPanel.getUserPanel().userGrid.remoteRefresh();
 				App.getApp().main.infoPanel.docPanel.taskGrid.remoteRefresh();
 				App.getApp().refreshPayInfo();
@@ -3049,7 +3058,7 @@ Ext.apply(MenuHandler, {
 		}
 		var url = Constant.ROOT_PATH + "/core/x/Task!cancelTaskSn.action";
 
-		Confirm("确定作废工单吗?", this, function() {
+		Confirm(lbc('home.tools.TaskManager.msg.sureWantSelectedWork'), this, function() {
 			// 调用请求函数,详细参数请看busi-helper.js
 			App.sendRequest(url, {task_id : record.get('task_id'),taskType:record.get('task_type_id')}, callback);
 		});

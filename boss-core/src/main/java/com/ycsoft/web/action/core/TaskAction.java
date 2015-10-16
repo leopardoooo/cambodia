@@ -103,7 +103,8 @@ public class TaskAction extends BaseBusiAction{
 			taskCond.setStart(start);
 			taskCond.setLimit(limit);
 			getRoot().setPage(snTaskService.queryTask(taskCond.getTaskType(),taskCond.getAddrIds(),taskCond.getStartTime(),taskCond.getEndTime(),taskCond.getTaskId()
-					,taskCond.getTaskTeam(),taskCond.getStatus(),taskCond.getCustNo(),taskCond.getCustName(),taskCond.getAddr(),taskCond.getMobile(),taskCond.getZteStatus(),taskCond.getStart(),taskCond.getLimit()));
+					,taskCond.getTaskTeam(),taskCond.getStatus(),taskCond.getCustNo(),taskCond.getCustName(),taskCond.getAddr(),taskCond.getMobile(),
+					taskCond.getZteStatus(),taskCond.getSyncStatus(),taskCond.getStart(),taskCond.getLimit()));
 		}
 		return JSON_PAGE;
 	}
@@ -215,8 +216,10 @@ public class TaskAction extends BaseBusiAction{
 	}
 	
 	public String fillWriteOffTerminalTask() throws Exception{
-		String userIds = request.getParameter("userIds");
-		snTaskService.fillWriteOffTerminalTask(task_id, userIds.split(","));
+		String devices = request.getParameter("devices");
+		Type t = new TypeToken<List<TaskFillDevice>>(){}.getType();
+		List<TaskFillDevice> list = JsonHelper.gson.fromJson( devices , t);
+		snTaskService.fillWriteOffTerminalTask(task_id, list);
 		return JSON_SUCCESS;
 	}
 	

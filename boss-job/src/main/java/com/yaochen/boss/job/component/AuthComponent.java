@@ -12,6 +12,7 @@ import com.ycsoft.beans.core.job.BusiCmdParam;
 import com.ycsoft.beans.core.job.JBandCommand;
 import com.ycsoft.beans.core.job.JVodCommand;
 import com.ycsoft.beans.core.prod.CProdOrder;
+import com.ycsoft.beans.core.prod.CProdOrderDto;
 import com.ycsoft.beans.core.user.CUser;
 import com.ycsoft.boss.remoting.ott.Result;
 import com.ycsoft.business.dao.core.job.JBandCommandDao;
@@ -52,6 +53,25 @@ public class AuthComponent extends BaseComponent {
 		bandCmd.setCounty_id(user.getCounty_id());
 		bandCmd.setArea_id(user.getArea_id());
 		return bandCmd;
+	}
+	
+	/**
+	 * 宽带所有订单到期日后，对宽带补发清除授权指令，因为宽带在汇聚系统发的长授权
+	 * @param order
+	 */
+	public void clearBandAuth(List<CProdOrder> orders) throws Exception{
+		for(CProdOrder order:orders){
+			String userId=order.getUser_id();
+			CUser user=cUserDao.findByKey(userId);
+			if(user==null)
+				continue;
+			JBandCommand bandCmd = gBandCmd(user, -12);
+			bandCmd.setCmd_type(BusiCmdConstants.BAND_CLEAR_AUTH);
+			JsonObject params = new JsonObject();
+			params.addProperty(BusiCmdParam.login_name.name(), user.getLogin_name());
+			bandCmd.setDetail_param(params.toString());
+			jBandCommandDao.save(bandCmd);
+		}
 	}
 	/**
 	 * 生成修改宽带带宽的指令
@@ -107,7 +127,9 @@ public class AuthComponent extends BaseComponent {
 		cmd.setSend_time(new Date());
 		cmd.setIs_success(result.isSuccess()?SystemConstants.BOOLEAN_TRUE:SystemConstants.BOOLEAN_FALSE);
 		cmd.setError_info(result.getReason());
-		cmd.setReturn_code(Integer.parseInt(result.getStatus()));
+		try{
+			cmd.setReturn_code(Integer.parseInt(result.getStatus()));
+		}catch(Exception e){}
 		jVodCommandDao.updateByCmd(cmd.getTransnum(), cmd.getIs_send(), cmd.getIs_success(), cmd.getError_info(), cmd.getReturn_code());
 	}
 	
@@ -122,7 +144,11 @@ public class AuthComponent extends BaseComponent {
 		cmd.setSend_time(new Date());
 		cmd.setIs_success(result.isSuccess()?SystemConstants.BOOLEAN_TRUE:SystemConstants.BOOLEAN_FALSE);
 		cmd.setError_info(result.getReason());
-		cmd.setReturn_code(Integer.parseInt(result.getStatus()));
+		if(result.getStatus()!=null){
+			try{
+			cmd.setReturn_code(Integer.parseInt(result.getStatus()));
+			}catch(Exception e){}
+		}
 		//jBandCommandDao.update(cmd);
 		jBandCommandDao.updateByCmd(cmd.getTransnum(), cmd.getIs_send(), cmd.getIs_success(), cmd.getError_info(), cmd.getReturn_code());
 	}

@@ -154,7 +154,7 @@ LogoffUserForm = Ext.extend(BaseForm,{
 					items : [{
 						xtype : 'numberfield',
 						id : 'refundFeeValue',
-						fieldLabel : '退款总额',
+						fieldLabel : lmain("user._form.totalReturnFee"),
 						width : 100,
 						readOnly: true,
 						style: Constant.TEXTFIELD_STYLE,

@@ -28,7 +28,7 @@ public class Bootstrap {
 //	      System.exit(1);
 //	    }
 		
-		System.setProperty("javax.net.debug", "ssl,handshake");
+		//System.setProperty("javax.net.debug", "ssl,handshake");
 		//TODO 改成你本地的地址
         System.setProperty("javax.net.ssl.keyStore", "D:/boss/cambodia/boss-core/src/main/resources/cert/cfocn/admin.pfx");
         System.setProperty("javax.net.ssl.keyStorePassword", "123456");

@@ -11,7 +11,7 @@ PublicRechargeForm = Ext.extend(BaseForm,{
 		var acctId = record.get('acct_id');
 		this.acctitemId = record.get('acctitem_id');
 		PublicRechargeForm.superclass.constructor.call(this,{
-			labelWidth:120,
+			labelWidth:150,
 			border: false,
 			bodyStyle:'padding-top:15px',
 			defaults:{layout:'form',border:false},

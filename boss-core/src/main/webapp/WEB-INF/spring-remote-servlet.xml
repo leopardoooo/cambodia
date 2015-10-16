@@ -5,5 +5,12 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
     http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd"
 	default-autowire="byName" default-lazy-init="false">
-
+	
+	<bean name="/user" class="org.springframework.remoting.httpinvoker.HttpInvokerServiceExporter" scope="prototype">
+		<property name="service">
+			<bean class="com.ycsoft.business.service.externalImpl.UserServiceExternal" scope="prototype" />
+		</property>
+		<property name="serviceInterface" value="com.ycsoft.business.service.externalImpl.IUserServiceExternal" />
+	</bean>
+	
 </beans>

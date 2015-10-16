@@ -36,7 +36,7 @@
 		<filter-class>com.ycsoft.commons.action.BossStrutsPrepareAndExecuteFilter</filter-class>
 		<init-param>
 			<param-name>excludeUri</param-name>
-			<param-value>/services/</param-value>
+			<param-value>/services/,/remoting/</param-value>
 		</init-param>
 	</filter>
 	<filter-mapping>
@@ -44,7 +44,7 @@
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
 
-	<!-- 配置DispatcherServlet 
+	<!-- 配置DispatcherServlet  -->
 	<servlet>
 		<servlet-name>spring-remote</servlet-name>
 		<servlet-class>
@@ -56,7 +56,6 @@
 		<servlet-name>spring-remote</servlet-name>
 		<url-pattern>/remoting/*</url-pattern>
 	</servlet-mapping>
-	-->
 	
 	<!-- 强制SSL配置，即普通的请求也会重定向为SSL请求
 		CONFIDENTIAL: 要保证服务器和客户端之间传输的数据不能够被修改，且不能被第三方查看到
@@ -82,7 +81,7 @@
 	
 	<!-- 容器配置区域 session超时定义,单位为分钟  -->
 	<session-config>
-		<session-timeout>60</session-timeout>
+		<session-timeout>500</session-timeout>
 	</session-config>
 </web-app>
 

@@ -7,14 +7,14 @@ var _acms = lmain("cust.acct.columns");
 AcctItemTemplate = new Ext.XTemplate(
 	'<table width="100%" border="0" cellpadding="0" cellspacing="0">',
 		'<tr height=24>',
-			'<td class="label" width=20%>'+ _acms[0] + '：</td>',
-			'<td class="input_bold" width=30% colspan=3>&nbsp;{[values.acctitem_name ||""]}</td>',
+			'<td class="label" width=25%>'+ _acms[0] + '：</td>',
+			'<td class="input_bold" width=25% colspan=3>&nbsp;{[values.acctitem_name ||""]}</td>',
 		'</tr>',
 		'<tr height=24>',
-			'<td class="label" width=20%>'+_acms[2]+ '：</td>',
-			'<td class="input" width=30%>&nbsp;{[Ext.util.Format.formatFee(values.active_balance) ]}</td>',
-			'<td class="label" width=20%>'+_acms[3]+ '：</td>',
-			'<td class="input" width=30%>&nbsp;{[Ext.util.Format.formatFee(values.owe_fee)]}</td>',
+			'<td class="label" width=25%>'+_acms[2]+ '：</td>',
+			'<td class="input" width=25%>&nbsp;{[Ext.util.Format.formatFee(values.active_balance) ]}</td>',
+			'<td class="label" width=25%>'+_acms[3]+ '：</td>',
+			'<td class="input" width=25%>&nbsp;{[Ext.util.Format.formatFee(values.owe_fee)]}</td>',
 		'</tr>',
 		'<tr height=24>',
 			'<td class="label" width=20%>'+_acms[4]+ '：</td>',
@@ -47,15 +47,16 @@ PublicAcctRefundPanel = Ext.extend(BaseForm,{
 		PublicAcctRefundPanel.superclass.constructor.call(this,{
 			trackResetOnLoad:true,
 			border : false,
-			labelWidth: 80,
+			labelWidth: 200,
 			layout:'border',
 			baseCls: 'x-plain',
 			bodyStyle: Constant.TAB_STYLE,
 			items:[{
 					region:'north',
 					bodyStyle: Constant.TAB_STYLE,
-					height:180,
-					title:lmain("cust.acct._title"),items:[{}]
+					height:220,
+//					title:lmain("cust.acct._title"),
+					items:[{}]
 				},
 				{xtype : 'panel',
 	            	title : lmain("cust._form.titleAcctRefund"),
@@ -69,6 +70,7 @@ PublicAcctRefundPanel = Ext.extend(BaseForm,{
 						fieldLabel: lmain("cust._form.refundTotal"),
 						allowBlank:false,
 						allowNegative:false,
+						width:100,
 						name:'fee',id:'feeId',minValue:1}]}
 			]
 		});

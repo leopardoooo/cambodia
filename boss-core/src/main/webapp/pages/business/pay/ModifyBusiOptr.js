@@ -20,7 +20,7 @@ ModifyBusiOptrForm = Ext.extend(BaseForm,{
 		this.busiOptrStore.load();
 		ModifyBusiOptrForm.superclass.constructor.call(this,{
 			border:false,
-			labelWidth:75,
+			labelWidth:120,
 			bodyStyle: "background:#F9F9F9; padding: 10px;",
 			items:[
 				{xtype:'hidden',name:'fee_sn',value:feeSn},

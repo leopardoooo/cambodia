@@ -39,6 +39,7 @@ public class StopServiceJob implements Job2 {
 					jobComponent.saveJobExecute(stopJob.getJob_id(), stopJob.getArea_id(),stopJob.getCounty_id(), SystemConstants.BOOLEAN_TRUE, null);
 			 		jobComponent.deleteUserStopJob(stopJob.getJob_id());
 				}catch(Exception e){
+					e.printStackTrace();
 					logger.error("报停任务", e.getMessage());
 				}
 			}

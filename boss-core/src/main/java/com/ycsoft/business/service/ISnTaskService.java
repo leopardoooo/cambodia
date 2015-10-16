@@ -45,7 +45,7 @@ public interface ISnTaskService {
 	 * @param userIds
 	 * @throws Exception
 	 */
-	public void fillWriteOffTerminalTask(String taskId,String[] userIds) throws Exception;
+	public void fillWriteOffTerminalTask(String taskId,List<TaskFillDevice> deviceList) throws Exception;
 	
 	/**
 	 * 完工
@@ -67,13 +67,14 @@ public interface ISnTaskService {
 	 * @param custName
 	 * @param custAddr
 	 * @param zteStatus 
+	 * @param syncStatus 
 	 * @param limit 
 	 * @param start 
 	 * @throws Exception
 	 */
 	public Pager<TaskBaseInfoDto> queryTask(String taskTypes,String addrIds,String beginDate,String endDate,
 			String taskId,String teamId,String status, 
-			String custNo,String custName,String custAddr,String mobile, String zteStatus, Integer start, Integer limit) throws Exception;
+			String custNo,String custName,String custAddr,String mobile, String zteStatus, String syncStatus, Integer start, Integer limit) throws Exception;
 	
 
 	public Map<String, ?> queryTaskDetail(String task_id) throws Exception;

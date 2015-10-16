@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +22,6 @@ import com.ycsoft.beans.config.TDeviceChangeReason;
 import com.ycsoft.beans.core.acct.CAcct;
 import com.ycsoft.beans.core.cust.CCust;
 import com.ycsoft.beans.core.cust.CCustDevice;
-import com.ycsoft.beans.core.cust.CCustDeviceChange;
 import com.ycsoft.beans.core.fee.CFee;
 import com.ycsoft.beans.core.fee.CFeeAcct;
 import com.ycsoft.beans.core.fee.CFeeDevice;
@@ -36,7 +34,6 @@ import com.ycsoft.beans.core.prod.CProdPropChange;
 import com.ycsoft.beans.core.prod.CancelUserDto;
 import com.ycsoft.beans.core.user.CUser;
 import com.ycsoft.beans.core.user.CUserPropChange;
-import com.ycsoft.beans.device.RDeviceFee;
 import com.ycsoft.beans.prod.PPromotionAcct;
 import com.ycsoft.beans.prod.PSpkgOpenbusifee;
 import com.ycsoft.beans.prod.PSpkgOpenuser;
@@ -264,31 +261,16 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 				user.setTerminal_type(SystemConstants.USER_TERMINAL_TYPE_ZZD);
 			} else {
 				List<CUser> userList = userComponent.queryUserByCustId(cust.getCust_id());
-				if (userList != null){
-					for (CUser cu:userList){
-						if(cu.getUser_type().equals(user.getUser_type())){
-							user.setTerminal_type(SystemConstants.USER_TERMINAL_TYPE_FZD);
-							break;
-						}
+				user.setTerminal_type(SystemConstants.USER_TERMINAL_TYPE_ZZD);
+				if (userList.size() > 0){
+					Map<String, List<CUser>> map = CollectionHelper.converToMap(userList, "user_type");
+					List<CUser> ottList = map.get(USER_TYPE_OTT);
+					if(ottList == null || (ottList.size() > 0 && ottList.size() % 3 == 0)){//二主一副
+						user.setTerminal_type(SystemConstants.USER_TERMINAL_TYPE_ZZD);
+					}else{
+						user.setTerminal_type(SystemConstants.USER_TERMINAL_TYPE_FZD);
 					}
-					
-					//去掉OTT终端个数限制
-					/*int fzdNum = 0;
-					for(CUser cu:userList){
-						if(SystemConstants.USER_TERMINAL_TYPE_FZD.equals(cu.getTerminal_type())){
-							fzdNum += 1;
-						}
-						if(fzdNum >= 2){
-							throw new ServicesException(ErrorCode.OttFzdNotMoreThanTwo);
-						}
-					}*/
 				}
-				
-				if (StringHelper.isEmpty(user.getTerminal_type())){
-					user.setTerminal_type(SystemConstants.USER_TERMINAL_TYPE_ZZD);
-				}
-				
-				
 			}
 		}
 		
@@ -315,7 +297,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		userComponent.createUser(user);
 		
 		
-		if (user.getStatus().equals(StatusConstants.ACTIVE)){
+		if (user.getStatus().equals(StatusConstants.ACTIVE) || user.getUser_type().equals(USER_TYPE_BAND)){
 			createUserJob(user, custId, doneCode);
 		}
 		
@@ -356,34 +338,31 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		DeviceDto device = deviceComponent.queryDeviceByDeviceCode(deviceCode);
 		deviceComponent.checkChangeDevice(oldDevice, device);
 		
+		CCustDevice oldCustDevice = custComponent.queryCustDeviceByDeviceCode(oldDeviceCode);
+		
+		/*更换设备，新设备产权和购买方式与原设备一致，只是根据购买原因收费而已*/
+		
 		//修改用户设备信息
 		setUserDeviceInfo(user, device);
-		if(StringHelper.isNotEmpty(deviceBuyMode)){
-			user.setStr10(deviceBuyMode);
-		}
 		userComponent.updateDevice(doneCode, user);
+		
 		
 		TDeviceChangeReason changeReason = userComponent.queryChangeReasonByType(reasonType);
 		
 		if(changeReason.getIs_charge().equals(SystemConstants.BOOLEAN_TRUE)){
-			TDeviceBuyMode buyModeCfg = busiConfigComponent.queryBuyMode(deviceBuyMode);
-			String newOwnerShip = SystemConstants.OWNERSHIP_GD;
-			if(buyModeCfg!= null && buyModeCfg.getChange_ownship().equals(SystemConstants.BOOLEAN_TRUE)){
-				newOwnerShip = SystemConstants.OWNERSHIP_CUST;
-			}
-			this.buyDevice(device, SystemConstants.BUSI_BUY_MODE_BUY, newOwnerShip, deviceFee, getBusiParam().getBusiCode(), cust, doneCode);
+			this.buyDevice(device, oldCustDevice.getBuy_mode(), oldDevice.getOwnership(), deviceFee, busiCode, cust, doneCode);
 		}else{
 			custComponent.addDevice(doneCode, cust.getCust_id(),
 					device.getDevice_id(), device.getDevice_type(), device.getDevice_code(), 
 					device.getPairCard() ==null?null:device.getPairCard().getDevice_id(),
 					device.getPairCard() ==null?null:device.getPairCard().getCard_id(), 
-					null, null,deviceBuyMode);
-			if (StringHelper.isNotEmpty(device.getDevice_id())){
+					null, null,oldCustDevice.getBuy_mode());
+			if (device != null){
 				//更新设备仓库状态
 				deviceComponent.updateDeviceDepotStatus(doneCode, busiCode, device.getDevice_id(),
-						device.getDepot_status(), StatusConstants.USE,true);
-				if (!device.getOwnership().equals(SystemConstants.OWNERSHIP_GD)){
-					deviceComponent.updateDeviceOwnership(doneCode, busiCode, device.getDevice_id(),device.getOwnership(),SystemConstants.OWNERSHIP_GD,true);
+						device.getDepot_status(), StatusConstants.USE, user.getStr10(), true);
+				if (!device.getOwnership().equals(oldDevice.getOwnership())){
+					deviceComponent.updateDeviceOwnership(doneCode, busiCode, device.getDevice_id(),device.getOwnership(),oldDevice.getOwnership(),user.getStr10(),true);
 				}
 				//更新设备为旧设备
 				if (SystemConstants.BOOLEAN_TRUE.equals(device.getUsed()))
@@ -391,22 +370,19 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 			}
 		}
 		
-		
 		CCustDevice newCustDevice = custComponent.queryCustDeviceByDeviceCode(deviceCode);
 		//保存更换原因
 		if(newCustDevice != null)
 			custComponent.saveChangeDevice(newCustDevice, changeReason.getReason_type());
 		
-		CCustDevice oldCustDevice = custComponent.queryCustDeviceByDeviceCode(oldDeviceCode);
 		if(oldCustDevice != null)
 			custComponent.saveChangeDevice(oldCustDevice, changeReason.getReason_type());
 		
 		if(changeReason.getIs_reclaim().equals(SystemConstants.BOOLEAN_TRUE)){
-			deviceComponent.saveDeviceToReclaim(doneCode,  getBusiParam().getBusiCode(),
-					oldDevice, cust.getCust_id(), reasonType);
+			deviceComponent.saveDeviceToReclaim(doneCode,  busiCode, oldDevice, cust.getCust_id(), reasonType);
 		}
 		if(changeReason.getIs_lost().equals(SystemConstants.BOOLEAN_TRUE)){
-			deviceComponent.saveLossDevice(doneCode, getBusiParam().getBusiCode(), oldDeviceCode);
+			deviceComponent.saveLossDevice(doneCode, busiCode, oldDeviceCode);
 		}
 		
 		//处理授权
@@ -494,20 +470,14 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		if(!user.getCust_id().equals(custId)){
 			throw new ServicesException(ErrorCode.CustDataException);
 		}
-		//拆机完成后才能销户
-		if(!user.getUser_type().equals(USER_TYPE_OTT_MOBILE) && !user.getStatus().equals(StatusConstants.UNTUCKEND)){
+		if(user.getStatus().equals(StatusConstants.UNTUCK) || user.getStatus().equals(StatusConstants.REQSTOP) 
+				|| user.getStatus().equals(StatusConstants.INSTALL) ){
 			throw new ServicesException(ErrorCode.UserStatusNotOff);
 		}
-		
-		DeviceDto device = null;
-		if( (user.getUser_type().equals(USER_TYPE_DTT) || user.getUser_type().equals(USER_TYPE_OTT)) && StringHelper.isNotEmpty(user.getStb_id()) ){
-			device = deviceComponent.queryDeviceByDeviceCode(user.getStb_id());
-		}else if(user.getUser_type().equals(USER_TYPE_BAND) && StringHelper.isNotEmpty(user.getModem_mac())){
-			device = deviceComponent.queryDeviceByDeviceCode(user.getModem_mac());
-		}
-		
-		if(device != null && device.getOwnership().equals(SystemConstants.OWNERSHIP_GD)){
-			throw new ServicesException(ErrorCode.GDDEviceNotOff);
+		if(SystemConstants.BUSI_BUY_MODE_PRESENT.equals(user.getStr10()) && 
+			(StringHelper.isNotEmpty(user.getStb_id())||StringHelper.isNotEmpty(user.getCard_id()) 
+					|| StringHelper.isNotEmpty(user.getModem_mac()))){
+			throw new ServicesException(ErrorCode.UserStatusNotOff);
 		}
 
 		List<String> devoceList = new ArrayList<String>();
@@ -559,7 +529,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		}
 		
 		authComponent.sendAuth(user, cancelResultList, BusiCmdConstants.PASSVATE_PROD, doneCode);
-		
+		authComponent.sendAuth(user, cancelResultList, BusiCmdConstants.DEL_USER, doneCode);
 		//记录用户到历史表
 		userComponent.removeUserWithHis(doneCode, user);
 	}
@@ -802,6 +772,117 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		}
 		
 	}
+	
+	
+	public void checkOpenUser(String[] userIds) throws Exception{
+		//获取操作的客户、用户信息
+		List<CUser> users = userComponent.queryAllUserByUserIds(userIds);
+		CCust cust = custComponent.queryCustById(users.get(0).getCust_id());
+		if (users == null || users.size() == 0 || users.get(0) == null)
+			throw new ServicesException("请选择用户");
+		
+		//查找客户名下所有有效的产品
+		Map<String,String> packageUserIdS = new HashMap<String,String>();
+		List<CProdOrder> orderList = cProdOrderDao.queryCustEffOrder(users.get(0).getCust_id());
+		for (CProdOrder order:orderList){
+			if (StringHelper.isNotEmpty(order.getPackage_sn()) && StringHelper.isNotEmpty(order.getUser_id())){
+				packageUserIdS.put(order.getUser_id(),order.getPackage_sn());
+			}
+		}
+		
+		boolean hasPkgUser = false; //报停的用户有归属于客户套餐的
+		boolean hasBand = false; //有宽带用户
+		int count=0;
+		Map<Integer, CUser> map = new HashMap<Integer, CUser>();
+		for (CUser user:users){
+			if (!user.getStatus().equals(StatusConstants.REQSTOP)){
+				throw new ServicesException("用户["+user.getUser_id()+"]不是报停状态，不能报开!");
+				
+			}
+			if (packageUserIdS.get(user.getUser_id()) != null){
+				hasPkgUser =true;
+				count ++;
+			}
+			
+			if (user.getUser_type().equals(USER_TYPE_BAND)){
+				hasBand = true;
+			}
+		
+		}
+		
+		if (hasPkgUser && (count<packageUserIdS.size())){
+			throw new ServicesException("归属套餐的用户必须同时报开");
+			
+		}
+		
+		if(hasBand && cust.getCust_type().equals(SystemConstants.CUST_TYPE_RESIDENT)){
+			List<CUser> allUusers = userComponent.queryUserByCustId(cust.getCust_id());
+			List<String> selectUser = Arrays.asList(userIds);
+			for(CUser user : allUusers){
+				if (user.getStatus().equals(StatusConstants.REQSTOP)){
+					if(!selectUser.contains(user.getUser_id())){
+						throw new ServicesException("宽带用户报开,其他用户都需要报开");
+					}
+				}
+			}
+		}
+		
+	}
+	
+	
+	public void checkCancelStop(String[] userIds,String custId) throws Exception{
+		//获取操作的客户、用户信息
+		List<CUser> users = userComponent.queryAllUserByUserIds(userIds);
+		CCust cust = custComponent.queryCustById(users.get(0).getCust_id());
+		if (users == null || users.size() == 0 || users.get(0) == null)
+			throw new ServicesException("请选择用户");
+		
+		List<JUserStop> cancelUsers = jobComponent.queryStopByCustId(custId);
+		if(cancelUsers.size()==0){
+			throw new ServicesException("不存在预报停用户");
+		}
+		List<String> cancelUser = CollectionHelper.converValueToList(cancelUsers, "user_id");
+		//查找客户名下所有有效的产品
+		Map<String,String> packageUserIdS = new HashMap<String,String>();
+		List<CProdOrder> orderList = cProdOrderDao.queryCustEffOrder(users.get(0).getCust_id());
+		for (CProdOrder order:orderList){
+			if (StringHelper.isNotEmpty(order.getPackage_sn()) && StringHelper.isNotEmpty(order.getUser_id())
+					&& cancelUser.contains(order.getUser_id())){
+				packageUserIdS.put(order.getUser_id(),order.getPackage_sn());
+			}
+		}
+		
+		
+		boolean hasPkgUser = false; //报停的用户有归属于客户套餐的
+		boolean hasBand = false; //有宽带用户
+		int count=0;
+		for (CUser user:users){
+			if (packageUserIdS.get(user.getUser_id()) != null){
+				hasPkgUser =true;
+				count ++;
+			}
+			
+			if (user.getUser_type().equals(USER_TYPE_BAND)){
+				hasBand = true;
+			}
+		
+		}
+		
+		if (hasPkgUser && (count<packageUserIdS.size())){
+			throw new ServicesException("归属套餐的用户必须同时取消预报停");
+			
+		}
+		
+		if(hasBand && cust.getCust_type().equals(SystemConstants.CUST_TYPE_RESIDENT)){
+			List<String> selectUser = Arrays.asList(userIds);
+			for(String userId : cancelUser){
+				if(!selectUser.contains(userId)){
+					throw new ServicesException("宽带用户取消预报停,其他用户都需要取消预报停");
+				}
+			}
+		}
+		
+	}
 
 
 	@Override
@@ -875,6 +956,9 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		Integer doneCode = doneCodeComponent.gDoneCode();
 		List<CUser> users = getBusiParam().getSelectedUsers();
 		String[] userall = CollectionHelper.converValueToArray(users, "user_id");
+		if(users.size()>0){
+			checkCancelStop(userall,getBusiParam().getCust().getCust_id());
+		}
 		jobComponent.cancelStopUser(userall);
 		saveAllPublic(doneCode,getBusiParam());
 	}
@@ -891,6 +975,10 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		Integer doneCode = doneCodeComponent.gDoneCode();
 		//获取操作的客户、用户信息
 		List<CUser> users = getBusiParam().getSelectedUsers();
+		if(users.size()>0){
+			checkOpenUser(CollectionHelper.converValueToArray(users, "user_id"));
+		}
+		
 		List<CProdOrderDto> orderList = cProdOrderDao.queryCustEffOrderDto(cust.getCust_id());
 		boolean isCustPkgOpen = false;
 		for(CUser user:users){
@@ -1543,12 +1631,17 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 			doneCodeComponent.saveDoneCodeUnPay(task.getCust_id(),doneCode , getOptr().getOptr_id());
 		}
 		//update device status to idle,write off user
-		
+		//设置流水中user_id
+		BusiParameter parameter = getBusiParam();
+		List<CUser> userList = userComponent.queryTaskUser(taskId);
+		if(userList.size() > 0){
+			parameter.setSelectedUsers(userList);
+		}
 		for (WTaskUser user:allUserList){
 			if (StringHelper.isNotEmpty(user.getDevice_id())){
 				DeviceDto device = deviceComponent.queryDeviceByDeviceCode(user.getDevice_id());
 				deviceComponent.updateDeviceDepotStatus(doneCode, BusiCodeConstants.TASK_CANCEL, device.getDevice_id(), 
-					StatusConstants.USE, StatusConstants.ACTIVE, true);
+					StatusConstants.USE, StatusConstants.ACTIVE,null, true);
 			}
 			
 			// send write off cmd
@@ -1565,7 +1658,8 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		for (WTaskBaseInfo tb:taskList){
 			snTaskComponent.cancelTask(doneCode, tb.getTask_id());
 		}
-		getBusiParam().setBusiCode(BusiCodeConstants.TASK_CANCEL);
+		
+		parameter.setBusiCode(BusiCodeConstants.TASK_CANCEL);
 		saveAllPublic(doneCode, getBusiParam());
 		
 	}
@@ -1705,7 +1799,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		if(buyModeCfg!= null && device.getOwnership().equals(SystemConstants.OWNERSHIP_GD)
 					&& buyModeCfg.getChange_ownship().equals(SystemConstants.BOOLEAN_TRUE)){
 			String newOwnerShip = SystemConstants.OWNERSHIP_CUST;
-			deviceComponent.updateDeviceOwnership(doneCode, busiCode, device.getDevice_id(),device.getOwnership(),newOwnerShip,true);
+			deviceComponent.updateDeviceOwnership(doneCode, busiCode, device.getDevice_id(),device.getOwnership(),newOwnerShip,deviceBuyMode,true);
 		}
 		//保存设备费用
 		if (deviceFee != null && deviceFee.getFee_id()!= null && deviceFee.getFee()>0){

@@ -341,7 +341,7 @@ LinkPanel = Ext.extend(Ext.Panel,{
 					baseCls: 'x-plain',
 					columnWidth:0.5,
 					layout: 'form',
-					labelWidth: 75
+					labelWidth: 120
 				},
 				items: [{
 					items:[{
@@ -461,7 +461,7 @@ CustBaseForm = Ext.extend( BaseForm , {
 		this.linkPanel = new LinkPanel(this);
 		CustBaseForm.superclass.constructor.call(this, {
 			trackResetOnLoad:true,
-			labelWidth: 85,
+			labelWidth: 120,
 			bodyStyle: Constant.TAB_STYLE,
 			items:[{
 				layout:'column',
@@ -471,7 +471,7 @@ CustBaseForm = Ext.extend( BaseForm , {
 					baseCls: 'x-plain',
 					columnWidth:0.5,
 					layout: 'form',
-					labelWidth: 85
+					labelWidth: 120
 				},
 				items: [{
 					items:[{
@@ -531,7 +531,7 @@ CustBaseForm = Ext.extend( BaseForm , {
 				},{
 					columnWidth:0.80,
 					items:[{
-						width:300,
+						width:380,
 						fieldLabel: langUtils.main("cust.base.addr"),						
 						xtype:'textfield',
 						id : 'tempCustAddress',

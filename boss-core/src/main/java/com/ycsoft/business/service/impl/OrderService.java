@@ -350,12 +350,33 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		if(cancelOrder==null||StringHelper.isEmpty(busi_code)){
 			throw new ServicesException(ErrorCode.ParamIsNull);
 		}
-		List<CProdOrderDto> orderList=null;
-		if(busi_code.equals(BusiCodeConstants.PROD_TERMINATE)){
-			orderList=new ArrayList<>();
-			orderList.add(cancelOrder);
+		List<CProdOrderDto> orderList= new ArrayList<>();
+		orderList.add(cancelOrder);
+		
+		//碰撞检测
+		PProd prod=pProdDao.findByKey(cancelOrder.getProd_id());
+		if(!prod.getProd_type().equals(SystemConstants.PROD_TYPE_BASE)){	
+			//套餐处理
+			for(CProdOrder checkOrder: cProdOrderDao.queryNotExpPackageOrder(cust_id)){
+				if(cancelOrder.getExp_date().before(checkOrder.getExp_date())){
+					throw new ServicesException(ErrorCode.UnPayOrderCancelBefor,checkOrder.getOrder_sn());
+				}
+			}
+			//跟单产品在套餐后续订碰撞
+			List<CProdOrder>  orderAfterPakList=cProdOrderDao.querySingleProdOrderAfterPak(cancelOrder.getOrder_sn());
+			if(orderAfterPakList!=null&&orderAfterPakList.size()>0){
+				throw new ServicesException(ErrorCode.UnPayOrderCancelBefor,orderAfterPakList.get(0).getOrder_sn());
+			}
+			
 		}else{
-			orderList=orderComponent.queryOrderByCancelOrder(cancelOrder);
+			//单产品直接碰撞处理
+			for(CProdOrder checkOrder: cProdOrderDao.queryProdOrderDtoByUserId(cancelOrder.getUser_id())){
+				if(prod.getServ_id().equals(SystemConstants.PROD_SERV_ID_BAND)||cancelOrder.getProd_id().equals(checkOrder.getProd_id())){
+					if(cancelOrder.getExp_date().before(checkOrder.getExp_date())){
+						throw new ServicesException(ErrorCode.UnPayOrderCancelBefor,checkOrder.getOrder_sn());
+					}
+				}
+			}
 		}
 	
 		//参数检查		

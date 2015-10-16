@@ -6,14 +6,13 @@ var MaterialDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 		this.store = new Ext.data.JsonStore({
 			url :root + '/commons/x/QueryDevice!queryDeviceCanBuy.action',
 			fields:['device_model','device_model_text','total_num','buy_num','fee_value','fee_id',
-			'fee_std_id','fee_back','device_id']
+			'fee_std_id','fee_back']
 		});
 		
 		this.store.load();
 		
 		var cm = new Ext.ux.grid.LockingColumnModel({ 
 			columns : [
-				{header:'器材编号',dataIndex:'device_id',width:250,hidden:true},
 				{header:lmain("cust._form.deviceModel"),dataIndex:'device_model_text',width:250},
 				{header:lbc("common.price"),dataIndex:'fee_value',width:80,renderer:function(v){if(v == "-1"){return "<span style='font-weight:bold'>未配置器材费 </span>"}else{ return Ext.util.Format.formatFee(v)}}},
 				{header:lmain("cust._form.storeCount"),dataIndex:'total_num',width:80,renderer:App.qtipValue},

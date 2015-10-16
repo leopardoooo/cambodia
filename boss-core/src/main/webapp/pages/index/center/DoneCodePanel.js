@@ -161,16 +161,16 @@ DoneCodeGrid = Ext.extend(Ext.ux.Grid,{
 					}
 				}
 			},
-			{header:lc[1],dataIndex:'busi_name',	width:100},
-			{header:lc[2],dataIndex:'status_text',	width: 60,renderer:Ext.util.Format.statusShow},
+			{header:lc[1],dataIndex:'busi_name',	width:130, renderer:App.qtipValue},
+			{header:lc[2],dataIndex:'status_text',	width: 70,renderer:Ext.util.Format.statusShow},
 			{header:lc[3],dataIndex:'done_date',	width:125},
 			{header:lc[4],dataIndex:'optr_name',	width:100},
-			{header:lc[5],dataIndex:'dept_name',width:120},
-			{header:lc[6],dataIndex:'cancel_text',	width: 70},
-			{header:lc[7],dataIndex:'ignore_text',	width: 70},
-			{header:lc[8],dataIndex:'real_pay',	width: 80,renderer: Ext.util.Format.formatFee},
-			{header:lc[9],dataIndex:'attr_remark',width: 200},
-			{header:lc[10],dataIndex:'remark',	width: 200,renderer:App.qtipValue}
+			{header:lc[5],dataIndex:'dept_name',width:130},
+			{header:lc[6],dataIndex:'cancel_text',	width: 80},
+			{header:lc[7],dataIndex:'ignore_text',	width: 80},
+			{header:lc[8],dataIndex:'real_pay',	width: 90,renderer: Ext.util.Format.formatFee},
+			{header:lc[9],dataIndex:'attr_remark',width: 180},
+			{header:lc[10],dataIndex:'remark',	width: 180,renderer:App.qtipValue}
 		];
 		
 		DoneCodeGrid.superclass.constructor.call(this,{
@@ -182,16 +182,16 @@ DoneCodeGrid = Ext.extend(Ext.ux.Grid,{
 			columns:cm,
 			sm : new Ext.grid.CheckboxSelectionModel(),
 			bbar: new Ext.PagingToolbar({store: this.doneCodeStore ,pageSize : this.pageSize}),
-			tools:[{id:'search',qtip:'查询',cls:'tip-target',scope:this,handler:function(){
+			tools:[{id:'search',qtip:langUtils.main("user.list.tools")[0],cls:'tip-target',scope:this,handler:function(){
 				var comp = this.tools.search;
 				if(this.doneCodeStore.getCount()>0){
 					if(win)win.close();
 					win = FilterWindow.addComp(this,[
-						{text:'业务名称',field:'busi_name',type:'textfield'},
-						{text:'操作员',field:'optr_name',type:'textfield'},
-						{text:'状态',field:'status',showField:'status_text',
+						{text:lc[1],field:'busi_name',type:'textfield'},
+						{text:lc[4],field:'optr_name',type:'textfield'},
+						{text:lc[2],field:'status',showField:'status_text',
 							data:[
-								{'text':'状态','value':''},
+								{'text':lc[2],'value':''},
 								{'text':'正常','value':'ACTIVE'},
 								{'text':'失效','value':'INVALID'}
 							]
@@ -202,7 +202,7 @@ DoneCodeGrid = Ext.extend(Ext.ux.Grid,{
 						win.show();
 					}
 				}else{
-					Alert('请先查询数据！');
+					Alert(lbc('common.emptyMsg'));
 				}
 		    }}],	
 			listeners : {
