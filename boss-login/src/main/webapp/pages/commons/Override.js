@@ -618,19 +618,19 @@ Ext.util.Format.ceil = function(num,n){
  */
 Ext.util.Format.statusShow = function(v){
 	if(v=="正常" || v == "使用" || v == 'Normal' || v == 'Use'){
-		return "<span style='font-weight:bold'>"+v+" </span>";
+		return "<span style='font-weight:bold'>"+v+"</span>";
 	}else if(v == "失效" || v == "报停" || v == "欠费停" || v == "关联停" 
 		|| v== "报废" || v == 'Invalid' || v == 'Termination Report' || v == 'Arrearage Stop' || v == 'Associated stop' || v == 'Scrapped'){
-		return "<span style='color:red;font-weight:bold'>"+v+" </span>";
+		return "<span style='color:red;font-weight:bold'>"+v+"</span>";
 	}else if(v== "预开户" || v == "未支付" || v == "空闲" || v == "未打印"
 		|| v == 'Pre-Opening' || v == 'UnPaid' ||  v == 'Idle' || v == 'NotPrint'){
-		return "<span style='color:green;font-weight:bold'>"+v+" </span>";
+		return "<span style='color:green;font-weight:bold'>"+v+"</span>";
 	}else if(v == "欠费未停" ||  v == 'Arrears did not stop'){
-		return "<span style='color:#BE8415;font-weight:bold'>"+v+" </span>";
+		return "<span style='color:#BE8415;font-weight:bold'>"+v+"</span>";
 	}else if(v == "已支付" || v == "已打印" || v == 'Paid' || v == 'Print'){
-		return "<span style='color:blue;font-weight:bold'>"+v+" </span>";
+		return "<span style='color:blue;font-weight:bold'>"+v+"</span>";
 	}else if (v){
-		return "<span style='color:purple;font-weight:bold'>"+v+" </span>";
+		return "<span style='color:purple;font-weight:bold'>"+v+"</span>";
 	}else{
 		return "";
 	}

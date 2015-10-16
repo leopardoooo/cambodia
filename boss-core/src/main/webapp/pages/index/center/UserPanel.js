@@ -82,8 +82,7 @@ UserGrid = Ext.extend(Ext.ux.Grid,{
 			{header:lmain("user.base.type"),dataIndex:'user_type_text',width:90},
 			{header:lmain("user.base.name"),dataIndex:'user_name',	width:150, renderer:App.qtipValue},
 			{header:lmain("user.base.status"),dataIndex:'status_text',	width:100,renderer:function(v){
-				var status = Ext.util.Format.statusShow(v);
-				return App.qtipValue(status);
+				return App.qtipValue(Ext.util.Format.statusShow(v));
 			}},
 			{header:lmain("user.base.stbId"),dataIndex:'stb_id',	width:130,renderer:App.qtipValue},
 			{header:lmain("user.base.cardId"),dataIndex:'card_id',width:90,renderer:App.qtipValue},
