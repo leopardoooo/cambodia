@@ -13,6 +13,8 @@ import com.ycsoft.beans.system.SOptr;
 import com.ycsoft.beans.task.TaskFillDevice;
 import com.ycsoft.business.commons.pojo.BusiParameter;
 import com.ycsoft.business.service.impl.SnTaskService;
+import com.ycsoft.commons.helper.JsonHelper;
+import com.ycsoft.commons.helper.LoggerHelper;
 
 /**
  *  BOSSWebServiceSoapImplServiceSkeleton java skeleton for the axisService
@@ -140,15 +142,23 @@ public class BOSSWebServiceSoapImplServiceSkeleton
     		
     		devices.add(device);
     	}
-    	
+    	try{
+    		String debugString="taskId="+taskId+"  "+JsonHelper.fromObject(devices);
+    		LoggerHelper.debug(this.getClass(),debugString);
+    		System.out.println("###############"+debugString);
+    	}catch(Exception e) {
+    		e.printStackTrace();
+    	}
     	try {
     		snTaskService.setParam(getServiceParam());
 			snTaskService.fillTask(taskId, devices);
+			
 			return createDeviceFeedBackResponse(createResultHeadForSuccess());
 		} catch (Exception e) {
 			e.printStackTrace();
 			return createDeviceFeedBackResponse(createResultHeadForFail(e));
 		}
+    	
     }
     
     private DeviceFeedBackResponseE createDeviceFeedBackResponse(ResultHead head){
