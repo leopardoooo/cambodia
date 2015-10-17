@@ -125,7 +125,7 @@ AddressTree = Ext.extend(Ext.ux.tree.TreeGridEditor,{
 	        columns: [{
 	            header: langUtils.bc('home.tools.AddressNodeManage.formWin.labelAddrTree'),
 	            dataIndex: 'text',
-	            width:200,
+	            width:160,
 	            displayTip: true
 	        }],
 	        // 设置Obar

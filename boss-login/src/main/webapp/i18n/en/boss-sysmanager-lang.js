@@ -419,7 +419,13 @@ Sys = {
 		labelStbType : 'box type~',
 		labelCardType : 'card type~',
 		labelPairModemType2 : 'pairing MODEM type~',
-		labelTypeName : 'type name~'
+		labelTypeName : 'type name~',
+		labelBoxNo:'Box No.~',
+		selectByInputNoBatchNumDeviceType:'Support input No. or batch number or device type fuzzy query~',
+		filesFormatOne:'Support XLS and TXT format: first row is space, a total of 3 columns: box number, device number, card number~',
+		filesFormatTwo:'Support XLS and TXT format: first row is space, a total of 3 columns: box number, device number,MAC~',
+		filesFormatThree:'Support XLS and TXT format: first row is space,2 or 3 columns (2 columns, then the system default MAC= device number) <br> 2 column: box number, device number; 3 columns: box number, device number, MAC~',
+		filesFormatFour:'Support XLS and TXT format: first row is space, a total of 1 columns: device number~'
 
 	},
 
@@ -531,7 +537,7 @@ Sys = {
 	BackHouse : {// equipment refunding
 		_title : 'equipment refunding~',
 		titleSimple : 'refunding~',
-		outPutNo : 'refunding number~',
+		outPutNo : 'refunding No.~',
 		outPutType : 'refunding type~',
 		outPutDate : 'refunding date~',
 		titleOutputInfo : 'refunding information~',

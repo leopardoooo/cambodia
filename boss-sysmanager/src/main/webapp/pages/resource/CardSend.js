@@ -265,7 +265,7 @@ CardSendForm = Ext.extend(Ext.FormPanel, {
 		                    items: [{
 					                xtype: 'displayfield',
 					                width : 400,
-					                value:"<font style='font-size:13px;color:red'>支持xls和txt,格式为：第一行为空,共1列：设备号</font>"
+					                value:"<font style='font-size:13px;color:red'>"+CHECK_COMMON.filesFormatFour+"</font>"
 								},{
 		                    	id:'caFileId',xtype:'textfield',fieldLabel:'文件',inputType:'file',
 		                    	allowBlank:false,anchor:'95%',name:'files'}]
