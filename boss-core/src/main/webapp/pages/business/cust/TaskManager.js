@@ -372,7 +372,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 		this.taskNoField = new Ext.form.TextField({
 				xtype: 'textfield',width: 90,emptyText: forms['taskNo']});			
 		this.custNameField = new Ext.form.TextField({
-				xtype: 'textfield',width: 90,emptyText: forms['custName']});
+				xtype: 'textfield',width: 100,emptyText: forms['custName']});
 		this.mobileField = new Ext.form.TextField({
 				xtype: 'textfield',width: 100,emptyText: forms['mobile']});
 		this.newaddrField = new Ext.form.TextField({
@@ -494,9 +494,9 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 					}
 					return '<div  style="font-weight: bold;color: '+ color +';" ext:qtitle="" ext:qtip="' + text + '">' + text +'</div>';
 				}},
-				{header: taskCols[3], dataIndex:'team_id_text',width:80,renderer:App.qtipValue},
-				{header: taskCols[4],dataIndex: 'zte_status_text', width: 70, renderer:Ext.util.Format.statusShow},
-				{header: taskCols[14],dataIndex: 'sync_status_text', width: 90, renderer:Ext.util.Format.statusShow},
+				{header: taskCols[3], dataIndex:'team_id_text',width:120,renderer:App.qtipValue},
+				{header: taskCols[4],dataIndex: 'zte_status_text', width:90, renderer:Ext.util.Format.statusShow},
+				{header: taskCols[14],dataIndex: 'sync_status_text', width: 110, renderer:Ext.util.Format.statusShow},
 				{header: taskCols[5], dataIndex : 'address', width: 200,renderer:App.qtipValue},
 				{header: taskCols[6], dataIndex : 'tel', 				width: 100, renderer:App.qtipValue},
 				{header: taskCols[7], dataIndex: 'task_create_time', 	width: 80, renderer: Ext.util.Format.dateFormat},					
