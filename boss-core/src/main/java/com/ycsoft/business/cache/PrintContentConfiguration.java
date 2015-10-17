@@ -20,7 +20,7 @@ public class PrintContentConfiguration {
 	/**
 	 * 初始化打印内容配置的路径
 	 */
-	private static final String PRINT_XML_PATH = "WEB-INF"+File.separator+"print";
+	private static final String PRINT_XML_PATH  = "WEB-INF"+File.separator+"print";
 
 	/**
 	 * 存储所有的模板，以文件名作为KEY
