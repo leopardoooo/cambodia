@@ -13,7 +13,7 @@ import com.ycsoft.boss.remoting.cfocn.CFOCN_WebSvc_WorkOrderStub.TestSSLResponse
 public class SSLTest {
 	
 	public static void main(String[] args) throws Exception{
-		
+		// DEBUG模式
 		System.setProperty("javax.net.debug", "ssl,handshake");
         System.setProperty("javax.net.ssl.keyStore", "D:/Java/workJPZ/boss/cambodia/boss-core/src/main/resources/cert/client/client.p12");
 //        System.setProperty("javax.net.ssl.keyStore", "/Users/killer/Documents/MyWorks/GitHub/cambodia/boss-core/src/main/resources/cert/client/client.p12");
