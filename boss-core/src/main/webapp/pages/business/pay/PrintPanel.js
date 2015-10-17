@@ -28,12 +28,12 @@ var printdata = null;
  	printStoreUrl:Constant.ROOT_PATH+"/core/x/Pay!queryPrintRecord.action",
  	printStoreFields: [
 				'cust_id','doc_sn','done_code','doc_name',
-				'is_invoice','doc_type','done_date','optr_name',
+				'is_invoice','doc_type','done_date','optr_name','doc_type_name',
 				'optr_id'
 			],
 	printGridColumns:[
 		{ header: LU_PI.printGridColumns[0], dataIndex: 'done_code'},
-		{ header: LU_PI.printGridColumns[1], dataIndex: 'doc_name', width: 120},
+		{ header: LU_PI.printGridColumns[1], dataIndex: 'doc_type_name', width: 120},
 		{ header: LU_PI.printGridColumns[2], dataIndex: 'done_date', width: 140}
 	],
  	//构造函数

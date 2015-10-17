@@ -8,7 +8,9 @@ import java.io.Serializable;
 import java.util.Date;
 
 import com.ycsoft.beans.base.BusiBase;
+import com.ycsoft.commons.constants.DictKey;
 import com.ycsoft.commons.helper.DateHelper;
+import com.ycsoft.commons.store.MemoryDict;
 import com.ycsoft.daos.config.POJO;
 
 /**
@@ -62,6 +64,7 @@ public class CDoc extends BusiBase implements Serializable {
 
 	public void setDoc_type(String doc_type) {
 		this.doc_type = doc_type;
+		doc_type_name = MemoryDict.getDictName(DictKey.INVOICE_TYPE, this.doc_type);
 	}
 
 	/**

@@ -581,6 +581,7 @@ CustBaseForm = Ext.extend( BaseForm , {
 						editable:true,
 						allowBlank:false,
 				        forceSelection: true,
+				        selectOnFocus:true,
 						listeners: {
 							scope: this,
 							'focus':{

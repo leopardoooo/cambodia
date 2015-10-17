@@ -80,10 +80,10 @@ public class SimpleComponent extends BaseBusiComponent {
 		if(sList.size()>0){
 			addrIds = CollectionHelper.converValueToArray(sList, "addr_id");
 		}else{
-			SDept dept= sDeptDao.findByKey(getOptr().getDept_id());
-			if(StringHelper.isNotEmpty(dept.getAgent_id())){
-				throw new ComponentException(ErrorCode.DeptAddrIsNull,dept.getDept_name());
-			}
+//			SDept dept= sDeptDao.findByKey(getOptr().getDept_id());
+//			if(StringHelper.isNotEmpty(dept.getAgent_id())){
+//				throw new ComponentException(ErrorCode.DeptAddrIsNull,dept.getDept_name());
+//			}
 			//tAddressDao.queryAddrByAllowPids(levelId, addrPid)
 			String[] pids={SystemConstants.ADDRESS_ROOT_ID};
 			addrIds= CollectionHelper.converValueToArray(tAddressDao.queryAddrByAllowPids(SystemConstants.ADDR_TREE_LEVEL_ONE,pids),"addr_id");
