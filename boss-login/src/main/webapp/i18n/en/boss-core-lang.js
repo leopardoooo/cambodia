@@ -101,7 +101,7 @@ BCLang.home = {
 		// customer page
 		cust: {
 			base: {_title: "Basic Information~",name: "CustName~",busiId: "CustNo.~",openDate: "Open Account Date~",addr: "Address~",status: "CustStatus~",
-				type: "CustType",certType: "ID Category~",certNum: "IDNo.~",linkMan: "Contact~",tel: "Mobile Phone1~",barthday: "Birthday~",
+				type: "CustType~",certType: "ID Category~",certNum: "IDNo.~",linkMan: "Contact~",tel: "Mobile Phone1~",barthday: "Birthday~",
 				mobile: "Mobile Phone2~",areaCateory: "Area Community~",houseNetType: "ServiceType~",houseManager: "Community Customer Manager~",
 				houseOptr: "Community Maintenance Staff~",postalAddr: "PostAddress", remark: "Remark~",
 				email: "Email~", sex: "Sex~",postcode: 'Postcode~', blackList: 'BlackList~',
@@ -560,7 +560,7 @@ BCLang.home = {
 					'ZTEState~', 'Address~', 'Tel~', 'CreatTime~', 'FaultType~', 'FaultDetails~','WorkNo.~','CustManager~'
 					,'CustManagerTel~','CustNo~','cfocnSyncStatus'],
 			userCols : ['UserType~', 'UserName~', 'Password~', 'DeviceModel~', 'DeviceNO.~', 'PosNo~', 'OccNo~', 'Bandwidth~'],
-			operateCols : ['OperatingTime~', 'OperationType~', 'Operator~,', 'SyncStatus~', 'Description~','DelayTime~'],
+			operateCols : ['OperatingTime~', 'OperationType~', 'Operator~', 'SyncStatus~', 'Description~','DelayTime~'],
 			taskDeviceCols : ['UserType~', 'UserName~', 'Model~', 'DeviceNO.~', 'DeviceRecycling~','OldDeviceNO.~'],
 			msg : {
 				enterDeviceNo : 'Please enter the device number~',

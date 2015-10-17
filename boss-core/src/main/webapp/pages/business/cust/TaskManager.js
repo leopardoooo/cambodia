@@ -477,12 +477,12 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 	        cm: new Ext.ux.grid.LockingColumnModel({
 	        	columns:[
 				{header: taskCols[10],dataIndex : 'task_id', width: 70, renderer:App.qtipValue},
-				{header: taskCols[0],		dataIndex : 'task_type_id_text', 	width: 70, renderer: function(v, m ,rs){
+				{header: taskCols[0],		dataIndex : 'task_type_id_text', 	width: 120, renderer: function(v, m ,rs){
 					return '<div  style="font-weight: bold" ext:qtitle="" ext:qtip="' + v + '">' + v +'</div>';
 				}},
 				{header: taskCols[13], 	dataIndex: 'cust_no', width: 80},
 				{header: taskCols[1], 	dataIndex: 'cust_name', width: 80},
-				{header: taskCols[2], 		dataIndex: 'task_status', width: 80, renderer: function(v, m ,rs){
+				{header: taskCols[2], 		dataIndex: 'task_status', width: 130, renderer: function(v, m ,rs){
 					var text = rs.get("task_status_text");
 					var color = "black";
 					if(v == 'INIT'){
