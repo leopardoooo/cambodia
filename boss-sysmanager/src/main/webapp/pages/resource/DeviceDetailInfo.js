@@ -13,10 +13,10 @@ var DeviceDetailForm = Ext.extend(Ext.form.FormPanel,{
 			layout:'column',
 			region:'north',
 			height:50,
-			labelWidth:100,
+			labelWidth:120,
 			bodyStyle:'padding:10px',
 			items:[
-				{columnWidth:.45,layout:'form',border:false,items:[
+				{columnWidth:.40,layout:'form',border:false,items:[
 						{xtype:'textfield',fieldLabel:DEV_COMMON_LU.labelDevCode,allowBlank:false,
 							name:'device_code',width:200,
 							listeners:{
@@ -29,7 +29,7 @@ var DeviceDetailForm = Ext.extend(Ext.form.FormPanel,{
 							}
 						}
 					]},
-					{columnWidth:.55,border:false,items:[
+					{columnWidth:.6,border:false,items:[
 						{xtype:'button',text:COMMON_LU.query,iconCls:'icon-query',
 							listeners:{
 								scope:this,

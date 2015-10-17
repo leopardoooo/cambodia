@@ -102,10 +102,10 @@ var CheckInDetailWin = Ext.extend(Ext.Window,{
 			fields:['device_model_text','device_code','pair_device_code','box_no']
 		});
 		var columns = [
-			{header:'箱号',dataIndex:'box_no',width:120,renderer:App.qtipValue},
+			{header:DEV_COMMON_LU.labelBoxNo,dataIndex:'box_no',width:120,renderer:App.qtipValue},
 			{header:DEV_COMMON_LU.labelDevCode,dataIndex:'device_code',width:150,renderer:App.qtipValue},
 			{header:DEV_COMMON_LU.labelDeviceModel,dataIndex:'device_model_text',width:200,renderer:App.qtipValue},
-			{header:'卡或MAC',dataIndex:'pair_device_code',width:120,renderer:App.qtipValue}
+			{header:DEV_COMMON_LU.labelPairCardCode,dataIndex:'pair_device_code',width:120,renderer:App.qtipValue}
 
 		];
 		this.grid = new Ext.grid.GridPanel({
@@ -163,16 +163,16 @@ var CheckInGrid = Ext.extend(Ext.grid.GridPanel,{
 		var currentOptrId = App.data.optr['optr_id'];
 		var columns = [
 			{header:CHECK_LU.labelInputNo,dataIndex:'input_no',width:80,renderer:App.qtipValue},
-			{header:'批号',dataIndex:'batch_num',width:80,renderer:App.qtipValue},
+			{header:CHECK_COMMON.labelBatchNum,dataIndex:'batch_num',width:80,renderer:App.qtipValue},
 			{header:CHECK_COMMON.labelSupplier,dataIndex:'supplier_name',width:85},
 			{header:CHECK_COMMON.labelInputDate,dataIndex:'create_time',width:135},
 			{header:lsys('DeviceCommon.labelDeviceType'),dataIndex:'device_type_text',width:80},
 			{header:lsys('DeviceCommon.labelDeviceModel'),dataIndex:'device_model_text',width:200,renderer:App.qtipValue},
 			{header:lsys('DeviceCommon.labelNum'),dataIndex:'count',width:50},
 			{id:'checkIn_remark_id',header:lsys('common.remarkTxt'),dataIndex:'remark',renderer:App.qtipValue},
-			{header:lsys('common.doActionBtn'),dataIndex:'device_done_code',width:80,renderer:function(v,meta,record){
+			{header:lsys('common.doActionBtn'),dataIndex:'device_done_code',width:120,renderer:function(v,meta,record){
 					if(currentOptrId == record.get('optr_id')){
-						return "<a href='#' onclick=Ext.getCmp('checkInGridId').editInputNo("+v+")>修改单号</a>";
+						return "<a href='#' onclick=Ext.getCmp('checkInGridId').editInputNo("+v+")>"+CHECK_COMMON.titleModifyOrderNum+"</a>";
 					}
 					return null;
 				}
@@ -197,9 +197,9 @@ var CheckInGrid = Ext.extend(Ext.grid.GridPanel,{
 			tbar:['-',COM_LU.inputKeyWork,
 				new Ext.ux.form.SearchField({
 	                store: this.checkInGridStore,
-	                width: 210,
+	                width: 280,
 	                hasSearch : true,
-	                emptyText: '入库单号,批号,设备类型模糊查询'
+	                emptyText: CHECK_COMMON.selectByInputNoBatchNumDeviceType
 	            }),'-','->','-',
 				{text:CHECK_LU.labelFileInput,iconCls:'icon-excel',scope:this,handler:this.fileCheckIn},'-',
 				{text:CHECK_LU.labelManualInput,iconCls:'icon-hand',scope:this,handler:this.handCheckIn},
@@ -257,7 +257,7 @@ var FileForm = Ext.extend(Ext.form.FormPanel,{
 	constructor:function(){
 		FileForm.superclass.constructor.call(this,{
 			id:'fileFormId',
-			labelWidth: 80,
+			labelWidth: 120,
 			layout : 'column',
 			fileUpload: true,
 			trackResetOnLoad:true,
@@ -290,7 +290,7 @@ var FileForm = Ext.extend(Ext.form.FormPanel,{
 								}
 							}
 						},{
-							fieldLabel : '设备型号',
+							fieldLabel : CHECK_COMMON.labelDeviceModel,
 							allowBlank : false,
 							id : 'ctlDeviceModelInId',
 							xtype:'combo',
@@ -314,12 +314,12 @@ var FileForm = Ext.extend(Ext.form.FormPanel,{
 									var str = "";
 									if(record.get('device_type') == 'STB'){
 										if(record.get('interactive_type') == 'SINGLE'){
-											str = "支持xls和txt,格式为：第一行为空,共3列：箱号,设备号,卡号"
+											str = CHECK_COMMON.filesFormatOne
 										}else{
-											str = "支持xls和txt,格式为：第一行为空,共3列：箱号,设备号,MAC"
+											str = CHECK_COMMON.filesFormatTwo
 										}
 									}else{
-										str = "支持xls和txt,格式为：第一行为空,可以2或3列,(2列的话系统默认MAC=设备号)<br>2列:箱号,设备号;3列：箱号,设备号,MAC"
+										str = CHECK_COMMON.filesFormatThree
 									}
 									if(!Ext.isEmpty(str)){
 										Ext.getCmp('filesInDescId').setValue("<font style='font-size:14px;color:red'>"+str+"</font>");
@@ -444,7 +444,7 @@ var HandForm = Ext.extend(Ext.form.FormPanel,{
 		this.parent = p;
 		HandForm.superclass.constructor.call(this,{
 			id:'handFormId',
-			labelWidth: 80,
+			labelWidth: 120,
 			height: 140,
 			region: 'north',
 			layout:'column',
@@ -543,9 +543,9 @@ var CheckInDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 				,renderer:this.paramComboRender.createDelegate(this.deviceModelCombo.getStore())
 				,scope:this},
 			{header:COM_LU.orderNum,dataIndex:'device_code',width:130,editor:new DeviceCodeField({parent:this,fieldName:'device_code',vtype:'alphanum'})},
-			{id:'pair_device_code_id',header:'卡号或MAC',dataIndex:'pair_device_code',width:120,
+			{id:'pair_device_code_id',header:CHECK_COMMON.labelPairCardCode,dataIndex:'pair_device_code',width:120,
 				editor:new DeviceCodeField({parent:this,fieldName:'pair_device_code',vtype:'alphanum'})},
-			{header:'箱号',dataIndex:'box_no',width:120,editor:new Ext.form.TextField({vtype:'alphanum'})},
+			{header:CHECK_COMMON.labelBoxNo,dataIndex:'box_no',width:120,editor:new Ext.form.TextField({vtype:'alphanum'})},
 			{header:lsys('common.doActionBtn'),dataIndex:'',width:50,renderer:function(value,metavalue,record,i){
 				return "<a href='#' onclick=doCheckInDel()>" + COM_LU.remove + "</a>";
 			}}
@@ -774,7 +774,7 @@ var MateralHandForm = Ext.extend(Ext.form.FormPanel,{
 		this.parent = p;
 		MateralHandForm.superclass.constructor.call(this,{
 			id:'materalHandFormId',
-			labelWidth: 80,
+			labelWidth: 120,
 			region:'center',
 			layout:'column',
 			fileUpload: true,
@@ -927,10 +927,10 @@ var InputNoWin = Ext.extend(Ext.Window, {
 			closeAction:'hide',
 			border:false,
 			maximizable:false,
-			width: 330,
-			height: 250,
+			width: 450,
+			height: 260,
 			items:[{id:'inputNoFormId',xtype:'form',border:false,
-				bodyStyle:'padding-top:10px',labelWidth:65,items:[
+				bodyStyle:'padding-top:10px',labelWidth:120,items:[
 					{xtype:'hidden',name:'deviceDoneCode'},
 					{xtype:'textfield',fieldLabel:CHECK_COMMON.labelNewOrderNo,width:200,name:'inputNo',vtype:'alphanum',allowBlank:false},
 					{fieldLabel:lsys('common.remarkTxt'),name:'remark',maxLength:128,xtype:'textarea',width : 210,height : 140}//128个汉字

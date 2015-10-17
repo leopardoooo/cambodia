@@ -153,7 +153,7 @@ var DeviceStatusFileForm = Ext.extend(Ext.form.FormPanel, {
 				DeviceStatusFileForm.superclass.constructor.call(this, {
 							id : 'deviceStatusFileFormId',
 							border : false,
-							labelWidth : 80,
+							labelWidth : 120,
 							bodyStyle : 'padding-top:10px',
 							fileUpload : true,
 							defaults : {
@@ -210,7 +210,7 @@ var DeviceStatusFileWin = Ext.extend(Ext.Window, {
 							title : STATUS_LU.titleFileOptr,
 							closeAction : 'hide',
 							maximizable : false,
-							width : 500,
+							width : 550,
 							height : 350,
 							layout : 'fit',
 							border : false,
@@ -317,7 +317,7 @@ var DeviceStatusHandForm = Ext.extend(Ext.form.FormPanel, {
 		DeviceStatusHandForm.superclass.constructor.call(this, {
 			id : 'deviceStatusHandFormId',
 			region:'south',
-			labelWidth : 80,
+			labelWidth : 130,
 			height:150,
 			bodyStyle : 'padding-top:10px',
 			fileUpload : true,

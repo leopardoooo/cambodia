@@ -67,9 +67,9 @@ var QueryDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 			{header:DEV_COMMON_LU.labelDeviceModel,dataIndex:'device_model_text',width:200},
 //			{header:'modem_mac',dataIndex:'modem_mac',width:75,hidden:true},
 //			{header:DEV_COMMON_LU.labelPairCardType,dataIndex:'pair_device_model_text',width:90},
-			{header:'卡号或MAC',dataIndex:'pair_device_code',width:120},
+			{header:DEV_COMMON_LU.labelPairCardCode,dataIndex:'pair_device_code',width:120},
 //			{header:DEV_COMMON_LU.labelPairModemCode,dataIndex:'pair_device_modem_code',width:120},
-			{header:COMMON_LU.doActionBtn,dataIndex:'',width:40,renderer:function(value,metavalue,record,i){
+			{header:COMMON_LU.doActionBtn,dataIndex:'',width:80,renderer:function(value,metavalue,record,i){
 				return "<a href='#' onclick=doDel()>" + COMMON_LU.remove + "</a>";
 			}}
 		];

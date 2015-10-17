@@ -18,7 +18,7 @@ QueryDeviceForm = Ext.extend(Ext.form.FormPanel,{
 			border:false,
 			bodyStyle:'padding-top:10px',
 			layout:'column',
-			labelWidth:80,
+			labelWidth:120,
 			items:[
 				{columnWidth:.33,layout:'form',border:false,items:[
 					{fieldLabel:DEV_COMMON_LU.labelDepot,hiddenName:'depotId',xtype:'combo',allowBlank:false,
