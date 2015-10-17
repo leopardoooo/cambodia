@@ -239,6 +239,8 @@ public class InvoiceComponent extends BaseBusiComponent {
 		rInvoiceDao.saveEditStatus(doneCode,StatusConstants.INVALID,"");
 	}
 
+	
+	
 	/**
 	 * @param invoiceId
 	 * @param invoiceMode
@@ -626,5 +628,19 @@ public class InvoiceComponent extends BaseBusiComponent {
 
 	public void setSDeptDao(SDeptDao deptDao) {
 		sDeptDao = deptDao;
+	}
+
+	public boolean checkInvoiceOptr(List<String> invoiceIdList,String optrId) throws Exception{
+		if(invoiceIdList == null || invoiceIdList.size()==0){
+			return false;
+		}
+		
+		for(String str : invoiceIdList){
+			RInvoice r = rInvoiceDao.queryInvoice(SystemConstants.BASE_INVOICE_CODE,str);
+			if(r == null ||StringHelper.isEmpty(r.getOptr_id()) || !r.getOptr_id().equals(optrId)){
+				return false;
+			}
+		}
+		return true;
 	}
 }

@@ -536,6 +536,9 @@ InvoiceWindow = Ext.extend( Ext.Window ,{
 		});
 	},
 	checkInvoice: function(invoiceId,successFunc,clearFunc){
+		if(Ext.isEmpty(invoiceId) ){
+			return;
+		}
 		//排除同一个发票号,不同发票代码的情况.
 		if(oldInvoiceBookId && oldInvoiceCode && oldInvoiceId && oldInvoiceId == invoiceId ){
 			var oldData = {invoice_book_id:oldInvoiceBookId,invoice_code:oldInvoiceCode,invoice_id:oldInvoiceId}
@@ -796,9 +799,14 @@ InvoiceWindow = Ext.extend( Ext.Window ,{
 					for(var i =0 ;i<all.length ;i++){
 						all[i]["docitem_data"] = Ext.decode(all[i]["docitem_data"]);
 					}
-					
+					//打印的收据如果不是操作人自己的，下次跳票为空
+					var record = Ext.decode(res.responseText);
+					var invoiceNext = '';
+					if(record){
+						invoiceNext = this.invoiceStore.getAt(this.invoiceStore.getCount()-1).get('invoiceId');
+					}
 					//保存最后一张发票
-					App.getApp().useInvoice(this.docType,this.invoiceStore.getAt(this.invoiceStore.getCount()-1).get('invoiceId'));
+					App.getApp().useInvoice(this.docType,invoiceNext);
 
 					//	调用打印面板的发票打印信息
 					this.printPanel.doInvoicePrint(all ,this.record,this.printType);

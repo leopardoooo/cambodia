@@ -132,7 +132,7 @@ public interface IDocService extends IBaseService{
 	 * @param invoiceCode 原发票代码
 	 * @param invoices 新发票信息
 	 */
-	public void saveInvoice(String invoiceId, String invoiceCode, List<InvoiceFromDto> invoices) throws Exception;
+	public boolean saveInvoice(String invoiceId, String invoiceCode, List<InvoiceFromDto> invoices) throws Exception;
 
 	/**
 		预付费打印
