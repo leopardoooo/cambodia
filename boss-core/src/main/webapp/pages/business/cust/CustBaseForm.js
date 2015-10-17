@@ -580,12 +580,7 @@ CustBaseForm = Ext.extend( BaseForm , {
 						valueField:'optr_id',displayField:'optr_name',
 						editable:true,
 						allowBlank:false,
-						typeAhead: true,  
 				        forceSelection: true,
-				        typeAhead: true,  
-				        mode: 'local',
-				        triggerAction: 'all',  
-				        selectOnFocus:true,
 						listeners: {
 							scope: this,
 							'focus':{
