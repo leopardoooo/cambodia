@@ -40,7 +40,15 @@ public class CProdOrderDto extends CProdOrder {
 	//可转金额部分(退订和销户)
 	private Integer balance_acct;
 	
+	private String login_name;
 	
+	
+	public String getLogin_name() {
+		return login_name;
+	}
+	public void setLogin_name(String login_name) {
+		this.login_name = login_name;
+	}
 	public Integer getBalance_cfee() {
 		return balance_cfee;
 	}

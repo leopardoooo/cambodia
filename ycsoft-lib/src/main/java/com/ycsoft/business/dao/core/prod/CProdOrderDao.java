@@ -390,4 +390,18 @@ public class CProdOrderDao extends BaseEntityDao<CProdOrder> {
 				  "	   and a.package_sn=pak.order_sn and pak.done_code>? )";
 		return this.createQuery(sql, custId,custId,taskDoneCode).list();
 	}
+	/**
+	 * 查询正常宽带所有订单失效的订单清单
+	 * @return
+	 * @throws JDBCException
+	 */
+	public List<CProdOrder> queryBandAllOrderExp() throws JDBCException{
+		String sql="select t.* "
+				+" from c_prod_order t ,c_user cu "
+				+" where t.status='ACTIVE' and t.exp_date<trunc(sysdate) "
+				+" and cu.user_id=t.user_id and cu.user_type='BAND' and cu.status='ACTIVE' "
+				+" and not exists(select 1 from c_prod_order a "
+						+ " where a.user_id=t.user_id and a.exp_date>=trunc(sysdate))";
+		return this.createQuery(sql).list();				
+	}
 }

@@ -113,7 +113,7 @@ BCLang.home = {
 				switchProvince: 'Please select province~',
 				oldCustLevel: 'Former Customer Level~',
 				newCustLevel: 'New Customer Level~',
-				deviceType: 'Equipment Type~',
+				deviceType: 'Device Type~',
 				deviceModel: ' Device Model~',
 				storeCount: 'Storage Quantity~',
 				buyWay: 'Purchase Way~',
@@ -164,13 +164,13 @@ BCLang.home = {
 			base:{
 				type: 'ServiceType', name: ' TerminalName', status: 'Status~', statusTime: 'StatusTime~',
 				stbId: 'Stb~', cardId: 'CARD~', modem: 'MODEM~', createTime: 'CreateTime~',
-				loginName: 'Account~', terminal: 'Terminal Type~', deviceModel: 'Equipment Type~', buyWay: 'BuyWay~',
+				loginName: 'Account~', terminal: 'Terminal Type~', deviceModel: 'Device Type~', buyWay: 'BuyWay~',
 				stopDate: 'Termination Pre-Report Time~', stopType: 'Calling Fee Type~', protocolDate: 'Agreement Date~', 
 				str4: 'IP Adress~',str6: 'IP Fee Amount~'
 			},
 			_form: {
 				taskBackFill: ' backfilling construction~',
-				deviceCode: 'Equipment Code~',
+				deviceCode: 'Device Code~',
 				feeName: ' Fee Name~',
 				feeAmount: 'Fee Money Amount $~',
 				protocolInfo: 'Agreement Information~',
@@ -213,7 +213,7 @@ BCLang.home = {
 				totalReturnFee: 'Total Refund~',
 				canTransferFee: 'transferable Money Amount~',
 				canRefundRealFee: 'Real refund amount~',
-				returnDevice: 'Recycle Equipment~',
+				returnDevice: 'Recycle Device~',
 				retrunInfo: 'Refundable~',
 				transferInfo: 'transferable~',
 				stdId: 'StbNo.~',
@@ -243,7 +243,7 @@ BCLang.home = {
 				transferDetailDate: ' Transferring Details（Billing Starting Date：{0} "）~',
 				labelChangeDeviceResion: 'The Replacement Need~',
 				labelChangeBuyDevice: ' Income from the purchase cost~',
-				labelChangeReclaimDevice: ' Recycling Equipment~',
+				labelChangeReclaimDevice: ' Recycling Device~',
 				labelChangeLossDevice: ' Report the loss of equipment~',
 				
 				oldOrderFee: 'Original Order Amount~',
@@ -258,17 +258,17 @@ BCLang.home = {
 			prod: {
 				base: {
 					_title: " Customer Product~",
-					columns: ["Order Sn","Product Name~","Belonged Package~","Current Fee~","Effective Date~" ,"Invalid Date~","Status~","Status Change Time~","Purchase Time~" ,"Purchase Month Quantity~","SerialNo.~","WhetherToPay~"]
+					columns: ["OrderSn~","ProductName~","Belonged Package~","CurrentCharges~","EffectiveDate~" ,"ExpirationDate~","Status~","StatusChangeTime~","OrderTime~" ,"OrderMonths~","SerialNo.~","WhetherToPay~"]
 				},
 				pkg: {
 					_title: 'Customer Package~',
-					columns: ["Order Sn","Product Name~","Current Fee~","Status~"," Effective Date~" ,"Invalid Date~","Product Type~","Purchase Time~"]
+					columns: ["OrderSn~","ProductName~","CurrentCharges~","Status~","EffectiveDate~" ,"ExpirationDate~","ProductType~","OrderTime~"]
 				},
 				tools: ["Default Order~","History Oder~"]
 			},
 			userDetail: {
 				tabs: ["Details~","Abnormal Information~"],
-				detail: ["User Type~","User Name~","Equipment Type~","Buy Way~","Status~","Status Time~","Pre-termination Report Time~","Creation Time~","Calling Fee Type~","During Agreement Period~","Account~",
+				detail: ["User Type~","User Name~","Device Type~","Buy Way~","Status~","Status Time~","Pre-termination Report Time~","Creation Time~","Calling Fee Type~","During Agreement Period~","Account~",
 				         "Terminal Type~","Account~","Terminal Type~","IP Information~","IP Fee Amount~"],
 				change: ["Service~","Feature~","Prior to Change~","After Change~","Change Date~","Operator~"]
 			},
@@ -281,14 +281,14 @@ BCLang.home = {
 		pay: {
 			payfee: {
 				_title: "prepaid money~",
-				columns: ["Serial Number~","Service Name~","Account Type~","Account Name~","User Type~", "User Name~","Equipment No.~","Status~","Money Amount~","Estimated Expiry Date before Payment~",
-				        "Expiry Date after Payment~","Print Status~","Payment Way~","Reception Date~","Account Date~","Receptionist~","Reception Department~","Invoice~","Invoice Issuance Way~", "Invoice Type~", "Developer~"]
+				columns: ["SerialNo.~","ServiceName~","AccountTypes~","AccountName~","UserType~", "UserName~","DeviceNo.~","Status~","Money~","Expire Date Before~",
+				        "Expire Date After~","PrintStatus~","PaymentWay~","ProcessingDate~","PaymentDates~","Receptionist~","ReceptionDept~","Invoice~","Invoice Issuance Way~", "InvoiceType~", "Developer~"]
 			},
 			busifee: {
 				_title: "Service Fee~",
-				columns: ["Serial Number~","Fee Name~","Equipment Type~","Equipment No.~","Status~","Print Status~",
-				          "Payable~","Paid~","Payment Way~","ReceptionDate~","Receptionist~","ReceptionDepartment~",
-				          "Invoice~"," Invoice Issuance Way~","Invoice Type~","Buy Quantity~","Equipment Type~","Remark~", "Developer~", "Payment Dates~"]
+				columns: ["SerialNo.~","FeeName~","DeviceType~","DeviceNo.~","Status~","PrintStatus~",
+				          "Payable~","Paid~","PaymentWay~","ReceptionDate~","Receptionist~","ReceptionDept~",
+				          "Invoice~"," Invoice Issuance Way~","InvoiceType~","BuyQuantity~","Device Model~","Remark~", "Developer~", "Payment Dates~"]
 			},
 			detail: {
 				_title: 'payment record~',
@@ -396,19 +396,19 @@ BCLang.home = {
             	msgFail: 'Modification fails!~'
             }
 		},
-		queryDevice:{//Equipment Inquiry
-			_title:' Equipment Inquiry~',
-			titleDevInfo:' Equipment Information~',
-			labelDevNo:' Equipment Serial Number~',
-			labelDevType:'Equipment Type~',
-			labelDevModel:'Equipment Type~',
+		queryDevice:{//Device Inquiry
+			_title:' Device Inquiry~',
+			titleDevInfo:' Device Information~',
+			labelDevNo:' Device Serial Number~',
+			labelDevType:'Device Type~',
+			labelDevModel:'Device Type~',
 			labelModelName:'Type Name~',
-			labelDevName:'Equipment Name~',
-			labelDevCode:'Equipment No.~',
+			labelDevName:'Device Name~',
+			labelDevCode:'Device No.~',
 			labelDeptName:'Storage Warehouse~',
 			labelCustNo:'Customer No.~',
 			labelCustName:'Customer Name~',
-			labelDevStatus:'Equipment Status~',
+			labelDevStatus:'Device Status~',
 			labelDepStatus:'Storage Status~',
 			labelTranStatus:'Moving Status~',
 			labelOwnership:'Ownership~',
@@ -419,7 +419,7 @@ BCLang.home = {
             labelModemModel:' Matching MODEM Type~',
             labelStbNo:' Matching StbNo.~',
             labelStbModel:' Matching Stb Type~',
-            tipDevNotExists:'Inquiry Equipment does not exist!~'
+            tipDevNotExists:'Inquiry Device does not exist!~'
 			
 		},
 		invoiceQuery:{//Invoice Inquiry
@@ -526,7 +526,7 @@ BCLang.home = {
 			_userTitle : 'User Details~',
 			_winTitle : 'Work Order Completion~',
 			_ZteWinTitle : 'ZTE Authorized~',
-			_fillDevTitle: 'Backfill Equipment',
+			_fillDevTitle: 'Backfill Device',
 			forms : {
 				custNo : 'Customer ID~',
 				taskNo : 'WorkOrdersNo.~',
@@ -550,7 +550,7 @@ BCLang.home = {
 				accptTime : 'Hours:~',
 				distTeam : 'Order Arrangement~',
 				invalidTeam : 'WorkOrders Invalid~',
-				backDevice : 'Backfill Equipment~',
+				backDevice : 'Backfill Device~',
 				finish : 'Completed~',
 				returning : 'visit~',
 				sendAuth : 'ZTE Authorized~',
@@ -561,7 +561,7 @@ BCLang.home = {
 					,'CustManagerTel~','CustNo~','cfocnSyncStatus'],
 			userCols : ['UserType~', 'UserName~', 'Password~', 'DeviceModel~', 'DeviceNO.~', 'PosNo~', 'OccNo~', 'Bandwidth~'],
 			operateCols : ['OperatingTime~', 'OperationType~', 'Operator~,', 'SyncStatus~', 'Description~','DelayTime~'],
-			taskDeviceCols : ['UserType~', 'UserName~', 'Model~', 'DeviceNO.~', 'EquipmentRecycling~','OldDeviceNO.~'],
+			taskDeviceCols : ['UserType~', 'UserName~', 'Model~', 'DeviceNO.~', 'DeviceRecycling~','OldDeviceNO.~'],
 			msg : {
 				enterDeviceNo : 'Please enter the device number~',
 				noCancel : 'No cancellations~!',
@@ -632,7 +632,7 @@ BCLang.msgBox = {
 	restoreCustSuccess:'restore customer successfully!~',
 	restoreCustFailed:'fail to restore customer, Please contact administrator.~',
 	needLogOffUser:'Please cancel user under this Customer at first~',
-	recycleGdDevice:'Please recycle Equipment whose ownership is SuperNet~',
+	recycleGdDevice:'Please recycle Device whose ownership is SuperNet~',
 	custIsRelocated:'Customer has moved~',
 	confirmRelocateCust:'Are you sure to move customer?~',
 	notAllowedJoinUnit:'The customer is unit customer, cannot join unit!~',
@@ -648,8 +648,8 @@ BCLang.msgBox = {
 	cancelPayFeeSuccess:'Payment rollback Reversal Success!~',
 	commonSuccess: 'Operation success!~',
 	
-	custHasUnSuitableDev:'This User cannot do Equipment exchange now~',
-	custCantExchangeDev:' This User cannot do Equipment exchange now~',
+	custHasUnSuitableDev:'This User cannot do Device exchange now~',
+	custCantExchangeDev:' This User cannot do Device exchange now~',
 	
 	confirmRegLoss:'Are you sure to loss report?~',
 	regLossSuccess:'Successful loss report!~',
@@ -663,19 +663,19 @@ BCLang.msgBox = {
 	confirmNotPrintStatus:'Sure for not Print?~',
 	statusPrintStatusSuccess:'open mark successfully!~',
 	confirmPrintStatus:'Sure to open Print Mark?~',
-	//Equipment Sales
-	selectDev2Sale:'Please select Equipment on sales!~',
-	cantSaleCosOwerIsCust:'Equipment ownership belongs to Customer, cannot be sold~',
+	//Device Sales
+	selectDev2Sale:'Please select Device on sales!~',
+	cantSaleCosOwerIsCust:'Device ownership belongs to Customer, cannot be sold~',
 	//Change Purchase Way
 	modifyBuyType:'Change Purchase Way~',
-	need2SwitchCountyId:'current shop is not the shop where the Equipment is bought，Please switch to [{0}] and then operate！~',
+	need2SwitchCountyId:'current shop is not the shop where the Device is bought，Please switch to [{0}] and then operate！~',
 	//Change Ownership
 	changeOwner2Cust:'Sure to change ownership to individual？~',
 	changeOwner2Gd:'Sure to change ownership to SuperNet？~',
 	cangeOwnerSuccess:'change ownership successfully!~',
-	//Equipment recycling
-	selectDev2Recycle:'Please select recycled Equipment!~',
-	devCantRecycleStillInUse:"Equipment is in using, cannot be recycled~",
+	//Device recycling
+	selectDev2Recycle:'Please select recycled Device!~',
+	devCantRecycleStillInUse:"Device is in using, cannot be recycled~",
 	onlyResidentCanNonResiCust:'Only Resident Customer can be turned to Group Customer~',
 	depositUnPaySuccess:'Deposit refunded successfully!~',
 	unPayed:'unpaid！~',
@@ -736,11 +736,11 @@ BCLang.msgBox = {
 	
 	notChooseDeviceMustBeInput: 'When backfilling construction is not selected for equipment，the equipment code must be input!~',
 	noChargeNumber: 'Fee No. does not exist!~',
-	singleStbNotSupDTT: 'This Equipment is one-way Stb, Do not support current OTT Type!~',
-	doubleStbNotSupOTT: 'This Equipment is two-way Stb, Do not support current DTT Type!~',
-	modemNotSupUserType: 'Equipment为Modem，Do not support selected[{0}]User Type!~',
-	currDeviceNotSupUserType: 'This Equipment do not support current User Type!~',
-	deviceFeeMustBeBetween:'Equipment Fee must be between [{0}]-[{1}]!~',
+	singleStbNotSupDTT: 'This Device is one-way Stb, Do not support current OTT Type!~',
+	doubleStbNotSupOTT: 'This Device is two-way Stb, Do not support current DTT Type!~',
+	modemNotSupUserType: 'Device Modem，Do not support selected[{0}]User Type!~',
+	currDeviceNotSupUserType: 'This Device do not support current User Type!~',
+	deviceFeeMustBeBetween:'Device Fee must be between [{0}]-[{1}]!~',
 	addUserToTempTable: 'Please add Users need saving to Temporary Saving Table!~',
 	notTransProject: 'No transfer payment item!~',
 	chooseTariff: 'Please choose fees at first!~',

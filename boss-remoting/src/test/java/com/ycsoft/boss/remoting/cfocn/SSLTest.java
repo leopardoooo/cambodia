@@ -15,11 +15,19 @@ public class SSLTest {
 	public static void main(String[] args) throws Exception{
 		
 		System.setProperty("javax.net.debug", "ssl,handshake");
+<<<<<<< HEAD
         System.setProperty("javax.net.ssl.keyStore", "D:/Java/workJPZ/boss/cambodia/boss-core/src/main/resources/cert/cfocn/admin.pfx");
+=======
+        System.setProperty("javax.net.ssl.keyStore", "/Users/killer/Documents/MyWorks/GitHub/cambodia/boss-core/src/main/resources/cert/client/client.p12");
+>>>>>>> branch 'master' of https://github.com/leopardoooo/cambodia.git
         System.setProperty("javax.net.ssl.keyStorePassword", "a1234567");
         System.setProperty("javax.net.ssl.keyStoreType", "PKCS12");
 		
+<<<<<<< HEAD
 		System.setProperty("javax.net.ssl.trustStore", "D:/Java/workJPZ/boss/cambodia/boss-core/src/main/resources/cert/cfocn/cfocn.ca.jks");
+=======
+		System.setProperty("javax.net.ssl.trustStore", "/Users/killer/Documents/MyWorks/GitHub/cambodia/boss-core/src/main/resources/cert/cfocn/cfocn.ca.jks");
+>>>>>>> branch 'master' of https://github.com/leopardoooo/cambodia.git
         System.setProperty("javax.net.ssl.trustStorePassword", "a1234567");
         System.setProperty("javax.net.ssl.trustStoreType", "JKS");
 		

@@ -212,15 +212,20 @@ public class AuthComponent extends BaseComponent{
 	private void deleteOttUser(CUser user,List<CProdOrder> orderList,Integer doneCode) throws Exception{
 		//删除授权
 		String[] orderResIds = getOrderProdRes(orderList);
+		JsonObject params = new JsonObject();
+		params.addProperty(BusiCmdParam.login_name.name(), user.getLogin_name());
 		for (String orderResId:orderResIds){
 			JVodCommand ottCmd = gOttCmd(user,doneCode);
 			ottCmd.setRes_id(orderResId);
 			//发送减授权
+			
+			ottCmd.setDetail_param(params.toString());
 			ottCmd.setCmd_type(BusiCmdConstants.PASSVATE_PROD);
 			jVodCommandDao.save(ottCmd);
 		}
 		//销户
 		JVodCommand ottCmd = gOttCmd(user,doneCode);
+		ottCmd.setDetail_param(params.toString());
 		ottCmd.setCmd_type(BusiCmdConstants.DEL_USER);		
 		jVodCommandDao.save(ottCmd);
 	}

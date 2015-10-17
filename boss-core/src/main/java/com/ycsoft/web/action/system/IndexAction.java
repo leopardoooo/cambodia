@@ -131,7 +131,9 @@ public class IndexAction extends BaseBusiAction{
 	 * @throws Exception
 	 */
 	public String queryUnCheckBulletin()throws Exception{
-		getRoot().setSimpleObj(indexService.queryUnCheckByOptrId(optr.getOptr_id()));
+		if(optr != null){
+			getRoot().setSimpleObj(indexService.queryUnCheckByOptrId(optr.getOptr_id()));
+		}
 		return JSON_SIMPLEOBJ;
 	}
 	

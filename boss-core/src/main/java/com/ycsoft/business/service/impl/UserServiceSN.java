@@ -265,7 +265,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 				if (userList.size() > 0){
 					Map<String, List<CUser>> map = CollectionHelper.converToMap(userList, "user_type");
 					List<CUser> ottList = map.get(USER_TYPE_OTT);
-					if(ottList.size() > 0 && ottList.size() % 3 == 0){//二主一副
+					if(ottList == null || (ottList.size() > 0 && ottList.size() % 3 == 0)){//二主一副
 						user.setTerminal_type(SystemConstants.USER_TERMINAL_TYPE_ZZD);
 					}else{
 						user.setTerminal_type(SystemConstants.USER_TERMINAL_TYPE_FZD);
@@ -297,7 +297,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		userComponent.createUser(user);
 		
 		
-		if (user.getStatus().equals(StatusConstants.ACTIVE)){
+		if (user.getStatus().equals(StatusConstants.ACTIVE) || user.getUser_type().equals(USER_TYPE_BAND)){
 			createUserJob(user, custId, doneCode);
 		}
 		
@@ -530,7 +530,6 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		
 		authComponent.sendAuth(user, cancelResultList, BusiCmdConstants.PASSVATE_PROD, doneCode);
 		authComponent.sendAuth(user, cancelResultList, BusiCmdConstants.DEL_USER, doneCode);
-		
 		//记录用户到历史表
 		userComponent.removeUserWithHis(doneCode, user);
 	}

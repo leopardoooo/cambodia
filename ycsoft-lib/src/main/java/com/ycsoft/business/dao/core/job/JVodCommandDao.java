@@ -61,7 +61,7 @@ public class JVodCommandDao extends BaseEntityDao<JVodCommand> {
 	}
 	
 	public List<JVodCommand> queryCmd() throws JDBCException {
-		String sql = "select * from j_vod_command where is_send='F' and rownum<500 order by transnum";
+		String sql = "select * from (select * from j_vod_command where is_send='F' order by transnum) where  rownum<500 ";
 		return this.createQuery(sql).list();
 	}
 	

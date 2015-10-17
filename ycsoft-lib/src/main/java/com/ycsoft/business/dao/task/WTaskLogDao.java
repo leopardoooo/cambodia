@@ -29,10 +29,10 @@ public class WTaskLogDao extends BaseEntityDao<WTaskLog> {
 		this.executeUpdate(sql, StatusConstants.INVALID,remark,taskId,StatusConstants.NOT_EXEC);
 	}
 	public List<WTaskLog> querySynLog() throws JDBCException {
-		String sql = "select * from w_task_log t where "
+		String sql = " select * from (select * from w_task_log t where "
 				+" syn_status =? "+
 				" and  (t.delay_time is  null or t.delay_time<=0 or (t.delay_time>0 and t.log_time <sysdate-t.delay_time/(24*60))) "
-				+" order by t.log_sn";
+				+" order by t.log_sn ) where rownum<500 ";
 		return this.createQuery(sql, StatusConstants.NOT_EXEC).list();
 	}
 }

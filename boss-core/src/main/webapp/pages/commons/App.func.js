@@ -130,7 +130,7 @@ Ext.apply(App.func,{
 					return false;
 			}else if(busicode == '2123'){//重置密码
 				//只有user_type = BAND和OTT_MOBILE用户显示, 且用户状态 是 正常 和施工 
-				if( (data['user_type'] == 'BAND' || data['user_type'] == 'OTT_MOBILE') && data.status == 'ACTIVE' ){
+				if( (data['user_type'] == 'BAND' || data['user_type'] == 'OTT_MOBILE') && (data.status == 'ACTIVE' || data['status'] == 'INSTALL') ){
 					return true;
 				}else{
 					return false;

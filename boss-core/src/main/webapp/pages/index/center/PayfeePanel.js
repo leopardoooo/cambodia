@@ -25,26 +25,26 @@ AcctFeeGrid = Ext.extend(Ext.ux.Grid, {
 		var cm = new Ext.ux.grid.LockingColumnModel({ 
     		columns : [
     			{header:lc[0],dataIndex:'create_done_code',width:80},
-				{header:lc[1],dataIndex:'busi_name',	width:80,renderer:App.qtipValue},
-				{header:lc[2],dataIndex:'acct_type_text',width:70},
-				{header:lc[3],dataIndex:'fee_text',width:130,renderer:App.qtipValue},
+				{header:lc[1],dataIndex:'busi_name',	width:150,renderer:App.qtipValue},
+				{header:lc[2],dataIndex:'acct_type_text',width:105,renderer:App.qtipValue},
+				{header:lc[3],dataIndex:'fee_text',width:150,renderer:App.qtipValue},
 				{header:lc[4],dataIndex:'user_type_text',width:70},
-				{header:lc[5],dataIndex:'user_name',width:70,renderer:App.qtipValue},
+				{header:lc[5],dataIndex:'user_name',width:130,renderer:App.qtipValue},
 				{header:lc[6],dataIndex:'device_code',width:130,renderer:App.qtipValue},
-				{header:lc[7],dataIndex:'status_text',width:60,renderer:Ext.util.Format.statusShow},
+				{header:lc[7],dataIndex:'status_text',width:70,renderer:Ext.util.Format.statusShow},
 				{header:lc[8],dataIndex:'real_pay',width:60,renderer:Ext.util.Format.formatFee},				
 				{header:lc[9],dataIndex:'begin_date',width:125,renderer:Ext.util.Format.dateFormat},
 				{header:lc[10],dataIndex:'prod_invalid_date',width:125,renderer:Ext.util.Format.dateFormat},
-				{header:lc[11],dataIndex:'is_doc_text',width:70,renderer:Ext.util.Format.statusShow},
-				{header:lc[12],dataIndex:'pay_type_text',width:70},
+				{header:lc[11],dataIndex:'is_doc_text',width:75,renderer:Ext.util.Format.statusShow},
+				{header:lc[12],dataIndex:'pay_type_text',width:75, renderer:App.qtipValue},
 				{header:lc[13],dataIndex:'create_time',width:125},
 				{header:lc[14],dataIndex:'acct_date',width:125},
-				{header:lc[15],dataIndex:'optr_name',width:80},
-				{header:lc[16],dataIndex:'dept_name',width:80},
-				{header:lc[17],dataIndex:'invoice_id',width:80},
-				{header:lc[18],dataIndex:'invoice_mode_text',width:80},
-				{header:lc[19],dataIndex:'doc_type_text',width:80},
-				{header:lc[20],dataIndex:'busi_optr_name',width:80, renderer:App.qtipValue}
+				{header:lc[15],dataIndex:'optr_name',width:90, renderer:App.qtipValue},
+				{header:lc[16],dataIndex:'dept_name',width:100, renderer:App.qtipValue},
+				{header:lc[17],dataIndex:'invoice_id',width:80, renderer:App.qtipValue},
+//				{header:lc[18],dataIndex:'invoice_mode_text',width:80},
+				{header:lc[19],dataIndex:'doc_type_text',width:90, renderer:App.qtipValue},
+				{header:lc[20],dataIndex:'busi_optr_name',width:100, renderer:App.qtipValue}
 	        ]
 	     });
 		
@@ -155,21 +155,21 @@ BusiFeeGrid = Ext.extend(Ext.ux.Grid, {
 				{header:lc[2],dataIndex:'device_type_text',width:80},
 				{header:lc[16],dataIndex:'device_model_name',width:120, renderer:App.qtipValue},
 				{header:lc[3],dataIndex:'device_code',width:130, renderer:App.qtipValue},
-				{header:lc[4],dataIndex:'status_text',width:60,renderer:Ext.util.Format.statusShow},
+				{header:lc[4],dataIndex:'status_text',width:70,renderer:Ext.util.Format.statusShow},
 				{header:lc[5],dataIndex:'is_doc_text',width:80,renderer:Ext.util.Format.statusShow},
 				{header:lc[6],dataIndex:'should_pay',width:60,renderer:Ext.util.Format.formatFee},
 				{header:lc[7],dataIndex:'real_pay',width:60,renderer:Ext.util.Format.formatFee},
 				{header:lc[17],dataIndex:'count_text',width:120,renderer:App.qtipValue},
-				{header:lc[15],dataIndex:'buy_num',width:75},
-				{header:lc[8],dataIndex:'pay_type_text',width:80},
+				{header:lc[15],dataIndex:'buy_num',width:80},
+				{header:lc[8],dataIndex:'pay_type_text',width:90, renderer:App.qtipValue},
 				{header:lc[9],dataIndex:'create_time',width:125},
 				{header:lc[19],dataIndex:'acct_date',width:125},
-				{header:lc[10],dataIndex:'optr_name',width:80},
-				{header:lc[11],dataIndex:'dept_name',width:80},
-				{header:lc[12],dataIndex:'invoice_id',width:90},
-				{header:lc[13],dataIndex:'invoice_mode_text',width:80},
-				{header:lc[14],dataIndex:'doc_type_text',width:80},
-				{header:lc[18],dataIndex:'busi_optr_name',width:80, renderer:App.qtipValue}
+				{header:lc[10],dataIndex:'optr_name',width:90, renderer:App.qtipValue},
+				{header:lc[11],dataIndex:'dept_name',width:100, renderer:App.qtipValue},
+				{header:lc[12],dataIndex:'invoice_id',width:90, renderer:App.qtipValue},
+//				{header:lc[13],dataIndex:'invoice_mode_text',width:80},
+				{header:lc[14],dataIndex:'doc_type_text',width:90, renderer:App.qtipValue},
+				{header:lc[18],dataIndex:'busi_optr_name',width:100, renderer:App.qtipValue}
 	        ]
 	      });
 		
