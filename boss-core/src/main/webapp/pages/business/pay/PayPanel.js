@@ -210,6 +210,7 @@ PayPanel = Ext.extend( Ext.Panel ,{
 		if(arr.length > 1){
 			dollar = parseInt(arr[0]);
 			jy = parseFloat('0.'+arr[1]);
+			jy = dollar > 0 ? jy : jy*-1;
 		}
 		
 		Ext.getCmp("nfDollar").setValue(dollar);
