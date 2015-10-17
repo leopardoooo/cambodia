@@ -18,7 +18,6 @@ import com.ycsoft.beans.invoice.RInvoice;
 import com.ycsoft.beans.invoice.RInvoiceDetail;
 import com.ycsoft.beans.invoice.RInvoiceFeelist;
 import com.ycsoft.beans.invoice.RInvoiceOptr;
-import com.ycsoft.beans.system.SOptr;
 import com.ycsoft.business.commons.abstracts.BaseBusiComponent;
 import com.ycsoft.business.dao.core.cust.CCustDao;
 import com.ycsoft.business.dao.core.fee.CFeeDao;
@@ -40,6 +39,8 @@ import com.ycsoft.commons.constants.InvoiceOptrType;
 import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.exception.ComponentException;
+import com.ycsoft.commons.exception.ErrorCode;
+import com.ycsoft.commons.exception.ServicesException;
 import com.ycsoft.commons.helper.CollectionHelper;
 import com.ycsoft.commons.helper.DateHelper;
 import com.ycsoft.commons.helper.StringHelper;
@@ -288,8 +289,7 @@ public class InvoiceComponent extends BaseBusiComponent {
 		
 		if(invoices!=null){
 			if (invoices.size()==0){
-				errorMeg = "发票不存在或者不在当前库";
-				throw new ComponentException(errorMeg);
+				throw new ServicesException(ErrorCode.ReceiptNotExists);
 			}else{
 				for (int i=invoices.size()-1;i>=0;i--){
 					RInvoice invoice = invoices.get(i);
@@ -300,9 +300,10 @@ public class InvoiceComponent extends BaseBusiComponent {
 							continue;
 						}*/
 						if(StringHelper.isEmpty(invoice.getOptr_id())){
-							errorMeg = "发票["+ invoice.getInvoice_id() +"]未领用";
+							/*errorMeg = "发票["+ invoice.getInvoice_id() +"]未领用";
 							errorMsgList.add(errorMeg);
-							continue;
+							continue;*/
+							throw new ServicesException(ErrorCode.ReceiptNotRecipients, invoice.getInvoice_id());
 						}
 					}
 					if(!docType.equals(invoice.getInvoice_type())){
@@ -311,15 +312,17 @@ public class InvoiceComponent extends BaseBusiComponent {
 						continue;
 					}
 					if(!invoice.getFinance_status().equals(SystemConstants.INVOICE_STATUS_IDLE)){
-						errorMeg = "发票已结账";
+						/*errorMeg = "发票已结账";
 						errorMsgList.add(errorMeg);
-						continue;
+						continue;*/
+						throw new ServicesException(ErrorCode.ReceiptAlreadyCheckout);
 					}else if (!invoice.getStatus().equals(SystemConstants.INVOICE_STATUS_IDLE)
 							&&!SystemConstants.INVOICE_MODE_MANUAL.equals(invoice.getInvoice_mode())){
 						//打印的发票状态必须为空闲
-						errorMeg = "发票["+ invoice.getInvoice_id() +"]已使用";
+						/*errorMeg = "发票["+ invoice.getInvoice_id() +"]已使用";
 						errorMsgList.add(errorMeg);
-						continue;
+						continue;*/
+						throw new ServicesException(ErrorCode.ReceiptIsUsed, invoice.getInvoice_id());
 					}else if (SystemConstants.INVOICE_MODE_AUTO.equals(invoiceMode)){
 						//如果机打票，不允许原先被手工开票过
 						if (SystemConstants.INVOICE_MODE_MANUAL.equals(invoice.getInvoice_mode())){
