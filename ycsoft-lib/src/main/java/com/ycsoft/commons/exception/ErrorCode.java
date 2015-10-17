@@ -144,6 +144,11 @@ public enum ErrorCode {
 	ResOttIsError("OTT控制字格式错误"),
 	CmdTypeUnDefined("授权类型(%s)未定义,请联系管理员"),
 	
+	ReceiptNotExists("收据不存在或者不在当前库"),
+	ReceiptNotRecipients("收据[%s]未领用"),
+	ReceiptAlreadyCheckout("收据已结账"),
+	ReceiptIsUsed("收据[%s]已使用"),
+	
 	//======================未翻译===========================
 	NoStopRecord("找不到产品报停记录，请联系管理员"),
 	TaskDeviceUnFill("有未回填设备的用户，不能完工"),
