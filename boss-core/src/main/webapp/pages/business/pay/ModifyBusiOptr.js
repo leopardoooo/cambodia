@@ -28,26 +28,29 @@ ModifyBusiOptrForm = Ext.extend(BaseForm,{
 				{
 					hiddenName: 'busi_optr_id',
 					fieldLabel: lmain("pay._form.newOptrName"),
-					xtype:'lovcombo',width:200,
+					xtype:'combo',width:200,
 					store:this.busiOptrStore,
-					valueField:'optr_id',displayField:'optr_name',boxMaxHeight:500,
+					valueField:'optr_id',displayField:'optr_name',
 					editable:true,forceSelection:true,allowBlank:false,
-					beforeBlur:function(){},
-					listeners:{
-						beforequery:function(e){
+					listeners: {
+						scope: this,
+						'focus':{
+							fn:function(combo){
+								combo.expand();
+								combo.doQuery(combo.allQuery, true);
+							},
+							buffer:200
+						},
+						beforequery: function(e){
 							var combo = e.combo;
-							var store = combo.getStore();
-				            var value = e.query;
-					        if(Ext.isEmpty(value)){ 
-								store.clearFilter();
-					        }else{
-					            combo.collapse();
-					        	var re = new RegExp('^.*' + value + '.*$','i');
-					            store.filterBy(function(record,id){
-					                var text = record.get('attr');
-					                return re.test(text);
+					        if(!e.forceAll){
+					            var value = Ext.isEmpty(e.query) ? '' : e.query.toUpperCase();  
+					            combo.store.filterBy(function(record,id){  
+					                return record.get(combo.displayField).toUpperCase().indexOf(value) != -1;  
 					            });
-					            combo.expand();
+					            if(!combo.isExpanded()){
+					            	combo.expand();
+					            }
 					            return false;
 					        }
 						}
@@ -63,17 +66,6 @@ ModifyBusiOptrForm = Ext.extend(BaseForm,{
 				return false;
 			}
 		},this);
-	},
-	doValid: function(){
-		var value = this.getForm().findField('busi_optr_id').getValue();
-		var arr = value.split(',');
-		if(arr.length > 3){
-			var obj = {};
-			obj['isValid'] = false;
-			obj['msg'] = '业务员最多选择3个!';
-			return obj;
-		}
-		return ModifyBusiOptrForm.superclass.doValid.call(this);
 	},
 	getValues:function(){
 		var values = this.getForm().getValues();
