@@ -15,7 +15,7 @@ public class SSLTest {
 	public static void main(String[] args) throws Exception{
 		// DEBUG模式
 		System.setProperty("javax.net.debug", "ssl,handshake");
-        System.setProperty("javax.net.ssl.keyStore", "/Users/killer/Documents/MyWorks/GitHub/cambodia/boss-core/src/main/resources/cert/client/client.p12");
+        System.setProperty("javax.net.ssl.keyStore", "/Users/killer/Documents/MyWorks/GitHub/cambodia/boss-core/src/main/resources/cert/server/server.p12");
         System.setProperty("javax.net.ssl.keyStorePassword", "a1234567");
         System.setProperty("javax.net.ssl.keyStoreType", "PKCS12");
 		
