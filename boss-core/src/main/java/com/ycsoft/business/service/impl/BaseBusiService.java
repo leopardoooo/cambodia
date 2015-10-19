@@ -1921,11 +1921,14 @@ public class BaseBusiService extends BaseService {
 				order.getStatus(),statusChange.getNew_value()));
 		changeList.add(new CProdPropChange("status_date",
 				DateHelper.dateToStr(order.getStatus_date()),DateHelper.dateToStr(new Date())));
-		changeList.add(new CProdPropChange("exp_date",DateHelper.dateToStr(order.getExp_date()),
-				DateHelper.dateToStr(expDate)));
+		
+		if (expDate != null && order.getExp_date().getTime() != expDate.getTime()){
+			changeList.add(new CProdPropChange("exp_date",DateHelper.dateToStr(order.getExp_date()),
+					DateHelper.dateToStr(expDate)));
+		}
 		
 		
-		if (effDate != null){
+		if (effDate != null && order.getEff_date().getTime() != effDate.getTime()){
 			changeList.add(new CProdPropChange("eff_date",DateHelper.dateToStr(order.getEff_date()),
 					DateHelper.dateToStr(effDate)));
 		}

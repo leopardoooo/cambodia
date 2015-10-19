@@ -536,6 +536,9 @@ public class OrderComponent extends BaseBusiComponent {
 		return followPayList;
 	}
 	
+	public List<CProdOrder> queryPakDetailOrder(String package_sn) throws Exception{
+		return cProdOrderDao.queryPakDetailOrder(package_sn);
+	}
 	/**
 	 * 销户时订单退款金额计算
 	 * @param orderList
@@ -1707,7 +1710,7 @@ public class OrderComponent extends BaseBusiComponent {
 		} else {
 			for (Iterator<ProdTariffDto> tariffIt = ptList.iterator();tariffIt.hasNext();) {
 				ProdTariffDto  tariff = tariffIt.next();
-				if (!checkRule(cust,user, tariff.getBill_rule()))
+				if (!checkRule(cust,user, tariff.getRule_id()))
 					tariffIt.remove();
 			}
 		}
