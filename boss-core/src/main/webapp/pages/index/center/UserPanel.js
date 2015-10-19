@@ -80,7 +80,7 @@ UserGrid = Ext.extend(Ext.ux.Grid,{
     		columns : [
             sm,
 			{header:lmain("user.base.type"),dataIndex:'user_type_text',width:90},
-			{header:lmain("user.base.name"),dataIndex:'user_name',	width:150, renderer:App.qtipValue},
+			{header:lmain("user.base.name"),dataIndex:'user_name',	width:200, renderer:App.qtipValue},
 			{header:lmain("user.base.status"),dataIndex:'status_text',	width:100,renderer:function(v){
 				return App.qtipValue(Ext.util.Format.statusShow(v));
 			}},
@@ -1157,8 +1157,8 @@ OrderFeeDetailGrid = Ext.extend(Ext.grid.GridPanel,{
 		var lc = langUtils.main("user.prodDetail.detail");
 		var cm = [
 			{header:lc[0],dataIndex:'order_fee_sn', width:60},
-			{header:lc[1],dataIndex:'fee_type_text',width:70},
-			{header:lc[3],dataIndex:'input_type_text', width:80},
+			{header:lc[1],dataIndex:'fee_type_text',width:80},
+			{header:lc[3],dataIndex:'input_type_text', width:100},
 			{header:lc[4],dataIndex:'input_fee',width:80, renderer: Ext.util.Format.formatFee},
 			{header:lc[2],dataIndex:'input_prod_name',width:150, renderer: App.qtipValue},
 			{header:lc[8],dataIndex:'done_code', width:80}

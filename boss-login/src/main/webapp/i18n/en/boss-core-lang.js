@@ -162,11 +162,11 @@ BCLang.home = {
 		// Customer Page
 		user: {
 			base:{
-				type: 'ServiceType', name: ' TerminalName', status: 'Status~', statusTime: 'StatusTime~',
-				stbId: 'Stb~', cardId: 'CARD~', modem: 'MODEM~', createTime: 'CreateTime~',
-				loginName: 'Account~', terminal: 'Terminal Type~', deviceModel: 'Device Type~', buyWay: 'BuyWay~',
-				stopDate: 'Termination Pre-Report Time~', stopType: 'Calling Fee Type~', protocolDate: 'Agreement Date~', 
-				str4: 'IP Adress~',str6: 'IP Fee Amount~'
+				type: 'TerminalType~', name: 'TerminalName~', status: 'Status~', statusTime: 'StatusTime~',
+				stbId: 'StbNo.~', cardId: 'CARDNo.~', modem: 'MODEM~', createTime: 'CreateTime~',
+				loginName: 'Account~', terminal: 'TerminalType~', deviceModel: 'DeviceType~', buyWay: 'BuyWay~',
+				stopDate: 'ForecastStopTime~', stopType: 'ReminderFeeType~', protocolDate: 'AgreementDate~', 
+				str4: 'IPAdress~',str6: 'IPFeeAmount~'
 			},
 			_form: {
 				taskBackFill: ' backfilling construction~',
@@ -252,12 +252,12 @@ BCLang.home = {
 				newAddFee: 'Up close to the amount of~'
 			},
 			list: {
-				_title: 'User Information~',
+				_title: 'Terminal Information~',
 				tools: ["Inquiry~"]
 			},
 			prod: {
 				base: {
-					_title: " Customer Product~",
+					_title: "Customer Product~",
 					columns: ["OrderSn~","ProductName~","Belonged Package~","CurrentCharges~","EffectiveDate~" ,"ExpirationDate~","Status~","StatusChangeTime~","OrderTime~" ,"OrderMonths~","SerialNo.~","WhetherToPay~"]
 				},
 				pkg: {
@@ -267,20 +267,20 @@ BCLang.home = {
 				tools: ["Default Order~","History Oder~"]
 			},
 			userDetail: {
-				tabs: ["Details~","Abnormal Information~"],
-				detail: ["User Type~","User Name~","Device Type~","Buy Way~","Status~","Status Time~","Pre-termination Report Time~","Creation Time~","Calling Fee Type~","During Agreement Period~","Account~",
-				         "Terminal Type~","Account~","Terminal Type~","IP Information~","IP Fee Amount~"],
-				change: ["Service~","Feature~","Prior to Change~","After Change~","Change Date~","Operator~"]
+				tabs: ["Details~","Change Information~"],
+				detail: ["UserType~","UserName~","DeviceType~","BuyWay~","Status~","StatusTime~","ForecastStopTime~","CreateTime~","ReminderFeeType~","InNetworkProtocolPeriod~","Account~",
+				         "TerminalType~","Account~","Terminal Type~","IPInfo~","IPFeeAmount~"],
+				change: ["Service~","Feature~","ModifyAgo~","Modified~","ChangeDate~","Operator~"]
 			},
 			prodDetail: {
-				tabs: ["Order Amount in Details~","Abnormal Information~"],
-				detail: ["No.~","Fund Type~"," Import Product~"," Import Type~"," Import Money Amount~"," Export Product~","Export Type~","Import Money Amount~","Serial Number~" ]
+				tabs: ["Order Amount Details~","Change Information~"],
+				detail: ["No.~","FundsType~","ImportProduct~","ImportType~","ImportMoneyAmount~","ExportProduct~","ExportType~","ExportMoneyAmount~","SerialNo.~" ]
 			}
 		},
 		//Payment Records
 		pay: {
 			payfee: {
-				_title: "prepaid money~",
+				_title: "Prepaid Money~",
 				columns: ["SerialNo.~","ServiceName~","AccountTypes~","AccountName~","UserType~", "UserName~","DeviceNo.~","Status~","Money~","Expire Date Before~",
 				        "Expire Date After~","PrintStatus~","PaymentWay~","ProcessingDate~","PaymentDates~","Receptionist~","ReceptionDept~","Invoice~","Invoice Issuance Way~", "InvoiceType~", "Developer~"]
 			},
@@ -291,9 +291,9 @@ BCLang.home = {
 				          "Invoice~"," Invoice Issuance Way~","InvoiceType~","BuyQuantity~","Device Model~","Remark~", "Developer~", "Payment Dates~"]
 			},
 			detail: {
-				_title: 'payment record~',
-				columns: ["Payment No.~","USD~","KHR~","Exchange~","KHR Round-off~","Effective~","Payment Way~",
-				          "Payer~","Service Serial Number~","Reception No.~","Reception Issuance Way~","Reception Date~","Receptionist~","Reception Department~"]
+				_title: 'Payment Records~',
+				columns: ["PaymentNo.~","USD~","KHR~","Exchange~","KHR Round-off~","Effective~","PaymentWay~",
+				          "Payer~","SerialNo.~","ReceptionNo.~","ReceptionIssuanceWay~","ReceptionDate~","Receptionist~","ReceptionDept~"]
 			},
 			feePayDetail: {
 				_title: 'Fee Details~',
@@ -348,16 +348,16 @@ BCLang.home = {
 		cmd: {
 			dtt: {
 				_title: "DTT Instruction Information~",
-				columns: ['ServiceSerialNumber~','StbNo.~','Card No.~','ControlWord~','ProgramName~',
+				columns: ['SerialNo.~','StbNo.~','CardNo.~','ControlWord~','ProgramName~',
 				       'InstructionType~','ResultMark~','CreateTime~','SendTime~','CARecycleTime~','WrongInfo~','AuthEndDate~']
 			},
 			ott: {
 				_title: "OTT Instruction Information~",
-				columns: ['InstructionNo.~','ServiceSerialNumber~','InstructionType~','StbNo.~','Card No.~','MAC~','SuccessOrNot~','WrongInfo~','Send Time~']
+				columns: ['InstructionNo.~','SerialNo.~','InstructionType~','StbNo.~','CardNo.~','MAC~','SuccessOrNot~','WrongInfo~','SendTime~']
 			},
 			band: {
 				_title: 'BAND Instruction Information~',
-				columns: ['InstructionNo.~','ServiceSerialNumber~','InstructionType~','StbNo.~','ModemNo.~','SuccessOrNot~','WrongInfo~','SendTime~']
+				columns: ['InstructionNo.~','SerialNo.~','InstructionType~','StbNo.~','ModemNo.~','SuccessOrNot~','WrongInfo~','SendTime~']
 			}
 		},
 		// Bill

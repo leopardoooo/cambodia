@@ -26,7 +26,7 @@ UserBaseForm = Ext.extend( BaseForm , {
 					baseCls: 'x-plain',
 					columnWidth:0.5,
 					anchor: '100%',
-					labelWidth:100
+					labelWidth: 130
 				},
 				items:[{
 					items:[{
@@ -78,7 +78,7 @@ UserBaseForm = Ext.extend( BaseForm , {
 				items: [{
 					items:[{
 						xtype: 'checkbox',
-					    labelWidth: 120,
+					    labelWidth: 130,
 					    fieldLabel: lmain("user._form.taskBackFill"),
 					    id: "boxTaskEl",
 					    checked: true,
@@ -112,7 +112,7 @@ UserBaseForm = Ext.extend( BaseForm , {
 					baseCls: 'x-plain',
 					columnWidth:0.5,
 					anchor: '100%',
-					labelWidth:100
+					labelWidth: 130
 				},
 				items:[{
 					items:[{
@@ -174,7 +174,7 @@ UserBaseForm = Ext.extend( BaseForm , {
 			},{
 				anchor:'96%',
 				xtype: 'displayfield',
-			    labelWidth: 120,
+			    labelWidth: 130,
 			    height: 50,
 			    id: 'dfProtocolInfoEl',
 			    fieldLabel: lmain("user._form.protocolInfo")
@@ -202,7 +202,7 @@ UserBaseForm = Ext.extend( BaseForm , {
 		                }
 		            }]
 			    },{
-			    	style: 'margin-left: 30px;',
+			    	style: 'margin-left: 80px;',
 			    	items :[{
 			    		xtype: 'textfield',
 			    		id: "txtLoginPswd",
