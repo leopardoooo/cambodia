@@ -496,7 +496,7 @@ BCLang.home = {
 				
 			},
 			formWin:{
-				labelSortNum:'序号~',
+				labelSortNum:'排序值~',
 				labelProvince:'省~',
 				labelDistrict:'行政区域~',
 				labelNetType:'网络类型~',
@@ -504,9 +504,9 @@ BCLang.home = {
 				emptyTxtBlurQuery:'支持模糊查询~',
 				btnTxtClose:'关闭~',
 				btnTxtSave:'保存~',
-				labelRoadNum:'路号名称~',
-				titleNewSaveLevelRoadNum:'新增路号~',
-				titleEditSaveLevelRoadNum:'修改路号~',
+				labelRoadNum:'门牌号~',
+				titleNewSaveLevelRoadNum:'新增门牌号~',
+				titleEditSaveLevelRoadNum:'修改门牌号~',
 				labelStreatName:'街道名称~',
 				titleNewSaveLevelStreet:'新增街道~',
 				titleEditSaveLevelStreet:'修改街道~',

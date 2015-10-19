@@ -103,10 +103,9 @@ public enum ErrorCode {
 	AcctAddFeeIsNotPositive("扣款金额不能是负数"),
 	
 	InvoiceIsNotYou("只有开票人可以操作"),
-	InvoiceCheckStatusIsNotIdle("发票已结账或缴销，不能操作"),
-	InvoiceTemplateDeptIsNull("模板缺失发票缴销仓库配置，请联系管理员"),
-	InvoiceNotExists("发票不存在"),
-	InvoiceNotUse("发票未使用或已作废"),
+	InvoiceCheckStatusIsNotIdle("收据已结账或核销，不能操作"),
+	InvoiceNotExists("收据不存在"),
+	
 	
 	TemplateNotConfigBuseFee("该地区费用模板未配置该费用项(%s)"),
 	CustUserIpAddressFeeCoinfigError("客户宽带IP收费存在多个费用项目，请联系管理员！"),
@@ -144,11 +143,18 @@ public enum ErrorCode {
 	ResOttIsError("OTT控制字格式错误"),
 	CmdTypeUnDefined("授权类型(%s)未定义,请联系管理员"),
 	
+	ReceiptNotExists("收据不存在或者不在当前库"),
+	ReceiptNotRecipients("收据[%s]未领用"),
+	ReceiptAlreadyCheckout("收据已结账"),
+	ReceiptIsUsed("收据[%s]已使用"),
+	
 	//======================未翻译===========================
 	NoStopRecord("找不到产品报停记录，请联系管理员"),
 	TaskDeviceUnFill("有未回填设备的用户，不能完工"),
 	GDDEviceNotOff("supernet产权的设备不能销户，请先拆机或购买设备!"),
-	UserStatusNotOff("用户状态为正常并且设备购买方式为购买，或者用户状态为拆机完成才能销户!")
+	UserStatusNotOff("用户状态为正常并且设备购买方式为购买，或者用户状态为拆机完成才能销户!"),
+	InvoiceNotUse("收据未使用或已作废"),
+	InvoiceTemplateDeptIsNull("模板缺失收据核销仓库配置，请联系管理员")
 	;
 	
 	

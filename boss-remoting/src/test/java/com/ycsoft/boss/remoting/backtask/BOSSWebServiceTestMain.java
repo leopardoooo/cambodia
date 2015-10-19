@@ -22,13 +22,13 @@ public class BOSSWebServiceTestMain {
 		
 		System.setProperty("javax.net.debug", "ssl,handshake");
        // System.setProperty("javax.net.ssl.keyStore", "/Users/killer/Documents/MyWorks/GitHub/cambodia/boss-core/src/main/resources/cert/client/client.p12");
-        System.setProperty("javax.net.ssl.keyStore", "E:/MyWork/workspace_st/cambodia/boss-core/src/main/resources/cert/client/client.p12");
+        System.setProperty("javax.net.ssl.keyStore", "D:/Java/workJPZ/boss/cambodia/boss-core/src/main/resources/cert/client/client.p12");
         
         System.setProperty("javax.net.ssl.keyStorePassword", "a1234567");
         System.setProperty("javax.net.ssl.keyStoreType", "PKCS12");
 		
 		//System.setProperty("javax.net.ssl.trustStore", "/Users/killer/Documents/MyWorks/GitHub/cambodia/boss-core/src/main/resources/cert/client/ca.p12");
-		System.setProperty("javax.net.ssl.trustStore", "E:/MyWork/workspace_st/cambodia/boss-core/src/main/resources/cert/client/ca.p12");
+		System.setProperty("javax.net.ssl.trustStore", "D:/Java/workJPZ/boss/cambodia/boss-core/src/main/resources/cert/client/ca.p12");
         System.setProperty("javax.net.ssl.trustStorePassword", "a1234567");
         System.setProperty("javax.net.ssl.trustStoreType", "PKCS12");
 		
@@ -45,7 +45,7 @@ public class BOSSWebServiceTestMain {
 				
 				WorkOrderResp arg=new WorkOrderResp();
 				// 工单编号
-				arg.setOrderNo("10003315");
+				arg.setOrderNo("10003318");
 		    	// 完工类型
 		    	arg.setRespType("QC");
 		    	// 回执消息, 如果失败的情况
@@ -64,7 +64,7 @@ public class BOSSWebServiceTestMain {
 			=new com.ycsoft.boss.remoting.backtask.BOSSWebServiceSoapImplServiceStub.DeviceFeedBackE();
 			
 			DeviceFeedBack param1=new DeviceFeedBack();
-			param1.setArg0("？");//工单ID
+			param1.setArg0("10003317");//工单ID
 	    	
 	    	// 设备信息
 	    	ProductInfo prodArray[] = new ProductInfo[1];
@@ -74,11 +74,20 @@ public class BOSSWebServiceTestMain {
 	    	DeviceInfo d1=new DeviceInfo();
 	    	DeviceInfos.add(d1);
 	    	
-	    	d1.setDeviceSN("？");//设备编号
-	    	d1.setIsFCPort(false);//是否光猫
+	    	d1.setDeviceSN("SKW031501000178");//设备编号
+	    	d1.setIsFCPort(false);//OTT
 	    	d1.setOriginalDeviceSN(null);//原设备编号
 	    	d1.setOCCSerialCode(null);//光路信息1
 	    	d1.setPOSSerialCode(null);//光路信息2
+	    	
+	    	DeviceInfo d2=new DeviceInfo();
+	    	DeviceInfos.add(d2);
+	    	
+	    	d2.setDeviceSN("ZTEGC06D2420");//设备编号
+	    	d2.setIsFCPort(true);//光猫
+	    	d2.setOriginalDeviceSN(null);//原设备编号
+	    	d2.setOCCSerialCode("5555");//光路信息1
+	    	d2.setPOSSerialCode("4443");//光路信息2
 	    	
 	    	prodArray[0].setDeviceInfos(DeviceInfos.toArray(new DeviceInfo[DeviceInfos.size()]));
 	    	param1.setArg2(prodArray);

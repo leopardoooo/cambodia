@@ -9,7 +9,7 @@ var transferNo = {
 };
 
 //仓库
-var depot = {fieldLabel:"目标仓库",hiddenName:'deviceTransfer.depot_order',xtype:'combo',allowBlank:false,
+var depot = {fieldLabel:lsys('DeviceDetailInfo.labelTargetDepot'),hiddenName:'deviceTransfer.depot_order',xtype:'combo',allowBlank:false,
 		store:new Ext.data.JsonStore({
 			url:'resource/Device!queryDeptByOptr.action',
 			fields:['dept_id','dept_name']
@@ -369,7 +369,7 @@ var TransferFileForm = Ext.extend(Ext.form.FormPanel,{
 	constructor:function(){
 		TransferFileForm.superclass.constructor.call(this,{
 			id:'transferFileFormId',
-			labelWidth: 80,
+			labelWidth: 120,
 			fileUpload: true,
 			bodyStyle:'padding-top:10px',
 			defaults:{
@@ -384,7 +384,7 @@ var TransferFileForm = Ext.extend(Ext.form.FormPanel,{
 				{
 	                xtype: 'displayfield',
 	                width : 400,
-	                value:"<font style='font-size:14px;color:red'>支持xls和txt,格式为：第一行为空,共1列：设备号</font>"
+	                value:"<font style='font-size:14px;color:red'>"+CHECK_COMMON.filesFormatFour+"</font>"
 				},
 				{id:'checkOutFileId',fieldLabel:DEV_COMMON_LU.labelDevFile,name:'files',xtype:'textfield',inputType:'file',allowBlank:false,anchor:'95%'},
 				outRemark
@@ -419,7 +419,7 @@ var TransferFileWin = Ext.extend(Ext.Window,{
 			title:CHE_OUT_LU.labelFileTrans,
 			closeAction:'hide',
 			maximizable:false,
-			width: 500,
+			width: 580,
 			height: 340,
 			layout: 'fit',
 			border: false,
@@ -488,7 +488,6 @@ var TransferHandForm = Ext.extend(Ext.form.FormPanel,{
 			id:'transferHandFormId',
 			region:'south',
 			height:100,
-			labelWidth: 80,
 			bodyStyle:'padding-top:10px',	
 			layout:'column',
 			anchor: '100%',
@@ -496,13 +495,13 @@ var TransferHandForm = Ext.extend(Ext.form.FormPanel,{
 				baseCls: 'x-plain',
 				columnWidth:0.5,
 				layout: 'form',
-				labelWidth: 75
+				labelWidth: 130
 			},
 			items:[{
-				columnWidth:0.4,
+				columnWidth:0.45,
 				items:[transferNo,depot]
 			},{
-				columnWidth:0.6,
+				columnWidth:0.55,
 				items:[statusCmp,outRemark]
 			}]
 		});
@@ -584,7 +583,7 @@ var TransferHandWin = Ext.extend(Ext.Window,{
 			title:CHE_OUT_LU.labelManualTrans,
 			closeAction:'hide',
 			maximizable:false,
-			width: 800,
+			width: 840,
 			height: 500,
 			border: false,
 			layout:'border',
@@ -796,7 +795,6 @@ var TransferBatchForm = Ext.extend(Ext.form.FormPanel,{
 			id:'transferBatchNumFormId',
 			region:'south',
 			height:100,
-			labelWidth: 80,
 			fileUpload: true,
 			bodyStyle:'padding-top:10px',
 			layout:'column',
@@ -805,7 +803,7 @@ var TransferBatchForm = Ext.extend(Ext.form.FormPanel,{
 				baseCls: 'x-plain',
 				columnWidth:0.5,
 				layout: 'form',
-				labelWidth: 75
+				labelWidth: 130
 			},
 			items:[{
 				columnWidth:0.4,
@@ -860,7 +858,7 @@ BatchNumTransferDeviceGrid = Ext.extend(Ext.grid.GridPanel,{
    			{header:DEV_COMMON_LU.labelDevCode2,dataIndex:'device_code',width:150},//,editor:deviceCodeComp
    			{header:DEV_COMMON_LU.labelDeviceType,dataIndex:'device_type_text',width:90},
    			{header:DEV_COMMON_LU.labelDeviceModel,dataIndex:'device_model_text',width:200},
-   			{header:'卡号或MAC',dataIndex:'pair_device_code',width:150}
+   			{header:DEV_COMMON_LU.labelPairCardCode,dataIndex:'pair_device_code',width:150}
 //   			{header:'modem_mac',dataIndex:'modem_mac',width:75,hidden:true},
 //   			{header:DEV_COMMON_LU.labelPairCardType,dataIndex:'pair_device_model_text',width:90},
 //   			{header:DEV_COMMON_LU.labelPairModemType,dataIndex:'pair_device_modem_model_text',width:90},
@@ -1176,7 +1174,7 @@ var TransferConfirmForm = Ext.extend(Ext.form.FormPanel,{
 		TransferConfirmForm.superclass.constructor.call(this,{
 			id:'transferConfirmFormId',
 			border:false,
-			labelWidth: 85,
+			labelWidth: 120,
 			fileUpload: true,
 			bodyStyle:'padding-top:10px',
 			defaults:{
@@ -1262,7 +1260,7 @@ var TransferNoWin = Ext.extend(Ext.Window, {
 			width: 330,
 			height: 250,
 			items:[{id:'transferNoFormId',xtype:'form',border:false,
-				bodyStyle:'padding-top:10px',labelWidth:65,items:[
+				bodyStyle:'padding-top:10px',labelWidth:120,items:[
 					{xtype:'hidden',name:'deviceDoneCode'},
 					{xtype:'textfield',fieldLabel:DEV_COMMON_LU.labelNewOrderNo,name:'transferNo',width:200,vtype:'alphanum',allowBlank:false},
 					{fieldLabel:lsys('common.remarkTxt'),name:'remark',maxLength:128,xtype:'textarea',width : 210,height : 140}//128个汉字

@@ -192,11 +192,7 @@ var MateralBackDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 			ds:this.materalStore,
 			clicksToEdit:1,
 			cm:cm,
-			sm:new Ext.grid.RowSelectionModel({}),
-			tbar:[
-				'-',
-				{text:COMMON_LU.addNewOne,iconCls:'icon-add',handler:this.doAdd,scope:this},'-'
-			]
+			sm:new Ext.grid.RowSelectionModel({})
 		});
 	},//是否可编辑
 	cellEditable:function(colIndex,rowIndex){
@@ -247,25 +243,13 @@ var MateralBackDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 			}
 			record.set('num',parseInt(value));
 		}
-	},
-	doAdd:function(){
-		var count = this.getStore().getCount();
-		var recordType = this.getStore().recordType;
-		var record = new recordType({
-			device_id:'',device_type_text:'',device_type:'',device_model:'',
-			device_model_text:'',total_num:'',num:''
-		});
-		this.stopEditing();
-		this.getStore().add(record);
-		this.startEditing(count,0);
-		this.getSelectionModel().selectRow(count);
 	}
 });
 
 var BackMateralForm = Ext.extend(Ext.form.FormPanel,{
 	constructor:function(){
 		BackHandForm.superclass.constructor.call(this,{
-			labelWidth: 80,
+			labelWidth: 120,
 			height:155,
 			region:'north',
 			fileUpload: true,
@@ -388,7 +372,7 @@ var BackFileForm = Ext.extend(Ext.form.FormPanel,{
 		BackFileForm.superclass.constructor.call(this,{
 			id:'backFileFormId',
 			border:false,
-			labelWidth: 80,
+			labelWidth: 120,
 			layout : 'column',
 			fileUpload: true,
 			bodyStyle:'padding-top:10px',
@@ -410,7 +394,7 @@ var BackFileForm = Ext.extend(Ext.form.FormPanel,{
 					items:[{
 			                xtype: 'displayfield',
 			                width : 400,
-			                value:"<font style='font-size:14px;color:red'>支持xls和txt,格式为：第一行为空,共1列：设备号</font>"
+			                value:"<font style='font-size:14px;color:red'>"+CHECK_COMMON.filesFormatFour+"</font>"
 						},
 						{id:'backHouseFileId',fieldLabel:DEV_COMMON_LU.labelDevFile,name:'files',xtype:'textfield',inputType:'file',allowBlank:false,anchor:'95%'},//,width:367},
 						backRemark
@@ -446,7 +430,7 @@ var BackFileWin = Ext.extend(Ext.Window,{
 			title:BH_LU.fileOutput,
 			closeAction:'hide',
 			maximizable:false,
-			width: 600,
+			width: 700,
 			height: 300,
 			layout: 'fit',
 			border: false,
@@ -506,7 +490,7 @@ var BackHandForm = Ext.extend(Ext.form.FormPanel,{
 	constructor:function(){
 		BackHandForm.superclass.constructor.call(this,{
 			id:'backHandFormId',
-			labelWidth: 80,
+			labelWidth: 120,
 			height:155,
 			region:'north',
 			fileUpload: true,
@@ -689,7 +673,7 @@ var OutputNoWin = Ext.extend(Ext.Window, {
 			width: 400,
 			height: 300,
 			items:[{id:'outputNoFormId',xtype:'form',border:false,
-				bodyStyle:'padding-top:10px',labelWidth:80,items:[
+				bodyStyle:'padding-top:10px',labelWidth:120,items:[
 					{xtype:'hidden',name:'deviceDoneCode'},
 					{xtype:'textfield',fieldLabel:DEV_COMMON_LU.labelNewOrderNo,width:200,name:'outputNo',vtype:'alphanum',allowBlank:false},
 					{fieldLabel:COMMON_LU.remarkTxt,name:'remark',maxLength:128,xtype:'textarea',width : 210,height : 140}//128个汉字

@@ -101,7 +101,7 @@ BCLang.home = {
 		// customer page
 		cust: {
 			base: {_title: "Basic Information~",name: "CustName~",busiId: "CustNo.~",openDate: "Open Account Date~",addr: "Address~",status: "CustStatus~",
-				type: "CustType",certType: "ID Category~",certNum: "IDNo.~",linkMan: "Contact~",tel: "Mobile Phone1~",barthday: "Birthday~",
+				type: "CustType~",certType: "ID Category~",certNum: "IDNo.~",linkMan: "Contact~",tel: "Mobile Phone1~",barthday: "Birthday~",
 				mobile: "Mobile Phone2~",areaCateory: "Area Community~",houseNetType: "ServiceType~",houseManager: "Community Customer Manager~",
 				houseOptr: "Community Maintenance Staff~",postalAddr: "PostAddress", remark: "Remark~",
 				email: "Email~", sex: "Sex~",postcode: 'Postcode~', blackList: 'BlackList~',
@@ -526,23 +526,23 @@ BCLang.home = {
 			_userTitle : 'User Details~',
 			_winTitle : 'Work Order Completion~',
 			_ZteWinTitle : 'ZTE Authorized~',
-			_fillDevTitle: 'Backfill Device',
+			_fillDevTitle: 'BackfillDevice~',
 			forms : {
-				custNo : 'Customer ID~',
+				custNo : 'CustomerNo.~',
 				taskNo : 'WorkOrdersNo.~',
-				custName : 'Customer Name~',
+				custName : 'CustomerName~',
 				mobile : 'Tel~',
-				newaddr : 'address~',
-				taskStatus : 'work order status~',
-				taskDetailType : 'WorkOrders type~',
-				taskAddr : 'area~',
-				taskTeam : 'construction team~',
-				faultType : 'fault type~',
-				finishType : 'completion type~',
-				finishExplan : 'completed Description~',
-				zteStatus	: 'ZTE status~',
-				zteRemark :'remark~',
-				syncStatus:'cfocn synchronous status~'
+				newaddr : 'Address~',
+				taskStatus : 'WorkOrdersStatus~',
+				taskDetailType : 'WorkOrdersType~',
+				taskAddr : 'Area~',
+				taskTeam : 'ConstructionTeam~',
+				faultType : 'FaultType~',
+				finishType : 'CompletionType~',
+				finishExplan : 'CompletedDesc~',
+				zteStatus	: 'ZTEStatus~',
+				zteRemark :'Remark~',
+				syncStatus:'CfocnSyncStatus~'
 			},
 			buttons : {
 				query : 'Query~',
@@ -552,15 +552,15 @@ BCLang.home = {
 				invalidTeam : 'WorkOrders Invalid~',
 				backDevice : 'Backfill Device~',
 				finish : 'Completed~',
-				returning : 'visit~',
+				returning : 'Visit~',
 				sendAuth : 'ZTE Authorized~',
 				withdraw : 'CFOCN Withdraw~'
 			},
 			taskCols : ['WorkOrdersType~', 'CustName~', 'WorkOrdersStatus~', 'ConstructionTeam~',
-					'ZTEState~', 'Address~', 'Tel~', 'CreatTime~', 'FaultType~', 'FaultDetails~','WorkNo.~','CustManager~'
-					,'CustManagerTel~','CustNo~','cfocnSyncStatus'],
-			userCols : ['UserType~', 'UserName~', 'Password~', 'DeviceModel~', 'DeviceNO.~', 'PosNo~', 'OccNo~', 'Bandwidth~'],
-			operateCols : ['OperatingTime~', 'OperationType~', 'Operator~,', 'SyncStatus~', 'Description~','DelayTime~'],
+					'ZTEStatus~', 'Address~', 'Tel~', 'CreatTime~', 'FaultType~', 'FaultDetails~','WorkNo.~','CustManager~'
+					,'CustManagerTel~','CustNo.~','cfocnSyncStatus~'],
+			userCols : ['UserType~', 'UserName~', 'Password~', 'DeviceModel~', 'DeviceNO.~', 'PosNo.~', 'OccNo.~', 'BandWidth~'],
+			operateCols : ['OperatingTime~', 'OperationType~', 'Operator~', 'SyncStatus~', 'Description~','DelayTime~'],
 			taskDeviceCols : ['UserType~', 'UserName~', 'Model~', 'DeviceNO.~', 'DeviceRecycling~','OldDeviceNO.~'],
 			msg : {
 				enterDeviceNo : 'Please enter the device number~',

@@ -122,6 +122,7 @@ Ext.apply(Ext.form.ComboBox.prototype , {
 	typeAhead: true,
     triggerAction: 'all',
 	selectOnFocus : true,
+	listWidth: 200,
 	width:FormFieldWidth-8
 })
 // ColumnModel 

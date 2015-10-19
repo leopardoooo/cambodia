@@ -1291,12 +1291,25 @@ public class DeviceComponent extends BaseDeviceComponent {
 	}
 
 	public List<SDept> queryChildDept(SOptr optr) throws Exception{
-		String dataRight = this.queryDataRightCon(optr, DataRight.DEVICE_MNG.toString());
-		if (dataRight.equals(DataRightLevel.AREA.toString()) || optr.getCounty_id().equals(SystemConstants.COUNTY_ALL)) {
+		if(this.queryDeptDataRightCon(optr, DataRight.DEVICE_MNG.toString())){
 			return sDeptDao.queryAllDept();
+		}else{
+			String depotId = findDepot(optr);
+			return sDeptDao.queryChildDept(depotId);
 		}
-		String depotId = findDepot(optr);
-		return sDeptDao.queryChildDept(depotId);
+	}
+	
+	
+	protected boolean queryDeptDataRightCon(SOptr optr,String dataRightType) throws Exception,
+			ComponentException {		
+		//取操作员原来信息，参数optr有可能是切换后的
+		SOptr sOptr = sOptrDao.findByKey(optr.getOptr_id());
+		List<SRole> roleList = sRoleDao.queryByOptrId(sOptr.getOptr_id(),dataRightType,sOptr.getCounty_id());
+		for (SRole role : roleList) {
+			if (StringHelper.isNotEmpty(role.getData_right_level()) || StringHelper.isNotEmpty(role.getRule_str()))
+				return true;
+		}
+		return false;
 	}
 	
 

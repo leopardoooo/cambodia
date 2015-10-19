@@ -416,8 +416,13 @@ Sys = {
 		labelStbType:'盒类型~',
 		labelCardType:'卡类型~',
 		labelPairModemType2:'配对MODEM类型~',
-		labelTypeName:'类型名称~'
-		
+		labelTypeName:'类型名称~',
+		labelBoxNo:'箱号~',
+		selectByInputNoBatchNumDeviceType:'支持入库编号,批号,设备类型模糊查询~',
+		filesFormatOne:'支持xls和txt,格式为：第一行为空,共3列：箱号,设备号,卡号~',
+		filesFormatTwo:'支持xls和txt,格式为：第一行为空,共3列：箱号,设备号,MAC~',
+		filesFormatThree:'支持xls和txt,格式为：第一行为空,可以2或3列,(2列的话系统默认MAC=设备号)<br>2列:箱号,设备号;3列：箱号,设备号,MAC~',
+		filesFormatFour:'支持xls和txt,格式为：第一行为空,共1列：设备号~'
 		
 		
 	},

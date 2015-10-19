@@ -372,7 +372,7 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 		if (task.getTask_type_id().equals(SystemConstants.TASK_TYPE_INSTALL) && 
 				resultType.equals(SystemConstants.TASK_FINISH_TYPE_SUCCESS)){
 			//如果是安装工单且为正常完工，修改用户产品的开始计费日期和状态 
-			installSuccess(doneCode, task.getTask_id(), users);
+			installSuccess(doneCode, task.getCust_id(), users);
 		} else if (task.getTask_type_id().equals(SystemConstants.TASK_TYPE_INSTALL) && 
 				resultType.equals(SystemConstants.TASK_FINISH_TYPE_FAILURE)){
 			//如果是安装工单且施工失败，修改用户状态为施工失败
@@ -436,10 +436,9 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 		saveAllPublic(doneCode, parameter);
 	}
 	
-	public void installSuccess(Integer doneCode,String custId,List<CUser> users) throws Exception {
+	public void installSuccess(Integer doneCode,String custId, List<CUser> users) throws Exception {
 		//获取操作的客户、用户信息
 		List<CProdOrderDto> orderList = cProdOrderDao.queryCustEffOrderDto(custId);
-		boolean isCustPkgOpen = false;
 		for(CUser user:users){
 			updateUserStatus(doneCode, user.getUser_id(), user.getStatus(), StatusConstants.ACTIVE);
 			//修改订单状态为正常状态，并更新到期日
@@ -450,9 +449,6 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 					if (curProdId == null || !order.getProd_id().equals(curProdId))
 						startDate = null;
 					startDate = openProd(doneCode, order,startDate);
-					if (StringHelper.isNotEmpty(order.getPackage_sn())){
-						isCustPkgOpen = true;
-					}
 					
 					curProdId = order.getProd_id();
 				}
@@ -464,19 +460,26 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 			List<CProdOrder> prodList = orderComponent.queryOrderProdByUserId(user.getUser_id());
 			authComponent.sendAuth(user, prodList, BusiCmdConstants.ACCTIVATE_PROD, doneCode);
 			
-			for(CProdOrder order : prodList){
+			/*for(CProdOrder order : prodList){
 				List<CProdPropChange> propChangeList = new ArrayList<CProdPropChange>();
 				propChangeList.add(new CProdPropChange("status", order.getStatus(), StatusConstants.ACTIVE));
 				propChangeList.add(new CProdPropChange("status_date", DateHelper.dateToStr(order.getStatus_date()), DateHelper.formatNow()));
 				userProdComponent.editProd(doneCode, order.getOrder_sn(), propChangeList);
-			}
+			}*/
 		}
 		
-		if (isCustPkgOpen){
-			//修改套餐状态
-			Date startDate = null;
-			for (CProdOrderDto order:orderList){
-				if (!order.getProd_type().equals(SystemConstants.PROD_TYPE_BASE)){
+		Date startDate = null;
+		boolean isOpen = true;
+		for (CProdOrderDto order:orderList){
+			if (!order.getProd_type().equals(SystemConstants.PROD_TYPE_BASE)){
+				List<CProdOrder> prodChildren = orderComponent.queryPakDetailOrder(order.getOrder_sn());
+				for(CProdOrder child : prodChildren){
+					if(!child.getStatus().equals(StatusConstants.ACTIVE)){
+						isOpen = false;
+						break;
+					}
+				}
+				if(isOpen){
 					startDate = openProd(doneCode, order,startDate);
 				}
 			}

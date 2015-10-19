@@ -86,7 +86,7 @@ public class TaskComponent extends BaseComponent {
 		//工单状态判断
 		if(!task.getTask_status().equals(StatusConstants.TASK_CREATE)
 				&&!task.getTask_status().equals(StatusConstants.TASK_ENDWAIT)){
-			throw new Exception("工单状态非可派单派单");
+			throw new Exception("工单状态非可派工单");
 		}
 
 		if(!cfonTeamId.equals(task.getTeam_id())){

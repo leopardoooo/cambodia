@@ -9,7 +9,7 @@ Ext.apply( App, {
 	 */
 	getNextInvoice:function(docType){
 		var invoiceId = App.getApp().invoiceId;
-		if(!Ext.isEmpty(invoiceId)&&invoiceId[docType]!=null){
+		if(!Ext.isEmpty(invoiceId)&&!Ext.isEmpty(invoiceId[docType])){
 			return Ext.util.Format.lpad(parseInt(invoiceId[docType],10)+1,invoiceId[docType].length,'0');
 		}
 		return '';
@@ -21,9 +21,7 @@ Ext.apply( App, {
 	 * 保存发票号
 	 */	
 	useInvoice:function(docType,invoiceId){
-		if (invoiceId!=''){
-			App.getApp().invoiceId[docType]=invoiceId;
-		}
+		App.getApp().invoiceId[docType]=invoiceId;
 	},	
 	findDtvNetTypeById: function (netType) {
 	    return this.findNetTypeByUserTypeID('DTV',netType);

@@ -16,9 +16,12 @@ public class SSLTest {
 		// DEBUG模式
 		System.setProperty("javax.net.debug", "ssl,handshake");
         System.setProperty("javax.net.ssl.keyStore", "/Users/killer/Documents/MyWorks/GitHub/cambodia/boss-core/src/main/resources/cert/server/server.p12");
+     //  System.setProperty("javax.net.ssl.keyStore", "D:/Java/workJPZ/boss/cambodia/boss-core/src/main/resources/cert/client/client.p12");
+	 //  System.setProperty("javax.net.ssl.keyStore", "/Users/killer/Documents/MyWorks/GitHub/cambodia/boss-core/src/main/resources/cert/client/client.p12");
         System.setProperty("javax.net.ssl.keyStorePassword", "a1234567");
         System.setProperty("javax.net.ssl.keyStoreType", "PKCS12");
 		
+//		System.setProperty("javax.net.ssl.trustStore", "D:/Java/workJPZ/boss/cambodia/boss-core/src/main/resources/cert/cfocn/cfocn.ca.jks");
 		System.setProperty("javax.net.ssl.trustStore", "/Users/killer/Documents/MyWorks/GitHub/cambodia/boss-core/src/main/resources/cert/cfocn/cfocn.ca.jks");
         System.setProperty("javax.net.ssl.trustStorePassword", "a1234567");
         System.setProperty("javax.net.ssl.trustStoreType", "JKS");

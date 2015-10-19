@@ -1,0 +1,549 @@
+10-16 09:52:49 [ INFO]-[org.springframework.core.SpringProperties:60]     - Found 'spring.properties' file in local classpath
+10-16 09:52:49 [ INFO]-[org.springframework.context.support.ClassPathXmlApplicationContext:510]     - Refreshing org.springframework.context.support.ClassPathXmlApplicationContext@1fa68b9c: startup date [Fri Oct 16 09:52:49 CST 2015]; root of context hierarchy
+10-16 09:52:49 [ INFO]-[org.springframework.beans.factory.xml.XmlBeanDefinitionReader:315]     - Loading XML bean definitions from class path resource [spring-beans.xml]
+10-16 09:52:54 [ INFO]-[org.springframework.beans.factory.xml.XmlBeanDefinitionReader:315]     - Loading XML bean definitions from class path resource [spring-client.xml]
+10-16 09:52:57 [ INFO]-[com.ycsoft.commons.config.CustomPropertyConfigurer:172]     - Loading properties file from URL [file:/D:/Java/workJPZ/boss/cambodia/boss-job/target/classes/spring.properties]
+10-16 09:52:57 [ INFO]-[com.ycsoft.commons.config.CustomPropertyConfigurer:172]     - Loading properties file from file [D:\Java\workJPZ\boss\cambodia\ycsoft-lib\target\classes\config\core.properties]
+10-16 09:52:57 [ INFO]-[com.ycsoft.commons.config.CustomPropertyConfigurer:172]     - Loading properties file from file [D:\Java\workJPZ\boss\cambodia\ycsoft-lib\target\classes\config\environment.properties]
+10-16 09:52:57 [ INFO]-[com.ycsoft.commons.config.CustomPropertyConfigurer:172]     - Loading properties file from file [D:\Java\workJPZ\boss\cambodia\ycsoft-lib\target\classes\config\jdbc.properties]
+10-16 09:52:58 [ INFO]-[org.springframework.beans.factory.support.DefaultListableBeanFactory:598]     - Pre-instantiating singletons in org.springframework.beans.factory.support.DefaultListableBeanFactory@342c0de: defining beans [busiDao,cfgDao,CProdInvalidUpdateDao,dataSynaDao,jobDao,prodIncludeDao,org.springframework.context.annotation.internalConfigurationAnnotationProcessor,org.springframework.context.annotation.internalAutowiredAnnotationProcessor,org.springframework.context.annotation.internalRequiredAnnotationProcessor,org.springframework.context.annotation.internalCommonAnnotationProcessor,bandAuthJob,bandWidthChangeJob,busiCfgDataJob,authComponent,busiComponent,dataSynaComponent,jobComponent,taskComponent,orderExpChangeStatusJob,ottAuthJob,stopServiceJob,taskBulletinJob,taskServiceJob,acctUnFreezeJob,autoPlusAccreditJob,bankAgreeJob,bankFeedsResultJob,bankFileSyncJob,changeTariffJob,clockPreBookJob,dataSynaCzlyJob,dealAcctUnfreezeJob,dealDelAcctItemJob,dealDoneCodeJob,editCustClassJob,feeDealPromotionJob,modifyUserStatusJob,prodCancelJob,prodIncludeRelationJob,stopServiceByExpireDateJob,BCreditAddressStopDao,BThersholdCfgDao,JSendMsgDao,JSendMsgHisDao,TAcctFeeTypeDao,TAcctitemToProdDao,TAddressDao,TAdjustDataDao,TBandCheckTypeDao,TBusiCmdSupplierDao,TBusiCodeDao,TBusiCodeDocDao,TBusiCodeFeeDao,TBusiCodeTaskDao,TBusiConfirmDao,TBusiDocDao,TBusiDocTemplatefileDao,TBusiFeeDao,TBusiFeeDeviceDao,TBusiFeeStdDao,TConfigDao,TConfigTemplateDao,TCountyAcctChangeDao,TCountyAcctDao,TCustColonyCfgDao,TDeviceBuyModeDao,TDeviceBuyModeFeeDao,TDeviceChangeReasonDao,TDistrictDao,TExchangeDao,TExtendAttributeDao,TExtendDao,TExtendGroupDao,TExtendScriptDao,TGripDataDao,TGripLogDao,TInvoicePrintitemDao,TNetTypeDao,TNonresCustApprovalDao,TOpenTempDao,TPayTypeDao,TPrintitemDao,TProdStatusRentDao,TProvinceDao,TPublicAcctitemDao,TRuleDefineCountyDao,TRuleDefineDao,TRuleEditDao,TServerCountyDao,TServerDao,TSpellDao,TStbFilledDao,TTabDefineDao,TTaskTypeDao,TTemplateColumnDao,TTemplateColumnOptrDao,TTemplateCountyDao,TTemplateDao,TTemplateExcludeCountyDao,TTemplateFeeStdDao,TTemplateTypeDao,TTerminalAmountDao,TUpdateCfgDao,CAcctAcctitemActiveDao,CAcctAcctitemAdjustDao,CAcctAcctitemChangeDao,CAcctAcctitemDao,CAcctAcctitemHisDao,CAcctAcctitemInactiveDao,CAcctAcctitemInactiveHisDao,CAcctAcctitemInvalidDao,CAcctAcctitemMergeDao,CAcctAcctitemOrderDao,CAcctAcctitemThresholdDao,CAcctAcctitemThresholdPropDao,CAcctAcctitemTransDao,CAcctBankDao,CAcctDao,CAcctHisDao,CAcctPreFeeDao,CGeneralAcctDao,CGeneralAcctDedailDao,CGeneralContractDao,CGeneralContractDetailDao,CGeneralContractHisDao,CGeneralContractPayDao,CGeneralCredentialDao,CBankAgreeDao,CBankAgreeHisDao,CBankGotodiskDao,CBankPayDao,CBankRefundtodiskDao,CBankReturnDao,CBankReturnPayerrorDao,BBillDao,BBillWriteoffDao,BRentfeeDao,BTaskInfoDao,BTaskScheduleContentDao,BTaskScheduleDao,BTaskScheduleListDao,tvOrderDao,CDoneCodeDao,CDoneCodeDetailDao,CDoneCodeInfoDao,CDoneCodeUnpayDao,extCDoneCodeDao,CCustAddrDao,CCustAddrHisDao,CCustBonuspointConsumeDao,CCustBonuspointDao,CCustBonuspointProduceDao,CCustDao,CCustDeviceBuymodePropDao,CCustDeviceChangeDao,CCustDeviceDao,CCustDeviceHisDao,CCustHisDao,CCustLinkmanDao,CCustLinkmanHisDao,CCustPropChangeDao,CCustUnitToResidentDao,CFeeAcctDao,CFeeBusiDao,CFeeDao,CFeeDeviceDao,CFeePayDao,CFeePayDetailDao,CFeePropChangeDao,CFeeUnitpreDao,CFeeUnprintDao,JBandCommandDao,JBusiCmdDao,JBusiCmdProdDao,JBusiCmdSendosdCfgDao,JBusiCmdSendosdDao,JBusiCmdSendosdHisDao,JCaCommandDao,JCaCommandOsdInvalidDao,JCustAcctmodeCalDao,JCustCreateBillDao,JCustCreditCalDao,JCustCreditExecDao,JCustInvalidCalDao,JCustUnwriteoffDao,JCustWriteoffAcctDao,JCustWriteoffDao,JDataSyncDao,JExecResultDao,JExecuteRecordDao,JOdscntRecordDao,JProdNextTariffDao,JProdNextTariffHisDao,JProdPreopenDao,JProdPreopenHisDao,JRecordChangeDao,JSignalDao,JSmsRecordDao,JUserStopDao,JVodCommandDao,TOsdPhraseDao,TOsdStopDao,CDocDao,CDocFeeDao,CDocItemDao,CInvoiceDao,CInvoiceItemDao,CInvoicePropChangeDao,CProdDao,CProdHisDao,CProdInvalidTariffDao,CProdMobileBillDao,CProdOrderDao,CProdOrderFeeDao,CProdOrderFeeOutDao,CProdOrderHisDao,CProdOrderTransfeeDao,CProdPropChangeDao,CProdPropPatDao,CProdResourceAcctDao,CProdRscDao,CProdStatusChangeDao,CProdSynDao,CPromFeeDao,CPromFeeProdDao,CPromotionAcctDao,CPromotionAcctHisDao,CPromotionCardDao,CPromotionDao,CPromotionGiftDao,CPromotionHisDao,CPromProdRefundDao,CRejectResDao,CUserAtvDao,CUserAtvHisDao,CUserBroadbandDao,CUserBroadbandHisDao,CUserDao,CUserDtvDao,CUserDtvHisDao,CUserHisDao,CUserPropChangeDao,CValuableCardDao,CValuableCardFeeDao,CValuableCardHisDao,CVoucherDao,CVoucherDoneVoucheridDao,CVoucherProcureDao,CVoucherTypeDao,PDictProdDao,PPackageProdDao,PPackageProdHisDao,PProdCountyDao,PProdCountyPriceDao,PProdCountyResDao,PProdDao,PProdDictCountyDao,PProdDictDao,PProdDynResDao,PProdResChangeDao,PProdStaticResDao,PProdTariffCountyDao,PProdTariffDao,PProdTariffDisctCountyDao,PProdTariffDisctDao,PProdUserResDao,PPromFeeCountyDao,PPromFeeDao,PPromFeeDivisionDao,PPromFeeProdDao,PPromFeeUserDao,PPromotionAcctDao,PPromotionCardDao,PPromotionCountyDao,PPromotionDao,PPromotionEasyProdDao,PPromotionFeeDao,PPromotionGiftDao,PPromotionThemeCountyDao,PPromotionThemeDao,PResDao,PResgroupDao,PResgroupResDao,PSpkgDao,PSpkgOpenbusifeeDao,PSpkgOpenuserDao,TServerResDao,RProjectAddrDao,RProjectCountyDao,RProjectDao,CBandUpgradeRecordDao,RCardDao,RCardModelDao,RDepotDefineDao,RDepotSDeptDao,RDeviceChangeDao,RDeviceDao,RDeviceDifeenceDao,RDeviceDoneDetailDao,RDeviceDoneDeviceidDao,RDeviceEditDao,RDeviceFeeDao,RDeviceHisDao,RDeviceInputDao,RDeviceModelCountyDao,RDeviceModelDao,RDeviceOrderDao,RDeviceOrderDetailDao,RDeviceOutputDao,RDeviceProcureDao,RDeviceReclaimDao,RDeviceSupplierDao,RDeviceTransferDao,RDeviceTypeDao,RDeviceUseRecordsDao,RModemDao,RModemModelDao,RPairCfgDao,RStbDao,RStbModelDao,RInvoiceDao,RInvoiceDetailDao,RInvoiceFeelistDao,RInvoiceInputDao,RInvoiceOptrDao,RInvoiceTransferDao,SAgentDao,SAreaDao,SBulletinCountyDao,SBulletinDao,SBulletinWorktaskDao,SCountyDao,SDataRightTypeDao,SDataTranslationDao,SDeptAddrDao,sdeptBusicodeDao,SDeptDao,SItemDefineDao,SItemvalueDao,SLogDao,SOptrDao,SOptrLoginDao,SOptrResourceDao,SOptrRoleDao,SParamDao,SResourceDao,SRoleCountyDao,SRoleDao,SRoleDataDao,SRoleResourceDao,SSubSystemDao,SSysChangeDao,TTaskDetailTypeDao,TTaskTemplatefileDao,WCustInfoDao,WLogDao,WPrintDao,WRevisitInfoDao,WTaskBaseInfoDao,WTaskLogDao,WTaskServDao,WTaskUserDao,WTeamDao,WVisitDao,WWorkDao,memoryComponent,propertyConfigurer,dataSource,org.springframework.aop.config.internalAutoProxyCreator,org.springframework.transaction.annotation.AnnotationTransactionAttributeSource#0,org.springframework.transaction.interceptor.TransactionInterceptor#0,org.springframework.transaction.config.internalTransactionAdvisor,org.springframework.aop.support.DefaultBeanFactoryPointcutAdvisor#0,txAdvice,jdbcTemplate,transactionManager,sqlGenerator,userService,ottClient,org.springframework.context.annotation.ConfigurationClassPostProcessor.importAwareProcessor]; root of factory hierarchy
+10-16 09:52:59 [ INFO]-[com.mchange.v2.log.MLog:92]     - MLog clients using log4j logging.
+10-16 09:52:59 [ INFO]-[com.mchange.v2.c3p0.C3P0Registry:216]     - Initializing c3p0-0.9.2.1 [built 20-March-2013 10:47:27 +0000; debug? true; trace: 10]
+10-16 09:53:04 [ INFO]-[com.yaochen.boss.job.BusiCfgDataJob:36]     -  ----- 加载基础数据 ------ 
+10-16 09:53:04 [ INFO]-[com.mchange.v2.c3p0.impl.AbstractPoolBackedDataSource:522]     - Initializing c3p0 pool... com.mchange.v2.c3p0.ComboPooledDataSource [ acquireIncrement -> 3, acquireRetryAttempts -> 30, acquireRetryDelay -> 1000, autoCommitOnClose -> false, automaticTestTable -> null, breakAfterAcquireFailure -> false, checkoutTimeout -> 10000, connectionCustomizerClassName -> null, connectionTesterClassName -> com.mchange.v2.c3p0.impl.DefaultConnectionTester, dataSourceName -> 1hge1hn9cum98g01vth4eq|1d5c9aa6, debugUnreturnedConnectionStackTraces -> false, description -> null, driverClass -> oracle.jdbc.driver.OracleDriver, factoryClassLocation -> null, forceIgnoreUnresolvedTransactions -> false, identityToken -> 1hge1hn9cum98g01vth4eq|1d5c9aa6, idleConnectionTestPeriod -> 0, initialPoolSize -> 3, jdbcUrl -> jdbc:oracle:thin:@127.0.0.1:1521:supernet, maxAdministrativeTaskTime -> 0, maxConnectionAge -> 0, maxIdleTime -> 1000, maxIdleTimeExcessConnections -> 0, maxPoolSize -> 100, maxStatements -> 0, maxStatementsPerConnection -> 0, minPoolSize -> 3, numHelperThreads -> 3, preferredTestQuery -> null, properties -> {user=******, password=******}, propertyCycle -> 0, statementCacheNumDeferredCloseThreads -> 0, testConnectionOnCheckin -> false, testConnectionOnCheckout -> false, unreturnedConnectionTimeout -> 0, userOverrides -> {}, usesTraditionalReflectiveProxies -> false ]
+10-16 09:53:26 [ INFO]-[com.yaochen.myquartz.impl.DefaultStdSchedulerFactory:1179]     - Using default implementation for ThreadExecutor
+10-16 09:53:26 [ INFO]-[org.quartz.simpl.SimpleThreadPool:270]     - Job execution threads will use class loader of thread: main
+10-16 09:53:26 [ INFO]-[org.quartz.core.SchedulerSignalerImpl:60]     - Initialized Scheduler Signaller of type: class org.quartz.core.SchedulerSignalerImpl
+10-16 09:53:26 [ INFO]-[org.quartz.core.QuartzScheduler:229]     - Quartz Scheduler v.1.8.6 created.
+10-16 09:53:26 [ INFO]-[org.quartz.simpl.RAMJobStore:139]     - RAMJobStore initialized.
+10-16 09:53:26 [ INFO]-[org.quartz.core.QuartzScheduler:255]     - Scheduler meta-data: Quartz Scheduler (v1.8.6) 'DefaultQuartzScheduler' with instanceId 'NON_CLUSTERED'
+  Scheduler class: 'org.quartz.core.QuartzScheduler' - running locally.
+  NOT STARTED.
+  Currently in standby mode.
+  Number of jobs executed: 0
+  Using thread pool 'org.quartz.simpl.SimpleThreadPool' - with 1 threads.
+  Using job-store 'org.quartz.simpl.RAMJobStore' - which does not support persistence. and is not clustered.
+
+10-16 09:53:26 [ INFO]-[com.yaochen.myquartz.impl.DefaultStdSchedulerFactory:1324]     - Quartz scheduler 'DefaultQuartzScheduler' initialized from default resource file in Quartz package: 'quartz.properties'
+10-16 09:53:26 [ INFO]-[com.yaochen.myquartz.impl.DefaultStdSchedulerFactory:1328]     - Quartz scheduler version: 1.8.6
+10-16 09:53:26 [ INFO]-[org.quartz.core.QuartzScheduler:519]     - Scheduler DefaultQuartzScheduler_$_NON_CLUSTERED started.
+10-16 09:53:28 [ INFO]-[org.apache.axis2.deployment.ModuleDeployer:82]     - Deploying module: addressing-1.6.3 - file:/D:/Java/MAVEN/repository/org/apache/axis2/axis2/1.6.3/axis2-1.6.3.jar
+10-16 09:54:21 [ERROR]-[com.yaochen.boss.job.TaskServiceJob:85]     - 未知严重错误，暂停发送!
+java.lang.Exception: 工单状态非可派工单
+	at com.yaochen.boss.job.component.TaskComponent.sendNewWorkOrder(TaskComponent.java:89)
+	at com.yaochen.boss.job.component.TaskComponent$$FastClassBySpringCGLIB$$7ddf655b.invoke(<generated>)
+	at org.springframework.cglib.proxy.MethodProxy.invoke(MethodProxy.java:204)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.invokeJoinpoint(CglibAopProxy.java:700)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:150)
+	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:96)
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:260)
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:94)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:172)
+	at org.springframework.aop.interceptor.ExposeInvocationInterceptor.invoke(ExposeInvocationInterceptor.java:91)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:172)
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:633)
+	at com.yaochen.boss.job.component.TaskComponent$$EnhancerBySpringCGLIB$$3d8dd180.sendNewWorkOrder(<generated>)
+	at com.yaochen.boss.job.TaskServiceJob.execute(TaskServiceJob.java:61)
+	at com.yaochen.myquartz.DefaultJobAdapter.execute(DefaultJobAdapter.java:88)
+	at org.quartz.core.JobRunShell.run(JobRunShell.java:223)
+	at org.quartz.simpl.SimpleThreadPool$WorkerThread.run(SimpleThreadPool.java:549)
+10-16 09:54:24 [ INFO]-[org.apache.commons.httpclient.HttpMethodDirector:439]     - I/O exception (org.apache.axis2.AxisFault) caught when processing request: Connection has been shutdown: javax.net.ssl.SSLHandshakeException: sun.security.validator.ValidatorException: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
+10-16 09:54:24 [ INFO]-[org.apache.commons.httpclient.HttpMethodDirector:445]     - Retrying request
+10-16 09:54:25 [ INFO]-[org.apache.commons.httpclient.HttpMethodDirector:439]     - I/O exception (org.apache.axis2.AxisFault) caught when processing request: Connection has been shutdown: javax.net.ssl.SSLHandshakeException: sun.security.validator.ValidatorException: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
+10-16 09:54:25 [ INFO]-[org.apache.commons.httpclient.HttpMethodDirector:445]     - Retrying request
+10-16 09:54:25 [ INFO]-[org.apache.commons.httpclient.HttpMethodDirector:439]     - I/O exception (org.apache.axis2.AxisFault) caught when processing request: Connection has been shutdown: javax.net.ssl.SSLHandshakeException: sun.security.validator.ValidatorException: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
+10-16 09:54:25 [ INFO]-[org.apache.commons.httpclient.HttpMethodDirector:445]     - Retrying request
+10-16 09:54:25 [ INFO]-[org.apache.axis2.transport.http.HTTPSender:196]     - Unable to sendViaPost to url[https://omis.cfocn.com.kh/BOSS/CFOCN_WebSvc_WorkOrder.asmx]
+org.apache.axis2.AxisFault: Connection has been shutdown: javax.net.ssl.SSLHandshakeException: sun.security.validator.ValidatorException: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
+	at org.apache.axis2.AxisFault.makeFault(AxisFault.java:430)
+	at org.apache.axis2.transport.http.SOAPMessageFormatter.writeTo(SOAPMessageFormatter.java:78)
+	at org.apache.axis2.transport.http.AxisRequestEntity.writeRequest(AxisRequestEntity.java:84)
+	at org.apache.commons.httpclient.methods.EntityEnclosingMethod.writeRequestBody(EntityEnclosingMethod.java:499)
+	at org.apache.commons.httpclient.HttpMethodBase.writeRequest(HttpMethodBase.java:2114)
+	at org.apache.commons.httpclient.HttpMethodBase.execute(HttpMethodBase.java:1096)
+	at org.apache.commons.httpclient.HttpMethodDirector.executeWithRetry(HttpMethodDirector.java:398)
+	at org.apache.commons.httpclient.HttpMethodDirector.executeMethod(HttpMethodDirector.java:171)
+	at org.apache.commons.httpclient.HttpClient.executeMethod(HttpClient.java:397)
+	at org.apache.axis2.transport.http.AbstractHTTPSender.executeMethod(AbstractHTTPSender.java:621)
+	at org.apache.axis2.transport.http.HTTPSender.sendViaPost(HTTPSender.java:193)
+	at org.apache.axis2.transport.http.HTTPSender.send(HTTPSender.java:75)
+	at org.apache.axis2.transport.http.CommonsHTTPTransportSender.writeMessageWithCommons(CommonsHTTPTransportSender.java:396)
+	at org.apache.axis2.transport.http.CommonsHTTPTransportSender.invoke(CommonsHTTPTransportSender.java:223)
+	at org.apache.axis2.engine.AxisEngine.send(AxisEngine.java:443)
+	at org.apache.axis2.description.OutInAxisOperationClient.send(OutInAxisOperation.java:406)
+	at org.apache.axis2.description.OutInAxisOperationClient.executeImpl(OutInAxisOperation.java:229)
+	at org.apache.axis2.client.OperationClient.execute(OperationClient.java:165)
+	at com.ycsoft.boss.remoting.cfocn.CFOCN_WebSvc_WorkOrderStub.manuallyInfluencedWorkOrder(CFOCN_WebSvc_WorkOrderStub.java:899)
+	at com.ycsoft.boss.remoting.cfocn.WorkOrderClient$2.doCallback(WorkOrderClient.java:143)
+	at com.ycsoft.boss.remoting.cfocn.WorkOrderClient.applyTemplate(WorkOrderClient.java:151)
+	at com.ycsoft.boss.remoting.cfocn.WorkOrderClient.cancelTaskService(WorkOrderClient.java:139)
+	at com.ycsoft.boss.remoting.cfocn.WorkOrderClient.cancelTaskService(WorkOrderClient.java:135)
+	at com.yaochen.boss.job.component.TaskComponent.cancelTaskService(TaskComponent.java:72)
+	at com.yaochen.boss.job.component.TaskComponent$$FastClassBySpringCGLIB$$7ddf655b.invoke(<generated>)
+	at org.springframework.cglib.proxy.MethodProxy.invoke(MethodProxy.java:204)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.invokeJoinpoint(CglibAopProxy.java:700)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:150)
+	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:96)
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:260)
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:94)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:172)
+	at org.springframework.aop.interceptor.ExposeInvocationInterceptor.invoke(ExposeInvocationInterceptor.java:91)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:172)
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:633)
+	at com.yaochen.boss.job.component.TaskComponent$$EnhancerBySpringCGLIB$$3d8dd180.cancelTaskService(<generated>)
+	at com.yaochen.boss.job.TaskServiceJob.execute(TaskServiceJob.java:59)
+	at com.yaochen.myquartz.DefaultJobAdapter.execute(DefaultJobAdapter.java:88)
+	at org.quartz.core.JobRunShell.run(JobRunShell.java:223)
+	at org.quartz.simpl.SimpleThreadPool$WorkerThread.run(SimpleThreadPool.java:549)
+Caused by: com.ctc.wstx.exc.WstxIOException: Connection has been shutdown: javax.net.ssl.SSLHandshakeException: sun.security.validator.ValidatorException: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
+	at com.ctc.wstx.sw.BaseStreamWriter._finishDocument(BaseStreamWriter.java:1406)
+	at com.ctc.wstx.sw.BaseStreamWriter.close(BaseStreamWriter.java:247)
+	at org.apache.axiom.util.stax.wrapper.XMLStreamWriterWrapper.close(XMLStreamWriterWrapper.java:46)
+	at org.apache.axiom.om.impl.MTOMXMLStreamWriter.close(MTOMXMLStreamWriter.java:220)
+	at org.apache.axiom.om.impl.llom.OMSerializableImpl.serializeAndConsume(OMSerializableImpl.java:169)
+	at org.apache.axis2.transport.http.SOAPMessageFormatter.writeTo(SOAPMessageFormatter.java:74)
+	... 38 more
+Caused by: javax.net.ssl.SSLException: Connection has been shutdown: javax.net.ssl.SSLHandshakeException: sun.security.validator.ValidatorException: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
+	at sun.security.ssl.SSLSocketImpl.checkEOF(SSLSocketImpl.java:1476)
+	at sun.security.ssl.SSLSocketImpl.checkWrite(SSLSocketImpl.java:1488)
+	at sun.security.ssl.AppOutputStream.write(AppOutputStream.java:70)
+	at java.io.BufferedOutputStream.flushBuffer(BufferedOutputStream.java:82)
+	at java.io.BufferedOutputStream.flush(BufferedOutputStream.java:140)
+	at org.apache.commons.httpclient.ChunkedOutputStream.flush(ChunkedOutputStream.java:191)
+	at com.ctc.wstx.io.UTF8Writer.flush(UTF8Writer.java:103)
+	at com.ctc.wstx.sw.BufferingXmlWriter.flush(BufferingXmlWriter.java:225)
+	at com.ctc.wstx.sw.BufferingXmlWriter.close(BufferingXmlWriter.java:198)
+	at com.ctc.wstx.sw.BaseStreamWriter._finishDocument(BaseStreamWriter.java:1404)
+	... 43 more
+Caused by: javax.net.ssl.SSLHandshakeException: sun.security.validator.ValidatorException: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
+	at sun.security.ssl.Alerts.getSSLException(Alerts.java:192)
+	at sun.security.ssl.SSLSocketImpl.fatal(SSLSocketImpl.java:1884)
+	at sun.security.ssl.Handshaker.fatalSE(Handshaker.java:276)
+	at sun.security.ssl.Handshaker.fatalSE(Handshaker.java:270)
+	at sun.security.ssl.ClientHandshaker.serverCertificate(ClientHandshaker.java:1341)
+	at sun.security.ssl.ClientHandshaker.processMessage(ClientHandshaker.java:153)
+	at sun.security.ssl.Handshaker.processLoop(Handshaker.java:868)
+	at sun.security.ssl.Handshaker.process_record(Handshaker.java:804)
+	at sun.security.ssl.SSLSocketImpl.readRecord(SSLSocketImpl.java:1016)
+	at sun.security.ssl.SSLSocketImpl.performInitialHandshake(SSLSocketImpl.java:1312)
+	at sun.security.ssl.SSLSocketImpl.writeRecord(SSLSocketImpl.java:702)
+	at sun.security.ssl.AppOutputStream.write(AppOutputStream.java:122)
+	at java.io.BufferedOutputStream.flushBuffer(BufferedOutputStream.java:82)
+	at java.io.BufferedOutputStream.flush(BufferedOutputStream.java:140)
+	at org.apache.commons.httpclient.ChunkedOutputStream.flush(ChunkedOutputStream.java:191)
+	at com.ctc.wstx.io.UTF8Writer.flush(UTF8Writer.java:103)
+	at com.ctc.wstx.sw.BufferingXmlWriter.flush(BufferingXmlWriter.java:225)
+	at com.ctc.wstx.sw.BaseStreamWriter.flush(BaseStreamWriter.java:259)
+	at org.apache.axiom.util.stax.wrapper.XMLStreamWriterWrapper.flush(XMLStreamWriterWrapper.java:50)
+	at org.apache.axiom.om.impl.MTOMXMLStreamWriter.flush(MTOMXMLStreamWriter.java:228)
+	at org.apache.axis2.databinding.ADBDataSource.serialize(ADBDataSource.java:91)
+	at org.apache.axiom.om.impl.llom.OMSourcedElementImpl.internalSerialize(OMSourcedElementImpl.java:742)
+	at org.apache.axiom.om.impl.util.OMSerializerUtil.serializeChildren(OMSerializerUtil.java:563)
+	at org.apache.axiom.om.impl.llom.OMElementImpl.internalSerialize(OMElementImpl.java:790)
+	at org.apache.axiom.soap.impl.llom.SOAPEnvelopeImpl.serializeInternally(SOAPEnvelopeImpl.java:271)
+	at org.apache.axiom.soap.impl.llom.SOAPEnvelopeImpl.internalSerialize(SOAPEnvelopeImpl.java:233)
+	at org.apache.axiom.om.impl.llom.OMSerializableImpl.serializeAndConsume(OMSerializableImpl.java:165)
+	... 39 more
+Caused by: sun.security.validator.ValidatorException: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
+	at sun.security.validator.PKIXValidator.doBuild(PKIXValidator.java:385)
+	at sun.security.validator.PKIXValidator.engineValidate(PKIXValidator.java:292)
+	at sun.security.validator.Validator.validate(Validator.java:260)
+	at sun.security.ssl.X509TrustManagerImpl.validate(X509TrustManagerImpl.java:326)
+	at sun.security.ssl.X509TrustManagerImpl.checkTrusted(X509TrustManagerImpl.java:231)
+	at sun.security.ssl.X509TrustManagerImpl.checkServerTrusted(X509TrustManagerImpl.java:126)
+	at sun.security.ssl.ClientHandshaker.serverCertificate(ClientHandshaker.java:1323)
+	... 61 more
+Caused by: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
+	at sun.security.provider.certpath.SunCertPathBuilder.engineBuild(SunCertPathBuilder.java:196)
+	at java.security.cert.CertPathBuilder.build(CertPathBuilder.java:268)
+	at sun.security.validator.PKIXValidator.doBuild(PKIXValidator.java:380)
+	... 67 more
+10-16 09:54:25 [ERROR]-[com.yaochen.boss.job.TaskServiceJob:77]     - 未知严重错误，暂停发送!
+com.ycsoft.boss.remoting.cfocn.WordOrderException: WordOrder Service request failure.; nested exception is: 
+	org.apache.axis2.AxisFault: Connection has been shutdown: javax.net.ssl.SSLHandshakeException: sun.security.validator.ValidatorException: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
+	at com.ycsoft.boss.remoting.cfocn.WorkOrderClient.applyTemplate(WorkOrderClient.java:154)
+	at com.ycsoft.boss.remoting.cfocn.WorkOrderClient.cancelTaskService(WorkOrderClient.java:139)
+	at com.ycsoft.boss.remoting.cfocn.WorkOrderClient.cancelTaskService(WorkOrderClient.java:135)
+	at com.yaochen.boss.job.component.TaskComponent.cancelTaskService(TaskComponent.java:72)
+	at com.yaochen.boss.job.component.TaskComponent$$FastClassBySpringCGLIB$$7ddf655b.invoke(<generated>)
+	at org.springframework.cglib.proxy.MethodProxy.invoke(MethodProxy.java:204)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.invokeJoinpoint(CglibAopProxy.java:700)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:150)
+	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:96)
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:260)
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:94)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:172)
+	at org.springframework.aop.interceptor.ExposeInvocationInterceptor.invoke(ExposeInvocationInterceptor.java:91)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:172)
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:633)
+	at com.yaochen.boss.job.component.TaskComponent$$EnhancerBySpringCGLIB$$3d8dd180.cancelTaskService(<generated>)
+	at com.yaochen.boss.job.TaskServiceJob.execute(TaskServiceJob.java:59)
+	at com.yaochen.myquartz.DefaultJobAdapter.execute(DefaultJobAdapter.java:88)
+	at org.quartz.core.JobRunShell.run(JobRunShell.java:223)
+	at org.quartz.simpl.SimpleThreadPool$WorkerThread.run(SimpleThreadPool.java:549)
+Caused by: org.apache.axis2.AxisFault: Connection has been shutdown: javax.net.ssl.SSLHandshakeException: sun.security.validator.ValidatorException: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
+	at org.apache.axis2.AxisFault.makeFault(AxisFault.java:430)
+	at org.apache.axis2.transport.http.SOAPMessageFormatter.writeTo(SOAPMessageFormatter.java:78)
+	at org.apache.axis2.transport.http.AxisRequestEntity.writeRequest(AxisRequestEntity.java:84)
+	at org.apache.commons.httpclient.methods.EntityEnclosingMethod.writeRequestBody(EntityEnclosingMethod.java:499)
+	at org.apache.commons.httpclient.HttpMethodBase.writeRequest(HttpMethodBase.java:2114)
+	at org.apache.commons.httpclient.HttpMethodBase.execute(HttpMethodBase.java:1096)
+	at org.apache.commons.httpclient.HttpMethodDirector.executeWithRetry(HttpMethodDirector.java:398)
+	at org.apache.commons.httpclient.HttpMethodDirector.executeMethod(HttpMethodDirector.java:171)
+	at org.apache.commons.httpclient.HttpClient.executeMethod(HttpClient.java:397)
+	at org.apache.axis2.transport.http.AbstractHTTPSender.executeMethod(AbstractHTTPSender.java:621)
+	at org.apache.axis2.transport.http.HTTPSender.sendViaPost(HTTPSender.java:193)
+	at org.apache.axis2.transport.http.HTTPSender.send(HTTPSender.java:75)
+	at org.apache.axis2.transport.http.CommonsHTTPTransportSender.writeMessageWithCommons(CommonsHTTPTransportSender.java:396)
+	at org.apache.axis2.transport.http.CommonsHTTPTransportSender.invoke(CommonsHTTPTransportSender.java:223)
+	at org.apache.axis2.engine.AxisEngine.send(AxisEngine.java:443)
+	at org.apache.axis2.description.OutInAxisOperationClient.send(OutInAxisOperation.java:406)
+	at org.apache.axis2.description.OutInAxisOperationClient.executeImpl(OutInAxisOperation.java:229)
+	at org.apache.axis2.client.OperationClient.execute(OperationClient.java:165)
+	at com.ycsoft.boss.remoting.cfocn.CFOCN_WebSvc_WorkOrderStub.manuallyInfluencedWorkOrder(CFOCN_WebSvc_WorkOrderStub.java:899)
+	at com.ycsoft.boss.remoting.cfocn.WorkOrderClient$2.doCallback(WorkOrderClient.java:143)
+	at com.ycsoft.boss.remoting.cfocn.WorkOrderClient.applyTemplate(WorkOrderClient.java:151)
+	... 19 more
+Caused by: com.ctc.wstx.exc.WstxIOException: Connection has been shutdown: javax.net.ssl.SSLHandshakeException: sun.security.validator.ValidatorException: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
+	at com.ctc.wstx.sw.BaseStreamWriter._finishDocument(BaseStreamWriter.java:1406)
+	at com.ctc.wstx.sw.BaseStreamWriter.close(BaseStreamWriter.java:247)
+	at org.apache.axiom.util.stax.wrapper.XMLStreamWriterWrapper.close(XMLStreamWriterWrapper.java:46)
+	at org.apache.axiom.om.impl.MTOMXMLStreamWriter.close(MTOMXMLStreamWriter.java:220)
+	at org.apache.axiom.om.impl.llom.OMSerializableImpl.serializeAndConsume(OMSerializableImpl.java:169)
+	at org.apache.axis2.transport.http.SOAPMessageFormatter.writeTo(SOAPMessageFormatter.java:74)
+	... 38 more
+Caused by: javax.net.ssl.SSLException: Connection has been shutdown: javax.net.ssl.SSLHandshakeException: sun.security.validator.ValidatorException: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
+	at sun.security.ssl.SSLSocketImpl.checkEOF(SSLSocketImpl.java:1476)
+	at sun.security.ssl.SSLSocketImpl.checkWrite(SSLSocketImpl.java:1488)
+	at sun.security.ssl.AppOutputStream.write(AppOutputStream.java:70)
+	at java.io.BufferedOutputStream.flushBuffer(BufferedOutputStream.java:82)
+	at java.io.BufferedOutputStream.flush(BufferedOutputStream.java:140)
+	at org.apache.commons.httpclient.ChunkedOutputStream.flush(ChunkedOutputStream.java:191)
+	at com.ctc.wstx.io.UTF8Writer.flush(UTF8Writer.java:103)
+	at com.ctc.wstx.sw.BufferingXmlWriter.flush(BufferingXmlWriter.java:225)
+	at com.ctc.wstx.sw.BufferingXmlWriter.close(BufferingXmlWriter.java:198)
+	at com.ctc.wstx.sw.BaseStreamWriter._finishDocument(BaseStreamWriter.java:1404)
+	... 43 more
+Caused by: javax.net.ssl.SSLHandshakeException: sun.security.validator.ValidatorException: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
+	at sun.security.ssl.Alerts.getSSLException(Alerts.java:192)
+	at sun.security.ssl.SSLSocketImpl.fatal(SSLSocketImpl.java:1884)
+	at sun.security.ssl.Handshaker.fatalSE(Handshaker.java:276)
+	at sun.security.ssl.Handshaker.fatalSE(Handshaker.java:270)
+	at sun.security.ssl.ClientHandshaker.serverCertificate(ClientHandshaker.java:1341)
+	at sun.security.ssl.ClientHandshaker.processMessage(ClientHandshaker.java:153)
+	at sun.security.ssl.Handshaker.processLoop(Handshaker.java:868)
+	at sun.security.ssl.Handshaker.process_record(Handshaker.java:804)
+	at sun.security.ssl.SSLSocketImpl.readRecord(SSLSocketImpl.java:1016)
+	at sun.security.ssl.SSLSocketImpl.performInitialHandshake(SSLSocketImpl.java:1312)
+	at sun.security.ssl.SSLSocketImpl.writeRecord(SSLSocketImpl.java:702)
+	at sun.security.ssl.AppOutputStream.write(AppOutputStream.java:122)
+	at java.io.BufferedOutputStream.flushBuffer(BufferedOutputStream.java:82)
+	at java.io.BufferedOutputStream.flush(BufferedOutputStream.java:140)
+	at org.apache.commons.httpclient.ChunkedOutputStream.flush(ChunkedOutputStream.java:191)
+	at com.ctc.wstx.io.UTF8Writer.flush(UTF8Writer.java:103)
+	at com.ctc.wstx.sw.BufferingXmlWriter.flush(BufferingXmlWriter.java:225)
+	at com.ctc.wstx.sw.BaseStreamWriter.flush(BaseStreamWriter.java:259)
+	at org.apache.axiom.util.stax.wrapper.XMLStreamWriterWrapper.flush(XMLStreamWriterWrapper.java:50)
+	at org.apache.axiom.om.impl.MTOMXMLStreamWriter.flush(MTOMXMLStreamWriter.java:228)
+	at org.apache.axis2.databinding.ADBDataSource.serialize(ADBDataSource.java:91)
+	at org.apache.axiom.om.impl.llom.OMSourcedElementImpl.internalSerialize(OMSourcedElementImpl.java:742)
+	at org.apache.axiom.om.impl.util.OMSerializerUtil.serializeChildren(OMSerializerUtil.java:563)
+	at org.apache.axiom.om.impl.llom.OMElementImpl.internalSerialize(OMElementImpl.java:790)
+	at org.apache.axiom.soap.impl.llom.SOAPEnvelopeImpl.serializeInternally(SOAPEnvelopeImpl.java:271)
+	at org.apache.axiom.soap.impl.llom.SOAPEnvelopeImpl.internalSerialize(SOAPEnvelopeImpl.java:233)
+	at org.apache.axiom.om.impl.llom.OMSerializableImpl.serializeAndConsume(OMSerializableImpl.java:165)
+	... 39 more
+Caused by: sun.security.validator.ValidatorException: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
+	at sun.security.validator.PKIXValidator.doBuild(PKIXValidator.java:385)
+	at sun.security.validator.PKIXValidator.engineValidate(PKIXValidator.java:292)
+	at sun.security.validator.Validator.validate(Validator.java:260)
+	at sun.security.ssl.X509TrustManagerImpl.validate(X509TrustManagerImpl.java:326)
+	at sun.security.ssl.X509TrustManagerImpl.checkTrusted(X509TrustManagerImpl.java:231)
+	at sun.security.ssl.X509TrustManagerImpl.checkServerTrusted(X509TrustManagerImpl.java:126)
+	at sun.security.ssl.ClientHandshaker.serverCertificate(ClientHandshaker.java:1323)
+	... 61 more
+Caused by: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
+	at sun.security.provider.certpath.SunCertPathBuilder.engineBuild(SunCertPathBuilder.java:196)
+	at java.security.cert.CertPathBuilder.build(CertPathBuilder.java:268)
+	at sun.security.validator.PKIXValidator.doBuild(PKIXValidator.java:380)
+	... 67 more
+10-16 09:56:43 [ INFO]-[org.springframework.core.SpringProperties:60]     - Found 'spring.properties' file in local classpath
+10-16 09:56:43 [ INFO]-[org.springframework.context.support.ClassPathXmlApplicationContext:510]     - Refreshing org.springframework.context.support.ClassPathXmlApplicationContext@3385f539: startup date [Fri Oct 16 09:56:43 CST 2015]; root of context hierarchy
+10-16 09:56:44 [ INFO]-[org.springframework.beans.factory.xml.XmlBeanDefinitionReader:315]     - Loading XML bean definitions from class path resource [spring-beans.xml]
+10-16 09:56:46 [ INFO]-[org.springframework.beans.factory.xml.XmlBeanDefinitionReader:315]     - Loading XML bean definitions from class path resource [spring-client.xml]
+10-16 09:56:49 [ INFO]-[com.ycsoft.commons.config.CustomPropertyConfigurer:172]     - Loading properties file from URL [file:/D:/Java/workJPZ/boss/cambodia/boss-job/target/classes/spring.properties]
+10-16 09:56:49 [ INFO]-[com.ycsoft.commons.config.CustomPropertyConfigurer:172]     - Loading properties file from file [D:\Java\workJPZ\boss\cambodia\ycsoft-lib\target\classes\config\core.properties]
+10-16 09:56:49 [ INFO]-[com.ycsoft.commons.config.CustomPropertyConfigurer:172]     - Loading properties file from file [D:\Java\workJPZ\boss\cambodia\ycsoft-lib\target\classes\config\environment.properties]
+10-16 09:56:49 [ INFO]-[com.ycsoft.commons.config.CustomPropertyConfigurer:172]     - Loading properties file from file [D:\Java\workJPZ\boss\cambodia\ycsoft-lib\target\classes\config\jdbc.properties]
+10-16 09:56:51 [ INFO]-[org.springframework.beans.factory.support.DefaultListableBeanFactory:598]     - Pre-instantiating singletons in org.springframework.beans.factory.support.DefaultListableBeanFactory@26a0aa1e: defining beans [busiDao,cfgDao,CProdInvalidUpdateDao,dataSynaDao,jobDao,prodIncludeDao,org.springframework.context.annotation.internalConfigurationAnnotationProcessor,org.springframework.context.annotation.internalAutowiredAnnotationProcessor,org.springframework.context.annotation.internalRequiredAnnotationProcessor,org.springframework.context.annotation.internalCommonAnnotationProcessor,bandAuthJob,bandWidthChangeJob,busiCfgDataJob,authComponent,busiComponent,dataSynaComponent,jobComponent,taskComponent,orderExpChangeStatusJob,ottAuthJob,stopServiceJob,taskBulletinJob,taskServiceJob,acctUnFreezeJob,autoPlusAccreditJob,bankAgreeJob,bankFeedsResultJob,bankFileSyncJob,changeTariffJob,clockPreBookJob,dataSynaCzlyJob,dealAcctUnfreezeJob,dealDelAcctItemJob,dealDoneCodeJob,editCustClassJob,feeDealPromotionJob,modifyUserStatusJob,prodCancelJob,prodIncludeRelationJob,stopServiceByExpireDateJob,BCreditAddressStopDao,BThersholdCfgDao,JSendMsgDao,JSendMsgHisDao,TAcctFeeTypeDao,TAcctitemToProdDao,TAddressDao,TAdjustDataDao,TBandCheckTypeDao,TBusiCmdSupplierDao,TBusiCodeDao,TBusiCodeDocDao,TBusiCodeFeeDao,TBusiCodeTaskDao,TBusiConfirmDao,TBusiDocDao,TBusiDocTemplatefileDao,TBusiFeeDao,TBusiFeeDeviceDao,TBusiFeeStdDao,TConfigDao,TConfigTemplateDao,TCountyAcctChangeDao,TCountyAcctDao,TCustColonyCfgDao,TDeviceBuyModeDao,TDeviceBuyModeFeeDao,TDeviceChangeReasonDao,TDistrictDao,TExchangeDao,TExtendAttributeDao,TExtendDao,TExtendGroupDao,TExtendScriptDao,TGripDataDao,TGripLogDao,TInvoicePrintitemDao,TNetTypeDao,TNonresCustApprovalDao,TOpenTempDao,TPayTypeDao,TPrintitemDao,TProdStatusRentDao,TProvinceDao,TPublicAcctitemDao,TRuleDefineCountyDao,TRuleDefineDao,TRuleEditDao,TServerCountyDao,TServerDao,TSpellDao,TStbFilledDao,TTabDefineDao,TTaskTypeDao,TTemplateColumnDao,TTemplateColumnOptrDao,TTemplateCountyDao,TTemplateDao,TTemplateExcludeCountyDao,TTemplateFeeStdDao,TTemplateTypeDao,TTerminalAmountDao,TUpdateCfgDao,CAcctAcctitemActiveDao,CAcctAcctitemAdjustDao,CAcctAcctitemChangeDao,CAcctAcctitemDao,CAcctAcctitemHisDao,CAcctAcctitemInactiveDao,CAcctAcctitemInactiveHisDao,CAcctAcctitemInvalidDao,CAcctAcctitemMergeDao,CAcctAcctitemOrderDao,CAcctAcctitemThresholdDao,CAcctAcctitemThresholdPropDao,CAcctAcctitemTransDao,CAcctBankDao,CAcctDao,CAcctHisDao,CAcctPreFeeDao,CGeneralAcctDao,CGeneralAcctDedailDao,CGeneralContractDao,CGeneralContractDetailDao,CGeneralContractHisDao,CGeneralContractPayDao,CGeneralCredentialDao,CBankAgreeDao,CBankAgreeHisDao,CBankGotodiskDao,CBankPayDao,CBankRefundtodiskDao,CBankReturnDao,CBankReturnPayerrorDao,BBillDao,BBillWriteoffDao,BRentfeeDao,BTaskInfoDao,BTaskScheduleContentDao,BTaskScheduleDao,BTaskScheduleListDao,tvOrderDao,CDoneCodeDao,CDoneCodeDetailDao,CDoneCodeInfoDao,CDoneCodeUnpayDao,extCDoneCodeDao,CCustAddrDao,CCustAddrHisDao,CCustBonuspointConsumeDao,CCustBonuspointDao,CCustBonuspointProduceDao,CCustDao,CCustDeviceBuymodePropDao,CCustDeviceChangeDao,CCustDeviceDao,CCustDeviceHisDao,CCustHisDao,CCustLinkmanDao,CCustLinkmanHisDao,CCustPropChangeDao,CCustUnitToResidentDao,CFeeAcctDao,CFeeBusiDao,CFeeDao,CFeeDeviceDao,CFeePayDao,CFeePayDetailDao,CFeePropChangeDao,CFeeUnitpreDao,CFeeUnprintDao,JBandCommandDao,JBusiCmdDao,JBusiCmdProdDao,JBusiCmdSendosdCfgDao,JBusiCmdSendosdDao,JBusiCmdSendosdHisDao,JCaCommandDao,JCaCommandOsdInvalidDao,JCustAcctmodeCalDao,JCustCreateBillDao,JCustCreditCalDao,JCustCreditExecDao,JCustInvalidCalDao,JCustUnwriteoffDao,JCustWriteoffAcctDao,JCustWriteoffDao,JDataSyncDao,JExecResultDao,JExecuteRecordDao,JOdscntRecordDao,JProdNextTariffDao,JProdNextTariffHisDao,JProdPreopenDao,JProdPreopenHisDao,JRecordChangeDao,JSignalDao,JSmsRecordDao,JUserStopDao,JVodCommandDao,TOsdPhraseDao,TOsdStopDao,CDocDao,CDocFeeDao,CDocItemDao,CInvoiceDao,CInvoiceItemDao,CInvoicePropChangeDao,CProdDao,CProdHisDao,CProdInvalidTariffDao,CProdMobileBillDao,CProdOrderDao,CProdOrderFeeDao,CProdOrderFeeOutDao,CProdOrderHisDao,CProdOrderTransfeeDao,CProdPropChangeDao,CProdPropPatDao,CProdResourceAcctDao,CProdRscDao,CProdStatusChangeDao,CProdSynDao,CPromFeeDao,CPromFeeProdDao,CPromotionAcctDao,CPromotionAcctHisDao,CPromotionCardDao,CPromotionDao,CPromotionGiftDao,CPromotionHisDao,CPromProdRefundDao,CRejectResDao,CUserAtvDao,CUserAtvHisDao,CUserBroadbandDao,CUserBroadbandHisDao,CUserDao,CUserDtvDao,CUserDtvHisDao,CUserHisDao,CUserPropChangeDao,CValuableCardDao,CValuableCardFeeDao,CValuableCardHisDao,CVoucherDao,CVoucherDoneVoucheridDao,CVoucherProcureDao,CVoucherTypeDao,PDictProdDao,PPackageProdDao,PPackageProdHisDao,PProdCountyDao,PProdCountyPriceDao,PProdCountyResDao,PProdDao,PProdDictCountyDao,PProdDictDao,PProdDynResDao,PProdResChangeDao,PProdStaticResDao,PProdTariffCountyDao,PProdTariffDao,PProdTariffDisctCountyDao,PProdTariffDisctDao,PProdUserResDao,PPromFeeCountyDao,PPromFeeDao,PPromFeeDivisionDao,PPromFeeProdDao,PPromFeeUserDao,PPromotionAcctDao,PPromotionCardDao,PPromotionCountyDao,PPromotionDao,PPromotionEasyProdDao,PPromotionFeeDao,PPromotionGiftDao,PPromotionThemeCountyDao,PPromotionThemeDao,PResDao,PResgroupDao,PResgroupResDao,PSpkgDao,PSpkgOpenbusifeeDao,PSpkgOpenuserDao,TServerResDao,RProjectAddrDao,RProjectCountyDao,RProjectDao,CBandUpgradeRecordDao,RCardDao,RCardModelDao,RDepotDefineDao,RDepotSDeptDao,RDeviceChangeDao,RDeviceDao,RDeviceDifeenceDao,RDeviceDoneDetailDao,RDeviceDoneDeviceidDao,RDeviceEditDao,RDeviceFeeDao,RDeviceHisDao,RDeviceInputDao,RDeviceModelCountyDao,RDeviceModelDao,RDeviceOrderDao,RDeviceOrderDetailDao,RDeviceOutputDao,RDeviceProcureDao,RDeviceReclaimDao,RDeviceSupplierDao,RDeviceTransferDao,RDeviceTypeDao,RDeviceUseRecordsDao,RModemDao,RModemModelDao,RPairCfgDao,RStbDao,RStbModelDao,RInvoiceDao,RInvoiceDetailDao,RInvoiceFeelistDao,RInvoiceInputDao,RInvoiceOptrDao,RInvoiceTransferDao,SAgentDao,SAreaDao,SBulletinCountyDao,SBulletinDao,SBulletinWorktaskDao,SCountyDao,SDataRightTypeDao,SDataTranslationDao,SDeptAddrDao,sdeptBusicodeDao,SDeptDao,SItemDefineDao,SItemvalueDao,SLogDao,SOptrDao,SOptrLoginDao,SOptrResourceDao,SOptrRoleDao,SParamDao,SResourceDao,SRoleCountyDao,SRoleDao,SRoleDataDao,SRoleResourceDao,SSubSystemDao,SSysChangeDao,TTaskDetailTypeDao,TTaskTemplatefileDao,WCustInfoDao,WLogDao,WPrintDao,WRevisitInfoDao,WTaskBaseInfoDao,WTaskLogDao,WTaskServDao,WTaskUserDao,WTeamDao,WVisitDao,WWorkDao,memoryComponent,propertyConfigurer,dataSource,org.springframework.aop.config.internalAutoProxyCreator,org.springframework.transaction.annotation.AnnotationTransactionAttributeSource#0,org.springframework.transaction.interceptor.TransactionInterceptor#0,org.springframework.transaction.config.internalTransactionAdvisor,org.springframework.aop.support.DefaultBeanFactoryPointcutAdvisor#0,txAdvice,jdbcTemplate,transactionManager,sqlGenerator,userService,ottClient,org.springframework.context.annotation.ConfigurationClassPostProcessor.importAwareProcessor]; root of factory hierarchy
+10-16 09:56:52 [ INFO]-[com.mchange.v2.log.MLog:92]     - MLog clients using log4j logging.
+10-16 09:56:52 [ INFO]-[com.mchange.v2.c3p0.C3P0Registry:216]     - Initializing c3p0-0.9.2.1 [built 20-March-2013 10:47:27 +0000; debug? true; trace: 10]
+10-16 09:56:57 [ INFO]-[com.yaochen.boss.job.BusiCfgDataJob:36]     -  ----- 加载基础数据 ------ 
+10-16 09:56:57 [ INFO]-[com.mchange.v2.c3p0.impl.AbstractPoolBackedDataSource:522]     - Initializing c3p0 pool... com.mchange.v2.c3p0.ComboPooledDataSource [ acquireIncrement -> 3, acquireRetryAttempts -> 30, acquireRetryDelay -> 1000, autoCommitOnClose -> false, automaticTestTable -> null, breakAfterAcquireFailure -> false, checkoutTimeout -> 10000, connectionCustomizerClassName -> null, connectionTesterClassName -> com.mchange.v2.c3p0.impl.DefaultConnectionTester, dataSourceName -> 1hge1hn9cume8ooaroikd|c26bb1a, debugUnreturnedConnectionStackTraces -> false, description -> null, driverClass -> oracle.jdbc.driver.OracleDriver, factoryClassLocation -> null, forceIgnoreUnresolvedTransactions -> false, identityToken -> 1hge1hn9cume8ooaroikd|c26bb1a, idleConnectionTestPeriod -> 0, initialPoolSize -> 3, jdbcUrl -> jdbc:oracle:thin:@127.0.0.1:1521:supernet, maxAdministrativeTaskTime -> 0, maxConnectionAge -> 0, maxIdleTime -> 1000, maxIdleTimeExcessConnections -> 0, maxPoolSize -> 100, maxStatements -> 0, maxStatementsPerConnection -> 0, minPoolSize -> 3, numHelperThreads -> 3, preferredTestQuery -> null, properties -> {user=******, password=******}, propertyCycle -> 0, statementCacheNumDeferredCloseThreads -> 0, testConnectionOnCheckin -> false, testConnectionOnCheckout -> false, unreturnedConnectionTimeout -> 0, userOverrides -> {}, usesTraditionalReflectiveProxies -> false ]
+10-16 09:57:13 [ INFO]-[com.yaochen.myquartz.impl.DefaultStdSchedulerFactory:1179]     - Using default implementation for ThreadExecutor
+10-16 09:57:13 [ INFO]-[org.quartz.simpl.SimpleThreadPool:270]     - Job execution threads will use class loader of thread: main
+10-16 09:57:14 [ INFO]-[org.quartz.core.SchedulerSignalerImpl:60]     - Initialized Scheduler Signaller of type: class org.quartz.core.SchedulerSignalerImpl
+10-16 09:57:14 [ INFO]-[org.quartz.core.QuartzScheduler:229]     - Quartz Scheduler v.1.8.6 created.
+10-16 09:57:14 [ INFO]-[org.quartz.simpl.RAMJobStore:139]     - RAMJobStore initialized.
+10-16 09:57:14 [ INFO]-[org.quartz.core.QuartzScheduler:255]     - Scheduler meta-data: Quartz Scheduler (v1.8.6) 'DefaultQuartzScheduler' with instanceId 'NON_CLUSTERED'
+  Scheduler class: 'org.quartz.core.QuartzScheduler' - running locally.
+  NOT STARTED.
+  Currently in standby mode.
+  Number of jobs executed: 0
+  Using thread pool 'org.quartz.simpl.SimpleThreadPool' - with 1 threads.
+  Using job-store 'org.quartz.simpl.RAMJobStore' - which does not support persistence. and is not clustered.
+
+10-16 09:57:14 [ INFO]-[com.yaochen.myquartz.impl.DefaultStdSchedulerFactory:1324]     - Quartz scheduler 'DefaultQuartzScheduler' initialized from default resource file in Quartz package: 'quartz.properties'
+10-16 09:57:14 [ INFO]-[com.yaochen.myquartz.impl.DefaultStdSchedulerFactory:1328]     - Quartz scheduler version: 1.8.6
+10-16 09:57:14 [ INFO]-[org.quartz.core.QuartzScheduler:519]     - Scheduler DefaultQuartzScheduler_$_NON_CLUSTERED started.
+10-16 09:57:15 [ INFO]-[org.apache.axis2.deployment.ModuleDeployer:82]     - Deploying module: addressing-1.6.3 - file:/D:/Java/MAVEN/repository/org/apache/axis2/axis2/1.6.3/axis2-1.6.3.jar
+10-16 09:59:56 [ INFO]-[org.springframework.core.SpringProperties:60]     - Found 'spring.properties' file in local classpath
+10-16 09:59:57 [ INFO]-[org.springframework.context.support.ClassPathXmlApplicationContext:510]     - Refreshing org.springframework.context.support.ClassPathXmlApplicationContext@7ffc9053: startup date [Fri Oct 16 09:59:57 CST 2015]; root of context hierarchy
+10-16 09:59:57 [ INFO]-[org.springframework.beans.factory.xml.XmlBeanDefinitionReader:315]     - Loading XML bean definitions from class path resource [spring-beans.xml]
+10-16 10:00:12 [ INFO]-[org.springframework.beans.factory.xml.XmlBeanDefinitionReader:315]     - Loading XML bean definitions from class path resource [spring-client.xml]
+10-16 10:00:15 [ INFO]-[com.ycsoft.commons.config.CustomPropertyConfigurer:172]     - Loading properties file from URL [file:/D:/Java/workJPZ/boss/cambodia/boss-job/target/classes/spring.properties]
+10-16 10:00:15 [ INFO]-[com.ycsoft.commons.config.CustomPropertyConfigurer:172]     - Loading properties file from file [D:\Java\workJPZ\boss\cambodia\ycsoft-lib\target\classes\config\core.properties]
+10-16 10:00:15 [ INFO]-[com.ycsoft.commons.config.CustomPropertyConfigurer:172]     - Loading properties file from file [D:\Java\workJPZ\boss\cambodia\ycsoft-lib\target\classes\config\environment.properties]
+10-16 10:00:15 [ INFO]-[com.ycsoft.commons.config.CustomPropertyConfigurer:172]     - Loading properties file from file [D:\Java\workJPZ\boss\cambodia\ycsoft-lib\target\classes\config\jdbc.properties]
+10-16 10:00:16 [ INFO]-[org.springframework.beans.factory.support.DefaultListableBeanFactory:598]     - Pre-instantiating singletons in org.springframework.beans.factory.support.DefaultListableBeanFactory@5df3ade7: defining beans [busiDao,cfgDao,CProdInvalidUpdateDao,dataSynaDao,jobDao,prodIncludeDao,org.springframework.context.annotation.internalConfigurationAnnotationProcessor,org.springframework.context.annotation.internalAutowiredAnnotationProcessor,org.springframework.context.annotation.internalRequiredAnnotationProcessor,org.springframework.context.annotation.internalCommonAnnotationProcessor,bandAuthJob,bandWidthChangeJob,busiCfgDataJob,authComponent,busiComponent,dataSynaComponent,jobComponent,taskComponent,orderExpChangeStatusJob,ottAuthJob,stopServiceJob,taskBulletinJob,taskServiceJob,acctUnFreezeJob,autoPlusAccreditJob,bankAgreeJob,bankFeedsResultJob,bankFileSyncJob,changeTariffJob,clockPreBookJob,dataSynaCzlyJob,dealAcctUnfreezeJob,dealDelAcctItemJob,dealDoneCodeJob,editCustClassJob,feeDealPromotionJob,modifyUserStatusJob,prodCancelJob,prodIncludeRelationJob,stopServiceByExpireDateJob,BCreditAddressStopDao,BThersholdCfgDao,JSendMsgDao,JSendMsgHisDao,TAcctFeeTypeDao,TAcctitemToProdDao,TAddressDao,TAdjustDataDao,TBandCheckTypeDao,TBusiCmdSupplierDao,TBusiCodeDao,TBusiCodeDocDao,TBusiCodeFeeDao,TBusiCodeTaskDao,TBusiConfirmDao,TBusiDocDao,TBusiDocTemplatefileDao,TBusiFeeDao,TBusiFeeDeviceDao,TBusiFeeStdDao,TConfigDao,TConfigTemplateDao,TCountyAcctChangeDao,TCountyAcctDao,TCustColonyCfgDao,TDeviceBuyModeDao,TDeviceBuyModeFeeDao,TDeviceChangeReasonDao,TDistrictDao,TExchangeDao,TExtendAttributeDao,TExtendDao,TExtendGroupDao,TExtendScriptDao,TGripDataDao,TGripLogDao,TInvoicePrintitemDao,TNetTypeDao,TNonresCustApprovalDao,TOpenTempDao,TPayTypeDao,TPrintitemDao,TProdStatusRentDao,TProvinceDao,TPublicAcctitemDao,TRuleDefineCountyDao,TRuleDefineDao,TRuleEditDao,TServerCountyDao,TServerDao,TSpellDao,TStbFilledDao,TTabDefineDao,TTaskTypeDao,TTemplateColumnDao,TTemplateColumnOptrDao,TTemplateCountyDao,TTemplateDao,TTemplateExcludeCountyDao,TTemplateFeeStdDao,TTemplateTypeDao,TTerminalAmountDao,TUpdateCfgDao,CAcctAcctitemActiveDao,CAcctAcctitemAdjustDao,CAcctAcctitemChangeDao,CAcctAcctitemDao,CAcctAcctitemHisDao,CAcctAcctitemInactiveDao,CAcctAcctitemInactiveHisDao,CAcctAcctitemInvalidDao,CAcctAcctitemMergeDao,CAcctAcctitemOrderDao,CAcctAcctitemThresholdDao,CAcctAcctitemThresholdPropDao,CAcctAcctitemTransDao,CAcctBankDao,CAcctDao,CAcctHisDao,CAcctPreFeeDao,CGeneralAcctDao,CGeneralAcctDedailDao,CGeneralContractDao,CGeneralContractDetailDao,CGeneralContractHisDao,CGeneralContractPayDao,CGeneralCredentialDao,CBankAgreeDao,CBankAgreeHisDao,CBankGotodiskDao,CBankPayDao,CBankRefundtodiskDao,CBankReturnDao,CBankReturnPayerrorDao,BBillDao,BBillWriteoffDao,BRentfeeDao,BTaskInfoDao,BTaskScheduleContentDao,BTaskScheduleDao,BTaskScheduleListDao,tvOrderDao,CDoneCodeDao,CDoneCodeDetailDao,CDoneCodeInfoDao,CDoneCodeUnpayDao,extCDoneCodeDao,CCustAddrDao,CCustAddrHisDao,CCustBonuspointConsumeDao,CCustBonuspointDao,CCustBonuspointProduceDao,CCustDao,CCustDeviceBuymodePropDao,CCustDeviceChangeDao,CCustDeviceDao,CCustDeviceHisDao,CCustHisDao,CCustLinkmanDao,CCustLinkmanHisDao,CCustPropChangeDao,CCustUnitToResidentDao,CFeeAcctDao,CFeeBusiDao,CFeeDao,CFeeDeviceDao,CFeePayDao,CFeePayDetailDao,CFeePropChangeDao,CFeeUnitpreDao,CFeeUnprintDao,JBandCommandDao,JBusiCmdDao,JBusiCmdProdDao,JBusiCmdSendosdCfgDao,JBusiCmdSendosdDao,JBusiCmdSendosdHisDao,JCaCommandDao,JCaCommandOsdInvalidDao,JCustAcctmodeCalDao,JCustCreateBillDao,JCustCreditCalDao,JCustCreditExecDao,JCustInvalidCalDao,JCustUnwriteoffDao,JCustWriteoffAcctDao,JCustWriteoffDao,JDataSyncDao,JExecResultDao,JExecuteRecordDao,JOdscntRecordDao,JProdNextTariffDao,JProdNextTariffHisDao,JProdPreopenDao,JProdPreopenHisDao,JRecordChangeDao,JSignalDao,JSmsRecordDao,JUserStopDao,JVodCommandDao,TOsdPhraseDao,TOsdStopDao,CDocDao,CDocFeeDao,CDocItemDao,CInvoiceDao,CInvoiceItemDao,CInvoicePropChangeDao,CProdDao,CProdHisDao,CProdInvalidTariffDao,CProdMobileBillDao,CProdOrderDao,CProdOrderFeeDao,CProdOrderFeeOutDao,CProdOrderHisDao,CProdOrderTransfeeDao,CProdPropChangeDao,CProdPropPatDao,CProdResourceAcctDao,CProdRscDao,CProdStatusChangeDao,CProdSynDao,CPromFeeDao,CPromFeeProdDao,CPromotionAcctDao,CPromotionAcctHisDao,CPromotionCardDao,CPromotionDao,CPromotionGiftDao,CPromotionHisDao,CPromProdRefundDao,CRejectResDao,CUserAtvDao,CUserAtvHisDao,CUserBroadbandDao,CUserBroadbandHisDao,CUserDao,CUserDtvDao,CUserDtvHisDao,CUserHisDao,CUserPropChangeDao,CValuableCardDao,CValuableCardFeeDao,CValuableCardHisDao,CVoucherDao,CVoucherDoneVoucheridDao,CVoucherProcureDao,CVoucherTypeDao,PDictProdDao,PPackageProdDao,PPackageProdHisDao,PProdCountyDao,PProdCountyPriceDao,PProdCountyResDao,PProdDao,PProdDictCountyDao,PProdDictDao,PProdDynResDao,PProdResChangeDao,PProdStaticResDao,PProdTariffCountyDao,PProdTariffDao,PProdTariffDisctCountyDao,PProdTariffDisctDao,PProdUserResDao,PPromFeeCountyDao,PPromFeeDao,PPromFeeDivisionDao,PPromFeeProdDao,PPromFeeUserDao,PPromotionAcctDao,PPromotionCardDao,PPromotionCountyDao,PPromotionDao,PPromotionEasyProdDao,PPromotionFeeDao,PPromotionGiftDao,PPromotionThemeCountyDao,PPromotionThemeDao,PResDao,PResgroupDao,PResgroupResDao,PSpkgDao,PSpkgOpenbusifeeDao,PSpkgOpenuserDao,TServerResDao,RProjectAddrDao,RProjectCountyDao,RProjectDao,CBandUpgradeRecordDao,RCardDao,RCardModelDao,RDepotDefineDao,RDepotSDeptDao,RDeviceChangeDao,RDeviceDao,RDeviceDifeenceDao,RDeviceDoneDetailDao,RDeviceDoneDeviceidDao,RDeviceEditDao,RDeviceFeeDao,RDeviceHisDao,RDeviceInputDao,RDeviceModelCountyDao,RDeviceModelDao,RDeviceOrderDao,RDeviceOrderDetailDao,RDeviceOutputDao,RDeviceProcureDao,RDeviceReclaimDao,RDeviceSupplierDao,RDeviceTransferDao,RDeviceTypeDao,RDeviceUseRecordsDao,RModemDao,RModemModelDao,RPairCfgDao,RStbDao,RStbModelDao,RInvoiceDao,RInvoiceDetailDao,RInvoiceFeelistDao,RInvoiceInputDao,RInvoiceOptrDao,RInvoiceTransferDao,SAgentDao,SAreaDao,SBulletinCountyDao,SBulletinDao,SBulletinWorktaskDao,SCountyDao,SDataRightTypeDao,SDataTranslationDao,SDeptAddrDao,sdeptBusicodeDao,SDeptDao,SItemDefineDao,SItemvalueDao,SLogDao,SOptrDao,SOptrLoginDao,SOptrResourceDao,SOptrRoleDao,SParamDao,SResourceDao,SRoleCountyDao,SRoleDao,SRoleDataDao,SRoleResourceDao,SSubSystemDao,SSysChangeDao,TTaskDetailTypeDao,TTaskTemplatefileDao,WCustInfoDao,WLogDao,WPrintDao,WRevisitInfoDao,WTaskBaseInfoDao,WTaskLogDao,WTaskServDao,WTaskUserDao,WTeamDao,WVisitDao,WWorkDao,memoryComponent,propertyConfigurer,dataSource,org.springframework.aop.config.internalAutoProxyCreator,org.springframework.transaction.annotation.AnnotationTransactionAttributeSource#0,org.springframework.transaction.interceptor.TransactionInterceptor#0,org.springframework.transaction.config.internalTransactionAdvisor,org.springframework.aop.support.DefaultBeanFactoryPointcutAdvisor#0,txAdvice,jdbcTemplate,transactionManager,sqlGenerator,userService,ottClient,org.springframework.context.annotation.ConfigurationClassPostProcessor.importAwareProcessor]; root of factory hierarchy
+10-16 10:00:18 [ INFO]-[com.mchange.v2.log.MLog:92]     - MLog clients using log4j logging.
+10-16 10:00:18 [ INFO]-[com.mchange.v2.c3p0.C3P0Registry:216]     - Initializing c3p0-0.9.2.1 [built 20-March-2013 10:47:27 +0000; debug? true; trace: 10]
+10-16 10:00:23 [ INFO]-[com.yaochen.boss.job.BusiCfgDataJob:36]     -  ----- 加载基础数据 ------ 
+10-16 10:00:23 [ INFO]-[com.mchange.v2.c3p0.impl.AbstractPoolBackedDataSource:522]     - Initializing c3p0 pool... com.mchange.v2.c3p0.ComboPooledDataSource [ acquireIncrement -> 3, acquireRetryAttempts -> 30, acquireRetryDelay -> 1000, autoCommitOnClose -> false, automaticTestTable -> null, breakAfterAcquireFailure -> false, checkoutTimeout -> 10000, connectionCustomizerClassName -> null, connectionTesterClassName -> com.mchange.v2.c3p0.impl.DefaultConnectionTester, dataSourceName -> 1hge1hn9cumin5sy6dicy|37b44519, debugUnreturnedConnectionStackTraces -> false, description -> null, driverClass -> oracle.jdbc.driver.OracleDriver, factoryClassLocation -> null, forceIgnoreUnresolvedTransactions -> false, identityToken -> 1hge1hn9cumin5sy6dicy|37b44519, idleConnectionTestPeriod -> 0, initialPoolSize -> 3, jdbcUrl -> jdbc:oracle:thin:@127.0.0.1:1521:supernet, maxAdministrativeTaskTime -> 0, maxConnectionAge -> 0, maxIdleTime -> 1000, maxIdleTimeExcessConnections -> 0, maxPoolSize -> 100, maxStatements -> 0, maxStatementsPerConnection -> 0, minPoolSize -> 3, numHelperThreads -> 3, preferredTestQuery -> null, properties -> {user=******, password=******}, propertyCycle -> 0, statementCacheNumDeferredCloseThreads -> 0, testConnectionOnCheckin -> false, testConnectionOnCheckout -> false, unreturnedConnectionTimeout -> 0, userOverrides -> {}, usesTraditionalReflectiveProxies -> false ]
+10-16 10:00:48 [ INFO]-[com.yaochen.myquartz.impl.DefaultStdSchedulerFactory:1179]     - Using default implementation for ThreadExecutor
+10-16 10:00:48 [ INFO]-[org.quartz.simpl.SimpleThreadPool:270]     - Job execution threads will use class loader of thread: main
+10-16 10:00:48 [ INFO]-[org.quartz.core.SchedulerSignalerImpl:60]     - Initialized Scheduler Signaller of type: class org.quartz.core.SchedulerSignalerImpl
+10-16 10:00:48 [ INFO]-[org.quartz.core.QuartzScheduler:229]     - Quartz Scheduler v.1.8.6 created.
+10-16 10:00:48 [ INFO]-[org.quartz.simpl.RAMJobStore:139]     - RAMJobStore initialized.
+10-16 10:00:48 [ INFO]-[org.quartz.core.QuartzScheduler:255]     - Scheduler meta-data: Quartz Scheduler (v1.8.6) 'DefaultQuartzScheduler' with instanceId 'NON_CLUSTERED'
+  Scheduler class: 'org.quartz.core.QuartzScheduler' - running locally.
+  NOT STARTED.
+  Currently in standby mode.
+  Number of jobs executed: 0
+  Using thread pool 'org.quartz.simpl.SimpleThreadPool' - with 1 threads.
+  Using job-store 'org.quartz.simpl.RAMJobStore' - which does not support persistence. and is not clustered.
+
+10-16 10:00:48 [ INFO]-[com.yaochen.myquartz.impl.DefaultStdSchedulerFactory:1324]     - Quartz scheduler 'DefaultQuartzScheduler' initialized from default resource file in Quartz package: 'quartz.properties'
+10-16 10:00:48 [ INFO]-[com.yaochen.myquartz.impl.DefaultStdSchedulerFactory:1328]     - Quartz scheduler version: 1.8.6
+10-16 10:00:48 [ INFO]-[org.quartz.core.QuartzScheduler:519]     - Scheduler DefaultQuartzScheduler_$_NON_CLUSTERED started.
+10-16 10:00:50 [ INFO]-[org.apache.axis2.deployment.ModuleDeployer:82]     - Deploying module: addressing-1.6.3 - file:/D:/Java/MAVEN/repository/org/apache/axis2/axis2/1.6.3/axis2-1.6.3.jar
+10-16 10:02:16 [ INFO]-[org.apache.commons.httpclient.HttpMethodDirector:439]     - I/O exception (org.apache.axis2.AxisFault) caught when processing request: Connection has been shutdown: javax.net.ssl.SSLHandshakeException: sun.security.validator.ValidatorException: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
+10-16 10:02:16 [ INFO]-[org.apache.commons.httpclient.HttpMethodDirector:445]     - Retrying request
+10-16 10:02:16 [ INFO]-[org.apache.commons.httpclient.HttpMethodDirector:439]     - I/O exception (org.apache.axis2.AxisFault) caught when processing request: Connection has been shutdown: javax.net.ssl.SSLHandshakeException: sun.security.validator.ValidatorException: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
+10-16 10:02:16 [ INFO]-[org.apache.commons.httpclient.HttpMethodDirector:445]     - Retrying request
+10-16 10:02:16 [ INFO]-[org.apache.commons.httpclient.HttpMethodDirector:439]     - I/O exception (org.apache.axis2.AxisFault) caught when processing request: Connection has been shutdown: javax.net.ssl.SSLHandshakeException: sun.security.validator.ValidatorException: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
+10-16 10:02:16 [ INFO]-[org.apache.commons.httpclient.HttpMethodDirector:445]     - Retrying request
+10-16 10:02:16 [ INFO]-[org.apache.axis2.transport.http.HTTPSender:196]     - Unable to sendViaPost to url[https://omis.cfocn.com.kh/BOSS/CFOCN_WebSvc_WorkOrder.asmx]
+org.apache.axis2.AxisFault: Connection has been shutdown: javax.net.ssl.SSLHandshakeException: sun.security.validator.ValidatorException: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
+	at org.apache.axis2.AxisFault.makeFault(AxisFault.java:430)
+	at org.apache.axis2.transport.http.SOAPMessageFormatter.writeTo(SOAPMessageFormatter.java:78)
+	at org.apache.axis2.transport.http.AxisRequestEntity.writeRequest(AxisRequestEntity.java:84)
+	at org.apache.commons.httpclient.methods.EntityEnclosingMethod.writeRequestBody(EntityEnclosingMethod.java:499)
+	at org.apache.commons.httpclient.HttpMethodBase.writeRequest(HttpMethodBase.java:2114)
+	at org.apache.commons.httpclient.HttpMethodBase.execute(HttpMethodBase.java:1096)
+	at org.apache.commons.httpclient.HttpMethodDirector.executeWithRetry(HttpMethodDirector.java:398)
+	at org.apache.commons.httpclient.HttpMethodDirector.executeMethod(HttpMethodDirector.java:171)
+	at org.apache.commons.httpclient.HttpClient.executeMethod(HttpClient.java:397)
+	at org.apache.axis2.transport.http.AbstractHTTPSender.executeMethod(AbstractHTTPSender.java:621)
+	at org.apache.axis2.transport.http.HTTPSender.sendViaPost(HTTPSender.java:193)
+	at org.apache.axis2.transport.http.HTTPSender.send(HTTPSender.java:75)
+	at org.apache.axis2.transport.http.CommonsHTTPTransportSender.writeMessageWithCommons(CommonsHTTPTransportSender.java:396)
+	at org.apache.axis2.transport.http.CommonsHTTPTransportSender.invoke(CommonsHTTPTransportSender.java:223)
+	at org.apache.axis2.engine.AxisEngine.send(AxisEngine.java:443)
+	at org.apache.axis2.description.OutInAxisOperationClient.send(OutInAxisOperation.java:406)
+	at org.apache.axis2.description.OutInAxisOperationClient.executeImpl(OutInAxisOperation.java:229)
+	at org.apache.axis2.client.OperationClient.execute(OperationClient.java:165)
+	at com.ycsoft.boss.remoting.cfocn.CFOCN_WebSvc_WorkOrderStub.receiveWorkOrder(CFOCN_WebSvc_WorkOrderStub.java:669)
+	at com.ycsoft.boss.remoting.cfocn.WorkOrderClient$1.doCallback(WorkOrderClient.java:117)
+	at com.ycsoft.boss.remoting.cfocn.WorkOrderClient.applyTemplate(WorkOrderClient.java:151)
+	at com.ycsoft.boss.remoting.cfocn.WorkOrderClient.createTaskService(WorkOrderClient.java:113)
+	at com.ycsoft.boss.remoting.cfocn.WorkOrderClient.createTaskService(WorkOrderClient.java:55)
+	at com.yaochen.boss.job.component.TaskComponent.sendNewWorkOrder(TaskComponent.java:98)
+	at com.yaochen.boss.job.component.TaskComponent$$FastClassBySpringCGLIB$$7ddf655b.invoke(<generated>)
+	at org.springframework.cglib.proxy.MethodProxy.invoke(MethodProxy.java:204)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.invokeJoinpoint(CglibAopProxy.java:700)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:150)
+	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:96)
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:260)
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:94)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:172)
+	at org.springframework.aop.interceptor.ExposeInvocationInterceptor.invoke(ExposeInvocationInterceptor.java:91)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:172)
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:633)
+	at com.yaochen.boss.job.component.TaskComponent$$EnhancerBySpringCGLIB$$b13e8f9c.sendNewWorkOrder(<generated>)
+	at com.yaochen.boss.job.TaskServiceJob.execute(TaskServiceJob.java:61)
+	at com.yaochen.myquartz.DefaultJobAdapter.execute(DefaultJobAdapter.java:88)
+	at org.quartz.core.JobRunShell.run(JobRunShell.java:223)
+	at org.quartz.simpl.SimpleThreadPool$WorkerThread.run(SimpleThreadPool.java:549)
+Caused by: com.ctc.wstx.exc.WstxIOException: Connection has been shutdown: javax.net.ssl.SSLHandshakeException: sun.security.validator.ValidatorException: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
+	at com.ctc.wstx.sw.BaseStreamWriter._finishDocument(BaseStreamWriter.java:1406)
+	at com.ctc.wstx.sw.BaseStreamWriter.close(BaseStreamWriter.java:247)
+	at org.apache.axiom.util.stax.wrapper.XMLStreamWriterWrapper.close(XMLStreamWriterWrapper.java:46)
+	at org.apache.axiom.om.impl.MTOMXMLStreamWriter.close(MTOMXMLStreamWriter.java:220)
+	at org.apache.axiom.om.impl.llom.OMSerializableImpl.serializeAndConsume(OMSerializableImpl.java:169)
+	at org.apache.axis2.transport.http.SOAPMessageFormatter.writeTo(SOAPMessageFormatter.java:74)
+	... 38 more
+Caused by: javax.net.ssl.SSLException: Connection has been shutdown: javax.net.ssl.SSLHandshakeException: sun.security.validator.ValidatorException: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
+	at sun.security.ssl.SSLSocketImpl.checkEOF(SSLSocketImpl.java:1476)
+	at sun.security.ssl.SSLSocketImpl.checkWrite(SSLSocketImpl.java:1488)
+	at sun.security.ssl.AppOutputStream.write(AppOutputStream.java:70)
+	at java.io.BufferedOutputStream.flushBuffer(BufferedOutputStream.java:82)
+	at java.io.BufferedOutputStream.flush(BufferedOutputStream.java:140)
+	at org.apache.commons.httpclient.ChunkedOutputStream.flush(ChunkedOutputStream.java:191)
+	at com.ctc.wstx.io.UTF8Writer.flush(UTF8Writer.java:103)
+	at com.ctc.wstx.sw.BufferingXmlWriter.flush(BufferingXmlWriter.java:225)
+	at com.ctc.wstx.sw.BufferingXmlWriter.close(BufferingXmlWriter.java:198)
+	at com.ctc.wstx.sw.BaseStreamWriter._finishDocument(BaseStreamWriter.java:1404)
+	... 43 more
+Caused by: javax.net.ssl.SSLHandshakeException: sun.security.validator.ValidatorException: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
+	at sun.security.ssl.Alerts.getSSLException(Alerts.java:192)
+	at sun.security.ssl.SSLSocketImpl.fatal(SSLSocketImpl.java:1884)
+	at sun.security.ssl.Handshaker.fatalSE(Handshaker.java:276)
+	at sun.security.ssl.Handshaker.fatalSE(Handshaker.java:270)
+	at sun.security.ssl.ClientHandshaker.serverCertificate(ClientHandshaker.java:1341)
+	at sun.security.ssl.ClientHandshaker.processMessage(ClientHandshaker.java:153)
+	at sun.security.ssl.Handshaker.processLoop(Handshaker.java:868)
+	at sun.security.ssl.Handshaker.process_record(Handshaker.java:804)
+	at sun.security.ssl.SSLSocketImpl.readRecord(SSLSocketImpl.java:1016)
+	at sun.security.ssl.SSLSocketImpl.performInitialHandshake(SSLSocketImpl.java:1312)
+	at sun.security.ssl.SSLSocketImpl.writeRecord(SSLSocketImpl.java:702)
+	at sun.security.ssl.AppOutputStream.write(AppOutputStream.java:122)
+	at java.io.BufferedOutputStream.flushBuffer(BufferedOutputStream.java:82)
+	at java.io.BufferedOutputStream.flush(BufferedOutputStream.java:140)
+	at org.apache.commons.httpclient.ChunkedOutputStream.flush(ChunkedOutputStream.java:191)
+	at com.ctc.wstx.io.UTF8Writer.flush(UTF8Writer.java:103)
+	at com.ctc.wstx.sw.BufferingXmlWriter.flush(BufferingXmlWriter.java:225)
+	at com.ctc.wstx.sw.BaseStreamWriter.flush(BaseStreamWriter.java:259)
+	at org.apache.axiom.util.stax.wrapper.XMLStreamWriterWrapper.flush(XMLStreamWriterWrapper.java:50)
+	at org.apache.axiom.om.impl.MTOMXMLStreamWriter.flush(MTOMXMLStreamWriter.java:228)
+	at org.apache.axis2.databinding.ADBDataSource.serialize(ADBDataSource.java:91)
+	at org.apache.axiom.om.impl.llom.OMSourcedElementImpl.internalSerialize(OMSourcedElementImpl.java:742)
+	at org.apache.axiom.om.impl.util.OMSerializerUtil.serializeChildren(OMSerializerUtil.java:563)
+	at org.apache.axiom.om.impl.llom.OMElementImpl.internalSerialize(OMElementImpl.java:790)
+	at org.apache.axiom.soap.impl.llom.SOAPEnvelopeImpl.serializeInternally(SOAPEnvelopeImpl.java:271)
+	at org.apache.axiom.soap.impl.llom.SOAPEnvelopeImpl.internalSerialize(SOAPEnvelopeImpl.java:233)
+	at org.apache.axiom.om.impl.llom.OMSerializableImpl.serializeAndConsume(OMSerializableImpl.java:165)
+	... 39 more
+Caused by: sun.security.validator.ValidatorException: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
+	at sun.security.validator.PKIXValidator.doBuild(PKIXValidator.java:385)
+	at sun.security.validator.PKIXValidator.engineValidate(PKIXValidator.java:292)
+	at sun.security.validator.Validator.validate(Validator.java:260)
+	at sun.security.ssl.X509TrustManagerImpl.validate(X509TrustManagerImpl.java:326)
+	at sun.security.ssl.X509TrustManagerImpl.checkTrusted(X509TrustManagerImpl.java:231)
+	at sun.security.ssl.X509TrustManagerImpl.checkServerTrusted(X509TrustManagerImpl.java:126)
+	at sun.security.ssl.ClientHandshaker.serverCertificate(ClientHandshaker.java:1323)
+	... 61 more
+Caused by: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
+	at sun.security.provider.certpath.SunCertPathBuilder.engineBuild(SunCertPathBuilder.java:196)
+	at java.security.cert.CertPathBuilder.build(CertPathBuilder.java:268)
+	at sun.security.validator.PKIXValidator.doBuild(PKIXValidator.java:380)
+	... 67 more
+10-16 10:02:17 [ERROR]-[com.yaochen.boss.job.TaskServiceJob:77]     - 未知严重错误，暂停发送!
+com.ycsoft.boss.remoting.cfocn.WordOrderException: WordOrder Service request failure.; nested exception is: 
+	org.apache.axis2.AxisFault: Connection has been shutdown: javax.net.ssl.SSLHandshakeException: sun.security.validator.ValidatorException: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
+	at com.ycsoft.boss.remoting.cfocn.WorkOrderClient.applyTemplate(WorkOrderClient.java:154)
+	at com.ycsoft.boss.remoting.cfocn.WorkOrderClient.createTaskService(WorkOrderClient.java:113)
+	at com.ycsoft.boss.remoting.cfocn.WorkOrderClient.createTaskService(WorkOrderClient.java:55)
+	at com.yaochen.boss.job.component.TaskComponent.sendNewWorkOrder(TaskComponent.java:98)
+	at com.yaochen.boss.job.component.TaskComponent$$FastClassBySpringCGLIB$$7ddf655b.invoke(<generated>)
+	at org.springframework.cglib.proxy.MethodProxy.invoke(MethodProxy.java:204)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.invokeJoinpoint(CglibAopProxy.java:700)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:150)
+	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:96)
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:260)
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:94)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:172)
+	at org.springframework.aop.interceptor.ExposeInvocationInterceptor.invoke(ExposeInvocationInterceptor.java:91)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:172)
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:633)
+	at com.yaochen.boss.job.component.TaskComponent$$EnhancerBySpringCGLIB$$b13e8f9c.sendNewWorkOrder(<generated>)
+	at com.yaochen.boss.job.TaskServiceJob.execute(TaskServiceJob.java:61)
+	at com.yaochen.myquartz.DefaultJobAdapter.execute(DefaultJobAdapter.java:88)
+	at org.quartz.core.JobRunShell.run(JobRunShell.java:223)
+	at org.quartz.simpl.SimpleThreadPool$WorkerThread.run(SimpleThreadPool.java:549)
+Caused by: org.apache.axis2.AxisFault: Connection has been shutdown: javax.net.ssl.SSLHandshakeException: sun.security.validator.ValidatorException: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
+	at org.apache.axis2.AxisFault.makeFault(AxisFault.java:430)
+	at org.apache.axis2.transport.http.SOAPMessageFormatter.writeTo(SOAPMessageFormatter.java:78)
+	at org.apache.axis2.transport.http.AxisRequestEntity.writeRequest(AxisRequestEntity.java:84)
+	at org.apache.commons.httpclient.methods.EntityEnclosingMethod.writeRequestBody(EntityEnclosingMethod.java:499)
+	at org.apache.commons.httpclient.HttpMethodBase.writeRequest(HttpMethodBase.java:2114)
+	at org.apache.commons.httpclient.HttpMethodBase.execute(HttpMethodBase.java:1096)
+	at org.apache.commons.httpclient.HttpMethodDirector.executeWithRetry(HttpMethodDirector.java:398)
+	at org.apache.commons.httpclient.HttpMethodDirector.executeMethod(HttpMethodDirector.java:171)
+	at org.apache.commons.httpclient.HttpClient.executeMethod(HttpClient.java:397)
+	at org.apache.axis2.transport.http.AbstractHTTPSender.executeMethod(AbstractHTTPSender.java:621)
+	at org.apache.axis2.transport.http.HTTPSender.sendViaPost(HTTPSender.java:193)
+	at org.apache.axis2.transport.http.HTTPSender.send(HTTPSender.java:75)
+	at org.apache.axis2.transport.http.CommonsHTTPTransportSender.writeMessageWithCommons(CommonsHTTPTransportSender.java:396)
+	at org.apache.axis2.transport.http.CommonsHTTPTransportSender.invoke(CommonsHTTPTransportSender.java:223)
+	at org.apache.axis2.engine.AxisEngine.send(AxisEngine.java:443)
+	at org.apache.axis2.description.OutInAxisOperationClient.send(OutInAxisOperation.java:406)
+	at org.apache.axis2.description.OutInAxisOperationClient.executeImpl(OutInAxisOperation.java:229)
+	at org.apache.axis2.client.OperationClient.execute(OperationClient.java:165)
+	at com.ycsoft.boss.remoting.cfocn.CFOCN_WebSvc_WorkOrderStub.receiveWorkOrder(CFOCN_WebSvc_WorkOrderStub.java:669)
+	at com.ycsoft.boss.remoting.cfocn.WorkOrderClient$1.doCallback(WorkOrderClient.java:117)
+	at com.ycsoft.boss.remoting.cfocn.WorkOrderClient.applyTemplate(WorkOrderClient.java:151)
+	... 19 more
+Caused by: com.ctc.wstx.exc.WstxIOException: Connection has been shutdown: javax.net.ssl.SSLHandshakeException: sun.security.validator.ValidatorException: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
+	at com.ctc.wstx.sw.BaseStreamWriter._finishDocument(BaseStreamWriter.java:1406)
+	at com.ctc.wstx.sw.BaseStreamWriter.close(BaseStreamWriter.java:247)
+	at org.apache.axiom.util.stax.wrapper.XMLStreamWriterWrapper.close(XMLStreamWriterWrapper.java:46)
+	at org.apache.axiom.om.impl.MTOMXMLStreamWriter.close(MTOMXMLStreamWriter.java:220)
+	at org.apache.axiom.om.impl.llom.OMSerializableImpl.serializeAndConsume(OMSerializableImpl.java:169)
+	at org.apache.axis2.transport.http.SOAPMessageFormatter.writeTo(SOAPMessageFormatter.java:74)
+	... 38 more
+Caused by: javax.net.ssl.SSLException: Connection has been shutdown: javax.net.ssl.SSLHandshakeException: sun.security.validator.ValidatorException: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
+	at sun.security.ssl.SSLSocketImpl.checkEOF(SSLSocketImpl.java:1476)
+	at sun.security.ssl.SSLSocketImpl.checkWrite(SSLSocketImpl.java:1488)
+	at sun.security.ssl.AppOutputStream.write(AppOutputStream.java:70)
+	at java.io.BufferedOutputStream.flushBuffer(BufferedOutputStream.java:82)
+	at java.io.BufferedOutputStream.flush(BufferedOutputStream.java:140)
+	at org.apache.commons.httpclient.ChunkedOutputStream.flush(ChunkedOutputStream.java:191)
+	at com.ctc.wstx.io.UTF8Writer.flush(UTF8Writer.java:103)
+	at com.ctc.wstx.sw.BufferingXmlWriter.flush(BufferingXmlWriter.java:225)
+	at com.ctc.wstx.sw.BufferingXmlWriter.close(BufferingXmlWriter.java:198)
+	at com.ctc.wstx.sw.BaseStreamWriter._finishDocument(BaseStreamWriter.java:1404)
+	... 43 more
+Caused by: javax.net.ssl.SSLHandshakeException: sun.security.validator.ValidatorException: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
+	at sun.security.ssl.Alerts.getSSLException(Alerts.java:192)
+	at sun.security.ssl.SSLSocketImpl.fatal(SSLSocketImpl.java:1884)
+	at sun.security.ssl.Handshaker.fatalSE(Handshaker.java:276)
+	at sun.security.ssl.Handshaker.fatalSE(Handshaker.java:270)
+	at sun.security.ssl.ClientHandshaker.serverCertificate(ClientHandshaker.java:1341)
+	at sun.security.ssl.ClientHandshaker.processMessage(ClientHandshaker.java:153)
+	at sun.security.ssl.Handshaker.processLoop(Handshaker.java:868)
+	at sun.security.ssl.Handshaker.process_record(Handshaker.java:804)
+	at sun.security.ssl.SSLSocketImpl.readRecord(SSLSocketImpl.java:1016)
+	at sun.security.ssl.SSLSocketImpl.performInitialHandshake(SSLSocketImpl.java:1312)
+	at sun.security.ssl.SSLSocketImpl.writeRecord(SSLSocketImpl.java:702)
+	at sun.security.ssl.AppOutputStream.write(AppOutputStream.java:122)
+	at java.io.BufferedOutputStream.flushBuffer(BufferedOutputStream.java:82)
+	at java.io.BufferedOutputStream.flush(BufferedOutputStream.java:140)
+	at org.apache.commons.httpclient.ChunkedOutputStream.flush(ChunkedOutputStream.java:191)
+	at com.ctc.wstx.io.UTF8Writer.flush(UTF8Writer.java:103)
+	at com.ctc.wstx.sw.BufferingXmlWriter.flush(BufferingXmlWriter.java:225)
+	at com.ctc.wstx.sw.BaseStreamWriter.flush(BaseStreamWriter.java:259)
+	at org.apache.axiom.util.stax.wrapper.XMLStreamWriterWrapper.flush(XMLStreamWriterWrapper.java:50)
+	at org.apache.axiom.om.impl.MTOMXMLStreamWriter.flush(MTOMXMLStreamWriter.java:228)
+	at org.apache.axis2.databinding.ADBDataSource.serialize(ADBDataSource.java:91)
+	at org.apache.axiom.om.impl.llom.OMSourcedElementImpl.internalSerialize(OMSourcedElementImpl.java:742)
+	at org.apache.axiom.om.impl.util.OMSerializerUtil.serializeChildren(OMSerializerUtil.java:563)
+	at org.apache.axiom.om.impl.llom.OMElementImpl.internalSerialize(OMElementImpl.java:790)
+	at org.apache.axiom.soap.impl.llom.SOAPEnvelopeImpl.serializeInternally(SOAPEnvelopeImpl.java:271)
+	at org.apache.axiom.soap.impl.llom.SOAPEnvelopeImpl.internalSerialize(SOAPEnvelopeImpl.java:233)
+	at org.apache.axiom.om.impl.llom.OMSerializableImpl.serializeAndConsume(OMSerializableImpl.java:165)
+	... 39 more
+Caused by: sun.security.validator.ValidatorException: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
+	at sun.security.validator.PKIXValidator.doBuild(PKIXValidator.java:385)
+	at sun.security.validator.PKIXValidator.engineValidate(PKIXValidator.java:292)
+	at sun.security.validator.Validator.validate(Validator.java:260)
+	at sun.security.ssl.X509TrustManagerImpl.validate(X509TrustManagerImpl.java:326)
+	at sun.security.ssl.X509TrustManagerImpl.checkTrusted(X509TrustManagerImpl.java:231)
+	at sun.security.ssl.X509TrustManagerImpl.checkServerTrusted(X509TrustManagerImpl.java:126)
+	at sun.security.ssl.ClientHandshaker.serverCertificate(ClientHandshaker.java:1323)
+	... 61 more
+Caused by: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
+	at sun.security.provider.certpath.SunCertPathBuilder.engineBuild(SunCertPathBuilder.java:196)
+	at java.security.cert.CertPathBuilder.build(CertPathBuilder.java:268)
+	at sun.security.validator.PKIXValidator.doBuild(PKIXValidator.java:380)
+	... 67 more

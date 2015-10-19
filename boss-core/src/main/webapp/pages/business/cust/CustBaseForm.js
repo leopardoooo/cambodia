@@ -572,13 +572,39 @@ CustBaseForm = Ext.extend( BaseForm , {
 							}
 						}
 					},{
+						id: 'comboDvpId',
 						fieldLabel: langUtils.main("cust.base.developName"),
 						xtype:'combo',
 						hiddenName: 'cust.str9',
 						store: this.busiOptrStore,
 						valueField:'optr_id',displayField:'optr_name',
 						editable:true,
-						allowBlank:false
+						allowBlank:false,
+				        forceSelection: true,
+				        selectOnFocus:true,
+						listeners: {
+							scope: this,
+							'focus':{
+								fn:function(combo){
+									combo.expand();
+									combo.doQuery(combo.allQuery, true);
+								},
+								buffer:200
+							},
+							beforequery: function(e){
+								var combo = e.combo;
+						        if(!e.forceAll){
+						            var value = Ext.isEmpty(e.query) ? '' : e.query.toUpperCase();  
+						            combo.store.filterBy(function(record,id){  
+						                return record.get(combo.displayField).toUpperCase().indexOf(value) != -1;  
+						            });
+						            if(!combo.isExpanded()){
+						            	combo.expand();
+						            }
+						            return false;
+						        }
+							}
+						}
 					}]
 				},{
 					id:'addCustItemsTwo',

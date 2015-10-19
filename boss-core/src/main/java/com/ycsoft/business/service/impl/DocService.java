@@ -387,7 +387,7 @@ public class DocService extends BaseBusiService implements IDocService {
 		return invoiceComponent.queryInvoiceById(invoiceId);
 	}
 
-	public void saveInvoice(String invoiceId, String invoiceCode,
+	public boolean saveInvoice(String invoiceId, String invoiceCode,
 			List<InvoiceFromDto> invoices) throws Exception {
 		Integer doneCode = doneCodeComponent.gDoneCode();
 		int balance = acctComponent.queryXJBalanceByCustId(getBusiParam().getCust().getCust_id());
@@ -405,7 +405,8 @@ public class DocService extends BaseBusiService implements IDocService {
 				invoiceComponent.checkInvoice(i.getInvoice_id(), i.getDoc_type(), SystemConstants.INVOICE_MODE_AUTO);
 			}
 		}
-		
+		//验证能不能跳收据号
+		boolean flay = invoiceComponent.checkInvoiceOptr(invoiceIdList,getOptr().getOptr_id());
 		
 		
 		if(!oldFlag){
@@ -436,6 +437,7 @@ public class DocService extends BaseBusiService implements IDocService {
 			
 		}
 		saveAllPublic(doneCode,getBusiParam());
+		return flay;
 	}
 	
 	public CInvoiceDto queryReprintInvoice(String invoiceId, String invoiceCode) throws Exception {
