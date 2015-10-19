@@ -22,43 +22,28 @@ public class BOSSWebServiceTestMain {
 		
 		System.setProperty("javax.net.debug", "ssl,handshake");
        // System.setProperty("javax.net.ssl.keyStore", "/Users/killer/Documents/MyWorks/GitHub/cambodia/boss-core/src/main/resources/cert/client/client.p12");
-        System.setProperty("javax.net.ssl.keyStore", "D:/Java/workJPZ/boss/cambodia/boss-core/src/main/resources/cert/client/client.p12");
-        
+        System.setProperty("javax.net.ssl.keyStore", "D:/ycsoft/ssl/cfocn.client.jks");
         System.setProperty("javax.net.ssl.keyStorePassword", "a1234567");
         System.setProperty("javax.net.ssl.keyStoreType", "PKCS12");
 		
 		//System.setProperty("javax.net.ssl.trustStore", "/Users/killer/Documents/MyWorks/GitHub/cambodia/boss-core/src/main/resources/cert/client/ca.p12");
-		System.setProperty("javax.net.ssl.trustStore", "D:/Java/workJPZ/boss/cambodia/boss-core/src/main/resources/cert/client/ca.p12");
+		System.setProperty("javax.net.ssl.trustStore", "D:/ycsoft/ssl/ca.p12");
         System.setProperty("javax.net.ssl.trustStorePassword", "a1234567");
         System.setProperty("javax.net.ssl.trustStoreType", "PKCS12");
 		
-        
-        // TODO 接口方法调用： 
-        // 参考 BOSSWebServiceSoapImplServiceTest的test方法
-        try {
+        BOSSWebServiceTestMain aa=new BOSSWebServiceTestMain();
+        //完工测试
+        aa.testEnd("a123");
+			
+
+
+	}
+	
+	//回退测试
+	public void testFill(){
+		try{
 			com.ycsoft.boss.remoting.backtask.BOSSWebServiceSoapImplServiceStub stub =
 			        new com.ycsoft.boss.remoting.backtask.BOSSWebServiceSoapImplServiceStub();
-			try{
-				//完工测试
-				com.ycsoft.boss.remoting.backtask.BOSSWebServiceSoapImplServiceStub.ReturnWorkOrderE returnWorkOrder8 =
-			            new com.ycsoft.boss.remoting.backtask.BOSSWebServiceSoapImplServiceStub.ReturnWorkOrderE();
-				
-				WorkOrderResp arg=new WorkOrderResp();
-				// 工单编号
-				arg.setOrderNo("10003318");
-		    	// 完工类型
-		    	arg.setRespType("QC");
-		    	// 回执消息, 如果失败的情况
-		    	arg.setRespMsg("你好啊OK");
-		    	
-				ReturnWorkOrder param=new ReturnWorkOrder();
-				param.setArg0(arg);
-				returnWorkOrder8.setReturnWorkOrder(param);
-				stub.returnWorkOrder(returnWorkOrder8);
-			}catch(Exception e){
-				e.printStackTrace();
-			}
-			
 			//回填测试
 			com.ycsoft.boss.remoting.backtask.BOSSWebServiceSoapImplServiceStub.DeviceFeedBackE deviceFeedBack10
 			=new com.ycsoft.boss.remoting.backtask.BOSSWebServiceSoapImplServiceStub.DeviceFeedBackE();
@@ -93,17 +78,40 @@ public class BOSSWebServiceTestMain {
 	    	param1.setArg2(prodArray);
 			deviceFeedBack10.setDeviceFeedBack(param1);			
 			stub.deviceFeedBack(deviceFeedBack10);
+		
+	} catch (Exception e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	}
+	/**
+	 * 完工测试
+	 * @param taskId
+	 */
+	public void testEnd(String taskId){
+		try{
+			com.ycsoft.boss.remoting.backtask.BOSSWebServiceSoapImplServiceStub stub =
+		        new com.ycsoft.boss.remoting.backtask.BOSSWebServiceSoapImplServiceStub();
+		
+			//完工测试
+			com.ycsoft.boss.remoting.backtask.BOSSWebServiceSoapImplServiceStub.ReturnWorkOrderE returnWorkOrder8 =
+		            new com.ycsoft.boss.remoting.backtask.BOSSWebServiceSoapImplServiceStub.ReturnWorkOrderE();
 			
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
+			WorkOrderResp arg=new WorkOrderResp();
+			// 工单编号
+			arg.setOrderNo(taskId);
+	    	// 完工类型
+	    	arg.setRespType("QC");
+	    	// 回执消息, 如果失败的情况
+	    	arg.setRespMsg("你好啊OK");
+	    	
+			ReturnWorkOrder param=new ReturnWorkOrder();
+			param.setArg0(arg);
+			returnWorkOrder8.setReturnWorkOrder(param);
+			stub.returnWorkOrder(returnWorkOrder8);
+		}catch(Exception e){
 			e.printStackTrace();
 		}
-        
-        
-        
-        
-        
-
 	}
 
 }
