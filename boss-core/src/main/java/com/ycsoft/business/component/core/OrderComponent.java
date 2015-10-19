@@ -1707,7 +1707,7 @@ public class OrderComponent extends BaseBusiComponent {
 		} else {
 			for (Iterator<ProdTariffDto> tariffIt = ptList.iterator();tariffIt.hasNext();) {
 				ProdTariffDto  tariff = tariffIt.next();
-				if (!checkRule(cust,user, tariff.getBill_rule()))
+				if (!checkRule(cust,user, tariff.getRule_id()))
 					tariffIt.remove();
 			}
 		}

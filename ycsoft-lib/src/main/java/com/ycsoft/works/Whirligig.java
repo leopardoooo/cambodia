@@ -5,6 +5,7 @@ import java.util.List;
 import com.ycsoft.beans.core.job.JSignal;
 import com.ycsoft.business.component.config.MemoryComponent;
 import com.ycsoft.business.dao.core.job.JSignalDao;
+import com.ycsoft.commons.helper.LoggerHelper;
 
 public class Whirligig {
 	private static String loadLastId = null;
@@ -35,13 +36,14 @@ public class Whirligig {
 
 	private void setupData(JSignal d) throws Exception {
 		if (d.getSignal_type().equals("M")) {
-			System.out.println("加载dict");
+			//System.out.println("加载dict");
+			LoggerHelper.info(this.getClass(), "加载dict");
 			memoryComponent.setupMemoryDict(d);
 		} else if (d.getSignal_type().equals("T")) {
-			System.out.println("加载template");
+			LoggerHelper.info(this.getClass(), "加载template");
 			memoryComponent.setupMemoryTemplate();
 		} else if (d.getSignal_type().equals("P")) {
-			System.out.println("加载print");
+			LoggerHelper.info(this.getClass(), "加载print");
 			memoryComponent.setupMemoryPrintData();
 		}
 	}
