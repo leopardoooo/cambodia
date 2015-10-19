@@ -421,7 +421,7 @@ ProdGrid = Ext.extend(Ext.TabPanel,{
 		prodDetailTab.refreshPanel(prodDetailTab.getActiveTab());
 	},
 	getSelections:function(){
-		var panelId = App.getData().currentPanelId || this.getActiveTab().items.itemAt(0).getId();
+		var panelId = this.getActiveTab().items.itemAt(0).getId();
 		if(panelId === "U_CUST_PKG"){
 			return this.custPkgGrid.getSelectionModel().getSelections();
 		}else{
