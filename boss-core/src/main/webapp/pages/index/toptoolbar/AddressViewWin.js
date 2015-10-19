@@ -660,7 +660,7 @@ AddressViewWin = Ext.extend(Ext.Window,{
 			border : false ,
 			closeAction : 'hide',
 			width:800,
-			height : 450,
+			height : 550,
 			items : [this.addrTree],
 			buttons : [{text : lbc('common.close'),scope : this,handler : function() {this.hide();}}]
 		});

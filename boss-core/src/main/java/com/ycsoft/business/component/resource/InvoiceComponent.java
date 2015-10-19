@@ -75,6 +75,11 @@ public class InvoiceComponent extends BaseBusiComponent {
 	 * @throws Exception
 	 */
 	public InvoiceDto queryInvoiceByInvoiceId(String invoiceId,String invoiceCode) throws Exception {
+		boolean flag = rInvoiceDao.isExistsInvoice(invoiceId, invoiceCode);
+		if(!flag){
+			throw new ComponentException(ErrorCode.InvoiceNotExists);
+		}
+		
 		InvoiceDto invoice = rInvoiceDao.queryInvoiceByInvoiceId(invoiceId,invoiceCode);
 		List<InvoiceDetailDto> detail = rInvoiceDao.queryDetail(invoiceId,invoice.getInvoice_book_id(),invoice.getInvoice_code());
 		invoice.setInvoiceDetailList(detail);
