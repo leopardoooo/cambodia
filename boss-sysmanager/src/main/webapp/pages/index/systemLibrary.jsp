@@ -101,3 +101,6 @@
   	<script type="text/javascript" src="<%=r %>/pages/sysmanager/config/TemplateRoleView.js"></script>
   	<!-- 停机数配置 -->
   	<script type="text/javascript" src="<%=r %>/pages/sysmanager/config/stopcount/StopCount.js"></script>
+  	
+  	<!-- 省定义配置 -->
+	<script type="text/javascript" src="<%=r %>/pages/sysmanager/system/ProvinceConfig.js"></script>

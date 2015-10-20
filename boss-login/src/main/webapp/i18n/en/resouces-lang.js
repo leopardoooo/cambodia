@@ -137,7 +137,9 @@ ResSysLang = {
 	'3009': 'Receipt Verification~',
 	'3114': 'Cancel WrittenOff~',
 	'3112': 'Modify Status~',
-	'3110': 'Receipts Refunding~'
+	'3110': 'Receipts Refunding~',
+	
+	'3000':	'Provincial Config'
 };
 
 // 工具栏国际化
