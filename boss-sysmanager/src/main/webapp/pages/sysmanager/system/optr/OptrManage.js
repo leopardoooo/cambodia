@@ -661,12 +661,6 @@ OptrWindow = Ext.extend(Ext.Window, {
 		var old = this.optrManageForm.getForm().getValues(), newValues = {};
 		var store = this.cfgRoleGrid.getStore();
 		var data = [];
-		for (var k = 0; k < store.getCount(); k++) {
-			var obj = {};
-			obj["role_id"] = store.getAt(k).data.role_id;
-			obj["role_name"] = store.getAt(k).data.role_name;
-			data.push(obj);
-		}
 		var isHaveSys = false;
 		store.each(function(record){
 			var obj = {};
