@@ -102,7 +102,7 @@ public enum ErrorCode {
 	AcctDebitFeeIsPositive("扣款金额不能是正数"),
 	AcctAddFeeIsNotPositive("扣款金额不能是负数"),
 	
-	InvoiceIsNotYou("只有开票人可以操作"),
+	InvoiceIsNotYou("只有收据领用人可以操作"),
 	InvoiceCheckStatusIsNotIdle("收据已结账或核销，不能操作"),
 	InvoiceNotExists("收据不存在"),
 	

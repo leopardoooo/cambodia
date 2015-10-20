@@ -131,7 +131,7 @@ var OptrManageForm = Ext.extend(Ext.form.FormPanel, {
 															var record = new recordType({
 																login_sys_id:record.get('sub_system_id'),sub_system_text:record.get('sub_system_text')
 															});
-														Ext.getCmp('subSystemSelectId').getStore().add(record);
+															Ext.getCmp('subSystemSelectId').getStore().add(record);
 														}
 													});
 												}
@@ -199,8 +199,8 @@ var OptrManageForm = Ext.extend(Ext.form.FormPanel, {
 		this.doInit();
 	},
 	doInit : function(){
-		var record = new Ext.data.Record(this.storeData);
-		if(record){
+		if(this.storeData != null){
+			var record = new Ext.data.Record(this.storeData);
 			this.getForm().loadRecord(record);
 			this.loginSysId = record.get('login_sys_id');
 			Ext.getCmp('subSystemSelectId').setValue(record.get('sub_system_text'));
@@ -667,12 +667,27 @@ OptrWindow = Ext.extend(Ext.Window, {
 			obj["role_name"] = store.getAt(k).data.role_name;
 			data.push(obj);
 		}
+		var isHaveSys = false;
+		store.each(function(record){
+			var obj = {};
+			obj["role_id"] = record.get('role_id');
+			obj["role_name"] =record.get('role_name');
+			data.push(obj);
+			if(!Ext.isEmpty(record.get('sub_system_id'))){
+				isHaveSys = true;
+			}
+		})
+		
+		
 		newValues['optrRoleList'] = Ext.encode(data);
 		for (var key in old) {
 			newValues["newoptr." + key] = old[key];
 		}
-		if(this.optrManageForm.loginSysId != null){
-			newValues["newoptr.login_sys_id"] = this.optrManageForm.loginSysId;
+		if(Ext.isEmpty(this.optrManageForm.loginSysId) && isHaveSys){
+			Alert("请选择默认登录系统");
+			return false;
+		}else{
+			newValues["newoptr.login_sys_id"] = '1';
 		}
 		newValues["newoptr.dept_id"] = Ext.getCmp('optrManageFormId').deptId;
 		if(this.type =='update'){

@@ -46,7 +46,7 @@ QueryInvoiceForm = Ext.extend(Ext.form.FormPanel,{
 				}
 			},
 			bodyStyle:'padding:10px',
-			labelWidth:75,
+			labelWidth:110,
 			layout:'column',
 			items:[
 				{columnWidth:.5,layout:'form',border:false,items:[
