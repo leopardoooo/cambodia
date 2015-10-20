@@ -276,7 +276,8 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		
 		TDeviceBuyMode buyModeCfg = busiConfigComponent.queryBuyMode(deviceBuyMode);
 		//处理设备和授权
-		if (!user.getUser_type().equals(USER_TYPE_OTT_MOBILE)){
+		//批量开户不添加设备到c_cust_device
+		if (!user.getUser_type().equals(USER_TYPE_OTT_MOBILE) && getBusiParam().getBusiCode().equals(BusiCodeConstants.USER_OPEN)){
 			String ownership = SystemConstants.OWNERSHIP_GD;
 			if (buyModeCfg!= null && buyModeCfg.getChange_ownship().equals(SystemConstants.BOOLEAN_TRUE))
 				ownership = SystemConstants.OWNERSHIP_CUST;
