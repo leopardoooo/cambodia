@@ -883,7 +883,8 @@ OptrDataWin = Ext.extend(Ext.Window, {//个人修改面板
 												valueField : 'sub_system_id',
 												fieldLabel : LU['labelDefaultSystem'],
 												hiddenName : 'sub_system_id',
-												allowBlank : false
+												allowBlank : false,
+												width: 150
 											}]
 								}]
 					}],
