@@ -34,6 +34,7 @@
 	<script type="text/javascript" src="<%=r %>/pages/sysmanager/system/role/RoleManage.js"></script>
 	<!-- 地区管理 -->
 	<script type="text/javascript" src="<%=r %>/pages/sysmanager/system/addr/AddressView.js"></script>
+	<script type="text/javascript" src="<%=r %>/pages/sysmanager/system/addr/DistrictView.js"></script>
 	<script type="text/javascript" src="<%=r %>/pages/sysmanager/system/addr/ChangeAddress.js"></script>
 	<!-- 促销配置 -->
 	<script type="text/javascript" src="<%=r %>/pages/sysmanager/config/promotion/Promotion.js"></script>
