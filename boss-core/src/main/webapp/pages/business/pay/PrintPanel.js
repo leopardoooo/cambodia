@@ -497,18 +497,18 @@ InvoiceWindow = Ext.extend( Ext.Window ,{
                 header: LU_PI.invoiceGridColumns[0],
                 align: 'center',
                 dataIndex: 'serialNum',
-                width: 60
+                width: 75
             }, {
                 header: LU_PI.invoiceGridColumns[1],
                 dataIndex: 'invoiceId',
-                width: 130,
+                width: 150,
                 align: 'center',
                 editor: new Ext.form.TextField()
             }, {
                 header: LU_PI.invoiceGridColumns[2],
                 align: 'center',
                 dataIndex: 'open_optr_name',
-                width: 130
+                width: 150
         	}],
         	listeners : {
         		scope : this,
@@ -517,7 +517,7 @@ InvoiceWindow = Ext.extend( Ext.Window ,{
 		});
 		
 		InvoiceWindow.superclass.constructor.call(this,{
-			width: 350,
+			width: 400,
 			height: 200,
 			modal: true,
 			layout: 'fit',
@@ -525,10 +525,12 @@ InvoiceWindow = Ext.extend( Ext.Window ,{
 			buttons: [{
 				text: lbc('common.save'),
 				scope: this,
+				iconCls: 'icon-save',
 				handler: this.onSave
 			},{
 				text: lbc('common.cancel'),
 				scope: this,
+				iconCls: 'icon-cancel',
 				handler: function(){
 					this.close();
 				}

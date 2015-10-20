@@ -331,7 +331,7 @@ FeePayGrid = Ext.extend(Ext.ux.Grid, {
 		var lc = langUtils.main("pay.detail.columns");
 		var cm = new Ext.ux.grid.LockingColumnModel({ 
     		columns : [
-    			{header:lc[0],dataIndex:'pay_sn',width:80,renderer:function(value,metaData,record){
+    			{header:lc[0],dataIndex:'pay_sn',width:85,renderer:function(value,metaData,record){
 						that = this;
 						if(value != ''){
 							return '<div style="text-decoration:underline;font-weight:bold"  onclick="Ext.getCmp(\'P_FEE_PAY\').doTransferFeeShow();"  ext:qtitle="" ext:qtip="' + value + '">' + value +'</div>';
@@ -340,18 +340,18 @@ FeePayGrid = Ext.extend(Ext.ux.Grid, {
 						}
 					}},
 				{header:lc[1],dataIndex:'usd',width:50,renderer:Ext.util.Format.formatFee},
-				{header:lc[5],dataIndex:'is_valid_text',width:55,renderer:Ext.util.Format.statusShow},
+				{header:lc[5],dataIndex:'is_valid_text',width:70,renderer:Ext.util.Format.statusShow},
 				{header:lc[2],dataIndex:'khr',width:50,renderer:Ext.util.Format.formatFee},
-				{header:lc[3],dataIndex:'exchange',width:50},
-				{header:lc[4],dataIndex:'cos',width:70,renderer:Ext.util.Format.formatFee},
-				{header:lc[6],dataIndex:'pay_type_text',width:70},
+				{header:lc[3],dataIndex:'exchange',width:70},
+				{header:lc[4],dataIndex:'cos',width:100,renderer:Ext.util.Format.formatFee},
+				{header:lc[6],dataIndex:'pay_type_text',width:100},
 				{header:lc[7],dataIndex:'payer',width:70},
 				{header:lc[8],dataIndex:'done_code',width:80},
 				{header:lc[9],dataIndex:'receipt_id',width:100},
-				{header:lc[10],dataIndex:'invoice_mode_text',width:80},
+//				{header:lc[10],dataIndex:'invoice_mode_text',width:80},
 				{header:lc[11],dataIndex:'create_time',width:125},
-				{header:lc[12],dataIndex:'optr_name',width:80},
-				{header:lc[13],dataIndex:'dept_name',width:80}
+				{header:lc[12],dataIndex:'optr_name',width:100},
+				{header:lc[13],dataIndex:'dept_name',width:100}
 	        ]
 	      });
 		
