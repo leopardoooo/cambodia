@@ -22,6 +22,7 @@ import com.ycsoft.boss.remoting.cfocn.CFOCN_WebSvc_WorkOrderStub.ResultHead;
 import com.ycsoft.boss.remoting.cfocn.CFOCN_WebSvc_WorkOrderStub.WorkOrder;
 import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.helper.DateHelper;
+import com.ycsoft.commons.helper.StringHelper;
 
 
 
@@ -82,7 +83,12 @@ public class WorkOrderClient {
 		order.setUserAddress(task.getOld_addr());
 		order.setUserNo(custNo);
 		order.setUserName(task.getCust_name());
-		order.setUserTel(task.getMobile());
+		if(StringHelper.isNotEmpty(task.getTel())){
+			order.setUserTel(task.getTel());
+		}else{
+			order.setUserTel(task.getMobile());
+		}
+		
 		if (task.getTask_type_id().equals(SystemConstants.TASK_TYPE_INSTALL))
 			order.setOrderContent("install");
 		else if (task.getTask_type_id().equals(SystemConstants.TASK_TYPE_MOVE)){

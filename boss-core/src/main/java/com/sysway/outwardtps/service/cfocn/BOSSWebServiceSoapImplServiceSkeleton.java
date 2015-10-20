@@ -125,30 +125,32 @@ public class BOSSWebServiceSoapImplServiceSkeleton
     	// 工单编号
     	String taskId = dfb.getArg0();
     	String type = dfb.getArg1();//无效参数；原意是标明本次是新装还是变更设备，实际上并没有这么使用
-  
+    	
+    	try {
+			LoggerHelper.debug(this.getClass(),"taskId="+taskId+"  "+JsonHelper.fromObject(dfb));
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
+
     	
     	// 设备信息
     	ProductInfo[] prodArray = dfb.getArg2();
     	List<TaskFillDevice> devices = new ArrayList<>();
-    	for (DeviceInfo deviceInfo : prodArray[0].getDeviceInfos()) {
-    		TaskFillDevice device = new TaskFillDevice();
-    		device.setDeviceCode(deviceInfo.getDeviceSN());
-    		device.setFcPort(deviceInfo.getIsFCPort());
-    		device.setOldDeviceCode(deviceInfo.getOriginalDeviceSN());
-    		if (device.isFcPort()){
-    			device.setOccNo(deviceInfo.getOCCSerialCode());//交接箱编号
-    			device.setPosNo(deviceInfo.getPOSSerialCode());//分光器编号
-    		}
-    		
-    		devices.add(device);
+    	for(ProductInfo prodInfo:prodArray){
+	    	for (DeviceInfo deviceInfo : prodInfo.getDeviceInfos()) {
+	    		TaskFillDevice device = new TaskFillDevice();
+	    		device.setDeviceCode(deviceInfo.getDeviceSN());
+	    		device.setFcPort(deviceInfo.getIsFCPort());
+	    		device.setOldDeviceCode(deviceInfo.getOriginalDeviceSN());
+	    		if (device.isFcPort()){
+	    			device.setOccNo(deviceInfo.getOCCSerialCode());//交接箱编号
+	    			device.setPosNo(deviceInfo.getPOSSerialCode());//分光器编号
+	    		}
+	    		
+	    		devices.add(device);
+	    	}
     	}
-    	try{
-    		String debugString="taskId="+taskId+"  "+JsonHelper.fromObject(devices);
-    		LoggerHelper.debug(this.getClass(),debugString);
-    		System.out.println("###############"+debugString);
-    	}catch(Exception e) {
-    		e.printStackTrace();
-    	}
+    	
     	try {
     		snTaskService.setParam(getServiceParam());
 			snTaskService.fillTask(taskId, devices);

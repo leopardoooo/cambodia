@@ -11,6 +11,7 @@ import com.google.gson.JsonObject;
 import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.exception.ComponentException;
 import com.ycsoft.commons.helper.DateHelper;
+import com.ycsoft.commons.helper.LoggerHelper;
 import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.http.HttpUtils;
 import com.ycsoft.http.ResponseBody;
@@ -137,10 +138,10 @@ public class OttClient {
 	 * 增加或者修改产品
 	 * @return
 	 */
-	public Result addOrUpdateProduct(String productId,String productName){
+	public Result addOrUpdateProduct(String prodFeeInfo){
 		String url = builder.getUrl(URLBuilder.Method.ADD_UPDATE_PRODUCT); 
-		Product product = new Product(productId,productName);
-		return sendOttCmdOnHttp(url, new Gson().toJson(product));
+		//Product product = new Product(productId,productName);
+		return sendOttCmdOnHttp(url, prodFeeInfo);
 	}
 	
 	/**
@@ -161,7 +162,15 @@ public class OttClient {
 		Result result =null;
 		try {
 			ResponseBody response = HttpUtils.doPost(url, param);
-			result = new Gson().fromJson(response.getBody(), Result.class);
+			try{
+				result = new Gson().fromJson(response.getBody(), Result.class);
+			}catch(Throwable e1){
+				String info=response.getBody();
+				LoggerHelper.debug(this.getClass(), info);
+				info=info.substring(info.indexOf("{"));
+				result = new Gson().fromJson(info, Result.class);
+			}
+			
 		} catch (Throwable e) {
 			result = new Result();
 			result.setErr("1");
