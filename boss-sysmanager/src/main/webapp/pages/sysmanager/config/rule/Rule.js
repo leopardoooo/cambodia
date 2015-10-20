@@ -844,8 +844,8 @@ var RuleWin = Ext.extend(Ext.Window,{
 		formValues['rule_str'] = ruleStr;
 		formValues['rule_str_cn'] = propName;
 		formValues['optr_id'] = App.data.optr['optr_id'];
-		
-		if(formValues['exp_date'] == '')formValues['exp_date'] = null;
+		formValues['eff_date'] = Date.parseDate(formValues['eff_date'],'Y-m-d');
+		formValues['exp_date'] = Date.parseDate(formValues['exp_date'],'Y-m-d');
 		
 		var ruleEditDto={};
 		ruleEditDto.rule = formValues;
@@ -1026,7 +1026,8 @@ var RuleHandWin = Ext.extend(Ext.Window,{
 		
 		//操作员信息
 		obj['rule.optr_id'] = App.data.optr['optr_id'];
-		
+		obj['rule.eff_date'] = Date.parseDate(obj['rule.eff_date'],'Y-m-d');
+		obj['rule.exp_date'] = Date.parseDate(obj['rule.exp_date'],'Y-m-d');
 		Ext.Ajax.request({
 			url:root+'/config/Rule!updateHandRule.action',
 			params:obj,
@@ -1292,7 +1293,8 @@ var RuleDetailWin = Ext.extend(Ext.Window,{
 		
 		//操作员信息
 		obj['rule.optr_id'] = App.data.optr['optr_id'];
-		
+		obj['rule.eff_date'] = Date.parseDate(obj['rule.eff_date'],'Y-m-d');
+		obj['rule.exp_date'] = Date.parseDate(obj['rule.exp_date'],'Y-m-d');
 		var msg = Show();
 		Ext.Ajax.request({
 			url:root+'/config/Rule!updateDetailRule.action',

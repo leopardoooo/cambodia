@@ -5,7 +5,7 @@ CheckInInvoiceForm = Ext.extend(Ext.form.FormPanel,{
 			id:'checkInInvoiceFormId',
 			layout:'column',
 			border:false,
-			labelWidth: 120,
+			labelWidth: 150,
 //			labelAlign:'left',
 			trackResetOnLoad:true,
 			bodyStyle:'padding-top:10px;padding-left:10px',

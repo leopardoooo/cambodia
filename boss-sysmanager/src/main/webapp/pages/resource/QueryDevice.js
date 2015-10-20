@@ -93,7 +93,7 @@ QueryDeviceForm = Ext.extend(Ext.form.FormPanel,{
 										btn.hide();
 									
 								}else{
-									if(btn.hidden && this.showDownloadBtn === true)
+//									if(btn.hidden && this.showDownloadBtn === true)
 										btn.show();
 								}
 							}

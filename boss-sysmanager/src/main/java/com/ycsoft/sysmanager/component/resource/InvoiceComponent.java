@@ -403,6 +403,10 @@ public class InvoiceComponent extends BaseComponent {
 	 * @throws Exception
 	 */
 	public InvoiceDto queryInvoiceByInvoiceId(String invoiceId,String invoiceBookId,String invoiceCode) throws Exception {
+		boolean flag = rInvoiceDao.isExistsInvoice(invoiceId, invoiceCode);
+		if(!flag){
+			throw new ComponentException(ErrorCode.InvoiceNotExists);
+		}
 		InvoiceDto dto = rInvoiceDao.queryInvoiceByInvoiceId(invoiceId,invoiceCode);
 		
 		List<InvoiceDepotDto> depot = rInvoiceDao.queryDepot(invoiceId,invoiceCode);

@@ -13,7 +13,7 @@ public class SystemConstants {
 	public final static String AREA_ALL="4500";
 	public final static String COUNTY_ALL="4501";
 	
-	public final static  String DEFAULT_OPTR_ID = "6";
+	public final static  String DEFAULT_OPTR_ID = "0";
 	
 	/**
 	 * 分公司的统一编号

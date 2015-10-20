@@ -175,7 +175,10 @@ public class SystemComponent extends BaseSystemComponent {
 
 	public List<SRole> queryRoleForAssign(SOptr optr, String subSystemId,
 			String dataType) throws Exception {
-		String dataRight = this.queryDataRightCon(optr, DataRight.ROLE.toString());
+		String dataRight = SystemConstants.DEFAULT_DATA_RIGHT;
+		if(!optr.getOptr_id().equals(SystemConstants.DEFAULT_OPTR_ID)){
+			dataRight = this.queryDataRightCon(optr, DataRight.ROLE.toString());
+		}
 		List<SRole> list = sRoleDao.queryRoleToUse(subSystemId, dataType,
 				optr.getCounty_id(), dataRight);
 		return list;
