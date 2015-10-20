@@ -472,7 +472,7 @@ BCLang.home = {
 			titleInvoiceWindow:'Print {0} Invoices totally~',
 			wdxj:'Shop Cash~',
 			printGridColumns:['Serial Number~','Reception Name~','Create Time~'],
-			invoiceGridColumns:['Serial Number~','Invoice No.~','Invoice Code~'],
+			invoiceGridColumns:['SerialNo.~','InvoiceNo.~','Drawer~'],
 			printItemGridColumns:['Name~','Money Amount~'],
 			stillEmptyInvoiceField:"Still empty invoice input frame!~",
 			hasDuplcateInvoice:"There is repeated Invoice，Please confirm!~"
