@@ -359,6 +359,7 @@ LinkPanel = Ext.extend(Ext.Panel,{
 						fieldLabel: langUtils.main("cust.base.tel"),
 						name:'linkman.tel',
 						xtype:'textfield',
+						allowBlank: false,
 						id: 'linkmanTel'
 					},{
 						fieldLabel: langUtils.main("cust.base.email"),
