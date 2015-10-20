@@ -25,6 +25,8 @@ public class SDeptDto extends SDept implements Tree {
 		node.setText(getDept_name());
 		node.setAttr_src(getAddress_name_src());
 		node.setAttr_src_id(getAddress_id_src());
+		node.setOther_id(getAgent_id());
+		node.setOther_name(getAgent_name());
 		node.setLeaf(true);
 		node.getOthers().put("dept_type",getDept_type());
 		node.getOthers().put("countyId", getCounty_id());

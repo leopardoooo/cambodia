@@ -35,6 +35,7 @@ public class SDept extends CountyBase implements Serializable {
 	private String dept_pid;
 	private String remark;
 	private String agent_id;//代理商ID
+	private String agent_name;
 
 	// name info
 	private String dept_type_text;
@@ -45,6 +46,14 @@ public class SDept extends CountyBase implements Serializable {
 	public SDept() {
 	}
 
+	public String getAgent_name() {
+		return agent_name;
+	}
+
+	public void setAgent_name(String agent_name) {
+		this.agent_name = agent_name;
+	}
+	
 	public String getAgent_id() {
 		return agent_id;
 	}

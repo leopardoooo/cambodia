@@ -7,7 +7,9 @@ package com.ycsoft.business.dao.system;
 import org.springframework.stereotype.Component;
 
 import com.ycsoft.beans.system.SAgent;
+import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.daos.abstracts.BaseEntityDao;
+import com.ycsoft.daos.core.Pager;
 
 
 /**
@@ -26,4 +28,12 @@ public class SAgentDao extends BaseEntityDao<SAgent> {
 		return this.createQuery(sql, deptId).first();
 	}
 
+	public Pager<SAgent> queryAgent(String query, Integer start, Integer limit) throws Exception {
+		String sql = "select * from s_agent where 1=1";
+		if(StringHelper.isNotEmpty(query)){
+			sql += " and name like '%"+query+"%'";
+		}
+		return this.createQuery(sql).setStart(start).setLimit(limit).page();
+	}
+	
 }

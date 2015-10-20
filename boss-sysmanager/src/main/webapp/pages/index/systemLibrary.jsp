@@ -19,7 +19,7 @@
 	<!-- 规则配置 -->
 	<script type="text/javascript" src="<%=r %>/pages/sysmanager/config/rule/Rule.js"></script>
 	<!-- 机构管理 -->
-	<script type="text/javascript" src="<%=r %>/pages/sysmanager/system/dept/OrgManage.js"></script>
+	<script type="text/javascript" src="<%=r %>/pages/sysmanager/system/dept/DeptView.js"></script>
 	<!-- 操作记录 -->
 	<script type="text/javascript" src="<%=r %>/pages/sysmanager/system/log/LogView.js"></script>
 	<!-- 系统异动记录 -->
@@ -105,3 +105,5 @@
   	
   	<!-- 省定义配置 -->
 	<script type="text/javascript" src="<%=r %>/pages/sysmanager/system/ProvinceConfig.js"></script>
+	<!-- 代理商配置 -->
+	<script type="text/javascript" src="<%=r %>/pages/sysmanager/system/AgentConfig.js"></script>

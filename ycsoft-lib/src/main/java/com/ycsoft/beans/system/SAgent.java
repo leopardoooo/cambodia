@@ -6,6 +6,9 @@ package com.ycsoft.beans.system;
 
 import java.io.Serializable ;
 import java.util.Date ;
+
+import com.ycsoft.commons.constants.DictKey;
+import com.ycsoft.commons.store.MemoryDict;
 import com.ycsoft.daos.config.POJO ;
 
 
@@ -14,8 +17,8 @@ import com.ycsoft.daos.config.POJO ;
  */
 @POJO(
 	tn="S_AGENT",
-	sn="id",
-	pk="")
+	sn="SEQ_AGENT_ID",
+	pk="ID")
 public class SAgent implements Serializable {
 	
 	// SAgent all properties 
@@ -37,11 +40,15 @@ public class SAgent implements Serializable {
 	private String optr_id ;	
 	private String remark ;	
 	
+	private String agent_type_text;
+	private String cert_type_text;
+	private String busi_optr_name;
+	private String optr_name;
+
 	/**
 	 * default empty constructor
 	 */
 	public SAgent() {}
-	
 	
 	// id getter and setter
 	public String getId(){
@@ -68,6 +75,7 @@ public class SAgent implements Serializable {
 	
 	public void setAgent_type(String agent_type){
 		this.agent_type = agent_type ;
+		this.agent_type_text = MemoryDict.getDictName(DictKey.CUST_TYPE, agent_type);
 	}
 	
 	// tel getter and setter
@@ -86,6 +94,7 @@ public class SAgent implements Serializable {
 	
 	public void setCert_type(String cert_type){
 		this.cert_type = cert_type ;
+		this.cert_type_text = MemoryDict.getDictName(DictKey.CERT_TYPE, cert_type);
 	}
 	
 	// cert_num getter and setter
@@ -104,6 +113,7 @@ public class SAgent implements Serializable {
 	
 	public void setBusi_optr_id(String busi_optr_id){
 		this.busi_optr_id = busi_optr_id ;
+		this.busi_optr_name = MemoryDict.getDictName(DictKey.OPTR, busi_optr_id);
 	}
 	
 	// taxid getter and setter
@@ -140,6 +150,7 @@ public class SAgent implements Serializable {
 	
 	public void setOptr_id(String optr_id){
 		this.optr_id = optr_id ;
+		this.optr_name = MemoryDict.getDictName(DictKey.OPTR, optr_id);
 	}
 	
 	// remark getter and setter
@@ -149,6 +160,26 @@ public class SAgent implements Serializable {
 	
 	public void setRemark(String remark){
 		this.remark = remark ;
+	}
+
+	
+	public String getAgent_type_text() {
+		return agent_type_text;
+	}
+
+
+	public String getCert_type_text() {
+		return cert_type_text;
+	}
+
+
+	public String getBusi_optr_name() {
+		return busi_optr_name;
+	}
+
+
+	public String getOptr_name() {
+		return optr_name;
 	}
 
 }
