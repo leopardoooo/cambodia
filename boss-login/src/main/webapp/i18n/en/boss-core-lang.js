@@ -270,7 +270,7 @@ BCLang.home = {
 				tabs: ["Details~","Change Information~"],
 				detail: ["UserType~","UserName~","DeviceType~","BuyWay~","Status~","StatusTime~","ForecastStopTime~","CreateTime~","ReminderFeeType~","InNetworkProtocolPeriod~","Account~",
 				         "TerminalType~","Account~","Terminal Type~","IPInfo~","IPFeeAmount~"],
-				change: ["Service~","Feature~","ModifyAgo~","Modified~","ChangeDate~","Operator~"]
+				change: ["ServiceName~","Feature~","ModifyAgo~","Modified~","ChangeDate~","Operator~"]
 			},
 			prodDetail: {
 				tabs: ["Order Amount Details~","Change Information~"],

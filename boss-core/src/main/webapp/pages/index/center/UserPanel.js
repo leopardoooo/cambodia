@@ -670,8 +670,8 @@ UserPropChangeGrid = Ext.extend(Ext.grid.GridPanel,{
 		});
 		var lc = langUtils.main("user.userDetail.change");
 		var cm = [
-			{header:lc[0],dataIndex:'busi_name',		width:80,	renderer:App.qtipValue},
-			{header:lc[1],dataIndex:'column_name_text',	width:80, 	renderer:App.qtipValue},
+			{header:lc[0],dataIndex:'busi_name',		width:150,	renderer:App.qtipValue},
+			{header:lc[1],dataIndex:'column_name_text',	width:100, 	renderer:App.qtipValue},
 			{header:lc[2],dataIndex:'old_value_text',	width:120,	renderer:App.qtipValue},
 			{header:lc[3],dataIndex:'new_value_text',	width:120,	renderer:App.qtipValue},
 			{header:lc[4],dataIndex:'change_time',		width:130,	renderer:App.qtipValue},
@@ -698,120 +698,6 @@ UserPropChangeGrid = Ext.extend(Ext.grid.GridPanel,{
 				this.changeStore.proxy = new Ext.data.PagingMemoryProxy(data),
 				//本地分页
 				this.changeStore.load({params:{start:0,limit:App.pageSize}});
-			}
-		});
-	},
-	reset : function(){//重置面板信息
-		this.getStore().removeAll();
-		this.isReload = true;
-	}
-});
-
-/**
- * 用户促销信息
- * @class UserPropChangeGrid
- * @extends Ext.grid.GridPanel
- */
-PromotionGrid = Ext.extend(Ext.ux.Grid,{
-	region: 'center',
-	border: false,
-	changeStore: null,
-	isReload : true,//用于判断第一次激活时加载
-	constructor: function(){
-		this.promotionStore = new Ext.data.JsonStore({
-			fields: ["promotion_sn","user_id","promotion_id","promotion_name","times",
-				"status","status_text","create_time","is_necessary","total_acct_fee",
-				"total_acct_count","repetition_times","total_acct_fee","theme_id","auto_exec",
-				"eff_date","exp_date"]
-		});
-		
-		var cm = new Ext.ux.grid.LockingColumnModel({ 
-    		columns : [
-            {header:'促销编号',dataIndex:'promotion_sn',width:60,hidden : true},
-			{header:'促销名称',dataIndex:'promotion_name',width:150},
-			{header:'状态',dataIndex:'status_text',width:80},
-			{header:'操作时间',dataIndex:'create_time',	width:80,renderer:Ext.util.Format.dateFormat}
-	        ]
-	      });
-		
-	    var sm = new Ext.grid.CheckboxSelectionModel();
-		var pageTbar = new Ext.PagingToolbar({store: this.changeStore ,pageSize : App.pageSize});
-		pageTbar.refresh.hide();
-		PromotionGrid.superclass.constructor.call(this,{
-			id : 'UserPromotion',
-			region: 'center',
-			store:this.promotionStore,
-			sm : sm,
-			cm:cm,
-			view: new Ext.ux.grid.ColumnLockBufferView(),
-			bbar: pageTbar
-		})
-	},
-	initEvents: function(){
-		this.on("afterrender",function(){
-			this.swapViews();
-		},this,{delay:10});
-		
-		PromotionGrid.superclass.initEvents.call(this);
-	},
-	remoteRefresh:function(uid,utype){
-		Ext.Ajax.request({
-			url: Constant.ROOT_PATH + "/commons/x/QueryUser!queryUserPromotion.action",
-			scope:this,
-			params:{userId:uid},
-			success:function(res,opt){
-				var data = Ext.decode(res.responseText);
-				//PagingMemoryProxy() 一次性读取数据
-				this.promotionStore.proxy = new Ext.data.PagingMemoryProxy(data),
-				//本地分页
-				this.promotionStore.load({params:{start:0,limit:App.pageSize}});
-			}
-		});
-	},
-	reset : function(){//重置面板信息
-		this.getStore().removeAll();
-		this.isReload = true;
-	}
-});
-
-/*
- * 用户有效资源
- */
-UserValidResGrid = Ext.extend(Ext.grid.GridPanel,{
-	border: false,
-	resStore: null,
-	isReload : true,//用于判断第一次激活时加载
-	constructor: function(){
-		this.resStore = new Ext.data.JsonStore({
-			fields: ["res_id","res_name"]
-		});
-		var cm = [
-			{header:'资源编号',dataIndex:'res_id'},
-			{header:'资源名称',dataIndex:'res_name'}
-		];
-		var pageTbar = new Ext.PagingToolbar({store: this.resStore ,pageSize : App.pageSize});
-		pageTbar.refresh.hide();
-		UserValidResGrid.superclass.constructor.call(this,{
-			store:this.resStore,
-			columns:cm,
-			viewConfig : {
-				forceFit : true
-			},
-			bbar: pageTbar
-		})
-	},
-	
-	remoteRefresh:function(uid,utype){
-		Ext.Ajax.request({
-			url: Constant.ROOT_PATH + "/core/x/User!queryValidRes.action",
-			scope:this,
-			params:{userId:uid,userType:utype},
-			success:function(res,opt){
-				var data = Ext.decode(res.responseText);
-				//PagingMemoryProxy() 一次性读取数据
-				this.resStore.proxy = new Ext.data.PagingMemoryProxy(data),
-				//本地分页
-				this.resStore.load({params:{start:0,limit:App.pageSize}});
 			}
 		});
 	},
@@ -874,8 +760,6 @@ UserDetailTab = Ext.extend(CommonTab,{
 		this.parent = p;
 		this.userPropChangeGrid = new UserPropChangeGrid();
 		this.userDetailInfo = new UserDetailInfo();
-//		this.userValidResGrid = new UserValidResGrid();
-//		this.promotionGrid = new PromotionGrid();
 		UserDetailTab.superclass.constructor.call(this, {
 			activeTab: 0,
 			border: false,
@@ -885,18 +769,11 @@ UserDetailTab = Ext.extend(CommonTab,{
 			},
 			items:[{
 				title:langUtils.main("user.userDetail.tabs")[0],
-//				id : 'test',
 				items:[this.userDetailInfo]
 			},{
 				title:langUtils.main("user.userDetail.tabs")[1],
 				items:[this.userPropChangeGrid]
-			}/*,{
-				title : '有效资源',
-				items:[this.userValidResGrid]
-			},{
-				title : '促销信息',
-				items:[this.promotionGrid]
-			}*/]
+			}]
 		});
 	},
 	refreshPanel : function(p){
@@ -920,160 +797,9 @@ UserDetailTab = Ext.extend(CommonTab,{
 	},
 	resetPanel : function(){//重置TAB面板
 		this.userPropChangeGrid.reset();
-//		this.userValidResGrid.reset();
-//		this.userDetailInfo.reset();
-//		this.promotionGrid.reset();
 		this.userId = null;
 		this.type = null;
 		this.userRecord = null;
-		this.isReload = true;
-	}
-});
-
-ProdDetailTemplate = new Ext.XTemplate(
-	'<table width="100%" border="0" cellpadding="0" cellspacing="0">',
-		'<tr height=24>',
-			'<td class="label" width=20%>产品名称：</td>',
-			'<td class="input_bold" width=30%>&nbsp;{[values.prod_name ||""]}</td>',
-			'<td class="label" width=20%>状态：</td>',
-			'<td class="input_bold" width=30%>&nbsp;{[values.status_text ||""]}</td>',
-		'</tr>',
-		'<tr height=24>',
-	      	'<td class="label" width=20%>资费名称：</td>',
-	      	'<td class="input_bold" width=30%>&nbsp;{[values.tariff_name ||""]}</td>',
-      		'<td class="label" width=25%>未生效资费：</td>',
-      		'<td class="input_bold" width=30%>&nbsp;{[values.next_tariff_name ||""]}</td>',	      	
-    	'</tr>',
-    	'<tr height=24>',
-      		'<td class="label" width=20%>订购方式：</td>',
-      		'<td class="input_bold" width=30%>&nbsp;{[values.order_type_text ||""]}</td>',
-	      	'<td class="label" width=20%>订购日期：</td>',
-	      	'<td class="input_bold" width=30%>&nbsp;{[fm.dateFormat(values.order_date) ||""]}</td>',      		
-
-    	'</tr>',
-    	'<tr height=24>',
-    	    '<td class="label" width=20%>产品描述：</td>',
-      		'<td class="input_bold" colspan=3>&nbsp;{[values.prod_desc ||""]}</td>',
-    	'</tr>',      		
-    	'<tr height=24>',
-
-      		'<td class="label" width=20%>预计到期日期：</td>',
-      		'<td class="input_bold" width=30%>&nbsp;{[fm.dateFormat(values.invalid_date) ||""]}</td>',
-      		'<td class="label" width=25%>开始计费日期：</td>',
-      		'<td class="input_bold" width=30%>&nbsp;{[fm.dateFormat(values.billinfo_eff_date) ||""]}</td>',
-    	'</tr>',
-    	'<tr height=24>',
-      		'<td class="label" width=25%>预开通日期：</td>',
-      		'<td class="input_bold" width=30%>&nbsp;{[fm.dateFormat(values.pre_open_time) ||""]}</td>',
-      		'<td class="label" width=20%>失效日期：</td>',
-      		'<td class="input_bold" width=30%>&nbsp;{[fm.dateFormat(values.exp_date) ||""]}</td>',
-    	'</tr>',
-    	'<tr height=24>',
-      		'<td class="label" width=25%>公用使用类型：</td>',
-      		'<td class="input_bold" width=30%>&nbsp;{[values.public_acctitem_type_text ||""]}</td>',
-      		'<td class="label" width=20%>停机类型：</td>',
-      		'<td class="input_bold" width=30%>',
-      			'<tpl if="values.stop_by_invalid_date==\'T\'">',
-      				'到期日',
-      			'</tpl>',
-      			'<tpl if="values.stop_by_invalid_date==\'F\'">',
-      				'账务',
-      			'</tpl>',
-      		'</td>',
-    	'</tr>',
-    	'<tr height=24>',
-      		'<td class="label" width=25%>银行扣费：</td>',
-      		'<td class="input_bold" width=30%>&nbsp;{[values.is_bank_pay_text||""]}</td>',      		
-    	'</tr>',    
-	'</table>'
-);
-
-/**
- * 产品资费信息
- * @class ProdExpensesGrid
- * @extends Ext.grid.GridPanel
- */
-ProdExpensesGrid = Ext.extend(Ext.grid.GridPanel,{
-	region:'center',
-	border:false,
-	expensesStore:null,
-	isReload : true,
-	constructor:function(){
-		this.expensesStore = new Ext.data.JsonStore({
-			url:Constant.ROOT_PATH + "/commons/x/QueryUser!queryUserProdTariff.action",
-			fields: ["tariff_name","billing_type","rent","billing_type_text"],
-			sortInfo:{
-				field:'rent',
-				direction:'DESC'
-			}
-		}); 
-		
-		var cm = [
-			{header:'资费名称',dataIndex:'tariff_name', width:90},
-			{header:'计费方式',dataIndex:'billing_type_text', width:90},
-			{header:'租费',dataIndex:'rent',renderer : Ext.util.Format.formatFee, width:90}
-		];
-				  
-		ProdExpensesGrid.superclass.constructor.call(this,{
-			id : 'prodExpensesGrid',
-			region: 'center',
-			store:this.expensesStore,
-			columns:cm
-		})
-	},
-	remoteRefresh:function(tariffId){
-		this.expensesStore.baseParams.tariffId= tariffId;
-		this.expensesStore.load();
-	},
-	reset : function(){
-		this.getStore().removeAll();
-		this.isReload = true;
-	}
-});
-
-/**
- * 资费变更信息
- * @class ProdChangeGrid
- * @extends Ext.grid.GridPanel
- */
-TariffChangeGrid = Ext.extend(Ext.grid.GridPanel,{
-	region:'center',
-	border:false,
-	changeStore:null,
-	isReload : true,
-	constructor:function(){
-		this.changeStore = new Ext.data.JsonStore({
-			url:Constant.ROOT_PATH + "/commons/x/QueryUser!tariffProdChange.action",
-			fields: ["sn","tariff_id","eff_date","exp_date","area_id","county_id","old_tariff_name","new_tariff_name"],
-			root: 'records',
-			totalProperty: 'totalProperty',
-			sortInfo:{
-				field:'exp_date',
-				direction:'DESC'
-			}
-		}); 
-		
-		var cm = [
-			{header:'生效资费名称',dataIndex:'new_tariff_name', width:110},
-			{header:'失效资费名称',dataIndex:'old_tariff_name', width:110},
-			{header:'生效日期',dataIndex:'eff_date', width:110,renderer:Ext.util.Format.dateFormat},
-			{header:'失效日期',dataIndex:'exp_date', width:110}
-		];
-				  
-		TariffChangeGrid.superclass.constructor.call(this,{
-			region: 'center',
-			store:this.changeStore,
-			columns:cm
-		})
-	},
-	remoteRefresh:function(prodSn){
-		this.changeStore.baseParams.prodSn = prodSn;
-		this.changeStore.load({
-			params: { start: 0, limit: App.pageSize }
-		});
-	},
-	reset : function(){
-		this.getStore().removeAll();
 		this.isReload = true;
 	}
 });
@@ -1102,8 +828,8 @@ ProdPropChangeGrid = Ext.extend(Ext.grid.GridPanel,{
 		}); 
 		var lc = langUtils.main("user.userDetail.change");
 		var cm = [
-			{header:lc[0],dataIndex:'busi_name', width:60,renderer:App.qtipValue},
-			{header:lc[1],dataIndex:'column_name_text', width:90,renderer:App.qtipValue},
+			{header:lc[0],dataIndex:'busi_name', width:150,renderer:App.qtipValue},
+			{header:lc[1],dataIndex:'column_name_text', width:100,renderer:App.qtipValue},
 			{header:lc[2],dataIndex:'old_value', width:120,renderer:App.qtipValue},
 			{header:lc[3],dataIndex:'new_value',width:120,renderer:App.qtipValue},
 			{header:lc[4],dataIndex:'change_time',width:130},
@@ -1186,82 +912,6 @@ OrderFeeDetailGrid = Ext.extend(Ext.grid.GridPanel,{
 	}
 });
 
-/**
- * 产品资源信息
- * @class ProdResPanel
- * @extends Ext.Panel
- */
-ProdResGrid = Ext.extend(Ext.grid.GridPanel,{
-	isReload : true,
-	ResStore : null,//产品资源
-	constructor : function(){
-		this.ResStore = new Ext.data.JsonStore({
-			url:Constant.ROOT_PATH + "/commons/x/QueryUser!queryUserProdRes.action",
-			fields : ["res_id","res_desc","res_name","external_res_id"]
-		});
-		
-		ProdResGrid.superclass.constructor.call(this,{
-			border: false,
-			region: 'center',
-			store:this.ResStore,
-			columns:[
-				{header:'控制字',dataIndex:'external_res_id',width:40},
-				{header:'资源名字',dataIndex:'res_name'},
-				{header:'资源描述',dataIndex:'res_desc'}
-			],
-			viewConfig : {
-				forceFit : true
-			}
-		})
-	},
-	remoteRefresh:function(prodSn){
-		this.ResStore.baseParams.prodSn = prodSn;
-		this.ResStore.load();
-	},
-	reset : function(){//重置面板信息
-		this.ResStore.removeAll();
-		this.isReload = true;
-	}
-})
-
-
-/**
- * 产品详细信息
- * @class ProdDetailInfo
- * @extends Ext.Panel
- */
-ProdDetailInfo = Ext.extend(Ext.Panel,{
-	templateData:{resList:[]},
-	tpl: null,
-	constructor: function(){
-		this.tpl = ProdDetailTemplate;
-		this.tpl.compile();
-		ProdDetailInfo.superclass.constructor.call(this, {
-			border: false,
-			layout: 'anchor',
-			anchor: '100%',
-			bodyStyle: "background:#F9F9F9;overflow-y:auto;overflow-x:hidden;",
-			defaults: {
-					bodyStyle: "background:#F9F9F9"
-				},
-			items : [{xtype : "panel",
-						border : false,
-						bodyStyle: "background:#F9F9F9; padding: 10px;padding-top: 4px;padding-bottom: 0px;",
-						html : this.tpl.applyTemplate(this.templateData)
-					}]
-		});
-	}
-	,
-	reset:function(){//重置详细信息
-		if(this.items.itemAt(0).getEl()){
-			this.tpl.overwrite( this.items.itemAt(0).body, this.templateData);
-		}
-	},
-	refresh:function(record){
-		this.tpl.overwrite( this.items.itemAt(0).body, record.data);
-	}
-});
-
 ProdDetailTab = Ext.extend(CommonTab,{
 	prodExpensesGrid:null,
 	prodChangeGrid:null,
@@ -1273,12 +923,8 @@ ProdDetailTab = Ext.extend(CommonTab,{
 	userRecord : null,
 	isReload:true,
 	constructor:function(){
-//		this.prodExpensesGrid = new ProdExpensesGrid();
 		this.prodPropChangeGrid = new ProdPropChangeGrid();
 		this.orderFeeDetailGrid = new OrderFeeDetailGrid();
-//		this.tariffChangeGrid = new TariffChangeGrid();
-//		this.prodResGrid = new ProdResGrid();
-//		this.prodDetailInfo = new ProdDetailInfo();
 		ProdDetailTab.superclass.constructor.call(this, {
 			activeTab: 0,
 			border: false,
@@ -1286,26 +932,14 @@ ProdDetailTab = Ext.extend(CommonTab,{
 				layout: 'fit',
 				border:false
 			},
-			items:[/*{
-				title:'详细信息',
-				items:[this.prodDetailInfo]
-			},{
-				title:'资源信息',
-				items:[this.prodResGrid]
-			},{
-				title:'资费信息',
-				items:[this.prodExpensesGrid]
-			},*/{
+			items:[{
 				title: langUtils.main("user.prodDetail.tabs")[0],
 				items: [this.orderFeeDetailGrid]
 			},
 			{
 				title:langUtils.main("user.prodDetail.tabs")[1],
 				items:[this.prodPropChangeGrid]
-			}/*,{
-				title:'资费变更',
-				items:[this.tariffChangeGrid]
-			}*/]
+			}]
 		});
 	},
 	refreshPanel : function(p){
@@ -1345,15 +979,10 @@ ProdDetailTab = Ext.extend(CommonTab,{
 		this.refresh(record);
 	},
 	refresh: function(record){
-//		this.prodDetailInfo.refresh(record);
 	},
 	resetPanel : function(){//重置Tab面板的子面板信息
-//		this.prodDetailInfo.reset();
-		//this.prodExpensesGrid.reset();
 		this.orderFeeDetailGrid.reset();
 		this.prodPropChangeGrid.reset();
-		//this.prodResGrid.reset();
-		//this.tariffChangeGrid.reset();
 		this.prodSn = null;
 		this.tariffId = null;
 		this.userRecord = null;
@@ -1421,15 +1050,10 @@ UserPanel = Ext.extend( BaseInfoPanel , {
 		});
 	},
 	refresh:function(){
-		//if (!App.getApp().isPreCust()){
-			//客户不是预开户客户
-			this.userDetailTab.resetPanel();
-//			this.userDetailTab.refreshPanel();
-			this.prodGrid.reset();
-			this.prodDetailTab.resetPanel();
-			this.userGrid.remoteRefresh();
-//			this.prodGrid.remoteRefresh();
-		//}
+		this.userDetailTab.resetPanel();
+		this.prodGrid.reset();
+		this.prodDetailTab.resetPanel();
+		this.userGrid.remoteRefresh();
 	},
 	getUserDetailTemplate: function(){
 		return UserDetailTemplate;
