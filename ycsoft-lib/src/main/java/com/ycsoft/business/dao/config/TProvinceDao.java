@@ -28,5 +28,19 @@ public class TProvinceDao extends BaseEntityDao<TProvince> {
 		String sql = "select * from t_province where cust_code is not null ";
 		return createQuery(sql).list();
 	}
+	
+	public void createCustNameSeq(String seqName) throws Exception {
+		this.getJdbcTemplate().execute("call proc_create_cust_name_seq('"+seqName+"')");
+	}
+	
+	public int countProvinceByName(String id, String name) throws Exception {
+		String sql = "select count(1) from t_province where id<>? and name=?";
+		return this.count(sql, id, name);
+	}
+	
+	public int countProvinceByCustCode(String id, String custCode) throws Exception {
+		String sql = "select count(1) from t_province where id<>? and cust_code=?";
+		return this.count(sql, id, custCode);
+	}
 
 }
