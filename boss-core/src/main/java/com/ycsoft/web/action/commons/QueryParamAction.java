@@ -113,13 +113,13 @@ public class QueryParamAction extends BaseBusiAction {
 	
 	public String queryAddressTree() throws Exception{
 		List addrs =  queryCfgService.queryAddressTree(queryText,addrId,optr);
-		getRoot().setRecords(TreeBuilder.createSysAdreeTree(addrs));
+		getRoot().setRecords(TreeBuilder.createSysAdreeTree(addrs,true));
 		return JSON_RECORDS;
 	}
 	
 	public String queryDistrictTree() throws Exception{
 		List addrs =  queryCfgService.queryDistrictByPid(districtId);
-		getRoot().setRecords(TreeBuilder.createSysAdreeTree(addrs));
+		getRoot().setRecords(TreeBuilder.createSysAdreeTree(addrs,true));
 		return JSON_RECORDS;
 	}
 	

@@ -31,6 +31,7 @@ import com.ycsoft.business.dao.system.SCountyDao;
 import com.ycsoft.business.dao.system.SDeptAddrDao;
 import com.ycsoft.business.dao.system.SDeptDao;
 import com.ycsoft.business.dao.system.SOptrDao;
+import com.ycsoft.business.dto.config.DistrictSysDto;
 import com.ycsoft.business.dto.config.TAddressDto;
 import com.ycsoft.business.dto.config.TAddressSysDto;
 import com.ycsoft.business.dto.system.OptrDto;
@@ -528,5 +529,18 @@ public class AddressComponent extends BaseComponent {
 			throw new ComponentException(ErrorCode.ParamIsNull);
 		}
 		return tDistrictDao.queryDistrictListByPid(pId);
+	}
+
+	public List queryDistrictTree(String name, SOptr optr) throws Exception{
+		List<DistrictSysDto> list = new ArrayList<DistrictSysDto>();
+		if(StringHelper.isNotEmpty(name)){
+			list = tDistrictDao.queryAllAddrByName(name);
+		}else{
+			list = tDistrictDao.queryAllDistrictTree();
+		}
+		if(list.size()>2000){
+			throw new ComponentException(ErrorCode.DataNumTooMuch);
+		}
+		return list;
 	}
 }

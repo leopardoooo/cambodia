@@ -12,9 +12,10 @@ public class SystemConstants {
 	 */
 	public final static String AREA_ALL="4500";
 	public final static String COUNTY_ALL="4501";
-	
+	//超管ID
 	public final static  String DEFAULT_OPTR_ID = "0";
-	
+	//柬埔寨 根行政区域
+	public final static  String DISTRICT_ID = "50";
 	/**
 	 * 分公司的统一编号
 	 */

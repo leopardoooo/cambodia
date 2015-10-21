@@ -108,11 +108,10 @@ DistrictTree = Ext.extend(Ext.ux.tree.TreeGridEditor,{
 			id : 'DistrictTree',
 			root : new Ext.tree.AsyncTreeNode({expanded : true,id:'-1'}),
 			loader: new AddressTreeLoader({
-	            dataUrl: root+"/system/Address!queryAddrTree.action",
+	            dataUrl: root+"/system/Address!queryDistrictTree.action",
 	            listeners:{
 	            	scope:this,
-	            	load: this.doLoad,
-	            	beforeload : this.onBeforeLoad
+	            	load: this.doLoad
 	            }
 	        }),
 	        maxDepth: 4,
@@ -226,15 +225,6 @@ DistrictTree = Ext.extend(Ext.ux.tree.TreeGridEditor,{
 			}
 		};
 		handlerStatus(thiz.getChildNodes(node));
-	},
-	onBeforeLoad:function(l,node){
-		l.on('beforeload',function(loader,node){
-			var id = node.id;
-			if(id == 'tge-root'){
-				id = "";
-			}
-  			l.baseParams = {addrId:id}; //通过这个传递参数，这样就可以点一个节点出来它的子节点来实现异步加载
-		},l);
 	},
 	doLoad: function(treeLoader,rootNode){
 		var thiz = this;

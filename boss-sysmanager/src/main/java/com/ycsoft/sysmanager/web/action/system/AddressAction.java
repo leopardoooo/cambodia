@@ -65,13 +65,13 @@ public class AddressAction extends BaseAction {
 
 	public String queryAddrTree() throws Exception{
 		List addrs =  addressComponent.queryAddrByName(queryText,addrId,optr);
-		getRoot().setRecords(TreeBuilder.createSysAdreeTree(addrs));
+		getRoot().setRecords(TreeBuilder.createSysAdreeTree(addrs,true));
 		return JSON_RECORDS;
 	}
 	
 	public String queryDistrictTree() throws Exception{
-		List addrs =  addressComponent.queryDistrictByPid(districtId);
-		getRoot().setRecords(TreeBuilder.createSysAdreeTree(addrs));
+		List addrs =  addressComponent.queryDistrictTree(queryText,optr);
+		getRoot().setRecords(TreeBuilder.createSysAdreeTree(addrs,false));
 		return JSON_RECORDS;
 	}
 	

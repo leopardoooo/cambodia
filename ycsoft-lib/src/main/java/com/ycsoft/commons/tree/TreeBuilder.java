@@ -92,7 +92,7 @@ public class TreeBuilder {
 		return target;
 	}
 	
-	public static List<AddrTreeNode> createSysAdreeTree(List<AddrTree> src){
+	public static List<AddrTreeNode> createSysAdreeTree(List<AddrTree> src,boolean isExpanded){
 		List<AddrTreeNode> target = new ArrayList<AddrTreeNode>();
 		Map<String,AddrTreeNode> tempMap = new HashMap<String,AddrTreeNode>();
 		for (AddrTree tree : src){
@@ -113,7 +113,9 @@ public class TreeBuilder {
 				if(parentNode.getChildren() == null){
 					parentNode.setChildren(new ArrayList<AddrTreeNode>());
 				}
-				parentNode.setExpanded(true);
+				if(isExpanded){
+					parentNode.setExpanded(isExpanded);
+				}
 				parentNode.getChildren().add( node );
 				parentNode.setLeaf(false);
 				parentNode.setCls("fold");
