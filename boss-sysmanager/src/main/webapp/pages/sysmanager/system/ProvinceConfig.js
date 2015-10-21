@@ -48,7 +48,7 @@
 	 		
 	 		alert(Ext.encode(values));
 	 		
-//	 		Ext.getBody().mask();
+	 		Ext.getBody().mask();
 			Ext.Ajax.request({
 				url:root+'/config/Config!saveProvince.action',
 				params:{
@@ -58,7 +58,7 @@
 				success:function(req){
 					this.store.commitChanges();
 					this.doRefresh();
-//					Ext.getBody().unmask();
+					Ext.getBody().unmask();
 					Alert('修改成功!');
 				}
 			});
