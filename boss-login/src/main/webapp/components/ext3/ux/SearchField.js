@@ -28,7 +28,7 @@ Ext.ux.form.SearchField = Ext.extend(Ext.form.TwinTriggerField, {
     onTrigger1Click : function(){
         if(this.hasSearch){
             this.el.dom.value = '';
-            var o = {start: 0,limit : 15};
+            var o = {start: 0,limit : 20};
             this.store.baseParams = this.store.baseParams || {};
             this.store.baseParams[this.paramName] = '';
             this.store.reload({params:o});
@@ -47,7 +47,7 @@ Ext.ux.form.SearchField = Ext.extend(Ext.form.TwinTriggerField, {
         	Alert('请不要输入单引号');
 			return;
         }
-        var o = {start: 0, limit:15 };
+        var o = {start: 0, limit:20 };
         this.store.baseParams = this.store.baseParams || {};
         this.store.baseParams[this.paramName] = v;
         this.store.reload({params:o});

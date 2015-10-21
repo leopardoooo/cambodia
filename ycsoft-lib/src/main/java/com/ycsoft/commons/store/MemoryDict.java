@@ -213,6 +213,11 @@ public class MemoryDict {
 		MemoryDict.transList = transList;
 		reLoadData();
 	}
+	
+	public static void setTransData(List<SDataTranslation> transList){
+		MemoryDict.transList = transList;
+		reLoadData();
+	}
 
 	/**
 	 * 添加字典数据
@@ -243,23 +248,11 @@ public class MemoryDict {
 		}
 	}
 	
-	public static void appendTransData(SDataTranslation trans) {
+	public static void appendTransData(List<SDataTranslation> datalist) {
 		try {
-			/*Map<String, SDataTranslation> transTempMap = new HashMap<String, SDataTranslation>();
 			for (SDataTranslation trans : datalist) {
-				String dataCn = trans.getData_cn();
-				SDataTranslation dataTrans = transTempMap.get(dataCn);
-				if (dataTrans == null) {
-					dataTrans = new SDataTranslation();
-					transTempMap.put(dataCn, dataTrans);
-				}
-				BeanUtils.copyProperties(dataTrans, trans);
+				getTransMap().put(trans.getData_cn(), trans);
 			}
-			transMap.putAll(transTempMap);*/
-			if(trans != null){
-				transMap.put(trans.getData_cn(), trans);
-			}
-			
 		} catch (Exception e) {
 			LoggerHelper.error(MemoryDict.class, "国际化数据装载异常");
 		} finally{

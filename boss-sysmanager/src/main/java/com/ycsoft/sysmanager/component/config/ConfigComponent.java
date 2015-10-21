@@ -7,6 +7,8 @@ import org.springframework.stereotype.Component;
 
 import com.ycsoft.beans.config.TProvince;
 import com.ycsoft.beans.system.SAgent;
+import com.ycsoft.beans.system.SDataTranslation;
+import com.ycsoft.business.component.config.MemoryComponent;
 import com.ycsoft.business.dao.config.TProvinceDao;
 import com.ycsoft.business.dao.system.SAgentDao;
 import com.ycsoft.commons.abstracts.BaseComponent;
@@ -21,6 +23,8 @@ public class ConfigComponent extends BaseComponent {
 	private TProvinceDao tProvinceDao;
 	@Autowired
 	private SAgentDao sAgentDao;
+	@Autowired
+	private MemoryComponent memoryComponent;
 	
 	public List<TProvince> queryProvince() throws Exception {
 		return tProvinceDao.findAll();
@@ -43,6 +47,7 @@ public class ConfigComponent extends BaseComponent {
 				try {
 					tProvinceDao.createCustNameSeq(province.getCust_code());
 				} catch (Exception e) {
+					e.printStackTrace();
 					throw new ComponentException("根据该客户编号前缀创建的客户编号序列已存在，请更换前缀");
 				}
 			}
@@ -67,4 +72,25 @@ public class ConfigComponent extends BaseComponent {
 		}
 	}
 	
+	public Pager<SDataTranslation> queryDataTranslation(String query, Integer start, Integer limit) throws Exception {
+		return sDataTranslationDao.queryDataTranslation(query, start, limit);
+	}
+	
+	public void saveDataTranslation(List<SDataTranslation> dataList) throws Exception {
+		for(SDataTranslation data : dataList){
+			if(sDataTranslationDao.countByDataCn(data.getId(), data.getData_cn()) > 0){
+				throw new ComponentException("中文【"+data.getData_cn()+"】已存在");
+			}
+			if(StringHelper.isEmpty(data.getId())){
+				data.setId(sDataTranslationDao.findSequence().toString());
+				sDataTranslationDao.save(data);
+			}else{
+				sDataTranslationDao.update(data);
+			}
+		}
+	}
+	
+	public void deleteDataTranslation(String[] ids) throws Exception {
+		sDataTranslationDao.remove(ids);
+	}
 }

@@ -7,19 +7,27 @@ import com.ycsoft.daos.config.POJO;
 /**
  * SDataTranslation -> S_DATA_TRANSLATION mapping
  */
-@POJO(tn = "S_DATA_TRANSLATION", sn = "", pk = "DATA_CN")
+@POJO(tn = "S_DATA_TRANSLATION", sn = "SEQ_DATA_TRANS_ID", pk = "ID")
 public class SDataTranslation implements Serializable {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -8990485390737034660L;
+	private String id;
 	private String data_cn;
 	private String data_en;
 	private String data_kh;
 	
 	public SDataTranslation(){}
 	
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
 	public String getData_cn() {
 		return data_cn;
 	}
