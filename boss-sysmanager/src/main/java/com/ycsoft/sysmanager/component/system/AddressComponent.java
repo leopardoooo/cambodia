@@ -1,6 +1,7 @@
 package com.ycsoft.sysmanager.component.system;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -20,6 +21,7 @@ import com.ycsoft.beans.system.SDept;
 import com.ycsoft.beans.system.SDeptAddr;
 import com.ycsoft.beans.system.SItemvalue;
 import com.ycsoft.beans.system.SOptr;
+import com.ycsoft.beans.system.SSysChange;
 import com.ycsoft.business.commons.pojo.BusiParameter;
 import com.ycsoft.business.dao.config.TAddressDao;
 import com.ycsoft.business.dao.config.TCustColonyCfgDao;
@@ -40,14 +42,19 @@ import com.ycsoft.commons.abstracts.BaseComponent;
 import com.ycsoft.commons.constants.BusiCodeConstants;
 import com.ycsoft.commons.constants.SequenceConstants;
 import com.ycsoft.commons.constants.StatusConstants;
+import com.ycsoft.commons.constants.SysChangeType;
 import com.ycsoft.commons.constants.SystemConstants;
+import com.ycsoft.commons.exception.ActionException;
 import com.ycsoft.commons.exception.ComponentException;
 import com.ycsoft.commons.exception.ErrorCode;
 import com.ycsoft.commons.helper.CnToSpell;
 import com.ycsoft.commons.helper.CollectionHelper;
+import com.ycsoft.commons.helper.DateHelper;
 import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.daos.core.JDBCException;
 import com.ycsoft.daos.core.Pager;
+import com.ycsoft.daos.helper.BeanHelper;
+import com.ycsoft.sysmanager.web.commons.interceptor.WebOptr;
 
 @Component
 public class AddressComponent extends BaseComponent {
@@ -542,5 +549,65 @@ public class AddressComponent extends BaseComponent {
 			throw new ComponentException(ErrorCode.DataNumTooMuch);
 		}
 		return list;
+	}
+
+	public void updateDistruct(TDistrict disDto) throws Exception{
+		List<TDistrict> oldList = new ArrayList<TDistrict>();
+		List<TDistrict> newList = new ArrayList<TDistrict>();
+		if(StringHelper.isNotEmpty(disDto.getDistrict_id())){//修改
+			TDistrict _t = tDistrictDao.findByKey(disDto.getDistrict_id());
+			if(_t != null)
+				oldList.add(_t);
+			tDistrictDao.update(disDto);
+		}else{//新增
+			disDto.setDistrict_id(getNextAddrId());
+			if(disDto.getDistrict_level() == 1){//新增的如果是省，就是本身的district_id
+				disDto.setParent_id(disDto.getDistrict_id());
+			}
+			disDto.setStatus(StatusConstants.ACTIVE);
+			disDto.setCreate_time(DateHelper.now());
+			tDistrictDao.save(disDto);
+//			newList.add(addr);
+		}
+		
+		saveDistrictChanges(oldList, newList);
+	}
+	
+	
+	private void saveDistrictChanges(List<TDistrict> oldList, List<TDistrict> newList) throws ActionException{
+		try{
+			List<SSysChange> changes = new ArrayList<SSysChange>();
+			
+			String content;
+			String optrId = WebOptr.getOptr().getOptr_id();
+			Date createTime = new Date();
+			Integer doneCode = getDoneCOde();
+			String changeType = SysChangeType.DISTRICT.toString();
+			String key ;
+			String keyDesc;
+			String changeDesc = "行政区域定义";
+			if(CollectionHelper.isEmpty(oldList)){//新增
+				for(TDistrict add:newList){
+					key = add.getDistrict_id();
+					keyDesc = add.getDistrict_name();
+					content = BeanHelper.beanchange(null, add);
+					SSysChange change = new SSysChange(changeType, doneCode, key, keyDesc, changeDesc, content, optrId, createTime);
+					changes.add(change);
+				}
+			}else{
+				TDistrict oldAdd = oldList.get(0);
+				TDistrict newAdd = CollectionHelper.isNotEmpty(newList)?newList.get(0):null;
+				
+				key = oldAdd.getDistrict_id();
+				keyDesc = newAdd!=null ? newAdd.getDistrict_name():oldAdd.getDistrict_name();
+				content = BeanHelper.beanchange(oldAdd, newAdd);
+				SSysChange change = new SSysChange(changeType, doneCode, key, keyDesc, changeDesc, content, optrId, createTime);
+				changes.add(change);
+			}
+			
+			getSSysChangeDao().save(changes.toArray(new SSysChange[changes.size()]));
+		}catch (Exception e) {
+			throw new ActionException(e.getMessage());
+		}
 	}
 }

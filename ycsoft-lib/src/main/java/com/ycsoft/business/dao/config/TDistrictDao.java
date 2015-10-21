@@ -49,10 +49,15 @@ public class TDistrictDao extends BaseEntityDao<TDistrict> {
 
 
 	public List<DistrictSysDto> queryAllAddrByName(String name)  throws JDBCException {
-		String sql = "select distinct t.*,level from t_district t start with t.district_id in"
-				+ " (select d.district_id from t_district d where d.district_name like  '%'||?||'%' "
-				+ "connect by prior t.parent_id = t.district_id order by level DESC ";
-		return createQuery(DistrictSysDto.class,sql, name).list();
+		name = name.toLowerCase();
+		String sql = "select d.* from (select distinct c.*  from t_district c "
+				+ "start with c.district_id in (select a.district_id from t_district a ,(select t.district_id from t_district t "
+				+ "where   lower( t.district_name) not like  '%'||?||'%' ) b  "
+				+ "where a.parent_id =b. district_id and lower( a.district_name) like '%'||?||'%' "
+				+ "union all select t.district_id from t_district t "
+				+ "where  lower( t.district_name) like '%'||?||'%' )"
+				+ " connect by prior c.parent_id = c.district_id)d order by d.district_level  ";
+		return createQuery(DistrictSysDto.class,sql, name,name,name).list();
 	}
 	
 	public List<DistrictSysDto> queryAllDistrictTree()  throws JDBCException {
