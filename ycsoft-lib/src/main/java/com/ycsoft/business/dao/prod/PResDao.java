@@ -41,7 +41,7 @@ public class PResDao extends BaseEntityDao<PRes> {
 		if(!countyId.equals(SystemConstants.COUNTY_ALL)){
 			cond = " and (p.county_id='"+SystemConstants.COUNTY_ALL+"' or p.county_id='"+countyId+"') ";
 		}
-		String sql = "select p.res_id,p.res_name,p.serv_id,p.res_desc,p.status,p.create_time,p.res_type,p.currency,p.optr_id,p.area_id,p.county_id,"
+		String sql = "select p.res_id,p.res_name,p.serv_id,p.res_desc,p.status,p.create_time,p.res_type,p.currency,p.optr_id,p.area_id,p.county_id,p.band_width,"
 			+ " case when count(t.id)>0 then 'T' else 'F' end isRecommend"
 			+ " from p_res p,("
 				+ " select a.prod_id id,a.res_id from p_prod_static_res a"
@@ -56,7 +56,7 @@ public class PResDao extends BaseEntityDao<PRes> {
 		if(StringHelper.isNotEmpty(servId)){
 			sql += " and p.serv_id='"+servId+"'";
 		}
-	    sql += " group by p.res_id,p.res_name,p.serv_id,p.res_desc,p.status,p.create_time,p.res_type,p.currency,p.optr_id,p.area_id,p.county_id order by p.create_time desc";
+	    sql += " group by p.res_id,p.res_name,p.serv_id,p.res_desc,p.status,p.create_time,p.res_type,p.currency,p.optr_id,p.area_id,p.county_id,p.band_width order by p.create_time desc";
 		return createQuery(ResDto.class, sql).setStart(start).setLimit(limit).page();
 	}
 	

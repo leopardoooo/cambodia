@@ -148,6 +148,49 @@ Sys = {
 			labelAddrTree : 'Address tree'
 		}
 	},
+	DistrictNodeManage : {//行政区配置
+		panelTitle : 'Address Management',// 面板主标题
+		msg : {// 各种提示消息
+			actionFailed : 'action failed.',
+			actionSuccess : 'success',
+			confirmSave : 'Click OK to save these settings?',
+			confirmInvalid : 'Click OK to invalid',
+			confirmDelete : 'Click OK to delte',
+			confirmActivate : 'Click OK to activate',
+			cantBeInvalided : 'it has sub nodes,can\'t be invalided.',
+			maxDepthText : 'can\'t add child node.',
+			noSingleQuoteAllowed : 'single quote is forbidden.'
+
+		},
+		formWin : {
+			labelShowName : 'show name',
+			labelProvince : 'province name',
+			labelCityName : 'city name',
+			labelCityDistrictName : 'city Administrative Region',
+			labelSubDistrictName : 'sub Administrative Region',
+			labelDesc:'name description~',
+			labelremark:'Remark~',
+			labelAddrTree : 'district tree',
+			
+			labelDistrict : 'district',
+			labelNetType : 'net type',
+			emptyTxtProvince : 'please select a province',
+			emptyTxtBlurQuery : 'support blur query',
+			btnTxtClose : 'close',
+			btnTxtSave : 'save',
+			labelRoadNum : 'road number',
+			titleNewSaveLevelRoadNum : 'add sibling road number',
+			labelStreatName : 'street name',
+			titleNewSaveLevelStreet : 'add street',
+			labelCityName : 'city name',
+			titleNewSaveLevelCity : 'add sibling node',
+			labelParentName : 'parent address name',
+
+			labelNewAddChild : 'add child node',
+			labelNewAddBrother : 'add sibling node'
+			
+		}
+	},
 	WorkTask : {
 		msg : {
 			minTimeText : 'You can not select the day before~',

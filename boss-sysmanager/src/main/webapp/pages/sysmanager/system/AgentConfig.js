@@ -4,7 +4,7 @@
  
  AgentGrid = Ext.extend(Ext.grid.GridPanel, {
  	agentStore: null,
- 	pageSize: 10,
+ 	pageSize: 20,
  	constructor: function(){
  		this.agentStore = new Ext.data.JsonStore({
 			url: root+'/config/Config!queryAgent.action',
@@ -38,6 +38,7 @@
  			border: false,
  			tbar:[' ',' ','输入关键字' , ' ',
 				new Ext.ux.form.SearchField({
+					id: 'agentSearchFieldId',
 	                store: this.agentStore,
 	                width: 200,
 	                hasSearch : true,
@@ -52,7 +53,8 @@
  	},
  	doRefresh: function(){
  		this.agentStore.removeAll();
- 		this.agentStore.reload();
+ 		this.agentStore.baseParams['query'] = Ext.getCmp('agentSearchFieldId').getValue();
+ 		this.agentStore.load();
  	},
  	doUpdate: function(id){
 		var win = new AgentWin(this);

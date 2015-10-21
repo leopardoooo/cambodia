@@ -9,7 +9,10 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 
 import com.ycsoft.beans.config.TDistrict;
+import com.ycsoft.business.dto.config.DistrictSysDto;
+import com.ycsoft.business.dto.config.TAddressSysDto;
 import com.ycsoft.business.dto.config.TDistrictDto;
+import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.daos.abstracts.BaseEntityDao;
 import com.ycsoft.daos.core.JDBCException;
 
@@ -42,6 +45,25 @@ public class TDistrictDao extends BaseEntityDao<TDistrict> {
 		String sql = "  select t.*,level from t_district t start with t.district_id = ? "
 				+ " connect by prior t.district_id = t.parent_id order by level asc " ;
 		return createQuery(TDistrictDto.class,sql, pId).list();
+	}
+
+
+	public List<DistrictSysDto> queryAllAddrByName(String name)  throws JDBCException {
+		name = name.toLowerCase();
+		String sql = "select d.* from (select distinct c.*  from t_district c "
+				+ "start with c.district_id in (select a.district_id from t_district a ,(select t.district_id from t_district t "
+				+ "where   lower( t.district_name) not like  '%'||?||'%' ) b  "
+				+ "where a.parent_id =b. district_id and lower( a.district_name) like '%'||?||'%' "
+				+ "union all select t.district_id from t_district t "
+				+ "where  lower( t.district_name) like '%'||?||'%' )"
+				+ " connect by prior c.parent_id = c.district_id)d order by d.district_level  ";
+		return createQuery(DistrictSysDto.class,sql, name,name,name).list();
+	}
+	
+	public List<DistrictSysDto> queryAllDistrictTree()  throws JDBCException {
+		String sql = "select t.*,level from t_district t start with t.district_id = ? "
+				+ "connect by prior t.district_id = t.parent_id order by level asc ";
+		return createQuery(DistrictSysDto.class,sql,SystemConstants.DISTRICT_ID).list();
 	}
 
 }

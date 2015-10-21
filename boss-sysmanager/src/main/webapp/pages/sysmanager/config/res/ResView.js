@@ -4,7 +4,7 @@ ResGrid = Ext.extend(Ext.grid.GridPanel, {
 		this.resStore = new Ext.data.JsonStore({
 			url:root+'/config/Res!queryRes.action',
 			fields:['res_name','res_desc','status','status_text','res_type','res_type_text','isRecommend',
-				'currency','currency_text','create_time','serv_id','serv_id_text','res_id','optr_id','county_id','area_id'
+				'currency','currency_text','create_time','serv_id','serv_id_text','res_id','optr_id','county_id','area_id', 'band_width'
 			],
 			totalProperty:'totalProperty',
 			root:'records'
@@ -16,12 +16,13 @@ ResGrid = Ext.extend(Ext.grid.GridPanel, {
 		var countyId = App.data.optr['county_id'];
 		var colModel = new Ext.grid.ColumnModel([
 			sm,
-			{header:'BOSS资源名称',dataIndex:'res_name',width:110,renderer:App.qtipValue},
-			{header:'BOSS服务类型',dataIndex:'serv_id_text',width:75},
-			{header:'状态',dataIndex:'status_text',width:55,renderer:Ext.util.Format.statusShow},
-			{header:'BOSS资源类型',dataIndex:'res_type_text',width:80},
-			{header:'全省通用',dataIndex:'currency_text',width:65},
-			{header:'创建时间',dataIndex:'create_time',width:120},
+			{header:'BOSS资源名称',dataIndex:'res_name',width:150,renderer:App.qtipValue},
+			{header:'BOSS服务类型',dataIndex:'serv_id_text',width:100},
+			{header:'状态',dataIndex:'status_text',width:80	,renderer:Ext.util.Format.statusShow},
+//			{header:'BOSS资源类型',dataIndex:'res_type_text',width:80},
+//			{header:'全省通用',dataIndex:'currency_text',width:65},
+			{header: '带宽', dataIndex: 'band_width', width:80},
+			{header:'创建时间',dataIndex:'create_time',width:135},
 			{header:'描述',dataIndex:'res_desc',id:'res_desc_id'},
 			{header:'操作',dataIndex:'county_id',renderer:function(v, md, record, i){
 					var str = "";
@@ -42,7 +43,7 @@ ResGrid = Ext.extend(Ext.grid.GridPanel, {
 			title:'BOSS资源信息',
 			border:false,
 			region:'north',
-			height:250,
+			height:350,
 			autoExpandColumn:'res_desc_id',
 			store:this.resStore,
 			colModel:colModel,
@@ -139,11 +140,11 @@ ServerResGrid = Ext.extend(Ext.grid.GridPanel, {
 		var countyId = App.data.optr['county_id'];
 		var colModel = new Ext.grid.ColumnModel([
 			sm,
-			{header:'服务器名称',dataIndex:'server_name',width:120,renderer:App.qtipValue},
-			{header:'资源编号',dataIndex:'external_res_id',width:120},
-			{header:'资源名称',dataIndex:'res_name',width:120},
-			{header:'BOSS资源名称',dataIndex:'boss_res_name',width:120},
-			{header:'服务类型',dataIndex:'serv_type_text',width:80},
+			{header:'服务器名称',dataIndex:'server_name',width:100,renderer:App.qtipValue},
+			{header:'资源编号',dataIndex:'external_res_id',width:340,renderer:App.qtipValue},
+			{header:'资源名称',dataIndex:'res_name',width:250,renderer:App.qtipValue},
+			{header:'BOSS资源名称',dataIndex:'boss_res_name',width:250,renderer:App.qtipValue},
+			{header:'服务类型',dataIndex:'serv_type_text',width:65},
 			{header:'操作',dataIndex:'county_id',renderer:function(v, md, record, i){
 					var res = '';
 					if(countyId == '4501' || countyId == v){
@@ -232,12 +233,12 @@ ResWin = Ext.extend(Ext.Window,{
 			id:'resWinId',
 			title:'添加BOSS资源',
 			border:false,
-			width:300,
-			height:250,
+			width:350,
+			height:280,
 			layout:'fit',
 			items:[
 				{id:'resFormId',xtype:'form',labelWidth:120,
-					bodyStyle:'padding-top:5px',items:[
+					bodyStyle:'padding-top:10px',items:[
 					{xtype:'hidden',name:'res_id'},
 					{xtype:'textfield',fieldLabel:'BOSS资源名称',name:'res_name',allowBlank:false,
 						listeners:{
@@ -251,25 +252,26 @@ ResWin = Ext.extend(Ext.Window,{
 							scope: this,
 							select: function(combo,record,idx){
 								var value = combo.getValue();
-								var resType = Ext.getCmp('resFormId').getForm().findField('res_type');
-								if(value == 'ITV'){
-									if(resType.disabled)
-										resType.enable();
+								var bandWidth = Ext.getCmp('resFormId').getForm().findField('band_width');
+								if(value == 'BAND'){
+									if(bandWidth.disabled)
+										bandWidth.enable();
 								}else{
-									if(!resType.disabled){
-										resType.clearValue();
-										resType.disable();
+									if(!bandWidth.disabled){
+										bandWidth.setValue(null);
+										bandWidth.disable();
 									}
 								}
 							}
 						}
 					},
-					{xtype:'paramcombo',fieldLabel:'BOSS资源类型',disabled:true,allowBlank:false,
+					/*{xtype:'paramcombo',fieldLabel:'BOSS资源类型',disabled:true,allowBlank:false,
 						hiddenName:'res_type',paramName:'RES_TYPE'},
 					{xtype:'checkbox',fieldLabel:'全省通用',name:'currency',inputValue:'T',
 						disabled : App.data.optr['county_id'] == '4501'
 											? false
-											: true},
+											: true},*/
+					{xtype: 'numberfield', fieldLabel: '带宽', name: 'band_width', allowDecimals: false, allowNegative: false, allowBlank: false},
 					{xtype:'textarea',fieldLabel:'资源描述',name:'res_desc',anchor:'95%',height:60}
 				]}
 			],
@@ -288,19 +290,24 @@ ResWin = Ext.extend(Ext.Window,{
 	show: function(record){
 		ResWin.superclass.show.call(this);
 		if(record){
+			this.setTitle('修改BOSS资源');
 			var form = Ext.getCmp('resFormId').getForm();
 			Ext.getCmp('resFormId').getForm().loadRecord(record);
-			if(record.get('serv_id') == 'ITV'){
+			if(record.get('serv_id') == 'BAND'){
+				form.findField('band_width').enable(); 	
+			}else{
+				form.findField('band_width').disable();	
+			}
+			/*if(record.get('serv_id') == 'ITV'){
 				var comp = form.findField('res_type'); 
 				if(comp.disabled)comp.enable();
 			}else{
 				var comp = form.findField('res_type');
 				if(!comp.disabled)comp.disable();
-			}
-			this.setTitle('修改BOSS资源');
-			if(record.get('currency') === 'T'){
+			}*/
+			/*if(record.get('currency') === 'T'){
 				form.findField('currency').setValue(true);
-			}
+			}*/
 		}else{
 			this.setTitle('添加BOSS资源');
 		}
@@ -331,9 +338,9 @@ ResWin = Ext.extend(Ext.Window,{
 		var form = Ext.getCmp('resFormId').getForm();
 		if(!form.isValid())return;
 		var values = form.getValues();
-		if(Ext.isEmpty(values['currency'])){
+		/*if(Ext.isEmpty(values['currency'])){
 			values['currency'] = 'F';
-		}
+		}*/
 		var obj = {};
 		for(var prop in values){
 			obj['res.'+prop] = values[prop];

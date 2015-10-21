@@ -311,29 +311,68 @@ public class SnTaskComponent extends BaseBusiComponent {
 	// 保存开户、移机、故障单的回填信息
 	public void fillTaskInfo(Integer doneCode, WTaskBaseInfo task, List<WTaskUser> userList,
 			List<TaskFillDevice> deviceList) throws Exception {
+		JsonObject jo = new JsonObject();
+		String noInfo = "";
 		if (task.getTask_type_id().equals(SystemConstants.TASK_TYPE_INSTALL)) {
 			// 更新工单用户对应的设备信息
+			String deviceInfo = "";
 			for (TaskFillDevice fillDevice : deviceList) {
-				wTaskUserDao.updateTaskUserDevice(fillDevice.getDeviceCode(), fillDevice.getUserId(),
-						task.getTask_id());
-				if (fillDevice.isFcPort()) {
-					updateBandFc(fillDevice, task);
+				WTaskUser wu = wTaskUserDao.queryBean(task.getTask_id(),fillDevice.getUserId());
+				boolean isSave = false;
+				if(wu != null){
+					if(fillDevice.getDeviceCode().equals(wu.getDevice_id())){
+						isSave = true;
+					}
 				}
+				if(!isSave){
+					deviceInfo = deviceInfo + wu.getDevice_id() +"->"+fillDevice.getDeviceCode()+",";
+				}
+				wTaskUserDao.updateTaskUserDevice(fillDevice.getDeviceCode(), fillDevice.getUserId(),task.getTask_id());
+				if (fillDevice.isFcPort()) {
+					noInfo = noInfo + updateBandFc(fillDevice, task);
+				}
+			}
+			if(StringHelper.isNotEmpty(deviceInfo)){
+				jo.addProperty("device_change",StringHelper.delEndChar(deviceInfo, 1) );
 			}
 		} else {
 			for (TaskFillDevice fillDevice : deviceList) {
-				updateBandFc(fillDevice, task);
+				noInfo = noInfo + updateBandFc(fillDevice, task);
 			}
 		}
-
+		if(StringHelper.isNotEmpty(noInfo)){
+			jo.addProperty("other_change",StringHelper.delEndChar(noInfo, 1) );
+		}
 		// 记录工单操作日志
-		createTaskLog(task.getTask_id(), BusiCodeConstants.TASK_FILL, doneCode, null, StatusConstants.NONE);
+		createTaskLog(task.getTask_id(), BusiCodeConstants.TASK_FILL, doneCode, jo.toString(), StatusConstants.NONE);
 	}
 
 	// 更新宽带用的光路信息
-	private void updateBandFc(TaskFillDevice fillDevice, WTaskBaseInfo task) throws Exception {
+	private String updateBandFc(TaskFillDevice fillDevice, WTaskBaseInfo task) throws Exception {
+		String noInfo = "";
 		if (StringHelper.isNotEmpty(fillDevice.getOccNo())) {
 			CUser user = new CUser();
+			CUser oldUser = cUserDao.findByKey(fillDevice.getUserId());
+			if(oldUser == null){
+				throw new ComponentException("用户不存在");
+			}
+			String userName = getFillUserName(oldUser);
+			String occ = "";
+			String pos = "";
+			String zte = "";
+			if(!fillDevice.getOccNo().equals(oldUser.getStr7())){
+				occ = "occ_No:"+oldUser.getStr7()+"->"+fillDevice.getOccNo()+",";
+			}
+			if(!fillDevice.getPosNo().equals(oldUser.getStr8())){
+				pos = "pos_No:"+oldUser.getStr8()+"->"+fillDevice.getPosNo()+",";
+			} 
+			WTaskBaseInfo wtb = wTaskBaseInfoDao.findByKey(task.getTask_id());
+			if(!StatusConstants.NOT_EXEC.equals(wtb.getZte_status())){
+				zte = "zte_status:"+StatusConstants.NOT_EXEC+",";
+			}
+			if(StringHelper.isNotEmpty(occ)||StringHelper.isNotEmpty(pos)||StringHelper.isNotEmpty(zte)){
+				noInfo = userName+"("+StringHelper.delEndChar(occ+pos+zte, 1)+"),";
+			}
 			user.setUser_id(fillDevice.getUserId());
 			user.setStr7(fillDevice.getOccNo());
 			user.setStr8(fillDevice.getPosNo());
@@ -343,8 +382,9 @@ public class SnTaskComponent extends BaseBusiComponent {
 			task.setZte_status(StatusConstants.NOT_EXEC);
 			task.setZte_status_date(new Date());
 			wTaskBaseInfoDao.update(task);
+			
 		}
-
+		return noInfo;
 	}
 
 	// 回填工单

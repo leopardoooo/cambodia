@@ -11,10 +11,11 @@ import org.springframework.stereotype.Controller;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.ycsoft.beans.config.TAddress;
+import com.ycsoft.beans.config.TDistrict;
 import com.ycsoft.beans.config.TProvince;
 import com.ycsoft.beans.core.cust.CCust;
 import com.ycsoft.beans.system.SSysChange;
-import com.ycsoft.business.dto.config.TAddressDto;
+import com.ycsoft.business.dto.config.DistrictSysDto;
 import com.ycsoft.business.dto.config.TAddressSysDto;
 import com.ycsoft.commons.abstracts.BaseAction;
 import com.ycsoft.commons.constants.SysChangeType;
@@ -42,6 +43,7 @@ public class AddressAction extends BaseAction {
 	private String custId;
 	private String status;
 	private TAddressSysDto addrDto;
+	private TDistrict disDto;
 	private String districtId;
 	private File file;
 
@@ -70,10 +72,24 @@ public class AddressAction extends BaseAction {
 	}
 	
 	public String queryDistrictTree() throws Exception{
-		List addrs =  addressComponent.queryDistrictByPid(districtId);
-		getRoot().setRecords(TreeBuilder.createSysAdreeTree(addrs));
+		List addrs =  addressComponent.queryDistrictTree(queryText,optr);
+		getRoot().setRecords(TreeBuilder.createSysTree(addrs,false,15));
 		return JSON_RECORDS;
 	}
+	
+	public String updateDistruct() throws Exception{
+		addressComponent.updateDistruct(disDto);
+		return JSON_SUCCESS;
+	}
+//	public String editDistruct() throws Exception{
+//		List<TAddress> oldList = new ArrayList<TAddress>();
+//		oldList.add(addressComponent.queryAddrByaddrId(addrDto.getAddr_id()));
+//		addressComponent.editAddress(addrDto);
+//		List<TAddress> newList = new ArrayList<TAddress>();
+//		newList.add(addressComponent.queryAddrByaddrId(addrDto.getAddr_id()));
+//		saveChanges(oldList, newList);
+//		return JSON;
+//	}
 	
 	/**
 	 * 增加地区
@@ -167,8 +183,6 @@ public class AddressAction extends BaseAction {
 			throw new ActionException(e.getMessage());
 		}
 	}
-
-
 
 	/**
 	 * 修改地区名字
@@ -329,31 +343,21 @@ public class AddressAction extends BaseAction {
 		this.addr = addr;
 	}
 
-
-
 	public String getCustId() {
 		return custId;
 	}
-
-
 
 	public void setCustId(String custId) {
 		this.custId = custId;
 	}
 
-
-
 	public void setStatus(String status) {
 		this.status = status;
 	}
 
-
-
 	public File getFile() {
 		return file;
 	}
-
-
 
 	public void setFile(File file) {
 		this.file = file;
@@ -369,6 +373,14 @@ public class AddressAction extends BaseAction {
 
 	public void setDistrictId(String districtId) {
 		this.districtId = districtId;
+	}
+
+	public TDistrict getDisDto() {
+		return disDto;
+	}
+
+	public void setDisDto(TDistrict disDto) {
+		this.disDto = disDto;
 	}
 
 
