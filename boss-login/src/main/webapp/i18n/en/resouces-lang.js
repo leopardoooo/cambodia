@@ -140,7 +140,8 @@ ResSysLang = {
 	'3110': 'Receipts Refunding~',
 	
 	'3000':	'Provincial Config',
-	'3200':	'Agent Config'
+	'3200':	'Agent Config',
+	'3201':	'Translation Config'
 };
 
 // 工具栏国际化

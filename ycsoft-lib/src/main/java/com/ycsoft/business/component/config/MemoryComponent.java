@@ -45,7 +45,7 @@ public class MemoryComponent extends BaseComponent{
 		jSignalDao.addSignal("P", content);
 	}
 
-	public void setupMemoryDict(JSignal signal) throws JDBCException {
+	public void setupMemoryDict(JSignal signal) throws Exception {
 		if (StringHelper.isEmpty(signal.getSignal_content())) {
 			// 装载所有数据
 			MemoryDict.setupData(sItemvalueDao.findAllViewDict(), sDataTranslationDao.findAll());
@@ -54,8 +54,7 @@ public class MemoryComponent extends BaseComponent{
 					.getSignal_content());
 			MemoryDict.appendData(datas);
 			
-			SDataTranslation trans = sDataTranslationDao.findByKey(signal.getSignal_content());
-			MemoryDict.appendTransData(trans);
+			MemoryDict.appendTransData(sDataTranslationDao.queryDataTranslation(signal.getSignal_content()));
 		}
 	}
 

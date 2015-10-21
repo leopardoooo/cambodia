@@ -40,15 +40,13 @@
  		this.stopEditing();
  		var modifiedRecords = this.store.getModifiedRecords();
  		if(modifiedRecords.length > 0){
+ 			this.store.commitChanges();
 	 		var values = [];
 	 		Ext.each(modifiedRecords, function(record){
 	 			var obj = record.data;
 	 			values.push(obj);
 	 		}, this);
 	 		
-	 		alert(Ext.encode(values));
-	 		
-//	 		Ext.getBody().mask();
 			Ext.Ajax.request({
 				url:root+'/config/Config!saveProvince.action',
 				params:{
@@ -56,9 +54,7 @@
 				},
 				scope:this,
 				success:function(req){
-					this.store.commitChanges();
 					this.doRefresh();
-//					Ext.getBody().unmask();
 					Alert('修改成功!');
 				}
 			});
@@ -70,7 +66,7 @@
  ProvinceConfig = Ext.extend(Ext.Panel, {
     constructor: function () {
         this.grid = new ProvinceGrid(this);
-        OnlineUser.superclass.constructor.call(this, {
+        ProvinceConfig.superclass.constructor.call(this, {
             id: 'ProvinceConfig',
             title: '省定义配置',
             closable: true,
