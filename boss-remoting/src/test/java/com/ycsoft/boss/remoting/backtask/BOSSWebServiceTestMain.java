@@ -19,17 +19,17 @@ import com.ycsoft.boss.remoting.backtask.BOSSWebServiceSoapImplServiceStub.WorkO
 public class BOSSWebServiceTestMain {
 
 	public static void main(String[] args) {
-		
+		//E:/MyWork/workspace_st/cambodia
 		System.setProperty("javax.net.debug", "ssl,handshake");
-        System.setProperty("javax.net.ssl.keyStore", "/Users/killer/Documents/MyWorks/GitHub/cambodia/boss-remoting/src/main/resources/backtask/boss-test-client.p12");
-       // System.setProperty("javax.net.ssl.keyStore", "D:/ycsoft/ssl/cfocn.client.jks");
+       // System.setProperty("javax.net.ssl.keyStore", "E:/MyWork/workspace_st/cambodia/boss-remoting/src/main/resources/backtask/boss-test-client.p12");
+        System.setProperty("javax.net.ssl.keyStore", "D:/ycsoft/ssl/boss-test-client.p12");
         System.setProperty("javax.net.ssl.keyStorePassword", "a1234567");
         System.setProperty("javax.net.ssl.keyStoreType", "PKCS12");
 		
-		System.setProperty("javax.net.ssl.trustStore", "/Users/killer/Documents/MyWorks/GitHub/cambodia/boss-core/src/main/resources/cert/client/ca.p12");
-		//System.setProperty("javax.net.ssl.trustStore", "D:/ycsoft/ssl/ca.p12");
+		//System.setProperty("javax.net.ssl.trustStore", "E:/MyWork/workspace_st/cambodia/boss-core/src/main/resources/cert/client/ca.p12");
+		System.setProperty("javax.net.ssl.trustStore", "D:/ycsoft/ssl/ca.jks");
         System.setProperty("javax.net.ssl.trustStorePassword", "a1234567");
-        System.setProperty("javax.net.ssl.trustStoreType", "PKCS12");
+        System.setProperty("javax.net.ssl.trustStoreType", "JKS");
 		
         BOSSWebServiceTestMain aa=new BOSSWebServiceTestMain();
         //完工测试

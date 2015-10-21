@@ -52,9 +52,31 @@
 		</filter> 
 	</appender>
 	
+	<!-- log4j.logger.com.easyooo.framework=INFO  com.yaochen.myquartz -->
 	
-	<root>
+	<logger name="com.yaochen.myquartz">
 		<level value="INFO" />
+	</logger>
+	<logger name="org.quartz">
+		<level value="INFO" />
+	</logger>
+	<logger name="org.apache">
+		<level value="INFO" />
+	</logger>
+	<logger name="org.apache.axis2">
+		<level value="ERROR" />
+	</logger>
+	<logger name="org.springframework">
+		<level value="INFO" />
+	</logger>
+	<logger name="com.mchange">
+		<level value="INFO" />
+	</logger>
+	<logger name="com.ycsoft.daos.core.impl.QueryImpl">
+		<level value="INFO" />
+	</logger>
+	<root>
+		<level value="DEBUG" />
 		<!-- 输出的屏幕,linux下启动注释掉，开发时启用 -->
 		<appender-ref ref="CON" />
 		<!-- 输出到总日志文件中 -->

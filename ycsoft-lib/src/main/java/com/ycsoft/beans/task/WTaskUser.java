@@ -24,8 +24,22 @@ public class WTaskUser implements Serializable {
 	private String device_model_text;
 	private String recycle_result_text;
 	
+	private String occ_no;
+	private String pos_no;
 	
 	
+	public String getOcc_no() {
+		return occ_no;
+	}
+	public void setOcc_no(String occ_no) {
+		this.occ_no = occ_no;
+	}
+	public String getPos_no() {
+		return pos_no;
+	}
+	public void setPos_no(String pos_no) {
+		this.pos_no = pos_no;
+	}
 	public String getUser_type_text() {
 		return user_type_text;
 	}
