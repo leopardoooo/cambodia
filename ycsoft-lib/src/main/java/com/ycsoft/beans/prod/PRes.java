@@ -31,6 +31,7 @@ public class PRes extends PResgroup implements Serializable {
 	private Date create_time;
 	private String res_type;
 	private String currency;
+	private Integer band_width;
 	
 	private String status_text;
 	private String serv_id_text;
@@ -38,6 +39,14 @@ public class PRes extends PResgroup implements Serializable {
 	private String currency_text;
 	private String external_res_id;
 
+	public Integer getBand_width() {
+		return band_width;
+	}
+
+	public void setBand_width(Integer band_width) {
+		this.band_width = band_width;
+	}
+	
 	public String getStatus_text() {
 		return status_text;
 	}
