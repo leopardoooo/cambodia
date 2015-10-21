@@ -302,8 +302,9 @@ public class SnTaskComponent extends BaseBusiComponent {
 		task.setTask_invalide_time(new Date());
 		task.setTask_status_date(new Date());
 		wTaskBaseInfoDao.update(task);
-		// 如果是CFON的工单需要同步
-		task = wTaskBaseInfoDao.findByKey(taskId);
+		//task = wTaskBaseInfoDao.findByKey(taskId);
+		wTaskLogDao.updateUnSynLogToNone(taskId, "作废工单取消执行");
+		
 		createTaskLog(taskId, BusiCodeConstants.TASK_CANCEL, doneCode, null, StatusConstants.NONE);
 	}
 

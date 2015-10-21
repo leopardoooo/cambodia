@@ -17,6 +17,8 @@ public class TreeNode {
 	private String attr;
 	private String attr_src;
 	private String attr_src_id;
+	private String other_id;
+	private String other_name;
 	private boolean expanded = false;
 	private boolean singleClickExpand = true;
 	private Map<String,String> others = new HashMap<String,String>();
@@ -31,6 +33,19 @@ public class TreeNode {
 	}
 
 
+	public String getOther_id() {
+		return other_id;
+	}
+	public void setOther_id(String other_id) {
+		this.other_id = other_id;
+	}
+	public String getOther_name() {
+		return other_name;
+	}
+	public void setOther_name(String other_name) {
+		this.other_name = other_name;
+	}
+	
 	public boolean isExpanded() {
 		return expanded;
 	}

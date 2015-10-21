@@ -35,4 +35,9 @@ public class WTaskLogDao extends BaseEntityDao<WTaskLog> {
 				+" order by t.log_sn ) where rownum<500 ";
 		return this.createQuery(sql, StatusConstants.NOT_EXEC).list();
 	}
+	
+	public void updateExecResult(WTaskLog log) throws JDBCException{
+		String sql=" update w_task_log t set syn_status=? ,error_code=? ,error_remark=?,syn_time=? where log_sn=? ";
+		this.executeUpdate(sql, log.getSyn_status(),log.getError_code(),log.getError_remark(),log.getSyn_time(),log.getLog_sn());
+	}
 }

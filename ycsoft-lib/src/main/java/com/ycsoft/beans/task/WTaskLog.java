@@ -24,16 +24,7 @@ public class WTaskLog  extends BusiBase  implements Serializable {
 	private String error_remark;
 	private String syn_status_text;
 	private int delay_time;
-	private String log_remark;
-
 	
-	
-	public String getLog_remark() {
-		return log_remark;
-	}
-	public void setLog_remark(String log_remark) {
-		this.log_remark = log_remark;
-	}
 	public int getDelay_time() {
 		return delay_time;
 	}

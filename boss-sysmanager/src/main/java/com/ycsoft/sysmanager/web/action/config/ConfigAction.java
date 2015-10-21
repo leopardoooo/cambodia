@@ -1,11 +1,14 @@
 package com.ycsoft.sysmanager.web.action.config;
 
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.ycsoft.beans.config.TProvince;
+import com.ycsoft.beans.system.SAgent;
 import com.ycsoft.commons.abstracts.BaseAction;
 import com.ycsoft.sysmanager.component.config.ConfigComponent;
 
@@ -20,6 +23,9 @@ public class ConfigAction extends BaseAction {
 	@Autowired
 	private ConfigComponent configComponent;
 	
+	private String query;
+	private SAgent agent;
+	
 	public String queryProvince() throws Exception {
 		getRoot().setRecords(configComponent.queryProvince());
 		return JSON_RECORDS;
@@ -30,6 +36,33 @@ public class ConfigAction extends BaseAction {
 		List<TProvince> provinceList = new Gson().fromJson(str, new TypeToken<List<TProvince>>(){}.getType());
 		configComponent.saveProvince(provinceList);
 		return JSON_SUCCESS;
+	}
+	
+	public String queryAllAgent() throws Exception {
+		getRoot().setRecords(configComponent.queryAllAgent());
+		return JSON_RECORDS;
+	}
+	
+	public String queryAgent() throws Exception {
+		getRoot().setPage(configComponent.queryAgent(query, start, limit));
+		return JSON_PAGE;
+	}
+	
+	public String saveAgent() throws Exception {
+		configComponent.saveAgent(agent);
+		return JSON_SUCCESS;
+	}
+	
+	public SAgent getAgent() {
+		return agent;
+	}
+
+	public void setAgent(SAgent agent) {
+		this.agent = agent;
+	}
+	
+	public void setQuery(String query) {
+		this.query = query;
 	}
 	
 }

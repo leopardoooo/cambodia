@@ -64,8 +64,8 @@ public class SDeptDao extends BaseEntityDao<SDept> {
 	 */
 	public List<SDeptDto> queryDeptByCountyId(String countyId) throws JDBCException{
 		String sql = StringHelper.append("select level, s.*",
-				" from ( select dept_id,dept_name,dept_type,county_id,area_id,create_time,creator,dept_order_num,status, dept_pid",
-				" from s_dept ) s",
+				" from ( select dept_id,dept_name,dept_type,county_id,area_id,d.create_time,creator,dept_order_num,status, dept_pid,d.agent_id, a.name agent_name",
+				" from s_dept d, s_agent a where d.agent_id=a.id(+) ) s",
 				" where s.status = ? start with dept_id = ? ",
 				" connect by prior s.dept_id = s.dept_pid  order by level,s.dept_type desc");
 		return createQuery(SDeptDto.class, sql, StatusConstants.ACTIVE,countyId).list();

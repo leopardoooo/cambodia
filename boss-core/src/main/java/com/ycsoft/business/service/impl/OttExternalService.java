@@ -11,6 +11,7 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.google.gson.Gson;
 import com.ycsoft.beans.core.acct.CAcctAcctitem;
 import com.ycsoft.beans.core.cust.CCust;
 import com.ycsoft.beans.core.cust.CCustLinkman;
@@ -22,6 +23,9 @@ import com.ycsoft.beans.ott.OttAccount;
 import com.ycsoft.beans.ott.OttProdTariff;
 import com.ycsoft.beans.ott.OttUserOrder;
 import com.ycsoft.beans.ott.OttUserProd;
+import com.ycsoft.beans.ott.TServerOttauthDto;
+import com.ycsoft.beans.ott.TServerOttauthFee;
+import com.ycsoft.beans.ott.TServerOttauthProd;
 import com.ycsoft.beans.prod.PProd;
 import com.ycsoft.beans.prod.PProdTariff;
 import com.ycsoft.beans.prod.PProdTariffDisct;
@@ -29,6 +33,7 @@ import com.ycsoft.beans.prod.PPromotionEasyProd;
 import com.ycsoft.boss.remoting.ott.OttClient;
 import com.ycsoft.boss.remoting.ott.Result;
 import com.ycsoft.business.component.core.OrderComponent;
+import com.ycsoft.business.dao.config.TServerOttconfigProdDao;
 import com.ycsoft.business.dao.core.acct.CAcctAcctitemDao;
 import com.ycsoft.business.dao.core.cust.CCustDao;
 import com.ycsoft.business.dao.core.cust.CCustLinkmanDao;
@@ -78,6 +83,8 @@ public class OttExternalService extends OrderService {
 	private PProdTariffDisctDao pProdTariffDisctDao;
 	@Autowired
 	private PPromotionEasyProdDao pPromotionEasyProdDao;
+	@Autowired
+	private TServerOttconfigProdDao tServerOttconfigProdDao;
 	/**
 	 * 获得用户账户
 	 * @param login_name
@@ -627,6 +634,43 @@ public class OttExternalService extends OrderService {
 	public void updateProduct() throws Exception{
 		//没有升级业务
 		throw new ServicesException(ErrorCode.E40009);
+	}
+	/**
+	 * 同步产品
+	 * @throws Exception
+	 */
+	public void saveSyncProd()throws Exception{
+		
+		List<TServerOttauthDto> list=new ArrayList<>();
+		
+		for(TServerOttauthProd prod:tServerOttconfigProdDao.queryNeedSyncDto()){
+			List<TServerOttauthFee> fees=tServerOttconfigProdDao.queryFee(prod.getId());
+			if(fees!=null&&fees.size()>0){
+				TServerOttauthDto dto=new TServerOttauthDto();
+				dto.setId(prod.getId());
+				dto.setName(prod.getName());
+				dto.setStatus(prod.getStatus());
+				dto.setFee(fees);
+				if(StringHelper.isNotEmpty(prod.getDomain())){
+					Map<String,String> map=new HashMap<>();
+					map.put("domain", prod.getDomain());
+					dto.setExtension(map);
+				}
+				list.add(dto);
+			}
+		}
+
+		for(TServerOttauthDto dto:list){
+			String prodFeeInfo =new Gson().toJson(dto);
+			LoggerHelper.debug(this.getClass(), prodFeeInfo);
+			
+			Result resutl=ottClient.addOrUpdateProduct(prodFeeInfo);
+			if(!resutl.isSuccess()){
+				throw new ServicesException(resutl.getStatus()+resutl.getErr()+resutl.getReason());
+			}
+			tServerOttconfigProdDao.updateSync(dto.getId());
+			
+		}
 	}
 	
 }

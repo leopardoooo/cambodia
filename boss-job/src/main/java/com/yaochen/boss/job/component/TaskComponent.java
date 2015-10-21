@@ -28,6 +28,7 @@ import com.ycsoft.business.dao.task.WTeamDao;
 import com.ycsoft.commons.abstracts.BaseComponent;
 import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.constants.SystemConstants;
+import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.daos.core.JDBCException;
 @Component
 public class TaskComponent extends BaseComponent {
@@ -144,9 +145,15 @@ public class TaskComponent extends BaseComponent {
 		}
 		
 		log.setError_code(result.getErr());
-		log.setError_remark(result.getReason());
+		if(StringHelper.isNotEmpty(result.getReason())&&result.getReason().length()>110){
+			log.setError_remark(result.getReason().substring(0, 110));
+		}else{
+			log.setError_remark(result.getReason());
+		}
+		
 		log.setSyn_time(new Date());
-		wTaskLogDao.update(log);
+		//wTaskLogDao.update(log);
+		wTaskLogDao.updateExecResult(log);
 		
 	}
 	/**
