@@ -70,7 +70,7 @@
  ProvinceConfig = Ext.extend(Ext.Panel, {
     constructor: function () {
         this.grid = new ProvinceGrid(this);
-        OnlineUser.superclass.constructor.call(this, {
+        ProvinceConfig.superclass.constructor.call(this, {
             id: 'ProvinceConfig',
             title: '省定义配置',
             closable: true,
