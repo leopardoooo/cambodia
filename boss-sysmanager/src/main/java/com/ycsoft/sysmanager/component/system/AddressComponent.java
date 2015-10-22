@@ -246,6 +246,10 @@ public class AddressComponent extends BaseComponent {
 		return tAddressDao.findSequence(SequenceConstants.SEQ_ADDR_ID).toString();
 	}
 	
+	private String getDistrictId() throws JDBCException{
+		return tDistrictDao.findSequence().toString();
+	}
+	
 	public List<OptrDto> queryOptrByCountyId(String countyId) throws Exception {
 		return sOptrDao.queryOptrByCountyId(countyId);
 	}
@@ -323,10 +327,49 @@ public class AddressComponent extends BaseComponent {
 	
 	public void updateAddressStatus(String addrId, String status) throws Exception{
 		TAddress addr = tAddressDao.findByKey(addrId);
+		
+		if(addr.getTree_level()==0){
+			throw new ComponentException("本级不能启用禁用操作");
+		}
+		if(status.equals(StatusConstants.ACTIVE)){
+			if(StringHelper.isNotEmpty(addr.getAddr_pid())){
+				TAddress _p = tAddressDao.findByKey(addr.getAddr_pid());
+				if(!_p.getStatus().equals(status)){
+					throw new ComponentException("上级状态是禁用的，不能启用本级");
+				}
+			}
+		}else{
+			List<TAddress> list = tAddressDao.queryByPidStatus(addrId,status);
+			if(list.size()>0){
+				throw new ComponentException("下级状态是正常的，不能禁用本级");
+			}
+		}
+		
 		addr.setStatus(status);
 		tAddressDao.update(addr);
 	}
 
+	public void updateDistructStatus(String addrId, String status) throws Exception{
+		TDistrict _t = tDistrictDao.findByKey(addrId);
+		if(_t.getDistrict_level()==0){
+			throw new ComponentException("本级不能启用禁用操作");
+		}
+		if(status.equals(StatusConstants.ACTIVE)){
+			if(StringHelper.isNotEmpty(_t.getParent_id())){
+				TDistrict _p = tDistrictDao.findByKey(_t.getParent_id());
+				if(!_p.getStatus().equals(status)){
+					throw new ComponentException("上级状态是禁用的，不能启用本级");
+				}
+			}
+		}else{
+			List<TDistrict> list = tDistrictDao.queryByPidStatus(addrId,status);
+			if(list.size()>0){
+				throw new ComponentException("下级状态是正常的，不能禁用本级");
+			}
+		}
+		_t.setStatus(status);
+		tDistrictDao.update(_t);
+	}
 	/**
 	 * 小区挂载
 	 * @param newAddrId 新区域编号
@@ -538,15 +581,19 @@ public class AddressComponent extends BaseComponent {
 		return tDistrictDao.queryDistrictListByPid(pId);
 	}
 
-	public List queryDistrictTree(String name, SOptr optr) throws Exception{
+	public List queryDistrictTree(String name, String addrId, SOptr optr) throws Exception{
 		List<DistrictSysDto> list = new ArrayList<DistrictSysDto>();
-		if(StringHelper.isNotEmpty(name)){
-			list = tDistrictDao.queryAllAddrByName(name);
+		if(StringHelper.isNotEmpty(addrId)){
+			list = tDistrictDao.queryByPid(addrId);
 		}else{
-			list = tDistrictDao.queryAllDistrictTree();
-		}
-		if(list.size()>2000){
-			throw new ComponentException(ErrorCode.DataNumTooMuch);
+			if(StringHelper.isNotEmpty(name)){
+				list = tDistrictDao.queryAllAddrByName(name);
+			}else{
+				list = tDistrictDao.queryAllDistrictTree();
+			}
+			if(list.size()>2000){
+				throw new ComponentException(ErrorCode.DataNumTooMuch);
+			}
 		}
 		return list;
 	}
@@ -560,9 +607,9 @@ public class AddressComponent extends BaseComponent {
 				oldList.add(_t);
 			tDistrictDao.update(disDto);
 		}else{//新增
-			disDto.setDistrict_id(getNextAddrId());
+			disDto.setDistrict_id(getDistrictId());
 			if(disDto.getDistrict_level() == 1){//新增的如果是省，就是本身的district_id
-				disDto.setParent_id(disDto.getDistrict_id());
+				disDto.setProvince_id(disDto.getDistrict_id());
 			}
 			disDto.setStatus(StatusConstants.ACTIVE);
 			disDto.setCreate_time(DateHelper.now());
@@ -610,4 +657,6 @@ public class AddressComponent extends BaseComponent {
 			throw new ActionException(e.getMessage());
 		}
 	}
+
+
 }

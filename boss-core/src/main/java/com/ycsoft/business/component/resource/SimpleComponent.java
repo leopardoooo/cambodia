@@ -29,6 +29,7 @@ import com.ycsoft.business.dto.config.TAddressDto;
 import com.ycsoft.business.dto.config.TAddressSysDto;
 import com.ycsoft.commons.constants.DataRight;
 import com.ycsoft.commons.constants.SequenceConstants;
+import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.exception.ComponentException;
 import com.ycsoft.commons.exception.ErrorCode;
@@ -241,6 +242,22 @@ public class SimpleComponent extends BaseBusiComponent {
 	
 	public void updateAddressStatus(String addrId, String status) throws Exception{
 		TAddress addr = tAddressDao.findByKey(addrId);
+		if(addr.getTree_level()==0){
+			throw new ComponentException("本级不能启用禁用操作");
+		}
+		if(status.equals(StatusConstants.ACTIVE)){
+			if(StringHelper.isNotEmpty(addr.getAddr_pid())){
+				TAddress _p = tAddressDao.findByKey(addr.getAddr_pid());
+				if(!_p.getStatus().equals(status)){
+					throw new ComponentException("上级状态是禁用的，不能启用本级");
+				}
+			}
+		}else{
+			List<TAddress> list = tAddressDao.queryByPidStatus(addrId,status);
+			if(list.size()>0){
+				throw new ComponentException("下级状态是正常的，不能禁用本级");
+			}
+		}
 		addr.setStatus(status);
 		tAddressDao.update(addr);
 	}

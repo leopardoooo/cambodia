@@ -15,7 +15,6 @@ import com.ycsoft.beans.config.TDistrict;
 import com.ycsoft.beans.config.TProvince;
 import com.ycsoft.beans.core.cust.CCust;
 import com.ycsoft.beans.system.SSysChange;
-import com.ycsoft.business.dto.config.DistrictSysDto;
 import com.ycsoft.business.dto.config.TAddressSysDto;
 import com.ycsoft.commons.abstracts.BaseAction;
 import com.ycsoft.commons.constants.SysChangeType;
@@ -72,8 +71,8 @@ public class AddressAction extends BaseAction {
 	}
 	
 	public String queryDistrictTree() throws Exception{
-		List addrs =  addressComponent.queryDistrictTree(queryText,optr);
-		getRoot().setRecords(TreeBuilder.createSysTree(addrs,false,15));
+		List addrs =  addressComponent.queryDistrictTree(queryText,addrId,optr);
+		getRoot().setRecords(TreeBuilder.createSysTree(addrs,true));
 		return JSON_RECORDS;
 	}
 	
@@ -81,15 +80,12 @@ public class AddressAction extends BaseAction {
 		addressComponent.updateDistruct(disDto);
 		return JSON_SUCCESS;
 	}
-//	public String editDistruct() throws Exception{
-//		List<TAddress> oldList = new ArrayList<TAddress>();
-//		oldList.add(addressComponent.queryAddrByaddrId(addrDto.getAddr_id()));
-//		addressComponent.editAddress(addrDto);
-//		List<TAddress> newList = new ArrayList<TAddress>();
-//		newList.add(addressComponent.queryAddrByaddrId(addrDto.getAddr_id()));
-//		saveChanges(oldList, newList);
-//		return JSON;
-//	}
+	
+	public String updateDistructStatus() throws Exception {
+		addressComponent.updateDistructStatus(addrId, status);
+		return JSON_SUCCESS;
+	}
+
 	
 	/**
 	 * 增加地区

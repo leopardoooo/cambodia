@@ -246,10 +246,10 @@ AddressTree = Ext.extend(Ext.ux.tree.TreeGridEditor,{
 		handlerStatus(thiz.getChildNodes(rootNode));
 	},
 	checkRemove : function(n){
-		if (!n.leaf) {
-            Alert(langUtils.bc('home.tools.AddressNodeManage.msg.cantBeInvalided'));
-            return false;
-        }
+//		if (!n.leaf) {
+//            Alert(langUtils.bc('home.tools.AddressNodeManage.msg.cantBeInvalided'));
+//            return false;
+//        }
         return true;
 	},
 	doDelete : function(n){

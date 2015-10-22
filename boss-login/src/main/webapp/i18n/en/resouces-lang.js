@@ -141,7 +141,8 @@ ResSysLang = {
 	
 	'3000':	'Provincial Config',
 	'3200':	'Agent Config',
-	'3201':	'Translation Config'
+	'3201':	'Translation Config',
+	'5001':	'District Config'
 };
 
 // 工具栏国际化

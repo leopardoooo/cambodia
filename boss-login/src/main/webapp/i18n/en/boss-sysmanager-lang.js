@@ -164,6 +164,7 @@ Sys = {
 		},
 		formWin : {
 			labelShowName : 'show name',
+			labelCountry:'country name',
 			labelProvince : 'province name',
 			labelCityName : 'city name',
 			labelCityDistrictName : 'city Administrative Region',

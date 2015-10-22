@@ -163,6 +163,7 @@ Sys = {
 		},
 		formWin:{
 			labelShowName:'显示名称~',
+			labelCountry:'国家名称~',
 			labelProvince:'省名称~',
 			labelCityName:'城市名称~',
 			labelCityDistrictName : '城市行政区名称~',

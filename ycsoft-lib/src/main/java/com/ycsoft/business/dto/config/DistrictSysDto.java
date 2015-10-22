@@ -2,6 +2,7 @@ package com.ycsoft.business.dto.config;
 
 import com.ycsoft.beans.config.TDistrict;
 import com.ycsoft.commons.constants.StatusConstants;
+import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.tree.AddrTree;
 import com.ycsoft.commons.tree.AddrTreeNode;
 
@@ -35,7 +36,11 @@ public class DistrictSysDto extends TDistrict implements AddrTree {
 			node.setHideObarLeveladd(true);
 			node.setHideObarStatusinvalid(true);
 		}
-//		node.setIs_leaf( getIs_leaf());
+		if(getDistrict_level() == 0 || getDistrict_level() == 1 ||getDistrict_level() == 2 ||getDistrict_level() == 3){
+			node.setIs_leaf( SystemConstants.BOOLEAN_FALSE);
+		}else if(getDistrict_level() == 4){
+			node.setIs_leaf( SystemConstants.BOOLEAN_TRUE);
+		}
 		node.getOthers().put("district_level", String.valueOf(getDistrict_level()));
 		node.getOthers().put("province_id", getProvince_id());
 		node.getOthers().put("remark", getRemark());
