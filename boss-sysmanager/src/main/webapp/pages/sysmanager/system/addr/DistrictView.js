@@ -60,6 +60,39 @@ SearchField = Ext.extend(Ext.form.TwinTriggerField, {
 
 Ext.reg('searchfield', SearchField);
 
+AddressTreeLoader = Ext.extend(Ext.tree.TreeLoader,{
+	load : function(node, callback, scope){
+        if(this.clearOnLoad){
+            while(node.firstChild){
+                node.removeChild(node.firstChild);
+            }
+        }
+        if(this.doPreload(node)){ // preloaded json children
+            this.runCallback(callback, scope || node, [node]);
+        }else if(this.directFn || this.dataUrl || this.url){
+            this.requestData(node, callback, scope || node);
+        }
+    },
+    doPreload : function(node){//新增is_refresh 为了刷新父节点
+        if(node.attributes.children && node.attributes.is_refresh){
+            if(node.childNodes.length < 1){ // preloaded?
+                var cs = node.attributes.children;
+                node.beginUpdate();
+                for(var i = 0, len = cs.length; i < len; i++){
+                    var cn = node.appendChild(this.createNode(cs[i]));
+                    if(this.preloadChildren){
+                        this.doPreload(cn);
+                    }
+                }
+                node.endUpdate();
+            }
+            return true;
+        }
+        return false;
+    }
+
+
+})
 
 /**
  * 地址表格编辑树
@@ -73,11 +106,12 @@ DistrictTree = Ext.extend(Ext.ux.tree.TreeGridEditor,{
 		DistrictTree.superclass.constructor.call(this,{
 			id : 'DistrictTree',
 			root : new Ext.tree.AsyncTreeNode({expanded : true,id:'-1'}),
-			loader: new Ext.tree.TreeLoader({
+			loader: new AddressTreeLoader({
 	            dataUrl: root+"/system/Address!queryDistrictTree.action",
 	            listeners:{
 	            	scope:this,
-	            	load: this.doLoad
+	            	load: this.doLoad,
+	            	beforeload : this.onBeforeLoad
 	            }
 	        }),
 	        maxDepth: 5,
@@ -123,8 +157,7 @@ DistrictTree = Ext.extend(Ext.ux.tree.TreeGridEditor,{
 	            }, {
 	                id: 'statusInvalid',
 	                text:langUtils.sys('common.forbiddenBtn') ,
-	                handler : this.doStatusInvalid,
-	                validator: this.checkRemove
+	                handler : this.doStatusInvalid
 	            }]
 	        }
 	        ,tbar: [' ',{
@@ -147,7 +180,7 @@ DistrictTree = Ext.extend(Ext.ux.tree.TreeGridEditor,{
 										  text:'gen',
 										  id:'-1',
 										  draggable:false,
-//										  is_refresh:true,
+										  is_refresh:true,
 										  children:data
 										 });
 								DistrictThiz.getRootNode().removeAll();									 
@@ -160,6 +193,15 @@ DistrictTree = Ext.extend(Ext.ux.tree.TreeGridEditor,{
 	        }]
 		});
 		
+	},
+	onBeforeLoad:function(l,node){
+		l.on('beforeload',function(loader,node){
+			var id = node.id;
+			if(id == 'tge-root'){
+				id = "";
+			}
+  			l.baseParams = {addrId:id}; //通过这个传递参数，这样就可以点一个节点出来它的子节点来实现异步加载
+		},l);
 	},
 	doExpandnode:function(){
 		var node = this.getRootNode();
@@ -198,18 +240,11 @@ DistrictTree = Ext.extend(Ext.ux.tree.TreeGridEditor,{
 		};
 		handlerStatus(thiz.getChildNodes(rootNode));
 	},
-	checkRemove : function(n){
-		if (!n.leaf) {
-            Alert(langUtils.sys('DistrictNodeManage.msg.cantBeInvalided'));
-            return false;
-        }
-        return true;
-	},
 	doStatusActive: function(node){
 		Confirm(langUtils.sys('DistrictNodeManage.msg.confirmActivate'), Ext.getCmp('AddressTree') ,function(){
 			Ext.Ajax.request({
 				scope : this,
-				url : root + '/system/Address!updateAddressStatus.action',
+				url : root + '/system/Address!updateDistructStatus.action',
 				params : {
 					addrId: node.id,
 					status: 'ACTIVE'
@@ -218,7 +253,7 @@ DistrictTree = Ext.extend(Ext.ux.tree.TreeGridEditor,{
 					var res = Ext.decode(res.responseText);
 					if(res === true){
 						Alert(langUtils.sys('DistrictNodeManage.msg.actionSuccess'));
-//						node.parentNode.attributes.is_refresh = false;
+						node.parentNode.attributes.is_refresh = false;
 						node.parentNode.reload();
 					}
 				}
@@ -229,7 +264,7 @@ DistrictTree = Ext.extend(Ext.ux.tree.TreeGridEditor,{
 		Confirm(langUtils.sys('DistrictNodeManage.msg.confirmInvalid'), Ext.getCmp('AddressTree') ,function(){
 			Ext.Ajax.request({
 				scope : this,
-				url : root + '/system/Address!updateAddressStatus.action',
+				url : root + '/system/Address!updateDistructStatus.action',
 				params : {
 					addrId: node.id,
 					status: 'INVALID'
@@ -238,7 +273,7 @@ DistrictTree = Ext.extend(Ext.ux.tree.TreeGridEditor,{
 					var res = Ext.decode(res.responseText);
 					if(res === true){
 						Alert(langUtils.sys('DistrictNodeManage.msg.actionSuccess'));
-//						node.parentNode.attributes.is_refresh = false;
+						node.parentNode.attributes.is_refresh = false;
 						node.parentNode.reload();
 					}
 				}
@@ -282,6 +317,7 @@ DistrictWin = Ext.extend(Ext.Window,{
 				name : 'district_desc',
 				height : 40,
 				width : 250,
+				allowBlank : false,
 				xtype:'textarea',
 				fieldLabel : lsys('DistrictNodeManage.formWin.labelDesc')
 			},{
@@ -299,12 +335,14 @@ DistrictWin = Ext.extend(Ext.Window,{
 		var fieldLabel;
 		this.level = parseFloat(node.attributes.others.district_level);
 		if(this.level == 0){
-			fieldLabel =lsys('DistrictNodeManage.formWin.labelProvince');
+			fieldLabel =lsys('DistrictNodeManage.formWin.labelCountry');
 		}else if(this.level == 1){
-			fieldLabel =lsys('DistrictNodeManage.formWin.labelCityName');
+			fieldLabel =lsys('DistrictNodeManage.formWin.labelProvince');
 		}else if(this.level == 2){
-			fieldLabel =lsys('DistrictNodeManage.formWin.labelCityDistrictName');
+			fieldLabel =lsys('DistrictNodeManage.formWin.labelCityName');
 		}else if(this.level == 3){
+			fieldLabel =lsys('DistrictNodeManage.formWin.labelCityDistrictName');
+		}else if(this.level == 4){
 			fieldLabel =lsys('DistrictNodeManage.formWin.labelSubDistrictName');
 		}
 		var pcmp = Ext.getCmp('parentName');
@@ -312,11 +350,6 @@ DistrictWin = Ext.extend(Ext.Window,{
 			this.title = lsys('common.addNewOne');
 			pcmp.hideLabel = false;
 			pcmp.show();
-			
-//			this.itemForm.add({xtype : 'displayfield',
-//				id : 'parentName',
-//				name : 'parent_name',
-//				fieldLabel : langUtils.sys('DistrictNodeManage.formWin.labelParentName')})
 			pcmp.setValue(node.text);
 			Ext.getCmp('districtLevel').setValue(this.level+1);
 		}else if(this.type == 'edit'){
@@ -388,18 +421,13 @@ DistrictWin = Ext.extend(Ext.Window,{
 						mb.hide();//隐藏提示框
 						mb = null;
 						var rs = Ext.decode(res.responseText);
-						if(true === rs.success){
+						if(true === rs){
 							Alert(langUtils.sys('DistrictNodeManage.msg.actionSuccess'));
 							if(this.type == 'add'){
-								if(this.node.leaf){
-//									this.node.parentNode.attributes.is_refresh = false;
-									this.node.parentNode.reload();
-								}else{
-//									this.node.attributes.is_refresh = false;
-									this.node.reload();
-								}
+								this.node.attributes.is_refresh = false;
+								this.node.reload();
 							}else{
-//								this.node.parentNode.attributes.is_refresh = false;
+								this.node.parentNode.attributes.is_refresh = false;
 								this.node.parentNode.reload();
 							}
 

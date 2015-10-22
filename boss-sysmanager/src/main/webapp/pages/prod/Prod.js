@@ -257,11 +257,6 @@ ProdTree = Ext.extend(Ext.tree.TreePanel, {
 					Ext.getCmp('addLowestPrice').show();
 				}
 
-				// TODO 暂时
-				if (App.data.optr['county_id'] != '4501' && id == '2728') {
-					Ext.getCmp('addTariff').hide();
-				}
-
 			}
 		});
 	},
@@ -299,88 +294,6 @@ ProdTree = Ext.extend(Ext.tree.TreePanel, {
 		Ext.getCmp('selectQuickId').setValue("");
 	}
 });
-
-var PordDictTree = Ext.extend(Ext.tree.TreePanel, {
-			prodId : null,
-			constructor : function(v) {
-				var loader = new Ext.tree.TreeLoader({
-							url : root
-									+ "/system/Prod!getPordDictTree.action?doneId="
-									+ v
-						});
-				PordDictTree.superclass.constructor.call(this, {
-							region : 'center',
-							width : 210,
-							split : true,
-							minSize : 210,
-							id : 'prodDictTreeId',
-							maxSize : 260,
-							margins : '0 0 3 2',
-							lines : false,
-							autoScroll : true,
-							animCollapse : true,
-							animate : false,
-							collapseMode : 'mini',
-							bodyStyle : 'padding:3px',
-							loader : loader,
-							root : {
-								id : '0',
-								iconCls : 'x-tree-root-icon',
-								nodeType : 'async',
-								text : '产品目录'
-							}
-						});
-				this.getRootNode().expand(true);
-			},
-			listeners : {
-				'checkchange' : function(node, checked) {
-					node.expand();
-					node.attributes.checked = checked;
-					node.eachChild(function(child) {
-								child.ui.toggleCheck(checked);
-								child.attributes.checked = checked;
-								child.fireEvent('checkchange', child, checked);
-							});
-				}
-			}
-		});
-
-PordDictWindow = Ext.extend(Ext.Window, {
-			dictTree : null,
-			constructor : function(v) {
-				this.dictTree = new PordDictTree(v)
-				PordDictWindow.superclass.constructor.call(this, {
-							title : '产品目录',
-							layout : 'fit',
-							width : 400,
-							height : 400,
-							closeAction : 'hide',
-							items : this.dictTree,
-							buttons : [{
-								text : '确认',
-								scope : this,
-								handler : function() {
-									this.hide();
-									var prodItemName = [];
-									var textValue = '选择产品目录';
-									var nodes = this.dictTree.getChecked();
-									for (var i in nodes) {
-										if (nodes[i].leaf) {
-											prodItemName.push(nodes[i].text);
-										}
-									}
-									if (prodItemName.length > 0) {
-										textValue = prodItemName.join(",");
-									}
-									Ext.getCmp('prodItemName')
-											.setText(Ext.util.Format.ellipsis(
-													textValue, 15));
-								}
-							}]
-						});
-			}
-		});
-
 // 产品form
 ProdListForm = Ext.extend(Ext.form.FormPanel, {
 	resForm : null,
@@ -390,7 +303,6 @@ ProdListForm = Ext.extend(Ext.form.FormPanel, {
 	pordDictWindow : null,
 	prodId : null,
 	extAttrForm : null,
-	textValue : '选择产品目录',
 	updateProd : false,
 	constructor : function(v, t, s) {
 		Ext.apply(this, v || {});
@@ -398,7 +310,6 @@ ProdListForm = Ext.extend(Ext.form.FormPanel, {
 
 		if (s) {// 修改产品
 			this.store = s;
-			this.textValue = '变更已有目录';
 			this.prodId = s.prod_id;
 			this.doInitAttrForm({
 						tabName : Constant.P_PROD,
@@ -457,12 +368,8 @@ ProdListForm = Ext.extend(Ext.form.FormPanel, {
 											scope : this,
 											'select' : function(combo, record,
 													index) {
-												this
-														.selectRes(
-																combo
-																		.getValue(),
-																App.data.optr['area_id']);
-												this.treeCheckfalse();// 清空适用地区树
+												this.selectRes(combo.getValue(),App.data.optr['area_id']);
+//												this.treeCheckfalse();// 清空适用地区树
 											}
 
 										}
@@ -474,15 +381,6 @@ ProdListForm = Ext.extend(Ext.form.FormPanel, {
 										defaultValue : 'F',
 										disabled : this.updateProd,
 										hiddenName : 'refund'
-									}, {
-										fieldLabel : '产品目录',
-										xtype : 'button',
-										id : 'prodItemName',
-										width : 130,
-										height : 26,
-										text : this.textValue,
-										scope : this,
-										handler : this.addResource
 									}, {
 										xtype : 'datefield',
 										editable : false,
@@ -610,37 +508,21 @@ ProdListForm = Ext.extend(Ext.form.FormPanel, {
 		this.extAttrForm = ExtAttrFactory.gExtForm(params, cfg);
 	},
 	addRes : function() {
-		var areaId = App.data.optr['area_id'];
-		if (this.userType == cfgProdType["U"]) {
-			var store = Ext.getCmp('servId').getStore();
-			store.each(function(record) {
-						if (record.get('item_value') != 'DTV'
-								&& record.get('item_value') != 'ITV') {
-							store.remove(record);
-						}
-					});
-		} else if (this.userType == cfgProdType["C"]) {
-			var store = Ext.getCmp('servId').getStore();
-			store.each(function(record) {
-						if (record.get('item_value') != 'DTV'
-								&& record.get('item_value') != 'ITV'
-								&& record.get('item_value') != 'BAND') {
-							store.remove(record);
-						}
-					});
+		if (this.userType != cfgProdType["P"]) {
 			Ext.getCmp('servId').setDisabled(true);
+		}else{
+			if (!this.store) {
+				Ext.getCmp('servId').setDisabled(false);
+			}
 		}
-
+		
 		if (this.store) {
-			this.selectRes(this.store.serv_id, areaId);
+			this.selectRes(this.store.serv_id, App.data.optr['area_id']);
 			if (this.store.just_for_once == "T") {
 				this.addProdInvalidDate(this.store.just_for_once);
 			}
 			this.updateLoad(this.store);
-		} else {
-			this.selectRes(Ext.getCmp('servId').getValue(), areaId);
 		}
-
 	},
 	selectRes : function(servId, areaId) {
 		if (Ext.isEmpty(areaId)) {
@@ -670,9 +552,7 @@ ProdListForm = Ext.extend(Ext.form.FormPanel, {
 							var res = Ext.decode(response.responseText);
 							if (this.userType == cfgProdType["P"]) {
 								if (Ext.getCmp('resForm'))
-									Ext
-											.getCmp('resForm')
-											.showData(
+									Ext.getCmp('resForm').showData(
 													res.simpleObj.dynamicResList,
 													res.simpleObj.staticResList,
 													areaId);
@@ -714,11 +594,6 @@ ProdListForm = Ext.extend(Ext.form.FormPanel, {
 
 			this.doLayout();
 		}
-	}, // 产品目录配置
-	addResource : function() {
-		if (!this.pordDictWindow)
-			this.pordDictWindow = new PordDictWindow(this.prodId);
-		this.pordDictWindow.show();
 	},
 	updateLoad : function(data) {
 		var prodInfo = {};
@@ -787,40 +662,44 @@ ProdCountyTree = Ext.extend(Ext.tree.TreePanel, {
 			},
 			initComponent : function() {
 				// 每隔一秒，判断是否需要过滤子产品
-				this.threadId = setInterval(function() {
-							if (Ext.getCmp('ProdCountyTree')
-									&& Ext.getCmp('ProdCountyTree').checkchange) {
-								if (Ext.getCmp('prodPkgForm')) {
-									Ext.getCmp('prodPkgForm').doFilter(Ext
-											.getCmp('ProdCountyTree')
-											.getCheckedIds());
-								}
-								Ext.getCmp('ProdCountyTree').checkchange = false;
-							}
-						}, 1000);
+//				this.threadId = setInterval(function() {
+//							if (Ext.getCmp('ProdCountyTree')
+//									&& Ext.getCmp('ProdCountyTree').checkchange) {
+//								if (Ext.getCmp('prodPkgForm')) {
+//									Ext.getCmp('prodPkgForm').doFilter(Ext
+//											.getCmp('ProdCountyTree')
+//											.getCheckedIds());
+//								}
+//								Ext.getCmp('ProdCountyTree').checkchange = false;
+//							}
+//						}, 1000);
 				ProdCountyTree.superclass.initComponent.call(this);
 			},
 			initEvents : function() {
 				this.on("afterrender", function() {
-							// 如果不是修改
-							if (!this.prodId) {
-								// 如果是基本包或者分公司操作员，
-								if (this.prodType == cfgProdType["P"]
-										|| App.data.optr['county_id'] != '4501') {
-									var node = this.getRootNode();
-									node.attributes.checked = true;
-									node.ui.toggleCheck(true);
-									node.fireEvent('checkchange', node, true);
-								}
-								// }else{
-								// 如果是修改，且不是基本包
-								// if(this.prodType != cfgProdType["P"] ){
-								// this.disable();
-								// }
-							}
+							var node = this.getRootNode();
+							node.attributes.checked = true;
+							node.ui.toggleCheck(true);
+							node.fireEvent('checkchange', node, true);
+//							// 如果不是修改
+//							if (!this.prodId) {
+//								// 如果是基本包或者分公司操作员，
+//								if (this.prodType == cfgProdType["P"]
+//										|| App.data.optr['county_id'] != '4501') {
+//									var node = this.getRootNode();
+//									node.attributes.checked = true;
+//									node.ui.toggleCheck(true);
+//									node.fireEvent('checkchange', node, true);
+//								}
+//							}else{
+//								 //如果是修改，且不是基本包
+//								 if(this.prodType != cfgProdType["P"] ){
+//								 	this.disable();
+//								 }
+//							}
 
 						}, this, {
-							delay : 3000
+							delay : 1000
 						});
 
 				this.on('checkchange', function(node, checked) {
@@ -872,40 +751,38 @@ ProdWindow = Ext.extend(Ext.Window, {
 
 		this.resProdForm = new ResProdForm(prodId);
 		// 如果是修改产品,且已生效
-		if (store
-				&& Date.parseDate(store["eff_date"], 'Y-m-d h:i:s')
-						.format('Y-m-d') <= nowDate().format('Y-m-d')) {
-			this.updateProd = true;
-			var title = '';
-			if (v == cfgProdType["P"]) {
-				this.FORM = this.resProdForm;
-				title = '资源配置';
-			} else {
-				title = '产品已生效，不能修改子产品';
-				this.FORM = {
-					xtype : 'panel',
-					title : '提示',
-					region : 'center',
-					bodyStyle : Constant.SET_STYLE,
-					layout : 'fit',
-					items : [{
-						bodyStyle : "background:#F9F9F9; padding: 10px;padding-top: 4px;padding-bottom: 0px;",
-						html : "<font style='font-family:微软雅黑;font-size:20'>"
-								+ title + "</font>"
-					}]
-				}
-			}
-
-		} else {
-
-
+//		if (store
+//				&& Date.parseDate(store["eff_date"], 'Y-m-d h:i:s')
+//						.format('Y-m-d') <= nowDate().format('Y-m-d')) {
+//			this.updateProd = true;
+//			var title = '';
+//			if (v == cfgProdType["P"]) {
+//				this.FORM = this.resProdForm;
+//				title = '资源配置';
+//			} else {
+//				title = '产品已生效，不能修改子产品';
+//				this.FORM = {
+//					xtype : 'panel',
+//					title : '提示',
+//					region : 'center',
+//					bodyStyle : Constant.SET_STYLE,
+//					layout : 'fit',
+//					items : [{
+//						bodyStyle : "background:#F9F9F9; padding: 10px;padding-top: 4px;padding-bottom: 0px;",
+//						html : "<font style='font-family:微软雅黑;font-size:20'>"
+//								+ title + "</font>"
+//					}]
+//				}
+//			}
+//
+//		} else {
 			if (v == cfgProdType["P"]) {
 				this.FORM = this.resProdForm;
 			} else {
 				this.prodList = new ProdList(store);
 				this.FORM = this.prodList;
 			}
-		}
+//		}
 		this.formvalue = v;
 
 		// 如果是新建产品
@@ -1190,13 +1067,13 @@ LoginWindow = Ext.extend(Ext.Window, {
 			}, {
 				xtype : 'button',
 				scale : 'up',
-				text : "<FONT style='font-family:隶书;FONT-SIZE: 34; FILTER: Glow(color=#ffccbb,strength=2); COLOR: #4433aa; HEIGHT: 8pt'>客户套餐</font>",
+				text : "<FONT style='font-family:隶书;FONT-SIZE: 34; FILTER: Glow(color=#ffccbb,strength=2); COLOR: #4433aa; HEIGHT: 8pt'>套餐产品</font>",
 				scope : this,
 				handler : this.cpordLogin
 			}, {
 				xtype : 'button',
 				scale : 'up',
-				text : "<FONT style='font-family:隶书;FONT-SIZE: 34; FILTER: Glow(color=#ffccbb,strength=2); COLOR: #4433aa; HEIGHT: 8pt'>用户套餐</font>",
+				text : "<FONT style='font-family:隶书;FONT-SIZE: 34; FILTER: Glow(color=#ffccbb,strength=2); COLOR: #4433aa; HEIGHT: 8pt'>协议套餐</font>",
 				scope : this,
 				handler : this.upordLogin
 			}]

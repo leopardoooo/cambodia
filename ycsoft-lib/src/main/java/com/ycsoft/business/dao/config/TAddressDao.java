@@ -12,6 +12,7 @@ import java.util.Map;
 import org.springframework.stereotype.Component;
 
 import com.ycsoft.beans.config.TAddress;
+import com.ycsoft.beans.config.TDistrict;
 import com.ycsoft.beans.core.cust.CCust;
 import com.ycsoft.business.dto.config.TAddressDto;
 import com.ycsoft.business.dto.config.TAddressSysDto;
@@ -480,6 +481,11 @@ public class TAddressDao extends BaseEntityDao<TAddress> {
 	public String queryMaxSortNumByPid(String addrPId) throws JDBCException {
 		String sql = " select  decode(max(t.sort_num),null,0,max(t.sort_num)) sort_num from t_address t where t.addr_pid=? ";
 		return this.findUnique(sql,addrPId);
+	}
+	
+	public List<TAddress> queryByPidStatus(String Id,String status) throws JDBCException {
+		String sql = " select t.* from  t_address t where t.addr_pid = ? and t.status <> ?";
+		return createQuery(sql, Id,status).list();
 	}
 	
 }

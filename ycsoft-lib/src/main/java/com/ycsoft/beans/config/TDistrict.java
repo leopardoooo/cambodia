@@ -14,7 +14,7 @@ import com.ycsoft.daos.config.POJO ;
  */
 @POJO(
 	tn="T_DISTRICT",
-	sn="",
+	sn="SEQ_DISTRICT_ID",
 	pk="district_id")
 public class TDistrict implements Serializable {
 	

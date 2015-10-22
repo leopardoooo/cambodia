@@ -41,12 +41,20 @@ public class TDistrictDao extends BaseEntityDao<TDistrict> {
 		return createQuery(sql, Id).list();
 	}
 	
+	public List<TDistrict> queryByPidStatus(String Id,String status) throws JDBCException {
+		String sql = " select t.* from  t_district t where t.parent_id = ? and t.status <> ?";
+		return createQuery(sql, Id,status).list();
+	}
+	
 	public List<TDistrictDto> queryDistrictListByPid(String pId) throws JDBCException {
 		String sql = "  select t.*,level from t_district t start with t.district_id = ? "
 				+ " connect by prior t.district_id = t.parent_id order by level asc " ;
 		return createQuery(TDistrictDto.class,sql, pId).list();
 	}
-
+	public List<DistrictSysDto> queryByPid(String pId)  throws JDBCException {
+		String sql = "select t.* from  t_district t where t.parent_id = ? ";
+		return createQuery(DistrictSysDto.class,sql, pId).list();
+	}
 
 	public List<DistrictSysDto> queryAllAddrByName(String name)  throws JDBCException {
 		name = name.toLowerCase();
@@ -59,9 +67,12 @@ public class TDistrictDao extends BaseEntityDao<TDistrict> {
 				+ " connect by prior c.parent_id = c.district_id)d order by d.district_level  ";
 		return createQuery(DistrictSysDto.class,sql, name,name,name).list();
 	}
-	
+	public List<DistrictSysDto> queryBaseByPid()  throws JDBCException {
+		String sql = "select t.* from  t_district t where t.district_level = '0' ";
+		return createQuery(DistrictSysDto.class,sql).list();
+	}
 	public List<DistrictSysDto> queryAllDistrictTree()  throws JDBCException {
-		String sql = "select t.*,level from t_district t start with t.district_id = ? "
+		String sql = "select t.*,level from t_district t where t.district_level in ('0','1') start with t.district_id = ? "
 				+ "connect by prior t.district_id = t.parent_id order by level asc ";
 		return createQuery(DistrictSysDto.class,sql,SystemConstants.DISTRICT_ID).list();
 	}

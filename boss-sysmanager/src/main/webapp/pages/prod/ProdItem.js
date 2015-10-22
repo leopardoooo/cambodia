@@ -348,7 +348,7 @@ ResProdForm = Ext.extend(Ext.Panel, {
     staticdata: null,
     areaId: null,
     constructor: function (prodId) {
-        this.dynResGrid = new DynResGrid(prodId);
+//        this.dynResGrid = new DynResGrid(prodId);
         this.prodId = prodId;
         ResThis = this;
         ResProdForm.superclass.constructor.call(this, {
@@ -390,12 +390,12 @@ ResProdForm = Ext.extend(Ext.Panel, {
                 spilt: true,
                 layout: 'fit',
                 items: []
-            },{
-                region: 'east',
-                width:'20%',
-                spilt: true,
-                layout: 'fit',
-                items: [this.dynResGrid]
+//            },{
+//                region: 'east',
+//                width:'20%',
+//                spilt: true,
+//                layout: 'fit',
+//                items: [this.dynResGrid]
             }]
         })
     },
@@ -413,7 +413,7 @@ ResProdForm = Ext.extend(Ext.Panel, {
 //        }
 //    },
     showData: function (dyndata, staticdata, areaId) {
-        this.dynResGrid.showData(dyndata);
+//        this.dynResGrid.showData(dyndata);
 //        this.selectType = 'STATIC';
 //        this.dyndata = dyndata;
         this.staticdata = staticdata;
@@ -434,22 +434,27 @@ ResProdForm = Ext.extend(Ext.Panel, {
     createResPanel: function (staticdata, areaId) {
         if (0 < staticdata.length) {
             var store = new Ext.data.JsonStore({
-                id: 'res_name',
                 fields: ['res_id', 'res_name', 'serverIds', 'currency',
                 {
-                    name: 'shortName',
-                    mapping: 'res_name',
+//                    name: 'shortName',
+//                    mapping: 'res_name'
+////                    convert: this.shortName
+//                },{
+                    name: 'serverName',
+                    mapping: 'serverIds',
                     convert: this.shortName
                 }]
             });
             store.loadData(staticdata);
+   
+            
             var dataview = new Ext.DataView({
                 store: store,
                 tpl: new Ext.XTemplate('<tpl for=".">', '<tpl if="values.currency == \'T\'">', 
-                '<div class="viewres" id="{res_id}" title="{res_name}{serverIds}">', '<span>{shortName}{serverIds}</span>', '</div>', '</tpl>', 
+                '<div class="viewres" id="{res_id}" title="{res_name}{serverIds}">', '<span>{res_name}</br>{serverName}</span>', '</div>', '</tpl>', 
                 '<tpl if="values.currency == \'F\'">', 
                 	'<div class="viewres" id="{res_id}" title="{res_name}{serverIds}">', 
-                		'<span style="color: 000099;">{shortName}{serverIds}</span>', '</div>', '</tpl>', '</tpl>'),
+                		'<span style="color: 000099;">{res_name}</br>{serverName}</span>', '</div>', '</tpl>', '</tpl>'),
                 selectedClass: 'x-view-selected',
                 id: 'resdatas',
                 itemSelector: 'div.viewres',
@@ -457,8 +462,9 @@ ResProdForm = Ext.extend(Ext.Panel, {
                 plugins: new Ext.DataView.DragSelector({
                     dragSafe: true
                 }),
-                multiSelect: true,
-                style: 'overflow:auto'
+                multiSelect: true
+                ,style: 'overflow:auto'
+	            ,simpleSelect: true
             });
             var images = new Ext.Panel({
                 id: 'images',
@@ -489,10 +495,23 @@ ResProdForm = Ext.extend(Ext.Panel, {
         return panel;
     },
     shortName: function (filename) {
-        short_filename = filename;
-        if (ResThis.getChars(short_filename) > 12) {
-            short_filename = ResThis.sb_substr(short_filename, 0, 8) + ' ... ' + ResThis.sb_substr(short_filename, -4);
+        var short_filename;
+        var num = ResThis.getChars(filename);
+        var count = 30;
+        if(num > count){
+        	for(var i=0 ;i<num/count;i++){
+        		if(i==0){
+        			short_filename = ResThis.sb_substr(filename, i*count, count*(i+1))+"</br>";
+        		}else{
+        			short_filename = short_filename+ ResThis.sb_substr(filename, i*count, count*(i+1))+"</br>";
+        		}
+        	}
+        }else{
+        	short_filename = filename;
         }
+//        if (ResThis.getChars(short_filename) > 30) {
+//            short_filename = ResThis.sb_substr(short_filename, 0, 12) + ' ... ' + ResThis.sb_substr(short_filename, -4);
+//        }
         return short_filename;
     },
     sb_substr: function (str, startp, endp) {

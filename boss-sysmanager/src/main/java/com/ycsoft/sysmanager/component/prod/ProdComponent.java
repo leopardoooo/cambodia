@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -132,108 +133,162 @@ public class ProdComponent extends BaseComponent {
 	 * @return
 	 * @throws Exception
 	 */
+//	public List<TreeNode> getProdTree(SOptr optr,String showAll,String startEffDate,
+//			String endEffDate, String startExpDate, String endExpDate) throws Exception {
+//		List<SItemvalue> servList = MemoryDict.getDicts(DictKey.SERV_ID);
+//		List<SItemvalue> pkgList = MemoryDict.getDicts(DictKey.PROD_TYPE);
+//		String countyDataRight = null;
+////		if(SystemConstants.COUNTY_ALL.equals(optr.getCounty_id())){
+////			countyDataRight = SystemConstants.DEFAULT_DATA_RIGHT;
+////		}else{
+//		countyDataRight = this.queryDataRightCon(optr, DataRight.CHANGE_COUNTY.toString());
+////		}
+//		List<PProd> prods = pProdDao.getProdByAreaId(countyDataRight,showAll, startEffDate,
+//				endEffDate, startExpDate, endExpDate);
+//		List<PProd> baseProds = null;
+////		List<PProd> upkgProds = null;
+//		List<TreeNode> ct = null;
+////		List<TreeNode> et = null;
+//		
+//		Map<String, List<PProd>> disctmap = CollectionHelper.converToMap(prods,"prod_type");
+//
+//		baseProds = disctmap.get(SystemConstants.PROD_TYPE_BASE);
+////		upkgProds = disctmap.get(SystemConstants.PROD_TYPE_USERPKG);
+//		//客户套餐暂时取消
+////		List<PProd> cpkgProds = null;  
+////		List<TreeNode> dt = null;
+////		cpkgProds = disctmap.get(SystemConstants.PROD_TYPE_CUSTPKG);
+////		if(cpkgProds!=null){
+////			dt = TreeBuilder.convertToProdNodes(cpkgProds, "prod_id","prod_name");
+////		}
+////		for (int i = pkgList.size()-1; i>=0; i--) {
+////			if(pkgList.get(i).getItem_value().equals(SystemConstants.PROD_TYPE_CUSTPKG)){
+////				pkgList.remove(i);
+////			}
+////		}
+//		
+//		List<TreeNode> at = TreeBuilder.convertToNodes(pkgList, "item_value","item_name");
+//		List<TreeNode> bt = TreeBuilder.convertToNodes(servList, "item_value","item_name");
+//		bt.addAll(at);
+//		
+//		if(prods!=null){
+//			 ct = TreeBuilder.convertToProdNodes(prods, "prod_id","prod_name");
+//		}
+////		if(upkgProds!=null){
+////			 et = TreeBuilder.convertToProdNodes(upkgProds, "prod_id","prod_name");
+////		}
+////		for (int i = 0; i < pkgList.size(); i++) {
+////			if(pkgList.get(i).getItem_value().equals(SystemConstants.PROD_TYPE_BASE)){
+////				for (int j = 0; j < servList.size(); j++) {
+////					at.get(i).getChildren().add(bt.get(j));
+////				}
+////			}
+////			
+////			if(pkgList.get(i).getItem_value().equals(SystemConstants.PROD_TYPE_CUSTPKG)&&cpkgProds!=null){
+////				for (int j = 0; j < cpkgProds.size(); j++) {
+////					dt.get(j).setLeaf(true);
+////					if (cpkgProds.get(j).getProd_type().equals(SystemConstants.PROD_TYPE_CUSTPKG)) {
+////						if(optr.getArea_id().equals(SystemConstants.AREA_ALL)){
+////							dt.get(j).getOthers().put("att", "prodId");
+////						}else{
+////							if(cpkgProds.get(j).getFor_area_id().equals(SystemConstants.AREA_ALL)){
+////								dt.get(j).getOthers().put("att", "areaProdId");
+////							}else{
+////								dt.get(j).getOthers().put("att", "prodId");
+////							}
+////						} 
+////						dt.get(j).getOthers().put("area_id", cpkgProds.get(j).getArea_id());
+////						at.get(i).getChildren().add(dt.get(j));
+////					}
+////				}
+////			}
+////			if(pkgList.get(i).getItem_value().equals(SystemConstants.PROD_TYPE_USERPKG)&&upkgProds!=null){
+////				for (int j = 0; j < upkgProds.size(); j++) {
+////					et.get(j).setLeaf(true);
+////					if (upkgProds.get(j).getProd_type().equals(SystemConstants.PROD_TYPE_USERPKG)) {
+////						if(optr.getArea_id().equals(SystemConstants.AREA_ALL)){
+////							et.get(j).getOthers().put("att", "prodId");
+////						}else {
+////							if(upkgProds.get(j).getFor_area_id().equals(SystemConstants.AREA_ALL)){
+////								et.get(j).getOthers().put("att", "areaProdId");
+////							}else{
+////								et.get(j).getOthers().put("att", "prodId");
+////							}
+////						}
+////						et.get(j).getOthers().put("area_id", upkgProds.get(j).getArea_id());
+////						at.get(i).getChildren().add(et.get(j));
+////					}
+////				}
+////			}
+////		}
+//		for (int i = 0; i < servList.size(); i++) {
+//			if(prods!=null){
+//				for (int j = 0; j < prods.size(); j++) {
+//					ct.get(j).setLeaf(true);
+//					if (servList.get(i).getItem_value().equals(prods.get(j).getServ_id())) {
+//						if(optr.getArea_id().equals(SystemConstants.AREA_ALL)){
+//							ct.get(j).getOthers().put("att", "prodId");
+//						}else{
+//							if(prods.get(j).getFor_area_id().equals(SystemConstants.AREA_ALL)){
+//								ct.get(j).getOthers().put("att", "areaProdId");
+//							}else{
+//								ct.get(j).getOthers().put("att", "prodId");
+//							}
+//						}
+//						ct.get(j).getOthers().put("area_id", prods.get(j).getArea_id());
+//						bt.get(i).getChildren().add(ct.get(j));
+//					}
+//			
+//				}
+//			}
+//		}
+//		return bt;
+//	}
+
+	
 	public List<TreeNode> getProdTree(SOptr optr,String showAll,String startEffDate,
 			String endEffDate, String startExpDate, String endExpDate) throws Exception {
 		List<SItemvalue> servList = MemoryDict.getDicts(DictKey.SERV_ID);
-//		List<SItemvalue> pkgList = MemoryDict.getDicts(DictKey.PROD_TYPE);
+		List<SItemvalue> pkgList = MemoryDict.getDicts(DictKey.PROD_TYPE);
+		List<SItemvalue> allList = new ArrayList<SItemvalue>();
+		allList.addAll(servList);
+		allList.addAll(pkgList);
+        Iterator<SItemvalue> it = allList.iterator();  
+        while(it.hasNext()){  
+        	SItemvalue tempobj = it.next();  
+            if(tempobj.getItem_value().equals(SystemConstants.PROD_TYPE_BASE)){  
+                //移除当前的对象  
+                it.remove();  
+            }  
+        }  
 		String countyDataRight = null;
-//		if(SystemConstants.COUNTY_ALL.equals(optr.getCounty_id())){
-//			countyDataRight = SystemConstants.DEFAULT_DATA_RIGHT;
-//		}else{
 		countyDataRight = this.queryDataRightCon(optr, DataRight.CHANGE_COUNTY.toString());
-//		}
 		List<PProd> prods = pProdDao.getProdByAreaId(countyDataRight,showAll, startEffDate,
 				endEffDate, startExpDate, endExpDate);
-		List<PProd> baseProds = null;
-//		List<PProd> upkgProds = null;
+		
+//		Map<String, List<PProd>> prodtmap = CollectionHelper.converToMap(prods,"prod_type");
 		List<TreeNode> ct = null;
-//		List<TreeNode> et = null;
+		List<TreeNode> bt = TreeBuilder.convertToNodes(allList, "item_value","item_name");
 		
-		Map<String, List<PProd>> disctmap = CollectionHelper.converToMap(prods,"prod_type");
-
-		baseProds = disctmap.get(SystemConstants.PROD_TYPE_BASE);
-//		upkgProds = disctmap.get(SystemConstants.PROD_TYPE_USERPKG);
-		//客户套餐暂时取消
-//		List<PProd> cpkgProds = null;  
-//		List<TreeNode> dt = null;
-//		cpkgProds = disctmap.get(SystemConstants.PROD_TYPE_CUSTPKG);
-//		if(cpkgProds!=null){
-//			dt = TreeBuilder.convertToProdNodes(cpkgProds, "prod_id","prod_name");
-//		}
-//		for (int i = pkgList.size()-1; i>=0; i--) {
-//			if(pkgList.get(i).getItem_value().equals(SystemConstants.PROD_TYPE_CUSTPKG)){
-//				pkgList.remove(i);
-//			}
-//		}
-		
-//		List<TreeNode> at = TreeBuilder.convertToNodes(pkgList, "item_value","item_name");
-		List<TreeNode> bt = TreeBuilder.convertToNodes(servList, "item_value","item_name");
-		
-		if(baseProds!=null){
-			 ct = TreeBuilder.convertToProdNodes(baseProds, "prod_id","prod_name");
+		if(prods!=null){
+			 ct = TreeBuilder.convertToProdNodes(prods, "prod_id","prod_name");
 		}
-//		if(upkgProds!=null){
-//			 et = TreeBuilder.convertToProdNodes(upkgProds, "prod_id","prod_name");
-//		}
-//		for (int i = 0; i < pkgList.size(); i++) {
-//			if(pkgList.get(i).getItem_value().equals(SystemConstants.PROD_TYPE_BASE)){
-//				for (int j = 0; j < servList.size(); j++) {
-//					at.get(i).getChildren().add(bt.get(j));
-//				}
-//			}
-//			
-//			if(pkgList.get(i).getItem_value().equals(SystemConstants.PROD_TYPE_CUSTPKG)&&cpkgProds!=null){
-//				for (int j = 0; j < cpkgProds.size(); j++) {
-//					dt.get(j).setLeaf(true);
-//					if (cpkgProds.get(j).getProd_type().equals(SystemConstants.PROD_TYPE_CUSTPKG)) {
-//						if(optr.getArea_id().equals(SystemConstants.AREA_ALL)){
-//							dt.get(j).getOthers().put("att", "prodId");
-//						}else{
-//							if(cpkgProds.get(j).getFor_area_id().equals(SystemConstants.AREA_ALL)){
-//								dt.get(j).getOthers().put("att", "areaProdId");
-//							}else{
-//								dt.get(j).getOthers().put("att", "prodId");
-//							}
-//						} 
-//						dt.get(j).getOthers().put("area_id", cpkgProds.get(j).getArea_id());
-//						at.get(i).getChildren().add(dt.get(j));
-//					}
-//				}
-//			}
-//			if(pkgList.get(i).getItem_value().equals(SystemConstants.PROD_TYPE_USERPKG)&&upkgProds!=null){
-//				for (int j = 0; j < upkgProds.size(); j++) {
-//					et.get(j).setLeaf(true);
-//					if (upkgProds.get(j).getProd_type().equals(SystemConstants.PROD_TYPE_USERPKG)) {
-//						if(optr.getArea_id().equals(SystemConstants.AREA_ALL)){
-//							et.get(j).getOthers().put("att", "prodId");
-//						}else {
-//							if(upkgProds.get(j).getFor_area_id().equals(SystemConstants.AREA_ALL)){
-//								et.get(j).getOthers().put("att", "areaProdId");
-//							}else{
-//								et.get(j).getOthers().put("att", "prodId");
-//							}
-//						}
-//						et.get(j).getOthers().put("area_id", upkgProds.get(j).getArea_id());
-//						at.get(i).getChildren().add(et.get(j));
-//					}
-//				}
-//			}
-//		}
-		for (int i = 0; i < servList.size(); i++) {
-			if(baseProds!=null){
-				for (int j = 0; j < baseProds.size(); j++) {
+
+		for (int i = 0; i < allList.size(); i++) {
+			if(prods!=null){
+				for (int j = 0; j < prods.size(); j++) {
 					ct.get(j).setLeaf(true);
-					if (servList.get(i).getItem_value().equals(baseProds.get(j).getServ_id())) {
+					if (allList.get(i).getItem_value().equals(prods.get(j).getServ_id()) || allList.get(i).getItem_value().equals(prods.get(j).getProd_type())) {
 						if(optr.getArea_id().equals(SystemConstants.AREA_ALL)){
 							ct.get(j).getOthers().put("att", "prodId");
 						}else{
-							if(baseProds.get(j).getFor_area_id().equals(SystemConstants.AREA_ALL)){
+							if(prods.get(j).getFor_area_id().equals(SystemConstants.AREA_ALL)){
 								ct.get(j).getOthers().put("att", "areaProdId");
 							}else{
 								ct.get(j).getOthers().put("att", "prodId");
 							}
 						}
-						ct.get(j).getOthers().put("area_id", baseProds.get(j).getArea_id());
+						ct.get(j).getOthers().put("area_id", prods.get(j).getArea_id());
 						bt.get(i).getChildren().add(ct.get(j));
 					}
 			
@@ -242,7 +297,7 @@ public class ProdComponent extends BaseComponent {
 		}
 		return bt;
 	}
-
+	
 	/**
 	 * 地区地市资源关系树 按照TreeNode结构排列
 	 * 
