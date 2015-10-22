@@ -36,29 +36,12 @@ TaskDetailGrid = Ext.extend(Ext.grid.GridPanel, {
 			border: false,
 			cm : new Ext.grid.ColumnModel([{
 				header : operateCols[0],dataIndex : 'log_time',width : 130}, {
-				header : operateCols[1],dataIndex : 'busi_name',width:120,renderer : App.qtipValue}, {
+				header : operateCols[1],dataIndex : 'busi_name',width:150,renderer : App.qtipValue}, {
 				header : operateCols[2],dataIndex : 'optr_name',width:80,renderer : App.qtipValue}, {
 				header : operateCols[3],dataIndex : 'syn_status_text',width:80,renderer : App.qtipValue}, {
-				header : operateCols[5],dataIndex : 'delay_time',width:80}
-//				,{header : operateCols[4],dataIndex : 'log_detail',width:350,renderer :  App.qtipValue}
-				]),
-			viewConfig: {
-	            forceFit:true,
-	            enableRowBody:true,
-	            showPreview:true,
-	            getRowClass : function(record, rowIndex, p, store){
-	            	if(Ext.isEmpty(record.get('log_detail'))){
-	            		return 'x-grid3-row-collapsed';
-	            	}
-	            	p.body = '<div><div style="font-size:14px;font-family:KaiTi;color:#337FE5;">'
-	                + '&nbsp&nbsp' +record.data.log_detail + '</br></div>'
-	                + '<div style="width:690px;height:1;"/>'
-	                + '<div style="text-align:right;float:right;"> ' + 
-	                '</div></div>'
-	                ;
-	                return 'x-grid3-row-expanded';
-	            }
-	        }
+				header : operateCols[5],dataIndex : 'delay_time',width:80},
+				{header : operateCols[4],dataIndex : 'log_detail',width:430,renderer :  App.qtipValue}
+			])
 		})               
 	}                    
 })
