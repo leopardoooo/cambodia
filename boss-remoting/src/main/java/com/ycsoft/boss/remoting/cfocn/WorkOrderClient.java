@@ -22,13 +22,15 @@ import com.ycsoft.boss.remoting.cfocn.CFOCN_WebSvc_WorkOrderStub.ResultHead;
 import com.ycsoft.boss.remoting.cfocn.CFOCN_WebSvc_WorkOrderStub.WorkOrder;
 import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.helper.DateHelper;
+import com.ycsoft.commons.helper.JsonHelper;
+import com.ycsoft.commons.helper.LoggerHelper;
 import com.ycsoft.commons.helper.StringHelper;
 
 
 
 public class WorkOrderClient {
 	private CFOCN_WebSvc_WorkOrderStub workOrderStub;
-	private Logger LOG = LoggerFactory.getLogger(getClass());
+	private static Logger LOG = LoggerFactory.getLogger(WorkOrderClient.class);
 	
 	private final String INFL_TYPE_CANCEL="Cancle";//撤销工单
 	private final String INFL_TYPE_REMIND="Remind";//催单
@@ -53,6 +55,12 @@ public class WorkOrderClient {
 		ArrayOfProductInfo productArray = getDeviceInfo(userList);
 		workOrder.setProductInfos(productArray);
 		receiveWorkOrder.setMWorkOrder(workOrder);
+		try {
+			if(LOG.isDebugEnabled()){
+				LOG.debug(JsonHelper.fromObject(receiveWorkOrder));
+			}
+		} catch (Exception e) {e.printStackTrace();}
+		
 		return createTaskService(receiveWorkOrder);
 	}
 
@@ -66,6 +74,17 @@ public class WorkOrderClient {
 		for (WTaskUser user:userList){
 			DeviceInfo deviceInfo = new DeviceInfo();
 			deviceInfo.setDeviceName(user.getDevice_model());
+			if(StringHelper.isNotEmpty(user.getDevice_id())){
+				deviceInfo.setDeviceSN(user.getDevice_id());//设备编号
+				
+			}
+			if(StringHelper.isNotEmpty(user.getOcc_no())){
+				deviceInfo.setOCCSerialCode(user.getOcc_no());//交接箱编号
+			}
+			if(StringHelper.isNotEmpty(user.getPos_no())){
+				deviceInfo.setPOSSerialCode(user.getPos_no());//分光器编号
+			}
+			
 			deviceInfo.setIsFCPort(SystemConstants.USER_TYPE_BAND.equals(user.getUser_type())?true:false);
 			deviceArray.addDeviceInfo(deviceInfo);
 		}
@@ -138,6 +157,11 @@ public class WorkOrderClient {
 		influence.setNo(""+doneCode);
 		influence.setType(INFL_TYPE_CANCEL);
 		influence.setContent("cancel work order "+taskId);
+		try {
+			if(LOG.isDebugEnabled()){
+				LOG.debug(JsonHelper.fromObject(influence));
+			}
+		} catch (Exception e) {e.printStackTrace();}
 		return cancelTaskService(influence);
 	}
 	
@@ -155,7 +179,7 @@ public class WorkOrderClient {
 		ResultHead result = null;
 		try {
 			result = callback.doCallback();
-			System.out.println("============================="+result.getHeadCode()+"      "+result.getHeadMsg());
+			//System.out.println("============================="+result.getHeadCode()+"      "+result.getHeadMsg());
 		} catch (RemoteException e) {
 			throw new WordOrderException(e);
 		}

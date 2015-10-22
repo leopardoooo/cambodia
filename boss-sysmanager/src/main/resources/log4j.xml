@@ -10,8 +10,8 @@
 
 	<appender name="SYS" class="org.apache.log4j.RollingFileAppender">
 		<param name="File" value="${catalina.home}/logs/bosssys.log" />
-		<param name="MaxFileSize" value="10MB" />
-		<param name="MaxBackupIndex" value="30" />
+		<param name="MaxFileSize" value="30MB" />
+		<param name="MaxBackupIndex" value="10" />
 		<layout class="org.apache.log4j.PatternLayout">
 			<param name="ConversionPattern" value="%d{MM-dd HH\:mm\:ss} [%5p]-[%c\:%L] %3x - %m%n" />
 		</layout>
@@ -25,26 +25,32 @@
 	<logger name="com.opensymphony">
 		<level value="INFO" />
 		<appender-ref ref="CON" />
+		<appender-ref ref="SYS" />
 	</logger>
 	<logger name="org.apache">
 		<level value="INFO" />
 		<appender-ref ref="CON" />
+		<appender-ref ref="SYS" />
 	</logger>
 	<logger name="org.springframework.jdbc.datasource">
 		<level value="INFO" />
 		<appender-ref ref="CON" />
+		<appender-ref ref="SYS" />
 	</logger>
 	<logger name="org.springframework">
 		<level value="INFO" />
 		<appender-ref ref="CON" />
+		<appender-ref ref="SYS" />
 	</logger>
 	<logger name="com.ycsoft">
 		<level value="DEBUG" />
 		<appender-ref ref="CON" />
+		<appender-ref ref="SYS" />
 	</logger>
 	<logger name="com.ycsoft.daos">
 		<level value="INFO" />
 		<appender-ref ref="CON" />
+		<appender-ref ref="SYS" />
 	</logger>
 	
 	<root>

@@ -5,6 +5,8 @@ package com.ycsoft.boss.remoting.cfocn;
 
 import com.ycsoft.boss.remoting.cfocn.CFOCN_WebSvc_WorkOrderStub.TestSSL;
 import com.ycsoft.boss.remoting.cfocn.CFOCN_WebSvc_WorkOrderStub.TestSSLResponse;
+import com.ycsoft.boss.remoting.cfocn.CFOCN_WebSvc_WorkOrderStub.WorkOrder;
+import com.ycsoft.commons.helper.JsonHelper;
 
 /**
  * 
@@ -14,25 +16,33 @@ public class SSLTest {
 	
 	public static void main(String[] args) throws Exception{
 		// DEBUG模式
-		System.setProperty("javax.net.debug", "ssl,handshake");
-        System.setProperty("javax.net.ssl.keyStore", "/Users/killer/Documents/MyWorks/GitHub/cambodia/boss-core/src/main/resources/cert/server/server.p12");
-     //  System.setProperty("javax.net.ssl.keyStore", "D:/Java/workJPZ/boss/cambodia/boss-core/src/main/resources/cert/client/client.p12");
-	 //  System.setProperty("javax.net.ssl.keyStore", "/Users/killer/Documents/MyWorks/GitHub/cambodia/boss-core/src/main/resources/cert/client/client.p12");
+        System.setProperty("javax.net.ssl.keyStore", "D:/ycsoft/ssl/server.p12");
         System.setProperty("javax.net.ssl.keyStorePassword", "a1234567");
         System.setProperty("javax.net.ssl.keyStoreType", "PKCS12");
 		
-//		System.setProperty("javax.net.ssl.trustStore", "D:/Java/workJPZ/boss/cambodia/boss-core/src/main/resources/cert/cfocn/cfocn.ca.jks");
-		System.setProperty("javax.net.ssl.trustStore", "/Users/killer/Documents/MyWorks/GitHub/cambodia/boss-core/src/main/resources/cert/cfocn/cfocn.ca.jks");
+        //TODO 改成你本地的地址
+		System.setProperty("javax.net.ssl.trustStore", "D:/ycsoft/ssl/cfocn.ca.jks");
         System.setProperty("javax.net.ssl.trustStorePassword", "a1234567");
         System.setProperty("javax.net.ssl.trustStoreType", "JKS");
 		
 		
 		CFOCN_WebSvc_WorkOrderStub stub = new CFOCN_WebSvc_WorkOrderStub();
-		TestSSL testSsl = new TestSSL();
-		testSsl.setParam1("Hello");
+		//TestSSL testSsl = new TestSSL();
+		//testSsl.setParam1("Hello");
 		
-		TestSSLResponse response = stub.testSSL(testSsl);
-		System.out.println("服务器返回的结果：" + response.getTestSSLResult());
+		//TestSSLResponse response = stub.testSSL(testSsl);
+		com.ycsoft.boss.remoting.cfocn.CFOCN_WebSvc_WorkOrderStub.GetWorkOrder getWorkOrder=new 
+				com.ycsoft.boss.remoting.cfocn.CFOCN_WebSvc_WorkOrderStub.GetWorkOrder();
+		getWorkOrder.setOrderNo("10003345");
+		
+		com.ycsoft.boss.remoting.cfocn.CFOCN_WebSvc_WorkOrderStub.GetWorkOrderResponse res=
+				stub.getWorkOrder(getWorkOrder);
+		System.out.println(JsonHelper.fromObject(res));
+		WorkOrder or=res.getGetWorkOrderResult();
+		//or.get
+		System.out.println(JsonHelper.fromObject(or));
+		
+		//System.out.println("服务器返回的结果：" + response.getTestSSLResult());
 	}
 
 }

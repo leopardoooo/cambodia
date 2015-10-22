@@ -9,19 +9,23 @@ package com.sysway.outwardtps.service.cfocn;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.ycsoft.beans.system.SOptr;
 import com.ycsoft.beans.task.TaskFillDevice;
 import com.ycsoft.business.commons.pojo.BusiParameter;
 import com.ycsoft.business.service.impl.SnTaskService;
 import com.ycsoft.commons.helper.JsonHelper;
 import com.ycsoft.commons.helper.LoggerHelper;
+import com.ycsoft.commons.helper.StringHelper;
 
 /**
  *  BOSSWebServiceSoapImplServiceSkeleton java skeleton for the axisService
  */
 public class BOSSWebServiceSoapImplServiceSkeleton
     implements BOSSWebServiceSoapImplServiceSkeletonInterface {
-    
+	private static Logger LOG = LoggerFactory.getLogger(BOSSWebServiceSoapImplServiceSkeleton.class);
 	private SnTaskService snTaskService;
 	
 	/**
@@ -59,7 +63,16 @@ public class BOSSWebServiceSoapImplServiceSkeleton
     	String resultType = resp.getRespType();
     	// 回执消息, 如果失败的情况
     	String msg = resp.getRespMsg();
+    	if(StringHelper.isNotEmpty(resp.getAttachData())){
+    		msg=msg+";"+resp.getAttachData();
+    	}
     	
+    	
+     	try {
+     		if(LOG.isDebugEnabled()){
+     			LOG.debug(JsonHelper.fromObject(resp));
+     		}
+		} catch (Exception e1) {e1.printStackTrace();}
     	
     	try{
     		// 调用boss接口完成工单
@@ -126,13 +139,14 @@ public class BOSSWebServiceSoapImplServiceSkeleton
     	String taskId = dfb.getArg0();
     	String type = dfb.getArg1();//无效参数；原意是标明本次是新装还是变更设备，实际上并没有这么使用
     	
-    	try {
-			LoggerHelper.debug(this.getClass(),"taskId="+taskId+"  "+JsonHelper.fromObject(dfb));
-		} catch (Exception e1) {
-			e1.printStackTrace();
-		}
-
     	
+		try {
+     		if(LOG.isDebugEnabled()){
+     			LOG.debug(JsonHelper.fromObject(dfb));
+     		}
+		} catch (Exception e1) {e1.printStackTrace();}
+		
+
     	// 设备信息
     	ProductInfo[] prodArray = dfb.getArg2();
     	List<TaskFillDevice> devices = new ArrayList<>();

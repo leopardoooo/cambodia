@@ -121,6 +121,7 @@ public class TaskComponent extends BaseComponent {
 	}
 	
 	public List<WTaskUser> queryTaskUser(String taskId) throws Exception{
+		
 		return wTaskUserDao.queryByTaskId(taskId);
 	}
 	
