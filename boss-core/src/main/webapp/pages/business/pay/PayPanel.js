@@ -200,29 +200,27 @@ PayPanel = Ext.extend( Ext.Panel ,{
 		this.doCalFee();
 	},
 	doCalFee: function(){
-		var dollar = 0;
+		var money = 0;
 		this.realFeeStore.each(function(record){
-			dollar += record.get('real_pay');
+			money += record.get('real_pay');
 		}, this);
-		dollar = dollar / 100.0;
+		money = money / 100.0;
 		
-		var arr = dollar.toString().split('.'), jy = 0;
+		var arr = money.toString().split('.'), jy = 0, dollar = 0;
 		if(arr.length > 1){
 			dollar = parseInt(arr[0]);
 			jy = parseFloat('0.'+arr[1]);
-			jy = dollar > 0 ? jy : jy*-1;
+			jy = money >= 0 ? jy : jy*-1;
+		}else{
+			dollar = money;
 		}
 		
 		Ext.getCmp("nfDollar").setValue(dollar);
 		Ext.getCmp("nfJianYuan").setValue(Ext.util.Format.round(jy * this.feeData["EXC"], 2));
-		var substrIndex = 1, append = "";
-		if(dollar < 0){
-			substrIndex = 2;
-			append = "-";
-		} 
-		Ext.getCmp("labelDollor").setText(append+ Ext.util.Format.usMoney(dollar).substr(substrIndex));
+
+		Ext.getCmp("labelDollor").setText(dollar+jy);
 		var jianYuan = Ext.util.Format.usMoney(dollar * this.feeData["EXC"]);
-		Ext.getCmp("LabelJian").setText(append+jianYuan.substr(substrIndex));
+		Ext.getCmp("LabelJian").setText(jianYuan);
 		Ext.getCmp("labelExchange").setText("1USD=" + this.feeData["EXC"] + "KHR");
 		Ext.getCmp("hdExchange").setValue(this.feeData["EXC"]);
 	},
