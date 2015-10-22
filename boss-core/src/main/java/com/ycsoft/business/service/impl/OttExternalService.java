@@ -85,6 +85,7 @@ public class OttExternalService extends OrderService {
 	private PPromotionEasyProdDao pPromotionEasyProdDao;
 	@Autowired
 	private TServerOttconfigProdDao tServerOttconfigProdDao;
+
 	/**
 	 * 获得用户账户
 	 * @param login_name
@@ -578,27 +579,35 @@ public class OttExternalService extends OrderService {
 		
 		for(PProd prod:prodList){
 			for(PProdTariffDisct _d:prodPanel.getTariffMap().get(prod.getProd_id())){
-				OttProdTariff tf=new OttProdTariff();
-				prodTariffList.add(tf);
-				
-				tf.setId(prod.getProd_id());
-				tf.setName(prod.getProd_name());
-				tf.setType("0");
-				tf.setProduct_fee_id(_d.getTariff_id());
-				tf.setPrice(NumericHelper.changeF2Y(_d.getDisct_rent().toString()));
-				if(_d.getBilling_type().equals(SystemConstants.BILLING_TYPE_DAY)){
-					//按天
-					tf.setUnit("day");
-					tf.setAmount(_d.getBilling_cycle().toString());
-				}else{
-					if(_d.getBilling_cycle().equals(12)){
-						tf.setUnit("year");
-						tf.setAmount("1");
-					}else{
-						tf.setUnit("month");
+				//资费适用移动渠道判断
+				PProdTariff tariff= pProdTariffDao.findByKey(_d.getTariff_id());
+				if(tariff!=null&&tariff.getService_channel()!=null
+						&&tariff.getService_channel().indexOf(SystemConstants.SERVICE_CHANNEL_MOBILE)>=0){
+					
+					OttProdTariff tf=new OttProdTariff();
+					prodTariffList.add(tf);
+					
+					tf.setId(prod.getProd_id());
+					tf.setName(prod.getProd_name());
+					tf.setType("0");
+					tf.setProduct_fee_id(_d.getTariff_id());
+					
+					tf.setPrice(NumericHelper.changeF2Y(_d.getDisct_rent().toString()));
+					if(_d.getBilling_type().equals(SystemConstants.BILLING_TYPE_DAY)){
+						//按天
+						tf.setUnit("day");
 						tf.setAmount(_d.getBilling_cycle().toString());
+					}else{
+						if(_d.getBilling_cycle().equals(12)){
+							tf.setUnit("year");
+							tf.setAmount("1");
+						}else{
+							tf.setUnit("month");
+							tf.setAmount(_d.getBilling_cycle().toString());
+						}
 					}
 				}
+				
 			}
 		}
 		
@@ -650,6 +659,9 @@ public class OttExternalService extends OrderService {
 				dto.setId(prod.getId());
 				dto.setName(prod.getName());
 				dto.setStatus(prod.getStatus());
+				for(TServerOttauthFee fee:fees){
+					fee.setProd_id(null);
+				}
 				dto.setFee(fees);
 				if(StringHelper.isNotEmpty(prod.getDomain())){
 					Map<String,String> map=new HashMap<>();

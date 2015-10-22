@@ -42,6 +42,8 @@ public class PProdTariff extends OptrBase implements Serializable {
 	private String spkg_sn;
 	private Date eff_date;
 	private Date exp_date;
+	
+	private String   service_channel;//SERVICE_CHANNEL
 
 	private String billing_type_text;
 	private String status_text;
@@ -53,6 +55,14 @@ public class PProdTariff extends OptrBase implements Serializable {
 	private String tariff_type_text;
 
 	
+	public String getService_channel() {
+		return service_channel;
+	}
+
+	public void setService_channel(String service_channel) {
+		this.service_channel = service_channel;
+	}
+
 	public Date getEff_date() {
 		return eff_date;
 	}
