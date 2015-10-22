@@ -51,6 +51,7 @@ import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.exception.ErrorCode;
 import com.ycsoft.commons.exception.ServicesException;
 import com.ycsoft.commons.helper.DateHelper;
+import com.ycsoft.commons.helper.JsonHelper;
 import com.ycsoft.commons.helper.LoggerHelper;
 import com.ycsoft.commons.helper.NumericHelper;
 import com.ycsoft.commons.helper.StringHelper;
@@ -358,7 +359,7 @@ public class OttExternalService extends OrderService {
 	 * @throws Exception 
 	 */
 	public List<OttUserProd> getOrderedProductList(String loginName) throws Exception{
-		LoggerHelper.debug(this.getClass(), "loginName="+loginName);
+		LoggerHelper.debug(this.getClass(), "func=getOrderedProductList"+" loginName="+loginName);
 		CUser user=userComponent.queryUserByLoginName(loginName);
 		if(user==null||!user.getUser_type().equals(SystemConstants.USER_TYPE_OTT_MOBILE)){
 			throw new ServicesException(ErrorCode.UserLoginNameIsNotExistsOrIsNotOttMobile);
@@ -390,6 +391,7 @@ public class OttExternalService extends OrderService {
 			re.setEnd_time( DateHelper.format(order.getExp_date(),DateHelper.FORMAT_TIME_END));
 			resutls.add(re);
 		}
+		LoggerHelper.debug(this.getClass(), "func=getOrderedProductList results="+JsonHelper.fromObject(resutls));
 		return resutls;
 	}
 	
@@ -553,7 +555,7 @@ public class OttExternalService extends OrderService {
 	 * @throws Exception 
 	 */
 	public List<OttProdTariff> getProductList(String loginName,String product_ids) throws Exception{
-		LoggerHelper.debug(this.getClass(), "loginName="+loginName+" product_ids="+product_ids);
+		LoggerHelper.debug(this.getClass(), "func=getProductList,loginName="+loginName+" product_ids="+product_ids);
 		CUser user=userComponent.queryUserByLoginName(loginName);
 		if(user==null||!user.getUser_type().equals(SystemConstants.USER_TYPE_OTT_MOBILE)){
 			throw new ServicesException(ErrorCode.UserLoginNameIsNotExistsOrIsNotOttMobile);
@@ -610,7 +612,7 @@ public class OttExternalService extends OrderService {
 				
 			}
 		}
-		
+		LoggerHelper.debug(this.getClass(), "func=getProductList,result="+JsonHelper.fromObject(prodTariffList));
 		return prodTariffList;
 	}
 	
