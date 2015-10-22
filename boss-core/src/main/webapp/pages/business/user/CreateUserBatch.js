@@ -382,7 +382,7 @@ UserBaseBatchForm = Ext.extend( BaseForm , {
 					nfFee.setValue(data["fee_value"]/100.0);
 					this.currentFeeData = data;
 				}else{
-					Ext.DomQuery.selectNode('label[for=nfFee]').innerHTML = "费用名称";
+					Ext.DomQuery.selectNode('label[for=nfFee]').innerHTML = lmain("user._form.feeName");
 					nfFee.setMaxValue(0);
 					nfFee.setMinValue(0);
 					nfFee.setValue(0.00);
