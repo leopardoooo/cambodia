@@ -4,12 +4,7 @@ import java.io.Serializable;
 
 import com.ycsoft.daos.config.POJO;
 
-@POJO(
-		tn="T_SERVER_OTTAUTH_FEE",
-		sn="",
-		pk="ID")
 public class TServerOttauthFee implements Serializable {
-	 private String prod_id;//	产品ID	
 	 private String id;//
 	 private String name;//	
 	 private String  type;//	产品类型	0：周期性产品，如包月或者包年1：单片
@@ -22,12 +17,7 @@ public class TServerOttauthFee implements Serializable {
 	 private String  end_time;//	结束时间	2050-06-19 08:59:59
 	 private String continue_buy;// CONTINUE_BUY
 	 private String explanation; //EXPLANATION
-	public String getProd_id() {
-		return prod_id;
-	}
-	public void setProd_id(String prod_id) {
-		this.prod_id = prod_id;
-	}
+
 	public String getId() {
 		return id;
 	}

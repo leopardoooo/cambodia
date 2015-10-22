@@ -9,24 +9,28 @@ import com.ycsoft.daos.config.POJO;
 		tn="T_SERVER_OTTAUTH_PROD",
 		sn="",
 		pk="ID")
-public class TServerOttauthProd implements Serializable {
-	private String id;
-	private String name;
+public class TServerOttauthProd extends TServerOttauthFee implements Serializable {
+	
 	private String status;
 	private String domain;// 
 	private String need_sync;//NEED_SYNC
 	private Date sync_date;
-	public String getId() {
-		return id;
+	
+	private String fee_id;
+	private String fee_name;
+
+	
+	public String getFee_id() {
+		return fee_id;
 	}
-	public void setId(String id) {
-		this.id = id;
+	public void setFee_id(String fee_id) {
+		this.fee_id = fee_id;
 	}
-	public String getName() {
-		return name;
+	public String getFee_name() {
+		return fee_name;
 	}
-	public void setName(String name) {
-		this.name = name;
+	public void setFee_name(String fee_name) {
+		this.fee_name = fee_name;
 	}
 	public String getStatus() {
 		return status;

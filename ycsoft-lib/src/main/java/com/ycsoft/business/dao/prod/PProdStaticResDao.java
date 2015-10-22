@@ -57,4 +57,19 @@ public class PProdStaticResDao extends BaseEntityDao<PProdStaticRes> {
 			
 			return resIds;
 		}
+		
+		public String[] queryExternalRes(String prodId) throws JDBCException{
+
+			String sql = "select distinct b.external_res_id res_id from p_prod_static_res a,t_server_res b "
+					+ " where a.res_id=b.boss_res_id and a.prod_id =? ";
+			
+			List<PProdStaticRes> list = this.createQuery(sql,prodId).list();
+			String[] resIds = new String[list.size()];
+			int i=0;
+			for(PProdStaticRes res:list){
+				resIds[i] = res.getRes_id();
+				i++;
+			}
+			return resIds;
+		}
 }

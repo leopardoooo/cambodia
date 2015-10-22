@@ -1,7 +1,5 @@
 package com.ycsoft.beans.ott;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 public class TServerOttauthDto  {
@@ -11,13 +9,13 @@ public class TServerOttauthDto  {
 	private String status;
 	private Map<String,String> extension;// EXTENSION
 	
-	private List<TServerOttauthFee> fee=new ArrayList<>();
+	private TServerOttauthFee[] fee;
 
-	public List<TServerOttauthFee> getFee() {
+	public TServerOttauthFee[] getFee() {
 		return fee;
 	}
 
-	public void setFee(List<TServerOttauthFee> fee) {
+	public void setFee(TServerOttauthFee[] fee) {
 		this.fee = fee;
 	}
 

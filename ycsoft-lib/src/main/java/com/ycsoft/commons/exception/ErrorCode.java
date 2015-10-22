@@ -118,6 +118,10 @@ public enum ErrorCode {
 	EditFeeUnPayError("未支付中存在购买配件或批量购买配件操作，请使用取消订单功能"),
 	BusiCodeCanNotCancel("该业务不能回退（%s）"),
 	
+	TServerOttauthProdNotConfig("控制字%s未在t_server_ottauth_prod中定义"),
+	
+	OttMobileProdOnlyOneControlRes("OttMobile产品(prod_id=%s)必须配置一个控制字，且只能配置一个控制字"),
+	
 	/**OTT接口相关错误码**/
 	E40001("Mac地址认证失败（提示用户，不能进入）"),
 	E40002("EPG认证失败，返回Guest帐号"),

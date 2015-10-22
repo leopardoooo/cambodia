@@ -33,13 +33,14 @@ import com.ycsoft.beans.prod.PPromotionEasyProd;
 import com.ycsoft.boss.remoting.ott.OttClient;
 import com.ycsoft.boss.remoting.ott.Result;
 import com.ycsoft.business.component.core.OrderComponent;
-import com.ycsoft.business.dao.config.TServerOttconfigProdDao;
+import com.ycsoft.business.dao.config.TServerOttauthProdDao;
 import com.ycsoft.business.dao.core.acct.CAcctAcctitemDao;
 import com.ycsoft.business.dao.core.cust.CCustDao;
 import com.ycsoft.business.dao.core.cust.CCustLinkmanDao;
 import com.ycsoft.business.dao.core.cust.CCustPropChangeDao;
 import com.ycsoft.business.dao.core.prod.CProdOrderDao;
 import com.ycsoft.business.dao.core.user.CUserDao;
+import com.ycsoft.business.dao.prod.PProdStaticResDao;
 import com.ycsoft.business.dao.prod.PProdTariffDao;
 import com.ycsoft.business.dao.prod.PProdTariffDisctDao;
 import com.ycsoft.business.dao.prod.PPromotionEasyProdDao;
@@ -50,11 +51,13 @@ import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.exception.ErrorCode;
 import com.ycsoft.commons.exception.ServicesException;
+import com.ycsoft.commons.helper.CollectionHelper;
 import com.ycsoft.commons.helper.DateHelper;
 import com.ycsoft.commons.helper.JsonHelper;
 import com.ycsoft.commons.helper.LoggerHelper;
 import com.ycsoft.commons.helper.NumericHelper;
 import com.ycsoft.commons.helper.StringHelper;
+import com.ycsoft.daos.helper.BeanHelper;
 /**
  * OTT调用BOSS接口实现
  * @author new
@@ -85,14 +88,16 @@ public class OttExternalService extends OrderService {
 	@Autowired
 	private PPromotionEasyProdDao pPromotionEasyProdDao;
 	@Autowired
-	private TServerOttconfigProdDao tServerOttconfigProdDao;
+	private TServerOttauthProdDao tServerOttauthProdDao;
+	@Autowired
+	private PProdStaticResDao pProdStaticResDao;
 
 	/**
 	 * 获得用户账户
 	 * @param login_name
 	 */
 	public OttAccount getAccountInfo(String loginName)throws Exception{
-		LoggerHelper.debug(this.getClass(), "loginName="+loginName);
+		LoggerHelper.debug(this.getClass(), "func=getAccountInfo loginName="+loginName);
 			OttAccount ottAcct=new OttAccount();
 			CUser user=cUserDao.queryUserByLoginName(loginName);
 			if(user==null||!user.getUser_type().equals(SystemConstants.USER_TYPE_OTT_MOBILE)){
@@ -128,7 +133,7 @@ public class OttExternalService extends OrderService {
 	 * @param telephone 手机号码
 	 */
 	public void  modifyAccountInfo(String loginName,String user_passwd,String user_rank,String user_name,String telephone) throws Exception{
-		LoggerHelper.debug(this.getClass(), "loginName="+loginName+" user_passwd="+user_passwd+" user_rank="+user_rank+" telephone="+telephone+" user_name="+user_name);
+		LoggerHelper.debug(this.getClass(), "func=modifyAccountInfo  loginName="+loginName+" user_passwd="+user_passwd+" user_rank="+user_rank+" telephone="+telephone+" user_name="+user_name);
 			CUser user=cUserDao.queryUserByLoginName(loginName);
 			if(user==null||!user.getUser_type().equals(SystemConstants.USER_TYPE_OTT_MOBILE)){
 				throw new ServicesException(ErrorCode.UserLoginNameIsNotExistsOrIsNotOttMobile);
@@ -241,7 +246,7 @@ public class OttExternalService extends OrderService {
 	 */
 	public Map<String,String> RegisterAccount(String loginName,String user_passwd,
 			String user_name,String user_rank,String telephone,String email) throws Exception{
-		LoggerHelper.debug(this.getClass(), "loginName="+loginName+" user_passwd="+user_passwd+" user_rank="+user_rank+" telephone="+telephone+" user_name="+user_name+" email="+email);
+		LoggerHelper.debug(this.getClass(), "func=RegisterAccount loginName="+loginName+" user_passwd="+user_passwd+" user_rank="+user_rank+" telephone="+telephone+" user_name="+user_name+" email="+email);
 		
 		if(StringHelper.isEmpty(loginName)||StringHelper.isEmpty(user_passwd)){
 			throw new ServicesException(ErrorCode.E40006);
@@ -249,7 +254,7 @@ public class OttExternalService extends OrderService {
 		Integer doneCode=this.initExternalBusiParam(BusiCodeConstants.CUST_OPEN, null);
 		
 		if(userComponent.queryUserByLoginName(loginName)!=null){
-			throw new ServicesException(ErrorCode.E40009);
+			throw new ServicesException(ErrorCode.UserLoginNameIsExists);
 		}
 		
 		if(StringHelper.isEmpty(user_name)){
@@ -305,7 +310,7 @@ public class OttExternalService extends OrderService {
 		
 		 //注册免费送3天节目
 		for(PPromotionEasyProd easyProd: pPromotionEasyProdDao.queryPromotionByType(SystemConstants.PROMOTION_TYPE_OTT_MOBILE_EXTERNAL)){
-			OrderProd orderProd=getOttMobileOrderProd(user,easyProd.getProd_id(),easyProd.getTariff_id(),easyProd.getOrder_cycles(),null,null,null);
+			OrderProd orderProd=getOttMobileOrderProd(user,easyProd.getTariff_id(),easyProd.getOrder_cycles(),null,null,null);
 			saveOrderProd(orderProd, this.getBusiParam().getBusiCode(), this.getBusiParam().getDoneCode());
 		}
 		
@@ -324,9 +329,10 @@ public class OttExternalService extends OrderService {
 	    }
 	    //产品授权
 	    Map<String,Date> userResMap = authComponent.getUserResExpDate(user.getUser_id());
+	    Map<String,TServerOttauthProd> ottauthMap= tServerOttauthProdDao.queryAllMap();
 		for(String externalResId: userResMap.keySet()){
 			String resDate=DateHelper.format( userResMap.get(externalResId), DateHelper.FORMAT_TIME_END);
-			Result resutl=ottClient.openUserProduct(user.getLogin_name(), externalResId,resDate);
+			Result resutl=ottClient.openUserProduct(user.getLogin_name(), externalResId,resDate,ottauthMap);
 			if(!resutl.isSuccess()){
 				throw new ServicesException(ErrorCode.E40009);
 			}
@@ -341,7 +347,7 @@ public class OttExternalService extends OrderService {
 	 * @throws Exception 
 	 */
 	public Map<String,String> queryUserValidate(String loginName) throws Exception{
-		LoggerHelper.debug(this.getClass(), "loginName="+loginName);
+		LoggerHelper.debug(this.getClass(), "func=userValidate loginName="+loginName);
 		CUser user=userComponent.queryUserByLoginName(loginName);
 		Map<String,String> result=new HashMap<>();
 		if(user==null){
@@ -353,6 +359,7 @@ public class OttExternalService extends OrderService {
 	}
 	/**
 	 * 根据用户ID获取用户的已订购列表
+	 * 产品要提取对应的控制字给OTT平台
 	 * @param user_id 用户ID
 	 * @param version OTT业务版本号
 	 * @param user_ip 来源IP
@@ -364,31 +371,35 @@ public class OttExternalService extends OrderService {
 		if(user==null||!user.getUser_type().equals(SystemConstants.USER_TYPE_OTT_MOBILE)){
 			throw new ServicesException(ErrorCode.UserLoginNameIsNotExistsOrIsNotOttMobile);
 		}
-		//map<prod_id,CProdOrderDto>
-		Map<String,CProdOrderDto> unExpOrderMap=new HashMap<>();
-		for(CProdOrderDto order: cProdOrderDao.queryProdOrderDtoByUserId(user.getUser_id())){
-			if(!order.getExp_date().before(DateHelper.today())){
-				CProdOrderDto _prodOrder= unExpOrderMap.get(order.getProd_id());
-				if(_prodOrder==null){
-					unExpOrderMap.put(order.getProd_id(), order);
-				}else{
-					if(order.getExp_date().before(_prodOrder.getExp_date())){
-						order.setExp_date(_prodOrder.getExp_date());
-					}
-					if(order.getEff_date().after(_prodOrder.getEff_date())){
-						order.setEff_date(_prodOrder.getEff_date());
-					}
-				}
-			}
-		}
+
+		Map<String,Date> userResMap = authComponent.getUserResExpDate(user.getUser_id());
+		 
 		List<OttUserProd> resutls=new ArrayList<>();
-		for(CProdOrderDto order: unExpOrderMap.values()){
+		
+		if(userResMap.size()<=0){
+			return resutls;
+		}
+		Map<String,TServerOttauthProd> ottauthMap=tServerOttauthProdDao.queryAllMap();
+		//该用户可以订购的产品列表
+		Map<String,OttProdTariff> ottProdTariffMap=
+				CollectionHelper.converToMapSingle(this.queryOttProdTariff(user, null),"id");
+		
+		for(Map.Entry<String, Date> order: userResMap.entrySet()){
 			OttUserProd re=new OttUserProd();
-			re.setId(order.getProd_id());
-			re.setName(order.getProd_name());
-			re.setContinue_buy("1");
-			re.setBegin_time( DateHelper.format(order.getEff_date(),DateHelper.FORMAT_TIME_START));
-			re.setEnd_time( DateHelper.format(order.getExp_date(),DateHelper.FORMAT_TIME_END));
+			//同步给OTT_MOBILE平台要换成的资源的产品ID和名称
+			TServerOttauthProd ottauth=ottauthMap.get(order.getKey());
+			if(ottauth==null){
+				throw new ServicesException(ErrorCode.TServerOttauthProdNotConfig,order.getKey());
+			}
+			re.setId(ottauth.getId());
+			re.setName(ottauth.getName());
+			if(ottProdTariffMap.containsKey(order.getKey())){
+				re.setContinue_buy("1");//根据可定产品判断
+			}else{
+				re.setContinue_buy("0");//根据可定产品判断
+			}
+			re.setBegin_time( DateHelper.format(DateHelper.today(),DateHelper.FORMAT_TIME_START));
+			re.setEnd_time( DateHelper.format(order.getValue(),DateHelper.FORMAT_TIME_END));
 			resutls.add(re);
 		}
 		LoggerHelper.debug(this.getClass(), "func=getOrderedProductList results="+JsonHelper.fromObject(resutls));
@@ -407,7 +418,14 @@ public class OttExternalService extends OrderService {
 	 * @return
 	 * @throws Exception
 	 */
-	private OrderProd getOttMobileOrderProd(CUser user,String product_id,String product_fee_id,Integer amount,String file_name,String boss_data,String ott_date) throws Exception{
+	private OrderProd getOttMobileOrderProd(CUser user,String product_fee_id,Integer amount,String file_name,String boss_data,String ott_date) throws Exception{
+		
+		String[] tmpTariff=product_fee_id.split("_");
+		PProdTariff tariff=pProdTariffDao.findByKey(tmpTariff[0]);
+		if(tariff==null){
+			throw new ServicesException(ErrorCode.ProdNotExists);
+		}
+		String product_id=tariff.getProd_id();
 		OrderProd orderProd=new OrderProd();
 		orderProd.setCust_id(user.getCust_id());
 		orderProd.setUser_id(user.getUser_id());
@@ -424,8 +442,7 @@ public class OttExternalService extends OrderService {
 			CProdOrderDto dto=cProdOrderDao.queryCProdOrderDtoByKey(last_order_sn);
 			eff_date=DateHelper.addDate(dto.getExp_date(), 1);	
 		}
-		String[] tmpTariff=orderProd.getTariff_id().split("_");
-		PProdTariff tariff=pProdTariffDao.findByKey(tmpTariff[0]);
+		
 		int billing_cycle=0;
 		int rent=0;
 		if(tmpTariff.length==2){
@@ -478,7 +495,7 @@ public class OttExternalService extends OrderService {
 	 * @throws Exception 
 	 */
 	public void saveOttMobileBuyProduct(String loginName,String product_id,String product_fee_id,Integer amount,String file_name,String boss_data,String ott_date) throws Exception{
-		LoggerHelper.debug(this.getClass(), "loginName="+loginName+" product_id="+product_id+" product_fee_id="+product_fee_id+" amount="+amount);
+		LoggerHelper.debug(this.getClass(), "func=buyProduct "+"loginName="+loginName+" product_id="+product_id+" product_fee_id="+product_fee_id+" amount="+amount);
 		if(StringHelper.isEmpty(loginName)||
 			StringHelper.isEmpty(product_id)||
 			StringHelper.isEmpty(product_fee_id)||
@@ -494,7 +511,7 @@ public class OttExternalService extends OrderService {
 		this.initExternalBusiParam(busi_code, user.getCust_id());
 		doneCodeComponent.lockCust(user.getCust_id());
 		
-		OrderProd orderProd=getOttMobileOrderProd(user,product_id,product_fee_id,amount,file_name,boss_data,ott_date);
+		OrderProd orderProd=getOttMobileOrderProd(user,product_fee_id,amount,file_name,boss_data,ott_date);
 		
 		try{
 		   saveOrderProd(orderProd, busi_code, this.getBusiParam().getDoneCode());
@@ -508,9 +525,10 @@ public class OttExternalService extends OrderService {
 		this.saveAllPublic(this.getBusiParam().getDoneCode(), this.getBusiParam());
 		//处理实时指令
 		Map<String,Date> userResMap = authComponent.getUserResExpDate(user.getUser_id());
+		Map<String,TServerOttauthProd> ottauthMap= tServerOttauthProdDao.queryAllMap();
 		for(String externalResId: userResMap.keySet()){
 			String resDate=DateHelper.format( userResMap.get(externalResId), DateHelper.FORMAT_TIME_END);
-			Result resutl=ottClient.openUserProduct(user.getLogin_name(), externalResId,resDate);
+			Result resutl=ottClient.openUserProduct(user.getLogin_name(), externalResId,resDate,ottauthMap);
 			if(!resutl.isSuccess()){
 				throw new ServicesException(ErrorCode.E40009);
 			}
@@ -560,6 +578,13 @@ public class OttExternalService extends OrderService {
 		if(user==null||!user.getUser_type().equals(SystemConstants.USER_TYPE_OTT_MOBILE)){
 			throw new ServicesException(ErrorCode.UserLoginNameIsNotExistsOrIsNotOttMobile);
 		}
+		List<OttProdTariff> prodTariffList=this.queryOttProdTariff(user, product_ids);
+		LoggerHelper.debug(this.getClass(), "func=getProductList,result="+JsonHelper.fromObject(prodTariffList));
+		return prodTariffList;
+	}
+	
+	private List<OttProdTariff> queryOttProdTariff(CUser user,String product_ids) throws Exception{
+	
 		List<OttProdTariff> prodTariffList=new ArrayList<>();
 		
 		OrderProdPanel prodPanel=orderComponent.queryOrderableProd(BusiCodeConstants.PROD_SINGLE_ORDER,user.getCust_id(),user.getUser_id(),null);
@@ -579,6 +604,7 @@ public class OttExternalService extends OrderService {
 			}
 		}
 		
+		Map<String,TServerOttauthProd> ottauthMap=tServerOttauthProdDao.queryAllMap();
 		for(PProd prod:prodList){
 			for(PProdTariffDisct _d:prodPanel.getTariffMap().get(prod.getProd_id())){
 				//资费适用移动渠道判断
@@ -588,9 +614,18 @@ public class OttExternalService extends OrderService {
 					
 					OttProdTariff tf=new OttProdTariff();
 					prodTariffList.add(tf);
+					//产品 转换成对应的资源
+					String[] externalRess=pProdStaticResDao.queryExternalRes(prod.getProd_id());
+					if(externalRess==null||externalRess.length!=1){
+						throw new ServicesException(ErrorCode.OttMobileProdOnlyOneControlRes);
+					}
+					TServerOttauthProd ottauth=ottauthMap.get(externalRess[0]);
+					if(ottauth==null){
+						throw new ServicesException(ErrorCode.TServerOttauthProdNotConfig,externalRess[0]);
+					}
 					
-					tf.setId(prod.getProd_id());
-					tf.setName(prod.getProd_name());
+					tf.setId(ottauth.getId());
+					tf.setName(ottauth.getName());
 					tf.setType("0");
 					tf.setProduct_fee_id(_d.getTariff_id());
 					
@@ -612,7 +647,6 @@ public class OttExternalService extends OrderService {
 				
 			}
 		}
-		LoggerHelper.debug(this.getClass(), "func=getProductList,result="+JsonHelper.fromObject(prodTariffList));
 		return prodTariffList;
 	}
 	
@@ -654,24 +688,26 @@ public class OttExternalService extends OrderService {
 		
 		List<TServerOttauthDto> list=new ArrayList<>();
 		
-		for(TServerOttauthProd prod:tServerOttconfigProdDao.queryNeedSyncDto()){
-			List<TServerOttauthFee> fees=tServerOttconfigProdDao.queryFee(prod.getId());
-			if(fees!=null&&fees.size()>0){
+		for(TServerOttauthProd prod:tServerOttauthProdDao.queryNeedSyncDto()){
+			
 				TServerOttauthDto dto=new TServerOttauthDto();
 				dto.setId(prod.getId());
 				dto.setName(prod.getName());
 				dto.setStatus(prod.getStatus());
-				for(TServerOttauthFee fee:fees){
-					fee.setProd_id(null);
-				}
+				
+				TServerOttauthFee[] fees=new TServerOttauthFee[1];
+				fees[0]=new TServerOttauthFee();
+				BeanHelper.copyProperties(fees[0], prod);
+				fees[0].setId(prod.getFee_id());
+				fees[0].setName(prod.getFee_name());
 				dto.setFee(fees);
-				if(StringHelper.isNotEmpty(prod.getDomain())){
-					Map<String,String> map=new HashMap<>();
-					map.put("domain", prod.getDomain());
-					dto.setExtension(map);
-				}
+				
+				Map<String,String> map=new HashMap<>();
+				map.put("domain", prod.getDomain());
+				dto.setExtension(map);
+				
 				list.add(dto);
-			}
+			
 		}
 
 		for(TServerOttauthDto dto:list){
@@ -680,9 +716,9 @@ public class OttExternalService extends OrderService {
 			
 			Result resutl=ottClient.addOrUpdateProduct(prodFeeInfo);
 			if(!resutl.isSuccess()){
-				throw new ServicesException(resutl.getStatus()+resutl.getErr()+resutl.getReason());
+				throw new ServicesException(resutl.getStatus()+" "+resutl.getErr()+" "+resutl.getReason());
 			}
-			tServerOttconfigProdDao.updateSync(dto.getId());
+			tServerOttauthProdDao.updateSync(dto.getId());
 			
 		}
 	}
