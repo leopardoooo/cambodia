@@ -5,7 +5,7 @@
  * http://www.extjs.com/license
  */
 #resdatas .viewres {
-	width: 74 px;
+/* 	width: 74 px;
 	height: 54 px;
  	float: left;
     margin:4px 0 4px 4px;
@@ -13,8 +13,17 @@
     text-align: center;
     line-height: 1.25em;
     color: #333;
-    background:#eee no-repeat scroll right bottom;/*#EFF5FB*/
+    background:#eee no-repeat scroll right bottom;#EFF5FB */
     
+    float: left;
+	width: 40%;
+	height: 40px;
+	margin: 5px 0 0 10px;
+	padding: 5px 20px 5px 10px;
+	background: #fff;
+	border: 1px solid #ddd;
+	cursor: pointer;
+	position: relative;
 }
 #resdatas strong {
       display: block;
@@ -26,7 +35,7 @@
 #resdatas .x-view-over{
     border:1px solid #dddddd;
    	background: #efefef url(../../resources/images/grid/row-over.gif) repeat-x left top;
-    padding: 4px;
+    /* padding: 4px; */
 }
 
 #resdatas .x-view-selected {
@@ -37,9 +46,8 @@
     -moz-background-clip:border;
 	-moz-background-inline-policy:continuous;
 	-moz-background-origin:padding;
-	background:#6495ED no-repeat scroll right bottom;/*#EFF5FB*/
+	background:#6495ED no-repeat scroll right bottom;/* #EFF5FB */
 	border:1px solid #99BBE8;
-	padding:4px;
 }
 
 

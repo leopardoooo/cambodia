@@ -54,7 +54,7 @@ public class PPackageProdDao extends BaseEntityDao<PPackageProd> {
 	}
 	
 	public List<PPackageProd> queryPkgById(String pkId)  throws Exception{
-		String sql = "select  distinct prod_id  from p_package_prod where package_id=? ";
+		String sql = "select  distinct package_id  from p_package_prod where package_id=? ";
 		List<PPackageProd> pkList = this.createQuery(PPackageProd.class,sql, pkId).list();
 		return pkList;
 	}
