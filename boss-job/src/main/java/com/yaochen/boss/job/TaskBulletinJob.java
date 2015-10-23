@@ -153,8 +153,8 @@ public class TaskBulletinJob implements Job2 {
 			englishBulletin.append("cfocn dispatch sync failure ").append(cfocn_failure_total).append(",");
 		}
 		if(init_supernet_total>0){
-			chinaBulletin.append("总共").append(init_supernet_total).append("个施工.");
-			chinaBulletin.append("total ").append(init_supernet_total).append(" construction.");
+			chinaBulletin.append("总共").append(init_supernet_total).append("个正在施工.");
+			englishBulletin.append("total ").append(init_supernet_total).append(" under construction.");
 		}
 		
 		return chinaBulletin.append("\n").append(englishBulletin.toString()).toString();
@@ -218,7 +218,7 @@ public class TaskBulletinJob implements Job2 {
 		}
 		if(create_total>0){
 			chinaBulletin.append("总共").append(create_total).append("个待派单.");
-			chinaBulletin.append("total ").append(create_total).append(" wait dispatch.");
+			englishBulletin.append("total ").append(create_total).append(" wait dispatch.");
 		}
 		
 		return chinaBulletin.append("\n").append(englishBulletin.toString()).toString();
