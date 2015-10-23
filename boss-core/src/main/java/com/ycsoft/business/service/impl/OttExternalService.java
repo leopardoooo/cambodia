@@ -382,7 +382,7 @@ public class OttExternalService extends OrderService {
 		Map<String,TServerOttauthProd> ottauthMap=tServerOttauthProdDao.queryAllMap();
 		//该用户可以订购的产品列表
 		Map<String,OttProdTariff> ottProdTariffMap=
-				CollectionHelper.converToMapSingle(this.queryOttProdTariff(user, null),"id");
+				CollectionHelper.converToMapSingle(this.queryOttProdTariff(user),"id");
 		
 		for(Map.Entry<String, Date> order: userResMap.entrySet()){
 			OttUserProd re=new OttUserProd();
@@ -578,34 +578,31 @@ public class OttExternalService extends OrderService {
 		if(user==null||!user.getUser_type().equals(SystemConstants.USER_TYPE_OTT_MOBILE)){
 			throw new ServicesException(ErrorCode.UserLoginNameIsNotExistsOrIsNotOttMobile);
 		}
-		List<OttProdTariff> prodTariffList=this.queryOttProdTariff(user, product_ids);
+		
+		List<OttProdTariff> prodTariffList=new ArrayList<>();
+		if(StringHelper.isEmpty(product_ids)){
+			prodTariffList=this.queryOttProdTariff(user);
+		}else{
+			
+			for(OttProdTariff tariff:this.queryOttProdTariff(user)){
+				if(product_ids.indexOf(tariff.getId())>=0){
+					prodTariffList.add(tariff);
+				}
+			}
+		}
 		LoggerHelper.debug(this.getClass(), "func=getProductList,result="+JsonHelper.fromObject(prodTariffList));
 		return prodTariffList;
 	}
 	
-	private List<OttProdTariff> queryOttProdTariff(CUser user,String product_ids) throws Exception{
+	private List<OttProdTariff> queryOttProdTariff(CUser user) throws Exception{
 	
 		List<OttProdTariff> prodTariffList=new ArrayList<>();
 		
 		OrderProdPanel prodPanel=orderComponent.queryOrderableProd(BusiCodeConstants.PROD_SINGLE_ORDER,user.getCust_id(),user.getUser_id(),null);
-		
-		List<PProd> prodList=new ArrayList<>();
-		if(StringHelper.isEmpty(product_ids)){
-			prodList=prodPanel.getProdList();
-		}else{
-			Set<String> _set=new HashSet<String>();
-			for(String product_id:product_ids.split(",")){
-				_set.add(product_id);
-			}
-			for(PProd prod:prodPanel.getProdList()){
-				if(_set.contains(prod.getProd_id())){
-					prodList.add(prod);
-				}
-			}
-		}
+
 		
 		Map<String,TServerOttauthProd> ottauthMap=tServerOttauthProdDao.queryAllMap();
-		for(PProd prod:prodList){
+		for(PProd prod:prodPanel.getProdList()){
 			for(PProdTariffDisct _d:prodPanel.getTariffMap().get(prod.getProd_id())){
 				//资费适用移动渠道判断
 				PProdTariff tariff= pProdTariffDao.findByKey(_d.getTariff_id());
