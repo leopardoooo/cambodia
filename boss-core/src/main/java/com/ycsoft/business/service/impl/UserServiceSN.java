@@ -67,6 +67,7 @@ import com.ycsoft.commons.exception.ServicesException;
 import com.ycsoft.commons.helper.CollectionHelper;
 import com.ycsoft.commons.helper.DateHelper;
 import com.ycsoft.commons.helper.StringHelper;
+import com.ycsoft.commons.store.MemoryDict;
 import com.ycsoft.daos.core.JDBCException;
 
 @Service
@@ -318,7 +319,11 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 	}
 	
 	public List<TDeviceChangeReason> queryDeviceChangeReason() throws Exception {
-		return userComponent.queryDeviceChangeReason();
+		List<TDeviceChangeReason> list = userComponent.queryDeviceChangeReason();
+		for(TDeviceChangeReason reason : list){
+			reason.setReason_text( MemoryDict.getTransData(reason.getReason_text()) );
+		}
+		return list;
 	}
 	
 	/**
