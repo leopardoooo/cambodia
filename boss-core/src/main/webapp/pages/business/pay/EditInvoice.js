@@ -18,13 +18,14 @@ AutoInvoicePanel = Ext.extend( Ext.Panel, {
 				{id:'old_doc_sn',name : 'docSn',xtype : 'hidden'},
 				{id:'doc_type',name : 'doc_type',xtype : 'hidden'},
 				{
-					xtype : 'combo',
-					store : new Ext.data.SimpleStore({
+					xtype : 'paramcombo',
+					paramName: 'EDIT_STATUS_R_DEVICE',
+					/*store : new Ext.data.SimpleStore({
 								fields : ['status', 'status_text'],
 								data : [['INVALID', '作废'], ['IDLE', '空闲']]
 							}),
 					displayField : 'status_text',
-					valueField : 'status',
+					valueField : 'status',*/
 					fieldLabel : lmain("doc._form.oldStatus"),
 					forceSelection : true,
 					allowBlank : false,
@@ -38,7 +39,7 @@ AutoInvoicePanel = Ext.extend( Ext.Panel, {
 					listeners : {
 						change : this.checkInvoice
 					}
-				},{
+				},{id : 'new_invoice_code',xtype:'hidden',name: 'newInvoice.invoice_code'}/*{
 					id : 'new_invoice_code',
 					allowBlank:false,
 					xtype : 'combo',
@@ -72,7 +73,7 @@ AutoInvoicePanel = Ext.extend( Ext.Panel, {
 							Ext.getCmp('new_invoice_book_id').setValue(rec.get('invoice_book_id'));
 						}
 					}
-				}				
+				}*/				
 			]
 		})
 		this.doInit();
@@ -112,8 +113,9 @@ AutoInvoicePanel = Ext.extend( Ext.Panel, {
 							obj['invoice_type_text'] = rec[i].invoice_type_text
 							data.push(obj);
 						}
-						invoiceCode.setValue('');
-						invoiceCode.getStore().loadData(data);
+						/*invoiceCode.setValue('');
+						invoiceCode.getStore().loadData(data);*/
+						invoiceCode.setValue(data[0]['invoice_code']);
 					}
 				},
 				clearData:function(){
