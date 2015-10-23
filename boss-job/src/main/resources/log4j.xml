@@ -27,7 +27,7 @@
 	<appender name="ALLLOG" class="org.apache.log4j.RollingFileAppender"> 
 		<param name="File" value="./logs/boss_job_all.log"/> 
 		<param name="MaxFileSize" value="30MB"/>
-		<param name="MaxBackupIndex" value="10"/>
+		<param name="MaxBackupIndex" value="30"/>
 		<layout class="org.apache.log4j.PatternLayout"> 
 		  <param  name="ConversionPattern" value="%d{MM-dd HH\:mm\:ss} [%5p]-[%c\:%L] %3x - %m%n"/> 
 		</layout> 
@@ -41,7 +41,7 @@
 	<appender name="ERRORLOG" class="org.apache.log4j.RollingFileAppender"> 
 		<param name="File" value="./logs/boss_job_error.log"/> 
 		<param name="MaxFileSize" value="30MB"/>
-		<param name="MaxBackupIndex" value="10"/>
+		<param name="MaxBackupIndex" value="30"/>
 		<layout class="org.apache.log4j.PatternLayout"> 
 		  <param  name="ConversionPattern" value="%d{MM-dd HH\:mm\:ss} [%5p]-[%c\:%L] %3x - %m%n"/> 
 		</layout> 
@@ -73,6 +73,9 @@
 		<level value="INFO" />
 	</logger>
 	<logger name="com.ycsoft.daos.core.impl.QueryImpl">
+		<level value="INFO" />
+	</logger>
+	<logger name="httpclient">
 		<level value="INFO" />
 	</logger>
 	<root>
