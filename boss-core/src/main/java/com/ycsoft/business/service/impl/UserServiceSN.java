@@ -1109,10 +1109,10 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 			user.setLogin_name(newLoginName);
 			
 			List<CProdOrder> orderList = orderComponent.queryNotExpAllOrderByUser(user.getUser_id());
-			authComponent.sendAuth(selectedUser, orderList, BusiCmdConstants.DEL_USER, doneCode);
 			if(user.getUser_type().equals(USER_TYPE_BAND)){
 				authComponent.sendAuth(user, null, BusiCmdConstants.REFRESH_TERMINAL, doneCode);
 			}else{
+				authComponent.sendAuth(selectedUser, orderList, BusiCmdConstants.DEL_USER, doneCode);
 				authComponent.sendAuth(user, orderList, BusiCmdConstants.CREAT_USER, doneCode);
 			}
 			authComponent.sendAuth(user, orderList, BusiCmdConstants.ACCTIVATE_PROD, doneCode);
