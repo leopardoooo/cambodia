@@ -26,7 +26,7 @@ public class Result {
 	}
 	
 	public boolean isSuccess(){
-		return "0".equals(this.err);
+		return "0".equals(this.status);
 	}
 	
 	public boolean isUndefinedError(){
