@@ -2,6 +2,7 @@ package com.yaochen.boss.job.component;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,9 +13,10 @@ import com.ycsoft.beans.core.job.BusiCmdParam;
 import com.ycsoft.beans.core.job.JBandCommand;
 import com.ycsoft.beans.core.job.JVodCommand;
 import com.ycsoft.beans.core.prod.CProdOrder;
-import com.ycsoft.beans.core.prod.CProdOrderDto;
 import com.ycsoft.beans.core.user.CUser;
+import com.ycsoft.beans.ott.TServerOttauthProd;
 import com.ycsoft.boss.remoting.ott.Result;
+import com.ycsoft.business.dao.config.TServerOttauthProdDao;
 import com.ycsoft.business.dao.core.job.JBandCommandDao;
 import com.ycsoft.business.dao.core.job.JCaCommandDao;
 import com.ycsoft.business.dao.core.job.JVodCommandDao;
@@ -24,6 +26,7 @@ import com.ycsoft.commons.abstracts.BaseComponent;
 import com.ycsoft.commons.constants.BusiCmdConstants;
 import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.helper.DateHelper;
+import com.ycsoft.daos.core.JDBCException;
 
 @Component
 public class AuthComponent extends BaseComponent {
@@ -37,7 +40,17 @@ public class AuthComponent extends BaseComponent {
 	private JCaCommandDao jCaCommandDao;
 	@Autowired
 	private CProdOrderDao cProdOrderDao;
+	@Autowired
+	private TServerOttauthProdDao tServerOttauthProdDao;
 	
+	/**
+	 * 查询ott授权资源
+	 * @throws Exception 
+	 * @throws JDBCException 
+	 */
+	public Map<String,TServerOttauthProd> queryOttAuthProdMap() throws Exception{
+		return tServerOttauthProdDao.queryAllMap();
+	}
 	private Long gTransnum() throws Exception{
 		return Long.parseLong(jCaCommandDao.findSequence().toString());
 	}

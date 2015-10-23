@@ -58,7 +58,6 @@ public class PProdTariff extends OptrBase implements Serializable {
 	private String tariff_type_text;
 
 	
-	
 	public String getService_channel() {
 		return service_channel;
 	}

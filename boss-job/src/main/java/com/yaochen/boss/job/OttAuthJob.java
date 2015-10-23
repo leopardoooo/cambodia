@@ -1,6 +1,8 @@
 package com.yaochen.boss.job;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
@@ -15,6 +17,7 @@ import com.yaochen.myquartz.Job2;
 import com.yaochen.myquartz.Job2ExecutionContext;
 import com.ycsoft.beans.core.job.BusiCmdParam;
 import com.ycsoft.beans.core.job.JVodCommand;
+import com.ycsoft.beans.ott.TServerOttauthProd;
 import com.ycsoft.boss.remoting.ott.OttClient;
 import com.ycsoft.boss.remoting.ott.Result;
 import com.ycsoft.commons.constants.BusiCmdConstants;
@@ -31,6 +34,7 @@ public class OttAuthJob implements Job2 {
 	public void execute(Job2ExecutionContext arg0) throws JobExecutionException {
 		//读取要发送的指令
 		List<JVodCommand> cmdList = null;
+		Map<String,TServerOttauthProd> ottAuthMap=null ;//new HashMap<>();
 		try{
 			cmdList = authComponent.queryOttCmd();
 		} catch(Exception e){
@@ -39,8 +43,12 @@ public class OttAuthJob implements Job2 {
 		}
 		
 		for (JVodCommand cmd:cmdList){
+			
 			Result result = null;
 			try{
+				if(ottAuthMap==null){
+					ottAuthMap=authComponent.queryOttAuthProdMap();
+				}
 				JsonObject params =new JsonParser().parse(cmd.getDetail_param()).getAsJsonObject();
 				if ((cmd.getCmd_type().equals(BusiCmdConstants.CHANGE_USER))){
 					/**String loginName
@@ -58,10 +66,10 @@ public class OttAuthJob implements Job2 {
 					
 					result = ottClient.deleteUser(getJsonValue(params,BusiCmdParam.login_name.name()));
 				} else if ((cmd.getCmd_type().equals(BusiCmdConstants.PASSVATE_PROD))){
-					result = ottClient.stopUserProduct(getJsonValue(params,BusiCmdParam.login_name.name()), cmd.getRes_id());
+					result = ottClient.stopUserProduct(getJsonValue(params,BusiCmdParam.login_name.name()), cmd.getRes_id(),ottAuthMap);
 				} else if  ((cmd.getCmd_type().equals(BusiCmdConstants.ACCTIVATE_PROD))){
 					result = ottClient.openUserProduct(getJsonValue(params,BusiCmdParam.login_name.name()), cmd.getRes_id(),
-							getJsonValue(params,BusiCmdParam.prod_exp_date.name()));
+							getJsonValue(params,BusiCmdParam.prod_exp_date.name()),ottAuthMap);
 				}else{
 					result=ottClient.getBossErrorResult("未定义的指令类型");
 				}

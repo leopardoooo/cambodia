@@ -3,11 +3,11 @@ package com.ycsoft.boss.remoting.ott;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.Map;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.ycsoft.beans.ott.TServerOttauthProd;
 import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.exception.ComponentException;
 import com.ycsoft.commons.helper.DateHelper;
@@ -79,7 +79,7 @@ public class OttClient {
 	 * @return
 	 * @throws ComponentException 
 	 */
-	public Result openUserProduct(String loginName,String externalResId,String expDate) {
+	public Result openUserProduct(String loginName,String externalResId,String expDate,Map<String,TServerOttauthProd> ottAuthMap) {
 		String url = builder.getUrl(URLBuilder.Method.OPEN_USER_PRODCT); 
 		
 		if(StringHelper.isEmpty(loginName)){
@@ -88,14 +88,18 @@ public class OttClient {
 		if(externalResId==null){
 			return this.getBossErrorResult("授权控制字为空");
 		}
-		String[] spiltRess=externalResId.split(",");
-		if(spiltRess.length!=2){
-			return this.getBossErrorResult("Ott的授权控子格式错误：OTT平台产品包ID,OTT平台资费ID");
+		if(ottAuthMap==null){
+			return this.getBossErrorResult("TServerOttauthProd数据为空");
+		}
+		//String[] spiltRess=externalResId.split(",");
+		TServerOttauthProd ottauth=ottAuthMap.get(externalResId);
+		if(ottauth==null){
+			return this.getBossErrorResult("控制字"+externalResId+" 未在t_server_ottauth_prod表定义");
 		}
 		
-		Auth auth = new Auth(loginName.toString(),spiltRess[0]);
+		Auth auth = new Auth(loginName.toString(),ottauth.getId());
 		auth.setEnd_time(expDate);
-		auth.setProduct_fee_id(spiltRess[1]);
+		auth.setProduct_fee_id(ottauth.getFee_id());
 		List<Auth> authList = new ArrayList<>();
 		authList.add(auth);
 		
@@ -109,7 +113,7 @@ public class OttClient {
 	 * @throws ComponentException 
 	 */
 	
-	public Result stopUserProduct(String loginName,String externalResId){
+	public Result stopUserProduct(String loginName,String externalResId,Map<String,TServerOttauthProd> ottAuthMap){
 		String url = builder.getUrl(URLBuilder.Method.STOP_USER_PRODCT); 
 		if(StringHelper.isEmpty(loginName)){
 			return this.getBossErrorResult("loginName账户为空");
@@ -117,18 +121,22 @@ public class OttClient {
 		if(externalResId==null){
 			return this.getBossErrorResult("授权控制字为空");
 		}
-		String[] spiltRess=externalResId.split(",");
-		if(spiltRess.length!=2){
-			return this.getBossErrorResult("Ott的授权控子格式错误：OTT平台产品包ID,OTT平台资费ID");
+		if(ottAuthMap==null){
+			return this.getBossErrorResult("TServerOttauthProd数据为空");
+		}
+		//String[] spiltRess=externalResId.split(",");
+		TServerOttauthProd ottauth=ottAuthMap.get(externalResId);
+		if(ottauth==null){
+			return this.getBossErrorResult("控制字"+externalResId+" 未在t_server_ottauth_prod表定义");
 		}
 		
 		JsonObject jsonData = new JsonObject();
 		jsonData.addProperty("user_id", loginName);
-		jsonData.addProperty("product_id", spiltRess[0]);
-		jsonData.addProperty("product_fee_id",spiltRess[1]);
+		jsonData.addProperty("product_id", ottauth.getId());
+		jsonData.addProperty("product_fee_id",ottauth.getFee_id());
 		
 		String param = StringHelper.append("[",jsonData.toString(),"]");
-		System.out.println(param);
+		//System.out.println(param);
 		
 		return sendOttCmdOnHttp(url, param);
 		

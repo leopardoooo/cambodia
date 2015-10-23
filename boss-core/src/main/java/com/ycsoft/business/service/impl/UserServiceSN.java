@@ -329,7 +329,6 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		CCust cust = getBusiParam().getCust();
 		String busiCode = getBusiParam().getBusiCode();
 		doneCodeComponent.lockCust(cust.getCust_id());
-		CUser oldUser = userComponent.queryUserById(userId);
 		CUser user = userComponent.queryUserById(userId);
 		
 		String oldDeviceCode = user.getStb_id();
@@ -399,10 +398,10 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 	
 			//设备回收，发设备销毁指令
 			if(changeReason.getIs_reclaim().equals(SystemConstants.BOOLEAN_TRUE)){
-				authComponent.sendAuth(oldUser, null, BusiCmdConstants.DEL_USER, doneCode);
+				authComponent.sendAuth(user, null, BusiCmdConstants.DEL_USER, doneCode);
 			}else{
 				//设备不回收，旧设备发产品减指令
-				authComponent.sendAuth(oldUser, prodList, BusiCmdConstants.PASSVATE_PROD, doneCode);
+				authComponent.sendAuth(user, prodList, BusiCmdConstants.PASSVATE_PROD, doneCode);
 			}
 			
 		}
@@ -1109,10 +1108,10 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 			user.setLogin_name(newLoginName);
 			
 			List<CProdOrder> orderList = orderComponent.queryNotExpAllOrderByUser(user.getUser_id());
-			authComponent.sendAuth(selectedUser, orderList, BusiCmdConstants.DEL_USER, doneCode);
 			if(user.getUser_type().equals(USER_TYPE_BAND)){
 				authComponent.sendAuth(user, null, BusiCmdConstants.REFRESH_TERMINAL, doneCode);
 			}else{
+				authComponent.sendAuth(selectedUser, orderList, BusiCmdConstants.DEL_USER, doneCode);
 				authComponent.sendAuth(user, orderList, BusiCmdConstants.CREAT_USER, doneCode);
 			}
 			authComponent.sendAuth(user, orderList, BusiCmdConstants.ACCTIVATE_PROD, doneCode);
