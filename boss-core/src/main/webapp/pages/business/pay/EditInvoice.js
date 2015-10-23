@@ -92,7 +92,7 @@ AutoInvoicePanel = Ext.extend( Ext.Panel, {
 		if(txt.isValid()){
 			Ext.Ajax.request({
 				url:Constant.ROOT_PATH + "/core/x/Pay!checkInvoice.action",
-				async: false,
+//				async: false,
 				params:{
 					invoice_id:txt.getValue(),
 					doc_type:Ext.getCmp('doc_type').getValue(),
@@ -115,14 +115,13 @@ AutoInvoicePanel = Ext.extend( Ext.Panel, {
 						}
 						/*invoiceCode.setValue('');
 						invoiceCode.getStore().loadData(data);*/
-						invoiceCode.setValue(data[0]['invoice_code']);
+						if(data.length > 0)
+							invoiceCode.setValue(data[0]['invoice_code']);
 					}
 				},
 				clearData:function(){
 					txt.setValue("");
-					var invoiceCode = Ext.getCmp('new_invoice_code');
-					invoiceCode.setValue('');
-					invoiceCode.getStore().removeAll();
+					Ext.getCmp('new_invoice_code').setValue('');
 				}
 			});
 		}
