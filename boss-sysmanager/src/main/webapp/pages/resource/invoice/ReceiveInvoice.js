@@ -7,7 +7,7 @@ ReceiveInvoicePanel = Ext.extend(CommonInvoicePanel,{
 	initComponent:function(){
 		ReceiveInvoicePanel.superclass.initComponent.call(this);
 		this.items.itemAt(0).title=lsys('TransferInvoice._title');
-		this.form.insert(0,{columnWidth:1,layout:'form', labelWidth:145,border:false,items:[
+		this.form.insert(0,{columnWidth:1,layout:'form', labelWidth:120,border:false,items:[
 		                        {xtype: 'hidden', name:'transDepotId', value: App.data.optr['dept_id'] },
 	     						{xtype:'combo',fieldLabel:lsys('ReceiveInvoice.optrId'),hiddenName:'optrId',allowBlank: false,
 	     							store:new Ext.data.JsonStore({

@@ -276,16 +276,16 @@ CfeePayWindow = Ext.extend(Ext.Window, {
 		})
 		var lc = langUtils.main("pay.feePayDetail.columns");
 		var columns = [
-					   {header: lc[0], width: 80,sortable:true, dataIndex: 'create_done_code'},
-		               {header: lc[1],sortable:true, dataIndex: 'fee_text'},
+					   {header: lc[0], width: 80,sortable:true, dataIndex: 'create_done_code',renderer:App.qtipValue},
+		               {header: lc[1],sortable:true, dataIndex: 'fee_text',renderer:App.qtipValue},
 		               {header: lc[2], width: 70, sortable:true, dataIndex: 'real_pay',renderer:Ext.util.Format.formatFee},
-					   {header: lc[3], width: 80,sortable:true, dataIndex: 'invoice_id'}
+					   {header: lc[3], width: 80,sortable:true, dataIndex: 'invoice_id',renderer:App.qtipValue}
            ];
 		return CfeePayWindow.superclass.constructor.call(this, {
 			layout:"fit",
 			title: langUtils.main("pay.feePayDetail._title"),
-			width: 500,
-			height: 200,
+			width: 600,
+			height: 300,
 			resizable: false,
 			maximizable: false,
 			closeAction: 'hide',

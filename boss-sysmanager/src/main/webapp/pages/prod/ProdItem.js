@@ -436,17 +436,12 @@ ResProdForm = Ext.extend(Ext.Panel, {
             var store = new Ext.data.JsonStore({
                 fields: ['res_id', 'res_name', 'serverIds', 'currency',
                 {
-//                    name: 'shortName',
-//                    mapping: 'res_name'
-////                    convert: this.shortName
-//                },{
                     name: 'serverName',
                     mapping: 'serverIds',
                     convert: this.shortName
                 }]
             });
             store.loadData(staticdata);
-   
             
             var dataview = new Ext.DataView({
                 store: store,
@@ -509,23 +504,15 @@ ResProdForm = Ext.extend(Ext.Panel, {
         }else{
         	short_filename = filename;
         }
-//        if (ResThis.getChars(short_filename) > 30) {
-//            short_filename = ResThis.sb_substr(short_filename, 0, 12) + ' ... ' + ResThis.sb_substr(short_filename, -4);
-//        }
         return short_filename;
     },
     sb_substr: function (str, startp, endp) {
-        var i = 0;
-        c = 0;
-        unicode = 0;
-        rstr = '';
+        var i = 0,c = 0,unicode = 0,rstr = '';
         var len = str.length;
         var sblen = ResThis.getChars(str);
-
         if (startp < 0) {
             startp = sblen + startp;
         }
-
         if (endp < 1) {
             endp = sblen + endp; // - ((str.charCodeAt(len-1) < 127) ? 1 : 2);   
         }
@@ -541,7 +528,6 @@ ResProdForm = Ext.extend(Ext.Panel, {
                 c += 2;
             }
         }
-
         // 开始取   
         for (i = i; i < len; i++) {
             var unicode = str.charCodeAt(i);
@@ -551,20 +537,14 @@ ResProdForm = Ext.extend(Ext.Panel, {
                 c += 2;
             }
             rstr += str.charAt(i);
-
             if (c >= endp) {
                 break;
             }
         }
-
         return rstr;
     },
     getChars: function (str) {
-        var i = 0;
-        var c = 0.0;
-        var unicode = 0;
-        var len = 0;
-
+        var i = 0,c = 0.0,unicode = 0,len = 0;
         if (str == null || str == "") {
             return 0;
         }
@@ -580,7 +560,94 @@ ResProdForm = Ext.extend(Ext.Panel, {
         return c;
     }
 });
-// 套餐-子产品组件
+ProdList = Ext.extend(Ext.grid.EditorGridPanel,{
+	store:null,
+	prodId:null,
+	constructor:function(v){
+		this.prodId = v;
+		this.store = new Ext.data.JsonStore({
+			url : root + "/system/Prod!querypackageByProdId.action",
+			fields:['package_id','package_group_id','package_group_name','user_type','fee_value','fee_id',
+			'fee_std_id','fee_back']
+		});
+		
+		this.store.load();
+		var cm = new Ext.ux.grid.LockingColumnModel({ 
+			columns : [
+				{header:lmain("cust._form.deviceModel"),dataIndex:'device_model_text',width:250},
+				{header:lbc("common.price"),dataIndex:'fee_value',width:80,renderer:function(v){if(v == "-1"){return "<span style='font-weight:bold'>未配置器材费 </span>"}else{ return Ext.util.Format.formatFee(v)}}},
+				{header:lmain("cust._form.storeCount"),dataIndex:'total_num',width:80,renderer:App.qtipValue},
+				{id:'buy_num_id',header:lmain("cust._form.buyCount"),dataIndex:'buy_num',width:80,
+					scope:this
+					,editor: new Ext.form.NumberField({
+						allowDecimals:false,//不允许输入小数 
+		    			allowNegative:false,
+		    			minValue:1//enableKeyEvents: true,
+					})
+				},
+				{header:lbc("common.total"),dataIndex:'fee_back',width:100}
+			]
+        });
+		cm.isCellEditable = this.cellEditable;
+		ProdList.superclass.constructor.call(this,{
+			id: 'prodPkgForm',
+		    region: 'center',
+		    border: false,
+		    store:this.store,
+			cm:cm,
+			clicksToEdit:1,
+			view: new Ext.ux.grid.ColumnLockBufferView({}),
+			sm:new Ext.grid.RowSelectionModel({})
+		});	
+		},
+		cellEditable:function(colIndex,rowIndex){
+			var record = materalThat.getStore().getAt(rowIndex);//当前编辑行对应record
+//			if(colIndex == this.getIndexById('buy_num_id')){
+//				if(record.get('total_num') == 0 || record.get('fee_value') == "-1"){
+//					return false;
+//				}
+//			}
+			return Ext.grid.ColumnModel.prototype.isCellEditable.call(this, colIndex, rowIndex);
+		},
+		initEvents : function(){
+			MaterialDeviceGrid.superclass.initEvents.call(this);
+			this.on('afterrender',function(){
+				this.swapViews();
+			},this,{delay:10});
+			
+			this.on("afteredit",this.afterEdit,this);
+		},
+		swapViews : function(){
+			if(this.view.lockedWrap){
+				this.view.lockedWrap.dom.style.right = "0px";
+			}
+	        this.view.mainWrap.dom.style.left = "0px"; 
+	        if(this.view.updateLockedWidth){
+	        	this.view.updateLockedWidth = this.view.updateLockedWidth.createSequence(function(){ 
+		            this.view.mainWrap.dom.style.left = "0px"; 
+		        }, this); 
+	        }
+	          
+		},
+		afterEdit : function(obj){
+			var record = obj.record;
+			var fieldName = obj.field;//编辑的column对应的dataIndex
+			var value = obj.value;
+			if(fieldName=='buy_num'){
+//				if(!this.doChickValue(record,value)){
+//					record.set('buy_num', '');
+//					record.set('fee', '');
+//					record.set('fee_back', '');
+//					this.startEditing(obj.row,obj.column);
+//				}
+			}
+		}
+
+
+})
+
+
+/*// 套餐-子产品组件
 ProdList = Ext.extend(Ext.Panel, {
     uprodGrid: null,
     upackGrid: null,
@@ -827,4 +894,4 @@ ProdList = Ext.extend(Ext.Panel, {
             else{ return include==true&&record.get('prod_name').indexOf(value) >= 0;}
     	})
     }
-});
+});*/

@@ -528,15 +528,15 @@ ProdListForm = Ext.extend(Ext.form.FormPanel, {
 		if (Ext.isEmpty(areaId)) {
 			Alert("应用地区未选择");
 			return false;
-		} else if (Ext.isEmpty(servId)) {
+		} else if (this.userType == cfgProdType["P"] && Ext.isEmpty(servId)) {
 			Alert("服务类型未选择");
 			return false;
 		}
-		if (this.userType != cfgProdType["P"]) {
-			var grid = Ext.getCmp('prodPkgForm');
-			grid.uprodStroe.removeAll();
-			// grid.upackStore.removeAll();
-		}
+//		if (this.userType != cfgProdType["P"]) {
+//			var grid = Ext.getCmp('prodPkgForm');
+//			grid.uprodStroe.removeAll();
+////			 grid.upackStore.removeAll();
+//		}
 
 		if (!Ext.isEmpty(areaId)) {
 			Ext.Ajax.request({
@@ -558,9 +558,9 @@ ProdListForm = Ext.extend(Ext.form.FormPanel, {
 													areaId);
 							} else {
 								// 用户客户套餐加载数据，解除适用地区阴影
-								if (Ext.getCmp('prodPkgForm'))
-									Ext.getCmp('prodPkgForm')
-											.showData(res.simpleObj.prodList);
+//								if (Ext.getCmp('prodPkgForm'))
+//									Ext.getCmp('prodPkgForm')
+//											.showData(res.simpleObj.prodList);
 							}
 						}
 					});
@@ -779,7 +779,7 @@ ProdWindow = Ext.extend(Ext.Window, {
 			if (v == cfgProdType["P"]) {
 				this.FORM = this.resProdForm;
 			} else {
-				this.prodList = new ProdList(store);
+				this.prodList = new ProdList(prodId);
 				this.FORM = this.prodList;
 			}
 //		}
@@ -828,7 +828,7 @@ ProdWindow = Ext.extend(Ext.Window, {
 					border : false,
 					items : [{
 								region : 'north',
-								height : 270,
+								height : 250,
 								layout : 'border',
 								items : [this.prodListForm, this.prodCountyTree]
 							}, this.FORM],

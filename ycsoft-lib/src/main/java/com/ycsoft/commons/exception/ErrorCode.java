@@ -30,6 +30,7 @@ public enum ErrorCode {
 	NotCancelIsPackageDetail("订单是套餐子产品，不能独立退订"),
 	NotCancelOnlyTodayIsYou("只能取消当天自己操作的订单"),
 	NotCancelStatusException("订单状态异常，不能退订"),
+	NotCancleTheOrderBefor("请先退订订单号=%s的订单"),
 	
 	UnPayOrderCancelBefor("请先取消订单号=%s的订单费用"),
 	UnPayOrderCancelUnsubscribe("不能取消退订费用"),

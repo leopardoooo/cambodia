@@ -359,13 +359,13 @@ public class OrderService extends BaseBusiService implements IOrderService{
 			//套餐处理
 			for(CProdOrder checkOrder: cProdOrderDao.queryNotExpPackageOrder(cust_id)){
 				if(cancelOrder.getExp_date().before(checkOrder.getExp_date())){
-					throw new ServicesException(ErrorCode.UnPayOrderCancelBefor,checkOrder.getOrder_sn());
+					throw new ServicesException(ErrorCode.NotCancleTheOrderBefor,checkOrder.getOrder_sn());
 				}
 			}
 			//跟单产品在套餐后续订碰撞
 			List<CProdOrder>  orderAfterPakList=cProdOrderDao.querySingleProdOrderAfterPak(cancelOrder.getOrder_sn());
 			if(orderAfterPakList!=null&&orderAfterPakList.size()>0){
-				throw new ServicesException(ErrorCode.UnPayOrderCancelBefor,orderAfterPakList.get(0).getOrder_sn());
+				throw new ServicesException(ErrorCode.NotCancleTheOrderBefor,orderAfterPakList.get(0).getOrder_sn());
 			}
 			
 		}else{
@@ -373,7 +373,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 			for(CProdOrder checkOrder: cProdOrderDao.queryProdOrderDtoByUserId(cancelOrder.getUser_id())){
 				if(prod.getServ_id().equals(SystemConstants.PROD_SERV_ID_BAND)||cancelOrder.getProd_id().equals(checkOrder.getProd_id())){
 					if(cancelOrder.getExp_date().before(checkOrder.getExp_date())){
-						throw new ServicesException(ErrorCode.UnPayOrderCancelBefor,checkOrder.getOrder_sn());
+						throw new ServicesException(ErrorCode.NotCancleTheOrderBefor,checkOrder.getOrder_sn());
 					}
 				}
 			}
