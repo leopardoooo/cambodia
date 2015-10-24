@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import com.ycsoft.beans.core.prod.CProdOrder;
 import com.ycsoft.beans.core.prod.CProdOrderDto;
 import com.ycsoft.beans.core.prod.CProdOrderFollowPay;
+import com.ycsoft.beans.prod.PRes;
 import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.helper.StringHelper;
@@ -403,5 +404,15 @@ public class CProdOrderDao extends BaseEntityDao<CProdOrder> {
 				+" and not exists(select 1 from c_prod_order a "
 						+ " where a.user_id=t.user_id and a.exp_date>=trunc(sysdate))";
 		return this.createQuery(sql).list();				
+	}
+	/**
+	 * 查询产品的boss资源定义pres
+	 * @param prod_id
+	 * @return
+	 * @throws JDBCException 
+	 */
+	public List<PRes> queryPRes(String prod_id) throws JDBCException{
+		String sql="select p.* from p_prod_static_res a,p_res p  where a.res_id=p.res_id and a.prod_id=? ";
+		return this.createQuery(PRes.class, sql, prod_id).list();
 	}
 }

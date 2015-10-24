@@ -27,7 +27,29 @@ public class WTaskUser implements Serializable {
 	private String occ_no;
 	private String pos_no;
 	
+	private String login_name;
+	private String password;
+	private String bandwidth;
 	
+	
+	public String getLogin_name() {
+		return login_name;
+	}
+	public void setLogin_name(String login_name) {
+		this.login_name = login_name;
+	}
+	public String getPassword() {
+		return password;
+	}
+	public void setPassword(String password) {
+		this.password = password;
+	}
+	public String getBandwidth() {
+		return bandwidth;
+	}
+	public void setBandwidth(String bandwidth) {
+		this.bandwidth = bandwidth;
+	}
 	public String getOcc_no() {
 		return occ_no;
 	}
