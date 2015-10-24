@@ -24,9 +24,25 @@ public class TaskBaseInfoDto extends WTaskBaseInfo{
 	private String linkman_name;
 	private String linkman_tel;
 	private String cust_no;
+	private String cust_tel;
 	
 	
 	
+	public String getCust_tel() {
+		if(StringHelper.isNotEmpty(getTel()) && StringHelper.isNotEmpty(getMobile())){
+			cust_tel = getTel()+"*"+getMobile();
+		}else if(StringHelper.isNotEmpty(getTel())){
+			cust_tel = getTel();
+		}else if(StringHelper.isNotEmpty(getTel())){
+			cust_tel = getMobile();
+		}		
+		return cust_tel;
+	}
+
+	public void setCust_tel(String cust_tel) {
+		this.cust_tel = cust_tel;
+	}
+
 	public String getCust_no() {
 		return cust_no;
 	}

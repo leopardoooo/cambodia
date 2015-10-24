@@ -558,6 +558,12 @@ UserTemplate = new Ext.XTemplate(
 			'<td class="label" width=20%>'+ lmain("user.base.protocolDate") +'：</td>',
 			'<td class="input" width=30%>&nbsp;{[fm.dateFormat(values.protocol_date) ||""]}</td>',
 		'</tr>',
+		'<tr height=24>',
+		'<td class="label" width=20%>'+ lmain("user.base.stbId") +'：</td>',
+			'<td class="input" width=30%>&nbsp;{[values.stb_id ||""]}</td>',
+			'<td class="label" width=20%>'+ lmain("user.base.cardMac") +'：</td>',
+			'<td class="input" width=30%>&nbsp;{[values.card_id || values.modem_mac ||""]}</td>',
+		'</tr>',		
 	'</table>'
 );
 UserBroadbandTemplate = new Ext.XTemplate(

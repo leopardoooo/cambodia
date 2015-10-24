@@ -761,5 +761,6 @@ BCLang.msgBox = {
 	noFeeItemCanNotContinue:'Can not continue because no cost item',
 	EditPayFeeAndNumberIsWrong:'This fee is not divisible by the price, the purchase of the number as an integer',
 	SelectOnlyOneData:'Please choose a record',
-	ChooseToPayTheRecord:'Please choose to pay the record'
+	ChooseToPayTheRecord:'Please choose to pay the record',
+	userNotDTT:'Not DTT equipment or equipment does not exist'
 }

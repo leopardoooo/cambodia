@@ -283,7 +283,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 	initWidgets: function(item){
 		this.taskStore = new Ext.data.JsonStore({
 			url: root + '/core/x/Task!queryTasks.action' ,
-			fields:['task_id','cust_no','cust_name','tel','old_addr','new_addr','address','task_type_id',
+			fields:['task_id','cust_no','cust_name','cust_tel','old_addr','new_addr','address','task_type_id',
 					'task_status','task_status_text','task_type_id_text','team_id','team_id_text','bug_type','bug_type_text'
 					,'bug_detail','zte_status','zte_status_text','task_create_time','team_type','linkman_name',
 					'linkman_tel','sync_status','sync_status_text'],
@@ -440,7 +440,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 				{header: taskCols[4],dataIndex: 'zte_status_text', width:90, renderer:Ext.util.Format.statusShow},
 				{header: taskCols[14],dataIndex: 'sync_status_text', width: 110, renderer:Ext.util.Format.statusShow},
 				{header: taskCols[5], dataIndex : 'address', width: 200,renderer:App.qtipValue},
-				{header: taskCols[6], dataIndex : 'tel', 				width: 100, renderer:App.qtipValue},
+				{header: taskCols[6], dataIndex : 'cust_tel', 				width: 100, renderer:App.qtipValue},
 				{header: taskCols[7], dataIndex: 'task_create_time', 	width: 80, renderer: Ext.util.Format.dateFormat},					
 				{header: taskCols[8],dataIndex:'bug_type_text',width:85, renderer:App.qtipValue},
 				{header: taskCols[9],dataIndex:'bug_detail',width:120,renderer:App.qtipValue},
@@ -463,9 +463,9 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 	    });
 	},
 	initEvents: function(){
+		this.grid.on("cellclick",this.doCellClick,this)
 		this.grid.on("rowclick", this.doClickRecord, this );
 //		this.grid.on("celldblclick",this.doCellClick,this)
-		this.grid.on("cellclick",this.doCellClick,this)
 		TaskManagerPanel.superclass.initEvents.call(this);
 	},
 	doCellClick:function(grid, rowIndex, columnIndex, e) {
@@ -477,6 +477,8 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 				this.taskWin = new TaskDetailWindow();
 			}
 			this.taskWin.show(data);
+//	    }else{
+//	    	this.doClickRecord(grid,rowIndex,e);
 	    }
 	},showWin:function(value){
 		var endForm = new Ext.form.FormPanel({

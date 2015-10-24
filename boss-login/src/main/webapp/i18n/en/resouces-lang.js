@@ -86,7 +86,8 @@ ResLang = {
 	'820': ['Modify Develop People', 'Modify Develop People'],
 	'123': ['Super Pay Rollback', 'Super Pay Rollback'],
 	'122': ['Pay Rollback', 'Pay Rollback'],
-	'121': ['New Ticket', 'New Ticket']
+	'121': ['New Ticket', 'New Ticket'],
+	'5002': ['Equipment Recycling', 'Equipment Recycling']
 };
 
 ResSysLang = {

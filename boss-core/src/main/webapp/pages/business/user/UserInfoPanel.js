@@ -20,17 +20,18 @@ UserInfoPanel = Ext.extend(Ext.Panel,{
 				}); 
 				this.userStore.add(App.getApp().main.infoPanel.getUserPanel().userGrid.getSelections());
 				var cm = [
-					{header:'用户类型',dataIndex:'user_type_text',width:60},
-					{header:'机顶盒',dataIndex:'stb_id',	width:100},
+					{header:'用户类型',dataIndex:'user_type_text',width:80},
+					{header:'机顶盒',dataIndex:'stb_id',	width:150},
 					{header:'智能卡',dataIndex:'card_id',width:100},
-					{header:'Modem 号',dataIndex:'modem_mac',	width:100},
-					{header:'停机天数',dataIndex:'status_date',width:100,renderer:Ext.util.Format.DateDiffToday}
+					{header:'Modem 号',dataIndex:'modem_mac',	width:100}
+//					,{header:'停机天数',dataIndex:'status_date',width:100,renderer:Ext.util.Format.DateDiffToday}
 				]				
 				if(users.length>1){//多用户显示表					
 					var UserSelectGrid = new Ext.grid.GridPanel({
-							title : '用户信息',
+//							title : '用户信息',
+							border : false,	
 							store:this.userStore,
-							height : appheight,							
+							height : appheight,	
 							columns: cm
 					});
 					cell_items.push(UserSelectGrid);
@@ -57,6 +58,52 @@ UserInfoPanel = Ext.extend(Ext.Panel,{
 		});
 	}
 });
+
+
+UserInfoBaseForm = Ext.extend(Ext.Panel,{
+	userStore:null,
+	constructor: function(p){			
+				var users = App.getApp().main.infoPanel.getUserPanel().userGrid.getSelections();							
+				var cell_items=[];
+				this.userStore = new Ext.data.JsonStore({
+					root : 'records' ,
+					totalProperty: 'totalProperty',
+					fields: App.userRecord,
+					autoLoad: false
+				}); 
+				this.userStore.add(App.getApp().main.infoPanel.getUserPanel().userGrid.getSelections());
+				var cm = [
+					{header:'用户类型',dataIndex:'user_type_text',width:80},
+					{header:'机顶盒',dataIndex:'stb_id',	width:150},
+					{header:'智能卡',dataIndex:'card_id',width:100},
+					{header:'Modem 号',dataIndex:'modem_mac',	width:100}
+				]				
+				if(users.length>1){//多用户显示表					
+					var UserSelectGrid = new Ext.grid.GridPanel({
+							border : false,	
+							store:this.userStore,
+							columns: cm
+					});
+					cell_items.push(UserSelectGrid);
+				}
+				else{//单用户显示panel
+					var UserDetailTemplate = App.getApp().main.infoPanel.getUserPanel().getUserDetailTemplate();	
+					var UserSelectform = new Ext.Panel({	
+							border : false,	
+							autoScroll:true,
+							bodyStyle : Constant.TAB_STYLE,	
+							html:UserDetailTemplate[users[0].data.user_type].applyTemplate(users[0].data)							
+					});
+					cell_items.push(UserSelectform);						
+				};
+		UserInfoBaseForm.superclass.constructor.call(this,{
+ 					layout:'fit',
+					border : false,					
+					items : cell_items
+		});
+	}
+});
+
 
 //选中产品信息
 SelectedProdGrid = Ext.extend(Ext.grid.GridPanel,{

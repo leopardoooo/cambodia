@@ -98,7 +98,7 @@ TaskBaseTemplate = new Ext.XTemplate(
 		'<td class="label" width=20%>'+ taskCols[5] +'：</td>',
 		'<td class="input" width=30%>&nbsp;{[values.address ||""]}</td>',
 			'<td class="label" width=20%>'+ taskCols[6] +'：</td>',
-			'<td class="input" width=30%>&nbsp;{[values.tel ||""]}</td>',
+			'<td class="input" width=30%>&nbsp;{[values.cust_tel ||""]}</td>',
 		'</tr>',
 		'<tr height=24>',
 			'<td class="label" width=20%>'+ taskCols[7] +'：</td>',

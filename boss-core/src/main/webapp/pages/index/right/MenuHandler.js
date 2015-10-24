@@ -717,6 +717,27 @@ Ext.apply(MenuHandler, {
 
 		return false;
 	},
+	UserDeviceReclaim:function(){
+		if (!hasCust())
+			return false;
+		var userRecords = App.main.infoPanel.getUserPanel().userGrid.getSelections();
+		if (userRecords.length == 0) {
+			Alert(lmsg("needUser"));
+			return false;
+		}
+		var userIds = [];
+		for (i = 0; i < userRecords.length; i++) {
+			if (userRecords[i].get("user_type") != "DTT" || Ext.isEmpty(userRecords[i].get("stb_id"))) {
+				Alert(lmsg("userNotDTT"));
+				return false;
+			}
+		}	
+		return {
+			width: 600,
+			height: 400
+		};	
+	
+	},
 	// 回收设备
 	ReclaimDevice : function() {
 		if (!hasCust())
