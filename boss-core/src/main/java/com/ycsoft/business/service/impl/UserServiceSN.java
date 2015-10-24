@@ -67,6 +67,7 @@ import com.ycsoft.commons.exception.ServicesException;
 import com.ycsoft.commons.helper.CollectionHelper;
 import com.ycsoft.commons.helper.DateHelper;
 import com.ycsoft.commons.helper.StringHelper;
+import com.ycsoft.commons.store.MemoryDict;
 import com.ycsoft.daos.core.JDBCException;
 
 @Service
@@ -277,7 +278,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		TDeviceBuyMode buyModeCfg = busiConfigComponent.queryBuyMode(deviceBuyMode);
 		//处理设备和授权
 		//批量开户不添加设备到c_cust_device
-		if (!user.getUser_type().equals(USER_TYPE_OTT_MOBILE) && getBusiParam().getBusiCode().equals(BusiCodeConstants.USER_OPEN)){
+		if (!user.getUser_type().equals(USER_TYPE_OTT_MOBILE)){
 			String ownership = SystemConstants.OWNERSHIP_GD;
 			if (buyModeCfg!= null && buyModeCfg.getChange_ownship().equals(SystemConstants.BOOLEAN_TRUE))
 				ownership = SystemConstants.OWNERSHIP_CUST;
@@ -318,7 +319,11 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 	}
 	
 	public List<TDeviceChangeReason> queryDeviceChangeReason() throws Exception {
-		return userComponent.queryDeviceChangeReason();
+		List<TDeviceChangeReason> list = userComponent.queryDeviceChangeReason();
+		for(TDeviceChangeReason reason : list){
+			reason.setReason_text( MemoryDict.getTransData(reason.getReason_text()) );
+		}
+		return list;
 	}
 	
 	/**

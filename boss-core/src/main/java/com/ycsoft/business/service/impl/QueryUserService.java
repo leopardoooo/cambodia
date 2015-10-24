@@ -213,9 +213,8 @@ public class QueryUserService extends BaseService implements IQueryUserService {
 
 				ppt = prodComponent.queryTariffById(prodProp.getNew_value());
 				prodProp.setNew_value(ppt.getTariff_name());
-			}else{
-				prodProp.setColumn_name_text( MemoryDict.getTransData(prodProp.getColumn_name_text()) );
 			}
+			prodProp.setColumn_name_text( MemoryDict.getTransData(prodProp.getColumn_name_text()) );
 
 			paramName=prodProp.getParam_name();
 			//若数据字典字段不为空，则查询数据字典值

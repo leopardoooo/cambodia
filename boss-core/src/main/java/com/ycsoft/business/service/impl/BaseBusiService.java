@@ -1851,12 +1851,14 @@ public class BaseBusiService extends BaseService {
 	
 	protected void buyDevice(DeviceDto device,String buyMode,String ownership,FeeInfoDto fee, 
 			String busiCode,CCust cust,Integer doneCode) throws Exception {
-		//增加客户设备
-		custComponent.addDevice(doneCode, cust.getCust_id(),
-				device.getDevice_id(), device.getDevice_type(), device.getDevice_code(), 
-				device.getPairCard() ==null?null:device.getPairCard().getDevice_id(),
-				device.getPairCard() ==null?null:device.getPairCard().getCard_id(), 
-				null, null,buyMode);
+		if(!getBusiParam().getBusiCode().equals(BusiCodeConstants.USER_OPEN_BATCH)){
+			//增加客户设备
+			custComponent.addDevice(doneCode, cust.getCust_id(),
+					device.getDevice_id(), device.getDevice_type(), device.getDevice_code(), 
+					device.getPairCard() ==null?null:device.getPairCard().getDevice_id(),
+					device.getPairCard() ==null?null:device.getPairCard().getCard_id(), 
+					null, null,buyMode);
+		}
 		//保存设备费用
 		if (fee != null && fee.getFee_id()!= null && fee.getFee()>0){
 			String payType = SystemConstants.PAY_TYPE_UNPAY;

@@ -76,6 +76,7 @@ ResLang = {
 	'53': ['Join Units,', 'Added The Unit'],
 	'55': ['Exit Unit', 'Exit Unit'],
 	'124': ['Fees Charged', 'Fees Charged'],
+	'120': ['Sales Equipment', 'Sales Equipment'],
 	
 	'118': ['Address Management', 'Address Management'],
 	'26980': ['Work Order Management', 'Work Order Management'],

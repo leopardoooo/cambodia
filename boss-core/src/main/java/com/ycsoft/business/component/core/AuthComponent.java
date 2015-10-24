@@ -371,7 +371,7 @@ public class AuthComponent extends BaseComponent{
 			params.addProperty(BusiCmdParam.login_name.name(), user.getLogin_name());
 			params.addProperty(BusiCmdParam.band_policy_id.name(), resId);
 			params.addProperty(BusiCmdParam.prod_eff_date.name(),
-						DateHelper.format(DateHelper.today(), DateHelper.FORMAT_TIME_VOD));
+						DateHelper.format(DateHelper.addDate(DateHelper.today(),-1), DateHelper.FORMAT_TIME_VOD));
 			params.addProperty(BusiCmdParam.prod_exp_date.name(), DateHelper.format(expDate, DateHelper.FORMAT_TIME_VOD_END));
 			bandCmd.setDetail_param(params.toString());
 			jBandCommandDao.save(bandCmd);
