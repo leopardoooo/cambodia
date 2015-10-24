@@ -40,7 +40,9 @@ public class TaskServiceJob implements Job2 {
 		String cfonTeamId =null; 
 		try{
 			taskLogList = taskComponent.querySynTaskLog();
-			cfonTeamId=taskComponent.getTeamId(SystemConstants.TEAM_TYPE_CFOCN);
+			if(taskLogList.size()>0){
+				cfonTeamId=taskComponent.getTeamId(SystemConstants.TEAM_TYPE_CFOCN);
+			}
 		}catch(Exception e){
 			e.printStackTrace();
 			logger.error("读取工单同步信息错误"+e.getMessage());

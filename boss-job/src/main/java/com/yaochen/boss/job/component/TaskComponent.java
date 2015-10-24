@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.ycsoft.beans.core.cust.CCust;
+import com.ycsoft.beans.core.prod.CProdOrder;
+import com.ycsoft.beans.prod.PRes;
 import com.ycsoft.beans.system.SBullentionWorkCount;
 import com.ycsoft.beans.system.SBulletinWorktask;
 import com.ycsoft.beans.system.SOptr;
@@ -18,6 +20,7 @@ import com.ycsoft.beans.task.WTeam;
 import com.ycsoft.boss.remoting.cfocn.WorkOrderClient;
 import com.ycsoft.boss.remoting.ott.Result;
 import com.ycsoft.business.dao.core.cust.CCustDao;
+import com.ycsoft.business.dao.core.prod.CProdOrderDao;
 import com.ycsoft.business.dao.system.SBulletinDao;
 import com.ycsoft.business.dao.system.SBulletinWorktaskDao;
 import com.ycsoft.business.dao.system.SOptrDao;
@@ -29,7 +32,6 @@ import com.ycsoft.commons.abstracts.BaseComponent;
 import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.helper.StringHelper;
-import com.ycsoft.daos.core.JDBCException;
 @Component
 public class TaskComponent extends BaseComponent {
 	@Autowired
@@ -48,6 +50,8 @@ public class TaskComponent extends BaseComponent {
 	private SBulletinWorktaskDao sBulletinWorktaskDao;
 	@Autowired
 	private SBulletinDao sBulletinDao;
+	@Autowired
+	private CProdOrderDao cProdOrderDao;
 	
 	//查找需要执行的工单任务
 	public List<WTaskLog> querySynTaskLog() throws Exception{
@@ -121,8 +125,23 @@ public class TaskComponent extends BaseComponent {
 	}
 	
 	public List<WTaskUser> queryTaskUser(String taskId) throws Exception{
-		
-		return wTaskUserDao.queryByTaskId(taskId);
+		List<WTaskUser> taskUserList=wTaskUserDao.queryByTaskId(taskId);
+		for(WTaskUser taskuser:taskUserList){
+			if(SystemConstants.USER_TYPE_BAND.equals(taskuser.getUser_type())){
+				//提取带宽
+				List<CProdOrder> orders=cProdOrderDao.queryNotExpAllOrderByUser(taskuser.getUser_id());
+				if(orders.size()>0){
+					//提取控制字
+					List<PRes> pResList=cProdOrderDao.queryPRes(orders.get(0).getProd_id());
+					for(PRes res:pResList){
+						if(res.getBand_width()!=null&&res.getBand_width()>0){
+							taskuser.setBandwidth(res.getBand_width()+"M");
+						}
+					}
+				}
+			}
+		}
+		return taskUserList;
 	}
 	
 	public TaskCustExtInfo queryCustInfo(String custId)throws Exception{
