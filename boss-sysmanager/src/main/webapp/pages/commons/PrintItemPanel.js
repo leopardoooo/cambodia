@@ -31,7 +31,7 @@ PrintCfgGrid = Ext.extend(Ext.grid.GridPanel,{
 		
 	},
 	loadData:function(store){
-		store.removeAt(terStore.find('item_value','1'));
+		store.removeAt(store.find('item_value','1'));
 	},
 	swapViews : function(){
 		if(this.view.lockedWrap){

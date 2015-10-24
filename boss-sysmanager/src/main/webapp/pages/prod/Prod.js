@@ -995,19 +995,11 @@ ProdWindow = Ext.extend(Ext.Window, {
 					}
 				});
 			} else {
-				this.prodList.upackGrid.stopEditing();
-				var packprod = this.prodList.upackStore;
-
-				var packdata = [];
-				packIds = null;
-				if (packprod.getCount() < 2) {
-					Alert('必须至少选择两个子产品');
-					return false;
+				var packdata = this.prodList.getValues();
+				if(packdata.length == 0){
+					Alert(lsys('msgBox.tipPleaseEditWell'));
+					return;
 				}
-				packprod.each(function(record) {
-							packdata.push(record.data);
-						}, this)
-
 				var packrecords = Ext.encode(packdata);
 				all["packList"] = packrecords;
 				mb = Show();// 显示正在提交

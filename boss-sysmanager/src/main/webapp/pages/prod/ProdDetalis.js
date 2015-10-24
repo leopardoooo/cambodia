@@ -221,53 +221,40 @@ ProdDetalisForm = Ext.extend(Ext.Panel, {
 			NextProdGrid = Ext.extend(Ext.grid.GridPanel, {
 				nextProdStore : null,
 				constructor : function(title, Ndata) {
-					var hiddenvalue;
-					if (v.prod_type == cfgProdType["U"]) {
-						hiddenvalue = true;
-					} else {
-						hiddenvalue = false;
-					}
-					var fields = ['prod.prod_name', 'prod.prod_desc','prod.status_text', 'tariff_name', 
-						'max_prod_count','percent_value','percent','package_tariff_name','type','type_text'];
+					var fields = ['package_id','package_group_id','package_group_name','user_type','max_user_cnt','prod_list',
+			'precent','user_type_text','terminal_type','terminal_type_text','prod_list_text'];
 					var cm = [{
-								header : '子产品',
-								dataIndex : 'prod.prod_name',
-								width : 100,
+								header : '套餐内容组名称',
+								dataIndex : 'package_group_name',
+								width : 150,
 								renderer : App.qtipValue
 							}, {
-								header : '资费名称',
-								dataIndex : 'tariff_name',
-								width : 75,
+								header : '产品内容组',
+								dataIndex : 'prod_list_text',
+								width : 350,
 								renderer : App.qtipValue
 							},{
-								header : '套餐资费名称',
-								dataIndex : 'package_tariff_name',
-								width : 100								
+								header : '用户类型',
+								dataIndex : 'user_type_text',
+								width : 80								
 							},{
-								header : '分成值',
-								dataIndex : 'percent_value',
+								header : '终端类型',
+								dataIndex : 'terminal_type_text',
+								width : 80
+							},{
+								header : '用户数',
+								dataIndex : 'max_user_cnt',
 								width : 70
-							},{
-								header : '分成百分比',
-								dataIndex : 'percent',
-								width : 85
 							}, {
-								header : '最大产品数',
-								dataIndex : 'max_prod_count',
-								hidden : hiddenvalue,
+								header : '权重',
+								dataIndex : 'precent',
 								width : 80
-							}
-							, {
-								header : '分成类型',
-								dataIndex : 'type_text',
-								width : 80
-							}
-							]
+							}]
 					this.nextProdStore = new Ext.data.JsonStore({
 						fields : fields,
 						sortInfo:{
-							field:'type',direction:'DESC',
-							field:'package_tariff_name',direction:'DESC'
+							field:'user_type',direction:'DESC',
+							field:'package_group_id',direction:'DESC'
 						}
 					});
 					var sm = new Ext.grid.CheckboxSelectionModel({singleSelect : true});
@@ -308,7 +295,7 @@ ProdDetalisForm = Ext.extend(Ext.Panel, {
 				var statgrid = new ResFrom("<font style='font-family:微软雅黑;font-size:12'>资源信息</font>",statdata, dyndata);rrr.add(statgrid);
 			}
 			if (!Ext.isEmpty(nextdata)) {
-				var prodform = new NextProdGrid("<font style='font-family:微软雅黑;font-size:12'>子产品信息</font>",nextdata)
+				var prodform = new NextProdGrid("<font style='font-family:微软雅黑;font-size:12'>套餐内容组信息</font>",nextdata)
 				rrr.add(prodform);
 			}
 			ppp.doLayout();

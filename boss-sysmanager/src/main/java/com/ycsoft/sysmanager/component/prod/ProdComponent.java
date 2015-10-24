@@ -73,6 +73,7 @@ import com.ycsoft.commons.constants.FuncCode;
 import com.ycsoft.commons.constants.SysChangeType;
 import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.exception.ComponentException;
+import com.ycsoft.commons.exception.ErrorCode;
 import com.ycsoft.commons.helper.CollectionHelper;
 import com.ycsoft.commons.helper.JsonHelper;
 import com.ycsoft.commons.helper.NumericHelper;
@@ -788,7 +789,7 @@ public class ProdComponent extends BaseComponent {
 	 * @return List<PPackageProd>
 	 */
 	public List<PPackageProd> queryPackProdById(String prodId) throws Exception {
-		List<PPackageProd> pkgProdList = pPackageProdDao.queryPackProdById(prodId);
+		List<PPackageProd> pkgProdList = pPackageProdDao.queryPackProdByProdId(prodId);
 		return changeProd(pkgProdList);
 	}
 	
@@ -834,20 +835,13 @@ public class ProdComponent extends BaseComponent {
 	}
 	
 	public List<PPackageProd> changeProd(List<PPackageProd> list) throws Exception {
-//		for (PPackageProd pkg : list) {
-////			pkg.setProd(pProdDao.findByKey(pkg.getProd_id()));
-////			if (StringHelper.isNotEmpty(pkg.getTariff_id())) {
-////				pkg.setProdTariff(pProdTariffDao.findByKey(pkg.getTariff_id()));
-////				if (pkg.getProdTariff() != null)
-////					pkg.setTariff_name(pkg.getProdTariff().getTariff_name());
-////			}
-//			if (StringHelper.isNotEmpty(pkg.getPackage_tariff_id())) {
-//				PProdTariff pt = pProdTariffDao.findByKey(pkg.getPackage_tariff_id());
-//				if(pt!=null){
-//				//	pkg.setPackage_tariff_name(pt.getTariff_name());
-//				}
-//			}
-//		}
+		for (PPackageProd pkg : list) {
+			if(StringHelper.isNotEmpty(pkg.getProd_list())){
+				List<PProd> pList = pProdDao.findByProdIds(pkg.getProd_list().split(","));
+				String[] prodName = CollectionHelper.converValueToArray(pList, "prod_name");
+				pkg.setProd_list_text(StringHelper.join(prodName, ","));
+			}
+		}
 		return list;
 	}
 
@@ -1029,9 +1023,19 @@ public class ProdComponent extends BaseComponent {
 			Type type = new TypeToken<List<ProdCountyResDto>>() {}.getType();
 			List<ProdCountyResDto> res = JsonHelper.gson.fromJson(statList,type);
 			prodCountyResDtoList = res;
-			
 			// 静态资源，原先存在的，修改后取消，进行删除操作，，原先不存在的进行保存
 			if (prodCountyResDtoList.size() > 0) {
+				if(SystemConstants.USER_TYPE_OTT_MOBILE.equals(theOldProd.getServ_id())){
+					Map<String, List<ProdCountyResDto>> map = CollectionHelper.converToMap(prodCountyResDtoList, "county_id");
+					Iterator it = map.keySet().iterator();
+					while(it.hasNext()){
+						String key = (String) it.next();
+						List<ProdCountyResDto> value = map.get(key);
+						if(value.size()>1){
+							throw new ComponentException(ErrorCode.OttMobileNotHaveMoreRes);
+						}
+					}
+				}
 				PProdResChange change = new PProdResChange();
 				PProdStaticRes sRes = null;
 				PProdCountyRes cRes = null;
@@ -1238,6 +1242,20 @@ public class ProdComponent extends BaseComponent {
 			Type type = new TypeToken<List<PProdCountyRes>>() {
 			}.getType();
 			List<PProdCountyRes> res = JsonHelper.gson.fromJson(statList, type);
+			if(res.size()>0){
+				if(SystemConstants.USER_TYPE_OTT_MOBILE.equals(prod.getServ_id())){
+					Map<String, List<PProdCountyRes>> map = CollectionHelper.converToMap(res, "county_id");
+					Iterator it = map.keySet().iterator();
+					while(it.hasNext()){
+						String key = (String) it.next();
+						List<PProdCountyRes> value = map.get(key);
+						if(value.size()>1){
+							throw new ComponentException(ErrorCode.OttMobileNotHaveMoreRes);
+						}
+					}
+				}
+			}
+			
 			for (PProdCountyRes dto : res) {
 				PProdCountyRes resdto = new PProdCountyRes();
 				PProdStaticRes staticres = new PProdStaticRes();
@@ -1325,10 +1343,10 @@ public class ProdComponent extends BaseComponent {
 		if (prodDto.getPackList().size() > 0) {
 			List<PPackageProd> pkList = new ArrayList<PPackageProd>();
 			for(PPackageProd pk :prodDto.getPackList()){
-				PPackageProd pack = new PPackageProd();
-				pack.setPackage_id(prodDto.getProd_id());
-//				pack.setProd_id(pk.getProd_id());
-				pkList.add(pack);
+				checkProd(pk);
+				pk.setPackage_id(prodDto.getProd_id());
+				pk.setPackage_group_id(pPackageProdDao.findSequence().toString());
+				pkList.add(pk);
 			}
 			pPackageProdDao.save(pkList.toArray(new PPackageProd[pkList.size()]));
 		}
@@ -1337,6 +1355,27 @@ public class ProdComponent extends BaseComponent {
 		saveOperateLog(FuncCode.CREATE_PROD.toString(), prod.getProd_id(),prod.getProd_name(), WebOptr.getOptr());
 		sSysChangeDao.save(changes.toArray(new SSysChange[changes.size()]));
 		return prod;
+	}
+
+	private void checkProd(PPackageProd pk) throws Exception{
+		if(pk.getMax_user_cnt()<1){
+			throw new ComponentException(ErrorCode.ProdPackMaxUserCntIsError);
+		}else if(StringHelper.isEmpty(pk.getPackage_group_name())){
+			throw new ComponentException(ErrorCode.ProdPackGroupNameIsError);
+		}else if(StringHelper.isEmpty(pk.getProd_list())){
+			throw new ComponentException(ErrorCode.ProdPackProdListIsError);
+		}
+		//产品组需要按prodid 顺序排列
+		String[] prodIds = pk.getProd_list().split(",");
+		List<PProd> list = pProdDao.queryPackProdList(prodIds);
+		if(prodIds.length != list.size()){
+			throw new ComponentException(ErrorCode.ProdNotExists);
+		}
+		String[] prodIdList = CollectionHelper.converValueToArray(list, "prod_id");
+		if(prodIdList.length>0){
+			String prodList = StringHelper.join(prodIdList, ",");
+			pk.setProd_list(prodList);
+		}
 	}
 
 	/** 
@@ -1364,49 +1403,27 @@ public class ProdComponent extends BaseComponent {
 		//保存产品适用地区
 		saveProdCountyId(prod.getProd_id(), prodCountyIds);
 		
-		List<String> aList = new ArrayList<String>();
-		List<Object[]> oldPkgList = new ArrayList<Object[]>();
 		List<PPackageProd> pkList = new ArrayList<PPackageProd>();
 		if (prodDto.getPackList().size() > 0) {
-			List<PPackageProd> odlpackList = pPackageProdDao.queryPkgProdById(prodDto.getProd_id());
-			// 传入的数据与原来的数据一致，将不更新
-			for (int i = prodDto.getPackList().size() - 1; i >= 0; i--) {
-				if (!"null".equals(odlpackList) && odlpackList != null) {
-					boolean ck = false;
-					for (int k = odlpackList.size() - 1; k >= 0; k--) {
-//						if (prodDto.getPackList().get(i).getProd_id().equals(odlpackList.get(k).getProd_id())){
-//								odlpackList.remove(k);
-//								ck = true;
-//							}
-					}
-					if (ck) {
-						prodDto.getPackList().remove(i);
-					}
-				}
-			}
-			for(PPackageProd pk :odlpackList){
-//				aList.add(pk.getProd_id());
-				aList.add(prodDto.getProd_id());
-				oldPkgList.add(aList.toArray(new String[aList.size()]));
-				aList.clear();
-			}
 			for(PPackageProd pk :prodDto.getPackList()){
-				PPackageProd pack = new PPackageProd();
-				pack.setPackage_id(prodDto.getProd_id());
-//				pack.setProd_id(pk.getProd_id());
-				pkList.add(pack);
+				checkProd(pk);
+				pk.setPackage_id(prodDto.getProd_id());
+				if(StringHelper.isEmpty(pk.getPackage_group_id())){
+					pk.setPackage_group_id(pPackageProdDao.findSequence().toString());
+				}
+				pkList.add(pk);
 			}
-			
+			pPackageProdDao.deletePackById(prod.getProd_id());
+			// 保存新传入的数据
+			pPackageProdDao.save(pkList.toArray(new PPackageProd[pkList.size()]));
 		}
-		pPackageProdDao.deletePack(oldPkgList);
-		// 保存新传入的数据
-		pPackageProdDao.save(pkList.toArray(new PPackageProd[pkList.size()]));
-		if(oldPkgList.size()>0||pkList.size()>0){
-			List<ProdTariffDto> tarifflist = pProdTariffDao.queryTariffByProd(prod.getProd_id());
-			for (ProdTariffDto dto : tarifflist) {
-				deleteTariffById(dto.getTariff_id());
-			}
-		}
+
+//		if(pkList.size()>0){
+//			List<ProdTariffDto> tarifflist = pProdTariffDao.queryTariffByProd(prod.getProd_id());
+//			for (ProdTariffDto dto : tarifflist) {
+//				deleteTariffById(dto.getTariff_id());
+//			}
+//		}
 		//保存操作记录
 		saveOperateLog(FuncCode.MODIFY_PROD.toString(), prod.getProd_id(), prod.getProd_name(), WebOptr.getOptr());
 		
@@ -1627,9 +1644,9 @@ public class ProdComponent extends BaseComponent {
 				value = 0;
 			}
 			
-			pPackageProdDao.deletePackById(tariff.getProd_id(),tariff.getTariff_id());
-			pPackageProdDao.save(PacksList.toArray(new PPackageProd[PacksList.size()]));
-			pPackageProdHisDao.save(PacksList.toArray(new PPackageProdHis[PacksList.size()]));
+//			pPackageProdDao.deletePackById(tariff.getProd_id(),tariff.getTariff_id());
+//			pPackageProdDao.save(PacksList.toArray(new PPackageProd[PacksList.size()]));
+//			pPackageProdHisDao.save(PacksList.toArray(new PPackageProdHis[PacksList.size()]));
 		}
 		if(changes.size()>0){
 			sSysChangeDao.save(changes.toArray(new SSysChange[changes.size()]));

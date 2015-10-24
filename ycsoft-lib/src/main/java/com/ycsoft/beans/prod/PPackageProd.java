@@ -13,7 +13,7 @@ import com.ycsoft.daos.config.POJO;
 /**
  * PPackageProd -> P_PACKAGE_PROD mapping
  */
-@POJO(tn = "P_PACKAGE_PROD", sn = "", pk = "PACKAGE_GROUP_ID")
+@POJO(tn = "P_PACKAGE_PROD", sn = "SEQ_PACKAGE_GROUP_ID", pk = "PACKAGE_GROUP_ID")
 public class PPackageProd implements Serializable {
 
 	// PPackageProd all properties
@@ -34,9 +34,18 @@ public class PPackageProd implements Serializable {
 	private String prod_type;
 	private String user_type_text;
 	private String terminal_type_text;
+	private String prod_list_text;
 
 	
 	
+	public String getProd_list_text() {
+		return prod_list_text;
+	}
+
+	public void setProd_list_text(String prod_list_text) {
+		this.prod_list_text = prod_list_text;
+	}
+
 	public String getUser_type_text() {
 		return user_type_text;
 	}

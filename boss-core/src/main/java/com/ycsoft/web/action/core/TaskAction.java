@@ -113,6 +113,12 @@ public class TaskAction extends BaseBusiAction{
 		getRoot().setOthers(snTaskService.queryTaskDetail(task_id));
 		return JSON_OTHER;
 	}
+	public String queryAllTaskDetail() throws Exception{
+		getRoot().setOthers(snTaskService.queryAllTaskDetail(task_id));
+		return JSON_OTHER;
+	}
+	
+	
 	
 	public String queryTaskDevice()  throws Exception{
 		getRoot().setRecords(snTaskService.queryTaskDevice(task_id));

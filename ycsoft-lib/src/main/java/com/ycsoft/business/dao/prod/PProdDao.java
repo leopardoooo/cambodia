@@ -301,7 +301,7 @@ public class PProdDao extends BaseEntityDao<PProd> {
 	 * @throws JDBCException
 	 */
 	public List<PProd> findByProdIds(String[] prodIds) throws JDBCException {
-		String sql = "select * from p_prod where "+getSqlGenerator().setWhereInArray("prod_id",prodIds)+" ";
+		String sql = "select * from p_prod where "+getSqlGenerator().setWhereInArray("prod_id",prodIds)+" order by prod_id";
 		return createQuery(sql).list();
 	}
 	
@@ -390,6 +390,11 @@ public class PProdDao extends BaseEntityDao<PProd> {
 			}
 		}
 		return prodBandWidthMap;
+	}
+
+	public List<PProd> queryPackProdList(String[] prodIds) throws JDBCException{
+		String sql = "select * from p_prod t where "+getSqlGenerator().setWhereInArray("t.prod_id",prodIds)+" and t.status = ? order by t.prod_id ";
+		return this.createQuery(sql,StatusConstants.ACTIVE).list();
 	}
 	
 }

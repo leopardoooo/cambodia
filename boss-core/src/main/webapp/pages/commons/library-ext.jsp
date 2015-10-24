@@ -63,6 +63,8 @@ String _lang = session.getAttribute(Environment.USER_IN_SESSION_LANG).toString()
 <script type="text/javascript" src="<%=boss_res %>/pages/commons/ux/DistrictTreeCombo.js" charset="UTF-8"></script>
 <script type="text/javascript" src="<%=r %>/pages/business/user/UserBaseInfo.js"></script>
 <script type="text/javascript" src="<%=r %>/pages/business/user/UserInfoPanel.js"></script>
+<script type="text/javascript" src="<%=r %>/pages/business/cust/TaskBaseForm.js"></script>
+
 <script type="text/javascript" src="<%=boss_res %>/pages/commons/ux/MonthPickerPlugin.js" charset="UTF-8"></script>
 <script type="text/javascript" src="<%=boss_res %>/pages/commons/ux/lovcombo.js" charset="UTF-8"></script>
 <body>

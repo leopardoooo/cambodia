@@ -17,26 +17,17 @@ public class TaskUserDto extends WTaskUser{
 	private String password;
 	private String user_name;
 	private String device_code;	
-	private String occNo;
-	private String posNo;
+	private String prodname;
 	
 	
 
 	
-	public String getOccNo() {
-		return occNo;
+	public String getProdname() {
+		return prodname;
 	}
 
-	public void setOccNo(String occNo) {
-		this.occNo = occNo;
-	}
-
-	public String getPosNo() {
-		return posNo;
-	}
-
-	public void setPosNo(String posNo) {
-		this.posNo = posNo;
+	public void setProdname(String prodname) {
+		this.prodname = prodname;
 	}
 
 	public String getDevice_code() {

@@ -1,70 +1,4 @@
 /**工单管理*/
-UserDetailGrid = Ext.extend(Ext.grid.GridPanel, {
-	userDetailStore : null,
-	constructor : function() {
-		this.userDetailStore = new Ext.data.JsonStore({
-					fields : ['user_type', 'user_type_text','user_name', 'device_model','device_model_text','task_id',
-							'device_code', 'password','device_id','band','posNo','occNo']
-				});
-		var userCols = lbc('home.tools.TaskManager.userCols');
-		UserDetailGrid.superclass.constructor.call(this, {
-			ds : this.userDetailStore,
-			border: false,
-			sm : new Ext.grid.CheckboxSelectionModel(),
-			cm : new Ext.grid.ColumnModel([{
-						header : userCols[0],dataIndex : 'user_type_text',width : 80,renderer : App.qtipValue}, {
-						header : userCols[1],dataIndex : 'user_name',width : 180,renderer : App.qtipValue}, {
-						header : userCols[3],dataIndex : 'device_model_text',width : 200,renderer : App.qtipValue}, {
-						header : userCols[4],dataIndex : 'device_id',width : 120,renderer : App.qtipValue}, {
-						header : userCols[6],dataIndex : 'occNo',width : 100,renderer : App.qtipValue}, {
-						header : userCols[5],dataIndex : 'posNo',width : 100,renderer : App.qtipValue}, {
-						header : userCols[7],dataIndex : 'band',width: 80,renderer : App.qtipValue}])
-		})
-	}
-})
-
-TaskDetailGrid = Ext.extend(Ext.grid.GridPanel, {
-	taskDetailStore : null,
-	constructor : function() {
-		this.taskDetailStore = new Ext.data.JsonStore({
-					fields : ['busi_code', 'busi_name', 'optr_id','optr_name','log_time',
-							'syn_status','error_remark','syn_status_text','delay_time','log_detail']});
-		var operateCols = lbc('home.tools.TaskManager.operateCols');							
-		TaskDetailGrid.superclass.constructor.call(this, {
-			ds : this.taskDetailStore,
-			sm : new Ext.grid.CheckboxSelectionModel(),
-			border: false,
-			cm : new Ext.grid.ColumnModel([{
-				header : operateCols[0],dataIndex : 'log_time',width : 130}, {
-				header : operateCols[1],dataIndex : 'busi_name',width:150,renderer : App.qtipValue}, {
-				header : operateCols[2],dataIndex : 'optr_name',width:80,renderer : App.qtipValue}, {
-				header : operateCols[3],dataIndex : 'syn_status_text',width:80,renderer : App.qtipValue}, {
-				header : operateCols[5],dataIndex : 'delay_time',width:80},
-				{header : operateCols[4],dataIndex : 'log_detail',width:430,renderer :  App.qtipValue}
-			])
-		})               
-	}                    
-})
-
-TaskAllInfo = Ext.extend(Ext.TabPanel,{
-	panel : null,
-	userGrid : null,
-	detail : null,
-	constructor : function() {
-		this.userGrid = new UserDetailGrid();
-		this.detail = new TaskDetailGrid();
-		TaskAllInfo.superclass.constructor.call(this, {
-				border : false,
-				activeTab: 0,
-				closable : true,
-				defaults : {border: false,layout : 'fit'},
-				items:[{title : lbc('home.tools.TaskManager._operateTitle'),items:[this.detail]},
-				{title : lbc('home.tools.TaskManager._userTitle'),items:[this.userGrid]
-				}]
-		})
-	}
-})
-
 var TaskDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 	taskDeviceGridStore:null,
 	taskTypeId:null,
@@ -72,7 +6,7 @@ var TaskDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 		this.taskDeviceGridStore = new Ext.data.JsonStore({
 			url: root + '/core/x/Task!queryTaskDevice.action' ,
 			fields:['device_id','device_type','device_type_text','device_model','device_model_text','user_id',
-				'device_code','user_type', 'user_type_text','user_name','task_id','occNo','posNo','recycle_result'
+				'device_code','user_type', 'user_type_text','user_name','task_id','occ_no','pos_no','recycle_result'
 				,'recycle_result_text']
 		});
 		var taskId = rs.get('task_id');
@@ -94,8 +28,8 @@ var TaskDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 			nextColums = [{header:cols[4],dataIndex:'recycle_result_text',width:80,editor:this.resultCombo}]; 
 		}else{
 			nextColums = [{header:cols[3],dataIndex:'device_code',width:130,editor:new Ext.form.TextField({vtype:'alphanum'})},
-						{header:'OccNo',dataIndex:'occNo',width:80,editor:new Ext.form.TextField({vtype:'alphanum'})},
-						{header:'PosNo',dataIndex:'posNo',width:80,editor:new Ext.form.TextField({vtype:'alphanum'})}]
+						{header:'OccNo',dataIndex:'occ_no',width:80,editor:new Ext.form.TextField({vtype:'alphanum'})},
+						{header:'PosNo',dataIndex:'pos_no',width:80,editor:new Ext.form.TextField({vtype:'alphanum'})}]
 		}
 		columns  = baseColumns.concat(nextColums)
 		
@@ -112,7 +46,7 @@ var TaskDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 			}
 		});
 		},beforeEdit: function(obj){
-			if(obj.field == 'occNo' || obj.field == 'posNo'){
+			if(obj.field == 'occ_no' || obj.field == 'pos_no'){
 				var value = obj.record.get('user_type');
 				if(value !='BAND'){return false;}
 			}
@@ -137,8 +71,8 @@ var TaskDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 				values["oldDeviceCode"] = record.get('device_id');
 				values["deviceModel"] =record.get('device_model');
 				values["deviceCode"] = record.get('device_code');
-				values["posNo"] = record.get('posNo');
-				values["occNo"] = record.get('occNo');
+				values["posNo"] = record.get('pos_no');
+				values["occNo"] = record.get('occ_no');
 				values["fcPort"] = false;
 				if(record.get('user_type') == 'BAND'){
 					values["fcPort"] = true;
@@ -472,11 +406,19 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
     	// create the Grid
     	var sm = new Ext.grid.RowSelectionModel();
     	var taskCols = lbc('home.tools.TaskManager.taskCols');
+    	TaskThis = this;
 	    this.grid = new Ext.grid.GridPanel({
 	        store: this.taskStore,
 	        cm: new Ext.ux.grid.LockingColumnModel({
 	        	columns:[
-				{header: taskCols[10],dataIndex : 'task_id', width: 70, renderer:App.qtipValue},
+				{header: taskCols[10],dataIndex : 'task_id', width: 70, renderer:function(value,metaData,record){
+					that = this;
+					if(value != ''){
+						return '<div style="text-decoration:underline;font-weight:bold"    ext:qtitle="" ext:qtip="' + value + '">' + value +'</div>';
+					}else{
+						return '<div ext:qtitle="" ext:qtip="' + value + '">' + value +'</div>';
+					}
+				}},
 				{header: taskCols[0],		dataIndex : 'task_type_id_text', 	width: 120, renderer: function(v, m ,rs){
 					return '<div  style="font-weight: bold" ext:qtitle="" ext:qtip="' + v + '">' + v +'</div>';
 				}},
@@ -522,7 +464,50 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 	},
 	initEvents: function(){
 		this.grid.on("rowclick", this.doClickRecord, this );
+//		this.grid.on("celldblclick",this.doCellClick,this)
+		this.grid.on("cellclick",this.doCellClick,this)
 		TaskManagerPanel.superclass.initEvents.call(this);
+	},
+	doCellClick:function(grid, rowIndex, columnIndex, e) {
+	    var record = grid.getStore().getAt(rowIndex);  // 返回Record对象 Get the Record
+	    var fieldName = grid.getColumnModel().getDataIndex(columnIndex); // 返回字段名称 Get field name
+	    if(fieldName == 'task_id'){
+		    var data = record.get(fieldName);
+		    if(!this.taskWin){
+				this.taskWin = new TaskDetailWindow();
+			}
+			this.taskWin.show(data);
+	    }
+	},showWin:function(value){
+		var endForm = new Ext.form.FormPanel({
+			layout : 'form',
+			border : false,
+			labelWidth :20,
+			bodyStyle : 'padding : 5px;padding-top : 10px;',
+			items: [{
+				name:'detail_remark',
+				height : 250,
+				width : 460,
+				value:value,
+				xtype:'textarea'
+			}]
+		});
+		var win = new Ext.Window({
+			width: 550,
+			height: 350,
+			title: '明细',
+			border: false,
+			closeAction:'close',
+			layout: 'fit',
+			items: endForm,
+			buttons: [{
+				text: lbc('common.cancel'),
+				handler: function(){
+					win.hide();
+				}
+			}]
+		});
+		win.show();
 	},
 	doClickRecord:function(g, i, e){
 		//选中一条时才显示
@@ -536,8 +521,9 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 			params : {task_id : taskId},
 			success : function(res,opt){
 				var rs = Ext.decode(res.responseText);
-				this.taskAllInfo.userGrid.getStore().loadData(rs.taskUserList);
-				this.taskAllInfo.detail.getStore().loadData(rs.taskLogList);
+				this.taskAllInfo.loadBaseData(rs);
+//				userGrid.getStore().loadData(rs.taskUserList);
+//				this.taskAllInfo.detail.getStore().loadData(rs.taskLogList);
 			}
 		});
 	},

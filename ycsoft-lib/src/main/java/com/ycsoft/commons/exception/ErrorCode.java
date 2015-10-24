@@ -159,7 +159,11 @@ public enum ErrorCode {
 	GDDEviceNotOff("supernet产权的设备不能销户，请先拆机或购买设备!"),
 	UserStatusNotOff("用户状态为正常并且设备购买方式为购买，或者用户状态为拆机完成才能销户!"),
 	InvoiceNotUse("收据未使用或已作废"),
-	InvoiceTemplateDeptIsNull("模板缺失收据核销仓库配置，请联系管理员")
+	InvoiceTemplateDeptIsNull("模板缺失收据核销仓库配置，请联系管理员"),
+	OttMobileNotHaveMoreRes("OTT_MOBILE产品资源只能是1个"),
+	ProdPackMaxUserCntIsError("套餐产品的用户数必须大于等于1"),
+	ProdPackGroupNameIsError("产品内容组名称不能为空"),
+	ProdPackProdListIsError("产品内容组不能为空")
 	;
 	
 	

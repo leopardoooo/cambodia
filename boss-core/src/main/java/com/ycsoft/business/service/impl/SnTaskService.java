@@ -13,9 +13,9 @@ import com.ycsoft.beans.config.TDeviceBuyMode;
 import com.ycsoft.beans.core.cust.CCust;
 import com.ycsoft.beans.core.prod.CProdOrder;
 import com.ycsoft.beans.core.prod.CProdOrderDto;
-import com.ycsoft.beans.core.prod.CProdPropChange;
 import com.ycsoft.beans.core.user.CUser;
 import com.ycsoft.beans.core.user.CUserPropChange;
+import com.ycsoft.beans.prod.PProd;
 import com.ycsoft.beans.task.TaskFillDevice;
 import com.ycsoft.beans.task.WTaskBaseInfo;
 import com.ycsoft.beans.task.WTaskLog;
@@ -28,6 +28,7 @@ import com.ycsoft.business.component.task.SnTaskComponent;
 import com.ycsoft.business.dao.core.cust.CCustDao;
 import com.ycsoft.business.dao.core.prod.CProdOrderDao;
 import com.ycsoft.business.dao.core.user.CUserDao;
+import com.ycsoft.business.dao.prod.PProdDao;
 import com.ycsoft.business.dao.task.WTaskBaseInfoDao;
 import com.ycsoft.business.dao.task.WTaskLogDao;
 import com.ycsoft.business.dao.task.WTaskUserDao;
@@ -35,7 +36,6 @@ import com.ycsoft.business.dao.task.WTeamDao;
 import com.ycsoft.business.dto.config.TaskBaseInfoDto;
 import com.ycsoft.business.dto.config.TaskUserDto;
 import com.ycsoft.business.dto.core.cust.CustFullInfoDto;
-import com.ycsoft.business.dto.core.print.PrintItemDto;
 import com.ycsoft.business.dto.device.DeviceDto;
 import com.ycsoft.business.service.ISnTaskService;
 import com.ycsoft.commons.constants.BusiCmdConstants;
@@ -71,8 +71,8 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 	private WTeamDao wTeamDao;
 	@Autowired
 	private CCustDao cCustDao;
-	
-	
+	@Autowired
+	private PProdDao pProdDao;
 	
 	@Override
 	public void createBugTask(String custId, String bugDetail) throws Exception {
@@ -499,6 +499,13 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 		return wTaskBaseInfoDao.queryUnProcessTask(snTaskComponent.getTeamId(SystemConstants.TASK_ASSIGN_SUPPERNET),start, limit);
 	}
 
+	public Map<String , Object> queryAllTaskDetail(String task_id)throws Exception{
+		Map<String , Object> map = new HashMap<String, Object>();
+		map = queryTaskDetail(task_id);
+		map.put("taskBaseInfo", wTaskBaseInfoDao.findTaskDetailByTaskId(task_id));	
+		return map;
+	}
+	
 	
 	public Map<String , Object> queryTaskDetail(String task_id)throws Exception{
 		Map<String , Object> map = new HashMap<String, Object>();
@@ -515,8 +522,21 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 					throw new ServicesException("用户不存在");
 				}
 				task.setUser_name( taskComponent.getFillUserName(user) );
-				task.setOccNo(user.getStr7());
-				task.setPosNo(user.getStr8());
+				task.setPassword(user.getPassword());
+				task.setOcc_no(user.getStr7());
+				task.setPos_no(user.getStr8());
+				//提取产品名称
+				List<CProdOrder> orders=cProdOrderDao.queryNotExpAllOrderByUser(user.getUser_id());
+				if(orders.size()>0){
+					String prodId=orders.get(0).getProd_id();
+					if(StringHelper.isNotEmpty(orders.get(0).getPackage_id())){
+						prodId=orders.get(0).getPackage_id();
+					}
+					PProd prod=pProdDao.findByKey(prodId);
+					if(prod!=null){
+						task.setProdname(prod.getProd_name());
+					}
+				}
 				if(!user.getUser_type().equals(SystemConstants.USER_TYPE_OTT_MOBILE)){
 					if(StringHelper.isEmpty(user.getDevice_model()) && StringHelper.isNotEmpty(user.getStr3())){
 						user.setDevice_model(user.getStr3());
@@ -571,8 +591,8 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 					task.setDevice_id(null);
 				}
 			}
-			task.setOccNo(user.getStr7());
-			task.setPosNo(user.getStr8());
+			task.setOcc_no(user.getStr7());
+			task.setPos_no(user.getStr8());
 			if(!user.getUser_type().equals(SystemConstants.USER_TYPE_OTT_MOBILE)){
 				if(StringHelper.isEmpty(user.getDevice_model()) && StringHelper.isNotEmpty(user.getStr3())){
 					user.setDevice_model(user.getStr3());

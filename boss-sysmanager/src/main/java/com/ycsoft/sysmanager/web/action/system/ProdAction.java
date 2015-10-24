@@ -299,17 +299,17 @@ import com.ycsoft.sysmanager.dto.prod.ProdDto;
 	 */
 	public String savePack() throws Exception {
 		ProdDto proddto = new ProdDto();
-		List<PPackageProd> PacksList = new ArrayList<PPackageProd>();
+//		List<PPackageProd> PacksList = new ArrayList<PPackageProd>();
 		BeanUtils.copyProperties(prodDto, proddto);
 		if(StringHelper.isNotEmpty(packList)){
 			Type type = new TypeToken<List<PPackageProd>>(){}.getType();
 			List<PPackageProd> pack = JsonHelper.gson.fromJson(packList, type);
-				for (PPackageProd dto:pack){
-					PPackageProd packdto = new PPackageProd();
-//					packdto.setProd_id(dto.getProd_id());
-					PacksList.add(packdto);
-				}
-			proddto.setPackList(PacksList);
+//				for (PPackageProd dto:pack){
+//					PPackageProd packdto = new PPackageProd();
+////					packdto.setProd_id(dto.getProd_id());
+//					PacksList.add(packdto);
+//				}
+			proddto.setPackList(pack);
 		}
 		
 		proddto.setStatus(StatusConstants.ACTIVE);

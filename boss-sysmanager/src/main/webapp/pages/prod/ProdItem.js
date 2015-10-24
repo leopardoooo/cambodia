@@ -563,59 +563,113 @@ ResProdForm = Ext.extend(Ext.Panel, {
 ProdList = Ext.extend(Ext.grid.EditorGridPanel,{
 	store:null,
 	prodId:null,
+	prodComb:null,
+	userTypeComb:null,
+	terminalComb:null,
 	constructor:function(v){
 		this.prodId = v;
 		this.store = new Ext.data.JsonStore({
 			url : root + "/system/Prod!querypackageByProdId.action",
-			fields:['package_id','package_group_id','package_group_name','user_type','fee_value','fee_id',
-			'fee_std_id','fee_back']
+			fields:['package_id','package_group_id','package_group_name','user_type','max_user_cnt','prod_list',
+			'precent','user_type_text','terminal_type','terminal_type_text','prod_list_text']
 		});
 		
-		this.store.load();
+//		this.store.load();
+		
+		this.userTypeComb = new Ext.ux.ParamCombo({
+			paramName:'USER_TYPE',
+			isFilter:false,
+			listWidth:200
+		});
+		this.terminalComb = new Ext.ux.ParamCombo({
+			paramName:'TERMINAL_TYPE',
+			isFilter:false,
+			allowBlankItem:true,
+			listWidth:200
+		});
+		this.prodComb = new Ext.ux.ParamLovCombo({
+			paramName:'PROD_BASE',
+			isFilter:false,
+			listWidth:350
+		});
+		App.form.initComboData([this.userTypeComb,this.terminalComb,this.prodComb]);
+		var paramComboRender = function(value){
+			if(!Ext.isEmpty(value)){
+				if(value.indexOf(',') == -1){
+					var index = this.find('item_value',value);
+					var record = this.getAt(index);
+					if(!Ext.isEmpty(record)){
+						return record.get('item_name');
+					}
+				}else{
+					var countyIds = value.split(','), county_text = '';
+					Ext.each(countyIds,function(c){
+						var index = this.find('item_value',c);
+						var record = this.getAt(index);
+						county_text += record.get('item_name')+',';
+					},this);
+					
+					county_text = county_text.substring(0,county_text.lastIndexOf(','));
+					return '<div ext:qtitle="" ext:qtip="' + county_text + '">' + county_text +'</div>';
+				}
+			}
+			return '';
+		}
 		var cm = new Ext.ux.grid.LockingColumnModel({ 
 			columns : [
-				{header:lmain("cust._form.deviceModel"),dataIndex:'device_model_text',width:250},
-				{header:lbc("common.price"),dataIndex:'fee_value',width:80,renderer:function(v){if(v == "-1"){return "<span style='font-weight:bold'>未配置器材费 </span>"}else{ return Ext.util.Format.formatFee(v)}}},
-				{header:lmain("cust._form.storeCount"),dataIndex:'total_num',width:80,renderer:App.qtipValue},
-				{id:'buy_num_id',header:lmain("cust._form.buyCount"),dataIndex:'buy_num',width:80,
-					scope:this
-					,editor: new Ext.form.NumberField({
-						allowDecimals:false,//不允许输入小数 
-		    			allowNegative:false,
-		    			minValue:1//enableKeyEvents: true,
-					})
+				{header:'套餐内容组ID',dataIndex:'package_group_id',hidden:true},
+				{header:'套餐内容组名称',dataIndex:'package_group_name',width:200,editor:new Ext.form.TextField({})},
+				{header:'产品内容组',dataIndex:'prod_list',width:250,editor :this.prodComb,
+					renderer:paramComboRender.createDelegate(this.prodComb.getStore())
+				},		
+				{header:'用户类型',dataIndex:'user_type',width:100,
+					editor :this.userTypeComb,
+					renderer:paramComboRender.createDelegate(this.userTypeComb.getStore())
 				},
-				{header:lbc("common.total"),dataIndex:'fee_back',width:100}
+				{header:'终端类型',dataIndex:'terminal_type',width:100,editor :this.terminalComb,
+					renderer:paramComboRender.createDelegate(this.terminalComb.getStore())
+				},
+				{header:'用户数',dataIndex:'max_user_cnt',width:60,renderer:App.qtipValue,editor: new Ext.form.NumberField({
+					allowDecimals:false,//不允许输入小数 
+	    			allowNegative:false,
+	    			minValue:0//enableKeyEvents: true,
+				})},
+				{header:'权重',dataIndex:'precent',width:80,renderer:App.qtipValue,editor: new Ext.form.NumberField({
+					allowDecimals:false,//不允许输入小数 
+	    			allowNegative:false,
+	    			minValue:0//enableKeyEvents: true,
+				})}
 			]
         });
 		cm.isCellEditable = this.cellEditable;
 		ProdList.superclass.constructor.call(this,{
+			title:'套餐内容',
 			id: 'prodPkgForm',
 		    region: 'center',
 		    border: false,
 		    store:this.store,
 			cm:cm,
 			clicksToEdit:1,
-			view: new Ext.ux.grid.ColumnLockBufferView({}),
-			sm:new Ext.grid.RowSelectionModel({})
+			sm:new Ext.grid.RowSelectionModel({}),
+			tbar : [{
+	        	text : '添加',
+	        	iconCls : 'icon-add',
+	        	scope : this,
+	        	handler : this.addRecord
+	        }]
 		});	
 		},
 		cellEditable:function(colIndex,rowIndex){
-			var record = materalThat.getStore().getAt(rowIndex);//当前编辑行对应record
-//			if(colIndex == this.getIndexById('buy_num_id')){
-//				if(record.get('total_num') == 0 || record.get('fee_value') == "-1"){
-//					return false;
-//				}
-//			}
 			return Ext.grid.ColumnModel.prototype.isCellEditable.call(this, colIndex, rowIndex);
 		},
 		initEvents : function(){
-			MaterialDeviceGrid.superclass.initEvents.call(this);
+			ProdList.superclass.initEvents.call(this);
 			this.on('afterrender',function(){
 				this.swapViews();
 			},this,{delay:10});
 			
 			this.on("afteredit",this.afterEdit,this);
+			this.on("beforedit",this.beforeEdit,this);
 		},
 		swapViews : function(){
 			if(this.view.lockedWrap){
@@ -629,18 +683,60 @@ ProdList = Ext.extend(Ext.grid.EditorGridPanel,{
 	        }
 	          
 		},
+		beforeEdit : function(obj){
+			
+		},
 		afterEdit : function(obj){
 			var record = obj.record;
 			var fieldName = obj.field;//编辑的column对应的dataIndex
 			var value = obj.value;
-			if(fieldName=='buy_num'){
-//				if(!this.doChickValue(record,value)){
-//					record.set('buy_num', '');
-//					record.set('fee', '');
-//					record.set('fee_back', '');
-//					this.startEditing(obj.row,obj.column);
-//				}
-			}
+//			if(fieldName == 'user_type_text'){
+//				var cmp = this.userTypeComb;
+//				var index = cmp.store.find('item_name',value);
+//				var data = cmp.store.getAt(index);
+//				record.set('user_type',data.get('item_value'));
+//			}else if(fieldName == 'terminal_type_text'){
+//				var cmp = this.terminalComb;
+//				var index = cmp.store.find('item_name',value);
+//				var data = cmp.store.getAt(index);
+//				record.set('terminal_type',data.get('item_value'));
+//			}
+		},
+		addRecord : function(){
+			var count = this.getStore().getCount();
+			var recordType = this.getStore().recordType;
+			var record = new recordType({
+				package_group_id:'',
+				package_group_name : '',
+				user_type : '',
+				terminal_type : '',
+				max_user_cnt : 1,
+				prod_list: '',
+				precent:0
+			});
+
+			this.stopEditing();
+			this.getStore().add(record);
+			this.startEditing(count,0);
+			this.getSelectionModel().selectRow(count);
+		},
+		getValues:function(){
+			this.stopEditing();
+			var records = this.getStore().getModifiedRecords();
+			if(records.length == 0){Alert('数据没有修改');flag = false;}
+			var arr = []
+			Ext.each(records,function(record){
+				var values = {};
+				values["package_group_name"] = record.get('package_group_name');
+				values["user_type"] =record.get('user_type');
+				values["prod_list"] = record.get('prod_list');
+				values["max_user_cnt"] = record.get('max_user_cnt');
+				values["precent"] = record.get('precent');
+				values["package_group_id"] = record.get('package_group_id');
+				values["terminal_type"] = record.get('terminal_type');
+				arr.push(values);
+			},this);
+			return arr;
 		}
 
 

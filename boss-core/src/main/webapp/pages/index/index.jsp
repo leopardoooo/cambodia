@@ -236,6 +236,7 @@
 	<script type="text/javascript" src="<%=root %>/pages/index/center/PayfeePanel.js" charset="UTF-8"></script>
 	<script type="text/javascript" src="<%=root %>/pages/index/center/DocPanel.js" charset="UTF-8"></script>
 	<script type="text/javascript" src="<%=root %>/pages/index/center/DoneCodePanel.js" charset="UTF-8"></script>
+	<script type="text/javascript" src="<%=root %>/pages/business/cust/TaskBaseForm.js"></script>
 	<script type="text/javascript" src="<%=root %>/pages/index/center/CommandInfoPanel.js" charset="UTF-8"></script>
 	<script type="text/javascript" src="<%=boss_res %>/pages/commons/ux/MonthPickerPlugin.js" charset="UTF-8"></script>
 	<script type="text/javascript" src="<%=root %>/pages/index/center/BillPanel.js" charset="UTF-8"></script>

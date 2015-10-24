@@ -204,5 +204,13 @@ public class WTaskBaseInfoDao extends BaseEntityDao<WTaskBaseInfo> {
 							,currentTimeStamp
 							,currentTimeStamp).list();
 	}
-	
+	public TaskBaseInfoDto findTaskDetailByTaskId(String taskId) throws JDBCException{
+		String sql=" select t.*,wt.team_type, case when s.tel is null and s.mobile is null then '' "
+				+ "when s.mobile is null then s.tel when s.tel is null then s.mobile else s.tel || ',' || s.mobile "
+				+ "end linkman_tel, s.optr_name linkman_name,c.cust_no "
+				+ "from w_task_base_info t, C_CUST c, w_team wt, s_optr s where t.cust_id = c.cust_id and c.str9 = s.optr_id(+) "
+				+ "and t.team_id = wt.dept_id(+)  and t.task_id =? ORDER BY t.task_create_time DESC ";
+		return this.createQuery(TaskBaseInfoDto.class,sql, taskId).first();
+	}
+
 }

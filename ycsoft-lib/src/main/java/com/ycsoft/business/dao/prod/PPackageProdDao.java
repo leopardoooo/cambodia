@@ -43,14 +43,13 @@ public class PPackageProdDao extends BaseEntityDao<PPackageProd> {
 		String	sql = "delete p_package_prod  where prod_id = ? and package_id = ?";
 		executeBatch(sql, list);
 	}
-	public void deletePackById (String pkgId,String pkgTariffId) throws Exception {
-		String	sql = "delete p_package_prod  where  package_id = ? and (package_tariff_id is null or package_tariff_id = ?)";
-		executeUpdate(sql, pkgId,pkgTariffId);
+	public void deletePackById (String pkgId) throws Exception {
+		String	sql = "delete p_package_prod  where  package_id = ? ";
+		executeUpdate(sql, pkgId);
 	}
 	public List<PPackageProd> queryPackProdByProdId(String prodId)  throws Exception{
-		String sql = "select * from p_package_prod where prod_id=? ";
-		List<PPackageProd> tariffList = this.createQuery(PPackageProd.class,sql, prodId).list();
-		return tariffList;
+		String sql = "select * from p_package_prod where package_id=? ";
+		return this.createQuery(PPackageProd.class,sql, prodId).list();
 	}
 	
 	public List<PPackageProd> queryPkgById(String pkId)  throws Exception{
