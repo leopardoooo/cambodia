@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -509,46 +510,7 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 	
 	public Map<String , Object> queryTaskDetail(String task_id)throws Exception{
 		Map<String , Object> map = new HashMap<String, Object>();
-		List<TaskUserDto> userList = wTaskUserDao.queryUserDetailByTaskId(task_id);
-
-		if(userList.size()>0){
-			String[] userIds = CollectionHelper.converValueToArray(userList, "user_id"); 
-					
-			List<CUser> users = userComponent.queryAllUserAndHisByUserIds(userIds);
-			Map<String,CUser> userMap = CollectionHelper.converToMapSingle(users, "user_id");
-			for(TaskUserDto task: userList){
-				CUser user = userMap.get(task.getUser_id());
-				if(user == null){
-					throw new ServicesException("用户不存在");
-				}
-				task.setUser_name( taskComponent.getFillUserName(user) );
-				task.setPassword(user.getPassword());
-				task.setOcc_no(user.getStr7());
-				task.setPos_no(user.getStr8());
-				//提取产品名称
-				List<CProdOrder> orders=cProdOrderDao.queryNotExpAllOrderByUser(user.getUser_id());
-				if(orders.size()>0){
-					String prodId=orders.get(0).getProd_id();
-					if(StringHelper.isNotEmpty(orders.get(0).getPackage_id())){
-						prodId=orders.get(0).getPackage_id();
-					}
-					PProd prod=pProdDao.findByKey(prodId);
-					if(prod!=null){
-						task.setProdname(prod.getProd_name());
-					}
-				}
-				if(!user.getUser_type().equals(SystemConstants.USER_TYPE_OTT_MOBILE)){
-					if(StringHelper.isEmpty(user.getDevice_model()) && StringHelper.isNotEmpty(user.getStr3())){
-						user.setDevice_model(user.getStr3());
-						if(user.getUser_type().equals(SystemConstants.USER_TYPE_BAND)){
-							task.setDevice_model_text( MemoryDict.getDictName(DictKey.MODEM_MODEL, user.getStr3()) );
-						}else{
-							task.setDevice_model_text( MemoryDict.getDictName(DictKey.STB_MODEL, user.getStr3()) );
-						}
-					}
-				}
-			}
-		}
+		List<WTaskUser> userList = snTaskComponent.queryTaskDetailUser(task_id);
 		
 		List<WTaskLog> logList = wTaskLogDao.queryByTaskId(task_id);
 		for(WTaskLog log : logList){
@@ -575,36 +537,16 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 	}
 
 	public List<TaskUserDto> queryTaskDevice(String task_id) throws Exception {
-		WTaskBaseInfo taskBase = wTaskBaseInfoDao.findByKey(task_id);
-		List<TaskUserDto> userList = new ArrayList<TaskUserDto>();
-//		if(taskBase.getTask_type_id().equals(SystemConstants.TASK_TYPE_WRITEOFF_TERMINAL)){
-//			userList = wTaskUserDao.queryTaskWriteoffTerminal(task_id);
-//		}else{
-			userList = wTaskUserDao.queryUserDetailByTaskId(task_id);
-//		}
-		for(TaskUserDto task: userList){
-			CUser user = userComponent.queryUserById(task.getUser_id());
-			task.setUser_name( taskComponent.getFillUserName(user) );
-			if(taskBase.getTask_type_id().equals(SystemConstants.TASK_TYPE_MOVE) && user.getUser_type().equals(SystemConstants.USER_TYPE_BAND)){
-				if(StringHelper.isNotEmpty(task.getDevice_id())){
-					task.setDevice_code(task.getDevice_id());
-					task.setDevice_id(null);
-				}
-			}
-			task.setOcc_no(user.getStr7());
-			task.setPos_no(user.getStr8());
-			if(!user.getUser_type().equals(SystemConstants.USER_TYPE_OTT_MOBILE)){
-				if(StringHelper.isEmpty(user.getDevice_model()) && StringHelper.isNotEmpty(user.getStr3())){
-					user.setDevice_model(user.getStr3());
-					if(user.getUser_type().equals(SystemConstants.USER_TYPE_BAND)){
-						task.setDevice_model_text( MemoryDict.getDictName(DictKey.MODEM_MODEL, user.getStr3()) );
-					}else{
-						task.setDevice_model_text( MemoryDict.getDictName(DictKey.STB_MODEL, user.getStr3()) );
-					}
-				}
-			}
+		List<TaskUserDto> userDtoList = new ArrayList<TaskUserDto>();
+		List<WTaskUser> userList = snTaskComponent.queryTaskDetailUser(task_id);	
+		for(WTaskUser task: userList){
+			TaskUserDto _t = new TaskUserDto();
+			BeanUtils.copyProperties(task, _t);
+			_t.setDevice_code(_t.getDevice_id());
+			_t.setDevice_id(null);
+			userDtoList.add(_t);
 		}
-		return userList;
+		return userDtoList;
 	}
 
 	@Override

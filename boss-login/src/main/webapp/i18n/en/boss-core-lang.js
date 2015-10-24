@@ -559,7 +559,7 @@ BCLang.home = {
 			taskCols : ['WorkOrdersType', 'CustName', 'WorkOrdersStatus', 'ConstructionTeam',
 					'ZTEStatus', 'Address', 'Tel', 'CreatTime', 'FaultType', 'FaultDetails','WorkNo.','CustManager'
 					,'CustManagerTel','CustNo.','cfocnSyncStatus'],
-			userCols : ['UserType', 'UserName', 'Password', 'DeviceModel', 'DeviceNO.', 'PosNo.', 'OccNo.', 'BandWidth','Band password'],
+			userCols : ['UserType', 'Account number', 'Password', 'DeviceModel', 'DeviceNO.', 'PosNo.', 'OccNo.', 'BandWidth','Band password'],
 			operateCols : ['OperatingTime', 'OperationType', 'Operator', 'SyncStatus', 'Description','DelayTime'],
 			taskDeviceCols : ['UserType', 'UserName', 'Model', 'DeviceNO.', 'DeviceRecycling','OldDeviceNO.'],
 			msg : {

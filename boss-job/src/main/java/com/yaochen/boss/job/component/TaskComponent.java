@@ -124,26 +124,6 @@ public class TaskComponent extends BaseComponent {
 		return wTaskBaseInfoDao.findByKey(taskId);
 	}
 	
-	public List<WTaskUser> queryTaskUser(String taskId) throws Exception{
-		List<WTaskUser> taskUserList=wTaskUserDao.queryByTaskId(taskId);
-		for(WTaskUser taskuser:taskUserList){
-			if(SystemConstants.USER_TYPE_BAND.equals(taskuser.getUser_type())){
-				//提取带宽
-				List<CProdOrder> orders=cProdOrderDao.queryNotExpAllOrderByUser(taskuser.getUser_id());
-				if(orders.size()>0){
-					//提取控制字
-					List<PRes> pResList=cProdOrderDao.queryPRes(orders.get(0).getProd_id());
-					for(PRes res:pResList){
-						if(res.getBand_width()!=null&&res.getBand_width()>0){
-							taskuser.setBandwidth(res.getBand_width()+"M");
-						}
-					}
-				}
-			}
-		}
-		return taskUserList;
-	}
-	
 	public TaskCustExtInfo queryCustInfo(String custId)throws Exception{
 		CCust cust = cCustDao.findByKey(custId);
 		String areaCode = wTaskBaseInfoDao.queryTaskProvinceCode(custId);

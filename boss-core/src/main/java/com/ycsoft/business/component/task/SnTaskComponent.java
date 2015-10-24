@@ -697,6 +697,10 @@ public class SnTaskComponent extends BaseBusiComponent {
 		wTaskBaseInfoDao.updateTaskStatus(taskId, status);
 	}
 	
+	public List<WTaskUser> queryTaskDetailUser(String taskId)  throws Exception{
+		return queryTaskUser(taskId);
+	}
+	
 	public void updateTask(WTaskBaseInfo task) throws Exception {
 		wTaskBaseInfoDao.update(task);
 	}

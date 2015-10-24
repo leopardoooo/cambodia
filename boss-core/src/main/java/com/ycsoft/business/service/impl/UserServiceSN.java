@@ -1639,7 +1639,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		//update device status to idle,write off user
 		//设置流水中user_id
 		BusiParameter parameter = getBusiParam();
-		List<CUser> userList = userComponent.queryTaskUser(taskId);
+		List<CUser> userList = userComponent.queryUserByTaskId(taskId);
 		if(userList.size() > 0){
 			parameter.setSelectedUsers(userList);
 		}

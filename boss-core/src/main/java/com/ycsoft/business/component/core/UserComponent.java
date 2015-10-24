@@ -1261,7 +1261,7 @@ public class UserComponent extends BaseBusiComponent {
 		return list;
 	}
 	
-	public List<CUser> queryTaskUser(String taskId) throws Exception {
+	public List<CUser> queryUserByTaskId(String taskId) throws Exception {
 		return cUserDao.queryTaskUser(taskId);
 	}
 	

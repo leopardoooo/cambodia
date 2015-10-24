@@ -13,13 +13,17 @@ import java.util.Map.Entry;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.ycsoft.beans.core.job.JDataSync;
+import com.ycsoft.beans.core.prod.CProdOrder;
 import com.ycsoft.beans.core.user.UserResExpDate;
+import com.ycsoft.beans.prod.PRes;
 import com.ycsoft.beans.system.SDataRightType;
 import com.ycsoft.beans.system.SLog;
 import com.ycsoft.beans.system.SOptr;
 import com.ycsoft.beans.system.SRole;
+import com.ycsoft.beans.task.WTaskUser;
 import com.ycsoft.business.dao.core.common.CDoneCodeDao;
 import com.ycsoft.business.dao.core.job.JDataSyncDao;
+import com.ycsoft.business.dao.core.prod.CProdOrderDao;
 import com.ycsoft.business.dao.core.user.CUserDao;
 import com.ycsoft.business.dao.system.SDataRightTypeDao;
 import com.ycsoft.business.dao.system.SDataTranslationDao;
@@ -29,6 +33,7 @@ import com.ycsoft.business.dao.system.SOptrDao;
 import com.ycsoft.business.dao.system.SRoleDao;
 import com.ycsoft.business.dao.system.SSysChangeDao;
 import com.ycsoft.business.dao.task.WLogDao;
+import com.ycsoft.business.dao.task.WTaskUserDao;
 import com.ycsoft.commons.constants.SequenceConstants;
 import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.exception.ComponentException;
@@ -71,6 +76,30 @@ public abstract class BaseComponent{
 	private CUserDao cUserDao;
 	@Autowired
 	protected SDataTranslationDao sDataTranslationDao;
+	@Autowired
+	protected WTaskUserDao wTaskUserDao;
+	@Autowired
+	protected CProdOrderDao cProdOrderDao;
+	
+	public List<WTaskUser> queryTaskUser(String taskId) throws Exception{
+		List<WTaskUser> taskUserList=wTaskUserDao.queryByTaskId(taskId);
+		for(WTaskUser taskuser:taskUserList){
+			if(SystemConstants.USER_TYPE_BAND.equals(taskuser.getUser_type())){
+				//提取带宽
+				List<CProdOrder> orders=cProdOrderDao.queryNotExpAllOrderByUser(taskuser.getUser_id());
+				if(orders.size()>0){
+					//提取控制字
+					List<PRes> pResList=cProdOrderDao.queryPRes(orders.get(0).getProd_id());
+					for(PRes res:pResList){
+						if(res.getBand_width()!=null&&res.getBand_width()>0){
+							taskuser.setBandwidth(res.getBand_width()+"M");
+						}
+					}
+				}
+			}
+		}
+		return taskUserList;
+	}
 	
 	/**
 	 * 获得一个用户的所有授权资源时间
