@@ -226,6 +226,7 @@ public class OttExternalService extends OrderService {
 		    		new_user_passwd, cust.getAddress(), linkman.getEmail(), new_telephone
 		    		,user.getStb_id() , user.getModem_mac(), user.getStatus());
 		    if(!ottResult.isSuccess()){
+		    	LoggerHelper.debug(this.getClass(), "func=modifyAccountInfo error="+ottResult.getStatus()+" "+ottResult.getReason());
 		    	if(ottResult.isConnectionError())
 		    		throw new ServicesException(ErrorCode.E20003);
 		    	else
@@ -320,6 +321,7 @@ public class OttExternalService extends OrderService {
 	    		user_name, cust.getAddress(), linkMan.getEmail(), linkMan.getTel()
 	    		,user.getStb_id() , user.getModem_mac(), user.getStatus());
 	    if(!ottResult.isSuccess()){
+	    	LoggerHelper.debug(this.getClass(), "func=RegisterAccount error="+ottResult.getStatus()+" "+ottResult.getReason());
 	    	if(ottResult.getStatus().equals("40006"))
 	    		throw new ServicesException(ErrorCode.E40006);
 	    	else if(ottResult.isConnectionError())
@@ -334,6 +336,7 @@ public class OttExternalService extends OrderService {
 			String resDate=DateHelper.format( userResMap.get(externalResId), DateHelper.FORMAT_TIME_END);
 			Result resutl=ottClient.openUserProduct(user.getLogin_name(), externalResId,resDate,ottauthMap);
 			if(!resutl.isSuccess()){
+				LoggerHelper.debug(this.getClass(), "func=RegisterAccount error="+ottResult.getStatus()+" "+ottResult.getReason());
 				throw new ServicesException(ErrorCode.E40009);
 			}
 		}
@@ -530,6 +533,7 @@ public class OttExternalService extends OrderService {
 			String resDate=DateHelper.format( userResMap.get(externalResId), DateHelper.FORMAT_TIME_END);
 			Result resutl=ottClient.openUserProduct(user.getLogin_name(), externalResId,resDate,ottauthMap);
 			if(!resutl.isSuccess()){
+				LoggerHelper.debug(this.getClass(), "func=modifyAccountInfo error="+resutl.getStatus()+" "+resutl.getReason());
 				throw new ServicesException(ErrorCode.E40009);
 			}
 		}
