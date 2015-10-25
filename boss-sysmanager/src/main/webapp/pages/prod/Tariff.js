@@ -972,10 +972,18 @@ TariffGrid = Ext.extend(Ext.grid.GridPanel, {
             width: 60,
             renderer: App.qtipValue,
             dataIndex: 'rule_id_text'},
-        {header:'生效时间',dataIndex:'eff_date',sortable: true,width:100,renderer:Ext.util.Format.dateFormat},
-		{header:'失效时间',dataIndex:'exp_date',sortable: true,width:100,renderer:Ext.util.Format.dateFormat},
+        {header:'生效时间',dataIndex:'eff_date',sortable: true,width:80,renderer:Ext.util.Format.dateFormat},
+		{header:'失效时间',dataIndex:'exp_date',sortable: true,width:80,renderer:Ext.util.Format.dateFormat},
 		{header:'服务渠道',dataIndex:'service_channel_text',sortable: true,width:100,renderer:App.qtipValue},
         {
+            header: '操作',
+            width: 140,
+            scope:this,
+	        renderer:function(value,meta,record,rowIndex,columnIndex,store){
+	            	var btns = this.doFilterBtns(record);
+	            	return btns;
+            }
+        },{
             header: '日租规则',
             sortable: true,
             width: 60,
@@ -986,15 +994,8 @@ TariffGrid = Ext.extend(Ext.grid.GridPanel, {
             sortable: true,
             width: 60,
             renderer: App.qtipValue,
-            dataIndex: 'month_rent_cal_type_text'},
-        {
-            header: '操作',
-            width: 170,
-            scope:this,
-	        renderer:function(value,meta,record,rowIndex,columnIndex,store){
-	            	var btns = this.doFilterBtns(record);
-	            	return btns;
-            }}
+            dataIndex: 'month_rent_cal_type_text'}
+        
             ];
         TariffGrid.superclass.constructor.call(this, {
             ds: this.tariffStore,
@@ -1010,12 +1011,14 @@ TariffGrid = Ext.extend(Ext.grid.GridPanel, {
                 scope: this,
                 iconCls : 'icon-add',
                 id: 'addTariff',
-                handler: this.openTariff}, '-',{
-                text: '最低定价配置',
-                scope: this,
-                id: 'addLowestPrice',
-                iconCls : 'icon-add',
-                handler: this.openLowestPrice}]
+                handler: this.openTariff}
+//                , '-',{
+//                text: '最低定价配置',
+//                scope: this,
+//                id: 'addLowestPrice',
+//                iconCls : 'icon-add',
+//                handler: this.openLowestPrice}
+                ]
         })
     },
     doFilterBtns : function(record){

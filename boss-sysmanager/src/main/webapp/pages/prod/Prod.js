@@ -175,7 +175,7 @@ ProdTree = Ext.extend(Ext.tree.TreePanel, {
 	initEvents : function() {
 		this.on("click", function(node, e) {
 			var id = node.id;
-			Ext.getCmp('addLowestPrice').hide();
+//			Ext.getCmp('addLowestPrice').hide();
 			Ext.getCmp('addTariff').show();
 			if (node.attributes.others.att == "prodId") {
 				if (!this.prodId || this.prodId != id) {
@@ -251,11 +251,11 @@ ProdTree = Ext.extend(Ext.tree.TreePanel, {
 
 				}
 				// 套餐不使用最低定价功能
-				if (this.prodTreeStore.prod_type == cfgProdType["P"]
-						? true
-						: false) {
-					Ext.getCmp('addLowestPrice').show();
-				}
+//				if (this.prodTreeStore.prod_type == cfgProdType["P"]
+//						? true
+//						: false) {
+//					Ext.getCmp('addLowestPrice').show();
+//				}
 
 			}
 		});
