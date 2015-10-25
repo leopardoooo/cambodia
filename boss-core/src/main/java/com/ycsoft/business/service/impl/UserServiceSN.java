@@ -1861,6 +1861,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 //			propChangeList.add(new CUserPropChange("status", cuser.getStatus(), StatusConstants.UNTUCKEND));
 //			propChangeList.add(new CUserPropChange("status_date", DateHelper.dateToStr(cuser.getStatus_date()),DateHelper.dateToStr(new Date())));
 			userComponent.editUser(doneCode, user.getUser_id(), propChangeList);
+			authComponent.sendAuth(cuser, null, BusiCmdConstants.DEL_USER, doneCode);
 		}
 		saveAllPublic(doneCode, getBusiParam());
 
