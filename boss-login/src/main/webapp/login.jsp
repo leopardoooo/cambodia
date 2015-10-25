@@ -5,7 +5,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
   <head>
-    <title>尧辰网络BOSS系统v4.0-登录</title>
+    <title>SUPERNET BOSS系统v4.0-登录</title>
 	<link rel="stylesheet" type="text/css" href="<%=root %>/resources/css/login.css">
   	<script type="text/javascript" src="<%=root %>/components/ext3/ext-core.js"></script>
   	<script type="text/javascript">
