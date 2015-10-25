@@ -1349,6 +1349,16 @@ public class ProdComponent extends BaseComponent {
 				pkList.add(pk);
 			}
 			pPackageProdDao.save(pkList.toArray(new PPackageProd[pkList.size()]));
+			
+			String[] displayFields = new String[] {"package_group_name","user_type","prod_list","terminal_type","max_user_cnt","precent"};
+			String packChangeInfo = BeanHelper.listchange(null, pkList,displayFields );
+			if(StringHelper.isNotEmpty(packChangeInfo)){
+				String preAppend = "套餐内容组名称_用户类型_产品内容组_终端类型_用户数_权重";
+				packChangeInfo = preAppend + ":\n" + packChangeInfo;
+				SSysChange countyChange = new SSysChange(SysChangeType.PROD.toString(), doneCode,
+		    			prod.getProd_id(), prod.getProd_name(), "套餐内容组", packChangeInfo, WebOptr.getOptr().getOptr_id(), createTime);
+		    	changes.add(countyChange);
+			}
 		}
 		
 		//保存操作记录
@@ -1391,10 +1401,27 @@ public class ProdComponent extends BaseComponent {
 		if(validName(prodDto.getProd_name(),prodCountyIds,prodDto.getProd_id())){
 			throw new ComponentException("产品名称在该应用地区已经存在!");
 		};
+		PProd oldProd = pProdDao.findByKey(prodDto.getProd_id());
+		
 		PProd prod = new PProd();
 		BeanUtils.copyProperties(prodDto, prod);
 		pProdDao.update(prod);
-		// 属于哪个产品目录
+		
+		PProd newProd = pProdDao.findByKey(prodDto.getProd_id());
+		String prodChangeInfo = BeanHelper.beanchange(oldProd, newProd);
+		String changeType = SysChangeType.PROD.toString();
+		Date createTime = new Date();
+		int doneCode = getDoneCOde();
+		List<SSysChange> changes = new ArrayList<SSysChange>();
+		
+		if(StringHelper.isNotEmpty(prodChangeInfo)){
+			SSysChange prodChange = new SSysChange(changeType, doneCode, prod.getProd_id(),
+					prod.getProd_name(), "产品定义修改", prodChangeInfo, WebOptr.getOptr().getOptr_id(), createTime);
+			changes.add(prodChange);
+		}
+		
+	    List<TreeDto> oldProdCountList = pProdCountyDao.getProdCountyById(prod.getProd_id());
+	    
 		if (!"null".equals(dictProdIds) && dictProdIds != null) {
 			pDictProdDao.deleteDictProd(prodDto.getProd_id());
 			pDictProdDao.addDictProd(dictProdIds, prodDto.getProd_id());
@@ -1403,8 +1430,18 @@ public class ProdComponent extends BaseComponent {
 		//保存产品适用地区
 		saveProdCountyId(prod.getProd_id(), prodCountyIds);
 		
+		List<TreeDto> newProdCountList = pProdCountyDao.getProdCountyById(prod.getProd_id());
+		
+		String countyChangeInfo = BeanHelper.listchange(oldProdCountList, newProdCountList, "id", null);
+		if(StringHelper.isNotEmpty(countyChangeInfo)){
+			SSysChange countyChange = new SSysChange(SysChangeType.PROD.toString(), doneCode,
+	    			prod.getProd_id(), prod.getProd_name(), "产品适用地区", countyChangeInfo.replace("id", "county_id"), WebOptr.getOptr().getOptr_id(), createTime);
+	    	changes.add(countyChange);
+		}
+		
 		List<PPackageProd> pkList = new ArrayList<PPackageProd>();
 		if (prodDto.getPackList().size() > 0) {
+			List<PPackageProd> oldPackList =  pPackageProdDao.queryPackProdByProdId(prod.getProd_id());
 			for(PPackageProd pk :prodDto.getPackList()){
 				checkProd(pk);
 				pk.setPackage_id(prodDto.getProd_id());
@@ -1416,6 +1453,16 @@ public class ProdComponent extends BaseComponent {
 			pPackageProdDao.deletePackById(prod.getProd_id());
 			// 保存新传入的数据
 			pPackageProdDao.save(pkList.toArray(new PPackageProd[pkList.size()]));
+			String[] displayFields = new String[] {"package_group_name","user_type","prod_list","terminal_type","max_user_cnt","precent"};
+			String packChangeInfo = BeanHelper.listchange(oldPackList, pkList,displayFields );
+			if(StringHelper.isNotEmpty(packChangeInfo)){
+				String preAppend = "套餐内容组名称_用户类型_产品内容组_终端类型_用户数_权重";
+				packChangeInfo = preAppend + ":\n" + packChangeInfo;
+				SSysChange packChange = new SSysChange(SysChangeType.PROD.toString(), doneCode,
+		    			prod.getProd_id(), prod.getProd_name(), "套餐内容组", packChangeInfo, WebOptr.getOptr().getOptr_id(), createTime);
+		    	changes.add(packChange);
+			}
+			
 		}
 
 //		if(pkList.size()>0){
@@ -1426,7 +1473,7 @@ public class ProdComponent extends BaseComponent {
 //		}
 		//保存操作记录
 		saveOperateLog(FuncCode.MODIFY_PROD.toString(), prod.getProd_id(), prod.getProd_name(), WebOptr.getOptr());
-		
+		sSysChangeDao.save(changes.toArray(new SSysChange[changes.size()]));
 		return prod;
 	}
 	
@@ -1517,7 +1564,7 @@ public class ProdComponent extends BaseComponent {
 		List<TreeDto> oldTariffCountyBytariffId = pProdTariffCountyDao.getTariffCountyBytariffId(tariff.getTariff_id());
 		PProd prod = pProdDao.findByKey(tariff.getProd_id());
 		
-		checkPrice(tariff,prod.getProd_type(),tariffCountyIds,optr);
+//		checkPrice(tariff,prod.getProd_type(),tariffCountyIds,optr);
 		
 		if (StringHelper.isNotEmpty(tariff.getTariff_id())) {
 			oldTariff = pProdTariffDao.findByKey(tariff.getTariff_id());
@@ -2054,6 +2101,38 @@ public class ProdComponent extends BaseComponent {
 		return pProdDao.validName(prodName,prodCountyIds,prodId);
 	}
 
+	public Map<String,Object> queryProdOrderByServ() throws Exception {
+//		List<PProd> list = pProdDao.queryProdOrderByServ();
+		List<PProd> list = pProdDao.findAll();
+		Map<String, List<PProd>> prodMap = CollectionHelper.converToMap(list, "serv_id");
+		Map<String , Object> map = new HashMap<String, Object>();
+		List<SItemvalue> allList = new ArrayList<SItemvalue>();
+		for (String key : prodMap.keySet()) {
+			if(StringHelper.isNotEmpty(key)){
+				List<PProd> pList = prodMap.get(key);
+				List<SItemvalue> sList = new ArrayList<SItemvalue>();
+				for(PProd dto : pList){
+					SItemvalue s = new SItemvalue();
+					s.setItem_value(dto.getProd_id());
+					s.setItem_name(dto.getProd_name());
+					sList.add(s);
+				}
+				allList.addAll(sList);
+				map.put(key, sList);	
+			}
+		}
+		if(allList.size()>0){
+			map.put("all", allList);	
+		}
+		return map;
+	}
+	public List<PPackageProd> queryPackageByProdId(String prod_id)  throws Exception {
+		List<PPackageProd> list = pPackageProdDao.queryPackProdByProdId(prod_id);
+//		List<PProd> pList = pProdDao.findAll();
+//		 Map<String, List<PProd>> map = CollectionHelper.converToMap(pList, "prod_id");
+		return list;
+	}
+	
 	public PProdDao getPProdDao() {
 		return pProdDao;
 	}
@@ -2170,5 +2249,6 @@ public class ProdComponent extends BaseComponent {
 	public void setTServerCountyDao(TServerCountyDao tServerCountyDao) {
 		this.tServerCountyDao = tServerCountyDao;
 	}
+
 	
 }

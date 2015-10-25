@@ -558,9 +558,9 @@ ProdListForm = Ext.extend(Ext.form.FormPanel, {
 													areaId);
 							} else {
 								// 用户客户套餐加载数据，解除适用地区阴影
-//								if (Ext.getCmp('prodPkgForm'))
-//									Ext.getCmp('prodPkgForm')
-//											.showData(res.simpleObj.prodList);
+								if (Ext.getCmp('prodPkgForm'))
+									Ext.getCmp('prodPkgForm')
+											.showData(this.prodId);
 							}
 						}
 					});

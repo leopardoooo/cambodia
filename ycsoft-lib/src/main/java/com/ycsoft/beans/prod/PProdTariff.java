@@ -9,6 +9,7 @@ import java.util.Date;
 
 import com.ycsoft.beans.base.OptrBase;
 import com.ycsoft.commons.constants.DictKey;
+import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.commons.store.MemoryDict;
 import com.ycsoft.daos.config.POJO;
 
@@ -56,14 +57,33 @@ public class PProdTariff extends OptrBase implements Serializable {
 	private String use_fee_rule_text;
 	private String bill_rule_text;
 	private String tariff_type_text;
+	private String service_channel_text;
 
 	
+	
+	
+	public String getService_channel_text() {
+		return service_channel_text;
+	}
+
+	public void setService_channel_text(String service_channel_text) {
+		this.service_channel_text = service_channel_text;
+	}
+
 	public String getService_channel() {
 		return service_channel;
 	}
 
 	public void setService_channel(String service_channel) {
 		this.service_channel = service_channel;
+		if(StringHelper.isNotEmpty(this.service_channel)){
+			String [] items = this.service_channel.split(",");
+			this.service_channel_text = "";
+			for(String item:items){
+				this.service_channel_text += MemoryDict.getDictName(DictKey.SERVICE_CHANNEL, item) +",";
+			}
+			this.service_channel_text = this.service_channel_text.substring(0,this.service_channel_text.length() -1 ); 
+		}
 	}
 
 	public Date getEff_date() {
