@@ -13,7 +13,7 @@ Ext.apply(App.func,{
 		//如果是销户客户，全部隐藏操作按钮
 		var custStatus = App.getApp().getData().custFullInfo.cust.status;
 		if (custStatus == 'INVALID'){
-				if(busicode === '1008'){return true;}//设备回收
+				if(busicode === '1008'){return true;}
 				else if(busicode === '1051' && data['is_busi_fee']==='Y' && data['status']!='INVALID'){//业务费用
 					if(data['finance_status'] == 'CLOSE' || App.getData().optr.optr_id != data['optr_id'])
 					{return false;}else{return true;}

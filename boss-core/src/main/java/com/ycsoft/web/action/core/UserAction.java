@@ -155,6 +155,11 @@ public class UserAction extends BaseBusiAction {
 		return JSON_SUCCESS;
 	}
 	
+	public String saveDeviceReclaim() throws Exception{
+		userServiceSN.saveDeviceReclaim();
+		return JSON_SUCCESS;
+	}
+	
 	public String generateUserName() throws Exception {
 		String userType = request.getParameter("userType");
 		getRoot().setSimpleObj(userServiceSN.generateUserName(custId, userType));
