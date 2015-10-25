@@ -1608,7 +1608,7 @@ public class ProdComponent extends BaseComponent {
 				"tariff_desc", "prod_id", "tariff_type_text", "billing_type_text",
 				"rent" ,"month_rent_cal_type_text", "day_rent_cal_type_text",
 				"use_fee_rule", "bill_rule", "status_text", "area_name", "county_name",
-				"optr_name", "create_time", "rule_id","rule_id_text", "tariff_type_text"};
+				"optr_name", "create_time", "rule_id","rule_id_text", "tariff_type_text","eff_date","exp_date","service_channel"};
 		
 		List<VewRuleDto> rules = tRuleDefineDao.findRuleViewDictByType("BUSI",WebOptr.getOptr().getCounty_id());
 		
