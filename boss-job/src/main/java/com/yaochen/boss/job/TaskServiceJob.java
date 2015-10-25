@@ -30,11 +30,12 @@ public class TaskServiceJob implements Job2 {
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	@Autowired
 	private TaskComponent taskComponent;
-
+	@Autowired
+	private WorkOrderClient workOrderClient;
 	@Override
 	public void execute(Job2ExecutionContext context)
 			throws JobExecutionException {
-		WorkOrderClient client = new WorkOrderClient();
+		//WorkOrderClient client =  workOrderClient;
 		List<WTaskLog> taskLogList = null;
 		//施工队
 		String cfonTeamId =null; 
@@ -58,9 +59,9 @@ public class TaskServiceJob implements Job2 {
 			try{
 				if (taskLog.getBusi_code().equals(BusiCodeConstants.TASK_Withdraw)){
 					//撤回工单
-					taskComponent.cancelTaskService(client,taskLog.getTask_id(),taskLog.getDone_code());
+					taskComponent.cancelTaskService(workOrderClient,taskLog.getTask_id(),taskLog.getDone_code());
 				} else if (taskLog.getBusi_code().equals(BusiCodeConstants.TASK_ASSIGN)){
-					taskComponent.sendNewWorkOrder(client,taskLog.getTask_id(),cfonTeamId);		
+					taskComponent.sendNewWorkOrder(workOrderClient,taskLog.getTask_id(),cfonTeamId);		
 				}else {
 					result.setStatus(Result.BOSS_ERROR_STATUS);
 					result.setReason("未定义的同步类型");

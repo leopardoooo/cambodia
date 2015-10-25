@@ -45,6 +45,7 @@
 			</bean>	
 		</property>
 	</bean>
-	
+	<bean id="workOrderClient" class="com.ycsoft.boss.remoting.cfocn.WorkOrderClient"></bean>
+	<bean id="bOSSBandServiceAdapter" class="com.ycsoft.boss.remoting.aaa.BOSSBandServiceAdapter"></bean>
 
 </beans>
