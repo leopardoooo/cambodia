@@ -1831,5 +1831,41 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		
 	}
 
+	public void saveDeviceReclaim() throws Exception{
+		
+		CCust cust = getBusiParam().getCust();
+		doneCodeComponent.lockCust(cust.getCust_id());
+		List<CUser> users = getBusiParam().getSelectedUsers();
+		Integer doneCode = doneCodeComponent.gDoneCode();
+		for(CUser user : users){
+			CUser cuser = userComponent.queryUserById(user.getUser_id());
+			//更新设备状态和仓库
+			DeviceDto device = deviceComponent.queryDeviceByDeviceCode(user.getStb_id());
+			deviceComponent.updateDeviceDepotId(doneCode, BusiCodeConstants.DEVICE_USER_RECLAIM, device.getDevice_id(), 
+					device.getDepot_id(), getOptr().getDept_id(),cuser.getStr10(), true);
+			deviceComponent.updateDeviceDepotStatus(doneCode, BusiCodeConstants.DEVICE_USER_RECLAIM, device.getDevice_id(),
+					device.getDepot_status(), StatusConstants.IDLE,cuser.getStr10(), true);
+			deviceComponent.updateDeviceOwnership(doneCode, BusiCodeConstants.DEVICE_USER_RECLAIM, device.getDevice_id(), 
+					device.getOwnership(), SystemConstants.OWNERSHIP_GD, cuser.getStr10(), true);
+			//删除客户设备
+			custComponent.removeDevice(cust.getCust_id(), device.getDevice_id(), doneCode, SystemConstants.BOOLEAN_FALSE);
+			//更新用户设备信息为空
+			
+			List<CUserPropChange> propChangeList = new ArrayList<CUserPropChange>();
+			if(StringHelper.isNotEmpty(cuser.getStb_id()))
+				propChangeList.add(new CUserPropChange("stb_id", cuser.getStb_id(), ""));
+			if(StringHelper.isNotEmpty(cuser.getCard_id()))
+				propChangeList.add(new CUserPropChange("card_id", cuser.getCard_id(), ""));
+			if(StringHelper.isNotEmpty(cuser.getModem_mac()))
+				propChangeList.add(new CUserPropChange("modem_mac", cuser.getModem_mac(), ""));
+//			propChangeList.add(new CUserPropChange("status", cuser.getStatus(), StatusConstants.UNTUCKEND));
+//			propChangeList.add(new CUserPropChange("status_date", DateHelper.dateToStr(cuser.getStatus_date()),DateHelper.dateToStr(new Date())));
+			userComponent.editUser(doneCode, user.getUser_id(), propChangeList);
+		}
+		saveAllPublic(doneCode, getBusiParam());
+
+		
+	}
+
 	
 }
