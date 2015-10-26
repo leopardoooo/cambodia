@@ -138,7 +138,7 @@ public class CustComponent extends BaseBusiComponent {
 		if(cust.getCust_type().equals(SystemConstants.CUST_TYPE_NONRESIDENT) && StringHelper.isNotEmpty(cust.getSpkg_sn())){
 			PSpkg spkg = pSpkgDao.querySpkgBySn(cust.getSpkg_sn());
 			if(spkg != null){
-				if(!spkg.getStatus().equals(StatusConstants.IDLE))
+				if(!spkg.getStatus().equals(StatusConstants.IDLE) || cCustDao.queryBySpkgSn(spkg.getSpkg_sn()) != null)
 					throw new ComponentException(ErrorCode.SpkgIsUsed);
 				spkg.setApply_optr_id(getOptr().getOptr_id());
 				spkg.setApply_date(new Date());

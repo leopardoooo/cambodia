@@ -197,8 +197,8 @@ BCLang.home = {
 				maxUserCount: 'Max User Quantity',
 				titleDispatchUser: 'Distribute User',
 				terminalInfo: 'Terminal Information',
-				addToSelected: 'Added to the selected',
-				moveToOptional: 'Move to the Selectable',
+				addToSelected: 'AddedToSelected',
+				moveToOptional: 'MoveToSelectable',
 				stopTime: ' Stop Report Time',
 				stopFee: 'Termination Report Fee',
 				prodFeeCM: ["Product Name","Former Fee","New Fee","Former Expiry Date","Billing Date",
@@ -749,6 +749,7 @@ BCLang.msgBox = {
 	realpayMustBeGreaterThanZero: 'Real Payment cannot be less than 0，Please add Purchase Month Quantity!',
 	notMustBeOrderUser: 'No User need purchase!',
 	custPkgChooseUserMustBeEqualToMaxUserNum: 'Customer Package is selected, Users shall equal to max user quantity of package!',
+	spkgNoselectPkgCanContinueChooseUser: 'Protocol packages [{0}] does not select a user, the user can continue to choose!',
 	spkgPkgCanContinueChooseUser: 'Agreement package is selected, Users less than max quantity  of package，you can continue to select User!',
 	chooseInUsers: 'Please select Terminal User to join package!',
 	exceedPkgMaxUserNum: 'More than max quantity limit of package!',
@@ -762,5 +763,6 @@ BCLang.msgBox = {
 	EditPayFeeAndNumberIsWrong:'This fee is not divisible by the price, the purchase of the number as an integer',
 	SelectOnlyOneData:'Please choose a record',
 	ChooseToPayTheRecord:'Please choose to pay the record',
-	userNotDTT:'Not DTT equipment or equipment does not exist'
+	userNotDTT:'Not DTT equipment or equipment does not exist',
+	suerNotSave: 'Determined not to save it？'
 }

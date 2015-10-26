@@ -652,4 +652,9 @@ public class CCustDao extends BaseEntityDao<CCust> {
 		}
 	}
 	
+	public CCust queryBySpkgSn(String spkgSn) throws Exception {
+		String sql = "select * from c_cust where spkg_sn=?";
+		return this.createQuery(sql, spkgSn).first();
+	}
+	
 }
