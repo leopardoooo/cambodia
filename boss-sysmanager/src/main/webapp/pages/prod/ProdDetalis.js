@@ -264,10 +264,10 @@ ProdDetalisForm = Ext.extend(Ext.Panel, {
 								title : title,
 								ds : this.nextProdStore,
 								sm : sm,
-								columns : cm,
-								tbar : [{text : '分成值操作记录',iconCls : 'query',scope : this,handler : function(){
-									new ProdPackageHisWin(v).show();
-								}}]
+								columns : cm
+//								,tbar : [{text : '分成值操作记录',iconCls : 'query',scope : this,handler : function(){
+//									new ProdPackageHisWin(v).show();
+//								}}]
 							});
 				}
 			});

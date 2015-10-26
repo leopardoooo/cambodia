@@ -42,6 +42,7 @@ import com.ycsoft.sysmanager.dto.prod.ProdDto;
 		private ProdDto prodDto;
 		private ProdTariffDto prodTariffDto;
 		private String doneId;
+		private String prod_id;
 		private String ServId;
 		private String query;
 		private String dynamicResList;
@@ -60,6 +61,17 @@ import com.ycsoft.sysmanager.dto.prod.ProdDto;
 		private String countyId;
 		private PProdDict prodDict;
 		
+		
+		public String queryPackageByProdId()throws Exception{
+			getRoot().setRecords( prodComponent.queryPackageByProdId(prod_id) );
+			return JSON_RECORDS;
+		}
+		
+		public String queryProdOrderByServ() throws Exception {
+			getRoot().setOthers(prodComponent.queryProdOrderByServ());
+			return JSON_OTHER;
+			
+		}
 		/**
 		 *产品树
 		 */
@@ -544,4 +556,13 @@ import com.ycsoft.sysmanager.dto.prod.ProdDto;
 	public void setDisctCountyIds(String[] disctCountyIds) {
 		this.disctCountyIds = disctCountyIds;
 	}
+
+	public String getProd_id() {
+		return prod_id;
+	}
+
+	public void setProd_id(String prod_id) {
+		this.prod_id = prod_id;
+	}
+	
 }

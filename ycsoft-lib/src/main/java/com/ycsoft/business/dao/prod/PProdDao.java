@@ -396,5 +396,6 @@ public class PProdDao extends BaseEntityDao<PProd> {
 		String sql = "select * from p_prod t where "+getSqlGenerator().setWhereInArray("t.prod_id",prodIds)+" and t.status = ? order by t.prod_id ";
 		return this.createQuery(sql,StatusConstants.ACTIVE).list();
 	}
+
 	
 }

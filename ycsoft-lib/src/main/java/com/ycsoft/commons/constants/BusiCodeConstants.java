@@ -23,6 +23,8 @@ public final class BusiCodeConstants {
 	public final static String DEVICE_REG_LOST = "1014";//设备挂失
 	public final static String DEVICE_SALE = "1013";//销售
 	public final static String DEVICE_CANCEL_LOST = "1011";//取消设备挂失
+	public final static String DEVICE_USER_RECLAIM = "2270";//回收设备（可批量）
+	
 	
 	// Add business for the Cambodia
 	// Modified since 2015-07-31

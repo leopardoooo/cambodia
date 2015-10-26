@@ -6,6 +6,9 @@
  */
 package com.ycsoft.boss.remoting.backtask;
 
+import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.context.ConfigurationContextFactory;
+
 
 /*
  *  BOSSWebServiceSoapImplServiceTest Junit test case

@@ -6,6 +6,9 @@ package com.ycsoft.boss.remoting.backtask;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.context.ConfigurationContextFactory;
+
 import com.ycsoft.boss.remoting.backtask.BOSSWebServiceSoapImplServiceStub.DeviceFeedBack;
 import com.ycsoft.boss.remoting.backtask.BOSSWebServiceSoapImplServiceStub.DeviceInfo;
 import com.ycsoft.boss.remoting.backtask.BOSSWebServiceSoapImplServiceStub.ProductInfo;
@@ -37,6 +40,19 @@ public class BOSSWebServiceTestMain {
 			
 
 
+	}
+	
+	/**
+	 * TODO 使用一个指定的上下文构造相应的Stub，详情请参考：
+	 * https://issues.apache.org/jira/browse/AXIS2-3919
+	 * 所有的stub的都必须使用指定文件系统的context进行构造，否则必须定时清除文件
+	 * @return
+	 * @throws Exception
+	 */
+	public static BOSSWebServiceSoapImplServiceStub createContextStub()throws Exception{
+        ConfigurationContext axisConfigContext = ConfigurationContextFactory.createConfigurationContextFromFileSystem(null, null);
+        BOSSWebServiceSoapImplServiceStub bss = new BOSSWebServiceSoapImplServiceStub(axisConfigContext);
+        return bss;
 	}
 	
 	//回退测试

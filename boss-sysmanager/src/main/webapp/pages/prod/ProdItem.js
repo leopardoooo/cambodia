@@ -561,21 +561,19 @@ ResProdForm = Ext.extend(Ext.Panel, {
     }
 });
 ProdList = Ext.extend(Ext.grid.EditorGridPanel,{
-	store:null,
+	packStore:null,
 	prodId:null,
 	prodComb:null,
 	userTypeComb:null,
 	terminalComb:null,
+	prodMap:null,
 	constructor:function(v){
 		this.prodId = v;
-		this.store = new Ext.data.JsonStore({
-			url : root + "/system/Prod!querypackageByProdId.action",
+		this.packStore = new Ext.data.JsonStore({
+			url : root + "/system/Prod!queryPackageByProdId.action",
 			fields:['package_id','package_group_id','package_group_name','user_type','max_user_cnt','prod_list',
 			'precent','user_type_text','terminal_type','terminal_type_text','prod_list_text']
 		});
-		
-//		this.store.load();
-		
 		this.userTypeComb = new Ext.ux.ParamCombo({
 			paramName:'USER_TYPE',
 			isFilter:false,
@@ -588,12 +586,16 @@ ProdList = Ext.extend(Ext.grid.EditorGridPanel,{
 			listWidth:200
 		});
 		this.prodComb = new Ext.ux.ParamLovCombo({
-			paramName:'PROD_BASE',
+			store:new Ext.data.JsonStore({
+				fields:['item_value','item_name']
+			}),
 			isFilter:false,
-			listWidth:350
+			listWidth:200
+//			displayField:'prod_name',valueField:'prod_name',
+//			forceSelection:true,selectOnFocus:true,editable:true
 		});
-		App.form.initComboData([this.userTypeComb,this.terminalComb,this.prodComb]);
-		var paramComboRender = function(value){
+		
+		var paramComboRender = function(value,meta,record){
 			if(!Ext.isEmpty(value)){
 				if(value.indexOf(',') == -1){
 					var index = this.find('item_value',value);
@@ -602,15 +604,19 @@ ProdList = Ext.extend(Ext.grid.EditorGridPanel,{
 						return record.get('item_name');
 					}
 				}else{
-					var countyIds = value.split(','), county_text = '';
-					Ext.each(countyIds,function(c){
+					var _v = value.split(','), _v_text = '';
+					Ext.each(_v,function(c){
 						var index = this.find('item_value',c);
-						var record = this.getAt(index);
-						county_text += record.get('item_name')+',';
+						if(index != -1){
+							var record = this.getAt(index);
+							_v_text += record.get('item_name')+',';
+						}
 					},this);
-					
-					county_text = county_text.substring(0,county_text.lastIndexOf(','));
-					return '<div ext:qtitle="" ext:qtip="' + county_text + '">' + county_text +'</div>';
+					if(Ext.isEmpty(_v_text)){
+						_v_text = record.get('prod_list_text');
+					}
+					_v_text = _v_text.substring(0,_v_text.lastIndexOf(','));
+					return '<div ext:qtitle="" ext:qtip="' + _v_text + '">' + _v_text +'</div>';
 				}
 			}
 			return '';
@@ -619,13 +625,13 @@ ProdList = Ext.extend(Ext.grid.EditorGridPanel,{
 			columns : [
 				{header:'套餐内容组ID',dataIndex:'package_group_id',hidden:true},
 				{header:'套餐内容组名称',dataIndex:'package_group_name',width:200,editor:new Ext.form.TextField({})},
-				{header:'产品内容组',dataIndex:'prod_list',width:250,editor :this.prodComb,
-					renderer:paramComboRender.createDelegate(this.prodComb.getStore())
-				},		
 				{header:'用户类型',dataIndex:'user_type',width:100,
 					editor :this.userTypeComb,
 					renderer:paramComboRender.createDelegate(this.userTypeComb.getStore())
 				},
+				{header:'产品内容组',dataIndex:'prod_list',width:250,editor :this.prodComb,
+					renderer:paramComboRender.createDelegate(this.prodComb.getStore())
+				},		
 				{header:'终端类型',dataIndex:'terminal_type',width:100,editor :this.terminalComb,
 					renderer:paramComboRender.createDelegate(this.terminalComb.getStore())
 				},
@@ -638,7 +644,14 @@ ProdList = Ext.extend(Ext.grid.EditorGridPanel,{
 					allowDecimals:false,//不允许输入小数 
 	    			allowNegative:false,
 	    			minValue:0//enableKeyEvents: true,
-				})}
+				})},
+				{ header: '操作',
+			        width:80,
+			        scope:this,
+		            renderer:function(value,meta,record,rowIndex,columnIndex,store){
+		            	return "<a href='#' onclick=Ext.getCmp(\'"+"prodPkgForm"+"\').deleteRow(); style='color:blue'>删除</a>";
+					}
+				}
 			]
         });
 		cm.isCellEditable = this.cellEditable;
@@ -647,7 +660,7 @@ ProdList = Ext.extend(Ext.grid.EditorGridPanel,{
 			id: 'prodPkgForm',
 		    region: 'center',
 		    border: false,
-		    store:this.store,
+		    store:this.packStore,
 			cm:cm,
 			clicksToEdit:1,
 			sm:new Ext.grid.RowSelectionModel({}),
@@ -659,6 +672,19 @@ ProdList = Ext.extend(Ext.grid.EditorGridPanel,{
 	        }]
 		});	
 		},
+		initComponent:function(){
+			ProdList.superclass.initComponent.call(this);
+			App.form.initComboData([this.userTypeComb,this.terminalComb]);
+			Ext.Ajax.request({
+				url: root + '/system/Prod!queryProdOrderByServ.action',
+				scope:this,
+				success: function(res, ops){
+					var rs = Ext.decode(res.responseText);
+					this.prodMap = rs;
+					this.prodComb.getStore().loadData(this.prodMap["all"]);
+				}
+			});
+		},
 		cellEditable:function(colIndex,rowIndex){
 			return Ext.grid.ColumnModel.prototype.isCellEditable.call(this, colIndex, rowIndex);
 		},
@@ -669,7 +695,7 @@ ProdList = Ext.extend(Ext.grid.EditorGridPanel,{
 			},this,{delay:10});
 			
 			this.on("afteredit",this.afterEdit,this);
-			this.on("beforedit",this.beforeEdit,this);
+			this.on("beforeedit",this.beforeEdit,this);
 		},
 		swapViews : function(){
 			if(this.view.lockedWrap){
@@ -683,24 +709,29 @@ ProdList = Ext.extend(Ext.grid.EditorGridPanel,{
 	        }
 	          
 		},
+		showData: function (v) {
+			if(!Ext.isEmpty(v)){
+				this.packStore.load({params:{prod_id:v}});
+			}
+		},
 		beforeEdit : function(obj){
-			
+			var record = obj.record;
+			var fieldName = obj.field;//编辑的column对应的dataIndex
+			if(fieldName == 'prod_list'){
+				if(Ext.isEmpty(record.get('user_type'))){
+					return false;
+				}
+				this.prodComb.getStore().loadData(this.prodMap[record.get('user_type')]);
+			}
 		},
 		afterEdit : function(obj){
 			var record = obj.record;
 			var fieldName = obj.field;//编辑的column对应的dataIndex
 			var value = obj.value;
-//			if(fieldName == 'user_type_text'){
-//				var cmp = this.userTypeComb;
-//				var index = cmp.store.find('item_name',value);
-//				var data = cmp.store.getAt(index);
-//				record.set('user_type',data.get('item_value'));
-//			}else if(fieldName == 'terminal_type_text'){
-//				var cmp = this.terminalComb;
-//				var index = cmp.store.find('item_name',value);
-//				var data = cmp.store.getAt(index);
-//				record.set('terminal_type',data.get('item_value'));
-//			}
+			if(fieldName == 'user_type'){
+				record.set('prod_list','');
+				this.prodComb.getStore().loadData(this.prodMap[value]);
+			}
 		},
 		addRecord : function(){
 			var count = this.getStore().getCount();
@@ -720,12 +751,13 @@ ProdList = Ext.extend(Ext.grid.EditorGridPanel,{
 			this.startEditing(count,0);
 			this.getSelectionModel().selectRow(count);
 		},
+		deleteRow : function(){
+			this.getStore().remove(this.getSelectionModel().getSelected());
+		},
 		getValues:function(){
 			this.stopEditing();
-			var records = this.getStore().getModifiedRecords();
-			if(records.length == 0){Alert('数据没有修改');flag = false;}
 			var arr = []
-			Ext.each(records,function(record){
+			this.getStore().each(function(record){
 				var values = {};
 				values["package_group_name"] = record.get('package_group_name');
 				values["user_type"] =record.get('user_type');
@@ -735,8 +767,23 @@ ProdList = Ext.extend(Ext.grid.EditorGridPanel,{
 				values["package_group_id"] = record.get('package_group_id');
 				values["terminal_type"] = record.get('terminal_type');
 				arr.push(values);
-			},this);
+			})
 			return arr;
+//			var records = this.getStore().getModifiedRecords();
+//			if(records.length == 0){Alert('数据没有修改');flag = false;}
+//			var arr = []
+//			Ext.each(records,function(record){
+//				var values = {};
+//				values["package_group_name"] = record.get('package_group_name');
+//				values["user_type"] =record.get('user_type');
+//				values["prod_list"] = record.get('prod_list');
+//				values["max_user_cnt"] = record.get('max_user_cnt');
+//				values["precent"] = record.get('precent');
+//				values["package_group_id"] = record.get('package_group_id');
+//				values["terminal_type"] = record.get('terminal_type');
+//				arr.push(values);
+//			},this);
+//			return arr;
 		}
 
 

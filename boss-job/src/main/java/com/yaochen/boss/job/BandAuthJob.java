@@ -28,7 +28,8 @@ public class BandAuthJob implements Job2 {
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	@Autowired
 	private AuthComponent authComponent;
-	
+	@Autowired
+	private BOSSBandServiceAdapter bOSSBandServiceAdapter;
 	@Override
 	public void execute(Job2ExecutionContext arg0) throws JobExecutionException {
 		//读取要发送的指令
@@ -40,7 +41,8 @@ public class BandAuthJob implements Job2 {
 			return;
 		}
 		
-		BOSSBandServiceAdapter bandClient = new BOSSBandServiceAdapter();
+		BOSSBandServiceAdapter bandClient =bOSSBandServiceAdapter;
+		
 		
 		for (JBandCommand cmd:cmdList){
 			Result result = new Result();
