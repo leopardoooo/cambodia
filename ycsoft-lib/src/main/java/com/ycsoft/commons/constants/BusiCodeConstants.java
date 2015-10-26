@@ -149,6 +149,7 @@ public final class BusiCodeConstants {
 	public final static String TASK_CHANGE_DEVICE = "2262";	//工单更换回填的智能卡
 	public final static String CANCEL_PAY = "2263";	//支付回退
 	public final static String SUPER_CANCEL_PAY = "2264";//超级支付回退
+	public final static String OTHER_FEE = "2265";//杂费收取
 	
 	public final static String BATCH_USER_WRITE_OFF = "1913";	//批量销用户
 }

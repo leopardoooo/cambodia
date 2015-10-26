@@ -109,3 +109,5 @@
 	<script type="text/javascript" src="<%=r %>/pages/sysmanager/system/AgentConfig.js"></script>
 	<!-- 翻译配置 -->
 	<script type="text/javascript" src="<%=r %>/pages/sysmanager/system/TranslationConfig.js"></script>
+	<!-- 协议用户配置 -->
+	<script type="text/javascript" src="<%=r %>/pages/sysmanager/system/AgreementUserConfig.js"></script>
