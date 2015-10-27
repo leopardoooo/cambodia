@@ -221,7 +221,7 @@ public class OttClient {
 			//user.setEnd_time(Da);
 		} else {
 			user.setState("2");
-			user.setEnd_time(new Date());
+			//user.setEnd_time(new Date());
 		}
 		user.setUser_rank("0");
 		user.setUser_permission("0");
