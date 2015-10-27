@@ -135,19 +135,8 @@ public class CustComponent extends BaseBusiComponent {
 	 */
 	public String createCust(CCust cust,CCustLinkman linkMan, String custCode) throws Exception{
 
-		if(cust.getCust_type().equals(SystemConstants.CUST_TYPE_NONRESIDENT) && StringHelper.isNotEmpty(cust.getSpkg_sn())){
-			PSpkg spkg = pSpkgDao.querySpkgBySn(cust.getSpkg_sn());
-			if(spkg != null){
-				if(!spkg.getStatus().equals(StatusConstants.IDLE) || cCustDao.queryBySpkgSn(spkg.getSpkg_sn()) != null)
-					throw new ComponentException(ErrorCode.SpkgIsUsed);
-				spkg.setApply_optr_id(getOptr().getOptr_id());
-				spkg.setApply_date(new Date());
-				spkg.setStatus(StatusConstants.UNCONFIRM);
-				pSpkgDao.update(spkg);
-			}else{
-				throw new ComponentException(ErrorCode.SpkgIsError);
-			}
-		}
+		//检查协议号能否被客户使用
+		this.checkCustUseSpkgSn(cust, cust.getSpkg_sn());
 		
 		//保存客户基本信息
 		cust.setCust_id(gCustId());
@@ -183,7 +172,27 @@ public class CustComponent extends BaseBusiComponent {
 		return cust.getCust_id();
 	}
 
-
+	/**
+	 * 检查协议号能否被使用
+	 * @param cust
+	 * @param skkg_sn
+	 * @throws Exception
+	 */
+	public void checkCustUseSpkgSn(CCust cust,String skkg_sn) throws Exception{
+		if(cust.getCust_type().equals(SystemConstants.CUST_TYPE_NONRESIDENT) && StringHelper.isNotEmpty(skkg_sn)){
+			PSpkg spkg = pSpkgDao.querySpkgBySn(skkg_sn);
+			if(spkg != null){
+				if(!spkg.getStatus().equals(StatusConstants.IDLE) || cCustDao.queryBySpkgSn(spkg.getSpkg_sn()) != null)
+					throw new ComponentException(ErrorCode.SpkgIsUsed);
+				spkg.setApply_optr_id(getOptr().getOptr_id());
+				spkg.setApply_date(new Date());
+				spkg.setStatus(StatusConstants.UNCONFIRM);
+				pSpkgDao.update(spkg);
+			}else{
+				throw new ComponentException(ErrorCode.SpkgIsError);
+			}
+		}
+	}
 	/**
 	 * 修改客户信息
 	 * @param doneCode	流水号
@@ -201,6 +210,10 @@ public class CustComponent extends BaseBusiComponent {
 		Map<String, TTabDefine> tabDefine = queryTableDefine("CCUST");
 		
 		for (CCustPropChange change:propChangeList){
+			//验证协议号是否使用
+			if(change.getColumn_name().equals("spkg_sn")){
+				this.checkCustUseSpkgSn(cust, change.getNew_value());
+			}
 			
 			if(change.getColumn_name().equals("cust_count")){
 				int custCount = Integer.parseInt(change.getNew_value());

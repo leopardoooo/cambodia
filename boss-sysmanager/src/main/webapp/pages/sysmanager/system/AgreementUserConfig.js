@@ -10,8 +10,9 @@ AgreementGrid = Ext.extend(Ext.grid.GridPanel, {
 			url: root+'/config/Config!querySpkg.action',
 			fields: ['sp_id', 'spkg_sn', 'spkg_title', 'spkg_text', 'remark', 'create_time', 'optr_id', 'status', 'optr_name',       
 				'status_text', 'confirm_optr_id', 'confirm_date', 'apply_optr_id', 'apply_date', 'optr_name', 'confirm_optr_name', 'apply_optr_name',
-				{type:'date',name: 'eff_date', format: 'Y-m-d'}, {type:'date',name: 'exp_date', format: 'Y-m-d'}
-				],
+				{type:'date',name: 'eff_date', format: 'Y-m-d'}, {type:'date',name: 'exp_date', format: 'Y-m-d'},
+				'cust_no', 'cust_name', 'prod_name'
+			],
 			totalProperty: 'totalProperty',
 			root: 'records'
 		});
@@ -39,6 +40,9 @@ AgreementGrid = Ext.extend(Ext.grid.GridPanel, {
 				}
 				return text;
 			}},
+			{header: '客户编号',		dataIndex: 'cust_no',			width: 100, renderer: App.qtipValue},
+			{header: '客户名称',		dataIndex: 'cust_name',			width: 100, renderer: App.qtipValue},
+			{header: '产品名称',		dataIndex: 'prod_name',			width: 100, renderer: App.qtipValue},
 			{header: '备注',			dataIndex: 'remark', 			width: 100, renderer: App.qtipValue}
 		];
 		AgreementGrid.superclass.constructor.call(this, {
@@ -329,10 +333,6 @@ AgreementWin = Ext.extend(Ext.Window, {
 				allowBlank: false
 			},{
 				xtype: 'textfield',
-				fieldLabel: '协议标题',
-				name: 'spkg_title'
-			},{
-				xtype: 'textfield',
 				fieldLabel: '协议内容',
 				name: 'spkg_text'
 			},{
@@ -354,10 +354,16 @@ AgreementWin = Ext.extend(Ext.Window, {
 				format: 'Y-m-d'
 			},{
 				xtype: 'textarea',
+				fieldLabel: '协议标题',
+				name: 'spkg_title',
+				anchor: '95%',
+				height: 120
+			},{
+				xtype: 'textarea',
 				fieldLabel: '备注',
 				name: 'remark',
 				anchor: '95%',
-				height: 80
+				height: 100
 			}]
 		});
 		AgreementWin.superclass.constructor.call(this, {

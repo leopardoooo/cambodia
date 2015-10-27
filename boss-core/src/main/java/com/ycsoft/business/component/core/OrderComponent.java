@@ -1707,6 +1707,9 @@ public class OrderComponent extends BaseBusiComponent {
 				if (!tariff.getSpkg_sn().equals(cust.getSpkg_sn()))
 					tariffIt.remove();
 			}
+		}if(prod.getProd_type().equals(SystemConstants.PROD_TYPE_CUSTPKG)&&StringHelper.isNotEmpty(cust.getSpkg_sn())){
+			//有协议号的情况，客户套餐不能订购
+			ptList.clear();
 		} else {
 			for (Iterator<ProdTariffDto> tariffIt = ptList.iterator();tariffIt.hasNext();) {
 				ProdTariffDto  tariff = tariffIt.next();

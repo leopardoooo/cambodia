@@ -3,7 +3,7 @@
  */
 cfgProdType = {
 	"P" : "BASE",
-	"U" : "UPKG",
+	"U" : "SPKG",
 	"C" : "CPKG",
 	"ADDPROD" : "增加产品",
 	"UPDATEPROD" : "修改产品",
@@ -207,7 +207,10 @@ ProdTree = Ext.extend(Ext.tree.TreePanel, {
 	},
 	queryAll : function(id) {
 		Ext.Ajax.request({
-			url : root + '/system/Prod!queryProdById.action?doneId=' + id,
+			url : root + '/system/Prod!queryProdById.action',
+			params: {
+				doneId: id
+			},
 			scope : this,
 			success : function(res, ops) {
 				var rs = Ext.decode(res.responseText);
@@ -407,7 +410,7 @@ ProdListForm = Ext.extend(Ext.form.FormPanel, {
 										xtype : 'paramcombo',
 										paramName : 'BOOLEAN',
 										allowBlank : false,
-										defaultValue : 'F',
+										defaultValue : 'T',
 										disabled : this.updateProd,
 										hiddenName : 'is_base'
 									}, {
@@ -739,7 +742,6 @@ ProdWindow = Ext.extend(Ext.Window, {
 	FORM : null,
 	updateProd : false,
 	constructor : function(v, t, c, store) {
-		thiz = this;
 
 		var prodId = null;
 		if (store) {
@@ -840,9 +842,7 @@ ProdWindow = Ext.extend(Ext.Window, {
 							}, {
 								text : '关闭',
 								scope : this,
-								handler : function() {
-									thiz.close();
-								}
+								handler : this.close
 							}]
 				});
 	},
@@ -896,6 +896,7 @@ ProdWindow = Ext.extend(Ext.Window, {
 			Ext.Ajax.request({
 						url : root + '/system/Prod!editProd.action',
 						params : all,
+						scope: this,
 						success : function(res, ops) {
 							mb.hide();// 隐藏提示框
 							mb = null;
@@ -911,8 +912,8 @@ ProdWindow = Ext.extend(Ext.Window, {
 											Ext.getCmp('updateprodIdItems')
 													.setDisabled(false);
 											Ext.getCmp('addTariff').show();
-											thiz.close();
-										}, thiz);
+											this.close();
+										}, this);
 							} else {
 								Alert('操作失败!');
 							}
@@ -973,6 +974,7 @@ ProdWindow = Ext.extend(Ext.Window, {
 				Ext.Ajax.request({
 					url : root + '/system/Prod!save.action',
 					params : all,
+					scope: this,
 					success : function(res, ops) {
 						mb.hide();// 隐藏提示框
 						mb = null;
@@ -987,8 +989,8 @@ ProdWindow = Ext.extend(Ext.Window, {
 										Ext.getCmp('updateprodIdItems')
 												.setDisabled(false);
 										Ext.getCmp('addTariff').show();
-										thiz.close();
-									}, thiz);
+										this.close();
+									}, this);
 						} else {
 							Alert('操作失败!');
 						}
@@ -1006,6 +1008,7 @@ ProdWindow = Ext.extend(Ext.Window, {
 				Ext.Ajax.request({
 					url : root + '/system/Prod!savePack.action',
 					params : all,
+					scope: this,
 					success : function(res, ops) {
 						mb.hide();// 隐藏提示框
 						mb = null;
@@ -1020,8 +1023,8 @@ ProdWindow = Ext.extend(Ext.Window, {
 										Ext.getCmp('updateprodIdItems')
 												.setDisabled(false);
 										Ext.getCmp('addTariff').show();
-										thiz.close();
-									}, thiz);
+										this.close();
+									}, this);
 						} else {
 							Alert('操作失败!');
 						}

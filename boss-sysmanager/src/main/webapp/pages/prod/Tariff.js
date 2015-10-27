@@ -136,7 +136,6 @@ TariffWindow = Ext.extend(Ext.Window, {
     ispkg:null,
     constructor: function (t, v,ispkg,store, areaId, record) {
     	//t:title,v:prodId,isPkg:是否基本包
-        thiz = this;
         this.tprodId = v;
         this.forAreaId = areaId;
         this.ispkg = ispkg;
@@ -250,98 +249,98 @@ TariffWindow = Ext.extend(Ext.Window, {
             tariffall["prodTariffDto." + key] = formone[key];
         }
         
-//        if(thiz.ispkg != cfgProdType["P"]){
-//	        var packdata = [];
-//			packIds = null;
-//	        var store = this.prodPkgGrid.getStore();
-//	        this.prodPkgGrid.stopEditing();
-//	        
-//	        var typeArr = store.collect('type');	//分成类型
-//	        var percent = 0;
-//        	var flag = false;flagM = false;
-//        	for(var i=0,len=typeArr.length;i<len;i++){
-//        		var type = typeArr[i],type_text = '';
-//		        store.each(function(record){
-//		        	if(type == record.get('type')){
-//		        		type_text = record.get('type_text');
-//		        		if(type == 'M' && Ext.isEmpty(record.get('tariff_id'))){
-//			        		flag = true;
-//			        	}
-//			        	if(type == 'M' && Ext.isEmpty(record.get('max_prod_count'))){
-//				        	flagM = true;
-//			        	}
-//			        	if(type == 'F' && Ext.isEmpty(record.get('max_prod_count'))){
-//			        		record.set('max_prod_count',null);
-//			        	}
-//			        	if(Ext.isEmpty(record.get('percent_value'))){
-//			        		record.set('percent_value',0);
-//			        	}
-//				        percent += record.get('percent_value');
-//		        	}
-//		        });
-//		        if(thiz.ispkg == cfgProdType["U"]){
-////				    if(Ext.getCmp('billingType').getValue() != 'BY'){
-//				        if(flag){
-//				        	Alert('<b>'+type_text+'</b>分成类型中子产品未选择资费!'); 
-//				        	return;
-//				        }
-////			        }
-//		        }
-//		        if(flagM && thiz.ispkg == cfgProdType["C"]){
-//		        	Alert('<b>'+type_text+'</b>分成类型中子产品未选择最大产品数!'); 
-//				    return;
-//		        }
-//		        //市场分成必输，财务的可输可不输
-//		        if(type == 'M' && percent != Ext.getCmp('rent').getValue()){
-//		        	Alert('<b>'+type_text+'</b>类型中子产品分成值的和与套餐租费不一致!');
-//		        	return;
-//		        } else if(type == 'F' && percent > 0 && percent != Ext.getCmp('rent').getValue()){
-//		        	Alert('<b>'+type_text+'</b>类型中子产品分成值的和与套餐租费不一致!');
-//		        	return;
-//		        }
-////		        flag = false;
-//		        percent = 0;
-//        	}
-//        	
-//        	var fince_percent = 0;
-//        	
-//        	store.each(function(record){
-//        		if(Ext.isEmpty(record.get('tariff_id'))){
-//	        		flag = true;
-//	        	}
-//        		if(record.get('type') == 'F'){
-//        			fince_percent += record.get('percent_value');
-//        		}
-//        	});
-//        	store.each(function(record){
-//        		var type = record.get('type');
-//        		if(type == 'M'){
-//    				packdata.push(record.data);
-//        		}else if(type == 'F' && fince_percent >0){
-//        			packdata.push(record.data);
-//        		}
-//        	});
-//	        
-//	        /*store.each(function(record){
-//	        	if(Ext.isEmpty(record.get('tariff_id'))){
-//	        		flag = true;
-//	        	}
-//	        	if(Ext.isEmpty(record.get('percent_value'))){
-//	        		record.set('percent_value',0);
-//	        	}
-//		        percent += record.get('percent_value');
-//	        	packdata.push(record.data);
-//	        },this)
-//	        
-//	        if(thiz.ispkg == cfgProdType["U"]){
-//			    if(Ext.getCmp('billingType').getValue() != 'BY'){
-//			        if(flag){Alert('子产品未选择资费!'); return;};
-//		        }
-//	        }
-//	        if(percent != Ext.getCmp('rent').getValue()){Alert('子产品分成值的和与套餐租费不一致!');return;};*/
-//	        var packrecords = Ext.encode(packdata);
-//			tariffall["packList"] = packrecords;
-//        }
+/*        if(thiz.ispkg != cfgProdType["P"]){
+	        var packdata = [];
+			packIds = null;
+	        var store = this.prodPkgGrid.getStore();
+	        this.prodPkgGrid.stopEditing();
+	        
+	        var typeArr = store.collect('type');	//分成类型
+	        var percent = 0;
+        	var flag = false;flagM = false;
+        	for(var i=0,len=typeArr.length;i<len;i++){
+        		var type = typeArr[i],type_text = '';
+		        store.each(function(record){
+		        	if(type == record.get('type')){
+		        		type_text = record.get('type_text');
+		        		if(type == 'M' && Ext.isEmpty(record.get('tariff_id'))){
+			        		flag = true;
+			        	}
+			        	if(type == 'M' && Ext.isEmpty(record.get('max_prod_count'))){
+				        	flagM = true;
+			        	}
+			        	if(type == 'F' && Ext.isEmpty(record.get('max_prod_count'))){
+			        		record.set('max_prod_count',null);
+			        	}
+			        	if(Ext.isEmpty(record.get('percent_value'))){
+			        		record.set('percent_value',0);
+			        	}
+				        percent += record.get('percent_value');
+		        	}
+		        });
+		        if(thiz.ispkg == cfgProdType["U"]){
+//				    if(Ext.getCmp('billingType').getValue() != 'BY'){
+				        if(flag){
+				        	Alert('<b>'+type_text+'</b>分成类型中子产品未选择资费!'); 
+				        	return;
+				        }
+//			        }
+		        }
+		        if(flagM && thiz.ispkg == cfgProdType["C"]){
+		        	Alert('<b>'+type_text+'</b>分成类型中子产品未选择最大产品数!'); 
+				    return;
+		        }
+		        //市场分成必输，财务的可输可不输
+		        if(type == 'M' && percent != Ext.getCmp('rent').getValue()){
+		        	Alert('<b>'+type_text+'</b>类型中子产品分成值的和与套餐租费不一致!');
+		        	return;
+		        } else if(type == 'F' && percent > 0 && percent != Ext.getCmp('rent').getValue()){
+		        	Alert('<b>'+type_text+'</b>类型中子产品分成值的和与套餐租费不一致!');
+		        	return;
+		        }
+//		        flag = false;
+		        percent = 0;
+        	}
+        	
+        	var fince_percent = 0;
+        	
+        	store.each(function(record){
+        		if(Ext.isEmpty(record.get('tariff_id'))){
+	        		flag = true;
+	        	}
+        		if(record.get('type') == 'F'){
+        			fince_percent += record.get('percent_value');
+        		}
+        	});
+        	store.each(function(record){
+        		var type = record.get('type');
+        		if(type == 'M'){
+    				packdata.push(record.data);
+        		}else if(type == 'F' && fince_percent >0){
+        			packdata.push(record.data);
+        		}
+        	});
+	        
+	        store.each(function(record){
+	        	if(Ext.isEmpty(record.get('tariff_id'))){
+	        		flag = true;
+	        	}
+	        	if(Ext.isEmpty(record.get('percent_value'))){
+	        		record.set('percent_value',0);
+	        	}
+		        percent += record.get('percent_value');
+	        	packdata.push(record.data);
+	        },this)
+	        
+	        if(thiz.ispkg == cfgProdType["U"]){
+			    if(Ext.getCmp('billingType').getValue() != 'BY'){
+			        if(flag){Alert('子产品未选择资费!'); return;};
+		        }
+	        }
+	        if(percent != Ext.getCmp('rent').getValue()){Alert('子产品分成值的和与套餐租费不一致!');return;};
+	        var packrecords = Ext.encode(packdata);
+			tariffall["packList"] = packrecords;
+        }*/
         tariffall["prodTariffDto.rent"] =Ext.util.Format.formatToFen(Ext.getCmp('rent').getValue());
         tariffall["prodTariffDto.prod_id"] = this.tprodId;
         tariffall["prodTariffDto.for_area_id"] = this.forAreaId;
@@ -367,14 +366,15 @@ TariffWindow = Ext.extend(Ext.Window, {
         Ext.Ajax.request({
             url: root + '/system/Prod!saveTariff.action',
             params: tariffall,
+            scope: this,
             success: function (res, ops) {
             	mask.hide();
                 var rs = Ext.decode(res.responseText);
                 if (true === rs.success) {
                     Alert('操作成功!', function () {
-                    	Ext.getCmp('prodTreeId').queryAll(thiz.tprodId);
-                        thiz.close();
-                    }, thiz);
+                    	Ext.getCmp('prodTreeId').queryAll(this.tprodId);
+                        this.close();
+                    }, this);
                 }
                 else {
                     Alert('操作失败!');
@@ -686,6 +686,12 @@ TariffInfoPanel = Ext.extend(Ext.form.FormPanel, {
 				disabled : false,
 				minValue : new Date().format('Y-m-d')
 			},{
+				xtype: 'textfield',
+				fieldLabel: '协议编号',
+				name: 'spkg_sn',
+				disabled : false,
+				allowBlank: false
+			},{
 				fieldLabel: '服务渠道',
 				xtype:'paramlovcombo',paramName:'SERVICE_CHANNEL',
 				hiddenName:'service_channel',
@@ -799,7 +805,6 @@ var LowestPriceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 		});
 		this.priceStore.load();
 		this.prodId = prodId;
-		thatTothis = this;
 		var cm = new Ext.grid.ColumnModel([
 			{header:'适用地区',dataIndex:'county_name',width:150},
 			{id:'priceId',header:'省级定价(元)',dataIndex:'price',editor:new Ext.form.NumberField({allowNegative : false,allowDecimals : false,minValue : 0})},
@@ -827,7 +832,7 @@ var LowestPriceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 		LowestPriceGrid.superclass.initComponent.call(this);
 	},
 	doSave:function(){
-		thatTothis.stopEditing();// 停止编辑
+		this.stopEditing();// 停止编辑
 		Confirm("确定保存吗?", this ,function(){
 			mb = Show();//显示正在提交
 			
@@ -865,7 +870,7 @@ var LowestPriceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 		var priceIdIndex = this.getIndexById('priceId');
 		var aPriceIdIndex = this.getIndexById('areaPriceId');
 		var cPriceIdIndex = this.getIndexById('countyPriceId');
-		var count = thatTothis.getStore().getCount();
+		var count = this.getStore().getCount();
 		if(count!=rowIndex){
 			if(colIndex === priceIdIndex){
 				//省级定价,只有4501能改
@@ -912,7 +917,6 @@ TariffGrid = Ext.extend(Ext.grid.GridPanel, {
     forAreaId: null,
     editTariff:false,//修改资费
     constructor: function () {
-    	tariffThis = this;
     	
     	//修改资费的权限
 		for(var i=0;i<App.subMenu.length;i++){
@@ -922,12 +926,11 @@ TariffGrid = Ext.extend(Ext.grid.GridPanel, {
 			}
 		}
     	
-        tariffGridThiz = this;
         this.tariffStore = new Ext.data.JsonStore({
             	fields: ['tariff_name','billing_type_text','billing_cycle','rent','status_text','tariff_desc','prod_id','tariff_id','billing_type',
             	'month_rent_cal_type','day_rent_cal_type','use_fee_rule','bill_rule','month_rent_cal_type_text','day_rent_cal_type_text',
             	'use_fee_rule_text','bill_rule_text','rule_id_text','rule_id','status','status_text','optr_id','county_id','countyList',
-            	'tariff_type','tariff_type_text','area_id','eff_date','exp_date','service_channel','service_channel_text'],
+            	'tariff_type','tariff_type_text','area_id','eff_date','exp_date','service_channel','service_channel_text','spkg_sn'],
             	sortInfo: {field: 'status_text', direction: 'DESC'}
         });
         var tariffsm = new Ext.grid.CheckboxSelectionModel();
@@ -966,6 +969,10 @@ TariffGrid = Ext.extend(Ext.grid.GridPanel, {
             width: 60,
             renderer : Ext.util.Format.formatFee
             },
+        {
+        	header: '协议编号',
+        	dataIndex: 'spkg_sn'
+        },
         {
             header: '业务规则',
             sortable: true,
@@ -1030,11 +1037,11 @@ TariffGrid = Ext.extend(Ext.grid.GridPanel, {
             || (this.editTariff && record.get('countyList').length == 1 
             		&& record.get('countyList')[0] == App.data.optr['county_id'])){
             		if(record.get('status') == 'ACTIVE'){
-            			btns = btns + "&nbsp;<a href='#' onclick='tariffGridThiz.UpDateTariff();' style='color:blue'>修改</a>" 
-            			+ "&nbsp;<a href='#' onclick='tariffGridThiz.deleteTariff();' style='color:blue'>禁用</a>" 
-            			+ "&nbsp;<a href='#' onclick='tariffGridThiz.ShowDisct();' style='color:blue'>折扣</a>"
+            			btns = btns + "&nbsp;<a href='#' onclick=Ext.getCmp('tariffGrid').UpDateTariff() style='color:blue'>修改</a>" 
+            			+ "&nbsp;<a href='#' onclick=Ext.getCmp('tariffGrid').deleteTariff() style='color:blue'>禁用</a>" 
+            			+ "&nbsp;<a href='#' onclick=Ext.getCmp('tariffGrid').ShowDisct() style='color:blue'>折扣</a>"
             		}else{
-            			btns = btns + "&nbsp;<a href='#' onclick='tariffGridThiz.UpToUseTariff();' style='color:blue'>启用</a>"
+            			btns = btns + "&nbsp;<a href='#' onclick=Ext.getCmp('tariffGrid').UpToUseTariff() style='color:blue'>启用</a>"
             		}
             		
 		}
@@ -1091,19 +1098,20 @@ TariffGrid = Ext.extend(Ext.grid.GridPanel, {
     	    var grid = Ext.getCmp('tariffGrid');
         	var record = grid.getSelectionModel().getSelected();
     		var tariffId = record.get('tariff_id');
-            Confirm("确定禁用该资费吗?", null, function () {
+            Confirm("确定禁用该资费吗?", this, function () {
                 Ext.Ajax.request({
                     url: root + '/system/Prod!deleteTariff.action',
                     params: {
                         doneId: tariffId
                     },
+                    scope: this,
                     success: function (res, ops) {
                         var rs = Ext.decode(res.responseText);
                         if (true === rs.success) {
                             Alert('操作成功!', function () {
-		                    	Ext.getCmp('prodTreeId').queryAll(tariffThis.tprodId);
+		                    	Ext.getCmp('prodTreeId').queryAll(this.tprodId);
 								Ext.getCmp('updateprodIdItems').setDisabled(false);
-		                    }, tariffThis);
+		                    }, this);
                         }
                         else {
                             Alert('操作失败!');
