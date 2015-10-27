@@ -885,7 +885,7 @@ public class RDeviceDao extends BaseEntityDao<RDevice> {
 				"       is_new_stb, device_model, batch_num,total_num,box_no)"+
 				" select r.device_id, r.device_type, r.device_status, r.depot_status, r.used, r.backup, r.freezed, r.diffence_type, r.depot_id, r.ownership, r.warranty_date, r.is_virtual, r.is_local,"+
 				" r.is_new_stb,r.device_model,r.batch_num,r.total_num,r.box_no"+
-				" from r_device_done_deviceid d,r_device r"+
+				" from r_device r"+
 				" where r.device_id=? ";
 		executeUpdate(sql, deviceId);	
 		
