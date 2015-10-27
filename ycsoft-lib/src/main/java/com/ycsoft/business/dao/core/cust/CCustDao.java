@@ -657,4 +657,9 @@ public class CCustDao extends BaseEntityDao<CCust> {
 		return this.createQuery(sql, spkgSn).first();
 	}
 	
+	public void clearSpkgSn(String spkgSn) throws Exception {
+		String sql = "update c_cust set spkg_sn=null where spkg_sn=?";
+		this.executeUpdate(sql, spkgSn);
+	}
+	
 }

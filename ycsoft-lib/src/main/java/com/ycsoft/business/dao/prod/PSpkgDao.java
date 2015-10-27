@@ -35,7 +35,8 @@ public class PSpkgDao extends BaseEntityDao<PSpkg> {
 			sql += " and s.spkg_title like '%"+query+"%' or spkg_text like '%"+query+"%'";
 		}
 		sql += "group by c.cust_no,c.cust_name,s.sp_id, s.spkg_sn, s.spkg_title, s.spkg_text, s.eff_date, s.exp_date, "
-				+ "s.remark, s.optr_id, s.create_time, s.status,s.confirm_optr_id, s.confirm_date, s.apply_optr_id, s.apply_date";
+				+ "s.remark, s.optr_id, s.create_time, s.status,s.confirm_optr_id, s.confirm_date, s.apply_optr_id, s.apply_date"
+				+ " order by s.create_time desc";
 		return this.createQuery(sql).setStart(start).setLimit(limit).page();
 	}
 	

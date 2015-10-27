@@ -1,6 +1,5 @@
 package com.ycsoft.sysmanager.component.config;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -19,6 +18,7 @@ import com.ycsoft.beans.system.SDataTranslation;
 import com.ycsoft.business.dao.config.TBusiFeeStdDao;
 import com.ycsoft.business.dao.config.TProvinceDao;
 import com.ycsoft.business.dao.config.TTemplateCountyDao;
+import com.ycsoft.business.dao.core.cust.CCustDao;
 import com.ycsoft.business.dao.prod.PSpkgDao;
 import com.ycsoft.business.dao.prod.PSpkgOpenbusifeeDao;
 import com.ycsoft.business.dao.prod.PSpkgOpenuserDao;
@@ -53,6 +53,8 @@ public class ConfigComponent extends BaseComponent {
 	private RDeviceFeeDao rDeviceFeeDao;
 	@Autowired
 	private TBusiFeeStdDao tBusiFeeStdDao;
+	@Autowired
+	private CCustDao cCustDao;
 	
 	public Pager<PSpkg> querySpkg(String query, Integer start, Integer limit) throws Exception {
 		return pSpkgDao.querySpkg(query, start, limit);
@@ -111,11 +113,16 @@ public class ConfigComponent extends BaseComponent {
 		PSpkg spkg = pSpkgDao.findByKey(spId);
 		if(spkg == null)
 			throw new ComponentException("协议数据不存在!");
-		if(!spkg.getStatus().equals(newStatus)){
+		
+		if(newStatus.equals(StatusConstants.CONFIRM)){
 			spkg.setStatus(newStatus);
 			spkg.setConfirm_optr_id(WebOptr.getOptr().getOptr_id());
 			spkg.setConfirm_date(new Date());
 			pSpkgDao.update(spkg);
+		}else if(newStatus.equals(StatusConstants.INVALID)){
+			spkg.setStatus(StatusConstants.IDLE);
+			pSpkgDao.update(spkg);
+			cCustDao.clearSpkgSn(spkg.getSpkg_sn());
 		}
 	}
 	
