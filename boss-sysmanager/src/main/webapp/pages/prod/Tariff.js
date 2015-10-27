@@ -379,6 +379,9 @@ TariffWindow = Ext.extend(Ext.Window, {
                 else {
                     Alert('操作失败!');
                 }
+            },
+            clearData: function(){
+            	mask.hide();
             }
         });
     },
@@ -585,6 +588,7 @@ TariffInfoPanel = Ext.extend(Ext.form.FormPanel, {
     constructor: function (p, record) {
         this.parent = p;
         this.record = record;
+        console.log(this.record);
         this.busiRuleStore = new Ext.data.JsonStore({
             url: root + '/system/Index!queryBusiRule.action',
             fields: ['rule_id', 'rule_name']
@@ -689,8 +693,7 @@ TariffInfoPanel = Ext.extend(Ext.form.FormPanel, {
 				xtype: 'textfield',
 				fieldLabel: '协议编号',
 				name: 'spkg_sn',
-				disabled : false,
-				allowBlank: false
+				disabled : false
 			},{
 				fieldLabel: '服务渠道',
 				xtype:'paramlovcombo',paramName:'SERVICE_CHANNEL',

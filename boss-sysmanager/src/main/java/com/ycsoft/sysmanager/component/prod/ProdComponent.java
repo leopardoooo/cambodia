@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.google.gson.reflect.TypeToken;
@@ -59,6 +60,7 @@ import com.ycsoft.business.dao.prod.PPromFeeCountyDao;
 import com.ycsoft.business.dao.prod.PPromotionDao;
 import com.ycsoft.business.dao.prod.PResDao;
 import com.ycsoft.business.dao.prod.PResgroupDao;
+import com.ycsoft.business.dao.prod.PSpkgDao;
 import com.ycsoft.business.dao.prod.TServerResDao;
 import com.ycsoft.business.dao.system.SAreaDao;
 import com.ycsoft.business.dao.system.SCountyDao;
@@ -126,6 +128,8 @@ public class ProdComponent extends BaseComponent {
 	
 	private SSysChangeDao sSysChangeDao;
 	private TServerCountyDao tServerCountyDao; 
+	@Autowired
+	private PSpkgDao pSpkgDao;
 
 	/**
 	 * 查询产品树
@@ -1563,6 +1567,13 @@ public class ProdComponent extends BaseComponent {
 		
 		List<TreeDto> oldTariffCountyBytariffId = pProdTariffCountyDao.getTariffCountyBytariffId(tariff.getTariff_id());
 		PProd prod = pProdDao.findByKey(tariff.getProd_id());
+		if(prod.getProd_type().equals(SystemConstants.PROD_TYPE_SPKG) && StringHelper.isNotEmpty(tariff.getSpkg_sn())){
+			if(pSpkgDao.querySpkgBySn(tariff.getSpkg_sn()) == null){
+				throw new ComponentException("该协议用户配置数据不存在");
+			}
+		}else{
+			tariff.setSpkg_sn("");
+		}
 		
 //		checkPrice(tariff,prod.getProd_type(),tariffCountyIds,optr);
 		
