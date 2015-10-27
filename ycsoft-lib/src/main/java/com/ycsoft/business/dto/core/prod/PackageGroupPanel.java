@@ -14,7 +14,7 @@ public class PackageGroupPanel implements Serializable {
 	private List<PackageGroupUser> groupList;
 	//客户下所有终端用户
 	private List<CUser> userList;
-
+	
 	//套餐配置跟客户用户数是否刚好匹配，如果匹配则needShow=falase（表示不需要打开终端选择界面)
 	private Boolean needShow;
 	

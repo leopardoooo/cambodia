@@ -8,6 +8,9 @@ import java.io.Serializable ;
 import java.util.Date ;
 import java.util.Date ;
 import java.util.Date ;
+
+import com.ycsoft.commons.constants.DictKey;
+import com.ycsoft.commons.store.MemoryDict;
 import com.ycsoft.daos.config.POJO ;
 
 
@@ -16,12 +19,16 @@ import com.ycsoft.daos.config.POJO ;
  */
 @POJO(
 	tn="P_SPKG",
-	sn="",
-	pk="")
+	sn="SEQ_SP_ID",
+	pk="SP_ID")
 public class PSpkg implements Serializable {
 	
 	// PSpkg all properties 
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 2224509151465955453L;
 	private String sp_id ;	
 	private String spkg_sn ;	
 	private String spkg_title ;	
@@ -31,13 +38,81 @@ public class PSpkg implements Serializable {
 	private String remark ;	
 	private String optr_id ;	
 	private Date create_time ;	
+	private String status;
+	private String confirm_optr_id;
+	private Date confirm_date;
+	private String apply_optr_id;
+	private Date apply_date;
+	
+	private String status_text;
+	private String optr_name;
+	private String confirm_optr_name;
+	private String apply_optr_name;
 	
 	/**
 	 * default empty constructor
 	 */
 	public PSpkg() {}
 	
+	public String getStatus_text() {
+		return status_text;
+	}
 	
+	public String getOptr_name() {
+		return optr_name;
+	}
+
+	public String getConfirm_optr_name() {
+		return confirm_optr_name;
+	}
+
+	public String getApply_optr_name() {
+		return apply_optr_name;
+	}
+	
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+		this.status_text = MemoryDict.getDictName(DictKey.STATUS, status);
+	}
+
+	public String getConfirm_optr_id() {
+		return confirm_optr_id;
+	}
+
+	public void setConfirm_optr_id(String confirm_optr_id) {
+		this.confirm_optr_id = confirm_optr_id;
+		this.confirm_optr_name = MemoryDict.getDictName(DictKey.OPTR, confirm_optr_id);
+	}
+
+	public Date getConfirm_date() {
+		return confirm_date;
+	}
+
+	public void setConfirm_date(Date confirm_date) {
+		this.confirm_date = confirm_date;
+	}
+
+	public String getApply_optr_id() {
+		return apply_optr_id;
+	}
+
+	public void setApply_optr_id(String apply_optr_id) {
+		this.apply_optr_id = apply_optr_id;
+		this.apply_optr_name = MemoryDict.getDictName(DictKey.OPTR, apply_optr_id);
+	}
+
+	public Date getApply_date() {
+		return apply_date;
+	}
+
+	public void setApply_date(Date apply_date) {
+		this.apply_date = apply_date;
+	}
+
 	// sp_id getter and setter
 	public String getSp_id(){
 		return this.sp_id ;
@@ -108,6 +183,7 @@ public class PSpkg implements Serializable {
 	
 	public void setOptr_id(String optr_id){
 		this.optr_id = optr_id ;
+		this.optr_name = MemoryDict.getDictName(DictKey.OPTR, optr_id);
 	}
 	
 	// create_time getter and setter

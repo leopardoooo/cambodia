@@ -28,8 +28,15 @@ public class PSpkgOpenbusifeeDao extends BaseEntityDao<PSpkgOpenbusifee> {
 	public List<PSpkgOpenbusifee> querySpkgOpenFee(String spkgSn) throws Exception {
 		String sql = "select sbf.*,b.fee_name from p_spkg s, p_spkg_openbusifee sbf,t_busi_fee b"
 				+ " where s.sp_id=sbf.sp_id and sbf.fee_id=b.fee_id"
-				+ " and s.spkg_sn=? and b.fee_type=? and sbf.status=?";
-		return this.createQuery(sql, spkgSn, SystemConstants.FEE_TYPE_BUSI, StatusConstants.IDLE).list();
+				+ " and s.spkg_sn=? and b.fee_type=? and sbf.status=? and s.status=?";
+		return this.createQuery(sql, spkgSn, SystemConstants.FEE_TYPE_BUSI, StatusConstants.IDLE, StatusConstants.CONFIRM).list();
+	}
+	
+	public List<PSpkgOpenbusifee> querySpkgOpenFeeBySpId(String spId) throws Exception {
+		String sql = "select sbf.*,b.fee_name from p_spkg_openbusifee sbf,t_busi_fee b"
+				+ " where sbf.fee_id=b.fee_id and sbf.sp_id=?"
+				+ " order by sbf.status, sbf.fee_id";
+		return this.createQuery(sql, spId).list();
 	}
 
 }

@@ -214,14 +214,14 @@ Ext.apply(Ext.form.VTypes, {
 		};
 		if (field.startDateField) {
 			var sd = Ext.getCmp(field.startDateField);
-			sd.maxValue = date;
+			sd.maxValue = field.customDay ? date.add(Date.DAY, field.customDay) : date;
 			if (sd.menu && sd.menu.picker) {
 				sd.menu.picker.maxDate = date;
 				dispUpd(sd.menu.picker);
 			}
 		} else if (field.endDateField) {
 			var ed = Ext.getCmp(field.endDateField);
-			ed.minValue = date;
+			ed.minValue = field.customDay ? date.add(Date.DAY, field.customDay) : date;
 			if (ed.menu && ed.menu.picker) {
 				ed.menu.picker.minDate = date;
 				dispUpd(ed.menu.picker);

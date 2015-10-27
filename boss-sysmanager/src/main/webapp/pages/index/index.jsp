@@ -16,6 +16,7 @@
 <html>
   <head>
     <title>首页-BOSS系统</title>
+    <meta http-equiv="cache-control" content="no-cache">
     <script type="text/javascript">
 		function nowDate(){
 			return Date.parseDate('<%=nowDate%>','Y-m-d h:i:s');

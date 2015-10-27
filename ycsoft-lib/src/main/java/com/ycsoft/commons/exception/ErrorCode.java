@@ -163,7 +163,9 @@ public enum ErrorCode {
 	OttMobileNotHaveMoreRes("OTT_MOBILE产品资源只能是1个"),
 	ProdPackMaxUserCntIsError("套餐产品的用户数必须大于等于1"),
 	ProdPackGroupNameIsError("产品内容组名称不能为空"),
-	ProdPackProdListIsError("产品内容组不能为空")
+	ProdPackProdListIsError("产品内容组不能为空"),
+	SpkgIsError("协议号不存在"),
+	SpkgIsUsed("协议号已使用")
 	;
 	
 	

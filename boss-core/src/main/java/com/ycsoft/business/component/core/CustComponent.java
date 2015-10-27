@@ -11,6 +11,7 @@ import java.util.Map;
 
 import org.apache.commons.beanutils.PropertyUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.ycsoft.beans.config.TAddress;
@@ -36,6 +37,7 @@ import com.ycsoft.beans.core.cust.CCustLinkman;
 import com.ycsoft.beans.core.cust.CCustLinkmanHis;
 import com.ycsoft.beans.core.cust.CCustPropChange;
 import com.ycsoft.beans.core.cust.CCustUnitToResident;
+import com.ycsoft.beans.prod.PSpkg;
 import com.ycsoft.beans.system.SAgent;
 import com.ycsoft.beans.system.SOptr;
 import com.ycsoft.business.commons.abstracts.BaseBusiComponent;
@@ -59,6 +61,7 @@ import com.ycsoft.business.dao.core.cust.CCustLinkmanDao;
 import com.ycsoft.business.dao.core.cust.CCustLinkmanHisDao;
 import com.ycsoft.business.dao.core.cust.CCustPropChangeDao;
 import com.ycsoft.business.dao.core.cust.CCustUnitToResidentDao;
+import com.ycsoft.business.dao.prod.PSpkgDao;
 import com.ycsoft.business.dto.config.TAddressDto;
 import com.ycsoft.business.dto.core.cust.CustDeviceDto;
 import com.ycsoft.business.dto.core.cust.CustFullInfoDto;
@@ -103,6 +106,9 @@ public class CustComponent extends BaseBusiComponent {
 	private TDistrictDao tDistrictDao;
 	private TProvinceDao tProvinceDao;
 	
+	@Autowired
+	private PSpkgDao pSpkgDao;
+	
 	/**
 	 * 查询变更产权的设备销售方式
 	 * @return
@@ -128,23 +134,25 @@ public class CustComponent extends BaseBusiComponent {
 	 * @throws Exception
 	 */
 	public String createCust(CCust cust,CCustLinkman linkMan, String custCode) throws Exception{
-		
-//		String appCode = cust.getApp_code();	//潜江非居民 审批单号
-//		if(StringHelper.isNotEmpty(appCode)){	//修改审批单号状态已使用
-//			TNonresCustApproval nca = tNonresCustApprovalDao.queryByAppCode(appCode);
-//			if(nca == null)
-//				throw new ComponentException("该审批单号不存在!");
-//			if(nca.getStatus().equals(StatusConstants.USE))
-//				throw new ComponentException("该审批单号已使用!");
-//			tNonresCustApprovalDao.updateStatus(appCode, StatusConstants.USE);
-//		}
+
+		if(cust.getCust_type().equals(SystemConstants.CUST_TYPE_NONRESIDENT) && StringHelper.isNotEmpty(cust.getSpkg_sn())){
+			PSpkg spkg = pSpkgDao.querySpkgBySn(cust.getSpkg_sn());
+			if(spkg != null){
+				if(!spkg.getStatus().equals(StatusConstants.IDLE) || cCustDao.queryBySpkgSn(spkg.getSpkg_sn()) != null)
+					throw new ComponentException(ErrorCode.SpkgIsUsed);
+				spkg.setApply_optr_id(getOptr().getOptr_id());
+				spkg.setApply_date(new Date());
+				spkg.setStatus(StatusConstants.UNCONFIRM);
+				pSpkgDao.update(spkg);
+			}else{
+				throw new ComponentException(ErrorCode.SpkgIsError);
+			}
+		}
 		
 		//保存客户基本信息
 		cust.setCust_id(gCustId());
 		cust.setCust_no(gCustNoByAddr(cust.getAddr_id(),custCode));
 
-		//设置默认信息:密码为证件号的后6位
-//		cust.setPassword(linkMan.getCert_num().length()>6?linkMan.getCert_num().substring(0, 6):linkMan.getCert_num());
 		
 		if(StringHelper.isEmpty(cust.getStatus())){
 			cust.setStatus(StatusConstants.ACTIVE);

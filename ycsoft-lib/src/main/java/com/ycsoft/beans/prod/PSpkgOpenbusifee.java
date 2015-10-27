@@ -7,6 +7,9 @@ package com.ycsoft.beans.prod;
 import java.io.Serializable ;
 import java.util.Date ;
 import java.util.Date ;
+
+import com.ycsoft.commons.constants.DictKey;
+import com.ycsoft.commons.store.MemoryDict;
 import com.ycsoft.daos.config.POJO ;
 
 
@@ -16,11 +19,15 @@ import com.ycsoft.daos.config.POJO ;
 @POJO(
 	tn="P_SPKG_OPENBUSIFEE",
 	sn="",
-	pk="")
+	pk="ID")
 public class PSpkgOpenbusifee implements Serializable {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 5840675314263929282L;
 	// PSpkgOpenbusifee all properties 
-
+	private String id;
 	private String sp_id ;	
 	private String fee_id ;	
 	private Integer fee ;	
@@ -30,7 +37,20 @@ public class PSpkgOpenbusifee implements Serializable {
 	private String optr_id ;	
 	private Integer use_done_code ;	
 	
+	private String status_text;
 	private String fee_name;
+	
+	public String getStatus_text() {
+		return status_text;
+	}
+	
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
 	
 	public String getFee_name() {
 		return fee_name;
@@ -82,6 +102,7 @@ public class PSpkgOpenbusifee implements Serializable {
 	
 	public void setStatus(String status){
 		this.status = status ;
+		this.status_text = MemoryDict.getDictName(DictKey.STATUS, status);
 	}
 	
 	// status_date getter and setter

@@ -144,6 +144,7 @@ ResSysLang = {
 	'3000':	'Provincial Config',
 	'3200':	'Agent Config',
 	'3201':	'Translation Config',
+	'3202': 'Protocol Customer',
 	'5001':	'District Config'
 };
 

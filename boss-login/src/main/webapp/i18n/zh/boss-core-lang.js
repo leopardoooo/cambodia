@@ -756,6 +756,7 @@ BCLang.msgBox = {
 	realpayMustBeGreaterThanZero: '实际应付不能小于0，请增加订购月数!',
 	notMustBeOrderUser: '没有需要订购的用户!',
 	custPkgChooseUserMustBeEqualToMaxUserNum: '客户套餐已选用户必须等于套餐最大用户数!',
+	spkgNoselectPkgCanContinueChooseUser: '协议套餐[{0}]没有选择用户，可继续选择用户!',
 	spkgPkgCanContinueChooseUser: '协议套餐已选用户小于套餐内容最大用户数，可继续选择用户!',
 	chooseInUsers: '请选择要参加套餐的终端用户!',
 	exceedPkgMaxUserNum: '已超过套餐最大用户数限制!',
@@ -769,6 +770,7 @@ BCLang.msgBox = {
 	EditPayFeeAndNumberIsWrong:'本次收费不能整除单价,购买个数应为整数',
 	SelectOnlyOneData:'请选择一条记录',
 	ChooseToPayTheRecord:'请选择要支付的记录',
-	userNotDTT:'非DTT设备或者设备不存在'
+	userNotDTT:'非DTT设备或者设备不存在',
+	suerNotSave: '确定不保存吗？'
 	
 }

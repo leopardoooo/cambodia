@@ -8,6 +8,7 @@ import java.io.Serializable ;
 import java.util.Date ;
 import java.util.Date ;
 
+import com.ycsoft.commons.constants.DictKey;
 import com.ycsoft.commons.store.MemoryDict;
 import com.ycsoft.daos.config.POJO ;
 
@@ -18,11 +19,11 @@ import com.ycsoft.daos.config.POJO ;
 @POJO(
 	tn="P_SPKG_OPENUSER",
 	sn="",
-	pk="")
+	pk="ID")
 public class PSpkgOpenuser implements Serializable {
 	
 	// PSpkgOpenuser all properties 
-
+	private String id;
 	private String sp_id ;	
 	private String user_type ;	
 	private String device_model ;	
@@ -36,9 +37,22 @@ public class PSpkgOpenuser implements Serializable {
 	private String optr_id ;	
 	private Integer use_done_code ;	
 	
+	private String status_text;
 	private String device_model_text;
 	private String buy_mode_name;
 	private String fee_name;
+	
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+	
+	public String getStatus_text() {
+		return status_text;
+	}
 	
 	public String getBuy_mode_name() {
 		return buy_mode_name;
@@ -96,13 +110,14 @@ public class PSpkgOpenuser implements Serializable {
 	
 	public void setDevice_model(String device_model){
 		this.device_model = device_model ;
-		String deviceType = "";
+		/*String deviceType = "";
 		if(getUser_type().equals("BAND")){
 			deviceType = "MODEM";
 		} else {
 			deviceType = "STB";
 		}
-		this.device_model_text = MemoryDict.getDictName(deviceType+"_MODEL", device_model);
+		this.device_model_text = MemoryDict.getDictName(deviceType+"_MODEL", device_model);*/
+		this.device_model_text = MemoryDict.getDictName(DictKey.DEVICE_MODEL, device_model);
 	}
 	
 	// buy_type getter and setter
@@ -148,6 +163,7 @@ public class PSpkgOpenuser implements Serializable {
 	
 	public void setStatus(String status){
 		this.status = status ;
+		this.status_text = MemoryDict.getDictName(DictKey.STATUS, status);
 	}
 	
 	// status_date getter and setter

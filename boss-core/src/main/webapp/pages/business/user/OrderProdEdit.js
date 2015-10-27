@@ -6,90 +6,194 @@ OrderProdEditForm = Ext.extend(BaseForm, {
 	baseData: null,
 	constructor: function(){
 		this.prodStore = new Ext.data.JsonStore({
-			fields: ['prod_id', 'prod_name']
+			fields: ['prod_id', 'prod_name', 'prod_type']
 		});
 		this.tariffStore = new Ext.data.JsonStore({
 			fields: ['tariff_id', 'disct_name', 'disct_rent', 'billing_cycle']
 		});
 		OrderProdEditForm.superclass.constructor.call(this, {
-			border: false,
 			bodyStyle: 'padding-top:15px',
-			labelWidth: 150,
-			items: [{
-				id: 'cmProdId',
-				fieldLabel: lmain("user._form.prodName"),
-				xtype: 'combo',
-				store: this.prodStore,
-				displayField: 'prod_name', valueField: 'prod_id',
-				allowBlank: false, listWidth: 200,
-				listeners: {
+			labelWidth: 180,
+			/*layout: 'column',
+			defaults:{
+				border: false,
+				layout: 'form',
+				columnWidth: .5
+			},*/
+			items:[
+				{
+					id: 'cmProdId',
+					fieldLabel: lmain("user._form.prodName"),
+					xtype: 'combo',
+					store: this.prodStore,
+					displayField: 'prod_name', valueField: 'prod_id',
+					allowBlank: false, listWidth: 200,
+					listeners: {
+						scope: this,
+						select: this.doSelectedProd
+					}
+				},{
+					style: 'margin-left:185px;padding:5px 0 8px 0;',
+					xtype: 'button',
+					text: lmain("user._form.switchUsers"),
+					iconCls: 'icon-add-user',
 					scope: this,
-					select: this.doSelectedProd
+		        	handler: function(){
+		        		this.openDispatchUserWindow();
+		        	}
+				},{
+					id: 'cmTariffId',
+					fieldLabel: lmain("user._form.prodTariff"),
+					xtype: 'combo',
+					store: this.tariffStore,
+					displayField: 'disct_name', valueField: 'tariff_id',
+					allowBlank: false,
+					listeners: {
+						scope: this,
+						select: this.doSelectTariff
+					}
+				},{
+					id: 'nfMonthId',
+					fieldLabel: lmain("user._form.prodOrderMonths"),
+					xtype: 'numberfield',
+					allowNegative: false,
+					allowDecimals: false,
+					allowBlank: false,
+					minValue: 0.01,
+					listeners: {
+						scope: this,
+						change: this.doChangeOrderMonth
+					}
+				},{
+					id: 'dfStartDateId',
+					fieldLabel: lmain("user._form.prodStartDate"),
+					xtype: 'displayfield'
+				},{
+					id: 'dfEndDateId',
+					fieldLabel: lmain("user._form.prodExpDate"),
+					xtype: 'datefield',
+					format: 'Y-m-d',
+					editable: false,
+					allowBlank: false,
+					listWidth: 200,
+					listeners: {
+						scope: this,
+						select: this.doSelectEndDate
+					}
+				},{
+					id: 'oldOrderFeeId',
+					fieldLabel: lmain("user._form.oldOrderFee"),
+					xtype: 'textfield',
+					readOnly: true
+				},{
+					id: 'oldTransFeeId',
+					fieldLabel: lmain("user._form.oldTransFee"),
+					xtype: 'textfield',
+					readOnly: true
+				},{
+					id: 'realOrderFeeId',
+					fieldLabel: lmain("user._form.realOrderFee"),
+					xtype: 'textfield',
+					readOnly: true
+				},{
+					id: 'dfDiffFeeId',
+					fieldLabel: lmain("user._form.newAddFee"),
+					xtype: 'numberfield',
+					allowBlank: false,
+					listeners: {
+						scope: this,
+						change: this.doChangeDiffFee
+					}
 				}
+			]
+			/*items: [{
+				items:[{
+					id: 'cmProdId',
+					fieldLabel: lmain("user._form.prodName"),
+					xtype: 'combo',
+					store: this.prodStore,
+					displayField: 'prod_name', valueField: 'prod_id',
+					allowBlank: false, listWidth: 200,
+					listeners: {
+						scope: this,
+						select: this.doSelectedProd
+					}
+				},{
+					id: 'cmTariffId',
+					fieldLabel: lmain("user._form.prodTariff"),
+					xtype: 'combo',
+					store: this.tariffStore,
+					displayField: 'disct_name', valueField: 'tariff_id',
+					allowBlank: false,
+					listeners: {
+						scope: this,
+						select: this.doSelectTariff
+					}
+				},{
+					id: 'dfStartDateId',
+					fieldLabel: lmain("user._form.prodStartDate"),
+					xtype: 'displayfield'
+				},{
+					id: 'oldOrderFeeId',
+					fieldLabel: lmain("user._form.oldOrderFee"),
+					xtype: 'textfield',
+					readOnly: true
+				},{
+					id: 'realOrderFeeId',
+					fieldLabel: lmain("user._form.realOrderFee"),
+					xtype: 'textfield',
+					readOnly: true
+				}]
 			},{
-				id: 'cmTariffId',
-				fieldLabel: lmain("user._form.prodTariff"),
-				xtype: 'combo',
-				store: this.tariffStore,
-				displayField: 'disct_name', valueField: 'tariff_id',
-				allowBlank: false,
-				listeners: {
+				items:[{
+					borderStyle: 'padding: 100px',
+					xtype: 'button',
+					text: lmain("user._form.switchUsers"),
+					iconCls: 'icon-add-user',
 					scope: this,
-					select: this.doSelectTariff
-				}
-			},{
-				id: 'nfMonthId',
-				fieldLabel: lmain("user._form.prodOrderMonths"),
-				xtype: 'numberfield',
-				allowNegative: false,
-				allowDecimals: false,
-				allowBlank: false,
-				minValue: 0.01,
-				listeners: {
-					scope: this,
-					change: this.doChangeOrderMonth
-				}
-			},{
-				id: 'dfStartDateId',
-				fieldLabel: lmain("user._form.prodStartDate"),
-				xtype: 'displayfield'
-			},{
-				id: 'dfEndDateId',
-				fieldLabel: lmain("user._form.prodExpDate"),
-				xtype: 'datefield',
-				format: 'Y-m-d',
-				editable: false,
-				allowBlank: false,
-				listWidth: 200,
-				listeners: {
-					scope: this,
-					select: this.doSelectEndDate
-				}
-			},{
-				id: 'oldOrderFeeId',
-				fieldLabel: lmain("user._form.oldOrderFee"),
-				xtype: 'textfield',
-				readOnly: true
-			},{
-				id: 'oldTransFeeId',
-				fieldLabel: lmain("user._form.oldTransFee"),
-				xtype: 'textfield',
-				readOnly: true
-			},{
-				id: 'realOrderFeeId',
-				fieldLabel: lmain("user._form.realOrderFee"),
-				xtype: 'textfield',
-				readOnly: true
-			},{
-				id: 'dfDiffFeeId',
-				fieldLabel: lmain("user._form.newAddFee"),
-				xtype: 'numberfield',
-				allowBlank: false,
-				listeners: {
-					scope: this,
-					change: this.doChangeDiffFee
-				}
-			}]
+		        	handler: function(){
+		        		this.openDispatchUserWindow();
+		        	}
+				},{
+					id: 'nfMonthId',
+					fieldLabel: lmain("user._form.prodOrderMonths"),
+					xtype: 'numberfield',
+					allowNegative: false,
+					allowDecimals: false,
+					allowBlank: false,
+					minValue: 0.01,
+					listeners: {
+						scope: this,
+						change: this.doChangeOrderMonth
+					}
+				},{
+					id: 'dfEndDateId',
+					fieldLabel: lmain("user._form.prodExpDate"),
+					xtype: 'datefield',
+					format: 'Y-m-d',
+					editable: false,
+					allowBlank: false,
+					listWidth: 200,
+					listeners: {
+						scope: this,
+						select: this.doSelectEndDate
+					}
+				},{
+					id: 'oldTransFeeId',
+					fieldLabel: lmain("user._form.oldTransFee"),
+					xtype: 'textfield',
+					readOnly: true
+				},{
+					id: 'dfDiffFeeId',
+					fieldLabel: lmain("user._form.newAddFee"),
+					xtype: 'numberfield',
+					allowBlank: false,
+					listeners: {
+						scope: this,
+						change: this.doChangeDiffFee
+					}
+				}]
+				}]*/
 		});
 	},
 	doInit:function(){
@@ -107,6 +211,7 @@ OrderProdEditForm = Ext.extend(BaseForm, {
 			success : function(res,opts){
 				var data = Ext.decode(res.responseText);
 				this.baseData = data;
+				console.log(this.baseData);
 				var prodList = data['prodList'];
 				var tariffList = data['tariffMap'];
 				
@@ -117,7 +222,7 @@ OrderProdEditForm = Ext.extend(BaseForm, {
 			}
 		});
 	},
-	doSelectedProd: function(combo, record, index){
+	doSelectedProd: function(){
 		var prodId = Ext.getCmp('cmProdId').getValue();
 		var tariffCmp = Ext.getCmp('cmTariffId');
 		this.tariffStore.loadData(this.baseData['tariffMap'][prodId]);
@@ -137,6 +242,24 @@ OrderProdEditForm = Ext.extend(BaseForm, {
 		Ext.getCmp('dfEndDateId').minValue = Date.parseDate( this.baseData['eff_date'], 'Y-m-d' );
 		
 		Ext.getCmp('dfEndDateId').setValue( Date.parseDate(this.baseData['exp_date'], 'Y-m-d H:i:s') );
+		
+		this.prodStore.each(function(record){
+			if(record.get('prod_id') == prodId){
+				this.prodType = record.get('prod_type');
+				return false;
+			}
+		}, this);
+		this.prodId = prodId;
+//		this.openDispatchUserWindow();
+	},
+	openDispatchUserWindow: function(){
+		if(this.isPkg()){
+			this.selectUserPanel = new SelectUserPanel(this);
+			this.selectUserPanel.loadPackageUsers(this.prodId, this.baseData['last_order_sn']);
+		}
+	},
+	isPkg: function(){
+		return this.prodType === "SPKG" || this.prodType === "CPKG";
 	},
 	doSelectTariff: function(){
 		this.calRealOrderFee();
@@ -200,13 +323,38 @@ OrderProdEditForm = Ext.extend(BaseForm, {
 		}*/
 		return true;
 	},
+	setTargetData:function(targetData){
+		if(this.isPkg()){
+			// 获得选中的用户
+			var groupUserMap = {};
+			Ext.each(targetData, function(rs){
+				var gid = rs["package_group_id"];
+				if(!groupUserMap[gid]){
+					groupUserMap[gid] = [];
+				}
+				groupUserMap[gid].push(rs["user_id"]);
+			}, this);
+			console.log(groupUserMap);
+			// 封装后台数据结构
+			var groupSelected = [];
+			for(var key in groupUserMap){
+				groupSelected.push({
+					"package_group_id": key,
+					"userSelectList": groupUserMap[key]
+				});
+			}
+			console.log(groupSelected);
+			this.groupSelectedData = groupSelected;
+		}
+	},
 	getValues: function(){
 		this.baseData['prod_id'] = Ext.getCmp('cmProdId').getValue();
 		this.baseData['tariff_id'] = Ext.getCmp('cmTariffId').getValue();
-		this.baseData['pay_fee'] = Ext.getCmp('dfDiffFeeId').getValue()*100;
+		this.baseData['pay_fee'] = Ext.getCmp('dfDiffFeeId').getValue()*100.0;
 		this.baseData['order_months'] = Ext.getCmp('nfMonthId').getValue();
 		this.baseData['eff_date'] = this.baseData['eff_date']+' 00:00:00';	//JSON解析日期格式 年月日时分秒
 		this.baseData['exp_date'] = Ext.getCmp('dfEndDateId').getValue().format("Y-m-d H:i:s");
+		this.baseData["groupSelected"] = this.groupSelectedData;
 		return {
 			orderProd: Ext.encode(this.baseData)
 		}

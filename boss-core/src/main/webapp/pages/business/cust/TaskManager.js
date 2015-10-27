@@ -28,8 +28,8 @@ var TaskDeviceGrid = Ext.extend(Ext.grid.EditorGridPanel,{
 			nextColums = [{header:cols[4],dataIndex:'recycle_result_text',width:80,editor:this.resultCombo}]; 
 		}else{
 			nextColums = [{header:cols[3],dataIndex:'device_code',width:130,editor:new Ext.form.TextField({vtype:'alphanum'})},
-						{header:'OccNo',dataIndex:'occ_no',width:80,editor:new Ext.form.TextField({vtype:'alphanum'})},
-						{header:'PosNo',dataIndex:'pos_no',width:80,editor:new Ext.form.TextField({vtype:'alphanum'})}]
+						{header:'OccNo',dataIndex:'occ_no',width:80,editor:new Ext.form.TextField()},
+						{header:'PosNo',dataIndex:'pos_no',width:80,editor:new Ext.form.TextField()}]
 		}
 		columns  = baseColumns.concat(nextColums)
 		

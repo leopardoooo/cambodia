@@ -12,8 +12,7 @@ InvoiceGrid = Ext.extend(Ext.ux.Grid,{
 			fields: ["invoice_book_id","invoice_id","invoice_code","invoice_mode","amount","print_date",
 					"status_text","optr_name","optr_id","status","finance_status","finance_status_text",
 						"print_type","is_invoice","doc_name","template_filename","fee_create_time",
-						"doc_sn","doc_type","fee_invoice_id","fee_invoice_code","doc_type_text",
-						"fee_invoice_status","fee_invoice_status_text","fee_done_code","invoice_mode_text"]
+						"doc_sn","doc_type","doc_type_text","invoice_mode_text"]
 		}); 
 		var lc = lmain("doc.invoice.columns");
 		var cm = new Ext.ux.grid.LockingColumnModel({ 

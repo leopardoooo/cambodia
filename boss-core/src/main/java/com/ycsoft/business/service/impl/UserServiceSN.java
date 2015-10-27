@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -193,14 +194,22 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 					
 					user.setStop_type(stopType);
 					
-					CUser newUser = this.openSingle(cust, user, doneCode, null, deviceType, deviceModel, deviceBuyMode, deviceFee);
-					users.add(newUser);
+					int openNum = openUser.getOpen_num();
+					for(int i=0;i<openNum;i++){
+						CUser newUser = this.openSingle(cust, user, doneCode, null, deviceType, deviceModel, deviceBuyMode, deviceFee);
+						deviceFee.setFee(0);
+						users.add(newUser);
+					}
+					
 				}
 			}
 			if(spkgBusiFeeList.size() > 0){
 				for(PSpkgOpenbusifee busiFee : spkgBusiFeeList){
-					feeComponent.saveBusiFee(cust.getCust_id(), cust != null ? cust.getAddr_id() : null, busiFee.getFee_id(), 1, 
-							SystemConstants.PAY_TYPE_UNPAY, busiFee.getFee(), doneCode, doneCode, getBusiParam().getBusiCode(), null, "");
+					if(busiFee.getFee() > 0){
+						feeComponent.saveBusiFee(cust.getCust_id(), cust != null ? cust.getAddr_id() : null, busiFee.getFee_id(), 1, 
+								SystemConstants.PAY_TYPE_UNPAY, busiFee.getFee(), doneCode, doneCode, getBusiParam().getBusiCode(), null, "");
+						doneCodeComponent.saveDoneCodeUnPay(cust.getCust_id(), doneCode,this.getOptr().getOptr_id());
+					}
 				}
 			}
 			userComponent.updateOpenUserDoneCode(cust.getSpkg_sn(), doneCode);
@@ -225,7 +234,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		return num;
 	}
 	
-	private CUser openSingle(CCust cust, CUser user, Integer doneCode, String deviceCode, String deviceType,
+	private CUser openSingle(CCust cust, CUser cuser, Integer doneCode, String deviceCode, String deviceType,
 			String deviceModel, String deviceBuyMode, FeeInfoDto deviceFee) throws Exception, JDBCException {
 		String custId = cust.getCust_id();
 		
@@ -233,6 +242,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		// 创建账户信息
 		String acctId = acctComponent.createAcct(custId, user_id, ACCT_TYPE_SPEC, null);
 		// 创建用户信息
+		CUser user = (CUser)cuser.clone();
 		user.setUser_id(user_id);
 		user.setAcct_id(acctId);
 		user.setCust_id(custId);

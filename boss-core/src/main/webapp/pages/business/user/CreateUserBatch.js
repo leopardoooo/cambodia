@@ -150,15 +150,21 @@ UserBaseBatchForm = Ext.extend( BaseForm , {
 			            maxValue: 5000,
 			            value: 1
 					},{
-						xtype:'checkbox',
-					    fieldLabel: lmain("user._form.manualOpen"),
-					    style: 'padding: 0 0 -20px 0;',
-					    id: "handOpenId",
-					    checked: true,
-					    listeners:{
-			            	scope: this,
-			            	check: this.doCheckedChangeOpenType
-			            }
+						layout: 'form',
+						baseCls: 'x-plain',
+						hidden: Ext.isEmpty(App.getCust()['spkg_sn']) ? true : false,
+						border: false,
+						items:[{
+							xtype:'checkbox',
+						    fieldLabel: lmain("user._form.manualOpen"),
+						    style: 'padding: 0 0 -20px 0;',
+						    id: 'handOpenId',
+						    checked: true,
+						    listeners:{
+				            	scope: this,
+				            	check: this.doCheckedChangeOpenType
+				            }
+						}]
 					}]
 				},{
 					id:'addUserToGridBtnId',
@@ -241,41 +247,43 @@ UserBaseBatchForm = Ext.extend( BaseForm , {
 			Ext.getCmp('busiFeePanelId').show();
 			Ext.getCmp('removeDataId').setDisabled(true);
 			
-			Ext.Ajax.request({
-				url: root + '/core/x/User!querySpkgUserInfo.action',
-				params: {
-					spkgSn: App.getCust()['spkg_sn']
-				},
-				scope: this,
-				success: function(res, opt){
-					var data = Ext.decode(res.responseText);
-					var spkgUsers = data['spkgUser'];
-					var array = [], total = 0;
-					for(var i=0; i<spkgUsers.length; i++){
-						var obj = {
-								user_type: spkgUsers[i]['user_type'],
-								device_type_text: spkgUsers[i]['device_model_text'],
-								buy_mode_text: spkgUsers[i]['buy_mode_name'],
-								open_amount: spkgUsers[i]['open_num'],
-								fee: 0,
-								sub_total: Ext.util.Format.formatFee( spkgUsers[i]['fee'] ),
-								fee_name: spkgUsers[i]['fee_name']
-						};
-						total += obj['sub_total'];
-						array.push(obj);
+			if(!Ext.isEmpty(App.getCust()['spkg_sn'])){
+				Ext.Ajax.request({
+					url: root + '/core/x/User!querySpkgUserInfo.action',
+					params: {
+						spkgSn: App.getCust()['spkg_sn']
+					},
+					scope: this,
+					success: function(res, opt){
+						var data = Ext.decode(res.responseText);
+						var spkgUsers = data['spkgUser'];
+						var array = [], total = 0;
+						for(var i=0; i<spkgUsers.length; i++){
+							var obj = {
+									user_type: spkgUsers[i]['user_type'],
+									device_type_text: spkgUsers[i]['device_model_text'],
+									buy_mode_text: spkgUsers[i]['buy_mode_name'],
+									open_amount: spkgUsers[i]['open_num'],
+									fee: 0,
+									sub_total: Ext.util.Format.formatFee( spkgUsers[i]['fee'] ),
+									fee_name: spkgUsers[i]['fee_name']
+							};
+							total += obj['sub_total'];
+							array.push(obj);
+						}
+						this.newUserGrid.getStore().removeAll();
+						this.newUserGrid.getStore().loadData(array);
+						
+						this.busiFeeGrid.getStore().removeAll();
+						this.busiFeeGrid.getStore().loadData(data['busiFee']);
+						
+						for(var i=0; i<data['busiFee'].length; i++){
+							total += Ext.util.Format.formatFee( data['busiFee'][i]['fee'] );
+						}
+						Ext.getCmp("tfTotal").setValue(total);
 					}
-					this.newUserGrid.getStore().removeAll();
-					this.newUserGrid.getStore().loadData(array);
-					
-					this.busiFeeGrid.getStore().removeAll();
-					this.busiFeeGrid.getStore().loadData(data['busiFee']);
-					
-					for(var i=0; i<data['busiFee'].length; i++){
-						total += Ext.util.Format.formatFee( data['busiFee'][i]['fee'] );
-					}
-					Ext.getCmp("tfTotal").setValue(total);
-				}
-			});
+				});
+			}
 		}
 		Ext.getCmp('boxUserType').setDisabled(flag);
 		Ext.getCmp('boxDeviceCategory').setDisabled(flag);

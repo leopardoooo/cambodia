@@ -20,7 +20,7 @@ import com.ycsoft.daos.config.POJO;
  *
  */
 @POJO(tn = "C_USER", sn = "SEQ_USER_ID", pk = "USER_ID")
-public class CUser extends BusiBase implements Serializable {
+public class CUser extends BusiBase implements Serializable, Cloneable {
 
 	// CUser all properties
 
@@ -490,8 +490,15 @@ public class CUser extends BusiBase implements Serializable {
 		this.protocol_date = protocol_date;
 	}
 	
-	
-
-	
+	@Override
+	public Object clone() throws CloneNotSupportedException {
+		Object o = null;
+		try {
+			o = super.clone();
+		} catch (CloneNotSupportedException e) {
+			e.printStackTrace();
+		}
+		return o;
+	}
 
 }

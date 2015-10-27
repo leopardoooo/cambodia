@@ -105,6 +105,9 @@ SelectUserPanel = Ext.extend(Ext.Panel, {
 				this.openDispatchUserWindow(this.selectUserData);
 			}
 		});
+	},
+	setTargetData: function(data){
+		this.parent.setTargetData(data);
 	}
 });
 
@@ -115,6 +118,7 @@ OpenDispatchUserWindow = Ext.extend(Ext.Window, {
 	selectedDataMap: {},
 	// 所有用户分组 key: group_id, value: 用户List 
 	allUserGroup: {},
+	sameSelectedUserIds: [],
 	parent: null,
 	currentActiveGroup: null,
 	constructor: function(p){
@@ -127,11 +131,20 @@ OpenDispatchUserWindow = Ext.extend(Ext.Window, {
 		});
 		// 源用户存储器
 		this.fromUserStore = new Ext.data.JsonStore({
-			fields: ["user_id","user_name"]
+			fields: ["user_id","user_name"],
+			sortInfo: {
+			    field: 'user_name',
+			    direction: 'ASC'
+			}
+
 		});
 		// 目标用户存储器
 		this.toUserStore = new Ext.data.JsonStore({
-			fields: ["user_id","user_name"]
+			fields: ["user_id","user_name"],
+			sortInfo: {
+			    field: 'user_name',
+			    direction: 'ASC'
+			}
 		});
 		this.fromSm = new Ext.grid.CheckboxSelectionModel();
 		this.toSm = new Ext.grid.CheckboxSelectionModel();
@@ -152,8 +165,8 @@ OpenDispatchUserWindow = Ext.extend(Ext.Window, {
 		return OpenDispatchUserWindow.superclass.constructor.call(this, {
 			layout:"border",
 			title: lmain("user._form.titleDispatchUser"),
-			width: 450,
-			height: 400,
+			width: 550,
+			height: 450,
 			resizable: false,
 			maximizable: false,
 			closeAction: 'hide',
@@ -161,8 +174,9 @@ OpenDispatchUserWindow = Ext.extend(Ext.Window, {
 			closable: false,
 			border: false,
 			items: [{
+				id: 'pkgSubTplId',
 				region: "north",
-				height: 110,
+				height: 150,
 				layout: 'fit',
 				bodyStyle: 'border-bottom: none',
 				items: {
@@ -258,21 +272,32 @@ OpenDispatchUserWindow = Ext.extend(Ext.Window, {
 			}],
 			buttons:[
 			         {text:lbc("common.save"), iconCls:'icon-save', scope:this, handler: this.doPassResultToParent},
-			         {text:lbc("common.close"), iconCls:'icon-close', scope:this, handler: this.hide}
+			         {text:lbc("common.close"), iconCls:'icon-close', scope:this, handler: function(){
+			         	Confirm(lmsg('suerNotSave'), this, function(){
+			         		this.hide();
+			         	});
+			         }}
 			]
 		});
 	},
 	//父页面加载数据
 	doPassResultToParent: function(){
 		var targetData = []; 
-		var alertInfo = null;
+		var alertInfo = '', ainfo = '';
 		var store = Ext.getCmp('datViewId').getStore();
 		
 		var flag = false;
+		console.log(this.selectedDataMap);
 		store.each(function(record){
+			console.log(record.data);
 			if(!this.selectedDataMap[record.get('package_group_id')]){
-				flag = true;
-				return false;
+				var prodType = this.allUserGroup[record.get('package_group_id')]['group']['prod_type'];
+				if(prodType == 'CPKG'){
+					flag = true;
+					return false;
+				}else if(prodType == 'SPKG'){
+					ainfo = lmsg('spkgNoselectPkgCanContinueChooseUser', null, [record.get('package_group_name')]);
+				}
 			}
 		}, this);
 		if(flag){
@@ -289,10 +314,16 @@ OpenDispatchUserWindow = Ext.extend(Ext.Window, {
 				return;
 			}
 			
-			if(group['prod_type'] == "SPKG" && users.length < group['max_user_cnt']){
-				alertInfo = lmsg('spkgPkgCanContinueChooseUser');
+			if(group['prod_type'] == "SPKG"){
+				if(users.length <= group['max_user_cnt']){
+					alertInfo = lmsg('spkgPkgCanContinueChooseUser');
+				}else if(users.length > group['max_user_cnt']){
+					Alert(lmsg('exceedPkgMaxUserNum'));
+					return;
+				}
 			}
 			
+			console.log(users);
 			for(var i = 0; i< users.length; i++){
 				var user = users[i];
 				targetData.push({
@@ -303,20 +334,29 @@ OpenDispatchUserWindow = Ext.extend(Ext.Window, {
 				});
 			}
 		}
+		alertInfo += ainfo;
 		if(alertInfo){
 			Alert(alertInfo, function(){
 				if(targetData.length>0){
-					this.parent.store.loadData(targetData);
-					this.hide();
+					console.log(targetData);
+					this.setReturnValue(targetData);
 				}
-			});
+			}, this);
 		}else if(targetData.length>0){
 			// 父面板加载数据
-			this.parent.store.loadData(targetData);
-			this.hide();
+			this.setReturnValue(targetData);
 		}else{
 			Alert(lmsg('chooseInUsers'));
 		}
+	},
+	setReturnValue: function(targetData){
+		var busiCode = App.getData().currentResource.busicode;
+		if(busiCode != '131'){	//不是订单修改
+			this.parent.store.loadData(targetData);
+		}else{
+			this.parent.setTargetData(targetData);
+		}
+		this.hide();
 	},
 	// 如果已经有默认值了，就不需要显示窗口，跳过选择的步骤
 	saveDefaultUsersWithNoShow: function(data){
@@ -356,6 +396,8 @@ OpenDispatchUserWindow = Ext.extend(Ext.Window, {
 		// 选中的组名
 		var groupId = nodes[0].id;
 		this.currentActiveGroup = groupId;
+		console.log(this.allUserGroup);
+		console.log(this.selectedDataMap);
 		// 所有用户
 		var groupUsers = this.allUserGroup[groupId]["users"];
 		var selectedUsers = this.selectedDataMap[groupId];
@@ -364,32 +406,59 @@ OpenDispatchUserWindow = Ext.extend(Ext.Window, {
 			for(var j = 0; j< groupUsers.length; j++){
 				var existed = false;
 				for(var i = 0 ; i < selectedUsers.length ; i++){
+					if(this.sameSelectedUserIds.indexOf(selectedUsers[i]['user_id']) == -1){
+						this.sameSelectedUserIds.push(selectedUsers[i]['user_id']);
+					}
 					if(selectedUsers[i]["user_id"] == groupUsers[j]["user_id"]){
 						existed = true;
 						break;
 					}
 				}
 				if(!existed){
-					tmpUsers.push(groupUsers[j]);
+					if(this.sameSelectedUserIds.indexOf(groupUsers[j]['user_id']) == -1)
+						tmpUsers.push(groupUsers[j]);
 				}
 			}
 		}else{
 			selectedUsers = [];
-			var userSelectList = this.allUserGroup[groupId]['group']['userSelectList'];
+			var groupProd = this.allUserGroup[groupId]['group'];
+			var userSelectList = groupProd['userSelectList'];
+			var userType = groupProd['user_type']
 			if(userSelectList.length > 0){
 				for(var i=0,len=groupUsers.length;i<len;i++){
 					var flag = false;
 					Ext.each(userSelectList, function(userId){
 						if(groupUsers[i]['user_id'] == userId){
 							selectedUsers.push(groupUsers[i]);
+							if(this.sameSelectedUserIds.indexOf(groupUsers[i]['user_id']) == -1){
+								this.sameSelectedUserIds.push(groupUsers[i]['user_id']);
+							}
 						}else{
-							tmpUsers.push((groupUsers[i]));
+							/*if(userType == 'OTT' && this.ottSelectedUsers.indexOf(userId) == -1){
+								tmpUsers.push((groupUsers[i]));
+							}else if(userType == 'BAND' && this.bandSelectedUsers.indexOf(userId) == -1){
+								tmpUsers.push((groupUsers[i]));
+							}*/
+							if(this.sameSelectedUserIds.indexOf(groupUsers[i]['user_id']) == -1)
+								tmpUsers.push(groupUsers[i]);
 						}
 					}, this);
 				}
 				
+				/*if(userType == 'OTT'){
+					Ext.each(selectedUsers, function(obj){
+						this.ottSelectedUsers.push(obj['user_id']);
+					}, this);
+				}else if(userType == 'BAND'){
+					Ext.each(selectedUsers, function(obj){
+						this.bandSelectedUsers.push(obj['user_id']);
+					}, this);
+				}*/
 			}else{
-				tmpUsers = groupUsers;
+				Ext.each(groupUsers, function(gu){
+					if(this.sameSelectedUserIds.indexOf(gu['user_id']) == -1)
+						tmpUsers.push(gu);
+				}, this);
 			}
 			
 		}
@@ -422,6 +491,8 @@ OpenDispatchUserWindow = Ext.extend(Ext.Window, {
 	// left -> right
 	doAddSelected: function(){
 		var selectedRecord = Ext.getCmp('datViewId').getSelectedRecords()[0];
+		console.log(selectedRecord.data);
+		
 		if(this.toUserStore.getCount() >= selectedRecord.get('max_user_cnt')){
 			Alert(lmsg('exceedPkgMaxUserNum'));
 			return;
@@ -438,11 +509,14 @@ OpenDispatchUserWindow = Ext.extend(Ext.Window, {
 		}
 		for(var i = 0; i< records.length; i++){
 			users.push(records[i].data);
+			if(this.sameSelectedUserIds.indexOf(records[i].get('user_id')) == -1)
+				this.sameSelectedUserIds.push(records[i].get('user_id'));
 		}
 		this.selectedDataMap[this.currentActiveGroup] = users;
 		this.setGridTitle();
 		this.setActiveItemsCount();
 		this.toSm.selectRecords(records);
+		console.log(this.sameSelectedUserIds);
 	},
 	// right -> left
 	doRemoveSelected: function(){
@@ -457,9 +531,12 @@ OpenDispatchUserWindow = Ext.extend(Ext.Window, {
 				for(var i = users.length - 1; i >= 0; i--){
 					if(users[i]["user_id"] == userId){
 						users.remove(users[i]);
+						this.sameSelectedUserIds.remove(userId);
 						break;
 					}
 				}
+				
+				
 			}
 		}
 		this.setGridTitle();
@@ -469,6 +546,7 @@ OpenDispatchUserWindow = Ext.extend(Ext.Window, {
 	// 显示之前进行数据归类
 	show: function(data){
 		if(data){
+			console.log(data);
 			this.doAnalysisData(data);
 			this.fromUserStore.removeAll();
 			this.toUserStore.removeAll();
@@ -487,16 +565,25 @@ OpenDispatchUserWindow = Ext.extend(Ext.Window, {
 					for(var j=0,len2=users.length;j<len2;j++){
 						var flag = false;
 						Ext.each(selectUserIds, function(selectUId){
-							if(users[j]['user_id'] == selectUId){
+							var userId = users[j]['user_id'];
+							if(userId == selectUId){
 								this.selectedDataMap[groupId].push({
-									'user_id': users[j]['user_id'],
+									'user_id': userId,
 									'user_name': users[j]['user_name']
 								});
+								
+								//修改套餐或订单修改时初始化已选中的用户
+								if(this.sameSelectedUserIds.indexOf(userId) == -1){
+									this.sameSelectedUserIds.push(userId);
+								}
+								
 							}
 						}, this);
 					}
 				}
 			}
+			console.log(this.selectedDataMap);
+			console.log(this.sameSelectedUserIds);
 			if(data['needShow'] == false){
 				this.doPassResultToParent();
 			}

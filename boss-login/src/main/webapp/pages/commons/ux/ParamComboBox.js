@@ -19,7 +19,7 @@ Ext.ux.ParamCombo = Ext.extend(Ext.form.ComboBox, {
 	paramName:null,//必须指定参数名称
 	defaultValue:null,
 	allowBlankItem:false,
-	isFilter:true,			//是否按县市过滤数据字典
+//	isFilter:true,			//是否按县市过滤数据字典
 	constructor:function(config){
 		config = config || {};
 		config = Ext.applyIf(config || {}, {
@@ -34,11 +34,11 @@ Ext.ux.ParamCombo = Ext.extend(Ext.form.ComboBox, {
 		this.store = new Ext.data.JsonStore({
 			fields:['item_value','item_name','show_county_id','item_idx'],
 			autoDestroy:true,
-			baseParams:{paramName:this.paramName},
+			baseParams:{paramName:this.paramName}/*,
 			listeners:{
 				scope:this,
 				load: loadParamValues
-			}
+			}*/
 		});
 		Ext.ux.ParamCombo.superclass.constructor.apply(this, arguments);
 	}

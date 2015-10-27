@@ -1756,8 +1756,8 @@ Ext.apply(MenuHandler, {
 			}
 		}
 		return {
-			width: 450,
-			height: 450
+			width: 650,
+			height: 520
 		};
 	},
 	// 取消套餐
