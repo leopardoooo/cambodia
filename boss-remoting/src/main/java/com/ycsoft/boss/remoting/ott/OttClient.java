@@ -216,8 +216,9 @@ public class OttClient {
 			device.setMac(deviceMac);
 			user.getDevice_info().add(device);
 		}
-		if (status != null && status.equals(StatusConstants.ACTIVE)){
+		if (status != null && (status.equals(StatusConstants.ACTIVE)||status.equals(StatusConstants.INSTALL))){
 			user.setState("0");
+			//user.setEnd_time(Da);
 		} else {
 			user.setState("2");
 			user.setEnd_time(new Date());
