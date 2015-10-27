@@ -275,7 +275,7 @@ Ext.apply(App.func,{
 /**************************************用户产品信息开始************************************************/
 		else if(panelName.indexOf('U_PROD')>=0){//用户产品信息
 			if(busicode == '131'){
-				if( (data['is_pay'] == 'F' && data['prod_type'] == 'CPKG' && data["package_id"] == null)
+				if( (data['is_pay'] == 'F' && (data['prod_type'] == 'CPKG' || data['prod_type'] == 'BASE') && data["package_id"] == null)
 					|| (data['prod_type'] == 'SPKG' && data["package_id"] == null) ){
 					return true;
 				}else{
