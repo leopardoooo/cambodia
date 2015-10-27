@@ -165,7 +165,7 @@ AgreementUserGrid = Ext.extend(Ext.grid.GridPanel, {
 			{header: '开户数量', dataIndex: 'open_num', width: 60, renderer: App.qtipValue},
 			{header: '购买方式', dataIndex: 'buy_mode_name', width: 65, renderer: App.qtipValue},
 			{header: '费用名称', dataIndex: 'fee_name', width: 150, renderer: App.qtipValue},
-			{header: '金额', dataIndex: 'fee', width: 50, renderer : function(v){
+			{header: '金额', dataIndex: 'fee', width: 60, renderer : function(v){
                 return Ext.util.Format.usMoney( Ext.util.Format.formatFee(v) );
             }},
 			{header: '状态', dataIndex: 'status_text', width: 50, renderer: Ext.util.Format.statusShow},
@@ -241,7 +241,7 @@ AgreementFeeGrid = Ext.extend(Ext.grid.GridPanel, {
 		});
 		var columns = [
 			{header: '费用名称', dataIndex: 'fee_name', width: 150},
-			{header: '金额', dataIndex: 'fee', width: 50, renderer : function(v){
+			{header: '金额', dataIndex: 'fee', width: 60, renderer : function(v){
                 return Ext.util.Format.usMoney( Ext.util.Format.formatFee(v) );
             }},
 			{header: '状态', dataIndex: 'status_text', width: 50, renderer: Ext.util.Format.statusShow},
@@ -550,6 +550,7 @@ AgreementUserWin = Ext.extend(Ext.Window, {
 					/*txtFee.setMaxValue(data["max_fee_value"]/100.0);
 					txtFee.setMinValue(data["min_fee_value"]/100.0);*/
 					txtFee.clearInvalid();
+					txtFee.setReadOnly(false);
 					this.form.getForm().findField('fee_id').setValue(data['fee_id']);
 					dfFeeName.setValue(data["fee_name"]);
 				}else{
@@ -558,6 +559,7 @@ AgreementUserWin = Ext.extend(Ext.Window, {
 					/*txtFee.setMaxValue(0);
 					txtFee.setMinValue(0);*/
 					txtFee.clearInvalid();
+					txtFee.setReadOnly(true);
 					this.form.getForm().findField('fee_id').setValue('');
 				}
 			}
