@@ -152,7 +152,7 @@ public class DES {
 			
 //			System.out.println(des.getEncString("123busi"));
 			
-		String strEnc = des.getEncString("123busi");// 加密字符串,返回String的密文
+		String strEnc = des.getEncString("busi123");// 加密字符串,返回String的密文
 		System.out.println(strEnc);
 
 		String strDes = des.getDesString(strEnc);// 把String 类型的密文解密

@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.gson.JsonObject;
+import com.ycsoft.beans.core.user.CUser;
 import com.ycsoft.beans.system.SOptr;
 import com.ycsoft.beans.task.TaskCustExtInfo;
 import com.ycsoft.beans.task.WTaskBaseInfo;
@@ -47,10 +48,10 @@ public class WorkOrderClient {
 		}
 	}
 	
-	public boolean createTaskService(WTaskBaseInfo task,List<WTaskUser> userList,TaskCustExtInfo extInfo) throws WordOrderException{
+	public boolean createTaskService(WTaskBaseInfo task,List<WTaskUser> userList,TaskCustExtInfo extInfo,List<CUser> custUsers) throws WordOrderException{
 		ReceiveWorkOrder receiveWorkOrder = new ReceiveWorkOrder();
 		//设置工单基本信息
-		WorkOrder workOrder = getWorkOrderBaseInfo(task, extInfo.getCust_no(),extInfo.getArea_code(),extInfo.getCustManager(),userList);
+		WorkOrder workOrder = getWorkOrderBaseInfo(task, extInfo.getCust_no(),extInfo.getArea_code(),extInfo.getCustManager(),userList,custUsers);
 		//设置设备信息
 		ArrayOfProductInfo productArray = getDeviceInfo(userList);
 		workOrder.setProductInfos(productArray);
@@ -93,7 +94,7 @@ public class WorkOrderClient {
 		return productArray;
 	}
 
-	private WorkOrder getWorkOrderBaseInfo(WTaskBaseInfo task, String custNo,String areaCode,SOptr custManager,List<WTaskUser> userList) {
+	private WorkOrder getWorkOrderBaseInfo(WTaskBaseInfo task, String custNo,String areaCode,SOptr custManager,List<WTaskUser> userList,List<CUser> custUsers) {
 		WorkOrder order = new WorkOrder();
 		order.setOrderNo(task.getTask_id());
 		order.setOrderType(Integer.parseInt(task.getTask_type_id()));
@@ -117,12 +118,12 @@ public class WorkOrderClient {
 			this.fillTaskDeviceInfo(OrderContent, userList, "安装设备Install:");
 		    //带宽    账号  密码
 			this.fillTaskBroadbandInfo(OrderContent, userList, true);
-		    //客户经理 
 		}else if (task.getTask_type_id().equals(SystemConstants.TASK_TYPE_MOVE)){
 			OrderContent.append("客户编号CustNo:").append(custNo);
+			this.moveFillAllUser(OrderContent, custUsers, "安装设备Install:");
 			this.fillTaskBroadbandInfo(OrderContent, userList, false);
-		}
-		else if (task.getTask_type_id().equals(SystemConstants.TASK_TYPE_WRITEOFF_LINE)){
+			
+		}else if (task.getTask_type_id().equals(SystemConstants.TASK_TYPE_WRITEOFF_LINE)){
 			OrderContent.append("客户编号CustNo:").append(custNo);
 			this.fillTaskDeviceInfo(OrderContent, userList, "拆除线路WriteoffLine:");
 			this.fillTaskBroadbandInfo(OrderContent, userList, false);
@@ -133,7 +134,14 @@ public class WorkOrderClient {
 		}else {
 			OrderContent.append("other");
 		}
-		
+		//装入客户经理
+		if (custManager != null){
+			OrderContent.append("\n").append("客户经理CustManager：").append(custManager.getOptr_name())
+			.append(" tel:").append(custManager.getTel());
+			if(StringHelper.isNotEmpty(custManager.getMobile())){
+				OrderContent.append("*").append(custManager.getMobile());
+			}
+		}
 		order.setOrderContent(OrderContent.toString());
 		
 		//TODO 预约上门时间
@@ -172,6 +180,35 @@ public class WorkOrderClient {
 		int ont_cnt=0;
 		int ott_cnt=0;
 	    for(WTaskUser taskUser: userList){
+	    	if(SystemConstants.USER_TYPE_BAND.equals(taskUser.getUser_type())){
+	    		ont_cnt++;
+	    	}
+	    	if(SystemConstants.USER_TYPE_OTT.equals(taskUser.getUser_type())){
+	    		ott_cnt++;
+	    	}
+	    }
+	    if(ont_cnt+ott_cnt>0){
+	    	OrderContent.append("\n").append(taskTypeInfo);
+	    	if(ont_cnt>0){
+	    		OrderContent.append(" ONT:").append(ont_cnt);
+	    	}
+	    	if(ott_cnt>0){
+	    		OrderContent.append(" OTT:").append(ott_cnt);
+	    	}
+	    }
+	}
+	/**
+	 * 移机单填入所有终端用户
+	 * @param OrderContent
+	 * @param taskTypeInfo
+	 */
+	public void moveFillAllUser(StringBuilder OrderContent,List<CUser> userList,String taskTypeInfo){
+		if(userList==null||userList.size()==0)
+			return;
+		
+		int ont_cnt=0;
+		int ott_cnt=0;
+	    for(CUser taskUser: userList){
 	    	if(SystemConstants.USER_TYPE_BAND.equals(taskUser.getUser_type())){
 	    		ont_cnt++;
 	    	}
