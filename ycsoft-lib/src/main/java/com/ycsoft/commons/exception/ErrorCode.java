@@ -167,7 +167,7 @@ public enum ErrorCode {
 	SpkgIsError("协议号不存在"),
 	SpkgIsUsed("协议号已使用"),
 	SpkgHasNotCONFIRM("协议号还未通过审批"),
-	SpkgIsNotTrueCust("资费协议号和客户不匹配"),
+	SpkgIsNotTrueCust("协议号和客户不匹配"),
 	SpkgIsPaiChuCustKG("请选退订客户套餐，才能订购协议套餐")
 	;
 	

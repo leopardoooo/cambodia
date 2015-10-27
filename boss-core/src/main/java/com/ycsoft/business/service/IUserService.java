@@ -377,9 +377,9 @@ public interface IUserService extends IBaseService{
 	public void validAccount(String name) throws Exception;
 	public List<TDeviceChangeReason> queryDeviceChangeReason() throws Exception;
 
-	List<PSpkgOpenuser> querySpkgUser(String custId) throws Exception;
+	List<PSpkgOpenuser> querySpkgUser(String spkgSn,String custId) throws Exception;
 
-	List<PSpkgOpenbusifee> querySpkgOpenFee(String custId) throws Exception;
+	List<PSpkgOpenbusifee> querySpkgOpenFee(String spkgSn) throws Exception;
 	
 	public void cancelInstallTask(String taskId) throws Exception;
 

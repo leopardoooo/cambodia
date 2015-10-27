@@ -2790,7 +2790,7 @@ public class UserService extends BaseBusiService implements IUserService {
 	}
 
 	@Override
-	public List<PSpkgOpenuser> querySpkgUser(String custId) throws Exception {
+	public List<PSpkgOpenuser> querySpkgUser(String custId,String spkgSn) throws Exception {
 		// TODO Auto-generated method stub
 		return null;
 	}

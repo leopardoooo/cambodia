@@ -173,7 +173,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 				}
 			}
 		}else{
-			List<PSpkgOpenuser> spkgUserList = this.querySpkgUser(cust.getSpkg_sn());
+			List<PSpkgOpenuser> spkgUserList = this.querySpkgUser(cust.getCust_id(),cust.getSpkg_sn());
 			List<PSpkgOpenbusifee> spkgBusiFeeList = this.querySpkgOpenFee(cust.getSpkg_sn());
 			if(spkgUserList.size() > 0){
 				for(PSpkgOpenuser openUser : spkgUserList){
@@ -1465,7 +1465,9 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 	}
 	
 	@Override
-	public List<PSpkgOpenuser> querySpkgUser(String spkgSn) throws Exception {
+	public List<PSpkgOpenuser> querySpkgUser(String custId,String spkgSn) throws Exception {
+		
+		custComponent.checkCustSpkgSnConfirm(custId,spkgSn);	
 		return userComponent.querySpkgUser(spkgSn);
 	}
 	

@@ -316,7 +316,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 			throw new ComponentException(ErrorCode.OrderDateFeeError);
 		}
 		
-		//订购月数和结束日 校检 结束日是否等于 开始日+订购月数
+		/**订购月数和结束日 校检 结束日是否等于 开始日+订购月数,不再强制验证订单修改的到期日是否准确
 		if(tariff.getBilling_type().equals(SystemConstants.BILLING_TYPE_DAY)){
 			Date checkExpDate= DateHelper.addDate(orderProd.getEff_date(), Math.round(orderProd.getOrder_months()*30)-1);
 			if(!checkExpDate.equals(orderProd.getExp_date())){
@@ -329,7 +329,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 			if(!checkExpDate.equals(orderProd.getExp_date())){
 				throw new ServicesException(ErrorCode.OrderDateExpDateError);
 			}
-		}
+		}**/
 		
 		return order;
 	}
