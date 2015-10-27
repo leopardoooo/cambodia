@@ -354,6 +354,10 @@ OrderProdEditForm = Ext.extend(BaseForm, {
 		this.baseData['order_months'] = Ext.getCmp('nfMonthId').getValue();
 		this.baseData['eff_date'] = this.baseData['eff_date']+' 00:00:00';	//JSON解析日期格式 年月日时分秒
 		this.baseData['exp_date'] = Ext.getCmp('dfEndDateId').getValue().format("Y-m-d H:i:s");
+		
+		if(Ext.isEmpty(this.groupSelectedData)){
+			this.groupSelectedData = this.baseData['groupSelected'];
+		}
 		this.baseData["groupSelected"] = this.groupSelectedData;
 		return {
 			orderProd: Ext.encode(this.baseData)
