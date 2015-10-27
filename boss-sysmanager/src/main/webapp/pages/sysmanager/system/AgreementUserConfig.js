@@ -369,7 +369,7 @@ AgreementWin = Ext.extend(Ext.Window, {
 		AgreementWin.superclass.constructor.call(this, {
 			border: false,
 			width: 400,
-			height: 400,
+			height: 450,
 			layout: 'fit',
 			closeAction: 'close',
 			items: [this.form],
@@ -383,6 +383,7 @@ AgreementWin = Ext.extend(Ext.Window, {
 		AgreementWin.superclass.show.call(this);
 		if(record){
 			this.form.getForm().loadRecord(record);
+			this.form.getForm().findField('spkg_sn').setReadOnly(true);		//协议编号不能修改
 		}
 	},
 	doSave: function(){
