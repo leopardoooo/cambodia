@@ -755,13 +755,14 @@ public class PayService extends BaseBusiService implements IPayService {
 				//费用已支付
 				throw new ServicesException(ErrorCode.UnPayIsOld);
 			}
+			/**不再验证
 			if(StringHelper.isNotEmpty(fee.getAcctitem_id())&&
 					!fee.getAcctitem_id().equals(SystemConstants.ACCTITEM_PUBLIC_ID)
 					&&fee.getReal_pay()!=0
 					&&StringHelper.isEmpty(fee.getProd_sn())){
 				//非公用账目的订购产品费，如果没有对应订单记录prod_sn，则报错
 				throw new ServicesException(ErrorCode.CFeeAndProdOrderIsNotOne);
-			}
+			}**/
 			needPayFee=needPayFee+fee.getReal_pay();
 			fee.setBusi_optr_id(pay.getBusi_optr_id());
 		}
