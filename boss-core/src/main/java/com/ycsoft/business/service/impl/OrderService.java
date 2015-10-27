@@ -30,6 +30,7 @@ import com.ycsoft.beans.prod.PPackageProd;
 import com.ycsoft.beans.prod.PProd;
 import com.ycsoft.beans.prod.PProdTariff;
 import com.ycsoft.beans.prod.PProdTariffDisct;
+import com.ycsoft.beans.prod.PSpkg;
 import com.ycsoft.business.component.core.OrderComponent;
 import com.ycsoft.business.dao.config.TPayTypeDao;
 import com.ycsoft.business.dao.core.cust.CCustDao;
@@ -40,6 +41,7 @@ import com.ycsoft.business.dao.prod.PPackageProdDao;
 import com.ycsoft.business.dao.prod.PProdDao;
 import com.ycsoft.business.dao.prod.PProdTariffDao;
 import com.ycsoft.business.dao.prod.PProdTariffDisctDao;
+import com.ycsoft.business.dao.prod.PSpkgDao;
 import com.ycsoft.business.dto.core.acct.PayDto;
 import com.ycsoft.business.dto.core.fee.BusiFeeDto;
 import com.ycsoft.business.dto.core.prod.OrderProd;
@@ -84,6 +86,8 @@ public class OrderService extends BaseBusiService implements IOrderService{
 	private CProdOrderFeeDao cProdOrderFeeDao;
 	@Autowired
 	private TPayTypeDao tPayTypeDao;
+	@Autowired
+	private PSpkgDao pSpkgDao;
 
 	/**
 	 * 查询订单修改需要初始化数据
@@ -1360,6 +1364,25 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		int billing_cycle=0;
 		int rent=0;
 		PProdTariff tariff=pProdTariffDao.findByKey(tmpTariff[0]);
+		
+		//验证协议套餐能否适用
+		if(StringHelper.isNotEmpty(tariff.getSpkg_sn())){
+			PSpkg spkg = pSpkgDao.querySpkgBySn(tariff.getSpkg_sn());
+			if(spkg == null||!spkg.getStatus().equals(StatusConstants.CONFIRM)){
+				throw new ServicesException(ErrorCode.SpkgHasNotCONFIRM);
+			}else if(!tariff.getSpkg_sn().equals(this.getBusiParam().getCust().getSpkg_sn())){
+				throw new ServicesException(ErrorCode.SpkgIsNotTrueCust);
+			}
+			if(lastOrder!=null){
+				CProdOrderDto tmp= cProdOrderDao.queryCProdOrderDtoByKey(lastOrder.getOrder_sn());
+				if(tmp==null){
+					throw new ServicesException(ErrorCode.ParamIsNull);
+				}
+				if(!SystemConstants.PROD_TYPE_SPKG.equals(tmp.getProd_type())){
+					throw new ServicesException(ErrorCode.SpkgIsPaiChuCustKG);
+				}
+			}
+		}
 		
 		if(tmpTariff.length==2){
 			
