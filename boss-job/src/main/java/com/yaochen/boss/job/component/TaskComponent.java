@@ -7,8 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.ycsoft.beans.core.cust.CCust;
-import com.ycsoft.beans.core.prod.CProdOrder;
-import com.ycsoft.beans.prod.PRes;
 import com.ycsoft.beans.system.SBullentionWorkCount;
 import com.ycsoft.beans.system.SBulletinWorktask;
 import com.ycsoft.beans.system.SOptr;
@@ -20,7 +18,7 @@ import com.ycsoft.beans.task.WTeam;
 import com.ycsoft.boss.remoting.cfocn.WorkOrderClient;
 import com.ycsoft.boss.remoting.ott.Result;
 import com.ycsoft.business.dao.core.cust.CCustDao;
-import com.ycsoft.business.dao.core.prod.CProdOrderDao;
+import com.ycsoft.business.dao.core.user.CUserDao;
 import com.ycsoft.business.dao.system.SBulletinDao;
 import com.ycsoft.business.dao.system.SBulletinWorktaskDao;
 import com.ycsoft.business.dao.system.SOptrDao;
@@ -51,7 +49,7 @@ public class TaskComponent extends BaseComponent {
 	@Autowired
 	private SBulletinDao sBulletinDao;
 	@Autowired
-	private CProdOrderDao cProdOrderDao;
+	private CUserDao cUserDao;
 	
 	//查找需要执行的工单任务
 	public List<WTaskLog> querySynTaskLog() throws Exception{
@@ -100,7 +98,7 @@ public class TaskComponent extends BaseComponent {
 		List<WTaskUser> userList = queryTaskUser(taskId);
 		TaskCustExtInfo extInfo = queryCustInfo(task.getCust_id());
 		
-		boolean sign= client.createTaskService(task, userList, extInfo);
+		boolean sign= client.createTaskService(task, userList, extInfo,cUserDao.queryUserByCustId(task.getCust_id()));
 		//更新工单状态为施工中
 		this.updateTaskBaseInfoStatus(taskId, StatusConstants.TASK_INIT);
 		//同步标志成功

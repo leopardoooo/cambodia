@@ -10,8 +10,9 @@ AgreementGrid = Ext.extend(Ext.grid.GridPanel, {
 			url: root+'/config/Config!querySpkg.action',
 			fields: ['sp_id', 'spkg_sn', 'spkg_title', 'spkg_text', 'remark', 'create_time', 'optr_id', 'status', 'optr_name',       
 				'status_text', 'confirm_optr_id', 'confirm_date', 'apply_optr_id', 'apply_date', 'optr_name', 'confirm_optr_name', 'apply_optr_name',
-				{type:'date',name: 'eff_date', format: 'Y-m-d'}, {type:'date',name: 'exp_date', format: 'Y-m-d'}
-				],
+				{type:'date',name: 'eff_date', format: 'Y-m-d'}, {type:'date',name: 'exp_date', format: 'Y-m-d'},
+				'cust_no', 'cust_name', 'prod_name'
+			],
 			totalProperty: 'totalProperty',
 			root: 'records'
 		});
@@ -39,6 +40,9 @@ AgreementGrid = Ext.extend(Ext.grid.GridPanel, {
 				}
 				return text;
 			}},
+			{header: '客户编号',		dataIndex: 'cust_no',			width: 100, renderer: App.qtipValue},
+			{header: '客户名称',		dataIndex: 'cust_name',			width: 100, renderer: App.qtipValue},
+			{header: '产品名称',		dataIndex: 'prod_name',			width: 100, renderer: App.qtipValue},
 			{header: '备注',			dataIndex: 'remark', 			width: 100, renderer: App.qtipValue}
 		];
 		AgreementGrid.superclass.constructor.call(this, {
@@ -165,7 +169,7 @@ AgreementUserGrid = Ext.extend(Ext.grid.GridPanel, {
 			{header: '开户数量', dataIndex: 'open_num', width: 60, renderer: App.qtipValue},
 			{header: '购买方式', dataIndex: 'buy_mode_name', width: 65, renderer: App.qtipValue},
 			{header: '费用名称', dataIndex: 'fee_name', width: 150, renderer: App.qtipValue},
-			{header: '金额', dataIndex: 'fee', width: 50, renderer : function(v){
+			{header: '金额', dataIndex: 'fee', width: 60, renderer : function(v){
                 return Ext.util.Format.usMoney( Ext.util.Format.formatFee(v) );
             }},
 			{header: '状态', dataIndex: 'status_text', width: 50, renderer: Ext.util.Format.statusShow},
@@ -241,7 +245,7 @@ AgreementFeeGrid = Ext.extend(Ext.grid.GridPanel, {
 		});
 		var columns = [
 			{header: '费用名称', dataIndex: 'fee_name', width: 150},
-			{header: '金额', dataIndex: 'fee', width: 50, renderer : function(v){
+			{header: '金额', dataIndex: 'fee', width: 60, renderer : function(v){
                 return Ext.util.Format.usMoney( Ext.util.Format.formatFee(v) );
             }},
 			{header: '状态', dataIndex: 'status_text', width: 50, renderer: Ext.util.Format.statusShow},
@@ -329,10 +333,6 @@ AgreementWin = Ext.extend(Ext.Window, {
 				allowBlank: false
 			},{
 				xtype: 'textfield',
-				fieldLabel: '协议标题',
-				name: 'spkg_title'
-			},{
-				xtype: 'textfield',
 				fieldLabel: '协议内容',
 				name: 'spkg_text'
 			},{
@@ -354,10 +354,16 @@ AgreementWin = Ext.extend(Ext.Window, {
 				format: 'Y-m-d'
 			},{
 				xtype: 'textarea',
+				fieldLabel: '协议标题',
+				name: 'spkg_title',
+				anchor: '95%',
+				height: 120
+			},{
+				xtype: 'textarea',
 				fieldLabel: '备注',
 				name: 'remark',
 				anchor: '95%',
-				height: 80
+				height: 100
 			}]
 		});
 		AgreementWin.superclass.constructor.call(this, {
@@ -550,6 +556,7 @@ AgreementUserWin = Ext.extend(Ext.Window, {
 					/*txtFee.setMaxValue(data["max_fee_value"]/100.0);
 					txtFee.setMinValue(data["min_fee_value"]/100.0);*/
 					txtFee.clearInvalid();
+					txtFee.setReadOnly(false);
 					this.form.getForm().findField('fee_id').setValue(data['fee_id']);
 					dfFeeName.setValue(data["fee_name"]);
 				}else{
@@ -558,6 +565,7 @@ AgreementUserWin = Ext.extend(Ext.Window, {
 					/*txtFee.setMaxValue(0);
 					txtFee.setMinValue(0);*/
 					txtFee.clearInvalid();
+					txtFee.setReadOnly(true);
 					this.form.getForm().findField('fee_id').setValue('');
 				}
 			}

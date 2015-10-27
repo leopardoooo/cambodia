@@ -45,7 +45,8 @@ public class PSpkgOpenuserDao extends BaseEntityDao<PSpkgOpenuser> {
 		String sql = "select so.*, bm.buy_mode_name, f.fee_name"
 				+ " from p_spkg_openuser so, t_device_buy_mode bm, t_busi_fee f"
 				+ " where so.buy_type=bm.buy_mode and so.fee_id=f.fee_id(+)"
-				+ " and so.sp_id = ?";
+				+ " and so.sp_id = ?"
+				+ " order by so.status, so.user_type";
 		return this.createQuery(sql, spId).list();
 	}
 

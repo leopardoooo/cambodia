@@ -49,6 +49,34 @@ public class PSpkg implements Serializable {
 	private String confirm_optr_name;
 	private String apply_optr_name;
 	
+	private String prod_name;
+	private String cust_no;
+	private String cust_name;
+	
+	public String getProd_name() {
+		return prod_name;
+	}
+
+	public void setProd_name(String prod_name) {
+		this.prod_name = prod_name;
+	}
+
+	public String getCust_no() {
+		return cust_no;
+	}
+
+	public void setCust_no(String cust_no) {
+		this.cust_no = cust_no;
+	}
+
+	public String getCust_name() {
+		return cust_name;
+	}
+
+	public void setCust_name(String cust_name) {
+		this.cust_name = cust_name;
+	}
+
 	/**
 	 * default empty constructor
 	 */
