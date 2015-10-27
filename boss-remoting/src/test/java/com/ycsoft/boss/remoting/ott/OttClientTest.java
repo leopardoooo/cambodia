@@ -11,7 +11,7 @@ public class OttClientTest {
 	@BeforeClass
 	public static void setUp(){
 		URLBuilder b = new URLBuilder();
-		b.setIp("172.18.21.56");
+		b.setIp("172.18.21.100");
 		b.setPort(80);
 		
 		client.setBuilder(b);
@@ -19,8 +19,8 @@ public class OttClientTest {
 	
 	@Test
 	public void testCreateUser() {
-		Result result = client.createUser("0120134264", "123456", "pybtest1", "moniwang",
-				null, null, "PND031407000245", "88-10-36-2D-E1-AF","ACTIVE");
+		Result result = client.createUser("99000002", "123456", "99000002", "moniwang",
+				null, null, "PND031501000065", "8810362E6435","ACTIVE");
 		assertEquals("0",result.getErr());
 	}
 	
