@@ -269,6 +269,7 @@ public class CustService extends BaseBusiService implements ICustService {
 				newAddress = change.getNew_value();
 				break;
 			}
+			
 		}
 		//生成移机工单
 		if(BusiCodeConstants.CUST_CHANGE_ADDR.equals(busiCode) && isMoveTask){
