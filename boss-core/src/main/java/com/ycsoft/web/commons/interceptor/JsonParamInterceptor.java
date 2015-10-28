@@ -8,10 +8,13 @@ import com.opensymphony.xwork2.ActionInvocation;
 import com.opensymphony.xwork2.interceptor.AbstractInterceptor;
 import com.opensymphony.xwork2.util.logging.Logger;
 import com.opensymphony.xwork2.util.logging.LoggerFactory;
+import com.ycsoft.beans.system.SOptr;
 import com.ycsoft.business.commons.pojo.Parameter;
 import com.ycsoft.commons.constants.Environment;
+import com.ycsoft.commons.exception.ServicesException;
 import com.ycsoft.commons.helper.JsonHelper;
 import com.ycsoft.commons.helper.LoggerHelper;
+import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.web.commons.abstracts.BaseBusiAction;
 
 /**
@@ -60,6 +63,15 @@ public class JsonParamInterceptor extends AbstractInterceptor{
 			//cfee缴费业务记录日志，用于串数据分析
 			LoggerHelper.info("CFEE", JsonParamInterceptor.class,json);
 		}
+		
+		Object obj = ServletActionContext.getRequest().getSession().getAttribute(Environment.USER_IN_SESSION_NAME);
+		if(obj != null){
+			SOptr optr = JsonHelper.toObject( obj.toString(), SOptr.class);
+			if(StringHelper.isNotEmpty(p.getOptr_id()) && !p.getOptr_id().equals(optr.getOptr_id())){
+				throw new ServicesException("操作员信息错误，请重新登陆");
+			}
+		}
+		
 		target.setParameter( p );
 
 	}

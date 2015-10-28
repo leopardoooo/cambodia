@@ -38,11 +38,17 @@ public class Parameter implements IParameter {
 	private String remark ;
 	
 	private String workBillAsignType;
+	private String optr_id;
 
 	private Map<String,Object> tempVar = new HashMap<String,Object>() ; //临时变量,用于在拦截器访问Service的变量
 
 	
-	
+	public String getOptr_id() {
+		return optr_id;
+	}
+	public void setOptr_id(String optr_id) {
+		this.optr_id = optr_id;
+	}
 	
 	public CFeePayDto getPay() {
 		return pay;

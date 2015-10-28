@@ -16,8 +16,21 @@ var showBulletin = function(){
 		url:root + '/system/x/Index!queryUnCheckBulletin.action' ,
 		scope:this,
 		success:function(res,opt){
-			var data = Ext.decode(res.responseText);
-			if(data){
+			var map = Ext.decode(res.responseText);
+			if(map){
+				var optr = map['optr'] ? Ext.decode(map['optr']) : {};
+				if(optr['optr_id'] != App.getData()['optr']['optr_id']){
+					Alert('操作员异常，请重新登陆！',function(){
+						/*if (window.parent){
+							window.parent.location.reload();
+						}else{
+							window.location.reload();
+						}*/
+						window.location.href = '/boss-login/login.jsp';
+					});
+				}
+				var data = map['bulletin'];
+				if(Ext.isEmpty(data))return;
 				var bulletinContent = Ext.util.Format.ellipsis(data['bulletin_content'],120,true);
 				var win = Ext.getCmp('bulletWinId');
 				if(!win){
