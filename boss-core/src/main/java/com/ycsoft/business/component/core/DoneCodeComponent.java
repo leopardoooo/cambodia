@@ -481,7 +481,9 @@ public class DoneCodeComponent extends BaseBusiComponent {
 					detail[i] = new CDoneCodeDetail();
 					detail[i].setDone_code(doneCode);
 					detail[i].setCust_id(custId);
-					detail[i].setUser_id(userIds.get(i).toString());
+					if(StringHelper.isNotEmpty(userIds.get(i))){//lxr临时添加
+						detail[i].setUser_id(userIds.get(i).toString());
+					}
 					detail[i].setArea_id(getOptr().getArea_id());
 					detail[i].setCounty_id(getOptr().getCounty_id());
 				}
