@@ -97,7 +97,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		doneCodeComponent.lockCust(cust.getCust_id());
 		
 		Integer doneCode = doneCodeComponent.gDoneCode();
-		openSingle(cust, user, doneCode, deviceCode, deviceType, deviceModel, deviceBuyMode, deviceFee);
+		user = openSingle(cust, user, doneCode, deviceCode, deviceType, deviceModel, deviceBuyMode, deviceFee);
 		
 		String userType = user.getUser_type();
 		//若没有设备号，新增工单

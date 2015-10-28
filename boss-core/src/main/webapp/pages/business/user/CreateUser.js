@@ -487,7 +487,6 @@ UserBaseForm = Ext.extend( BaseForm , {
 				loginName: loginName
 			},
 			success: function(res,opt){
-				field.focus();
 			}
 		});
 	},
