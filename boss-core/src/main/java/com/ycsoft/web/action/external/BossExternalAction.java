@@ -46,6 +46,7 @@ public class BossExternalAction extends AbstractAction{
 	private String ott_data; 
 	
 	private String update_product;
+	private String update_product_fee_id;
 	private float price;
 	private String currency_type;
 	
@@ -63,7 +64,7 @@ public class BossExternalAction extends AbstractAction{
 	public String getAccountInfo(){
 		this.doActionInCallbackForCommonResult(new Callback(){
 			@Override
-			public Object doCallback() throws Throwable {
+			public Object doCallback() throws Exception {
 				return ottExternalService.getAccountInfo(user_id);
 			}
 		}, null);
@@ -83,7 +84,7 @@ public class BossExternalAction extends AbstractAction{
 	public String modifyAccountInfo(){
 		this.doActionInCallbackForCommonResult(new Callback(){
 			@Override
-			public Object doCallback() throws Throwable {
+			public Object doCallback() throws Exception {
 				ottExternalService.modifyAccountInfo(user_id, user_passwd, user_rank, user_name, telephone);
 				return new Object();
 			}
@@ -104,7 +105,7 @@ public class BossExternalAction extends AbstractAction{
 	public String registerAccount(){
 		this.doActionInCallbackForCommonResult(new Callback(){
 			@Override
-			public Object doCallback() throws Throwable {
+			public Object doCallback() throws Exception {
 				return ottExternalService.RegisterAccount(user_id, user_passwd, user_name, user_rank, telephone, email);
 			}
 		}, null);
@@ -118,7 +119,7 @@ public class BossExternalAction extends AbstractAction{
 	public String userValidate(){
 		this.doActionInCallbackForCommonResult(new Callback(){
 			@Override
-			public Object doCallback() throws Throwable {
+			public Object doCallback() throws Exception {
 				return ottExternalService.queryUserValidate(user);
 			}
 		}, null);
@@ -139,7 +140,7 @@ public class BossExternalAction extends AbstractAction{
 	public String getOrderedProductList(){
 		this.doActionInCallbackForCommonResult(new Callback(){
 			@Override
-			public Object doCallback() throws Throwable {
+			public Object doCallback() throws Exception {
 				return ottExternalService.getOrderedProductList(user_id);
 			}
 		}, null);
@@ -158,7 +159,7 @@ public class BossExternalAction extends AbstractAction{
 	public String getProductList(){
 		this.doActionInCallbackForCommonResult(new Callback(){
 			@Override
-			public Object doCallback() throws Throwable {
+			public Object doCallback() throws Exception {
 				return ottExternalService.getProductList(user_id, product_ids);
 			}
 		}, null);
@@ -179,7 +180,7 @@ public class BossExternalAction extends AbstractAction{
 	public String buyProduct(){
 		this.doActionInCallbackForCommonResult(new Callback(){
 			@Override
-			public Object doCallback() throws Throwable {
+			public Object doCallback() throws Exception {
 				ottExternalService.saveOttMobileBuyProduct(user_id, product_id, product_fee_id, amount, film_name, boss_data, ott_data);
 				return new Object();
 			}
@@ -196,7 +197,7 @@ public class BossExternalAction extends AbstractAction{
 	public String getBuyProductHistory(){
 		this.doActionInCallbackForCommonResult(new Callback(){
 			@Override
-			public Object doCallback() throws Throwable {
+			public Object doCallback() throws Exception {
 				return ottExternalService.getBuyProductHistory(user_id);
 			}
 		}, null);
@@ -215,8 +216,8 @@ public class BossExternalAction extends AbstractAction{
 	public String getProductListByUpdate(){
 		this.doActionInCallbackForCommonResult(new Callback(){
 			@Override
-			public Object doCallback() throws Throwable {
-				return ottExternalService.getProductListByUpdate();
+			public Object doCallback() throws Exception {
+				return ottExternalService.getProductListByUpdate(user_id,product_ids);
 			}
 		}, null);
 		return JSON;
@@ -236,8 +237,8 @@ public class BossExternalAction extends AbstractAction{
 	public String updateProduct(){
 		this.doActionInCallbackForCommonResult(new Callback(){
 			@Override
-			public Object doCallback() throws Throwable {
-				ottExternalService.updateProduct();
+			public Object doCallback() throws Exception {
+				ottExternalService.updateProduct(user_id,product_id,update_product,update_product_fee_id);
 				return new Object();
 			}
 		}, null);
@@ -258,7 +259,7 @@ public class BossExternalAction extends AbstractAction{
 				msg = new Object();
 			}
 			body = ResultBody.createWithMsg(msg);
-		}catch(Throwable e){
+		}catch(Exception e){
 			Object msg = new Object();
 			if(errMsg != null){
 				msg = errMsg.extract();
@@ -272,7 +273,7 @@ public class BossExternalAction extends AbstractAction{
 				}
 			}else{
 				logger.error(e.getMessage(), e);
-				tex = new ServicesException(ErrorCode.UNKNOW_EXCEPTION);
+				tex = ServicesException.createUnknowException(e.getMessage(), e);
 			}
 			body = ResultBody.createWithExceptionAndMsg(tex, msg);
 		}
@@ -282,7 +283,7 @@ public class BossExternalAction extends AbstractAction{
 	}
 	
 	private interface Callback{
-		Object doCallback()throws Throwable;
+		Object doCallback()throws Exception;
 	}
 	
 	private interface ErrorMsgDataExtractor{
@@ -380,6 +381,14 @@ public class BossExternalAction extends AbstractAction{
 
 	public void setOttExternalService(OttExternalService ottExternalService) {
 		this.ottExternalService = ottExternalService;
+	}
+
+	public String getUpdate_product_fee_id() {
+		return update_product_fee_id;
+	}
+
+	public void setUpdate_product_fee_id(String update_product_fee_id) {
+		this.update_product_fee_id = update_product_fee_id;
 	}
 
 

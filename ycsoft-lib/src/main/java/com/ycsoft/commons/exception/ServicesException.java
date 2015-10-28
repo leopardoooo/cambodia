@@ -15,6 +15,17 @@ public class ServicesException extends Exception {
 
 	private ErrorCode errorCode;
 	
+	public ServicesException(String message,ErrorCode errorCode){
+		super(message);
+		this.errorCode=errorCode;
+	}
+	
+	public static ServicesException createUnknowException(String msg ,Exception e){
+		ServicesException ex=new ServicesException(msg,e);
+		ex.errorCode=ErrorCode.UNKNOW_EXCEPTION;
+		return ex;
+	}
+	
 	public ServicesException(ErrorCode errorCode){
 		super(errorCode.getDesc());
 		this.errorCode=errorCode;
