@@ -1245,8 +1245,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 
 	@Override
 	public List<SOptr> getByDeptId(String deptId) throws JDBCException {
-		// TODO Auto-generated method stub
-		return null;
+		return userComponent.getByDeptId(deptId);
 	}
 
 

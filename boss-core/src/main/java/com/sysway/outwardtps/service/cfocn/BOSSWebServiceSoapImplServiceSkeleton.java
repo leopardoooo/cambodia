@@ -77,7 +77,7 @@ public class BOSSWebServiceSoapImplServiceSkeleton
     	try{
     		// 调用boss接口完成工单
     		snTaskService.setParam(getServiceParam());
-    		snTaskService.finishTask(taskId, resultType,msg,false);
+    		snTaskService.finishTask(taskId, resultType, "",msg,false);
     		// 返回成功的结果
     		return createReturnWorkOrderResponse(createResultHeadForSuccess());
     	}catch(Exception e){

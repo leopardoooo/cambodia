@@ -209,7 +209,7 @@ public class UserAction extends BaseBusiAction {
 		userServiceSN.saveRemoveUser(userId,cancelFee,refundFee);
 		return JSON_SUCCESS;
 	}
-
+	
 	/**
 	 * 模拟转数
 	 * @throws Exception

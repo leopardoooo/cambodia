@@ -84,7 +84,7 @@ TaskGrid = Ext.extend(Ext.ux.Grid,{
 		this.taskStore = new Ext.data.JsonStore({
 			fields:['task_id','task_type_id',
 					'task_status','task_status_text','task_type_id_text','team_id','team_id_text','bug_type','bug_type_text'
-					,'bug_detail','zte_status','zte_status_text','task_create_time']
+					,'bug_detail','zte_status','zte_status_text','task_create_time','bug_phone']
 		}); 
 		var lc = lmain("doc.task.columns");
 		var cm = new Ext.ux.grid.LockingColumnModel({
@@ -97,12 +97,13 @@ TaskGrid = Ext.extend(Ext.ux.Grid,{
 						return '<div ext:qtitle="" ext:qtip="' + value + '">' + value +'</div>';
 					}
 				}},
-				{header:lc[1],dataIndex:'task_type_id_text',	width:110,renderer : App.qtipValue},
-				{header:lc[2],dataIndex:'task_status_text',	width:110,renderer:Ext.util.Format.statusShow},
+				{header:lc[1],dataIndex:'task_type_id_text',	width:120,renderer : App.qtipValue},
+				{header:lc[2],dataIndex:'task_status_text',	width:120,renderer:Ext.util.Format.statusShow},
 				{header:lc[3],dataIndex:'team_id_text',	width:120,renderer : App.qtipValue},
 				{header:lc[4],dataIndex:'bug_type_text',width:200,renderer : App.qtipValue},
 				{header:lc[5],dataIndex:'bug_detail',	width:120,renderer : App.qtipValue},
-				{header:lc[6],dataIndex:'zte_status_text',	width:80},
+				{header:lc[8],dataIndex:'bug_phone',	width:120,renderer : App.qtipValue},
+				{header:lc[6],dataIndex:'zte_status_text',	width:120},
 				{header:lc[7],dataIndex:'task_create_time',	width:130}
 			]
 		})

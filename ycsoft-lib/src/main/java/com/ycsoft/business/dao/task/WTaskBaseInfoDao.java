@@ -76,6 +76,12 @@ public class WTaskBaseInfoDao extends BaseEntityDao<WTaskBaseInfo> {
 		executeUpdate(sql, doneCode);
 
 	}
+	
+	public List<TaskBaseInfoDto> queryTaskByTaskTypeAndCustId(String custId, String taskTypeId) throws Exception {
+		String sql = "select distinct t.*, wt.team_type from w_task_base_info t, w_team wt, s_optr s"
+				+ " where t.team_id=wt.dept_id(+) and t.cust_id=? and t.task_type_id=? order by t.task_create_time desc";
+		return this.createQuery(TaskBaseInfoDto.class, sql, custId, taskTypeId).list();
+	}
 
 	public Pager<TaskBaseInfoDto> queryTask(String taskTypes, String addrIds, String beginDate, String endDate,
 			String taskId, String teamId, String status, String custNo, String custName, String custAddr,String mobile,

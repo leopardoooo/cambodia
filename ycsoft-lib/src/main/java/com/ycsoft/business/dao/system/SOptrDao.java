@@ -89,9 +89,9 @@ public class SOptrDao extends BaseEntityDao<SOptr> {
 	 * @throws JDBCException
 	 */
 	public List<SOptr> getByDeptId(String deptId) throws JDBCException {
-		String sql = "select o.* from s_optr o where o.dept_id=?";
+		String sql = "select o.* from s_optr o where o.dept_id=? and o.status=?";
 
-		List<SOptr> sysOptrs = createQuery(sql, deptId).list();
+		List<SOptr> sysOptrs = createQuery(sql, deptId, StatusConstants.ACTIVE).list();
 		return sysOptrs;
 	}
 	

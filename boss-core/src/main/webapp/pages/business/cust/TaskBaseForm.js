@@ -50,6 +50,65 @@ TaskDetailGrid = Ext.extend(Ext.grid.GridPanel, {
 	}                    
 })
 
+//相同客户 相同工单类型，除当前选中工单行以外的数据
+TaskSameGrid = Ext.extend(Ext.grid.GridPanel, {
+	taskSameStore : null,
+	constructor : function() {
+		this.taskSameStore = new Ext.data.JsonStore({
+					fields : ['task_id', 'task_status', 'task_status_text', 'team_id_text', 'task_create_time', 
+						'bug_type_text', 'bug_detail', 'sync_status_text', 'task_finish_desc']});
+		var cols = lbc('home.tools.TaskManager.samTaskCols');							
+		TaskSameGrid.superclass.constructor.call(this, {
+			ds : this.taskSameStore,
+			sm : new Ext.grid.CheckboxSelectionModel(),
+			border: false,
+			cm : new Ext.grid.ColumnModel([
+				{header : cols[0],dataIndex : 'task_id',width : 70, renderer:function(value,metaData,record){
+						if(value != ''){
+							return '<div style="text-decoration:underline;font-weight:bold"    ext:qtitle="" ext:qtip="' + value + '">' + value +'</div>';
+						}else{
+							return '<div ext:qtitle="" ext:qtip="' + value + '">' + value +'</div>';
+						}
+					}
+				},
+				{header : cols[1],dataIndex : 'task_status',width:130, renderer: function(v, m ,rs){
+					var text = rs.get("task_status_text");
+					var color = "black";
+					if(v == 'INIT'){
+						color = "purple";
+					}else if(v == 'END'){
+						color = "green";
+					}else if(v == 'CANCEL'){
+						color = "gray";
+					}
+					return '<div  style="font-weight: bold;color: '+ color +';" ext:qtitle="" ext:qtip="' + text + '">' + text +'</div>';
+				}},
+				{header : cols[2],dataIndex : 'team_id_text',width:120,renderer : App.qtipValue},
+				{header : cols[3],dataIndex : 'task_create_time',width:125,renderer : App.qtipValue},
+				{header : cols[4],dataIndex : 'bug_type_text',width:100},
+				{header : cols[5],dataIndex : 'bug_detail',width:150,renderer :  App.qtipValue},
+				{header : cols[6],dataIndex : 'sync_status_text',width:120, renderer:Ext.util.Format.statusShow},
+				{header : cols[7],dataIndex : 'task_finish_desc',width:150,renderer :  App.qtipValue}
+			]),
+			listeners: {
+				scope: this,
+				cellclick: this.doCellClick
+			}
+		})               
+	},
+	doCellClick:function(grid, rowIndex, columnIndex, e) {
+	    var record = grid.getStore().getAt(rowIndex);  // 返回Record对象 Get the Record
+	    var fieldName = grid.getColumnModel().getDataIndex(columnIndex); // 返回字段名称 Get field name
+	    if(fieldName == 'task_id'){
+		    var data = record.get(fieldName);
+		    if(!this.taskWin){
+				this.taskWin = new TaskDetailWindow();
+			}
+			this.taskWin.show(data);
+	    }
+	}
+});
+
 TaskAllInfo = Ext.extend(Ext.TabPanel,{
 	panel : null,
 	userGrid : null,
@@ -57,19 +116,22 @@ TaskAllInfo = Ext.extend(Ext.TabPanel,{
 	constructor : function() {
 		this.userGrid = new UserDetailGrid();
 		this.detail = new TaskDetailGrid();
+		this.sameTask = new TaskSameGrid();
 		TaskAllInfo.superclass.constructor.call(this, {
-				border : false,
 				activeTab: 0,
 				closable : true,
 				defaults : {border: false,layout : 'fit'},
-				items:[{title : lbc('home.tools.TaskManager._operateTitle'),items:[this.detail]},
-				{title : lbc('home.tools.TaskManager._userTitle'),items:[this.userGrid]
-				}]
+				items:[
+					{title : lbc('home.tools.TaskManager._operateTitle'),items:[this.detail]},
+					{title : lbc('home.tools.TaskManager._userTitle'),items:[this.userGrid]},
+					{title : lbc('home.tools.TaskManager._historyTitle'),items:[this.sameTask]}
+				]
 		})
 	},
 	loadBaseData:function(rs){
 		this.userGrid.getStore().loadData(rs.taskUserList);
 		this.detail.getStore().loadData(rs.taskLogList);
+		this.sameTask.getStore().loadData(rs.sameTaskList);
 	}
 })
 var taskCols = lbc('home.tools.TaskManager.taskCols');
@@ -91,14 +153,20 @@ TaskBaseTemplate = new Ext.XTemplate(
 		'<tr height=24>',
 			'<td class="label" width=20%>'+ taskCols[2] +'：</td>',
 			'<td class="input_bold" width=30%>&nbsp;{[values.task_status_text ||""]}</td>',
+			'<td class="label" width=20%>'+ taskCols[7] +'：</td>',
+			'<td class="input" width=30%>&nbsp;{[values.task_create_time ||""]}</td>',	
+		'</tr>',
+		'<tr height=24>',
 			'<td class="label" width=20%>'+ taskCols[3] +'：</td>',
 			'<td class="input" width=30%>&nbsp;{[values.team_id_text ||""]}</td>',
+			'<td class="label" width=20%>'+ taskCols[19] +'：</td>',
+			'<td class="input" width=30%>&nbsp;{[values.installer_id_text ||""]}</td>',
 		'</tr>',
 		'<tr height=24>',
 			'<td class="label" width=20%>'+ taskCols[6] +'：</td>',
 			'<td class="input" width=30%>&nbsp;{[values.cust_tel ||""]}</td>',
-			'<td class="label" width=20%>'+ taskCols[7] +'：</td>',
-			'<td class="input" width=30%>&nbsp;{[values.task_create_time ||""]}</td>',	
+			'<td class="label" width=20%>'+ taskCols[17] +'：</td>',
+			'<td class="input" width=30%>&nbsp;{[values.bug_phone ||""]}</td>',
 		'</tr>',
 		'<tpl if="values.old_addr">',
 			'<tr height=24>',
@@ -120,6 +188,10 @@ TaskBaseTemplate = new Ext.XTemplate(
 			'<td class="input" width=30% colspan=3>&nbsp;{[values.bug_type_text ||""]}</td>',
 		'</tr>',
 		'<tr height=24>',
+			'<td class="label" width=20%>'+ taskCols[18] +'：</td>',
+			'<td class="input" width=30% colspan=3>&nbsp;{[values.task_finish_desc ||""]}</td>',
+		'</tr>',
+		'<tr height=24>',
 			'<td class="label" width=20%>'+ taskCols[9] +'：</td>',
 			'<td class="input" width=30% colspan=3>&nbsp;{[values.bug_detail ||""]}</td>',
 		'</tr>',
@@ -138,7 +210,6 @@ TaskDetailForm = Ext.extend(Ext.Panel,{
 		this.tpl = TaskBaseTemplate;
 		this.tpl.compile();
 		TaskDetailForm.superclass.constructor.call(this, {
-			border: false,
 			layout: 'anchor',
 			anchor: '100%',
 			autoScroll:true,
@@ -146,8 +217,7 @@ TaskDetailForm = Ext.extend(Ext.Panel,{
 			defaults: {
 					bodyStyle: "background:#F9F9F9"
 				},
-			items : [{xtype : "panel",
-						border : false,
+			items : [{xtype : "panel",border: false,
 						bodyStyle: "background:#F9F9F9; padding: 10px;padding-top: 4px;padding-bottom: 0px;",
 						html : this.tpl.applyTemplate({})
 					}]

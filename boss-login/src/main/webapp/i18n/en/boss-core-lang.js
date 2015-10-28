@@ -312,7 +312,7 @@ BCLang.home = {
 			},
 			task: {
 				_title: 'Work Order',
-				columns: ["WorkOrdersNo.", "WorkOrdersType", "WorkOrderStatus", "ConstructionTeam","FaultCause", "FaultDetails", "ZTEAuthorizedState", "CreatingTime"],
+				columns: ["WorkOrdersNo.", "WorkOrdersType", "WorkOrderStatus", "ConstructionTeam","FaultCause", "FaultDetails", "ZTEAuthorizedState", "CreatingTime", "ReportFaultPhone"],
 				userColumns: ['UserType', 'UserName', 'DeviceModel', 'DeviceNumber', 'PosNo', 'OccNo ', 'BandWidth'],
 				detailColumns: ['OperatTime','OperatType', 'Operator','SyncStatus', 'ErrorDesc'],
 				winTitle: 'WorkOrders Info',
@@ -330,7 +330,8 @@ BCLang.home = {
 				oldStatus: ' FormerInvoiceStatus',
 				newInvoiceId: 'NewInvoiceNo.',
 				newInvoiceCode: 'NewInvoiceCode',
-				faultContent:'Fault content'
+				faultContent:'Fault content',
+				faultPhone: 'Report Fault Phone'
 			}
 		},
 		//Reception Record
@@ -527,6 +528,7 @@ BCLang.home = {
 			_winTitle : 'Work Order Completion',
 			_ZteWinTitle : 'ZTE Authorized',
 			_fillDevTitle: 'BackfillDevice',
+			_historyTitle : 'History WorkOrder',
 			forms : {
 				custNo : 'CustomerNo.',
 				taskNo : 'WorkOrdersNo.',
@@ -537,6 +539,7 @@ BCLang.home = {
 				taskDetailType : 'WorkOrdersType',
 				taskAddr : 'Area',
 				taskTeam : 'ConstructionTeam',
+				taskOptr : 'WorkOrderOperator',
 				faultType : 'FaultType',
 				finishType : 'CompletionType',
 				finishExplan : 'CompletedDesc',
@@ -557,8 +560,8 @@ BCLang.home = {
 				withdraw : 'CFOCN Withdraw'
 			},
 			taskCols : ['WorkOrdersType', 'CustName', 'WorkOrdersStatus', 'ConstructionTeam',
-					'ZTEStatus', 'Address', 'Tel', 'CreatTime', 'FaultType', 'FaultDetails','WorkNo.','CustManager'
-					,'CustManagerTel','CustNo.','cfocnSyncStatus','old address','new address'],
+					'ZTEStatus', 'Address', 'Tel', 'CreateTime', 'FaultType', 'FaultDetails','WorkNo.','CustManager',
+					'CustManagerTel','CustNo.','CfocnSyncStatus','OldAddress','NewAddress','ReportFaultPhone', 'FinishDescription', 'WorkOrderOperator'],
 			userCols : ['UserType', 'Account number', 'Password', 'DeviceModel', 'DeviceNO.', 'PosNo.', 'OccNo.', 'BandWidth','Band password'],
 			operateCols : ['OperatingTime', 'OperationType', 'Operator', 'SyncStatus', 'Description','DelayTime'],
 			taskDeviceCols : ['UserType', 'UserName', 'Model', 'DeviceNO.', 'DeviceRecycling','OldDeviceNO.'],

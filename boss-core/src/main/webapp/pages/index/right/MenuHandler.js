@@ -2875,7 +2875,7 @@ Ext.apply(MenuHandler, {
 	//新增保障单
 	NewRepairTask: function(){
 	    if(!hasCust()) return false;
-	    return {width: 450 , height: 300};
+	    return {width: 450 , height: 350};
 	  },
 	PrintRepairTask: function(){
 	  	var record = App.getApp().main.infoPanel.getDocPanel().taskGrid.getSelectionModel().getSelected();

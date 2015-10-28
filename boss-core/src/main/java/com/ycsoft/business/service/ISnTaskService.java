@@ -21,7 +21,7 @@ public interface ISnTaskService {
 	 * @param bugType 如果工单是故障单
 	 * @throws Exception 
 	 */
-	public void editTaskTeam(String taskId,String deptId,String bugType) throws Exception;
+	public void editTaskTeam(String taskId, String deptId, String optrId, String bugType) throws Exception;
 	
 	/**
 	 * 取消工单
@@ -52,7 +52,7 @@ public interface ISnTaskService {
 	 * @param taskId
 	 * @param resultType 完工类型
 	 */
-	public void finishTask(String taskId,String resultType,String remark,boolean isBusi)throws Exception;
+	public void finishTask(String taskId,String resultType, String bugType, String remark,boolean isBusi)throws Exception;
 	
 	/**
 	 * 工单查询

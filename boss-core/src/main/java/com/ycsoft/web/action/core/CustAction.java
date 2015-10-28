@@ -641,7 +641,8 @@ public class CustAction extends BaseBusiAction{
 	
 	public String saveBugTask() throws Exception{
 		String bugDetail = request.getParameter("bugDetail");
-		custService.saveBugTask(bugDetail);
+		String bugPhone = request.getParameter("bugPhone");
+		custService.saveBugTask(bugDetail, bugPhone);
 		return JSON_SUCCESS;
 	}
 	

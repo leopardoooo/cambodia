@@ -174,11 +174,11 @@ TaskDeviceWin = Ext.extend(Ext.Window,{
 TaskManagerPanel = Ext.extend( Ext.Panel ,{
 	taskStore:null,
 	grid: null,
-	pageSize: 15,
+	pageSize: 500,
 	taskAllInfo:null,
 	constructor:function(item){
 		this.initWidgets(item);	
-		this.taskAllInfo = new TaskAllInfo();
+		this.taskAllInfo = new TaskAllInfo(this);
 		var btns = lbc('home.tools.TaskManager.buttons');
   		TaskManagerPanel.superclass.constructor.call(this,{
 			border: false,
@@ -286,7 +286,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 			fields:['task_id','cust_no','cust_name','cust_tel','old_addr','new_addr','address','task_type_id',
 					'task_status','task_status_text','task_type_id_text','team_id','team_id_text','bug_type','bug_type_text'
 					,'bug_detail','zte_status','zte_status_text','task_create_time','team_type','linkman_name',
-					'linkman_tel','sync_status','sync_status_text'],
+					'linkman_tel','sync_status','sync_status_text','task_finish_desc','bug_phone'],
 			root : 'records',
 			totalProperty : 'totalProperty',
 			autoDestroy : true
@@ -412,7 +412,6 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 	        cm: new Ext.ux.grid.LockingColumnModel({
 	        	columns:[
 				{header: taskCols[10],dataIndex : 'task_id', width: 70, renderer:function(value,metaData,record){
-					that = this;
 					if(value != ''){
 						return '<div style="text-decoration:underline;font-weight:bold"    ext:qtitle="" ext:qtip="' + value + '">' + value +'</div>';
 					}else{
@@ -442,10 +441,11 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 				{header: taskCols[5], dataIndex : 'address', width: 200,renderer:App.qtipValue},
 				{header: taskCols[6], dataIndex : 'cust_tel', 				width: 100, renderer:App.qtipValue},
 				{header: taskCols[7], dataIndex: 'task_create_time', 	width: 80, renderer: Ext.util.Format.dateFormat},					
-				{header: taskCols[8],dataIndex:'bug_type_text',width:85, renderer:App.qtipValue},
+				{header: taskCols[8],dataIndex:'bug_type_text',width:120, renderer:App.qtipValue},
 				{header: taskCols[9],dataIndex:'bug_detail',width:120,renderer:App.qtipValue},
 				{header: taskCols[11],dataIndex:'linkman_name',width:90,renderer:App.qtipValue},
-				{header: taskCols[12],dataIndex:'linkman_tel',width:110,renderer:App.qtipValue}
+				{header: taskCols[17],dataIndex:'bug_phone',width:90,renderer:App.qtipValue},
+				{header: taskCols[18],dataIndex:'task_finish_desc',width:120,renderer:App.qtipValue}
 	        ]}),
 	        sm: sm,
 	        stripeRows: true,
@@ -514,18 +514,18 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 	doClickRecord:function(g, i, e){
 		//选中一条时才显示
 		var record = g.getStore().getAt(i);
-		this.loadTaskData(record.get("task_id"));
+		this.loadTaskData(record.get('task_id'));
 	},
 	loadTaskData:function(taskId){
 		Ext.Ajax.request({
 			scope : this,
 			url: root + '/core/x/Task!queryTaskDetail.action' ,
-			params : {task_id : taskId},
+			params : {
+				task_id: taskId
+			},
 			success : function(res,opt){
 				var rs = Ext.decode(res.responseText);
 				this.taskAllInfo.loadBaseData(rs);
-//				userGrid.getStore().loadData(rs.taskUserList);
-//				this.taskAllInfo.detail.getStore().loadData(rs.taskLogList);
 			}
 		});
 	},
@@ -695,6 +695,17 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 			}
 		});
 		
+		var optrCombo = new Ext.form.ComboBox({
+			width: 120,
+		    fieldLabel:lbc('home.tools.TaskManager.forms.taskOptr'),
+		    store: new Ext.data.JsonStore({
+		    	url: Constant.ROOT_PATH +'/core/x/User!getByDeptId.action',
+		    	fields: [ 'optr_id', 'optr_name' ]
+		    }),
+		    valueField: 'optr_id',
+		    displayField: 'optr_name'
+		});
+		
 		var teamCombo = new Ext.form.ComboBox({
 			typeAhead: true,
 			width: 120,
@@ -705,13 +716,25 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 		    allowBlank:false,
 		    store: new Ext.data.JsonStore({fields: [ 'dept_id', 'dept_name' ]}),
 		    valueField: 'dept_id',
-		    displayField: 'dept_name'
+		    displayField: 'dept_name',
+		    listeners: {
+		    	scope: this,
+		    	select: function(combo){
+		    		var value = combo.getValue();
+		    		optrCombo.getStore().load({
+		    			params:{
+		    				deptId: value	
+		    			}
+		    		});
+		    	}
+		    }
 		});
 		teamCombo.getStore().loadData(arr);
+		
 		var form = new Ext.form.FormPanel({
 			labelWidth: 150,
 			bodyStyle: 'padding-top: 10px;',
-			items: [teamCombo]
+			items: [teamCombo, optrCombo]
 		});
 		if(rs.get('task_type_id') == '2'){
 			var bugCauseCombo = new Ext.ux.ParamCombo({
@@ -719,6 +742,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 				xtype:'paramcombo',
 				allowBlank:false,
 				anchor: '95%',
+				allowBlankItem: true,
 				paramName:'TASK_BUG_CAUSE'
 			});
 			App.form.initComboData([bugCauseCombo]);
@@ -746,6 +770,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 					var url = Constant.ROOT_PATH + "/core/x/Task!editTaskTeam.action";
 					var taskId = rs.get("task_id");
 					var o = {task_id : taskId, deptId: teamCombo.getValue(),
+						optrId: optrCombo.getValue(),
 						bugType : bugCauseCombo?bugCauseCombo.getValue():null
 					};
 					App.sendRequest( url, o, function(res,opt){
@@ -801,13 +826,20 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 			}),displayField:'item_name',valueField:'item_value',
 			triggerAction:'all',mode:'local'
 		});
-		App.form.initComboData([finishCombo]);
+		var bugCauseCombo = new Ext.ux.ParamCombo({
+				fieldLabel: lbc('home.tools.TaskManager.forms.faultType'),
+				xtype:'paramcombo',
+				anchor: '95%',
+				allowBlankItem: true,
+				paramName:'TASK_BUG_CAUSE'
+			});
+		App.form.initComboData([finishCombo, bugCauseCombo]);
 		var endForm = new Ext.form.FormPanel({
 			layout : 'form',
 			border : false,
 			labelWidth : 150,
 			bodyStyle : 'padding : 5px;padding-top : 10px;',
-			items: [finishCombo,{
+			items: [finishCombo, bugCauseCombo,{
 				fieldLabel: lbc('home.tools.TaskManager.forms.finishExplan'),
 				name:'finishRemark',
 				height : 140,
@@ -836,6 +868,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 					var o = {
 						task_id : taskId, 
 						resultType : finishCombo.getValue(),
+						bugType: bugCauseCombo.getValue(),
 						finishRemark : endForm.getForm().findField('finishRemark').getValue()
 					};
 					App.sendRequest( url, o, function(res,opt){
