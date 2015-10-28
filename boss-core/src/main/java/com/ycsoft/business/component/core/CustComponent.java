@@ -193,6 +193,17 @@ public class CustComponent extends BaseBusiComponent {
 			}
 		}
 	}
+	
+	public void checkCustSpkgSnConfirm(String custId,String skkg_sn) throws Exception{
+		PSpkg spkg = pSpkgDao.querySpkgBySn(skkg_sn);
+		if(spkg == null||!spkg.getStatus().equals(StatusConstants.CONFIRM)){
+			throw new ComponentException(ErrorCode.SpkgHasNotCONFIRM);
+		}
+		CCust cust=cCustDao.findByKey(custId);
+		if(cust.getSpkg_sn()==null||!cust.getSpkg_sn().equals(skkg_sn)){
+			throw new ComponentException(ErrorCode.SpkgIsNotTrueCust);
+		}
+	}
 	/**
 	 * 修改客户信息
 	 * @param doneCode	流水号
@@ -212,7 +223,7 @@ public class CustComponent extends BaseBusiComponent {
 		for (CCustPropChange change:propChangeList){
 			//验证协议号是否使用
 			if(change.getColumn_name().equals("spkg_sn")){
-				this.checkCustUseSpkgSn(cust, change.getNew_value());
+				this.checkCustUseSpkgSn(cCustDao.findByKey(custId), change.getNew_value());
 			}
 			
 			if(change.getColumn_name().equals("cust_count")){

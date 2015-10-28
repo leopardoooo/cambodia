@@ -251,7 +251,8 @@ UserBaseBatchForm = Ext.extend( BaseForm , {
 				Ext.Ajax.request({
 					url: root + '/core/x/User!querySpkgUserInfo.action',
 					params: {
-						spkgSn: App.getCust()['spkg_sn']
+						spkgSn: App.getCust()['spkg_sn'],
+						custId: App.getCust()['cust_id']
 					},
 					scope: this,
 					success: function(res, opt){

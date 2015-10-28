@@ -915,7 +915,7 @@ public class UserAction extends BaseBusiAction {
 	
 	public String querySpkgUserInfo() throws Exception {
 		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("spkgUser", userServiceSN.querySpkgUser(spkgSn));
+		map.put("spkgUser", userServiceSN.querySpkgUser(custId,spkgSn));
 		map.put("busiFee", userServiceSN.querySpkgOpenFee(spkgSn));
 		getRoot().setSimpleObj(map);
 		return JSON_SIMPLEOBJ;

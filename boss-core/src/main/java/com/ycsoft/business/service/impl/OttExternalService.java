@@ -1,6 +1,7 @@
 package com.ycsoft.business.service.impl;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -319,7 +320,7 @@ public class OttExternalService extends OrderService {
 		//调用接口
 		Result ottResult=ottClient.editUser(loginName,user_passwd ,
 	    		user_name, cust.getAddress(), linkMan.getEmail(), linkMan.getTel()
-	    		,user.getStb_id() , user.getModem_mac(), user.getStatus());
+	    		,user.getStb_id() , user.getModem_mac(), StatusConstants.PREOPEN);//OTT_MOBILE注册默认设置PREOPEN 表示需要邮件激活
 	    if(!ottResult.isSuccess()){
 	    	LoggerHelper.debug(this.getClass(), "func=RegisterAccount error="+ottResult.getStatus()+" "+ottResult.getReason());
 	    	if(ottResult.getStatus().equals("40006"))
@@ -562,6 +563,7 @@ public class OttExternalService extends OrderService {
 			re.setTime(DateHelper.format(order.getOrder_time(), DateHelper.FORMAT_TIME));
 			resutls.add(re);
 		}
+		Collections.reverse(resutls);
 		return resutls;
 	}
 	

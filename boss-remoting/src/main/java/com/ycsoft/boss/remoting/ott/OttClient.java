@@ -219,7 +219,9 @@ public class OttClient {
 		if (status != null && (status.equals(StatusConstants.ACTIVE)||status.equals(StatusConstants.INSTALL))){
 			user.setState("0");
 			//user.setEnd_time(Da);
-		} else {
+		}if(status.equals(StatusConstants.PREOPEN)){
+			user.setState("9");//"9表示未激活 用于OTT_MOBILE注册接口使用"
+		}else {
 			user.setState("2");
 			//user.setEnd_time(new Date());
 		}
