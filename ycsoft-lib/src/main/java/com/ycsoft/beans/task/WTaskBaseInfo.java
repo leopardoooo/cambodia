@@ -51,6 +51,7 @@ public class WTaskBaseInfo implements Serializable{
 	private String optr_id;
 	private Integer finish_done_code;
 	private String bug_phone;
+	private String cust_sign_no;
 
 	private String task_type_name;
 	private String task_detail_type_name;
@@ -66,6 +67,14 @@ public class WTaskBaseInfo implements Serializable{
 	private Date zte_status_date;
 	private String sync_status;//同步状态
 	private Date sync_status_date;//同步状态时间
+	
+	public String getCust_sign_no() {
+		return cust_sign_no;
+	}
+
+	public void setCust_sign_no(String cust_sign_no) {
+		this.cust_sign_no = cust_sign_no;
+	}
 	
 	public String getBug_phone() {
 		return bug_phone;

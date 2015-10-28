@@ -404,7 +404,7 @@ public class SnTaskComponent extends BaseBusiComponent {
 	}
 
 	// 完工
-	public void finishTask(Integer doneCode, WTaskBaseInfo wtask, String resultType, String bugType, String finishDesc) throws Exception {
+	public void finishTask(Integer doneCode, WTaskBaseInfo wtask, String resultType, String bugType, String custSignNo, String finishDesc) throws Exception {
 		// 安装工单且完工成功要检查设备是否已经回填
 		if (wtask.getTask_type_id().equals(SystemConstants.TASK_TYPE_INSTALL)
 				&&resultType.equals(SystemConstants.TASK_FINISH_TYPE_SUCCESS)
@@ -422,6 +422,7 @@ public class SnTaskComponent extends BaseBusiComponent {
 		task.setTask_finish_time(new Date());
 		task.setTask_status_date(new Date());
 		task.setFinish_done_code(doneCode);
+		task.setCust_sign_no(custSignNo);
 		
 		if(StringHelper.isNotEmpty(bugType)){
 			task.setBug_type(bugType);

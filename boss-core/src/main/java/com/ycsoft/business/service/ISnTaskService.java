@@ -52,7 +52,7 @@ public interface ISnTaskService {
 	 * @param taskId
 	 * @param resultType 完工类型
 	 */
-	public void finishTask(String taskId,String resultType, String bugType, String remark,boolean isBusi)throws Exception;
+	public void finishTask(String taskId,String resultType, String bugType, String custSignNo, String remark,boolean isBusi)throws Exception;
 	
 	/**
 	 * 工单查询

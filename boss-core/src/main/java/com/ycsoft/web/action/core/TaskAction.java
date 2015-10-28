@@ -193,7 +193,8 @@ public class TaskAction extends BaseBusiAction{
 	 */
 	public String endTask() throws Exception{
 		String finishRemark = request.getParameter("finishRemark");
-		snTaskService.finishTask(task_id,resultType, bugType,finishRemark,true);
+		String custSignNo = request.getParameter("custSignNo");
+		snTaskService.finishTask(task_id,resultType, bugType, custSignNo,finishRemark,true);
 		return JSON_SUCCESS;
 	}
 	

@@ -543,6 +543,7 @@ BCLang.home = {
 				faultType : 'FaultType',
 				finishType : 'CompletionType',
 				finishExplan : 'CompletedDesc',
+				custSignNo : 'CustomerSignNo.',
 				zteStatus	: 'ZTEStatus',
 				zteRemark :'Remark',
 				syncStatus:'CfocnSyncStatus'
@@ -559,9 +560,9 @@ BCLang.home = {
 				sendAuth : 'ZTE Authorized',
 				withdraw : 'CFOCN Withdraw'
 			},
-			taskCols : ['WorkOrdersType', 'CustName', 'WorkOrdersStatus', 'ConstructionTeam',
-					'ZTEStatus', 'Address', 'Tel', 'CreateTime', 'FaultType', 'FaultDetails','WorkNo.','CustManager',
-					'CustManagerTel','CustNo.','CfocnSyncStatus','OldAddress','NewAddress','ReportFaultPhone', 'FinishDescription', 'WorkOrderOperator'],
+			taskCols : ['WorkOrdersType', 'CustName', 'WorkOrdersStatus', 'ConstructionTeam', 'ZTEStatus', 'Address', 'Tel', 'CreateTime', 
+				'FaultType', 'FaultDetails','WorkNo.','CustManager', 'CustManagerTel','CustNo.','CfocnSyncStatus','OldAddress','NewAddress',
+				'ReportFaultPhone', 'FinishDescription', 'WorkOrderOperator', 'CustomerSignNo.'],
 			userCols : ['UserType', 'Account number', 'Password', 'DeviceModel', 'DeviceNO.', 'PosNo.', 'OccNo.', 'BandWidth','Band password'],
 			operateCols : ['OperatingTime', 'OperationType', 'Operator', 'SyncStatus', 'Description','DelayTime'],
 			taskDeviceCols : ['UserType', 'UserName', 'Model', 'DeviceNO.', 'DeviceRecycling','OldDeviceNO.'],

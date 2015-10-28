@@ -354,7 +354,7 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 	 * isBusi=true表示完工是前台发起
 	 */
 	@Override
-	public void finishTask(String taskId, String resultType, String bugType, String remark, boolean isBusi)  throws Exception{
+	public void finishTask(String taskId, String resultType, String bugType, String custSignNo, String remark, boolean isBusi)  throws Exception{
 		WTaskBaseInfo task = wTaskBaseInfoDao.findByKey(taskId);
 		if (task == null)
 			throw new ServicesException("工单不存在!");
@@ -368,7 +368,7 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 		}
 		//获取业务流水
 		Integer doneCode = doneCodeComponent.gDoneCode();
-		snTaskComponent.finishTask(doneCode, task, resultType, bugType, remark);
+		snTaskComponent.finishTask(doneCode, task, resultType, bugType, custSignNo, remark);
 		List<CUser> users = cUserDao.queryTaskUser(taskId);
 		if (task.getTask_type_id().equals(SystemConstants.TASK_TYPE_INSTALL) && 
 				resultType.equals(SystemConstants.TASK_FINISH_TYPE_SUCCESS)){

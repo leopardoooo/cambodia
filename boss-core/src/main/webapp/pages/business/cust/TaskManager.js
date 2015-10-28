@@ -840,6 +840,11 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 			labelWidth : 150,
 			bodyStyle : 'padding : 5px;padding-top : 10px;',
 			items: [finishCombo, bugCauseCombo,{
+				fieldLabel: lbc('home.tools.TaskManager.forms.custSignNo'),
+				xtype: 'textfield',
+				name: 'custSignNo',
+				width: 200
+			},{
 				fieldLabel: lbc('home.tools.TaskManager.forms.finishExplan'),
 				name:'finishRemark',
 				height : 140,
@@ -869,6 +874,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 						task_id : taskId, 
 						resultType : finishCombo.getValue(),
 						bugType: bugCauseCombo.getValue(),
+						custSignNo : endForm.getForm().findField('custSignNo').getValue(),
 						finishRemark : endForm.getForm().findField('finishRemark').getValue()
 					};
 					App.sendRequest( url, o, function(res,opt){
