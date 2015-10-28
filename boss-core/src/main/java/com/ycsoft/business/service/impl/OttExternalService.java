@@ -41,6 +41,7 @@ import com.ycsoft.business.dao.core.cust.CCustLinkmanDao;
 import com.ycsoft.business.dao.core.cust.CCustPropChangeDao;
 import com.ycsoft.business.dao.core.prod.CProdOrderDao;
 import com.ycsoft.business.dao.core.user.CUserDao;
+import com.ycsoft.business.dao.prod.PProdDao;
 import com.ycsoft.business.dao.prod.PProdStaticResDao;
 import com.ycsoft.business.dao.prod.PProdTariffDao;
 import com.ycsoft.business.dao.prod.PProdTariffDisctDao;
@@ -58,6 +59,7 @@ import com.ycsoft.commons.helper.JsonHelper;
 import com.ycsoft.commons.helper.LoggerHelper;
 import com.ycsoft.commons.helper.NumericHelper;
 import com.ycsoft.commons.helper.StringHelper;
+import com.ycsoft.daos.core.JDBCException;
 import com.ycsoft.daos.helper.BeanHelper;
 /**
  * OTT调用BOSS接口实现
@@ -92,7 +94,8 @@ public class OttExternalService extends OrderService {
 	private TServerOttauthProdDao tServerOttauthProdDao;
 	@Autowired
 	private PProdStaticResDao pProdStaticResDao;
-
+	@Autowired
+	private PProdDao pProdDao;
 	/**
 	 * 获得用户账户
 	 * @param login_name
@@ -224,14 +227,11 @@ public class OttExternalService extends OrderService {
 			//调用接口修改
 			Result ottResult=
 					ottClient.editUser(user.getLogin_name(),new_user_passwd ,
-		    		new_user_passwd, cust.getAddress(), linkman.getEmail(), new_telephone
+					new_user_name, cust.getAddress(), linkman.getEmail(), new_telephone
 		    		,user.getStb_id() , user.getModem_mac(), user.getStatus());
 		    if(!ottResult.isSuccess()){
 		    	LoggerHelper.debug(this.getClass(), "func=modifyAccountInfo error="+ottResult.getStatus()+" "+ottResult.getReason());
-		    	if(ottResult.isConnectionError())
-		    		throw new ServicesException(ErrorCode.E20003);
-		    	else
-		    		throw new ServicesException(ErrorCode.E40009);
+		    	throw new Exception(ottResult.getReason());
 		    }
 	}
 	
@@ -328,7 +328,7 @@ public class OttExternalService extends OrderService {
 	    	else if(ottResult.isConnectionError())
 	    		throw new ServicesException(ErrorCode.E20003);
 	    	else
-	    		throw new ServicesException(ErrorCode.E40009);
+	    		throw new ServicesException(ottResult.getReason());
 	    }
 	    //产品授权
 	    Map<String,Date> userResMap = authComponent.getUserResExpDate(user.getUser_id());
@@ -338,7 +338,7 @@ public class OttExternalService extends OrderService {
 			Result resutl=ottClient.openUserProduct(user.getLogin_name(), externalResId,resDate,ottauthMap);
 			if(!resutl.isSuccess()){
 				LoggerHelper.debug(this.getClass(), "func=RegisterAccount error="+ottResult.getStatus()+" "+ottResult.getReason());
-				throw new ServicesException(ErrorCode.E40009);
+				throw new ServicesException(ottResult.getReason());
 			}
 		}
 		
@@ -402,6 +402,15 @@ public class OttExternalService extends OrderService {
 			}else{
 				re.setContinue_buy("0");//根据可定产品判断
 			}
+			//判断产品能否升级（内网产品可以升级）
+			if("1".equals(ottauth.getDomain())){
+				//内网产品,可升级
+				re.setUpdate("1");
+			}else{
+				//全网产品不能升级
+				re.setUpdate("0");
+			}
+			
 			re.setBegin_time( DateHelper.format(DateHelper.today(),DateHelper.FORMAT_TIME_START));
 			re.setEnd_time( DateHelper.format(order.getValue(),DateHelper.FORMAT_TIME_END));
 			resutls.add(re);
@@ -410,6 +419,74 @@ public class OttExternalService extends OrderService {
 		return resutls;
 	}
 	
+	private OrderProd getOttMobileUpdateProd(CUser user,String product_fee_id,Integer transFee) throws Exception{
+		String[] tmpTariff=product_fee_id.split("_");
+		PProdTariff tariff=pProdTariffDao.findByKey(tmpTariff[0]);
+		if(tariff==null){
+			throw new ServicesException(ErrorCode.ProdNotExists);
+		}
+		String product_id=tariff.getProd_id();
+		OrderProd orderProd=new OrderProd();
+		orderProd.setCust_id(user.getCust_id());
+		orderProd.setUser_id(user.getUser_id());
+		orderProd.setProd_id(product_id);
+		orderProd.setTariff_id(product_fee_id);
+		orderProd.setTransfer_fee(transFee);
+		orderProd.setPay_fee(0);
+		orderProd.setOrder_fee_type(SystemConstants.ORDER_FEE_TYPE_ACCT);
+		
+		List<CProdOrder> orderAlllist=cProdOrderDao.queryNotExpAllOrderByProd(user.getUser_id(),product_id);
+		Date eff_date=DateHelper.today();
+		String last_order_sn=null;
+		if(orderAlllist.size()>0){
+			last_order_sn=orderAlllist.get(orderAlllist.size()-1).getOrder_sn();
+			CProdOrderDto dto=cProdOrderDao.queryCProdOrderDtoByKey(last_order_sn);
+			eff_date=DateHelper.addDate(dto.getExp_date(), 1);	
+		}
+		
+		int billing_cycle=0;
+		int rent=0;
+		if(tmpTariff.length==2){
+			PProdTariffDisct disct= pProdTariffDisctDao.findByKey(tmpTariff[1]);
+			billing_cycle=disct.getBilling_cycle();
+			rent=disct.getDisct_rent();
+		}else{
+			billing_cycle=tariff.getBilling_cycle();
+			rent=tariff.getRent();
+		}
+		//订购月数 order_months
+		float order_months=0f;
+		// 实际支付金额（小计金额）pay_fee
+		//int pay_fee=0;
+		//失效日期exp_date
+		Date exp_date=null;
+		if(tariff.getBilling_type().equals(SystemConstants.BILLING_TYPE_DAY)){
+			
+			int days=Math.round(0.5f+ transFee*billing_cycle*1.0f/rent);
+			
+			order_months=days/30.0f;
+			exp_date=DateHelper.addDate(eff_date, days);
+		}else{
+			//先整月
+			int months=transFee*billing_cycle/rent;
+			exp_date=DateHelper.getNextMonthPreviousDay(eff_date, months);
+			order_months=months;
+			//然后看看零头
+			int _dayTransFee=transFee-months*rent/billing_cycle;
+			if(_dayTransFee>0){
+				int days=Math.round(0.5f+ _dayTransFee*30.0f*billing_cycle/rent);
+				exp_date=DateHelper.addDate(exp_date, days);
+				order_months=order_months+days/30.0f;
+			}
+			
+		}
+		orderProd.setEff_date(eff_date);
+		orderProd.setOrder_months(order_months);
+		orderProd.setExp_date(exp_date);
+		orderProd.setLast_order_sn(last_order_sn);
+		
+		return orderProd;
+	}
 	/**
 	 * 生成订购产品的数据结构OrderProd
 	 * @param user
@@ -534,13 +611,14 @@ public class OttExternalService extends OrderService {
 			String resDate=DateHelper.format( userResMap.get(externalResId), DateHelper.FORMAT_TIME_END);
 			Result resutl=ottClient.openUserProduct(user.getLogin_name(), externalResId,resDate,ottauthMap);
 			if(!resutl.isSuccess()){
-				LoggerHelper.debug(this.getClass(), "func=modifyAccountInfo error="+resutl.getStatus()+" "+resutl.getReason());
-				throw new ServicesException(ErrorCode.E40009);
+				LoggerHelper.error(this.getClass(), "func=buyProduct error="+resutl.getStatus()+" "+resutl.getReason());
+				throw new ServicesException(resutl.getReason());
 			}
 		}
 	}
 	/**
 	 * 根据用户ID获取用户购买产品记录
+	 * TODO 排序还是不对，要考虑历史产品
 	 * @param user_id 用户ID
 	 * @param version OTT业务版本号
 	 * @param user_ip 来源IP
@@ -554,16 +632,19 @@ public class OttExternalService extends OrderService {
 		}
 		//map<prod_id,CProdOrderDto>
 		List<OttUserOrder> resutls=new ArrayList<>();
-		for(CProdOrderDto order: cProdOrderDao.queryProdOrderDtoByUserId(user.getUser_id())){
+		Map<String,PProd> prodMap=CollectionHelper.converToMapSingle(pProdDao.findAll(),"prod_id");
+		for(CProdOrder order: cProdOrderDao.queryAllUserProdHisOrderByOrdertimeDesc(user.getUser_id())){
 			OttUserOrder re=new OttUserOrder();
 			re.setMoney(NumericHelper.changeF2Y(order.getOrder_fee().toString()));
 			re.setProduct_id(order.getProd_id());
-			re.setProduct_name(order.getProd_name());
+			if(prodMap.containsKey(order.getProd_id())){
+				re.setProduct_name(prodMap.get(order.getProd_id()).getProd_name());
+			}
 			re.setProduct_fee_id(order.getTariff_id());
 			re.setTime(DateHelper.format(order.getOrder_time(), DateHelper.FORMAT_TIME));
 			resutls.add(re);
 		}
-		Collections.reverse(resutls);
+		//Collections.reverse(resutls);
 		return resutls;
 	}
 	
@@ -599,7 +680,12 @@ public class OttExternalService extends OrderService {
 		LoggerHelper.debug(this.getClass(), "func=getProductList,result="+JsonHelper.fromObject(prodTariffList));
 		return prodTariffList;
 	}
-	
+	/**
+	 * ott_mobile用户可订购的产品包
+	 * @param user
+	 * @return
+	 * @throws Exception
+	 */
 	private List<OttProdTariff> queryOttProdTariff(CUser user) throws Exception{
 	
 		List<OttProdTariff> prodTariffList=new ArrayList<>();
@@ -661,10 +747,84 @@ public class OttExternalService extends OrderService {
 	 * @param version OTT业务版本号
 	 * @param user_ip 来源IP
 	 * @param product_ids 产品ID列表, 可以为空,多产品以逗号分隔
+	 * @throws Exception 
 	 */
-	public List<Object> getProductListByUpdate(){
-		//没有升级业务
-		return new ArrayList<Object>();
+	public List<OttProdTariff> getProductListByUpdate(String loginName,String product_ids) throws Exception{
+		
+		LoggerHelper.debug(this.getClass(), "func=getProductListByUpdate,loginName="+loginName+" product_ids="+product_ids);
+		CUser user=userComponent.queryUserByLoginName(loginName);
+		if(user==null||!user.getUser_type().equals(SystemConstants.USER_TYPE_OTT_MOBILE)){
+			throw new ServicesException(ErrorCode.UserLoginNameIsNotExistsOrIsNotOttMobile);
+		}
+		if(StringHelper.isEmpty(product_ids)){
+			throw new ServicesException(ErrorCode.E40006);
+		}
+		List<OttProdTariff> updateList=new ArrayList<>();
+		//提取最大到期日的订购记录
+		Map<String,CProdOrder> maxExpOrderMap=new HashMap<>();
+		for(CProdOrder order:  cProdOrderDao.queryNotExpAllOrderByUser(user.getUser_id())){
+			String[] externalRess=pProdStaticResDao.queryExternalRes(order.getProd_id());
+			if(externalRess==null||externalRess.length!=1){
+				throw new ServicesException(ErrorCode.OttMobileProdOnlyOneControlRes);
+			}
+			if(maxExpOrderMap.containsKey(externalRess[0])){
+				CProdOrder old= maxExpOrderMap.get(externalRess[0]);
+				if(order.getExp_date().after(old.getExp_date())){
+					maxExpOrderMap.put(externalRess[0], order);
+				}
+			}else{
+				maxExpOrderMap.put(externalRess[0], order);
+			}
+		}
+		
+		//确定内网包的最后订购的BOSS资费
+		String tariffId=null;
+		for(String externalRes:  maxExpOrderMap.keySet()){
+			if(externalRes.indexOf(product_ids)>=0){
+				CProdOrder order=maxExpOrderMap.get(externalRes);
+				if(StringHelper.isNotEmpty(order.getPackage_sn())){
+					//套餐子产品不能升级
+					return updateList;
+				}
+				tariffId=order.getTariff_id();
+				break;
+			}
+		}
+		if(tariffId==null){
+			//找不到资费
+			return updateList;
+		}
+		PProdTariff prodTariff= pProdTariffDao.findByKey(tariffId);
+		if(prodTariff==null){
+			return updateList;
+		}
+		//可用产品资费列表
+		List<OttProdTariff> prodTariffList=this.queryOttProdTariff(user);
+		
+		Map<String,TServerOttauthProd> ottauthMap=tServerOttauthProdDao.queryAllMap();
+		
+		/**
+		 * 1. 内网包可以升级到全网包。
+		2.内网包升级成全网包不再额外扣费，使用内网包的剩余金额折算到全网包中（到期日会变小）。
+		3.如果内网包的资费是包年的，则可以升级成资费是包年或包月或包天的全网包
+		   如果内网包的资费是包月的，则可以升级成资费是包月或包天的全网包
+		   如果内网包的资费是包天的，则可以升级成资费是包天的全网包
+		 */
+		for(OttProdTariff prod:prodTariffList){
+			TServerOttauthProd _a=ottauthMap.get(prod.getId());
+			if(_a!=null&&"2".equals(_a.getDomain())){
+				
+				PProdTariff domainTariff= pProdTariffDao.findByKey(prod.getProduct_fee_id());
+				if(prodTariff.getBilling_type().equals(domainTariff.getBilling_type())&&
+						prodTariff.getBilling_cycle().intValue()>=domainTariff.getBilling_cycle()){
+					updateList.add(prod);
+				}else if(prodTariff.getBilling_type().equals(SystemConstants.BILLING_TYPE_MONTH)
+						&&domainTariff.getBilling_type().equals(SystemConstants.BILLING_TYPE_DAY)){
+					updateList.add(prod);
+				}
+			}
+		}
+		return updateList;
 	}
 	
 	/**
@@ -679,9 +839,63 @@ public class OttExternalService extends OrderService {
 	 * @param currency_type RMB：人民币, USD：美元
 	 * @throws Exception 
 	 */
-	public void updateProduct() throws Exception{
-		//没有升级业务
-		throw new ServicesException(ErrorCode.E40009);
+	public void updateProduct(String loginName,String product_id,String update_product_id,String update_product_fee_id) throws Exception{
+		//TODO 没有升级业务
+		LoggerHelper.debug(this.getClass(), "func=updateProduct,loginName="+loginName+" product_id="+product_id
+				+" update_product_id="+update_product_id+" update_product_fee_id="+update_product_fee_id);
+		CUser user=userComponent.queryUserByLoginName(loginName);
+		if(user==null||!user.getUser_type().equals(SystemConstants.USER_TYPE_OTT_MOBILE)){
+			throw new ServicesException(ErrorCode.UserLoginNameIsNotExistsOrIsNotOttMobile);
+		}
+		if(StringHelper.isEmpty(product_id)
+				||StringHelper.isEmpty(update_product_id)
+				||StringHelper.isEmpty(update_product_fee_id)){
+			throw new ServicesException(ErrorCode.E40006);
+		}
+		
+		String busi_code=BusiCodeConstants.OTT_MOBILE_UPGRADE;
+		this.initExternalBusiParam(busi_code, user.getCust_id());
+		doneCodeComponent.lockCust(user.getCust_id());
+		Integer doneCode=this.getBusiParam().getDoneCode();
+		//退订product_id 资源对应的所有产品，然后订购update_product_fee_id对应的产品
+		//提取被退的订单清单
+		List<CProdOrderDto> cancleOrderList=new ArrayList<>();
+		for(CProdOrder order:  cProdOrderDao.queryNotExpAllOrderByUser(user.getUser_id())){
+			String[] externalRess=pProdStaticResDao.queryExternalRes(order.getProd_id());
+			if(externalRess==null||externalRess.length!=1){
+				throw new ServicesException(ErrorCode.OttMobileProdOnlyOneControlRes);
+			}
+			if(product_id.equals(externalRess[0])){
+				cancleOrderList.add(cProdOrderDao.queryCProdOrderDtoByKey(order.getOrder_sn()));
+			}
+		}
+		//转移支付金额提取
+		int translate_fee=this.queryOttMobileUpdateTransferFee(cancleOrderList);
+		if(translate_fee<=0){
+			throw new ServicesException(ErrorCode.E20005);
+		}
+		try{
+			OrderProd orderProd=getOttMobileUpdateProd(user,update_product_fee_id,translate_fee);
+			this.saveOttMobileUpdateProd(orderProd, cancleOrderList, busi_code, doneCode);
+		}catch(ServicesException e){
+			if(ErrorCode.AcctFeeNotEnough.equals(e.getErrorCode())){
+				throw new ServicesException(ErrorCode.E20005);
+			}else{
+				throw e;
+			}
+		}
+		this.saveAllPublic(this.getBusiParam().getDoneCode(), this.getBusiParam());
+		//处理实时指令
+		Map<String,Date> userResMap = authComponent.getUserResExpDate(user.getUser_id());
+		Map<String,TServerOttauthProd> ottauthMap= tServerOttauthProdDao.queryAllMap();
+		for(String externalResId: userResMap.keySet()){
+			String resDate=DateHelper.format( userResMap.get(externalResId), DateHelper.FORMAT_TIME_END);
+			Result resutl=ottClient.openUserProduct(user.getLogin_name(), externalResId,resDate,ottauthMap);
+			if(!resutl.isSuccess()){
+				LoggerHelper.error(this.getClass(), "func=updateProduct error="+resutl.getStatus()+" "+resutl.getReason());
+				throw new Exception(resutl.getReason());
+			}
+		}
 	}
 	/**
 	 * 同步产品

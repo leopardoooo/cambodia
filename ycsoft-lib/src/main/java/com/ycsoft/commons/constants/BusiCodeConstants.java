@@ -34,6 +34,7 @@ public final class BusiCodeConstants {
 	public final static String PROD_SINGLE_ORDER = "102"; //单用户订购
 	public final static String PROD_CONTINUE = "101";//续订
 	public final static String PROD_UPGRADE = "100";//升级
+	public final static String OTT_MOBILE_UPGRADE = "103";//ott_mobile升级
 	
 	public final static String PROD_TERMINATE = "1027";//退订
 	public final static String PROD_HIGH_TERMINATE="110";//高级退订

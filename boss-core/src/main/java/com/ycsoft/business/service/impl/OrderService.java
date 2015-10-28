@@ -1022,7 +1022,25 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		}
 		return list;
 	}
-	
+	/**
+	 * 查询ott_mobile升级的转移支付金额
+	 * @param cancelList
+	 * @return
+	 * @throws Exception
+	 */
+	public Integer queryOttMobileUpdateTransferFee(List<CProdOrderDto> cancelList) throws Exception{
+		Date eff_date=DateHelper.today();
+		int translate_fee=0;
+		for(CProdOrderDto order:  cancelList){
+			if(order.getIs_pay().equals(SystemConstants.BOOLEAN_TRUE)){
+				//计算可退余额
+				translate_fee=translate_fee+orderComponent.getTransCancelFee(eff_date, order);
+			}else{
+				throw new ServicesException(ErrorCode.OrderTransUnPayPleaseCancel,order.getOrder_sn());
+			}
+		}
+		return translate_fee;
+	}
 	/**
 	 * 订单的业务参数
 	 */
@@ -1105,6 +1123,31 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		this.saveAllPublic(doneCode, getBusiParam());
 		return prodSns;
 	}
+	
+	/**
+	 * ott_mobile产品升级
+	 * @param orderProd
+	 * @param cancleOrderList
+	 * @param busi_code
+	 * @param doneCode
+	 * @throws Exception
+	 */
+	public void saveOttMobileUpdateProd(OrderProd orderProd,List<CProdOrderDto> cancleOrderList,String busi_code,Integer doneCode)throws Exception{
+		PProd prodConfig=pProdDao.findByKey(orderProd.getProd_id());
+		//参数检查
+		checkOrderProdParam(orderProd,prodConfig,busi_code);
+		String optr_id=this.getBusiParam().getOptr().getOptr_id();
+		CCust cust=cCustDao.findByKey(orderProd.getCust_id());
+		CProdOrder cProdOrder=orderComponent.createCProdOrder(orderProd, doneCode, optr_id, cust.getArea_id(), cust.getCounty_id());
+		//产品状态设置
+		cProdOrder.setStatus(StatusConstants.ACTIVE);
+		//业务是否需要支付判断                     
+		cProdOrder.setIs_pay(SystemConstants.BOOLEAN_TRUE);
+		//保存订购记录
+		orderComponent.saveCProdOrderByOttMobileUpgrade(cProdOrder, orderProd, cancleOrderList);
+		
+	}
+	
 	/**
 	 * 保存订购记录
 	 * @return
@@ -1401,15 +1444,15 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		//orderProd.setBilling_type(tariff.getBilling_type());
 		//orderProd.setOrder_cycle(order_cycles);
 		
-		if(orderProd.getOrder_months()==0&&!busi_code.equals(BusiCodeConstants.PROD_UPGRADE)){
+		if(orderProd.getOrder_months()==0&&!busi_code.equals(BusiCodeConstants.PROD_UPGRADE)&&!busi_code.equals(BusiCodeConstants.OTT_MOBILE_UPGRADE)){
 			throw new  ComponentException(ErrorCode.OrderDateOrderMonthError);
 		}
-		if(order_cycles%billing_cycle!=0 && !busi_code.equals(BusiCodeConstants.PROD_UPGRADE)){
+		if(order_cycles%billing_cycle!=0 && !busi_code.equals(BusiCodeConstants.PROD_UPGRADE)&&!busi_code.equals(BusiCodeConstants.OTT_MOBILE_UPGRADE)){
 			throw new  ComponentException(ErrorCode.OrderDateOrderMonthError);
 		}
 		
 		//订购支付金额验证:如果是升级且根据转移支付金额折算到期日，不验证。
-		if(!(busi_code.equals(BusiCodeConstants.PROD_UPGRADE) && orderProd.getPay_fee()==0)){
+		if(!((busi_code.equals(BusiCodeConstants.PROD_UPGRADE)||busi_code.equals(BusiCodeConstants.OTT_MOBILE_UPGRADE)) && orderProd.getPay_fee()==0)){
 			if( (rent*order_cycles/billing_cycle) !=(orderProd.getPay_fee()+orderProd.getTransfer_fee())){
 				throw new ComponentException(ErrorCode.OrderDateFeeError);
 			}
@@ -1422,7 +1465,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 				throw new ServicesException(ErrorCode.OrderDateExpDateError);
 			}
 		}else{
-			if(!(busi_code.equals(BusiCodeConstants.PROD_UPGRADE) && orderProd.getPay_fee()==0)){
+			if(!((busi_code.equals(BusiCodeConstants.PROD_UPGRADE)||busi_code.equals(BusiCodeConstants.OTT_MOBILE_UPGRADE)) && orderProd.getPay_fee()==0)){
 				//包月 结束计费日=开始计费日+订购月数 -1天。
 				if(tariff.getBilling_type().equals(SystemConstants.BILLING_TYPE_MONTH)
 						&& !DateHelper.getNextMonthPreviousDay(orderProd.getEff_date(), order_cycles)

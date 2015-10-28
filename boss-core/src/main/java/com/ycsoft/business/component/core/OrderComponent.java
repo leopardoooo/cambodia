@@ -1210,7 +1210,30 @@ public class OrderComponent extends BaseBusiComponent {
 		}
 		return StatusConstants.ACTIVE;
 	}
-	
+	/**
+	 * OTT_MOBILE的升级
+	 * @param cProdOrder
+	 * @param orderProd
+	 * @param cacleOrderList
+	 * @return
+	 * @throws Exception
+	 */
+	public String saveCProdOrderByOttMobileUpgrade(CProdOrder cProdOrder,OrderProd orderProd,List<CProdOrderDto> cacleOrderList) throws Exception{
+		
+		int transfee=saveTransCancelProd(cProdOrder,cacleOrderList,DateHelper.today());
+		if(transfee!=orderProd.getTransfer_fee().intValue()){
+			throw new ComponentException("转移支付金额不一致，请重新操作!");
+		}
+		//保存订单
+		cProdOrderDao.save(cProdOrder);
+		//记录创建订单的原始状态
+		cProdStatusChangeDao.saveStatusChange(cProdOrder.getDone_code(), cProdOrder.getOrder_sn(), cProdOrder.getStatus());
+		//保存套餐的子订单
+		if(orderProd.getGroupSelected()!=null&&orderProd.getGroupSelected().size()>0){
+			savePackageUserProd(cProdOrder,orderProd);
+		}
+		return cProdOrder.getOrder_sn();
+	}
 	/**
 	 * 保存订购记录
 	 * @return
@@ -1249,7 +1272,7 @@ public class OrderComponent extends BaseBusiComponent {
 	 * @return
 	 * @throws Exception
 	 */
-	private int saveTransCancelProd(CProdOrder cProdOrder,List<CProdOrder> cancelList,Date cancelDate) throws Exception{
+	public int saveTransCancelProd(CProdOrder cProdOrder,List<? extends CProdOrder> cancelList,Date cancelDate) throws Exception{
 		int transFee=0;
 
 		List<CProdOrderFee> outputList=new ArrayList<>();
