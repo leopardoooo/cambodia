@@ -285,7 +285,6 @@ BusiPanel = Ext.extend( Ext.Panel , {
 		}
 		
 		commons["remark"] = Ext.getCmp('commonRemark').getValue();
-		commons['optr_id'] = App.getData().optr ? App.getData().optr['optr_id'] : '';
 		//设置提交参数
 		all[CoreConstant.JSON_PARAMS] = Ext.encode(commons);
 		var busiCode = App.getApp().data.currentResource.busicode;

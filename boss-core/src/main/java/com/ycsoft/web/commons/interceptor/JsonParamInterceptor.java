@@ -64,14 +64,6 @@ public class JsonParamInterceptor extends AbstractInterceptor{
 			LoggerHelper.info("CFEE", JsonParamInterceptor.class,json);
 		}
 		
-		Object obj = ServletActionContext.getRequest().getSession().getAttribute(Environment.USER_IN_SESSION_NAME);
-		if(obj != null){
-			SOptr optr = JsonHelper.toObject( obj.toString(), SOptr.class);
-			if(StringHelper.isNotEmpty(p.getOptr_id()) && !p.getOptr_id().equals(optr.getOptr_id())){
-				throw new ServicesException("操作员信息错误，请重新登陆");
-			}
-		}
-		
 		target.setParameter( p );
 
 	}
