@@ -59,10 +59,10 @@ public class JsonParamInterceptor extends AbstractInterceptor{
 	 */
 	private void process(BaseBusiAction target , String json)throws Exception{
 		Parameter p = JsonHelper.toObject(json, target.getParameter().getClass());
-		if("1040".equals(p.getBusiCode())){
+		//if("1040".equals(p.getBusiCode())){
 			//cfee缴费业务记录日志，用于串数据分析
-			LoggerHelper.info("CFEE", JsonParamInterceptor.class,json);
-		}
+			//LoggerHelper.info("CFEE", JsonParamInterceptor.class,json);
+		//}
 		
 		target.setParameter( p );
 
