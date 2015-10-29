@@ -5,6 +5,9 @@
  */
 Sys = {
 	common:{
+		labelOldStatus:'原状态',
+		labelNewStatus:'新状态',
+		labelBuyMode:'购买方式',
 		no:'否',
 		status:'状态',
 		query:'查询',

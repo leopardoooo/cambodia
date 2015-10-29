@@ -580,7 +580,7 @@ public class DeviceComponent extends BaseDeviceComponent {
 		//设备调拨信息
 		dev.setDeviceTransferList(rDeviceTransferDao.queryByDeviceId(devId));
 		
-		dev.setDeviceUseRecordsList(rDeviceUseRecordsDao.queryUseRecordByDeviceCode(deviceCode));
+		dev.setDeviceUseRecordsList(rDeviceChangeDao.queryDeviceUseRecored(devId));
 		return dev;
 	}
 	

@@ -9,6 +9,7 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 
 import com.ycsoft.beans.device.RDeviceChange;
+import com.ycsoft.beans.device.RDeviceChangeDto;
 import com.ycsoft.beans.system.SOptr;
 import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.daos.abstracts.BaseEntityDao;
@@ -30,7 +31,19 @@ public class RDeviceChangeDao extends BaseEntityDao<RDeviceChange> {
 	 * default empty constructor
 	 */
 	public RDeviceChangeDao() {}
-
+	/**
+	 * 查询设备使用和回收历史
+	 * @return
+	 * @throws JDBCException 
+	 */
+	public List<RDeviceChangeDto> queryDeviceUseRecored(String deviceId) throws JDBCException{
+		String sql="   select distinct  r.*,c.cust_id,c.cust_no,c.cust_name "
+		    +" from  r_device_change r,c_done_code_detail cdcd,c_cust c "
+		   +" where r.done_code=cdcd.done_code and c.cust_id=cdcd.cust_id "
+		   +" and r.column_name='depot_status'  and r.device_id=? "
+		   +" order by r.change_date desc ";
+		return this.createQuery(RDeviceChangeDto.class, sql, deviceId).list();
+	}
 	/**
 	 * @param doneCode
 	 */
