@@ -129,17 +129,24 @@ public class WorkOrderClient {
 			this.fillTaskBroadbandInfo(OrderContent, userList, false);
 		}else if (task.getTask_type_id().equals(SystemConstants.TASK_TYPE_FAULT)){
 			OrderContent.append("客户编号CustNo:").append(custNo);
-			this.fillTaskBroadbandInfo(OrderContent, userList, false);
-			OrderContent.append("\n").append("故障现象BugDetail:").append(task.getBug_detail());
+			//this.fillTaskBroadbandInfo(OrderContent, userList, false);
+			if(StringHelper.isNotEmpty(task.getBug_phone())){
+				OrderContent.append("\n").append("报障电话ReportFaultTel:").append(task.getBug_phone());
+			}
+			OrderContent.append("\n").append("故障现象Fault:").append(task.getBug_detail());
+			
 		}else {
 			OrderContent.append("other");
 		}
 		//装入客户经理
 		if (custManager != null){
-			OrderContent.append("\n").append("客户经理CustManager：").append(custManager.getOptr_name())
-			.append(" tel:").append(custManager.getTel());
-			if(StringHelper.isNotEmpty(custManager.getMobile())){
-				OrderContent.append("*").append(custManager.getMobile());
+			OrderContent.append("\n").append("客户经理CustManager：").append(custManager.getOptr_name());
+			if(StringHelper.isNotEmpty(custManager.getTel())&&StringHelper.isNotEmpty(custManager.getMobile())){
+				OrderContent.append(" tel:").append(custManager.getTel()).append("*").append(custManager.getMobile());
+			}else if(StringHelper.isNotEmpty(custManager.getTel())){
+				OrderContent.append(" tel:").append(custManager.getTel());
+			}else if(StringHelper.isNotEmpty(custManager.getMobile())){
+				OrderContent.append(" tel:").append(custManager.getMobile());
 			}
 		}
 		order.setOrderContent(OrderContent.toString());
@@ -171,7 +178,7 @@ public class WorkOrderClient {
 	    		OrderContent.append("\n").append("宽带Broadband:").append(taskUser.getBandwidth())
 	    		.append(" 账号Loginname:").append(taskUser.getLogin_name());
 	    		if(needPD){
-	    			OrderContent.append(" 密码Password").append(taskUser.getPassword());
+	    			OrderContent.append(" 密码Password:").append(taskUser.getPassword());
 	    		}
 	    	}
 	    }
