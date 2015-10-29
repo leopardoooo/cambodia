@@ -101,7 +101,7 @@ public class WTaskBaseInfoDao extends BaseEntityDao<WTaskBaseInfo> {
 			params.add(beginDate);
 		}
 		if(StringHelper.isNotEmpty(endDate)){
-			sql += " AND t.task_create_time < to_date(?, 'yyyy-MM-dd') ";
+			sql += " AND t.task_create_time < to_date(?, 'yyyy-MM-dd')+1 ";
 			params.add(endDate);
 		}	
 		if(StringHelper.isNotEmpty(taskTypes)){
