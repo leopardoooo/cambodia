@@ -211,7 +211,6 @@ OrderProdEditForm = Ext.extend(BaseForm, {
 			success : function(res,opts){
 				var data = Ext.decode(res.responseText);
 				this.baseData = data;
-				console.log(this.baseData);
 				var prodList = data['prodList'];
 				var tariffList = data['tariffMap'];
 				
@@ -334,7 +333,6 @@ OrderProdEditForm = Ext.extend(BaseForm, {
 				}
 				groupUserMap[gid].push(rs["user_id"]);
 			}, this);
-			console.log(groupUserMap);
 			// 封装后台数据结构
 			var groupSelected = [];
 			for(var key in groupUserMap){
@@ -343,7 +341,6 @@ OrderProdEditForm = Ext.extend(BaseForm, {
 					"userSelectList": groupUserMap[key]
 				});
 			}
-			console.log(groupSelected);
 			this.groupSelectedData = groupSelected;
 		}
 	},

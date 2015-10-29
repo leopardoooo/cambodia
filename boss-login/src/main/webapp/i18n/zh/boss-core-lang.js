@@ -312,7 +312,7 @@ BCLang.home = {
 			},
 			task: {
 				_title: '施工单',
-				columns: ["工单编号","工单类型","工单状态","施工队","故障原因","故障明细","ZTE授权状态","创建时间"],
+				columns: ["工单编号","工单类型","工单状态","施工队","故障原因","故障明细","ZTE授权状态","创建时间","保障电话"],
 				userColumns: ['用户类型', '用户名', '设备型号', '设备号', 'posNo', 'occNo', '带宽'],
 				detailColumns: ['操作时间', '操作类型', '操作人', '同步状态', '错误描述'],
 				winTitle: '工单信息',
@@ -330,7 +330,8 @@ BCLang.home = {
 				oldStatus: '原收据状态',
 				newInvoiceId: '新收据号码',
 				newInvoiceCode: '新收据代码',
-				faultContent:'故障内容'
+				faultContent:'故障内容',
+				faultPhone: '报障电话'
 			}
 		},
 		//受理记录
@@ -530,6 +531,7 @@ BCLang.home = {
 			_winTitle : '工单完工',
 			_ZteWinTitle : 'ZTE授权',
 			_fillDevTitle: '设备回填',
+			_historyTitle : '历史工单',
 			forms : {
 				custNo : '客户编号',
 				taskNo : '工单编号',
@@ -540,9 +542,11 @@ BCLang.home = {
 				taskDetailType : '工单类型',
 				taskAddr : '地区',
 				taskTeam : '施工队',
+				taskOptr : '处理人',
 				faultType : '故障类型',
 				finishType : '完工类型',
 				finishExplan : '完工说明',
+				custSignNo : '客户签字单号',
 				zteStatus	: 'ZTE状态',
 				zteRemark :'备注',
 				syncStatus	:'cfocn同步状态'
@@ -559,12 +563,13 @@ BCLang.home = {
 				sendAuth : 'ZTE授权',
 				withdraw : 'cfocn撤回'
 			},
-			taskCols : ['工单类型', '客户名称', '工单状态', '施工队', 'ZTE状态', '地址',
-					'联系电话', '创建时间', '故障类型', '故障详细信息','工单编号','客户经理','客户经理电话','客户编号','cfocn同步状态','原地址','新地址'],
+			taskCols : ['工单类型', '客户名称', '工单状态', '施工队', 'ZTE状态', '地址', '联系电话', '创建时间', '故障类型', '故障详细信息',
+				'工单编号','客户经理','客户经理电话','客户编号','cfocn同步状态','原地址','新地址','报障电话','完工描述', '工单处理人', '客户签字单号','状态时间','工单处理人电话','完工类型'],
 			userCols : ['用户类型', '账号', '密码', '设备型号', '设备号', 'posNo',
 					'occNo', '带宽','宽带密码'],
 			operateCols : ['操作时间', '操作类型', '操作人', '同步状态', '描述','延迟时间'],
 			taskDeviceCols : ['用户类型', '用户名', '型号', '设备编号', '设备回收','原设备编号'],
+			samTaskCols : ['工单编号', '工单状态', '施工队', '创建时间', '故障类型', '故障详细信息', 'cfocn同步状态','完工描述','工单处理人','完工时间','完工类型'],
 			msg : {
 				enterDeviceNo : '请输入设备号',
 				noCancel : '不允许取消!',

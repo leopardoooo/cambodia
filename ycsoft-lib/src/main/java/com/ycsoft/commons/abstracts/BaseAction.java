@@ -9,7 +9,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.struts2.ServletActionContext;
 
 import com.ycsoft.beans.system.SOptr;
+import com.ycsoft.commons.constants.Environment;
 import com.ycsoft.commons.helper.JsonHelper;
+import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.commons.pojo.Root;
 
 /**
@@ -35,6 +37,18 @@ public class BaseAction extends AbstractAction{
 	protected static final String JSON_SUCCESS = "json-success";
 	protected static final String JSON = "json";
 	protected static final String EXCEL = "excel";
+	/**
+	 * 查询服务器session保存的optr
+	 * @return
+	 * @throws Exception 
+	 */
+	public String querySessionOptr() throws Exception{
+		Object obj=getSession().getAttribute(Environment.USER_IN_SESSION_NAME);
+		if(obj!=null&&StringHelper.isNotEmpty(obj.toString())){
+			getRoot().setSimpleObj(JsonHelper.toObject(obj.toString(), SOptr.class));
+		}
+		return JSON_SIMPLEOBJ;
+	}
 	
 	/**
 	 * <p>当使用Ajax上传文件时，返回该结果类型，

@@ -21,24 +21,19 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 public class Bootstrap {
 
 	public static void main(String[] args) throws Exception {
-		//Keep only run single application 
-//	    FileLock lck = new FileOutputStream("flagFile").getChannel().tryLock();         
-//	    if(lck == null) {
-//	      System.out.println("另外一个进程已经运行中....");
-//	      System.exit(1);
-//	    }
-		
+		//证书相关设置
 		//System.setProperty("javax.net.debug", "ssl,handshake");
-		//TODO 改成你本地的地址
+		/*改成你本地的地址
         System.setProperty("javax.net.ssl.keyStore", "D:/ycsoft/ssl/server.p12");
         System.setProperty("javax.net.ssl.keyStorePassword", "a1234567");
         System.setProperty("javax.net.ssl.keyStoreType", "PKCS12");
 		
-        //TODO 改成你本地的地址
+        // 改成你本地的地址
 		System.setProperty("javax.net.ssl.trustStore", "D:/ycsoft/ssl/cfocn.ca.jks");
         System.setProperty("javax.net.ssl.trustStorePassword", "a1234567");
         System.setProperty("javax.net.ssl.trustStoreType", "JKS");
-        
+        **/
+		//Keep only run single application 
 		new Thread(new Runnable(){
 			@Override
 			public void run() {

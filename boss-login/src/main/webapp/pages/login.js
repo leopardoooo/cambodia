@@ -74,8 +74,10 @@ Ext.apply( Login , {
 		});
 	},
 	openUrl: function( url ){
+		//登陆后不弹出一个独立页面
 		window.location.href = url;
 		return;
+		//登陆后弹出一个独立页面，需要浏览器设置当前站点安全
 		var width = screen.width - 10;
 		var height = screen.height - 60;
 		var property = 'left=1,top=1,resizable=no,status=no,menubar=no,scrollbars=no,location=no,toolbar=no,' +

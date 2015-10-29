@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import com.ycsoft.beans.core.prod.CProdOrder;
 import com.ycsoft.beans.core.prod.CProdOrderDto;
 import com.ycsoft.beans.core.prod.CProdOrderFollowPay;
+import com.ycsoft.beans.ott.TServerOttauthProd;
 import com.ycsoft.beans.prod.PRes;
 import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.constants.SystemConstants;
@@ -414,5 +415,15 @@ public class CProdOrderDao extends BaseEntityDao<CProdOrder> {
 	public List<PRes> queryPRes(String prod_id) throws JDBCException{
 		String sql="select p.* from p_prod_static_res a,p_res p  where a.res_id=p.res_id and a.prod_id=? ";
 		return this.createQuery(PRes.class, sql, prod_id).list();
+	}
+
+	public List<CProdOrder> queryAllUserProdHisOrderByOrdertimeDesc(String user_id) throws JDBCException{
+		String sql="select order_sn, done_code, package_sn, package_id, cust_id, user_id, prod_id, tariff_id, disct_id, status, status_date, eff_date, exp_date, active_fee, bill_fee, order_months, order_fee, order_time, order_type, package_group_id, area_id, county_id, optr_id, remark, public_acctitem_type, is_pay "
+					+" from c_prod_order where user_id=? "
+					+" union all  "
+					+" select order_sn, done_code, package_sn, package_id, cust_id, user_id, prod_id, tariff_id, disct_id, status, status_date, eff_date, exp_date, active_fee, bill_fee, order_months, order_fee, order_time, order_type, package_group_id, area_id, county_id, optr_id, remark, public_acctitem_type, is_pay "
+					+" from c_prod_order_his where user_id=? "
+					+" order by order_time desc ";
+		return this.createQuery(sql, user_id,user_id).list();
 	}
 }

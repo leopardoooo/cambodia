@@ -43,7 +43,7 @@ QueryInvoiceForm = Ext.extend(Ext.form.FormPanel,{
 							}
 						}
 					});
-				}
+				}	
 			},
 			bodyStyle:'padding:10px',
 			labelWidth:110,
@@ -57,7 +57,7 @@ QueryInvoiceForm = Ext.extend(Ext.form.FormPanel,{
 							url:'resource/Device!queryChildDept.action',
 							autoLoad:true,
 							fields:['dept_id','dept_name']
-						}),displayField:'dept_name',valueField:'dept_id',allowBlank:false,
+						}),displayField:'dept_name',valueField:'dept_id',
 						triggerAction:'all',mode:'local',
 						listeners : {
 							scope:this,

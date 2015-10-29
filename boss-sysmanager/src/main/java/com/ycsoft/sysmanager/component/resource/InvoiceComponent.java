@@ -440,11 +440,11 @@ public class InvoiceComponent extends BaseComponent {
 	 */
 	public Pager<RInvoice> queryMulitInvoice(InvoiceDto invoiceDto,SOptr optr,Integer start,Integer limit)
 		throws Exception {
-		if (StringHelper.isEmpty(invoiceDto.getDepot_id())){
+		/**if (StringHelper.isEmpty(invoiceDto.getDepot_id())){
 			String depotId= this.findQueryDepot(optr);
 			if (StringHelper.isNotEmpty(depotId))
 				invoiceDto.setDepot_id(depotId);
-		}
+		}**/
 		return rInvoiceDao.queryMulitInvoice(invoiceDto, start, limit);
 	}
 

@@ -27,7 +27,7 @@ public class WTaskBaseInfo implements Serializable{
 	private String task_create_type;
 	private String task_status;
 	private String team_id;
-	private Integer installer_id;
+	private String installer_id;
 	private Date task_create_time;
 	private Date task_invalide_time;
 	private Date task_finish_time;
@@ -50,6 +50,8 @@ public class WTaskBaseInfo implements Serializable{
 	private String bug_detail;
 	private String optr_id;
 	private Integer finish_done_code;
+	private String bug_phone;
+	private String cust_sign_no;
 
 	private String task_type_name;
 	private String task_detail_type_name;
@@ -59,12 +61,50 @@ public class WTaskBaseInfo implements Serializable{
 	private String optr_name;
 	private String bug_type_text;
 	private String team_id_text;
+	private String installer_id_text;
+	private String installer_id_tel;
 	
+
+
 	private Date  task_status_date;
 	private Date zte_status_date;
 	private String sync_status;//同步状态
+	private String sync_status_text;
 	private Date sync_status_date;//同步状态时间
+	private String task_finish_type_text;//完工类型描述
 	
+	
+	public String getSync_status_text() {
+		return sync_status_text;
+	}
+
+	public String getTask_finish_type_text() {
+		return task_finish_type_text;
+	}
+	
+	public String getInstaller_id_tel() {
+		return installer_id_tel;
+	}
+
+	public void setInstaller_id_tel(String installer_id_tel) {
+		this.installer_id_tel = installer_id_tel;
+	}
+
+	public String getCust_sign_no() {
+		return cust_sign_no;
+	}
+
+	public void setCust_sign_no(String cust_sign_no) {
+		this.cust_sign_no = cust_sign_no;
+	}
+	
+	public String getBug_phone() {
+		return bug_phone;
+	}
+
+	public void setBug_phone(String bug_phone) {
+		this.bug_phone = bug_phone;
+	}
 	
 	public Date getTask_status_date() {
 		return task_status_date;
@@ -88,6 +128,7 @@ public class WTaskBaseInfo implements Serializable{
 
 	public void setSync_status(String sync_status) {
 		this.sync_status = sync_status;
+		this.sync_status_text = MemoryDict.getDictName(DictKey.STATUS, sync_status);
 	}
 
 	public Date getSync_status_date() {
@@ -195,6 +236,7 @@ public class WTaskBaseInfo implements Serializable{
 
 	public void setTask_finish_type(String task_finish_type) {
 		this.task_finish_type = task_finish_type;
+		this.task_finish_type_text=MemoryDict.getDictName(DictKey.TASK_FINISH_TYPE, task_finish_type);
 	}
 
 	public String getCust_id() {
@@ -252,9 +294,14 @@ public class WTaskBaseInfo implements Serializable{
 	public void setDone_code(Integer done_code) {
 		this.done_code = done_code;
 	}
+	
+	public String getInstaller_id_text() {
+		return installer_id_text;
+	}
 
-	public void setInstaller_id(Integer installer_id) {
+	public void setInstaller_id(String installer_id) {
 		this.installer_id = installer_id;
+		this.installer_id_text = MemoryDict.getDictName(DictKey.OPTR, installer_id);
 	}
 
 	public String getCounty_id() {
@@ -305,7 +352,7 @@ public class WTaskBaseInfo implements Serializable{
 		this.task_status_text = task_status_text;
 	}
 	
-	public Integer getInstaller_id() {
+	public String getInstaller_id() {
 		return installer_id;
 	}
 	

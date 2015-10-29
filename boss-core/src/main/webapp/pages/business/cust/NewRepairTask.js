@@ -7,7 +7,7 @@ NewRepairTaskForm = Ext.extend(BaseForm,{
 		NewRepairTaskForm.superclass.constructor.call(this,{
 			trackResetOnLoad:true,
 			border : false,
-			labelWidth: 100,
+			labelWidth: 120,
 			layout:'form',
 			baseCls: 'x-plain',
 			bodyStyle: "background:#F9F9F9; padding: 10px;",
@@ -16,9 +16,15 @@ NewRepairTaskForm = Ext.extend(BaseForm,{
 				name:'bugDetail',
 				preventScrollbars : true,
 				height : 180,
-				width : 280,
+				anchor: '95%',
 				allowBlank:false,
 				xtype:'textarea'
+			},{
+				xtype: 'textfield',
+				fieldLabel: lmain('doc._form.faultPhone'),
+				name: 'bugPhone',
+				anchor: '95%',
+				allowBlank: false
 			}]
 		})
 	},

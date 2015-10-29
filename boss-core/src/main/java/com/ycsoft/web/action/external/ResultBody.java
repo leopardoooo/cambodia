@@ -49,7 +49,7 @@ public class ResultBody {
 		rb.err = Err.FAILURE;
 		ErrorCode ec=ex.getErrorCode();
 		rb.status = ec.getOttStatusCode();
-		rb.reason = ec.getDesc();
+		rb.reason = ex.getMessage();
 		return rb;
 	}
 	/**

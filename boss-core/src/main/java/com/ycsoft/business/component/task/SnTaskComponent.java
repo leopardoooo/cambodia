@@ -122,9 +122,9 @@ public class SnTaskComponent extends BaseBusiComponent {
 	 * @param bugDetail
 	 * @throws Exception
 	 */
-	public String createBugTask(Integer doneCode, CCust cust, String bugDetail) throws Exception {
+	public String createBugTask(Integer doneCode, CCust cust, String bugDetail, String bugPhone) throws Exception {
 		String taskId = this.saveTaskBaseInfo(cust, doneCode, SystemConstants.TASK_TYPE_FAULT,
-				getTeamId(SystemConstants.TEAM_TYPE_SUPERNET), null, bugDetail);
+				getTeamId(SystemConstants.TEAM_TYPE_SUPERNET), null, bugDetail, bugPhone);
 		List<CUser> userList = cUserDao.queryUserByCustId(cust.getCust_id());
 		List<CUser> bandList = getUserByTyoe(userList, SystemConstants.USER_TYPE_BAND);
 		saveTaskUser(bandList, SystemConstants.TASK_TYPE_FAULT, taskId);
@@ -171,7 +171,7 @@ public class SnTaskComponent extends BaseBusiComponent {
 	 * @param buyType
 	 * @throws Exception
 	 */
-	public void changeTaskTeam(Integer doneCode, String taskId, String deptId, String buyType) throws Exception {
+	public void changeTaskTeam(Integer doneCode, String taskId, String deptId, String optrId, String buyType) throws Exception {
 		//需要查询锁
 		// 修改工单对应的施工队
 		WTaskBaseInfo task = wTaskBaseInfoDao.queryForLock(taskId);
@@ -194,6 +194,7 @@ public class SnTaskComponent extends BaseBusiComponent {
 		String oldTeamId = task.getTeam_id();
 		task.setBug_type(buyType);
 		task.setTeam_id(deptId);
+		task.setInstaller_id(optrId);
 		wTaskBaseInfoDao.update(task);
 		// 记录操作日志
 		//String cfonTeamId = getTeamId(SystemConstants.TEAM_TYPE_CFOCN);
@@ -207,13 +208,15 @@ public class SnTaskComponent extends BaseBusiComponent {
 			jo.addProperty("Team", SystemConstants.TEAM_TYPE_CFOCN);
 			createTaskLog(taskId, BusiCodeConstants.TASK_ASSIGN, doneCode, jo.toString(), StatusConstants.NOT_EXEC);
 			wTaskBaseInfoDao.updateTaskStatus(taskId, StatusConstants.TASK_CREATE);
+			//派给cfocn，同步状态设置为未执行
 			wTaskBaseInfoDao.updateTaskSyncStatus(taskId, StatusConstants.NOT_EXEC);
 		} else {
 			JsonObject jo = new JsonObject();
 			jo.addProperty("Team", SystemConstants.TEAM_TYPE_SUPERNET);
 			createTaskLog(taskId, BusiCodeConstants.TASK_ASSIGN, doneCode,jo.toString(), StatusConstants.NONE);
 			wTaskBaseInfoDao.updateTaskStatus(taskId, StatusConstants.TASK_INIT);
-			wTaskBaseInfoDao.updateTaskSyncStatus(taskId, StatusConstants.NONE);
+			//派给supernet取消同步状态
+			wTaskBaseInfoDao.updateTaskSyncStatus(taskId, null);
 		}
 	}
 	
@@ -403,13 +406,16 @@ public class SnTaskComponent extends BaseBusiComponent {
 	}
 
 	// 完工
-	public void finishTask(Integer doneCode, WTaskBaseInfo wtask, String resultType, String finishDesc) throws Exception {
+	public void finishTask(Integer doneCode, WTaskBaseInfo wtask, String resultType, String bugType, String custSignNo, String finishDesc) throws Exception {
 		// 安装工单且完工成功要检查设备是否已经回填
 		if (wtask.getTask_type_id().equals(SystemConstants.TASK_TYPE_INSTALL)
 				&&resultType.equals(SystemConstants.TASK_FINISH_TYPE_SUCCESS)
 				&&wTaskUserDao.queryUnFillUserCount(wtask.getTask_id()) > 0){
 			throw new ComponentException(ErrorCode.TaskDeviceIsNull);
 		}
+		// 记录操作日志
+		JsonObject jo = new JsonObject();
+				
 		WTaskBaseInfo task = new WTaskBaseInfo();
 		task.setTask_id(wtask.getTask_id());
 		task.setTask_status(StatusConstants.TASK_END);
@@ -418,9 +424,15 @@ public class SnTaskComponent extends BaseBusiComponent {
 		task.setTask_finish_time(new Date());
 		task.setTask_status_date(new Date());
 		task.setFinish_done_code(doneCode);
+		task.setCust_sign_no(custSignNo);
+		
+		if(StringHelper.isNotEmpty(bugType)){
+			task.setBug_type(bugType);
+			jo.addProperty("bugType", bugType);
+		}
+		
 		wTaskBaseInfoDao.update(task);
-		// 记录操作日志
-		JsonObject jo = new JsonObject();
+		
 		jo.addProperty("resultType", resultType);
 		jo.addProperty("finishDesc", finishDesc);
 		createTaskLog(wtask.getTask_id(), BusiCodeConstants.TASK_FINISH, doneCode, jo.toString(), StatusConstants.NONE);
@@ -599,10 +611,9 @@ public class SnTaskComponent extends BaseBusiComponent {
 			createTaskLog(taskId, BusiCodeConstants.TASK_FILL, doneCode, jo.toString(), StatusConstants.NONE);
 		}
 	}
-
-	// 保存工单基本信息
-	private String saveTaskBaseInfo(CCust cust, Integer doneCode, String taskType, String teamId, String newAddr,
-			String bugDetail) throws Exception {
+	
+	private WTaskBaseInfo setTaskBaseInfo(CCust cust, Integer doneCode, String taskType, String teamId, String newAddr,
+			String bugDetail, String bugPhone) throws Exception {
 		CCustLinkman linkman = CCustLinkmanDao.findByKey(cust.getCust_id());
 
 		WTaskBaseInfo task = new WTaskBaseInfo();
@@ -626,6 +637,21 @@ public class SnTaskComponent extends BaseBusiComponent {
 		task.setArea_id(cust.getArea_id());
 		task.setOptr_id(getOptr().getOptr_id());
 		task.setBug_detail(bugDetail);
+		task.setBug_phone(bugPhone);
+		return task;
+	}
+
+	// 保存工单基本信息
+	private String saveTaskBaseInfo(CCust cust, Integer doneCode, String taskType, String teamId, String newAddr,
+			String bugDetail) throws Exception {
+		WTaskBaseInfo task = this.setTaskBaseInfo(cust, doneCode, taskType, teamId, newAddr, bugDetail, "");
+		wTaskBaseInfoDao.save(task);
+		return task.getTask_id();
+	}
+	
+	private String saveTaskBaseInfo(CCust cust, Integer doneCode, String taskType, String teamId, String newAddr,
+			String bugDetail, String bugPhone) throws Exception {
+		WTaskBaseInfo task = this.setTaskBaseInfo(cust, doneCode, taskType, teamId, newAddr, bugDetail, bugPhone);
 		wTaskBaseInfoDao.save(task);
 		return task.getTask_id();
 	}

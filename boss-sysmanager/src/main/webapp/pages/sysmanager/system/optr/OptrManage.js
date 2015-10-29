@@ -667,9 +667,6 @@ OptrWindow = Ext.extend(Ext.Window, {
 			obj["role_id"] = record.get('role_id');
 			obj["role_name"] =record.get('role_name');
 			data.push(obj);
-			if(!Ext.isEmpty(record.get('sub_system_id'))){
-				isHaveSys = true;
-			}
 		})
 		
 		
@@ -677,12 +674,11 @@ OptrWindow = Ext.extend(Ext.Window, {
 		for (var key in old) {
 			newValues["newoptr." + key] = old[key];
 		}
-		if(Ext.isEmpty(this.optrManageForm.loginSysId) && isHaveSys){
-			Alert("请选择默认登录系统");
-			return false;
-		}else{
+		
+		if(Ext.isEmpty(newValues["newoptr.login_sys_id"])){
 			newValues["newoptr.login_sys_id"] = '1';
 		}
+		
 		newValues["newoptr.dept_id"] = Ext.getCmp('optrManageFormId').deptId;
 		if(this.type =='update'){
 			newValues["newoptr.login_name"] = Ext.getCmp('loginName').getValue();

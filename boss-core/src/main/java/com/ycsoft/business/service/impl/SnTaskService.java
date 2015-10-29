@@ -80,19 +80,19 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 		//获取业务流水
 		Integer doneCode = doneCodeComponent.gDoneCode();
 		CCust cust = cCustDao.findByKey(custId);
-		String taskId = snTaskComponent.createBugTask(doneCode, cust, bugDetail);
+		String taskId = snTaskComponent.createBugTask(doneCode, cust, bugDetail, "");
 		this.setDoneCodeInfo(taskId, getBusiParam(), BusiCodeConstants.TASK_INIT);
 		saveAllPublic(doneCode, getBusiParam());
 	}
 
 	@Override
-	public void editTaskTeam(String taskId, String deptId, String bugType) throws Exception{
+	public void editTaskTeam(String taskId, String deptId, String optrId, String bugType) throws Exception{
 		WTaskBaseInfo task = wTaskBaseInfoDao.findByKey(taskId);
 		if (task == null)
 			throw new ServicesException("工单不存在!");
-		if (task.getTask_type_id().equals(SystemConstants.TASK_TYPE_FAULT) && 
+		/**if (task.getTask_type_id().equals(SystemConstants.TASK_TYPE_FAULT) && 
 				StringHelper.isEmpty(bugType))
-			throw new ServicesException("请指定故障类型!");	
+			throw new ServicesException("请指定故障类型!");	**/
 		if (task.getTask_status().equals(StatusConstants.TASK_CANCEL))
 			throw new ServicesException("工单已取消，不能修改");	
 		if (task.getTask_status().equals(StatusConstants.TASK_END))
@@ -100,7 +100,7 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 		//获取业务流水
 		Integer doneCode = doneCodeComponent.gDoneCode();
 		this.setDoneCodeInfo(taskId, getBusiParam(), BusiCodeConstants.TASK_ASSIGN);
-		snTaskComponent.changeTaskTeam(doneCode, taskId, deptId,bugType);
+		snTaskComponent.changeTaskTeam(doneCode, taskId, deptId, optrId,bugType);
 		saveAllPublic(doneCode, getBusiParam());
 	}
 
@@ -354,7 +354,7 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 	 * isBusi=true表示完工是前台发起
 	 */
 	@Override
-	public void finishTask(String taskId, String resultType,String remark,boolean isBusi)  throws Exception{
+	public void finishTask(String taskId, String resultType, String bugType, String custSignNo, String remark, boolean isBusi)  throws Exception{
 		WTaskBaseInfo task = wTaskBaseInfoDao.findByKey(taskId);
 		if (task == null)
 			throw new ServicesException("工单不存在!");
@@ -368,7 +368,7 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 		}
 		//获取业务流水
 		Integer doneCode = doneCodeComponent.gDoneCode();
-		snTaskComponent.finishTask(doneCode, task, resultType,remark);
+		snTaskComponent.finishTask(doneCode, task, resultType, bugType, custSignNo, remark);
 		List<CUser> users = cUserDao.queryTaskUser(taskId);
 		if (task.getTask_type_id().equals(SystemConstants.TASK_TYPE_INSTALL) && 
 				resultType.equals(SystemConstants.TASK_FINISH_TYPE_SUCCESS)){
@@ -510,6 +510,15 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 	
 	public Map<String , Object> queryTaskDetail(String task_id)throws Exception{
 		Map<String , Object> map = new HashMap<String, Object>();
+		WTaskBaseInfo task = wTaskBaseInfoDao.findByKey(task_id);
+		List<TaskBaseInfoDto> list = wTaskBaseInfoDao.queryTaskByTaskTypeAndCustId(task.getCust_id(), task.getTask_type_id());
+		List<TaskBaseInfoDto> sameTaskList = new ArrayList<TaskBaseInfoDto>();
+		for(TaskBaseInfoDto dto : list){
+			if(!dto.getTask_id().equals(task.getTask_id())){
+				sameTaskList.add(dto);
+			}
+		}
+		
 		List<WTaskUser> userList = snTaskComponent.queryTaskDetailUser(task_id);
 		
 		List<WTaskLog> logList = wTaskLogDao.queryByTaskId(task_id);
@@ -520,6 +529,7 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 		}
 		map.put("taskUserList", userList);
 		map.put("taskLogList", logList);	
+		map.put("sameTaskList", sameTaskList);
 		return map;
 	}
 

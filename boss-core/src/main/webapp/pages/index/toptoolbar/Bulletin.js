@@ -18,6 +18,8 @@ var showBulletin = function(){
 		success:function(res,opt){
 			var data = Ext.decode(res.responseText);
 			if(data){
+		
+				if(Ext.isEmpty(data))return;
 				var bulletinContent = Ext.util.Format.ellipsis(data['bulletin_content'],120,true);
 				var win = Ext.getCmp('bulletWinId');
 				if(!win){

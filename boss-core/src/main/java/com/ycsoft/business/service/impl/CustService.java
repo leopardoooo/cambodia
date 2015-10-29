@@ -2222,13 +2222,13 @@ public class CustService extends BaseBusiService implements ICustService {
 	 * @param bugDetail
 	 * @throws Exception
 	 */
-	public void saveBugTask(String bugDetail) throws Exception{
+	public void saveBugTask(String bugDetail, String bugPhone) throws Exception{
 		CCust cust = getBusiParam().getCust();
 		String  custId = cust.getCust_id();
 		doneCodeComponent.lockCust(custId);
 		Integer doneCode = doneCodeComponent.gDoneCode();
 		
-		snTaskComponent.createBugTask(doneCode, cust, bugDetail);
+		snTaskComponent.createBugTask(doneCode, cust, bugDetail, bugPhone);
 		
 		saveAllPublic(doneCode, getBusiParam());
 	}

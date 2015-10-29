@@ -159,7 +159,8 @@ public class TaskAction extends BaseBusiAction{
 	 * @throws Exception
 	 */
 	public String editTaskTeam() throws Exception{
-		snTaskService.editTaskTeam(task_id,deptId,bugType);
+		String optrId = request.getParameter("optrId");
+		snTaskService.editTaskTeam(task_id, deptId, optrId, bugType);
 		return JSON_SUCCESS;
 	}
 	
@@ -192,7 +193,8 @@ public class TaskAction extends BaseBusiAction{
 	 */
 	public String endTask() throws Exception{
 		String finishRemark = request.getParameter("finishRemark");
-		snTaskService.finishTask(task_id,resultType,finishRemark,true);
+		String custSignNo = request.getParameter("custSignNo");
+		snTaskService.finishTask(task_id,resultType, bugType, custSignNo,finishRemark,true);
 		return JSON_SUCCESS;
 	}
 	
