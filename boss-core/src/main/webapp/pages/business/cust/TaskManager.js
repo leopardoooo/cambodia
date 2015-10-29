@@ -286,7 +286,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 			fields:['task_id','cust_no','cust_name','cust_tel','old_addr','new_addr','address','task_type_id',
 					'task_status','task_status_text','task_type_id_text','team_id','team_id_text','bug_type','bug_type_text'
 					,'bug_detail','zte_status','zte_status_text','task_create_time','team_type','linkman_name',
-					'linkman_tel','sync_status','sync_status_text','task_finish_desc','bug_phone'],
+					'linkman_tel','sync_status','sync_status_text','task_finish_desc','bug_phone','cust_sign_no','installer_id_text','installer_id_tel','task_finish_type_text'],
 			root : 'records',
 			totalProperty : 'totalProperty',
 			autoDestroy : true
@@ -435,9 +435,11 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 					}
 					return '<div  style="font-weight: bold;color: '+ color +';" ext:qtitle="" ext:qtip="' + text + '">' + text +'</div>';
 				}},
-				{header: taskCols[3], dataIndex:'team_id_text',width:120,renderer:App.qtipValue},
 				{header: taskCols[4],dataIndex: 'zte_status_text', width:90, renderer:Ext.util.Format.statusShow},
 				{header: taskCols[14],dataIndex: 'sync_status_text', width: 110, renderer:Ext.util.Format.statusShow},
+				{header: taskCols[3], dataIndex:'team_id_text',width:120,renderer:App.qtipValue},
+				{header: taskCols[19], dataIndex:'installer_id_text',width:120,renderer:App.qtipValue},
+				{header: taskCols[22], dataIndex:'installer_id_tel',width:120,renderer:App.qtipValue},
 				{header: taskCols[5], dataIndex : 'address', width: 200,renderer:App.qtipValue},
 				{header: taskCols[6], dataIndex : 'cust_tel', 				width: 100, renderer:App.qtipValue},
 				{header: taskCols[7], dataIndex: 'task_create_time', 	width: 80, renderer: Ext.util.Format.dateFormat},					
@@ -445,7 +447,9 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 				{header: taskCols[9],dataIndex:'bug_detail',width:120,renderer:App.qtipValue},
 				{header: taskCols[11],dataIndex:'linkman_name',width:90,renderer:App.qtipValue},
 				{header: taskCols[17],dataIndex:'bug_phone',width:90,renderer:App.qtipValue},
-				{header: taskCols[18],dataIndex:'task_finish_desc',width:120,renderer:App.qtipValue}
+				{header: taskCols[23],dataIndex:'task_finish_type_text',width:120,renderer:App.qtipValue},
+				{header: taskCols[18],dataIndex:'task_finish_desc',width:120,renderer:App.qtipValue},
+				{header: taskCols[20], dataIndex:'cust_sign_no',width:120,renderer:App.qtipValue},
 	        ]}),
 	        sm: sm,
 	        stripeRows: true,
@@ -689,9 +693,9 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 			if(rs.get('task_status') == 'CREATE' || rs.get('task_status') == 'ENDWAIT'){
 				arr.push(record.data);
 			}else if(rs.get('team_type') == 'SUPERNET' && rs.get('task_status') == 'INIT'){
-				if(record.get('dept_id') != rs.get('team_id')){
+//				if(record.get('dept_id') != rs.get('team_id')){
 					arr.push(record.data);
-				}
+//				}
 			}
 		});
 		
@@ -740,12 +744,13 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 			var bugCauseCombo = new Ext.ux.ParamCombo({
 				fieldLabel: lbc('home.tools.TaskManager.forms.faultType'),
 				xtype:'paramcombo',
-				allowBlank:false,
 				anchor: '95%',
 				allowBlankItem: true,
 				paramName:'TASK_BUG_CAUSE'
 			});
-			App.form.initComboData([bugCauseCombo]);
+			App.form.initComboData([bugCauseCombo], function(){
+				bugCauseCombo.setValue(rs.get('bug_type'));
+			}, this);
 			form.add(bugCauseCombo);
 		}
 		var win = new Ext.Window({
@@ -764,9 +769,9 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 					if(Ext.isEmpty(teamCombo.getValue())){
 						Alert(lbc('home.tools.TaskManager.msg.teamCantEmpty'));return false;
 					}
-					if(bugCauseCombo && Ext.isEmpty(bugCauseCombo.getValue())){
-						Alert(lbc('home.tools.TaskManager.msg.faultTypeCantEmpty'));return false;
-					}
+					//if(bugCauseCombo && Ext.isEmpty(bugCauseCombo.getValue())){
+					//	Alert(lbc('home.tools.TaskManager.msg.faultTypeCantEmpty'));return false;
+					//}
 					var url = Constant.ROOT_PATH + "/core/x/Task!editTaskTeam.action";
 					var taskId = rs.get("task_id");
 					var o = {task_id : taskId, deptId: teamCombo.getValue(),
@@ -826,32 +831,45 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 			}),displayField:'item_name',valueField:'item_value',
 			triggerAction:'all',mode:'local'
 		});
-		var bugCauseCombo = new Ext.ux.ParamCombo({
-				fieldLabel: lbc('home.tools.TaskManager.forms.faultType'),
-				xtype:'paramcombo',
-				anchor: '95%',
-				allowBlankItem: true,
-				paramName:'TASK_BUG_CAUSE'
-			});
-		App.form.initComboData([finishCombo, bugCauseCombo]);
+		
+		App.form.initComboData([finishCombo]);
+		
 		var endForm = new Ext.form.FormPanel({
 			layout : 'form',
 			border : false,
 			labelWidth : 150,
 			bodyStyle : 'padding : 5px;padding-top : 10px;',
-			items: [finishCombo, bugCauseCombo,{
-				fieldLabel: lbc('home.tools.TaskManager.forms.custSignNo'),
-				xtype: 'textfield',
-				name: 'custSignNo',
-				width: 200
-			},{
-				fieldLabel: lbc('home.tools.TaskManager.forms.finishExplan'),
-				name:'finishRemark',
-				height : 140,
-				width : 200,
-				xtype:'textarea'
-			}]
+			items: [finishCombo]
 		});
+		
+		var bugCauseCombo = null;
+		if(rs.get('task_type_id') == '2'){
+			bugCauseCombo = new Ext.ux.ParamCombo({
+				fieldLabel: lbc('home.tools.TaskManager.forms.faultType'),
+				xtype:'paramcombo',
+				allowBlank:false,
+				anchor: '95%',
+				//allowBlankItem: true,
+				paramName:'TASK_BUG_CAUSE'
+			});
+			App.form.initComboData([bugCauseCombo], function(){
+				bugCauseCombo.setValue(rs.get('bug_type'));
+			}, this);
+			endForm.add(bugCauseCombo);
+		}
+		endForm.add({
+			fieldLabel: lbc('home.tools.TaskManager.forms.custSignNo'),
+			xtype: 'textfield',
+			name: 'custSignNo',
+			width: 200
+		},{
+			fieldLabel: lbc('home.tools.TaskManager.forms.finishExplan'),
+			name:'finishRemark',
+			height : 140,
+			width : 200,
+			xtype:'textarea'
+		});
+		
 		var win = new Ext.Window({
 			width: 450,
 			height: 300,
@@ -873,7 +891,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 					var o = {
 						task_id : taskId, 
 						resultType : finishCombo.getValue(),
-						bugType: bugCauseCombo.getValue(),
+						bugType: bugCauseCombo == null ? '' : bugCauseCombo.getValue(),
 						custSignNo : endForm.getForm().findField('custSignNo').getValue(),
 						finishRemark : endForm.getForm().findField('finishRemark').getValue()
 					};

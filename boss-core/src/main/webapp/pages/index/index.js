@@ -170,6 +170,8 @@ Ext.onReady(function(){
 			
 			//开始轮询公告任务
 			Ext.TaskMgr.start(bulletinTask);
+			//检查操作员和服务器是否一致
+			Ext.TaskMgr.start(checkOptrIsTrueTask);
  		}
  	});
  	App.acctDate();

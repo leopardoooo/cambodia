@@ -208,13 +208,15 @@ public class SnTaskComponent extends BaseBusiComponent {
 			jo.addProperty("Team", SystemConstants.TEAM_TYPE_CFOCN);
 			createTaskLog(taskId, BusiCodeConstants.TASK_ASSIGN, doneCode, jo.toString(), StatusConstants.NOT_EXEC);
 			wTaskBaseInfoDao.updateTaskStatus(taskId, StatusConstants.TASK_CREATE);
+			//派给cfocn，同步状态设置为未执行
 			wTaskBaseInfoDao.updateTaskSyncStatus(taskId, StatusConstants.NOT_EXEC);
 		} else {
 			JsonObject jo = new JsonObject();
 			jo.addProperty("Team", SystemConstants.TEAM_TYPE_SUPERNET);
 			createTaskLog(taskId, BusiCodeConstants.TASK_ASSIGN, doneCode,jo.toString(), StatusConstants.NONE);
 			wTaskBaseInfoDao.updateTaskStatus(taskId, StatusConstants.TASK_INIT);
-			wTaskBaseInfoDao.updateTaskSyncStatus(taskId, StatusConstants.NONE);
+			//派给supernet取消同步状态
+			wTaskBaseInfoDao.updateTaskSyncStatus(taskId, null);
 		}
 	}
 	

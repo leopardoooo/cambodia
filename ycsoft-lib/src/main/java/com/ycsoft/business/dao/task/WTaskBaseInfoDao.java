@@ -90,8 +90,9 @@ public class WTaskBaseInfoDao extends BaseEntityDao<WTaskBaseInfo> {
 		String sql = "select t.*,wt.team_type,case when s.tel is null and s.mobile is null then '' "
 				+ " when s.mobile is null then  s.tel  "
 				+ " when s.tel is null then s.mobile  else s.tel||'*'||s.mobile end linkman_tel ,s.optr_name linkman_name,c.cust_no "
-				+ " from w_task_base_info t, C_CUST c ,w_team wt,s_optr s "+(StringHelper.isEmpty(addrIds)?"":", t_district td, t_address ta,t_province tp")
-				+ " where t.cust_id = c.cust_id and c.str9 = s.optr_id(+) and t.team_id = wt.dept_id(+) "+(StringHelper.isEmpty(addrIds)?"":" and c.addr_id = ta.addr_id "
+				+", case when i.tel is null then i.mobile else (case when i.mobile is null then i.tel else i.tel||'*'||i.mobile end) end installer_id_tel "
+				+ " from w_task_base_info t, C_CUST c ,w_team wt,s_optr s,s_optr i "+(StringHelper.isEmpty(addrIds)?"":", t_district td, t_address ta,t_province tp")
+				+ " where t.cust_id = c.cust_id and i.optr_id(+)=t.installer_id and c.str9 = s.optr_id(+) and t.team_id = wt.dept_id(+) "+(StringHelper.isEmpty(addrIds)?"":" and c.addr_id = ta.addr_id "
 				+ "and ta.district_id = td.district_id  and td.province_id=tp.id and  tp.id in ("+sqlGenerator.in(addrIds.split(","))+")") ;
 		List<Object> params = new ArrayList<Object>();
 		
@@ -167,9 +168,10 @@ public class WTaskBaseInfoDao extends BaseEntityDao<WTaskBaseInfo> {
 		String sql = "select t.* ,wt.team_type,case when s.tel is null and s.mobile is null then '' "
 				+ " when s.mobile is null then  s.tel  "
 				+ " when s.tel is null then s.mobile  else s.tel||'*'||s.mobile end linkman_tel ,"
-				+ " s.optr_name  linkman_name,c.cust_no "
-				+ " from w_task_base_info t, C_CUST c  ,w_team wt,s_optr s "
-				+ " where t.cust_id = c.cust_id and c.str9 = s.optr_id(+) and t.team_id = wt.dept_id(+) " 
+				+ " s.optr_name  linkman_name,c.cust_no ,"
+				+" case when i.tel is null then i.mobile else (case when i.mobile is null then i.tel else i.tel||'*'||i.mobile end) end installer_id_tel "
+				+ " from w_task_base_info t, C_CUST c  ,w_team wt,s_optr s,s_optr i "
+				+ " where t.cust_id = c.cust_id and i.optr_id(+)=t.installer_id and c.str9 = s.optr_id(+) and t.team_id = wt.dept_id(+) " 
 				+" and (( t.task_status =? and t.team_id =?) or t.task_status=? or (t.task_status=? and t.zte_status=?) or (t.task_status=? and t.sync_status=?)) "
 				+" ORDER BY t.task_create_time DESC ";
 		return this.createQuery(TaskBaseInfoDto.class,sql,StatusConstants.TASK_CREATE,deptId,StatusConstants.TASK_ENDWAIT
@@ -212,9 +214,10 @@ public class WTaskBaseInfoDao extends BaseEntityDao<WTaskBaseInfo> {
 	}
 	public TaskBaseInfoDto findTaskDetailByTaskId(String taskId) throws JDBCException{
 		String sql=" select t.*,wt.team_type, case when s.tel is null and s.mobile is null then '' "
-				+ "when s.mobile is null then s.tel when s.tel is null then s.mobile else s.tel || '*' || s.mobile "
-				+ "end linkman_tel, s.optr_name linkman_name,c.cust_no "
-				+ "from w_task_base_info t, C_CUST c, w_team wt, s_optr s where t.cust_id = c.cust_id and c.str9 = s.optr_id(+) "
+				+ "  when s.mobile is null then s.tel when s.tel is null then s.mobile else s.tel || '*' || s.mobile "
+				+ "end linkman_tel, s.optr_name linkman_name,c.cust_no, "
+				+" case when i.tel is null and i.mobile is null then '' when i.mobile is null then i.tel when i.tel is null then i.mobile else i.tel || '*' || i.mobile end installer_id_tel "
+				+ "from w_task_base_info t, C_CUST c, w_team wt, s_optr s,s_optr i where t.cust_id = c.cust_id and c.str9 = s.optr_id(+) and i.optr_id(+)=t.installer_id "
 				+ "and t.team_id = wt.dept_id(+)  and t.task_id =? ORDER BY t.task_create_time DESC ";
 		return this.createQuery(TaskBaseInfoDto.class,sql, taskId).first();
 	}
