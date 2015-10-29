@@ -483,7 +483,7 @@ Ext.apply(App.func,{
 					return false;
 				}					
 			}else if(busicode == '2223'){ //打印标记
-				if (data['is_doc'] == 'T'){
+				if (data['is_doc'] == 'T' || data['status'] != 'PAY'){
 					return false;
 				}	
 				var date = Date.parseDate(data['create_time'].substring(0,10),'Y-m-d');
