@@ -74,6 +74,31 @@ public class DoneCodeComponent extends BaseBusiComponent {
 			return true;
 		}
 	}
+	
+	public void saveDoneCodeDetail(Integer doneCode, String custId, List<String> userIdList) throws Exception {
+		CDoneCodeDetail[] detail = new CDoneCodeDetail[userIdList.size()];
+		for( int i=0;i<userIdList.size();i++){
+			detail[i] = new CDoneCodeDetail();
+			detail[i].setDone_code(doneCode);
+			detail[i].setCust_id(custId);
+			detail[i].setUser_id(userIdList.get(i));
+			detail[i].setArea_id(getOptr().getArea_id());
+			detail[i].setCounty_id(getOptr().getCounty_id());
+		}
+		cDoneCodeDetailDao.save(detail);
+	}
+	
+	public void saveDoneCode(Integer doneCode, String busiCode, String addrId) throws Exception {
+		CDoneCode cDoneCode = new CDoneCode();
+		cDoneCode.setDone_code(doneCode);
+		cDoneCode.setBusi_code(busiCode);
+		cDoneCode.setStatus(StatusConstants.ACTIVE);
+		cDoneCode.setAddr_id(addrId);
+		cDoneCode.setService_channel(SystemConstants.SERVICE_CHANNEL_YYT);
+		setBaseInfo(cDoneCode);
+		cDoneCodeDao.save(cDoneCode);
+	}
+	
 	/**
 	 * 保存未支付业务
 	 * @param cust_id

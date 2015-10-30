@@ -54,6 +54,7 @@ public class PProd extends BusiBase implements Serializable {
 	private String public_acctitem_type;
 	private String is_extend;
 	private String is_bank_pay;
+	private String tariff_id;
 
 	private boolean pkg = false; // 是否为套餐
 	private String is_invalid;	//是否失效
@@ -74,6 +75,13 @@ public class PProd extends BusiBase implements Serializable {
 	private String public_acctitem_type_text;
 	private String allow_pay_text;
 
+	public String getTariff_id() {
+		return tariff_id;
+	}
+
+	public void setTariff_id(String tariff_id) {
+		this.tariff_id = tariff_id;
+	}
 	
 	public String getIs_extend() {
 		return is_extend;

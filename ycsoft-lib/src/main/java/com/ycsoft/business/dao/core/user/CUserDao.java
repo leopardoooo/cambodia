@@ -520,6 +520,11 @@ public class CUserDao extends BaseEntityDao<CUser> {
 		String sql="select * from c_user where login_name=? ";
 		return this.createQuery(sql, loginName).first();
 	}
+	
+	public int countLikeLoginName(String loginNamePrefix) throws Exception {
+		String sql = "select count(1) from c_user where login_name like ?";
+		return this.count(sql, loginNamePrefix+"%");
+	}
 
 	public int updateUserNameByDeviceCode(CUser user,String custId) throws JDBCException {
 		String sql = "update c_user set user_name=? where cust_id=? and ( stb_id=? or card_id=? or modem_mac=? )";

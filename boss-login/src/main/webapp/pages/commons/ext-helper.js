@@ -6,6 +6,7 @@
  */
 
 Ext.Ajax.handleResponse = Ext.Ajax.handleResponse.createInterceptor(function(response, options){//处理函数。 
+	console.log(response.responseText);
 	var data = Ext.decode(response.responseText);
 	if(data && data["success"]===false && data["exception"]){
 		var obj = data["exception"];

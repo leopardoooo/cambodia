@@ -1265,4 +1265,8 @@ public class UserComponent extends BaseBusiComponent {
 		return cUserDao.queryTaskUser(taskId);
 	}
 	
+	public int countLikeLoginName(String loginNamePrefix) throws Exception {
+		return cUserDao.countLikeLoginName(loginNamePrefix);
+	}
+	
 }

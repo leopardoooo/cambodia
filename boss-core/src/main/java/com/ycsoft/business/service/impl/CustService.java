@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,7 +29,6 @@ import com.ycsoft.beans.core.fee.CFee;
 import com.ycsoft.beans.core.prod.CProd;
 import com.ycsoft.beans.core.prod.CProdPropChange;
 import com.ycsoft.beans.core.user.CUser;
-import com.ycsoft.beans.core.user.CUserPropChange;
 import com.ycsoft.beans.device.RDevice;
 import com.ycsoft.beans.device.RDeviceFee;
 import com.ycsoft.beans.device.RDeviceModel;
@@ -39,15 +39,18 @@ import com.ycsoft.beans.system.SOptr;
 import com.ycsoft.business.commons.pojo.BusiParameter;
 import com.ycsoft.business.component.core.OrderComponent;
 import com.ycsoft.business.component.task.SnTaskComponent;
+import com.ycsoft.business.dao.core.user.CUserDao;
 import com.ycsoft.business.dto.config.TAddressDto;
 import com.ycsoft.business.dto.core.acct.AcctAcctitemActiveDto;
 import com.ycsoft.business.dto.core.acct.AcctitemDto;
 import com.ycsoft.business.dto.core.cust.CustFullInfoDto;
+import com.ycsoft.business.dto.core.cust.CustOTTMobile;
 import com.ycsoft.business.dto.core.fee.CFeePayDto;
 import com.ycsoft.business.dto.core.fee.FeeBusiFormDto;
 import com.ycsoft.business.dto.core.fee.FeeInfoDto;
 import com.ycsoft.business.dto.core.prod.CProdDto;
 import com.ycsoft.business.dto.core.prod.CustProdDto;
+import com.ycsoft.business.dto.core.prod.OrderProd;
 import com.ycsoft.business.dto.core.user.UserDto;
 import com.ycsoft.business.dto.core.user.UserRes;
 import com.ycsoft.business.dto.device.DeviceDto;
@@ -74,6 +77,8 @@ public class CustService extends BaseBusiService implements ICustService {
 	private OrderComponent orderComponent;
 	@Autowired
 	private SnTaskComponent snTaskComponent;
+	@Autowired
+	private CUserDao cUserDao;
 	/**
 	 * 创建新客户
 	 * @param busiCode
@@ -157,7 +162,7 @@ public class CustService extends BaseBusiService implements ICustService {
 		}
 		doneCodeComponent.saveBatchDoneCode(doneCode, BusiCodeConstants.CUST_BATCH_OPEN,null, custIds, null);
 	}
-
+	
 	private String findAddr(String address,CCustAddr addr) throws Exception{
 		if(StringHelper.isEmpty(address)){
 			throw new ServicesException("小区不能为空!");

@@ -202,6 +202,8 @@
 	<script type="text/javascript" src="<%=root %>/pages/index/toptoolbar/FeeUnitpreWin.js"></script>
 	<script type="text/javascript" src="<%=root %>/pages/index/toptoolbar/QueryInvoice.js"></script>
 	<script type="text/javascript" src="<%=root %>/pages/index/toptoolbar/QueryDevice.js"></script>
+	<script type="text/javascript" src="<%=root %>/pages/business/cust/AddrCustSelect.js"></script>
+	<script type="text/javascript" src="<%=root %>/pages/index/toptoolbar/OpenOTTMobile.js"></script>
 	<script type="text/javascript" src="<%=root %>/pages/index/toptoolbar/QueryVoucher.js"></script>
 	<script type="text/javascript" src="<%=root %>/pages/index/toptoolbar/ValuableCardWin.js"></script>
 	<script type="text/javascript" src="<%=root %>/pages/index/toptoolbar/UpdateAddress.js"></script>

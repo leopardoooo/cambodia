@@ -155,6 +155,16 @@ public class PProdDao extends BaseEntityDao<PProd> {
 				countyId ,countyId,servId).list();
 		return prodList;
 	}
+	
+	public List<PProd> queryFeeOrderUserProd(String servId) throws Exception {
+		String sql = StringHelper.append("select distinct t.prod_id, t.prod_name||'_'||ppt.tariff_name prod_name, ppt.tariff_id from p_prod t,P_PROD_TARIFF ppt",
+				" where t.eff_date < SYSDATE AND (t.exp_date IS NULL OR t.exp_date > SYSDATE) and t.prod_id=ppt.prod_id ",
+				" and t.status = ? and t.prod_type =? and t.serv_id =?",
+				" and ppt.eff_date < SYSDATE AND (ppt.exp_date IS NULL OR ppt.exp_date > SYSDATE)"
+				+ " and ppt.status=? and ppt.rent=0 order by t.prod_name desc");
+		return this.createQuery(sql, StatusConstants.ACTIVE, PROD_TYPE_BASE, servId, StatusConstants.ACTIVE ).list();
+		
+	}
 
 	/**
 	 * @param areaId

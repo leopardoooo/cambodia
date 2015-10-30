@@ -73,6 +73,13 @@ Ext.apply( App, {
 					iconCls:'query',
 					attrs : App.data.resources[i]
 				});
+			}else if(App.data.resources[i].handler == 'openOTTMobile'){
+				menuItems.push({
+					itemId:'openOTTMobile',
+					text: text,
+					iconCls:'query',
+					attrs : App.data.resources[i]
+				});
 			}else if(App.data.resources[i].handler == 'checkAccountId'){
 				menuItems.push({
 					itemId:'checkAccountId',
@@ -292,6 +299,8 @@ Ext.apply( App, {
 								App.tool.showDeviceWin();
 							}else if(item.itemId === 'queryInvoiceId'){
 								App.tool.showInvoiceWin();
+							}else if(item.itemId === 'openOTTMobile'){
+								App.tool.showOpenOTTMobileeWin();
 							}else if(item.itemId === 'closeInvoiceId'){
 								App.tool.showCloseInvoiceWin();
 							}else if(item.itemId === 'checkAccountId'){

@@ -189,6 +189,12 @@ TopToolbar = Ext.extend(Ext.Toolbar , {
 			win = new QueryInvoiceWin();
 		win.show();
 	},
+	showOpenOTTMobileeWin: function(){
+		var win = Ext.getCmp('showOTTMobileeWin');
+		if(!win)
+			win = new OpenOTTMobileWin();
+		win.show();
+	},
 	showCloseInvoiceWin:function(){
 		var win = Ext.getCmp('closeInvoiceWinId');
 		if(!win)
