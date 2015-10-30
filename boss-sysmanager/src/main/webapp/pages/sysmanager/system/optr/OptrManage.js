@@ -86,7 +86,8 @@ var OptrManageForm = Ext.extend(Ext.form.FormPanel, {
 								},{
 									fieldLabel : '电话',
 									name : 'tel',
-									xtype: 'numberfield'									
+									xtype: 'textfield',
+									vtype: 'numZero' 
 								}/*,
 								{
 						            fieldLabel: '业务员',
@@ -140,7 +141,7 @@ var OptrManageForm = Ext.extend(Ext.form.FormPanel, {
 //												}
 											},
 											select:function(combo){
-												this.loginSysId = null;
+												this.loginSysId = combo.getValue();
 											}
 									}
 								},
@@ -174,7 +175,8 @@ var OptrManageForm = Ext.extend(Ext.form.FormPanel, {
 								},{
 									fieldLabel : '电话2',
 									name : 'mobile',
-									xtype: 'numberfield'									
+									xtype: 'textfield',
+									vtype: 'numZero' 									
 								}
 								]
 					},{
@@ -677,6 +679,8 @@ OptrWindow = Ext.extend(Ext.Window, {
 		
 		if(Ext.isEmpty(newValues["newoptr.login_sys_id"])){
 			newValues["newoptr.login_sys_id"] = '1';
+		}else{
+			newValues["newoptr.login_sys_id"] = this.optrManageForm.loginSysId;
 		}
 		
 		newValues["newoptr.dept_id"] = Ext.getCmp('optrManageFormId').deptId;
