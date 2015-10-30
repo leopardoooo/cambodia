@@ -166,7 +166,7 @@ BCLang.home = {
 				stbId: '机顶盒', cardId: '智能卡', modem: 'Modem号', createTime: '创建时间',
 				loginName: '账号', terminal: '终端类型', deviceModel: '设备型号', buyWay: '购买方式',
 				stopDate: '预报停时间', stopType: '催费类型', protocolDate: '协议日期', 
-				str4: 'IP地址',str6: 'IP收费数量',cardMac:'卡号或MAC'
+				str4: 'IP地址',str6: 'IP收费数量',cardMac:'卡号或MAC',password:'密码'
 			},
 			_form: {
 				taskBackFill: '施工回填',

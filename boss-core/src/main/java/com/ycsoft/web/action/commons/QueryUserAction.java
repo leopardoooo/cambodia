@@ -3,6 +3,7 @@ package com.ycsoft.web.action.commons;
 
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -57,6 +58,33 @@ public class QueryUserAction extends BaseAction{
 		getRoot().setRecords(userList);
 		return JSON_RECORDS;
 	}
+	
+	public String queryUserAndTotal() throws Exception{
+		List<UserDto> userList = null;
+		if (StatusConstants.INVALID.equals(custStatus))
+			userList = queryUserService.queryUserHis(custId);
+		else{
+			userList = queryUserService.queryUser(custId);
+			Map<String,Integer> userCntMap=new HashMap<>();
+			for(UserDto user:userList){
+				if(userCntMap.containsKey(user.getUser_type())){
+					userCntMap.put(user.getUser_type(), userCntMap.get(user.getUser_type())+1);
+				}else{
+					userCntMap.put(user.getUser_type(), 1);
+				}
+			}
+			if(userCntMap.size()>0){
+				StringBuilder totalStr=new StringBuilder();
+				for(String userType: userCntMap.keySet()){
+					totalStr.append(" ").append(userType).append(":").append(userCntMap.get(userType).intValue());
+				}
+				getRoot().setSimpleObj(totalStr.toString());
+			}
+		}
+		getRoot().setRecords(userList);
+		return JSON;
+	}
+	
 
 	/**
 	 * 根据客户查询所有产品信息

@@ -166,7 +166,7 @@ BCLang.home = {
 				stbId: 'StbNo.', cardId: 'CARDNo.', modem: 'MODEM', createTime: 'CreateTime',
 				loginName: 'Account', terminal: 'TerminalType', deviceModel: 'DeviceType', buyWay: 'BuyWay',
 				stopDate: 'ForecastStopTime', stopType: 'ReminderFeeType', protocolDate: 'AgreementDate', 
-				str4: 'IPAdress',str6: 'IPFeeAmount'
+				str4: 'IPAdress',str6: 'IPFeeAmount',password:'Password'
 			},
 			_form: {
 				taskBackFill: ' backfilling construction',
