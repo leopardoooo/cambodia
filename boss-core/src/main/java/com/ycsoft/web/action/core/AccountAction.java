@@ -14,6 +14,8 @@ import org.springframework.stereotype.Controller;
 import com.ycsoft.business.dto.core.cust.CustOTTMobile;
 import com.ycsoft.business.dto.core.user.UserLoginPwd;
 import com.ycsoft.business.service.IAccountService;
+import com.ycsoft.commons.helper.JsonHelper;
+import com.ycsoft.commons.pojo.Root;
 import com.ycsoft.web.commons.abstracts.BaseBusiAction;
 
 @Controller
@@ -32,6 +34,7 @@ public class AccountAction extends BaseBusiAction {
 		this.txtFileName = custOtt.getCust_name_prefix()+"vip.txt";
 		BufferedWriter bw = null;
 		File file = null;
+		Root root = getProxyRoot();
 		try {
 			file = new File(path+this.txtFileName);
 			bw = new BufferedWriter(new FileWriter(file));
@@ -43,15 +46,17 @@ public class AccountAction extends BaseBusiAction {
 			bw.flush();
 			
 			this.txtStream = new FileInputStream(file);
+			root.setSuccess(true);
 		} catch (Exception e) {
-//			e.printStackTrace();
-			throw e;
+			e.printStackTrace();
+			root.setSimpleObj(e.getMessage());
+			root.setSuccess(false);
 		} finally {
 			if(bw != null)bw.close();
 			if(file.exists())file.delete();
 		}
 		
-		return "text8";
+		return "txt";
 	}
 	
 	public String queryOTTMobileFreeProd() throws Exception {

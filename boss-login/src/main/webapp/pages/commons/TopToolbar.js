@@ -967,6 +967,7 @@ var checkOptrIsTrue = function(){
 	Ext.Ajax.request({
 		url:root + '/querySessionOptr' ,
 		scope:this,
+		method: 'POST',
 		success:function(res,opt){
 			var optr = Ext.decode(res.responseText);
 			//console.log(optr);

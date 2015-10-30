@@ -47,12 +47,15 @@ public class AccountService extends OrderService implements IAccountService {
 		List<UserLoginPwd> list = new ArrayList<UserLoginPwd>();
 		for(int i=0; i < custNum; i++){
 			
-			userCount += i;	//后缀跟数字自增1
 			UserLoginPwd userLoginPwd = new UserLoginPwd();
 			//不足补零
 			String loginName = custNamePrefix + StringHelper.leftWithZero( String.valueOf(userCount), sumNum );
-			if(userComponent.queryUserByLoginName(loginName) != null)
-				throw new ServicesException("账号已存在!");
+			userCount += 1;	//后缀跟数字自增1
+			if(userComponent.queryUserByLoginName(loginName) != null){
+//				throw new ServicesException("账号已存在!");
+				custNum += 1;	//账号存在，后缀+1继续生成，直到不存在为止
+				continue;
+			}
 			String password = String.valueOf( 100000 + new Random(System.currentTimeMillis()).nextInt(900000) );
 			userLoginPwd.setLogin_name(loginName);
 			userLoginPwd.setPassword( password );
@@ -94,6 +97,7 @@ public class AccountService extends OrderService implements IAccountService {
 			user.setLogin_name(loginName);
 			user.setPassword(cust.getPassword());
 			cUserDao.save(user);
+			createUserJob(user, custId, doneCode);
 			
 			OrderProd orderProd = new OrderProd();
 			orderProd.setCust_id(custId);
@@ -116,11 +120,6 @@ public class AccountService extends OrderService implements IAccountService {
 			orderProd.setOrder_months(orderMonths);
 			
 			saveOrderProd(orderProd, busiParamter.getBusiCode(), doneCode);
-			
-			/*busiParamter.getCustFullInfo().setCust(cust);
-			List<CUser> selectedUsers = new ArrayList<CUser>();
-			selectedUsers.add(user);
-			busiParamter.setSelectedUsers(selectedUsers);*/
 			
 			List<String> userIdList = new ArrayList<String>();
 			userIdList.add(userId);

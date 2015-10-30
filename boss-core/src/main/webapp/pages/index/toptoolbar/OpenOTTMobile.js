@@ -37,7 +37,7 @@ OpenOTTMobileWin = Ext.extend(Ext.Window, {
 					id : 'tempCustAddress',
 					name:'custOtt.address',
 					allowBlank:false,
-					disabled:true
+					readOnly:true
 				}]
 			},{
 				border: false,
@@ -112,22 +112,26 @@ OpenOTTMobileWin = Ext.extend(Ext.Window, {
 			win = new AddrCustSelectWin();
 		}
 		win.show();
-//		win.maximize();
 	},
 	doSave: function(){
 		var form = this.formPanel.getForm();
 		if(!form.isValid())return;
-//		var values = form.getValues();
 		var all = {}, busiParams = {};
 		busiParams['busiCode'] = '2500';
 		all['jsonParams'] = Ext.encode(busiParams);
+		var msg = Show();
 		form.submit({
 			url: root+'/core/x/Account!createOttMobile.action',
 			scope: this,
 			params: all,
 			success: function(form,action){
-				console.log(action.result);
+			},
+			failure: function(form, action){
 			}
 		});
+		setTimeout(function(){
+			msg.hide();
+			Alert('下载成功');
+		}, 3000);
 	}
 });

@@ -137,11 +137,12 @@
                 <param name="charSet">UTF-8</param>
 				<param name="root">root</param>
 			</result>
-			<result type="stream" name="text8">
-	            <param name="contentType">text/html;charset=UTF-8</param>
+			<result type="stream" name="txt">
+	            <param name="contentType">text/plain;charset=UTF-8</param>
 	            <param name="inputName">txtStream</param>
 	            <param name="contentDisposition">attachment;filename=${txtFileName}</param>
 	            <param name="bufferSize">1024</param>
+	            <param name="success">true</param>
             </result>
 			
 			<result type="json" name="json-simpleObj">
