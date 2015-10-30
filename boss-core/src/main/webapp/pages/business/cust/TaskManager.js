@@ -449,7 +449,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 				{header: taskCols[17],dataIndex:'bug_phone',width:90,renderer:App.qtipValue},
 				{header: taskCols[23],dataIndex:'task_finish_type_text',width:120,renderer:App.qtipValue},
 				{header: taskCols[18],dataIndex:'task_finish_desc',width:120,renderer:App.qtipValue},
-				{header: taskCols[20], dataIndex:'cust_sign_no',width:120,renderer:App.qtipValue},
+				{header: taskCols[20], dataIndex:'cust_sign_no',width:120,renderer:App.qtipValue}
 	        ]}),
 	        sm: sm,
 	        stripeRows: true,
