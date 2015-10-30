@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <table width="1000px" border="0" align="left">
   <tr>
     <td height="88px" colspan="8" align="center"><table width="100%" height="100%" border="0">
@@ -5,13 +6,13 @@
 		<td height="10px" colspan="8" align="center" class="t1">Cambodian Superme Telecommunication Media Group Co.,ltd</td>
 	  </tr>
 	  <tr>
-		<td height="10px" colspan="8" align="center" class="t1">柬埔寨通信传媒集团有限公司</td>
+		<td height="10px" colspan="8" align="center" class="t1">\u67ec\u57d4\u5be8\u901a\u4fe1\u4f20\u5a92\u96c6\u56e2\u6709\u9650\u516c\u53f8</td>
 	  </tr>
 	  <tr>
 		<td height="10px" colspan="8" align="center" class="t2">OUTGOING MATERIAL</td>
 	  </tr>
 	  <tr>
-		<td height="10px" colspan="8" align="center" class="t2">物料出库单</td>
+		<td height="10px" colspan="8" align="center" class="t2">\u7269\u6599\u51fa\u5e93\u5355</td>
 	  </tr>
     </table></td>
   </tr>
@@ -25,9 +26,9 @@
   </tr>
   <tr class="t3">
     <td height="5px" width="40px" align="center">&nbsp;</td>
-    <td width="150px" align="right">申请部门</td>
-    <td align="right">操作员</td>
-    <td align="right">出库日期</td>
+    <td width="150px" align="right">\u7533\u8bf7\u90e8\u95e8</td>
+    <td align="right">\u64cd\u4f5c\u5458</td>
+    <td align="right">\u51fa\u5e93\u65e5\u671f</td>
   </tr>
   <tr>
   	<td height="1px" colspan="8"></td>
@@ -45,14 +46,14 @@
 		<td width="11%" align="center" class="tdtlr">Remark</td>
 	  </tr>
 	  <tr>
-		<td height="30px" align="center" class="tdrbl">序号</td>
-		<td align="center" class="tdrbl">规格型号</td>
-		<td align="center" class="tdrbl">批次号</td>
-		<td align="center" class="tdrbl">纸箱号</td>
-		<td align="center" class="tdrbl">供应商</td>
-		<td align="center" class="tdrbl">单位</td>
-		<td align="center" class="tdrbl">数量</td>
-		<td align="center" class="tdrbl">备注</td>
+		<td height="30px" align="center" class="tdrbl">\u5e8f\u53f7</td>
+		<td align="center" class="tdrbl">\u89c4\u683c\u578b\u53f7</td>
+		<td align="center" class="tdrbl">\u6279\u6b21\u53f7</td>
+		<td align="center" class="tdrbl">\u7eb8\u7bb1\u53f7</td>
+		<td align="center" class="tdrbl">\u4f9b\u5e94\u5546</td>
+		<td align="center" class="tdrbl">\u5355\u4f4d</td>
+		<td align="center" class="tdrbl">\u6570\u91cf</td>
+		<td align="center" class="tdrbl">\u5907\u6ce8</td>
 	  </tr>
 	  <tpl for="values.deviceListInfo">
 		 <tr height="60px">
@@ -61,9 +62,9 @@
 		 	<td align="center" class="tbsolid">{[values.batch_num || '']}</td> 
 		 	<td align="center" class="tbsolid">{[values.box_no || '']}</td> 
 		 	<td align="center" class="tbsolid">{[values.supplier_name || '']}</td> 
-		 	<td align="center" class="tbsolid">个</li> 
+		 	<td align="center" class="tbsolid">\u4e2a</li> 
 		 	<td align="center" class="tbsolid">{[values.total_num || '']}</td> 
-		 	<td align="center" class="tbsolid">备注</td>
+		 	<td align="center" class="tbsolid"></td>
 		 </tr>
 	 </tpl>
     </table></td>
@@ -88,8 +89,8 @@
         <td width="25%">&nbsp;</td>
       </tr>
       <tr>
-        <td align="right">出库领用人</td>
-        <td align="right">仓管员</td>
+        <td align="right">\u51fa\u5e93\u9886\u7528\u4eba</td>
+        <td align="right">\u4ed3\u7ba1\u5458</td>
         <td>&nbsp;</td>
       </tr>
     </table></td>
