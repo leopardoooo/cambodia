@@ -562,10 +562,10 @@ BCLang.home = {
 			},
 			taskCols : ['WorkOrdersType', 'CustName', 'WorkOrdersStatus', 'ConstructionTeam', 'ZTEStatus', 'Address', 'Tel', 'CreateTime', 
 				'FaultType', 'FaultDetails','WorkNo.','CustManager', 'CustManagerTel','CustNo.','CfocnSyncStatus','OldAddress','NewAddress',
-				'ReportFaultPhone', 'FinishDescription', 'WorkOrderOperator', 'CustomerSignNo.'],
+				'ReportFaultPhone', 'FinishDescription', 'WorkOrderOperator', 'CustomerSignNo.','StatusTime','WorkOrderOperatorTel','FinishType'],
 			userCols : ['UserType', 'Account number', 'Password', 'DeviceModel', 'DeviceNO.', 'PosNo.', 'OccNo.', 'BandWidth','Band password'],
 			operateCols : ['OperatingTime', 'OperationType', 'Operator', 'SyncStatus', 'Description','DelayTime'],
-			taskDeviceCols : ['UserType', 'UserName', 'Model', 'DeviceNO.', 'DeviceRecycling','OldDeviceNO.'],
+			samTaskCols : ['WorkNo.', 'WorkOrdersStatus', 'ConstructionTeam', 'CreateTime', 'FaultType', 'FaultDetails', 'SyncStatus','FinishDescription','WorkOrderOperatorTel','FinishTime','FinishType'],
 			msg : {
 				enterDeviceNo : 'Please enter the device number',
 				noCancel : 'No cancellations!',

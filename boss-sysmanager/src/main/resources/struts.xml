@@ -92,6 +92,12 @@
 	    	</result>
 	    </action> 
 	    
+	    <action name="querySessionOptr" class="com.ycsoft.commons.abstracts.BaseAction" method="querySessionOptr">
+	    	<result type="json" name="json-simpleObj">
+				<param name="root">root.simpleObj</param>
+				<param name="ignoreHierarchy">false</param><!-- 不忽略继承关系，返回json字符串包含父类的属性 -->
+			</result>
+		</action>
 	    <!-- 
 		 	/* 
 		 	 * 以下Action使用通配符配置，通常情况下新建了一个控制类，不需要在进行配置，

@@ -953,3 +953,34 @@ OptrDataWin = Ext.extend(Ext.Window, {//个人修改面板
 		})
 	}
 });
+
+
+var checkOptrIsTrueTime = 30*1000;//公告任务循环执行时间(单位为毫秒)
+//var winHideTime = 10000;//公告框显示多少时间后隐藏(单位为毫秒)
+
+var checkOptrIsTrueTask = {
+		run:function(){checkOptrIsTrue();},
+		interval:checkOptrIsTrueTime
+	};
+
+var checkOptrIsTrue = function(){
+	Ext.Ajax.request({
+		url:root + '/querySessionOptr' ,
+		scope:this,
+		success:function(res,opt){
+			var optr = Ext.decode(res.responseText);
+			//console.log(optr);
+			if(!Ext.isEmpty(optr)){
+				if(optr['optr_id'] != App.getData()['optr']['optr_id']){
+					Alert('操作员异常，请重新登陆！optr exception,Please Relogin!',function(){
+						window.location.href = '/boss-login/login.jsp';
+					});
+				}
+			}else{
+				Alert('操作员丢失，请重新登录！ optr loss,Please Relogin!',function(){
+					window.location.href = '/boss-login/login.jsp';
+				});
+			}
+		}
+	});
+};

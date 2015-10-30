@@ -234,17 +234,20 @@ var DeviceDetailPanel = Ext.extend(Ext.Panel,{
 			height:100,
 			split:true,
 			store:new Ext.data.JsonStore({
-				fields:['done_code','cust_id','cust_no','cust_name',
-					'busi_code','busi_name','done_date','optr_name'
+				fields:['done_code','busi_name','old_value_text','new_value_text','cust_no','cust_name',
+					'busi_name','change_date','optr_name','buy_mode_text'
 				]
 			}),
 			columns:[
 				{header:COMMON_LU.labelDoneCode,dataIndex:'done_code',width:75},
 				{header:COMMON_LU.labelBusiName,dataIndex:'busi_name',width:80},
+				{header:COMMON_LU.labelOldStatus,dataIndex:'old_value_text',width:80},
+				{header:COMMON_LU.labelNewStatus,dataIndex:'new_value_text',width:80},
 				{header:DEV_COMMON_LU.labelCustNo,dataIndex:'cust_no',width:90},
 				{header:DEV_COMMON_LU.labelCustName,dataIndex:'cust_name',width:100,renderer:App.qtipValue},
 				{header:COMMON_LU.optr,dataIndex:'optr_name',width:75},
-				{header:DEV_COMMON_LU.labelOperateTime,dataIndex:'done_date',width:120}
+				{header:DEV_COMMON_LU.labelOperateTime,dataIndex:'change_date',width:120},
+				{header:COMMON_LU.labelBuyMode,dataIndex:'buy_mode_text',width:80}
 			]
 		});
 		

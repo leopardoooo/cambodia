@@ -8,6 +8,8 @@ import java.io.Serializable;
 import java.util.Date;
 
 import com.ycsoft.beans.base.BusiBase;
+import com.ycsoft.commons.constants.DictKey;
+import com.ycsoft.commons.store.MemoryDict;
 import com.ycsoft.daos.config.POJO;
 
 /**
@@ -31,6 +33,7 @@ public class RDeviceChange extends BusiBase implements Serializable {
 	private String pair_modem_id;
 	private String buy_mode;
 
+	private String buy_mode_text;
 	/**
 	 * default empty constructor
 	 */
@@ -39,12 +42,18 @@ public class RDeviceChange extends BusiBase implements Serializable {
 
 	
 	
+	public String getBuy_mode_text() {
+		return buy_mode_text;
+	}
+
+
 	public String getBuy_mode() {
 		return buy_mode;
 	}
 
 	public void setBuy_mode(String buy_mode) {
 		this.buy_mode = buy_mode;
+		this.buy_mode_text=MemoryDict.getDictName(DictKey.DEVICE_BUY_MODE, buy_mode);
 	}
 
 	// device_id getter and setter

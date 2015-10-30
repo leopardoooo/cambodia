@@ -90,9 +90,9 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 		WTaskBaseInfo task = wTaskBaseInfoDao.findByKey(taskId);
 		if (task == null)
 			throw new ServicesException("工单不存在!");
-		if (task.getTask_type_id().equals(SystemConstants.TASK_TYPE_FAULT) && 
+		/**if (task.getTask_type_id().equals(SystemConstants.TASK_TYPE_FAULT) && 
 				StringHelper.isEmpty(bugType))
-			throw new ServicesException("请指定故障类型!");	
+			throw new ServicesException("请指定故障类型!");	**/
 		if (task.getTask_status().equals(StatusConstants.TASK_CANCEL))
 			throw new ServicesException("工单已取消，不能修改");	
 		if (task.getTask_status().equals(StatusConstants.TASK_END))

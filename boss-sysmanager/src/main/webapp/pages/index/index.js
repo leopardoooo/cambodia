@@ -121,6 +121,8 @@ Ext.onReady(function() {
 		    
 		    App.clearLoadImage();
 		    
+		    //检查操作员和服务器是否一致
+			Ext.TaskMgr.start(checkOptrIsTrueTask);
  		}
  	});
 	

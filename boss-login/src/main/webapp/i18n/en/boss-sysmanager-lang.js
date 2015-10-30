@@ -5,6 +5,9 @@
  */
 Sys = {
 	common : {
+		labelOldStatus:'OldStatus',
+		labelNewStatus:'NewStatus',
+		labelBuyMode:'BuyMode',
 		no : 'No',
 		status : 'status',
 		query : 'Query',

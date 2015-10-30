@@ -55,8 +55,8 @@ TaskSameGrid = Ext.extend(Ext.grid.GridPanel, {
 	taskSameStore : null,
 	constructor : function() {
 		this.taskSameStore = new Ext.data.JsonStore({
-					fields : ['task_id', 'task_status', 'task_status_text', 'team_id_text', 'task_create_time', 
-						'bug_type_text', 'bug_detail', 'sync_status_text', 'task_finish_desc']});
+					fields : ['task_id','task_create_time','bug_type_text', 'bug_detail', 'task_finish_desc', 'team_id_text','installer_id_text',
+						'task_status', 'task_status_text','task_finish_time','task_finish_type_text']});
 		var cols = lbc('home.tools.TaskManager.samTaskCols');							
 		TaskSameGrid.superclass.constructor.call(this, {
 			ds : this.taskSameStore,
@@ -71,7 +71,7 @@ TaskSameGrid = Ext.extend(Ext.grid.GridPanel, {
 						}
 					}
 				},
-				{header : cols[1],dataIndex : 'task_status',width:130, renderer: function(v, m ,rs){
+				{header : cols[1],dataIndex : 'task_status',width:60, renderer: function(v, m ,rs){
 					var text = rs.get("task_status_text");
 					var color = "black";
 					if(v == 'INIT'){
@@ -83,12 +83,14 @@ TaskSameGrid = Ext.extend(Ext.grid.GridPanel, {
 					}
 					return '<div  style="font-weight: bold;color: '+ color +';" ext:qtitle="" ext:qtip="' + text + '">' + text +'</div>';
 				}},
-				{header : cols[2],dataIndex : 'team_id_text',width:120,renderer : App.qtipValue},
-				{header : cols[3],dataIndex : 'task_create_time',width:125,renderer : App.qtipValue},
+				{header : cols[10],dataIndex : 'task_finish_type_text',width:60,renderer : App.qtipValue},
+				{header : cols[7],dataIndex : 'task_finish_desc',width:150,renderer :  App.qtipValue},				
 				{header : cols[4],dataIndex : 'bug_type_text',width:100},
 				{header : cols[5],dataIndex : 'bug_detail',width:150,renderer :  App.qtipValue},
-				{header : cols[6],dataIndex : 'sync_status_text',width:120, renderer:Ext.util.Format.statusShow},
-				{header : cols[7],dataIndex : 'task_finish_desc',width:150,renderer :  App.qtipValue}
+				{header : cols[3],dataIndex : 'task_create_time',width:120,renderer : App.qtipValue},	
+				{header : cols[9],dataIndex : 'task_finish_time',width:150,renderer:App.qtipValue},
+				{header : cols[2],dataIndex : 'team_id_text',width:120,renderer : App.qtipValue},
+				{header : cols[8],dataIndex : 'installer_id_text',width:120,renderer : App.qtipValue}
 			]),
 			listeners: {
 				scope: this,
@@ -151,10 +153,17 @@ TaskBaseTemplate = new Ext.XTemplate(
 			'<td class="input_bold" width=30%>&nbsp;{[values.cust_name ||""]}</td>',
 		'</tr>',
 		'<tr height=24>',
+		'<td class="label" width=20%>'+ taskCols[6] +'：</td>',
+		'<td class="input" width=30%>&nbsp;{[values.cust_tel ||""]}</td>',
+		'<td class="label" width=20%>'+ taskCols[7] +'：</td>',
+		'<td class="input" width=30%>&nbsp;{[values.task_create_time ||""]}</td>',	
+		'</tr>',
+		'<tr height=24>',
 			'<td class="label" width=20%>'+ taskCols[2] +'：</td>',
 			'<td class="input_bold" width=30%>&nbsp;{[values.task_status_text ||""]}</td>',
-			'<td class="label" width=20%>'+ taskCols[7] +'：</td>',
-			'<td class="input" width=30%>&nbsp;{[values.task_create_time ||""]}</td>',	
+			'<td class="label" width=20%>'+ taskCols[21] +'：</td>',
+			'<td class="input" width=30% colspan=3>&nbsp;{[values.task_status_date ||""]}</td>',
+			
 		'</tr>',
 		'<tr height=24>',
 			'<td class="label" width=20%>'+ taskCols[3] +'：</td>',
@@ -163,11 +172,12 @@ TaskBaseTemplate = new Ext.XTemplate(
 			'<td class="input" width=30%>&nbsp;{[values.installer_id_text ||""]}</td>',
 		'</tr>',
 		'<tr height=24>',
-			'<td class="label" width=20%>'+ taskCols[6] +'：</td>',
-			'<td class="input" width=30%>&nbsp;{[values.cust_tel ||""]}</td>',
-			'<td class="label" width=20%>'+ taskCols[17] +'：</td>',
-			'<td class="input" width=30%>&nbsp;{[values.bug_phone ||""]}</td>',
-		'</tr>',
+		'<td class="label" width=20%>'+ taskCols[17] +'：</td>',
+		'<td class="input" width=30%>&nbsp;{[values.bug_phone ||""]}</td>',
+		'<td class="label" width=20%>'+ taskCols[22] +'：</td>',
+		'<td class="input" width=30%>&nbsp;{[values.installer_id_tel ||""]}</td>',
+	'</tr>',
+		
 		'<tpl if="values.old_addr">',
 			'<tr height=24>',
 				'<td class="label" width=20%>'+ taskCols[15] +'：</td>',
@@ -190,12 +200,12 @@ TaskBaseTemplate = new Ext.XTemplate(
 			'<td class="input" width=30%>&nbsp;{[values.cust_sign_no ||""]}</td>',
 		'</tr>',
 		'<tr height=24>',
-			'<td class="label" width=20%>'+ taskCols[18] +'：</td>',
-			'<td class="input" width=30% colspan=3>&nbsp;{[values.task_finish_desc ||""]}</td>',
+		'<td class="label" width=20%>'+ taskCols[9] +'：</td>',
+		'<td class="input" width=30% colspan=3>&nbsp;{[values.bug_detail ||""]}</td>',
 		'</tr>',
 		'<tr height=24>',
-			'<td class="label" width=20%>'+ taskCols[9] +'：</td>',
-			'<td class="input" width=30% colspan=3>&nbsp;{[values.bug_detail ||""]}</td>',
+			'<td class="label" width=20%>'+ taskCols[18] +'：</td>',
+			'<td class="input" width=30% colspan=3>&nbsp;({[values.task_finish_type_text ||""]})&nbsp;{[values.task_finish_desc ||""]}</td>',
 		'</tr>',
 		'<tr height=24>',
 			'<td class="label" width=20%>'+ taskCols[11] +'：</td>',
@@ -251,7 +261,7 @@ TaskDetailWindow = Ext.extend(Ext.Window, {
 				items : [{
 							region : 'north',
 							layout : 'fit',
-							height: 280,
+							height: 310,
 							border: false,
 							items : [this.taskDetailForm]
 						}, {

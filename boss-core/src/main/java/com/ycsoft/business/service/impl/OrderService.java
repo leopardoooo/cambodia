@@ -1388,6 +1388,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 				}
 			}
 		}
+		
 		//开始计费日校检
 		if(StringHelper.isNotEmpty(orderProd.getLast_order_sn())
 				&&!busi_code.equals(BusiCodeConstants.PROD_UPGRADE)){
@@ -1444,44 +1445,38 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		//orderProd.setBilling_type(tariff.getBilling_type());
 		//orderProd.setOrder_cycle(order_cycles);
 		
-		if(orderProd.getOrder_months()==0&&!busi_code.equals(BusiCodeConstants.PROD_UPGRADE)&&!busi_code.equals(BusiCodeConstants.OTT_MOBILE_UPGRADE)){
+		if(orderProd.getOrder_months()==0){
 			throw new  ComponentException(ErrorCode.OrderDateOrderMonthError);
 		}
-		if(order_cycles%billing_cycle!=0 && !busi_code.equals(BusiCodeConstants.PROD_UPGRADE)&&!busi_code.equals(BusiCodeConstants.OTT_MOBILE_UPGRADE)){
+	
+		//普通订购，续订，套餐订购，缴费 验证订购月数，订购金额，截止日期 是否一致
+		if(busi_code.equals(BusiCodeConstants.PROD_SINGLE_ORDER)||
+				busi_code.equals(BusiCodeConstants.PROD_CONTINUE)||
+				busi_code.equals(BusiCodeConstants.PROD_PACKAGE_ORDER)||
+				busi_code.equals(BusiCodeConstants.ACCT_PAY)){
+			//订购月数
+			if(order_cycles%billing_cycle!=0){
 			throw new  ComponentException(ErrorCode.OrderDateOrderMonthError);
-		}
-		
-		//订购支付金额验证:如果是升级且根据转移支付金额折算到期日，不验证。
-		if(!((busi_code.equals(BusiCodeConstants.PROD_UPGRADE)||busi_code.equals(BusiCodeConstants.OTT_MOBILE_UPGRADE)) && orderProd.getPay_fee()==0)){
-			if( (rent*order_cycles/billing_cycle) !=(orderProd.getPay_fee()+orderProd.getTransfer_fee())){
+			}
+			//订购金额
+			if(orderProd.getPay_fee()==0&& (rent*order_cycles/billing_cycle) !=(orderProd.getPay_fee()+orderProd.getTransfer_fee())){
 				throw new ComponentException(ErrorCode.OrderDateFeeError);
 			}
-		} 
-		
-		//结束计费日校检
-		if(busi_code.equals(BusiCodeConstants.PROD_UPGRADE)&&orderProd.getOrder_months()==0){
-			//升级且0订购月数的情况，结束日期=上期订购结束日
-			if(!orderProd.getExp_date().equals(lastOrder.getExp_date())){
+			
+			//包月 结束计费日=开始计费日+订购月数 -1天。
+			if(tariff.getBilling_type().equals(SystemConstants.BILLING_TYPE_MONTH)
+					&& !DateHelper.getNextMonthPreviousDay(orderProd.getEff_date(), order_cycles)
+						.equals(orderProd.getExp_date())){
 				throw new ServicesException(ErrorCode.OrderDateExpDateError);
 			}
-		}else{
-			if(!((busi_code.equals(BusiCodeConstants.PROD_UPGRADE)||busi_code.equals(BusiCodeConstants.OTT_MOBILE_UPGRADE)) && orderProd.getPay_fee()==0)){
-				//包月 结束计费日=开始计费日+订购月数 -1天。
-				if(tariff.getBilling_type().equals(SystemConstants.BILLING_TYPE_MONTH)
-						&& !DateHelper.getNextMonthPreviousDay(orderProd.getEff_date(), order_cycles)
-							.equals(orderProd.getExp_date())){
+			//包天 结束计费日=开始计费日+订购天数-1天
+			if(tariff.getBilling_type().equals(SystemConstants.BILLING_TYPE_DAY)
+				&& !DateHelper.addDate(orderProd.getEff_date(), order_cycles-1)
+				.equals(orderProd.getExp_date())){
 					throw new ServicesException(ErrorCode.OrderDateExpDateError);
-				}
-				//包天 结束计费日=开始计费日+订购天数-1天
-				if(tariff.getBilling_type().equals(SystemConstants.BILLING_TYPE_DAY)
-					&& !DateHelper.addDate(orderProd.getEff_date(), order_cycles-1)
-					.equals(orderProd.getExp_date())){
-						throw new ServicesException(ErrorCode.OrderDateExpDateError);
-					}
-			} else {
-				//TODO 如果是升级且根据转移支付金额折算到期日
 			}
-		}		
+		}
+		
 		//支付类型判断
 		if(orderProd.getOrder_fee_type()!=null){
 			if(!orderProd.getOrder_fee_type().equals(SystemConstants.ORDER_FEE_TYPE_ACCT)

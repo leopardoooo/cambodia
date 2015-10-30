@@ -132,10 +132,7 @@ public class IndexAction extends BaseBusiAction{
 	 */
 	public String queryUnCheckBulletin()throws Exception{
 		if(optr != null){
-			Map<String, Object> map = new HashMap<String, Object>();
-			map.put("bulletin", indexService.queryUnCheckByOptrId(optr.getOptr_id()));
-			map.put("optr", getSession().getAttribute(Environment.USER_IN_SESSION_NAME));
-			getRoot().setSimpleObj(map);
+			getRoot().setSimpleObj(indexService.queryUnCheckByOptrId(optr.getOptr_id()));
 		}
 		return JSON_SIMPLEOBJ;
 	}

@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.ycsoft.beans.device.RDevice;
+import com.ycsoft.beans.device.RDeviceChangeDto;
 import com.ycsoft.beans.device.RDeviceInput;
 import com.ycsoft.beans.device.RDeviceTransfer;
 import com.ycsoft.beans.device.RDeviceUseRecords;
@@ -44,7 +45,7 @@ public class DeviceDto extends RDevice{
 	private Date create_time;
 	private RDeviceInput deviceInput;
 	private List<RDeviceTransfer> deviceTransferList;
-	private List<RDeviceUseRecords> deviceUseRecordsList;
+	private List<RDeviceChangeDto> deviceUseRecordsList;
 	
 	public RDeviceInput getDeviceInput() {
 		return deviceInput;
@@ -253,11 +254,11 @@ public class DeviceDto extends RDevice{
 		return MemoryDict.getDictName("STB_MODEL", pair_device_stb_model);
 	}
 
-	public List<RDeviceUseRecords> getDeviceUseRecordsList() {
+	public List<RDeviceChangeDto> getDeviceUseRecordsList() {
 		return deviceUseRecordsList;
 	}
 
-	public void setDeviceUseRecordsList(List<RDeviceUseRecords> deviceUseRecordsList) {
+	public void setDeviceUseRecordsList(List<RDeviceChangeDto> deviceUseRecordsList) {
 		this.deviceUseRecordsList = deviceUseRecordsList;
 	}
 
