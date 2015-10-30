@@ -66,10 +66,11 @@ UserGrid = Ext.extend(Ext.ux.Grid,{
 	userStore:null,
 	region: 'center',
 	parent: null ,
+	oldTitle: langUtils.main("user.list._title"),
 	constructor:function( parent){
 		this.parent = parent;
 		this.userStore = new Ext.data.JsonStore({
-			url:Constant.ROOT_PATH + "/commons/x/QueryUser!queryUser.action",
+//			url:Constant.ROOT_PATH + "/commons/x/QueryUser!queryUser.action",
 			fields: App.userRecord
 		}); 
 		//不能放initEvents里
@@ -91,7 +92,7 @@ UserGrid = Ext.extend(Ext.ux.Grid,{
 	      });
 		
 		UserGrid.superclass.constructor.call(this,{
-			title: langUtils.main("user.list._title"),
+			title: this.oldTitle,
 			id:'U_USER',
 			store:this.userStore,
 			sm:sm,
@@ -174,24 +175,40 @@ UserGrid = Ext.extend(Ext.ux.Grid,{
 		//显示数据加载提示框
 		App.showTip();
 		var cust = App.data.custFullInfo.cust;
-		this.userStore.baseParams={custId:cust['cust_id'],custStatus:cust['status']};
-		this.refresh();
+//		this.userStore.baseParams={custId:cust['cust_id'],custStatus:cust['status']};
+//		this.refresh();
+		
+		Ext.Ajax.request({
+			url: Constant.ROOT_PATH + "/commons/x/QueryUser!queryUserAndTotal.action",
+			params: {custId:cust['cust_id'],custStatus:cust['status']},
+			scope: this,
+			success: function(res, opt){
+				var data = Ext.decode(res.responseText);
+				if(data){
+					this.userStore.loadData(data['records']);
+					this.setTitle(this.oldTitle+'  ('+data['simpleObj']+')');
+				}else{
+					this.userStore.removeAll();
+					this.setTitle(this.oldTitle);
+				}
+			}
+		});
+		
 		//过滤tbar按钮
-		if(App.getCust().status == 'RELOCATE'){
+		if(App.getCust().status == 'ACTIVE'){
+			if(this.getTopToolbar())
+				this.getTopToolbar().show();
+			App.getApp().disableBarByBusiCode(this.getTopToolbar(),['1020','1025','1015'],false);
+		}else if(App.getCust().status == 'RELOCATE'){
 			App.getApp().disableBarByBusiCode(this.getTopToolbar(),['1020','1025','1015'],true);
 		}else if(App.getCust().status == 'DATACLOSE'){
 			if(this.getTopToolbar())
 				this.getTopToolbar().hide();
 			this.doLayout();
-		}else if(App.getCust().status == 'ACTIVE'){
-			if(this.getTopToolbar())
-				this.getTopToolbar().show();
-			App.getApp().disableBarByBusiCode(this.getTopToolbar(),['1020','1025','1015'],false);
 		}
-//		App.getApp().disableBarByBusiCode(this.getTopToolbar(),['1040'],true);
 	},
 	refresh:function(){
-		this.userStore.load();
+//		this.userStore.load();
 	},
 	doClickRecord: function(g, i, e){
 		//选中一条时才显示
