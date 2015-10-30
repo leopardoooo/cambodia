@@ -56,7 +56,7 @@
 		<td align="center" class="tdrbl">\u5907\u6ce8</td>
 	  </tr>
 	  <tpl for="values.deviceListInfo">
-		 <tr height="60px">
+		 <tr height="50px">
 		 	<td align="center" class="tbsolid">{[xindex]}</td> 
 		 	<td align="center" class="tbsolid">{[values.model_name || '']}</td> 
 		 	<td align="center" class="tbsolid">{[values.batch_num || '']}</td> 
@@ -72,10 +72,10 @@
   <tr>
     
     <tpl if="values.deviceListInfo.length == 4">
-    	<td height="60px" colspan="8" align="center">&nbsp;</td>
+    	<td height="50px" colspan="8" align="center">&nbsp;</td>
     </tpl>
     <tpl if="values.deviceListInfo.length != 4">
-    	<td height="{[(4-values.deviceListInfo.length)*60 + 60]}px" colspan="8" align="center">&nbsp;</td>
+    	<td height="{[(4-values.deviceListInfo.length)*50 + 50]}px" colspan="8" align="center">&nbsp;</td>
     </tpl>
   </tr>
   <tr>
