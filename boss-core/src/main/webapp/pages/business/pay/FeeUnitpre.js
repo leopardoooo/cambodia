@@ -278,7 +278,6 @@ var FeeUnitpreForm = Ext.extend(BaseForm,{
 		}
 		values["pay.khr"] = values["pay.khr"] * 100;
 		values["pay.usd"] = values["pay.usd"] * 100;
-		console.log(values);
 		return values;
 	},
 	getFee : function(){

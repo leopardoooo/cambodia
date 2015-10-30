@@ -588,7 +588,6 @@ TariffInfoPanel = Ext.extend(Ext.form.FormPanel, {
     constructor: function (p, record) {
         this.parent = p;
         this.record = record;
-        console.log(this.record);
         this.busiRuleStore = new Ext.data.JsonStore({
             url: root + '/system/Index!queryBusiRule.action',
             fields: ['rule_id', 'rule_name']

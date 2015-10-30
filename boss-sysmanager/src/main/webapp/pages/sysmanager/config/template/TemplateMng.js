@@ -17,7 +17,6 @@ TemplateTree = Ext.extend(Ext.tree.TreePanel,{
 			listeners:{
 				load: function(treeLoader, node, response){
 					var data = Ext.decode(response.responseText);
-					//console.log(response.responseText);
 					var list = [];
 					var rawDataList = data.treeList || [];
 					var optr = App.getApp().data.optr;

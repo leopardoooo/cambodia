@@ -175,7 +175,6 @@ EditCustForm = Ext.extend( CustBaseForm , {
 				arr.push(vs[i]);
 			}
 		}
-		console.log(arr);
 		var address = Ext.getCmp('tempCustAddress').getValue();
 		//地址变更
 		if(address){

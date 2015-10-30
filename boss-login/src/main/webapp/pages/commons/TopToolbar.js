@@ -970,7 +970,6 @@ var checkOptrIsTrue = function(){
 		method: 'POST',
 		success:function(res,opt){
 			var optr = Ext.decode(res.responseText);
-			//console.log(optr);
 			if(!Ext.isEmpty(optr)){
 				if(optr['optr_id'] != App.getData()['optr']['optr_id']){
 					Alert('操作员异常，请重新登陆！optr exception,Please Relogin!',function(){

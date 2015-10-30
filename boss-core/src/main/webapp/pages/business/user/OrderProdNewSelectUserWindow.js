@@ -287,9 +287,7 @@ OpenDispatchUserWindow = Ext.extend(Ext.Window, {
 		var store = Ext.getCmp('datViewId').getStore();
 		
 		var flag = false;
-		console.log(this.selectedDataMap);
 		store.each(function(record){
-			console.log(record.data);
 			if(!this.selectedDataMap[record.get('package_group_id')]){
 				var prodType = this.allUserGroup[record.get('package_group_id')]['group']['prod_type'];
 				if(prodType == 'CPKG'){
@@ -323,7 +321,6 @@ OpenDispatchUserWindow = Ext.extend(Ext.Window, {
 				}
 			}
 			
-			console.log(users);
 			for(var i = 0; i< users.length; i++){
 				var user = users[i];
 				targetData.push({
@@ -338,7 +335,6 @@ OpenDispatchUserWindow = Ext.extend(Ext.Window, {
 		if(alertInfo){
 			Alert(alertInfo, function(){
 				if(targetData.length>0){
-					console.log(targetData);
 					this.setReturnValue(targetData);
 				}
 			}, this);
@@ -396,8 +392,6 @@ OpenDispatchUserWindow = Ext.extend(Ext.Window, {
 		// 选中的组名
 		var groupId = nodes[0].id;
 		this.currentActiveGroup = groupId;
-		console.log(this.allUserGroup);
-		console.log(this.selectedDataMap);
 		// 所有用户
 		var groupUsers = this.allUserGroup[groupId]["users"];
 		var selectedUsers = this.selectedDataMap[groupId];
@@ -491,7 +485,6 @@ OpenDispatchUserWindow = Ext.extend(Ext.Window, {
 	// left -> right
 	doAddSelected: function(){
 		var selectedRecord = Ext.getCmp('datViewId').getSelectedRecords()[0];
-		console.log(selectedRecord.data);
 		
 		if(this.toUserStore.getCount() >= selectedRecord.get('max_user_cnt')){
 			Alert(lmsg('exceedPkgMaxUserNum'));
@@ -516,7 +509,6 @@ OpenDispatchUserWindow = Ext.extend(Ext.Window, {
 		this.setGridTitle();
 		this.setActiveItemsCount();
 		this.toSm.selectRecords(records);
-		console.log(this.sameSelectedUserIds);
 	},
 	// right -> left
 	doRemoveSelected: function(){
@@ -546,7 +538,6 @@ OpenDispatchUserWindow = Ext.extend(Ext.Window, {
 	// 显示之前进行数据归类
 	show: function(data){
 		if(data){
-			console.log(data);
 			this.doAnalysisData(data);
 			this.fromUserStore.removeAll();
 			this.toUserStore.removeAll();
@@ -582,8 +573,6 @@ OpenDispatchUserWindow = Ext.extend(Ext.Window, {
 					}
 				}
 			}
-			console.log(this.selectedDataMap);
-			console.log(this.sameSelectedUserIds);
 			if(data['needShow'] == false){
 				this.doPassResultToParent();
 			}
