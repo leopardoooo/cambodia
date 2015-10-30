@@ -63,6 +63,7 @@ Ext.apply( Login , {
 				if(errs && errs.length > 0){
 					msg.update("<li>"+ errs[0] +"</li>");
 				}else{
+					Ext.util.Cookies.set('boss_show_language', lang.getValue());
 					msg.update("<li>正在跳转...</li>");
 					var urls = o['simpleObj'];
 					this.openUrl( urls['sub_system_url']+"/rego?sub_system_id="+urls['sub_system_id']);

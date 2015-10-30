@@ -8,6 +8,7 @@
     <title>SUPERNET BOSS系统v4.0-登录</title>
 	<link rel="stylesheet" type="text/css" href="<%=root %>/resources/css/login.css">
   	<script type="text/javascript" src="<%=root %>/components/ext3/ext-core.js"></script>
+  	<script type="text/javascript" src="<%=root %>/components/ext3/Cookies.js"></script>
   	<script type="text/javascript">
   		var root = '<%=root %>';
   	</script>
@@ -117,6 +118,10 @@
   	</table>
   	 <script type="text/javascript">
 	  	Ext.onReady(function(){
+	  		var lang = Ext.util.Cookies.get('boss_show_language');
+			if(!Ext.isEmpty(lang)){
+				document.getElementById('lang').value = lang;
+			}
 			Login.enterToNext('loginName','pwd')('pwd','btnSubmit');
 	  	})
 	  </script>
