@@ -113,7 +113,12 @@ public class OttExternalService extends OrderService {
 			
 			ottAcct.setCustomer_code(cust.getCust_no());
 			ottAcct.setUser_id(user.getLogin_name());
-			ottAcct.setUser_name(linkman.getLinkman_name());
+			if(StringHelper.isEmpty(linkman.getLinkman_name())){
+				ottAcct.setUser_id(user.getLogin_name());
+			}else{
+				ottAcct.setUser_name(linkman.getLinkman_name());
+			}
+			
 			ottAcct.setMoney(NumericHelper.changeF2Y(acctItem.getActive_balance().toString()));
 			if(SystemConstants.CUST_LEVEL_VIP.equals(cust.getCust_level())){
 				ottAcct.setUser_rank("1");

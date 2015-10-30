@@ -78,6 +78,7 @@ public class QueryUserAction extends BaseAction{
 				for(String userType: userCntMap.keySet()){
 					totalStr.append(" ").append(userType).append(":").append(userCntMap.get(userType).intValue());
 				}
+				totalStr.append(" ");
 				getRoot().setSimpleObj(totalStr.toString());
 			}
 		}

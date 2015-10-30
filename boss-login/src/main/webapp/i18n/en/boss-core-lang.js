@@ -585,6 +585,11 @@ BCLang.home = {
 				endWaitCanNotUse:'completed wait Can only be used for Order completed or Order Arrangement'
 			}
 		},
+		openOTT: {
+			custNamePrefix: 'CustomerNamePrefix',
+			num: 'Quantity',
+			dowlnloadSuccess: 'Download Successful'
+		},
 		feeUnitpre : {
 			_title : 'non-business TOLL information',
 			cols : ['contract type', 'contract number', 'contract name', 'customer name', 'contract amount', 'invoice number', 'operator'],

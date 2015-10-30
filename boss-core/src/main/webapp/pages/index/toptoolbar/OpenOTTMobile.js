@@ -9,21 +9,22 @@ OpenOTTMobileWin = Ext.extend(Ext.Window, {
 			fields: ['prod_id', 'prod_name', 'tariff_id', 'tariff_name'],
 			autoLoad: true
 		});
+		var ott = lbc('home.tools.openOTT');
 		this.formPanel = new Ext.FormPanel({
 			border: false,
 			bodyStyle: 'padding-top: 10px',
-			labelWidth: 120,
 			layout: 'column',
 			fileUpload: true,
 			defaults: {
 				layout: 'form',
 				columnWidth: 1,
+				labelWidth: 150,
 				border: false
 			},
 			items:[{
 				items:[{
 					xtype: 'textfield',
-					fieldLabel: '客户名称前缀',
+					fieldLabel: ott['custNamePrefix'],
 					name: 'custOtt.cust_name_prefix',
 					allowBlank: false
 				}]
@@ -31,7 +32,7 @@ OpenOTTMobileWin = Ext.extend(Ext.Window, {
 				border: false,
 				columnWidth: .8,
 				items:[{
-					width:250,
+					width:220,
 					fieldLabel: lmain("cust.base.addr"),						
 					xtype:'textfield',
 					id : 'tempCustAddress',
@@ -55,7 +56,7 @@ OpenOTTMobileWin = Ext.extend(Ext.Window, {
 			},{
 				items: [{
 					xtype: 'combo',
-					fieldLabel: '产品名称',
+					fieldLabel: lmain("user._form.prodName"),
 					hiddenName: 'custOtt.prod_id',
 					store: this.prodStore,
 					displayField: 'prod_name', valueField: 'prod_id',
@@ -68,13 +69,13 @@ OpenOTTMobileWin = Ext.extend(Ext.Window, {
 						}
 					}
 				},{
-					fieldLabel: '到期日',
+					fieldLabel: lmain("user._form.expDate"),
 					xtype: 'datefield',
 					name: 'custOtt.invalid_date',
 					format: 'Y-m-d',
 					allowBlank: false
 				},{
-					fieldLabel: '数量',
+					fieldLabel: ott['num'],
 					xtype: 'numberfield',
 					name: 'custOtt.cust_number',
 					allowDecimals: false,
@@ -101,8 +102,8 @@ OpenOTTMobileWin = Ext.extend(Ext.Window, {
 			closeAction: 'close',
 			items: [this.formPanel],
 			buttons: [
-				{text: '保存 ', iconCls: 'icon-save', scope: this, handler: this.doSave},
-				{text: '关闭 ', iconCls: 'icon-close', scope: this, handler: this.close}
+				{text: lbc('common.save'), iconCls: 'icon-save', scope: this, handler: this.doSave},
+				{text: lbc('common.close'), iconCls: 'icon-close', scope: this, handler: this.close}
 			]
 		});
 	},
@@ -131,7 +132,7 @@ OpenOTTMobileWin = Ext.extend(Ext.Window, {
 		});
 		setTimeout(function(){
 			msg.hide();
-			Alert('下载成功');
+			Alert(lbc('home.tools.openOTT.dowlnloadSuccess'));
 		}, 3000);
 	}
 });
