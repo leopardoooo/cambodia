@@ -589,6 +589,11 @@ BCLang.home = {
 				endWaitCanNotUse:'完工等待只能用于完工或派单'
 			}
 		},
+		openOTT: {
+			custNamePrefix: '客户名称前缀',
+			num: '数量',
+			dowlnloadSuccess: '下载成功'
+		},
 		feeUnitpre : {
 			_title : '非营业费收费信息',
 			cols : ['合同类型', '合同号', '合同名称', '客户名称', '合同金额', '发票号码', '操作'],
