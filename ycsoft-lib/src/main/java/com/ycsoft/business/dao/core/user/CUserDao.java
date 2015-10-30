@@ -485,7 +485,7 @@ public class CUserDao extends BaseEntityDao<CUser> {
 						" from c_prod_order a,p_prod_static_res b,t_server_res c ,t_prod_status_openstop op ",
 				        " where a.status=op.status_id and  op.open_or_stop=1 ",
 				        " and  b.res_id= c.boss_res_id and a.prod_id=b.prod_id ",
-				        " and a.user_id=? and a.exp_date>trunc(sysdate) ");
+				        " and a.user_id=? and a.exp_date>=trunc(sysdate) ");
 		return this.createQuery(UserResExpDate.class, sql, userId).list();
 	}
 	
