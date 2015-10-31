@@ -19,8 +19,8 @@ AgreementWin = Ext.extend(Ext.Window, {
 				allowBlank: false
 			},{
 				xtype: 'textfield',
-				fieldLabel: '协议内容',
-				name: 'spkg_text'
+				fieldLabel: '协议标题',
+				name: 'spkg_title'
 			},{
 				xtype: 'datefield',
 				fieldLabel: '生效时间',
@@ -40,8 +40,8 @@ AgreementWin = Ext.extend(Ext.Window, {
 				format: 'Y-m-d'
 			},{
 				xtype: 'textarea',
-				fieldLabel: '协议标题',
-				name: 'spkg_title',
+				fieldLabel: '协议内容',
+				name: 'spkg_text',
 				anchor: '95%',
 				height: 120
 			},{

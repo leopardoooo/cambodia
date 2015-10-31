@@ -115,13 +115,21 @@ public class BaseBusiComponent extends BaseComponent{
 			userName = MemoryDict.getDictName( DictKey.TERMINAL_TYPE, SystemConstants.USER_TERMINAL_TYPE_ZZD );
 		}else if(user.getUser_type().equals(SystemConstants.USER_TYPE_OTT)){
 			if(StringHelper.isNotEmpty(user.getUser_name())){
-				userName = userName +" ("+user.getLogin_name() +")";
-			}else{
+				userName = user.getUser_name() +" ("+user.getLogin_name() +")";
+			}else if(StringHelper.isNotEmpty(user.getTerminal_type())){
 				userName = MemoryDict.getDictName( DictKey.TERMINAL_TYPE, user.getTerminal_type() )+" ("+user.getLogin_name()+")";
+			}else{
+				userName=user.getLogin_name();
 			}
 		}else{
-			if(StringHelper.isEmpty(user.getUser_name())){
-				userName = user.getLogin_name();
+			if(StringHelper.isNotEmpty(user.getUser_name())){
+				userName = user.getUser_name() +" ("+user.getLogin_name() +")";
+			}else{
+				if(StringHelper.isEmpty(user.getLogin_name())){
+					userName=user.getUser_type();
+				}else{
+					userName = user.getLogin_name();
+				}
 			}
 		}
 		
