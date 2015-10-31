@@ -15,7 +15,7 @@ AgreementWin = Ext.extend(Ext.Window, {
 				xtype: 'textfield',
 				fieldLabel: '协议编号',
 				name: 'spkg_sn',
-				vtype: 'numZero',
+				//vtype: 'numZero',
 				allowBlank: false
 			},{
 				xtype: 'textfield',
