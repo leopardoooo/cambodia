@@ -66,11 +66,11 @@ var custInfoHTML =
 			'<td class="label">'+ langUtils.main("cust.base.unitNumber") +':</td>' +
 			'<td class="input">&nbsp;{[values.cust.str8 || ""]}</td>'+
 		'</tr>' + 
-		'<tr height=24>'+
-			'<td class="label">'+ langUtils.main("cust.base.spkgSn") +':</td>' +
-			'<td class="input">&nbsp;{[values.cust.spkg_sn || ""]}</td>'+
-		'</tr>' + 
 	'</tpl>'+
+	'<tr height=24>'+
+	'<td class="label">'+ langUtils.main("cust.base.spkgSn") +':</td>' +
+	'<td class="input">&nbsp;{[values.cust.spkg_sn || ""]}</td>'+
+	'</tr>' + 
 	'<tr height=24>'+
 		'<td class="label">'+ langUtils.main("cust.base.postalAddr") +':</td>' +
 		'<td class="input" colspan="3">&nbsp;{[values.linkman.mail_address || "" ]}</td>'+

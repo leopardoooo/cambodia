@@ -297,6 +297,11 @@ CustBaseForm = Ext.extend( BaseForm , {
 							paramName: 'LANGUAGE_TYPE',
 							allowBlank: false,
 							hiddenName:'cust.str6'
+						},{
+							id:'cust_spkg_sn_id',
+							fieldLabel:langUtils.main("cust.base.spkgSn"),
+							xtype:'textfield',
+							name:'cust.spkg_sn'
 						}]
 				}]
 			},{
@@ -392,19 +397,20 @@ CustBaseForm = Ext.extend( BaseForm , {
 					allowBlank: false,
 					name:'cust.str8'
 				});
+			/**
 			Ext.getCmp('addCustItemsTwo').add({
 					id:'cust_spkg_sn_id',
 					fieldLabel:langUtils.main("cust.base.spkgSn"),
 					xtype:'textfield',
 					name:'cust.spkg_sn'
 				})
-			
+			**/
 		}else{
 			var comp = Ext.getCmp('cust_str7_id');
 			if(comp){
 				Ext.getCmp('addCustItemsOne').remove(comp,true);
 				Ext.getCmp('addCustItemsTwo').remove(Ext.getCmp('cust_str8_id'),true);
-				Ext.getCmp('addCustItemsTwo').remove(Ext.getCmp('cust_spkg_sn_id'),true);
+				//Ext.getCmp('addCustItemsTwo').remove(Ext.getCmp('cust_spkg_sn_id'),true);
 			}
 		}
 		App.form.initComboData( this.linkPanel.findByType("paramcombo"));
