@@ -39,7 +39,7 @@ public class PProdStaticResDao extends BaseEntityDao<PProdStaticRes> {
 		public String[] queryResByProdIds(List<String> prodIds) throws JDBCException{
 			String prodIdStr ="";
 			for (String prodId:prodIds){
-				prodIdStr = ",'"+prodId+"'";
+				prodIdStr += ",'"+prodId+"'";
 			}
 			
 			prodIdStr = prodIdStr.substring(1);
