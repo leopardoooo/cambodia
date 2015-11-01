@@ -162,7 +162,7 @@ public class WTaskBaseInfoDao extends BaseEntityDao<WTaskBaseInfo> {
 		return this.createQuery(sql,doneCode).list();
 	}
 
-	public Pager<TaskBaseInfoDto> queryUnProcessTask(String deptId, Integer start,
+	public Pager<TaskBaseInfoDto> queryUnProcessTask(String deptId,String optrId, Integer start,
 			Integer limit) throws JDBCException {
 		
 		String sql = "select t.* ,wt.team_type,case when s.tel is null and s.mobile is null then '' "
@@ -172,10 +172,10 @@ public class WTaskBaseInfoDao extends BaseEntityDao<WTaskBaseInfo> {
 				+" case when i.tel is null then i.mobile else (case when i.mobile is null then i.tel else i.tel||'*'||i.mobile end) end installer_id_tel "
 				+ " from w_task_base_info t, C_CUST c  ,w_team wt,s_optr s,s_optr i "
 				+ " where t.cust_id = c.cust_id and i.optr_id(+)=t.installer_id and c.str9 = s.optr_id(+) and t.team_id = wt.dept_id(+) " 
-				+" and (( t.task_status =? and t.team_id =?) or t.task_status=? or (t.task_status=? and t.zte_status=?) or (t.task_status=? and t.sync_status=?)) "
+				+" and (( t.task_status =? and t.team_id =?) or t.task_status=? or (t.task_status=? and t.zte_status=?) or (t.task_status=? and t.sync_status=?) or (task_status=? and t.installer_id=? ) ) "
 				+" ORDER BY t.task_create_time DESC ";
 		return this.createQuery(TaskBaseInfoDto.class,sql,StatusConstants.TASK_CREATE,deptId,StatusConstants.TASK_ENDWAIT
-				,StatusConstants.TASK_INIT,StatusConstants.NOT_EXEC,StatusConstants.TASK_CREATE,StatusConstants.FAILURE)
+				,StatusConstants.TASK_INIT,StatusConstants.NOT_EXEC,StatusConstants.TASK_CREATE,StatusConstants.FAILURE,StatusConstants.TASK_INIT,optrId)
 			.setLimit(limit)
 			.setStart(start)
 			.page();
