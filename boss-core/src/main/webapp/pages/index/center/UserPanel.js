@@ -186,7 +186,11 @@ UserGrid = Ext.extend(Ext.ux.Grid,{
 				var data = Ext.decode(res.responseText);
 				if(data){
 					this.userStore.loadData(data['records']);
-					this.setTitle(this.oldTitle+'  ('+data['simpleObj']+')');
+					if(data['simpleObj']){
+						this.setTitle(this.oldTitle+'  ('+data['simpleObj']+')');
+					}else{
+						this.setTitle(this.oldTitle);
+					}
 				}else{
 					this.userStore.removeAll();
 					this.setTitle(this.oldTitle);
