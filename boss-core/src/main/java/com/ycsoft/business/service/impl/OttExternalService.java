@@ -339,7 +339,10 @@ public class OttExternalService extends OrderService {
 	    Map<String,Date> userResMap = authComponent.getUserResExpDate(user.getUser_id());
 	    Map<String,TServerOttauthProd> ottauthMap= tServerOttauthProdDao.queryAllMap();
 		for(String externalResId: userResMap.keySet()){
-			String resDate=DateHelper.format( userResMap.get(externalResId), DateHelper.FORMAT_TIME_END);
+			//注册时的授权额外加上注册时的小时（即当天晚上23点注册的，如果送一天，则至少能看到明天晚上23点）
+			String resDate=DateHelper.format( DateHelper.addNumDate(DateHelper.addDate(userResMap.get(externalResId), 1), DateHelper.getCurrHour(), DateHelper.HOUR), DateHelper.FORMAT_TIME);
+			userResMap.get(externalResId);
+			
 			Result resutl=ottClient.openUserProduct(user.getLogin_name(), externalResId,resDate,ottauthMap);
 			if(!resutl.isSuccess()){
 				LoggerHelper.debug(this.getClass(), "func=RegisterAccount error="+ottResult.getStatus()+" "+ottResult.getReason());

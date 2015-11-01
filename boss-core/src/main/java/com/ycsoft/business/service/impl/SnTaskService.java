@@ -16,6 +16,7 @@ import com.ycsoft.beans.core.prod.CProdOrder;
 import com.ycsoft.beans.core.prod.CProdOrderDto;
 import com.ycsoft.beans.core.user.CUser;
 import com.ycsoft.beans.core.user.CUserPropChange;
+import com.ycsoft.beans.system.SOptr;
 import com.ycsoft.beans.task.TaskFillDevice;
 import com.ycsoft.beans.task.WTaskBaseInfo;
 import com.ycsoft.beans.task.WTaskLog;
@@ -510,7 +511,7 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 	}
 
 	public Pager<TaskBaseInfoDto> queryUnProcessTask(Integer start, Integer limit) throws Exception {
-		return wTaskBaseInfoDao.queryUnProcessTask(snTaskComponent.getTeamId(SystemConstants.TASK_ASSIGN_SUPPERNET),start, limit);
+		return wTaskBaseInfoDao.queryUnProcessTask(snTaskComponent.getTeamId(SystemConstants.TASK_ASSIGN_SUPPERNET),getOptr()==null?null:getOptr().getOptr_id(),start, limit);
 	}
 
 	public Map<String , Object> queryAllTaskDetail(String task_id)throws Exception{
