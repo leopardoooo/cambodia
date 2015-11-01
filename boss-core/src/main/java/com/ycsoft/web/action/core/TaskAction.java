@@ -198,6 +198,12 @@ public class TaskAction extends BaseBusiAction{
 		return JSON_SUCCESS;
 	}
 	
+	public String editCustSignNo() throws Exception {
+		String custSignNo = request.getParameter("custSignNo");
+		snTaskService.editCustSignNo(task_id, custSignNo);
+		return JSON_SUCCESS;
+	}
+	
 	/**
 	 * 保存zte
 	 * @return

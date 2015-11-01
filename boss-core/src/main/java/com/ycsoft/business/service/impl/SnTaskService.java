@@ -16,7 +16,6 @@ import com.ycsoft.beans.core.prod.CProdOrder;
 import com.ycsoft.beans.core.prod.CProdOrderDto;
 import com.ycsoft.beans.core.user.CUser;
 import com.ycsoft.beans.core.user.CUserPropChange;
-import com.ycsoft.beans.prod.PProd;
 import com.ycsoft.beans.task.TaskFillDevice;
 import com.ycsoft.beans.task.WTaskBaseInfo;
 import com.ycsoft.beans.task.WTaskLog;
@@ -41,14 +40,12 @@ import com.ycsoft.business.dto.device.DeviceDto;
 import com.ycsoft.business.service.ISnTaskService;
 import com.ycsoft.commons.constants.BusiCmdConstants;
 import com.ycsoft.commons.constants.BusiCodeConstants;
-import com.ycsoft.commons.constants.DictKey;
 import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.exception.ServicesException;
 import com.ycsoft.commons.helper.CollectionHelper;
 import com.ycsoft.commons.helper.DateHelper;
 import com.ycsoft.commons.helper.StringHelper;
-import com.ycsoft.commons.store.MemoryDict;
 import com.ycsoft.daos.core.Pager;
 @Service
 public class SnTaskService  extends BaseBusiService implements ISnTaskService{
@@ -435,6 +432,22 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 		parameter.setSelectedUsers(users);
 		this.setDoneCodeInfo(taskId, parameter, BusiCodeConstants.TASK_FINISH);
 		saveAllPublic(doneCode, parameter);
+	}
+	
+	public void editCustSignNo(String taskId, String custSignNo) throws Exception {
+		Integer doneCode = doneCodeComponent.gDoneCode();
+		WTaskBaseInfo task = wTaskBaseInfoDao.findByKey(taskId);
+		if(task == null)
+			throw new ServicesException("工单不存在!");
+		if(!task.getTask_status().equals(StatusConstants.TASK_END))
+			throw new ServicesException("工单不是完工中，不能修改回单客户签单号!");
+		BusiParameter parameter = getBusiParam();
+		if(parameter == null){
+			parameter = new BusiParameter();
+		}
+		this.setDoneCodeInfo(taskId, parameter, BusiCodeConstants.TASK_MODIFY_CUSTSIGNNO);
+		snTaskComponent.editCustSignNo(doneCode, task, custSignNo);
+		saveAllPublic(doneCode, parameter);	
 	}
 	
 	public void installSuccess(Integer doneCode,String custId, List<CUser> users) throws Exception {

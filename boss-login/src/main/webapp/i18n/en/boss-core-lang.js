@@ -529,6 +529,7 @@ BCLang.home = {
 			_ZteWinTitle : 'ZTE Authorized',
 			_fillDevTitle: 'BackfillDevice',
 			_historyTitle : 'History WorkOrder',
+			_custSingNoTitle: 'Modify customer signature single No.',
 			forms : {
 				custNo : 'CustomerNo.',
 				taskNo : 'WorkOrdersNo.',
@@ -543,10 +544,12 @@ BCLang.home = {
 				faultType : 'FaultType',
 				finishType : 'CompletionType',
 				finishExplan : 'CompletedDesc',
-				custSignNo : 'CustomerSignNo.',
+				custSignNo : 'CustomerSignatureNo.',
 				zteStatus	: 'ZTEStatus',
 				zteRemark :'Remark',
-				syncStatus:'CfocnSyncStatus'
+				syncStatus:'CfocnSyncStatus',
+				oldCustSignNo : 'Original SignatureNo.',
+				newCustSignNo : 'New SignatureNo.'
 			},
 			buttons : {
 				query : 'Query',
@@ -558,7 +561,8 @@ BCLang.home = {
 				finish : 'Completed',
 				returning : 'Visit',
 				sendAuth : 'ZTE Authorized',
-				withdraw : 'CFOCN Withdraw'
+				withdraw : 'CFOCN Withdraw',
+				modifyCustSignNo: 'Modify SignatureNo.'
 			},
 			taskCols : ['WorkOrdersType', 'CustName', 'WorkOrdersStatus', 'ConstructionTeam', 'ZTEStatus', 'Address', 'Tel', 'CreateTime', 
 				'FaultType', 'FaultDetails','WorkNo.','CustManager', 'CustManagerTel','CustNo.','CfocnSyncStatus','OldAddress','NewAddress',
@@ -582,7 +586,8 @@ BCLang.home = {
 				taskStatusInitAndCfocnCanWithdraw:'Work order status must be During Construction and construction team must be cfocn',
 				taskStatusInitAndSupernetCanAssignment:'Work order status is Waiting or During Construction and construction team is supernet can assignment',
 				zteStatusCanSend:'status is failure  or NOT_EXEC  can be operate zte',
-				endWaitCanNotUse:'completed wait Can only be used for Order completed or Order Arrangement'
+				endWaitCanNotUse:'completed wait Can only be used for Order completed or Order Arrangement',
+				notEndCanNotModify: 'WorkOrder completion to modify customer signature single number'
 			}
 		},
 		openOTT: {

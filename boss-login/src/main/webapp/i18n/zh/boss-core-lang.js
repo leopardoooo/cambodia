@@ -532,6 +532,7 @@ BCLang.home = {
 			_ZteWinTitle : 'ZTE授权',
 			_fillDevTitle: '设备回填',
 			_historyTitle : '历史工单',
+			_custSingNoTitle: '修改客户签字单号',
 			forms : {
 				custNo : '客户编号',
 				taskNo : '工单编号',
@@ -549,7 +550,9 @@ BCLang.home = {
 				custSignNo : '客户签字单号',
 				zteStatus	: 'ZTE状态',
 				zteRemark :'备注',
-				syncStatus	:'cfocn同步状态'
+				syncStatus	:'cfocn同步状态',
+				oldCustSignNo : '原客户签字单号',
+				newCustSignNo : '新客户签字单号'
 			},
 			buttons : {
 				query : '查询',
@@ -561,7 +564,8 @@ BCLang.home = {
 				finish : '完工',
 				returning : '回访',
 				sendAuth : 'ZTE授权',
-				withdraw : 'cfocn撤回'
+				withdraw : 'cfocn撤回',
+				modifyCustSignNo: '修改客户签字单号'
 			},
 			taskCols : ['工单类型', '客户名称', '工单状态', '施工队', 'ZTE状态', '地址', '联系电话', '创建时间', '故障类型', '故障详细信息',
 				'工单编号','客户经理','客户经理电话','客户编号','cfocn同步状态','原地址','新地址','报障电话','完工描述', '工单处理人', '客户签字单号','状态时间','工单处理人电话','完工类型'],
@@ -586,7 +590,8 @@ BCLang.home = {
 				taskStatusInitAndCfocnCanWithdraw:'施工中状态和cfocn施工队才能使用工单撤回',
 				taskStatusInitAndSupernetCanAssignment:'只有待派单状态的工单或者施工中状态,supernet的工单才能进行派单',
 				zteStatusCanSend:'必须是失败或未执行才能发送zte授权',
-				endWaitCanNotUse:'完工等待只能用于完工或派单'
+				endWaitCanNotUse:'完工等待只能用于完工或派单',
+				notEndCanNotModify: '工单完工才能修改客户签字单号'
 			}
 		},
 		openOTT: {

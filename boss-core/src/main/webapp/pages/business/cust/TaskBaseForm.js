@@ -40,9 +40,9 @@ TaskDetailGrid = Ext.extend(Ext.grid.GridPanel, {
 			border: false,
 			cm : new Ext.grid.ColumnModel([{
 				header : operateCols[0],dataIndex : 'log_time',width : 130}, {
-				header : operateCols[1],dataIndex : 'busi_name',width:70,renderer : App.qtipValue}, {
+				header : operateCols[1],dataIndex : 'busi_name',width:180,renderer : App.qtipValue}, {
 				header : operateCols[2],dataIndex : 'optr_name',width:70,renderer : App.qtipValue}, {
-				header : operateCols[3],dataIndex : 'syn_status_text',width:70,renderer : App.qtipValue}, {
+				header : operateCols[3],dataIndex : 'syn_status_text',width:120,renderer : App.qtipValue}, {
 				header : operateCols[5],dataIndex : 'delay_time',width:70},
 				{header : operateCols[4],dataIndex : 'log_detail',width:400,renderer :  App.qtipValue}
 			])
@@ -71,7 +71,7 @@ TaskSameGrid = Ext.extend(Ext.grid.GridPanel, {
 						}
 					}
 				},
-				{header : cols[1],dataIndex : 'task_status',width:60, renderer: function(v, m ,rs){
+				{header : cols[1],dataIndex : 'task_status',width:120, renderer: function(v, m ,rs){
 					var text = rs.get("task_status_text");
 					var color = "black";
 					if(v == 'INIT'){
@@ -83,9 +83,9 @@ TaskSameGrid = Ext.extend(Ext.grid.GridPanel, {
 					}
 					return '<div  style="font-weight: bold;color: '+ color +';" ext:qtitle="" ext:qtip="' + text + '">' + text +'</div>';
 				}},
-				{header : cols[10],dataIndex : 'task_finish_type_text',width:60,renderer : App.qtipValue},
+				{header : cols[10],dataIndex : 'task_finish_type_text',width:120,renderer : App.qtipValue},
 				{header : cols[7],dataIndex : 'task_finish_desc',width:150,renderer :  App.qtipValue},				
-				{header : cols[4],dataIndex : 'bug_type_text',width:100},
+				{header : cols[4],dataIndex : 'bug_type_text',width:150,renderer :  App.qtipValue},
 				{header : cols[5],dataIndex : 'bug_detail',width:150,renderer :  App.qtipValue},
 				{header : cols[3],dataIndex : 'task_create_time',width:120,renderer : App.qtipValue},	
 				{header : cols[9],dataIndex : 'task_finish_time',width:150,renderer:App.qtipValue},

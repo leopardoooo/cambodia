@@ -202,7 +202,6 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 				text: btns['distTeam'],
 				height: 30,
 				width: 80,
-//				disabled:true,
 				hidden:true,
 				style: 'color: red;',
 				scope: this,
@@ -259,6 +258,14 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 				height: 30,
 				scope: this,
 				handler: this.doSendTask
+			},{
+				id:'custsignno_btn_id',
+				text: btns['modifyCustSignNo'],
+				width: 80,
+				hidden:true,
+				height: 30,
+				scope: this,
+				handler: this.doModifySignNo
 			}]
 		});
 	},
@@ -458,7 +465,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 		        pageSize: this.pageSize
 		    }),
 			tbar: [this.taskDetailTypeCombo,'-',this.taskAddrCombo,'-',lbc('home.tools.TaskManager.buttons.accptTime'),this.createStartDateField,' ',this.createEndDateField,'-',
-			this.taskTeamCombo,'-',this.taskStatusCombo,'-',this.zteStatusCombo,this.syncStatusCombo],
+			this.taskTeamCombo,'-',this.taskStatusCombo,'-',this.zteStatusCombo,'-',this.syncStatusCombo],
 			listeners : {
 				'render' : function() {
 					twoTbar.render(this.tbar);
@@ -541,6 +548,70 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 	newaddrField: null,
 	zteStatusCombo:null,
 	syncStatusCombo:null,
+	doModifySignNo: function(){
+		var rs = this.getSelections();
+		if(rs === false){return ;}
+		var taskStatus = rs.get("task_status");
+		if(taskStatus != 'END'){
+			Alert(lbc('home.tools.TaskManager.msg.notEndCanNotModify'));
+			return ;
+		}
+		var form = new Ext.form.FormPanel({
+			layout : 'form',
+			border : false,
+			labelWidth : 150,
+			bodyStyle : 'padding : 5px;padding-top : 10px;',
+			items: [{
+				fieldLabel: lbc('home.tools.TaskManager.forms.oldCustSignNo'),
+				value: rs.get('cust_sign_no'),
+				xtype:'displayfield'
+			},{
+				fieldLabel: lbc('home.tools.TaskManager.forms.newCustSignNo'),
+				xtype:'textfield',
+				name: 'newCustSignNo',
+				allowBlank: false
+			}]
+		});
+		var win = new Ext.Window({
+			width: 450,
+			height: 250,
+			title: lbc('home.tools.TaskManager._custSingNoTitle'),
+			closeAction:'close',
+			layout: 'fit',
+			items: form,
+			buttons: [{
+				text: lbc('common.save'),
+				scope: this,
+				iconCls : 'icon-save',
+				handler: function(){
+					if(!form.getForm().isValid()) return;
+					var url = Constant.ROOT_PATH + "/core/x/Task!editCustSignNo.action";
+					var taskId = rs.get("task_id");
+					var o = {
+						task_id : taskId, 
+						custSignNo : form.getForm().findField('newCustSignNo').getValue()
+					};
+					App.sendRequest( url, o, function(res,opt){
+						Ext.getCmp('taskManagerPanelId').grid.getStore().reload({
+							callback:function(records, options, success){  
+				           		var panel = Ext.getCmp('taskManagerPanelId');
+					           	var index = panel.grid.getStore().find('task_id',taskId);	           		
+					           	panel.grid.getSelectionModel().selectRow(index);
+					           	panel.loadTaskData(taskId);
+							}
+				         });
+						win.close();
+					});
+				}
+			},{
+				text: lbc('common.cancel'),
+				handler: function(){
+					win.hide();
+				}
+			}]
+		});
+		win.show();
+	},
 	doCancelTask: function(){
 		var rs = this.getSelections();
 		if(rs === false){return ;}

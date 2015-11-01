@@ -55,6 +55,14 @@ public interface ISnTaskService {
 	public void finishTask(String taskId,String resultType, String bugType, String custSignNo, String remark,boolean isBusi)throws Exception;
 	
 	/**
+	 * 修改回单客户签单号
+	 * @param taskId
+	 * @param custSignNo
+	 * @throws Exception
+	 */
+	public void editCustSignNo(String taskId, String custSignNo) throws Exception;
+	
+	/**
 	 * 工单查询
 	 * @param taskTypes
 	 * @param areaIds

@@ -37,6 +37,8 @@
 				Ext.getCmp('withdraw_btn_id').show();
 			}else if(res['handler'] == 'send_btn_id'){//发送ZTE
 				Ext.getCmp('send_btn_id').show();
+			}else if(res['handler'] == 'custsignno_btn_id'){//修改客户签字单号
+				Ext.getCmp('custsignno_btn_id').show();
 			}
 		} 
 	});

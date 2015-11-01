@@ -712,6 +712,19 @@ public class SnTaskComponent extends BaseBusiComponent {
 			wTaskLogDao.save(log);
 		}
 	}
+	
+	public void editCustSignNo(Integer doneCode, WTaskBaseInfo task, String newCustSignNo) throws Exception {
+		if(!newCustSignNo.equals(task.getCust_sign_no())){
+			WTaskBaseInfo wTask = new WTaskBaseInfo();
+			wTask.setTask_id(task.getTask_id());
+			wTask.setCust_sign_no(newCustSignNo);
+			wTaskBaseInfoDao.update(wTask);
+			
+			JsonObject jo = new JsonObject();
+			jo.addProperty("custSignNo", newCustSignNo);
+			createTaskLog(task.getTask_id(), BusiCodeConstants.TASK_MODIFY_CUSTSIGNNO, doneCode, jo.toString(), StatusConstants.NONE);
+		}
+	}
 
 	/**
 	 * 更改工单状态
