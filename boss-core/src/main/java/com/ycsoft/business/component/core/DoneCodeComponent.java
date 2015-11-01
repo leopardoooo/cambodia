@@ -206,8 +206,8 @@ public class DoneCodeComponent extends BaseBusiComponent {
 		return cDoneCodeDao.getUserOpenDate(cDoneCode, start, limit);
 	}
 	
-	public Pager<DoneInfoDto> getOrderProdDate(Integer cDoneCode,String countyId, Integer start, Integer limit) throws Exception {
-		return cDoneCodeDao.getOrderProdDate(cDoneCode, countyId, start, limit);
+	public Pager<DoneInfoDto> getOrderProdDate(Integer cDoneCode,String custId, Integer start, Integer limit) throws Exception {
+		return cDoneCodeDao.getOrderProdDate(cDoneCode, custId, start, limit);
 	}
 	
 	public Pager<DoneInfoDto> getBandUpgradeDate(Integer cDoneCode,String countyId, Integer start, Integer limit) throws Exception {

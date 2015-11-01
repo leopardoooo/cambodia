@@ -32,7 +32,7 @@ public class DoneCodeAction extends BaseBusiAction {
 	 * @throws Exception
 	 */
 	public String getGridDate() throws Exception {
-		getRoot().setPage(doneCodeService.getGridDate(doneCode, start, limit));
+		getRoot().setPage(doneCodeService.getGridDate(doneCode, custId, start, limit));
 		return JSON_PAGE;
 	}
 	/**

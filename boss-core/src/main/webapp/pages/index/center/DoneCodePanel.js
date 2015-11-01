@@ -3,9 +3,9 @@ DoneResultGrid =Ext.extend(Ext.grid.GridPanel,{
 		var columns=[],fields=[];showRemark = false;
 		if(busiCode == '1020' || busiCode == '2020'){		//用户开户
 			columns = [
-				{header: '终端类型',dataIndex: 'user_name',width:150},
-	         	{header: '用户状态',dataIndex: 'status_text',width:65,renderer:Ext.util.Format.statusShow},
-	         	{header: '用户类型',dataIndex: 'user_type_text',width:65},
+				{header: '终端类型',dataIndex: 'user_name',width:200},
+	         	{header: '用户状态',dataIndex: 'status_text',width:140,renderer:Ext.util.Format.statusShow},
+	         	{header: '用户类型',dataIndex: 'user_type_text',width:75},
 	         	{header: '机顶盒号',dataIndex: 'stb_id',width:140},
 	         	{header: '智能卡号',dataIndex: 'card_id',width:140},
 	         	{header: 'Modem号',dataIndex: 'modem_mac',width:140}
@@ -14,26 +14,40 @@ DoneResultGrid =Ext.extend(Ext.grid.GridPanel,{
 	        	'user_name','status_text','user_type',
 			    'user_type_text','stb_id','card_id','modem_mac'
 			];
-		}else if(busiCode == '1015'){		//用户订购
-	        columns = [
-	        	{header: '产品名称',dataIndex: 'prod_name',width:100,renderer:App.qtipValue},
-				{header: '产品状态',dataIndex: 'status_text',width:60,renderer:Ext.util.Format.statusShow},
-				{header: '资费',dataIndex: 'tariff_name',width:55},
-				{header: '到期日',dataIndex: 'invalid_date',width:75,renderer:Ext.util.Format.dateFormat},
-				{header: '用户类型',dataIndex: 'user_type_text',width:65},
-				{header: '机顶盒号',dataIndex: 'stb_id',width:130},
-				{header: '智能卡号',dataIndex: 'card_id',width:125},
-				{header: 'Modem号',dataIndex: 'modem_mac',width:120}
+		}else if(busiCode == '102' || busiCode == '1015' || busiCode == '101' || busiCode == '100' || busiCode == '103'
+			|| busiCode == '109' || busiCode == '110' || busiCode == '1027' || busiCode == '1040' || busiCode == '1041'){
+			//订购、退订、升级，续订，缴费，套餐订购
+			columns = [
+	        	{header: '订单号',dataIndex: 'order_sn',width:60, renderer: App.qtipValue},
+				{header: '流水号',dataIndex: 'done_code',width:60, renderer: App.qtipValue},
+				{header: '产品编号',dataIndex: 'prod_id',width:70, renderer: App.qtipValue},
+				{header: '产品名称',dataIndex: 'prod_name',width:150, renderer: App.qtipValue},
+				{header: '资费名称',dataIndex: 'tariff_name',width:100, renderer: App.qtipValue},
+				{header: '订购日期',dataIndex: 'order_time',width:135, renderer: App.qtipValue},
+				{header: '订购金额',dataIndex: 'order_fee',width:70,renderer : Ext.util.Format.formatFee},
+				{header: '转移金额',dataIndex: 'active_fee',width:75,renderer : Ext.util.Format.formatFee},
+				{header: '订购月数',dataIndex: 'order_months',width:65, renderer: App.qtipValue},
+				{header: '生效日期',dataIndex: 'eff_date',width:100,renderer:Ext.util.Format.dateFormat},
+				{header: '失效日期',dataIndex: 'exp_date',width:100,renderer:Ext.util.Format.dateFormat}
 	         ];
 	         fields = [
-	         	'user_type','status_text','user_type_text','stb_id',
-	         	'card_id','modem_mac','tariff_name','invalid_date','prod_name'
+	         	'order_sn','done_code','prod_id','order_time',
+	         	'order_fee','active_fee','order_months','eff_date','exp_date','prod_name','tariff_name'
 		     ];
-		}else if(busiCode == '1007'){ //购买设备
+		}else if(busiCode == '1009'){ //更换设备
+		 	columns = [
+		 		{header: '用户类型',dataIndex: 'user_type_text',width:200,renderer:App.qtipValue},
+	        	{header: '修改属性',dataIndex: 'column_name_text',width:150,renderer:App.qtipValue},
+				{header: '变更前',dataIndex: 'old_value',width:150,renderer:App.qtipValue},
+				{header: '变更后',dataIndex: 'new_value',width:150,renderer:App.qtipValue}
+	         ];
+	         fields = ['column_name_text','old_value','new_value','user_type_text'];
+			
+		}/*else if(busiCode == '1007'){ //购买设备
 			 columns = [
 	        	{header: '设备类型',dataIndex: 'device_type_text',width:100,renderer:App.qtipValue},
-				{header: '设备编号',dataIndex: 'device_code',width:120,renderer:App.qtipValue},
-				{header: '状态',dataIndex: 'status_text',width:60,renderer:Ext.util.Format.statusShow},
+				{header: '设备编号',dataIndex: 'device_code',width:140,renderer:App.qtipValue},
+				{header: '状态',dataIndex: 'status_text',width:120,renderer:Ext.util.Format.statusShow},
 				{header: '配对卡号',dataIndex: 'pair_card_code',width:120,renderer:App.qtipValue},
 				{header: '配对MODEM号',dataIndex: 'pair_modem_code',width:120,renderer:App.qtipValue},
 				{header: '购买类型',dataIndex: 'buy_mode_text',width:80}
@@ -43,15 +57,6 @@ DoneResultGrid =Ext.extend(Ext.grid.GridPanel,{
 	         	'pair_modem_code','buy_mode_text'
 		     ];
 		
-		}else if(busiCode == '1009'){ //更换设备
-		 	columns = [
-		 		{header: '用户类型',dataIndex: 'user_type_text',width:100,renderer:App.qtipValue},
-	        	{header: '修改属性',dataIndex: 'column_name_text',width:100,renderer:App.qtipValue},
-				{header: '变更前',dataIndex: 'old_value',width:140,renderer:App.qtipValue},
-				{header: '变更后',dataIndex: 'new_value',width:140,renderer:App.qtipValue}
-	         ];
-	         fields = ['column_name_text','old_value','new_value','user_type_text'];
-			
 		}else if(busiCode == '1064' || busiCode =='9003'){ //促销,自动促销
 			 columns = [
 		 		{header: '促销名称',dataIndex: 'promotion_name',width:250,renderer:App.qtipValue},
@@ -84,12 +89,12 @@ DoneResultGrid =Ext.extend(Ext.grid.GridPanel,{
 	         ];
 	         fields = ['old_prod_name','prod_name','old_tariff_name',
 	         	'tariff_name','pre_fee','change_fee','fee','change_type_text','fee_type_text'];
-		}
+		}*/
 		var queryStore = new Ext.data.JsonStore({ 
 			url  : root + '/core/x/DoneCode!getGridDate.action' ,
 			root : 'records' ,
 			totalProperty: 'totalProperty',
-			baseParams: {limit: App.pageSize,start: 0 ,doneCode : doneCode },
+			baseParams: {limit: App.pageSize,start: 0 ,doneCode : doneCode, custId: App.getCust()['cust_id'] },
 			fields: fields       
 		}); 
 		queryStore.load({
@@ -100,7 +105,6 @@ DoneResultGrid =Ext.extend(Ext.grid.GridPanel,{
 			columns:columns,
 			region : 'center',
 			viewConfig: {
-	            forceFit:true,
 	            enableRowBody:true,
 	            showPreview:showRemark,
 	            getRowClass : function(record, rowIndex, p, store){
@@ -121,7 +125,7 @@ DoneCodeInfoWindow = Ext.extend( Ext.Window , {
 	constructor: function ( doneCode,busiCode){
 		this.doneGrid = new DoneResultGrid(doneCode,busiCode);
 		DoneCodeInfoWindow.superclass.constructor.call(this,{
-			width: 760,
+			width: 800,
 			height: 400,
 			title: '操作明细',
 			layout: 'fit',
@@ -130,6 +134,17 @@ DoneCodeInfoWindow = Ext.extend( Ext.Window , {
 		});
 	}
 });
+
+var isBusiCode = function(busiCode){
+	if(busiCode == '1020' || busiCode == '2020' || busiCode == '1015' || busiCode == '1064'
+		|| busiCode == '1009' || busiCode == '9003'|| busiCode == '1007' || busiCode == '1127'
+		|| busiCode == '102' || busiCode == '1015' || busiCode == '101' || busiCode == '100' || busiCode == '103'
+		|| busiCode == '109' || busiCode == '110' || busiCode == '1027' || busiCode == '1040' || busiCode == '1041'){
+			return true;
+		}
+	return false;
+}
+
 /**
  * 受理记录表格
  */
@@ -152,9 +167,8 @@ DoneCodeGrid = Ext.extend(Ext.ux.Grid,{
 		var lc = langUtils.main("doneCode.columns");
 		var cm = [
 			{header:lc[0],dataIndex:'done_code',width:100,renderer:function(value,metaData,record){
-				var busiCode = record.get('busi_code');
-					if(busiCode == '1020' || busiCode == '2020' || busiCode == '1015' || busiCode == '1064' 
-						|| busiCode == '1009' || busiCode == '9003'|| busiCode == '1007' || busiCode == '1127'){
+					var busiCode = record.get('busi_code');
+					if(isBusiCode(busiCode)){
 						return '<div style="text-decoration:underline;font-weight:bold" ext:qtitle="" ext:qtip="' + value + '">' + value +'</div>';
 					}else{
 						return '<div ext:qtitle="" ext:qtip="' + value + '">' + value +'</div>';
@@ -209,8 +223,7 @@ DoneCodeGrid = Ext.extend(Ext.ux.Grid,{
 				"rowdblclick" : function(g, i, e) {
 					var record = g.getStore().getAt(i);
 					var busiCode = record.get('busi_code');
-					if(busiCode == '1020' || busiCode == '2020' || busiCode == '1015'|| busiCode == '1064'
-					|| busiCode == '1009'|| busiCode == '1007' || busiCode == '9003' || busiCode == '1127'){
+					if(isBusiCode(busiCode)){
 						var doneCode = record.get('done_code');
 						new DoneCodeInfoWindow( doneCode,busiCode ).show();
 					}

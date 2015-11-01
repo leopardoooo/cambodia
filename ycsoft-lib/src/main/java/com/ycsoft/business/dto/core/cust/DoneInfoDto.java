@@ -52,6 +52,87 @@ public class DoneInfoDto {
 	private String fee_type_text ;
 	private String remark;
 	
+	private Integer done_code;
+	private String order_sn;
+	private String prod_id;
+	private Date order_time;
+	private Integer order_fee;
+	private Integer active_fee;
+	private Integer order_months;
+	private Date eff_date;
+	private Date exp_date;
+	
+	public Integer getDone_code() {
+		return done_code;
+	}
+
+	public void setDone_code(Integer done_code) {
+		this.done_code = done_code;
+	}
+	public String getOrder_sn() {
+		return order_sn;
+	}
+
+	public void setOrder_sn(String order_sn) {
+		this.order_sn = order_sn;
+	}
+
+	public String getProd_id() {
+		return prod_id;
+	}
+
+	public void setProd_id(String prod_id) {
+		this.prod_id = prod_id;
+	}
+
+	public Date getOrder_time() {
+		return order_time;
+	}
+
+	public void setOrder_time(Date order_time) {
+		this.order_time = order_time;
+	}
+
+	public Integer getOrder_fee() {
+		return order_fee;
+	}
+
+	public void setOrder_fee(Integer order_fee) {
+		this.order_fee = order_fee;
+	}
+
+	public Integer getActive_fee() {
+		return active_fee;
+	}
+
+	public void setActive_fee(Integer active_fee) {
+		this.active_fee = active_fee;
+	}
+
+	public Integer getOrder_months() {
+		return order_months;
+	}
+
+	public void setOrder_months(Integer order_months) {
+		this.order_months = order_months;
+	}
+
+	public Date getEff_date() {
+		return eff_date;
+	}
+
+	public void setEff_date(Date eff_date) {
+		this.eff_date = eff_date;
+	}
+
+	public Date getExp_date() {
+		return exp_date;
+	}
+
+	public void setExp_date(Date exp_date) {
+		this.exp_date = exp_date;
+	}
+
 	public String getOld_prod_name() {
 		return old_prod_name;
 	}

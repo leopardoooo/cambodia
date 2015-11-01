@@ -178,8 +178,8 @@ public class CDoneCodeDao extends BaseEntityDao<CDoneCode> {
 				.setStart(start).setLimit(limit).page();
 	}
 	
-	public Pager<DoneInfoDto> getOrderProdDate(Integer cDoneCode, String countyId, Integer start, Integer limit) throws Exception {
-		String sql = "select pp.prod_name,ppt.tariff_name,cp.invalid_date,cu.stb_id,cu.card_id,cu.user_type ,cp.status" +
+	public Pager<DoneInfoDto> getOrderProdDate(Integer doneCode, String custId, Integer start, Integer limit) throws Exception {
+		/*String sql = "select pp.prod_name,ppt.tariff_name,cp.invalid_date,cu.stb_id,cu.card_id,cu.user_type ,cp.status" +
 				" from c_prod cp,p_prod pp,c_user cu,p_prod_tariff ppt " +
 				" where cp.done_code=? and cp.county_id=? and cu.county_id=?" +
 				" and ppt.tariff_id(+)=cp.tariff_id and cp.prod_id=pp.prod_id(+) and cp.user_id = cu.user_id" +
@@ -189,7 +189,26 @@ public class CDoneCodeDao extends BaseEntityDao<CDoneCode> {
 				" and ppt.tariff_id(+)=cp.tariff_id and cp.prod_id=pp.prod_id(+) and cp.user_id = cu.user_id ";
 		
 		return this.createQuery(DoneInfoDto.class, sql, cDoneCode,countyId,countyId,cDoneCode,countyId,countyId)
-				.setStart(start).setLimit(limit).page();
+				.setStart(start).setLimit(limit).page();*/
+		String sql = "select '订购Order' remark,t.order_sn,t.done_code,t.prod_id,t.order_time,t.order_fee,t.active_fee,t.order_months,t.eff_date,t.exp_date,"
+				+ " p.prod_name,pf.tariff_name"
+				+ " from c_prod_order t,p_prod p,p_prod_tariff  pf"
+				+ " where t.package_sn is null and t.prod_id=p.prod_id and t.tariff_id=pf.tariff_id "
+				+ " and t.done_code=? and t.cust_id=?"
+				+ " union all"
+				+ " select '订购Order' remark,t.order_sn,t.done_code,t.prod_id,t.order_time,t.order_fee,t.active_fee,t.order_months,t.eff_date,t.exp_date,"
+				+ " p.prod_name,pf.tariff_name"
+				+ " from c_prod_order_his t ,p_prod p,p_prod_tariff  pf"
+				+ " where t.package_sn is null and t.prod_id=p.prod_id and t.tariff_id=pf.tariff_id "
+				+ " and t.done_code=? and t.cust_id=?"
+				+ " union all"
+				+ " select '退订Unsubscribe' remark,t.order_sn,t.delete_done_code done_code,t.prod_id,t.order_time,t.order_fee,t.active_fee,t.order_months,t.eff_date,t.exp_date,"
+				+ " p.prod_name,pf.tariff_name"
+				+ " from c_prod_order_his t ,p_prod p,p_prod_tariff  pf"
+				+ " where t.package_sn is null and t.prod_id=p.prod_id and t.tariff_id=pf.tariff_id  "
+				+ " and t.delete_done_code=? and t.cust_id=?"
+				+ " order by remark";
+		return this.createQuery(DoneInfoDto.class, sql, doneCode, custId, doneCode, custId, doneCode, custId).setStart(start).setLimit(limit).page();
 	}
 	
 	public Pager<DoneInfoDto> getDeviceBuyDate(Integer cDoneCode, String countyId, Integer start, Integer limit) throws Exception {

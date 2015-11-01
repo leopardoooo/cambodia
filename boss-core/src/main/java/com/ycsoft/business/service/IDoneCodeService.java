@@ -36,7 +36,7 @@ public interface IDoneCodeService extends IBaseService{
 	 * @return
 	 * @throws Exception
 	 */
-	public Pager<DoneInfoDto> getGridDate(Integer doneCode, Integer start,Integer limit) throws Exception;
+	public Pager<DoneInfoDto> getGridDate(Integer doneCode, String custId, Integer start,Integer limit) throws Exception;
 	
 	/**
 	 * 业务回退

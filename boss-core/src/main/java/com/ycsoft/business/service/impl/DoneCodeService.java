@@ -621,7 +621,7 @@ public class DoneCodeService extends BaseBusiService implements IDoneCodeService
 		this.busiConfigComponent = busiConfigComponent;
 	}
 
-	public Pager<DoneInfoDto> getGridDate(Integer doneCode, Integer start,
+	public Pager<DoneInfoDto> getGridDate(Integer doneCode, String custId, Integer start,
 			Integer limit) throws Exception {
 		CDoneCode cDoneCode = doneCodeComponent.queryByKey(doneCode);
 		String busiCode = cDoneCode.getBusi_code();
@@ -648,8 +648,12 @@ public class DoneCodeService extends BaseBusiService implements IDoneCodeService
 			}
 			return new Pager(infoList,infoList.size());
 //			return doneCodeComponent.getUserOpenDate(doneCode,start,limit);
-		}else if(busiCode.equals(PROD_PACKAGE_ORDER)){
-			return doneCodeComponent.getOrderProdDate(doneCode,cDoneCode.getCounty_id(),start,limit);
+		}else if(busiCode.equals(PROD_PACKAGE_ORDER) || busiCode.equals(BusiCodeConstants.PROD_SINGLE_ORDER)
+				|| busiCode.equals(BusiCodeConstants.PROD_CONTINUE) || busiCode.equals(BusiCodeConstants.PROD_UPGRADE)
+				|| busiCode.equals(BusiCodeConstants.OTT_MOBILE_UPGRADE) || busiCode.equals(BusiCodeConstants.PROD_TERMINATE)
+				|| busiCode.equals(BusiCodeConstants.PROD_HIGH_TERMINATE) || busiCode.equals(BusiCodeConstants.PROD_SUPER_TERMINATE)
+				|| busiCode.equals(BusiCodeConstants.ACCT_PAY) || busiCode.equals(BusiCodeConstants.ACCT_REFUND)){
+			return doneCodeComponent.getOrderProdDate(doneCode,custId,start,limit);
 		}else if(busiCode.equals(DEVICE_CHANGE)){
 			return doneCodeComponent.getDeviceChangeDate(doneCode,cDoneCode.getCounty_id(),start,limit);
 		}else if(busiCode.equals(DEVICE_BUY)){
