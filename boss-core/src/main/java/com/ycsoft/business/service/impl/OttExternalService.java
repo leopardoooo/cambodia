@@ -104,7 +104,7 @@ public class OttExternalService extends OrderService {
 		LoggerHelper.debug(this.getClass(), "func=getAccountInfo loginName="+loginName);
 			OttAccount ottAcct=new OttAccount();
 			CUser user=cUserDao.queryUserByLoginName(loginName);
-			if(user==null||!user.getUser_type().equals(SystemConstants.USER_TYPE_OTT_MOBILE)){
+			if(user==null){
 				throw new ServicesException(ErrorCode.UserLoginNameIsNotExistsOrIsNotOttMobile);
 			}
 			CCust cust=custComponent.queryCustById(user.getCust_id());

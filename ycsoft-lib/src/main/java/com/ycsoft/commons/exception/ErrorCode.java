@@ -164,8 +164,8 @@ public enum ErrorCode {
 	ProdPackMaxUserCntIsError("套餐产品的用户数必须大于等于1"),
 	ProdPackGroupNameIsError("产品内容组名称不能为空"),
 	ProdPackProdListIsError("产品内容组不能为空"),
-	SpkgIsError("协议号不存在"),
-	SpkgIsUsed("协议号已使用"),
+	SpkgIsError("协议号不存在或协议未生效或已失效"),
+	SpkgIsUsed("协议号已被使用"),
 	SpkgHasNotCONFIRM("协议号还未通过审批"),
 	SpkgIsNotTrueCust("协议号和客户不匹配"),
 	SpkgIsPaiChuCustKG("请选退订客户套餐，才能订购协议套餐")

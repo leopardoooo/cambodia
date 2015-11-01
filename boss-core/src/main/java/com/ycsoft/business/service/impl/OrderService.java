@@ -1412,7 +1412,9 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		//验证协议套餐能否适用
 		if(StringHelper.isNotEmpty(tariff.getSpkg_sn())){
 			PSpkg spkg = pSpkgDao.querySpkgBySn(tariff.getSpkg_sn());
-			if(spkg == null||!spkg.getStatus().equals(StatusConstants.CONFIRM)){
+			if(spkg == null){
+				throw new ServicesException(ErrorCode.SpkgIsError);
+			}else if(!spkg.getStatus().equals(StatusConstants.CONFIRM)){
 				throw new ServicesException(ErrorCode.SpkgHasNotCONFIRM);
 			}else if(!tariff.getSpkg_sn().equals(this.getBusiParam().getCust().getSpkg_sn())){
 				throw new ServicesException(ErrorCode.SpkgIsNotTrueCust);

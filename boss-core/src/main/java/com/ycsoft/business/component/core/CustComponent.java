@@ -179,7 +179,7 @@ public class CustComponent extends BaseBusiComponent {
 	 * @throws Exception
 	 */
 	public void checkCustUseSpkgSn(CCust cust,String skkg_sn) throws Exception{
-		if(cust.getCust_type().equals(SystemConstants.CUST_TYPE_NONRESIDENT) && StringHelper.isNotEmpty(skkg_sn)){
+		if(StringHelper.isNotEmpty(skkg_sn)){
 			PSpkg spkg = pSpkgDao.querySpkgBySn(skkg_sn);
 			if(spkg != null){
 				if(!spkg.getStatus().equals(StatusConstants.IDLE) || cCustDao.queryBySpkgSn(spkg.getSpkg_sn()) != null)
