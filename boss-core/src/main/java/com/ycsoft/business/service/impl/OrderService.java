@@ -172,7 +172,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		
 
 		
-		//TODO 客户套餐自动选终端处理，因为前台先不提供客户套餐用户变更功能，如果套餐变更了产品，自动更新用户对应的套餐内容
+		// 客户套餐自动选终端处理，因为前台先不提供客户套餐用户变更功能，如果套餐变更了产品，自动更新用户对应的套餐内容
 		if(order.getProd_type().equals(SystemConstants.PROD_TYPE_CUSTPKG)
 				&&!order.getProd_id().equals(orderProd.getProd_id())){
 			this.editCustOrderAutoSelectUser(orderProd);
@@ -203,7 +203,7 @@ public class OrderService extends BaseBusiService implements IOrderService{
 		orderComponent.moveOrderByCancelOrder(orderChangeList, userMap, done_code);
 		//处理授权
 		this.authProdNoPackage(orderChangeList, userMap, done_code);
-		
+		getBusiParam().setOperateObj("OrderSn:"+editOrder.getOrder_sn());
 		this.saveAllPublic(done_code, this.getBusiParam());
 	}
 	/**
