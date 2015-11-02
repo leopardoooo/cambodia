@@ -1,5 +1,6 @@
 package com.ycsoft.business.dao.prod;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
@@ -36,7 +37,7 @@ public class PProdStaticResDao extends BaseEntityDao<PProdStaticRes> {
 			return createQuery(sql,SystemConstants.BOOLEAN_TRUE).list();
 		}
 		
-		public String[] queryResByProdIds(List<String> prodIds) throws JDBCException{
+		public String[] queryResByProdIds(Collection<String> prodIds) throws JDBCException{
 			String prodIdStr ="";
 			for (String prodId:prodIds){
 				prodIdStr += ",'"+prodId+"'";

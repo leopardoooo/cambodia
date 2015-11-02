@@ -1,19 +1,18 @@
 package com.ycsoft.business.component.core;
 
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.google.gson.JsonObject;
-import com.ycsoft.beans.config.TServerRes;
 import com.ycsoft.beans.core.job.BusiCmdParam;
 import com.ycsoft.beans.core.job.JBandCommand;
-import com.ycsoft.beans.core.job.JBusiCmd;
 import com.ycsoft.beans.core.job.JCaCommand;
 import com.ycsoft.beans.core.job.JVodCommand;
 import com.ycsoft.beans.core.job.SmsxCmd;
@@ -449,7 +448,7 @@ public class AuthComponent extends BaseComponent{
 	private String[] getOrderProdRes(List<CProdOrder> orderList) throws JDBCException {
 		if (orderList == null || orderList.size()==0)
 			return new String[0];
-		List<String> orderProdList = new ArrayList<>();
+		Set<String> orderProdList = new HashSet<>();
 		for (CProdOrder order:orderList){
 			orderProdList.add(order.getProd_id());
 		}
