@@ -769,6 +769,24 @@ public class OttExternalService extends OrderService {
 		if(user==null||!user.getUser_type().equals(SystemConstants.USER_TYPE_OTT_MOBILE)){
 			throw new ServicesException(ErrorCode.UserLoginNameIsNotExistsOrIsNotOttMobile);
 		}
+		//this.get
+		//提取最大到期日的订购记录
+		Map<String,CProdOrder> maxExpOrderMap=new HashMap<>();
+		for(CProdOrder order:  cProdOrderDao.queryNotExpAllOrderByUser(user.getUser_id())){
+			String[] externalRess=pProdStaticResDao.queryExternalRes(order.getProd_id());
+			if(externalRess==null||externalRess.length!=1){
+				throw new ServicesException(ErrorCode.OttMobileProdOnlyOneControlRes);
+			}
+			if(maxExpOrderMap.containsKey(externalRess[0])){
+				CProdOrder old= maxExpOrderMap.get(externalRess[0]);
+				if(order.getExp_date().after(old.getExp_date())){
+					maxExpOrderMap.put(externalRess[0], order);
+				}
+			}else{
+				maxExpOrderMap.put(externalRess[0], order);
+			}
+		}
+		
 		/**
 		if(StringHelper.isEmpty(product_ids)){
 			throw new ServicesException(ErrorCode.E40006);
@@ -777,6 +795,18 @@ public class OttExternalService extends OrderService {
 
 		List<OttProdTariff> prodTariffList=this.queryOttProdTariff(user);
 		Map<String,TServerOttauthProd> ottauthMap=tServerOttauthProdDao.queryAllMap();
+		//判断用户已订购的产品中是否存在内网包
+		boolean canhasnwop=false;
+		for(String id:  maxExpOrderMap.keySet()){
+			TServerOttauthProd _a=ottauthMap.get(id);
+			if(_a!=null&&"1".equals(_a.getDomain())){
+				canhasnwop=true;
+				break;
+			}
+		}
+		if(!canhasnwop){//不存在内网包，则返回空升级列表
+			return updateList;
+		}
 		for(OttProdTariff op:prodTariffList){
 			TServerOttauthProd _a=ottauthMap.get(op.getId());
 			if(_a!=null&&"1".equals(_a.getDomain())){
