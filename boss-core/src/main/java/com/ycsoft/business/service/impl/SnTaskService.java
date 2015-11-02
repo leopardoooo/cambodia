@@ -99,6 +99,7 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 		Integer doneCode = doneCodeComponent.gDoneCode();
 		this.setDoneCodeInfo(taskId, getBusiParam(), BusiCodeConstants.TASK_ASSIGN);
 		snTaskComponent.changeTaskTeam(doneCode, taskId, deptId, optrId,bugType);
+		this.getBusiParam().setOperateObj("WorkOrdersSn:"+taskId);
 		saveAllPublic(doneCode, getBusiParam());
 	}
 
@@ -108,6 +109,7 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 		Integer doneCode = doneCodeComponent.gDoneCode();
 		this.setDoneCodeInfo(taskId, getBusiParam(), BusiCodeConstants.TASK_CANCEL);
 		snTaskComponent.cancelTask(doneCode, taskId);
+		this.getBusiParam().setOperateObj("WorkOrdersSn:"+taskId);
 		saveAllPublic(doneCode, getBusiParam());
 		
 	}
@@ -117,6 +119,7 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 		Integer doneCode = doneCodeComponent.gDoneCode();
 		this.setDoneCodeInfo(taskId, getBusiParam(), BusiCodeConstants.TASK_Withdraw);
 		snTaskComponent.withdrawTask(doneCode, taskId);
+		this.getBusiParam().setOperateObj("WorkOrdersSn:"+taskId);
 		saveAllPublic(doneCode, getBusiParam());
 	}
 	
@@ -139,6 +142,7 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 			}
 			snTaskComponent.fillWriteOffTerminalTask(doneCode,taskId,CollectionHelper.converValueToArray(userList, "userId"),key);
 		}
+		this.getBusiParam().setOperateObj("WorkOrdersSn:"+taskId);
 		saveAllPublic(doneCode, getBusiParam());
 	}
 	
@@ -180,6 +184,7 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 			this.fillInstallUserDevice(doneCode, deviceList);
 		}
 		this.setDoneCodeInfo(taskId, getBusiParam(), BusiCodeConstants.TASK_FILL);
+		this.getBusiParam().setOperateObj("WorkOrdersSn:"+taskId);
 		saveAllPublic(doneCode, getBusiParam());
 	}
 	
@@ -432,6 +437,7 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 		}
 		parameter.setSelectedUsers(users);
 		this.setDoneCodeInfo(taskId, parameter, BusiCodeConstants.TASK_FINISH);
+		this.getBusiParam().setOperateObj("WorkOrdersSn:"+taskId);
 		saveAllPublic(doneCode, parameter);
 	}
 	
@@ -448,6 +454,7 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 		}
 		this.setDoneCodeInfo(taskId, parameter, BusiCodeConstants.TASK_MODIFY_CUSTSIGNNO);
 		snTaskComponent.editCustSignNo(doneCode, task, custSignNo);
+		this.getBusiParam().setOperateObj("WorkOrdersSn:"+taskId); 
 		saveAllPublic(doneCode, parameter);	
 	}
 	
@@ -586,6 +593,7 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 		Integer doneCode = doneCodeComponent.gDoneCode();
 		snTaskComponent.saveZte(doneCode, task_id, zte_status,log_remark);
 		this.setDoneCodeInfo(task_id, getBusiParam(), BusiCodeConstants.TASK_ZTE_OPEN);
+		this.getBusiParam().setOperateObj("WorkOrdersSn:"+task_id);
 		saveAllPublic(doneCode, getBusiParam());
 	}
 

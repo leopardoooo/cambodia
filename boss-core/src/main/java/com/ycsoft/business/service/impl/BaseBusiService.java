@@ -1730,6 +1730,19 @@ public class BaseBusiService extends BaseService {
 		}
 		
 		/**
+		 * ext_c_done_code，记录一些操作对象 
+		 * 取消费用（费用名称，创建流水号，金额）
+		 * 工单相关 工单编号
+		 * 订单修改  产品名称，订单编号
+		 * 取消和打开打印标记   业务流水号，费用编号
+		 * 打印收据  收据编号
+		 * 作废收据  收据编号
+		 * 修改收据  收据编号
+		 */
+		if(null != busiParam.getBusiExtAttr()){
+			extTableComponent.saveBusiAttr(busiParam.getDoneCode(), busiParam.getBusiExtAttr());
+		}
+		/**
 		if(cust != null){
 			//获取业务流水
 			custId = cust.getCust_id();

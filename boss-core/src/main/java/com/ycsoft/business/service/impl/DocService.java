@@ -132,7 +132,7 @@ public class DocService extends BaseBusiService implements IDocService {
 //		if(!oldInvoice.getDoc_type().equals(newInvoice.getDoc_type())){
 //			invoiceComponent.updateDocType(docSn, newInvoice.getDoc_type());
 //		}
-		
+		this.getBusiParam().setOperateObj(oldInvoice.getInvoice_id()+"=>"+newInvoice.getInvoice_id());
 		saveAllPublic(doneCode,getBusiParam());
 	}
 	
@@ -435,6 +435,17 @@ public class DocService extends BaseBusiService implements IDocService {
 				invoiceComponent.invalidInvoice(doneCode, invoiceId, invoiceCode);
 			}
 			
+		}
+		if(StringHelper.isNotEmpty(invoiceId)){
+			this.getBusiParam().setOperateObj(invoiceId);
+		}
+		if(invoiceIdList!=null&&invoiceIdList.size()>0){
+			String _ids="";
+			for(String _id: invoiceIdList ){
+				
+				_ids+=" "+_id;
+			}
+			this.getBusiParam().setOperateObj(_ids);
 		}
 		saveAllPublic(doneCode,getBusiParam());
 		return flay;

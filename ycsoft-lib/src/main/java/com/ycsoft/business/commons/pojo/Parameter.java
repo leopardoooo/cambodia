@@ -1,5 +1,6 @@
 package com.ycsoft.business.commons.pojo;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,6 +10,7 @@ import com.ycsoft.beans.system.SOptr;
 import com.ycsoft.business.dto.config.ExtAttrFormDto;
 import com.ycsoft.business.dto.core.fee.CFeePayDto;
 import com.ycsoft.business.dto.core.fee.FeeBusiFormDto;
+import com.ycsoft.commons.constants.SystemConstants;
 
 
 /**
@@ -102,6 +104,21 @@ public class Parameter implements IParameter {
 	public void setBusiExtAttr(ExtCDoneCode[] busiExtAttr) {
 		this.busiExtAttr = busiExtAttr;
 	}
+	//设置业务的操作对象信息
+	public void setOperateObj(String optrInfo){
+		ExtCDoneCode ext=new ExtCDoneCode();
+		ext.setAttribute_id(SystemConstants.ExtOperateObj);
+		ext.setAttribute_value(optrInfo);
+		List<ExtCDoneCode> list=new ArrayList<>();
+		if(this.busiExtAttr!=null){
+			for(ExtCDoneCode e:this.busiExtAttr){
+				list.add(e);
+			}
+		}
+		list.add(ext);
+		this.busiExtAttr=list.toArray(new ExtCDoneCode[list.size()]);
+	}
+	
 	public void setDoneCode(Integer doneCode) {
 		this.doneCode = doneCode;
 	}

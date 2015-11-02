@@ -217,6 +217,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		snTaskComponent.createOpenTask(doneCode, cust, users, getBusiParam().getWorkBillAsignType());
 		
 		getBusiParam().setSelectedUsers(users);
+		snTaskComponent.saveTaskCreateBusiExt(cust.getCust_id(), doneCode, getBusiParam());
 		saveAllPublic(doneCode, getBusiParam());
 	}
 
@@ -675,7 +676,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		}
 		
 		snTaskComponent.createWriteOffTask(doneCode, cust, users, getBusiParam().getWorkBillAsignType());
-		
+		snTaskComponent.saveTaskCreateBusiExt(cust.getCust_id(), doneCode, getBusiParam());
 		saveAllPublic(doneCode,getBusiParam());
 	}
 	
@@ -1677,6 +1678,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		}
 		
 		parameter.setBusiCode(BusiCodeConstants.TASK_CANCEL);
+		snTaskComponent.saveTaskCreateBusiExt(task.getTask_id(), task.getDone_code(), this.getBusiParam());
 		saveAllPublic(doneCode, getBusiParam());
 		
 	}

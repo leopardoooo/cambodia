@@ -28,6 +28,15 @@ public class OttProdTariff implements Serializable {
 	 private Object boss_data="";//	BOSS扩展数据	产品订购时回传BOSS
 	 private String begin_time="2014-06-19 08:59:59";//	开始时间	2014-06-19 08:59:59
 	 private String  end_time="2050-06-19 08:59:59";//	结束时间	2050-06-19 08:59:59
+	 private Object update=null;
+	 
+	 
+	public Object getUpdate() {
+		return update;
+	}
+	public void setUpdate(Object update) {
+		this.update = update;
+	}
 	public String getId() {
 		return id;
 	}

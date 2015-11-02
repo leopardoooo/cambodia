@@ -14,12 +14,14 @@ import com.google.gson.Gson;
 import com.ycsoft.beans.core.common.CDoneCode;
 import com.ycsoft.beans.core.common.CDoneCodeDetail;
 import com.ycsoft.beans.core.common.CDoneCodeInfo;
+import com.ycsoft.beans.core.common.ExtCDoneCode;
 import com.ycsoft.beans.core.fee.CFee;
 import com.ycsoft.beans.core.user.CUser;
 import com.ycsoft.business.commons.abstracts.BaseBusiComponent;
 import com.ycsoft.business.dao.config.TBusiConfirmDao;
 import com.ycsoft.business.dao.core.common.CDoneCodeInfoDao;
 import com.ycsoft.business.dao.core.common.CDoneCodeUnpayDao;
+import com.ycsoft.business.dao.core.common.ExtCDoneCodeDao;
 import com.ycsoft.business.dao.core.cust.CCustDao;
 import com.ycsoft.business.dao.core.fee.CFeeDao;
 import com.ycsoft.business.dao.core.user.CUserDao;
@@ -62,6 +64,8 @@ public class DoneCodeComponent extends BaseBusiComponent {
 	private CUserDao cUserDao;
 	@Autowired
 	private CUserHisDao cUserHisDao;
+	@Autowired
+	private ExtCDoneCodeDao extCDoneCodeDao;
 	/**
 	 * 给业务增加用户锁，防止并发临界时数据不一致。
 	 * @param cust_id
@@ -332,6 +336,15 @@ public class DoneCodeComponent extends BaseBusiComponent {
 					}
 				}
 				tempQ.setRemark(str);
+			}
+		}
+		if(pageTarget.getRecords()!=null&&pageTarget.getRecords().size()>0){
+			for(DoneCodeExtAttrDto dto:  pageTarget.getRecords()){
+				StringBuilder buffer=new StringBuilder();
+				for(ExtCDoneCode ext:extCDoneCodeDao.queryExtOperateObjByDoneCode(dto.getDone_code())){
+					buffer.append(ext.getAttribute_value()).append(" ");
+				}
+				dto.setAttr_remark(buffer.toString());
 			}
 		}
 		return pageTarget;

@@ -272,6 +272,8 @@ public class PayService extends BaseBusiService implements IPayService {
 			infoDesc=info;
 		}
 		if(!onlyShowInfo){
+			CFee fee = feeComponent.queryBySn(fee_sn);
+			this.getBusiParam().setOperateObj(fee.getFee_id_text()+fee.getAcctitem_id_text()+" (amount:"+fee.getReal_pay()/100+")");
 			this.saveAllPublic(doneCode, this.getBusiParam());
 		}
 	    return infoDesc;
@@ -1441,6 +1443,7 @@ public class PayService extends BaseBusiService implements IPayService {
 		
 		Integer doneCode = doneCodeComponent.gDoneCode();
 		BusiParameter p = getBusiParam();
+		this.getBusiParam().setOperateObj(fee.getAcctitem_id_text()+fee.getFee_id_text()+" feeSn:"+fee_sn+" feeDoneCode:"+fee.getCreate_done_code());
 		saveAllPublic(doneCode,p);
 		
 	}
@@ -1462,6 +1465,7 @@ public class PayService extends BaseBusiService implements IPayService {
 		//MemoryPrintData.reloadOptrFee(optrId, feeSnList);
 		
 		Integer doneCode = doneCodeComponent.gDoneCode();
+		this.getBusiParam().setOperateObj(fee.getAcctitem_id_text()+fee.getFee_id_text()+" feeSn:"+fee_sn+" feeDoneCode:"+fee.getCreate_done_code());
 		BusiParameter p = getBusiParam();
 		saveAllPublic(doneCode,p);
 	}

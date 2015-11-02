@@ -279,6 +279,7 @@ public class CustService extends BaseBusiService implements ICustService {
 		//生成移机工单
 		if(BusiCodeConstants.CUST_CHANGE_ADDR.equals(busiCode) && isMoveTask){
 			snTaskComponent.createMoveTask(doneCode, cust, null, newAddress, getBusiParam().getWorkBillAsignType());
+			snTaskComponent.saveTaskCreateBusiExt(cust.getCust_id(), doneCode, getBusiParam());
 		}
 		
 		//设置扩展表信息
@@ -2233,8 +2234,8 @@ public class CustService extends BaseBusiService implements ICustService {
 		doneCodeComponent.lockCust(custId);
 		Integer doneCode = doneCodeComponent.gDoneCode();
 		
-		snTaskComponent.createBugTask(doneCode, cust, bugDetail, bugPhone);
-		
+		String taskId=snTaskComponent.createBugTask(doneCode, cust, bugDetail, bugPhone);
+		this.getBusiParam().setOperateObj("WorkOrdersSn:"+taskId);
 		saveAllPublic(doneCode, getBusiParam());
 	}
 	

@@ -751,6 +751,11 @@ public class OttExternalService extends OrderService {
 	 * 根据用户ID获取用户的可升级产品列表；产品ID列表不为空时，
 	 * 返回包含该产品列表的组合产品列表
 	 * 
+			 * 1. 内网包可以升级到全网包。
+			2.内网包升级成全网包不再额外扣费，使用内网包的剩余金额折算到全网包中（到期日会变小）。
+			3.如果内网包的资费是包年的，则可以升级成资费是包年或包月或包天的全网包
+			   如果内网包的资费是包月的，则可以升级成资费是包月或包天的全网包
+			   如果内网包的资费是包天的，则可以升级成资费是包天的全网包
 	 * @param user_id 用户ID
 	 * @param version OTT业务版本号
 	 * @param user_ip 来源IP
@@ -764,53 +769,26 @@ public class OttExternalService extends OrderService {
 		if(user==null||!user.getUser_type().equals(SystemConstants.USER_TYPE_OTT_MOBILE)){
 			throw new ServicesException(ErrorCode.UserLoginNameIsNotExistsOrIsNotOttMobile);
 		}
+		/**
 		if(StringHelper.isEmpty(product_ids)){
 			throw new ServicesException(ErrorCode.E40006);
-		}
+		}**/
 		List<OttProdTariff> updateList=new ArrayList<>();
-		//提取最大到期日的订购记录
-		Map<String,CProdOrder> maxExpOrderMap=new HashMap<>();
-		for(CProdOrder order:  cProdOrderDao.queryNotExpAllOrderByUser(user.getUser_id())){
-			String[] externalRess=pProdStaticResDao.queryExternalRes(order.getProd_id());
-			if(externalRess==null||externalRess.length!=1){
-				throw new ServicesException(ErrorCode.OttMobileProdOnlyOneControlRes);
-			}
-			if(maxExpOrderMap.containsKey(externalRess[0])){
-				CProdOrder old= maxExpOrderMap.get(externalRess[0]);
-				if(order.getExp_date().after(old.getExp_date())){
-					maxExpOrderMap.put(externalRess[0], order);
-				}
-			}else{
-				maxExpOrderMap.put(externalRess[0], order);
-			}
-		}
-		
-		//确定内网包的最后订购的BOSS资费
-		String tariffId=null;
-		for(String externalRes:  maxExpOrderMap.keySet()){
-			if(externalRes.indexOf(product_ids)>=0){
-				CProdOrder order=maxExpOrderMap.get(externalRes);
-				if(StringHelper.isNotEmpty(order.getPackage_sn())){
-					//套餐子产品不能升级
-					return updateList;
-				}
-				tariffId=order.getTariff_id();
-				break;
-			}
-		}
-		if(tariffId==null){
-			//找不到资费
-			return updateList;
-		}
-		PProdTariff prodTariff= pProdTariffDao.findByKey(tariffId);
-		if(prodTariff==null){
-			return updateList;
-		}
-		//可用产品资费列表
+
 		List<OttProdTariff> prodTariffList=this.queryOttProdTariff(user);
-		
 		Map<String,TServerOttauthProd> ottauthMap=tServerOttauthProdDao.queryAllMap();
-		
+		for(OttProdTariff op:prodTariffList){
+			TServerOttauthProd _a=ottauthMap.get(op.getId());
+			if(_a!=null&&"1".equals(_a.getDomain())){
+				//内容包清单
+				if(StringHelper.isEmpty(product_ids)){
+					updateList.add(op);
+				}else if(product_ids.indexOf(op.getId())>=0){
+					updateList.add(op);
+				}
+			}
+		}
+		//提取可升级的全网包
 		/**
 		 * 1. 内网包可以升级到全网包。
 		2.内网包升级成全网包不再额外扣费，使用内网包的剩余金额折算到全网包中（到期日会变小）。
@@ -818,20 +796,25 @@ public class OttExternalService extends OrderService {
 		   如果内网包的资费是包月的，则可以升级成资费是包月或包天的全网包
 		   如果内网包的资费是包天的，则可以升级成资费是包天的全网包
 		 */
-		for(OttProdTariff prod:prodTariffList){
-			TServerOttauthProd _a=ottauthMap.get(prod.getId());
-			if(_a!=null&&"2".equals(_a.getDomain())){
-				
-				PProdTariff domainTariff= pProdTariffDao.findByKey(prod.getProduct_fee_id());
-				if(prodTariff.getBilling_type().equals(domainTariff.getBilling_type())&&
-						prodTariff.getBilling_cycle().intValue()>=domainTariff.getBilling_cycle()){
-					updateList.add(prod);
-				}else if(prodTariff.getBilling_type().equals(SystemConstants.BILLING_TYPE_MONTH)
-						&&domainTariff.getBilling_type().equals(SystemConstants.BILLING_TYPE_DAY)){
-					updateList.add(prod);
+		for(OttProdTariff nwop:updateList){
+			List<OttProdTariff> update=new ArrayList<>();
+			for(OttProdTariff op1:  prodTariffList){
+				TServerOttauthProd _a=ottauthMap.get(op1.getId());
+				if(_a!=null&&"2".equals(_a.getDomain())){
+					PProdTariff prodTariff= pProdTariffDao.findByKey(nwop.getProduct_fee_id());
+					PProdTariff domainTariff= pProdTariffDao.findByKey(op1.getProduct_fee_id());
+					if(prodTariff.getBilling_type().equals(domainTariff.getBilling_type())&&
+							prodTariff.getBilling_cycle().intValue()>=domainTariff.getBilling_cycle()){
+						update.add(op1);
+					}else if(prodTariff.getBilling_type().equals(SystemConstants.BILLING_TYPE_MONTH)
+							&&domainTariff.getBilling_type().equals(SystemConstants.BILLING_TYPE_DAY)){
+						update.add(op1);
+					}
 				}
 			}
+			nwop.setUpdate(update);
 		}
+		
 		return updateList;
 	}
 	

@@ -68,6 +68,18 @@ public class CFee extends BusiBase implements Serializable {
 	private String pay_sn;
 	private String fee_std_id;
 	
+	private String acctitem_id_text;
+	private String fee_id_text;
+	
+	
+	public String getAcctitem_id_text() {
+		return acctitem_id_text;
+	}
+
+	public String getFee_id_text() {
+		return fee_id_text;
+	}
+
 	public String getFee_std_id() {
 		return fee_std_id;
 	}
@@ -195,6 +207,7 @@ public class CFee extends BusiBase implements Serializable {
 
 	public void setFee_id(String fee_id) {
 		this.fee_id = fee_id;
+		this.fee_id_text=MemoryDict.getDictName(DictKey.BUSI_FEE, fee_id);
 	}
 
 	// count getter and setter
@@ -359,6 +372,7 @@ public class CFee extends BusiBase implements Serializable {
 
 	public void setAcctitem_id(String acctitem_id) {
 		this.acctitem_id = acctitem_id;
+		this.acctitem_id_text=MemoryDict.getDictName(DictKey.ACCTITEM, acctitem_id);
 	}
 
 	public String getAuto_promotion() {

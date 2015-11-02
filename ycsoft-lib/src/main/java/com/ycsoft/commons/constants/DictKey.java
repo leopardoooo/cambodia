@@ -51,5 +51,7 @@ public enum DictKey {
 	/**开户服务语言**/
 	LANGUAGE_TYPE,
 	/**资费服务渠道**/
-	SERVICE_CHANNEL
+	SERVICE_CHANNEL,
+	/**BUSI_FEE**/
+	BUSI_FEE,ACCTITEM
 }

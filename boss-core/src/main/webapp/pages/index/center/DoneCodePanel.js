@@ -3,12 +3,12 @@ DoneResultGrid =Ext.extend(Ext.grid.GridPanel,{
 		var columns=[],fields=[];showRemark = false;
 		if(busiCode == '1020' || busiCode == '2020'){		//用户开户
 			columns = [
-				{header: '终端类型',dataIndex: 'user_name',width:200},
-	         	{header: '用户状态',dataIndex: 'status_text',width:140,renderer:Ext.util.Format.statusShow},
-	         	{header: '用户类型',dataIndex: 'user_type_text',width:75},
-	         	{header: '机顶盒号',dataIndex: 'stb_id',width:140},
-	         	{header: '智能卡号',dataIndex: 'card_id',width:140},
-	         	{header: 'Modem号',dataIndex: 'modem_mac',width:140}
+				{header: '用户名UserName',dataIndex: 'user_name',width:200},
+	         	{header: '用户状态UserStatus',dataIndex: 'status_text',width:140,renderer:Ext.util.Format.statusShow},
+	         	{header: '用户类型Terminal',dataIndex: 'user_type_text',width:75},
+	         	{header: '机顶盒号StbId',dataIndex: 'stb_id',width:140},
+	         	{header: '智能卡号CaId',dataIndex: 'card_id',width:140},
+	         	{header: 'Mac',dataIndex: 'modem_mac',width:140}
 	        ];
 	        fields = [
 	        	'user_name','status_text','user_type',
@@ -18,28 +18,24 @@ DoneResultGrid =Ext.extend(Ext.grid.GridPanel,{
 			|| busiCode == '109' || busiCode == '110' || busiCode == '1027' || busiCode == '1040' || busiCode == '1041'){
 			//订购、退订、升级，续订，缴费，套餐订购
 			columns = [
-	        	{header: '订单号',dataIndex: 'order_sn',width:60, renderer: App.qtipValue},
-				{header: '流水号',dataIndex: 'done_code',width:60, renderer: App.qtipValue},
-				{header: '产品编号',dataIndex: 'prod_id',width:70, renderer: App.qtipValue},
-				{header: '产品名称',dataIndex: 'prod_name',width:150, renderer: App.qtipValue},
-				{header: '资费名称',dataIndex: 'tariff_name',width:100, renderer: App.qtipValue},
-				{header: '订购日期',dataIndex: 'order_time',width:135, renderer: App.qtipValue},
-				{header: '订购金额',dataIndex: 'order_fee',width:70,renderer : Ext.util.Format.formatFee},
-				{header: '转移金额',dataIndex: 'active_fee',width:75,renderer : Ext.util.Format.formatFee},
-				{header: '订购月数',dataIndex: 'order_months',width:65, renderer: App.qtipValue},
-				{header: '生效日期',dataIndex: 'eff_date',width:100,renderer:Ext.util.Format.dateFormat},
-				{header: '失效日期',dataIndex: 'exp_date',width:100,renderer:Ext.util.Format.dateFormat}
+			    {header: '操作Optr',dataIndex: 'remark',width:100, renderer: App.qtipValue},
+	        	{header: '订单OrderSn',dataIndex: 'order_sn',width:80, renderer: App.qtipValue},
+				{header: '产品Prod',dataIndex: 'prod_name',width:150, renderer: App.qtipValue},
+				{header: '资费Tariff',dataIndex: 'tariff_name',width:100, renderer: App.qtipValue},
+				{header: '生效日EffDate',dataIndex: 'eff_date',width:100,renderer:Ext.util.Format.dateFormat},
+				{header: '失效日ExpDate',dataIndex: 'exp_date',width:100,renderer:Ext.util.Format.dateFormat},
+				{header: '订购时间OrderTime',dataIndex: 'order_time',width:135, renderer: App.qtipValue}
 	         ];
 	         fields = [
-	         	'order_sn','done_code','prod_id','order_time',
+	         	'order_sn','remark','prod_id','order_time',
 	         	'order_fee','active_fee','order_months','eff_date','exp_date','prod_name','tariff_name'
 		     ];
 		}else if(busiCode == '1009'){ //更换设备
 		 	columns = [
-		 		{header: '用户类型',dataIndex: 'user_type_text',width:200,renderer:App.qtipValue},
-	        	{header: '修改属性',dataIndex: 'column_name_text',width:150,renderer:App.qtipValue},
-				{header: '变更前',dataIndex: 'old_value',width:150,renderer:App.qtipValue},
-				{header: '变更后',dataIndex: 'new_value',width:150,renderer:App.qtipValue}
+		 		{header: '用户类型Terminal',dataIndex: 'user_type_text',width:200,renderer:App.qtipValue},
+	        	{header: '修改属性EditColumn',dataIndex: 'column_name_text',width:150,renderer:App.qtipValue},
+				{header: '变更前OldValue',dataIndex: 'old_value',width:150,renderer:App.qtipValue},
+				{header: '变更后NewValue',dataIndex: 'new_value',width:150,renderer:App.qtipValue}
 	         ];
 	         fields = ['column_name_text','old_value','new_value','user_type_text'];
 			

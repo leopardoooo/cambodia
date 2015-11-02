@@ -23,6 +23,7 @@ import com.ycsoft.beans.task.WTaskLog;
 import com.ycsoft.beans.task.WTaskUser;
 import com.ycsoft.beans.task.WTeam;
 import com.ycsoft.business.commons.abstracts.BaseBusiComponent;
+import com.ycsoft.business.commons.pojo.BusiParameter;
 import com.ycsoft.business.dao.config.TConfigTemplateDao;
 import com.ycsoft.business.dao.core.cust.CCustLinkmanDao;
 import com.ycsoft.business.dao.core.user.CUserDao;
@@ -73,6 +74,27 @@ public class SnTaskComponent extends BaseBusiComponent {
 	// 创建开户工单
 	public void createOpenTask(Integer doneCode, CCust cust, List<CUser> userList, String assignType) throws Exception {
 		this.createTaskWithUser(doneCode, cust, userList, SystemConstants.TASK_TYPE_INSTALL, assignType);
+	}
+	/**
+	 * 保存创建工单的业务扩展信息
+	 * @param custId
+	 * @param doneCode
+	 * @param BusiParameter
+	 * @throws Exception
+	 */
+	public void saveTaskCreateBusiExt(String custId,Integer doneCode,BusiParameter BusiParameter) throws Exception{
+		List<WTaskBaseInfo> list=wTaskBaseInfoDao.queryTaskByDoneCode(doneCode);
+		if(list.size()>0){
+			String taskIds=null;
+			for(WTaskBaseInfo w:list){
+				if(w.getCust_id().equals(custId)){
+					taskIds+=" "+w.getTask_id();
+				}
+			}
+			if(taskIds!=null){
+				BusiParameter.setOperateObj("WorkOrdersSn:"+taskIds);
+			}
+		}
 	}
 
 	/**

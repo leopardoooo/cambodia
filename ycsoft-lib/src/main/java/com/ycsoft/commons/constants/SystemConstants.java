@@ -616,4 +616,6 @@ public class SystemConstants {
 	public static final String Bulletin_worktask_YYT="YYT";//营业厅工单提醒
 	public static final String Bulletin_worktask_CALL="CALL";//呼叫中心工单提醒
 	public static final String Bulletin_worktask_WORK="WORK";//工程部门工单提醒
+	
+	public static final String ExtOperateObj="operateObj";//操作对象键值
  }
