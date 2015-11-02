@@ -85,13 +85,13 @@ public class SnTaskComponent extends BaseBusiComponent {
 	public void saveTaskCreateBusiExt(String custId,Integer doneCode,BusiParameter BusiParameter) throws Exception{
 		List<WTaskBaseInfo> list=wTaskBaseInfoDao.queryTaskByDoneCode(doneCode);
 		if(list.size()>0){
-			String taskIds=null;
+			String taskIds="";
 			for(WTaskBaseInfo w:list){
 				if(w.getCust_id().equals(custId)){
 					taskIds+=" "+w.getTask_id();
 				}
 			}
-			if(taskIds!=null){
+			if(StringHelper.isNotEmpty(taskIds)){
 				BusiParameter.setOperateObj("WorkOrdersSn:"+taskIds);
 			}
 		}
