@@ -271,7 +271,7 @@ ResWin = Ext.extend(Ext.Window,{
 						disabled : App.data.optr['county_id'] == '4501'
 											? false
 											: true},*/
-					{xtype: 'numberfield', fieldLabel: '带宽', name: 'band_width', allowDecimals: false, allowNegative: false, allowBlank: false},
+					{xtype: 'numberfield', fieldLabel: '带宽', name: 'band_width', allowDecimals: false, allowNegative: false},
 					{xtype:'textarea',fieldLabel:'资源描述',name:'res_desc',anchor:'95%',height:60}
 				]}
 			],
