@@ -1451,11 +1451,11 @@ public class OrderService extends BaseBusiService implements IOrderService{
 			throw new  ComponentException(ErrorCode.OrderDateOrderMonthError);
 		}
 	
-		//普通订购，续订，套餐订购，缴费 验证订购月数，订购金额，截止日期 是否一致
-		if(busi_code.equals(BusiCodeConstants.PROD_SINGLE_ORDER)||
+		//非0资费且普通订购，续订，套餐订购，缴费 验证订购月数，订购金额，截止日期 是否一致
+		if(rent>0&&(busi_code.equals(BusiCodeConstants.PROD_SINGLE_ORDER)||
 				busi_code.equals(BusiCodeConstants.PROD_CONTINUE)||
 				busi_code.equals(BusiCodeConstants.PROD_PACKAGE_ORDER)||
-				busi_code.equals(BusiCodeConstants.ACCT_PAY)){
+				busi_code.equals(BusiCodeConstants.ACCT_PAY))){
 			//订购月数
 			if(order_cycles%billing_cycle!=0){
 			throw new  ComponentException(ErrorCode.OrderDateOrderMonthError);
