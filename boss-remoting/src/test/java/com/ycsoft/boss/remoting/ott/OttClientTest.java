@@ -2,11 +2,18 @@ package com.ycsoft.boss.remoting.ott;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.ycsoft.beans.ott.TServerOttauthProd;
+
 public class OttClientTest {
 	static OttClient client = new OttClient();
+	
+
 	
 	@BeforeClass
 	public static void setUp(){
@@ -19,8 +26,9 @@ public class OttClientTest {
 	
 	@Test
 	public void testCreateUser() {
-		Result result = client.createUser("99000002", "123456", "99000002", "moniwang",
-				null, null, "PND031501000065", "8810362E6435","ACTIVE");
+		//{"login_name":"0120777661","login_password":"612598","stb_id":"PND031409000746","stb_mac":"8810362E2F79","user_status":"INSTALL"}
+		Result result = client.createUser("0120777661", "612598", "0120777661", "moniwang",
+				null, null, "PND031409000746", "8810362E2F79","INSTALL");
 		assertEquals("0",result.getErr());
 	}
 	
@@ -42,10 +50,15 @@ public class OttClientTest {
 	@Test 
 	public void addUserProduct(){
 		
-//		Result result=client.openUserProduct("0120134264", 
-//				"PO_SuperTV_BASE_Internet_1M", "2015-11-13");
-//		System.out.println(result.getStatus()+":"+result.getReason());
-//		assertEquals("0",result.getErr());
+		TServerOttauthProd op=new TServerOttauthProd();
+		op.setId("BasePO_SuperTV_Basic_Mobile");
+		op.setFee_id("9223372028795493243");
+		Map<String,TServerOttauthProd> map=new HashMap<>();
+		map.put(op.getId(),op);
+		Result result=client.openUserProduct("13882130978@sina.com", 
+				"BasePO_SuperTV_Basic_Mobile", "2015-10-30 23:59:59",map);
+		System.out.println(result.getStatus()+":"+result.getReason());
+		assertEquals("0",result.getErr());
 	}
 	/**
 	 * BasePO_SuperTV_Basic

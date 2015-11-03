@@ -7,7 +7,7 @@ UserDetailGrid = Ext.extend(Ext.grid.GridPanel, {
 	constructor : function() {
 		this.userDetailStore = new Ext.data.JsonStore({
 					fields : ['user_type', 'user_type_text','login_name', 'device_model','device_model_text','task_id',
-							'device_code', 'password','device_id','bandwidth','pos_no','occ_no']
+							'device_code', 'password','device_id','bandwidth','pos_no','occ_no','status_text','status_date','exp_date']
 				});
 		var userCols = lbc('home.tools.TaskManager.userCols');
 		UserDetailGrid.superclass.constructor.call(this, {
@@ -18,9 +18,12 @@ UserDetailGrid = Ext.extend(Ext.grid.GridPanel, {
 						header : userCols[0],dataIndex : 'user_type_text',width : 70,renderer : App.qtipValue}, {
 						header : userCols[3],dataIndex : 'device_model_text',width : 160,renderer : App.qtipValue}, {
 						header : userCols[4],dataIndex : 'device_id',width : 120,renderer : App.qtipValue}, {
-						header : userCols[7],dataIndex : 'bandwidth',width: 120,renderer : App.qtipValue},{
-						header : userCols[1],dataIndex : 'login_name',width : 120,renderer : App.qtipValue}, {
-						header : userCols[8],dataIndex : 'password',width: 80,renderer : App.qtipValue},{
+						header : userCols[7],dataIndex : 'bandwidth',width: 40,renderer : App.qtipValue},{
+						header : userCols[1],dataIndex : 'login_name',width : 110,renderer : App.qtipValue}, {
+						header : userCols[8],dataIndex : 'password',width: 60,renderer : App.qtipValue}, {
+						header : userCols[9],dataIndex : 'status_text',width : 60,renderer : App.qtipValue}, {
+						header : userCols[10],dataIndex : 'status_date',width : 110,renderer : App.qtipValue}, {
+						header : userCols[11],dataIndex : 'exp_date',width : 100,renderer : App.qtipValue},{
 						header : userCols[6],dataIndex : 'occ_no',width : 80,renderer : App.qtipValue}, {
 						header : userCols[5],dataIndex : 'pos_no',width : 80,renderer : App.qtipValue}])
 		})

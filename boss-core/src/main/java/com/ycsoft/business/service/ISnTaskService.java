@@ -21,7 +21,7 @@ public interface ISnTaskService {
 	 * @param bugType 如果工单是故障单
 	 * @throws Exception 
 	 */
-	public void editTaskTeam(String taskId, String deptId, String optrId, String bugType) throws Exception;
+	public void editTaskTeam(String taskId, String deptId, String optrId, String bugType,String finishRemark) throws Exception;
 	
 	/**
 	 * 取消工单

@@ -160,7 +160,8 @@ public class TaskAction extends BaseBusiAction{
 	 */
 	public String editTaskTeam() throws Exception{
 		String optrId = request.getParameter("optrId");
-		snTaskService.editTaskTeam(task_id, deptId, optrId, bugType);
+		String finishRemark = request.getParameter("finishRemark");
+		snTaskService.editTaskTeam(task_id, deptId, optrId, bugType,finishRemark);
 		return JSON_SUCCESS;
 	}
 	

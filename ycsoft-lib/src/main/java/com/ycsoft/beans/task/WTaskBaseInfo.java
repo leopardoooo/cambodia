@@ -52,6 +52,7 @@ public class WTaskBaseInfo implements Serializable{
 	private Integer finish_done_code;
 	private String bug_phone;
 	private String cust_sign_no;
+	private String zte_optr_id;
 
 	private String task_type_name;
 	private String task_detail_type_name;
@@ -77,6 +78,17 @@ public class WTaskBaseInfo implements Serializable{
 	public String getSync_status_text() {
 		return sync_status_text;
 	}
+
+	
+	public String getZte_optr_id() {
+		return zte_optr_id;
+	}
+
+
+	public void setZte_optr_id(String zte_optr_id) {
+		this.zte_optr_id = zte_optr_id;
+	}
+
 
 	public String getTask_finish_type_text() {
 		return task_finish_type_text;

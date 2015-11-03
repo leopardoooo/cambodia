@@ -293,7 +293,7 @@ public class CProdOrderDao extends BaseEntityDao<CProdOrder> {
 	}
 	
 	public List<CProdOrder> queryOrderProdByUserId(String user_id) throws JDBCException{
-		String sql = "select * from c_prod_order where user_id=?";
+		String sql = "select * from c_prod_order where user_id=? order by exp_date";
 		return this.createQuery(sql, user_id).list();
 	}
 	/**

@@ -10,10 +10,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -1780,15 +1781,17 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		orderComponent.saveOrderFeeOut(orderComponent.getOrderFeeOutFromOrderFee(orderFeeList), doneCode);
 		//退订相关所有订单
 		List<CProdOrder> taskCancelOrders=cProdOrderDao.queryTaskCancelOrder(task.getCust_id(), userIds, task.getDone_code());
+		Set<String> hasDetlSet=new HashSet<String>();//已退订的产品
 		for(CProdOrder order:taskCancelOrders){
-			//先退订单产品和套餐子产品
+			//先退订单产品和套餐产品
 			if(StringHelper.isEmpty(order.getPackage_sn())){
 				changeOrderList.addAll(orderComponent.saveCancelProdOrder(order, doneCode));
+				hasDetlSet.add(order.getOrder_sn());
 			}
 		}
 		for(CProdOrder order:taskCancelOrders){
-			//再退订套餐
-			if(StringHelper.isNotEmpty(order.getPackage_sn())){
+			//再退订套餐子产品，且对应套餐没有被退订
+			if(StringHelper.isNotEmpty(order.getPackage_sn())&&!hasDetlSet.contains(order.getPackage_sn())){
 				changeOrderList.addAll(orderComponent.saveCancelProdOrder(order, doneCode));
 			}
 		}

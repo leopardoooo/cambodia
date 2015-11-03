@@ -33,11 +33,11 @@ public class SSLTest {
 		//TestSSLResponse response = stub.testSSL(testSsl);
 		com.ycsoft.boss.remoting.cfocn.CFOCN_WebSvc_WorkOrderStub.GetWorkOrder getWorkOrder=new 
 				com.ycsoft.boss.remoting.cfocn.CFOCN_WebSvc_WorkOrderStub.GetWorkOrder();
-		getWorkOrder.setOrderNo("10003345");
+		getWorkOrder.setOrderNo("10104110");//10104110
 		
 		com.ycsoft.boss.remoting.cfocn.CFOCN_WebSvc_WorkOrderStub.GetWorkOrderResponse res=
 				stub.getWorkOrder(getWorkOrder);
-		System.out.println(JsonHelper.fromObject(res));
+		//System.out.println(JsonHelper.fromObject(res));
 		WorkOrder or=res.getGetWorkOrderResult();
 		//or.get
 		System.out.println(JsonHelper.fromObject(or));

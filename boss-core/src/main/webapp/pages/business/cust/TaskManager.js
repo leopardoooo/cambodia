@@ -824,9 +824,20 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 			}, this);
 			form.add(bugCauseCombo);
 		}
+		//完工描述
+		form.add({
+			fieldLabel: lbc('home.tools.TaskManager.forms.finishExplan'),
+			name:'finishRemark',
+			height : 140,
+			width : 200,
+			value:rs.get('task_finish_desc'),
+			xtype:'textarea'
+		});
+		
+		
 		var win = new Ext.Window({
 			width: 450,
-			height: 250,
+			height: 350,
 			title: lbc('home.tools.TaskManager.forms.taskTeam'),
 			border: false,
 			closeAction:'close',
@@ -847,7 +858,8 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 					var taskId = rs.get("task_id");
 					var o = {task_id : taskId, deptId: teamCombo.getValue(),
 						optrId: optrCombo.getValue(),
-						bugType : bugCauseCombo?bugCauseCombo.getValue():null
+						bugType : bugCauseCombo?bugCauseCombo.getValue():null,
+						finishRemark : form.getForm().findField('finishRemark').getValue()
 					};
 					App.sendRequest( url, o, function(res,opt){
 						Ext.getCmp('taskManagerPanelId').grid.getStore().reload({
@@ -938,6 +950,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 			name:'finishRemark',
 			height : 140,
 			width : 200,
+			value:rs.get('task_finish_desc'),
 			xtype:'textarea'
 		});
 		

@@ -16,7 +16,7 @@ public class WTaskUserDao extends BaseEntityDao<WTaskUser> {
 	private static final long serialVersionUID = 8241332533236339953L;
 	
 	public List<WTaskUser> queryByTaskId(String taskId) throws JDBCException {
-		String sql = "select t.*,cu.str7 occ_no,cu.str8 pos_no,cu.login_name,cu.password from w_task_user t,c_user cu "
+		String sql = "select t.*,cu.str7 occ_no,cu.str8 pos_no,cu.login_name,cu.password,cu.status,cu.status_date from w_task_user t,c_user cu "
 				+" where   cu.user_id(+)=t.user_id and t.task_id=? ";
 		return this.createQuery(sql, taskId).list();
 	}

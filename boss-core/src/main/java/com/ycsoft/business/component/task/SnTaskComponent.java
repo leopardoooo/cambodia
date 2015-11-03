@@ -12,6 +12,7 @@ import com.google.gson.JsonObject;
 import com.ycsoft.beans.config.TConfigTemplate;
 import com.ycsoft.beans.core.cust.CCust;
 import com.ycsoft.beans.core.cust.CCustLinkman;
+import com.ycsoft.beans.core.prod.CProdOrder;
 import com.ycsoft.beans.core.prod.CProdOrderDto;
 import com.ycsoft.beans.core.prod.CProdPropChange;
 import com.ycsoft.beans.core.user.CUser;
@@ -193,7 +194,7 @@ public class SnTaskComponent extends BaseBusiComponent {
 	 * @param buyType
 	 * @throws Exception
 	 */
-	public void changeTaskTeam(Integer doneCode, String taskId, String deptId, String optrId, String buyType) throws Exception {
+	public void changeTaskTeam(Integer doneCode, String taskId, String deptId, String optrId, String buyType,String finishRemark) throws Exception {
 		//需要查询锁
 		// 修改工单对应的施工队
 		WTaskBaseInfo task = wTaskBaseInfoDao.queryForLock(taskId);
@@ -217,6 +218,7 @@ public class SnTaskComponent extends BaseBusiComponent {
 		task.setBug_type(buyType);
 		task.setTeam_id(deptId);
 		task.setInstaller_id(optrId);
+		task.setTask_finish_desc(finishRemark);
 		wTaskBaseInfoDao.update(task);
 		// 记录操作日志
 		//String cfonTeamId = getTeamId(SystemConstants.TEAM_TYPE_CFOCN);
@@ -461,11 +463,12 @@ public class SnTaskComponent extends BaseBusiComponent {
 
 	}
 	
-	public void saveZte(Integer doneCode, String task_id, String zte_status, String log_remark) throws Exception {
+	public void saveZte(Integer doneCode, String task_id, String zte_status, String log_remark,String zte_optr_id) throws Exception {
 		WTaskBaseInfo task = new WTaskBaseInfo();
 		task.setTask_id(task_id);
 		task.setZte_status(zte_status);
 		task.setZte_status_date(new Date());
+		task.setZte_optr_id(zte_optr_id);
 		wTaskBaseInfoDao.update(task);
 
 		// 记录操作日志
@@ -759,7 +762,25 @@ public class SnTaskComponent extends BaseBusiComponent {
 	}
 	
 	public List<WTaskUser> queryTaskDetailUser(String taskId)  throws Exception{
-		return queryTaskUser(taskId);
+		List<WTaskUser> list= queryTaskUser(taskId);
+		//提取BNAD用户状态和产品状态，产品截止日期
+		for(WTaskUser wu:list){
+			if(SystemConstants.USER_TYPE_BAND.equals(wu.getUser_type())){
+				//提取产品
+				List<CProdOrder> orders=cProdOrderDao.queryOrderProdByUserId(wu.getUser_id());
+				if(orders.size()>0){
+					CProdOrder lastorder=orders.get(orders.size()-1);
+					wu.setExp_date(lastorder.getExp_date());
+					if(StatusConstants.ACTIVE.equals(wu.getStatus())
+							&&lastorder.getStatus().equals(StatusConstants.FORSTOP)){
+						//当用户状态正常 产品到期停时，装入产品的状态和状态时间
+						wu.setStatus(lastorder.getStatus());
+						wu.setStatus_date(lastorder.getStatus_date());
+					}
+				}
+			}
+		}
+		return list;
 	}
 	
 	public void updateTask(WTaskBaseInfo task) throws Exception {

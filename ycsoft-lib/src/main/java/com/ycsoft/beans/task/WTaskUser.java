@@ -1,6 +1,7 @@
 package com.ycsoft.beans.task;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import com.ycsoft.commons.constants.DictKey;
 import com.ycsoft.commons.store.MemoryDict;
@@ -30,8 +31,34 @@ public class WTaskUser implements Serializable {
 	private String login_name;
 	private String password;
 	private String bandwidth;
+	//状态
+	private String status;//状态  取用户状态正常、施工、报停，如果用户是正常的，产品状态是到期停，则取产品状态
+	private String status_text;//状态文本
+	private Date status_date;
+	private Date exp_date;//产品失效日期
 	
-	
+	public String getStatus() {
+		return status;
+	}
+	public void setStatus(String status) {
+		this.status = status;
+		this.status_text=MemoryDict.getDictName(DictKey.STATUS, status);
+	}
+	public Date getStatus_date() {
+		return status_date;
+	}
+	public void setStatus_date(Date status_date) {
+		this.status_date = status_date;
+	}
+	public Date getExp_date() {
+		return exp_date;
+	}
+	public void setExp_date(Date exp_date) {
+		this.exp_date = exp_date;
+	}
+	public String getStatus_text() {
+		return status_text;
+	}
 	public String getLogin_name() {
 		return login_name;
 	}

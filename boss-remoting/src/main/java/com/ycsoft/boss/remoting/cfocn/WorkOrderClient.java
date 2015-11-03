@@ -114,8 +114,8 @@ public class WorkOrderClient {
 		if (task.getTask_type_id().equals(SystemConstants.TASK_TYPE_INSTALL)){
 			 //客户编号
 			OrderContent.append("客户编号CustNo:").append(custNo);
-		    //安装的设备类型数量 :   安装设备 ONT:1 OTT:2
-			this.fillTaskDeviceInfo(OrderContent, userList, "安装设备Install:");
+		    //安装的设备类型数量 :   安装设备 ONT:1 OTT(几核):2
+			this.fillInstallDeviceInfo(OrderContent, userList, "安装设备Install:");
 		    //带宽    账号  密码
 			this.fillTaskBroadbandInfo(OrderContent, userList, true);
 		}else if (task.getTask_type_id().equals(SystemConstants.TASK_TYPE_MOVE)){
@@ -202,6 +202,36 @@ public class WorkOrderClient {
 	    	if(ott_cnt>0){
 	    		OrderContent.append(" OTT:").append(ott_cnt);
 	    	}
+	    }
+	}
+	
+	private void  fillInstallDeviceInfo(StringBuilder OrderContent,List<WTaskUser> userList,String taskTypeInfo){
+		int ont_cnt=0;
+		int ott_cnt_4core=0;
+		int ott_cnt_2core=0;
+	    for(WTaskUser taskUser: userList){
+	    	if(SystemConstants.USER_TYPE_BAND.equals(taskUser.getUser_type())){
+	    		ont_cnt++;
+	    	}
+	    	if(SystemConstants.USER_TYPE_OTT.equals(taskUser.getUser_type())){
+	    		if("PND_OTT_04".equals(taskUser.getDevice_model())){
+	    			ott_cnt_4core++;
+	    		}else{
+	    			ott_cnt_2core++;
+	    		}
+	    	}
+	    }
+	    if(ont_cnt+ott_cnt_4core+ott_cnt_2core>0){
+	    	OrderContent.append("\n").append(taskTypeInfo);
+	    	if(ont_cnt>0){
+	    		OrderContent.append(" ONT:").append(ont_cnt);
+	    	}
+	    	if(ott_cnt_4core>0){
+		    	OrderContent.append(" OTT(四核4core):").append(ott_cnt_4core);
+	    	}
+	       if(ott_cnt_2core>0){
+	    	   OrderContent.append(" OTT(两核2core):").append(ott_cnt_2core);
+	       }
 	    }
 	}
 	/**

@@ -84,7 +84,7 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 	}
 
 	@Override
-	public void editTaskTeam(String taskId, String deptId, String optrId, String bugType) throws Exception{
+	public void editTaskTeam(String taskId, String deptId, String optrId, String bugType,String finishRemark) throws Exception{
 		WTaskBaseInfo task = wTaskBaseInfoDao.findByKey(taskId);
 		if (task == null)
 			throw new ServicesException("工单不存在!");
@@ -98,7 +98,7 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 		//获取业务流水
 		Integer doneCode = doneCodeComponent.gDoneCode();
 		this.setDoneCodeInfo(taskId, getBusiParam(), BusiCodeConstants.TASK_ASSIGN);
-		snTaskComponent.changeTaskTeam(doneCode, taskId, deptId, optrId,bugType);
+		snTaskComponent.changeTaskTeam(doneCode, taskId, deptId, optrId,bugType,finishRemark);
 		this.getBusiParam().setOperateObj("WorkOrdersSn:"+taskId);
 		saveAllPublic(doneCode, getBusiParam());
 	}
@@ -591,7 +591,7 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 			throw new ServicesException("工单已完工");	
 		//获取业务流水
 		Integer doneCode = doneCodeComponent.gDoneCode();
-		snTaskComponent.saveZte(doneCode, task_id, zte_status,log_remark);
+		snTaskComponent.saveZte(doneCode, task_id, zte_status,log_remark,getOptr().getOptr_id());
 		this.setDoneCodeInfo(task_id, getBusiParam(), BusiCodeConstants.TASK_ZTE_OPEN);
 		this.getBusiParam().setOperateObj("WorkOrdersSn:"+task_id);
 		saveAllPublic(doneCode, getBusiParam());
