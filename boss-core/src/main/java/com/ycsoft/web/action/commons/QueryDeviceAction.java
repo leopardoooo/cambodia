@@ -107,6 +107,16 @@ public class QueryDeviceAction extends BaseBusiAction {
 		return JSON;
 	}
 	
+	public String queryDeviceArea()throws Exception{
+		try {
+			DeviceDto rd = custService.querySaleableDeviceArea(deviceCode,userType);
+			getRoot().setSimpleObj(rd);
+		} catch (Exception e){
+			getRoot().setSuccess(false);
+			getRoot().setSimpleObj(e.getMessage());
+		}
+		return JSON;
+	}
 	/**
 	 * 设备更换
 	 * @return

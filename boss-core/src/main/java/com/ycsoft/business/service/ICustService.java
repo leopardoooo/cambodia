@@ -287,6 +287,13 @@ public interface ICustService extends IBaseService{
 	 * @throws Exception
 	 */
 	public DeviceDto querySaleableDevice(String deviceCode) throws Exception;
+	/**
+	 * 返回最后一个设备的型号
+	 * @param deviceCode
+	 * @return
+	 * @throws Exception
+	 */
+	public DeviceDto querySaleableDeviceArea(String deviceCodes,String userType) throws Exception;
 	
 	public DeviceDto queryChangeDevice(String userType, String deviceCode) throws Exception;
 	

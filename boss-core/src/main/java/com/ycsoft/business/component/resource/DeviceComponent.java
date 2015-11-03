@@ -17,6 +17,7 @@ import com.ycsoft.beans.core.fee.CFeeDevice;
 import com.ycsoft.beans.core.valuable.CValuableCard;
 import com.ycsoft.beans.core.valuable.CValuableCardFee;
 import com.ycsoft.beans.core.valuable.CValuableCardHis;
+import com.ycsoft.beans.depot.RDepotDefine;
 import com.ycsoft.beans.device.RCard;
 import com.ycsoft.beans.device.RDevice;
 import com.ycsoft.beans.device.RDeviceFee;
@@ -26,6 +27,7 @@ import com.ycsoft.beans.device.RDeviceUseRecords;
 import com.ycsoft.beans.device.RModem;
 import com.ycsoft.beans.device.RStb;
 import com.ycsoft.beans.device.RStbModel;
+import com.ycsoft.beans.system.SDept;
 import com.ycsoft.beans.system.SOptr;
 import com.ycsoft.business.commons.abstracts.BaseBusiComponent;
 import com.ycsoft.business.dao.config.TBusiFeeDeviceDao;
@@ -50,6 +52,7 @@ import com.ycsoft.business.dao.resource.device.RPairCfgDao;
 import com.ycsoft.business.dao.resource.device.RStbDao;
 import com.ycsoft.business.dao.resource.device.RStbModelDao;
 import com.ycsoft.business.dao.system.SDeptDao;
+import com.ycsoft.business.dto.config.TemplateConfigDto;
 import com.ycsoft.business.dto.device.DeviceDto;
 import com.ycsoft.business.dto.device.DeviceSmallDto;
 import com.ycsoft.business.dto.device.ValuableCardDto;
@@ -631,6 +634,85 @@ public class DeviceComponent extends BaseBusiComponent {
 			return rd;
 		else
 			return null;
+	}
+	/**
+	 * 开户时输入多个设备编号，验证这些设备是否可用
+	 * @param deviceCodes
+	 * @param userType
+	 * @return 最后一个设备的型号
+	 * @throws Exception
+	 */
+	public List<DeviceDto> querySaleableDeviceArea(String deviceCodes,String userType) throws Exception{
+		//TODO 
+		if(StringHelper.isEmpty(deviceCodes)||StringHelper.isEmpty(userType)){
+			throw new ComponentException(ErrorCode.ParamIsNull);
+		}
+		String[] deviceCodeArrays=deviceCodes.split("\n");
+		List<DeviceDto> list=new ArrayList<>();
+		for(String deviceCode:deviceCodeArrays){
+			DeviceDto rd = queryDevice(deviceCode);
+			if(isDeviceSaleable(rd)){
+				//判断设备仓库是否可用
+				checkDeviceDepotCanUse(rd);
+				//判断设备和用户类型是否匹配
+				checkDeviceUserType(rd,userType);
+			}
+			list.add(rd);
+		}
+		return list;
+	}
+	
+	/**
+	 * 判断设备跟用户类型是否匹配
+	 * singleStbNotSupDTT: '此设备为单向机顶盒，不支持当前的OTT用户类型!',
+	doubleStbNotSupOTT: '此设备为双向机顶盒，不支持当前的DTT用户类型!',
+	modemNotSupUserType: '设备为Modem猫，不支持所选[{0}]用户类型!',
+	currDeviceNotSupUserType: '此设备不支持当前的用户类型!',
+	 * @throws ComponentException 
+	 */
+	public boolean checkDeviceUserType(DeviceDto rd,String userType) throws ComponentException{
+		if(userType.equals(SystemConstants.USER_TYPE_DTT)
+				&&SystemConstants.DEVICE_TYPE_STB.equals(rd.getDevice_type())
+				&&SystemConstants.DTV_SERV_TYPE_SINGLE.equals(rd.getDeviceModel().getInteractive_type())){
+			return true;
+		}else if(userType.equals(SystemConstants.USER_TYPE_OTT)
+				&&SystemConstants.DEVICE_TYPE_STB.equals(rd.getDevice_type())
+				&&SystemConstants.DTV_SERV_TYPE_DOUBLE.equals(rd.getDeviceModel().getInteractive_type())){
+			return true;
+		}else if(userType.equals(SystemConstants.USER_TYPE_BAND)
+				&&SystemConstants.DEVICE_TYPE_MODEM.equals(rd.getDevice_type())){
+			return true;
+		}else {
+			throw new ComponentException(ErrorCode.DeviceNotSupUserType,rd.getDevice_code(),userType);
+		}
+	}
+	/**
+	 * 判断设备仓库和操作员部门是否匹配
+	 */
+	private void checkDeviceDepotCanUse(DeviceDto device) throws Exception{
+		String scopeDevice = queryTemplateConfig(TemplateConfigDto.Config.SCOPE_DEVICE.toString());
+		if (SystemConstants.SYS_LEVEL_DEPT.equals(scopeDevice)) {
+			//按营业厅
+			if (!getOptr().getDept_id().equals(device.getDepot_id())) {
+				SDept dept = sDeptDao.findByKey(device.getDepot_id());
+				if (dept == null) {
+					throw new ComponentException("当前设备所在仓库数据有问题");
+				}
+				throw new ComponentException(ErrorCode.DeviceNotInRightDepot,device.getDevice_code(),dept.getDept_name());
+			}
+		} else if (SystemConstants.SYS_LEVEL_COUNTY.equals(scopeDevice)) {
+			//按县市
+			SDept dept = sDeptDao.findByKey(device.getDepot_id());
+			if (!getOptr().getCounty_id().equals(dept.getCounty_id())) {
+				throw new ComponentException(ErrorCode.DeviceNotInRightDepot,device.getDevice_code(),dept.getDept_name());
+			}
+		}
+	}
+	public static void main(String args[]){
+		String aaa="aaa\nbbb\nccc\n";
+		String[] bbb=aaa.split("\n");
+		for(String b:bbb)
+		System.out.println("##"+b);
 	}
 	
 	public DeviceDto queryChangeDevice(String userType, String deviceCode) throws Exception {

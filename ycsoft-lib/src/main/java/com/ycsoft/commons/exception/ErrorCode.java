@@ -91,8 +91,10 @@ public enum ErrorCode {
 	DeviceNotExists("设备不存在"),
 	DeviceTotalNumIsNull("设备数量不够"),
 	DeviceTotalNumIsTooBig("设备入库数量超出了订货数量"),
+	DeviceNotInRightDepot("%s设备在%s,不在当前仓库"),
 	DeviceDateException("设备数据异常，请联系管理员!(device_id=%s)"),
 	DevicePairModelNotExists("设备对应的智能卡型号不存在!(device_model=%s)"),
+	DeviceNotSupUserType("%s设备不支持%s用户"),
 	
 	AcctPublicNotExists("客户缺失公用账户，请联系管理员！"),
 	AcctItemNotExists("账目不存在，请联系管理员！"),

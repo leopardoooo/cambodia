@@ -43,15 +43,16 @@ UserBaseForm = Ext.extend( BaseForm , {
 					}]
 				},{
 					items:[{
-			            xtype: 'textfield',
+			            xtype: 'textarea',
 			            fieldLabel: lmain("user._form.deviceCode"),
 			            width : 150,
+			            height: 80,
 			            id: 'deviceCodeEl',
 //			            disabled: true,
 			            allowBlank: false,
 			            listeners: {
 			            	scope: this,
-			            	change: this.doDeviceCodeChange
+			            	change: this.doDeviceCodeAreaChange
 			            }
 					}]
 				}/*,{
@@ -371,6 +372,38 @@ UserBaseForm = Ext.extend( BaseForm , {
 		if(data.length > 0)
 			cmb.setValue(data[0]['item_value']);
 		Ext.getCmp("deviceBuyMode").focus();
+	},/*设备文本域修改*/
+	doDeviceCodeAreaChange:function(field){
+		var v = field.getValue().trim();
+		var currUserType = Ext.getCmp("boxUserType").getValue();
+		if(!currUserType){
+			Alert("请先选择用户类型!");
+			currUserTypeBox.focus();
+			currUserTypeBox.expand();
+			field.setValue("");
+			return;
+		}
+		if(!v)return ;
+		Ext.Ajax.request({
+			scope : this,
+			url : root + '/commons/x/QueryDevice!queryDeviceArea.action',
+			params : { deviceCode: v,userType:currUserType},
+			success : function(response,opts){
+				var obj = Ext.decode(response.responseText);
+				if(!obj.success){
+					Alert(obj.simpleObj);
+					field.setRawValue("");
+					return ;
+				}
+				var data = obj.simpleObj;
+				var box = Ext.getCmp("deviceCategoryEl");
+				box.getStore().loadData([{
+					item_name: data["device_model_text"],
+					item_value: data["device_model"]
+				}]);
+				box.setValue(data["device_model"]);
+			}
+		});
 	},
 	//设备号发生变化
 	doDeviceCodeChange : function(field){

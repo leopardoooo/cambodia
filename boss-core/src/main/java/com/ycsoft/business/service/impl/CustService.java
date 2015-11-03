@@ -1787,6 +1787,15 @@ public class CustService extends BaseBusiService implements ICustService {
 		return deviceComponent.querySaleableDevice(deviceCode);
 	}
 	
+	public DeviceDto querySaleableDeviceArea(String deviceCodes,String userType)throws Exception {
+		List<DeviceDto> list= deviceComponent.querySaleableDeviceArea(deviceCodes,userType);
+		if(list.size()>0){
+			return  list.get(list.size()-1);
+		}else{
+			return null;
+		}
+	}
+	
 	public DeviceDto queryChangeDevice(String userType, String deviceCode) throws Exception {
 		return deviceComponent.queryChangeDevice(userType, deviceCode);
 	}

@@ -92,26 +92,36 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 	public void createUser(CUser user, String deviceCode, String deviceType, String deviceModel, String deviceBuyMode,
 			FeeInfoDto deviceFee) throws Exception {
 		CCust cust = getBusiParam().getCust();
+		doneCodeComponent.lockCust(cust.getCust_id());
 		this.validAccount(user.getLogin_name());
 		this.canOpenUser(cust);
-		doneCodeComponent.lockCust(cust.getCust_id());
 		
 		Integer doneCode = doneCodeComponent.gDoneCode();
-		user = openSingle(cust, user, doneCode, deviceCode, deviceType, deviceModel, deviceBuyMode, deviceFee);
-		
+		getBusiParam().resetUser();
+		if(user.getUser_type().equals(SystemConstants.USER_TYPE_OTT_MOBILE)){
+			user = openSingle(cust, user, doneCode, deviceCode, deviceType, deviceModel, deviceBuyMode, deviceFee);
+			getBusiParam().addUser(user);//设置拦截器所需要的参数
+		}else{
+			//用户开户多设备开户
+			List<DeviceDto> list= deviceComponent.querySaleableDeviceArea(deviceCode,user.getUser_type());
+			
+			for(DeviceDto device:list){
+				user.setLogin_name(null);
+				user = openSingle(cust, user, doneCode, device.getDevice_code(), device.getDevice_type(), device.getDevice_model(), deviceBuyMode, deviceFee);
+				getBusiParam().addUser(user);//设置拦截器所需要的参数
+			}
+		}
+		/**
 		String userType = user.getUser_type();
 		//若没有设备号，新增工单
-		//DTT不开工单
+		DTT不开工单
 		if ((userType.equals(USER_TYPE_BAND) && StringHelper.isEmpty(user.getModem_mac()))
 				|| (userType.equals(USER_TYPE_OTT) && StringHelper.isEmpty(user.getStb_id()))) {
 			List<CUser> userList = new ArrayList<CUser>();
 			user.setDevice_model(deviceModel);
 			userList.add(user);
 			snTaskComponent.createOpenTask(doneCode, cust, userList, getBusiParam().getWorkBillAsignType());
-		}
-		// 设置拦截器所需要的参数
-		getBusiParam().resetUser();
-		getBusiParam().addUser(user);
+		}**/
 		saveAllPublic(doneCode, getBusiParam());
 
 	}
