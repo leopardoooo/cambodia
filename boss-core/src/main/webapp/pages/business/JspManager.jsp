@@ -9,6 +9,7 @@
   <body></body>
   <%
      Object scriptFiles = request.getAttribute("url");
+     String dversion="2";
      if(null == scriptFiles || "".equals( scriptFiles )){
      	out.println("ErrorMsg: 该资源没有配置脚本文件!");
      }else{
@@ -16,7 +17,7 @@
 	     String [] jsFile = scriptFiles.toString().split(",");
 	     for(String fUrl : jsFile){
 	     	if("".equals(fUrl)) continue;
-	     	fUrl+="?d="+new Date().getTime();
+	     	fUrl+="?d="+dversion;
 	     	out.println(StringHelper.formatIgnoreType(url , root+ "/" + fUrl));
 	     }
      }

@@ -503,7 +503,9 @@ ProdOrderForm = Ext.extend( BaseForm, {
 		var mothNum = parseInt(mothAllNum);
 		var dayNum = Math.ceil((mothAllNum - mothNum)*30);
 		//月数赋值
+		Ext.getCmp("sfOrderCycle").setMinValue(0);
 		Ext.getCmp("sfOrderCycle").setValue(mothNum+Ext.util.Format.ceil((dayNum/30),2));
+		//alert(Ext.getCmp("sfOrderCycle").getValue());
 		var startDate = Ext.getCmp("dfStartDate").getValue();
 		//开始日期加mothNum月，dayNum天,,startDate是+1天的，所以到期日要-1天，dayNum-1;
 		Ext.getCmp("dfExpDate").setValue(Ext.util.Format.addTime(startDate.format("Y-m-d"),mothNum,dayNum-1));
