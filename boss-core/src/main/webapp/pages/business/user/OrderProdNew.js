@@ -159,13 +159,21 @@ ProdOrderForm = Ext.extend( BaseForm, {
 					    id: 'dfStartDate',
 					    format: 'Y-m-d',
 					    allowBlank: false,
-					    readOnly: true
+					    readOnly: true,
+					    vtype: 'daterange',
+                		endDateField: 'dfExpDate',
+                		customDay: 1
 					},{
-						xtype: 'textfield',
+						xtype: 'datefield',
 						id: 'dfExpDate',
-						editable: true,
 						allowBlank: false,
-			            fieldLabel: lmain("user._form.prodExpDate")
+						readOnly: true,
+			            fieldLabel: lmain("user._form.prodExpDate"),
+			            format: 'Y-m-d',
+			            listeners: {
+			            	scope: this,
+			            	select: this.doSelectExpDate
+			            }
 					}]
 				}]
 			},{  
@@ -521,9 +529,16 @@ ProdOrderForm = Ext.extend( BaseForm, {
 			sfOrderCycle.setMaxValue(null);
 		}
 		//0资费的话，按月算
+		//零资费可以修改结束计费日期，订购月数可以是大于零的小数，按天计算
+		var field = Ext.getCmp('dfExpDate');
 		if(record.get('disct_rent') == 0){
 			Ext.getCmp('order_type_id').setValue('ORDER');
 			Ext.getCmp('orderMonthItemsId').show();
+			field.setReadOnly(false);
+			sfOrderCycle.setMinValue(0);
+		}else{
+			field.setReadOnly(true);
+			sfOrderCycle.setMinValue(billingCycle);
 		}
 		var orderType = Ext.getCmp('order_type_id').getValue();
 		if(orderType == 'TRANSFER'){
@@ -535,6 +550,12 @@ ProdOrderForm = Ext.extend( BaseForm, {
 			// 计算结算金额
 			this.doLoadTransferAmount();
 		}
+	},
+	doSelectExpDate: function(dateField, expDate){
+		var effDate = Ext.getCmp('dfStartDate').getValue();
+		var days = Ext.util.Format.getDays( effDate.format('Y-m-d'), expDate.add(Date.DAY, 1).format('Y-m-d') )*1.0;
+		var orderMonths = Ext.util.Format.round(days/30.0,2);
+		Ext.getCmp('sfOrderCycle').setValue(orderMonths);
 	},
 	// 上期结束计费日
 	getLastProdEndDate: function(prodId){
@@ -706,7 +727,7 @@ ProdOrderForm = Ext.extend( BaseForm, {
 		
 		values["order_fee_type"] = Ext.getCmp('orderFeeTypeId').getValue();
 		// 失效日期
-		values["exp_date"] = Ext.getCmp("dfExpDate").getValue() + " 00:00:00";
+		values["exp_date"] = Ext.getCmp("dfExpDate").getValue().format('Y-m-d') + " 00:00:00";
 		
 	
 		var all = {
