@@ -524,7 +524,25 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 	public Map<String , Object> queryAllTaskDetail(String task_id)throws Exception{
 		Map<String , Object> map = new HashMap<String, Object>();
 		map = queryTaskDetail(task_id);
-		map.put("taskBaseInfo", wTaskBaseInfoDao.findTaskDetailByTaskId(task_id));	
+		TaskBaseInfoDto task= wTaskBaseInfoDao.findTaskDetailByTaskId(task_id);
+		List<WTaskUser> userList=(List<WTaskUser>)map.get("taskUserList");
+		if(userList==null){
+			userList=new ArrayList<>();
+		}
+		//提取工单对应的设备数量信息
+		if(task.getTask_type_id().equals(SystemConstants.TASK_TYPE_INSTALL)){
+			//安装、 取wTaskUser信息，判断四核数量
+			task.setRemark(this.getWTaskIntallDeviceCnt(userList));
+		}else if(task.getTask_type_id().equals(SystemConstants.TASK_TYPE_WRITEOFF_TERMINAL)||
+				task.getTask_type_id().equals(SystemConstants.TASK_TYPE_WRITEOFF_LINE)){
+			//拆除、回收终端工单 取wTaskUser信息
+			task.setRemark(this.getWTaskUserDeviceCnt(userList));
+		}else if(task.getTask_type_id().equals(SystemConstants.TASK_TYPE_FAULT)||
+				task.getTask_type_id().equals(SystemConstants.TASK_TYPE_WRITEOFF_TERMINAL)){
+			//故障工单和迁移工单 取客户名下所有设备信息
+			task.setRemark(this.getCustDeviceCnt(userComponent.queryUserByCustId(task.getCust_id())));
+		}
+		map.put("taskBaseInfo", task);	
 		return map;
 	}
 	
@@ -548,12 +566,94 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 			String logstr = log.getLog_detail()==null?"":log.getLog_detail();
 			log.setLog_detail(logstr+errorstr);
 		}
+
 		map.put("taskUserList", userList);
 		map.put("taskLogList", logList);	
 		map.put("sameTaskList", sameTaskList);
 		return map;
 	}
-
+	
+	private String getWTaskIntallDeviceCnt(List<WTaskUser> userList){
+		int ont_cnt=0;
+		int ott_cnt_4core=0;
+		int ott_cnt_2core=0;
+	    for(WTaskUser taskUser: userList){
+	    	if(SystemConstants.USER_TYPE_BAND.equals(taskUser.getUser_type())){
+	    		ont_cnt++;
+	    	}
+	    	if(SystemConstants.USER_TYPE_OTT.equals(taskUser.getUser_type())){
+	    		if("PND_OTT_04".equals(taskUser.getDevice_model())){
+	    			ott_cnt_4core++;
+	    		}else{
+	    			ott_cnt_2core++;
+	    		}
+	    	}
+	    }
+	    StringBuilder OrderContent=new StringBuilder();
+	    if(ont_cnt+ott_cnt_4core+ott_cnt_2core>0){
+	    	if(ont_cnt>0){
+	    		OrderContent.append(" ONU:").append(ont_cnt);
+	    	}
+	    	if(ott_cnt_4core>0){
+		    	OrderContent.append("  OTT(四核4core):").append(ott_cnt_4core);
+	    	}
+	       if(ott_cnt_2core>0){
+	    	   OrderContent.append("  OTT(两核2core):").append(ott_cnt_2core);
+	       }
+	    }
+	    return OrderContent.toString();
+	}
+	/**
+	 * 工单信息中的设备信息
+	 * @param userList
+	 * @return
+	 */
+	private String getWTaskUserDeviceCnt(List<WTaskUser> userList){
+		int ont_cnt=0;
+		int ott_cnt=0;
+	    for(WTaskUser taskUser: userList){
+	    	if(SystemConstants.USER_TYPE_BAND.equals(taskUser.getUser_type())){
+	    		ont_cnt++;
+	    	}
+	    	if(SystemConstants.USER_TYPE_OTT.equals(taskUser.getUser_type())){
+	    		ott_cnt++;
+	    	}
+	    }
+	    StringBuilder OrderContent=new StringBuilder();
+	    if(ont_cnt+ott_cnt>0){
+	    	if(ont_cnt>0){
+	    		OrderContent.append(" ONU:").append(ont_cnt);
+	    	}
+	    	if(ott_cnt>0){
+	    		OrderContent.append(" OTT:").append(ott_cnt);
+	    	}
+	    }
+	    return OrderContent.toString();
+	}
+	private String getCustDeviceCnt(List<CUser> userList){
+		if(userList==null||userList.size()==0)
+			return "";
+		int ont_cnt=0;
+		int ott_cnt=0;
+	    for(CUser taskUser: userList){
+	    	if(SystemConstants.USER_TYPE_BAND.equals(taskUser.getUser_type())){
+	    		ont_cnt++;
+	    	}
+	    	if(SystemConstants.USER_TYPE_OTT.equals(taskUser.getUser_type())){
+	    		ott_cnt++;
+	    	}
+	    }
+	    StringBuilder OrderContent=new StringBuilder();
+	    if(ont_cnt+ott_cnt>0){
+	    	if(ont_cnt>0){
+	    		OrderContent.append(" ONU:").append(ont_cnt);
+	    	}
+	    	if(ott_cnt>0){
+	    		OrderContent.append(" OTT:").append(ott_cnt);
+	    	}
+	    }
+		return OrderContent.toString();
+	}
 	public List<WTeam> queryTaskTeam() throws Exception {
 		return wTeamDao.findAll();
 	}
