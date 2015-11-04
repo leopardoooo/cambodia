@@ -68,11 +68,13 @@ public class AuthComponent extends BaseComponent{
 		}
 		if (authCmdType.equals(BusiCmdConstants.CREAT_USER) || //创建用户
 				authCmdType.equals(BusiCmdConstants.CHANGE_USER) || //变更用户
-				authCmdType.equals(BusiCmdConstants.PASSVATE_USER) ||//钝化用户
-				authCmdType.equals(BusiCmdConstants.ACCTIVATE_USER)||//激活用户
 				authCmdType.equals(BusiCmdConstants.REFRESH_TERMINAL)){//刷新终端
 			this.editOttUser(user, doneCode);
-		} else if (authCmdType.equals(BusiCmdConstants.DEL_USER)){//删除用户
+		}else if(authCmdType.equals(BusiCmdConstants.PASSVATE_USER)){//钝化用户
+			this.stopOrOpenOttUser(user, doneCode, false);
+		} else if(authCmdType.equals(BusiCmdConstants.ACCTIVATE_USER)){//激活用户
+			this.stopOrOpenOttUser(user, doneCode, true);
+		}else if (authCmdType.equals(BusiCmdConstants.DEL_USER)){//删除用户
 			this.deleteOttUser(user,orderList, doneCode);
 		} else if (authCmdType.equals(BusiCmdConstants.PASSVATE_PROD) ||//产品授权
 				authCmdType.equals(BusiCmdConstants.ACCTIVATE_PROD)){
@@ -162,6 +164,30 @@ public class AuthComponent extends BaseComponent{
 		params.addProperty(BusiCmdParam.stb_id.name(), user.getStb_id());
 		params.addProperty(BusiCmdParam.stb_mac.name(), user.getModem_mac());
 		params.addProperty(BusiCmdParam.user_status.name(), user.getStatus());
+		ottCmd.setDetail_param(params.toString());
+		jVodCommandDao.save(ottCmd);
+	}
+	/**
+	 * 报停(isopen=false)或报开(isopen=true)ott终端
+	 * 
+	 * @param user
+	 * @param doneCode
+	 * @param isopen
+	 * @throws Exception
+	 */
+	private void stopOrOpenOttUser(CUser user,Integer doneCode,boolean isopen) throws Exception{
+		JVodCommand ottCmd = gOttCmd(user,doneCode);
+		ottCmd.setCmd_type(BusiCmdConstants.CHANGE_USER);
+		JsonObject params = new JsonObject();
+		params.addProperty(BusiCmdParam.login_name.name(), user.getLogin_name());
+		params.addProperty(BusiCmdParam.login_password.name(), user.getPassword());
+		params.addProperty(BusiCmdParam.stb_id.name(), user.getStb_id());
+		params.addProperty(BusiCmdParam.stb_mac.name(), user.getModem_mac());
+		if(isopen){
+			params.addProperty(BusiCmdParam.user_status.name(), StatusConstants.ACTIVE);
+		}else{
+			params.addProperty(BusiCmdParam.user_status.name(), StatusConstants.REQSTOP);
+		}
 		ottCmd.setDetail_param(params.toString());
 		jVodCommandDao.save(ottCmd);
 	}
