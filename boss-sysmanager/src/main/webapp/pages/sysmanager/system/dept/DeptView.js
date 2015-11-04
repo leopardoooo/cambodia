@@ -496,10 +496,10 @@ DeptTree = Ext.extend(Ext.ux.tree.TreeGridEditor,{
 	                id: 'add',
 	                deepestState: 'disabled',
 	                handler : function(n){
-	                	if(n.attributes.others.dept_type != 'FGS'){
-	                		Alert('只允许在分公司下添加部门。')
-	                		return;
-	                	}
+//	                	if(n.attributes.others.dept_type != 'FGS'){
+//	                		Alert('只允许在分公司下添加部门。')
+//	                		return;
+//	                	}
 	                	new DeptWin('add',n).show();
 	                }
 	            },{
@@ -523,13 +523,13 @@ DeptTree = Ext.extend(Ext.ux.tree.TreeGridEditor,{
 	                handler : this.doDelete,
 	                // 删除节点校验函数
 	                validator: this.checkRemove
-	            },
-	            {
-	                id: 'statusActive',
-	                text:'禁用业务',
-	                handler : function(n){
-	                	new SychBusiCodeWindow(n.attributes.id).show();
-	                }
+//	            },
+//	            {
+//	                id: 'statusActive',
+//	                text:'禁用业务',
+//	                handler : function(n){
+//	                	new SychBusiCodeWindow(n.attributes.id).show();
+//	                }
 	            }]
 	        }
 		})

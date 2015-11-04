@@ -334,25 +334,35 @@ DistrictWin = Ext.extend(Ext.Window,{
 		this.node = node;
 		var fieldLabel;
 		this.level = parseFloat(node.attributes.others.district_level);
-		if(this.level == 0){
-			fieldLabel =lsys('DistrictNodeManage.formWin.labelCountry');
-		}else if(this.level == 1){
-			fieldLabel =lsys('DistrictNodeManage.formWin.labelProvince');
-		}else if(this.level == 2){
-			fieldLabel =lsys('DistrictNodeManage.formWin.labelCityName');
-		}else if(this.level == 3){
-			fieldLabel =lsys('DistrictNodeManage.formWin.labelCityDistrictName');
-		}else if(this.level == 4){
-			fieldLabel =lsys('DistrictNodeManage.formWin.labelSubDistrictName');
-		}
+		
 		var pcmp = Ext.getCmp('parentName');
 		if(this.type == 'add'){
+			if(this.level == 0){
+				fieldLabel =lsys('DistrictNodeManage.formWin.labelProvince');
+			}else if(this.level == 1){
+				fieldLabel =lsys('DistrictNodeManage.formWin.labelCityName');
+			}else if(this.level == 2){
+				fieldLabel =lsys('DistrictNodeManage.formWin.labelCityDistrictName');
+			}else if(this.level == 3){
+				fieldLabel =lsys('DistrictNodeManage.formWin.labelSubDistrictName');
+			}
 			this.title = lsys('common.addNewOne');
 			pcmp.hideLabel = false;
 			pcmp.show();
 			pcmp.setValue(node.text);
 			Ext.getCmp('districtLevel').setValue(this.level+1);
 		}else if(this.type == 'edit'){
+			if(this.level == 0){
+				fieldLabel =lsys('DistrictNodeManage.formWin.labelCountry');
+			}else if(this.level == 1){
+				fieldLabel =lsys('DistrictNodeManage.formWin.labelProvince');
+			}else if(this.level == 2){
+				fieldLabel =lsys('DistrictNodeManage.formWin.labelCityName');
+			}else if(this.level == 3){
+				fieldLabel =lsys('DistrictNodeManage.formWin.labelCityDistrictName');
+			}else if(this.level == 4){
+				fieldLabel =lsys('DistrictNodeManage.formWin.labelSubDistrictName');
+			}
 			this.title = lsys('common.update');
 			pcmp.hideLabel = true;
 			pcmp.hide();
