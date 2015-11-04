@@ -77,8 +77,7 @@ public class JobComponent {
 	 * @return 
 	 * @throws Exception 
 	 */
-	public List<CProdOrder> changeHasExpOrderStatusToForStop() throws Exception{
-		Integer doneCode=-7;
+	public List<CProdOrder> changeHasExpOrderStatusToForStop(Integer doneCode) throws Exception{
 		//对所有订单失效的宽带用户发清除宽带的授权
 		List<CProdOrder> orders=cProdOrderDao.queryBandAllOrderExp();
 		cProdStatusChangeDao.saveOrderExpStatus(doneCode);

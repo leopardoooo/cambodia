@@ -72,13 +72,13 @@ public class AuthComponent extends BaseComponent {
 	 * 宽带所有订单到期日后，对宽带补发清除授权指令，因为宽带在汇聚系统发的长授权
 	 * @param order
 	 */
-	public void clearBandAuth(List<CProdOrder> orders) throws Exception{
+	public void clearBandAuth(List<CProdOrder> orders,Integer doneCode) throws Exception{
 		for(CProdOrder order:orders){
 			String userId=order.getUser_id();
 			CUser user=cUserDao.findByKey(userId);
 			if(user==null)
 				continue;
-			JBandCommand bandCmd = gBandCmd(user, -12);
+			JBandCommand bandCmd = gBandCmd(user, doneCode);
 			bandCmd.setCmd_type(BusiCmdConstants.BAND_CLEAR_AUTH);
 			JsonObject params = new JsonObject();
 			params.addProperty(BusiCmdParam.login_name.name(), user.getLogin_name());
