@@ -55,5 +55,10 @@ public class CProdStatusChangeDao extends BaseEntityDao<CProdStatusChange> {
 				+" select ?,t.order_sn,?,sysdate "
 				+" from c_prod_order t where t.status=? and t.exp_date<trunc(sysdate) ";
 		this.executeUpdate(sql,doneCode,StatusConstants.FORSTOP,StatusConstants.ACTIVE);
+		
+		String sql2="  insert into  busi.c_prod_prop_change(prod_sn,column_name,old_value,new_value,done_code,change_time,county_id,area_id) "
+		  +" select t.order_sn,'status',t.status,?,?,sysdate,t.county_id,t.area_id "
+		  +" from c_prod_order t  where t.status=? and t.exp_date<trunc(sysdate) ";
+		this.executeUpdate(sql2,StatusConstants.FORSTOP,doneCode,StatusConstants.ACTIVE);
 	}
 }
