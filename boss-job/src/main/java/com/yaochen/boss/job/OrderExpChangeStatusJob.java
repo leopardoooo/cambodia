@@ -32,9 +32,10 @@ public class OrderExpChangeStatusJob implements Job2  {
 	public void execute(Job2ExecutionContext arg0) throws JobExecutionException {
 		logger.info("启动处理订单失效修改状态为到期停");
 		try{
-			List<CProdOrder>  orders=jobComponent.changeHasExpOrderStatusToForStop();
+			Integer doneCode=-7;
+			List<CProdOrder>  orders=jobComponent.changeHasExpOrderStatusToForStop(doneCode);
 			//宽带所有订单到期日后，对宽带补发清除授权指令，因为宽带在汇聚系统发的长授权
-			authComponent.clearBandAuth(orders);
+			authComponent.clearBandAuth(orders,doneCode);
 			logger.info("结束处理订单失效修改状态为到期停");
 		}catch(Exception e){
 			logger.error("处理订单失效修改状态为到期停失败",e);
