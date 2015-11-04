@@ -45,7 +45,7 @@
 	                emptyText: '支持代理商名称模糊查询'
 	            }),
  				'->', '-',
- 				{text: '添加', iconCls: 'icon-add', scope: this, handler: this.doUpdate}, '-',
+ 				{text: '添加', iconCls: 'icon-add', scope: this, handler: this.doAdd}, '-',
  				{text: '刷新', iconCls: 'icon-refresh', scope: this, handler: this.doRefresh}, '-'
  			],
  			bbar: new Ext.PagingToolbar({store: this.agentStore, pageSize: this.pageSize})
@@ -56,15 +56,15 @@
  		this.agentStore.baseParams['query'] = Ext.getCmp('agentSearchFieldId').getValue();
  		this.agentStore.load();
  	},
+ 	doAdd:function(){
+ 		var win = new AgentWin(this);
+		win.setTitle('新增代理商');
+		win.show();
+ 	},
  	doUpdate: function(id){
 		var win = new AgentWin(this);
- 		if(Ext.isEmpty(id)){
- 			win.setTitle('新增代理商');
- 			win.show();
- 		}else{
- 			win.setTitle('修改代理商');
- 			win.show(this.getSelectionModel().getSelected());
- 		}
+		win.setTitle('修改代理商');
+		win.show(this.getSelectionModel().getSelected());
  	}
  });
  
