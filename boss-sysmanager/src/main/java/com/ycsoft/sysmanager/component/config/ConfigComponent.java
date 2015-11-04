@@ -57,7 +57,15 @@ public class ConfigComponent extends BaseComponent {
 	private CCustDao cCustDao;
 	
 	public Pager<PSpkg> querySpkg(String query, Integer start, Integer limit) throws Exception {
-		return pSpkgDao.querySpkg(query, start, limit);
+		Pager<PSpkg> page= pSpkgDao.querySpkg(query, start, limit);
+		for(PSpkg ps:  page.getRecords()){
+			String prodNameAll="";
+			for(String prodName:pSpkgDao.queryProdName(ps.getSpkg_sn())){
+				prodNameAll=prodNameAll+" "+prodName;
+			}
+			ps.setProd_name(prodNameAll);
+		}
+		return page;
 	}
 	
 	public Map querySpkgInfoBySpkgId(String spId) throws Exception {
