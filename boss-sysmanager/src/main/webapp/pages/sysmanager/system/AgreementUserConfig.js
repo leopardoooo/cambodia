@@ -470,9 +470,9 @@ AgreementGrid = Ext.extend(Ext.grid.GridPanel, {
 			{header: '确认时间', 	dataIndex: 'confirm_date', 		width: 120},
 			{header: '操作', 		dataIndex: 'status', 			width: 80, renderer: function(v, meta, r){
 				var text = '';
-				if(v != 'CONFIRM'){
-					text += '<a href=# onclick=Ext.getCmp("agreementGridId").doUpdate()>修改</a>';
-				}
+				
+				text += '<a href=# onclick=Ext.getCmp("agreementGridId").doUpdate()>修改</a>';
+				
 				if(v == 'UNCONFIRM'){
 					text += '&nbsp;&nbsp;<a href=# onclick=Ext.getCmp("agreementGridId").doStatus()>确认</a>';
 				}

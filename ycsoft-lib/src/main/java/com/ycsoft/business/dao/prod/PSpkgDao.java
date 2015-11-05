@@ -44,7 +44,7 @@ public class PSpkgDao extends BaseEntityDao<PSpkg> {
 	}
 	
 	public List<String> queryProdName(String spkg_sn) throws JDBCException{
-		String sql="select p.prod_name||'('||ppt.tariff_name||')' "
+		String sql="select distinct p.prod_name "
 				+ " from p_prod p ,p_prod_tariff ppt where p.prod_id=ppt.prod_id and ppt.spkg_sn=? ";
 		return this.findUniques(sql, spkg_sn);
 	}
