@@ -369,6 +369,9 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 				&&!task.getTask_status().equals(StatusConstants.TASK_ENDWAIT)){
 			throw new ServicesException("工单可完工状态");	
 		}
+		if(!isBusi&&StatusConstants.NOT_EXEC.equals(task.getZte_status())){
+			throw new ServicesException("请等待supernet完成ZTE授权.Please Wait supernet ZTE Auth.");
+		}
 		//获取业务流水
 		Integer doneCode = doneCodeComponent.gDoneCode();
 		snTaskComponent.finishTask(doneCode, task, resultType, bugType, custSignNo, remark);
