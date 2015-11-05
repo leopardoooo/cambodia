@@ -472,15 +472,15 @@ AgreementGrid = Ext.extend(Ext.grid.GridPanel, {
 				}
 				return text;
 			}},
+			{header: '客户编号',		dataIndex: 'cust_no',			width: 100, renderer: App.qtipValue},
+			{header: '客户名称',		dataIndex: 'cust_name',			width: 100, renderer: App.qtipValue},
 			{header: '申请操作员', 	dataIndex: 'apply_optr_name', 	width: 80, renderer: App.qtipValue},
 			{header: '申请时间', 	dataIndex: 'apply_date', 		width: 120},	
 			{header: '确认操作员', 	dataIndex: 'confirm_optr_name', width: 80, renderer: App.qtipValue},
 			{header: '确认时间', 	dataIndex: 'confirm_date', 		width: 120},
+			{header: '产品名称',		dataIndex: 'prod_name',			width: 100, renderer: App.qtipValue},
 			{header: '创建时间', 	dataIndex: 'create_time', 		width: 120},
 			{header: '创建操作员', 	dataIndex: 'optr_name', 		width: 80, renderer: App.qtipValue},			
-			{header: '客户编号',		dataIndex: 'cust_no',			width: 100, renderer: App.qtipValue},
-			{header: '客户名称',		dataIndex: 'cust_name',			width: 100, renderer: App.qtipValue},
-			{header: '产品名称',		dataIndex: 'prod_name',			width: 100, renderer: App.qtipValue},
 			{header: '备注',			dataIndex: 'remark', 			width: 100, renderer: App.qtipValue}
 		];
 		AgreementGrid.superclass.constructor.call(this, {
