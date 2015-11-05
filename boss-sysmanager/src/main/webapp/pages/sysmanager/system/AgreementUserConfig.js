@@ -28,7 +28,7 @@ AgreementWin = Ext.extend(Ext.Window, {
 				allowBlank: false,
 				format: 'Y-m-d',
 				value: currentDate.format('Y-m-d'),
-				minValue: currentDate.format('Y-m-d'),
+				//minValue: currentDate.format('Y-m-d'),
 				vtype: 'daterange',
                 endDateField: 'agreement_exp_date_id',
                 customDay: 1
@@ -461,13 +461,7 @@ AgreementGrid = Ext.extend(Ext.grid.GridPanel, {
 			{header: '协议内容', 	dataIndex: 'spkg_text', 		width: 100, renderer: App.qtipValue},
 			{header: '生效时间', 	dataIndex: 'eff_date', 			width: 75, renderer: Ext.util.Format.dateFormat},
 			{header: '失效时间', 	dataIndex: 'exp_date', 			width: 75, renderer: Ext.util.Format.dateFormat},
-			{header: '状态', 		dataIndex: 'status_text', 		width: 50, renderer: Ext.util.Format.statusShow},
-			{header: '创建操作员', 	dataIndex: 'optr_name', 		width: 80, renderer: App.qtipValue},
-			{header: '申请操作员', 	dataIndex: 'apply_optr_name', 	width: 80, renderer: App.qtipValue},
-			{header: '确认操作员', 	dataIndex: 'confirm_optr_name', width: 80, renderer: App.qtipValue},
-			{header: '创建时间', 	dataIndex: 'create_time', 		width: 120},
-			{header: '申请时间', 	dataIndex: 'apply_date', 		width: 120},
-			{header: '确认时间', 	dataIndex: 'confirm_date', 		width: 120},
+			{header: '状态', 		dataIndex: 'status_text', 		width: 50, renderer: Ext.util.Format.statusShow},			
 			{header: '操作', 		dataIndex: 'status', 			width: 80, renderer: function(v, meta, r){
 				var text = '';
 				
@@ -478,6 +472,12 @@ AgreementGrid = Ext.extend(Ext.grid.GridPanel, {
 				}
 				return text;
 			}},
+			{header: '申请操作员', 	dataIndex: 'apply_optr_name', 	width: 80, renderer: App.qtipValue},
+			{header: '申请时间', 	dataIndex: 'apply_date', 		width: 120},	
+			{header: '确认操作员', 	dataIndex: 'confirm_optr_name', width: 80, renderer: App.qtipValue},
+			{header: '确认时间', 	dataIndex: 'confirm_date', 		width: 120},
+			{header: '创建时间', 	dataIndex: 'create_time', 		width: 120},
+			{header: '创建操作员', 	dataIndex: 'optr_name', 		width: 80, renderer: App.qtipValue},			
 			{header: '客户编号',		dataIndex: 'cust_no',			width: 100, renderer: App.qtipValue},
 			{header: '客户名称',		dataIndex: 'cust_name',			width: 100, renderer: App.qtipValue},
 			{header: '产品名称',		dataIndex: 'prod_name',			width: 100, renderer: App.qtipValue},
