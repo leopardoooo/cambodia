@@ -293,7 +293,7 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 			fields:['task_id','cust_no','cust_name','cust_tel','old_addr','new_addr','address','task_type_id',
 					'task_status','task_status_text','task_type_id_text','team_id','team_id_text','bug_type','bug_type_text'
 					,'bug_detail','zte_status','zte_status_text','task_create_time','team_type','linkman_name',
-					'linkman_tel','sync_status','sync_status_text','task_finish_desc','bug_phone','cust_sign_no','installer_id_text','installer_id_tel','task_finish_type_text'],
+					'linkman_tel','sync_status','sync_status_text','task_finish_desc','bug_phone','cust_sign_no','installer_id_text','installer_id_tel','task_finish_type_text','task_finish_time'],
 			root : 'records',
 			totalProperty : 'totalProperty',
 			autoDestroy : true
@@ -449,7 +449,8 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 				{header: taskCols[22], dataIndex:'installer_id_tel',width:120,renderer:App.qtipValue},
 				{header: taskCols[5], dataIndex : 'address', width: 200,renderer:App.qtipValue},
 				{header: taskCols[6], dataIndex : 'cust_tel', 				width: 100, renderer:App.qtipValue},
-				{header: taskCols[7], dataIndex: 'task_create_time', 	width: 80, renderer: Ext.util.Format.dateFormat},					
+				{header: taskCols[7], dataIndex: 'task_create_time', 	width: 80, renderer: Ext.util.Format.dateFormat},
+				{header: taskCols[25], dataIndex: 'task_finish_time', 	width: 120, renderer: App.qtipValue},
 				{header: taskCols[8],dataIndex:'bug_type_text',width:120, renderer:App.qtipValue},
 				{header: taskCols[9],dataIndex:'bug_detail',width:120,renderer:App.qtipValue},
 				{header: taskCols[11],dataIndex:'linkman_name',width:90,renderer:App.qtipValue},
