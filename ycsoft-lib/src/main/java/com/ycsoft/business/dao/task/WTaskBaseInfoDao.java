@@ -96,50 +96,52 @@ public class WTaskBaseInfoDao extends BaseEntityDao<WTaskBaseInfo> {
 				+ "and ta.district_id = td.district_id  and td.province_id=tp.id and  tp.id in ("+sqlGenerator.in(addrIds.split(","))+")") ;
 		List<Object> params = new ArrayList<Object>();
 		
-		if(StringHelper.isNotEmpty(beginDate)){
-			sql += " AND t.task_create_time >= to_date(?, 'yyyy-MM-dd') ";
-			params.add(beginDate);
-		}
-		if(StringHelper.isNotEmpty(endDate)){
-			sql += " AND t.task_create_time < to_date(?, 'yyyy-MM-dd')+1 ";
-			params.add(endDate);
-		}	
-		if(StringHelper.isNotEmpty(taskTypes)){
-			sql += "  AND  t.task_type_id in ("+sqlGenerator.in(taskTypes.split(","))+")";
-		}
-		if(StringHelper.isNotEmpty(zteStatus)){
-			sql += "  AND  t.zte_status in ("+sqlGenerator.in(zteStatus.split(","))+")";
-		}
-		if(StringHelper.isNotEmpty(syncStatus)){
-			sql += "  AND  t.sync_status in ("+sqlGenerator.in(syncStatus.split(","))+")";
-		}
-		if(StringHelper.isNotEmpty(status)){
-			sql += "  AND T.TASK_STATUS in ("+sqlGenerator.in(status.split(","))+")";
-		}
 		if(StringHelper.isNotEmpty(taskId)){
+			//工单编号不为空时，只用工单编号查询
 			sql += "  AND t.task_id = ? ";
 			params.add(taskId);
+		}else{
+			if(StringHelper.isNotEmpty(beginDate)){
+				sql += " AND t.task_create_time >= to_date(?, 'yyyy-MM-dd') ";
+				params.add(beginDate);
+			}
+			if(StringHelper.isNotEmpty(endDate)){
+				sql += " AND t.task_create_time < to_date(?, 'yyyy-MM-dd')+1 ";
+				params.add(endDate);
+			}	
+			if(StringHelper.isNotEmpty(taskTypes)){
+				sql += "  AND  t.task_type_id in ("+sqlGenerator.in(taskTypes.split(","))+")";
+			}
+			if(StringHelper.isNotEmpty(zteStatus)){
+				sql += "  AND  t.zte_status in ("+sqlGenerator.in(zteStatus.split(","))+")";
+			}
+			if(StringHelper.isNotEmpty(syncStatus)){
+				sql += "  AND  t.sync_status in ("+sqlGenerator.in(syncStatus.split(","))+")";
+			}
+			if(StringHelper.isNotEmpty(status)){
+				sql += "  AND T.TASK_STATUS in ("+sqlGenerator.in(status.split(","))+")";
+			}
+			
+			if(StringHelper.isNotEmpty(teamId)){
+				sql += "  AND t.team_id in ("+sqlGenerator.in(teamId.split(","))+")";
+			}
+			if(StringHelper.isNotEmpty(custNo)){
+				sql += "  AND c.cust_no = ? ";
+				params.add(custNo);
+			}
+			if(StringHelper.isNotEmpty(custName)){
+				sql += "  AND t.cust_name = ? ";
+				params.add(custName);
+			}		
+			if(StringHelper.isNotEmpty(mobile)){
+				sql += "  AND t.tel like ? ";
+				params.add("%" +mobile+ "%");
+			}
+			if(StringHelper.isNotEmpty(custAddr)){
+				sql += "  AND t.old like ? ";
+				params.add("%" +custAddr+ "%");
+			}
 		}
-		if(StringHelper.isNotEmpty(teamId)){
-			sql += "  AND t.team_id in ("+sqlGenerator.in(teamId.split(","))+")";
-		}
-		if(StringHelper.isNotEmpty(custNo)){
-			sql += "  AND c.cust_no = ? ";
-			params.add(custNo);
-		}
-		if(StringHelper.isNotEmpty(custName)){
-			sql += "  AND t.cust_name = ? ";
-			params.add(custName);
-		}		
-		if(StringHelper.isNotEmpty(mobile)){
-			sql += "  AND t.tel like ? ";
-			params.add("%" +mobile+ "%");
-		}
-		if(StringHelper.isNotEmpty(custAddr)){
-			sql += "  AND t.old like ? ";
-			params.add("%" +custAddr+ "%");
-		}
-		
 		sql += " ORDER BY t.task_create_time DESC ";
 		return this.createQuery(TaskBaseInfoDto.class,sql, params.toArray(new Object[params.size()]))
 			.setLimit(limit)
