@@ -102,6 +102,18 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 		this.getBusiParam().setOperateObj("WorkOrdersSn:"+taskId);
 		saveAllPublic(doneCode, getBusiParam());
 	}
+	/**
+	 * 记录BOSS接口被调用报错日志
+	 * @param taskId
+	 * @param errorInfo
+	 * @throws Exception
+	 */
+	public void saveErrorLog(String taskId,String busiCode,String errorInfo) throws Exception{
+		if(errorInfo!=null&&errorInfo.length()>150){
+			errorInfo=errorInfo.substring(0, 150);
+		}
+		snTaskComponent.createTaskLog(taskId, busiCode,  doneCodeComponent.gDoneCode(), errorInfo, StatusConstants.FAILURE);
+	}
 
 	@Override
 	public void cancelTask(String taskId)  throws Exception{
