@@ -107,7 +107,9 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 			List<DeviceDto> list= deviceComponent.querySaleableDeviceArea(deviceCode,user.getUser_type());
 			
 			for(DeviceDto device:list){
-				user.setLogin_name(null);
+				if(list.size()>1){
+					user.setLogin_name(null);
+				}
 				user = openSingle(cust, user, doneCode, device.getDevice_code(), device.getDevice_type(), device.getDevice_model(), deviceBuyMode, deviceFee);
 				getBusiParam().addUser(user);//设置拦截器所需要的参数
 			}
