@@ -112,7 +112,13 @@ public class BaseBusiComponent extends BaseComponent{
 	public String getFillUserName(CUser user){
 		String userName = "";
 		if(user.getUser_type().equals(SystemConstants.USER_TYPE_DTT)){
-			userName = MemoryDict.getDictName( DictKey.TERMINAL_TYPE, SystemConstants.USER_TERMINAL_TYPE_ZZD );
+			if(StringHelper.isNotEmpty(user.getUser_name())){
+				userName = user.getUser_name() +" ("+user.getStb_id() +")";
+			}else if(StringHelper.isNotEmpty(user.getStb_id())){
+				userName=user.getStb_id();
+			}else{
+				userName = MemoryDict.getDictName( DictKey.TERMINAL_TYPE, SystemConstants.USER_TERMINAL_TYPE_ZZD );
+			}
 		}else if(user.getUser_type().equals(SystemConstants.USER_TYPE_OTT)){
 			if(StringHelper.isNotEmpty(user.getUser_name())){
 				userName = user.getUser_name() +" ("+user.getLogin_name() +")";
