@@ -81,7 +81,7 @@ public class BOSSWebServiceSoapImplServiceSkeleton
     		// 返回成功的结果
     		return createReturnWorkOrderResponse(createResultHeadForSuccess());
     	}catch(Exception e){
-    		e.printStackTrace();
+    		LOG.debug("cfocn完工失败，工单编号:"+taskId,e);
     		// 返回失败的结果
     		return createReturnWorkOrderResponse(createResultHeadForFail(e));
     	}
@@ -171,7 +171,7 @@ public class BOSSWebServiceSoapImplServiceSkeleton
 			
 			return createDeviceFeedBackResponse(createResultHeadForSuccess());
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOG.debug("cfocn回填失败，工单编号："+taskId,e);
 			return createDeviceFeedBackResponse(createResultHeadForFail(e));
 		}
     	
