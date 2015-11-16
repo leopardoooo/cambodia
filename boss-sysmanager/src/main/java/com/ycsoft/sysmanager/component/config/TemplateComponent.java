@@ -841,6 +841,7 @@ public class TemplateComponent  extends  BaseComponent {
 	public void saveConfigTpls(String templateId, String templateType,
 			List<TConfigTemplate> configList, String[] countyIds, SOptr optr)
 			throws Exception {
+		/**
 		String oweFeeNumber = "";	//修改后值
 		String preTemplateId = "";
 		for(TConfigTemplate ct : configList){
@@ -863,7 +864,7 @@ public class TemplateComponent  extends  BaseComponent {
 						.getTemplate_id(), remark + " 修改前天数：" + ct.getConfig_value()+"; 修改后天数：" + oweFeeNumber+"  模板ID："+preTemplateId,
 						optr);
 			}
-		}
+		}**/
 		//保存模板地区配置
 		saveTemplateCountyConfigs(templateId, templateType, countyIds);
 		

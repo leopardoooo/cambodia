@@ -71,8 +71,9 @@ public class TemplateConfigDto extends TTemplate {
 		/**发票缴销仓库**/
 		INVOICE_DEPT_CHECKOUT,
 		/**工单延迟时间**/
-		DELAY_TASK_TIME
-		
+		DELAY_TASK_TIME,
+		/**OTT_MOBILE注册赠送天数**/
+		OTT_MOBILE_REGISTER_DAYS,
 	};
 
 	private List<TConfigTemplate> configList = null;

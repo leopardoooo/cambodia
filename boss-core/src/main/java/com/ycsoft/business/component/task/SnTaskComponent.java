@@ -702,7 +702,7 @@ public class SnTaskComponent extends BaseBusiComponent {
 		return null;
 	}
 
-	private void createTaskLog(String taskId, String busiCode, Integer doneCode, String logDetail, String synStatus)
+	public void createTaskLog(String taskId, String busiCode, Integer doneCode, String logDetail, String synStatus)
 			throws Exception {
 		if (StringHelper.isNotEmpty(taskId)) {
 			WTaskLog log = new WTaskLog();

@@ -17,7 +17,7 @@ public class Bootstrap2 {
 		QrtzJobDetail job = new QrtzJobDetail();
 		job.setJob_name("Test_job");
 		job.setJob_pool(Constants.JOB_POOL_NONE);
-		job.setJob_bean("taskServiceJob");
+		job.setJob_bean("orderExpChangeStatusJob");
 		job.setTrigger_type(Constants.TRIGGER_TYPE_SIMPLE);
 		job.setRepeat_count(0);
 		job.setRepeat_interval(1000L);

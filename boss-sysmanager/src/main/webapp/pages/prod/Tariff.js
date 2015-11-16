@@ -1041,7 +1041,7 @@ TariffGrid = Ext.extend(Ext.grid.GridPanel, {
             		if(record.get('status') == 'ACTIVE'){
             			btns = btns + "&nbsp;<a href='#' onclick=Ext.getCmp('tariffGrid').UpDateTariff() style='color:blue'>修改</a>" 
             			+ "&nbsp;<a href='#' onclick=Ext.getCmp('tariffGrid').deleteTariff() style='color:blue'>禁用</a>" 
-            			+ "&nbsp;<a href='#' onclick=Ext.getCmp('tariffGrid').ShowDisct() style='color:blue'>折扣</a>"
+            			// + "&nbsp;<a href='#' onclick=Ext.getCmp('tariffGrid').ShowDisct() style='color:blue'>折扣</a>"
             		}else{
             			btns = btns + "&nbsp;<a href='#' onclick=Ext.getCmp('tariffGrid').UpToUseTariff() style='color:blue'>启用</a>"
             		}

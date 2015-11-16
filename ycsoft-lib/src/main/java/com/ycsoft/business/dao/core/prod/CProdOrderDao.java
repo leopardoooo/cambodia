@@ -317,7 +317,7 @@ public class CProdOrderDao extends BaseEntityDao<CProdOrder> {
 		+"  where  t.prod_id=p.prod_id and p.serv_id=? "
 		+"  and t.status in (?,?) "
 		+" AND t.EXP_DATE>=TRUNC(SYSDATE) AND t.check_time is null " 
-		+" and t.eff_date <=trunc(sysdate)+1 and t.is_pay='T' ";
+		+" and t.eff_date <=trunc(sysdate)+1  ";
 		return this.createQuery(CProdOrder.class,sql, SystemConstants.PROD_SERV_ID_BAND,StatusConstants.ACTIVE,StatusConstants.INSTALL).list();
 	}
 	/**

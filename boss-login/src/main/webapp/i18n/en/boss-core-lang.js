@@ -566,7 +566,7 @@ BCLang.home = {
 			},
 			taskCols : ['WorkOrdersType', 'CustName', 'WorkOrdersStatus', 'ConstructionTeam', 'ZTEStatus', 'Address', 'Tel', 'CreateTime', 
 				'FaultType', 'FaultDetails','WorkNo.','CustManager', 'CustManagerTel','CustNo.','CfocnSyncStatus','OldAddress','NewAddress',
-				'ReportFaultPhone', 'FinishDescription', 'WorkOrderOperator', 'CustomerSignNo.','StatusTime','WorkOrderOperatorTel','FinishType'],
+				'ReportFaultPhone', 'FinishDescription', 'WorkOrderOperator', 'CustomerSignNo.','StatusTime','WorkOrderOperatorTel','FinishType','TaskDeviceCnt','TaskFinishTime'],
 			userCols : ['UserType', 'Account number', 'Password', 'DeviceModel', 'DeviceNO.', 'PosNo.', 'OccNo.', 'BandWidth','Band password','Status','StatusTime','ProdExpDate'],
 			operateCols : ['OperatingTime', 'OperationType', 'Operator', 'SyncStatus', 'Description','DelayTime'],
 			samTaskCols : ['WorkNo.', 'WorkOrdersStatus', 'ConstructionTeam', 'CreateTime', 'FaultType', 'FaultDetails', 'SyncStatus','FinishDescription','WorkOrderOperatorTel','FinishTime','FinishType'],

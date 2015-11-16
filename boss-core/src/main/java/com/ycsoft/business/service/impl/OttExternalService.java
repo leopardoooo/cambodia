@@ -46,6 +46,7 @@ import com.ycsoft.business.dao.prod.PProdStaticResDao;
 import com.ycsoft.business.dao.prod.PProdTariffDao;
 import com.ycsoft.business.dao.prod.PProdTariffDisctDao;
 import com.ycsoft.business.dao.prod.PPromotionEasyProdDao;
+import com.ycsoft.business.dto.config.TemplateConfigDto;
 import com.ycsoft.business.dto.core.prod.OrderProd;
 import com.ycsoft.business.dto.core.prod.OrderProdPanel;
 import com.ycsoft.commons.constants.BusiCodeConstants;
@@ -226,7 +227,9 @@ public class OttExternalService extends OrderService {
 				cCustLinkmanDao.update(updatelinkman);
 				
 			}
-			
+			if(StringHelper.isEmpty(new_user_name)){
+				new_user_name=user.getLogin_name();
+			}
 			//业务保存
 			this.saveAllPublic(doneCode, this.getBusiParam());
 			//调用接口修改
@@ -315,9 +318,18 @@ public class OttExternalService extends OrderService {
 		resultMap.put("customer_code", cust.getCust_no());
 		
 		
-		 //注册免费送3天节目
+		//模板配置注册送天数
+		int templateDays=0;
+		try{
+			String TemplateDayString = orderComponent.queryTemplateConfig(TemplateConfigDto.Config.OTT_MOBILE_REGISTER_DAYS.toString());
+			if(StringHelper.isNotEmpty(TemplateDayString)){
+				templateDays=Integer.valueOf(TemplateDayString);
+			}
+		}catch(Exception e){}
+		//注册免费送3天节目
 		for(PPromotionEasyProd easyProd: pPromotionEasyProdDao.queryPromotionByType(SystemConstants.PROMOTION_TYPE_OTT_MOBILE_EXTERNAL)){
-			OrderProd orderProd=getOttMobileOrderProd(user,easyProd.getTariff_id(),easyProd.getOrder_cycles(),null,null,null);
+			//有模板配置则按模板配置送
+			OrderProd orderProd=getOttMobileOrderProd(user,easyProd.getTariff_id(),(templateDays>0?templateDays:easyProd.getOrder_cycles()),null,null,null);
 			saveOrderProd(orderProd, this.getBusiParam().getBusiCode(), this.getBusiParam().getDoneCode());
 		}
 		

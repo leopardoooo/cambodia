@@ -5,45 +5,11 @@ Ext.apply( App, {
 	refrshTool : function() {
 		//操作员信息
 		var data = App.data;
-		var deptmenu ;
-			App.tool.insert(2,{
-				text: langUtils.tools("qhbm"),
-				iconCls: 'icon-t-dept',
-				handler : App.tool.onToggleDept
-			});
-		if (data.optr['login_name']=='admin'){
-			//工具菜单
-			App.tool.insert(2, {
-				text: langUtils.tools("gj"),
-				iconCls:'icon-t-county',
-				menu: new Ext.menu.Menu({
-					items:[	
-						{
-							itemId:'reloadConfig',
-							text: langUtils.tools("czpz"),
-							iconCls:'icon-t-county'
-						},
-						{
-							itemId:'reloadPrintData',
-							text: langUtils.tools("czfpsj"),
-							iconCls:'icon-t-county'
-						}
-					],
-					listeners: {
-						scope: App.tool,
-						itemclick: function(item){
-							if(item.itemId === 'reloadConfig')
-								App.tool.reloadConfig();
-							else if(item.itemId == 'reloadPrintData'){
-								App.tool.reloadPrintData();
-							}
-						}
-					}
-				})
-			} );
-			App.tool.insert(3,'-');
-		}
-		
+		App.tool.insert(2,{
+			text: langUtils.tools("qhbm"),
+			iconCls: 'icon-t-dept',
+			handler : App.tool.onToggleDept
+		});
 		App.tool.insert(2,{text: langUtils.tools("gg") ,iconCls:'bulletin',listeners:{
 				click:function(){
 					App.tool.bulletinAllWin();
@@ -54,138 +20,140 @@ Ext.apply( App, {
 		
 
 		//操作员权限包含的其他业务按钮
-		var menuItems = [];
-		for(var i=0;i<App.data.resources.length;i++){
-			var resId = App.data.resources[i]["attrs"]["res_id"];
+		var menuItems = [], reloadMeuItems = [], resources = App.data.resources;
+		for(var i=0;i<resources.length;i++){
+			var res = resources[i];
+			var resId = resources[i]["attrs"]["res_id"];
+			var handler = App.data.resources[i].handler;
 			var text = langUtils.res(resId);
 			text = Ext.isArray(text)? text[0] : text;
-			if(App.data.resources[i].handler == 'queryDeviceId'){
+			if(handler == 'queryDeviceId'){
 				menuItems.push({
 					itemId:'queryDeviceId',
 					text: text,
 					iconCls:'query',
-					attrs : App.data.resources[i]
+					attrs : res
 				});
-			}else if(App.data.resources[i].handler == 'queryInvoiceId'){
+			}else if(handler == 'queryInvoiceId'){
 				menuItems.push({
 					itemId:'queryInvoiceId',
 					text: text,
 					iconCls:'query',
-					attrs : App.data.resources[i]
+					attrs : res
 				});
-			}else if(App.data.resources[i].handler == 'openOTTMobile'){
+			}else if(handler == 'openOTTMobile'){
 				menuItems.push({
 					itemId:'openOTTMobile',
 					text: text,
 					iconCls:'query',
-					attrs : App.data.resources[i]
+					attrs : res
 				});
-			}else if(App.data.resources[i].handler == 'checkAccountId'){
+			}else if(handler == 'checkAccountId'){
 				menuItems.push({
 					itemId:'checkAccountId',
 					text: text,
 					iconCls:'gz',
-					attrs : App.data.resources[i]
+					attrs : res
 				});
-			}else if(App.data.resources[i].handler == 'DeviceCountCheck'){
+			}else if(handler == 'DeviceCountCheck'){
 				menuItems.push({
 					itemId:'DeviceCountCheck',
 					text: text,
 					iconCls:'gz',
-					attrs : App.data.resources[i]
+					attrs : res
 				});
-			}else if(App.data.resources[i].handler == 'UserCountCheck'){
+			}else if(handler == 'UserCountCheck'){
 				menuItems.push({
 					itemId:'UserCountCheck',
 					text: text,
 					iconCls:'gz',
-					attrs : App.data.resources[i]
+					attrs : res
 				});
-			}else if(App.data.resources[i].handler == 'feeUnitpreId'){
+			}else if(handler == 'feeUnitpreId'){
 				menuItems.push({
 					itemId:'feeUnitpreId',
 					text: text,
 					iconCls:'pay',
-					attrs : App.data.resources[i]
+					attrs : res
 				});
-			}else if(App.data.resources[i].handler == 'batchPayFeeId'){
+			}else if(handler == 'batchPayFeeId'){
 				menuItems.push({
 					itemId:'batchPayFeeId',
 					text: text,
 					iconCls:'pay',
-					attrs : App.data.resources[i]
+					attrs : res
 				});
-			}else if(App.data.resources[i].handler == 'batchEditAcctDateId'){
+			}else if(handler == 'batchEditAcctDateId'){
 				menuItems.push({
 					itemId:'batchEditAcctDateId',
 					text: text,
 					iconCls:'editCust',
-					attrs : App.data.resources[i]
+					attrs : res
 				});
-			}else if(App.data.resources[i].handler == 'BatchNewCust'){
+			}else if(handler == 'BatchNewCust'){
 				menuItems.push({
 					itemId:'batchOpenCust',
 					text: text,
 					iconCls:'newCust',
-					attrs : App.data.resources[i]
+					attrs : res
 				});
-			}else if(App.data.resources[i].handler == 'BatchLogoffCust'){
+			}else if(handler == 'BatchLogoffCust'){
 				menuItems.push({
 					itemId:'batchLogoffCust',
 					text: text,
 					iconCls:'delCust',
-					attrs : App.data.resources[i]
+					attrs : res
 				});
-			}else if(App.data.resources[i].handler == 'BatchLogoffUser'){
+			}else if(handler == 'BatchLogoffUser'){
 				menuItems.push({
 					itemId:'batchLogoffUser',
 					text: text,
 					iconCls:'logoffUser',
-					attrs : App.data.resources[i]
+					attrs : res
 				});
-			}else if(App.data.resources[i].handler == 'BatchOrderProd'){
+			}else if(handler == 'BatchOrderProd'){
 				menuItems.push({
 					itemId:'batchOrderProd',
 					text: text,
 					iconCls:'orderProd',
-					attrs : App.data.resources[i]
+					attrs : res
 				});
-			}else if(App.data.resources[i].handler == 'BatchCancelProd'){
+			}else if(handler == 'BatchCancelProd'){
 				menuItems.push({
 					itemId:'batchCancelProd',
 					text: text,
 					iconCls:'cancelProd',
-					attrs : App.data.resources[i]
+					attrs : res
 				});
-			}else if(App.data.resources[i].handler == 'ConfigBranchCom'){
+			}else if(handler == 'ConfigBranchCom'){
 				menuItems.push({
 					itemId:'ConfigBranchCom',
 					text: text,
 					iconCls:'newCust',
-					attrs : App.data.resources[i]
+					attrs : res
 				});
-			}else if(App.data.resources[i].handler == 'valuableCardWinId'){
+			}else if(handler == 'valuableCardWinId'){
 				menuItems.push({
 					itemId:'valuableCardWinId',
 					text: text,
 					iconCls:'icon_card',
-					attrs : App.data.resources[i]
+					attrs : res
 				});
-			}else if(App.data.resources[i].handler == 'updateAddressId'){
+			}else if(handler == 'updateAddressId'){
 				menuItems.push({
 					itemId:'updateAddressId',
 					text: text,
 					iconCls:'changeAddr',
-					attrs : App.data.resources[i]
+					attrs : res
 				});
-			}else if(App.data.resources[i].handler == 'queryVoucherId'){
+			}else if(handler == 'queryVoucherId'){
 				menuItems.push({
 					itemId:'queryVoucherId',
 					text: text,
 					iconCls:'query',
-					attrs : App.data.resources[i]
+					attrs : res
 				});
-			}else if(App.data.resources[i].handler == 'payRemindId'){
+			}else if(handler == 'payRemindId'){
 				Ext.Ajax.request({
 						url:Constant.ROOT_PATH + "/commons/x/QueryCust!queryImportanceCustNum.action",
 						success : function(res, ops) {
@@ -211,64 +179,76 @@ Ext.apply( App, {
 					    }
 					});
 
-			}else if(App.data.resources[i].handler == 'editCustStatusId'){
+			}else if(handler == 'editCustStatusId'){
 				//将客户状态修改为"资料隔离"
 				menuItems.push({
 					itemId:'editCustStatusId',
 					text: text,
 					iconCls:'editUserStatus',
-					attrs : App.data.resources[i]
+					attrs : res
 				});
-			}else if(App.data.resources[i].handler == 'editUserStatusId'){
+			}else if(handler == 'editUserStatusId'){
 				//将用户状态修改为"休眠"或"关模隔离"
 				menuItems.push({
 					itemId:'editUserStatusId',
 					text: text,
 					iconCls:'editUserStatus',
-					attrs : App.data.resources[i]
+					attrs : res
 				});
-			}else if(App.data.resources[i].handler == 'checkMobileBill'){
+			}else if(handler == 'checkMobileBill'){
 				//未支付结账
 				menuItems.push({
 					itemId:'checkMobileBill',
 					text: text,
 					iconCls:'pay',
-					attrs : App.data.resources[i]
+					attrs : res
 				});
-			}else if(App.data.resources[i].handler == 'queryBandOnlineUser'){
+			}else if(handler == 'queryBandOnlineUser'){
 				menuItems.push({
 					itemId:'queryBandOnlineUser',
 					text: text,
 					iconCls:'query',
-					attrs : App.data.resources[i]
+					attrs : res
 				});
-			}else if(App.data.resources[i].handler == 'queryBandUserFailedLog'){
+			}else if(handler == 'queryBandUserFailedLog'){
 				menuItems.push({
 					itemId:'queryBandUserFailedLog',
 					text: text,
 					iconCls:'query',
-					attrs : App.data.resources[i]
+					attrs : res
 				});
-			}else if(App.data.resources[i].handler == 'sendCaCardId'){
+			}else if(handler == 'sendCaCardId'){
 				menuItems.push({
 					itemId:'sendCaCardId',
 					text: text,
 					iconCls:'icon-busi',
-					attrs : App.data.resources[i]
+					attrs : res
 				});
-			}else if('TaskManager' == App.data.resources[i].handler){
+			}else if('TaskManager' == handler){
 				menuItems.push({
 					itemId: 'TaskManager',
 					text: text,
-					iconCls: App.data.resources[i].iconCls,
-					attrs : App.data.resources[i]
+					iconCls: res.iconCls,
+					attrs : res
 				});
-			}else if('AddressViewWin' == App.data.resources[i].handler){
+			}else if('AddressViewWin' == handler){
 				menuItems.push({
 					itemId: 'AddressViewWin',
 					text: text,
-					iconCls: App.data.resources[i].iconCls,
-					attrs : App.data.resources[i]
+					iconCls: res.iconCls,
+					attrs : res
+				});
+			}else if('reloadConfig' == handler){
+				reloadMeuItems.push({
+					itemId: 'reloadConfig',
+					text: langUtils.tools("czpz"),
+					iconCls:'icon-t-county'
+				});
+			}else if('reloadPrintData' == handler){
+				reloadMeuItems.push({
+					itemId: 'reloadPrintData',
+					text: langUtils.tools("czfpsj"),
+					iconCls:'icon-t-county'
 				});
 			}
 		}
@@ -284,7 +264,8 @@ Ext.apply( App, {
 					listeners: {
 						scope: App.tool,
 						itemclick: function(item){
-							if(item.itemId!='batchOpenCust' || item.itemId!='ConfigBranchCom' ){
+							var itemId = item.itemId;
+							if(itemId!='batchOpenCust' || itemId!='ConfigBranchCom' ){
 								//添加操作员正在使用的功能,goUrl()调用bigWindow已经存在以下方法
 								if(item.attrs){
 									App.addOnlineUser(item.attrs.attrs);
@@ -295,59 +276,59 @@ Ext.apply( App, {
 								Alert('当前部门无法进行 “' + item.attrs.attrs.businame + '” 这项业务!');
 								return;
 							}
-							if(item.itemId === 'queryDeviceId'){
+							if(itemId === 'queryDeviceId'){
 								App.tool.showDeviceWin();
-							}else if(item.itemId === 'queryInvoiceId'){
+							}else if(itemId === 'queryInvoiceId'){
 								App.tool.showInvoiceWin();
-							}else if(item.itemId === 'openOTTMobile'){
+							}else if(itemId === 'openOTTMobile'){
 								App.tool.showOpenOTTMobileeWin();
-							}else if(item.itemId === 'closeInvoiceId'){
+							}else if(itemId === 'closeInvoiceId'){
 								App.tool.showCloseInvoiceWin();
-							}else if(item.itemId === 'checkAccountId'){
+							}else if(itemId === 'checkAccountId'){
 								App.tool.showCheckAcctountWin();
-							}else if(item.itemId === 'DeviceCountCheck'){
+							}else if(itemId === 'DeviceCountCheck'){
 								App.tool.showDeviceCountCheckWin();
-							}else if(item.itemId === 'UserCountCheck'){
+							}else if(itemId === 'UserCountCheck'){
 								App.tool.showUserCountCheckWin();
-							}else if(item.itemId === 'feeUnitpreId'){
+							}else if(itemId === 'feeUnitpreId'){
 								App.tool.showFeeUnitpreWin();
-							}else if(item.itemId === 'batchPayFeeId'){
+							}else if(itemId === 'batchPayFeeId'){
 								App.tool.showBatchPayFeeWin();
-							}else if(item.itemId === 'batchEditAcctDateId'){
+							}else if(itemId === 'batchEditAcctDateId'){
 								App.tool.showBatchEditAcctDateWin();
-							}else if(item.itemId == 'batchOpenCust'){
+							}else if(itemId == 'batchOpenCust'){
 								goUrl(item.attrs);
-							}else if(item.itemId == 'batchLogoffCust'){
+							}else if(itemId == 'batchLogoffCust'){
 								App.tool.showBatchLogoffCustWin();
-							}else if(item.itemId == 'batchLogoffUser'){
+							}else if(itemId == 'batchLogoffUser'){
 								App.tool.showBatchLogoffUserWin();
-							}else if(item.itemId == 'batchOrderProd'){
+							}else if(itemId == 'batchOrderProd'){
 								App.tool.showBatchOrderProdWin();
-							}else if(item.itemId == 'batchCancelProd'){
+							}else if(itemId == 'batchCancelProd'){
 								App.tool.showBatchCancelProdWin();
-							}else if(item.itemId == 'ConfigBranchCom'){
+							}else if(itemId == 'ConfigBranchCom'){
 								goUrl(item.attrs);
-							}else if(item.itemId == 'valuableCardWinId'){
+							}else if(itemId == 'valuableCardWinId'){
 								App.tool.showvaluableCardWin();
-							}else if(item.itemId == 'updateAddressId'){
+							}else if(itemId == 'updateAddressId'){
 								App.tool.showupdateAddressWin();
-							}else if(item.itemId == 'queryVoucherId'){
+							}else if(itemId == 'queryVoucherId'){
 								App.tool.showVoucherWin();
-							}else if(item.itemId == 'editCustStatusId'){
+							}else if(itemId == 'editCustStatusId'){
 								App.tool.showCustStatusWin();
-							}else if(item.itemId == 'editUserStatusId'){
+							}else if(itemId == 'editUserStatusId'){
 								App.tool.showUserStatusWin();
-							}else if(item.itemId == 'checkMobileBill'){
+							}else if(itemId == 'checkMobileBill'){
 								App.tool.showMobileBillWin();
-							}else if(item.itemId == 'queryBandOnlineUser'){
+							}else if(itemId == 'queryBandOnlineUser'){
 								App.tool.showBandOnlineUserWin();
-							}else if(item.itemId == 'queryBandUserFailedLog'){
+							}else if(itemId == 'queryBandUserFailedLog'){
 								App.tool.showBandUserFailedLogWin();
-							}else if(item.itemId == 'sendCaCardId'){
+							}else if(itemId == 'sendCaCardId'){
 								App.tool.showCaCardWin();
-							}else if(item.itemId == 'TaskManager'){
+							}else if(itemId == 'TaskManager'){
 								App.tool.showTaskManagerWin(item);
-							}else if(item.itemId == 'AddressViewWin'){
+							}else if(itemId == 'AddressViewWin'){
 								App.tool.showAddressViewWin(item);
 							}
 						}
@@ -357,6 +338,27 @@ Ext.apply( App, {
 			
 			App.tool.insert(5,'-');
 	
+		}
+		
+		if(reloadMeuItems.length > 0){
+			App.tool.insert(6,{
+				text: langUtils.tools("gj"),
+				iconCls:'icon-t-county',
+				menu: new Ext.menu.Menu({
+					items:reloadMeuItems,
+					listeners: {
+						scope: App.tool,
+						itemclick: function(item){
+							if(item.itemId === 'reloadConfig')
+								App.tool.reloadConfig();
+							else if(item.itemId == 'reloadPrintData'){
+								App.tool.reloadPrintData();
+							}
+						}
+					}
+				})
+			});
+			App.tool.insert(7,'-');
 		}
 		
 		App.tool.doLayout();
