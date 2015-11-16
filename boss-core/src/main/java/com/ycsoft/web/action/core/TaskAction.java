@@ -199,6 +199,12 @@ public class TaskAction extends BaseBusiAction{
 		return JSON_SUCCESS;
 	}
 	
+	public String queryCanEndTask() throws Exception{
+		getRoot().setSimpleObj(snTaskService.queryCanEndTask(task_id,resultType));
+		return JSON_SIMPLEOBJ;
+		
+	}
+	
 	public String editCustSignNo() throws Exception {
 		String custSignNo = request.getParameter("custSignNo");
 		snTaskService.editCustSignNo(task_id, custSignNo);

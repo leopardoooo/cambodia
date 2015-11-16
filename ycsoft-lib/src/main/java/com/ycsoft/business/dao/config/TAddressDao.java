@@ -339,7 +339,7 @@ public class TAddressDao extends BaseEntityDao<TAddress> {
 	 * @throws Exception
 	 */
 	public List<TAddress> queryBindableAddr(String countyId, String deptId) throws Exception {
-		String sql = "select t.* from t_address t  where t.county_id = ? and t.tree_level = '2' " ;
+		String sql = "select t.* from t_address t  where t.county_id = ? and t.tree_level = '1' " ;
 		return createQuery(sql, countyId).list();
 	}
 
@@ -407,10 +407,12 @@ public class TAddressDao extends BaseEntityDao<TAddress> {
 	
 	public List<TAddressSysDto> queryAllAddrByIds(String[] addrIds) throws JDBCException {
 		String src = "";
+		String isRelationCity = ",'F' isRelationCity ";
 		if(addrIds != null && addrIds.length>0){
 			src = " and "+getSqlGenerator().setWhereInArray("addr_id",addrIds);
+			isRelationCity = ",'T' isRelationCity ";
 		}
-		String sql = "SELECT * FROM t_address where  tree_level = '1' "+ src;
+		String sql = "SELECT t.* "+isRelationCity+" FROM t_address t where  t.tree_level = '1' "+ src;
 		return createQuery(TAddressSysDto.class,sql).list();
 	}
 	

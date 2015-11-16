@@ -2,6 +2,7 @@ package com.ycsoft.business.dto.config;
 
 import com.ycsoft.beans.config.TAddress;
 import com.ycsoft.commons.constants.StatusConstants;
+import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.tree.AddrTree;
 import com.ycsoft.commons.tree.AddrTreeNode;
 
@@ -21,6 +22,7 @@ public class TAddressSysDto extends TAddress implements AddrTree {
 	private String addr_p_name;
 	private String addr_last_id;
 	private String district_name;
+	private String isRelationCity;
 	
 	public void transform(AddrTreeNode node){
 		node.setId( getAddr_id());
@@ -30,6 +32,8 @@ public class TAddressSysDto extends TAddress implements AddrTree {
 		node.setCls("file");
 		if(getTree_level() == 3){
 			node.setHideObarAdd(true);
+		}else if(getTree_level() == 1 && SystemConstants.BOOLEAN_TRUE.equals(getIsRelationCity())){
+			node.setHideObarLeveladd(true);
 		}
 		if(getStatus().equals(StatusConstants.ACTIVE)){
 			node.setHideObarStatusactive(true);
@@ -52,27 +56,29 @@ public class TAddressSysDto extends TAddress implements AddrTree {
 
 	
 	
+	public String getIsRelationCity() {
+		return isRelationCity;
+	}
+
+	public void setIsRelationCity(String isRelationCity) {
+		this.isRelationCity = isRelationCity;
+	}
+
 	public String getDistrict_name() {
 		return district_name;
 	}
-
-
 
 	public void setDistrict_name(String district_name) {
 		this.district_name = district_name;
 	}
 
-
-
 	public String getAddr_last_id() {
 		return addr_last_id;
 	}
 
-
 	public void setAddr_last_id(String addr_last_id) {
 		this.addr_last_id = addr_last_id;
 	}
-
 
 	public Integer getNum() {
 		return num;

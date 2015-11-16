@@ -902,6 +902,7 @@ public class BaseBusiComponent extends BaseComponent{
 		String isRstopFee = SystemConstants.BOOLEAN_FALSE;
 		try {
 			isRstopFee = this.queryTemplateConfig(TemplateConfigDto.Config.IS_RSTOP_FEE.toString());
+			isRstopFee = isRstopFee==null ?SystemConstants.BOOLEAN_FALSE:isRstopFee;
 		} catch (Exception e){
 			
 		}

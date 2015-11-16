@@ -547,7 +547,7 @@ public class AddressComponent extends BaseComponent {
 				addrIds= CollectionHelper.converValueToArray(tAddressDao.queryAllAddrByPids(SystemConstants.ADDR_TREE_LEVEL_ONE,pids),"addr_id");
 			}
 			if(StringHelper.isEmpty(name)){
-				list = tAddressDao.queryAllAddrByIds(null);
+				list = tAddressDao.queryAllAddrByIds(addrIds);
 			}else{
 				name = name.toLowerCase();
 				name = name.replaceAll(" ", "");

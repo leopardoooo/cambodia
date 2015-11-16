@@ -202,7 +202,7 @@ public class SimpleComponent extends BaseBusiComponent {
 				addrIds= CollectionHelper.converValueToArray(tAddressDao.queryAllAddrByPids(SystemConstants.ADDR_TREE_LEVEL_ONE,pids),"addr_id");
 			}
 			if(StringHelper.isEmpty(name)){
-				list = tAddressDao.queryAllAddrByIds(null);
+				list = tAddressDao.queryAllAddrByIds(addrIds);
 			}else{
 				name = name.toLowerCase();
 				name = name.replaceAll(" ", "");
@@ -222,6 +222,11 @@ public class SimpleComponent extends BaseBusiComponent {
 		if(list.size()>2000){
 			throw new ComponentException(ErrorCode.DataNumTooMuch);
 		}
+		
+		if(list.size()>2000){
+			throw new ComponentException(ErrorCode.DataNumTooMuch);
+		}
+		
 		return list;
 	}
 	
@@ -279,6 +284,11 @@ public class SimpleComponent extends BaseBusiComponent {
 	 * @throws Exception
 	 */
 	public TAddress saveAddress(TAddressSysDto addr,String type) throws Exception{
+		List<SDeptAddr> sList = sDeptAddrDao.getAddrByDept(getOptr().getDept_id());
+		//新增的地区是城市，如果操作员所在部门已经关联了地区，就不允许新增
+		if(sList.size()>0 && addr.getTree_level().equals(SystemConstants.ADDR_TREE_LEVEL_ONE)){
+			throw new ComponentException(ErrorCode.AddNewAddrIsFail);
+		}
 		TAddress  newAddr = new TAddress();
 		newAddr.setAddr_pid(addr.getAddr_pid());
 		newAddr.setArea_id(addr.getArea_id());

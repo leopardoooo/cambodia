@@ -979,6 +979,39 @@ TaskManagerPanel = Ext.extend( Ext.Panel ,{
 						custSignNo : endForm.getForm().findField('custSignNo').getValue(),
 						finishRemark : endForm.getForm().findField('finishRemark').getValue()
 					};
+					//宽带
+//					function callbackSave(res, opt) {
+//						var rec = Ext.decode(res.responseText);
+//						if(rec == false){
+//							Confirm( "宽带设备未回填,是否继续操作?", this, function() {
+//								App.sendRequest( url, o, function(res,opt){
+//									Ext.getCmp('taskManagerPanelId').grid.getStore().reload({
+//										callback:function(records, options, success){  
+//							           		var panel = Ext.getCmp('taskManagerPanelId');
+//								           	var index = panel.grid.getStore().find('task_id',taskId);	           		
+//								           	panel.grid.getSelectionModel().selectRow(index);
+//								           	panel.loadTaskData(taskId);
+//										}
+//							         });
+//									win.close();
+//								});
+//							});
+//						}else{
+//							App.sendRequest( url, o, function(res,opt){
+//								Ext.getCmp('taskManagerPanelId').grid.getStore().reload({
+//									callback:function(records, options, success){  
+//						           		var panel = Ext.getCmp('taskManagerPanelId');
+//							           	var index = panel.grid.getStore().find('task_id',taskId);	           		
+//							           	panel.grid.getSelectionModel().selectRow(index);
+//							           	panel.loadTaskData(taskId);
+//									}
+//						         });
+//								win.close();
+//							});
+//						}
+//					}
+//					App.sendRequest(Constant.ROOT_PATH + "/core/x/Task!queryCanEndTask.action", o, callbackSave);
+					
 					App.sendRequest( url, o, function(res,opt){
 						Ext.getCmp('taskManagerPanelId').grid.getStore().reload({
 							callback:function(records, options, success){  

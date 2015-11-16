@@ -26,6 +26,11 @@ public class WTaskUserDao extends BaseEntityDao<WTaskUser> {
 		return this.count(sql, taskId);
 	}
 
+	public int queryUnFillUserCountIsBand(String taskId) throws JDBCException {
+		String sql = "select count(1) from w_task_user where task_id=? and device_id is null and user_type = ?"; 
+		return this.count(sql, taskId,SystemConstants.USER_TYPE_BAND);
+	}
+	
 	public List<TaskUserDto> queryUserDetailByTaskId(String taskId) throws JDBCException {
 		String sql = "select t.*  from w_task_user t where t.task_id=? ";
 		return this.createQuery(TaskUserDto.class,sql, taskId).list();

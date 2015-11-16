@@ -724,10 +724,11 @@ Ext.apply(MenuHandler, {
 			Alert(lmsg("needUser"));
 			return false;
 		}
-		var userIds = [];
+		//宽带也需要回收，取消限制
 		for (i = 0; i < userRecords.length; i++) {
-			if (userRecords[i].get("user_type") != "DTT" || Ext.isEmpty(userRecords[i].get("stb_id"))) {
-				Alert(lmsg("userNotDTT"));
+			if (Ext.isEmpty(userRecords[i].get("card_id")) && Ext.isEmpty(userRecords[i].get("stb_id")) 
+			&& Ext.isEmpty(userRecords[i].get("modem_mac"))) {
+				Alert(lmsg("selectDev2Recycle"));
 				return false;
 			}
 		}	

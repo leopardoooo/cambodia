@@ -170,7 +170,8 @@ public enum ErrorCode {
 	SpkgIsUsed("协议号已被使用"),
 	SpkgHasNotCONFIRM("协议号还未通过审批"),
 	SpkgIsNotTrueCust("协议号和客户不匹配"),
-	SpkgIsPaiChuCustKG("请选退订客户套餐，才能订购协议套餐")
+	SpkgIsPaiChuCustKG("请选退订客户套餐，才能订购协议套餐"),
+	AddNewAddrIsFail("新增地址失败"),
 	;
 	
 	

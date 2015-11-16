@@ -521,9 +521,15 @@ public class SnTaskComponent extends BaseBusiComponent {
 					getTeamId(SystemConstants.TEAM_TYPE_SUPERNET), taskType);			
 				createTaskLog(taskId, BusiCodeConstants.TASK_INIT, doneCode, null, StatusConstants.NONE);
 			//一个宽带用户一个工单
+			int i = 1;
 			for (CUser user:bandList){
 				List<CUser> l = new ArrayList<CUser>();
 				l.add(user);
+				// 把所有ott用户和第一个宽带用户归为第一个工单
+				if (i == 1){
+					l.addAll(tvUserList);
+				}
+				i++;
 				taskId = createSingleTaskWithUser(doneCode, cust, l, 
 						getTeamId(SystemConstants.TEAM_TYPE_CFOCN), taskType);
 				JsonObject jo = new JsonObject();
@@ -551,6 +557,7 @@ public class SnTaskComponent extends BaseBusiComponent {
 					if (i == 1){
 						l.addAll(tvUserList);
 					}
+					i++;
 					String taskId = createSingleTaskWithUser(doneCode, cust, l,getTeamId(teamType), taskType);
 					if (teamType.equals(SystemConstants.TEAM_TYPE_CFOCN)){
 						JsonObject jo = new JsonObject();

@@ -43,6 +43,8 @@ import com.ycsoft.commons.constants.BusiCmdConstants;
 import com.ycsoft.commons.constants.BusiCodeConstants;
 import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.constants.SystemConstants;
+import com.ycsoft.commons.exception.ComponentException;
+import com.ycsoft.commons.exception.ErrorCode;
 import com.ycsoft.commons.exception.ServicesException;
 import com.ycsoft.commons.helper.CollectionHelper;
 import com.ycsoft.commons.helper.DateHelper;
@@ -595,6 +597,18 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 		this.setDoneCodeInfo(task_id, getBusiParam(), BusiCodeConstants.TASK_ZTE_OPEN);
 		this.getBusiParam().setOperateObj("WorkOrdersSn:"+task_id);
 		saveAllPublic(doneCode, getBusiParam());
+	}
+
+	@Override
+	public Object queryCanEndTask(String task_id, String resultType) throws Exception {
+		WTaskBaseInfo task = wTaskBaseInfoDao.findByKey(task_id);
+		if (task.getTask_type_id().equals(SystemConstants.TASK_TYPE_INSTALL)
+				&&resultType.equals(SystemConstants.TASK_FINISH_TYPE_SUCCESS)
+				&&wTaskUserDao.queryUnFillUserCountIsBand(task.getTask_id()) > 0){
+			return false;
+//			throw new ComponentException(ErrorCode.TaskDeviceIsNull);
+		}
+		return true;
 	}
 
 	
