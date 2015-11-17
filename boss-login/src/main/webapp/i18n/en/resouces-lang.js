@@ -146,7 +146,8 @@ ResSysLang = {
 	'3200':	'Agent Config',
 	'3201':	'Translation Config',
 	'3202': 'Protocol Customer',
-	'5001':	'District Config'
+	'5001':	'District Config',
+	'3301':	'OTT Config'
 };
 
 // 工具栏国际化

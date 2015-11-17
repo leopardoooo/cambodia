@@ -111,3 +111,5 @@
 	<script type="text/javascript" src="<%=r %>/pages/sysmanager/system/TranslationConfig.js"></script>
 	<!-- 协议用户配置 -->
 	<script type="text/javascript" src="<%=r %>/pages/sysmanager/system/AgreementUserConfig.js"></script>
+	<!-- OTT资源配置 -->
+	<script type="text/javascript" src="<%=r %>/pages/sysmanager/system/OttResConfig.js"></script>

@@ -8,13 +8,15 @@ import org.springframework.stereotype.Controller;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.ycsoft.beans.config.TProvince;
+import com.ycsoft.beans.ott.TServerOttauthProd;
 import com.ycsoft.beans.prod.PSpkg;
 import com.ycsoft.beans.prod.PSpkgOpenbusifee;
 import com.ycsoft.beans.prod.PSpkgOpenuser;
 import com.ycsoft.beans.system.SAgent;
 import com.ycsoft.beans.system.SDataTranslation;
+import com.ycsoft.business.service.externalImpl.IOttServiceExternal;
 import com.ycsoft.commons.abstracts.BaseAction;
-import com.ycsoft.commons.exception.ComponentException;
+import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.sysmanager.component.config.ConfigComponent;
 
 @Controller
@@ -36,6 +38,29 @@ public class ConfigAction extends BaseAction {
 	private String sp_id;
 	private String id;
 	private String status;
+	private TServerOttauthProd ottAuth;
+	private IOttServiceExternal ottService;
+	
+	public void setOttService(IOttServiceExternal ottService) {
+		this.ottService = ottService;
+	}
+	
+	public String queryAllOttAuth() throws Exception {
+		getRoot().setRecords(configComponent.queryAllOttAuth());
+		return JSON_RECORDS;
+	}
+	
+	public String queryOttAuth() throws Exception {
+		getRoot().setPage(configComponent.queryOttAuth(query, start, limit));
+		return JSON_PAGE;
+	}
+	public String saveOttAuth() throws Exception {
+		configComponent.saveOttAuth(ottAuth);
+		if(ottAuth.getNeed_sync().equals(SystemConstants.BOOLEAN_TRUE)){
+			ottService.saveSyncProd();
+		}
+		return JSON_SUCCESS;
+	}
 	
 	public String querySpkg() throws Exception {
 		getRoot().setPage(configComponent.querySpkg(query, start, limit));
@@ -190,6 +215,13 @@ public class ConfigAction extends BaseAction {
 
 	public void setStatus(String status) {
 		this.status = status;
+	}
+	
+	public TServerOttauthProd getOttAuth() {
+		return ottAuth;
+	}
+	public void setOttAuth(TServerOttauthProd ottAuth) {
+		this.ottAuth = ottAuth;
 	}
 	
 }

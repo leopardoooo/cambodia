@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import com.ycsoft.beans.config.TProvince;
 import com.ycsoft.beans.device.RDeviceFee;
+import com.ycsoft.beans.ott.TServerOttauthProd;
 import com.ycsoft.beans.prod.PSpkg;
 import com.ycsoft.beans.prod.PSpkgOpenbusifee;
 import com.ycsoft.beans.prod.PSpkgOpenuser;
@@ -17,6 +18,7 @@ import com.ycsoft.beans.system.SAgent;
 import com.ycsoft.beans.system.SDataTranslation;
 import com.ycsoft.business.dao.config.TBusiFeeStdDao;
 import com.ycsoft.business.dao.config.TProvinceDao;
+import com.ycsoft.business.dao.config.TServerOttauthProdDao;
 import com.ycsoft.business.dao.config.TTemplateCountyDao;
 import com.ycsoft.business.dao.core.cust.CCustDao;
 import com.ycsoft.business.dao.prod.PSpkgDao;
@@ -25,6 +27,7 @@ import com.ycsoft.business.dao.prod.PSpkgOpenuserDao;
 import com.ycsoft.business.dao.resource.device.RDeviceFeeDao;
 import com.ycsoft.business.dao.system.SAgentDao;
 import com.ycsoft.business.dto.core.fee.BusiFeeDto;
+import com.ycsoft.business.service.externalImpl.IOttServiceExternal;
 import com.ycsoft.commons.abstracts.BaseComponent;
 import com.ycsoft.commons.constants.BusiCodeConstants;
 import com.ycsoft.commons.constants.StatusConstants;
@@ -55,6 +58,30 @@ public class ConfigComponent extends BaseComponent {
 	private TBusiFeeStdDao tBusiFeeStdDao;
 	@Autowired
 	private CCustDao cCustDao;
+	@Autowired
+	private TServerOttauthProdDao tServerOttauthProdDao;
+	
+	public List<TServerOttauthProd> queryAllOttAuth() throws Exception {
+		return tServerOttauthProdDao.findAll();
+	}
+	
+	public Pager<TServerOttauthProd> queryOttAuth(String query, Integer start, Integer limit) throws Exception {
+		return tServerOttauthProdDao.queryOttAuth(query, start, limit);
+	}
+	
+	public void saveOttAuth(TServerOttauthProd ottAuth) throws Exception {
+		if(tServerOttauthProdDao.countByFeeId(ottAuth.getId(), ottAuth.getFee_id()) > 0){
+			throw new ComponentException("资费ID【"+ottAuth.getFee_id()+"】已存在");
+		}
+		if(StringHelper.isEmpty(ottAuth.getId())){
+			ottAuth.setId(tServerOttauthProdDao.findSequence().toString());
+			ottAuth.setStatus("0");		//默认待审核
+			tServerOttauthProdDao.save(ottAuth);
+		}else{
+			tServerOttauthProdDao.update(ottAuth);
+		}
+		
+	}
 	
 	public Pager<PSpkg> querySpkg(String query, Integer start, Integer limit) throws Exception {
 		Pager<PSpkg> page= pSpkgDao.querySpkg(query, start, limit);

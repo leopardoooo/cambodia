@@ -13,4 +13,11 @@
 		<property name="serviceInterface" value="com.ycsoft.business.service.externalImpl.IUserServiceExternal" />
 	</bean>
 	
+	<bean name="/ott" class="org.springframework.remoting.httpinvoker.HttpInvokerServiceExporter" scope="prototype">
+		<property name="service">
+			<bean class="com.ycsoft.business.service.externalImpl.OttServiceExternal" scope="prototype" />
+		</property>
+		<property name="serviceInterface" value="com.ycsoft.business.service.externalImpl.IOttServiceExternal" />
+	</bean>
+	
 </beans>

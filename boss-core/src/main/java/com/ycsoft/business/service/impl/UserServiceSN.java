@@ -793,10 +793,9 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 			List<CUser> allUusers = userComponent.queryUserByCustId(cust.getCust_id());
 			List<String> selectUser = Arrays.asList(userIds);
 			for(CUser user : allUusers){
-				if (!user.getStatus().equals(StatusConstants.REQSTOP) && user.getUser_type().equals(SystemConstants.USER_TYPE_OTT)){
-					if(!selectUser.contains(user.getUser_id())){
-						throw new ServicesException(ErrorCode.BandUserStopOhterOttUserMustStop);
-					}
+				if (!user.getStatus().equals(StatusConstants.REQSTOP) && user.getUser_type().equals(USER_TYPE_OTT)
+						&& !selectUser.contains(user.getUser_id())){
+					throw new ServicesException(ErrorCode.BandUserStopOhterOttUserMustStop);
 				}
 			}
 		}
@@ -904,7 +903,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 			for(CUser user : cancelUsersList){
 				if (user.getUser_type().equals(SystemConstants.USER_TYPE_BAND)){
 					if(!selectUser.contains(user.getUser_id())){
-						throw new ServicesException("OTT用户取消预报停,其他宽带用户都需要取消预报停");
+						throw new ServicesException(ErrorCode.OttUserCancelForecastStopBandUserAlso);
 					}
 				}
 				
