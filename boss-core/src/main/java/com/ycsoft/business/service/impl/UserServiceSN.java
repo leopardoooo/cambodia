@@ -1867,7 +1867,11 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		for(CUser user : users){
 			CUser cuser = userComponent.queryUserById(user.getUser_id());
 			//更新设备状态和仓库
-			DeviceDto device = deviceComponent.queryDeviceByDeviceCode(user.getStb_id());
+			String deviceId = user.getStb_id();
+			if(cuser.getUser_type().equals(SystemConstants.USER_TYPE_BAND)){
+				deviceId = user.getModem_mac();
+			}
+			DeviceDto device = deviceComponent.queryDeviceByDeviceCode(deviceId);
 			deviceComponent.updateDeviceDepotId(doneCode, BusiCodeConstants.DEVICE_USER_RECLAIM, device.getDevice_id(), 
 					device.getDepot_id(), getOptr().getDept_id(),cuser.getStr10(), true);
 			deviceComponent.updateDeviceDepotStatus(doneCode, BusiCodeConstants.DEVICE_USER_RECLAIM, device.getDevice_id(),
