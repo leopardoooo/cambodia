@@ -154,6 +154,10 @@ public enum ErrorCode {
 	ReceiptNotRecipients("收据[%s]未领用"),
 	ReceiptAlreadyCheckout("收据已结账"),
 	ReceiptIsUsed("收据[%s]已使用"),
+	UserIsNotExists("用户不存在"),
+	UserStatusIsNotActiveNotStop("用户[%S]不是正常状态，不能报停"),
+	PackageUserMustToStop("归属套餐的用户必须同时报停"),
+	BandUserStopOhterOttUserMustStop("宽带用户报停,其他OTT用户都需要报停"),
 	
 	//======================未翻译===========================
 	NoStopRecord("找不到产品报停记录，请联系管理员"),

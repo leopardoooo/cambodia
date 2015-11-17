@@ -753,7 +753,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		List<CUser> users = userComponent.queryAllUserByUserIds(userIds);
 		CCust cust = custComponent.queryCustById(users.get(0).getCust_id());
 		if (users == null || users.size() == 0 || users.get(0) == null)
-			throw new ServicesException("请选择用户");
+			throw new ServicesException(ErrorCode.UserIsNotExists);
 		
 		//查找客户名下所有有效的产品
 		Map<String,String> packageUserIdS = new HashMap<String,String>();
@@ -770,7 +770,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		Map<Integer, CUser> map = new HashMap<Integer, CUser>();
 		for (CUser user:users){
 			if (!user.getStatus().equals(StatusConstants.ACTIVE)){
-				throw new ServicesException("用户["+user.getUser_id()+"]不是正常状态，不能报停!");
+				throw new ServicesException(ErrorCode.UserStatusIsNotActiveNotStop,user.getUser_id());
 				
 			}
 			if (packageUserIdS.get(user.getUser_id()) != null){
@@ -785,7 +785,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		}
 		
 		if (hasPkgUser && (count<packageUserIdS.size())){
-			throw new ServicesException("归属套餐的用户必须同时报停");
+			throw new ServicesException(ErrorCode.PackageUserMustToStop);
 			
 		}
 		
@@ -793,9 +793,9 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 			List<CUser> allUusers = userComponent.queryUserByCustId(cust.getCust_id());
 			List<String> selectUser = Arrays.asList(userIds);
 			for(CUser user : allUusers){
-				if (!user.getStatus().equals(StatusConstants.REQSTOP)){
+				if (!user.getStatus().equals(StatusConstants.REQSTOP) && user.getUser_type().equals(SystemConstants.USER_TYPE_OTT)){
 					if(!selectUser.contains(user.getUser_id())){
-						throw new ServicesException("宽带用户报停,其他用户都需要报停");
+						throw new ServicesException(ErrorCode.BandUserStopOhterOttUserMustStop);
 					}
 				}
 			}
