@@ -785,7 +785,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		}
 		
 		if (hasPkgUser && (count<packageUserIdS.size())){
-			throw new ServicesException(ErrorCode.PackageUserMustToStop);
+			throw new ServicesException(ErrorCode.PackageUserMustToOperation);
 			
 		}
 		
@@ -809,7 +809,7 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		List<CUser> users = userComponent.queryAllUserByUserIds(userIds);
 		CCust cust = custComponent.queryCustById(users.get(0).getCust_id());
 		if (users == null || users.size() == 0 || users.get(0) == null)
-			throw new ServicesException("请选择用户");
+			throw new ServicesException(ErrorCode.UserIsNotExists);
 		
 		//查找客户名下所有有效的产品
 		Map<String,String> packageUserIdS = new HashMap<String,String>();
@@ -821,12 +821,12 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		}
 		
 		boolean hasPkgUser = false; //报停的用户有归属于客户套餐的
-		boolean hasBand = false; //有宽带用户
+		boolean hasOtt = false; //有OTT用户
 		int count=0;
 		Map<Integer, CUser> map = new HashMap<Integer, CUser>();
 		for (CUser user:users){
 			if (!user.getStatus().equals(StatusConstants.REQSTOP)){
-				throw new ServicesException("用户["+user.getUser_id()+"]不是报停状态，不能报开!");
+				throw new ServicesException(ErrorCode.UserStatusIsNotReqstopNotOpen,user.getUser_id());
 				
 			}
 			if (packageUserIdS.get(user.getUser_id()) != null){
@@ -834,24 +834,23 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 				count ++;
 			}
 			
-			if (user.getUser_type().equals(USER_TYPE_BAND)){
-				hasBand = true;
+			if (user.getUser_type().equals(USER_TYPE_OTT)){
+				hasOtt = true;
 			}
-		
 		}
 		
 		if (hasPkgUser && (count<packageUserIdS.size())){
-			throw new ServicesException("归属套餐的用户必须同时报开");
+			throw new ServicesException(ErrorCode.PackageUserMustToOperation);
 			
 		}
 		
-		if(hasBand && cust.getCust_type().equals(SystemConstants.CUST_TYPE_RESIDENT)){
+		if(hasOtt && cust.getCust_type().equals(SystemConstants.CUST_TYPE_RESIDENT)){
 			List<CUser> allUusers = userComponent.queryUserByCustId(cust.getCust_id());
 			List<String> selectUser = Arrays.asList(userIds);
 			for(CUser user : allUusers){
-				if (user.getStatus().equals(StatusConstants.REQSTOP)){
+				if (user.getStatus().equals(StatusConstants.REQSTOP) && user.getUser_type().equals(SystemConstants.USER_TYPE_BAND)){
 					if(!selectUser.contains(user.getUser_id())){
-						throw new ServicesException("宽带用户报开,其他用户都需要报开");
+						throw new ServicesException(ErrorCode.OttUserOpenOhterBandUserMustOpen);
 					}
 				}
 			}
@@ -865,11 +864,11 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 		List<CUser> users = userComponent.queryAllUserByUserIds(userIds);
 		CCust cust = custComponent.queryCustById(users.get(0).getCust_id());
 		if (users == null || users.size() == 0 || users.get(0) == null)
-			throw new ServicesException("请选择用户");
+			throw new ServicesException(ErrorCode.UserIsNotExists);
 		
 		List<JUserStop> cancelUsers = jobComponent.queryStopByCustId(custId);
 		if(cancelUsers.size()==0){
-			throw new ServicesException("不存在预报停用户");
+			throw new ServicesException(ErrorCode.ForecastStopUserIsNotExists);
 		}
 		List<String> cancelUser = CollectionHelper.converValueToList(cancelUsers, "user_id");
 		//查找客户名下所有有效的产品
@@ -882,33 +881,33 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 			}
 		}
 		
-		
 		boolean hasPkgUser = false; //报停的用户有归属于客户套餐的
-		boolean hasBand = false; //有宽带用户
+		boolean hasOtt = false; //有OTT用户
 		int count=0;
 		for (CUser user:users){
 			if (packageUserIdS.get(user.getUser_id()) != null){
 				hasPkgUser =true;
 				count ++;
 			}
-			
-			if (user.getUser_type().equals(USER_TYPE_BAND)){
-				hasBand = true;
+			if (user.getUser_type().equals(USER_TYPE_OTT)){
+				hasOtt = true;
 			}
-		
 		}
 		
 		if (hasPkgUser && (count<packageUserIdS.size())){
-			throw new ServicesException("归属套餐的用户必须同时取消预报停");
-			
+			throw new ServicesException(ErrorCode.PackageUserMustToOperation);
 		}
 		
-		if(hasBand && cust.getCust_type().equals(SystemConstants.CUST_TYPE_RESIDENT)){
+		List<CUser> cancelUsersList = userComponent.queryAllUserByUserIds(cancelUser.toArray(new String[cancelUser.size()]));
+		if(hasOtt && cust.getCust_type().equals(SystemConstants.CUST_TYPE_RESIDENT)){
 			List<String> selectUser = Arrays.asList(userIds);
-			for(String userId : cancelUser){
-				if(!selectUser.contains(userId)){
-					throw new ServicesException("宽带用户取消预报停,其他用户都需要取消预报停");
+			for(CUser user : cancelUsersList){
+				if (user.getUser_type().equals(SystemConstants.USER_TYPE_BAND)){
+					if(!selectUser.contains(user.getUser_id())){
+						throw new ServicesException("OTT用户取消预报停,其他宽带用户都需要取消预报停");
+					}
 				}
+				
 			}
 		}
 		
