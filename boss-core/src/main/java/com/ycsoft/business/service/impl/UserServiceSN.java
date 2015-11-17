@@ -793,10 +793,9 @@ public class UserServiceSN extends BaseBusiService implements IUserService {
 			List<CUser> allUusers = userComponent.queryUserByCustId(cust.getCust_id());
 			List<String> selectUser = Arrays.asList(userIds);
 			for(CUser user : allUusers){
-				if (!user.getStatus().equals(StatusConstants.REQSTOP)){
-					if(!selectUser.contains(user.getUser_id())){
-						throw new ServicesException("宽带用户报停,其他用户都需要报停");
-					}
+				if (!user.getStatus().equals(StatusConstants.REQSTOP) && user.getUser_type().equals(USER_TYPE_OTT)
+						&& !selectUser.contains(user.getUser_id())){
+					throw new ServicesException("宽带用户报停,OTT用户需要报停");
 				}
 			}
 		}
