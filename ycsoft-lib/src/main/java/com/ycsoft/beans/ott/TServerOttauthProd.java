@@ -7,7 +7,7 @@ import com.ycsoft.daos.config.POJO;
 
 @POJO(
 		tn="T_SERVER_OTTAUTH_PROD",
-		sn="SEQ_OTTAUTH_SN",
+		sn="",
 		pk="ID")
 public class TServerOttauthProd extends TServerOttauthFee implements Serializable {
 	

@@ -8,12 +8,14 @@
  		this.ottResStore = new Ext.data.JsonStore({
 			url: root+'/config/Config!queryOttAuth.action',
 			fields: ['id', 'name', 'status', 'domain', 'need_sync', 'sync_date', 'fee_id', 'fee_name', 'type', 'price',
-				'currency_type', 'unit', 'amount', 'pay_type', 'begin_time', 'end_time', 'continue_buy', 'explanation'],
+				'currency_type', 'unit', 'amount', 'pay_type', 'continue_buy', 'explanation',
+				{type:'date',name: 'begin_time', format: 'Y-m-d'}, {type:'date',name: 'end_time', format: 'Y-m-d'}],
 			totalProperty:'totalProperty',
 			root:'records'
 		});
 		this.ottResStore.load({params:{start:0,limit:this.pageSize}});
 		var columns = [
+			{header: '产品ID',		dataIndex: 'id',				width: 80, renderer: App.qtipValue},
 			{header: '产品名称', 	dataIndex: 'name', 				width: 150, renderer: App.qtipValue},
 			{header: '状态', 		dataIndex: 'status', 			width: 55, renderer: function(v){
 					return v == '0' ? '待审核' : '已审核';
@@ -53,14 +55,8 @@
 					return v == '0' ? '预付费' : '后付费';
 				}
 			},
-			{header: '生效时间', 	dataIndex: 'begin_time', 		width: 100, renderer: function(v){
-				if(v && v.length > 10) return Ext.util.Format.dateFormat(v);
-				return v;
-			}},
-			{header: '失效时间', 	dataIndex: 'end_time', 			width: 100, renderer: function(v){
-				if(v && v.length > 10) return Ext.util.Format.dateFormat(v);
-				return v;
-			}},
+			{header: '生效时间', 	dataIndex: 'begin_time', 		width: 100, renderer: Ext.util.Format.dateFormat},
+			{header: '失效时间', 	dataIndex: 'end_time', 			width: 100, renderer: Ext.util.Format.dateFormat},
 			{header: '是否支持续费', dataIndex: 'continue_buy', 		width: 85, renderer: function(v){
 					return v == '0' ? '不支持' : '支持';
 				}
@@ -98,7 +94,7 @@
  	},
  	doUpdate: function(){
  		var win = new OttResWin();
- 		win.setTitle('添加OTT资源');
+ 		win.setTitle('修改OTT资源');
  		win.show(this.getSelectionModel().getSelected());
  	},
  	doRefresh: function(){
@@ -109,6 +105,7 @@
  });
  
  OttResWin = Ext.extend(Ext.Window, {
+ 	type: 'save',
  	constructor: function(){
  		this.formPanel = new Ext.form.FormPanel({
  			layout: 'column',
@@ -125,12 +122,9 @@
 				defaultType: 'textfield'		
 			},
 			items:[{
-					xtype: 'hidden',
-					name: 'id'
-				},{
 				items:[{
-					fieldLabel: '产品名称',
-					name: 'name',
+					fieldLabel: '产品ID',
+					name: 'id',
 					allowBlank: false
 				},{
 					fieldLabel: '同步',
@@ -177,17 +171,30 @@
 					editable: false,
 					allowBlank: false
 				},{
-					fieldLabel: '生效时间',
+					fieldLabel: '支持续费',
+					hiddenName: 'continue_buy',
+					xtype: 'combo',
+					store: new Ext.data.JsonStore({
+						fields: ['text', 'value'],
+						data:[{'text': '不支持', 'value': '0'}, {'text': '支持', 'value': '1'}]
+					}),
+					displayField: 'text', valueField: 'value', 
+					editable: false,
+					allowBlank: false
+				},{
+					id: 'ott_end_time_id',
+					fieldLabel: '失效时间',
 					xtype: 'datefield',
-					name: 'begin_time',
+					name: 'end_time',
 					format: 'Y-m-d',
-					minValue: nowDate().format('Y-m-d'),
-					vtype: 'daterange',
-	                endDateField: 'ott_end_time_id',
-	                customDay: 1
+					allowBlank: false
 				}]
 			},{
 				items:[{
+					fieldLabel: '产品名称',
+					name: 'name',
+					allowBlank: false
+				},{
 					fieldLabel: '内外网',
 					hiddenName: 'domain',
 					xtype: 'combo',
@@ -214,6 +221,13 @@
 					editable: false,
 					allowBlank: false
 				},{
+					xtype: 'numberfield',
+					fieldLabel: '计价数量',
+					name: 'amount',
+					allowDecimals: false,
+					allowNegative: false,
+					allowBlank: false
+				},{
 					fieldLabel: '货币类型',
 					hiddenName: 'currency_type',
 					xtype: 'combo',
@@ -225,29 +239,15 @@
 					editable: false,
 					allowBlank: false
 				},{
-					xtype: 'numberfield',
-					fieldLabel: '计价数量',
-					name: 'amount',
-					allowDecimals: false,
-					allowNegative: false,
-					allowBlank: false
-				},{
-					fieldLabel: '支持续费',
-					hiddenName: 'continue_buy',
-					xtype: 'combo',
-					store: new Ext.data.JsonStore({
-						fields: ['text', 'value'],
-						data:[{'text': '不支持', 'value': '0'}, {'text': '支持', 'value': '1'}]
-					}),
-					displayField: 'text', valueField: 'value', 
-					editable: false,
-					allowBlank: false
-				},{
-					id: 'ott_end_time_id',
-					fieldLabel: '失效时间',
+					fieldLabel: '生效时间',
 					xtype: 'datefield',
-					name: 'end_time',
-					format: 'Y-m-d'
+					name: 'begin_time',
+					format: 'Y-m-d',
+					minValue: nowDate().format('Y-m-d'),
+					vtype: 'daterange',
+	                endDateField: 'ott_end_time_id',
+	                customDay: 1,
+					allowBlank: false
 				}]
 			},{
 				columnWidth: 1,
@@ -276,9 +276,11 @@
  	},
  	show: function(record){
  		if(record){
+ 			this.type = 'update';
  			var form = this.formPanel.getForm();
  			form.loadRecord(record);
  			
+ 			form.findField('id').setReadOnly(true);			//不能修改产品ID
  			form.findField('fee_id').setReadOnly(true);		//不能修改资费ID
  		}
  		OttResWin.superclass.show.call(this);
@@ -291,7 +293,7 @@
  			for(var key in values){
  				agent['ottAuth.'+key] = values[key];
  			}
- 			
+ 			agent['type'] = this.type;
  			Ext.Ajax.request({
  				url: root+'/config/Config!saveOttAuth.action',
  				params: agent,
