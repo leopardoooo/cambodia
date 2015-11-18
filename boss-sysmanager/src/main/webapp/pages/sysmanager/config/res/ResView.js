@@ -338,9 +338,9 @@ ResWin = Ext.extend(Ext.Window,{
 		var form = Ext.getCmp('resFormId').getForm();
 		if(!form.isValid())return;
 		var values = form.getValues();
-		/*if(Ext.isEmpty(values['currency'])){
-			values['currency'] = 'F';
-		}*/
+		if(Ext.isEmpty(values['currency'])){
+			values['currency'] = 'T';
+		}
 		var obj = {};
 		for(var prop in values){
 			obj['res.'+prop] = values[prop];
@@ -384,7 +384,7 @@ ServerResWin = Ext.extend(Ext.Window,{
 	currServType: null,		//当前选择的serv_id
 	constructor:function(){
 		this.serverStore = new Ext.data.JsonStore({
-			url:root+'/config/Res!queryServerByCountyId.action',
+			url:root+'/config/Res!queryServerByServType.action',
 			fields:['server_id','server_name','serv_type']
 		});
 		this.bossResStore = new Ext.data.JsonStore({
@@ -393,18 +393,23 @@ ServerResWin = Ext.extend(Ext.Window,{
 			totalProperty:'totalProperty',
 			fields:['res_id','res_name','serv_id']
 		});
-		this.serverStore.load();
 		this.bossResStore.load();
+		
+		this.ottResStore = new Ext.data.JsonStore({
+			url: root+'/config/Config!queryAllOttAuth.action',
+			fields: ['id', 'name']
+		});
 		
 		ServerResWin.superclass.constructor.call(this,{
 			id:'serverResWinId',
 			title:'添加服务器资源',
 			border:false,
 			width:550,
-			height:200,
+			height:400,
 			layout:'fit',
+			closeAction: 'close',
 			items:[
-				{id:'serverResFormId',xtype:'form',
+				{id:'serverResFormId',xtype:'form', labelWidth: 100,
 					bodyStyle:'padding-top:5px',items:[
 					{xtype:'combo',fieldLabel:'服务器名',hiddenName:'server_id',
 						store: this.serverStore,
@@ -414,11 +419,39 @@ ServerResWin = Ext.extend(Ext.Window,{
 							select:function(combo,record){
 								this.bossResStore.baseParams['servId'] = record.get('serv_type');
 								this.bossResStore.load();
+								
+								this.doOutOttRes(combo.getValue());
 							}
 						}
 					},
-					{xtype:'textfield',fieldLabel:'资源编号',name:'external_res_id',allowBlank:false},
-					{xtype:'textfield',fieldLabel:'资源名称',name:'res_name',anchor:'95%',allowBlank:false},
+					{
+						id:'externalResId', 
+						layout: 'form',
+						border: false,
+						anchor: '100%',
+						items:[{xtype:'textfield',fieldLabel:'资源编号',name:'external_res_id',allowBlank:false}]},
+					{
+						id:'resNameId', 
+						layout: 'form',
+						border: false,
+						anchor: '100%',
+						items:[{xtype:'textfield',fieldLabel:'资源名称',name:'res_name',anchor:'95%',allowBlank:false}]},
+					{
+						id:'outOttResPanelId', 
+						layout: 'form',
+						border: false,
+						anchor: '100%',
+						items:[{xtype: 'combo', fieldLabel: '外部资源', id: 'outOttResId',
+						store: this.ottResStore, displayField: 'name', valueField: 'id', editable: false,
+						listeners: {
+							scope: this,
+							select: function(cb, record){
+								var form = Ext.getCmp('serverResFormId').getForm();
+								form.findField('external_res_id').setValue(cb.getValue());
+								form.findField('res_name').setValue(record.get('name'));
+							}
+						}
+					}]},
 					{xtype:'combo',fieldLabel:'BOSS资源名称',hiddenName:'boss_res_id',id:'boss_res_id_id',
 //						store:this.bossResStore,
 						store:new Ext.data.JsonStore({
@@ -445,6 +478,7 @@ ServerResWin = Ext.extend(Ext.Window,{
 		ServerResWin.superclass.show.call(this);
 		Ext.getCmp('boss_res_id_id').getStore().removeAll();
 		this.bossResStore.reload();
+		var servType = null;
 		if(record){
 			Ext.getCmp('serverResFormId').getForm().loadRecord(record);
 			this.setTitle('修改服务器资源');
@@ -453,6 +487,7 @@ ServerResWin = Ext.extend(Ext.Window,{
 				obj['oldServerRes.'+i] = data[i];
 			}
 			this.oldServerRes = obj;
+			servType = record.get('serv_type');
 		}else{
 			this.setTitle('添加服务器资源');
 		}
@@ -473,16 +508,59 @@ ServerResWin = Ext.extend(Ext.Window,{
 		Ext.getCmp('boss_res_id_id').getStore().add(resRec);
 		Ext.getCmp('boss_res_id_id').setValue(resRec.get('res_id'));
 		Ext.getCmp('boss_res_id_id').setReadOnly(true);
+		
+		
+		if(Ext.isEmpty(servType)){
+			servType = bossResRecord.get('serv_id');
+		}
+		this.serverStore.load({
+			params:{
+				serv_type: servType
+			}
+		});
+		
+		if(record){
+			this.ottResStore.on('load', function(){
+				this.doOutOttRes(record.get('server_id'), record.get('external_res_id'));
+			}, this);
+		}
+		this.ottResStore.load();
+	},
+	doOutOttRes: function(serverId, externalResId){
+		var resIdCmp = Ext.getCmp('externalResId');
+		var resNameCmp = Ext.getCmp('resNameId');
+		var outOttResCmp = Ext.getCmp('outOttResPanelId');
+		if(serverId == 'SDK'){
+			resIdCmp.setVisible(false);
+			resNameCmp.setVisible(false);
+			resIdCmp.allowBlank = true;
+			resNameCmp.allowBlank = true;
+			
+			outOttResCmp.setVisible(true);
+			outOttResCmp.allowBlank = false;
+			if(externalResId)
+				Ext.getCmp('outOttResId').setValue(externalResId);
+		}else{
+			resIdCmp.setVisible(true);
+			resNameCmp.setVisible(true);
+			resIdCmp.allowBlank = false;
+			resNameCmp.allowBlank = false;
+			
+			outOttResCmp.setVisible(false);
+			outOttResCmp.allowBlank = true;
+		}
 	},
 	doSave:function(){
 		var form = Ext.getCmp('serverResFormId').getForm();
 		if(!form.isValid())return;
 		var values = form.getValues();
+		delete values['outOttResId'];
 		var obj = {};
 		for(var prop in values){
 			obj['serverRes.'+prop] = values[prop];
 		}
 		Ext.apply(obj,this.oldServerRes);
+		
 		var url = root+'/config/Res!saveServerRes.action';
 		Ext.Ajax.request({
 			url:url,

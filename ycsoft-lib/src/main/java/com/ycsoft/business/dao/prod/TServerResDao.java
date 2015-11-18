@@ -53,6 +53,11 @@ public class TServerResDao extends BaseEntityDao<TServerRes> {
 		return createQuery(sql,bossResId, serverId).first();
 	}
 	
+	public List<TServer> queryServerByServType(String servType) throws JDBCException {
+		String sql = "select * from t_server where serv_type=?";
+		return this.createQuery(TServer.class, sql, servType).list();
+	}
+	
 	public List<TServer> queryServerByCountyId(String countyId) throws JDBCException {
 		String sql = "";
 		if (countyId.equals(SystemConstants.COUNTY_ALL)) {

@@ -31,6 +31,12 @@ public class ResAction extends BaseAction {
 	
 	private String groupId;
 	
+	public String queryServerByServType() throws Exception {
+		String servType = request.getParameter("serv_type");
+		getRoot().setRecords(resComponent.queryServerByServType(servType));
+		return JSON_RECORDS;
+	}
+	
 	//查询所有t_server
 	public String queryServerByCountyId() throws Exception {
 		getRoot().setRecords(resComponent.queryServerByCountyId(optr.getCounty_id()));
