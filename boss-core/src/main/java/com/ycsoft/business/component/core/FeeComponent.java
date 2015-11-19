@@ -1700,7 +1700,7 @@ public class FeeComponent extends BaseBusiComponent {
 	 */
 	public void changeFeeInvoice(String newInvoiceCode,String newInvoiceBookId, String newInvoiceId,
 			String oldInvoiceCode,String oldInvoiceId) throws JDBCException {
-		cFeeDao.updateInvoice(newInvoiceCode, newInvoiceBookId, newInvoiceId, oldInvoiceCode, oldInvoiceId);
+		cFeeDao.updateInvoice(newInvoiceCode, StringHelper.isEmpty(newInvoiceBookId)?newInvoiceCode:newInvoiceBookId, newInvoiceId, oldInvoiceCode, oldInvoiceId);
 	}
 	
 	/**
