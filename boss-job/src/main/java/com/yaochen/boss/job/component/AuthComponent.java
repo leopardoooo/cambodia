@@ -166,5 +166,19 @@ public class AuthComponent extends BaseComponent {
 		jBandCommandDao.updateByCmd(cmd.getTransnum(), cmd.getIs_send(), cmd.getIs_success(), cmd.getError_info(), cmd.getReturn_code());
 	}
 	
-	
+	/**
+	 * 执行计划发送OSD
+	 * @throws JDBCException 
+	 */
+	public int saveSendPlanOsd() throws JDBCException{
+		//更新标记
+		int cnt=jCaCommandDao.updatePlanOsdSign();
+		if(cnt>0){
+		//移动记录
+		jCaCommandDao.transPlanOsdToExecBySign();
+		//删除
+		jCaCommandDao.deletePlanOsdBySign();
+		}
+		return cnt;
+	}
 }
