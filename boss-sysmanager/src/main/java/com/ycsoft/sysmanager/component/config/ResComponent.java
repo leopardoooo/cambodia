@@ -43,6 +43,10 @@ public class ResComponent extends BaseComponent {
 	private TServerCountyDao tServerCountyDao;
 	private BCreditAddressStopDao bCreditAddressStopDao;
 	
+	public List<TServer> queryServerByServType(String servType) throws Exception {
+		return tServerResDao.queryServerByServType(servType);
+	}
+	
 	public List<TServer> queryServerByCountyId(String countyId) throws Exception {
 		return tServerResDao.queryServerByCountyId(countyId);
 	}

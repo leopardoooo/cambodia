@@ -34,12 +34,13 @@ public class ConfigAction extends BaseAction {
 	private PSpkg spkg;
 	private PSpkgOpenuser spkgUser;
 	private PSpkgOpenbusifee spkgBusiFee;
+	private TServerOttauthProd ottAuth;
+	private IOttServiceExternal ottService;
 	private String query;
 	private String sp_id;
 	private String id;
 	private String status;
-	private TServerOttauthProd ottAuth;
-	private IOttServiceExternal ottService;
+	private String type;
 	
 	public void setOttService(IOttServiceExternal ottService) {
 		this.ottService = ottService;
@@ -55,7 +56,7 @@ public class ConfigAction extends BaseAction {
 		return JSON_PAGE;
 	}
 	public String saveOttAuth() throws Exception {
-		configComponent.saveOttAuth(ottAuth);
+		configComponent.saveOttAuth(ottAuth, type);
 		if(ottAuth.getNeed_sync().equals(SystemConstants.BOOLEAN_TRUE)){
 			ottService.saveSyncProd();
 		}
@@ -222,6 +223,9 @@ public class ConfigAction extends BaseAction {
 	}
 	public void setOttAuth(TServerOttauthProd ottAuth) {
 		this.ottAuth = ottAuth;
+	}
+	public void setType(String type) {
+		this.type = type;
 	}
 	
 }

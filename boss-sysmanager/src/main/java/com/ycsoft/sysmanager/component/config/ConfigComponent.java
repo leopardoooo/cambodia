@@ -69,15 +69,17 @@ public class ConfigComponent extends BaseComponent {
 		return tServerOttauthProdDao.queryOttAuth(query, start, limit);
 	}
 	
-	public void saveOttAuth(TServerOttauthProd ottAuth) throws Exception {
+	public void saveOttAuth(TServerOttauthProd ottAuth, String type) throws Exception {
 		if(tServerOttauthProdDao.countByFeeId(ottAuth.getId(), ottAuth.getFee_id()) > 0){
 			throw new ComponentException("资费ID【"+ottAuth.getFee_id()+"】已存在");
 		}
-		if(StringHelper.isEmpty(ottAuth.getId())){
-			ottAuth.setId(tServerOttauthProdDao.findSequence().toString());
+		if(type.equals("save")){
+			if(tServerOttauthProdDao.findByKey(ottAuth.getId()) != null){
+				throw new ComponentException("产品ID【"+ottAuth.getId()+"】已存在");
+			}
 			ottAuth.setStatus("0");		//默认待审核
 			tServerOttauthProdDao.save(ottAuth);
-		}else{
+		}else if(type.equals("update")){
 			tServerOttauthProdDao.update(ottAuth);
 		}
 		
