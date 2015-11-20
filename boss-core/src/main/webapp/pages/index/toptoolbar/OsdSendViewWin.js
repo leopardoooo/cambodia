@@ -39,17 +39,6 @@ OsdSendPanel = Ext.extend(Ext.FormPanel, {
 	                    }]
 					
 				},{
-					columnWidth : 1,
-					items:[{
-						fieldLabel: lbc('home.tools.osdSend.forms.osd_call_type'),
-						xtype:'paramcombo',
-						allowBlank:false,
-						anchor:'50%',
-						hiddenName:'osd_call_type',
-						paramName:'OSD_CALL_TYPE',
-						defaultValue:'ROLL'
-					}]
-				},{
 					columnWidth:0.6,
 					items:[{
 	                        xtype: 'textfield',
@@ -68,6 +57,17 @@ OsdSendPanel = Ext.extend(Ext.FormPanel, {
 			                value:"<font style='font-size:10px;color:red'>"+lbc('home.tools.osdSend.msg.detail_time_info')+"</font>"
 						}]
 					
+				},{
+					columnWidth : 1,
+					items:[{
+						fieldLabel: lbc('home.tools.osdSend.forms.osd_call_type'),
+						xtype:'paramcombo',
+						allowBlank:false,
+						anchor:'50%',
+						hiddenName:'osd_call_type',
+						paramName:'OSD_CALL_TYPE',
+						defaultValue:'ROLL'
+					}]
 				},{
 					columnWidth:0.5,
                     items: [{
@@ -110,6 +110,7 @@ OsdSendPanel = Ext.extend(Ext.FormPanel, {
                         anchor:'96%',
                         allowBlank: false,
                         height: 150,
+                        readOnly:true,
                         name: 'message'
                		 }]
 				}]
