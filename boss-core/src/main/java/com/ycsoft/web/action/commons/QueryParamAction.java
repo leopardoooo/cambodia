@@ -1,5 +1,6 @@
 package com.ycsoft.web.action.commons;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,7 +10,10 @@ import com.ycsoft.business.dto.config.TAddressSysDto;
 import com.ycsoft.business.service.IQueryCfgService;
 import com.ycsoft.commons.constants.DataRight;
 import com.ycsoft.commons.constants.DictKey;
+import com.ycsoft.commons.helper.CollectionHelper;
+import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.commons.tree.TreeBuilder;
+import com.ycsoft.sysmanager.dto.resource.DeviceDto;
 import com.ycsoft.web.commons.abstracts.BaseBusiAction;
 
 
@@ -34,6 +38,7 @@ public class QueryParamAction extends BaseBusiAction {
 	private String districtId;
 	private TAddressSysDto addrDto;
 	private String status;
+	private File files;
 
 	public String queryProdFreeDay() throws Exception{
 		getRoot().setOthers(queryCfgService.queryProdFreeDay());
@@ -141,6 +146,43 @@ public class QueryParamAction extends BaseBusiAction {
 		return JSON;
 	}
 	
+	public String queryCanToSendOsd() throws Exception{
+		String begin_date = request.getParameter("begin_date");
+		String end_date = request.getParameter("end_date");
+		String detail_time = request.getParameter("detail_time");
+		String message = request.getParameter("message");
+		List<String> list = new ArrayList<String>();
+		String msg = "";
+		try{
+			list = queryCfgService.queryCanToSendOsd(files,begin_date,end_date,detail_time,message);
+		}catch(Exception e){
+			e.printStackTrace();
+			msg = e.getMessage();
+		}
+		if(StringHelper.isNotEmpty(msg)){
+			return retrunNone(msg);
+		}
+		return returnList(list);
+		
+	}
+	
+	public String saveOsd() throws Exception {
+		String begin_date = request.getParameter("begin_date");
+		String end_date = request.getParameter("end_date");
+		String detail_time = request.getParameter("detail_time");
+		String send_title = request.getParameter("send_title");
+		String send_optr = request.getParameter("send_optr");
+		String message = request.getParameter("message");
+		String msg = "";
+		try{
+			queryCfgService.saveOsdByFiles(files,begin_date,end_date,detail_time,send_title,send_optr,message );
+		}catch(Exception e){
+			e.printStackTrace();
+			msg = e.getMessage();
+		}
+		return retrunNone(msg);
+	}
+	
 	public String queryProvince() throws Exception{
 		List<TProvince> list = queryCfgService.queryProvince();
 		getRoot().setRecords(list);
@@ -227,6 +269,14 @@ public class QueryParamAction extends BaseBusiAction {
 
 	public void setStatus(String status) {
 		this.status = status;
+	}
+
+	public File getFiles() {
+		return files;
+	}
+
+	public void setFiles(File files) {
+		this.files = files;
 	}
 	
 }

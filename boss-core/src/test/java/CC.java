@@ -28,14 +28,20 @@ public class CC {
 //		CFee c = new CFee();
 //		System.out.println(PropertyUtils.getProperty(c, "optr_id"));
 //		String one = "装箱号1";
-//		String one1 = "CSS0001";
+		String one1 = "CSS0001,c  ，   ss";
 //		String one2 = "A1中";
 //		Pattern p = Pattern.compile("[^a-zA-Z0-9]"); 
 //		Matcher m = p.matcher(one); 
 //		String newFrist = m.replaceAll("");
 //		System.out.println(newFrist.length()+"-"+one1.length()+"-"+one2.length());
-		System.out.println( DateHelper.format(DateHelper.now()));
-		System.out.println( DateHelper.format(DateHelper.addNumDate(DateHelper.now(), 60, DateHelper.SECOND)));
+		one1 = one1.replaceAll("\\s*", "");
+		String regex = ",|，|\\s+";
+		String strAry[] = one1.split(regex);
+        for (int i = 0; i < strAry.length; i++) {
+            System.out.println("i="+i+" Val="+strAry[i]);
+        }
+//		System.out.println( one1.split(regex));
+//		System.out.println( DateHelper.format(DateHelper.addNumDate(DateHelper.now(), 60, DateHelper.SECOND)));
 //		String filePath = "E:\\work\\TCL1009台机顶盒入库文件.txt";  
 //        readTxtFile(filePath);  
 	}

@@ -1,6 +1,7 @@
 package com.ycsoft.business.component.resource;
 
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -14,7 +15,6 @@ import com.ycsoft.beans.config.TAddress;
 import com.ycsoft.beans.config.TDistrict;
 import com.ycsoft.beans.config.TProvince;
 import com.ycsoft.beans.core.cust.CCustAddrNote;
-import com.ycsoft.beans.system.SDept;
 import com.ycsoft.beans.system.SDeptAddr;
 import com.ycsoft.beans.system.SOptr;
 import com.ycsoft.business.commons.abstracts.BaseBusiComponent;
@@ -25,6 +25,7 @@ import com.ycsoft.business.dao.core.cust.CCustAddrDao;
 import com.ycsoft.business.dao.system.SDeptAddrDao;
 import com.ycsoft.business.dao.system.SDeptDao;
 import com.ycsoft.business.dao.system.SParamDao;
+import com.ycsoft.business.dto.config.OsdSendDto;
 import com.ycsoft.business.dto.config.TAddressDto;
 import com.ycsoft.business.dto.config.TAddressSysDto;
 import com.ycsoft.commons.constants.DataRight;
@@ -34,6 +35,7 @@ import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.exception.ComponentException;
 import com.ycsoft.commons.exception.ErrorCode;
 import com.ycsoft.commons.helper.CollectionHelper;
+import com.ycsoft.commons.helper.FileHelper;
 import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.daos.core.JDBCException;
 import com.ycsoft.daos.core.Pager;
@@ -334,6 +336,18 @@ public class SimpleComponent extends BaseBusiComponent {
 		addr.setIs_leaf(isLeaf);
 		tAddressDao.update(addr);
 	}
+	public List<OsdSendDto> queryDataByFiles(File files) throws Exception{
+		String[] colName = new String[]{"superNet","consumer","name","edcdebt","cintriDebt","currency","billDate","dueDate","region"};
+		List<OsdSendDto> list = new ArrayList<OsdSendDto>();
+		//txt txtToBean中去掉第一行
+		list = FileHelper.txtToBeanBase(files, colName, OsdSendDto.class,26,";");
+		if(list.size()==0){
+			throw new ComponentException(ErrorCode.DataIsNullCheckFile);
+		}
+		return list;
+	}
+	
+	
 
 	public void setTAddressDao(TAddressDao addressDao) {
 		tAddressDao = addressDao;

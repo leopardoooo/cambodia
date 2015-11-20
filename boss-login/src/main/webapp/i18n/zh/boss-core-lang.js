@@ -623,6 +623,28 @@ BCLang.home = {
 				receiptCantUsed : '该收据无法使用',
 				custNameOrContractNoQuery : '支持客户名称或合同号模糊查询'
 			}
+		},
+		osdSend:{
+			_title : 'OSD催缴',
+			forms : {
+				begin_date : '发送时间',
+				end_date : '结束时间',
+				detail_time : '时间点',
+				send_title : '主题',
+				template : '模板',
+				send_optr : '发送人',
+				file : '数据文件',
+				message : '信息',
+				sendOSD:'发送催缴',
+				cancleOSD:'取消催缴'
+			},
+			msg : {
+				actionFailed:'发送OSD失败',
+				actionSuccess:'发送OSD成功',
+				detail_time_info : '时分,可以多个,逗号分隔，如9:00,12:00',
+				dataMustTxt : '请选择txt文件进行上传,文件后缀名为.txt!',
+				confirmSendOsd:'一共有[{0}]条数据,分[{1}]个时间点催缴'
+			}
 		}
 	}
 	
@@ -787,5 +809,4 @@ BCLang.msgBox = {
 	ChooseToPayTheRecord:'请选择要支付的记录',
 	userNotDTT:'非DTT设备或者设备不存在',
 	suerNotSave: '确定不保存吗？'
-	
 }

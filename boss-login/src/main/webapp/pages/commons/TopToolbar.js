@@ -395,6 +395,12 @@ TopToolbar = Ext.extend(Ext.Toolbar , {
 			win = new AddressViewWin();
 		win.show();
 //		new AddressViewWin().show();
+	},
+	showOsdSendViewWin:function(){
+		var win = Ext.getCmp('OsdSendViewWinId');
+		if(!win)
+			win = new OsdSendViewWin();
+		win.show();
 	}
 	
 });

@@ -160,8 +160,14 @@ public enum ErrorCode {
 	BandUserStopOhterOttUserMustStop("宽带用户报停,其他OTT用户都需要报停"),
 	UserStatusIsNotReqstopNotOpen("用户[%s]不是报停状态，不能报开"),
 	OttUserOpenOhterBandUserMustOpen("OTT用户报开,其他宽带用户都需要报开"),
-	ForecastStopUserIsNotExists("预报停用户不存在"),
+	ForecastStopUserIsNotExists("预报停用户不存在"),	
 	OttUserCancelForecastStopBandUserAlso("OTT用户取消预报停,其他宽带用户都需要取消预报停"),
+	
+	TimePointFormatIsError("时间格式错误"),
+	DataIsNullCheckFile("数据不存在,请检查文件"),
+	CardHaveSpecialCharacter("该卡号[%s]含有特殊字符!"),
+	DuplicateCardNumber("重复的卡号%s"),
+	FileContentCommentLineNumberIsError("文件内容注释行数不对"),
 	
 	//======================未翻译===========================
 	NoStopRecord("找不到产品报停记录，请联系管理员"),

@@ -183,8 +183,10 @@ PayPanel = Ext.extend( Ext.Panel ,{
 		var record = this.feeStore.getAt(rowIndex);
 		if(this.realFeeStore.indexOf(record) > 0)
 			return;
-		var recordArray = this.getSameTypeProd(this.feeStore, record);
-		
+		//取消一起拖动
+		var recordArray = [];
+		recordArray.push(record)			
+//		var recordArray = this.getSameTypeProd(this.feeStore, record);
 		this.feeStore.remove(recordArray);
 		this.realFeeStore.add(recordArray);
 		this.doCalFee();
@@ -193,8 +195,9 @@ PayPanel = Ext.extend( Ext.Panel ,{
 		var record = this.realFeeStore.getAt(rowIndex);
 		if(this.feeStore.indexOf(record) > 0)
 			return;
-		var recordArray = this.getSameTypeProd(this.realFeeStore, record);
-		
+		var recordArray = [];
+		recordArray.push(record)
+//		var recordArray = this.getSameTypeProd(this.realFeeStore, record);
 		this.realFeeStore.remove(recordArray);
 		this.feeStore.add(recordArray);
 		this.doCalFee();

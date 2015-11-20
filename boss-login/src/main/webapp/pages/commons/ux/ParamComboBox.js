@@ -19,6 +19,7 @@ Ext.ux.ParamCombo = Ext.extend(Ext.form.ComboBox, {
 	paramName:null,//必须指定参数名称
 	defaultValue:null,
 	allowBlankItem:false,
+	isContrary:false,//item_name,item_value 反显示
 //	isFilter:true,			//是否按县市过滤数据字典
 	constructor:function(config){
 		config = config || {};

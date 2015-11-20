@@ -30,7 +30,29 @@ public class JCaCommandDao extends BaseEntityDao<JCaCommand> {
 	 * default empty constructor
 	 */
 	public JCaCommandDao() {}
-
+	@Override
+	public int[] save(JCaCommand ...t) throws JDBCException{
+		for(JCaCommand a:t){
+			this.save2(a);
+		}
+		return null;
+	}
+	private void save2(JCaCommand t) throws JDBCException{
+		String detailParam=t.getDetail_params();
+		t.setDetail_params(null);
+		try{
+		super.save(t);
+		if(detailParam!=null){
+			String sql="update j_ca_command set detail_params=? where transnum=? ";
+			this.executeUpdate(sql,detailParam, t.getTransnum());
+		}
+		}catch(JDBCException e){
+			throw e;
+		}finally{
+		t.setDetail_params(detailParam);
+		}
+	}
+	
 	/**
 	 * 查询客户指令
 	 * @param custId

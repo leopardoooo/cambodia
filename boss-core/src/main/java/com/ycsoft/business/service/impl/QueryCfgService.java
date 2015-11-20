@@ -1,12 +1,15 @@
 
 package com.ycsoft.business.service.impl;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.ycsoft.beans.config.TAddress;
@@ -15,6 +18,7 @@ import com.ycsoft.beans.config.TPayType;
 import com.ycsoft.beans.config.TProvince;
 import com.ycsoft.beans.config.TUpdateCfg;
 import com.ycsoft.beans.core.cust.CCustAddrNote;
+import com.ycsoft.beans.core.job.JCaCommandOsdsend;
 import com.ycsoft.beans.core.job.JOdscntRecord;
 import com.ycsoft.beans.core.voucher.CVoucher;
 import com.ycsoft.beans.system.SDept;
@@ -27,13 +31,16 @@ import com.ycsoft.business.commons.abstracts.BaseService;
 import com.ycsoft.business.component.config.BusiConfigComponent;
 import com.ycsoft.business.component.config.ExtTableComponent;
 import com.ycsoft.business.component.config.MemoryComponent;
+import com.ycsoft.business.component.core.DoneCodeComponent;
 import com.ycsoft.business.component.core.FeeComponent;
+import com.ycsoft.business.component.core.JobComponent;
 import com.ycsoft.business.component.resource.SimpleComponent;
 import com.ycsoft.business.component.system.IndexComponent;
 import com.ycsoft.business.component.task.TaskComponent;
 import com.ycsoft.business.dto.config.BusiDocDto;
 import com.ycsoft.business.dto.config.ExtendAttributeDto;
 import com.ycsoft.business.dto.config.ExtendTableAttributeDto;
+import com.ycsoft.business.dto.config.OsdSendDto;
 import com.ycsoft.business.dto.config.TAddressDto;
 import com.ycsoft.business.dto.config.TAddressSysDto;
 import com.ycsoft.business.dto.config.TaskWorkDto;
@@ -41,7 +48,11 @@ import com.ycsoft.business.dto.core.fee.BusiFeeDto;
 import com.ycsoft.business.service.IQueryCfgService;
 import com.ycsoft.commons.constants.DictKey;
 import com.ycsoft.commons.constants.SystemConstants;
+import com.ycsoft.commons.exception.ComponentException;
+import com.ycsoft.commons.exception.ErrorCode;
 import com.ycsoft.commons.helper.CollectionHelper;
+import com.ycsoft.commons.helper.DateHelper;
+import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.commons.store.MemoryDict;
 import com.ycsoft.commons.store.TemplateConfig;
 import com.ycsoft.daos.core.JDBCException;
@@ -62,6 +73,10 @@ public class QueryCfgService extends BaseService implements IQueryCfgService{
 	private SimpleComponent simpleComponent;
 	private IndexComponent indexComponent;
 	private MemoryComponent memoryComponent;
+	@Autowired
+	private DoneCodeComponent doneCodeComponent;
+	@Autowired
+	private JobComponent jobComponent;
 
 	public Map<String, String> queryProdFreeDay() throws Exception{
 		String dtvCfg = busiConfigComponent.queryTemplateConfig(TemplateConfig.Template.BASE_PROD_FREE_DAY.toString());
@@ -362,6 +377,48 @@ public class QueryCfgService extends BaseService implements IQueryCfgService{
 	@Override
 	public void editAddress(TAddressSysDto addrDto) throws Exception {
 		 simpleComponent.editAddress(addrDto);
+	}
+
+	@Override
+	public void saveOsdByFiles(File files, String begin_date, String end_date, String detail_time,
+			String send_title, String send_optr, String message) throws Exception {
+		List<OsdSendDto> list = simpleComponent.queryDataByFiles(files);
+		jobComponent.saveOsdByFiles(list,begin_date,end_date,detail_time,send_title,send_optr,message);
+	
+	}
+
+	public List<String> queryCanToSendOsd(File files, String begin_date, String end_date, String detail_time, String message) throws Exception {
+		if(StringHelper.isEmpty(begin_date)||StringHelper.isEmpty(end_date)||StringHelper.isEmpty(detail_time)
+				||StringHelper.isEmpty(message)){
+			throw new ComponentException(ErrorCode.ParamIsNull);
+		}
+		detail_time = detail_time.replace("，", ",").replace("：", ":");
+		String[] detailTime =  detail_time.split(",");
+		Date sendTimeDate = DateHelper.strToDate(begin_date); //开始时间
+		Date endTimeDate = DateHelper.strToDate(end_date);;  //截止时间
+		int c = DateHelper.getDiffDays(sendTimeDate, endTimeDate); //执行多少天
+		List<String> timeList = new ArrayList<String>();
+		for(int i=0;i<detailTime.length;i++){
+			for(int j=0;j<=c;j++){
+				Date _d = DateHelper.addDate(sendTimeDate, j);
+				String[] _time = detailTime[i].split(":");
+				if(_time.length != 2 ||StringHelper.isEmpty(_time[0])||StringHelper.isEmpty(_time[1])
+						||_time[0].length()!=2||_time[1].length()>2||Integer.parseInt(_time[0])>24||Integer.parseInt(_time[1])>60){
+					throw new ComponentException(ErrorCode.TimePointFormatIsError);
+				}
+				_d.setHours(Integer.parseInt(_time[0]));
+				_d.setMinutes(Integer.parseInt(_time[1]));
+				timeList.add(DateHelper.format(_d));
+			}
+		}
+		
+		List<OsdSendDto> list = simpleComponent.queryDataByFiles(files);
+		List<String> cards = CollectionHelper.converValueToList(list, "superNet");
+		jobComponent.checkIsRepeat(cards.toArray(new String[cards.size()]));
+		List<String> strlist = new ArrayList<String>();
+		strlist.add(String.valueOf(cards.size()));
+		strlist.add(String.valueOf(timeList.size()));
+		return strlist ;
 	}
 
 

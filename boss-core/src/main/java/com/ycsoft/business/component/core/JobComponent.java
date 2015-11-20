@@ -5,16 +5,21 @@ package com.ycsoft.business.component.core;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.ycsoft.beans.core.acct.CAcctAcctitem;
+import com.ycsoft.beans.core.common.CDoneCode;
 import com.ycsoft.beans.core.job.JBandCommand;
 import com.ycsoft.beans.core.job.JBusiCmd;
 import com.ycsoft.beans.core.job.JCaCommand;
+import com.ycsoft.beans.core.job.JCaCommandOsdsend;
 import com.ycsoft.beans.core.job.JCustAcctmodeCal;
 import com.ycsoft.beans.core.job.JCustCreateBill;
 import com.ycsoft.beans.core.job.JCustCreditCal;
@@ -27,6 +32,7 @@ import com.ycsoft.beans.core.job.JProdNextTariffHis;
 import com.ycsoft.beans.core.job.JProdPreopen;
 import com.ycsoft.beans.core.job.JUserStop;
 import com.ycsoft.beans.core.job.JVodCommand;
+import com.ycsoft.beans.core.job.SmsxCmd;
 import com.ycsoft.beans.core.prod.CProdOrder;
 import com.ycsoft.beans.core.user.CUser;
 import com.ycsoft.beans.prod.PPackageProd;
@@ -36,6 +42,7 @@ import com.ycsoft.business.commons.abstracts.BaseBusiComponent;
 import com.ycsoft.business.dao.core.job.JBandCommandDao;
 import com.ycsoft.business.dao.core.job.JBusiCmdDao;
 import com.ycsoft.business.dao.core.job.JCaCommandDao;
+import com.ycsoft.business.dao.core.job.JCaCommandOsdsendDao;
 import com.ycsoft.business.dao.core.job.JCustAcctmodeCalDao;
 import com.ycsoft.business.dao.core.job.JCustCreateBillDao;
 import com.ycsoft.business.dao.core.job.JCustCreditCalDao;
@@ -49,15 +56,20 @@ import com.ycsoft.business.dao.core.job.JProdPreopenDao;
 import com.ycsoft.business.dao.core.job.JUserStopDao;
 import com.ycsoft.business.dao.core.job.JVodCommandDao;
 import com.ycsoft.business.dao.core.prod.CProdOrderDao;
+import com.ycsoft.business.dto.config.OsdSendDto;
 import com.ycsoft.business.dto.core.prod.CProdDto;
 import com.ycsoft.business.dto.core.prod.JBandCommandDto;
 import com.ycsoft.business.dto.core.prod.JCaCommandDto;
 import com.ycsoft.business.dto.core.prod.JVodCommandDto;
 import com.ycsoft.business.dto.core.user.UserRes;
 import com.ycsoft.commons.constants.BusiCmdConstants;
+import com.ycsoft.commons.constants.BusiCodeConstants;
 import com.ycsoft.commons.constants.SequenceConstants;
+import com.ycsoft.commons.constants.StatusConstants;
 import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.exception.ComponentException;
+import com.ycsoft.commons.exception.ErrorCode;
+import com.ycsoft.commons.helper.CollectionHelper;
 import com.ycsoft.commons.helper.DateHelper;
 import com.ycsoft.commons.helper.StringHelper;
 import com.ycsoft.daos.core.JDBCException;
@@ -87,6 +99,8 @@ public class JobComponent  extends BaseBusiComponent {
 	private JCustAcctmodeCalDao jCustAcctmodeCalDao;
 	@Autowired
 	private CProdOrderDao cProdOrderDao;
+	@Autowired
+	private JCaCommandOsdsendDao jCaCommandOsdsendDao;
 	
 	/**
 	 * 创建计算信用度任务
@@ -616,6 +630,12 @@ public class JobComponent  extends BaseBusiComponent {
 	public void saveCancelCaAuth(CUser cuser,Integer doneCode) throws Exception{
 		jCaCommandDao.saveCancelCaAuth(cuser,doneCode);
 	}
+
+	
+	public Integer gDoneCode() throws Exception{
+		return Integer.parseInt(cDoneCodeDao.findSequence().toString());
+	}
+	
 	/**
 	 * 插入到期日期计算任务
 	 * @param doneCode
@@ -731,4 +751,149 @@ public class JobComponent  extends BaseBusiComponent {
 		jCustAcctmodeCalDao = custAcctmodeCalDao;
 	}
 
+	/**
+	 * OSD催缴
+	 * @param list
+	 * @param begin_date
+	 * @param end_date
+	 * @param detail_time
+	 * @param send_title
+	 * @param send_optr
+	 * @param message
+	 * @throws Exception
+	 */
+	public void saveOsdByFiles(List<OsdSendDto> list, String begin_date, String end_date, String detail_time,
+			String send_title, String send_optr, String message) throws Exception{
+		//已经验证了,不需要再次验证
+//		checkIsRepeat(CollectionHelper.converValueToArray(list, "superNet"));
+		
+		if(StringHelper.isEmpty(begin_date)||StringHelper.isEmpty(end_date)||StringHelper.isEmpty(detail_time)
+				||StringHelper.isEmpty(message)){
+			throw new ComponentException(ErrorCode.ParamIsNull);
+		}
+		detail_time = detail_time.replace("，", ",").replace("：", ":");
+		String[] detailTime =  detail_time.split(",");
+		Date sendTimeDate = DateHelper.strToDate(begin_date); //开始时间
+		Date endTimeDate = DateHelper.strToDate(end_date);;  //截止时间
+		int c = DateHelper.getDiffDays(sendTimeDate, endTimeDate); //执行多少天
+		List<String> timeList = new ArrayList<String>();
+		for(int i=0;i<detailTime.length;i++){
+			for(int j=0;j<=c;j++){
+				Date _d = DateHelper.addDate(sendTimeDate, j);
+				String[] _time = detailTime[i].split(":");
+				if(_time.length != 2){
+					throw new ComponentException(ErrorCode.TimePointFormatIsError);
+				}
+				_d.setHours(Integer.parseInt(_time[0]));
+				_d.setMinutes(Integer.parseInt(_time[1]));
+				timeList.add(DateHelper.format(_d));
+			}
+		}
+		
+		
+		send_title = StringHelper.isEmpty(send_title)?"-1":send_title;
+		String detailParams = "TITLE:''"+send_title+"'';MSG:''" + message + "'';style:''1'';duration:''60''";
+		String info = StringHelper.append(StringHelper.isEmpty(send_title)?"":"send_title:"+send_title+";"
+				,StringHelper.isEmpty(send_optr)?"":"send_optr:"+send_optr+";");
+		
+		List<JCaCommandOsdsend> osdList = new ArrayList<JCaCommandOsdsend>();
+		Integer jobId = getJobId();
+		Integer doneCode = gDoneCode();
+		for(String time:timeList){
+			for(OsdSendDto dto : list){
+				String detail = detailParams.replace("{Consumer}", dto.getConsumer() == null ?"":dto.getConsumer())
+						.replace("{Name}", dto.getName() == null ?"":dto.getName())
+						.replace("{EDCDebt}", dto.getEdcdebt() == null ?"":dto.getEdcdebt())
+						.replace("{CintriDebt}", dto.getCintriDebt() == null ?"":dto.getCintriDebt())
+						.replace("{Currency}", dto.getCurrency() == null ?"":dto.getCurrency())
+						.replace("{BillDate}", dto.getBillDate() == null ?"":dto.getBillDate())
+						.replace("{DueDate}", dto.getDueDate() == null ?"":dto.getDueDate())
+						.replace("{region}", dto.getRegion() == null ?"":dto.getRegion());
+				if(StringHelper.isEmpty(dto.getSuperNet())){
+					throw new ComponentException("卡号不能为空");
+				}
+				
+				JCaCommandOsdsend dttCmd =this.createOsdCmd(jobId,doneCode,dto.getSuperNet());
+				dttCmd.setDetail_params(detail);
+				dttCmd.setCmd_type(SmsxCmd.SendOSD.name());
+				dttCmd.setSend_date(DateHelper.parseDate(time,DateHelper.FORMAT_TIME));
+				osdList.add(dttCmd);
+				
+			
+				
+			}
+		}
+		
+		
+		if(osdList.size()>0){
+			jCaCommandOsdsendDao.save(osdList.toArray(new JCaCommandOsdsend[osdList.size()]));
+			//保存流水
+			CDoneCode cDoneCode = new CDoneCode();
+			cDoneCode.setDone_code(doneCode);
+			cDoneCode.setBusi_code(BusiCodeConstants.CARD_CA_SEND);
+			cDoneCode.setStatus(StatusConstants.ACTIVE);
+			cDoneCode.setCounty_id(getOptr().getCounty_id());
+			cDoneCode.setArea_id(getOptr().getArea_id());
+			cDoneCode.setDept_id(getOptr().getDept_id());
+			cDoneCode.setOptr_id(getOptr().getOptr_id());
+			cDoneCode.setRemark(info);
+			cDoneCodeDao.save(cDoneCode);
+		}
+		
+	}
+	public void checkIsRepeat(String[] deviceCodes) throws Exception {
+		List<String> list = new ArrayList<String>();
+		Map<String,String> map = new HashMap<String,String>();
+		Pattern p = Pattern.compile("[^a-zA-Z0-9]"); 
+		for(String code : deviceCodes){
+			Matcher m = p.matcher(code); 
+			String newDeviceCode = m.replaceAll("");
+			if(newDeviceCode.length()!= code.length()){
+				throw new ComponentException(ErrorCode.CardHaveSpecialCharacter,code);
+			}
+			if(map.containsKey(code)){
+				list.add(code);
+			}else{
+				map.put(code, code);
+			}
+		}
+		if(list.size()>0){
+			String str = "";
+			int t=0;
+			int n=0;
+			for(String s : list){
+				if(t<3){
+					str += s+",";
+				}
+				t++;
+				if(t==2){
+					str +="<br/> ";
+					t=0;
+				}
+				n++;
+				if(n ==20){
+					break;
+				}
+			}
+			str ="<br/>"+StringHelper.delEndChar(str,1)+";";
+			throw new ComponentException(ErrorCode.DuplicateCardNumber,str);
+		}
+	}
+	
+	private JCaCommandOsdsend createOsdCmd(Integer jobId,Integer doneCode,String cardId) throws Exception{
+		JCaCommandOsdsend dttCmd = new JCaCommandOsdsend();
+		dttCmd.setDone_code(doneCode);
+		dttCmd.setJob_id(jobId);
+		dttCmd.setTransnum(Long.parseLong(jCaCommandDao.findSequence().toString()));
+		dttCmd.setCard_id(cardId);
+		dttCmd.setStb_id("11111111");
+		dttCmd.setCas_type("SMSX");
+		dttCmd.setCas_id("SMSX");
+		dttCmd.setCreate_time(new Date());
+		dttCmd.setIs_sent("N");
+		dttCmd.setCounty_id(SystemConstants.COUNTY_ALL);
+		dttCmd.setArea_id(SystemConstants.AREA_ALL);
+		dttCmd.setPriority(SystemConstants.PRIORITY_SSSQ);
+		return dttCmd;
+	}
 }

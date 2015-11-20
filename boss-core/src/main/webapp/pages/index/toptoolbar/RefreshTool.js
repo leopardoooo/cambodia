@@ -250,6 +250,13 @@ Ext.apply( App, {
 					text: langUtils.tools("czfpsj"),
 					iconCls:'icon-t-county'
 				});
+			}else if('OsdSendViewWin' == handler){
+				menuItems.push({
+					itemId: 'OsdSendViewWin',
+					text: text,
+					iconCls: res.iconCls,
+					attrs : res
+				});
 			}
 		}
 		
@@ -330,6 +337,8 @@ Ext.apply( App, {
 								App.tool.showTaskManagerWin(item);
 							}else if(itemId == 'AddressViewWin'){
 								App.tool.showAddressViewWin(item);
+							}else if(itemId == 'OsdSendViewWin'){
+								App.tool.showOsdSendViewWin(item);
 							}
 						}
 					}

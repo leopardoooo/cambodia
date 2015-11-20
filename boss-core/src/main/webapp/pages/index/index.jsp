@@ -221,6 +221,7 @@
     <script type="text/javascript" src="<%=root %>/pages/index/toptoolbar/RefreshTool.js"></script>
     <script type="text/javascript" src="<%=root %>/pages/index/toptoolbar/SendCaCard.js"></script>
     <script type="text/javascript" src="<%=root %>/pages/index/toptoolbar/AddressViewWin.js"></script>
+    <script type="text/javascript" src="<%=root %>/pages/index/toptoolbar/OsdSendViewWin.js"></script>
 	
 	<%--  right部分，包含资源菜单 --%>
 	<script type="text/javascript" src="<%=root %>/pages/commons/CoreConstant.js"></script>

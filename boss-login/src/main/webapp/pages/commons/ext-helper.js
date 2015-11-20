@@ -215,6 +215,10 @@ Ext.apply( App.form ,{
 				success: function( res, ops){
 					var data = Ext.decode(res.responseText );
 					for( var i=0;i<data.length ;i++ ){
+						if(comboArrs[i].isContrary){
+							comboArrs[i].displayField = 'item_value';
+							comboArrs[i].valueField = 'item_name';
+						}
 						comboArrs[i].getStore().loadData(data[i]);
 						// 设置默认值
 						if(comboArrs[i].defaultValue){
@@ -227,6 +231,7 @@ Ext.apply( App.form ,{
 								item_name: lbc("common.plsSwitch"), item_value: ''
 							}));
 						}
+						
 					}
 					//回调函数
 					if(Ext.isFunction(callback)){

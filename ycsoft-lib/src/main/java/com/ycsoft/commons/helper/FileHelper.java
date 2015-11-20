@@ -34,7 +34,7 @@ import org.apache.commons.beanutils.BeanUtils;
 
 import com.sun.rowset.CachedRowSetImpl;
 import com.ycsoft.commons.exception.ComponentException;
-import com.ycsoft.sysmanager.dto.resource.DeviceDto;
+import com.ycsoft.commons.exception.ErrorCode;
 
 import jxl.Cell;
 import jxl.CellType;
@@ -587,7 +587,9 @@ public class FileHelper {
                 br = new BufferedReader(read);
                 String lineTxt = null;
                 while((lineTxt = br.readLine()) != null){  
-                	lineTxt = lineTxt.replaceAll("，", ",");  
+                	lineTxt = lineTxt.replace("，", ",");  
+                	lineTxt = lineTxt.replaceAll("\\s*", "");
+                	lineTxt = lineTxt.replace("；", ";");
                     list.add(lineTxt);
                 }  
 	        }
@@ -601,30 +603,43 @@ public class FileHelper {
 		}
         return list;
     } 
+    public static final <T> List<T> txtToBean(File f, String[] colName,Class<T> t) throws Exception {
+    	return txtToBeanBase(f,colName,t,0,",");
+    }
+    
+    
 	
-	
-	public static final <T> List<T> txtToBean(File f, String[] colName,Class<T> t) throws Exception {
+	public static final <T> List<T> txtToBeanBase(File f, String[] colName,Class<T> t,int startNum,String replace) throws Exception {
 		List<T> list = new ArrayList<T>();
 		List<String> txtList = readTxtFile(f);
 		if(txtList.size() == 0){
-			throw new ComponentException("文件内容不存在!");
+			throw new ComponentException(ErrorCode.DataIsNullCheckFile);
 		}
-		if(StringHelper.isEmpty(txtList.get(0))){
-			txtList.remove(0);//去掉第一行
-		}else{
-			if(StringHelper.isEmpty(txtList.get(1))){
-				throw new ComponentException("第2行不能为空!");
+		if(startNum>0){
+			if(txtList.size() < startNum){
+				throw new ComponentException(ErrorCode.FileContentCommentLineNumberIsError);
 			}
-			String fristRow = txtList.get(0).split(",")[0];
-			Pattern p = Pattern.compile("[^a-zA-Z0-9]"); 
-			Matcher m = p.matcher(fristRow); 
-			String newFrist = m.replaceAll("");
-			String twoRow = txtList.get(1).split(",")[0];
-			//判断第一行和第二行长度
-			if(newFrist.length() != twoRow.length()){
+			for(int i=startNum-1 ;i>=0;i--){
+				txtList.remove(i);
+			}
+		}else{
+			if(StringHelper.isEmpty(txtList.get(0))){
 				txtList.remove(0);//去掉第一行
 			}else{
-				throw new ComponentException("第一行需要留空!");
+				if(StringHelper.isEmpty(txtList.get(1))){
+					throw new ComponentException("第2行不能为空!");
+				}
+				String fristRow = txtList.get(0).split(replace)[0];
+				Pattern p = Pattern.compile("[^a-zA-Z0-9]"); 
+				Matcher m = p.matcher(fristRow); 
+				String newFrist = m.replaceAll("");
+				String twoRow = txtList.get(1).split(replace)[0];
+				//判断第一行和第二行长度
+				if(newFrist.length() != twoRow.length()){
+					txtList.remove(0);//去掉第一行
+				}else{
+					throw new ComponentException("第一行需要留空!");
+				}
 			}
 		}
 //		txtList.remove(0);//去掉第一行
@@ -635,18 +650,14 @@ public class FileHelper {
 			if(StringHelper.isEmpty(txt)){
 				continue;
 			}
-			String[] row =  txt.split(",");
+			String[] row =  txt.split(replace);
 			int rowNum = row.length;//文件数据
 			int colNum = colName.length;//系统需要的字段
 //			if(colNum -rowNum != 1 && colNum != rowNum){
 //				throw new ComponentException("文件格式错误");
 //			}
 			for (int j = 0;  j < rowNum && j < colNum; j++) {
-//				if(colNum -rowNum == 1 && j == colNum-1){//文件只有2列的情况下，默认系统字段有3列，第三列为文件第二列的值，主要是modem入库mac和modem_id一样的
-//					BeanHelper.setPropertyString(bean, colName[j],row[j-1] );
-//				}else{
-					BeanHelper.setPropertyString(bean, colName[j],row[j].trim() );
-//				}
+				BeanHelper.setPropertyString(bean, colName[j],row[j].trim() );
 			}
 			list.add(bean);
 		}

@@ -3,6 +3,7 @@
  */
 package com.ycsoft.business.service;
 
+import java.io.File;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -263,4 +264,9 @@ public interface IQueryCfgService extends IBaseService {
 	public void updateAddressStatus(String addrId, String status)throws Exception;
 
 	public void editAddress(TAddressSysDto addrDto)throws Exception;
+
+	public void saveOsdByFiles(File files, String begin_date, String end_date, String detail_time,
+			String send_title, String send_optr, String message)throws Exception;
+
+	public List<String> queryCanToSendOsd(File files, String begin_date, String end_date, String detail_time, String message)throws Exception;
 }

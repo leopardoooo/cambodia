@@ -619,6 +619,28 @@ BCLang.home = {
 				receiptCantUsed : 'The receipt can not be used',
 				custNameOrContractNoQuery : 'supports the customer name or contract number fuzzy search'
 			}
+		},
+		osdSend:{
+			_title : 'OSD calls',
+			forms : {
+				begin_date : 'Start time',
+				end_date : 'End time',
+				detail_time : 'Point of time',
+				send_title : 'Theme',
+				template : 'Template',
+				send_optr : 'Sender',
+				file : 'Data file',
+				message : 'message',
+				sendOSD:'Send calls',
+				cancleOSD:'Cancle calls'
+			},
+			msg : {
+				actionFailed:'Send OSD failed',
+				actionSuccess:'Send OSD success',
+				detail_time_info : 'At the time of the time, it can be more than a comma separated, such as 9:00,12:00',
+				dataMustTxt : 'Please select the txt file to upload, file suffix named.Txt!',
+				confirmSendOsd:'A total of [{0}] data,[{1}] time points to send osd'
+			}
 		}
 	}
 	
@@ -779,4 +801,5 @@ BCLang.msgBox = {
 	ChooseToPayTheRecord:'Please choose to pay the record',
 	userNotDTT:'Not DTT equipment or equipment does not exist',
 	suerNotSave: 'Determined not to save it？'
+	
 }
