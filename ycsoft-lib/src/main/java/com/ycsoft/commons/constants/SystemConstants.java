@@ -618,4 +618,5 @@ public class SystemConstants {
 	public static final String Bulletin_worktask_WORK="WORK";//工程部门工单提醒
 	
 	public static final String ExtOperateObj="operateObj";//操作对象键值
+	public static final int Osd_Job_Id=-10;//osd催缴job_id
  }
