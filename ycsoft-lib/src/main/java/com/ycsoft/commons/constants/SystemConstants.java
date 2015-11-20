@@ -286,6 +286,9 @@ public class SystemConstants {
 	public final static String PROD_SERV_ID_ITV = "ITV";
 	public final static String PROD_SERV_ID_BAND = "BAND";
 	public final static String PROD_SERV_ID_RENT = "RENT";
+	public final static String PROD_SERV_ID_OTT = "OTT";
+	public final static String PROD_SERV_ID_OTTMOBILE = "OTT_MOBILE";
+	public final static String PROD_SERV_ID_DTT= "DTT";
 
 	/**
 	 * 产品打包类型

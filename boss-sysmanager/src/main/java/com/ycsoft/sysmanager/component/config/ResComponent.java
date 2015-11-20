@@ -25,6 +25,7 @@ import com.ycsoft.commons.abstracts.BaseComponent;
 import com.ycsoft.commons.constants.BusiCmdConstants;
 import com.ycsoft.commons.constants.FuncCode;
 import com.ycsoft.commons.constants.StatusConstants;
+import com.ycsoft.commons.constants.SystemConstants;
 import com.ycsoft.commons.exception.ComponentException;
 import com.ycsoft.commons.helper.JsonHelper;
 import com.ycsoft.commons.helper.StringHelper;
@@ -44,6 +45,9 @@ public class ResComponent extends BaseComponent {
 	private BCreditAddressStopDao bCreditAddressStopDao;
 	
 	public List<TServer> queryServerByServType(String servType) throws Exception {
+		if(SystemConstants.PROD_SERV_ID_OTTMOBILE.endsWith(servType)){
+			servType=SystemConstants.PROD_SERV_ID_OTT;
+		}
 		return tServerResDao.queryServerByServType(servType);
 	}
 	

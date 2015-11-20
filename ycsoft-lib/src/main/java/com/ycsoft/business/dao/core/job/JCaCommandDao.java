@@ -177,4 +177,30 @@ public class JCaCommandDao extends BaseEntityDao<JCaCommand> {
 		String sql = "delete from j_ca_command where transnum = ? ";
 		executeUpdate(sql, cmd.getTransnum());
 	}
+	/**
+	 * 更新计划待发送的OSD的发送标记
+	 * @throws JDBCException 
+	 */
+	public int updatePlanOsdSign() throws JDBCException{
+		String sql="update j_ca_command_osdsend set result_flag='M' where send_date<sysdate ";
+		return this.executeUpdate(sql);
+	}
+	/**
+	 * 移动计划待发送的被标记OSD到正式表
+	 * @throws JDBCException 
+	 */
+	public void transPlanOsdToExecBySign() throws JDBCException{
+		String sql="insert into j_ca_command(transnum, job_id, cas_id, cas_type, user_id, cust_id, done_code, cmd_type, stb_id, card_id, prg_name, boss_res_id, control_id, auth_begin_date, auth_end_date, area_id, is_sent, record_date, detail_params, priority) "
+								   +" select transnum, job_id, cas_id, cas_type, user_id, cust_id, done_code, cmd_type, stb_id, card_id, prg_name, boss_res_id, control_id, auth_begin_date, auth_end_date, area_id, 'N', record_date, detail_params, priority "
+								   +" from j_ca_command_osdsend where result_flag='M'";
+		this.executeUpdate(sql);
+	}
+	/**
+	 * 删除被标记的计划待发送的OSD记录
+	 * @throws JDBCException 
+	 */
+	public void deletePlanOsdBySign() throws JDBCException{
+		String sql="delete from j_ca_command_osdsend where result_flag='M' ";
+		this.executeUpdate(sql);
+	}
 }
