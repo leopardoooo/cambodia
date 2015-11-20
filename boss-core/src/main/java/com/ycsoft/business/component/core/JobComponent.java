@@ -829,7 +829,7 @@ public class JobComponent  extends BaseBusiComponent {
 			//保存流水
 			CDoneCode cDoneCode = new CDoneCode();
 			cDoneCode.setDone_code(doneCode);
-			cDoneCode.setBusi_code(BusiCodeConstants.CARD_CA_SEND);
+			cDoneCode.setBusi_code(BusiCodeConstants.CARD_OSD_SEND);
 			cDoneCode.setStatus(StatusConstants.ACTIVE);
 			cDoneCode.setCounty_id(getOptr().getCounty_id());
 			cDoneCode.setArea_id(getOptr().getArea_id());

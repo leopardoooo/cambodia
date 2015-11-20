@@ -157,4 +157,5 @@ public final class BusiCodeConstants {
 	
 	public final static String BATCH_USER_WRITE_OFF = "1913";	//批量销用户
 	public final static String BATCH_OPEN_USER_OTT_MOBILE = "2500";	//批量手机开户
+	public final static String CARD_OSD_SEND = "5001";//OSD催缴
 }
