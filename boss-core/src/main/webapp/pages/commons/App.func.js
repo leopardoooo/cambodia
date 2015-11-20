@@ -469,12 +469,15 @@ Ext.apply(App.func,{
 				if (data['is_doc'] == 'T'){
 					return false;
 				}	
-				var date = Date.parseDate(data['create_time'].substring(0,10),'Y-m-d');
-				var cfgData = App.getApp().findCfgData('PRINT_DATE_CFG');
-				if(Ext.isEmpty(cfgData))
-					return false;
-				date = date.add(Date.DAY,parseInt(cfgData.config_value));
-				if(!Ext.isEmpty(data['invoice_id']) || nowDate().format('Y-m-d') > date.format('Y-m-d')){
+//				var date = Date.parseDate(data['create_time'].substring(0,10),'Y-m-d');
+//				var cfgData = App.getApp().findCfgData('PRINT_DATE_CFG');
+//				if(Ext.isEmpty(cfgData))
+//					return false;
+//				date = date.add(Date.DAY,parseInt(cfgData.config_value));
+//				if(!Ext.isEmpty(data['invoice_id']) || nowDate().format('Y-m-d') > date.format('Y-m-d')){
+//					return false;
+//				}
+				if(!Ext.isEmpty(data['invoice_id'])){
 					return false;
 				}
 				if (data['is_doc'] == 'N'){
@@ -486,12 +489,15 @@ Ext.apply(App.func,{
 				if (data['is_doc'] == 'T' || data['status'] != 'PAY'){
 					return false;
 				}	
-				var date = Date.parseDate(data['create_time'].substring(0,10),'Y-m-d');
-				var cfgData = App.getApp().findCfgData('PRINT_DATE_CFG');
-				if(Ext.isEmpty(cfgData))
-					return false;
-				date = date.add(Date.DAY,parseInt(cfgData.config_value));
-				if(!Ext.isEmpty(data['invoice_id']) || nowDate().format('Y-m-d') > date.format('Y-m-d')){
+//				var date = Date.parseDate(data['create_time'].substring(0,10),'Y-m-d');
+//				var cfgData = App.getApp().findCfgData('PRINT_DATE_CFG');
+//				if(Ext.isEmpty(cfgData))
+//					return false;
+//				date = date.add(Date.DAY,parseInt(cfgData.config_value));
+//				if(!Ext.isEmpty(data['invoice_id']) || nowDate().format('Y-m-d') > date.format('Y-m-d')){
+//					return false;
+//				}
+				if(!Ext.isEmpty(data['invoice_id'])){
 					return false;
 				}
 				

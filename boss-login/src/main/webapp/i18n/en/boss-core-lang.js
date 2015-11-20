@@ -626,6 +626,7 @@ BCLang.home = {
 				begin_date : 'Start time',
 				end_date : 'End time',
 				detail_time : 'Point of time',
+				osd_call_type : 'Send type',
 				send_title : 'Theme',
 				template : 'Template',
 				send_optr : 'Sender',

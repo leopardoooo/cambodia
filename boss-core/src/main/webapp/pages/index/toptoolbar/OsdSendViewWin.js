@@ -39,6 +39,17 @@ OsdSendPanel = Ext.extend(Ext.FormPanel, {
 	                    }]
 					
 				},{
+					columnWidth : 1,
+					items:[{
+						fieldLabel: lbc('home.tools.osdSend.forms.osd_call_type'),
+						xtype:'paramcombo',
+						allowBlank:false,
+						anchor:'50%',
+						hiddenName:'osd_call_type',
+						paramName:'OSD_CALL_TYPE',
+						defaultValue:'ROLL'
+					}]
+				},{
 					columnWidth:0.6,
 					items:[{
 	                        xtype: 'textfield',

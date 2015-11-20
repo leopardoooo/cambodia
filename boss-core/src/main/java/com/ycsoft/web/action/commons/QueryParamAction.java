@@ -173,6 +173,7 @@ public class QueryParamAction extends BaseBusiAction {
 		String send_title = request.getParameter("send_title");
 		String send_optr = request.getParameter("send_optr");
 		String message = request.getParameter("message");
+		String osd_call_type = request.getParameter("osd_call_type");//发送类型，暂时没用
 		String msg = "";
 		try{
 			queryCfgService.saveOsdByFiles(files,begin_date,end_date,detail_time,send_title,send_optr,message );

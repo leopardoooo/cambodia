@@ -630,6 +630,7 @@ BCLang.home = {
 				begin_date : '发送时间',
 				end_date : '结束时间',
 				detail_time : '时间点',
+				osd_call_type : '发送类型',
 				send_title : '主题',
 				template : '模板',
 				send_optr : '发送人',
