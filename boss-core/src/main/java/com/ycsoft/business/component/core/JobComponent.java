@@ -797,7 +797,6 @@ public class JobComponent  extends BaseBusiComponent {
 				,StringHelper.isEmpty(send_optr)?"":"send_optr:"+send_optr+";");
 		
 		List<JCaCommandOsdsend> osdList = new ArrayList<JCaCommandOsdsend>();
-		Integer jobId = getJobId();
 		Integer doneCode = gDoneCode();
 		for(String time:timeList){
 			for(OsdSendDto dto : list){
@@ -813,7 +812,7 @@ public class JobComponent  extends BaseBusiComponent {
 					throw new ComponentException("卡号不能为空");
 				}
 				
-				JCaCommandOsdsend dttCmd =this.createOsdCmd(jobId,doneCode,dto.getSuperNet());
+				JCaCommandOsdsend dttCmd =this.createOsdCmd(SystemConstants.Osd_Job_Id,doneCode,dto.getSuperNet());
 				dttCmd.setDetail_params(detail);
 				dttCmd.setCmd_type(SmsxCmd.SendOSD.name());
 				dttCmd.setSend_date(DateHelper.parseDate(time,DateHelper.FORMAT_TIME));
