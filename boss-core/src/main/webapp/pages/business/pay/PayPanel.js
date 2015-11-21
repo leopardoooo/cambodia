@@ -158,9 +158,11 @@ PayPanel = Ext.extend( Ext.Panel ,{
 				this.feeStore.removeAll();
 				this.realFeeStore.add(records);
 			}else{
-				var recordArray = this.getSameTypeProd(this.feeStore, records);
-				this.realFeeStore.add(recordArray);
-				this.feeStore.remove(recordArray);
+				this.realFeeStore.add(records);
+				this.feeStore.remove(records);
+//				var recordArray = this.getSameTypeProd(this.feeStore, records);
+//				this.realFeeStore.add(recordArray);
+//				this.feeStore.remove(recordArray);
 			}
 				this.doCalFee();
 		}
@@ -172,9 +174,11 @@ PayPanel = Ext.extend( Ext.Panel ,{
 				this.realFeeStore.removeAll();
 				this.feeStore.add(records);
 			}else{
-				var recordArray = this.getSameTypeProd(this.realFeeStore, records);
-				this.realFeeStore.remove(recordArray);
-				this.feeStore.add(recordArray);
+				this.realFeeStore.add(records);
+				this.feeStore.remove(records);
+//				var recordArray = this.getSameTypeProd(this.realFeeStore, records);
+//				this.realFeeStore.remove(recordArray);
+//				this.feeStore.add(recordArray);
 			}
 				this.doCalFee();
 		}
