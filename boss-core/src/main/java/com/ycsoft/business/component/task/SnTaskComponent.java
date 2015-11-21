@@ -18,6 +18,8 @@ import com.ycsoft.beans.core.prod.CProdPropChange;
 import com.ycsoft.beans.core.user.CUser;
 import com.ycsoft.beans.core.user.CUserPropChange;
 import com.ycsoft.beans.device.RDevice;
+import com.ycsoft.beans.device.RModemModel;
+import com.ycsoft.beans.device.RStbModel;
 import com.ycsoft.beans.task.TaskFillDevice;
 import com.ycsoft.beans.task.WTaskBaseInfo;
 import com.ycsoft.beans.task.WTaskLog;
@@ -30,6 +32,8 @@ import com.ycsoft.business.dao.core.cust.CCustLinkmanDao;
 import com.ycsoft.business.dao.core.user.CUserDao;
 import com.ycsoft.business.dao.core.user.CUserPropChangeDao;
 import com.ycsoft.business.dao.resource.device.RDeviceDao;
+import com.ycsoft.business.dao.resource.device.RModemModelDao;
+import com.ycsoft.business.dao.resource.device.RStbModelDao;
 import com.ycsoft.business.dao.task.WTaskBaseInfoDao;
 import com.ycsoft.business.dao.task.WTaskLogDao;
 import com.ycsoft.business.dao.task.WTaskUserDao;
@@ -71,7 +75,10 @@ public class SnTaskComponent extends BaseBusiComponent {
 	private TConfigTemplateDao tConfigTemplateDao;
 
 	private CUserPropChangeDao cUserPropChangeDao;
-
+	@Autowired
+	private RModemModelDao rModemModelDao;
+	@Autowired
+	private RStbModelDao rStbModelDao;
 	// 创建开户工单
 	public void createOpenTask(Integer doneCode, CCust cust, List<CUser> userList, String assignType) throws Exception {
 		this.createTaskWithUser(doneCode, cust, userList, SystemConstants.TASK_TYPE_INSTALL, assignType);
@@ -125,6 +132,9 @@ public class SnTaskComponent extends BaseBusiComponent {
 		}
 		// 创建拆线路单
 		List<CUser> bandList = getUserByTyoe(userList, SystemConstants.USER_TYPE_BAND);
+		if (bandList.size() == 0) {
+			return;// no user
+		}
 		String teamType = SystemConstants.TEAM_TYPE_SUPERNET;
 		String synStatus=StatusConstants.NONE;
 		if (SystemConstants.TASK_ASSIGN_CFOCN.equals(assignType)){
@@ -134,7 +144,7 @@ public class SnTaskComponent extends BaseBusiComponent {
 		String teamId = getTeamId(teamType);
 		String taskId = this.saveTaskBaseInfo(cust, doneCode, SystemConstants.TASK_TYPE_WRITEOFF_LINE, teamId, null,
 				null);
-		this.saveTaskUser(bandList, SystemConstants.TASK_TYPE_WRITEOFF_LINE, taskId);
+		this.saveTaskUser(bandList, SystemConstants.TASK_TYPE_WRITEOFF_LINE, taskId,doneCode);
 		createTaskLog(taskId, BusiCodeConstants.TASK_INIT, doneCode, null, synStatus);
 	}
 
@@ -150,7 +160,7 @@ public class SnTaskComponent extends BaseBusiComponent {
 				getTeamId(SystemConstants.TEAM_TYPE_SUPERNET), null, bugDetail, bugPhone);
 		List<CUser> userList = cUserDao.queryUserByCustId(cust.getCust_id());
 		List<CUser> bandList = getUserByTyoe(userList, SystemConstants.USER_TYPE_BAND);
-		saveTaskUser(bandList, SystemConstants.TASK_TYPE_FAULT, taskId);
+		saveTaskUser(bandList, SystemConstants.TASK_TYPE_FAULT, taskId,doneCode);
 		//记录日志
 		createTaskLog(taskId, BusiCodeConstants.TASK_INIT, doneCode, null, StatusConstants.NONE);
 		return taskId;
@@ -178,7 +188,7 @@ public class SnTaskComponent extends BaseBusiComponent {
 		List<CUser> userList = cUserDao.queryUserByCustId(cust.getCust_id());
 		//取宽带是为了光路信息变化回填用的
 		List<CUser> bandList = getUserByTyoe(userList, SystemConstants.USER_TYPE_BAND);
-		saveTaskUser(bandList, SystemConstants.TASK_TYPE_MOVE, taskId);
+		saveTaskUser(bandList, SystemConstants.TASK_TYPE_MOVE, taskId,doneCode);
 		//记录日志
 		createTaskLog(taskId, BusiCodeConstants.TASK_INIT, doneCode, null,synStatus);
 	}
@@ -577,17 +587,17 @@ public class SnTaskComponent extends BaseBusiComponent {
 		if (userList == null || userList.size() == 0)
 			return null;
 		String taskId = this.saveTaskBaseInfo(cust, doneCode, taskType, deptId, null, null);
-		saveTaskUser(userList, taskType, taskId);
+		saveTaskUser(userList, taskType, taskId,doneCode);
 		return taskId;
 	}
 
 	// 保存工单用户
-	private void saveTaskUser(List<CUser> userList, String taskType, String taskId) throws JDBCException {
+	private void saveTaskUser(List<CUser> userList, String taskType, String taskId,Integer doneCode) throws Exception {
 		for (CUser user : userList) {
 			WTaskUser taskUser = new WTaskUser();
 			taskUser.setTask_id(taskId);
 			taskUser.setUser_id(user.getUser_id());
-			taskUser.setDevice_model(user.getStr3());
+			taskUser.setDevice_model(getUserDeviceModel(user,doneCode));
 			taskUser.setUser_type(user.getUser_type());
 			taskUser.setDevice_id(user.getUser_type().equals(SystemConstants.USER_TYPE_BAND) ? user.getModem_mac()
 					: user.getStb_id());
@@ -608,6 +618,39 @@ public class SnTaskComponent extends BaseBusiComponent {
 			}
 			wTaskUserDao.save(taskUser);
 		}
+	}
+	
+	
+	private String getUserDeviceModel(CUser user,Integer doneCode)throws Exception{
+		if(user.getUser_type().equals(SystemConstants.USER_TYPE_BAND)){
+			if(StringHelper.isNotEmpty(user.getModem_mac())){
+				RModemModel modemModel = rModemModelDao.queryByModemMac(user.getModem_mac());
+				if(modemModel != null){
+					user.setDevice_model(modemModel.getDevice_model());
+				}
+			}
+		}else{
+			if(StringHelper.isNotEmpty(user.getStb_id())){
+				RStbModel stbModel = rStbModelDao.queryByStbId(user.getStb_id());
+				if(stbModel != null){
+					user.setDevice_model(stbModel.getDevice_model());
+				}
+			}
+		}
+		if(!user.getUser_type().equals(SystemConstants.USER_TYPE_OTT_MOBILE)){
+			//如果str3原先没有的，根据设备编号找到设备型号，修改cuser
+			if(StringHelper.isNotEmpty(user.getDevice_model()) && StringHelper.isEmpty(user.getStr3())){
+				CUser cuser = cUserDao.findByKey(user.getUser_id());
+
+				List<CUserPropChange> userChangeList = new ArrayList<CUserPropChange>();
+				userChangeList.add(new CUserPropChange("str3", cuser.getStr3(), user.getDevice_model()));
+				this.editUser(doneCode, cuser.getUser_id(), userChangeList);
+			}
+			if(StringHelper.isEmpty(user.getDevice_model()) && StringHelper.isNotEmpty(user.getStr3())){
+				user.setDevice_model(user.getStr3());
+			}
+		}
+		return user.getDevice_model();
 	}
 
 	private void updateUserDevice(TaskFillDevice fillDevice, List<WTaskUser> userList, Integer doneCode, String taskId)

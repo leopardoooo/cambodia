@@ -686,12 +686,15 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 
 	public List<TaskUserDto> queryTaskDevice(String task_id) throws Exception {
 		List<TaskUserDto> userDtoList = new ArrayList<TaskUserDto>();
-		List<WTaskUser> userList = snTaskComponent.queryTaskDetailUser(task_id);	
+		List<WTaskUser> userList = snTaskComponent.queryTaskDetailUser(task_id);
+		WTaskBaseInfo taskBase = wTaskBaseInfoDao.findByKey(task_id);
 		for(WTaskUser task: userList){
 			TaskUserDto _t = new TaskUserDto();
 			BeanUtils.copyProperties(task, _t);
-			_t.setDevice_code(_t.getDevice_id());
-			_t.setDevice_id(null);
+			if (!taskBase.getTask_type_id().equals(SystemConstants.TASK_TYPE_WRITEOFF_TERMINAL)){
+				_t.setDevice_code(_t.getDevice_id());
+				_t.setDevice_id(null);
+			}
 			userDtoList.add(_t);
 		}
 		return userDtoList;
