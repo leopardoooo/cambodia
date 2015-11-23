@@ -296,23 +296,24 @@ public class AuthComponent extends BaseComponent{
 		//获取用户所有资源的所有到期日
 		Map<String,Date> userResMap = this.getUserResExpDate(user.getUser_id());
 		//获取订单包含的资源
-		String[] orderResIds = getOrderProdRes(orderList);
+		String[] orderResIds = getOrderProdRes(orderList);		
 		
 		for (String orderResId:orderResIds){
 			JCaCommand dttCmd = gDttCmd(user, doneCode);
 			dttCmd.setBoss_res_id(orderResId);
 			dttCmd.setControl_id(orderResId);
 			Date expDate = userResMap.get(orderResId);
-			//发送减授权
-			dttCmd.setCmd_type(SmsxCmd.CancelProduct.name());
-			jCaCommandDao.save(dttCmd);
-			if (expDate != null && expDate.after(new Date())){
+			dttCmd.setTransnum(gTransnum());
+			if (expDate != null ){
 				dttCmd.setTransnum(gTransnum());
 				dttCmd.setCmd_type(SmsxCmd.AddProduct.name());
 				dttCmd.setAuth_begin_date(DateHelper.format(new Date(), DateHelper.FORMAT_TIME_VOD));
-				dttCmd.setAuth_end_date( DateHelper.format(expDate, DateHelper.FORMAT_TIME_VOD));
-				jCaCommandDao.save(dttCmd);
+				dttCmd.setAuth_end_date( DateHelper.format(expDate, DateHelper.FORMAT_TIME_VOD_END));
+			}else{
+				//发送减授权
+				dttCmd.setCmd_type(SmsxCmd.CancelProduct.name());
 			}
+			jCaCommandDao.save(dttCmd);
 		}
 	}
 	
