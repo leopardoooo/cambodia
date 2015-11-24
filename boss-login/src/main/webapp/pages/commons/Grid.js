@@ -4,7 +4,7 @@ Ext.ns("Ext.ux");
 var cmFormat = "<div title='{0}' class='{1} toolbtn' onclick='goUrl({2})'></div>";	
 var lockCmFormat = "<a onclick='goUrl({0},{1})'><img title='{2}' class='toolbtn' src='/boss-login/resources/images/menu2/{3}' /></a>";
 Ext.ux.Grid = Ext.extend(Ext.grid.GridPanel,{
-	
+	refreshCustId:null,
 	attrs:[],//子面板tbar上的按钮 和 行上面的按钮的集合
 	childID:null,//子面板ID
 	constructor:function(cfg){
@@ -34,8 +34,17 @@ Ext.ux.Grid = Ext.extend(Ext.grid.GridPanel,{
 		var pageBar = this.getBottomToolbar();
 		var start = 0;
 		var limit = this.pageSize;
-		if(pageBar){
+		//切换客户后，分页起始页重置为0开始
+		var canRefresh = false;
+		if(this.refreshCustId == null){
+			canRefresh = true;		
+		}else if(this.refreshCustId == App.data.custFullInfo.cust.cust_id){
+			canRefresh = true;
+		}
+		
+		if(pageBar && canRefresh){
 			start = pageBar.cursor;//当前分页信息的start
+			this.refreshCustId = App.data.custFullInfo.cust.cust_id;
 		}
 		this.getStore().load({
 			params:{
