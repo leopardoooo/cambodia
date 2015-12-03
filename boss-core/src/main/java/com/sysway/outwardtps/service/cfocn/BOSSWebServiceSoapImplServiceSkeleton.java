@@ -82,6 +82,9 @@ public class BOSSWebServiceSoapImplServiceSkeleton
     		// 返回成功的结果
     		return createReturnWorkOrderResponse(createResultHeadForSuccess());
     	}catch(Exception e){
+    		try {
+    			LOG.info(JsonHelper.fromObject(resp));
+    		} catch (Exception e1) {e1.printStackTrace();}
     		LOG.error("cfocn完工失败，工单编号:"+taskId,e);
     		try {
     			snTaskService.setParam(getServiceParam());
@@ -178,6 +181,9 @@ public class BOSSWebServiceSoapImplServiceSkeleton
 			
 			return createDeviceFeedBackResponse(createResultHeadForSuccess());
 		} catch (Exception e) {
+			try {	     		
+	     		LOG.info(JsonHelper.fromObject(dfb));	 
+			} catch (Exception e1) {e1.printStackTrace();}
 			LOG.error("cfocn回填失败，工单编号："+taskId,e);
 			try {
 				snTaskService.setParam(getServiceParam());
