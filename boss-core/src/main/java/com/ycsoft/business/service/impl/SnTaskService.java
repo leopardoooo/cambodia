@@ -195,7 +195,7 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 		snTaskComponent.fillTaskInfo(doneCode, task,userList, deviceList );
 		//修改用户设备信息
 		if (task.getTask_type_id().equals(SystemConstants.TASK_TYPE_INSTALL)){
-			this.fillInstallUserDevice(doneCode, deviceList);
+			this.fillInstallUserDevice(doneCode, deviceList,task);
 		}
 		this.setDoneCodeInfo(taskId, getBusiParam(), BusiCodeConstants.TASK_FILL);
 		this.getBusiParam().setOperateObj("WorkOrdersSn:"+taskId);
@@ -203,7 +203,7 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 	}
 	
 	//回填新装用户设备
-	private void fillInstallUserDevice(int doneCode,List<TaskFillDevice> deviceList) throws Exception {
+	private void fillInstallUserDevice(int doneCode,List<TaskFillDevice> deviceList,WTaskBaseInfo task) throws Exception {
 		CCust cust = null;
 		for (TaskFillDevice fillDevice:deviceList){
 			CUser user = userComponent.queryUserById(fillDevice.getUserId());
@@ -226,9 +226,11 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 			if (cust == null)
 				cust = custComponent.queryCustById(user.getCust_id());
 			this.buyDevice(fillDevice.getDevice(), user.getStr10(), ownership, null, BusiCodeConstants.TASK_FILL, cust, doneCode);
-			if (StringHelper.isNotEmpty(fillDevice.getOldDeviceCode())){
-				
+			//回填更换设备
+			if (StringHelper.isNotEmpty(fillDevice.getOldDeviceCode()) && fillDevice.getOldDevice() != null){
 				DeviceDto oldDevice = fillDevice.getOldDevice();
+				//删除custdevice的旧设备
+				custComponent.removeDevice(task.getCust_id(), oldDevice.getDevice_id(), doneCode, SystemConstants.BOOLEAN_FALSE);
 				//更新设备仓库状态
 				deviceComponent.updateDeviceDepotStatus(doneCode, BusiCodeConstants.TASK_FILL, oldDevice.getDevice_id(),
 						oldDevice.getDepot_status(), StatusConstants.IDLE,null,true);
@@ -691,7 +693,9 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 		for(WTaskUser task: userList){
 			TaskUserDto _t = new TaskUserDto();
 			BeanUtils.copyProperties(task, _t);
-			if (!taskBase.getTask_type_id().equals(SystemConstants.TASK_TYPE_WRITEOFF_TERMINAL)){
+			//（除开新安装设备回填更换，拆机时候设备回收） Device_id为原设备，Device_code为新的设备
+			if (!taskBase.getTask_type_id().equals(SystemConstants.TASK_TYPE_WRITEOFF_TERMINAL)&&
+					!taskBase.getTask_type_id().equals(SystemConstants.TASK_TYPE_INSTALL)){
 				_t.setDevice_code(_t.getDevice_id());
 				_t.setDevice_id(null);
 			}

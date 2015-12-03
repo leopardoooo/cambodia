@@ -1864,7 +1864,7 @@ public class BaseBusiService extends BaseService {
 	
 	protected void buyDevice(DeviceDto device,String buyMode,String ownership,FeeInfoDto fee, 
 			String busiCode,CCust cust,Integer doneCode) throws Exception {
-		if(!BusiCodeConstants.USER_OPEN_BATCH.equals(getBusiParam().getBusiCode())){
+		if(!BusiCodeConstants.USER_OPEN_BATCH.equals(busiCode)){
 			//增加客户设备
 			custComponent.addDevice(doneCode, cust.getCust_id(),
 					device.getDevice_id(), device.getDevice_type(), device.getDevice_code(), 
