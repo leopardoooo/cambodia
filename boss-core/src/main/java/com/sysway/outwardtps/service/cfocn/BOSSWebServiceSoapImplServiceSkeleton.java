@@ -82,12 +82,12 @@ public class BOSSWebServiceSoapImplServiceSkeleton
     		// 返回成功的结果
     		return createReturnWorkOrderResponse(createResultHeadForSuccess());
     	}catch(Exception e){
-    		LOG.debug("cfocn完工失败，工单编号:"+taskId,e);
+    		LOG.error("cfocn完工失败，工单编号:"+taskId,e);
     		try {
     			snTaskService.setParam(getServiceParam());
 				snTaskService.saveErrorLog(taskId,BusiCodeConstants.TASK_FINISH, e.getMessage());
 			} catch (Exception e1) {
-				LOG.debug("记录cfocn调用BOSS接口错误日志异常",e);
+				LOG.error("记录cfocn调用BOSS接口错误日志异常",e);
 			}
     		// 返回失败的结果
     		return createReturnWorkOrderResponse(createResultHeadForFail(e));
@@ -178,12 +178,12 @@ public class BOSSWebServiceSoapImplServiceSkeleton
 			
 			return createDeviceFeedBackResponse(createResultHeadForSuccess());
 		} catch (Exception e) {
-			LOG.debug("cfocn回填失败，工单编号："+taskId,e);
+			LOG.error("cfocn回填失败，工单编号："+taskId,e);
 			try {
 				snTaskService.setParam(getServiceParam());
 				snTaskService.saveErrorLog(taskId, BusiCodeConstants.TASK_FILL,e.getMessage());
 			} catch (Exception e1) {
-				LOG.debug("记录cfocn调用BOSS接口错误日志异常",e);
+				LOG.error("记录cfocn调用BOSS接口错误日志异常",e);
 			}
 			return createDeviceFeedBackResponse(createResultHeadForFail(e));
 		}

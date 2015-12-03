@@ -302,18 +302,22 @@ public class AuthComponent extends BaseComponent{
 			JCaCommand dttCmd = gDttCmd(user, doneCode);
 			dttCmd.setBoss_res_id(orderResId);
 			dttCmd.setControl_id(orderResId);
-			Date expDate = userResMap.get(orderResId);
 			dttCmd.setTransnum(gTransnum());
+			//减授权
+			dttCmd.setCmd_type(SmsxCmd.CancelProduct.name());
+			jCaCommandDao.save(dttCmd);
+			//加授权
+			Date expDate = userResMap.get(orderResId);
 			if (expDate != null ){
+				dttCmd = gDttCmd(user, doneCode);
+				dttCmd.setBoss_res_id(orderResId);
+				dttCmd.setControl_id(orderResId);
 				dttCmd.setTransnum(gTransnum());
 				dttCmd.setCmd_type(SmsxCmd.AddProduct.name());
 				dttCmd.setAuth_begin_date(DateHelper.format(new Date(), DateHelper.FORMAT_TIME_VOD));
 				dttCmd.setAuth_end_date( DateHelper.format(expDate, DateHelper.FORMAT_TIME_VOD_END));
-			}else{
-				//发送减授权
-				dttCmd.setCmd_type(SmsxCmd.CancelProduct.name());
+				jCaCommandDao.save(dttCmd);
 			}
-			jCaCommandDao.save(dttCmd);
 		}
 	}
 	
