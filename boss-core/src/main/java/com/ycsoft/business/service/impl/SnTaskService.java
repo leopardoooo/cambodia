@@ -693,7 +693,9 @@ public class SnTaskService  extends BaseBusiService implements ISnTaskService{
 		for(WTaskUser task: userList){
 			TaskUserDto _t = new TaskUserDto();
 			BeanUtils.copyProperties(task, _t);
-			if (!taskBase.getTask_type_id().equals(SystemConstants.TASK_TYPE_WRITEOFF_TERMINAL)){
+			//（除开新安装设备回填更换，拆机时候设备回收） Device_id为原设备，Device_code为新的设备
+			if (!taskBase.getTask_type_id().equals(SystemConstants.TASK_TYPE_WRITEOFF_TERMINAL)&&
+					!taskBase.getTask_type_id().equals(SystemConstants.TASK_TYPE_INSTALL)){
 				_t.setDevice_code(_t.getDevice_id());
 				_t.setDevice_id(null);
 			}
